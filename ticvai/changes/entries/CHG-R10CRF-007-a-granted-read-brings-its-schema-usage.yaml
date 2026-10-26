@@ -1,0 +1,47 @@
+id: CHG-R10CRF-007
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'A read granted across deployables brings USAGE on the table''s schema with its SELECT, so the access role can
+  use catalogue and read exactly platform.workstation and catalogue.entitlement_template (XDR-003), not the whole
+  schemas; row-level security still decides the rows. The same grant fixes XDR-001, XDR-002 and XDR-005.'
+decision:
+  what: 'ADAM CR-247, option A, as recommended. The package''s source for these grants is docs/active/cross-deployable-
+    writes.yaml `reads`, which tools/derive-ddl.py writes into 920-row-level-security.sql and the forward migration;
+    XDR-003 (CR-240, CHG-R10ORD-009) already granted the two SELECTs. tools/derive-ddl.py deployable_read_grants now
+    also writes a guarded GRANT USAGE ON SCHEMA for each granted table''s schema (not the kernel''s platform schema,
+    which every host already uses), and tools/ddl_forward.py carries that block into the forward migration (GRANT_USAGE)
+    with its rollback. No SQL is written by hand.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-247 (Hrushikant Patkar, #27706 getOfflinePackage), accepted by the lead on 26 October 2026: CR-240''s
+  in-process reads fail with "permission denied" because the access role has no USAGE on schema catalogue (DB-ROLES
+  grants each role only its own schemas), and the SELECT grants alone cannot fix that.'
+keys_touched:
+  operations: [getOfflinePackage]
+  tables: [platform.workstation, catalogue.entitlement_template]
+  files:
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+root_class: 'a table grant across deployables without its schema''s USAGE'
+tickets:
+  started:
+  - '27706 (getOfflinePackage): through CR-247''s comment; its text is not rewritten.'
+  unstarted:
+  - 'The migration child task under the platform MIG ticket, for the migration owner.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-247
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::deployable_read_grants
+status: open
+notes: 'The forward migration (tenant) carries: USAGE on catalogue to access, on access to commerce (XDR-001, XDR-002,
+  which r9 granted SELECT on without USAGE) and on assets to commerce (XDR-005), beside the SELECTs; the control
+  migration carries USAGE on control and SELECT on control.api_client to commerce (XDR-006, CHG-R10CRF-003). The
+  decision names platform.apply_deployable_grants(), which is the repository''s (db/tenant/004-deployable-roles.sql), not
+  the package''s: the package''s grants are guarded statements in the forward migration. If that function is re-run
+  with a revoke of everything a role does not own, it would undo them, so the migration task either adds the
+  cross-deployable-writes.yaml reads to the function or re-applies the migration''s grant blocks after it (a question
+  for the lead in the lane report).'

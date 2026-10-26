@@ -1051,6 +1051,10 @@ paths:
       x-ticvai-audience:
       - service
       x-ticvai-auth: service
+      x-ticvai-auth-note: 'The HTTP route and its 401 wait for serviceAuth between deployables (ADAM CR-241, option B,
+        accepted 26 October 2026, as CR-174 split #30710): they are built by a follow-up ticket ordered after the
+        ticket that builds serviceAuth. Until then the write is CrossRegion''s in-process API and the route is not
+        exposed; no other auth scheme stands in for it.'
       summary: Quarantine an entry an offline device replayed and the server refused
       description: '**The owner''s write of `sync.rejection`** (14 October 2026, CHG-XDW-002; ADR-0055 rule 4).
         `sync.rejection` is in `sync`, CrossRegionService''s schema in the `operations` deployable, and the replays
@@ -1065,6 +1069,24 @@ paths:
         it, verbatim (`payload`), for the supervisor who resolves it (`orders.listSyncRejections`,
         `resolveSyncRejection`). It is not transactional with the caller''s batch: a failure here is the
         caller''s transient failure, and the batch stops at that entry and is retried from there (SD-028).
+
+
+        **Built in two parts** (accepted 26 October 2026, Chinmay, ADAM CR-241 option B; the split CR-174 made of
+        #30710). **The write is CrossRegion''s in-process API now**: an Application interface the CrossRegion module
+        implements, which validates the entry, inserts the `sync.rejection` row under row-level security and is
+        idempotent on the rejection''s `id`, durably (the `convertInventoryHold` / CatalogueInProcessApi precedent).
+        `syncGamePlays` and `reconcileBurstEnvironment` call it in process today. **The HTTP route `POST
+        /sync-rejections` and its `401`** stay in this contract and are built by a follow-up ticket ordered after
+        the ticket that builds serviceAuth between deployables; until then the route is not exposed, and no other
+        authentication scheme is invented for it. `orders.syncOrders` and `access.syncScans` reach it when that
+        route is built.
+
+
+        **What a create may carry** (ADAM CR-241). The operation records and never judges, and resolving belongs to
+        `recordSyncRejectionResolution`, so `resolvedAt`, `resolvedByPrincipalId`, `resolution` and
+        `resolvedRecordId` are read-only on create: a body carrying any of them is `400 validation` naming the field.
+        A `workstationId` the row''s foreign key refuses (it names nothing) is `400 validation` on `workstationId`:
+        the insert''s own key check answers it, so nothing else is read.
 
         '
       tags:
@@ -1092,9 +1114,18 @@ paths:
               schema:
                 $ref: ../spine/orders.yaml#/components/schemas/SyncRejection
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          description: 'Validation failed (`validation`), with `errors[]` naming the field. Includes a body carrying
+            any resolution field (`resolvedAt`, `resolvedByPrincipalId`, `resolution`, `resolvedRecordId`), which are
+            read-only on create, and a `workstationId` the row''s foreign key refuses (ADAM CR-241).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '401':
-          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          description: The calling workload's token is missing or invalid (`unauthenticated`). Built with the route,
+            after serviceAuth between deployables (ADAM CR-241).
           x-ticvai-problem-types:
           - unauthenticated
           content:

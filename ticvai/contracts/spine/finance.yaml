@@ -2689,7 +2689,18 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
-      description: '**Order.** Newest first, by `postedAt` descending, then by `id`.'
+      description: '**Order.** Newest first, by `postedAt` descending, then by `id`.
+
+
+        **Whose midnight bounds a day** (accepted 26 October 2026, Chinmay, ADAM CR-251 option A: the stop-gap the
+        owner of #32326 built is the rule). `postedFrom` and `postedTo` are days in the time zone of the region at or
+        above the caller''s scope (`tenancy#regionSettingsRecords`, by the caller''s scope path). When the caller''s
+        scope gives no single region (a brand or the tenant root) and `postedFrom` or `postedTo` is sent, the answer
+        is `400 validation` on `postedFrom` ("filter by day from one venue or region"). Without a day filter the list
+        works at any scope. Picking the region from `venueId` for a head-office caller (option B) can follow when
+        someone needs it.
+
+        '
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -2730,13 +2741,15 @@ paths:
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: A day in the time zone of the region at or above the caller's scope, local midnight to local
+            midnight. Refused 400 on postedFrom when the caller's scope gives no single region (ADAM CR-251).
       - name: postedTo
         in: query
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: A day in the time zone of the region at or above the caller's scope, local midnight to local
+            midnight. Refused 400 on postedFrom when the caller's scope gives no single region (ADAM CR-251).
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -2753,6 +2766,16 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Posting'
+        '400':
+          description: 'Validation failed (`validation`). Includes a `postedFrom` or `postedTo` sent by a caller whose
+            scope gives no single region; `errors[]` names `postedFrom`, "filter by day from one venue or region"
+            (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ledger/trial-balance:
@@ -2761,10 +2784,34 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-043 Daily Reconciliation"
         - "P08 BO-090 Period Close"
+      x-ticvai-reads:
+      - table: ledger.fiscal_period
+        for: 'the period, and its legal entity (ADAM CR-246)'
+      - table: ledger.account
+        for: 'every postable account of the period''s legal entity, by code (ADAM CR-246)'
+      - table: ledger.journal_entry
+        for: 'which entries count: `posted` and `reversed` ones of the period (journal_entry.fiscal_period_id; ADAM CR-246)'
+      - table: ledger.posting
+        for: 'the debits and credits of those entries (ADAM CR-246)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
       summary: Trial balance for a period
+      description: '**What the figures are** (accepted 26 October 2026, Chinmay, ADAM CR-246 option A; proposed, the
+        client to correct). For each account, `debit` and `credit` are the sums of its postings over the journal
+        entries of the fiscal period whose `status` is `posted` or `reversed` (a reversal is its own offsetting entry,
+        so both count); `draft` and `pendingApproval` entries do not. `balance` is `debit` minus `credit`
+        (debit-positive, whatever the account''s type): **the period''s movement, not a carried-forward closing
+        balance**. Every postable account of the period''s legal entity is listed, including accounts with no
+        postings (zero rows), ordered by account `code`; non-postable parent accounts (`isPostable` false) are not
+        listed. `totalDebit` and `totalCredit` are the sums of the rows, and `isBalanced` is their equality.
+
+
+        **`legalEntityId`**, when sent, must be the fiscal period''s own legal entity (a fiscal period belongs to
+        exactly one); any other value is `404`, as an unknown or out-of-scope `fiscalPeriodId` is. A closing-balance
+        view (option B) can follow once year-end close is defined.
+
+        '
       tags:
       - ledger
       x-ticvai-permission: LEDGER_VIEW
@@ -2790,6 +2837,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TrialBalance'
+        '404':
+          description: 'No such fiscal period in the caller''s scope, or a `legalEntityId` that is not the period''s
+            legal entity (ADAM CR-246).'
+          x-ticvai-problem-types:
+          - not-found
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-variances:
@@ -4671,7 +4727,7 @@ paths:
       - name: invoiceTemplateId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by its legal entity and document kind: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 invoice-template-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -4692,6 +4748,14 @@ paths:
                 $ref: '#/components/schemas/FinTaxInvoiceTemplate'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'Refused, and nothing is stored. `invoice-template-id-mismatch` (ADAM CR-245): a record for its legal entity and document kind exists and the path''s `invoiceTemplateId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - invoice-template-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: '`nextNumber` below the last number issued in the series, or a language the legal
             entity''s region does not offer.'
@@ -4771,7 +4835,7 @@ paths:
       - name: providerId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by its legal entity: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 provider-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -4791,9 +4855,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/FinEInvoicingProvider'
         '409':
-          description: '`live` requested before any `test` transmission from this legal entity was accepted.'
+          description: '`live` requested before any `test` transmission from this legal entity was accepted. `provider-id-mismatch` (ADAM CR-245): a record for its legal entity exists and the path''s `providerId` is not its id (or names another such record); nothing changes.'
           x-ticvai-problem-types:
           - einvoicing-not-tested
+          - provider-id-mismatch
           content:
             application/problem+json:
               schema:
@@ -7249,6 +7314,9 @@ components:
           format: date-time
     TrialBalance:
       x-ticvai-persistence: none — computed
+      description: 'Computed by `getTrialBalance` for one fiscal period (ADAM CR-246): each postable account''s
+        movement over the period''s `posted` and `reversed` journal entries, debit-positive, every postable account
+        listed (zero rows too) in account `code` order.'
       type: object
       required:
       - fiscalPeriodId
@@ -7292,11 +7360,19 @@ components:
               type:
                 $ref: '#/components/schemas/AccountType'
               debit:
-                $ref: ../shared/common.yaml#/components/schemas/Money
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                description: The sum of the account's debit postings over the period's `posted` and `reversed`
+                  entries (ADAM CR-246).
               credit:
-                $ref: ../shared/common.yaml#/components/schemas/Money
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                description: The sum of the account's credit postings over the same entries.
               balance:
-                $ref: ../shared/common.yaml#/components/schemas/Money
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                description: '`debit` minus `credit`, debit-positive for every account type: the period''s movement,
+                  not a carried-forward closing balance (ADAM CR-246).'
     VarianceReviewStatus:
       type: string
       enum:

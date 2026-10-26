@@ -741,6 +741,11 @@ DROP_POLICY = re.compile(rf"^DROP POLICY IF EXISTS {NAME} ON ({QNAME})$", re.I)
 GRANT_READ = re.compile(r"^DO \$\$ BEGIN IF EXISTS \(SELECT 1 FROM pg_roles WHERE rolname = '(\w+)'\) AND "
                         r"to_regclass\('([\w.]+)'\) IS NOT NULL THEN GRANT SELECT ON [\w.]+ TO \w+; END IF; END \$\$;?$",
                         re.I)
+# derive-ddl's guarded USAGE on the schema of a read granted across deployables (ADAM CR-247, CHG-R10CRF-007): role,
+# schema. A SELECT on a table is refused without USAGE on its schema, which DB-ROLES gives a role on its own schemas only.
+GRANT_USAGE = re.compile(r"^DO \$\$ BEGIN IF EXISTS \(SELECT 1 FROM pg_roles WHERE rolname = '(\w+)'\) AND "
+                         r"EXISTS \(SELECT 1 FROM pg_namespace WHERE nspname = '(\w+)'\) THEN GRANT USAGE ON SCHEMA \w+ "
+                         r"TO \w+; END IF; END \$\$;?$", re.I)
 
 
 # derive-ddl's change version block (ADAM CR-239, CHG-R10ORD-011): the table, the sequence, the function, the trigger.
@@ -1875,6 +1880,14 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             # row and runs twice, so it is written as it is.
             p.statements.append(stmt)
             p.rollback.append(f"REVOKE SELECT ON {unq(g.group(2))} FROM {g.group(1)};")
+            p.counts["other"] += 1
+            continue
+        gu = GRANT_USAGE.match(s)
+        if gu:
+            # **The schema's USAGE beside a granted read** (ADAM CR-247, CHG-R10CRF-007): guarded on the role and the
+            # schema, touches no row, runs twice; written as it is.
+            p.statements.append(stmt)
+            p.rollback.append(f"REVOKE USAGE ON SCHEMA {gu.group(2)} FROM {gu.group(1)};")
             p.counts["other"] += 1
             continue
         m = DROP_POLICY.match(s)

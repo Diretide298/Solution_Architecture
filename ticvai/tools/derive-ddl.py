@@ -74,7 +74,9 @@ the schema a null member still collides (`NULLS NOT DISTINCT`, CHG-MKT-002). **A
 indexed as `lower(column)`**, so a code is unique whatever its case, as common.yaml says; an opaque
 external id marked `x-ticvai-unique-compare: exact` is not (CHG-GEN-001). `x-ticvai-required-when:
 {prop: {other: value}}` is a table CHECK that the column is set on rows where `other` is `value`
-(CHG-TEN-001: a product tile names its variant). Uniqueness and immutability rules
+(CHG-TEN-001: a product tile names its variant). `x-ticvai-null-exactly-when: {prop: {other: value}}` is a table
+CHECK that the column is null exactly on the rows where `other` is `value` (ADAM CR-242: a session's `ended_at` is null
+exactly while it is `active`). Uniqueness and immutability rules
 the contracts state only in prose are not -- there is nothing machine-readable to derive them from.
 **A storage-only column carries its own `enum`** (and `maxLength`, `default`) on its schema-reference
 record, and gets the same CHECK (CHG-R6-001).
@@ -1524,13 +1526,25 @@ def sql_literal(v) -> str:
 CROSS_DEPLOYABLE = ROOT / "docs" / "active" / "cross-deployable-writes.yaml"
 
 
-def deployable_read_grants() -> str:
+def deployable_read_grants(db: str = "tenant") -> str:
     """The `reads` of docs/active/cross-deployable-writes.yaml as guarded GRANT blocks (ADAM CR-196, CHG-R9CR-005).
 
     One block per table: `GRANT <privileges> ON <table> TO <reader>` when the role and the table exist. DB-ROLES makes
-    the roles (`commerce`, `access`, `operations`, `workers`, `ticvai_ai`); a database without them is left alone."""
+    the roles (`commerce`, `access`, `operations`, `workers`, `ticvai_ai`); a database without them is left alone.
+
+    **The schema's USAGE comes with the table** (ADAM CR-247, option A, accepted 26 October 2026; CHG-R10CRF-007). A
+    SELECT on `catalogue.entitlement_template` is useless to a role with no USAGE on `catalogue`: DB-ROLES grants each
+    role only its own schemas, so CR-240's in-process reads failed with "permission denied for schema catalogue". Each
+    read now grants USAGE on the table's schema too (never anything else in it), guarded on the role and the schema.
+
+    **Each grant goes to the database that holds the table** (ADAM CR-243, option A, accepted 26 October 2026;
+    CHG-R10CRF-003): a `control.*` table is in the control database (ADR-0039), so its grant is written into the
+    control database's file and forward migration (`db` "control"), and the tenant file carries only tenant tables."""
     doc = yaml.safe_load(CROSS_DEPLOYABLE.read_text(encoding="utf-8")) or {}
     out = []
+    # Every host already uses the kernel's schema (the `kernel` tables, DB-ROLES), so no USAGE is written for it, and
+    # no rollback could revoke what the kernel needs.
+    kernel_schemas = {str(k.get("table") or "").split(".", 1)[0] for k in doc.get("kernel") or []}
     for r in doc.get("reads") or []:
         role = str(r.get("reader") or "")
         privs = ", ".join(str(p).upper() for p in r.get("privileges") or [])
@@ -1538,7 +1552,17 @@ def deployable_read_grants() -> str:
             print(f"  ! cross-deployable read {r.get('id')}: reader {role!r} with {privs!r} is not a role and SELECT; "
                   "no grant written")
             continue
+        used = {(role, s) for s in kernel_schemas}
         for t in r.get("tables") or []:
+            schema = str(t).split(".", 1)[0]
+            if area(schema) != db:
+                continue
+            if (role, schema) not in used:
+                used.add((role, schema))
+                out.append(f"-- {r.get('id')}: {role} may use schema {schema} for the tables granted below (ADAM CR-247)")
+                out.append(f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = {sql_literal(role)}) AND "
+                           f"EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = {sql_literal(schema)}) THEN "
+                           f"GRANT USAGE ON SCHEMA {schema} TO {role}; END IF; END $$;")
             out.append(f"-- {r.get('id')}: {role} reads {t} in process (ADR-0055 rule 4 as amended; "
                        f"{r.get('decision_ref') or ''})")
             out.append(f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = {sql_literal(role)}) AND "
@@ -1547,7 +1571,8 @@ def deployable_read_grants() -> str:
     if not out:
         return ""
     return ("\n-- **Reads granted across deployables** (docs/active/cross-deployable-writes.yaml `reads`; ADAM CR-196,\n"
-            "-- CHG-R9CR-005). Row-level security still applies to every row these roles read.\n" + "\n".join(out) + "\n")
+            "-- CHG-R9CR-005; the schema's USAGE with each, ADAM CR-247). Row-level security still applies to every row\n"
+            "-- these roles read.\n" + "\n".join(out) + "\n")
 
 
 # **Ending every session of a principal, whatever venue the caller acts at** (ADAM CR-180, option A, accepted 21 October
@@ -1913,6 +1938,16 @@ def table_marks(cols: dict, tables) -> dict:
                 (column_of(str(p)) or f"?{p}",
                  {(column_of(str(k)) or f"?{k}"): v for k, v in (cond or {}).items()})
                 for p, cond in rw.items() if isinstance(cond, dict) and cond]
+        # **A column null exactly while another holds a value** (ADAM CR-242, option A, accepted 26 October 2026;
+        # CHG-R10CRF-002): `x-ticvai-null-exactly-when: {endedAt: {status: active}}` is a table CHECK that the column is
+        # null on the rows where `status` is `active` and set on every other row, so an ended session always says when
+        # it ended. Becomes `CHECK ((<when> IS NOT DISTINCT FROM 'v') = (<col> IS NULL))`.
+        nw = marks.get("x-ticvai-null-exactly-when")
+        if isinstance(nw, dict) and nw:
+            entry["null_exactly_when"] = [
+                (column_of(str(p)) or f"?{p}",
+                 {(column_of(str(k)) or f"?{k}"): v for k, v in (cond or {}).items()})
+                for p, cond in nw.items() if isinstance(cond, dict) and len(cond) == 1]
         # **A row names exactly one of two things** (ADAM CR-158, 18 October 2026; CHG-CRA-002):
         # `x-ticvai-exactly-one-of: [[permission, roleId]]` on the schema is a table CHECK that exactly one column of
         # each set is set, `num_nonnulls(a, b) = 1`. A grant names a permission or a role, never both and never neither.
@@ -2915,6 +2950,15 @@ def main() -> int:
                                   else f"{q(k)} IS NULL OR {q(k)} NOT IN ({lits})")
                 body.append(f"    CONSTRAINT {obj_name(short, rcol, 'when', suffix='chk')} CHECK ("
                             f"{' OR '.join(exempt)} OR {q(rcol)} IS NOT NULL)")
+            # `x-ticvai-null-exactly-when` (ADAM CR-242, CHG-R10CRF-002): null on exactly the rows of one value.
+            for ncol, cond in (marks.get(t) or {}).get("null_exactly_when") or []:
+                bad = [k[1:] for k in [ncol, *cond] if k.startswith("?")]
+                if bad:
+                    no_unique.append(f"{t} (x-ticvai-null-exactly-when {ncol}): {', '.join(bad)} is not a column")
+                    continue
+                (k, v), = cond.items()
+                body.append(f"    CONSTRAINT {obj_name(short, ncol, 'null', suffix='chk')} CHECK (("
+                            f"{q(k)} IS NOT DISTINCT FROM {sql_literal(v)}) = ({q(ncol)} IS NULL))")
             # `x-ticvai-exactly-one-of` (ADAM CR-158, CHG-CRA-002): exactly one column of the set is set.
             for group in (marks.get(t) or {}).get("exactly_one_of") or []:
                 bad = [k[1:] for k in group if k.startswith("?")]
@@ -3351,9 +3395,13 @@ def main() -> int:
     # docs/active/cross-deployable-writes.yaml, appended to the tenant row-level security file, so the forward
     # migration carries them to databases already built. Each is guarded on the role and the table existing: a
     # database built without DB-ROLES' roles, or before the table, is left as it is. Row-level security still
-    # applies to every row the role reads.
-    files["tenant/920-row-level-security.sql"] = (files["tenant/920-row-level-security.sql"].rstrip("\n") + "\n"
-                                                  + deployable_read_grants())
+    # applies to every row the role reads. A `control.*` table's grant goes to the control database's file (ADAM
+    # CR-243, CHG-R10CRF-003), and each read brings its schema's USAGE (ADAM CR-247, CHG-R10CRF-007).
+    for grant_db in ("tenant", CONTROL):
+        grants = deployable_read_grants(grant_db)
+        key = f"{grant_db}/920-row-level-security.sql"
+        if grants and key in files:
+            files[key] = files[key].rstrip("\n") + "\n" + grants
 
     # ADAM CR-180 (CHG-R10ID-006): the one function that ends a principal's sessions everywhere, written beside the
     # policies it works within; the forward migration carries it (CREATE OR REPLACE) to databases already built.

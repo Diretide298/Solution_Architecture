@@ -1,0 +1,34 @@
+id: CHG-R10CRF-011
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'listLedgerEntries'' postedFrom and postedTo are days in the time zone of the region at or above the caller''s
+  scope; when the caller''s scope gives no single region and either is sent, the answer is 400 validation on postedFrom
+  ("filter by day from one venue or region"); without a day filter the list works at any scope.'
+decision:
+  what: 'ADAM CR-251, option A, as recommended: the stop-gap the owner of #32326 built is the rule.
+    contracts/spine/finance.yaml listLedgerEntries: the description, the two parameters and a 400.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-251 (Deep Khanvilkar, #32326 listLedgerEntries), accepted by the lead on 26 October 2026: a brand or
+  tenant caller has several regions, possibly in different time zones, and nothing said whose midnight bounds a day.'
+keys_touched:
+  operations: [listLedgerEntries]
+  files:
+  - contracts/spine/finance.yaml
+root_class: 'a local-day filter at a scope with no single time zone'
+tickets:
+  started:
+  - '32326 (listLedgerEntries): built this way; through CR-251''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-251
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Siblings left for the lead (the decision names listLedgerEntries only): getDeferredRevenue, getForeignTenderReport,
+  getUnifiedReconciliation, getVatReturn, ingestSettlementFile, listPriceVariances and listTaxInvoices also take days
+  "in the region''s time zone". Option B (the region from venueId for a head-office caller) can follow.'

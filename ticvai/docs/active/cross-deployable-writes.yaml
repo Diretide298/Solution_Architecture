@@ -155,3 +155,18 @@ reads:
     built (CR-174), and a call on it would run at the tenant root and lose the caller''s scope; read in process instead,
     as XDR-001 and XDR-002, a plain select on the same tenant database under the caller''s own connection, so the
     table''s row-level security scopes it.'
+- id: XDR-006
+  reader: commerce
+  tables: [control.api_client]
+  privileges: [SELECT]
+  queries: [public-api#apiClientRecords]
+  operations: [setApprovalExternalProvider]
+  added: '2026-10-26'
+  decision_ref: ADAM CR-243, option A, Chinmay, 26 October 2026
+  why: 'approvals setApprovalExternalProvider (Tenancy, commerce) refuses an apiClientId that is not an active API
+    client of the tenant with 422 api-client-not-active, and the API clients are Platform''s (operations), in the
+    control database. The service route between deployables is not built (CR-174), so there was no allowed way to
+    answer the 422. Commerce reads control.api_client in process over the control connection it already holds for
+    routing (#27692, CR-161), served in-process as well as service. The grant is written into the control database''s
+    forward migration, not the tenant''s (tools/derive-ddl.py). control.api_client has no row-level security, so the
+    asker names the rows it may see (the client''s allowed_tenant_ids holds the caller''s tenant).'

@@ -903,6 +903,10 @@ paths:
         for: 'the workstation and its configurationProfileVersion (was path-inferred in the lineage)'
       - table: tenancy.device_telemetry
         for: 'the heartbeat series: errorCount over the last hour and syncBacklog (ADAM CR-103, option 3; CHG-R10TEN-007)'
+      - table: tenancy.device_firmware
+        for: 'the newest released firmware for each device kind, the firmware currency term (ADAM CR-244)'
+      - table: platform.configuration_profile
+        for: 'the profile''s version, the profile currency term (ADAM CR-244)'
       summary: A score a manager can sort by, and what is dragging it down
       description: >
         Board 1 of the client's POS design set. **The package held `lastHeartbeatAt` and a heartbeat
@@ -916,28 +920,48 @@ paths:
         three things dragging it down tell them what to do.
 
         **The formula, the bands and the windows, proposed defaults the client can correct** (ADAM CR-103,
-        option 3, accepted 15 October 2026; CHG-R10TEN-007). Computed live from the workstation's devices
-        (`platform.device`), their heartbeat series (`tenancy.device_telemetry`) and the workstation's profile, as
-        `Workstation.healthScore` states:
+        option 3, accepted 15 October 2026; CHG-R10TEN-007; **made exact by ADAM CR-244, option A, accepted 26 October
+        2026, Chinmay, CHG-R10CRF-004**, so the score is defined here and nowhere else). Computed live from the
+        workstation's active devices (`platform.device`), their heartbeat series (`tenancy.device_telemetry`), the
+        released firmware (`tenancy.device_firmware`) and the workstation's profile (`platform.configuration_profile`):
 
-        - `score` = 40 device online share (the share of its devices whose last status is `online` or
-        `localMode`) + 25 heartbeat freshness (25 when the freshest heartbeat is one minute old or less, 0 at 15
-        minutes or more, linear between) + 20 firmware and profile currency (20 on the latest, 10 one version
-        behind, 0 older; the lower of the devices' firmware and the workstation's `configurationProfileVersion`
-        against the profile's latest published version) + 15 error rate (15 at no errors in the last hour, 0 at
-        10 or more, linear between: the sum of `errorCount` in the series over the last hour), rounded.
+        - `score` = 40 device online share (the share of its active devices whose last status is `online` or
+        `localMode`) + 25 heartbeat freshness + 20 firmware and profile currency + 15 error rate, rounded to a whole
+        number.
 
-        - `status`: `healthy` at 80 or more, `warning` at 60 or more, `degraded` below 60. **`offline`** when no
-        device of the workstation has heartbeated for 15 minutes (the offline window), or none ever has, whatever
-        the score. A sync backlog over 100 records on any device, or a battery under 15%, caps it at `warning`.
+        - **Heartbeat freshness** is the **stalest** active device's last heartbeat: 25 at one minute old or less, 0 at
+        15 minutes or more, linear between.
 
-        - `contributors`: one entry per factor that took points off, `weight` the points it took, largest first:
-        `deviceOffline` (online share), `heartbeatAge` (freshness), `firmwareOutdated` and `profileDrift`
-        (currency, whichever is behind), `errorRate`, and `syncBacklog` and `deviceBattery` where they cap the
-        status (weight 0, `detail` naming the device and the value).
+        - **Firmware currency**: a device's latest firmware is the newest `released` `tenancy.device_firmware` row for
+        its device kind, ordered by semantic version (major, minor, patch, compared as numbers): 100% on it, 50% one
+        version behind, 0 older. **Profile currency**: a device is current when its `configurationProfileId` equals the
+        workstation's and the workstation's `configurationProfileVersion` equals that profile's `version` (its latest
+        published version, one row per version since CR-228); 100% current,
+        0 not. The workstation takes the lowest of its active devices' firmware and profile currency, and **the 20
+        points are the average of the two**.
+
+        - **Error rate**: 15 at no errors in the last hour, 0 at 10 or more, linear between (the sum of `errorCount`
+        in the heartbeat series over the last hour). **Until `tenancy.device_telemetry` lands in the database, this
+        term is dropped and the other three are re-weighted to 100** (each weight times 100/85: online share 47,
+        freshness 29, currency 24, before rounding the sum), and `syncBacklog` and `errorRate` have no source.
+
+        - **A workstation with no active devices** is `offline` with `score` 0 and no `contributors`.
+
+        - `status`: `healthy` at 80 or more, `warning` at 60 or more, `degraded` below 60 (the "failure" of the
+        `Workstation.healthScore` note); **`offline` when every active device is offline** (no heartbeat for 15
+        minutes, the device window below), whatever the score. A battery under 15% on any device caps it at
+        `warning`, and so, once the heartbeat series lands, does a sync backlog over 100 records on any device.
+
+        - `contributors`: **every factor that has a source**, ordered by the points it lost, most first: `weight` is
+        the points lost out of 100 (0 for a factor that lost none), and `detail` a short phrase naming the device and
+        the value (for example "till printer offline 22 min", "firmware 2.3.1, latest 2.4.0"). The factors are
+        `deviceOffline` (online share), `heartbeatAge` (freshness), `firmwareOutdated` and `profileDrift` (currency),
+        `deviceBattery` (the cap, weight 0), and `errorRate` and `syncBacklog` once the heartbeat series lands.
 
         - **The device windows** (`states/registered-device.yaml`): a device with no heartbeat for 15 minutes
         is `offline`, and one silent for 7 days after that is `unknown`.
+
+        - **Ships on this in Sprint 1** (#31204); the client corrects these defaults in one place, here.
       tags: [tenancy]
       x-ticvai-permission: DEVICE_VIEW
       x-ticvai-audience: [staff]
@@ -1210,7 +1234,9 @@ paths:
         `configuration_profile_id` and `configuration_profile_version` as each workstation takes the version,
         and keeps the deployment's `status`, `succeededCount`, `failedCount`, `failureReasons`, `startedAt` and
         `completedAt` and the deployed version's `status` (`deploying`, then `deployed`) up to date
-        (`states/profile-deployment.yaml`, `states/configuration-profile.yaml`). The job is its own piece of
+        (`states/profile-deployment.yaml`, `states/configuration-profile.yaml`). **When the version is
+        deployed, the profile's older `published` or `deployed` versions become `superseded`**; that is the only
+        place `superseded` is set (ADAM CR-250, option A, accepted 26 October 2026). The job is its own piece of
         work with its own ticket; this operation does not wait for it.
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
@@ -5117,8 +5143,11 @@ components:
             Assigned by the server: 1 on create, and one more each time a change lands on a
             published version (see `setConfigurationProfile`). **Each version is its own row,
             keyed (`id`, `version`)** (CHG-R8MIG-019): a new version is a new row, and
-            `setConfigurationProfile` sets the older published row's `status` to `superseded`, its
-            settings left exactly as they were. `id` is the profile and names every version of it;
+            `setConfigurationProfile` leaves the older row exactly as it is, `status` included.
+            **`superseded` is set only by `deployConfigurationProfile`**, when the newer version is
+            deployed: a deployed version is what workstations still run, so marking it superseded before
+            the new one reaches them would misreport the fleet (ADAM CR-250, option A, accepted 26 October
+            2026, Chinmay). `id` is the profile and names every version of it;
             `platform.profile_deployment` keys a deployment to one version by (`profile_id`, `version`).
             **A read of "the profile" takes its latest version**; older versions stay readable by
             (`id`, `version`) (ADAM CR-228, option A, decided 25 October 2026; CHG-R10TEN-009).
@@ -5758,7 +5787,9 @@ components:
             firmware currency (20 on the latest, 10 one version behind, 0 older) + 15 errors in the last hour
             (15 at none, 0 at 10 or more, linear between). `healthy` at 80 or more, `warning` at 60 or more,
             `degraded` below 60; `offline` after 15 minutes with no heartbeat, whatever the score; `unknown`
-            until the first heartbeat. A battery under 15% caps the device at `warning`.
+            until the first heartbeat. A battery under 15% caps the device at `warning`. The latest firmware,
+            and the error term until `tenancy.device_telemetry` lands (dropped, the other three re-weighted to
+            100), are as `getWorkstationHealth` states them (ADAM CR-244, 26 October 2026).
         lastHeartbeatAt: { type: string, format: date-time, nullable: true, readOnly: true }
         capabilities:
           type: array
@@ -7168,7 +7199,10 @@ components:
             minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile
             currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0
             errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80
-            is a warning and below 60 a failure.**
+            is a warning and below 60 a failure.** The exact rules (whose heartbeat, which firmware is the
+            latest, what profile currency compares, the error term until the heartbeat series lands, a
+            workstation with no devices, the bands and the contributors) are `getWorkstationHealth`'s, the
+            one place the score is defined (ADAM CR-244, 26 October 2026).
         configurationProfileId:
           type: string
           format: uuid

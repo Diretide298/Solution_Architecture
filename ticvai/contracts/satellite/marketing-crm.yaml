@@ -7800,7 +7800,7 @@ paths:
         - name: communicationProviderId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `channel`, `providerName`, `account` and `environment` within the caller''s scope: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 communication-provider-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -7816,7 +7816,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `communication-provider-id-mismatch` (ADAM CR-245): a record for `channel`, `providerName`, `account` and `environment` within the caller''s scope exists and the path''s `communicationProviderId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - communication-provider-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [provider-credentials-failed, provider-connection-failed, webhook-verification-failed, secret-reference-unresolved]
           description: >
@@ -7865,7 +7873,7 @@ paths:
         - name: senderIdentityId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by its channel''s sender key (`fromAddress`; `senderId` and `country`; `phoneNumber`; or `application`, `platform` and `environment`) within the caller''s scope: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 sender-identity-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -7881,7 +7889,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `sender-identity-id-mismatch` (ADAM CR-245): a record for its channel''s sender key (`fromAddress`; `senderId` and `country`; `phoneNumber`; or `application`, `platform` and `environment`) within the caller''s scope exists and the path''s `senderIdentityId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - sender-identity-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [sender-identity-not-verified, channel-fields-missing, provider-not-on-channel]
           description: >
@@ -8098,7 +8114,7 @@ paths:
         - name: eventId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces. The body''s `eventId`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `eventType`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `eventId`); where there is one, this must equal its id, else `409 event-id-mismatch` and nothing changes. The body''s `eventId`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -8120,7 +8136,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `event-id-mismatch` (ADAM CR-245): a record for `eventType` exists and the path''s `eventId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - event-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [event-type-not-registered, template-channel-mismatch, template-not-platform-owned]
           description: >
@@ -8231,7 +8255,7 @@ paths:
         - name: routingRuleId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by its selectors (`channel`, `country`, `brandId`, `messageClass`, `priorityClass`, `recipientType`): where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 routing-rule-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -8253,7 +8277,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `routing-rule-id-mismatch` (ADAM CR-245): a record for its selectors (`channel`, `country`, `brandId`, `messageClass`, `priorityClass`, `recipientType`) exists and the path''s `routingRuleId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - routing-rule-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [unknown-provider, provider-not-on-channel, provider-listed-twice, fallback-includes-own-channel]
           description: >
@@ -8920,7 +8952,7 @@ paths:
         - name: purposeId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces. The body''s `purposeId`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `purposeCode`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `purposeId`); where there is one, this must equal its id, else `409 purpose-id-mismatch` and nothing changes. The body''s `purposeId`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -8942,7 +8974,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `purpose-id-mismatch` (ADAM CR-245): a record for `purposeCode` exists and the path''s `purposeId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - purpose-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /communication-preference-marketing:
@@ -9132,7 +9172,7 @@ paths:
         - name: technologyId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces. The body''s `technologyId`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `name`, `provider` and `domainApplication`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `technologyId`); where there is one, this must equal its id, else `409 technology-id-mismatch` and nothing changes. The body''s `technologyId`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -9153,6 +9193,14 @@ paths:
                 $ref: '#/components/schemas/CookieTrackingDigitalTechnologyRegistryView'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: 'Refused, and nothing is stored. `technology-id-mismatch` (ADAM CR-245): a record for `name`, `provider` and `domainApplication` exists and the path''s `technologyId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - technology-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [category-required, non-essential-without-consent]
           description: Approved with no category, or a non-essential technology marked as needing no consent.
@@ -9265,7 +9313,7 @@ paths:
         - name: bannerDesignId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The new version''s id (ADAM CR-245). Every call stores a new version of the design for `brandId` and `channel`, and the new version takes this id (a client UUIDv7, the same key as a body `id`); an id that already names a stored design version is `409 banner-design-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -9286,6 +9334,14 @@ paths:
                 $ref: '#/components/schemas/CookieBannerPreferenceCenterDesignerView'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: 'Refused, and nothing is stored. `banner-design-id-mismatch` (ADAM CR-245): the path''s `bannerDesignId` already names a stored design version; nothing changes.'
+          x-ticvai-problem-types:
+          - banner-design-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [reject-harder-than-accept, non-essential-pre-ticked, do-not-sell-button-missing]
           description: A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button.
@@ -9490,7 +9546,7 @@ paths:
         - name: governanceId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `policyId`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 governance-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -9516,9 +9572,10 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          x-ticvai-problem-types: [privacy-notice-transition-not-allowed, approval-fields-read-only, classification-locked-after-approval]
-          description: A status move the lifecycle does not allow, approval fields sent by the caller, or a
-            change to the classification after approval.
+          x-ticvai-problem-types: [privacy-notice-transition-not-allowed, approval-fields-read-only, classification-locked-after-approval, governance-id-mismatch]
+          description: 'A status move the lifecycle does not allow, approval fields sent by the caller, or a
+            change to the classification after approval. `governance-id-mismatch` (ADAM CR-245): a record for
+            `policyId` exists and the path''s `governanceId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -9768,7 +9825,7 @@ paths:
         - name: requestTypeId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 request-type-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -9790,8 +9847,8 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          x-ticvai-problem-types: [request-type-has-open-requests]
-          description: Retiring a type that still has open requests.
+          x-ticvai-problem-types: [request-type-has-open-requests, request-type-id-mismatch]
+          description: 'Retiring a type that still has open requests. `request-type-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `requestTypeId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -11752,7 +11809,7 @@ paths:
         - name: caseResolutionId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `caseId`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 case-resolution-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -11776,7 +11833,15 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `case-resolution-id-mismatch` (ADAM CR-245): a record for `caseId` exists and the path''s `caseResolutionId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - case-resolution-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-service-copilot:
@@ -12033,7 +12098,7 @@ paths:
         - name: routingRuleId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 routing-rule-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -12049,7 +12114,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `routing-rule-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `routingRuleId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - routing-rule-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /sla-policy-service:
@@ -12272,7 +12345,7 @@ paths:
         - name: agentServiceProfileId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `principalId`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 agent-service-profile-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -12295,6 +12368,14 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'Refused, and nothing is stored. `agent-service-profile-id-mismatch` (ADAM CR-245): a record for `principalId` exists and the path''s `agentServiceProfileId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - agent-service-profile-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /escalation-critical-case:
@@ -12923,7 +13004,7 @@ paths:
         - name: automationId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 automation-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -12945,7 +13026,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `automation-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `automationId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - automation-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waiver-consent:
@@ -13813,7 +13902,7 @@ paths:
         - name: associationId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `formId`, `targetType` and `targetId`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 association-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -13837,8 +13926,8 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          x-ticvai-problem-types: [waiver-retired]
-          description: The waiver is retired.
+          x-ticvai-problem-types: [waiver-retired, association-id-mismatch]
+          description: 'The waiver is retired. `association-id-mismatch` (ADAM CR-245): a record for `formId`, `targetType` and `targetId` exists and the path''s `associationId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -15164,7 +15253,7 @@ paths:
         - name: verificationId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `submissionId`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 verification-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -15182,7 +15271,15 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `verification-id-mismatch` (ADAM CR-245): a record for `submissionId` exists and the path''s `verificationId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - verification-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [checks-failing, reason-required]
           description: '`verified` while an automatic check fails or no signature is present
@@ -18126,7 +18223,7 @@ paths:
         - name: caseCategoryId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 case-category-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -18150,8 +18247,8 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
-          x-ticvai-problem-types: [category-has-active-subcategories]
-          description: Retiring a category that still has active subcategories.
+          x-ticvai-problem-types: [category-has-active-subcategories, case-category-id-mismatch]
+          description: 'Retiring a category that still has active subcategories. `case-category-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `caseCategoryId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -18250,7 +18347,7 @@ paths:
         - name: queueId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 queue-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -18274,9 +18371,10 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
-          x-ticvai-problem-types: [queue-named-by-routing-rule, queue-has-waiting-cases]
-          description: Retiring a queue that an active routing rule names, or that an unresolved case still
-            waits in.
+          x-ticvai-problem-types: [queue-named-by-routing-rule, queue-has-waiting-cases, queue-id-mismatch]
+          description: 'Retiring a queue that an active routing rule names, or that an unresolved case still
+            waits in. `queue-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `queueId` is not its
+            id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -19137,7 +19235,7 @@ paths:
       - name: scanPolicyId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `channel` and `domainApplication`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 scan-policy-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -19158,6 +19256,14 @@ paths:
                 $ref: '#/components/schemas/CookieScanPolicy'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: 'Refused, and nothing is stored. `scan-policy-id-mismatch` (ADAM CR-245): a record for `channel` and `domainApplication` exists and the path''s `scanPolicyId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - scan-policy-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [day-of-week-required, day-of-month-required]
           description: A weekly schedule with no `dayOfWeek`, or a monthly one with no `dayOfMonth`

@@ -100,8 +100,13 @@ x-ticvai-queries:
       lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Platform's service route (serviceAuth).
-    served: [service]
+      from another deployable through Platform's service route (serviceAuth), and **in process by commerce**,
+      under the granted read XDR-006 (ADAM CR-243, option A, accepted 26 October 2026): commerce composes this
+      query over the control connection it already holds for routing (#27692, CR-161), because the service route
+      between deployables is not built (CR-174). control.api_client has no row-level security in the control
+      database, so an in-process asker names the rows it may see: approvals#setApprovalExternalProvider asks by
+      the `apiClientId` and treats a row whose `allowed_tenant_ids` does not hold the caller's tenant as absent.
+    served: [in-process, service]
 paths:
   /developers:
     post:
@@ -2125,7 +2130,7 @@ paths:
         - name: anomalyRuleId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `ruleKey`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 anomaly-rule-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -2142,6 +2147,14 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ApiAnomalyRule' }
+        '409':
+          description: 'Refused, and nothing is stored. `anomaly-rule-id-mismatch` (ADAM CR-245): a record for `ruleKey` exists and the path''s `anomalyRuleId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - anomaly-rule-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 

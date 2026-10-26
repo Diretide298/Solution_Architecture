@@ -2210,7 +2210,7 @@ paths:
       - name: labourBudgetId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by venue, department and `periodStart`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 labour-budget-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -2230,8 +2230,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/LabourBudget'
         '409':
-          x-ticvai-problem-types: [labour-budget-period-overlap]
-          description: The period overlaps another budget for the same venue and department
+          x-ticvai-problem-types: [labour-budget-period-overlap, labour-budget-id-mismatch]
+          description: 'The period overlaps another budget for the same venue and department `labour-budget-id-mismatch` (ADAM CR-245): a record for venue, department and `periodStart` exists and the path''s `labourBudgetId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:

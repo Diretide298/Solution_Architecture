@@ -1242,11 +1242,14 @@ paths:
         refused `400`; nobody writes a matrix for a level above or below their own through this call.
 
 
-        **PUT semantics — keyed on `kind` and the scope, never on an id.** There is no id in the path
-        and `ApprovalMatrix.id` is read-only, so the body names its target: the matrix for `kind` at
-        `scopeLevel`, on the scope node the caller is acting at (`scopePath` is read-only and set from
-        it). Where no matrix exists for that pair, this creates version 1 and answers `201`; where one
-        does, it stores a new version and answers `200`. **The body replaces the rule set whole**: the
+        **PUT semantics — the matrix is found by `kind` and the scope; the path''s `matrixId` is its id**
+        (accepted 26 October 2026, Chinmay, ADAM CR-245 option B). The body names its target: the matrix for
+        `kind` at `scopeLevel`, on the scope node the caller is acting at (`scopePath` is read-only and set from
+        it). Where no matrix exists for that pair, this creates version 1 with the path''s `matrixId` as its id (a
+        client UUIDv7, the same idempotency key as a body `id`) and answers `201`; where one does, the path''s
+        `matrixId` must equal that matrix''s id, and the call stores a new version of it and answers `200`. A
+        `matrixId` that is not the id of the matrix for (`kind`, scope), including one naming another kind''s
+        matrix, is `409 matrix-id-mismatch` and nothing changes. `ApprovalMatrix.id` is read-only in the body. **The body replaces the rule set whole**: the
         new version holds exactly the rules in `rules`, in their `order`, and a rule omitted from the
         body is not in the new version. Rule `id`s are read-only and ignored on input — each version
         carries its own rule rows. The previous version is kept, never edited, because requests in
@@ -1264,7 +1267,7 @@ paths:
       - name: matrixId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `kind` and the scope node the caller acts at: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 matrix-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1307,7 +1310,11 @@ paths:
             never match because an earlier one always does. `ruleOrder` names the offending rule, and
             `blockingRuleOrder` or `parentScopePath` names what it collides with.
 
+            `matrix-id-mismatch` (ADAM CR-245): a record for `kind` and the scope node the caller acts at exists and the path''s `matrixId` is not its id (or names another such record); nothing changes.
+
             '
+          x-ticvai-problem-types:
+          - matrix-id-mismatch
           content:
             application/problem+json:
               schema:
@@ -3281,13 +3288,14 @@ paths:
         - "P08 ADM-341 Four-Eyes & Dual-Control Policy"
         - "P08 BO-863 Resource Lifecycle, Governance & Audit"
       summary: Require a second, independent pair of eyes
-      description: '**PUT semantics — an upsert keyed on `code`.** There is no id in the path, and
-        `code` is the policy''s required, stable name, so the body names its target by it at the tenant
-        the caller is acting at. Where no policy has that `code` one is created and the answer is
-        `201`; where one does, the body replaces it whole and the answer is `200`. Omitted optional
-        fields take their defaults or empty — an omitted `appliesToRequestKinds` or
-        `requiredApproverGroupIds` stores an empty list, not the previous one. `id` is set by the server
-        and ignored on input. There is no delete: a policy is switched off with `isActive: false`.
+      description: '**PUT semantics — an upsert keyed on `code`.** `code` is the policy''s required, stable
+        name, so the body names its target by it at the tenant the caller is acting at. Where no policy has
+        that `code` one is created with the path''s `controlPolicyId` as its id and the answer is `201`; where
+        one does, the path''s `controlPolicyId` must equal its id (else `409 control-policy-id-mismatch` and
+        nothing changes; ADAM CR-245, 26 October 2026) and the body replaces it whole and the answer is `200`.
+        Omitted optional fields take their defaults or empty — an omitted `appliesToRequestKinds` or
+        `requiredApproverGroupIds` stores an empty list, not the previous one. A body `id`, when sent, must
+        equal the path''s. There is no delete: a policy is switched off with `isActive: false`.
 
         '
       tags:
@@ -3301,7 +3309,7 @@ paths:
       - name: controlPolicyId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 control-policy-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -3326,6 +3334,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalControlPolicy'
+        '409':
+          description: 'Refused, and nothing is stored. `control-policy-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `controlPolicyId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - control-policy-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/signature:
@@ -3461,13 +3477,14 @@ paths:
         breached by nine the next morning with nobody having done anything wrong.
 
 
-        **PUT semantics — an upsert keyed on `code`.** There is no id in the path, and `code` is the
-        policy''s required, stable name, so the body names its target by it at the tenant the caller
-        is acting at. Where no policy has that `code` one is created and the answer is `201`; where one
-        does, the body replaces it whole and the answer is `200`. Omitted optional fields take their
-        defaults or empty — an omitted `reminders` list stores no reminders, not the previous ones, and
-        an omitted `calendarId` or `escalationGroupId` clears it. `id` is set by the server and ignored
-        on input.
+        **PUT semantics — an upsert keyed on `code`.** `code` is the policy''s required, stable name, so
+        the body names its target by it at the tenant the caller is acting at. Where no policy has that
+        `code` one is created with the path''s `slaPolicyId` as its id and the answer is `201`; where one
+        does, the path''s `slaPolicyId` must equal its id (else `409 sla-policy-id-mismatch` and nothing
+        changes; ADAM CR-245, 26 October 2026) and the body replaces it whole and the answer is `200`.
+        Omitted optional fields take their defaults or empty — an omitted `reminders` list stores no
+        reminders, not the previous ones, and an omitted `calendarId` or `escalationGroupId` clears it. A
+        body `id`, when sent, must equal the path''s.
 
         '
       tags:
@@ -3481,7 +3498,7 @@ paths:
       - name: slaPolicyId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 sla-policy-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -3506,6 +3523,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalSlaPolicy'
+        '409':
+          description: 'Refused, and nothing is stored. `sla-policy-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `slaPolicyId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - sla-policy-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-delegations/availability/{availabilityId}:
@@ -3520,12 +3545,12 @@ paths:
         that will be left on after the holiday, and every approval for a month goes to the wrong person.
 
 
-        **PUT semantics — keyed on the body''s `id`.** There is no id in the path. A body with no `id`
-        records a new period, the server assigns its `id`, and the answer is `201`; a body with the
-        `id` of an existing period replaces that period whole and the answer is `200`. Omitted optional
-        fields are cleared — an omitted `substitutePrincipalId`, `delegationId` or `reason` removes the
-        stored one, and an omitted `appliesToRequestKinds` stores an empty list. An `id` that names no
-        period is `404`.
+        **PUT semantics — keyed on the path''s `availabilityId`**, the period''s id (the body''s `id`, when
+        sent, must equal it; ADAM CR-245, 26 October 2026, which corrected the text left from before the id
+        moved into the path). Where no period has that id, a new period is recorded with it (a client
+        UUIDv7) and the answer is `201`; where one does, the body replaces that period whole and the answer
+        is `200`. Omitted optional fields are cleared — an omitted `substitutePrincipalId`, `delegationId` or
+        `reason` removes the stored one, and an omitted `appliesToRequestKinds` stores an empty list.
 
         '
       tags:
@@ -3558,7 +3583,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApproverAvailability'
         '201':
-          description: Recorded — a new period, with the `id` the server gave it
+          description: Recorded — a new period, with the path's `availabilityId` as its `id`
           content:
             application/json:
               schema:
@@ -3581,11 +3606,12 @@ paths:
         legal-hold interaction that has to be decided once rather than argued per request.
 
 
-        **PUT semantics — keyed on the body''s `id`.** There is no id in the path. A body with no `id`
-        creates a policy, the server assigns its `id`, and the answer is `201`; a body with the `id` of
-        an existing policy replaces it whole and the answer is `200`. Omitted optional fields take
-        their defaults or are cleared — an omitted `legalBasis` removes the stored one, and an omitted
-        `appliesToRequestKinds` stores an empty list. An `id` that names no policy is `404`.
+        **PUT semantics — keyed on the path''s `retentionPolicyId`**, the policy''s id (the body''s `id`,
+        when sent, must equal it; ADAM CR-245, 26 October 2026, which corrected the text left from before
+        the id moved into the path). Where no policy has that id, one is created with it (a client UUIDv7)
+        and the answer is `201`; where one does, the body replaces it whole and the answer is `200`.
+        Omitted optional fields take their defaults or are cleared — an omitted `legalBasis` removes the
+        stored one, and an omitted `appliesToRequestKinds` stores an empty list.
 
         '
       tags:
@@ -3619,7 +3645,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalRetentionPolicy'
         '201':
-          description: Created — a new policy, with the `id` the server gave it
+          description: Created — a new policy, with the path's `retentionPolicyId` as its `id`
           content:
             application/json:
               schema:
@@ -4191,8 +4217,9 @@ paths:
         - "P08 ADM-354 External Workflow System Integration"
       x-ticvai-read-via:
       - query: public-api#apiClientRecords
-        route: service
-        for: 'its read of control.api_client, Platform''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of control.api_client, Platform''s data (CHG-MOD-001), asked in process over the control connection
+          commerce holds for routing: the granted read XDR-006 (ADAM CR-243, option A, 26 October 2026)'
       - query: ai#approvalRequestScoreRecords
         route: service
         for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
@@ -4217,11 +4244,30 @@ paths:
 
 
         **PUT semantics — an upsert keyed on `code`**, as `setApprovalSlaPolicy`. Where no provider has that
-        `code` one is created (`201`); where one does, the body replaces it whole (`200`). `id`, `status`
-        changes by the platform, and `lastSuccessAt` are the server''s. `outboundCredential` and
-        `signingSecret` are write-only; omitting them on a replace keeps the stored ones. An `endpointUrl`
-        that is not `https`, an `apiClientId` that is not an active API client of the tenant, or a
-        `decisionMapping` that maps no value to `approve` and `reject` is `422`.
+        `code` one is created with the path''s `externalProviderId` as its id (a client UUIDv7) (`201`); where
+        one does, the path''s `externalProviderId` must equal its id, else `409 external-provider-id-mismatch`
+        and nothing changes, and the body replaces it whole (`200`) (accepted 26 October 2026, Chinmay, ADAM
+        CR-245 option B). A body `id`, when sent, must equal the path''s; `status` changes by the platform and
+        `lastSuccessAt` are the server''s. An `endpointUrl` that is not `https`, an `apiClientId` that is not an
+        active API client of the tenant, or a `decisionMapping` that maps no value to `approve` and `reject` is
+        `422`.
+
+
+        **The API-client check is a granted in-process read** (accepted 26 October 2026, Chinmay, ADAM CR-243
+        option A). `api-client-not-active` is answered from Platform''s `public-api#apiClientRecords`, asked in
+        process (served `in-process` as well as `service`) over the control connection commerce already holds for
+        routing (#27692, CR-161): the read XDR-006 of docs/active/cross-deployable-writes.yaml. An `apiClientId`
+        with no row there, whose row''s `status` is not `active`, or whose `allowedTenantIds` does not hold the
+        caller''s tenant, is the `422`.
+
+
+        **The secrets are kept in the Key Vault secret store** (ADAM CR-243 option A). `outboundCredential` and
+        `signingSecret` are write-only: each is written through the Application''s secret-store abstraction
+        (`ISecretStore`, with the Azure Key Vault adapter), and the row keeps the secret''s reference, never the
+        value (CHG-R1S-020); omitting either on a replace keeps the stored one. The store is built by its own
+        ticket, ordered before this one; until it lands this operation is built against the abstraction with a
+        test double, never a plaintext column. The same store serves ADR-0071''s PIN pepper and every other
+        `*_secret_ref` column.
 
         '
       tags:
@@ -4235,7 +4281,7 @@ paths:
       - name: externalProviderId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 external-provider-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -4263,6 +4309,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalExternalProvider'
+        '409':
+          description: 'Refused, and nothing is stored. `external-provider-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `externalProviderId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - external-provider-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [endpoint-not-https, api-client-not-active, decision-mapping-incomplete]
           description: The endpoint is not `https`, the API client is not an active client of the tenant, or

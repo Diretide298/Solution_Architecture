@@ -1,0 +1,46 @@
+id: CHG-R10CRF-004
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'getWorkstationHealth defines the score exactly, as proposed defaults the client can correct: the stalest active
+  device''s heartbeat; the newest released firmware of the device''s kind by semantic version; profile current when the
+  device''s and workstation''s profile ids match and the workstation''s profile version is the profile''s; the 20-point
+  term the average of the two; the error term dropped and the rest re-weighted to 100 until tenancy.device_telemetry
+  lands; no active devices is offline, 0, no contributors; the bands, the offline rule, the battery cap; contributors
+  every factor with a source, by points lost.'
+decision:
+  what: 'ADAM CR-244, option A, as recommended. contracts/spine/tenancy.yaml getWorkstationHealth: the formula text
+    (replacing the 25 October text of CHG-R10TEN-007 where CR-244 decides otherwise: the stalest, not the freshest,
+    heartbeat; the average, not the lower, of firmware and profile; the error term until the heartbeat series lands; a
+    workstation with no devices; contributors) and x-ticvai-reads tenancy.device_firmware and
+    platform.configuration_profile. Workstation.healthScore and RegisteredDevice''s health point to it as the one place
+    the score is defined.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-244 (Deep Khanvilkar, #31204 getWorkstationHealth), accepted by the lead on 26 October 2026: CR-103''s
+  follow-up had only partly landed, and seven aggregation, version and empty-workstation rules were undefined, so the
+  BO-128 board would have ranked a guessed score.'
+keys_touched:
+  operations: [getWorkstationHealth]
+  schemas: [Workstation, RegisteredDevice]
+  tables: [platform.device, platform.workstation, tenancy.device_firmware, platform.configuration_profile,
+    tenancy.device_telemetry]
+  files:
+  - contracts/spine/tenancy.yaml
+root_class: 'a computed status with no stated formula or window (CHG-R10TEN-007''s class)'
+tickets:
+  started:
+  - '31204 (getWorkstationHealth): through CR-244''s comment; it ships on this in Sprint 1.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-244
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open
+notes: 'Not decided by CR-244 and kept from the authored text: across several devices the workstation takes the lowest
+  firmware and profile currency (CHG-R10TEN-007); "the profile''s version" is its latest published version (one row per
+  version since CR-228); the sync-backlog cap returns with the heartbeat series. Both are proposed defaults the client
+  corrects here. Cross-lane: tenancy.yaml is lane A2''s contract.'

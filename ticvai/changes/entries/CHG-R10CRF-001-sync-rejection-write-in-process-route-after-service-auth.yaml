@@ -1,0 +1,48 @@
+id: CHG-R10CRF-001
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'recordSyncRejection is built in two parts: the write is CrossRegion''s in-process API now (validation, an
+  RLS-scoped insert into sync.rejection, durable idempotency on the rejection id), called in process by syncGamePlays
+  and reconcileBurstEnvironment; the HTTP route POST /sync-rejections and its 401 stay in the contract and wait for
+  serviceAuth between deployables. A create carrying any resolution field is 400 validation, and so is a workstationId
+  the row''s foreign key refuses.'
+decision:
+  what: 'ADAM CR-241, option B, as recommended: split #35807 as CR-174 split #30710. contracts/spine/cross-region.yaml
+    recordSyncRejection: x-ticvai-auth-note (the route and its 401 wait for serviceAuth; no other scheme), the
+    description (the two parts; what a create may carry), the 400 (validation, the resolution fields and an unknown
+    workstationId) and the 401 text. orders.yaml SyncRejection already marks resolvedAt, resolvedByPrincipalId,
+    resolution and resolvedRecordId readOnly (since 5 September); the contract now says a create carrying them is
+    refused, not ignored.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-241 (Deep Khanvilkar, #35807 recordSyncRejection), accepted by the lead on 26 October 2026. The
+  operation is a serviceAuth route called across deployables, and serviceAuth between deployables is not built and
+  has no ticket (CR-174; ADR-0055, 21 October amendment), so built now it would be an unauthenticated write or an
+  invented auth scheme. The two smaller gaps (resolution fields on a create; an unknown workstationId) had no answer.'
+keys_touched:
+  operations: [recordSyncRejection]
+  schemas: [SyncRejection]
+  tables: [sync.rejection]
+  files:
+  - contracts/spine/cross-region.yaml
+root_class: 'a serviceAuth route between deployables before serviceAuth exists (the CR-174 class)'
+tickets:
+  started:
+  - '35807 (recordSyncRejection): through CR-241''s comment, as CHG-ADM-002 says; its text is not rewritten.'
+  unstarted:
+  - 'The follow-up ticket that exposes POST /sync-rejections after the serviceAuth ticket: a plan item the lead files
+    after the r10 tag (LEAD-QUESTIONS-r10, plan items).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-241
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'No database change: the foreign key sync.rejection.workstation_id -> platform.workstation is enforced since r1,
+  so the insert answers the unknown workstation and nothing in Tenancy is read (check-cross-module-reads XR-FACT and
+  check-error-sources E-READ-VIA hold the text to that). Sibling: recordSyncRejectionResolution is the same kind of
+  serviceAuth route and is called only from commerce (resolveSyncRejection); the decision does not move it, so it is
+  unchanged and listed for the lead.'

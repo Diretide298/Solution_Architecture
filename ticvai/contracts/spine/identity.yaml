@@ -2020,6 +2020,12 @@ paths:
         (`PasswordPolicy.pinLength` digits, `pinReusePrevention`; CHG-CRD-002), because it is valid only on a
         registered workstation (see `LoginRequest.method`). **Every other session of the principal is ended** on
         success, since a credential changed because it leaked is not fixed while the leaked one is still signed in.
+        **What ending them writes** (accepted 26 October 2026, Chinmay, ADAM CR-242 option A): each other live
+        `identity.session` row of the principal takes `status` `terminated`, `endedAt` now, `endedByPrincipalId` the
+        principal itself and `endReason` `credential-changed`; the session that
+        made the change stays signed in. The three columns are V0108''s (CHG-R8MIG-015) and the CHECK that `endedAt` is
+        null exactly while `active` is the next forward migration''s: until the migration is applied to a database,
+        the change that writes them carries the columns behind it.
 
         **What it writes** (14 October 2026, CHG-CRD-001, ADAM CR-078): the principal''s `identity.principal_credential`
         row for `method` takes the new PHC hash (ADR-0071), `setAt` now, `failedAttempts` 0 and `lockedUntil` null; the
@@ -11279,6 +11285,9 @@ components:
 
     ActiveSession:
       x-ticvai-persistence: identity.session
+      # ADAM CR-242, option A, accepted 26 October 2026 (CHG-R10CRF-002): an ended session always says when it ended.
+      x-ticvai-null-exactly-when:
+        endedAt: {status: active}
       description: '**The session record, in `identity.session`** (3 October 2026, CHG-R1S-008; the HLD/LLD
         cross-check and the r1 gate). Until then it was "none — Redis session registry", and 11 operations
         wrote a session no SQL created: nothing defined its columns, so `listActiveSessions` could not page,
@@ -11321,22 +11330,24 @@ components:
           format: date-time
           nullable: true
           readOnly: true
-          description: When the session ended; null while `active` (R8 blocker IDENTITY-C46, CHG-R8MIG-015).
+          description: When the session ended; null exactly while `active`, and set on every other status (R8
+            blocker IDENTITY-C46, CHG-R8MIG-015; a table CHECK since ADAM CR-242, 26 October 2026).
         endedByPrincipalId:
           type: string
           format: uuid
           nullable: true
           readOnly: true
           x-ticvai-references: identity.principal
-          description: Who ended it (`forceLogout`'s caller or supervisor); null when the principal signed out or it
-            expired.
+          description: Who ended it (`forceLogout`'s caller or supervisor; the principal itself when
+            `changeOwnCredential` ended its other sessions); null when the principal signed out or it expired.
         endReason:
           type: string
           minLength: 3
           maxLength: 500
           nullable: true
           readOnly: true
-          description: Why it was ended, as `forceLogout` was given it (or `supervisor-takeover` from the till door).
+          description: Why it was ended, as `forceLogout` was given it (or `supervisor-takeover` from the till door, or
+            `credential-changed` when `changeOwnCredential` ended it; ADAM CR-242).
         roleId:
           type: string
           format: uuid

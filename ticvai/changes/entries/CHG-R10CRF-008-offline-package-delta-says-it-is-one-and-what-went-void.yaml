@@ -1,0 +1,38 @@
+id: CHG-R10CRF-008
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'OfflinePackage gains isDelta, baseVersion (the sinceVersion it answers, null on a whole package) and
+  removedTicketIds (the changed entitlements that no longer admit: fullyConsumed, expired, cancelled, surrendered);
+  entitlements carries only rows that still admit. A device replaces or adds entitlements, drops removedTicketIds, and
+  merges only when isDelta is true.'
+decision:
+  what: 'ADAM CR-248, option A, as recommended. contracts/spine/access.yaml OfflinePackage: isDelta, baseVersion,
+    removedTicketIds and the entitlements description; getOfflinePackage''s description and its sinceVersion parameter.
+    Additive, mirroring CatalogueBundle''s isDelta and baseVersion (baseVersion an integer, as sinceVersion and
+    entitlementsVersion are).'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-248 (Hrushikant Patkar, #27706 getOfflinePackage), accepted by the lead on 26 October 2026: CR-239''s
+  delta sent void rows that looked exactly like valid ones and said nothing about being a delta, so a device merging it
+  would admit cancelled tickets offline.'
+keys_touched:
+  operations: [getOfflinePackage]
+  schemas: [OfflinePackage]
+  files:
+  - contracts/spine/access.yaml
+root_class: 'a delta with no marker and no removal list'
+tickets:
+  started:
+  - '27706 (getOfflinePackage): through CR-248''s comment; build the delta to this now.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-248
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'No database change: OfflinePackage is a generated artefact (persistence none). Cross-lane: access.yaml is lane
+  C''s contract (CR-239, CR-240).'

@@ -18359,7 +18359,7 @@ paths:
       - name: configurationTemplateId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `subject` and `name`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 configuration-template-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -18378,6 +18378,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConfigurationTemplate'
+        '409':
+          description: 'Refused, and nothing is stored. `configuration-template-id-mismatch` (ADAM CR-245): a record for `subject` and `name` exists and the path''s `configurationTemplateId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - configuration-template-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [source-required]
           description: '`sourceRequired`.'
@@ -18583,7 +18591,7 @@ paths:
       - name: connectionId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `salesChannelId`, `connectorName` and `environment`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 connection-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -18602,6 +18610,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelConnection'
+        '409':
+          description: 'Refused, and nothing is stored. `connection-id-mismatch` (ADAM CR-245): a record for `salesChannelId`, `connectorName` and `environment` exists and the path''s `connectionId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - connection-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [secret-not-reference]
           description: '`secretNotReference`.'
@@ -19000,7 +19016,7 @@ paths:
       - name: priceCategoryId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `entryKind` and `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 price-category-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -19020,8 +19036,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/PriceCategory'
         '409':
-          x-ticvai-problem-types: [in-use]
-          description: '`inUse`.'
+          x-ticvai-problem-types: [in-use, price-category-id-mismatch]
+          description: '`inUse`. `price-category-id-mismatch` (ADAM CR-245): a record for `entryKind` and `code` exists and the path''s `priceCategoryId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -19244,7 +19260,7 @@ paths:
       - name: feeId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 fee-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -19264,8 +19280,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/PricingFee'
         '409':
-          x-ticvai-problem-types: [change-request-required]
-          description: '`changeRequestRequired`.'
+          x-ticvai-problem-types: [change-request-required, fee-id-mismatch]
+          description: '`changeRequestRequired`. `fee-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `feeId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -19315,7 +19331,7 @@ paths:
       - name: calculationProfileId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `code` and `version`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 calculation-profile-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -19335,8 +19351,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/CalculationProfile'
         '409':
-          x-ticvai-problem-types: [version-in-use]
-          description: '`versionInUse`.'
+          x-ticvai-problem-types: [version-in-use, calculation-profile-id-mismatch]
+          description: '`versionInUse`. `calculation-profile-id-mismatch` (ADAM CR-245): a record for `code` and `version` exists and the path''s `calculationProfileId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -19357,7 +19373,7 @@ paths:
         - "P08 ADM-075 Currency Precision, Rounding & Monetary Rules"
       summary: Set precision and rounding for a currency
       description: '**One rounding profile per currency the tenant sells in** (29 September, writers pass).
-        Creates or updates the `catalogue.rounding_profile` for `currency`: decimal places (up to three, and the
+        Creates or updates the `catalogue.rounding_profile` for `currency` (keyed on `currency`; the path id is the profile''s id, ADAM CR-245): decimal places (up to three, and the
         third is kept, not rounded away, MoM 1 Sep 2026 §4.5), calculation and display precision, method, stage
         and cash rounding increment. `calculationPrecision` may not be below `decimalPlaces` (`422`
         `precisionBelowDecimals`). A change applies to calculations from the next price publication, never to a
@@ -19381,7 +19397,7 @@ paths:
       - name: roundingProfileId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `currency`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 rounding-profile-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -19400,6 +19416,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RoundingProfile'
+        '409':
+          description: 'Refused, and nothing is stored. `rounding-profile-id-mismatch` (ADAM CR-245): a record for `currency` exists and the path''s `roundingProfileId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - rounding-profile-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [precision-below-decimals]
           description: '`precisionBelowDecimals`.'
@@ -19760,7 +19784,7 @@ paths:
       - name: signalId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `registryKind` and `name`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 signal-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -19779,6 +19803,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SignalRegistryEntry'
+        '409':
+          description: 'Refused, and nothing is stored. `signal-id-mismatch` (ADAM CR-245): a record for `registryKind` and `name` exists and the path''s `signalId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - signal-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [trust-too-low]
           description: '`trustTooLow`.'
