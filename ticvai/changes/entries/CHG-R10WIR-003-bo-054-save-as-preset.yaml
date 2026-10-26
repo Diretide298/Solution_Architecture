@@ -1,0 +1,42 @@
+id: CHG-R10WIR-003
+date: '2026-10-26'
+source: audit
+kind: spec
+summary: 'BO-054 Role Assignment gains Save as preset and its form, which call setCapabilityTemplate: the tenant saves the
+  ticked permissions as its own preset, beside the platform''s.'
+decision:
+  what: 'ADAM CR-267: screens/P08 BO-054 actionBar gains the secondaryButton "Save as preset" (operation
+    setCapabilityTemplate, ROLE_MANAGE at the tenant scope, disabled for a venue-scoped caller as Create role is) and the
+    overlay formSetCapabilityTemplate (modal; confirm "Save preset" -> setCapabilityTemplate; dismiss Cancel). The form
+    collects what the request takes: name, code, the ticked capabilities, optional description and module; the client
+    gives the new preset its id. A 409 capability-template-is-preset stays in the dialog (CR-176, CHG-R10ID-005).
+    Logged in docs/active/approved-ui-changes.yaml (BO-054 overlay:formSetCapabilityTemplate, region:rowActions) under
+    CR-267.'
+  by: Chinmay
+  date: '2026-10-26'
+  quote: '"Add the forms in r10 (Recommended)"'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-153734-1986): check-screen-wiring S-OP-UNREACHED, BO-054
+  setCapabilityTemplate, built on by #30743. setCapabilityTemplate has no other screen, and BO-054''s approved no-access
+  text already names saving a preset (CHG-IDR-001); the lane''s round 1 left it for the lead (CHG-R10WIR-001 report).'
+keys_touched:
+  screens: [BO-054]
+  operations: [setCapabilityTemplate]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'a write declared on an approved screen with no control to call it'
+tickets:
+  started:
+  - '30743 (setCapabilityTemplate, Ready for QA, Sanket Keluskar): the operation is unchanged; BO-054 now calls it. Told
+    through CR-267''s comment; its text is not rewritten.'
+  unstarted:
+  - '27938, 28289, 31195 to 31197 and 32085 to 32087 (BO-054): build the button and form at the next tag.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-267
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Visible change to an approved screen, logged in ADAM as CR-267 (the rule of 22 October). No database change.'
