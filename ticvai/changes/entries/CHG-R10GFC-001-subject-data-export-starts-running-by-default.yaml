@@ -1,0 +1,40 @@
+id: CHG-R10GFC-001
+date: '2026-10-26'
+source: audit
+kind: contract
+summary: 'identity.SubjectDataExport.status declares default `running`, so the column agrees with the lead''s rule that
+  no matrix means the export runs at once; exportSubjectData writes `awaitingApproval` only where Approvals raised a
+  request.'
+decision:
+  what: 'contracts/spine/identity.yaml: SubjectDataExport.status gains `default: running` and its description says
+    `running` by default (no matrix means it runs at once, CHG-R10ID-024), `awaitingApproval` where a request was
+    raised; the schema''s description, exportSubjectData''s text and its x-ticvai-writes `for` say the same. The column
+    identity.subject_data_export.status gets DEFAULT ''running'' (the table is new in r10, so the default is part of
+    its CREATE TABLE in the forward migration).'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-135604-1087), check-contract-storage
+  ST-DEFAULT-DESCRIBED (CR-151, CHG-CRA-002): the description named `awaitingApproval` as the starting value with no
+  default. Lane A1 wrote the schema for ADAM CR-101 (CHG-R10ID-016); the lead ruled on 25 October, r10 round 3, "no
+  matrix means it runs at once" (CHG-R10ID-024), so the value a row takes when nothing else says is `running`, not
+  `awaitingApproval`.'
+keys_touched:
+  operations: [exportSubjectData]
+  schemas: [SubjectDataExport]
+  tables: [identity.subject_data_export]
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'a stored enum whose starting value is stated in words and not declared'
+tickets:
+  started: []
+  unstarted:
+  - 'exportSubjectData and getSubjectDataExport (#27750, #30720 and their screen tickets, all New on 22 October): they
+    pick it up at the r10 tag.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-101
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
