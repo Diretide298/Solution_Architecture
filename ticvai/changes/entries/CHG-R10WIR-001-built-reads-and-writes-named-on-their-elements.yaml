@@ -1,0 +1,61 @@
+id: CHG-R10WIR-001
+date: '2026-10-26'
+source: audit
+kind: spec
+summary: 'Seven approved screens name the operation on the element that already does the job (ADM-145, BO-065, BO-1063,
+  BO-503, BO-1162, CMS-101), and derive-screen-wiring binds BO-1068''s one publish gate to deployConfigurationProfile;
+  nothing visible changes.'
+decision:
+  what: 'Binding only (`operation`, an overlay''s `reads`; invisible to check-approved-ui). screens/P08: ADM-145 the
+    panel "The selected promotion approval" reads listPromotions (its promotion columns are the promotion behind the
+    request); BO-065 the "Guest two-step verification" toggle and "Actions that ask again" show getVenueSettings (the
+    value or the inherited tenant default; "Save venue settings" and its form still send setVenueSettings); BO-1063 its
+    six number fields show getVenueSettings, the Save button still sends setVenueSettings (as WEB-011''s fields show
+    getMyProfile); BO-503 "Version history" and BO-1162 "Security Audit" call listAuditRecords (onAction). screens/P13
+    CMS-101 formCreateGuidedChoice reads [listProducts, listProductCategories, listEvents, listBookingFlows], the
+    answer-target pickers its body and the editor''s notes name (siblings: the last three were unreached too).
+    tools/derive-screen-wiring.py: reached() now counts an overlay''s `reads` as the check does (it looked for another
+    component to bind a form''s picker read to), and a screen''s one publishGate binds a deploy* operation as it binds
+    publish*: BO-1068''s gate "Promotes this configuration to the target environment" is the confirm the call needs,
+    and binding its derived button instead would only move the finding to S-BUTTON-FORM. On the refresh the deriver
+    also binds BO-1162''s table "Every security governance audit" to listWalletConfigurationVersions (its one unshown
+    onLoad read, the rule-4 slot).'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-153734-1986): check-screen-wiring S-OP-UNREACHED, built
+  on by started tickets, which passed only because the allowance pattern matched the line for five findings r10 fixed
+  (CHG-R10GFP-006, CHG-R10OPN-005). The lead''s instruction for r10: fix every gate finding at the source.'
+keys_touched:
+  screens: [ADM-145, BO-065, BO-1063, BO-1068, BO-503, BO-1162, CMS-101]
+  operations: [listPromotions, getVenueSettings, deployConfigurationProfile, listAuditRecords, listProducts,
+    listProductCategories, listEvents, listBookingFlows, listWalletConfigurationVersions]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - screens/P13-white-label-cms.yaml
+  - tools/derive-screen-wiring.py
+root_class: 'a declared operation whose element is on the approved screen but does not name it; the deriver did not count
+  overlay reads and bound a lone publish gate only for publish*'
+tickets:
+  started:
+  - '31830 and 31832 (listPromotions, ADM-145), 30823 (getVenueSettings, BO-065 and BO-1063), 30821
+    (deployConfigurationProfile, BO-1068), 30824 (listAuditRecords, BO-503 and BO-1162), 31736 and 31738 (listProducts,
+    CMS-101): the operations are unchanged; the lead comments that these screens now reach them. Their text is not
+    rewritten.'
+  unstarted:
+  - 'Screen tickets pick the binding up at the next tag: 28763, 28778 and 33152 to 33154, 33193 to 33195 (BO-065), 29122
+    and 33922 to 33924 (BO-1063), 29120 and 33916 to 33918 (BO-1068), 28038, 28325, 31455 to 31457, 32156 to 32158
+    (BO-1162), 27916 and 31144 to 31146 (CMS-101). ADM-145 and BO-503 have no screen ticket of their own (ADM-145 is a
+    section of BO-084).'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-262
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'adam_cr: CR-262 is the nearest r10 CR, the lead''s ruling of 26 October on S-OP-UNREACHED (an unreached
+  declaration on an approved screen is fixed with no visible change). Measured after the screen derive steps and
+  link-screens-contracts: S-OP-UNREACHED 0 new, 5 built on (from 14; the five left are for the lead), 20 gone;
+  check-approved-ui, check-screens, check-screen-patterns, check-screen-value-sources and check-binding-ratchet as on
+  the gate. No database change.'
