@@ -6175,8 +6175,7 @@ paths:
         bands apply per line**, by that line''s own performance: each line''s percentage is the band its own
         performance falls in, so one refund of lines for two performances can carry two percentages. **The refund
         type is the band''s** (`RefundPolicy.timeBands[].refundType`; (the lead''s answer of 25 October 2026 to the r10 lanes'' questions; CHG-R10ORD-021)): a
-        venue with no bands refunds in full before the cut-off (the line''s performance, or the end of
-        `refundWindowDays` for an undated line) and nothing after it.
+        venue with no bands refunds in full before the cut-off (the performance start time of each line; for an undated line, the end of `refundWindowDays`, ADAM CR-208) and nothing after it.
         **`settleTo` onto the venue''s `refundDestinations`** (`RefundCalculationPolicyView`): `originalTender` is
         `originalPayment`; `advanceBalance` is `walletCredit`; `storeCredit` is `voucherCreditNote` (issued as a
         gift card, CHG-CSP-037); `wireTransfer` is `originalPayment`, paid out by transfer. A `settleTo` whose
@@ -6284,8 +6283,7 @@ paths:
         bands apply per line**, by that line''s own performance: each line''s percentage is the band its own
         performance falls in, so one refund of lines for two performances can carry two percentages. **The refund
         type is the band''s** (`RefundPolicy.timeBands[].refundType`; (the lead''s answer of 25 October 2026 to the r10 lanes'' questions; CHG-R10ORD-021)): a
-        venue with no bands refunds in full before the cut-off (the line''s performance, or the end of
-        `refundWindowDays` for an undated line) and nothing after it.
+        venue with no bands refunds in full before the cut-off (the performance start time of each line; for an undated line, the end of `refundWindowDays`, ADAM CR-208) and nothing after it.
         **`settleTo` onto the venue''s `refundDestinations`** (`RefundCalculationPolicyView`): `originalTender` is
         `originalPayment`; `advanceBalance` is `walletCredit`; `storeCredit` is `voucherCreditNote` (issued as a
         gift card, CHG-CSP-037); `wireTransfer` is `originalPayment`, paid out by transfer. A `settleTo` whose
@@ -25120,8 +25118,8 @@ components:
 
 
             **Each band names the refund type that applies in it** (`refundType`, ADAM CR-208; (the lead''s answer of 25 October 2026 to the r10 lanes'' questions; CHG-R10ORD-021)).
-            A venue that has set no bands refunds in full (`fullRefund`) before the cut-off (the line''s performance, or
-            the end of `refundWindowDays` for an undated line) and nothing after it.
+            A venue that has set no bands refunds in full (`fullRefund`) before the cut-off (the performance start time of each line; for an undated line, the end of
+            `refundWindowDays`, ADAM CR-208) and nothing after it.
 
             '
           items:

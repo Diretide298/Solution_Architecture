@@ -1697,6 +1697,9 @@ paths:
   /visit-plans:
     get:
       operationId: listMyVisitPlans
+      x-ticvai-no-screen: 'No approved screen shows the guest''s plans: GST-059''s cold-entry read was removed because the
+        approved screen has no element for it (ADAM CR-262, CHG-R10OPN-005; Chinmay, 26 October 2026). Kept and built
+        (36219, 36305) for the planner; a screen that needs it comes back through a CR.'
       x-ticvai-consumed-by:
         - "P02 GST-059 Plan in Progress"
       x-ticvai-read-via:

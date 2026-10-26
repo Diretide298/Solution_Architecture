@@ -12530,9 +12530,10 @@ screens:
 
 
     **Mobile v4 role (MOB-6): "Plan in Progress".** Today''s plan against live waits (`getWaitTimes`);
-    rules-based, AI not required. Build note (r8, GPS-C15): the cold entry (no planId) reads `listMyVisitPlans`
-    for today; the edges from GST-001, GST-022 and GST-041 carry the chosen plan''s id, so the earlier
-    "planId has no source" notes no longer apply.'
+    rules-based, AI not required. Build note (r8, GPS-C15): the edges from GST-001, GST-022 and GST-041 carry the
+    chosen plan''s id, so the earlier "planId has no source" notes no longer apply. The cold entry no longer
+    looks the guest''s plans up (`listMyVisitPlans` is not declared here, CHG-R10OPN-005, ADAM CR-262; Chinmay, 26 October 2026): opened without a `planId`,
+    the screen shows its emptyFirstRun state, the offer to make a plan on GST-051.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getWaitTimes` reads one of them — list, select,
@@ -12601,15 +12602,6 @@ screens:
     purpose: Swap candidates for one item that suit everyone in the party
     trigger: onAction
     provenance: decided 29 September 2026, MOB-6
-  - operationId: listMyVisitPlans
-    contract: venue-map
-    purpose: 'Only when signed in, like `getVisitPlan` (GFIX-6): on the cold entry (no `planId`) it asks
-      for the guest''s plans with `date` today, newest first, and takes the first one''s `id` for `getVisitPlan`.
-      No component shows the list itself: what it finds fills the Today timeline, and an empty page is
-      the emptyFirstRun state (offer to make a plan on GST-051). Opened with a `planId`, it is not called.
-      Not background (r8 integration, CHG-R8INT-008): the guest sees what it finds, and the approved screen
-      has no element of its own for it (the prototype has no view of this screen).'
-    trigger: onLoad
   entryState:
     params:
     - name: planId
@@ -12619,8 +12611,9 @@ screens:
     - name: itemId
       from: navigation
       optional: true
-    coldEntry: 'Opened from a reminder on the visit day: today''s plan, or an offer to make one when there
-      is none. `itemId` is the plan item the guest taps Swap on, picked on this screen.'
+    coldEntry: 'Opened from a reminder on the visit day. Without a `planId` it offers to make a plan (GST-051)
+      and does not look the guest''s plans up (CHG-R10OPN-005, ADAM CR-262). `itemId` is the plan item the guest
+      taps Swap on, picked on this screen.'
   wireframe:
     status: approved
     provenance: client-verified

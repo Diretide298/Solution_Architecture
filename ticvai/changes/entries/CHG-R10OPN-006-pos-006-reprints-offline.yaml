@@ -1,0 +1,42 @@
+id: CHG-R10OPN-006
+date: '2026-10-26'
+source: audit
+kind: spec
+summary: 'POS-006 Held Orders'' offline text says this till''s held orders can still be reprinted offline and the reprint
+  queues, as reprintOrder''s contract allows.'
+decision:
+  what: 'ADAM CR-263, option A: screens/P04 POS-006 states.offline now reads "Orders held at this terminal are listed,
+    and they can still be reprinted; a reprint is queued and sent when the connection is back. Those held elsewhere are
+    not — resuming another till''s sale needs the server". Logged in docs/active/approved-ui-changes.yaml (POS-006
+    state:offline) under CR-263.'
+  by: Chinmay
+  date: '2026-10-26'
+  quote: '"Yes, all six (Recommended)", then "actually get them build r10 thats fine"'
+why: 'The r10 integration gate of 26 October 2026: check-screen-wiring S-OFFLINE-REFUSED (4.4, CHG-SWP-004): reprintOrder
+  is x-ticvai-offline-capable on P04 and POS-006 refused it offline. The lead''s six decisions of 26 October 2026, item
+  6.'
+keys_touched:
+  screens:
+  - POS-006
+  operations:
+  - reprintOrder
+  files:
+  - screens/P04-point-of-sale.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'an offline state written for the screen''s main action (resume) that also refused a write the contract
+  queues'
+tickets:
+  started:
+  - '30699 (reprintOrder, Ready for QA, Chinmay Patkar), the started ticket check-screen-wiring names on this finding:
+    through CR-263''s comment; its text is not rewritten.'
+  unstarted:
+  - '28256 and 31993 to 31995 (POS-006): pick the text up at the next tag.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-263
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+notes: 'Visible change to an approved screen, logged in ADAM as CR-263 (the rule of 22 October). No database change.'
+status: open

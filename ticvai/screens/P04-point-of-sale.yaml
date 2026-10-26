@@ -2638,15 +2638,6 @@ screens:
     contract: orders
     purpose: Take a payment against an order
     trigger: onAction
-  - operationId: listPerformances
-    contract: catalogue
-    purpose: 'The cold entry (r8, GPS-C05): a link to a performance that has happened offers the next
-      performance of the same event, the first upcoming one `listPerformances` returns for the performance''s
-      `eventId` (`getPerformance`). Not called on the ordinary way in. Not background (r8 integration,
-      CHG-R8INT-008): the cashier sees the performance it offers, and the approved screen has no element
-      of its own for the offer.'
-    trigger: onLoad
-    provenance: r8 second round, GPS-C05 (ticket 28206)
   entryState:
     params:
     - name: holdId
@@ -2659,10 +2650,10 @@ screens:
     - name: eventId
       from: navigation
       optional: true
-      notes: 'r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`); `listPerformances` takes
-        it on the cold entry.'
-    coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
-      event.'
+      notes: 'r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`).'
+    coldEntry: '**A link to a performance that has happened** shows that performance (`getPerformance`); the
+      cashier picks another on the sell screens. The next performance is not looked up here: the approved
+      screen has no element for the offer, so `listPerformances` is not declared (CHG-R10OPN-005, ADAM CR-262; Chinmay, 26 October 2026).'
   wireframe:
     status: approved
     provenance: client-verified
@@ -3798,8 +3789,9 @@ screens:
       `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY`
       for `resumeOrder`, `holdOrder`, `modifyOrder`; `ORDER_REFUND` for `createRefund`; `ORDER_REPRINT`
       for `reprintOrder`.'
-    offline: Orders held at this terminal are listed. Those held elsewhere are not — resuming another
-      till's sale needs the server
+    offline: Orders held at this terminal are listed, and they can still be reprinted; a reprint is queued
+      and sent when the connection is back. Those held elsewhere are not — resuming another till's sale
+      needs the server
     denied: Held sales are listed and cannot be recalled without `sale.resume`. **The list is still shown**,
       because a cashier who cannot see the held sale fetches a supervisor to the wrong screen.
   apis:

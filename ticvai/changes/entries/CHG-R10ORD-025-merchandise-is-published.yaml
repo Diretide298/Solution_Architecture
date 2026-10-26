@@ -36,9 +36,9 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-value-sources.py
-notes: 'Database change: retail.merchandise.is_published (boolean, default false). Default false hides every existing item
-  from guests until it is published: whether the migration sets active items true is the migration owner''s backfill question,
-  listed for the lead.'
+notes: 'Database change: retail.merchandise.is_published (boolean, default false). The backfill question this listed for
+  the lead is answered (Chinmay, 26 October 2026, CHG-R10OPN-002): every item already there when the column arrives is set
+  true by the forward migration (x-ticvai-backfill), so no current item disappears from guests; new items default false.'
 release_tag: pending
 decision_owner: Chinmay
 status: open

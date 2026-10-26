@@ -1,0 +1,50 @@
+id: CHG-R10OPN-002
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'Every merchandise item that exists when retail.merchandise.is_published arrives is set to published, so no
+  current item disappears from guests; new items still default to false. A new contract mark, x-ticvai-backfill, says
+  so, and derive-ddl writes the backfill into the forward migration.'
+decision:
+  what: 'ADAM CR-104 (CHG-R10ORD-025, its backfill question): MerchandiseItem.isPublished gains `x-ticvai-backfill: true`
+    (contracts/satellite/retail.yaml). The package had no way to say what the rows already there take when a column
+    arrives, so the generator gains one: tools/derive-ddl.py reads `x-ticvai-backfill` on a persisted property (BACKFILL,
+    a scalar typed as the column is), and tools/ddl_forward.py backfill_block writes, in one guarded block that runs
+    only where the table is there and the column is not yet, `ALTER TABLE retail.merchandise ADD COLUMN IF NOT EXISTS
+    is_published boolean DEFAULT false` and then `UPDATE retail.merchandise SET is_published = true`. Applied twice it
+    touches no row; the next derive folds the column and writes nothing. Six tests in
+    tools/tests/test_migration_generator.py.'
+  by: Chinmay
+  date: '2026-10-26'
+  quote: '"Yes, all six (Recommended)", then "actually get them build r10 thats fine"'
+why: 'The lead''s six decisions of 26 October 2026 on the r10 open questions (audit decisions-2026-10-26), item 2: lane C
+  left the backfill of is_published to the migration owner (CHG-R10ORD-025 notes), and a default of false on existing
+  rows would hide every item guests see today.'
+keys_touched:
+  schemas:
+  - MerchandiseItem
+  tables:
+  - retail.merchandise
+  files:
+  - contracts/satellite/retail.yaml
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  - tools/tests/test_migration_generator.py
+root_class: 'new: a column added to a table that holds rows, whose default is right for new rows and wrong for the old
+  ones, and no contract field to say so'
+tickets:
+  started:
+  - '27820 (retail floor operations, lookupMerchandise, as CHG-R10ORD-025 lists it): through CR-104''s comment; its
+    text is not rewritten. Migration work: the backfill rides in the forward migration with the column, a child task of
+    MIG-RETAIL for Hrushikant Patkar.'
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-104
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/ddl_forward.py
+notes: 'Database change the generator writes: retail.merchandise.is_published boolean DEFAULT false, added with its
+  backfill (every existing row true) in one guarded block of the next forward migration.'
+status: open

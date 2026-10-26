@@ -26,8 +26,9 @@ triage: fix-forward
 prevention:
   type: none
   reason: A format and a source the decision left open; no check can tell the intended one.
-notes: No database change. The product's validity is read as catalogue.Product.onSaleTo, the only validity end a product
-  carries; listed in the report in case the lead meant another field.
+notes: 'No database change here. The product''s validity was read as catalogue.Product.onSaleTo, the only end a product
+  carried; the lead answered (Chinmay, 26 October 2026, CHG-R10OPN-003): it is the end of validity, not the close of sales,
+  so seasonEnd reads Product.validTo (new, nullable), falling back to onSaleTo.'
 release_tag: pending
 decision_owner: Chinmay
 status: open

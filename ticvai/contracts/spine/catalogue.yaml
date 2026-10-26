@@ -1287,6 +1287,12 @@ paths:
                       format: date-time
                       nullable: true
                       description: Retires the matched products automatically at that time (retiring a season).
+                    validTo:
+                      type: string
+                      format: date-time
+                      nullable: true
+                      description: The last moment the matched products' entitlements are valid (`Product.validTo`;
+                        ADAM CR-167, CHG-R10OPN-003); null means the same as `onSaleTo`.
                     channels:
                       type: array
                       items:
@@ -23472,7 +23478,9 @@ components:
             default.
 
             `seasonEnd` anchors to the venue''s own season rather than the calendar — a water park closing
-            in October is not a quarter boundary.
+            in October is not a quarter boundary. The season ends at the end of the product''s validity,
+            `Product.validTo`, or its `onSaleTo` where `validTo` is null (ADAM CR-167 as the lead ruled it, 26
+            October 2026; CHG-R10OPN-003).
 
             '
         expiryDate:
@@ -24335,6 +24343,16 @@ components:
           nullable: true
           description: 'Retires the product automatically. **Retirement is not deletion** — the product
             stops selling and every order that referenced it still resolves.
+
+            '
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+          description: '**The last moment the product''s entitlements are valid; null means the same as
+            `onSaleTo`** (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). A season pass stops
+            selling at `onSaleTo` and is used until `validTo`: an entitlement template''s `expiryAnchor` of
+            `seasonEnd` ends here (`access#issueOrderEntitlements`). Sales closing is not validity ending.
 
             '
         categoryId:

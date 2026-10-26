@@ -75,6 +75,14 @@ scope_path index and the column, and applies the table's generated policy. It is
 where the table never had one (our team's repository builds platform.outbox_sequence without it, migration 240) is
 left as it is. Not listed for a person: the decision is the contract's, and the column held only a copy of a path.
 
+**A new column the contract backfills is filled where it lands** (CHG-R10OPN-002, ADAM CR-104, 26 October 2026).
+`x-ticvai-backfill: <value>` on a persisted property (derive-ddl BACKFILL, passed as `backfill=`) is the value the rows
+already in the table take when the column arrives; rows written later take the column's default.
+`backfill_block` writes one guarded block, `ALTER TABLE ... ADD COLUMN` and then `UPDATE ... SET <column> = <value>`,
+that runs only where the table is there and the column is not yet: applied twice, or on a database that already has
+the column, it touches no row. The UPDATE is a one-time data statement, so `apply_forward` folds the column and not the
+UPDATE, and the next run writes nothing.
+
 This is not a SQL parser. It understands the statements `derive-ddl.py` emits and the handful a
 person writes in a forward migration; anything else it cannot place is listed for review rather than
 guessed at.
@@ -537,6 +545,8 @@ class Model:
             s = norm(stmt)
             if re.match(r"INSERT INTO platform\.schema_version\b", s, re.I):
                 continue
+            if BACKFILL_UPDATE.match(s):
+                continue   # a declared backfill's one-time UPDATE (CHG-R10OPN-002): data, not schema
             if POLICY_RENAME.match(s):
                 continue   # a renamed table's policies take its name (CHG-R8WFM-001): the model keys no policy name
             g = None if RETIRE_GUARD.match(s) else GUARD.match(s)
@@ -804,6 +814,18 @@ def guard_block(guard: str, stmts) -> str:
             st = "PERFORM " + st[6:].lstrip()
         lines.append(st + ";")
     return f"DO $$ BEGIN IF {guard} THEN\n" + "\n".join(lines) + "\nEND IF; END $$"
+
+
+# **A backfill a contract declares** (CHG-R10OPN-002): the UPDATE inside `backfill_block`, which a model does not fold.
+BACKFILL_UPDATE = re.compile(rf"^UPDATE (?:ONLY )?{QNAME} SET {NAME} = .+$", re.I | re.S)
+
+
+def backfill_block(t: str, c: str, add: str, value: str) -> str:
+    """The new column `c` (`add`, its definition) and the value the rows already there take (`value`, a SQL literal):
+    one guarded block that runs only where the table is there and the column is not yet (CHG-R10OPN-002)."""
+    sch, name = _split_t(t)
+    guard = exists_guard([t], extra=[f"NOT {_col_exists(sch, name, unq(c))}"])
+    return guard_block(guard, [f"ALTER TABLE {t} ADD COLUMN IF NOT EXISTS {add}", f"UPDATE {t} SET {c} = {value}"])
 
 
 def named_columns(text: str, cols) -> set:
@@ -1336,18 +1358,21 @@ def _renamed_name(new_name: str, rc: dict, tables) -> str:
 
 
 def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired: dict | None = None,
-         descoped=None) -> Plan:
+         descoped=None, backfill: dict | None = None) -> Plan:
     """`renames`: {"tables": {old: new}, "columns": {(table as named now, old column): new column}}, the
     declared renames (CHG-R6-010). Only a table that exists on the old side under its old name and on the new
     side under its new one is treated as renamed; likewise a column. `retired`: {table: {column}}, the columns the
     contracts withdraw (`x-ticvai-retired-columns`, CHG-MGN-001). `descoped`: the tables whose contract says
     `x-ticvai-scope: none` (CHG-R9MIG-001); one the old side gave a scope_path loses it here (`descope_block`).
+    `backfill`: {table: {column: SQL literal}}, the value the rows already there take when a new column arrives
+    (`x-ticvai-backfill`, CHG-R10OPN-002; `backfill_block`); a column of a new table has no rows to fill.
     Every statement written is guarded at the end (`guard_statements`, CHG-R9MIG-002)."""
     p = Plan(area)
     recon_cols, recon_names, recon_fk, recon_drop = [], [], [], []   # (statement, rollback), in the order they run
     recon_pk = []                                                    # widened primary keys (CHG-R9KEY-001)
     renames = renames or {}
     retired = retired or {}
+    backfill = backfill or {}
     known = set(old.tables) | set(new.tables)
     # the declared-unscoped tables that still have the scope_path a forward migration gave them (CHG-R9MIG-001)
     gone_scope = {t for t in (descoped or ()) if t in old.tables and t in new.tables
@@ -1540,7 +1565,11 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                     continue
                 if c not in a.cols:
                     add = relaxed(d)
-                    p.statements.append(f"ALTER TABLE {t} ADD COLUMN IF NOT EXISTS {add}")
+                    if c in backfill.get(t, {}):
+                        # **A declared backfill fills the rows already there** (CHG-R10OPN-002, ADAM CR-104)
+                        p.statements.append(backfill_block(t, c, add, backfill[t][c]))
+                    else:
+                        p.statements.append(f"ALTER TABLE {t} ADD COLUMN IF NOT EXISTS {add}")
                     p.rollback.append(f"ALTER TABLE {t} DROP COLUMN IF EXISTS {c};")
                     p.counts["columns"] += 1
                     new_cols.setdefault(t, set()).add(c)

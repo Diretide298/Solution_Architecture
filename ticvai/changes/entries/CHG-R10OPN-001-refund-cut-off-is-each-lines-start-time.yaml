@@ -1,0 +1,41 @@
+id: CHG-R10OPN-001
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'The refund cut-off is the performance start time of each line, and for an undated line the end of
+  refundWindowDays; RefundPolicy, createRefund and simulateRefund say it in those words.'
+decision:
+  what: 'ADAM CR-208 (CHG-R10ORD-021): a venue with no time bands refunds in full before the cut-off and nothing after
+    it, and the cut-off is the performance start time of each line; for an undated line it is the end of
+    `refundWindowDays`. contracts/spine/orders.yaml: createRefund and simulateRefund descriptions, RefundPolicy.timeBands
+    description. The reading CHG-R10ORD-021''s notes already gave; the texts said "the line''s performance", which a
+    reader could take as the performance''s end or its date.'
+  by: Chinmay
+  date: '2026-10-26'
+  quote: '"Yes, all six (Recommended)", then "actually get them build r10 thats fine"'
+why: 'The lead''s six decisions of 26 October 2026 on the r10 open questions (audit decisions-2026-10-26), item 1: CR-208''s
+  cut-off, which CHG-R10ORD-021 (lane C) wrote as "the line''s performance".'
+keys_touched:
+  operations:
+  - createRefund
+  - simulateRefund
+  schemas:
+  - RefundPolicy
+  files:
+  - contracts/spine/orders.yaml
+root_class: 'a time rule named by its object (the performance) and not by the instant (its start time)'
+tickets:
+  started:
+  - '28284 (simulateRefund, as CHG-R10ORD-021 lists it): through CR-208''s comment; its text is not rewritten.'
+  unstarted:
+  - '31924 (createRefund): picks the wording up at the next tag through its pointer body.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-208
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Wording of a rule the lead decided; no check can tell which instant a sentence means. The texts now name the
+    instant (start time) and the fallback (end of refundWindowDays) together.'
+notes: No database change.
+status: open

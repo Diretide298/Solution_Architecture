@@ -2005,10 +2005,14 @@ components:
         isPublished:
           type: boolean
           default: false
+          x-ticvai-backfill: true   # every item already there when the column arrives is published (ADAM CR-104; CHG-R10OPN-002)
           description: '**Whether a guest or a visitor may see the item** (the lead''s answer of 25 October 2026 to the r10 lanes'' questions, question 22;
             CHG-R10ORD-025): the flag `listMerchandise` and `lookupMerchandise` already named for "published" (r8 walk
             of ticket 27820). A guest sees an item only while it is active and published; staff see every item. Set by
-            `PRODUCT_CONFIGURE` holders with `createMerchandise` and `updateMerchandise`; false until set.'
+            `PRODUCT_CONFIGURE` holders with `createMerchandise` and `updateMerchandise`; a new item is false until set.
+            **Every item that existed when the column arrived is published** (the lead, 26 October 2026, ADAM CR-104;
+            CHG-R10OPN-002): the forward migration sets it true on those rows (`x-ticvai-backfill`), so no item a guest
+            sees today disappears.'
         isDroppable:
           type: boolean
           default: true
