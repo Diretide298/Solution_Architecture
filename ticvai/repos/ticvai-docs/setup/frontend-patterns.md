@@ -25,6 +25,10 @@ since 13 October 2026; a rule its lint cannot express yet is still the rule, che
 | Local permission computation | Clients consume `effectivePermissions`. Client-side authz is a security hole and a divergence source |
 | `localStorage` / `sessionStorage` in artefacts | Unsupported in the target runtime |
 
+An HttpOnly cookie the edge sets, which no script reads, is not client storage: the on-sale waiting room's admission
+token reaches the guest web that way (ADR-0066 amendment of 25 October 2026, ADAM CR-216). The page never copies such a
+token into script, memory it persists, or either storage.
+
 ### 4.3 Style
 
 ```typescript
@@ -75,6 +79,29 @@ mutation goes through the outbox: only the writes below do.
 - Conflict policy is declared per entity at the call site, as the contract's `x-ticvai-conflict-policy`
   says. There is no global default.
 - The offline indicator reflects real transport state, never an optimistic guess.
+
+### 4.5 The API client
+
+**Every call goes through the published `@ticvai/api-client` package** (ADAM CR-195, Chinmay, 25 October 2026). It is
+generated from ticvai-contracts at each release tag and published as a versioned package to the `ticvai-frontend`
+group's GitLab package registry (the SETUP-CLIENTS task); each app repository depends on it by exact version,
+ticvai-guest-web first.
+
+- No hand-written client, no `fetch` to an API path outside the package, and no per-repository generator.
+- A screen's "connect to API" sub-task uses the package and waits for it. Until it is published, a screen is built
+  against the mock API and the contract's types, with the call behind one function the package call replaces.
+- A new release of the package is taken by changing the exact version, never a range.
+
+### 4.6 Search as you type
+
+**A search field that reads results as the guest types is type-ahead with a floor and a pause** (ADAM CR-223,
+25 October 2026; WEB-003 and GST-063 first):
+
+- The call goes out once typing pauses for 300 ms (debounce), and only for 2 or more characters (the operation's
+  `minLength`); fewer characters send nothing.
+- Enter searches at once.
+- The latest answer wins: an earlier request still in flight is cancelled or its answer dropped, so results never
+  go back to an older query.
 
 ---
 
