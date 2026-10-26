@@ -1149,12 +1149,25 @@ paths:
       x-ticvai-audience:
       - service
       x-ticvai-auth: service
+      x-ticvai-auth-note: 'The HTTP route and its 401 wait for serviceAuth between deployables (ADAM CR-241''s split,
+        applied here by the lead on 26 October 2026, as CR-174 split #30710): they are built by a follow-up ticket
+        ordered after the ticket that builds serviceAuth. Until then the write is CrossRegion''s in-process API and the
+        route is not exposed; no other auth scheme stands in for it.'
       summary: Record what a supervisor did about a quarantined entry
       description: '**The owner''s write of a rejection''s resolution** (14 October 2026, CHG-XDW-002; ADR-0055 rule
         4). `orders.resolveSyncRejection` (in `commerce`) checks the supervisor''s permission and calls this with
         what they did, the record it produced and who they are. **Resolved once**: the same resolution and record
         again is the same answer; a different one on an already-resolved rejection is refused `409`
         (`sync-rejection-already-resolved`), which the caller answers as its own `alreadyResolved`.
+
+
+        **Built in two parts, as `recordSyncRejection` is** (ADAM CR-241''s split; Chinmay, 26 October 2026: "Yes,
+        same split (Recommended)"). **The write is CrossRegion''s in-process API now**: an Application interface the
+        CrossRegion module implements, which validates the resolution, updates the `sync.rejection` row under
+        row-level security, keeps the resolved-once rule and is idempotent on the rejection''s `id`, durably. **The
+        HTTP route and its `401`** stay in this contract and are built by a follow-up ticket ordered after the ticket
+        that builds serviceAuth between deployables; until then the route is not exposed and no other authentication
+        scheme is invented for it. `orders.resolveSyncRejection` (in `commerce`) reaches it when that route is built.
 
         '
       tags:
@@ -1185,7 +1198,8 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '401':
-          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          description: The calling workload's token is missing or invalid (`unauthenticated`). Built with the route,
+            after serviceAuth between deployables (ADAM CR-241).
           x-ticvai-problem-types:
           - unauthenticated
           content:

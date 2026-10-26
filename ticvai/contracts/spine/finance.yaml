@@ -745,6 +745,9 @@ paths:
         00:00; CHG-R6-032). A longer range is a review of days already reconciled, never a reconciliation of its own;
         a provider that sends a monthly file (DI-268) is matched day by day against it.
 
+
+        **Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `from` or `to` are a day in the time zone of the region at or above the caller''s scope (`tenancy#regionSettingsRecords`, by the caller''s scope path). When the caller''s scope gives no single region (a brand or the tenant root) and `from` or `to` is sent, the answer is `400 validation` on `from` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
+
         '
       tags:
       - finance
@@ -762,14 +765,14 @@ paths:
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on from when the caller''s scope gives no single region (ADAM CR-251).'
       - name: to
         in: query
         required: true
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on from when the caller''s scope gives no single region (ADAM CR-251).'
       responses:
         '200':
           description: Sources with variances
@@ -777,6 +780,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnifiedReconciliation'
+        '400':
+          description: 'Validation failed (`validation`). Includes a day filter (`from`, `to`) sent by a caller whose scope gives no single region; `errors[]` names `from`, "filter by day from one venue or region" (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inter-entity-obligations/{obligationId}/settle:
@@ -1814,6 +1825,9 @@ paths:
         is not a balance. `totals` carries one `Money` per currency and each bucket is one ageing band in
         one currency. `total` is filled only when everything in scope is in a single currency.
 
+
+        **Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `asAt` is a day in the time zone of the region at or above the caller''s scope (`tenancy#regionSettingsRecords`, by the caller''s scope path). When the caller''s scope gives no single region (a brand or the tenant root) and `asAt` is sent, the answer is `400 validation` on `asAt` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
+
         '
       tags:
       - recognition
@@ -1827,7 +1841,7 @@ paths:
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on asAt when the caller''s scope gives no single region (ADAM CR-251).'
       - name: venueId
         in: query
         description: One venue. Omitted means every venue in the caller's scope, totalled per currency.
@@ -1841,6 +1855,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeferredRevenueReport'
+        '400':
+          description: 'Validation failed (`validation`). Includes a day filter (`asAt`) sent by a caller whose scope gives no single region; `errors[]` names `asAt`, "filter by day from one venue or region" (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recognition/run:
@@ -2508,6 +2530,9 @@ paths:
         it will show you that this cashier has taken 100 dollars, 200 Qatari riyal."* A cashier declaring
         a drawer holding three currencies needs this to reconcile, and without it the variance is unexplainable.
 
+
+        **Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `from` or `to` are a day in the time zone of the region at or above the caller''s scope (`tenancy#regionSettingsRecords`, by the caller''s scope path). When the caller''s scope gives no single region (a brand or the tenant root) and `from` or `to` is sent, the answer is `400 validation` on `from` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
+
         '
       tags:
       - reporting
@@ -2527,13 +2552,13 @@ paths:
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on from when the caller''s scope gives no single region (ADAM CR-251).'
       - name: to
         in: query
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on from when the caller''s scope gives no single region (ADAM CR-251).'
       responses:
         '200':
           description: Foreign tender
@@ -2541,6 +2566,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForeignTenderReport'
+        '400':
+          description: 'Validation failed (`validation`). Includes a day filter (`from`, `to`) sent by a caller whose scope gives no single region; `errors[]` names `from`, "filter by day from one venue or region" (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fx/inter-entity:
@@ -2878,7 +2911,11 @@ paths:
 
         
 
-        **Order.** Newest first, by `occurredAt` descending, then by `id`.'
+        **Order.** Newest first, by `occurredAt` descending, then by `id`.
+
+        **Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `occurredFrom` or `occurredTo` are a day in the time zone of the region at or above the caller''s scope (`tenancy#regionSettingsRecords`, by the caller''s scope path). When the caller''s scope gives no single region (a brand or the tenant root) and `occurredFrom` or `occurredTo` is sent, the answer is `400 validation` on `occurredFrom` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
+
+        '
       tags:
       - variance
       x-ticvai-permission: LEDGER_VIEW
@@ -2905,13 +2942,13 @@ paths:
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on occurredFrom when the caller''s scope gives no single region (ADAM CR-251).'
       - name: occurredTo
         in: query
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on occurredFrom when the caller''s scope gives no single region (ADAM CR-251).'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -2928,6 +2965,14 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/PriceVariance'
+        '400':
+          description: 'Validation failed (`validation`). Includes a day filter (`occurredFrom`, `occurredTo`) sent by a caller whose scope gives no single region; `errors[]` names `occurredFrom`, "filter by day from one venue or region" (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-variances/{varianceId}/review:
@@ -4203,6 +4248,8 @@ paths:
         issued to them (`buyerSubjectId` is the caller); staff see the legal entities their scope reaches.
 
         Ordered by `issuedAt` descending, `id` as the tiebreak.
+
+        **Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `issuedFrom` or `issuedTo` are a day in the time zone of the region at or above the caller's scope (`tenancy#regionSettingsRecords`, by the caller's scope path). When the caller's scope gives no single region (a brand or the tenant root) and `issuedFrom` or `issuedTo` is sent, the answer is `400 validation` on `issuedFrom` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
       tags:
       - tax
       x-ticvai-permission: LEDGER_VIEW
@@ -4235,13 +4282,13 @@ paths:
           $ref: '#/components/schemas/FinTaxInvoiceStatus'
       - name: issuedFrom
         in: query
-        description: A day in the region's time zone, local midnight to local midnight.
+        description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on issuedFrom when the caller''s scope gives no single region (ADAM CR-251).'
         schema:
           type: string
           format: date
       - name: issuedTo
         in: query
-        description: A day in the region's time zone, local midnight to local midnight.
+        description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on issuedFrom when the caller''s scope gives no single region (ADAM CR-251).'
         schema:
           type: string
           format: date
@@ -4261,6 +4308,14 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/FinTaxInvoice'
+        '400':
+          description: 'Validation failed (`validation`). Includes a day filter (`issuedFrom`, `issuedTo`) sent by a caller whose scope gives no single region; `errors[]` names `issuedFrom`, "filter by day from one venue or region" (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
@@ -5116,6 +5171,8 @@ paths:
         payable or refundable. Each box carries the tax codes and posting count behind it so it can be traced.
         `format` `csv` or `xlsx` returns the same boxes as a file link for the adviser; `json` for screens.
         Computed from the reporting replica; nothing is stored or filed by this call.
+
+        **Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `periodFrom` or `periodTo` are a day in the time zone of the region at or above the caller's scope (`tenancy#regionSettingsRecords`, by the caller's scope path). When the caller's scope gives no single region (a brand or the tenant root) and `periodFrom` or `periodTo` is sent, the answer is `400 validation` on `periodFrom` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
       tags:
       - reporting
       x-ticvai-permission: LEDGER_VIEW
@@ -5132,14 +5189,14 @@ paths:
       - name: periodFrom
         in: query
         required: true
-        description: A day in the region's time zone, local midnight to local midnight.
+        description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on periodFrom when the caller''s scope gives no single region (ADAM CR-251).'
         schema:
           type: string
           format: date
       - name: periodTo
         in: query
         required: true
-        description: A day in the region's time zone, local midnight to local midnight.
+        description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on periodFrom when the caller''s scope gives no single region (ADAM CR-251).'
         schema:
           type: string
           format: date
@@ -5159,6 +5216,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FinVatReturn'
+        '400':
+          description: 'Validation failed (`validation`). Includes a day filter (`periodFrom`, `periodTo`) sent by a caller whose scope gives no single region; `errors[]` names `periodFrom`, "filter by day from one venue or region" (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [period-not-whole-tax-months, legal-entity-not-tax-registered]
           description: The period is not whole tax months, or the legal entity has no tax registration number.
