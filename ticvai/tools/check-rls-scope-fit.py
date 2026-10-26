@@ -145,7 +145,10 @@ def classes(pol: dict) -> dict:
         # `(platform.tenant_root_in_scope() OR EXISTS (... platform.in_scope(hs.path)))`, and reading any mention of
         # the tenant root as "the tenant root only" reported createPrincipal, updatePrincipal and
         # resetPrincipalCredential at a venue as writes the policy refuses, which V0108 lets through.
-        rest = arg.replace("platform.tenant_root_in_scope()", "")
+        # Only an OR widens it: `tenant_root AND in_scope(...)` is still the tenant root only.
+        widened = "tenant_root_in_scope" not in arg or \
+            re.search(r"tenant_root_in_scope\(\)\s*\)?\s*OR\b", arg, re.I)
+        rest = arg.replace("platform.tenant_root_in_scope()", "") if widened else ""
         if "subject_in_scope" in rest:
             return "subject"
         if "in_scope(" in rest:
