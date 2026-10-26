@@ -1,0 +1,45 @@
+id: CHG-R10WIR-004
+date: '2026-10-26'
+source: audit
+kind: spec
+summary: 'BO-1001, BO-1002 and BO-1039 get a form for recommendSeats, and BO-994 a form for createSeatHold, each opened
+  from the button already on the screen and submitting the operation.'
+decision:
+  what: 'ADAM CR-268: screens/P08. BO-1001, BO-1002, BO-1039: the derived primary button, unlabelled until now, is
+    labelled ("Compare seats", "Suggest seats", "Find upgrade options") and calls recommendSeats; the overlay
+    formRecommendSeats (modal; confirm with the same label -> recommendSeats; dismiss Cancel) collects partySize and
+    strategy (SeatRecommendationStrategy), optional categoryIds, maxPrice, accessibleCount and maxOptions, for the
+    performance the screen shows. BO-994: "Create seat hold" calls createSeatHold; the overlay formCreateSeatHold
+    (confirm "Hold these seats") collects performanceId and either seatIds or zoneId with quantity, optional ttlSeconds
+    and subjectId; the client gives the hold its id. Logged in docs/active/approved-ui-changes.yaml (each screen''s
+    overlay and, for the three, region:-) under CR-268.'
+  by: Chinmay
+  date: '2026-10-26'
+  quote: '"Add the forms in r10 (Recommended)"'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-153734-1986): check-screen-wiring S-OP-UNREACHED on the
+  four, built on by #31848. Each button needed a body nothing on the screen collected, so binding it alone would have
+  been S-BUTTON-FORM; the lane''s round 1 left them for the lead.'
+keys_touched:
+  screens: [BO-1001, BO-1002, BO-1039, BO-994]
+  operations: [recommendSeats, createSeatHold]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'a derived button for a write whose body the approved screen had no form to collect'
+tickets:
+  started:
+  - '31848 (recommendSeats and createSeatHold, In progress, Chitrangi Mestry): the operations are unchanged; these four
+    screens now call them. Told through CR-268''s comment; its text is not rewritten.'
+  unstarted:
+  - 'The four screens have no screen ticket of their own in the release map; they pick the forms up at the next tag.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-268
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Visible change to approved screens, logged in ADAM as CR-268 (the rule of 22 October). Measured after the
+  screen derive steps and link-screens-contracts: S-OP-UNREACHED 0 new, 0 built on, 25 gone; S-BUTTON-FORM 0 new. No
+  database change.'

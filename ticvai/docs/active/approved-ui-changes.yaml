@@ -254,3 +254,84 @@ changes:
     and its move to GST-002 are already in the client-approved frame (wireframes/P02 Guest App.dc.html#gst-005); the
     record now carries them, so nothing the client sees changes'
   change: CHG-R10CRF-020
+- screen: BO-054
+  field: 'overlay:formSetCapabilityTemplate'
+  to: 1e50e7e1e140de63
+  approval: 'ADAM CR-267 (raised from the r10 integration gate, check-screen-wiring S-OP-UNREACHED on setCapabilityTemplate, 26 October 2026;
+    accepted 26 October 2026 by Chinmay: "Add the forms in r10 (Recommended)"): since 22 October 2026 a developer may change
+    approved UI when the change is logged in ADAM (the lead, 22 October 2026: "let frontend change ui and log it in changes.
+    dont worry about it"); this CR is that log. BO-054 gains Save as preset and its form, the action its approved
+    no-access text already names (saving a preset)'
+  change: CHG-R10WIR-003
+- screen: BO-054
+  field: 'region:rowActions'
+  to: f0ad84bbbc687894
+  approval: 'ADAM CR-267 (raised from the r10 integration gate, check-screen-wiring S-OP-UNREACHED on setCapabilityTemplate, 26 October 2026;
+    accepted 26 October 2026 by Chinmay: "Add the forms in r10 (Recommended)"): since 22 October 2026 a developer may change
+    approved UI when the change is logged in ADAM (the lead, 22 October 2026: "let frontend change ui and log it in changes.
+    dont worry about it"); this CR is that log. BO-054 gains Save as preset and its form, the action its approved
+    no-access text already names (saving a preset)'
+  change: CHG-R10WIR-003
+- screen: BO-1001
+  field: 'overlay:formRecommendSeats'
+  to: 9c1e6bd74ffc44c4
+  approval: 'ADAM CR-268 (raised from the r10 integration gate, check-screen-wiring S-OP-UNREACHED on recommendSeats and createSeatHold,
+    26 October 2026; accepted 26 October 2026 by Chinmay: "Add the forms in r10 (Recommended)"): since 22 October 2026 a
+    developer may change approved UI when the change is logged in ADAM (the lead, 22 October 2026: "let frontend change ui
+    and log it in changes. dont worry about it"); this CR is that log. The screen''s own button opens a form that collects
+    the request body; an unlabelled derived button gets its label'
+  change: CHG-R10WIR-004
+- screen: BO-1001
+  field: 'region:-'
+  to: fab0a4dfc436b2e0
+  approval: 'ADAM CR-268 (raised from the r10 integration gate, check-screen-wiring S-OP-UNREACHED on recommendSeats and createSeatHold,
+    26 October 2026; accepted 26 October 2026 by Chinmay: "Add the forms in r10 (Recommended)"): since 22 October 2026 a
+    developer may change approved UI when the change is logged in ADAM (the lead, 22 October 2026: "let frontend change ui
+    and log it in changes. dont worry about it"); this CR is that log. The screen''s own button opens a form that collects
+    the request body; an unlabelled derived button gets its label'
+  change: CHG-R10WIR-004
+- screen: BO-1002
+  field: 'overlay:formRecommendSeats'
+  to: ad70dae72d146b61
+  approval: 'ADAM CR-268 (raised from the r10 integration gate, check-screen-wiring S-OP-UNREACHED on recommendSeats and createSeatHold,
+    26 October 2026; accepted 26 October 2026 by Chinmay: "Add the forms in r10 (Recommended)"): since 22 October 2026 a
+    developer may change approved UI when the change is logged in ADAM (the lead, 22 October 2026: "let frontend change ui
+    and log it in changes. dont worry about it"); this CR is that log. The screen''s own button opens a form that collects
+    the request body; an unlabelled derived button gets its label'
+  change: CHG-R10WIR-004
+- screen: BO-1002
+  field: 'region:-'
+  to: 3c63dd7354b1dd0c
+  approval: 'ADAM CR-268 (raised from the r10 integration gate, check-screen-wiring S-OP-UNREACHED on recommendSeats and createSeatHold,
+    26 October 2026; accepted 26 October 2026 by Chinmay: "Add the forms in r10 (Recommended)"): since 22 October 2026 a
+    developer may change approved UI when the change is logged in ADAM (the lead, 22 October 2026: "let frontend change ui
+    and log it in changes. dont worry about it"); this CR is that log. The screen''s own button opens a form that collects
+    the request body; an unlabelled derived button gets its label'
+  change: CHG-R10WIR-004
+- screen: BO-1039
+  field: 'overlay:formRecommendSeats'
+  to: 6f89ec5f8d0877cb
+  approval: 'ADAM CR-268 (raised from the r10 integration gate, check-screen-wiring S-OP-UNREACHED on recommendSeats and createSeatHold,
+    26 October 2026; accepted 26 October 2026 by Chinmay: "Add the forms in r10 (Recommended)"): since 22 October 2026 a
+    developer may change approved UI when the change is logged in ADAM (the lead, 22 October 2026: "let frontend change ui
+    and log it in changes. dont worry about it"); this CR is that log. The screen''s own button opens a form that collects
+    the request body; an unlabelled derived button gets its label'
+  change: CHG-R10WIR-004
+- screen: BO-1039
+  field: 'region:-'
+  to: 910fb74b53fd95d0
+  approval: 'ADAM CR-268 (raised from the r10 integration gate, check-screen-wiring S-OP-UNREACHED on recommendSeats and createSeatHold,
+    26 October 2026; accepted 26 October 2026 by Chinmay: "Add the forms in r10 (Recommended)"): since 22 October 2026 a
+    developer may change approved UI when the change is logged in ADAM (the lead, 22 October 2026: "let frontend change ui
+    and log it in changes. dont worry about it"); this CR is that log. The screen''s own button opens a form that collects
+    the request body; an unlabelled derived button gets its label'
+  change: CHG-R10WIR-004
+- screen: BO-994
+  field: 'overlay:formCreateSeatHold'
+  to: c08d1b49cc56e52f
+  approval: 'ADAM CR-268 (raised from the r10 integration gate, check-screen-wiring S-OP-UNREACHED on recommendSeats and createSeatHold,
+    26 October 2026; accepted 26 October 2026 by Chinmay: "Add the forms in r10 (Recommended)"): since 22 October 2026 a
+    developer may change approved UI when the change is logged in ADAM (the lead, 22 October 2026: "let frontend change ui
+    and log it in changes. dont worry about it"); this CR is that log. The screen''s own button opens a form that collects
+    the request body; an unlabelled derived button gets its label'
+  change: CHG-R10WIR-004
