@@ -15,7 +15,7 @@ decision:
     fixed at their source by the wiring lane, not allowed.'
   by: Chinmay
   date: '2026-10-26'
-why: 'The lead, 26 October 2026: a fresh rebuild of r10 must pass the gate; never baseline, acknowledge or exempt to
+why: 'ADAM CR-261 and CR-262 (accepted 26 October 2026) and the r10 gate run 20261026-153734-1986. The lead, 26 October 2026: a fresh rebuild of r10 must pass the gate; never baseline, acknowledge or exempt to
   pass. An allowance kept after its failure is fixed would let a new failure of the same shape through.'
 keys_touched:
   files:
