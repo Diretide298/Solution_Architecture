@@ -4756,6 +4756,7 @@ components:
     DeviceFirmware:
       type: object
       x-ticvai-persistence: tenancy.device_firmware
+      x-ticvai-rls: read-beneath   # r10 gate 3, CHG-R10INT-002: read below the tenant by getWorkstationHealth (ADAM CR-244)
       description: '16.6.30 and 16.6.32. **A release, and how much of the fleet is on it.** Written by
         `createDeviceFirmware` and moved through its life by `setDeviceFirmwareStatus` (29 September,
         build pass); `startDeviceFirmwareRollout` deploys only a `released` one.
@@ -5110,6 +5111,7 @@ components:
     ConfigurationProfile:
       type: object
       x-ticvai-persistence: "platform.configuration_profile"
+      x-ticvai-rls: read-beneath   # r10 gate 3, CHG-R10INT-002: read below the tenant by getWorkstationHealth (ADAM CR-244)
       # Each version is its own row, so an earlier one stays readable (R8 blocker APPROVALS-TENANCY-C08, CHG-R8MIG-019).
       x-ticvai-primary-key: [id, version]
       description: >

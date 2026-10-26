@@ -1,0 +1,35 @@
+id: CHG-R10INT-002
+date: '2026-10-26'
+source: audit
+kind: contract
+summary: 'platform.configuration_profile and tenancy.device_firmware are read beneath the tenant: getWorkstationHealth
+  (venue) compares a venue''s workstations with the tenant''s profiles and firmware releases (ADAM CR-244).'
+decision:
+  what: 'ConfigurationProfile and DeviceFirmware gain x-ticvai-rls read-beneath: rows written at the tenant are
+    readable by a caller acting beneath it, as the AI and Tenancy settings the venue applies already are (CHG-MOD-008,
+    CHG-GEN-008). A venue''s workstations run the tenant''s profiles and firmware, so the health score''s firmware and
+    profile currency term (CR-244) cannot be computed at a venue without them. Writes stay at the tenant.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-153734-1986) failed check-rls-scope-fit RF-OWNED-ABOVE
+  on getWorkstationHealth''s two new reads, added by CHG-R10CRF-004 for ADAM CR-244 (accepted by Chinmay 26 October
+  2026). The lead''s instruction for r10: fix every gate finding at the source; never baseline, acknowledge or exempt.'
+keys_touched:
+  operations: [getWorkstationHealth]
+  files:
+  - contracts/spine/tenancy.yaml
+root_class: 'a lane added a venue-level read of a tenant-written table without the read-beneath mark the row security
+  needs'
+tickets:
+  started: []
+  unstarted:
+  - '31204 (getWorkstationHealth): told through CR-244''s comment.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-244
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-rls-scope-fit.py
+status: open
+notes: 'Database change: the forward migration gives both tables the read-beneath row-security policy.'
