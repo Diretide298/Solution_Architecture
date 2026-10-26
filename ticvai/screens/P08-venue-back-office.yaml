@@ -19359,7 +19359,7 @@ screens:
       - kind: toggle
         label: Guest two-step verification
         bindsTo: VenueSettings.identity.guestTwoStep.enabled
-        operation: setVenueSettings
+        operation: getVenueSettings
         notes: '**A venue option, off unless the venue enables it** (decided 29 September, rev 3 GAP-B1,
           per venue, superseding the second part of audit R167 "no guest MFA"; guests still never use
           enterprise SSO). On, a guest of this venue may enrol an authenticator app with email codes as
@@ -19370,7 +19370,7 @@ screens:
       - kind: multiSelect
         label: Actions that ask again
         bindsTo: VenueSettings.identity.guestTwoStep.stepUpActions
-        operation: setVenueSettings
+        operation: getVenueSettings
         notes: 'The guest actions at this venue that ask an enrolled guest for the factor again, whatever
           the age of the session: change contact details, change password, manage payment methods, transfer
           tickets, delete account. Proposed default all but transfer tickets, client to correct (rev 3
@@ -82175,6 +82175,7 @@ screens:
         provenance: pack Rental_Management.pdf, page 14 §Support
       - kind: secondaryButton
         label: Version history
+        operation: listAuditRecords
         provenance: pack Rental_Management.pdf, page 14 §Support
   states:
     loading: The product validation approval configuration as saved.
@@ -146888,35 +146889,35 @@ screens:
       - kind: numberField
         label: Cart hold (seconds)
         bindsTo: VenueSettings.cartLeaseSeconds
-        operation: setVenueSettings
+        operation: getVenueSettings
         provenance: contract tenancy.yaml VenueSettings.cartLeaseSeconds (defined 4 October 2026, CHG-FXS-001)
       - kind: numberField
         label: Cart extension (minutes)
         bindsTo: VenueSettings.cartHoldExtensionMinutes
-        operation: setVenueSettings
+        operation: getVenueSettings
         provenance: contract tenancy.yaml VenueSettings.cartHoldExtensionMinutes (defined 4 October 2026,
           CHG-FXS-001)
       - kind: numberField
         label: Cart extensions allowed
         bindsTo: VenueSettings.cartMaxExtensions
-        operation: setVenueSettings
+        operation: getVenueSettings
         provenance: contract tenancy.yaml VenueSettings.cartMaxExtensions (defined 4 October 2026, CHG-FXS-001)
       - kind: numberField
         label: Seat hold extension (seconds)
         bindsTo: VenueSettings.seating.seatHoldExtensionSeconds
-        operation: setVenueSettings
+        operation: getVenueSettings
         provenance: contract tenancy.yaml VenueSettings.seating.seatHoldExtensionSeconds (defined 4 October
           2026, CHG-FXS-001)
       - kind: numberField
         label: Seat hold extensions allowed
         bindsTo: VenueSettings.seating.seatHoldMaxExtensions
-        operation: setVenueSettings
+        operation: getVenueSettings
         provenance: contract tenancy.yaml VenueSettings.seating.seatHoldMaxExtensions (defined 4 October
           2026, CHG-FXS-001)
       - kind: numberField
         label: Seats per guest booking
         bindsTo: VenueSettings.seating.maxSeatsPerGuestOrder
-        operation: setVenueSettings
+        operation: getVenueSettings
         provenance: contract tenancy.yaml VenueSettings.seating.maxSeatsPerGuestOrder (defined 4 October
           2026, CHG-FXS-001)
       - kind: primaryButton
@@ -160563,6 +160564,7 @@ screens:
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 §Support
       - kind: secondaryButton
         label: Security Audit
+        operation: listAuditRecords
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 §Support
   overlays:
   - id: confirmRollback
@@ -179971,6 +179973,7 @@ screens:
       - kind: detailPanel
         label: The selected promotion approval
         bindsTo: ApprovalRequest
+        operation: listPromotions
         columns:
         - Promotion
         - Request type
@@ -205056,11 +205059,6 @@ screens:
   - operationId: listPaymentTerminals
     contract: payments
     purpose: The inventory
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: listDevices
-    contract: tenancy
-    purpose: The device register behind it
     trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: listPaymentTerminalCertifications

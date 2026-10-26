@@ -9351,10 +9351,6 @@ screens:
     contract: retail
     purpose: Print the receipt again
     trigger: onAction
-  - operationId: reprintOrder
-    contract: orders
-    purpose: Print the whole order again
-    trigger: onAction
   - operationId: reissueEntitlement
     contract: orders
     purpose: Reissue the ticket or wristband

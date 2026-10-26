@@ -15284,6 +15284,11 @@ screens:
   overlays:
   - id: formCreateGuidedChoice
     component: modal
+    reads:
+    - listProducts
+    - listProductCategories
+    - listEvents
+    - listBookingFlows
     trigger: New set-up
     body: '**Collects what `createGuidedChoice` sends before it is called.** Required: `name` (staff-facing),
       `mode`, `questions` (one or two, each with two to four answers and a target per answer). Optional:

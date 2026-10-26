@@ -1,0 +1,42 @@
+id: CHG-R10WIR-002
+date: '2026-10-26'
+source: audit
+kind: spec
+summary: 'ADM-580 no longer declares listDevices and POS-026 no longer declares reprintOrder: no element on either
+  approved screen reaches them, and both are reached on other screens; nothing visible changes.'
+decision:
+  what: 'ADAM CR-262, option A, the same ruling as CHG-R10OPN-005: screens/P08 ADM-580 drops the listDevices api ("The
+    device register behind it"; the screen''s body has no component and its buttons are pack text), and screens/P04
+    POS-026 drops reprintOrder ("Print the whole order again"; the screen''s one reprint control is "Reprint receipt",
+    reprintReceipt). listDevices stays declared and reached on ANL-003, BO-036, BO-124, BO-405, BO-732, EMP-043,
+    POS-016 and POS-025; reprintOrder on POS-002, POS-006, POS-030 and 17 more.'
+  by: Chinmay
+  date: '2026-10-26'
+  quote: '"Yes, all six (Recommended)", then "actually get them build r10 thats fine"'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-153734-1986): check-screen-wiring S-OP-UNREACHED on
+  ADM-580 and POS-026, built on by started tickets, masked until now by the gate''s allowance pattern. The lead''s six
+  decisions of 26 October 2026, item 5: a read the approved screen has no element for leaves it; if the screen later
+  needs it, it comes back through a CR.'
+keys_touched:
+  screens: [ADM-580, POS-026]
+  operations: [listDevices, reprintOrder]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - screens/P04-point-of-sale.yaml
+root_class: 'an operation declared on a screen that has no element for it'
+tickets:
+  started:
+  - '30798 (listDevices, Ready for QA, Sanket Keluskar) and 30699 (reprintOrder, Ready for QA, Chinmay Patkar): the
+    operations are unchanged and still reached elsewhere; the lead comments on them. Their text is not rewritten.'
+  unstarted:
+  - '28403 and 32318 to 32320 (POS-026): drop the declaration at the next tag. ADM-580 has no screen ticket of its own.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-262
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'No visible change (apis are invisible to check-approved-ui). POS-026''s approved emptyNoAccess text still names
+  reprintOrder beside reprintReceipt under ORDER_REPRINT; it is client copy and stays, for the lead. No database change.'
