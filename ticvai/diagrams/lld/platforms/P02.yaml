@@ -1658,6 +1658,7 @@ screens:
   - performanceId<-deepLink
   - eventId<-GST-007
   - holdIds<-navigation
+  - holdId<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -2086,6 +2087,7 @@ screens:
   offlineState: true
   entryParams:
   - subjectId<-session
+  - requestId<-navigation
   goesTo:
   - GST-039
   boardFrames: null

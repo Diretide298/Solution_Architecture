@@ -346,6 +346,7 @@ screens:
   - productId<-WEB-004
   - holdIds<-navigation
   - venueId<-session
+  - holdId<-navigation
   goesTo:
   - WEB-001
   - WEB-005
@@ -942,6 +943,7 @@ screens:
   - subjectId<-session
   - enrolmentId<-navigation
   - methodId<-navigation
+  - requestId<-navigation
   goesTo:
   - WEB-001
   - WEB-021
