@@ -47,6 +47,12 @@ schema, or the operation holds the venue or region); 150 are for the lead: 112 r
 (routed by a second run once Tenancy declares tenancy#scopeRecords, CR-217 option A, leaving 38), 18 platform
 billing rows (`control.*`, CR-202), 11 rows with no venue and 9 computed answers that read no table.
 
+**Round 3, 26 October 2026 (CHG-R10GEN-009).** The lead accepted every default on 25 October, so the fixer holds none:
+a platform billing row (`control.*`) stores its billing currency on its schema (`currencyCode`, CR-202, as
+CHG-R10ID-013 and -017 built it), a platform answer computed from `control.*` rows reads `control.billing_entity`,
+and a row with no venue or a computed answer takes the venue the operation acts at. Run on a derived tree
+(tools/derive-schema.py, derive-lineage.py --apply): the schema reference is where a stored currency becomes a column.
+
     python tools/check-money-currency.py [--all] [--list]
 """
 from __future__ import annotations

@@ -1,0 +1,64 @@
+id: CHG-R10GEN-009
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'The lead''s defaults for Money are fix-money-currency''s defaults, not holds: a platform billing row
+  (control.*) stores its billing currency on its schema (currencyCode), a platform answer computed from control.*
+  rows reads control.billing_entity, and a row with no venue or a computed answer takes the venue the operation acts
+  at. On the merged r10 tree check-money-currency is 0; the eight platform operations that still asked a venue''s or
+  region''s currency (round 1''s route, before CR-202 gave them the billing currency) no longer do.'
+decision:
+  what: 'The lead accepted every default of audit LANE-E-RULINGS.md on 25 October 2026 ("Accept all defaults"):
+    group 2, platform billing rows (control.*), a billing currency stored on the row (CR-202''s ruling); a row with
+    no venue, the caller''s working venue; a computed answer, the venue the operation acts at. The control.* rows
+    already carry it, built by the identity lane (CHG-R10ID-013: BillingEntity.billingCurrency, the invoice''s
+    currencyCode; CHG-R10ID-017: currencyCode on Plan, Subscription (control.contract), CapacityPack, LicenceAddOn,
+    LicensingModel, ModuleListing and SubscriptionCreditNote) and the computed answers (getCommercialMetrics,
+    listMemberExceptionOverride, scoreVsiAssessment) state control.billing_entity in x-ticvai-reads (CHG-R10ORD-019).
+    The 22 findings integration saw were the schema reference not yet derived from them. fix-money-currency now
+    writes both shapes itself where they are missing (add_currency_property, add_billing_read) and routes the no-venue
+    and computed cases to tenancy#venueSettingsRecords; applied to the merged tree it removes the round-1 venue or
+    region read of getBillingReconciliation, getLicenceEnforcement, getPlanRecommendations, getTenantLicences,
+    previewSubscriptionChange, removeLicenceAddOn, settleAiUsage and simulateCommercialPackage, whose Money is now in
+    the billing currency.'
+  by: Chinmay
+  date: '2026-10-25'
+why: 'ADAM CR-202 (generateInvoice, #28000) and the lead''s acceptance of the r10 lane E default rulings, 25 October
+  2026; the coordinator''s round-3 brief of 26 October ("the patterns into the build": the ruling is the default, not a
+  hold).'
+keys_touched:
+  operations: [getBillingReconciliation, getLicenceEnforcement, getPlanRecommendations, getTenantLicences,
+    previewSubscriptionChange, removeLicenceAddOn, settleAiUsage, simulateCommercialPackage]
+  tables: []
+  schemas: []
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/fix-money-currency.py
+  - tools/check-money-currency.py
+  - tools/tests/test_check_money_currency.py
+  - repos/ticvai-docs/setup/api-conventions.md
+  - repos/ticvai-ai/project-bible/setup/api-conventions.md
+  - repos/ticvai-backend/project-bible/setup/api-conventions.md
+  - repos/ticvai-contracts/project-bible/setup/api-conventions.md
+  - repos/ticvai-frontend/project-bible/setup/api-conventions.md
+  - repos/ticvai-infra/project-bible/setup/api-conventions.md
+  - ../viewer/mcp/setup/starters/docs/api-conventions.md
+root_class: 'a ruling left as a hold: the fixer listed for the lead what the lead had already decided'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-202
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-money-currency.py
+status: open
+notes: 'Measured on the merged tree with the schema reference and lineage derived (tools/derive-schema.py,
+  derive-lineage.py --apply, both restored before the commit): check-money-currency PASS, 0 findings;
+  fix-money-currency''s second run writes nothing and holds nothing; check-cross-module-reads XR-FACT, XR-ROUTE,
+  XR-QUERY, XR-LINEAGE 0. The forward migration the generator writes from the derived schema reference adds
+  currency_code to control.plan, control.contract, control.invoice (NOT NULL), control.credit_note,
+  control.capacity_pack, control.licence_add_on, control.licensing_model and control.module_listing, and
+  billing_currency to control.billing_entity (CHG-R10ID-013, -017); control.tenant needs none.'
