@@ -918,8 +918,16 @@
      "optional": true
     },
     {
+     "name": "holdIds",
+     "from": "navigation",
+     "optional": true,
+     "notes": "The seat holds GST-049 carries, one per seat, as on WEB-010 (ADAM CR-187, 25 October 2026)."
+    },
+    {
      "name": "holdId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "The resource hold (a cabana or spot held on the venue map) that `getResourceHold` reads for its countdown, when an edge carries one; otherwise each line's own `resourceHoldId`. Not a seat hold: the seat holds are `holdIds` (ADAM CR-187, 25 October 2026)."
     },
     {
      "name": "venueId",

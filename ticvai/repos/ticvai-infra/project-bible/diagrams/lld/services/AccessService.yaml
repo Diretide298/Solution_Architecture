@@ -1,5 +1,5 @@
 id: LLD-AccessService
-title: AccessService — 258 operations, 78 tables
+title: AccessService — 259 operations, 78 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: access
@@ -10,7 +10,7 @@ scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is h
   precisely because the gate cannot afford the arithmetic.
 ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
 coverage:
-  operations: 258
+  operations: 259
   inAFlow: 157
   percent: 61%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -23,7 +23,7 @@ schemas:
   largestTable: access.media_type
 operationsByContract:
 - contract: access
-  count: 258
+  count: 259
   operations:
   - operation: addBlacklistEntry
     verb: POST
@@ -1313,6 +1313,14 @@ operationsByContract:
     offline: false
     reads: 10
     writes: 4
+  - operation: recordQueueRedemptionUse
+    verb: POST
+    path: /internal/queue-redemptions
+    scope: venue
+    permission: null
+    offline: false
+    reads: 2
+    writes: 2
   - operation: releaseCredentialDevice
     verb: POST
     path: /device-bindings/{bindingId}/release
@@ -2129,6 +2137,7 @@ tables:
   - publishMediaCompatibilityTesting
   - publishRuleConflictCheck
   - publishTopologyValidation
+  - recordQueueRedemptionUse
   - releaseCredentialDevice
   - releaseIdentityLock
   - removeBlacklistEntry
@@ -2254,6 +2263,7 @@ tables:
   - publishMediaCompatibilityTesting
   - publishRuleConflictCheck
   - publishTopologyValidation
+  - recordQueueRedemptionUse
   - releaseCredentialDevice
   - releaseIdentityLock
   - removeBlacklistEntry
@@ -2608,7 +2618,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: access.entitlement
-  columns: 31
+  columns: 34
   store: postgres
   parent: null
   writtenBy:

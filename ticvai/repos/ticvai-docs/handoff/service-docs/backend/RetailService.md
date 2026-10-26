@@ -60,7 +60,7 @@ Records who handed over and against what. Partial collection is permitted — a 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `retail.shop_and_drop`, `retail.shop_and_drop_line` |
-| Writes | `cache:idempotency`, `retail.shop_and_drop_line` |
+| Writes | `cache:idempotency`, `retail.shop_and_drop`, `retail.shop_and_drop_line` |
 | Called by | POS-012 |
 | State model | Shop and drop ([states/shop-and-drop.yaml](../../../states/shop-and-drop.yaml)): moves `awaitingCollection` -> `partiallyCollected`, `partiallyCollected` -> `collected`, `awaitingCollection` -> `collected`, `uncollected` -> `collected` |
 
@@ -80,8 +80,8 @@ Records who handed over and against what. Partial collection is permitted — a 
 | lines[].lineId | string | yes |  |
 | lines[].quantity | integer | yes | (min 1) |
 | verifiedBy | enum (entitlementScan, receipt, dropReference, staffOverride) |  |  |
-| note | string |  | (max length 500) |
-| recordedAt | string (date-time) | yes |  |
+| note | string |  | Kept on the drop as collectionNote (ADAM CR-104). (max length 500) |
+| recordedAt | string (date-time) | yes | When the device recorded the handover; kept as collectedAt (ADAM CR-104). |
 
 **Response**: `ShopAndDrop`
 
@@ -92,7 +92,7 @@ Records who handed over and against what. Partial collection is permitted — a 
 | disposalDecidedAt | string (date-time) |  | When the decision was recorded (the server's time). (read-only; nullable) |
 | disposalDecidedByPrincipalId | string (uuid) |  | Who authorised it, the caller, from the session ("recorded with who authorised it"). (read-only; nullable) |
 | id | string | yes |  |
-| dropReference | string | yes | Short and readable. |
+| dropReference | string | yes | Short and readable. (max length 32; read-only) |
 | saleId | string |  | The till sale. (nullable) |
 | orderId | string (uuid) |  | The paid online order that created this collection (audit R236). (nullable) |
 | entitlementId | string |  | The ticket that claims these goods. (nullable) |
@@ -111,12 +111,15 @@ Records who handed over and against what. Partial collection is permitted — a 
 | collectedAt | string (date-time) |  | (nullable) |
 | collectedByPrincipalId | string (uuid) |  | (nullable) |
 | verifiedBy | string |  | (nullable) |
+| collectionNote | string |  | The note given with the latest collectShopAndDrop (ADAM CR-104, CHG-R10ORD-017); null when none was given. (max length 500; nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Collected |
+| 400 |  | A lines or lineIds entry that is not a line of this drop, or a quantity past what the line has left (line-not-on-drop, quantity-exceeds-line; ADAM CR-104). |
+| 404 |  | No drop with this dropId the caller can see (ADAM CR-104). |
 | 409 |  | Already collected (alreadyCollected), or past the collection deadline (pastCollectBy). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -130,6 +133,7 @@ Not a reservation. `reserveMerchandise` holds unsold stock for someone who has n
 
 **Also called by the order service when an online order is paid** (decided 28 September, audit R236): a guest on the web buys merchandise to collect on the way out, pays at checkout, and on payment the order service calls this with `orderId` (and no `saleId`), once per order, naming the retail lines marked for collection in `lineIds`. A staff caller at a till sends `saleId`. Exactly one of the two is sent.
 **Collection point hours** (r8 walk of ticket 27820): the collection point (`fnb.DeliveryLocation`) has `opensAt` and `closesAt` (time of day, local to the venue). The drop is refused 409 `collectionPointClosed` when it would be collected while the point is closed, and `collectBy` defaults to the close of the point's day when the request sends none.
+**What is refused, and how** (ADAM CR-104, option 1 as amended; Chinmay, 15 October 2026; CHG-R10ORD-017). Both `saleId` and `orderId`, or neither, is `400 sale-or-order-required`. A `saleId`, `orderId` or `collectionPointId` that names nothing the caller can see is `422` (`unknown-sale`, `unknown-order`, `unknown-collection-point`), and a `lineIds` entry that is not a line of that sale or order is `422 unknown-line`. **One drop per sale and one per order**: a second is `409 alreadyDropped`, kept by a unique index on each of `sale_id` and `order_id` (a row without one does not count), whatever `lineIds` it names. **`itemNotDroppable` is not raised** until an approved screen can set `MerchandiseItem.isDroppable`: none does today (CR-104), so every item is droppable. **`dropReference`** is server-assigned, the venue prefix and a sequence per venue, as `orderNumber` is (for example `DXB1-SD-000123`), unique in the tenant; the slip prints it and `lookupShopAndDrop` matches it exactly.
 
 |  |  |
 |---|---|
@@ -172,7 +176,7 @@ Not a reservation. `reserveMerchandise` holds unsold stock for someone who has n
 | disposalDecidedAt | string (date-time) |  | When the decision was recorded (the server's time). (read-only; nullable) |
 | disposalDecidedByPrincipalId | string (uuid) |  | Who authorised it, the caller, from the session ("recorded with who authorised it"). (read-only; nullable) |
 | id | string | yes |  |
-| dropReference | string | yes | Short and readable. |
+| dropReference | string | yes | Short and readable. (max length 32; read-only) |
 | saleId | string |  | The till sale. (nullable) |
 | orderId | string (uuid) |  | The paid online order that created this collection (audit R236). (nullable) |
 | entitlementId | string |  | The ticket that claims these goods. (nullable) |
@@ -191,13 +195,16 @@ Not a reservation. `reserveMerchandise` holds unsold stock for someone who has n
 | collectedAt | string (date-time) |  | (nullable) |
 | collectedByPrincipalId | string (uuid) |  | (nullable) |
 | verifiedBy | string |  | (nullable) |
+| collectionNote | string |  | The note given with the latest collectShopAndDrop (ADAM CR-104, CHG-R10ORD-017); null when none was given. (max length 500; nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Dropped |
-| 409 |  | Sale already dropped (alreadyDropped), an item is non-droppable — chilled, fragile, oversized — (itemNotDroppable), or the collection point is closed before collectBy (collectionPointClosed). |
+| 400 |  | Both saleId and orderId, or neither (sale-or-order-required; ADAM CR-104). |
+| 422 |  | The sale, order or collection point named is not one the caller can see (unknown-sale, unknown-order, unknown-collection-point), or a lineIds entry is not a line of it (unknown-line; ADAM CR-104). |
+| 409 |  | Sale already dropped (alreadyDropped), an item is non-droppable — chilled, fragile, oversized — (itemNotDroppable, not raised until an approved screen sets isDroppable; ADAM CR-104), or the collectio… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### lookupMerchandise
@@ -232,6 +239,7 @@ The most-used operation on a shop floor. Returns price after any live promotion,
 | sku | query |  | string | Exact match on sku, within the venue. |
 | includeSiblingOutlets | query |  | boolean | False leaves siblingOutlets empty. |
 | outletId | query |  | string (uuid) | The outlet to price and count at, for a caller with no workstation (audit R215). |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `PriceCheck`
 
@@ -272,6 +280,8 @@ The most-used operation on a shop floor. Returns price after any live promotion,
 
 Scanned at the collection point. Accepts the entitlement, the drop reference, or the original receipt — a guest arrives with whichever they still have.
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for goods they dropped themselves; another guest's goods is refused exactly as one that does not exist, never returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+**What it returns, in what order** (ADAM CR-104, option 1; CHG-R10ORD-017): the drops still awaiting collection, `status` `awaitingCollection` or `partiallyCollected`; a collected, uncollected or disposed drop is not returned. Newest first, by `droppedAt` descending, then `id`.
+Where `droppedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -418,6 +428,7 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 | requiresSerialNumber | boolean |  | (default False) |
 | imageAssetRef | string |  |  |
 | isDroppable | boolean |  | Whether the item may go to shop-and-drop; the venue sets chilled, fragile or oversized items false (R8 blocker APPROVALS-TENANCY-C34). (default True) |
+| isPublished | boolean |  | Whether guests and visitors may see the item (MerchandiseItem.isPublished; CHG-R10ORD-025). (default False) |
 
 **Response**: `MerchandiseItem`
 
@@ -425,8 +436,8 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 |---|---|---|---|
 | description | string |  | What the item is, in the guest's words. |
 | id | string (uuid) | yes |  |
-| sku | string | yes |  |
-| barcode | string |  | (nullable) |
+| sku | string | yes | Unique per outlet (ADAM CR-104, CHG-R10ORD-017); lookupMerchandise matches it exactly. |
+| barcode | string |  | Unique per outlet where set (ADAM CR-104; was unique per venue, which the table has no venue column to key); lookupMerchandise matches it exactly and returns one row. (nullable) |
 | name | string | yes |  |
 | outletId | string (uuid) | yes |  |
 | categoryId | string (uuid) |  | (nullable) |
@@ -442,6 +453,7 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 | requiresSerialNumber | boolean |  | (default False) |
 | imageAssetRef | string |  | (nullable) |
 | isActive | boolean | yes |  |
+| isPublished | boolean |  | Whether a guest or a visitor may see the item (the lead's answer of 25 October 2026 to the r10 lanes' questions, question 22; CHG-R10ORD-025): the flag listMerchandise and lookupMerchandise already n… (default False) |
 | isDroppable | boolean |  | Whether the item may be dropped for later collection (R8 blocker APPROVALS-TENANCY-C34). (default True) |
 
 **Responses**
@@ -450,7 +462,7 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 |---|---|---|
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
-| 409 |  | Barcode already in use in this venue. |
+| 409 |  | Barcode already in use by another item with the same outletId (ADAM CR-104). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listMerchandise
@@ -488,6 +500,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 | search | query |  | string | Case-insensitive "contains" match over name, sku, barcode and description. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -501,6 +514,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Merchandise, one page. |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -550,8 +564,8 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 |---|---|---|---|
 | description | string |  | What the item is, in the guest's words. |
 | id | string (uuid) | yes |  |
-| sku | string | yes |  |
-| barcode | string |  | (nullable) |
+| sku | string | yes | Unique per outlet (ADAM CR-104, CHG-R10ORD-017); lookupMerchandise matches it exactly. |
+| barcode | string |  | Unique per outlet where set (ADAM CR-104; was unique per venue, which the table has no venue column to key); lookupMerchandise matches it exactly and returns one row. (nullable) |
 | name | string | yes |  |
 | outletId | string (uuid) | yes |  |
 | categoryId | string (uuid) |  | (nullable) |
@@ -567,6 +581,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 | requiresSerialNumber | boolean |  | (default False) |
 | imageAssetRef | string |  | (nullable) |
 | isActive | boolean | yes |  |
+| isPublished | boolean |  | Whether a guest or a visitor may see the item (the lead's answer of 25 October 2026 to the r10 lanes' questions, question 22; CHG-R10ORD-025): the flag listMerchandise and lookupMerchandise already n… (default False) |
 | isDroppable | boolean |  | Whether the item may be dropped for later collection (R8 blocker APPROVALS-TENANCY-C34). (default True) |
 
 **Responses**
@@ -574,7 +589,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
-| 409 |  | The new barcode is already in use in this venue. |
+| 409 |  | The new barcode is already in use by another item with the same outletId (ADAM CR-104). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -1247,8 +1262,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | description | text | no | What the item is, in the guest's words. |
 | id | uuid | yes |  |
-| sku | text | yes |  |
-| barcode | text | no |  |
+| sku | text | yes | Unique per outlet (ADAM CR-104, CHG-R10ORD-017); lookupMerchandise matches it exactly. |
+| barcode | text | no | Unique per outlet where set (ADAM CR-104; was unique per venue, which the table has no venue column to key); lookupMerchandise matches it exactly and returns one row. |
 | name | text | yes |  |
 | outlet_id | uuid | yes |  |
 | category_id | uuid | no |  |
@@ -1261,6 +1276,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | requires_serial_number | boolean | no |  |
 | image_asset_ref | text | no |  |
 | is_active | boolean | yes |  |
+| is_published | boolean | no | Whether a guest or a visitor may see the item (the lead's answer of 25 October 2026 to the r10 lanes' questions, question 22; CHG-R10ORD-025): the flag listMerchandise and lookupMerchandise already n… |
 | is_droppable | boolean | no | Whether the item may be dropped for later collection (R8 blocker APPROVALS-TENANCY-C34). |
 
 ### `retail.reservation`
@@ -1396,6 +1412,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | collected_at | timestamptz | no |  |
 | collected_by_principal_id | uuid | no |  |
 | verified_by | text | no |  |
+| collection_note | text | no | The note given with the latest collectShopAndDrop (ADAM CR-104, CHG-R10ORD-017); null when none was given. |
 | venue_id | uuid | no | Points at platform.org_unit. |
 
 ### `retail.shop_and_drop_line`

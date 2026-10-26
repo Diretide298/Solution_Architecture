@@ -396,12 +396,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: claimCustomDomain
-      x-ticvai-emits:
-      - whitelabel.customDomainChanged
       x-ticvai-consumed-by:
         - "P08 BO-835 Site, Brand & Domain Setup"
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-emits:
+      - whitelabel.customDomainChanged
       x-ticvai-read-via:
       - query: subscription#tenantRecords
         route: in-process
@@ -523,11 +523,11 @@ paths:
         format: uuid
     post:
       operationId: verifyCustomDomain
-      x-ticvai-emits:
-      - whitelabel.customDomainChanged
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-emits:
+      - whitelabel.customDomainChanged
       x-ticvai-names-for-context: [control.tenant_domain]
       summary: Check the record and issue the certificate
       description: '**Verification and issuance are one act from the tenant''s point of view and two states
@@ -620,11 +620,11 @@ paths:
         format: uuid
     delete:
       operationId: relinquishCustomDomain
-      x-ticvai-emits:
-      - whitelabel.customDomainChanged
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-emits:
+      - whitelabel.customDomainChanged
       summary: Give the domain up
       description: '**Refused while it is the only active domain for a live app.** Releasing the hostname
         a tenant''s guests are using takes their storefront down, and the confirmation should say so rather
@@ -689,11 +689,11 @@ paths:
         format: uuid
     post:
       operationId: setPrimaryDomain
-      x-ticvai-emits:
-      - whitelabel.customDomainChanged
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-emits:
+      - whitelabel.customDomainChanged
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, batch 5 ("subdomain plus CNAME"): a primary domain with redirects; shape
@@ -755,11 +755,11 @@ paths:
         format: uuid
     post:
       operationId: regenerateDomainToken
-      x-ticvai-emits:
-      - whitelabel.customDomainChanged
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-emits:
+      - whitelabel.customDomainChanged
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, batch 5 (domains research B1-B6): a claim that timed out starts again with a

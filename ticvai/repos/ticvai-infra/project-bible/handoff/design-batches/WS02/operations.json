@@ -70,6 +70,11 @@
     "name": "productId",
     "in": "path",
     "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,

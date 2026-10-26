@@ -1,0 +1,31 @@
+# sitePackage.requested v1 — published by whitelabel
+# Added 25 October 2026 (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012): the white-label jobs
+# component on the workers host carries app builds, site packages and preview rendering, one event each.
+# Checked by tools/check-states.py.
+
+name: sitePackage.requested
+version: 1
+publisher: whitelabel
+description: A tenant asked for a self-hosting package of a published version.
+aggregate: sitePackage
+emittedWhen: exportSitePackage stores a SitePackage building
+emittedBy:
+- exportSitePackage
+payload:
+- field: sitePackageId
+  type: uuid
+  notes: The package's id, the event's aggregateId
+- field: version
+  type: string
+  notes: The published ConfigVersion.version to package
+- field: requestedByPrincipalId
+  type: uuid
+  required: false
+consumers:
+- context: white-label
+  purpose: 'Build the package from the version''s whitelabel.config_version snapshot, store it as an Assets media asset (packageAssetRef), and move the package building -> ready (with a download link that expires 24 hours after it is issued) or failed. The white-label jobs component in the workers host'
+  idempotencyKey: sitePackageId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 30 days after publication
+notes: 'No state model emits this: the request is stored by the operation and the work is the jobs component''s.'

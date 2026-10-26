@@ -1,13 +1,13 @@
 id: HLD-LIFECYCLES
 sourceFiles:
   folder: states/
-  files: 209
-  drawn: 208
+  files: 210
+  drawn: 209
   skipped:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 208 state models and 97 events
+title: 209 state models and 105 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -720,16 +720,15 @@ stateModels:
   owner: public-api
   service: PlatformService
   states: null
-  transitions: 6
+  transitions: 4
   initial:
   - active
   terminal:
   - revoked
   operations:
   - revokeApiCredential
-  - rotateApiCredential
   - setApiClientStatus
-  guarded: 6
+  guarded: 4
   ref: diagrams/lld/lifecycles/api-client.yaml
 - entity: API version
   contract: public-api
@@ -834,7 +833,7 @@ stateModels:
   owner: marketing
   service: MarketingService
   states: null
-  transitions: 8
+  transitions: 9
   initial:
   - draft
   terminal:
@@ -846,7 +845,7 @@ stateModels:
   - pauseCampaign
   - stopCampaign
   - unscheduleCampaign
-  guarded: 8
+  guarded: 9
   ref: diagrams/lld/lifecycles/campaign.yaml
 - entity: Cart
   contract: orders
@@ -1207,7 +1206,6 @@ stateModels:
   terminal:
   - revoked
   operations:
-  - claimCustomDomain
   - relinquishCustomDomain
   - verifyCustomDomain
   guarded: 12
@@ -1251,14 +1249,15 @@ stateModels:
 - entity: Developer account
   contract: public-api
   owner: public-api
-  service: null
+  service: PlatformService
   states: null
   transitions: 6
   initial:
   - pending
   terminal:
   - closed
-  operations: []
+  operations:
+  - verifyDeveloper
   guarded: 6
   ref: diagrams/lld/lifecycles/developer-account.yaml
 - entity: Device firmware release
@@ -1309,7 +1308,7 @@ stateModels:
   owner: orders
   service: CatalogueService
   states: null
-  transitions: 11
+  transitions: 14
   initial:
   - issued
   terminal:
@@ -1320,12 +1319,27 @@ stateModels:
   operations:
   - cancelPerformance
   - createRefund
+  - recordQueueRedemptionUse
   - suspendEntitlement
   - transferOrderTickets
   - validateAccess
   - voidEntitlement
-  guarded: 11
+  guarded: 14
   ref: diagrams/lld/lifecycles/entitlement-status.yaml
+- entity: Event lifecycle
+  contract: catalogue
+  owner: catalogue
+  service: CatalogueService
+  states: null
+  transitions: 11
+  initial:
+  - draft
+  terminal:
+  - archived
+  operations:
+  - setEventLifecycleState
+  guarded: 11
+  ref: diagrams/lld/lifecycles/event.yaml
 - entity: F&B order
   contract: fnb
   owner: fnb
@@ -1412,16 +1426,17 @@ stateModels:
 - entity: Group booking
   contract: orders
   owner: orders
-  service: null
+  service: OrderService
   states: null
-  transitions: 6
+  transitions: 7
   initial:
   - provisional
   terminal:
   - complete
   - cancelled
-  operations: []
-  guarded: 6
+  operations:
+  - updateGroupBooking
+  guarded: 7
   ref: diagrams/lld/lifecycles/group-booking.yaml
 - entity: Group quote
   contract: orders
@@ -1618,7 +1633,7 @@ stateModels:
   operations:
   - cancelInvoice
   - disputeInvoice
-  - generateInvoice
+  - issueInvoice
   - recordInvoicePayment
   - resolveInvoiceDispute
   guarded: 9
@@ -2357,13 +2372,11 @@ stateModels:
   owner: queue
   service: VenueOpsService
   states: null
-  transitions: 7
+  transitions: 10
   initial:
   - waiting
   terminal:
   - redeemed
-  - expired
-  - noShow
   - cancelled
   - released
   operations:
@@ -2371,8 +2384,9 @@ stateModels:
   - leaveQueue
   - overrideWaitingGuest
   - redeemWaitingGuest
+  - resolveCalledWaitingGuest
   - setQueueStatus
-  guarded: 7
+  guarded: 10
   ref: diagrams/lld/lifecycles/queue-entry.yaml
 - entity: Queue
   contract: queue
@@ -2440,13 +2454,13 @@ stateModels:
   owner: tenancy
   service: TenancyService
   states: null
-  transitions: 14
+  transitions: 21
   initial:
   - unknown
   terminal: []
   operations:
   - recordDeviceHeartbeat
-  guarded: 14
+  guarded: 21
   ref: diagrams/lld/lifecycles/registered-device.yaml
 - entity: Release
   contract: platform-ops
@@ -2858,7 +2872,7 @@ stateModels:
   owner: shift
   service: OrderService
   states: null
-  transitions: 14
+  transitions: 15
   initial:
   - pendingApproval
   - open
@@ -2873,7 +2887,7 @@ stateModels:
   - resumeShift
   - submitShiftCount
   - suspendShift
-  guarded: 14
+  guarded: 15
   ref: diagrams/lld/lifecycles/shift.yaml
 - entity: Shop and drop
   contract: retail
@@ -3316,14 +3330,14 @@ stateModels:
   owner: public-api
   service: null
   states: null
-  transitions: 3
+  transitions: 4
   initial:
   - queued
   terminal:
   - completed
   - failed
   operations: []
-  guarded: 3
+  guarded: 4
   ref: diagrams/lld/lifecycles/webhook-replay.yaml
 - entity: Webhook subscription
   contract: public-api
@@ -3435,6 +3449,8 @@ events:
   description: An API client's traffic breached an anomaly rule (volume against its own baseline or
     a ceiling, 4xx share, refusals from outside the allow-list, calls outside its usual operations),
     and the breach was recorded as an ApiAnomaly with the action taken.
+- event: appBuild-requested
+  description: A tenant asked for its branded app to be built for a store.
 - event: approval-escalated
   description: An approval request was escalated, by a person or because its SLA was breached.
 - event: approval-expired
@@ -3499,6 +3515,8 @@ events:
 - event: entitlement-voided
   description: One ticket was voided before settlement, within the same shift. The entitlement is cancelled
     (cancellationKind voided) and stops admitting.
+- event: event-lifecycleChanged
+  description: An event moved in its lifecycle (draft, planned, onSale, live, closed, cancelled, archived).
 - event: fnb-kitchenTicketCreated
   description: A kitchen ticket exists for a preparation station, from a till sale or a guest order.
 - event: fnb-menuPublished
@@ -3510,11 +3528,16 @@ events:
 - event: identity-credentialResetRequested
   description: Somebody asked for a password or PIN to be reset — a guest asked for a reset code, or
     a supervisor reset a member of staff's credential.
+- event: identity-guestCheckoutLinked
+  description: A signed-in guest proved a guest-checkout booking was theirs; the matched orders are
+    to be attached to them.
 - event: identity-guestRegistered
   description: A guest registered an account, with the consents they gave on the form.
 - event: identity-loginRecorded
   description: Somebody tried to sign in — a staff or partner principal, or a guest — and it succeeded,
     failed, or was asked for a second factor.
+- event: identity-privacyRequestRaised
+  description: A guest's privacy request (a data export or an erasure) was raised, as an Approvals request.
 - event: inventory-purchaseOrderReceived
   description: A purchase order is fully received.
 - event: inventoryHold-expired
@@ -3568,9 +3591,14 @@ events:
   description: A guest saved a payment method for future use, and consented to its storage.
 - event: performance-cancelled
   description: A performance was cancelled and everyone holding a ticket must be made whole.
+- event: preview-requested
+  description: A tenant asked for a preview of its working draft.
 - event: promotions-recommendationStrategyPublished
   description: What a placement may recommend changed — a recommendation strategy went live or changed
     while live, or the product relationships or suppressions it ranks with were set.
+- event: queueEntry-redeemed
+  description: A party with a Fast Pass entitlement was admitted at the ride from its virtual queue
+    entry, and the entitlement's use is Access's to take.
 - event: reporting-definitionPublished
   description: A report definition is available to run.
 - event: reporting-questionAnswered
@@ -3591,6 +3619,8 @@ events:
   description: A till has been counted and closed.
 - event: shift-opened
   description: A till shift was opened.
+- event: sitePackage-requested
+  description: A tenant asked for a self-hosting package of a published version.
 - event: stock-depleted
   description: Stock left a location — sold, wasted, transferred or counted out.
 - event: storefront-sessionEvent
@@ -3605,7 +3635,7 @@ events:
 - event: tenant-terminated
   description: A terminated tenant's retention window has ended and its data is being removed.
 - event: tenantDomain-mapped
-  description: A hostname was routed to a tenant, re-routed, or released.
+  description: A hostname was routed to a tenant, re-routed, or detached.
 - event: tenantDomain-rejected
   description: A custom domain mapping was refused because another tenant holds the hostname.
 - event: wallet-credited
@@ -3617,5 +3647,7 @@ events:
   description: Money left a wallet's available balance, held for a spend or captured.
 - event: whitelabel-contentPublished
   description: A tenant published content to their guest surfaces — a page, a banner, an FAQ or a policy.
+- event: whitelabel-customDomainChanged
+  description: A tenant's custom domain was claimed, verified, made primary, re-tokened or relinquished.
 - event: whitelabel-passCertificateExpiring
   description: A brand's Apple Wallet Pass Type ID certificate expires within 30 days.

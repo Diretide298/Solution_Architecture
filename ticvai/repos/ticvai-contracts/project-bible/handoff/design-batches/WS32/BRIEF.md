@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-315` | Order Amendment Workspace | C | 66 | 30 | 6 | 32 | 0 | 0 | — | notStarted (generated) |
 | `BO-316` | Amendment Eligibility & Policy Rule Builder | C | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-317` | Cancellation & Partial Cancellation Policy Configuration | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-318` | Refund Policy & Refund Calculation Configuration | C | 16 | 11 | 5 | 0 | 3 | 6 | — | notStarted (generated) |
+| `BO-318` | Refund Policy & Refund Calculation Configuration | C | 16 | 12 | 5 | 0 | 3 | 6 | — | notStarted (generated) |
 | `BO-319` | Void, Reversal & Same-Day Correction Management | C | 11 | 0 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
 | `BO-321` | After-Sales Financial Settlement & Adjustment Workspace | C | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-322` | Approval, Exception & Service Recovery Management | C | 9 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |

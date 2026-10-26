@@ -120,16 +120,14 @@
       {
        "kind": "detailPanel",
        "label": "The coupon code",
-       "bindsTo": "CouponCode",
+       "bindsTo": "GuestCouponCode",
        "columns": [
-        "CouponCode.code",
-        "CouponCode.status",
-        "CouponCode.redemptionCount",
-        "CouponCode.discount",
-        "CouponCode.invalidReason",
-        "CouponCode.validFrom",
-        "CouponCode.validTo",
-        "CouponCode.redeemedAt"
+        "GuestCouponCode.code",
+        "GuestCouponCode.status",
+        "GuestCouponCode.discount",
+        "GuestCouponCode.invalidReason",
+        "GuestCouponCode.validFrom",
+        "GuestCouponCode.validTo"
        ],
        "operation": "getGuestCouponCode",
        "provenance": "contract promotions.yaml GET /coupon-codes/{code}"
@@ -345,7 +343,9 @@
     },
     {
      "name": "code",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "A promo code: from a deep link, or carried from WEB-032's Use this offer through the booking flow, which keeps it with the booking (in memory, never in storage). Applied with `applyCartPromoCode` as soon as the cart has a line, and refused as that operation says (ADAM CR-225, 25 October 2026)."
     },
     {
      "name": "lineId",
@@ -357,8 +357,16 @@
      "optional": true
     },
     {
+     "name": "holdIds",
+     "from": "navigation",
+     "optional": true,
+     "notes": "The seat holds WEB-007 carries, one per seat (ADAM CR-187, 25 October 2026); each becomes a line's hold. `Cart.expiresAt` is the countdown from here on."
+    },
+    {
      "name": "holdId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "The resource hold (a cabana or spot held on the venue map) that `getResourceHold` reads for its countdown, when an edge carries one; otherwise each line's own `resourceHoldId`. Not a seat hold: the seat holds are `holdIds` (ADAM CR-187, 25 October 2026)."
     },
     {
      "name": "venueId",
@@ -782,7 +790,7 @@
       "lineId",
       "performanceId"
      ],
-     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-012 holds cartId, lineId, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, holdIds, lineId, performanceId and WEB-012 holds cartId, lineId, performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-011",
@@ -1076,7 +1084,7 @@
       "lineId",
       "performanceId"
      ],
-     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-013 holds lineId, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, holdIds, lineId, performanceId and WEB-013 holds lineId, performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-011",

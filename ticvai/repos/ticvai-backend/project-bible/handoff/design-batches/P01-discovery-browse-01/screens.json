@@ -178,7 +178,7 @@
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId only pre-select (deep link or optional), and WEB-024 opens on its own"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own"
     },
     {
      "to": "WEB-027",
@@ -302,7 +302,7 @@
        ],
        "operation": "listProducts",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "Guest cards show name, image, from-price, tags and availability only (DI-026). The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "notes": "**The photo is the primary item's `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset read. Guest cards show name, image, from-price, tags and availability only (DI-026). The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "banner",
@@ -508,7 +508,8 @@
   "navigation": {
    "entryFrom": [
     "WEB-001",
-    "WEB-003"
+    "WEB-003",
+    "WEB-032"
    ],
    "exitTo": [
     "WEB-001",
@@ -808,7 +809,7 @@
        "kind": "searchField",
        "label": "Search",
        "operation": "searchCatalogue",
-       "notes": "Sends `?q=` to `searchCatalogue`.",
+       "notes": "**Type-ahead** (ADAM CR-223, 25 October 2026, as built and as the client-approved prototype searches): `searchCatalogue` is called with `?q=` once typing pauses (300 ms debounce), only for 2 or more characters (the contract's minLength; fewer sends nothing), Enter searches at once, and the latest answer wins (an earlier one that arrives late is dropped). frontend-patterns 4.6.",
        "provenance": "contract catalogue.yaml GET /search"
       },
       {
@@ -823,7 +824,7 @@
        "label": "Results",
        "operation": "searchCatalogue",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "One card per result: name, summary, photo (`primaryMedia`), from-price (`fromPrice`), sold out shown rather than hidden (`isAvailable`), and `notBookableLabel` for an info-only product. `searchCatalogue` answers with no named schema, so the card binds none. Was the generated table 'Every money'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "notes": "**The photo is `primaryMedia.thumbnailUrl`** (`url` for the full-size view): the stable CDN address `searchCatalogue` returns to a guest for a public, ready asset (ADAM CR-221, 25 October 2026); the client never turns an `assetId` into an address and calls no asset read. One card per result: name, summary, photo (`primaryMedia`), from-price (`fromPrice`), sold out shown rather than hidden (`isAvailable`), and `notBookableLabel` for an info-only product. `searchCatalogue` answers with no named schema, so the card binds none. Was the generated table 'Every money'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "cardList",
@@ -837,7 +838,7 @@
        ],
        "operation": "listProducts",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "Before the guest types: what is on sale at the venue. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "notes": "**The photo is the primary item's `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset read. Before the guest types: what is on sale at the venue. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     }
@@ -855,7 +856,7 @@
    {
     "operationId": "searchCatalogue",
     "contract": "catalogue",
-    "purpose": "Find something by name",
+    "purpose": "Find something by name, type-ahead: called once typing pauses (300 ms debounce), for 2 or more characters, Enter at once, the latest answer wins (ADAM CR-223)",
     "trigger": "onAction"
    },
    {
@@ -1056,7 +1057,7 @@
        "kind": "detailPanel",
        "label": "Photo and video",
        "bindsTo": "Product.media",
-       "notes": "**The video plays directly, with no loader in front of it** (client meeting 30 September, MoM 4.8): the info button reveals the details and starts the primary video in place; the poster frame (the primary image, or the video's first frame) shows while it buffers, never a spinner or loading screen. Read more opens on the primary video or photo (`Product.media`, `isPrimary`).",
+       "notes": "**Each item plays or shows from its `ProductMedia.url`** (`thumbnailUrl` as the poster frame while it buffers): the stable CDN address `getProduct` returns to a guest for a public, ready asset (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset read. **The video plays directly, with no loader in front of it** (client meeting 30 September, MoM 4.8): the info button reveals the details and starts the primary video in place; the poster frame (the primary image, or the video's first frame) shows while it buffers, never a spinner or loading screen. Read more opens on the primary video or photo (`Product.media`, `isPrimary`).",
        "operation": "getProduct",
        "provenance": "decided 29 September, rev 3 23SEP-4; decided 30 September 2026, client meeting MoM 4.8 (Qossai)"
       },
@@ -1410,13 +1411,17 @@
       {
        "kind": "multiSelect",
        "label": "Any shops you'd like to visit?",
-       "notes": "Shown when Shopping is chosen (client meeting 30 September, MoM 4.7: retail and kiosk shops join F&B in the planner). The `retailTags` of the chosen parks' shops and retail kiosks; sent as `VisitPlanRequest.retailTags`.",
+       "bindsTo": "VisitPlannerOptions.retailTags",
+       "operation": "getVisitPlannerOptions",
+       "notes": "Shown when Shopping is chosen (client meeting 30 September, MoM 4.7: retail and kiosk shops join F&B in the planner). The `retailTags` of the chosen parks' shops and retail kiosks; sent as `VisitPlanRequest.retailTags`. **Bound to `VisitPlannerOptions.retailTags`** (per map, `{mapId, mapName, tags}`; ADAM CR-220, 25 October 2026), read with `getVisitPlannerOptions`, which also gives the *Not at the parks you chose* chip.",
        "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
       },
       {
        "kind": "selectField",
        "label": "What would you like for lunch?",
-       "notes": "Cuisines of the chosen parks' dining points only (restaurants, cafes, food kiosks; client meeting 30 September, MoM 4.7). In a multi-venue plan each cuisine names the park(s) that serve it, and lunch is planned only at a restaurant of that day's park.",
+       "bindsTo": "VisitPlannerOptions.cuisineTags",
+       "operation": "getVisitPlannerOptions",
+       "notes": "Cuisines of the chosen parks' dining points only (restaurants, cafes, food kiosks; client meeting 30 September, MoM 4.7). In a multi-venue plan each cuisine names the park(s) that serve it, and lunch is planned only at a restaurant of that day's park. **Bound to `VisitPlannerOptions.cuisineTags`** (per map, `{mapId, mapName, tags}`; ADAM CR-220, 25 October 2026), read with `getVisitPlannerOptions`, which also gives the *Not at the parks you chose* chip.",
        "provenance": "decided 29 September 2026, MOB-6; decided 30 September 2026, client meeting MoM 4.7 (Allam)"
       },
       {
@@ -1561,7 +1566,7 @@
    {
     "operationId": "getVisitPlannerOptions",
     "contract": "venue-map",
-    "purpose": "The planner's choices from the venue's data (r8, GPS-C21): the interest tags of its parks fill What are you most interested in?, and the ready-made plans and Fast Track bundles come from the same read.",
+    "purpose": "The planner's choices from the venue's data (r8, GPS-C21): the interest tags of its parks fill What are you most interested in?, its cuisineTags and retailTags fill the lunch and shop questions and the Not at the parks you chose chip (ADAM CR-220), and the ready-made plans and Fast Track bundles come from the same read.",
     "trigger": "onLoad",
     "provenance": "r8 integration, GPS-C21 (CHG-R8INT-007)"
    }

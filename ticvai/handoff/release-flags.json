@@ -5,9 +5,9 @@
   "undeclaredFlag": "on"
  },
  "counts": {
-  "appModules": 306,
+  "appModules": 305,
   "operations": 2563,
-  "sharedOperations": 1401
+  "sharedOperations": 1406
  },
  "appModules": {
   "AM-ACCREDITATION-P08": {
@@ -646,16 +646,19 @@
     "BO-353",
     "BO-354",
     "BO-355",
-    "BO-356"
+    "BO-356",
+    "BO-357"
    ],
    "operations": [
     "access#approveMultiMediaPreview",
+    "access#deliverCredential",
     "access#getCredentialIssuanceRetryPolicy",
     "access#getEntitlement",
     "access#getEntitlementCredential",
     "access#getEntitlementHistory",
     "access#listBrandingLocalizationTemplate",
     "access#listCredential",
+    "access#listCredentialDeliveryDistribution",
     "access#listCredentialGenerationIssuance",
     "access#listEntitlementCrossMedia",
     "access#listMediaActivationPriority",
@@ -677,7 +680,6 @@
   },
   "AM-ADMISSION-ACCESS-P08-8": {
    "screens": [
-    "BO-357",
     "BO-358",
     "BO-359",
     "BO-360",
@@ -687,8 +689,6 @@
     "BO-475"
    ],
    "operations": [
-    "access#deliverCredential",
-    "access#listCredentialDeliveryDistribution",
     "access#listCredentialReplacementReissue",
     "access#listCredentialSecurityOperational",
     "access#listCredentialUsageCross",
@@ -1055,7 +1055,8 @@
     "ai#searchAiDecisions",
     "identity#listOwnPlatformStaffGrants",
     "identity#openPlatformStaffGrant",
-    "subscription#listTenants"
+    "subscription#listTenants",
+    "tenancy#listOrgUnits"
    ]
   },
   "AM-AI-P12": {
@@ -1420,7 +1421,8 @@
     "assets#searchMedia",
     "assets#setMediaAssetTags",
     "assets#setMediaTaxonomy",
-    "assets#updateMediaAsset"
+    "assets#updateMediaAsset",
+    "tenancy#listOrgUnits"
    ]
   },
   "AM-DIGITAL-ASSETS-P13-3": {
@@ -1526,7 +1528,6 @@
     "finance#listTaxInvoices",
     "orders#getOrder",
     "orders#reissueEntitlement",
-    "orders#reprintOrder",
     "retail#reprintReceipt"
    ]
   },
@@ -1682,6 +1683,7 @@
    "screens": [
     "POS-001",
     "POS-007",
+    "POS-012",
     "POS-015",
     "POS-017",
     "POS-018",
@@ -1722,8 +1724,14 @@
     "fnb#updateTableVisit",
     "identity#selectRole",
     "orders#addCartLine",
+    "orders#listOrders",
     "promotions#evaluatePromotions",
+    "queue#listQueueFeeds",
+    "queue#listQueues",
     "reporting#listAlerts",
+    "retail#collectShopAndDrop",
+    "retail#lookupShopAndDrop",
+    "retail#reserveMerchandise",
     "shift#acceptShiftVariance",
     "shift#approveShiftOpen",
     "shift#closeShift",
@@ -1950,6 +1958,7 @@
     "retail#lookupRetailSale",
     "retail#setReturnPolicy",
     "tenancy#createOutlet",
+    "tenancy#getRegionSettings",
     "tenancy#listOutlets",
     "tenancy#updateOutlet"
    ]
@@ -2240,12 +2249,16 @@
    "screens": [
     "GST-010",
     "GST-042",
+    "GST-066",
     "GST-073"
    ],
    "operations": [
     "identity#createMfaChallenge",
+    "identity#deleteGuestAccount",
     "identity#enrolMfaMethod",
+    "identity#exportSubjectData",
     "identity#getGuestSession",
+    "identity#getSubjectDataExport",
     "identity#guestLogout",
     "identity#guestPasswordLogin",
     "identity#guestSocialLogin",
@@ -2260,7 +2273,10 @@
     "identity#verifyMfaChallenge",
     "identity#verifyMfaEnrolment",
     "marketing-crm#claimDeviceConsent",
+    "marketing-crm#getGuestConsents",
+    "marketing-crm#listConsentPurposes",
     "marketing-crm#listGuestDevices",
+    "marketing-crm#recordConsent",
     "marketing-crm#registerGuestDevice",
     "marketing-crm#revokeGuestDevice",
     "orders#getOrder",
@@ -2540,41 +2556,33 @@
   },
   "AM-IDENTITY-SECURITY-P10": {
    "screens": [
+    "PTR-001",
     "PTR-003",
     "PTR-020",
     "PTR-030",
     "PTR-040"
    ],
    "operations": [
+    "identity#changeOwnCredential",
+    "identity#completeSsoAuthorization",
     "identity#createDelegatedAccess",
     "identity#createMfaChallenge",
     "identity#createPrincipal",
     "identity#deleteDelegatedAccess",
+    "identity#enrolMfaMethod",
+    "identity#getCurrentSession",
     "identity#getPrincipal",
     "identity#listDelegatedAccess",
     "identity#listPrincipals",
-    "identity#updatePrincipal",
-    "identity#verifyMfaChallenge",
-    "subscription#approveBookingLimitCommercial",
-    "subscription#approvePartnerStatuLifecycle"
-   ]
-  },
-  "AM-IDENTITY-SECURITY-P10-BLOCK-A": {
-   "screens": [
-    "PTR-001"
-   ],
-   "operations": [
-    "identity#changeOwnCredential",
-    "identity#completeSsoAuthorization",
-    "identity#createMfaChallenge",
-    "identity#enrolMfaMethod",
-    "identity#getCurrentSession",
     "identity#listSsoProviders",
     "identity#login",
     "identity#selectRole",
     "identity#startSsoAuthorization",
+    "identity#updatePrincipal",
     "identity#verifyMfaChallenge",
-    "identity#verifyMfaEnrolment"
+    "identity#verifyMfaEnrolment",
+    "subscription#approveBookingLimitCommercial",
+    "subscription#approvePartnerStatuLifecycle"
    ]
   },
   "AM-IDENTITY-SECURITY-P12-BLOCK-A": {
@@ -2893,6 +2901,7 @@
     "maintenance#getWorkOrder",
     "maintenance#listAssets",
     "maintenance#listIncidents",
+    "maintenance#listInspections",
     "maintenance#listWorkOrders",
     "maintenance#lookupAsset",
     "maintenance#setAssetStatus",
@@ -2926,6 +2935,7 @@
     "access#revokeFacePass",
     "identity#deleteGuestAccount",
     "identity#exportSubjectData",
+    "identity#getSubjectDataExport",
     "identity#listDelegations",
     "identity#listMfaMethods",
     "identity#verifyGuestEmail",
@@ -2979,14 +2989,12 @@
     "GST-035",
     "GST-036",
     "GST-039",
-    "GST-066",
+    "GST-043",
     "GST-068",
     "GST-071"
    ],
    "operations": [
     "ai#listAiConversations",
-    "identity#deleteGuestAccount",
-    "identity#exportSubjectData",
     "marketing-crm#addToWishlist",
     "marketing-crm#createReferral",
     "marketing-crm#getForm",
@@ -3621,6 +3629,7 @@
     "orders#listMyOrders",
     "orders#listOwnGroupBookings",
     "orders#listOwnResaleListings",
+    "orders#listPaymentTokens",
     "orders#listReservations",
     "orders#payByLink",
     "orders#removeCartLine",
@@ -3702,6 +3711,7 @@
     "orders#listMyOrders",
     "orders#listOwnRefundRequests",
     "orders#listOwnResaleListings",
+    "orders#listPaymentTokens",
     "orders#listReservations",
     "orders#listTicketTransfers",
     "orders#payByLink",
@@ -4059,6 +4069,7 @@
     "BO-310",
     "BO-311",
     "BO-312",
+    "BO-313",
     "BO-778"
    ],
    "operations": [
@@ -4071,6 +4082,7 @@
     "orders#listAbandonedCarts",
     "orders#listCapacityReservationInventory",
     "orders#listChargebacks",
+    "orders#listOrderLifecycleTimeline",
     "orders#listOrderLineProduct",
     "orders#listOrderRefunds",
     "orders#listOrderReservation",
@@ -4088,7 +4100,6 @@
   },
   "AM-ORDERS-RESERVATIONS-P08-6": {
    "screens": [
-    "BO-313",
     "BO-314",
     "BO-315",
     "BO-316",
@@ -4103,7 +4114,8 @@
     "BO-327",
     "BO-328",
     "BO-329",
-    "BO-330"
+    "BO-330",
+    "BO-331"
    ],
    "operations": [
     "orders#approveExceptionServiceRecovery",
@@ -4117,10 +4129,10 @@
     "orders#listDepositPartialPayment",
     "orders#listExternalPaymentPartner",
     "orders#listExternalReferenceMappings",
-    "orders#listOrderLifecycleTimeline",
     "orders#listOrderPaymentDetail",
     "orders#listOrderSplitMerge",
     "orders#listPaymentAllocationRules",
+    "orders#listPaymentReconciliationException",
     "orders#listRelatedOrderTransaction",
     "orders#listVoidReversalSame",
     "orders#mergeOrders",
@@ -4158,7 +4170,7 @@
     "BO-275",
     "BO-276",
     "BO-277",
-    "BO-331",
+    "BO-278",
     "BO-332",
     "BO-333"
    ],
@@ -4177,9 +4189,9 @@
     "orders#listGroupRequirementAvailability",
     "orders#listGroupSale",
     "orders#listGroupSale2",
+    "orders#listGroupTicketSeat",
     "orders#listOrderFinancialReconciliation",
     "orders#listParticipantGuestList",
-    "orders#listPaymentReconciliationException",
     "orders#listQuoteBookingConversion",
     "orders#listQuoteRevisionNegotiation",
     "orders#setGroupBookingHandover",
@@ -4188,13 +4200,13 @@
     "orders#setGroupPackageExperience",
     "orders#setGroupPaymentSchedule",
     "orders#setGroupQuotationProposal",
+    "orders#setGroupTicketAllocation",
     "orders#setParticipantGuestList",
     "orders#updateGroupBooking"
    ]
   },
   "AM-ORDERS-RESERVATIONS-P08-8": {
    "screens": [
-    "BO-278",
     "BO-279",
     "BO-280",
     "BO-281",
@@ -4208,11 +4220,9 @@
     "orders#listGroupSale",
     "orders#listGroupSale2",
     "orders#listGroupTicketFulfillment",
-    "orders#listGroupTicketSeat",
     "orders#modifyOrder",
     "orders#recordGroupCheckIn",
     "orders#rescheduleOrder",
-    "orders#setGroupTicketAllocation",
     "orders#setGroupTicketFulfillment",
     "orders#updateGroupBooking"
    ]
@@ -4396,8 +4406,7 @@
     "payments#simulatePaymentConfiguration",
     "payments#simulatePaymentRouting",
     "payments#testPaymentProviderConnection",
-    "payments#updatePaymentMethod",
-    "tenancy#listDevices"
+    "payments#updatePaymentMethod"
    ]
   },
   "AM-PAYMENTS-P08-3": {
@@ -5835,12 +5844,10 @@
   "AM-RETAIL-P04": {
    "screens": [
     "POS-005",
-    "POS-012",
     "POS-023"
    ],
    "operations": [
     "access#enrolFaceTag",
-    "fnb#recordOrderHandover",
     "marketing-crm#redeemLoyaltyPoints",
     "orders#addCartLine",
     "orders#addTip",
@@ -5848,19 +5855,14 @@
     "orders#createOrder",
     "orders#createPayment",
     "orders#inquirePaymentStatus",
-    "orders#listOrders",
     "promotions#evaluatePromotions",
-    "retail#collectShopAndDrop",
     "retail#createRetailSale",
     "retail#createShopAndDrop",
     "retail#getRetailSale",
     "retail#listRetailSales",
     "retail#lookupMerchandise",
     "retail#lookupRetailSale",
-    "retail#lookupShopAndDrop",
     "retail#reprintReceipt",
-    "retail#reserveMerchandise",
-    "shift#getCurrentShift",
     "wallet#topUpWallet"
    ]
   },
@@ -5914,6 +5916,7 @@
     "queue#listQueues",
     "seating#createSeatHold",
     "seating#getSeatAvailability",
+    "seating#getSeatHold",
     "seating#recommendSeats",
     "seating#relinquishSeatHold",
     "venue-map#bookVisitPlan",
@@ -5956,7 +5959,6 @@
     "venue-map#getVisitPlan",
     "venue-map#getVisitPlannerOptions",
     "venue-map#listBookableVenueMaps",
-    "venue-map#listMyVisitPlans",
     "venue-map#listVisitPlanAlternatives",
     "venue-map#updateVisitPlan",
     "white-label#getTenantAppStatus"
@@ -5968,7 +5970,6 @@
    ],
    "operations": [
     "catalogue#getPerformance",
-    "catalogue#listPerformances",
     "orders#createOrder",
     "orders#createPayment",
     "seating#createSeatHold",
@@ -6940,6 +6941,7 @@
     "BO-087",
     "BO-1062",
     "BO-109",
+    "BO-129",
     "BO-136"
    ],
    "operations": [
@@ -6974,14 +6976,24 @@
     "identity#setSegregationRules",
     "identity#suggestRoleAssignment",
     "identity#updatePrincipal",
+    "tenancy#createDeviceFirmware",
     "tenancy#createSaleBoard",
+    "tenancy#deployConfigurationProfile",
+    "tenancy#getDeviceFirmware",
     "tenancy#getOrgUnit",
     "tenancy#getVenueSettings",
     "tenancy#getVenueSettingsDefaults",
+    "tenancy#getWorkstationHealth",
+    "tenancy#listDeviceFirmware",
     "tenancy#listSaleBoards",
+    "tenancy#listWorkstations",
+    "tenancy#rollbackDeviceFirmware",
+    "tenancy#setConfigurationProfile",
+    "tenancy#setDeviceFirmwareStatus",
     "tenancy#setRolePermissions",
     "tenancy#setVenueSettings",
     "tenancy#setVenueSettingsDefaults",
+    "tenancy#startDeviceFirmwareRollout",
     "tenancy#updateSaleBoard"
    ]
   },
@@ -6994,6 +7006,7 @@
     "BO-087",
     "BO-1062",
     "BO-109",
+    "BO-129",
     "BO-136"
    ],
    "operations": [
@@ -7028,14 +7041,24 @@
     "identity#setSegregationRules",
     "identity#suggestRoleAssignment",
     "identity#updatePrincipal",
+    "tenancy#createDeviceFirmware",
     "tenancy#createSaleBoard",
+    "tenancy#deployConfigurationProfile",
+    "tenancy#getDeviceFirmware",
     "tenancy#getOrgUnit",
     "tenancy#getVenueSettings",
     "tenancy#getVenueSettingsDefaults",
+    "tenancy#getWorkstationHealth",
+    "tenancy#listDeviceFirmware",
     "tenancy#listSaleBoards",
+    "tenancy#listWorkstations",
+    "tenancy#rollbackDeviceFirmware",
+    "tenancy#setConfigurationProfile",
+    "tenancy#setDeviceFirmwareStatus",
     "tenancy#setRolePermissions",
     "tenancy#setVenueSettings",
     "tenancy#setVenueSettingsDefaults",
+    "tenancy#startDeviceFirmwareRollout",
     "tenancy#updateSaleBoard"
    ]
   },
@@ -7292,7 +7315,6 @@
     "catalogue#listPriceLists",
     "catalogue#listPrices",
     "catalogue#listPricingRecommendationExplainability",
-    "catalogue#listProductCategories",
     "catalogue#listProductVariants",
     "catalogue#listProductVersions",
     "catalogue#listProducts",
@@ -8419,9 +8441,11 @@
     "BO-125",
     "BO-126",
     "BO-128",
-    "BO-129",
     "BO-131",
-    "BO-145"
+    "BO-145",
+    "BO-646",
+    "BO-674",
+    "BO-678"
    ],
    "operations": [
     "access#listVenueParkAccess",
@@ -8432,17 +8456,14 @@
     "retail#listMerchandise",
     "retail#updateMerchandise",
     "tenancy#configureWorkstation",
-    "tenancy#createDeviceFirmware",
     "tenancy#createOrgUnit",
     "tenancy#createSaleBoard",
     "tenancy#deployConfigurationProfile",
-    "tenancy#getDeviceFirmware",
     "tenancy#getVenueSettings",
     "tenancy#getWorkstation",
     "tenancy#getWorkstationHealth",
     "tenancy#issueDeviceCredential",
     "tenancy#listAuditRecords",
-    "tenancy#listDeviceFirmware",
     "tenancy#listDevices",
     "tenancy#listOrgUnits",
     "tenancy#listProfileDeployments",
@@ -8450,12 +8471,9 @@
     "tenancy#listWorkstations",
     "tenancy#registerDevice",
     "tenancy#revokeDeviceCredential",
-    "tenancy#rollbackDeviceFirmware",
     "tenancy#setConfigurationProfile",
     "tenancy#setConnectivityThresholds",
-    "tenancy#setDeviceFirmwareStatus",
     "tenancy#setVenueSettings",
-    "tenancy#startDeviceFirmwareRollout",
     "tenancy#updateOrgUnit",
     "tenancy#updateOutlet",
     "tenancy#updateSaleBoard"
@@ -8474,11 +8492,10 @@
     "BO-458",
     "BO-477",
     "BO-483",
-    "BO-646",
-    "BO-674",
-    "BO-678",
+    "BO-484",
     "BO-679",
     "BO-681",
+    "BO-727",
     "BO-751",
     "BO-797",
     "BO-812",
@@ -8498,6 +8515,7 @@
     "tenancy#getDeviceTelemetry",
     "tenancy#listDataRetentionSettings",
     "tenancy#listDeviceFirmware",
+    "tenancy#listOutlets",
     "tenancy#setDataRetentionSetting",
     "tenancy#setDeviceAssignment",
     "white-label#assignKiosk",
@@ -8513,12 +8531,10 @@
     "BO-1161",
     "BO-1174",
     "BO-1191",
-    "BO-484",
     "BO-587",
     "BO-599",
     "BO-600",
     "BO-602",
-    "BO-727",
     "BO-731",
     "BO-732",
     "BO-942"
@@ -9123,7 +9139,6 @@
     "catalogue#getPerformance",
     "catalogue#listEvents",
     "catalogue#listPerformances",
-    "catalogue#listProductCategories",
     "catalogue#updateEvent",
     "catalogue#updatePerformance",
     "seating#getSeatAvailability",
@@ -9638,7 +9653,6 @@
     "GST-001",
     "GST-038",
     "GST-040",
-    "GST-043",
     "GST-047",
     "GST-057"
    ],

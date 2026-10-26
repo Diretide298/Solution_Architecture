@@ -912,7 +912,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Carried, not typed: `externalProviderId`
 
-Errors to draw in the form: 422 The endpoint is not `https`, the API client is not an active client of the tenant, or the decision mapping has no value for `approve` or for `reject`
+Errors to draw in the form: 409 Refused, and nothing is stored. `external-provider-id-mismatch` (ADAM CR-245): a record for `code` exists and the path's `externalProviderId` is not its id (or …; 422 The endpoint is not `https`, the API client is not an active client of the tenant, or the decision mapping has no value for `approve` or for `reject`
 
 **Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -949,7 +949,7 @@ Errors to draw in the form: 422 The endpoint is not `https`, the API client is n
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save provider (primary button) | `setApprovalExternalProvider` PUT `/approval-external-providers/{externalProviderId}` | ApprovalExternalProvider | ApprovalExternalProvider | 422 The endpoint is not `https`, the API client is not an active client of the tenant, or the decision mapping has no value for `approve` or for `reject` | opens modal first |
+| Save provider (primary button) | `setApprovalExternalProvider` PUT `/approval-external-providers/{externalProviderId}` | ApprovalExternalProvider | ApprovalExternalProvider | 409 Refused, and nothing is stored. `external-provider-id-mismatch` (ADAM CR-245): a record for `code` exists and the path's `externalProviderId` is not its id (or …; 422 The endpoint is not `https`, the API client is … | opens modal first |
 
 **Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -970,7 +970,7 @@ Errors to draw in the form: 422 The endpoint is not `https`, the API client is n
 | Empty, first run (`?state=emptyFirstRun`) | No external workflow system configured yet. Offers no create action — this screen declares no operation that makes one and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 422 The endpoint is not `https`, the API client is not an active client of the tenant, or the decision mapping has no value for `approve` or for `reject` |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Refused, and nothing is stored. `external-provider-id-mismatch` (ADAM CR-245): a record for `code` exists and the path's `externalProviderId` is not its id (or …; 422 The endpoint is not `https`, the API client is not an active client of the tenant, or the decision mapping has no value for `approve` or for `reject` |
 
 #### Edge cases to draw
 
@@ -1026,10 +1026,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-354`
 - Workshop pack: Approval_Workflows_and_Governance_Reference.pdf board 7
 - Flow F129 *Approval Workflows and Governance board 7: Approval Integration Command Center*, step 10: Works in External Workflow System Integration → Allow TICVAI to integrate with third-party workflow/governance platforms when a client already operates an enterprise approval environment. The matrix specifically requires integration with …
+- ADR-0071 *Passwords and PINs are stored as Argon2id PHC strings; a PIN also takes a Key Vault pepper* (`docs/adr/0071-credentials-are-stored-as-argon2id-phc-strings.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (22), with its required mark, default, format and its error state (422).
+- [ ] Every input above is drawn (22), with its required mark, default, format and its error state (409, 422).
 - [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-354?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save provider.

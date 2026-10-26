@@ -409,6 +409,7 @@ Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the 
 - Flow F83 *A kitchen works a service from the rail to the exception*, step 1: Kitchen Operations Command Center. → **Drawn by the client as FNB-3A.** 3 operations on this step.
 - Flow F88 *An order is assembled, collected and notified*, step 5: Kitchen Operations Command Center. → **Drawn by the client as FNB-3A.** 3 operations on this step.
 - Flow F83 branch at step 1 (medium): when A step in the chain is not licensed for this tenant., **The chain stops at the module boundary.** `requiresModule` on each screen decides — a tenant without the retail licence does not see the retail half, and the journey is shorter rather than broken.
+- ADR-0055 *A modular monolith, deployed as five units* (`docs/adr/0055-a-modular-monolith-deployed-as-five-units.md`)
 
 #### Acceptance for the design
 
@@ -1161,6 +1162,7 @@ Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the 
 - Client design-board frames: `FnB Board 3.dc.html#fnb-3d`
 - Flow F83 *A kitchen works a service from the rail to the exception*, step 4: Active Order Management & Fulfilment Journey. → **Drawn by the client as FNB-3D.** 2 operations on this step.
 - Flow F88 *An order is assembled, collected and notified*, step 4: Active Order Management & Fulfilment Journey. → **Drawn by the client as FNB-3D.** 2 operations on this step.
+- ADR-0055 *A modular monolith, deployed as five units* (`docs/adr/0055-a-modular-monolith-deployed-as-five-units.md`)
 
 #### Acceptance for the design
 
@@ -1648,6 +1650,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client design-board frames: `FnB Board 3.dc.html#fnb-3f`
 - Flow F88 *An order is assembled, collected and notified*, step 1: Expeditor & Order Assembly. → **Drawn by the client as FNB-3F.** 3 operations on this step.
 - Flow F88 branch at step 1 (medium): when A step in the chain is not licensed for this tenant., **The chain stops at the module boundary.** `requiresModule` on each screen decides — a tenant without the retail licence does not see the retail half, and the journey is shorter rather than broken.
+- ADR-0055 *A modular monolith, deployed as five units* (`docs/adr/0055-a-modular-monolith-deployed-as-five-units.md`)
 
 #### Acceptance for the design
 
@@ -2066,6 +2069,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Drawn by: Claude Design F&B pack, 20 August
 - Client design-board frames: `FnB Board 3.dc.html#fnb-3h`
 - Flow F83 *A kitchen works a service from the rail to the exception*, step 5: Exceptions, Re-Fire & Unavailable Items. → **Drawn by the client as FNB-3H.** 3 operations on this step.
+- ADR-0055 *A modular monolith, deployed as five units* (`docs/adr/0055-a-modular-monolith-deployed-as-five-units.md`)
 
 #### Acceptance for the design
 

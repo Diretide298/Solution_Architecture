@@ -1649,7 +1649,8 @@
       {
        "kind": "detailPanel",
        "label": "The selected journey simulation audit",
-       "bindsTo": "Journey",
+       "operation": "simulateGuestJourney",
+       "bindsTo": "GuestJourneySimulationView",
        "columns": [
         "impossible journey sequences",
         "missing gates",

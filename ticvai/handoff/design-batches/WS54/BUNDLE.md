@@ -453,6 +453,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS115 Promotions   Bundles Management Board 10.dc.html#adm-229`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 10
 - Flow F163 *Promotions Bundles Management board 10: Promotion Performance Command Center*, step 2: Works in Campaign & Promotion Performance Explorer → Allow users to compare every promotion and campaign using consistent commercial KPIs.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

@@ -101,7 +101,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-093` | Channel & Distribution Configuration | B | 13 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `CMS-095` | Asset Replacement & Propagation Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-096` | Fallback, Expiry & Distribution Continuity | B | 1 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `CMS-096` | Fallback, Expiry & Distribution Continuity | B | 1 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `CMS-097` | DAM API & Integration Hub | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `CMS-098` | Delivery Monitoring & Integration Health | B | 0 | 45 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-099` | Asset Usage & Performance Analytics | B | 0 | 51 | 6 | 0 | 0 | 0 | — | notStarted (—) |

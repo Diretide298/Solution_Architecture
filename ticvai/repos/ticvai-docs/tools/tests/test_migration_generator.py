@@ -1070,3 +1070,63 @@ def test_check_migrations_lets_only_the_descope_blocks_drop_column_through():
     assert not cm.descope_drops(code.replace("column_name = 'scope_path'", "column_name = 'other'"))
     cm._CACHE["_scope_none"] = set()
     assert not cm.descope_drops(code)
+
+
+# ---- CHG-R10OPN-002: a new column the contract backfills (ADAM CR-104, the lead, 26 October 2026) ---------------------
+
+MI_OLD = "CREATE TABLE IF NOT EXISTS retail.merchandise (id uuid PRIMARY KEY NOT NULL, is_active boolean NOT NULL);\n"
+MI_NEW = ("CREATE TABLE IF NOT EXISTS retail.merchandise (id uuid PRIMARY KEY NOT NULL, is_active boolean NOT NULL, "
+          "is_published boolean DEFAULT false);\n")
+MI_FILL = {"retail.merchandise": {"is_published": "true"}}
+
+
+def test_a_declared_backfill_adds_the_column_then_fills_the_rows_already_there_in_one_guarded_block():
+    p = fwd.diff("tenant", model(MI_OLD), model(MI_NEW), backfill=MI_FILL)
+    assert len(p.statements) == 1, p.statements
+    block = p.statements[0]
+    assert block.startswith("DO $$ BEGIN IF to_regclass('retail.merchandise') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM "
+                            "information_schema.columns WHERE table_schema = 'retail' AND table_name = 'merchandise' "
+                            "AND column_name = 'is_published') THEN"), block
+    assert ran(p.statements) == [
+        "ALTER TABLE retail.merchandise ADD COLUMN IF NOT EXISTS is_published boolean DEFAULT false",
+        "UPDATE retail.merchandise SET is_published = true"]
+    assert p.rollback == ["ALTER TABLE retail.merchandise DROP COLUMN IF EXISTS is_published;"]
+    assert not p.review and not p.recon, (p.review, p.recon)
+
+
+def test_a_backfilled_column_folds_back_so_the_next_run_writes_and_lists_nothing():
+    p = fwd.diff("tenant", model(MI_OLD), model(MI_NEW), backfill=MI_FILL)
+    again = fwd.diff("tenant", fold(MI_OLD, p), model(MI_NEW), backfill=MI_FILL)
+    assert not again.statements and not again.review and not again.recon, (again.statements, again.review)
+
+
+def test_without_the_mark_the_column_is_added_with_no_update():
+    p = fwd.diff("tenant", model(MI_OLD), model(MI_NEW))
+    assert ran(p.statements) == ["ALTER TABLE retail.merchandise ADD COLUMN IF NOT EXISTS is_published boolean "
+                                 "DEFAULT false"]
+    assert not [s for s in p.statements if "UPDATE " in s]
+
+
+def test_a_new_tables_backfilled_column_has_no_rows_to_fill():
+    p = fwd.diff("tenant", model(""), model(MI_NEW), backfill=MI_FILL)
+    assert not [s for s in p.statements if "UPDATE " in s], p.statements
+
+
+def test_the_rendered_backfill_file_passes_check_migrations_rules_and_is_the_same_every_run():
+    a = fwd.render(fwd.diff("tenant", model(MI_OLD), model(MI_NEW), backfill=MI_FILL), "V0116", "r1 (x)", "20261026")
+    b = fwd.render(fwd.diff("tenant", model(MI_OLD), model(MI_NEW), backfill=MI_FILL), "V0116", "r1 (x)", "20261026")
+    assert a == b
+    body = a.split("-- ROLLBACK")[0]
+    assert "\nUPDATE retail.merchandise SET is_published = true;" in body
+    assert "DROP COLUMN" not in body
+
+
+def test_derive_ddl_types_the_backfill_value_as_the_column_is():
+    dd = _load("derive_ddl_r10opn", "derive-ddl.py")
+    assert dd.BACKFILL_MARK == "x-ticvai-backfill"
+    assert dd.backfill_literal("boolean", True) == "true"
+    assert dd.backfill_literal("boolean", False) == "false"
+    assert dd.backfill_literal("integer", 3) == "3"
+    assert dd.backfill_literal("text", "it's") == "'it''s'"
+    assert dd.backfill_literal("boolean", "yes") is None      # does not fit: nothing backfilled, a warning printed
+    assert dd.backfill_literal("integer", True) is None

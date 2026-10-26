@@ -47,6 +47,11 @@
     "name": "mode",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -61,7 +66,18 @@
   "offlineCapable": null,
   "conflictPolicy": null,
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "seatMapId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "performanceId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "SeatRecommendationRules"
  },

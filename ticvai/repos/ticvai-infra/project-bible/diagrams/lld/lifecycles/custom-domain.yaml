@@ -54,7 +54,8 @@ transitions:
   to: verified
   trigger: verified
   operation: verifyCustomDomain
-  guard: DNS resolves as expected.
+  guard: DNS resolves as expected. verifyCustomDomain checks once; the white-label domain job checks
+    again until the validation window ends (ADAM CR-105, CHG-R10TEN-011).
 - from: verifying
   to: failed
   trigger: verifyFailed
@@ -68,28 +69,25 @@ transitions:
   guard: Tried again.
 - from: verified
   to: issuing
-  trigger: issue
-  operation: claimCustomDomain
-  guard: Certificate requested.
+  trigger: job
+  guard: 'Certificate requested: the white-label domain job adds the domain to Front Door with a managed
+    certificate (ADAM CR-105, option 1; CHG-R10TEN-011: the job, not claimCustomDomain, owns issuing).'
 - from: issuing
   to: active
-  trigger: issued
-  operation: claimCustomDomain
-  guard: Serving.
+  trigger: job
+  guard: Serving. Front Door reports the domain validated and deployed (the white-label domain job).
 - from: issuing
   to: failed
-  trigger: issueFailed
-  operation: claimCustomDomain
-  guard: '**Rate limited or refused.** Retryable.'
+  trigger: job
+  guard: '**Rate limited or refused.** Retryable. Set by the white-label domain job.'
 - from: active
   to: expired
   trigger: job
   guard: '**Renewal did not happen.** The domain stops serving, and that is a page a guest sees.'
 - from: expired
   to: issuing
-  trigger: renew
-  operation: claimCustomDomain
-  guard: Renewing.
+  trigger: job
+  guard: Renewing. The white-label domain job requests the certificate again (ADAM CR-105).
 - from: active
   to: revoked
   trigger: revoke

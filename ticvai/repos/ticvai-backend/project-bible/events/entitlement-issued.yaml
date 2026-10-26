@@ -39,8 +39,9 @@ payload:
   type: timestamp
 consumers:
 - context: orders
-  purpose: Complete the order when every paid line holds its entitlements, and record the ids on the order
-    line (SD-026, 29 September)
+  purpose: Record the ids on the order line, and complete the order (paid to completed) when every line with a
+    template holds quantity entitlements; a line without a template needs none (SD-026, 29 September; ADAM CR-167,
+    CHG-R10ORD-010)
   idempotencyKey: entitlementId
   onFailure: retryThenDeadLetter
   isCritical: true

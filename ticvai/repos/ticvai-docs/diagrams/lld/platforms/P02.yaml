@@ -43,16 +43,16 @@ modulesUsed:
   screens: 2
 servicesCalled:
 - service: OrderService
-  operationCalls: 76
+  operationCalls: 77
 - service: MarketingService
-  operationCalls: 60
+  operationCalls: 62
 - service: CatalogueService
   operationCalls: 58
 - service: VenueOpsService
-  operationCalls: 56
-- service: AccessService
-  operationCalls: 26
+  operationCalls: 55
 - service: IdentityService
+  operationCalls: 28
+- service: AccessService
   operationCalls: 26
 - service: WhiteLabelService
   operationCalls: 22
@@ -360,6 +360,7 @@ screens:
   - cartId<-session
   - venueId<-session
   - entryId<-navigation
+  - waitingEntryId<-GST-046
   goesTo:
   - GST-001
   - GST-002
@@ -614,6 +615,7 @@ screens:
   - listBillingStatements
   - listDelegations
   - listMyPaymentIssues
+  - listPaymentTokens
   - listProducts
   - retryMyDunningPayment
   states:
@@ -1423,6 +1425,7 @@ screens:
   - lineId<-navigation
   - productId<-navigation
   - performanceId<-navigation
+  - holdIds<-navigation
   - holdId<-navigation
   - venueId<-session
   goesTo:
@@ -1453,6 +1456,7 @@ screens:
   - refreshToken
   - registerGuest
   - requestGuestOtp
+  - verifyGuestEmail
   - verifyGuestOtp
   - verifyMfaChallenge
   states:
@@ -1484,7 +1488,9 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - getMyProfile
   - getPublishedTenantConfig
+  - updateMyProfile
   states:
   - emptyFirstRun
   - error
@@ -1565,7 +1571,7 @@ screens:
   offlineState: true
   entryParams:
   - performanceId<-GST-007
-  - waitingEntryId<-GST-046
+  - waitingEntryId<-GST-007
   goesTo:
   - GST-001
   - GST-002
@@ -1651,7 +1657,7 @@ screens:
   entryParams:
   - performanceId<-deepLink
   - eventId<-GST-007
-  - holdId<-navigation
+  - holdIds<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -1934,7 +1940,6 @@ screens:
   operations:
   - getVisitPlan
   - getWaitTimes
-  - listMyVisitPlans
   - listVisitPlanAlternatives
   - updateVisitPlan
   states:
@@ -2068,6 +2073,7 @@ screens:
   - deleteGuestAccount
   - exportSubjectData
   - getGuestConsents
+  - getSubjectDataExport
   - listConsentPurposes
   - recordConsent
   states:

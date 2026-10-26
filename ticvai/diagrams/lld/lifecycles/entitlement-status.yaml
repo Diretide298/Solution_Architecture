@@ -1,5 +1,5 @@
 id: LLD-Entitlement
-title: Entitlement — 11 transitions
+title: Entitlement — 14 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/entitlement-status.yaml
@@ -39,6 +39,21 @@ transitions:
   guard: A single-entry ticket scanned
   emits:
   - access.validated
+- from: issued
+  to: partiallyConsumed
+  operation: recordQueueRedemptionUse
+  trigger: operation
+  guard: A multi-use Fast Pass taken once by a redeemed queue entry (queueEntry.redeemed; ADAM CR-238)
+- from: partiallyConsumed
+  to: fullyConsumed
+  operation: recordQueueRedemptionUse
+  trigger: operation
+  guard: The last use of a Fast Pass taken by a redeemed queue entry (ADAM CR-238)
+- from: issued
+  to: fullyConsumed
+  operation: recordQueueRedemptionUse
+  trigger: operation
+  guard: A single-use Fast Pass taken by a redeemed queue entry (ADAM CR-238)
 - from: issued
   to: expired
   trigger: timer

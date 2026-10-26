@@ -99,7 +99,7 @@ Retail Board 4. **A lot number answers which delivery; a serial answers which on
 **Searchable by serial first**, because the question is almost always asked with a serial in hand — a guest at a counter with a broken phone, or an auditor with a stock list.
 
 
-**Order.** Newest first, by `receivedAt` descending, then by `id`.
+**Order.** Newest first, by `receivedAt` descending, then by `id`. Where `receivedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|

@@ -3314,7 +3314,7 @@ tables:
   foreignWriters:
   - approvals
 - table: marketing.privacy_request
-  columns: 29
+  columns: 30
   store: postgres
   parent: null
   writtenBy:
@@ -3696,6 +3696,7 @@ screens:
 - P02:GST-039 Profile
 - P02:GST-040 Help & Support
 - P02:GST-042 Simple Registration & OTP
+- P02:GST-043 Arabic / RTL Experience
 - P02:GST-065 Newsletter & Preferences
 - P02:GST-066 Privacy & My Data
 - P02:GST-068 Help & My Cases

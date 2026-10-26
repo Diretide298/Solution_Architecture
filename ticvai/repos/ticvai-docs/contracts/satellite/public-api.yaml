@@ -61,6 +61,19 @@ info:
     OpenAPI files *are* the schema documentation. 13.1.1 to 13.1.5 ask for a portal that renders
     them, which is a frontend over artefacts that already exist.
 
+    ## Who a partner caller acts for (ADAM CR-098, accepted for r10; CHG-R10ID-011)
+
+    **A partner caller acts for one developer account: the one whose `control.developer_member` row has the
+    caller's signed-in email and status `active`.** Every row a developer owns (`control.api_client`,
+    `control.api_client_secret`, `control.integration_listing`, `control.production_access_request`,
+    `control.sandbox`, and the webhook subscriptions of its clients) is read and written by a partner caller only
+    when its `developer_id` is that account; another developer's row answers 404, exactly as a row that does not
+    exist, so ids are not probed. A member with role `readOnly` reads and never writes (403). **TICVAI staff are
+    unrestricted** and see every developer's rows. A developer account that is not `verified` is provisioned
+    nothing: its members may register listings in `draft` and read, and every write that creates a client, a
+    sandbox or a production request is 409 `developer-not-verified`. This rule is stated once here; each operation
+    that reaches a developer's rows applies it.
+
 servers:
   - url: https://api.ticvai.com/v1
 
@@ -87,8 +100,13 @@ x-ticvai-queries:
       lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Platform's service route (serviceAuth).
-    served: [service]
+      from another deployable through Platform's service route (serviceAuth), and **in process by commerce**,
+      under the granted read XDR-006 (ADAM CR-243, option A, accepted 26 October 2026): commerce composes this
+      query over the control connection it already holds for routing (#27692, CR-161), because the service route
+      between deployables is not built (CR-174). control.api_client has no row-level security in the control
+      database, so an in-process asker names the rows it may see: approvals#setApprovalExternalProvider asks by
+      the `apiClientId` and treats a row whose `allowed_tenant_ids` does not hold the caller's tenant as absent.
+    served: [in-process, service]
 paths:
   /developers:
     post:
@@ -96,6 +114,9 @@ paths:
       x-ticvai-consumed-by:
         - "P14 DEV-002 Register & Organisation"
       security: []
+      x-ticvai-writes:
+      - table: control.developer_member
+        for: 'the owner member, the contact email with role owner, written with the account (ADAM CR-098; CHG-R10ID-011)'
       summary: Register a developer or organisation
       description: >
         13.1.6 to 13.1.9. **An organisation, not a person** — an integration outlives the engineer
@@ -103,10 +124,20 @@ paths:
 
         A developer account is **not a tenant and not a partner.** A partner resells tickets; a
         developer writes software. Conflating them was the confusion CF-135 opened on.
+
+        **Public, with no permission and no tenant** (ADAM CR-098, accepted for r10; CHG-R10ID-011): a
+        developer account lives in the control database and belongs to no tenant, so the caller is anonymous and
+        nothing is checked against a grant. The body is `CreateDeveloperAccountRequest`; the server sets `id`,
+        `status` `pending` and no `verifiedAt`. **The contact is the owner:** the same write inserts one
+        `control.developer_member` row with the contact email, role `owner` and status `invited`, so
+        `setDeveloperMembers` always finds its one owner. **One account per contact email:** an organisation
+        already registered under that email, compared without case (unique on `lower(contact_email)`), is 409
+        `developer-already-registered` and nothing is written. The account stays `pending`, and is provisioned
+        nothing, until TICVAI staff verify it (`verifyDeveloper`).
       tags: [publicApi]
-      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-permission: null
       x-ticvai-audience: [public]
-      x-ticvai-scope-level: tenant
+      x-ticvai-scope-level: platform
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -115,7 +146,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/DeveloperAccount' }
+            schema: { $ref: '#/components/schemas/CreateDeveloperAccountRequest' }
       responses:
         '201':
           headers:
@@ -125,6 +156,15 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/DeveloperAccount' }
+        '400':
+          $ref: '../shared/common.yaml#/components/responses/BadRequest'
+        '409':
+          description: 'An organisation is already registered under this contact email, compared without case
+            (`developer-already-registered`; ADAM CR-098). Nothing is written.'
+          x-ticvai-problem-types: [developer-already-registered]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -160,6 +200,50 @@ paths:
                 $ref: '#/components/schemas/DeveloperAccount'
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /developers/{developerId}/verify:
+    parameters:
+      - name: developerId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: verifyDeveloper
+      summary: Verify a registered developer organisation
+      description: >
+        **TICVAI staff verify a developer before anything is provisioned** (ADAM CR-098, accepted for r10;
+        CHG-R10ID-011; states/developer-account.yaml: "Nothing was provisioned before this"). Moves a `pending`
+        account to `verified` and sets `verifiedAt`; from then its members may create sandbox clients, sandboxes and
+        production requests. The owner member stays `invited` until the person signs in to the portal with the
+        email. An account that is not `pending` is 409 `developer-not-pending` and nothing changes. No body: the
+        checks behind the decision (the organisation, its contact, its website) are the reviewer's.
+      tags: [publicApi]
+      x-ticvai-permission: DEVELOPER_ADMIN
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: platform
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Verified
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeveloperAccount' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: 'The account is not `pending` (`developer-not-pending`): already verified, suspended or closed.
+            Nothing changes.'
+          x-ticvai-problem-types: [developer-not-pending]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /developers/{developerId}/members:
@@ -270,6 +354,12 @@ paths:
         - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
       summary: Registered clients for this developer
+      description: >
+        **Whose clients** (ADAM CR-098; CHG-R10ID-011): a partner caller gets its own developer account's clients only
+        (the rule in this contract's description, "Who a partner caller acts for"); TICVAI staff get every client.
+        A client's secrets are never returned.
+
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -293,6 +383,9 @@ paths:
         - "P08 BO-1177 API Security, Access & Integration Permissions"
         - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
+      x-ticvai-writes:
+      - table: control.api_client_secret
+        for: 'the first secret''s keyed hash, one row (ADAM CR-098; CHG-R10ID-011)'
       summary: Create a client with scopes and an environment
       description: >
         13.1.11 to 13.1.13, and **CF-135a: the credential model was owned by nobody.** 2.7.52,
@@ -319,6 +412,12 @@ paths:
         read assigned products and partner prices; the product, price and capacity writes are open
         only through a platform-staff `ApiLicence.catalogueWriteException`. Keys expire: `credentialTtlDays` (default 365 for
         production, 90 for sandbox) sets `expiresAt`, and rotation renews it.
+
+        **The secret is a row of its own** (ADAM CR-098, accepted for r10; CHG-R10ID-011): the client
+        secret returned once here is stored only as a `control.api_client_secret` row (`ApiClientSecret`), its keyed
+        hash under the platform's client-secret key (ADR-0063, amendment of 25 October 2026), with `expiresAt` the
+        client's. A partner caller creates clients only for its own developer account, and only once that account
+        is `verified` (409 `developer-not-verified`).
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [staff, partner]
@@ -350,9 +449,11 @@ paths:
         '409':
           description: >
             A `production` client without a current certification, or asked for by a developer rather
-            than issued by TICVAI (`certification-required`, M17-06). Use `requestProductionAccess`.
+            than issued by TICVAI (`certification-required`, M17-06). Use `requestProductionAccess`. Or the
+            caller's developer account is not `verified` (`developer-not-verified`, ADAM CR-098).
           x-ticvai-problem-types:
             - certification-required
+            - developer-not-verified
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -380,11 +481,27 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
+      x-ticvai-writes:
+      - table: control.api_client_secret
+        for: 'the new secret''s row, and the earlier live rows'' expires_at cut to the overlap (ADAM CR-098; CHG-R10ID-011)'
+      - table: control.api_client
+        for: 'expires_at renewed by credentialTtlDays; status never changes here (ADAM CR-098)'
       summary: Issue a new secret, with an overlap window
       description: >
         13.1.15. **Rotation without an overlap is an outage.** Both secrets are valid until
         `oldSecretExpiresAt`, which gives the integrator time to deploy — and **a rotation with no
         overlap is one nobody performs until they are breached.**
+
+        **One row per secret** (ADAM CR-098, accepted for r10; CHG-R10ID-011). Rotation inserts a new
+        `control.api_client_secret` row (`ApiClientSecret`) holding the new secret's keyed hash, with `expiresAt` the
+        client's renewed `expiresAt` (now plus `credentialTtlDays`); every earlier row still live gets `expiresAt`
+        = now + `overlapHours`, or keeps its own if that is sooner, which is `oldSecretExpiresAt`. `issueApiToken`
+        accepts a secret matching any row of the client with `revokedAt` null and `expiresAt` in the future. A
+        production client approved with no secret yet (`decideProductionAccess`) takes its first secret here, and
+        `oldSecretExpiresAt` is then null. **Rotation never changes the client's status:** a `suspended` client is
+        409 `api-client-suspended` (it returns to `active` only through `setApiClientStatus`, with its reason) and a
+        `revoked` one is 409 `api-client-revoked`. An unknown client, or one of another developer account (the rule
+        in this contract's description), is 404. Nothing is written on a refusal.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [staff, partner]
@@ -400,7 +517,7 @@ paths:
             schema:
               type: object
               properties:
-                overlapHours: { type: integer, default: 72 }
+                overlapHours: { type: integer, minimum: 0, maximum: 720, default: 72, x-ticvai-persisted: false }
       responses:
         '201':
           headers:
@@ -413,7 +530,16 @@ paths:
                 type: object
                 properties:
                   clientSecret: { type: string, format: password }
-                  oldSecretExpiresAt: { type: string, format: date-time }
+                  oldSecretExpiresAt: { type: string, format: date-time, nullable: true }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          description: 'The client is `suspended` (`api-client-suspended`) or `revoked` (`api-client-revoked`); rotation
+            never reactivates a client (ADAM CR-098). Nothing is written.'
+          x-ticvai-problem-types: [api-client-suspended, api-client-revoked]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
@@ -421,6 +547,11 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
+      x-ticvai-writes:
+      - table: control.api_client_secret
+        for: 'revoked_at set on every row of the client (ADAM CR-098; CHG-R10ID-011)'
+      - table: control.api_client
+        for: 'status revoked, terminal (ADAM CR-098)'
       summary: Revoke immediately
       description: >
         13.1.15. **No overlap, by definition** — revocation is what you reach for when a secret has
@@ -428,6 +559,12 @@ paths:
 
         **Active tokens are invalidated too.** Revoking the credential while leaving issued tokens
         alive is a revocation that takes an hour to mean anything.
+
+        **Revocation is terminal** (ADAM CR-098, accepted for r10; CHG-R10ID-011; states/api-client.yaml):
+        the client goes `revoked` from `active` or `suspended`, and every `control.api_client_secret` row of the
+        client gets `revokedAt` now, so no secret verifies again. It never suspends: pausing a client reversibly is
+        `setApiClientStatus`. A client already `revoked` is 409 `api-client-revoked`; an unknown client, or one of
+        another developer account (the rule in this contract's description), is 404.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [staff, partner]
@@ -442,12 +579,25 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Revoked
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          description: 'The client is already `revoked` (`api-client-revoked`), which is terminal. Nothing changes.'
+          x-ticvai-problem-types: [api-client-revoked]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
   /oauth/token:
     post:
       operationId: issueApiToken
+      x-ticvai-reads:
+      - table: control.api_client_secret
+        for: 'the client''s live secret rows, against which the sent secret''s keyed hash is compared (ADAM CR-098; CHG-R10ID-011)'
+      - table: control.api_licence
+        for: 'the one licence of the tenant whose effective period covers now (ADAM CR-098)'
       security:
       - apiKeyAuth: []
       - serviceAuth: []
@@ -464,6 +614,13 @@ paths:
         request from an address outside `ApiClient.ipAllowList` is refused 403 `ip-not-allowed`, and a
         client past `expiresAt` gets no token (403 `client-expired`). Every refusal counts towards
         the anomaly rules (`setApiAnomalyRule`).
+
+        **How the secret is checked, and which licence applies** (ADAM CR-098, accepted for r10;
+        CHG-R10ID-011). The sent `clientSecret` is hashed with the platform's client-secret key of each live row's
+        `hashKeyVersion` and compared in constant time with the client's `control.api_client_secret` rows whose
+        `revokedAt` is null and `expiresAt` is in the future (ADR-0063, amendment of 25 October 2026); no match is
+        401. The scopes are licensed by the tenant's one `control.api_licence` row whose effective period covers now
+        (`setApiLicensing` keeps a tenant's periods from overlapping); a tenant with none licenses nothing.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [partner, service]
@@ -496,6 +653,8 @@ paths:
                   tokenType: { type: string }
                   expiresIn: { type: integer }
                   scope: { type: string }
+        '401':
+          $ref: '../shared/common.yaml#/components/responses/Unauthorized'
         '403':
           description: >
             The request came from an address outside the client's `ipAllowList` (`ip-not-allowed`),
@@ -515,6 +674,8 @@ paths:
       x-ticvai-consumed-by:
         - "P14 DEV-004 Sandbox"
       summary: Sandbox environments
+      description: >-
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -547,6 +708,10 @@ paths:
         **13.2.2 (tenant-specific sandboxes) is declined**, recorded rather than dropped. Per-customer
         staging from 30 July does tenant-specific validation: **development and certification are
         generic, acceptance is tenant-specific.**
+
+        **Only for a verified developer** (ADAM CR-098; CHG-R10ID-011): the sandbox belongs to the caller's developer
+        account (the rule in this contract's description), and an account that is not `verified` is 409
+        `developer-not-verified`, since nothing is provisioned before verification.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [staff, partner]
@@ -575,6 +740,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Sandbox' }
+        '409':
+          description: 'The caller''s developer account is not `verified` (`developer-not-verified`; ADAM CR-098).
+            Nothing is provisioned.'
+          x-ticvai-problem-types: [developer-not-verified]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -639,6 +811,8 @@ paths:
         **Per tenant, filterable by API client** (decided 28 September, audit R214 (4)). Returns every
         webhook subscription in the tenant; `clientId` narrows it to what one API client is subscribed
         to. A partner caller sees only its own client's subscriptions whatever it sends.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -791,6 +965,8 @@ paths:
       description: >
         13.1.30 and 13.3.23. **A developer debugging an integration needs the delivery log more than
         anything else in this contract**, and without it every question becomes a support ticket.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -841,18 +1017,25 @@ paths:
         of the types asked, and writes each delivery as a `control.webhook_delivery` with `isReplay` true and the
         replay's `replayId`; the row goes `running`, then `completed` or `failed`.
 
-        **The window** (CR-140): `to` before `from` is 400 `replay-window-invalid`. The retention bound is the
-        outbox itself: published rows leave with their monthly partition (ADR-0058), so a `from` older than the
-        oldest attached partition is 400 `replay-window-beyond-retention`. An event type the subscription does not
-        hold is 400 `replay-event-type-not-subscribed`. **The caller's tenant** must be one of the subscription's
-        API client's `allowedTenantIds`, else 404, as for an unknown subscription.
+        **What the request refuses** (CR-140, narrowed by ADAM CR-201, option A, 25 October 2026;
+        CHG-R10ID-012). Only what the control database can answer: `to` before `from` is 400
+        `replay-window-invalid`; a window longer than 7 days (`to` minus `from`, `to` defaulting to now) is 400
+        `replay-window-too-large`; an event type the subscription does not hold is 400
+        `replay-event-type-not-subscribed`. **The caller's tenant** must be one of the subscription's API client's
+        `allowedTenantIds`, else 404, as for an unknown subscription; the row records it as `tenantId` (the
+        caller's tenant, set by the server), and the dispatcher reads that tenant's outbox only.
 
-        **What the window measures, what it filters, how large it may be** (r8 walk of ticket 27997). The window
-        is on the outbox row's `created_at`, the moment the event was written, not the moment it was first
-        delivered. The subscription's own filters (event types, venues) are applied by the dispatcher to every
-        replayed event exactly as for a live delivery, so an event of another venue is never sent. One replay
-        covers at most 7 days (`to` minus `from`, `to` defaulting to now) and at most 10,000 events; a larger
-        ask is 400 `replay-window-too-large` and nothing is queued, so the integrator replays in steps.
+        **What the dispatcher refuses** (ADAM CR-201). The retention bound is the outbox itself: published rows leave
+        with their monthly partition (ADR-0058). When the window starts before the oldest attached outbox
+        partition of the row's tenant, the dispatcher sets the job `failed` with `failureReason`
+        `replay-window-beyond-retention`; when the window holds more than 10,000 events of the asked types, it
+        sets it `failed` with `replay-window-too-large`. In both cases it replays nothing, so the integrator asks
+        again in steps. The caller learns it from the job's status, not from this answer.
+
+        **What the window measures and what it filters** (r8 walk of ticket 27997). The window is on the outbox
+        row's `created_at`, the moment the event was written, not the moment it was first delivered. The
+        subscription's own filters (event types, venues) are applied by the dispatcher to every replayed event
+        exactly as for a live delivery, so an event of another venue is never sent.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [staff, partner]
@@ -883,12 +1066,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/WebhookReplayJob'
         '400':
-          description: 'The window or the event types cannot be replayed (ADAM CR-140; CHG-CRA-004): `to` before `from`
-            (`replay-window-invalid`); `from` older than the oldest outbox partition still attached
-            (`replay-window-beyond-retention`); an event type the subscription does not hold
-            (`replay-event-type-not-subscribed`); a window longer than 7 days or holding more than 10,000 events
-            (`replay-window-too-large`). Nothing is queued.'
-          x-ticvai-problem-types: [replay-window-invalid, replay-window-beyond-retention, replay-event-type-not-subscribed, replay-window-too-large]
+          description: 'The window or the event types cannot be replayed (ADAM CR-140, narrowed by CR-201;
+            CHG-R10ID-012): `to` before `from` (`replay-window-invalid`); an event type the subscription does not hold
+            (`replay-event-type-not-subscribed`); a window longer than 7 days (`replay-window-too-large`). Nothing is
+            queued. Retention and the 10,000-event cap are the dispatcher''s, which fails the job instead.'
+          x-ticvai-problem-types: [replay-window-invalid, replay-event-type-not-subscribed, replay-window-too-large]
           content:
             application/problem+json:
               schema:
@@ -1054,6 +1236,8 @@ paths:
         a staff caller must hold (`DEVELOPER_VIEW`, ADR-0025) is not enforced here, and a signed-in staff caller
         without it is not refused. Nobody is refused on this read, so the screen's no-access state cannot be reached
         through it.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags: [publicApi]
       x-ticvai-permission: null
       x-ticvai-audience: [public, partner]
@@ -1128,16 +1312,64 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /marketplace/listings:
+    get:
+      operationId: listMarketplaceListings
+      security:
+      - {}
+      x-ticvai-no-screen: 'the public marketplace page of the developer site (13.1.50), read before anyone signs in;
+        no app screen in the package draws it yet. DEV-007 and DEV-008 read listIntegrationListings (ADAM CR-203)'
+      summary: The public marketplace of certified integrations
+      description: >
+        13.1.50. **The public marketplace, split from the developer's and the reviewer's lists** (ADAM CR-203,
+        option B, 25 October 2026; CHG-R10ID-014). Anyone may call it, signed in or not, and it can only ever
+        answer listings that are `certified`, `visibility` `public` and unexpired (`certifiedUntil` null or today
+        or later); a draft, private, rejected, revoked, delisted or lapsed listing is never in it, whoever asks.
+        A separate operation, so a filter mistake on the authenticated list cannot leak a draft here.
+
+        **Statuses.** Only `status` `certified`: a listing in any other status is never returned, and there is
+        no status filter.
+
+        **Order.** By `name` ascending, then by `id`. Paged.
+
+        **Third-party code does not execute inside TICVAI**: a listing points at an integration running on the
+        developer's own infrastructure.
+      tags: [publicApi]
+      x-ticvai-permission: null
+      x-ticvai-audience: [public]
+      x-ticvai-scope-level: platform
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: category
+          in: query
+          required: false
+          schema: { type: string, enum: [crm, marketing, accounting, hotel, transport, analytics, accessibility, other] }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Certified public listings
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/IntegrationListing' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /listings:
     get:
       operationId: listIntegrationListings
       x-ticvai-consumed-by:
         - "P14 DEV-007 Marketplace Listing"
         - "P14 DEV-008 Programme Administration"
-      security:
-      - bearerAuth: []
-      - {}
-      summary: Published third-party integrations
+      summary: A developer's own listings, or the certification queue
       description: >
         13.1.50. **A listing, not an installation.** The integration runs on the developer's own
         infrastructure and this is the entry that describes it, points at it, and says it has been
@@ -1146,21 +1378,46 @@ paths:
         **Third-party code does not execute inside TICVAI** — stated rather than assumed, because
         executing submitted code in a multi-tenant platform is a different product with a different
         threat model.
+
+        **Authenticated only; the public marketplace is `listMarketplaceListings`** (ADAM CR-203, option B, 25
+        October 2026; CHG-R10ID-014). **Who sees what:** a developer (a partner caller) gets its own developer
+        account's listings in every status, drafts included (DEV-007; the rule in this contract's description);
+        TICVAI staff get every developer's listings (DEV-008, the certification queue), and may narrow them with
+        `status` and `developerId`. A partner caller's `developerId` other than its own answers an empty page.
+
+        **Order.** Listings waiting for review first (`submitted`, then `inReview`), then by `name` ascending, then
+        by `id`. Paged.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
-      x-ticvai-audience: [public, staff, partner]
+      x-ticvai-audience: [staff, partner]
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema: { type: string, enum: [draft, submitted, inReview, certified, rejected, revoked, delisted] }
+        - name: developerId
+          in: query
+          required: false
+          schema: { type: string, format: uuid }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
         '200':
           description: Listings
           content:
             application/json:
               schema:
-                type: array
-                items: { $ref: '#/components/schemas/IntegrationListing' }
+                allOf:
+                  - $ref: '../shared/common.yaml#/components/schemas/Page'
+                  - type: object
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/IntegrationListing' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
@@ -1269,7 +1526,7 @@ paths:
         DEV-008 sets licences with `setApiLicensing`; `listApiScopes` lists the scopes a licence may grant,
         not the licences. Returns what the write stores, in the write's own shape. Ordered by creation (`id`, a UUIDv7), oldest first.
       x-ticvai-permission: DEVELOPER_ADMIN
-      x-ticvai-scope-level: tenant
+      x-ticvai-scope-level: platform
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -1297,6 +1554,9 @@ paths:
       operationId: setApiLicensing
       x-ticvai-consumed-by:
         - "P14 DEV-008 Programme Administration"
+      x-ticvai-reads:
+      - table: control.tenant
+        for: 'the tenant staff name, which must exist (ADAM CR-098; CHG-R10ID-011)'
       x-ticvai-agreed: '29 September: 17 September minutes M17-04 (partners never create products, prices or performances through the API); the exception is platform-staff only'
       summary: Which API modules a tenant has licensed, and on what terms
       description: >
@@ -1321,10 +1581,18 @@ paths:
         alone may set here (a tenant principal sending it is refused 403 `platform-staff-only`), for a
         named client and named operations, with a reason and an end date; it is audited and lapses
         on its own.
+
+        **Staff name the tenant; a tenant's licences never overlap** (ADAM CR-098, accepted for r10;
+        CHG-R10ID-011). `tenantId` is sent by the TICVAI programme admin (DEV-008), who acts for no tenant of
+        their own, and must be a tenant of `control.tenant` (else 422 `unknown-tenant`). A licence whose
+        `effectiveFrom` to `effectiveTo` (an open end runs for ever) overlaps another licence of the same tenant
+        is 409 `api-licence-period-overlap` and nothing is written, so `issueApiToken` always finds at most one
+        licence in force; to change terms, end the current licence (`effectiveTo`) and start the next the day
+        after.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_ADMIN
       x-ticvai-audience: [staff]
-      x-ticvai-scope-level: tenant
+      x-ticvai-scope-level: platform
       x-ticvai-config-scope: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1355,6 +1623,19 @@ paths:
             (`platform-staff-only`, M17-04).
           x-ticvai-problem-types:
             - platform-staff-only
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: 'The licence''s effective period overlaps another licence of the same tenant
+            (`api-licence-period-overlap`; ADAM CR-098). Nothing is written.'
+          x-ticvai-problem-types: [api-licence-period-overlap]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '422':
+          description: '`tenantId` names no tenant (`unknown-tenant`; ADAM CR-098). Nothing is written.'
+          x-ticvai-problem-types: [unknown-tenant]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1586,6 +1867,12 @@ paths:
 
         Refused 409 `certification-required` when the listing is not certified or its certification
         has lapsed, and 422 `ip-allow-list-required` without an allow-list (M17-07).
+
+        **Only the developer's own listing and client** (ADAM CR-203, option B, 25 October 2026, and CR-098;
+        CHG-R10ID-014). The sandbox client must be the caller's developer account's (else 404, the rule in this
+        contract's description); `listingId` must name a listing whose `developerId` is that same account, else 422
+        `listing-not-owned` and nothing is written, so a developer cannot ride on another developer's
+        certification. An account that is not `verified` is 409 `developer-not-verified`.
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_MANAGE
       x-ticvai-audience: [partner]
@@ -1631,18 +1918,22 @@ paths:
           description: >
             The listing is not certified, or its certification has lapsed (`certification-required`);
             or the client is not a sandbox client, or a request for it is already pending
-            (`production-access-pending`).
+            (`production-access-pending`); or the caller's developer account is not `verified`
+            (`developer-not-verified`, ADAM CR-098).
           x-ticvai-problem-types:
             - certification-required
             - production-access-pending
+            - developer-not-verified
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
-          description: An empty `ipAllowList` (`ip-allow-list-required`) or an unknown scope (`unknown-scope`).
+          description: An empty `ipAllowList` (`ip-allow-list-required`), an unknown scope (`unknown-scope`), or a
+            `listingId` of another developer (`listing-not-owned`, ADAM CR-203).
           x-ticvai-problem-types:
             - ip-allow-list-required
             - unknown-scope
+            - listing-not-owned
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1665,7 +1956,15 @@ paths:
         The approval queue for production keys (M17-06). A developer sees their own organisation's
         requests; TICVAI staff see every request.
 
+        **A tenant's staff see only the requests for their tenant** (ADAM CR-203, option B, 25 October 2026;
+        CHG-R10ID-014): on BO-1073 and BO-1177 a tenant staff caller gets only the requests whose
+        `allowedTenantIds` contain the caller's tenant, never another tenant's or a developer's other requests.
+        Which caller is which: a partner caller is a developer member (the rule in this contract's description), a
+        TICVAI platform operator is platform staff, and any other staff caller is the tenant's.
+
         **Order.** Pending first (by `status`), then newest first, by `requestedAt` descending, then by `id`.
+
+        Where `requestedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags: [publicApi]
       x-ticvai-permission: DEVELOPER_VIEW
       x-ticvai-audience: [staff, partner]
@@ -1831,7 +2130,7 @@ paths:
         - name: anomalyRuleId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `ruleKey`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 anomaly-rule-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -1848,6 +2147,14 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ApiAnomalyRule' }
+        '409':
+          description: 'Refused, and nothing is stored. `anomaly-rule-id-mismatch` (ADAM CR-245): a record for `ruleKey` exists and the path''s `anomalyRuleId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - anomaly-rule-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -2080,11 +2387,19 @@ components:
 
         **Not a tenant and not a partner.** A partner resells tickets; a developer writes software,
         and one organisation may be both.
+      # One account per contact email, compared without case (ADAM CR-098; CHG-R10ID-011): a text member of a unique
+      # index is indexed as lower(column), so this is unique on lower(contact_email).
+      x-ticvai-unique-together:
+      - [contactEmail]
       required: [id, organisationName, contactEmail, status]
       properties:
         id: { type: string, format: uuid, readOnly: true }
         organisationName: { type: string }
-        contactEmail: { type: string, format: email }
+        contactEmail:
+          type: string
+          format: email
+          description: 'The organisation''s contact, who becomes its owner member on registration; unique without case
+            (`registerDeveloper` 409 `developer-already-registered`; ADAM CR-098).'
         websiteUrl: { type: string, nullable: true }
         countryCode: { type: string }
         partnerId:
@@ -2096,6 +2411,23 @@ components:
             the same record**, which is what CF-135a was about.
         status: { type: string, enum: [pending, verified, suspended, closed], readOnly: true }
         verifiedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+
+    CreateDeveloperAccountRequest:
+      type: object
+      x-ticvai-persistence: none — request only; stored as control.developer_account (DeveloperAccount) and its owner control.developer_member
+      description: '**What `registerDeveloper` takes** (ADAM CR-098, accepted for r10; CHG-R10ID-011): the
+        organisation and its contact, never the read-only `id`, `status` or `verifiedAt`, which the server sets.'
+      required: [organisationName, contactEmail]
+      properties:
+        organisationName: { type: string, maxLength: 300 }
+        contactEmail: { type: string, format: email }
+        websiteUrl: { type: string, nullable: true }
+        countryCode: { type: string, minLength: 2, maxLength: 2 }
+        partnerId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Where this developer is also a commercial partner.
 
     ApiClient:
       type: object
@@ -2178,6 +2510,50 @@ components:
           nullable: true
           readOnly: true
           description: Why the client was suspended (`setApiClientStatus`).
+
+    ApiClientSecret:
+      type: object
+      x-ticvai-persistence: control.api_client_secret
+      description: '**One secret of an API client, as stored** (ADAM CR-098, accepted for r10; CHG-R10ID-011).
+        Never returned: `createApiClient` and `rotateApiCredential` return the secret once and keep only its keyed
+        hash here. A client has one row per secret it was ever given; rotation inserts a row and cuts the earlier
+        live rows'' `expiresAt` to the overlap, revocation sets `revokedAt` on every row. A secret verifies
+        (`issueApiToken`) while its row has `revokedAt` null and `expiresAt` in the future.'
+      required: [id, apiClientId, secretHash, hashKeyVersion, issuedAt, expiresAt]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        apiClientId:
+          type: string
+          format: uuid
+          x-ticvai-references: control.api_client
+          description: The API client this secret belongs to (`control.api_client`). Named `apiClientId`, as
+            `ApprovalExternalProvider` and `WalletIntegrationMapping` name an API client, because the glossary bans
+            the bare word `client` in a name (CHG-R10GFC-002).
+        secretHash:
+          type: string
+          writeOnly: true
+          minLength: 64
+          maxLength: 64
+          x-ticvai-secret: blind-index
+          description: 'HMAC-SHA-256 of the secret under the platform''s client-secret key, 64 lowercase hex characters
+            (ADR-0063, amendment of 25 October 2026): a keyed hash under a platform key, since the control database
+            has no tenant key. Client secrets are long and random, so a fast keyed hash is safe where Argon2id
+            (ADR-0071, for passwords and PINs) would cost every token request.'
+        hashKeyVersion:
+          type: integer
+          minimum: 1
+          readOnly: true
+          description: 'Which version of the platform''s client-secret key made `secretHash`. A secret cannot be
+            re-hashed (the server never keeps it), so a retired key version stays in Key Vault until the last row
+            made with it has expired.'
+        issuedAt: { type: string, format: date-time, readOnly: true }
+        expiresAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: When this secret stops verifying; for the newest row the client's `expiresAt`, for an earlier
+            row the end of the rotation's overlap.
+        revokedAt: { type: string, format: date-time, nullable: true, readOnly: true }
 
     Sandbox:
       type: object
@@ -2572,7 +2948,12 @@ components:
           readOnly: true
           description: >
             **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
-        tenantId: { type: string, format: uuid, readOnly: true }
+        tenantId:
+          type: string
+          format: uuid
+          x-ticvai-references: control.tenant
+          description: 'The tenant licensed, sent by TICVAI staff (ADAM CR-098; CHG-R10ID-011). A tenant''s licences
+            never overlap in time (`setApiLicensing`, 409 `api-licence-period-overlap`).'
         licensedModules:
           type: array
           description: >
@@ -2615,10 +2996,18 @@ components:
         makes is marked as a replay in its payload. **Stored** (ADAM CR-140, option 1, 18 October 2026; CHG-CRA-004):
         one `control.webhook_replay` row per request, which the workers host''s replay dispatcher drains; each
         delivery it writes is a `control.webhook_delivery` with `isReplay` true and this `replayId`.'
-      required: [replayId, subscriptionId, from, status, queuedAt]
+      required: [replayId, subscriptionId, tenantId, from, status, queuedAt]
       properties:
         replayId: { type: string, format: uuid, x-ticvai-column: id }
         subscriptionId: { type: string, format: uuid, x-ticvai-references: control.webhook_subscription }
+        tenantId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: control.tenant
+          description: 'The tenant whose events are replayed: the caller''s tenant, set by the server, one of the API
+            client''s `allowedTenantIds` (ADAM CR-201, option A, 25 October 2026; CHG-R10ID-012). The dispatcher
+            reads only this tenant''s outbox.'
         from: { type: string, format: date-time, x-ticvai-column: window_from }
         to: { type: string, format: date-time, nullable: true, x-ticvai-column: window_to }
         eventTypes: { type: array, items: { $ref: '#/components/schemas/WebhookEventType' } }
@@ -2631,6 +3020,15 @@ components:
             `failed` when it stops (CR-140).'
         queuedAt: { type: string, format: date-time }
         completedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+        failureReason:
+          type: string
+          nullable: true
+          readOnly: true
+          maxLength: 500
+          description: 'Why a `failed` replay stopped, set by the dispatcher (ADAM CR-201; CHG-R10ID-012):
+            `replay-window-beyond-retention` (the window starts before the oldest attached outbox partition),
+            `replay-window-too-large` (more than 10,000 events in the window), or the dispatcher''s own error text.
+            Null otherwise.'
         requestedByPrincipalId:
           type: string
           format: uuid

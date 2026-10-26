@@ -264,7 +264,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; checkBookingEligibility · getAvailability · addCartLine · getPerformance +8</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; performanceId&larr;navigation, cartId&larr;navigation, productId&larr;WEB-004</div>
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Picks a time; the tickets for it appear</i> <span class="car">performanceId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Selects seats on the map</i> <span class="car">eventId · performanceId · productId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i> <span class="car">bundleId</span><br><a href="#web-010">WEB-010</a>  &mdash; <i>Reviews the cart and may enter a promotion c</i> <span class="car">cartId</span><br><a href="#web-015">WEB-015</a>  &mdash; <i>Adds tickets for a performance whose on-sale</i> <span class="car">performanceId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Picks a time; the tickets for it appear</i> <span class="car">performanceId</span><br><a href="#web-007">WEB-007</a>  &mdash; <i>Selects seats on the map</i> <span class="car">eventId · performanceId · productId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i> <span class="car">bundleId</span><br><a href="#web-010">WEB-010</a>  &mdash; <i>Reviews the cart and may enter a promotion c</i> <span class="car">cartId</span><br><a href="#web-015">WEB-015</a>  &mdash; <i>Adds tickets for a performance whose on-sale</i> <span class="car">performanceId · waitingEntryId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>drawer</b> eligibilityDeclaration &middot; <i>Once, on leaving selection, when a chosen product has an eligibility rule</i> &middot; <b>Continue</b> &middot; Back <span class="dis">discards party</span></div><div class="ov"><b>modal</b> consentQuestions &middot; <i>Once, after the session or date is picked, when the cart has consent questions</i> &middot; <b>Next</b> &middot; Back <span class="dis">discards answers</span></div></div>
         </div>
@@ -280,10 +280,10 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createSeatHold · getSeatAvailability · recommendSeats · listPerformances +3</div>
+          <div><b>OPERATIONS</b> &middot; createSeatHold · getSeatAvailability · recommendSeats · listPerformances +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; performanceId&larr;deepLink, eventId&larr;WEB-006, productId&larr;WEB-004</div>
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Ticket Type Selection</i> <span class="car">productId</span><br><a href="#web-006">WEB-006</a>  &mdash; <i>Date &amp; Performance Selection</i> <span class="car">eventId · performanceId · productId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i><br><a href="#web-010">WEB-010</a>  &mdash; <i>Reviews the cart</i> <span class="car">holdId · performanceId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-005">WEB-005</a>  &mdash; <i>Ticket Type Selection</i> <span class="car">productId</span><br><a href="#web-006">WEB-006</a>  &mdash; <i>Date &amp; Performance Selection</i> <span class="car">eventId · performanceId · productId</span><br><a href="#web-008">WEB-008</a>  &mdash; <i>Add-ons &amp; Upsell</i><br><a href="#web-010">WEB-010</a>  &mdash; <i>Reviews the cart</i> <span class="car">holdId · holdIds · performanceId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecommendSeats &middot; <i>Recommend seats</i> &middot; <b>Recommend seats</b> &middot; Cancel <span class="dis">discards partySize · strategy · categoryIds · maxPrice · accessibleCount · maxOptions</span></div><div class="ov"><b>modal</b> dateTimeOnSeatMap &middot; <i>The seat map opens for an event with several performances and `seatEventDateMode` is `popupOnSeatMap`</i> &middot; <b>Show seats</b> &rarr; <a href="#web-007">WEB-007</a> <span class="car">performanceId</span> &middot; Close</div></div>
         </div>
@@ -564,8 +564,8 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; enterWaitingRoom · getWaitingRoomPosition</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; performanceId&larr;WEB-006, waitingEntryId&larr;WEB-015</div>
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-006">WEB-006</a>  &mdash; <i>Continue to your tickets</i> <span class="car">performanceId</span></div>
+          <div><b>ARRIVES WITH</b> &middot; performanceId&larr;WEB-006, waitingEntryId&larr;WEB-006</div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-006">WEB-006</a>  &mdash; <i>Continue to your tickets</i> <span class="car">performanceId · waitingEntryId</span></div>
           
           
         </div>
@@ -581,7 +581,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; registerGuest · getGuestSession · guestLogout · guestPasswordLogin +10</div>
+          <div><b>OPERATIONS</b> &middot; registerGuest · getGuestSession · guestLogout · guestPasswordLogin +11</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · signInRefused · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; cartId&larr;session, challengeId&larr;navigation, subjectId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-010">WEB-010</a>  &mdash; <i>Signed in and verified — back to the cart</i> <span class="car">cartId</span><br><a href="#web-011">WEB-011</a>  &mdash; <i>Guest Details &amp; Attendee Forms</i><br><a href="#web-012">WEB-012</a>  &mdash; <i>Checkout — Payment</i><br><a href="#web-017">WEB-017</a>  &mdash; <i>My Account Dashboard</i> <span class="car">token</span><br><a href="#web-018">WEB-018</a>  &mdash; <i>My Tickets</i><br><a href="#web-019">WEB-019</a>  &mdash; <i>Order History</i></div>
@@ -714,7 +714,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listBillingStatements · getBillingStatement · listMyPaymentIssues · retryMyDunningPayment +1</div>
+          <div><b>OPERATIONS</b> &middot; listBillingStatements · getBillingStatement · listMyPaymentIssues · retryMyDunningPayment +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;session, orderId&larr;deepLink, caseId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-021">WEB-021</a>  &mdash; <i>Wallet &amp; Gift Cards</i><br><a href="#web-022">WEB-022</a>  &mdash; <i>Membership Plans</i> <span class="car">productId</span><br><a href="#web-024">WEB-024</a>  &mdash; <i>Devices, Wishlist &amp; Consent</i></div>
@@ -733,7 +733,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
 
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getWishlist · listGuestDevices · recordConsent · revokeGuestDevice +10</div>
+          <div><b>OPERATIONS</b> &middot; getWishlist · listGuestDevices · recordConsent · revokeGuestDevice +11</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; deviceId&larr;deepLink, itemId&larr;deepLink, subjectId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-021">WEB-021</a>  &mdash; <i>Wallet &amp; Gift Cards</i><br><a href="#web-022">WEB-022</a>  &mdash; <i>Membership Plans</i><br><a href="#web-023">WEB-023</a>  &mdash; <i>Membership Management</i></div>
@@ -888,7 +888,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getTenantAppStatus · getPublishedTenantConfig</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline · soldOut · closed</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> </div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a>  &mdash; <i>Back to the home page</i><br><a href="#web-002">WEB-002</a>  &mdash; <i>Pick another day</i> <span class="car">eventId</span></div>
           
           
         </div>
@@ -964,7 +964,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listPromotions · getPromotion</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; promotionId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> </div>
+          <div><b>GOES TO</b> &middot; <a href="#web-001">WEB-001</a> <br><a href="#web-002">WEB-002</a>  &mdash; <i>Use this offer</i> <span class="car">code</span></div>
           
           
         </div>

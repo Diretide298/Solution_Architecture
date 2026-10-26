@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 32,
-  "ofTotalOperations": 2845,
-  "tables": 63,
-  "ofTotalTables": 1149
+  "ofTotalOperations": 2854,
+  "tables": 66,
+  "ofTotalTables": 1161
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2813,
-    "tables": 1149,
+    "operations": 2822,
+    "tables": 1161,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -27,7 +27,7 @@
     "target": "burst environment",
     "services": 3,
     "operations": 32,
-    "tables": 63,
+    "tables": 66,
     "exampleLoad": "same stadium on-sale: 1.25M requests in 2h = 1,045 RPS at a 6x burst; compressed to 20 minutes, 6,270",
     "description": "**The on-sale only.** Provisioned before it opens, torn down after, and **its orders reconcile back into the shared cell** (ADR-0035) — which is the single point the two paths touch."
    }
@@ -227,7 +227,7 @@
   {
    "table": "catalogue.product",
    "schema": "catalogue",
-   "columns": 45,
+   "columns": 49,
    "burstOperations": 6,
    "written": false,
    "contention": null,
@@ -282,7 +282,7 @@
   {
    "table": "access.entitlement",
    "schema": "access",
-   "columns": 31,
+   "columns": 34,
    "burstOperations": 4,
    "written": true,
    "contention": null,
@@ -332,7 +332,7 @@
   {
    "table": "catalogue.event",
    "schema": "catalogue",
-   "columns": 10,
+   "columns": 13,
    "burstOperations": 3,
    "written": false,
    "contention": null,
@@ -387,7 +387,7 @@
   {
    "table": "promotions.promotion",
    "schema": "promotions",
-   "columns": 24,
+   "columns": 28,
    "burstOperations": 3,
    "written": false,
    "contention": null,
@@ -483,7 +483,7 @@
   {
    "table": "catalogue.variant",
    "schema": "catalogue",
-   "columns": 9,
+   "columns": 10,
    "burstOperations": 2,
    "written": false,
    "contention": null,
@@ -494,7 +494,7 @@
   {
    "table": "identity.delegated_access",
    "schema": "identity",
-   "columns": 23,
+   "columns": 25,
    "burstOperations": 2,
    "written": false,
    "contention": null,
@@ -588,7 +588,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "Holds 11 columns. **No description has been written for this table** — the name is the only thing saying what it is"
+   "note": "**The durable record of one keyed write** (SD-024): the `Idempotency-Key` a client sent, the operation it was used with, a hash of the request and the first answer, written once, when the write commits, in the same trans"
   },
   {
    "table": "promotions.promotion_evaluation_trace",
@@ -670,13 +670,24 @@
   {
    "table": "approvals.request",
    "schema": "approvals",
-   "columns": 35,
+   "columns": 36,
    "burstOperations": 1,
    "written": true,
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
    "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `approvals.matrix`, `approvals.rule`, `identity.principal`. **"
+  },
+  {
+   "table": "approvals.request_approver",
+   "schema": "approvals",
+   "columns": 5,
+   "burstOperations": 1,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": ""
   },
   {
    "table": "catalogue.channel_envelope",
@@ -714,7 +725,7 @@
   {
    "table": "identity.refresh_token",
    "schema": "identity",
-   "columns": 10,
+   "columns": 11,
    "burstOperations": 1,
    "written": true,
    "contention": null,
@@ -798,6 +809,28 @@
    "contended": false,
    "contentionIndeterminate": false,
    "note": "**Money going back**, always against a payment and never editing it. The ledger posts both"
+  },
+  {
+   "table": "orders.refund_line",
+   "schema": "orders",
+   "columns": 5,
+   "burstOperations": 1,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": ""
+  },
+  {
+   "table": "orders.refund_payment",
+   "schema": "orders",
+   "columns": 5,
+   "burstOperations": 1,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": ""
   },
   {
    "table": "payments.payment_attempt",
@@ -1190,12 +1223,14 @@
     "approvals.escalation",
     "approvals.matrix",
     "approvals.request",
+    "approvals.request_approver",
     "approvals.rule",
     "identity.principal"
    ],
    "writes": [
     "approvals.escalation",
-    "approvals.request"
+    "approvals.request",
+    "approvals.request_approver"
    ],
    "lock": null
   },
@@ -1262,6 +1297,8 @@
     "orders.fraud_rule",
     "orders.payment",
     "orders.refund",
+    "orders.refund_line",
+    "orders.refund_payment",
     "orders.sales_order"
    ],
    "writes": [
@@ -1269,6 +1306,8 @@
     "ledger.posting",
     "orders.order_event",
     "orders.refund",
+    "orders.refund_line",
+    "orders.refund_payment",
     "platform.outbox"
    ],
    "lock": null

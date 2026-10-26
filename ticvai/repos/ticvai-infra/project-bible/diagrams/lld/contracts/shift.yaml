@@ -271,6 +271,7 @@ operations:
   - orders.deposit_box
   - orders.deposit_box_foreign_holding
   - orders.deposit_box_opening_denomination
+  - orders.payment
   writes: []
 - operation: listShifts
   verb: GET

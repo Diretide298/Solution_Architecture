@@ -1032,16 +1032,16 @@
        "label": "Venue",
        "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
        "notes": "e.g. Dubai Park",
-       "bindsTo": "MediaAsset.venueId",
-       "operation": "setMediaAssetTags"
+       "bindsTo": "OrgUnit.id",
+       "operation": "listOrgUnits"
       },
       {
        "kind": "selectField",
        "label": "Category",
        "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
        "notes": "e.g. Marketing",
-       "bindsTo": "MediaAsset.categoryId",
-       "operation": "setMediaAssetTags"
+       "bindsTo": "MediaTaxonomy.categories",
+       "operation": "getMediaTaxonomy"
       },
       {
        "kind": "selectField",
@@ -1088,6 +1088,12 @@
     "purpose": "The controlled vocabularies",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listOrgUnits",
+    "contract": "tenancy",
+    "purpose": "The venues to tag an asset with (scope nodes at level venue) (check-screen-value-sources, CHG-R10UI-015)",
+    "trigger": "onLoad"
    }
   ],
   "wireframe": {

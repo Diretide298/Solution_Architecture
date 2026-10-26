@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 101 operations, 44 tables
+title: IdentityService — 102 operations, 46 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -10,14 +10,14 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 101
+  operations: 102
   inAFlow: 21
   percent: 21%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: identity
-  tables: 38
+  tables: 40
   stores:
   - postgres
   - redis
@@ -29,7 +29,7 @@ schemas:
   largestTable: pii.subject_biometric
 operationsByContract:
 - contract: identity
-  count: 101
+  count: 102
   operations:
   - operation: changeOwnCredential
     verb: POST
@@ -134,7 +134,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 3
-    writes: 3
+    writes: 5
   - operation: endGuestDeviceSessions
     verb: POST
     path: /internal/guest-sessions/end-for-device
@@ -174,7 +174,7 @@ operationsByContract:
     permission: GUEST_VIEW_PII
     offline: false
     reads: 7
-    writes: 2
+    writes: 4
   - operation: forceLogout
     verb: POST
     path: /auth/sessions/{sessionId}/force-logout
@@ -279,6 +279,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: getSubjectDataExport
+    verb: GET
+    path: /guests/{subjectId}/data-export/{requestId}
+    scope: tenant
+    permission: GUEST_VIEW_PII
+    offline: false
+    reads: 1
+    writes: 0
   - operation: grantDelegation
     verb: POST
     path: /guests/{subjectId}/delegations
@@ -317,7 +325,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 4
+    reads: 5
     writes: 6
   - operation: linkGuestCheckout
     verb: POST
@@ -325,8 +333,8 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 3
-    writes: 4
+    reads: 2
+    writes: 2
   - operation: listAccessDecisions
     verb: GET
     path: /access-decisions/audit
@@ -1160,7 +1168,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: identity.delegated_access
-  columns: 23
+  columns: 25
   store: postgres
   parent: null
   writtenBy:
@@ -1299,8 +1307,14 @@ tables:
   writtenBy:
   - identity
   foreignWriters: null
+- table: identity.redirect_host
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: identity.refresh_token
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -1350,8 +1364,15 @@ tables:
   writtenBy:
   - identity
   foreignWriters: null
+- table: identity.subject_data_export
+  columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
 - table: identity.subject_holding
-  columns: 10
+  columns: 12
   store: postgres
   parent: pii.subject
   writtenBy: []
@@ -1408,8 +1429,6 @@ readsFrom:
   operations: 7
 - service: MarketingService
   operations: 1
-- service: OrderService
-  operations: 1
 - service: VenueOpsService
   operations: 1
 writesOutside:
@@ -1430,9 +1449,11 @@ writesOutside:
   - operation: deleteGuestAccount
     tables:
     - approvals.request
+    - platform.outbox
   - operation: exportSubjectData
     tables:
     - approvals.request
+    - platform.outbox
   - operation: guestPasswordLogin
     tables:
     - platform.outbox
@@ -1474,17 +1495,6 @@ writesOutside:
   - operation: verifyGuestEmail
     tables:
     - marketing.message_dispatch
-- service: OrderService
-  operations: 1
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event OrderService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: linkGuestCheckout
-    tables:
-    - orders.sales_order
 screens:
 - P01:WEB-013 Booking Confirmation
 - P01:WEB-016 Login / Register

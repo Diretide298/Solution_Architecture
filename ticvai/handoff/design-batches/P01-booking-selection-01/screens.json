@@ -42,7 +42,7 @@
       "eventId",
       "productId"
      ],
-     "provenance": "derived — WEB-007 declares entryState.params eventId, holdId, performanceId, productId and WEB-005 holds eventId, productId, so an edge into it carries them"
+     "provenance": "derived — WEB-007 declares entryState.params eventId, holdId, holdIds, performanceId, productId and WEB-005 holds eventId, productId, so an edge into it carries them"
     },
     {
      "to": "WEB-008",
@@ -61,7 +61,7 @@
       "lineId",
       "performanceId"
      ],
-     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-005 holds cartId, code, lineId, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, holdIds, lineId, performanceId and WEB-005 holds cartId, code, lineId, performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-016",
@@ -132,7 +132,7 @@
       {
        "kind": "iconButton",
        "label": "Quick tour",
-       "notes": "Replays the four-step coach-mark tour. Shown only when `BookingFlowConfig.quickTour` is on (default off).",
+       "notes": "Replays the four-step coach-mark tour. Shown only when `BookingFlowLevelSettings.quickTour` (`getPublishedBookingFlow`) is on (default off).",
        "provenance": "decided 29 September, rev 3 REV3-20"
       },
       {
@@ -407,9 +407,10 @@
      "to": "WEB-015",
      "trigger": "Adds tickets for a performance whose on-sale waiting room is on",
      "operation": "addCartLine",
-     "precondition": "`addCartLine` refused `403 admission-required`: this performance's room is on and the page holds no admission token for it",
+     "precondition": "`addCartLine` refused `403 admission-required`: this performance's room is on and the browser sent no valid admission cookie for it. The edge carries the `waitingEntryId` the page got back from WEB-015, when it has one, so the guest keeps their place (ADAM CR-216)",
      "carries": [
-      "performanceId"
+      "performanceId",
+      "waitingEntryId"
      ],
      "returnsTo": "WEB-006",
      "provenance": "ADR-0066 (accepted 1 October 2026) and its 1 October amendment"
@@ -687,6 +688,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional: opened without it, the screen makes one with `joinWaitlist`."
+    },
+    {
+     "name": "waitingEntryId",
+     "from": "WEB-015",
+     "optional": true,
+     "notes": "The on-sale waiting-room entry the guest was admitted from (ADAM CR-216, 25 October 2026): held only to carry back to WEB-015 if `addCartLine` is refused `403 admission-required`. The admission token itself is the edge's HttpOnly cookie, never held by the page."
     }
    ],
    "preloaded": [
@@ -810,7 +817,7 @@
       "performanceId",
       "productId"
      ],
-     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId and WEB-007 holds eventId, performanceId, productId, so an edge into it carries them"
+     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId, waitingEntryId and WEB-007 holds eventId, performanceId, productId, so an edge into it carries them"
     },
     {
      "to": "WEB-010",
@@ -818,6 +825,7 @@
      "provenance": "flow F02 step 2→3",
      "carries": [
       "holdId",
+      "holdIds",
       "performanceId"
      ]
     }
@@ -853,13 +861,15 @@
       },
       {
        "kind": "banner",
-       "notes": "**One countdown: `Cart.expiresAt`** (the earliest lease in the cart), always visible. The 8-minute seat hold and the 15-minute cart lease are never shown as two clocks; a selection that expires silently while a guest enters card details is the worst outcome in this flow (CHG-SGU-020).",
-       "provenance": "carried from the previous definition"
+       "bindsTo": "SeatHold.expiresAt",
+       "operation": "getSeatHold",
+       "notes": "**One countdown: the earliest `SeatHold.expiresAt` of the guest's held seats**, always visible (ADAM CR-187, 25 October 2026). No cart exists on this step (WEB-010 creates it with the first line), so the clock is the holds': each `createSeatHold` returns its `expiresAt`, and a screen opened again with `holdIds` reads them with `getSeatHold`. From WEB-010 on, `Cart.expiresAt` takes over. The seat hold and the cart lease are never shown as two clocks; a selection that expires silently while a guest enters card details is the worst outcome in this flow (CHG-SGU-020).",
+       "provenance": "carried from the previous definition; ADAM CR-187 (option A), settled 25 October 2026"
       },
       {
        "kind": "seatMap",
        "label": "Choose seats",
-       "notes": "**A seat selection screen with no seat map.** `noGeometry` is the state that matters: a map imported from a manifest alone can be sold from a list and not rendered, and the screen has to say which it is rather than showing an empty frame. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking** on the guest channel (default 10, bounds 1-50): a `422 seat-limit-exceeded` from `createSeatHold` reads *Up to {maxSeats} seats per booking*, and the basket lists each seat (decided 29 September, rev 3 REV3-7). Section zoom happens on the same map (23SEP-16). **Sections first** (W2): tap a section to zoom in and see its seats; scroll or pinch out, or *← Whole map*, to return and compare sections, keeping held seats. **A tap on a seat is the hold** (`createSeatHold`); its length is the server's default and never a guest input (GFIX-3).",
+       "notes": "**A seat selection screen with no seat map.** `noGeometry` is the state that matters: a map imported from a manifest alone can be sold from a list and not rendered, and the screen has to say which it is rather than showing an empty frame. **At most `SeatAvailability.maxSeatsPerGuestOrder` seats per booking** on the guest channel (the venue's `VenueSettings.seating.maxSeatsPerGuestOrder`, default 10, bounds 1-50, read with `getSeatAvailability`; ADAM CR-187): a `422 seat-limit-exceeded` from `createSeatHold` still reads *Up to {maxSeats} seats per booking*, and the basket lists each seat (decided 29 September, rev 3 REV3-7). Section zoom happens on the same map (23SEP-16). **Sections first** (W2): tap a section to zoom in and see its seats; scroll or pinch out, or *← Whole map*, to return and compare sections, keeping held seats. **A tap on a seat is the hold** (`createSeatHold`); its length is the server's default and never a guest input (GFIX-3).",
        "provenance": "minute 2026-08-03 §Ticket Flow Variations by Product Type",
        "operation": "createSeatHold"
       },
@@ -964,6 +974,13 @@
     "provenance": "decided 29 September 2026, W12"
    },
    {
+    "operationId": "getSeatHold",
+    "contract": "seating",
+    "purpose": "Called on load when the screen is opened with `holdIds`: reads each of the guest's own holds (seats and `expiresAt`), so the held seats show again and the countdown runs to the earliest expiry (ADAM CR-187, 25 October 2026). Only under the guest session that placed the holds, signed in or the anonymous guest session (ADAM CR-183, ADR-0045): a hold is read only by the session or subject that made it with `createSeatHold`, so a visitor with no session has no `holdIds` and the screen does not call it",
+    "trigger": "onLoad",
+    "provenance": "ADAM CR-187 (option A), settled by Chinmay 25 October 2026"
+   },
+   {
     "operationId": "getPerformance",
     "contract": "catalogue",
     "purpose": "Resolves a deep-linked performance (r8, GPS-C05): its `eventId` drives `listPerformances` (time bar, fixture strip) and its `startsAt` and `status` the cold entry (a performance that has happened offers the next one of the same event). No component of its own.",
@@ -990,14 +1007,20 @@
      "notes": "r8 (GPS-C05): carried by the WEB-004 edge and the deep link, for `getPublishedBookingFlow`. When it is absent the screen asks `getPublishedBookingFlow` by `flowTypeKey`: `seatedFixedPerformance`, or `seatedDateTimeSeatMap` when the venue's `seatEventDateMode` puts the date over the map."
     },
     {
-     "name": "holdId",
+     "name": "holdIds",
      "from": "navigation",
      "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatHold`; a link or an edge that holds one opens it instead."
+     "notes": "The list of the guest's seat holds, one per seat (seating.yaml `createSeatHold`: one hold per tap; ADAM CR-187, 25 October 2026). Opened without it, each tap makes one with `createSeatHold`; opened with it, `getSeatHold` reads each and the held seats show again."
     },
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "holdId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen makes one with `createSeatHold`."
     }
    ],
    "coldEntry": "**A link to a performance that has happened.** Offers the next performance of the same event.",
@@ -1033,7 +1056,7 @@
     "id": "formRecommendSeats",
     "component": "modal",
     "trigger": "Recommend seats",
-    "body": "**How many seats, and best available or together.** The guest sets the party size (a How many seats stepper, at most `maxSeatsPerGuestOrder`) and picks the preference, then `recommendSeats` places them. Tickets are chosen after seats, so there are none to count yet.",
+    "body": "**How many seats, and best available or together.** The guest sets the party size (a How many seats stepper, at most `SeatAvailability.maxSeatsPerGuestOrder`, read with `getSeatAvailability`; ADAM CR-187) and picks the preference, then `recommendSeats` places them. A 422 still reads *Up to {maxSeats} seats per booking*. Tickets are chosen after seats, so there are none to count yet.",
     "bindsTo": "SeatRecommendationRequest",
     "confirm": {
      "label": "Recommend seats",
@@ -1145,7 +1168,7 @@
       "cartId",
       "performanceId"
      ],
-     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId, waitingEntryId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-010",
@@ -1155,7 +1178,7 @@
       "lineId",
       "performanceId"
      ],
-     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-008 holds cartId, lineId, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, holdIds, lineId, performanceId and WEB-008 holds cartId, lineId, performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-016",
@@ -1198,16 +1221,14 @@
       {
        "kind": "detailPanel",
        "label": "The bundle",
-       "bindsTo": "Bundle",
+       "bindsTo": "GuestBundle",
        "columns": [
-        "Bundle.code",
-        "Bundle.name",
-        "Bundle.description",
-        "Bundle.kind",
-        "Bundle.price",
-        "Bundle.savingsAmount",
-        "Bundle.savingsPercentage",
-        "Bundle.hasBeenSold"
+        "GuestBundle.name",
+        "GuestBundle.description",
+        "GuestBundle.kind",
+        "GuestBundle.price",
+        "GuestBundle.savingsAmount",
+        "GuestBundle.savingsPercentage"
        ],
        "operation": "getGuestBundle",
        "provenance": "contract promotions.yaml GET /bundles/{bundleId}",
@@ -1416,7 +1437,7 @@
      "carries": [
       "performanceId"
      ],
-     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId and WEB-009 holds performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId, waitingEntryId and WEB-009 holds performanceId, so an edge into it carries them"
     }
    ]
   },
@@ -1955,7 +1976,7 @@
     }
    ]
   },
-  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). A staged booking: date → start time → length (1 hour, 2 hours, half day, full day) → room type (focus pod, majlis, boardroom, auditorium) → attendees → add-ons (coffee break, working lunch, AV technician). **A room type is a product with `requiresTimeWindow`; a length is one of its variants** (the `length` axis, each value with `durationMinutes`), priced on its own, so the price is the variant's — the room rate for that length. The guest never names a room: `addCartLine` carries `bookedWindow` {startsAt, endsAt}, `endsAt` being the start plus the length, and `allocateResources` picks the room at checkout (26 August minute). Add-ons are lines with `parentLineId`. `422 windowLengthMismatch`, `windowRequired` and `windowNotAllowed` are programming errors; `409 windowUnavailable` says the time filled and offers the next free start.\n\n**29 September (W9).** Availability is checked against date, start time and length together (`listProductStartTimes` with `variantId` = length); changing any of the three re-checks every room, and a busy room shows *free from*. Starts every 15 minutes where the venue sets `stepMinutes` 15.",
+  "notes": "**New 29 September** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). A staged booking: date → start time → length (1 hour, 2 hours, half day, full day) → room type (focus pod, majlis, boardroom, auditorium) → attendees → add-ons (coffee break, working lunch, AV technician). **A room type is a product with `requiresTimeWindow`; a length is one of its variants** (the `length` axis, each value with `durationMinutes`), priced on its own, so the price is the variant's — the room rate for that length. The guest never names a room: `addCartLine` carries `bookedWindow` {startsAt, endsAt}, `endsAt` being the start plus the length, and `allocateResources` picks the room at checkout (26 August minute). Add-ons are lines with `parentLineId`. `422 windowLengthMismatch`, `windowRequired` and `windowNotAllowed` are programming errors; `409 windowUnavailable` says the time filled and offers the next free start.\n\n**29 September (W9).** Availability is checked against date, start time and length together (`listProductStartTimes` with `variantId` = length); changing any of the three re-checks every room, and a busy room shows *free from*. Starts fall on the venue's own `stepMinutes` (`VenueSettings.stepMinutes`, ADAM CR-253), which `listProductStartTimes` applies when the screen sends none.\n\n**26 October 2026 (ADAM CR-252, CR-253, CR-258).** A room type's add-ons are its `addOnProductIds`, in order. A length tile shows *Save n%* only from the server's `savingPercent`, never worked out here. The frame's per-date price dots (*Cheapest / Mid price / Peak price*) and its pre-cart *Subtotal / VAT / Total* are dropped (logged in docs/active/approved-ui-changes.yaml): the card shows list prices with *tax and offers are worked out in your basket*, and totals come from the cart. Start times are a public read, so a visitor sees them with no session.",
   "density": "compact",
   "pattern": "multiStepForm",
   "patternReason": "A staged booking — date, start time, length, room type, attendees, add-ons — ending in one `addCartLine`; the prototype draws it as one step revealing each choice in turn",
@@ -1984,7 +2005,7 @@
        "kind": "selectField",
        "label": "How long",
        "bindsTo": "ProductVariant",
-       "notes": "1 hour, 2 hours, half day (4 h), full day (8 h): the room type's `length` variants, each priced on its own (the prototype shows *Save 10%* and *Save 15%*).",
+       "notes": "1 hour, 2 hours, half day (4 h), full day (8 h): the room type's `length` variants, each priced on its own. *Save n%* shows only where the variant has a `referencePrice`, from the server's `savingPercent` (ADAM CR-253).",
        "operation": "listProductVariants",
        "provenance": "decided 29 September, rev 3 REV3-13"
       },
@@ -2006,7 +2027,7 @@
        "kind": "cardList",
        "label": "Add to the booking",
        "bindsTo": "Product",
-       "notes": "Coffee break, working lunch, AV technician: add-on lines with `parentLineId`.",
+       "notes": "Coffee break, working lunch, AV technician: the chosen room type's `addOnProductIds`, in that order, read from the products `listProducts` already loaded (ADAM CR-252); each is an add-on line with `parentLineId`.",
        "operation": "listProducts",
        "provenance": "decided 29 September, rev 3 REV3-13"
       }
@@ -2039,7 +2060,7 @@
    {
     "operationId": "listProducts",
     "contract": "catalogue",
-    "purpose": "Room types sold by the hour (`requiresTimeWindow`) and their add-ons",
+    "purpose": "Room types sold by the hour (`requiresTimeWindow`) and their add-ons (each room type's `addOnProductIds`, ADAM CR-252)",
     "trigger": "onLoad"
    },
    {
@@ -2051,7 +2072,7 @@
    {
     "operationId": "listProductStartTimes",
     "contract": "resources",
-    "purpose": "Start times free for the room type and length on the date",
+    "purpose": "Start times free for the room type and length on the date; a public read, no session needed (ADAM CR-258), at the venue's `stepMinutes` (ADAM CR-253)",
     "trigger": "onAction"
    },
    {

@@ -27,7 +27,13 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Performance"
  },
@@ -72,6 +78,11 @@
    {
     "name": "language",
     "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
     "required": null
    },
    {

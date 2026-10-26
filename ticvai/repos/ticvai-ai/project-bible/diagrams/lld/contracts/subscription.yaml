@@ -1,5 +1,5 @@
 id: LLD-subscription
-title: subscription — 153 operations
+title: subscription — 156 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -485,6 +485,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.billing_entity
   - control.contract
   - control.credit_note
   - control.invoice
@@ -492,6 +493,7 @@ operations:
   - control.module_listing
   - control.plan
   - control.plan_module
+  - control.platform_tax_rate
   - control.usage_record
   writes:
   - cache:idempotency
@@ -568,7 +570,8 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - control.billing_entity
   writes: []
 - operation: getCommissionStatement
   verb: GET
@@ -776,6 +779,24 @@ operations:
   - control.credit_note
   - control.credit_note_line
   - control.invoice_line
+  - control.invoice_number_sequence
+- operation: issueInvoice
+  verb: POST
+  path: /invoices/{invoiceId}/issue
+  scope: tenant
+  permission: PLATFORM_BILLING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.invoice
+  - control.invoice_line
+  writes:
+  - cache:idempotency
+  - control.invoice
+  - control.invoice_line
+  - control.invoice_number_sequence
 - operation: launchCellCluster
   verb: POST
   path: /cell-clusters
@@ -1030,6 +1051,7 @@ operations:
   reads:
   - access.entitlement
   - approvals.request
+  - control.billing_entity
   - identity.principal
   writes: []
 - operation: listMemberLifecycleCase
@@ -1472,6 +1494,17 @@ operations:
   - control.plan_limit
   - control.plan_module
   writes: []
+- operation: listPlatformTaxRates
+  verb: GET
+  path: /platform-tax-rates
+  scope: tenant
+  permission: PLATFORM_BILLING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.platform_tax_rate
+  writes: []
 - operation: listRenewalAuto
   verb: GET
   path: /renewal-auto
@@ -1809,6 +1842,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - control.billing_entity
   writes:
   - cache:idempotency
   - control.vsi_assessment
@@ -2251,6 +2285,20 @@ operations:
   - cache:idempotency
   - control.tier_allowance
   - control.tier_module
+- operation: setPlatformTaxRate
+  verb: PUT
+  path: /platform-tax-rates/{taxRateId}
+  scope: tenant
+  permission: PLATFORM_BILLING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.platform_tax_rate
+  writes:
+  - cache:idempotency
+  - control.platform_tax_rate
 - operation: setRenewalAutoMembership
   verb: PUT
   path: /renewal-auto-membership

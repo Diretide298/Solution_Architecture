@@ -53,7 +53,7 @@
        "label": "Language",
        "bindsTo": "PublishedTenantConfig.languages",
        "operation": "getPublishedTenantConfig",
-       "notes": "The languages the venue published; the choice is stored on the device and, for a signed-in guest, as the profile's language (GST-039). Arabic mirrors every layout (CF-42).",
+       "notes": "The languages the venue published; the choice is stored on the device and, for a signed-in guest, as the profile's language (GST-039). Arabic mirrors every layout (CF-42). **For a signed-in guest the screen then calls `updateMyProfile`, sending only `preferredLanguage`**, after the device copy is saved (ADAM CR-186, 25 October 2026); signed out, the device copy is all there is.",
        "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
       }
      ]
@@ -72,6 +72,21 @@
     "contract": "white-label",
     "purpose": "The published languages",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "Sent by the Language choice for a signed-in guest, not a control of its own: after the device copy is saved, the chosen language is written to the profile, sending only `preferredLanguage` (ADAM CR-186, 25 October 2026); signed out, nothing is sent",
+    "trigger": "background",
+    "provenance": "ADAM CR-186, settled by Chinmay 25 October 2026 (option A)"
+   },
+   {
+    "operationId": "getMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "Signed in only: the profile's current `preferredLanguage`, so Language shows what the profile holds and the write above changes what was read (ADAM CR-186; check-screen-patterns READ: an edit reads what it edits). Signed out, nothing is read and the device copy is shown",
+    "trigger": "onLoad",
+    "shownBy": "Language",
+    "provenance": "ADAM CR-186, settled by Chinmay 25 October 2026 (option A)"
    }
   ],
   "wireframe": {
@@ -155,7 +170,7 @@
     }
    ]
   },
-  "notes": "Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel 7 and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two screens. Both had the same single operation and the same purpose. **Bound 28 September** to `getTenantAppStatus.minimumAppVersion` for the forced upgrade and to `availability` and `availabilityMessage` for sold out and closed (decided 28 September, audit R073 (b)(f)). Build note (r8, WHITE-C10): the store link comes from `MinimumAppVersion.storeUrl`.",
+  "notes": "Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel 7 and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two screens. Both had the same single operation and the same purpose. **Bound 28 September** to `getTenantAppStatus.minimumAppVersion` for the forced upgrade and to `availability` and `availabilityMessage` for sold out and closed (decided 28 September, audit R073 (b)(f)). Build note (r8, WHITE-C10): the store link comes from `MinimumAppVersion.storeUrl`.\n\n**No raw status panel** (ADAM CR-181, option A, accepted by Chinmay 21 October 2026; raised by Chitrangi Mestry on #31074). The detail panel that listed `TenantAppStatus` publishedAt, expectedBackAt, minimumAppVersion, availability and availabilityMessage is removed: each value already appears, in words, in the state or banner that binds it (forced upgrade, maintenance with its back-at time, closed and sold out with the tenant's message), and the screen's purpose is one clear message. **Which state wins**, as on WEB-029 (ADAM CR-178): forced upgrade first (nothing works until the app is updated), then maintenance, then closed, then sold out.",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing",
@@ -174,20 +189,6 @@
        "operation": "getPublishedTenantConfig",
        "notes": "The main case: `isInMaintenance` with its message and the expected-back time (\"Back at 14:00\"), set live on CMS-001 (DI-215).",
        "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
-      },
-      {
-       "kind": "detailPanel",
-       "label": "The tenant app status",
-       "bindsTo": "TenantAppStatus",
-       "columns": [
-        "TenantAppStatus.publishedAt",
-        "TenantAppStatus.expectedBackAt",
-        "TenantAppStatus.minimumAppVersion",
-        "TenantAppStatus.availability",
-        "TenantAppStatus.availabilityMessage"
-       ],
-       "operation": "getTenantAppStatus",
-       "provenance": "contract white-label.yaml GET /tenant-config/status"
       },
       {
        "kind": "banner",

@@ -871,6 +871,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html#bo-778`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 5
 - Flow F248 *Marketing CRM Configuration Reference v1.0 board 5: Journey Automation Center*, step 8: Works in Abandoned Cart Recovery → Configure automated recovery of incomplete ticketing and commerce transactions. Define abandonment event, cart-value threshold, product/inventory checks, eligibility and recovery window. Configure …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

@@ -101,7 +101,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-093` | Channel & Distribution Configuration | B | 13 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `CMS-095` | Asset Replacement & Propagation Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-096` | Fallback, Expiry & Distribution Continuity | B | 1 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `CMS-096` | Fallback, Expiry & Distribution Continuity | B | 1 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `CMS-097` | DAM API & Integration Hub | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `CMS-098` | Delivery Monitoring & Integration Health | B | 0 | 45 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-099` | Asset Usage & Performance Analytics | B | 0 | 51 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -899,7 +899,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Default fallback asset | picker: choose an id (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Picked from the library (e.g. DAM-IMG-009211, "Default Dubai Park Hero"). | `MediaAsset.id` |
+| Default fallback asset | upload, or pick from the media library | optional | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | Picked from the library (e.g. DAM-IMG-009211, "Default Dubai Park Hero"). | `MediaDistributionChannel.fallbackAssetId` |
 
 #### Outputs: what the screen shows and produces
 
@@ -954,13 +954,11 @@ Screen guard: `ASSET_LIBRARY_MANAGE`
 
 #### Requirements it meets
 
-3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 23.1.13 | System shall distribute approved assets to websites, mobile apps, kiosks, CRM campaigns, and digital channels. | Digital Asset Management | CONTRACTED | `setMediaDistributionChannels` |
-| 23.1.3 | System shall support configurable metadata including asset type, owner, department, campaign, venue, event, creation date, expiry date, and usage rights. | Digital Asset Management | CONTRACTED | data `MediaAsset` |
-| 23.1.10 | System shall support secure sharing of assets across departments, venues, tenants, and external partners. | Digital Asset Management | CONTRACTED | data `MediaAsset` |
 
 #### Client meeting inputs
 

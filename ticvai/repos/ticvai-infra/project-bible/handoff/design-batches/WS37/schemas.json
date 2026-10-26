@@ -1,7 +1,7 @@
 {
  "ApprovalKind": {
   "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A platform suspension or reactivation of a tenant** (`configurationChange`, subject `tenant`, `subjectContract` `subscription`; ADAM CR-172; lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015): decided by the platform, never by the tenant''s own approvers. It is routed only by the **platform rule**, held in the control plane and seeded when the platform is provisioned, whose approvers hold `PLATFORM_TENANT_MANAGE`, with four eyes (the operator who raised it cannot decide it). It is not off by default like the review steps below: the platform rule always exists, and without it `createApprovalRequest` refuses `422 no-approval-route`.\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n\n**A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request\nwith no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the\nShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A platform suspension or reactivation of a tenant** (`configurationChange`, subject `tenant`, `subjectContract` `subscription`; ADAM CR-172; lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015): decided by the platform, never by the tenant''s own approvers. It is routed only by the **platform rule**, held in the control plane and seeded when the platform is provisioned, whose approvers hold `PLATFORM_TENANT_MANAGE`, with four eyes (the operator who raised it cannot decide it). It is not off by default like the review steps below: the platform rule always exists, and without it `createApprovalRequest` refuses `422 no-approval-route`.\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n\n**A sales channel going live** (ADAM CR-211, option A, decided 25 October 2026; CHG-R10CAT-003).\n`configurationChange`, subject `salesChannel`, `subjectContract` `catalogue`, `subjectId` the channel: raised by\ncatalogue `publishChannelReadinessValidation` on `submitForApproval`, and named by its `scheduleActivation` and\n`activate`, which are refused until it is approved. An existing kind narrowed by `subjectTypes`, so no kind is\nadded.\n\n**A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request\nwith no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the\nShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.\n\n**A guest's privacy request** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016). `configurationChange`,\n`subjectContract` `identity`, `subjectId` the guest's subject id, subject `subjectDataExport` for\n`exportSubjectData` and `subjectErasure` for `deleteGuestAccount`: an existing kind narrowed by `subjectTypes`,\nso no kind is added. Raised by Identity in process for the guest, it records the guest as `requestedBySubjectId`\n(`requestedByPrincipalId` null). A guest's own request needs no human approval step (ADR-0047 section 7); a\ntenant that wants one saves a rule for these subject types.",
   "enum": [
    "refund",
    "priceOverride",
@@ -35,10 +35,12 @@
     "version"
    ]
   ],
+  "description": "**Which matrix routes a request, and which version of it** (ADAM CR-102, option 1, accepted 15 October 2026; CHG-R10ID-015). Matrices resolve up the scope tree as configuration does (ADR-0018: nearest ancestor wins): for the request's `kind` at its `scopePath`, the matrix of the nearest node, the venue's, else the region's, else the tenant's, routes it alone; its rules are not followed by an ancestor's, because a venue or region matrix may only tighten what it inherits (`loosensParentRule`), so the nearest matrix already holds the ancestor's floor. At a node, the matrix **in force** is its highest `version`; when that version has `isActive` false, the node sets no matrix of that kind and the next ancestor's applies (confirmed by the lead, 25 October 2026, r10 round 3; CHG-R10ID-020). The request stores the matrix it was routed by (`approvalMatrixId`) and its `matrixVersion`, so a decision is checked against exactly that rule set.",
   "required": [
    "kind",
    "scopeLevel",
-   "rules"
+   "rules",
+   "version"
   ],
   "properties": {
    "id": {
@@ -64,7 +66,7 @@
    "version": {
     "type": "integer",
     "readOnly": true,
-    "description": "11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n**(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a request's `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).\n"
+    "description": "11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n**(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a request's `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)). **Never null** (ADAM CR-102, CHG-R10ID-015): the server sets it, 1 for a new matrix and the previous version plus one after; it is not sent and is ignored on input.\n"
    },
    "rules": {
     "type": "array",
@@ -80,6 +82,12 @@
  "ApprovalRule": {
   "type": "object",
   "x-ticvai-persistence": "approvals.rule",
+  "x-ticvai-unique-together": [
+   [
+    "matrix_id",
+    "code"
+   ]
+  ],
   "required": [
    "order",
    "approverRoleIds",
@@ -97,10 +105,20 @@
     "description": "**First match wins.** Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason about.\n"
    },
    "minAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "**Amounts compare in the venue's currency** (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020): a request amount in another currency (a supplier's, a tender's) is converted into the currency of the venue the request is raised at, at that day's FX rate (finance `listFxRates`), before it is compared with `minAmount` and `maxAmount`; a tenant- or region-level matrix's bounds are read in that same venue currency."
    },
    "maxAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The upper bound, compared as `minAmount` is (venue currency, the day''s FX rate; CR-102)."
    },
    "riskScoreAbove": {
     "type": "number",
@@ -110,7 +128,8 @@
    "condition": {
     "type": "string",
     "nullable": true,
-    "description": "11.1.13. Evaluated against the attributes the caller supplied.\n\n**No condition language is defined yet** (pull audit R104, 26 September): the grammar, the attributes it may name and how two conditions are compared for `unreachableRule` are an open decision, not something to infer from this field.\n\n**So a condition is refused, never stored** (decided 20 October 2026, Chinmay, R8 blocker cause APPROVALS-TENANCY-C06, option C; CHG-R8SPN-016). `setApprovalMatrix` refuses a rule whose `condition` is not null, and `approveMatrixMultiLevel` one whose `skipConditions` is not empty, with `422 condition-not-supported`, and store nothing. Every stored rule therefore has no condition, and `evaluateApprovalRequirement`, `createApprovalRequest` and `submitApprovalRequest` match on kind, scope, subject type, amount and `matchAttributes` only. A rule meant to restrict can never route silently as if unrestricted. The refusal is lifted when the grammar is decided.\n"
+    "maxLength": 500,
+    "description": "11.1.13. Evaluated against the attributes the caller supplied (`CreateApprovalRequest.attributes`, stored on the request).\n\n**The condition language: attribute comparisons joined by AND** (ADAM CR-102, option 1, accepted 15 October 2026; the open decision of pull audit R104, settled for r10; CHG-R10ID-015). It lifts the refusal of R8 blocker cause APPROVALS-TENANCY-C06 (CHG-R8SPN-016), which held only until the grammar was decided. A condition is one or more clauses separated by ` AND ` (upper case, single spaces); there is no OR, no NOT and no parentheses (an OR is two rules). A clause is `<attribute> <operator> <value>`:\n- `<attribute>` names a key of the request's `attributes`, by name (`[a-z][A-Za-z0-9]{0,63}`; for example `customerType`, `riskScore`, `department`);\n- `<operator>` is one of `=`, `!=`, `<`, `<=`, `>`, `>=`, `in`, `notIn`;\n- `<value>` is a single-quoted string (`'vip'`, a quote inside doubled), a number (`-12.5`), `true` or `false`, or, for `in` and `notIn`, a bracketed list of strings or of numbers (`['a', 'b']`, at most 50).\nA condition holds when every clause holds. A clause holds only when the attribute is present and of the value's type (string, number or boolean; `<`, `<=`, `>` and `>=` take numbers only); an absent or mistyped attribute makes the clause, and so the rule, not match. Strings compare exactly, case included. At most 10 clauses. `setApprovalMatrix` parses a non-null `condition` and refuses one that does not parse with `422 condition-invalid`, storing nothing, so a stored condition always parses. A rule matches when kind, scope, subject type, amount and `matchAttributes` match and then its `condition`, if any, holds.\n\n**How two conditions are compared for `unreachableRule`.** A later rule is unreachable when an earlier rule always matches first: every request that makes the later rule match also makes the earlier one match. For conditions this is decided clause by clause, and only where it can be proved: the earlier rule's condition is null, or each of its clauses is implied by a clause of the later rule on the same attribute (equal clauses; `= v` implies `!= w` for w other than v, `in` a list holding v and `notIn` a list without v; `> a` implies `> b` and `>= b` for a >= b, and likewise for `<`; `in L` implies `in M` when L is within M). A clause not provably implied counts as reachable, so the check never refuses a matrix that could route a request to the later rule.\n"
    },
    "approverRoleIds": {
     "type": "array",
@@ -200,7 +219,7 @@
     "type": "string",
     "maxLength": 64,
     "nullable": true,
-    "description": "**A stable code for the rule, unique within its matrix** (4 October 2026, CHG-FXC-005). The composite `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null."
+    "description": "**A stable code for the rule, unique within its matrix** (4 October 2026, CHG-FXC-005; enforced by a unique index on (`matrix_id`, `code`) since ADAM CR-102, CHG-R10ID-015, compared without case). The composite `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null, and two null codes do not collide. A body with two rules of one code is `400 validation`."
    },
    "minimumApprovals": {
     "type": "integer",

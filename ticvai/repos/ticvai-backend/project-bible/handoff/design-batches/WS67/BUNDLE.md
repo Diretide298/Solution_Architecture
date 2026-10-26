@@ -1424,6 +1424,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html#anl-026`
 - Workshop pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf board 2
 - Flow F176 *Unified BI Reporting and AI Analytics Platform board 2: Dashboard Library*, step 10: Works in Targets, Thresholds & KPI Status Rules → Configure how TICVAI determines whether KPI performance is healthy, warning or critical.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

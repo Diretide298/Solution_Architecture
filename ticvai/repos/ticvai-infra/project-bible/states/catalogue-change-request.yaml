@@ -28,15 +28,14 @@ transitions:
   guard: Resubmitted after the author's edits
 - from: pendingValidation
   to: pendingApproval
-  operation: submitPricingChangeRequest
-  trigger: operation
+  trigger: job
   guard: Every check passes (lines present, effective date not in the past, every object still exists); an
     `approvals.ApprovalRequest` is opened under the authority policy and its id recorded
 - from: pendingValidation
   to: draft
-  operation: submitPricingChangeRequest
-  trigger: operation
-  guard: A check fails; the problems come back as `422` and the author fixes them
+  trigger: job
+  guard: A check fails; the problems come back as `422` and the author fixes them. Both moves out of pendingValidation are
+    the validation run's, not a second submit, which the 409 refuses (r10 ruling on check-state-refusals, the lead, 25 October 2026; CHG-R10ORD-020)
 - from: pendingApproval
   to: approved
   operation: decidePricingChangeRequest

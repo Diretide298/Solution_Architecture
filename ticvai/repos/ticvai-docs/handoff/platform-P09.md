@@ -9,12 +9,12 @@
 | Contracts | 15 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 120 |
+| Operations with no screen | 124 |
 | Waves | wave1 28 · wave2 13 · wave3 170 |
 
 ## Gaps
 
-### 120 operations with no screen here
+### 124 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `listSalePermissionTargets` | catalogue | GET | What a sale permission rule can name at one level, with names |
 | `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
-| … | | | 80 more |
+| … | | | 84 more |
 
 ### 8 modules split across waves
 
@@ -286,7 +286,7 @@
 | `ADM-537` | Approval & Intervention History / Decision Timeline | Platform | 3 | 5 | yes |
 | `ADM-538` | Human Oversight Workflow Simulator & Readiness Center | Platform | 3 | 4 | yes |
 | `ADM-539` | AI Explainability & Audit Command Center | Platform | 3 | 4 | yes |
-| `ADM-540` | AI Decision Explorer & Search | Platform | 3 | 5 | yes |
+| `ADM-540` | AI Decision Explorer & Search | Platform | 3 | 6 | yes |
 | `ADM-541` | AI Decision Explanation Workspace | Platform | 3 | 4 | yes |
 | `ADM-542` | Data, Feature & Evidence Provenance | Platform | 3 | 4 | yes |
 | `ADM-543` | Candidate, Rule & Decision Path Trace | Platform | 3 | 4 | yes |

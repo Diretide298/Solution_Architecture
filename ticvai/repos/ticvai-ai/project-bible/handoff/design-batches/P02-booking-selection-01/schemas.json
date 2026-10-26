@@ -1475,7 +1475,7 @@
  "EntitlementShare": {
   "type": "object",
   "x-ticvai-persistence": "none — a view of the identity.delegated_access row shareEntitlement writes",
-  "description": "**A second person's right to present an entitlement the owner still holds.** Returned by `shareEntitlement` and `revokeEntitlementShare`; its `id` is the delegated-access row the share is.\n",
+  "description": "**A second person's right to present an entitlement the owner still holds.** Returned by `shareEntitlement` and `revokeEntitlementShare`; its `id` is the delegated-access row the share is. **Read from that row** (ADAM CR-209; CHG-R10ID-004): `entitlementId` from `over_object_ref` (`entitlement:<entitlementId>`), `toSubjectId` from `subject_id`, `validFrom` and `validUntil` from `valid_from` and `valid_to`, `revokedAt` from `revoked_at`; `status` is `revoked` when `revoked_at` is set, `expired` when `valid_to` has passed, else `active`.\n",
   "required": [
    "id",
    "entitlementId",
@@ -1652,6 +1652,13 @@
      "complete",
      "cancelled"
     ]
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "readOnly": true,
+    "description": "**The row's version, its ETag** (accepted 26 October 2026, Chinmay, ADAM CR-257 option A): 1 on create and bumped on every write; `getGroupBooking` and `updateGroupBooking` send it as `ETag`, and `updateGroupBooking` checks `If-Match` against it (`412` on a mismatch)."
    }
   }
  },
@@ -1729,6 +1736,11 @@
  "GroupPackageDefinition": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.group_package",
+  "x-ticvai-unique-together": [
+   [
+    "productId"
+   ]
+  ],
   "required": [
    "kind",
    "maxParticipants",
@@ -2785,7 +2797,8 @@
    "venueId",
    "scopePath",
    "isSellable",
-   "hasVariants"
+   "hasVariants",
+   "createdAt"
   ],
   "properties": {
    "id": {
@@ -2818,7 +2831,7 @@
      }
     ],
     "nullable": true,
-    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+    "description": "**The product's name in each of the tenant's enabled languages** (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
    },
    "descriptionLocalised": {
     "allOf": [
@@ -2870,6 +2883,12 @@
     "format": "date-time",
     "nullable": true,
     "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**The last moment the product's entitlements are valid; null means the same as `onSaleTo`** (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). A season pass stops selling at `onSaleTo` and is used until `validTo`: an entitlement template's `expiryAnchor` of `seasonEnd` ends here (`access#issueOrderEntitlements`). Sales closing is not validity ending.\n"
    },
    "categoryId": {
     "type": "string",
@@ -2984,6 +3003,15 @@
     },
     "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
    },
+   "addOnProductIds": {
+    "type": "array",
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The add-ons offered with this product, in display order** (accepted 26 October 2026, Chinmay, ADAM CR-252 option A): each a `kind: addOn` product of the same venue (a coffee break, a working lunch, an AV technician offered with a meeting-room type), set in the back office. `listProducts` answers it, so WEB-048 and GST-075 read a room type's add-ons from the load they already make and fetch those products; the guest adds one as a cart line with `parentLineId`. An id that is not a `kind: addOn` product of the same venue is `400 validation` on `addOnProductIds`. Empty when none is offered."
+   },
    "requiresTimeWindow": {
     "type": "boolean",
     "default": false,
@@ -3048,6 +3076,19 @@
     "format": "uuid",
     "nullable": true,
     "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "**When the product was created** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): `catalogue.product.created_at`, NOT NULL DEFAULT now(), set by the server and never by a request. Rows that predate it are backfilled by the migration task (the earliest of the product's first version's `published_at` and the migration time), then the NOT NULL and the DEFAULT are set. `listProductLifecycle` orders and filters on it."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true,
+    "description": "**When the product last changed** (ADAM CR-204): set by `updateProduct` and by every product sub-resource PUT and bulk change that versions the product; null until the first change after creation. `listProductLifecycle`'s `lastModifiedAt` and `modifiedSince` read it."
    }
   }
  },
@@ -3255,6 +3296,24 @@
     "type": "integer",
     "default": 100
    },
+   "url": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The asset's stable CDN address, for a guest card** (ADAM CR-221, option A, decided 25 October 2026; CHG-R10CAT-014): the asset library's public address for the asset, set on guest-facing reads (`searchCatalogue`, `listProducts` and `getProduct` for a guest or a visitor) when the asset is public and `ready`, as `getPublishedTenantConfig` returns white-label assets (`brandUrls`). Null otherwise, and on staff reads, which are unchanged. Catalogue reads the asset in process, a read the lead granted across deployables (XDR-005, 25 October 2026; CHG-R10CAT-015)."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The asset library's thumbnail address for the asset, on the same reads and with the same rule as `url` (ADAM CR-221)."
+   },
    "altText": {
     "allOf": [
      {
@@ -3350,6 +3409,23 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "description": "**The list price on the caller's channel now**, resolved on read from the price lists (`listProductVariants`; R8 blocker cause GPS-C27, CHG-R8SPN-028). Not stored on the variant and ignored on input. Null where no price list prices it on that channel. The list price, not the total: promotions and bundles are applied at the basket."
+   },
+   "referencePrice": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The price a saving is measured against** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C), set by the back office on the variant (`updateProductVariant`). Null where the variant claims no saving, which is the default. In the same currency as `listPrice`."
+   },
+   "savingPercent": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**Computed by the server, never in the browser** (ADAM CR-253): with a `referencePrice` and a `listPrice` below it, the whole percent the list price saves, `floor((referencePrice - listPrice) / referencePrice * 100)` (rounded down, so the label never overstates; proposed, client to correct); null otherwise. A length tile shows *Save n%* only when this is set."
    },
    "productId": {
     "type": "string",
@@ -3696,6 +3772,13 @@
       }
      }
     }
+   },
+   "maxSeatsPerGuestOrder": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 50,
+    "readOnly": true,
+    "description": "**The most seats one guest booking may hold at this performance's venue** (ADAM CR-187, 25 October 2026): the venue's `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7), read through `tenancy#venueSettingsRecords` (the venue's row, else the tenant's own row, else 10). A guest screen caps its party stepper with it before anything is held (WEB-007, GST-049); `createSeatHold` still refuses more with `422` `seat-limit-exceeded`, whose `maxSeats` is this value on a guest channel. Computed, not stored."
    },
    "zones": {
     "type": "array",

@@ -913,6 +913,12 @@
     "invalidates": [
      "listAssets"
     ]
+   },
+   {
+    "operationId": "listInspections",
+    "contract": "maintenance",
+    "purpose": "The asset's inspections, to pick the one a status change cites in Save asset status (check-screen-value-sources, CHG-R10UI-015)",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -976,6 +982,9 @@
    {
     "id": "formSetAssetStatus",
     "component": "modal",
+    "reads": [
+     "listInspections"
+    ],
     "trigger": "Save asset status",
     "body": "**Collects what `setAssetStatus` sends before it is called.** Required: `status`, `reason`, `recordedAt`. Optional: `inspectionId`, `raiseWorkOrder`. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "SetAssetStatusRequest",

@@ -345,6 +345,7 @@ paths:
         - "P08 BO-1104 Credit Type Definition Studio"
         - "P08 BO-1105 Credit Issuance Rule Configuration"
         - "P08 BO-1108 Expiry & Validity Policy Configuration"
+        - "P08 BO-1144 Peer-to-Peer Transfer Configuration"
         - "P08 BO-415 Wallet & Credit Type Configuration"
         - "P08 BO-420 Bonus Validity & Expiry Configuration"
         - "P08 BO-722 Prepaid Minute Package & Customer Balance Configuration"
@@ -1038,10 +1039,6 @@ paths:
   /shared-wallets:
     get:
       operationId: listSharedWallets
-      x-ticvai-read-via:
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       x-ticvai-consumed-by:
         - "P08 BO-1086 Wallet Ownership & Account Association"
         - "P08 BO-1113 Shared Wallet Command Center"
@@ -1053,6 +1050,10 @@ paths:
         - "P08 BO-1119 Corporate Wallet & Organizational Hierarchy"
         - "P08 BO-1120 Corporate Budget, Policy & Approval Rules"
         - "P08 BO-1122 Shared Wallet Simulator, Monitoring & Audit"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       summary: Family, household and corporate structures
       description: 'Board 4. **The money is in one place and the authority to spend it is distributed.**
         A parent funds, a child spends, and neither model works if the wallet belongs to exactly one
@@ -1088,6 +1089,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createSharedWallet
+      x-ticvai-consumed-by:
+        - "P08 BO-1113 Shared Wallet Command Center"
+        - "P08 BO-1114 Shared Wallet Model Configuration"
+        - "P08 BO-1119 Corporate Wallet & Organizational Hierarchy"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -1096,10 +1101,6 @@ paths:
         **Its currency** (CHG-R10ORD-019; the lead's ruling of 25 October 2026 on check-money-currency): the Money
         this operation answers or accepts is in the currency of the venue it acts at, the caller's working venue, read
         through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.
-      x-ticvai-consumed-by:
-        - "P08 BO-1113 Shared Wallet Command Center"
-        - "P08 BO-1114 Shared Wallet Model Configuration"
-        - "P08 BO-1119 Corporate Wallet & Organizational Hierarchy"
       x-ticvai-conflict-policy: serverWins
       summary: Set up a family, household or corporate wallet
       tags:
@@ -1138,10 +1139,6 @@ paths:
         format: uuid
     put:
       operationId: setSharedWalletMembers
-      x-ticvai-read-via:
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       x-ticvai-consumed-by:
         - "P08 BO-1086 Wallet Ownership & Account Association"
         - "P08 BO-1113 Shared Wallet Command Center"
@@ -1150,6 +1147,10 @@ paths:
         - "P08 BO-1117 Allowance & Budget Allocation Engine"
         - "P08 BO-1118 Member Spending Controls & Permissions"
         - "P08 BO-1120 Corporate Budget, Policy & Approval Rules"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       x-ticvai-conflict-policy: serverWins
       security:
       - guestAuth: []
@@ -1927,12 +1928,12 @@ paths:
   /wallet-movement-summary:
     get:
       operationId: getWalletMovementSummary
+      x-ticvai-consumed-by:
+        - "P08 BO-1170 Wallet Financial Period & Closing Controls"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-1170 Wallet Financial Period & Closing Controls"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1993,12 +1994,12 @@ paths:
   /wallet-pre-close-checks:
     get:
       operationId: getWalletPreCloseChecks
+      x-ticvai-consumed-by:
+        - "P08 BO-1170 Wallet Financial Period & Closing Controls"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-1170 Wallet Financial Period & Closing Controls"
       x-ticvai-audience:
       - staff
       - service
@@ -2725,13 +2726,13 @@ paths:
   /gift-cards:
     post:
       operationId: issueGiftCard
+      x-ticvai-consumed-by:
+        - "P08 BO-1123 Gift Card & Digital Benefit Command Center"
+        - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-1123 Gift Card & Digital Benefit Command Center"
-        - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
       x-ticvai-audience: [staff]
       summary: Issue or activate a gift card
       description: >
@@ -2790,15 +2791,15 @@ paths:
         schema: { type: string }
     get:
       operationId: getGiftCard
-      x-ticvai-read-via:
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
         - "P08 BO-1123 Gift Card & Digital Benefit Command Center"
         - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2898,12 +2899,12 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: activateGiftCard
+      x-ticvai-consumed-by:
+        - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
       x-ticvai-audience: [staff]
       summary: Activate a card at the point of sale
       description: >
@@ -2950,12 +2951,12 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: redeemGiftCard
+      x-ticvai-consumed-by:
+        - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-1125 Gift Card Issuance, Activation & Distribution"
       x-ticvai-note: >-
         **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
         locked for one guarded statement and every movement is a `wallet.wallet_transaction` with its `walletId`,

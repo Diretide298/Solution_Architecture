@@ -100,8 +100,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ACC-001` | Landing / Programme Overview | D | 0 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ACC-002` | Registration Form | D | 21 | 20 | 5 | 1 | 6 | 0 | — | notStarted (generated) |
 | `ACC-003` | Application Review & Submit | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ACC-004` | Application Status Tracking | D | 1 | 40 | 6 | 7 | 2 | 0 | — | notStarted (generated) |
-| `ACC-005` | Accreditation Badge | D | 0 | 0 | 5 | 2 | 2 | 6 | — | notStarted (generated) |
+| `ACC-004` | Application Status Tracking | D | 1 | 60 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ACC-005` | Accreditation Badge | D | 0 | 80 | 5 | 3 | 2 | 6 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

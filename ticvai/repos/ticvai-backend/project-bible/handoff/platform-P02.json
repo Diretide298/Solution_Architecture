@@ -7,7 +7,7 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-10-22",
+ "generated": "2026-10-26",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 77,
@@ -15,7 +15,7 @@
   "contracts": 19,
   "modules": 17,
   "undrawn": 0,
-  "operationsWithNoScreen": 22
+  "operationsWithNoScreen": 23
  },
  "waves": {
   "wave1": 77
@@ -152,7 +152,7 @@
   },
   {
    "contract": "identity",
-   "operations": 20
+   "operations": 21
   },
   {
    "contract": "catalogue",
@@ -163,16 +163,16 @@
    "operations": 15
   },
   {
-   "contract": "transport",
-   "operations": 12
-  },
-  {
    "contract": "access",
    "operations": 12
   },
   {
+   "contract": "transport",
+   "operations": 12
+  },
+  {
    "contract": "venue-map",
-   "operations": 10
+   "operations": 9
   },
   {
    "contract": "white-label",
@@ -187,11 +187,11 @@
    "operations": 6
   },
   {
-   "contract": "resources",
+   "contract": "wallet",
    "operations": 6
   },
   {
-   "contract": "wallet",
+   "contract": "resources",
    "operations": 6
   },
   {
@@ -352,7 +352,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 1,
    "route": "/general/memberships",
-   "operations": 8,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -595,7 +595,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/simple-registration-and-otp",
-   "operations": 13,
+   "operations": 14,
    "drawn": true
   },
   {
@@ -604,7 +604,7 @@
    "module": "System States",
    "wave": 1,
    "route": "/general/arabic-rtl-experience",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -748,7 +748,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/general/plan-my-day-in-progress",
-   "operations": 5,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -793,7 +793,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account/privacy-my-data",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -1047,6 +1047,12 @@
     "contract": "queue",
     "verb": "GET",
     "summary": "The caller's own queue entries"
+   },
+   {
+    "operation": "listMyVisitPlans",
+    "contract": "venue-map",
+    "verb": "GET",
+    "summary": "The caller's own visit plans, by date or status"
    }
   ],
   "modulesSplitAcrossWaves": [],

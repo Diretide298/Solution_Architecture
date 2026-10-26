@@ -932,6 +932,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html#bo-1055`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 11
 - Flow F284 *Seat Management Venue Mapping Reference v1.0 board 11: Seat Analytics Command …*, step 8: Works in Revenue by Seat Category → Measure performance of Premium, Standard, Value, Accessible and configured categories. Show revenue mix, seats sold, average price, discount, refund, yield and sell-through by category. Compare …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

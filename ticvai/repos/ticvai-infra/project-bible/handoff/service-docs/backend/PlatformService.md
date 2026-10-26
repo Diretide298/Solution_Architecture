@@ -7,7 +7,7 @@
 | Tier | platform: Provisioning, publishing, reporting, and the one cross-region path. |
 | Contracts | `subscription`, `platform-ops`, `public-api` |
 | Schemas owned | `control`, `subscription` |
-| Operations in the slice | 20 of 229 |
+| Operations in the slice | 21 of 234 |
 | Scale | Low volume, high consequence. Tenant provisioning and licensing. |
 | If it is down | Down blocks provisioning and the developer API. Trading is unaffected. |
 
@@ -38,6 +38,7 @@ Nothing outside itself.
 | publicApi | [`setApiClientStatus`](#setapiclientstatus) | POST | `/api-clients/{clientId}/status` | setup | 1 | ADM-356, BO-1179 |
 | publicApi | [`setApiLicensing`](#setapilicensing) | PUT | `/api-licensing/{licenceId}` | setup | 1 | DEV-008 |
 | publicApi | [`setDeveloperMembers`](#setdevelopermembers) | PUT | `/developers/{developerId}/members` | setup | 1 | DEV-002 |
+| publicApi | [`verifyDeveloper`](#verifydeveloper) | POST | `/developers/{developerId}/verify` | setup | 1 |  |
 | subscription | [`listModuleCatalogue`](#listmodulecatalogue) | GET | `/module-catalogue` | core | 1 | ADM-386, ADM-401, ADM-402, ADM-403, ADM-404, ADM-423 … |
 | subscription | [`setModuleListing`](#setmodulelisting) | PUT | `/module-catalogue/{moduleCode}` | setup | 1 |  |
 | subscription | [`setSubscription`](#setsubscription) | PUT | `/tenants/{tenantId}/subscription` | setup | 1 | ADM-008, ADM-410, ADM-417 |
@@ -78,6 +79,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| currencyCode | string |  | The ISO 4217 currency of the add-on's price (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a plat… (min length 3; max length 3; pattern ^[A-Z]{3}$) |
 | tenantId | string (uuid) |  | The tenant the add-on was sold to — the tenantId in the path, never the body. (read-only) |
 | moduleKey | ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | What a tenant buys, and what a screen belongs to. |
 | limitOverrides | array of EntitlementLimit |  |  |
@@ -214,6 +216,7 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| currencyCode | string |  | The ISO 4217 currency of the plan's basePrice and every overageUnitPrice of its limits (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored… (min length 3; max length 3; pattern ^[A-Z]{3}$) |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 1000) |
@@ -260,6 +263,7 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| currencyCode | string |  | The ISO 4217 currency of the plan's basePrice and every overageUnitPrice of its limits (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored… (min length 3; max length 3; pattern ^[A-Z]{3}$) |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 1000) |
@@ -345,6 +349,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| currencyCode | string |  | The ISO 4217 currency of the plan's basePrice and every overageUnitPrice of its limits (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored… (min length 3; max length 3; pattern ^[A-Z]{3}$) |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 1000) |
@@ -391,6 +396,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| currencyCode | string |  | The ISO 4217 currency of the plan's basePrice and every overageUnitPrice of its limits (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored… (min length 3; max length 3; pattern ^[A-Z]{3}$) |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
 | description | string |  | (max length 1000) |
@@ -468,7 +474,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Reads | `cache:idempotency`, `control.api_version`, `control.integration_listing` |
 | Writes | `cache:idempotency`, `control.integration_listing` |
 | Called by | DEV-008 |
-| State model | Integration listing ([states/integration-listing.yaml](../../../states/integration-listing.yaml)): moves `submitted` -> `inReview`, `inReview` -> `certified`, `inReview` -> `rejected`, `certified` -> `revoked`, `revoked` -> `delisted` |
+| State model | Integration listing ([states/integration-listing.yaml](../../../states/integration-listing.yaml)): moves `submitted` -> `inReview`, `inReview` -> `certified`, `inReview` -> `rejected`, `certified` -> `revoked` |
 
 **Parameters**
 
@@ -518,6 +524,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 **A client is bound to one environment.** A sandbox client cannot reach production, which is stated on the object rather than enforced by a naming convention — **a key that works in both is a key somebody will use in the wrong one.**
 **Production keys only after certification** (17 September minutes, M17-06; decided again 29 September). A developer creates `sandbox` clients here freely. A `production` client is refused 409 `certification-required` unless it names a certified integration (`certificationListingId`, an `IntegrationListing` in `certified` within `certifiedUntil`) and the caller is TICVAI staff (`issuedBy: ticvai`). The developer's route is `requestProductionAccess`, which TICVAI decides with `decideProductionAccess`; approving it creates the production client. **A production client needs an IP allow-list** (M17-07): an empty `ipAllowList` on a production client is refused 422 `ip-allow-list-required`.
 **Scopes are module scopes** (M17-05): each is `{module}.read` or `{module}.write` from `listApiScopes`, so a CRM integration partner is granted CRM scopes and nothing else. An unknown scope is refused 422 `unknown-scope`. **No scope grants a catalogue write** (M17-04): partners read assigned products and partner prices; the product, price and capacity writes are open only through a platform-staff `ApiLicence.catalogueWriteException`. Keys expire: `credentialTtlDays` (default 365 for production, 90 for sandbox) sets `expiresAt`, and rotation renews it.
+**The secret is a row of its own** (ADAM CR-098, accepted for r10; CHG-R10ID-011): the client secret returned once here is stored only as a `control.api_client_secret` row (`ApiClientSecret`), its keyed hash under the platform's client-secret key (ADR-0063, amendment of 25 October 2026), with `expiresAt` the client's. A partner caller creates clients only for its own developer account, and only once that account is `verified` (409 `developer-not-verified`).
 
 |  |  |
 |---|---|
@@ -528,7 +535,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.api_client`, `control.api_licence`, `control.developer_account`, `control.integration_listing` |
-| Writes | `cache:idempotency`, `control.api_client` |
+| Writes | `cache:idempotency`, `control.api_client`, `control.api_client_secret` |
 | Called by | BO-1177, DEV-003, PTR-019 |
 
 **Parameters**
@@ -718,17 +725,18 @@ Notifies every client using the version, and **the notification names which oper
 
 13.1.6 to 13.1.9. **An organisation, not a person** — an integration outlives the engineer who built it, and a credential tied to somebody's personal account dies when they leave.
 A developer account is **not a tenant and not a partner.** A partner resells tickets; a developer writes software. Conflating them was the confusion CF-135 opened on.
+**Public, with no permission and no tenant** (ADAM CR-098, accepted for r10; CHG-R10ID-011): a developer account lives in the control database and belongs to no tenant, so the caller is anonymous and nothing is checked against a grant. The body is `CreateDeveloperAccountRequest`; the server sets `id`, `status` `pending` and no `verifiedAt`. **The contact is the owner:** the same write inserts one `control.developer_member` row with the contact email, role `owner` and status `invited`, so `setDeveloperMembers` always finds its one owner. **One account per contact email:** an organisation already registered under that email, compared without case (unique on `lower(contact_email)`), is 409 `developer-already-registered` and nothing is written. The account stays `pending`, and is provisioned nothing, until TICVAI staff verify it (`verifyDeveloper`).
 
 |  |  |
 |---|---|
-| Permission | `DEVELOPER_VIEW` |
-| Scope level | tenant |
+| Permission | `None` |
+| Scope level | platform |
 | Part of slice | setup, makes `control.developer_account` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.developer_account` |
-| Writes | `cache:idempotency`, `control.developer_account` |
+| Writes | `cache:idempotency`, `control.developer_account`, `control.developer_member` |
 | Called by | DEV-002 |
 | State model | Developer account ([states/developer-account.yaml](../../../states/developer-account.yaml)): created as `pending` |
 
@@ -738,18 +746,15 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
-**Request body**: `DeveloperAccount`
+**Request body**: `CreateDeveloperAccountRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes | (read-only) |
-| organisationName | string | yes |  |
+| organisationName | string | yes | (max length 300) |
 | contactEmail | string (email) | yes |  |
 | websiteUrl | string |  | (nullable) |
-| countryCode | string |  |  |
+| countryCode | string |  | (min length 2; max length 2) |
 | partnerId | string (uuid) |  | Where this developer is also a commercial partner. (nullable) |
-| status | enum (pending, verified, suspended, closed) | yes | (read-only) |
-| verifiedAt | string (date-time) |  | (read-only; nullable) |
 
 **Response**: `DeveloperAccount`
 
@@ -757,7 +762,7 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
 | organisationName | string | yes |  |
-| contactEmail | string (email) | yes |  |
+| contactEmail | string (email) | yes | The organisation's contact, who becomes its owner member on registration; unique without case (registerDeveloper 409 developer-already-registered; ADAM CR-098). |
 | websiteUrl | string |  | (nullable) |
 | countryCode | string |  |  |
 | partnerId | string (uuid) |  | Where this developer is also a commercial partner. (nullable) |
@@ -769,6 +774,8 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Registered, pending verification |
+| 400 | BadRequest | Validation failed |
+| 409 |  | An organisation is already registered under this contact email, compared without case (developer-already-registered; ADAM CR-098). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### rotateApiCredential
@@ -776,6 +783,7 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 **`POST /api-clients/{clientId}/credentials`**: Issue a new secret, with an overlap window
 
 13.1.15. **Rotation without an overlap is an outage.** Both secrets are valid until `oldSecretExpiresAt`, which gives the integrator time to deploy — and **a rotation with no overlap is one nobody performs until they are breached.**
+**One row per secret** (ADAM CR-098, accepted for r10; CHG-R10ID-011). Rotation inserts a new `control.api_client_secret` row (`ApiClientSecret`) holding the new secret's keyed hash, with `expiresAt` the client's renewed `expiresAt` (now plus `credentialTtlDays`); every earlier row still live gets `expiresAt` = now + `overlapHours`, or keeps its own if that is sooner, which is `oldSecretExpiresAt`. `issueApiToken` accepts a secret matching any row of the client with `revokedAt` null and `expiresAt` in the future. A production client approved with no secret yet (`decideProductionAccess`) takes its first secret here, and `oldSecretExpiresAt` is then null. **Rotation never changes the client's status:** a `suspended` client is 409 `api-client-suspended` (it returns to `active` only through `setApiClientStatus`, with its reason) and a `revoked` one is 409 `api-client-revoked`. An unknown client, or one of another developer account (the rule in this contract's description), is 404. Nothing is written on a refusal.
 
 |  |  |
 |---|---|
@@ -786,9 +794,8 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.api_client` |
-| Writes | `cache:idempotency`, `control.api_client` |
+| Writes | `cache:idempotency`, `control.api_client`, `control.api_client_secret` |
 | Called by | DEV-003, PTR-019 |
-| State model | API client ([states/api-client.yaml](../../../states/api-client.yaml)): moves `suspended` -> `active` |
 
 **Parameters**
 
@@ -801,20 +808,22 @@ A developer account is **not a tenant and not a partner.** A partner resells tic
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| overlapHours | integer |  | (default 72) |
+| overlapHours | integer |  | (min 0; max 720; default 72) |
 
 **Response**: `object`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | clientSecret | string (password) |  |  |
-| oldSecretExpiresAt | string (date-time) |  |  |
+| oldSecretExpiresAt | string (date-time) |  | (nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Rotated |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The client is suspended (api-client-suspended) or revoked (api-client-revoked); rotation never reactivates a client (ADAM CR-098). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setApiClientStatus
@@ -889,17 +898,18 @@ Board 10, pp.115 and 122. **`revokeApiCredential` kills the secret; nothing paus
 **The example in the requirement is the shape**: a venue licensing the ticketing API and not the F&B one. A scope the tenant has not licensed produces no token, and the refusal happens at issue rather than at call time.
 **The rates themselves are CF-135c and remain open.** This is the surface they will be set through.
 **Catalogue writes are not grantable to partner or developer clients** (17 September minutes M17-04, decided 29 September): partners never create products, prices or performances through the API. The product, price list, channel capacity, lifecycle and alternative-code writes (`createProduct`, `updateProduct`, `setProductAttributes`, `createPriceList`, `updatePriceList`, `copyPriceList`, `setPrices`, `createChannelCapacity`, `updateChannelCapacity`, `setChannelAllocations`, `transitionProductLifecycle`, `setAlternativeCodes`) are in no scope a client can be granted, whatever modules are licensed. **The only exception is `catalogueWriteException`**, which TICVAI platform staff alone may set here (a tenant principal sending it is refused 403 `platform-staff-only`), for a named client and named operations, with a reason and an end date; it is audited and lapses on its own.
+**Staff name the tenant; a tenant's licences never overlap** (ADAM CR-098, accepted for r10; CHG-R10ID-011). `tenantId` is sent by the TICVAI programme admin (DEV-008), who acts for no tenant of their own, and must be a tenant of `control.tenant` (else 422 `unknown-tenant`). A licence whose `effectiveFrom` to `effectiveTo` (an open end runs for ever) overlaps another licence of the same tenant is 409 `api-licence-period-overlap` and nothing is written, so `issueApiToken` always finds at most one licence in force; to change terms, end the current licence (`effectiveTo`) and start the next the day after.
 
 |  |  |
 |---|---|
 | Permission | `DEVELOPER_ADMIN` |
-| Scope level | tenant |
+| Scope level | platform |
 | Part of slice | setup, makes `control.api_licence` non-empty |
 | Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `control.api_licence` |
+| Reads | `cache:idempotency`, `control.api_licence`, `control.tenant` |
 | Writes | `cache:idempotency`, `cache:resolution`, `control.api_licence` |
 | Called by | DEV-008 |
 
@@ -915,7 +925,7 @@ Board 10, pp.115 and 122. **`revokeApiCredential` kills the secret; nothing paus
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
-| tenantId | string (uuid) | yes | (read-only) |
+| tenantId | string (uuid) | yes | The tenant licensed, sent by TICVAI staff (ADAM CR-098; CHG-R10ID-011). |
 | licensedModules | array of ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. |
 | callAllowancePerMonth | integer |  | (nullable) |
 | catalogueWriteException | object |  | M17-04: the one way a client reaches a catalogue write, set by TICVAI platform staff only (setApiLicensing refuses anyone else 403 platform-staff-only). (nullable) |
@@ -934,7 +944,7 @@ Board 10, pp.115 and 122. **`revokeApiCredential` kills the secret; nothing paus
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
-| tenantId | string (uuid) | yes | (read-only) |
+| tenantId | string (uuid) | yes | The tenant licensed, sent by TICVAI staff (ADAM CR-098; CHG-R10ID-011). |
 | licensedModules | array of ModuleKey: enum (core, ticketing, access, fnb, retail, inventory, seating, membership, …) | yes | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. |
 | callAllowancePerMonth | integer |  | (nullable) |
 | catalogueWriteException | object |  | M17-04: the one way a client reaches a catalogue write, set by TICVAI platform staff only (setApiLicensing refuses anyone else 403 platform-staff-only). (nullable) |
@@ -954,6 +964,8 @@ Board 10, pp.115 and 122. **`revokeApiCredential` kills the secret; nothing paus
 |---|---|---|
 | 200 |  | Set |
 | 403 |  | catalogueWriteException was sent by a principal that is not TICVAI platform staff (platform-staff-only, M17-04). |
+| 409 |  | The licence's effective period overlaps another licence of the same tenant (api-licence-period-overlap; ADAM CR-098). |
+| 422 |  | tenantId names no tenant (unknown-tenant; ADAM CR-098). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setDeveloperMembers
@@ -1001,6 +1013,55 @@ identity tables; the portal signs a member in by the email.
 | 200 |  | Set |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### verifyDeveloper
+
+**`POST /developers/{developerId}/verify`**: Verify a registered developer organisation
+
+**TICVAI staff verify a developer before anything is provisioned** (ADAM CR-098, accepted for r10; CHG-R10ID-011; states/developer-account.yaml: "Nothing was provisioned before this"). Moves a `pending` account to `verified` and sets `verifiedAt`; from then its members may create sandbox clients, sandboxes and production requests. The owner member stays `invited` until the person signs in to the portal with the email. An account that is not `pending` is 409 `developer-not-pending` and nothing changes. No body: the checks behind the decision (the organisation, its contact, its website) are the reviewer's.
+
+|  |  |
+|---|---|
+| Permission | `DEVELOPER_ADMIN` |
+| Scope level | platform |
+| Part of slice | setup, makes `control.developer_account` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `control.developer_account` |
+| Writes | `cache:idempotency`, `control.developer_account` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+| State model | Developer account ([states/developer-account.yaml](../../../states/developer-account.yaml)): moves `pending` -> `verified` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| developerId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Response**: `DeveloperAccount`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| organisationName | string | yes |  |
+| contactEmail | string (email) | yes | The organisation's contact, who becomes its owner member on registration; unique without case (registerDeveloper 409 developer-already-registered; ADAM CR-098). |
+| websiteUrl | string |  | (nullable) |
+| countryCode | string |  |  |
+| partnerId | string (uuid) |  | Where this developer is also a commercial partner. (nullable) |
+| status | enum (pending, verified, suspended, closed) | yes | (read-only) |
+| verifiedAt | string (date-time) |  | (read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Verified |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The account is not pending (developer-not-pending): already verified, suspended or closed. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 
 ## Group: subscription
 
@@ -1009,6 +1070,7 @@ identity tables; the portal signs a member in by the email.
 **`GET /module-catalogue`**: Modules, their dependencies and their commercial treatment
 
 Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells combinations that cannot be provisioned.** F&B needs inventory; seating needs the venue map; redemption needs wallet — and a customer who buys the first of each pair and not the second discovers it during go-live.
+**Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -1056,6 +1118,7 @@ Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells comb
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| currencyCode | string |  | The ISO 4217 currency of the module's price (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a plat… (min length 3; max length 3; pattern ^[A-Z]{3}$) |
 | moduleCode | string | yes | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
 | name | string |  |  |
 | description | string |  | (nullable) |
@@ -1078,6 +1141,7 @@ Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells comb
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| currencyCode | string |  | The ISO 4217 currency of the module's price (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a plat… (min length 3; max length 3; pattern ^[A-Z]{3}$) |
 | moduleCode | string | yes | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
 | name | string |  |  |
 | description | string |  | (nullable) |
@@ -1149,6 +1213,8 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| issuingLegalEntity | enum (ainfiniteAiUae, ainfiniteAiIndia) |  | The TICVAI legal entity that invoices this tenant (the lead, 25 October 2026, r10 round 3, ADAM CR-202; CHG-R10ID-023): Ainfinite AI UAE or Ainfinite AI India. |
+| currencyCode | string |  | The ISO 4217 currency of this contract's currentPrice (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, si… (min length 3; max length 3; pattern ^[A-Z]{3}$) |
 | tenantId | string (uuid) | yes |  |
 | planId | string (uuid) | yes |  |
 | planName | string |  |  |
@@ -1491,12 +1557,24 @@ Every table this service owns that the slice reads or writes, with its columns a
 | last_used_at | timestamptz | no | A credential unused for a year is a credential nobody will notice being stolen. |
 | status_reason | text | no | Why the client was suspended (setApiClientStatus). |
 
+### `control.api_client_secret`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| api_client_id | uuid | yes | The API client this secret belongs to (control.api_client). |
+| secret_hash | text | yes | HMAC-SHA-256 of the secret under the platform's client-secret key, 64 lowercase hex characters (ADR-0063, amendment of 25 October 2026): a keyed hash under a platform key, since the control database… |
+| hash_key_version | integer | yes | Which version of the platform's client-secret key made secretHash. |
+| issued_at | timestamptz | yes |  |
+| expires_at | timestamptz | yes | When this secret stops verifying; for the newest row the client's expiresAt, for an earlier row the end of the rotation's overlap. |
+| revoked_at | timestamptz | no |  |
+
 ### `control.api_licence`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes | Added 20 August. |
-| tenant_id | uuid | yes |  |
+| tenant_id | uuid | yes | The tenant licensed, sent by TICVAI staff (ADAM CR-098; CHG-R10ID-011). |
 | licensed_modules | text[] | yes | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. |
 | call_allowance_per_month | integer | no |  |
 | catalogue_write_exception | jsonb | no | M17-04: the one way a client reaches a catalogue write, set by TICVAI platform staff only (setApiLicensing refuses anyone else 403 platform-staff-only). |
@@ -1524,6 +1602,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| issuing_legal_entity | text | no | The TICVAI legal entity that invoices this tenant (the lead, 25 October 2026, r10 round 3, ADAM CR-202; CHG-R10ID-023): Ainfinite AI UAE or Ainfinite AI India. |
+| currency_code | text | no | The ISO 4217 currency of this contract's currentPrice (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, si… |
 | tenant_id | uuid | yes |  |
 | plan_id | uuid | yes |  |
 | plan_name | text | no |  |
@@ -1543,7 +1623,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | organisation_name | text | yes |  |
-| contact_email | text | yes |  |
+| contact_email | text | yes | The organisation's contact, who becomes its owner member on registration; unique without case (registerDeveloper 409 developer-already-registered; ADAM CR-098). |
 | website_url | text | no |  |
 | country_code | text | no |  |
 | partner_id | uuid | no | Where this developer is also a commercial partner. |
@@ -1583,6 +1663,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| currency_code | text | no | The ISO 4217 currency of the add-on's price (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a plat… |
 | tenant_id | uuid | no | The tenant the add-on was sold to — the tenantId in the path, never the body. |
 | module_key | text | yes | The licence vocabulary, not the white-label one (the lead, 20 October 2026, r8 cause APPROVALS-TENANCY-C17, option B): an add-on licenses a shared ModuleKey (ticketing, fnb, retail, ...), or the add-… |
 | list_price | numeric(18,4) | no |  |
@@ -1609,6 +1690,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| currency_code | text | no | The ISO 4217 currency of the module's price (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a plat… |
 | module_code | text | yes | Values are ModuleKeys (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of white-label.ModuleEnablement.moduleKey, so a dependency is checked against what setModuleEnablement switches. |
 | name | text | no |  |
 | description | text | no |  |
@@ -1629,6 +1711,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| currency_code | text | no | The ISO 4217 currency of the plan's basePrice and every overageUnitPrice of its limits (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored… |
 | code | text | yes |  |
 | name | text | yes |  |
 | description | text | no |  |
@@ -1717,11 +1800,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-209 operations, added to this service in later releases without changing any of the above.
+213 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| billing | `cancelInvoice`, `disputeInvoice`, `generateInvoice`, `getBillingEntity`, `issueCreditNote`, `listCreditNotes`, `listSubscriptionInvoices`, `recordInvoicePayment`, `resolveInvoiceDispute`, `setBillingEntity` |
+| billing | `cancelInvoice`, `disputeInvoice`, `generateInvoice`, `getBillingEntity`, `issueCreditNote`, `issueInvoice`, `listCreditNotes`, `listPlatformTaxRates`, `listSubscriptionInvoices`, `recordInvoicePayment`, `resolveInvoiceDispute`, `setBillingEntity`, `setPlatformTaxRate` |
 | cell | `cancelDecommission`, `decommissionCell`, `executeTenantMigration`, `getCell`, `getCellCapacity`, `getCellHealth`, `launchCellCluster`, `listCellClusters`, `listCellJobs`, `listCells`, `listTenantCells`, `listTenantMigrations`, `planTenantMigration`, `provisionCell`, `rollbackTenantMigration`, `updateCellTier` |
 | drafted | `approveBookingLimitCommercial`, `approveMembershipProductValidation`, `approvePartnerStatuLifecycle`, `getMembershipProductValidation`, `listCommercialAgreement`, `listCommercialAgreementHealth`, `listCommercialAllocationQuota`, `listCommissionCalculationSettlement`, `listCommissionMarginIncentive`, `listCreditLimitExposure`, `listDepositGuaranteeFinancial`, `listMember`, `listMemberExceptionOverride`, `listMemberLifecycleCase`, `listMembershipActivationCredential`, `listMembershipAnnualPass`, `listMembershipCommercialPricing`, `listMembershipFreezeSuspension`, `listMembershipRenewalRetention`, `listMembershipUpgradeDowngrade`, `listMembershipUsageVisit`, `listPartner`, `listPartner2`, `listPartnerAccessRole`, `listPartnerCancellationRefund`, `listPartnerContactUser`, `listPartnerDisputeCase`, `listPartnerDocumentationCompliance`, `listPartnerOnboardingApplication`, `listPartnerOrderBooking`, `listPartnerPerformanceScorecard`, `listPartnerProfileReadiness`, `listPartnerReconciliationException`, `listPartnerRelationship`, `listPartnerStatementAccount`, `listRenewalAuto`, `listReservationHoldRelease`, `listTerritoryMarketDistribution`, `listVisitAdmissionEntitlement`, `setAgreementContractTerm`, `setFamilyHouseholdDependent`, `setMemberMembershipAccount`, `setMembershipEligibilityQualification`, `setMembershipEntitlementAdmission`, `setMembershipProductTier`, `setPartnerBrandVenue`, `setPartnerProfileOrganization`, `setPartnerRateNet`, `setPaymentTermBilling`, `setRenewalAutoMembership`, `setValidityActivationExpiry` |
 | environment | `listEnvironments`, `registerEnvironment` |
@@ -1734,7 +1817,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | plan | `getPlan`, `listPlans` |
 | platform | `getScalingPolicy`, `listArchivalJobs`, `listBackupRuns`, `listWafRules`, `setScalingPolicy`, `setWafPolicy` |
 | platform-ops | `cancelOutboxRepublish`, `getOutboxRepublish`, `listDeadLetters`, `listOutboxRepublishes`, `replayDeadLetter`, `republishOutbox`, `skipRolloutCell` |
-| publicApi | `createSandbox`, `createWebhookSubscription`, `getApiUsage`, `issueApiToken`, `listApiAnomalies`, `listApiClients`, `listApiScopes`, `listApiVersions`, `listDeveloperMembers`, `listIntegrationListings`, `listProductionAccessRequests`, `listSandboxes`, `listWebhookDeliveries`, `listWebhookEventTypes`, `listWebhookSubscriptions`, `replayEvents`, `requestProductionAccess`, `resetSandbox`, `revokeApiCredential`, `setApiAnomalyRule`, `setApiQuota`, `submitIntegrationListing`, `testWebhookSubscription` |
+| publicApi | `createSandbox`, `createWebhookSubscription`, `getApiUsage`, `issueApiToken`, `listApiAnomalies`, `listApiClients`, `listApiScopes`, `listApiVersions`, `listDeveloperMembers`, `listIntegrationListings`, `listMarketplaceListings`, `listProductionAccessRequests`, `listSandboxes`, `listWebhookDeliveries`, `listWebhookEventTypes`, `listWebhookSubscriptions`, `replayEvents`, `requestProductionAccess`, `resetSandbox`, `revokeApiCredential`, `setApiAnomalyRule`, `setApiQuota`, `submitIntegrationListing`, `testWebhookSubscription` |
 | release | `createRelease`, `getRelease`, `getReleaseReadiness`, `listReleases`, `promoteRelease`, `rejectRelease`, `withdrawRelease` |
 | rollout | `getRollout`, `listRollouts`, `pauseRollout`, `rollbackRollout`, `startRollout` |
 | subscription | `actOnPartnerApplicationReview`, `actOnPartnerCase`, `actOnPartnerCommissionLine`, `actOnPartnerReconciliationException`, `actOnPartnerSettlementBatch`, `addCapacityPack`, `cancelSubscription`, `createPartnerAgreement`, `createPartnerCase`, `createPartnerChangeRequest`, `createPartnerUser`, `decommissionBurstEnvironment`, `drainBurstEnvironment`, `exportPartnerInvoice`, `getBillingReconciliation`, `getCommercialMetrics`, `getCommissionStatement`, `getGoLiveReadiness`, `getLicenceEnforcement`, `getPlanRecommendations`, `getPlanTiers`, `getSubscription`, `getVsiModel`, `listBurstEnvironments`, `listChannelListings`, `listLicensingModels`, `listPartnerAgreements`, `listPartnerUsers`, `listVenueTypeTemplates`, `previewSubscriptionChange`, `reconcileBurstEnvironment`, `registerPartner`, `requestBurstEnvironment`, `runGoLiveValidation`, `scoreVsiAssessment`, `setChannelListing`, `setLicenceEnforcementPolicy`, `setLicensingModel`, `setMembershipCommercialConfig`, `setMembershipUsagePolicy`, `setPartnerAllocations`, `setPartnerCapabilityGrants`, `setPartnerCommissionRules`, `setPartnerContact`, `setPartnerCreditProfile`, `setPartnerDistributionRights`, `setPartnerSecurity`, `setPlanTiers`, `setTrialConfiguration`, `setVsiModel`, `settleAiUsage`, `simulateCommercialPackage`, `submitOnboardingApplication`, `updatePartnerAgreement` |

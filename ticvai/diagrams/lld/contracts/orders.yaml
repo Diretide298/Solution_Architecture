@@ -1,5 +1,5 @@
 id: LLD-orders
-title: orders — 227 operations
+title: orders — 228 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -188,10 +188,14 @@ operations:
   reads:
   - cache:idempotency
   - orders.refund
+  - orders.refund_line
+  - orders.refund_payment
   writes:
   - cache:idempotency
   - orders.order_event
   - orders.refund
+  - orders.refund_line
+  - orders.refund_payment
 - operation: assignChargeback
   verb: POST
   path: /chargebacks/{chargebackId}/assign
@@ -209,6 +213,20 @@ operations:
   - cache:idempotency
   - orders.chargeback
   - platform.audit_record
+- operation: attachGuestCheckoutOrders
+  verb: POST
+  path: /guest-checkout-links
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  writes:
+  - cache:idempotency
+  - orders.sales_order
+  - platform.outbox
 - operation: authoriseStoredValue
   verb: POST
   path: /stored-value/authorisations
@@ -644,6 +662,8 @@ operations:
   - orders.fraud_rule
   - orders.payment
   - orders.refund
+  - orders.refund_line
+  - orders.refund_payment
   - orders.sales_order
   writes:
   - cache:idempotency
@@ -651,6 +671,8 @@ operations:
   - ledger.posting
   - orders.order_event
   - orders.refund
+  - orders.refund_line
+  - orders.refund_payment
   - platform.outbox
 - operation: createRefundRequest
   verb: POST
@@ -1782,6 +1804,8 @@ operations:
   offline: true
   reads:
   - orders.refund
+  - orders.refund_line
+  - orders.refund_payment
   writes: []
 - operation: listOrderReservation
   verb: GET
@@ -1854,6 +1878,8 @@ operations:
   offline: false
   reads:
   - orders.refund
+  - orders.refund_line
+  - orders.refund_payment
   writes: []
 - operation: listOwnResaleListings
   verb: GET
@@ -2555,6 +2581,7 @@ operations:
   - orders.payment_link
   - orders.reservation
   - orders.sales_order
+  - payments.payment_attempt
   - platform.outbox
 - operation: previewProductTickets
   verb: GET
@@ -3481,7 +3508,15 @@ operations:
   audience:
   - staff
   offline: false
-  reads: []
+  reads:
+  - orders.order_line
+  - orders.payment
+  - orders.refund_calculation_policy
+  - orders.refund_line
+  - orders.refund_payment
+  - orders.refund_policy
+  - orders.refund_policy_time_band
+  - orders.sales_order
   writes: []
 - operation: splitOrder
   verb: POST
@@ -3593,7 +3628,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - orders.deposit
   - orders.group_booking
+  - orders.group_participant
+  - orders.group_quote
   - pii.subject
   writes:
   - cache:idempotency

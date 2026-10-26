@@ -15,7 +15,7 @@
   "implementation": {
    "app": "partner-web",
    "route": "/partners/partner-operations-command-center-ptr-042",
-   "component": "apps/partner-web/src/routes/partners/PartnerOperationsCommandCenter.tsx",
+   "component": "src/routes/partners/PartnerOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -297,17 +297,12 @@
    "app": "partner-web",
    "operator": "partner",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "partner-web",
+    "name": "Partner Web",
     "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
+    "siblings": [],
+    "note": "**P10 is its own app, in the ticvai-partner-web repository** (ADAM CR-153, raised by Chitrangi Mestry on 16 October 2026 while scaffolding that repository; accepted by Chinmay, option A). It follows the one-repository-per-app decision of 13 October 2026 and overrides the decision of 10 September 2026, which served P10 from the shared TICVAI Control app with P09, P11, P14 and P17. Its sign-in, navigation and permission filtering are its own shell. The partner users are still not TICVAI staff, and the permission model holds that line as before. The lead confirms that the repository was created on purpose (docs/active/frontend-repos.yaml marks the mapping assumed until then).",
+    "decided": "25 October 2026 (ADAM CR-153)"
    }
   }
  },
@@ -327,7 +322,7 @@
   "implementation": {
    "app": "partner-web",
    "route": "/partners/partner-orders-booking-management-ptr-043",
-   "component": "apps/partner-web/src/routes/partners/PartnerOrdersBookingManagement.tsx",
+   "component": "src/routes/partners/PartnerOrdersBookingManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -504,17 +499,12 @@
    "app": "partner-web",
    "operator": "partner",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "partner-web",
+    "name": "Partner Web",
     "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
+    "siblings": [],
+    "note": "**P10 is its own app, in the ticvai-partner-web repository** (ADAM CR-153, raised by Chitrangi Mestry on 16 October 2026 while scaffolding that repository; accepted by Chinmay, option A). It follows the one-repository-per-app decision of 13 October 2026 and overrides the decision of 10 September 2026, which served P10 from the shared TICVAI Control app with P09, P11, P14 and P17. Its sign-in, navigation and permission filtering are its own shell. The partner users are still not TICVAI staff, and the permission model holds that line as before. The lead confirms that the repository was created on purpose (docs/active/frontend-repos.yaml marks the mapping assumed until then).",
+    "decided": "25 October 2026 (ADAM CR-153)"
    }
   }
  },
@@ -534,7 +524,7 @@
   "implementation": {
    "app": "partner-web",
    "route": "/partners/reservations-holds-release-management-ptr-044",
-   "component": "apps/partner-web/src/routes/partners/ReservationsHoldsReleaseManagement.tsx",
+   "component": "src/routes/partners/ReservationsHoldsReleaseManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -700,17 +690,12 @@
    "app": "partner-web",
    "operator": "partner",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "partner-web",
+    "name": "Partner Web",
     "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
+    "siblings": [],
+    "note": "**P10 is its own app, in the ticvai-partner-web repository** (ADAM CR-153, raised by Chitrangi Mestry on 16 October 2026 while scaffolding that repository; accepted by Chinmay, option A). It follows the one-repository-per-app decision of 13 October 2026 and overrides the decision of 10 September 2026, which served P10 from the shared TICVAI Control app with P09, P11, P14 and P17. Its sign-in, navigation and permission filtering are its own shell. The partner users are still not TICVAI staff, and the permission model holds that line as before. The lead confirms that the repository was created on purpose (docs/active/frontend-repos.yaml marks the mapping assumed until then).",
+    "decided": "25 October 2026 (ADAM CR-153)"
    }
   }
  },
@@ -730,7 +715,7 @@
   "implementation": {
    "app": "partner-web",
    "route": "/partners/partner-cancellations-refunds-amendments-ptr-045",
-   "component": "apps/partner-web/src/routes/partners/PartnerCancellationsRefundsAmendments.tsx",
+   "component": "src/routes/partners/PartnerCancellationsRefundsAmendments.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -871,17 +856,12 @@
    "app": "partner-web",
    "operator": "partner",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "partner-web",
+    "name": "Partner Web",
     "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
+    "siblings": [],
+    "note": "**P10 is its own app, in the ticvai-partner-web repository** (ADAM CR-153, raised by Chitrangi Mestry on 16 October 2026 while scaffolding that repository; accepted by Chinmay, option A). It follows the one-repository-per-app decision of 13 October 2026 and overrides the decision of 10 September 2026, which served P10 from the shared TICVAI Control app with P09, P11, P14 and P17. Its sign-in, navigation and permission filtering are its own shell. The partner users are still not TICVAI staff, and the permission model holds that line as before. The lead confirms that the repository was created on purpose (docs/active/frontend-repos.yaml marks the mapping assumed until then).",
+    "decided": "25 October 2026 (ADAM CR-153)"
    }
   }
  },
@@ -901,7 +881,7 @@
   "implementation": {
    "app": "partner-web",
    "route": "/partners/partner-statement-account-activity-ptr-046",
-   "component": "apps/partner-web/src/routes/partners/PartnerStatementAccountActivity.tsx",
+   "component": "src/routes/partners/PartnerStatementAccountActivity.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1104,17 +1084,12 @@
    "app": "partner-web",
    "operator": "partner",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "partner-web",
+    "name": "Partner Web",
     "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
+    "siblings": [],
+    "note": "**P10 is its own app, in the ticvai-partner-web repository** (ADAM CR-153, raised by Chitrangi Mestry on 16 October 2026 while scaffolding that repository; accepted by Chinmay, option A). It follows the one-repository-per-app decision of 13 October 2026 and overrides the decision of 10 September 2026, which served P10 from the shared TICVAI Control app with P09, P11, P14 and P17. Its sign-in, navigation and permission filtering are its own shell. The partner users are still not TICVAI staff, and the permission model holds that line as before. The lead confirms that the repository was created on purpose (docs/active/frontend-repos.yaml marks the mapping assumed until then).",
+    "decided": "25 October 2026 (ADAM CR-153)"
    }
   }
  },
@@ -1134,7 +1109,7 @@
   "implementation": {
    "app": "partner-web",
    "route": "/partners/partner-disputes-cases-service-management-ptr-049",
-   "component": "apps/partner-web/src/routes/partners/PartnerDisputesCasesServiceManagement.tsx",
+   "component": "src/routes/partners/PartnerDisputesCasesServiceManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1352,17 +1327,12 @@
    "app": "partner-web",
    "operator": "partner",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "partner-web",
+    "name": "Partner Web",
     "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
+    "siblings": [],
+    "note": "**P10 is its own app, in the ticvai-partner-web repository** (ADAM CR-153, raised by Chitrangi Mestry on 16 October 2026 while scaffolding that repository; accepted by Chinmay, option A). It follows the one-repository-per-app decision of 13 October 2026 and overrides the decision of 10 September 2026, which served P10 from the shared TICVAI Control app with P09, P11, P14 and P17. Its sign-in, navigation and permission filtering are its own shell. The partner users are still not TICVAI staff, and the permission model holds that line as before. The lead confirms that the repository was created on purpose (docs/active/frontend-repos.yaml marks the mapping assumed until then).",
+    "decided": "25 October 2026 (ADAM CR-153)"
    }
   }
  },
@@ -1382,7 +1352,7 @@
   "implementation": {
    "app": "partner-web",
    "route": "/partners/partner-performance-scorecard-risk-monitoring-ptr-050",
-   "component": "apps/partner-web/src/routes/partners/PartnerPerformanceScorecardRiskMonitoring.tsx",
+   "component": "src/routes/partners/PartnerPerformanceScorecardRiskMonitoring.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1482,17 +1452,12 @@
    "app": "partner-web",
    "operator": "partner",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "partner-web",
+    "name": "Partner Web",
     "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
+    "siblings": [],
+    "note": "**P10 is its own app, in the ticvai-partner-web repository** (ADAM CR-153, raised by Chitrangi Mestry on 16 October 2026 while scaffolding that repository; accepted by Chinmay, option A). It follows the one-repository-per-app decision of 13 October 2026 and overrides the decision of 10 September 2026, which served P10 from the shared TICVAI Control app with P09, P11, P14 and P17. Its sign-in, navigation and permission filtering are its own shell. The partner users are still not TICVAI staff, and the permission model holds that line as before. The lead confirms that the repository was created on purpose (docs/active/frontend-repos.yaml marks the mapping assumed until then).",
+    "decided": "25 October 2026 (ADAM CR-153)"
    }
   }
  },
@@ -1512,7 +1477,7 @@
   "implementation": {
    "app": "partner-web",
    "route": "/partners/partner-ai-intelligence-relationship-optimization-ptr-051",
-   "component": "apps/partner-web/src/routes/partners/PartnerAiIntelligenceRelationshipOptimization.tsx",
+   "component": "src/routes/partners/PartnerAiIntelligenceRelationshipOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1604,17 +1569,12 @@
    "app": "partner-web",
    "operator": "partner",
    "targetApp": {
-    "app": "ticvai-control",
-    "name": "TICVAI Control",
+    "app": "partner-web",
+    "name": "Partner Web",
     "shell": "web",
-    "siblings": [
-     "P09",
-     "P11",
-     "P14",
-     "P17"
-    ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
-    "decided": "10 September 2026"
+    "siblings": [],
+    "note": "**P10 is its own app, in the ticvai-partner-web repository** (ADAM CR-153, raised by Chitrangi Mestry on 16 October 2026 while scaffolding that repository; accepted by Chinmay, option A). It follows the one-repository-per-app decision of 13 October 2026 and overrides the decision of 10 September 2026, which served P10 from the shared TICVAI Control app with P09, P11, P14 and P17. Its sign-in, navigation and permission filtering are its own shell. The partner users are still not TICVAI staff, and the permission model holds that line as before. The lead confirms that the repository was created on purpose (docs/active/frontend-repos.yaml marks the mapping assumed until then).",
+    "decided": "25 October 2026 (ADAM CR-153)"
    }
   }
  }

@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 32 |
-| Operations | 157 |
-| Contracts | 18 |
+| Operations | 158 |
+| Contracts | 19 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 168 |
+| Operations with no screen | 171 |
 | Waves | wave1 32 |
 
 ## Gaps
 
-### 168 operations with no screen here
+### 171 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend an inventory hold's TTL |
-| … | | | 128 more |
+| … | | | 131 more |
 
 ## Modules
 
@@ -79,7 +79,7 @@
 | `POS-001` | Begin Shift | Shift | 1 | 7 | yes |
 | `POS-002` | Sell — Ticket Catalogue | Sell | 1 | 32 | yes |
 | `POS-003` | Sell — Timed Entry | Sell | 1 | 6 | yes |
-| `POS-004` | Sell — Seat Map | Sell | 1 | 8 | yes |
+| `POS-004` | Sell — Seat Map | Sell | 1 | 7 | yes |
 | `POS-005` | Payment | Payment | 1 | 14 | yes |
 | `POS-006` | Held Orders | Sell | 1 | 14 | yes |
 | `POS-007` | Close Shift | Shift | 1 | 10 | yes |
@@ -87,7 +87,7 @@
 | `POS-009` | Staff Roster | Shift | 1 | 3 | yes |
 | `POS-010` | Add to Existing Ticket | Sell | 1 | 4 | yes |
 | `POS-011` | Returns, Refunds & Exchanges | Sell | 1 | 8 | yes |
-| `POS-012` | Omnichannel Order & Fulfilment Center | Sell | 1 | 6 | yes |
+| `POS-012` | Omnichannel Order & Fulfilment Center | Sell | 1 | 7 | yes |
 | `POS-013` | Mobile POS, Event Sales & Offline Operations | Sell | 1 | 3 | yes |
 | `POS-014` | Sales Exceptions, Controls & Operational Actions | Sell | 1 | 4 | yes |
 | `POS-015` | Cash Operations Dashboard | Sell | 1 | 2 | yes |
@@ -100,11 +100,11 @@
 | `POS-022` | Send to Kitchen | Sell | 1 | 5 | yes |
 | `POS-023` | Sell — Merchandise | Sell | 1 | 3 | yes |
 | `POS-024` | Outlet Setup | Sell | 1 | 6 | yes |
-| `POS-025` | Till Home | Sell | 1 | 8 | yes |
-| `POS-026` | Receipt & Reprint | Sell | 1 | 8 | yes |
+| `POS-025` | Till Home | Sell | 1 | 10 | yes |
+| `POS-026` | Receipt & Reprint | Sell | 1 | 7 | yes |
 | `POS-027` | Guest Lookup | Sell | 1 | 5 | yes |
 | `POS-028` | Table Service | Sell | 1 | 13 | yes |
-| `POS-029` | Order Queue | Sell | 1 | 4 | yes |
+| `POS-029` | Order Queue | Sell | 1 | 5 | yes |
 | `POS-030` | Sales Journal | Sell | 1 | 8 | yes |
 | `POS-031` | Reservations & Group Arrivals | Sell | 1 | 9 | yes |
 

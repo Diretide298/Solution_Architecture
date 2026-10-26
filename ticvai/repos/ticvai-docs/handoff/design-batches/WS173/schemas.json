@@ -2,6 +2,11 @@
  "AccessibleSeating": {
   "type": "object",
   "x-ticvai-persistence": "seating.accessible",
+  "x-ticvai-unique-together": [
+   [
+    "seatMapId"
+   ]
+  ],
   "description": "Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an accessible seat.**\n",
   "properties": {
    "seatMapId": {
@@ -173,6 +178,13 @@
       }
      }
     }
+   },
+   "maxSeatsPerGuestOrder": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 50,
+    "readOnly": true,
+    "description": "**The most seats one guest booking may hold at this performance's venue** (ADAM CR-187, 25 October 2026): the venue's `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7), read through `tenancy#venueSettingsRecords` (the venue's row, else the tenant's own row, else 10). A guest screen caps its party stepper with it before anything is held (WEB-007, GST-049); `createSeatHold` still refuses more with `422` `seat-limit-exceeded`, whose `maxSeats` is this value on a guest channel. Computed, not stored."
    },
    "zones": {
     "type": "array",
@@ -413,6 +425,13 @@
  "SeatRecommendationRules": {
   "type": "object",
   "x-ticvai-persistence": "seating.recommendation_rule",
+  "x-ticvai-unique-together": [
+   [
+    "seatMapId",
+    "performanceId"
+   ]
+  ],
+  "x-ticvai-unique-nulls": "not-distinct",
   "description": "Board 9, and the 21 August minute: *\"best-seat ranking… must be configurable per seat map/event.\"* **Five kinds, one scoring model** — five algorithms would eventually contradict each other.\n",
   "properties": {
    "seatMapId": {

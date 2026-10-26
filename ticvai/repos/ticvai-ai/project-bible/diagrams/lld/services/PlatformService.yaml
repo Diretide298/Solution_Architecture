@@ -1,10 +1,10 @@
 id: LLD-PlatformService
-title: PlatformService — 229 operations, 113 tables
+title: PlatformService — 234 operations, 119 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**Three contracts, two schemas, 113 tables.** Subscription, platform operations and the public
+why: '**Three contracts, two schemas, 119 tables.** Subscription, platform operations and the public
   API all write `control.*` — **they are one bounded context that was split into three contracts for
   API-surface reasons, not for data reasons.**
 
@@ -14,14 +14,14 @@ why: '**Three contracts, two schemas, 113 tables.** Subscription, platform opera
 scale: Low volume, high consequence. Tenant provisioning and licensing.
 ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
 coverage:
-  operations: 229
+  operations: 234
   inAFlow: 80
-  percent: 35%
+  percent: 34%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: control
-  tables: 104
+  tables: 110
   stores:
   - postgres
   largestTable: control.partner_agreement
@@ -32,7 +32,7 @@ schemas:
   largestTable: subscription.membership_product
 operationsByContract:
 - contract: subscription
-  count: 153
+  count: 156
   operations:
   - operation: actOnPartnerApplicationReview
     verb: POST
@@ -256,7 +256,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_BILLING_MANAGE
     offline: false
-    reads: 9
+    reads: 11
     writes: 3
   - operation: getBillingEntity
     verb: GET
@@ -304,7 +304,7 @@ operationsByContract:
     scope: platform
     permission: PLATFORM_BILLING_VIEW
     offline: false
-    reads: 0
+    reads: 1
     writes: 0
   - operation: getCommissionStatement
     verb: GET
@@ -417,6 +417,14 @@ operationsByContract:
     permission: PLATFORM_BILLING_MANAGE
     offline: false
     reads: 5
+    writes: 5
+  - operation: issueInvoice
+    verb: POST
+    path: /invoices/{invoiceId}/issue
+    scope: tenant
+    permission: PLATFORM_BILLING_MANAGE
+    offline: false
+    reads: 3
     writes: 4
   - operation: launchCellCluster
     verb: POST
@@ -552,7 +560,7 @@ operationsByContract:
     scope: tenant
     permission: PLATFORM_TENANT_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 0
   - operation: listMemberLifecycleCase
     verb: GET
@@ -770,6 +778,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: listPlatformTaxRates
+    verb: GET
+    path: /platform-tax-rates
+    scope: tenant
+    permission: PLATFORM_BILLING_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listRenewalAuto
     verb: GET
     path: /renewal-auto
@@ -952,7 +968,7 @@ operationsByContract:
     scope: platform
     permission: PLATFORM_PLAN_MANAGE
     offline: false
-    reads: 1
+    reads: 2
     writes: 2
   - operation: setAgreementContractTerm
     verb: PUT
@@ -1154,6 +1170,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: setPlatformTaxRate
+    verb: PUT
+    path: /platform-tax-rates/{taxRateId}
+    scope: tenant
+    permission: PLATFORM_BILLING_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
   - operation: setRenewalAutoMembership
     verb: PUT
     path: /renewal-auto-membership
@@ -1582,7 +1606,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: public-api
-  count: 36
+  count: 38
   operations:
   - operation: certifyIntegration
     verb: POST
@@ -1599,7 +1623,7 @@ operationsByContract:
     permission: DEVELOPER_MANAGE
     offline: false
     reads: 5
-    writes: 2
+    writes: 3
   - operation: createSandbox
     verb: POST
     path: /sandboxes
@@ -1654,7 +1678,7 @@ operationsByContract:
     scope: tenant
     permission: DEVELOPER_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 1
   - operation: listApiAnomalies
     verb: GET
@@ -1683,7 +1707,7 @@ operationsByContract:
   - operation: listApiLicences
     verb: GET
     path: /api-licensing
-    scope: tenant
+    scope: platform
     permission: DEVELOPER_ADMIN
     offline: false
     reads: 1
@@ -1725,6 +1749,14 @@ operationsByContract:
     path: /listings
     scope: tenant
     permission: DEVELOPER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMarketplaceListings
+    verb: GET
+    path: /marketplace/listings
+    scope: platform
+    permission: null
     offline: false
     reads: 1
     writes: 0
@@ -1771,11 +1803,11 @@ operationsByContract:
   - operation: registerDeveloper
     verb: POST
     path: /developers
-    scope: tenant
-    permission: DEVELOPER_VIEW
+    scope: platform
+    permission: null
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: replayEvents
     verb: POST
     path: /webhook-subscriptions/{subscriptionId}/replay
@@ -1807,7 +1839,7 @@ operationsByContract:
     permission: DEVELOPER_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: rotateApiCredential
     verb: POST
     path: /api-clients/{clientId}/credentials
@@ -1815,7 +1847,7 @@ operationsByContract:
     permission: DEVELOPER_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: setApiAnomalyRule
     verb: PUT
     path: /api-anomaly-rules/{anomalyRuleId}
@@ -1835,10 +1867,10 @@ operationsByContract:
   - operation: setApiLicensing
     verb: PUT
     path: /api-licensing/{licenceId}
-    scope: tenant
+    scope: platform
     permission: DEVELOPER_ADMIN
     offline: false
-    reads: 2
+    reads: 3
     writes: 3
   - operation: setApiQuota
     verb: PUT
@@ -1869,6 +1901,14 @@ operationsByContract:
     path: /webhook-subscriptions/{subscriptionId}/test
     scope: tenant
     permission: DEVELOPER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: verifyDeveloper
+    verb: POST
+    path: /developers/{developerId}/verify
+    scope: platform
+    permission: DEVELOPER_ADMIN
     offline: false
     reads: 2
     writes: 2
@@ -1927,6 +1967,7 @@ tables:
   - generateInvoice
   - issueApiToken
   - issueCreditNote
+  - issueInvoice
   - launchCellCluster
   - pauseRollout
   - planMigration
@@ -1989,6 +2030,7 @@ tables:
   - setPartnerSecurity
   - setPaymentTermBilling
   - setPlanTiers
+  - setPlatformTaxRate
   - setRenewalAutoMembership
   - setScalingPolicy
   - setSubscription
@@ -2008,6 +2050,7 @@ tables:
   - updateCellTier
   - updatePartnerAgreement
   - updateTenant
+  - verifyDeveloper
   - withdrawRelease
   readBy:
   - actOnPartnerApplicationReview
@@ -2052,6 +2095,7 @@ tables:
   - generateInvoice
   - issueApiToken
   - issueCreditNote
+  - issueInvoice
   - launchCellCluster
   - pauseRollout
   - planMigration
@@ -2114,6 +2158,7 @@ tables:
   - setPartnerSecurity
   - setPaymentTermBilling
   - setPlanTiers
+  - setPlatformTaxRate
   - setRenewalAutoMembership
   - setScalingPolicy
   - setSubscription
@@ -2133,6 +2178,7 @@ tables:
   - updateCellTier
   - updatePartnerAgreement
   - updateTenant
+  - verifyDeveloper
   - withdrawRelease
   keys:
     setApiLicensing:
@@ -2212,6 +2258,13 @@ tables:
   writtenBy:
   - public-api
   foreignWriters: null
+- table: control.api_client_secret
+  columns: 7
+  store: postgres
+  parent: control.api_client
+  writtenBy:
+  - public-api
+  foreignWriters: null
 - table: control.api_licence
   columns: 9
   store: postgres
@@ -2252,7 +2305,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: control.billing_entity
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -2266,7 +2319,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: control.capacity_pack
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -2342,14 +2395,14 @@ tables:
   - platform-ops
   foreignWriters: null
 - table: control.contract
-  columns: 12
+  columns: 14
   store: postgres
-  parent: control.tenant
+  parent: null
   writtenBy:
   - subscription
   foreignWriters: null
 - table: control.credit_note
-  columns: 13
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -2411,7 +2464,7 @@ tables:
   - public-api
   foreignWriters: null
 - table: control.invoice
-  columns: 14
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -2424,10 +2477,17 @@ tables:
   writtenBy:
   - subscription
   foreignWriters: null
-- table: control.licence_add_on
-  columns: 10
+- table: control.invoice_number_sequence
+  columns: 6
   store: postgres
-  parent: control.tenant
+  parent: null
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.licence_add_on
+  columns: 11
+  store: postgres
+  parent: null
   writtenBy:
   - subscription
   foreignWriters: null
@@ -2439,7 +2499,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: control.licensing_model
-  columns: 13
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -2485,7 +2545,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: control.module_listing
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -2707,7 +2767,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: control.plan
-  columns: 16
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -2724,6 +2784,31 @@ tables:
   columns: 4
   store: postgres
   parent: control.plan
+  writtenBy:
+  - subscription
+  foreignWriters: null
+- table: control.platform_operator
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: control.platform_operator_mfa
+  columns: 9
+  store: postgres
+  parent: control.platform_operator
+  writtenBy: []
+  foreignWriters: null
+- table: control.platform_session
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: control.platform_tax_rate
+  columns: 7
+  store: postgres
+  parent: null
   writtenBy:
   - subscription
   foreignWriters: null
@@ -2904,7 +2989,7 @@ tables:
   - public-api
   foreignWriters: null
 - table: control.webhook_replay
-  columns: 9
+  columns: 11
   store: postgres
   parent: null
   writtenBy:

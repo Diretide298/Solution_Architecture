@@ -273,127 +273,93 @@
       {
        "kind": "metricTile",
        "label": "Order Number",
+       "operation": "getOrder",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.orderNumber"
+       "bindsTo": "Order.orderNumber"
       },
       {
        "kind": "metricTile",
        "label": "Order Date/Time",
+       "operation": "getOrder",
+       "bindsTo": "Order.createdAt",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Order Status",
+       "operation": "getOrder",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.orderStatus"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Reservation Status",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.reservationStatus"
+       "bindsTo": "Order.status"
       },
       {
        "kind": "metricTile",
        "label": "Customer",
+       "operation": "getOrder",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.customer"
+       "bindsTo": "Order.subjectId"
       },
       {
        "kind": "metricTile",
        "label": "Channel",
+       "operation": "getOrder",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.channel"
+       "bindsTo": "Order.channel"
       },
       {
        "kind": "metricTile",
        "label": "Sales Location",
+       "operation": "getOrder",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.salesLocation"
+       "bindsTo": "Order.workstationId"
       },
       {
        "kind": "metricTile",
        "label": "Cashier/Agent",
+       "operation": "getOrder",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.cashierAgent"
+       "bindsTo": "Order.principalId"
       },
       {
        "kind": "metricTile",
        "label": "Currency",
+       "operation": "getOrder",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.currency"
+       "bindsTo": "Order.currency"
       },
       {
        "kind": "metricTile",
        "label": "Total",
+       "operation": "getOrder",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.total"
+       "bindsTo": "Order.grossAmount"
       },
       {
        "kind": "metricTile",
        "label": "Payment Status",
+       "operation": "getOrder",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.paymentStatus"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Fulfillment Status",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Display",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.fulfillmentStatus"
+       "bindsTo": "Order.payments"
       },
       {
        "kind": "metricTile",
        "label": "Tickets",
+       "operation": "getOrder",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.tickets"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Reservations",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.reservations"
+       "bindsTo": "Order.lines[].entitlementIds"
       },
       {
        "kind": "metricTile",
        "label": "Payments",
+       "operation": "getOrderStatement",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.payments"
+       "bindsTo": "OrderStatement.totalPaid"
       },
       {
        "kind": "metricTile",
        "label": "Refunds",
+       "operation": "getOrderStatement",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.refunds"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Invoices",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.invoices"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Credentials",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.credentials"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Membership",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.membership"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Waivers",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.waivers"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Related Orders",
-       "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Show",
-       "bindsTo": "OrderDetailTransactionWorkspaceView.relatedOrders"
+       "bindsTo": "OrderStatement.totalRefunded"
       },
       {
        "kind": "detailPanel",
@@ -423,23 +389,19 @@
       {
        "kind": "detailPanel",
        "label": "The selected order detail transaction",
-       "bindsTo": "OrderDetailTransactionWorkspaceView",
+       "operation": "getOrder",
+       "bindsTo": "Order",
        "columns": [
-        "OrderDetailTransactionWorkspaceView.lines[].product",
-        "OrderDetailTransactionWorkspaceView.lines[].ticketType",
-        "OrderDetailTransactionWorkspaceView.lines[].event",
-        "OrderDetailTransactionWorkspaceView.lines[].performance",
-        "OrderDetailTransactionWorkspaceView.date",
-        "OrderDetailTransactionWorkspaceView.lines[].timeslot",
-        "OrderDetailTransactionWorkspaceView.lines[].quantity",
-        "OrderDetailTransactionWorkspaceView.lines[].personType",
-        "OrderDetailTransactionWorkspaceView.lines[].seat",
-        "OrderDetailTransactionWorkspaceView.lines[].unitPrice",
-        "OrderDetailTransactionWorkspaceView.lines[].discount",
-        "OrderDetailTransactionWorkspaceView.lines[].tax",
-        "OrderDetailTransactionWorkspaceView.lines[].fee",
-        "OrderDetailTransactionWorkspaceView.total",
-        "OrderDetailTransactionWorkspaceView.lines[].ticketStatus"
+        "Order.lines[].variantId",
+        "Order.lines[].performanceId",
+        "Order.createdAt",
+        "Order.lines[].bookedWindow",
+        "Order.lines[].quantity",
+        "Order.lines[].seatIds",
+        "Order.lines[].serverUnitPrice",
+        "Order.lines[].discounts",
+        "Order.lines[].taxAmount",
+        "Order.grossAmount"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Order Total”, “Internal Notes”.",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 5 §Each line should display"

@@ -1848,6 +1848,7 @@
        "kind": "detailPanel",
        "label": "The selected promotion approval",
        "bindsTo": "ApprovalRequest",
+       "operation": "listPromotions",
        "columns": [
         "Promotion",
         "Request type",

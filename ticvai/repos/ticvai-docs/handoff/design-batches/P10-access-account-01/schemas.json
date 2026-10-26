@@ -307,6 +307,9 @@
    },
    "grantedBySubjectId": {
     "grantedByKind": "subject"
+   },
+   "revokedBySubjectId": {
+    "revokedByKind": "subject"
    }
   },
   "type": "object",
@@ -393,7 +396,7 @@
    "overObjectRef": {
     "type": "string",
     "nullable": true,
-    "description": "**Where the authority is over a thing rather than a scope** — a wallet, an entitlement, a booking. `scopePath` answers *where*; this answers *what*, and a guest's authority is almost always over a specific object rather than a branch of the tree.\n"
+    "description": "**Where the authority is over a thing rather than a scope** — a wallet, an entitlement, a booking. `scopePath` answers *where*; this answers *what*, and a guest's authority is almost always over a specific object rather than a branch of the tree.\n\n**Written as `<kind>:<id>`.** An entitlement share is `entitlement:<entitlementId>` (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004).\n"
    },
    "delegationKind": {
     "type": "string",
@@ -405,9 +408,10 @@
      "attendee",
      "corporateAdmin",
      "corporateMember",
-     "carer"
+     "carer",
+     "sharedEntitlement"
     ],
-    "description": "**What kind of relationship this expresses**, for display and for reporting. The mechanism does not branch on it — a family member and a group attendee are the same grant with different words around them, which is the point.\n"
+    "description": "**What kind of relationship this expresses**, for display and for reporting. The mechanism does not branch on it — a family member and a group attendee are the same grant with different words around them, which is the point.\n\n**`sharedEntitlement` is the row an entitlement share is** (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004). `shareEntitlement` writes exactly: `overObjectRef` `entitlement:<entitlementId>`, `subjectId` the recipient, `overSubjectId` the owner, `permission` `ENTITLEMENT_USE` with `roleId` null, `delegationKind` `sharedEntitlement`, `effect` ALLOW, `validTo` the request's `validUntil`, `grantedByKind` `subject` with `grantedBySubjectId` the owner. `revokeEntitlementShare` finds the row by the path's `shareId` and matches it to the path's `entitlementId` through `overObjectRef`; a row that does not match is 404. Orders' `EntitlementShare` is this row seen through the share.\n"
    },
    "quota": {
     "type": "integer",
@@ -441,6 +445,25 @@
     "nullable": true,
     "readOnly": true,
     "description": "Taken from `identity.user_access`. This table recorded `revokedBy` and not when, so it could say who revoked a grant and not whether it was before or after the thing somebody is asking about.\n"
+   },
+   "revokedByKind": {
+    "type": "string",
+    "enum": [
+     "principal",
+     "subject",
+     "system"
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Who revoked the grant** (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004): a staff member (`revoked_by_principal_id`), a guest (`revokedBySubjectId`, for example the owner taking back an entitlement share) or the system (an expiry sweep). Null while the grant is live."
+   },
+   "revokedBySubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "pii.subject",
+    "description": "The guest who revoked the grant; set when `revokedByKind` is `subject` (ADAM CR-209), since a guest is not a principal and cannot fill `revoked_by_principal_id`."
    },
    "validFrom": {
     "type": "string",
@@ -771,7 +794,7 @@
     "nullable": true,
     "writeOnly": true,
     "x-ticvai-secret": "field-encrypted",
-    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`."
+    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code."
    },
    "destination": {
     "type": "string",
@@ -1080,11 +1103,11 @@
       "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
      }
     ],
-    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks only: it never decides an operation by itself (ADAM CR-189). Anything scope-sensitive uses `permissionsByScope`.\n"
    },
    "permissionsByScope": {
     "type": "array",
-    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "description": "Permissions effective at each granted scope path, after deny resolution. Clients filter navigation on this and never compute permissions themselves.\n\n**The server keeps the same set and authorises from it** (decided 25 October 2026, Chinmay, ADAM CR-189 option A; CHG-R10ID-001). The rule for every operation: `x-ticvai-permission` is evaluated at the scope the operation acts on, from the per-scope set (the node acted on or one of its ancestors); `effectivePermissions` is for coarse checks only. A list's reach is the scope paths where its permission holds, and a filter outside it is `403`; a tenant-level operation needs its permission at the tenant root. The request kernel's seam carries this set beside the flat one (#27692 owns the field) and sign-in (#27666) fills it from the same resolution that fills this property; tests fill the seam until sign-in lands. The full statement is `docs/architecture/specs/permission-resolution.md` section 7.2. No wire shape changes.\n",
     "items": {
      "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
     }

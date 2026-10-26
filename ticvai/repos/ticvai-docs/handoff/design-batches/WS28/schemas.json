@@ -437,6 +437,13 @@
      "complete",
      "cancelled"
     ]
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "readOnly": true,
+    "description": "**The row's version, its ETag** (accepted 26 October 2026, Chinmay, ADAM CR-257 option A): 1 on create and bumped on every write; `getGroupBooking` and `updateGroupBooking` send it as `ETag`, and `updateGroupBooking` checks `If-Match` against it (`412` on a mismatch)."
    }
   }
  },
@@ -2088,7 +2095,7 @@
      }
     ],
     "readOnly": true,
-    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192; common.yaml `Money.scale`), when it is not the currency the venue trades in."
    },
    "chargeRateLockedUntil": {
     "type": "string",
@@ -2600,10 +2607,10 @@
     "type": "string",
     "enum": [
      "confirmed",
-     "namesPending",
      "complete",
      "cancelled"
-    ]
+    ],
+    "description": "`namesPending` is set by the timer, never by a PATCH: sending it is `400` on `status` (ADAM CR-257). The state model decides which move is allowed (`updateGroupBooking`)."
    }
   }
  }

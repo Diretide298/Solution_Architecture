@@ -338,6 +338,7 @@ operations:
   - guest
   offline: true
   reads:
+  - promotions.bundle
   - promotions.bundle_choice_group
   - promotions.bundle_choice_option
   - promotions.bundle_component
@@ -1961,7 +1962,10 @@ operations:
   - promotions.bundle_component
   writes:
   - cache:idempotency
+  - catalogue.product
+  - catalogue.variant
   - promotions.allocation_component
+  - promotions.allocation_split
   - promotions.bundle
   - promotions.bundle_component
   - promotions.promotion_audit

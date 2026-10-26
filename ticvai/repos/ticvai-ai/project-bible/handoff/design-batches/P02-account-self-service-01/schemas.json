@@ -278,6 +278,12 @@
  "Entitlement": {
   "type": "object",
   "x-ticvai-persistence": "access.entitlement",
+  "x-ticvai-index": [
+   [
+    "venueId",
+    "changeVersion"
+   ]
+  ],
   "description": "**What a guest actually holds.** Found missing on 18 August by the schema audit — 33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.\nThe package sold products, defined `EntitlementTemplate`, recorded `ScanEvent.ticketId`, transferred `ticket_transfer.ticketIds` and issued `wallet_pass.entitlementId` — **five artefacts referring to a thing that did not exist.** `validateAccess` read the *template* and never the instance, and `suspendEntitlement` suspended the template, **which would have suspended it for every guest who held one.**\n**The template is the definition and this is the instance.** A template says *an annual pass admits once a day for a year*; this says *this guest's annual pass, bought on 3 March, used eleven times, frozen for two weeks in July, valid until 2 March.*\n",
   "required": [
    "id",
@@ -287,7 +293,8 @@
    "subjectId",
    "status",
    "validFrom",
-   "validTo"
+   "validTo",
+   "changeVersion"
   ],
   "properties": {
    "id": {
@@ -347,7 +354,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed.\n"
+    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed. **Null for a guest checkout** (ADAM CR-167, CHG-R10ORD-010): `issueOrderEntitlements` leaves it null where `order.paid` names no subject; the field is always present, null or not.\n"
    },
    "venueId": {
     "type": "string",
@@ -359,6 +366,28 @@
    "mediaCode": {
     "type": "string",
     "description": "What is scanned — a QR payload, a wristband serial, a card number. **Rotatable without reissuing**, because a guest whose wristband broke should not need a new ticket.\n"
+   },
+   "changeVersion": {
+    "type": "integer",
+    "format": "int64",
+    "readOnly": true,
+    "x-ticvai-change-version": true,
+    "description": "**What the offline package's delta counts** (ADAM CR-239, option A; Chinmay, 25 October 2026; CHG-R10ORD-011). Set from a per-database sequence by a BEFORE INSERT OR UPDATE trigger, so every operation that writes `access.entitlement` (seventeen of them, in three contracts) moves it without remembering to; never set by an operation and never sent. `OfflinePackage.entitlementsVersion` is the highest of the package's rows, and `sinceVersion` selects the rows above it, void and used ones included. Indexed with `venueId`."
+   },
+   "mediaLinkedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**When the entitlement was put on its media** (ADAM CR-226, option A; Chinmay, 25 October 2026; CHG-R10ORD-012): written when `mediaCode` is set or rotated: at issue (`issueOrderEntitlements`, onto new media or, through `appendEntitlementToMedia`'s order, onto media the guest already holds), and whenever an operation replaces or rotates the code (`replaceCredential`, `getEntitlementCredential` with `rotate=true`). Not `validFrom`, which is the validity window's start. `MediaEntitlements` answers it as `addedAt`."
+   },
+   "rotationSecret": {
+    "type": "string",
+    "nullable": true,
+    "writeOnly": true,
+    "x-ticvai-column": "rotation_secret_ciphertext",
+    "x-ticvai-secret": "field-encrypted",
+    "description": "**The rotation seed, stored on the entitlement** (ADAM CR-167, option A; CHG-R10ORD-010): the Base32 shared secret the rotating code is derived from (`getEntitlementCredential` `rotation.secret`, audit R230), written by `issueOrderEntitlements` at issue for a `platformSignedQr` entitlement and replaced by `getEntitlementCredential` with `rotate=true`; encrypted with the tenant's field key (ADR-0063). Null for a `staticQr` or `rfidCard` entitlement, which does not rotate. Never returned except as `rotation` to the holder or a staff caller."
    },
    "credentialFormat": {
     "allOf": [
@@ -1460,10 +1489,35 @@
  },
  "GuestSession": {
   "x-ticvai-persistence": "none — Redis session registry",
+  "description": "**A guest sign-in's answer: the session and its new tokens** (`registerGuest`, `verifyGuestOtp`, `guestPasswordLogin`, `guestSocialLogin`, `guestUaePassLogin`). **Tokens come with a sign-in, never with a read** (accepted 15 October 2026 and approved by the lead as a breaking response change, ADAM CR-100; CHG-R10ID-009; BC-482), as on the staff side, where `LoginResponse` carries tokens and `Session` does not: `getGuestSession` returns `GuestSessionView`, the same session without `tokens`.",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/GuestSessionView"
+   },
+   {
+    "type": "object",
+    "required": [
+     "tokens"
+    ],
+    "properties": {
+     "tokens": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/TokenPair"
+       }
+      ],
+      "description": "The new access and refresh tokens; `refreshToken` returns the next pair. A guest's refresh token is stored as an `identity.refresh_token` row with `subjectId` set (`IdentityRefreshToken`)."
+     }
+    }
+   }
+  ]
+ },
+ "GuestSessionView": {
+  "x-ticvai-persistence": "none — Redis session registry",
   "type": "object",
+  "description": "**The guest session as `getGuestSession` reads it: no tokens** (accepted 15 October 2026, ADAM CR-100; CHG-R10ID-009; BC-482). A read never issues or rotates a token, so it stays a read and stays offline-capable; `GuestSession` (a sign-in's answer) is this plus `tokens`.",
   "required": [
    "subjectId",
-   "tokens",
    "isVerified",
    "expiresAt"
   ],
@@ -1475,9 +1529,6 @@
    "displayName": {
     "type": "string",
     "nullable": true
-   },
-   "tokens": {
-    "$ref": "#/components/schemas/TokenPair"
    },
    "isVerified": {
     "type": "boolean",
@@ -1585,7 +1636,7 @@
     "nullable": true,
     "writeOnly": true,
     "x-ticvai-secret": "field-encrypted",
-    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`."
+    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code."
    },
    "destination": {
     "type": "string",
@@ -1749,7 +1800,7 @@
      }
     ],
     "readOnly": true,
-    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192; common.yaml `Money.scale`), when it is not the currency the venue trades in."
    },
    "chargeRateLockedUntil": {
     "type": "string",
@@ -2071,7 +2122,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+    "description": "The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-018)."
    },
    "fxRate": {
     "allOf": [
@@ -2218,8 +2269,7 @@
  "RegisterGuestRequest": {
   "type": "object",
   "required": [
-   "identifier",
-   "channel"
+   "identifier"
   ],
   "properties": {
    "identifier": {
@@ -2233,7 +2283,8 @@
      "email",
      "sms",
      "whatsapp"
-    ]
+    ],
+    "description": "**Optional for a mobile number** (ADAM CR-222, 25 October 2026): left out, the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delivery (DI-209), as `requestGuestOtp` does; an email identifier sends email. A caller that sends `channel` still gets it (additive)."
    },
    "displayName": {
     "type": "string",
@@ -2347,11 +2398,11 @@
       "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
      }
     ],
-    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks only: it never decides an operation by itself (ADAM CR-189). Anything scope-sensitive uses `permissionsByScope`.\n"
    },
    "permissionsByScope": {
     "type": "array",
-    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "description": "Permissions effective at each granted scope path, after deny resolution. Clients filter navigation on this and never compute permissions themselves.\n\n**The server keeps the same set and authorises from it** (decided 25 October 2026, Chinmay, ADAM CR-189 option A; CHG-R10ID-001). The rule for every operation: `x-ticvai-permission` is evaluated at the scope the operation acts on, from the per-scope set (the node acted on or one of its ancestors); `effectivePermissions` is for coarse checks only. A list's reach is the scope paths where its permission holds, and a filter outside it is `403`; a tenant-level operation needs its permission at the tenant root. The request kernel's seam carries this set beside the flat one (#27692 owns the field) and sign-in (#27666) fills it from the same resolution that fills this property; tests fill the seam until sign-in lands. The full statement is `docs/architecture/specs/permission-resolution.md` section 7.2. No wire shape changes.\n",
     "items": {
      "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
     }
@@ -2381,6 +2432,79 @@
     "type": "string",
     "format": "date-time",
     "description": "When the session ends at the latest: `openedAt` plus `PasswordPolicy.sessionMaxHours` (12 hours by default; proposed, client to correct). A till session ends earlier, when the shift on its workstation closes; any session ends at `logout` or a revocation. Refreshing the access token never moves this time (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014)."
+   }
+  }
+ },
+ "SubjectDataExportStatus": {
+  "x-ticvai-persistence": "none — computed from identity.subject_data_export",
+  "type": "object",
+  "description": "**Where a guest's data export has got to, and the link to download it** (ADAM CR-101; CHG-R10ID-016), the answer of `getSubjectDataExport`. The link is issued afresh by each read of a `ready` export and is never stored.",
+  "required": [
+   "requestId",
+   "subjectId",
+   "format",
+   "status",
+   "requestedAt"
+  ],
+  "properties": {
+   "requestId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "format": {
+    "type": "string",
+    "enum": [
+     "json",
+     "csv",
+     "pdf"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "awaitingApproval",
+     "running",
+     "ready",
+     "failed",
+     "rejected",
+     "expired"
+    ],
+    "description": "As `SubjectDataExport.status`."
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "readyAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "downloadUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "description": "A signed link to the file in the tenant's private storage, valid for five minutes from this answer (as the package's other short-lived signed links); null unless `status` is `ready`. Read again for a new link."
+   },
+   "downloadUrlExpiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When `downloadUrl` stops working; null with no link."
+   },
+   "fileSizeBytes": {
+    "type": "integer",
+    "format": "int64",
+    "nullable": true
+   },
+   "failureReason": {
+    "type": "string",
+    "nullable": true,
+    "description": "Why the job failed, with `failed`; null otherwise."
    }
   }
  },

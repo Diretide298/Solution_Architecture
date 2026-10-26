@@ -325,8 +325,8 @@ operations:
   offline: false
   reads:
   - ledger.account
-  - ledger.event_budget
   - ledger.fiscal_period
+  - ledger.journal_entry
   - ledger.posting
   writes: []
 - operation: getUnifiedReconciliation

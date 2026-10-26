@@ -257,6 +257,9 @@
    {
     "id": "formConfigureWorkstation",
     "component": "modal",
+    "reads": [
+     "listSaleBoards"
+    ],
     "trigger": "Configure workstation",
     "body": "**Collects what `configureWorkstation` sends before it is called.** Required: `name`. Optional: `saleBoardId` (absent or null, the till uses its outlet's board; DEC-183, CHG-CSP-006), `outletId`, `cashDrawerLimit` (null inherits the venue's; DEC-179, CHG-CSP-016), `cashierInputMode`, `guestDisplayContent`, `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. **The form opens filled with the workstation as `getWorkstation` returns it and sends it back whole**: the call replaces the configuration, so a field left out takes its default (`cashierInputMode` `hybrid`, `guestDisplayContent` line items only, `isActive` on) or is cleared (ADAM CR-082, CHG-TEN-003). Dismissing sends nothing; the screen behind is unchanged. Not asked: `loadedMediaStockId` and `mediaStockRemaining`, deprecated and stored nowhere until BL-095 (the media stock record, on the printer device, waits on the BOCA stock answer; CHG-TEN-003). Refused `409 shift-open` while a shift is open on the till, naming the shift (CHG-TEN-004).",
     "bindsTo": "ConfigureWorkstationRequest",
@@ -365,6 +368,12 @@
      "getWorkstationHealth",
      "listWorkstations"
     ]
+   },
+   {
+    "operationId": "listSaleBoards",
+    "contract": "tenancy",
+    "purpose": "The venue's sale boards, to pick the workstation's board in Configure workstation (check-screen-value-sources, CHG-R10UI-015)",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -835,6 +844,12 @@
     "purpose": "The corrective actions, open first, whose id record, sign, escalate and close take: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
     "trigger": "onLoad",
     "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "getRegionSettings",
+    "contract": "tenancy",
+    "purpose": "Sent when an outlet form opens, not a control: the region's localLanguageNameLocales, the local-language names the form asks for (check-screen-value-sources, CHG-R10UI-015)",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -851,6 +866,11 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "regionId",
+     "from": "session",
+     "notes": "The region of the session's venue, for `getRegionSettings` (its localLanguageNameLocales: which local-language names an outlet asks for; check-screen-value-sources, CHG-R10UI-015)."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `outletId`, `actionId`.",

@@ -4508,7 +4508,7 @@
        "kind": "calendarView",
        "label": "Calendar",
        "operation": "listPerformances",
-       "notes": "Performances by day, week or month; a slot opens its performance. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Sends the visible window as `from`/`to` and the category filter as `categoryId`.",
+       "notes": "Performances by day, week or month; a slot opens its performance. Day, week, month and agenda views; the day starts at the venue's `calendarDayStartHour`. Sends the visible window as `from`/`to`. No category filter: the approved screen has no element for one, so its options read (`listProductCategories`) is not declared here (CHG-R10OPN-005, ADAM CR-262; Chinmay, 26 October 2026).",
        "provenance": "decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)"
       },
       {
@@ -4795,13 +4795,6 @@
     "contract": "catalogue",
     "purpose": "List performances of an event",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "listProductCategories",
-    "contract": "catalogue",
-    "purpose": "The options of the calendar's category filter (r8, GPS-C18), read once when the screen opens; the chosen category is sent to `listPerformances` as `categoryId`. No component of its own: the filter is part of the calendar. Not background (r8 integration, CHG-R8INT-008): the user sees the options, and the approved screen has no element of its own for the filter.",
-    "trigger": "onLoad",
-    "provenance": "r8 second round, GPS-C18 (ticket 28195)"
    },
    {
     "operationId": "getPerformance",

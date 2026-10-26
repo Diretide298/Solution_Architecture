@@ -463,6 +463,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS182 Upsell,CrossSellEngine Board 5.dc.html#adm-680`
 - Workshop pack: Upsell,CrossSellEngine.pdf board 5
 - Flow F291 *Upsell,CrossSellEngine board 5: Personalization & NBO Command Center*, step 2: Works in Customer Recommendation Profile → Provide the recommendation engine's commercially relevant customer context used for personalization. This should not become another CRM profile screen. CRM remains the authoritative source of …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

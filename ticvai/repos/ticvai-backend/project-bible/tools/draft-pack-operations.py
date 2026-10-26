@@ -52,6 +52,9 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import contract_shapes as CS  # noqa: E402 -- the r10 patterns, written by default (CHG-R10GEN-007)
+
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
 LINEAGE = ROOT / "handoff" / "api-data-lineage.json"
@@ -146,6 +149,16 @@ def module_of(pack: str) -> str:
     return stem.replace("_", " ").strip()
 
 
+def _service_of() -> dict:
+    """contract stem -> its service (handoff/service-decomposition.json), the reader of a drafted operation."""
+    p = ROOT / "handoff" / "service-decomposition.json"
+    svcs = (json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}).get("services") or {}
+    return {c: s for s, v in svcs.items() for c in v.get("contracts") or []}
+
+
+SERVICE_OF = _service_of()
+
+
 def conventions(lin: dict) -> dict:
     """Each contract's own permission and scope habits, split by read and write."""
     out = {}
@@ -181,8 +194,41 @@ def collect():
     return rows
 
 
-def block(oid, verb, screen_ref, summary, purpose, perm, scope, aud, ref, array, page, module):
+# The envelope's properties and required list (ENVELOPE below), for the order a drafted list states.
+ENVELOPE_PROPS = {"id": {}, "name": {}, "state": {}, "updatedAt": {}}
+ENVELOPE_REQUIRED = ["id"]
+
+
+def r10_parts(oid, verb, perm, scope, aud, array, purpose, route=None, reader=None, routes=None):
+    """**The r10 patterns a drafted operation carries from its first draft** (CHG-R10GEN-007): (b) a list states its
+    order, nulls last then `id` (CR-206, CR-236, CR-190); (g) its permission is evaluated per scope (CR-189); (f) a
+    public guest read of venue data takes GuestVenue and declares `400 venue-required` (CR-198); (e) a fact another
+    module owns named in the screen's purpose is asked of its owner's query (ADR-0055 rule 2). (a) does not arise:
+    the envelope carries no Money. Returns (description sentences, read-via entries, extra YAML lines under the
+    operation)."""
+    sentences = []
+    if array:
+        sentences.append(CS.order_sentence(ENVELOPE_PROPS, ENVELOPE_REQUIRED))
+    if perm:
+        sentences.append(CS.scope_sentence(perm, scope, bool(array)))
+    via = list(routes) if routes is not None else (CS.fact_routes(purpose, reader) if reader and purpose else [])
+    extra = []
+    if CS.is_public_guest_venue_read(verb, route, [aud], scope):
+        extra = ["      parameters:", "      - $ref: '%s'" % CS.GUEST_VENUE_REF]
+    return sentences, via, extra
+
+
+def block(oid, verb, screen_ref, summary, purpose, perm, scope, aud, ref, array, page, module,
+          route=None, reader=None, routes=None):
     q = lambda t: str(t).replace("'", "''")
+    sentences, via, extra = r10_parts(oid, verb, perm, scope, aud, array, purpose, route, reader, routes)
+    nl = "\n"
+    r10_desc = "".join(nl + nl + "        " + q(t) for t in sentences)
+    r10_via = "".join(f"      - query: {v['query']}{nl}        route: {v['route']}{nl}        for: '{q(v['for'])}'{nl}"
+                      for v in via)
+    r10_via = ("      x-ticvai-read-via:" + nl + r10_via) if via else ""
+    r10_params = "".join(line + nl for line in extra)
+    r10_400 = (f"        '400':{nl}          $ref: '{CS.VENUE_REQUIRED_REF}'{nl}") if extra else ""
     # ADR-0018: every configuration operation declares its level, and a drafted one is no
     # exception — `check-config-scope` failed 17 of these before this line existed.
     cfg = "" if verb == "get" else "      x-ticvai-config-scope: %s\n" % scope
@@ -192,7 +238,7 @@ def block(oid, verb, screen_ref, summary, purpose, perm, scope, aud, ref, array,
     return f"""      operationId: {oid}
       x-ticvai-consumed-by:
         - "{screen_ref}"
-      x-ticvai-audience:
+{r10_via}      x-ticvai-audience:
       - {aud}
       x-ticvai-provisional: true
       summary: {q(summary)}
@@ -204,7 +250,7 @@ def block(oid, verb, screen_ref, summary, purpose, perm, scope, aud, ref, array,
         would produce something that looks authoritative and describes nothing. **No
         `x-ticvai-persistence` either** - an operation can exist before its storage is decided and
         a table cannot. The name, the permission, the scope and the audience are derived; the
-        shape is the part a person writes.
+        shape is the part a person writes.{r10_desc}
 
         '
       tags:
@@ -214,8 +260,8 @@ def block(oid, verb, screen_ref, summary, purpose, perm, scope, aud, ref, array,
 {cfg}      x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: {"replica" if verb == "get" else "primary"}
-      responses:
-        '200':
+{r10_params}      responses:
+{r10_400}        '200':
           description: {q(summary)}
           content:
             application/json:
@@ -313,7 +359,8 @@ def main() -> int:
             s["name"][:70], (s.get("purpose") or "")[:300],
             conv_c["read"] if http == "get" else conv_c["write"],
             conv_c["scope"], PLAT_AUD.get(p.get("audience"), "staff"),
-            "DraftedRecord", http == "get", (s.get("source") or {}).get("page"), module)))
+            "DraftedRecord", http == "get", (s.get("source") or {}).get("page"), module,
+            route=route, reader=SERVICE_OF.get(contract))))
         wiring.setdefault(str(r["file"]), {})[s["id"]] = (oid, contract, s["name"][:70], http)
 
     print("%s -> contracts/.../%s.yaml" % (module, contract))

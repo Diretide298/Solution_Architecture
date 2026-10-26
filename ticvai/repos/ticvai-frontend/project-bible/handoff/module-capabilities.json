@@ -5,7 +5,7 @@
   "access": {
    "title": "3 — Admission and Access",
    "capabilityCount": 22,
-   "unguardedOperations": 6,
+   "unguardedOperations": 7,
    "capabilities": [
     {
      "key": "ACCESS_DIRECTION_SET",
@@ -1419,9 +1419,10 @@
      "key": "GUEST_VIEW_PII",
      "label": "personal fields. Distinct from GUEST_VIEW by design",
      "group": "Guest engagement",
-     "operationCount": 2,
+     "operationCount": 3,
      "operations": [
       "exportSubjectData",
+      "getSubjectDataExport",
       "listGuestIdentityVerifications"
      ],
      "elevated": false,
@@ -2098,7 +2099,7 @@
   "orders": {
    "title": "2 — Ticketing Sales",
    "capabilityCount": 21,
-   "unguardedOperations": 21,
+   "unguardedOperations": 22,
    "capabilities": [
     {
      "key": "CREDIT_MANAGE",
@@ -2662,13 +2663,13 @@
   "public-api": {
    "title": "13 — Developer & API Management",
    "capabilityCount": 3,
-   "unguardedOperations": 2,
+   "unguardedOperations": 4,
    "capabilities": [
     {
      "key": "DEVELOPER_ADMIN",
      "label": "quotas, certification, licensing — TICVAI-side only",
      "group": "Guest engagement",
-     "operationCount": 9,
+     "operationCount": 10,
      "operations": [
       "certifyIntegration",
       "decideProductionAccess",
@@ -2700,7 +2701,7 @@
      "key": "DEVELOPER_VIEW",
      "label": null,
      "group": "Guest engagement",
-     "operationCount": 13,
+     "operationCount": 12,
      "operations": [
       "getApiUsage",
       "getDeveloperAccount",
@@ -2723,14 +2724,14 @@
      "key": "QUEUE_MANAGE",
      "label": "configure, open/pause/close, call next, set wait time",
      "group": "Queue",
-     "operationCount": 9,
+     "operationCount": 10,
      "operations": [
       "callNextParties",
       "configureQueueFeed",
       "createQueue",
       "getQueueFeedHealth",
       "listQueueFeeds",
-      "setQueueStatus"
+      "resolveCalledWaitingGuest"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -3395,7 +3396,7 @@
      "operations": [
       "approveShiftOpen"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -3582,7 +3583,7 @@
      "key": "PLATFORM_BILLING_MANAGE",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 10,
+     "operationCount": 12,
      "operations": [
       "addCapacityPack",
       "cancelInvoice",
@@ -3598,7 +3599,7 @@
      "key": "PLATFORM_BILLING_VIEW",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 7,
+     "operationCount": 8,
      "operations": [
       "getBillingEntity",
       "getBillingReconciliation",

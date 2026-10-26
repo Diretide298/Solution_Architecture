@@ -392,7 +392,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+    "description": "The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-018)."
    },
    "fxRate": {
     "allOf": [
@@ -501,7 +501,7 @@
   }
  },
  "Refund": {
-  "x-ticvai-persistence": "orders.refund",
+  "x-ticvai-persistence": "orders.refund + orders.refund_line + orders.refund_payment",
   "type": "object",
   "required": [
    "id",
@@ -577,7 +577,7 @@
      }
     ],
     "readOnly": true,
-    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
+    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001), its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192)."
    },
    "amount": {
     "x-ticvai-column": "refunded_amount",
@@ -585,7 +585,70 @@
    },
    "appliedPercentage": {
     "type": "number",
-    "description": "From the venue's time bands, or an approver override."
+    "description": "From the venue's time bands, or an approver override. Where the refunded lines fall in different bands, each line's own percentage is on its `lines` row and this is the one the refund's lines share, or null when they differ (ADAM CR-208)."
+   },
+   "lines": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**What the refund took from each order line** (ADAM CR-208, option A; CHG-R10ORD-014): child rows, `orders.refund_line`, one per line refunded, written by `createRefund`. A line's refundable amount is what it paid minus its rows on earlier refunds.",
+    "items": {
+     "type": "object",
+     "required": [
+      "orderLineId",
+      "refundedAmount"
+     ],
+     "properties": {
+      "orderLineId": {
+       "type": "string",
+       "format": "uuid",
+       "x-ticvai-references": "orders.order_line"
+      },
+      "refundedAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "appliedPercentage": {
+       "type": "number",
+       "nullable": true,
+       "description": "The time band of this line's own performance (ADAM CR-208)."
+      }
+     }
+    }
+   },
+   "payments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**What the refund took from each payment** (ADAM CR-208, option A; CHG-R10ORD-014): child rows, `orders.refund_payment` (the decision's `refund_allocation`; naming-and-style bans `allocation` in DDL), one per payment refunded against, the most recent payment first and cash last. A payment's refundable amount is what it paid minus its rows on earlier refunds.",
+    "items": {
+     "type": "object",
+     "required": [
+      "paymentId",
+      "refundedAmount"
+     ],
+     "properties": {
+      "paymentId": {
+       "type": "string",
+       "format": "uuid",
+       "x-ticvai-references": "orders.payment"
+      },
+      "refundedAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "In the base currency, for the ledger."
+      },
+      "tenderAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true,
+       "description": "In the payment's tender currency (`Payment.tenderCurrency`), at that currency's scale; null where the payment was in the base currency."
+      }
+     }
+    }
    },
    "status": {
     "type": "string",
@@ -683,7 +746,7 @@
    },
    "timeBands": {
     "type": "array",
-    "description": "Refundable percentage by time before the performance. Evaluated most-specific first.\n",
+    "description": "Refundable percentage by time before the performance. Evaluated most-specific first.\n\n**Each band names the refund type that applies in it** (`refundType`, ADAM CR-208; (the lead's answer of 25 October 2026 to the r10 lanes' questions; CHG-R10ORD-021)). A venue that has set no bands refunds in full (`fullRefund`) before the cut-off (the performance start time of each line; for an undated line, the end of `refundWindowDays`, ADAM CR-208) and nothing after it.\n",
     "items": {
      "type": "object",
      "required": [
@@ -699,6 +762,18 @@
        "type": "number",
        "minimum": 0,
        "maximum": 100
+      },
+      "refundType": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "fullRefund",
+        "partialRefund",
+        "percentageRefund",
+        "proRataRefund",
+        "originalValueLessFees"
+       ],
+       "description": "The refund type that applies in this band (the values of `RefundCalculationPolicyView.refundTypes`; ADAM CR-208). Null on a band saved before r10, which is `percentageRefund` at its `percentage`."
       }
      }
     }

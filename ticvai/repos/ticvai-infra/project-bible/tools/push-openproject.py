@@ -94,7 +94,11 @@ def sub_tasks(r, lineage):
     elif r["track"] == "Frontend":
         name = r["subject"].split("] ", 1)[-1]
         for part, text in (("build", "Build the screen with every state (loading, empty, error, offline) against the mock API."),
-                           ("wire", "Connect the screen to the real API once its backend tasks are done."),
+                           # ADAM CR-195 (CHG-R10UI-011): the calls go through the published @ticvai/api-client
+                           # package (SETUP-CLIENTS), never a hand-written client or a per-repository generator.
+                           ("wire", "Connect the screen to the real API through the published @ticvai/api-client "
+                                    "package (SETUP-CLIENTS), once that package is published and the screen's backend "
+                                    "tasks are done: no hand-written client and no per-repository generator."),
                            ("test", "Component tests for the states and the main flows; lint and typecheck pass.")):
             label = {"build": "build with all states", "wire": "connect to API", "test": "tests"}[part]
             out.append((f"{key}#{part}", key, f"[FE] {name}: {label}", text))

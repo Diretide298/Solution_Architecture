@@ -1239,7 +1239,19 @@
   "pii.subject_identity": "2026-10-20",
   "platform.outbox_sequence": "2026-10-20",
   "venuemap.visit_plan_preset": "2026-10-20",
-  "whitelabel.content_block": "2026-10-20"
+  "whitelabel.content_block": "2026-10-20",
+  "approvals.request_approver": "2026-10-26",
+  "control.api_client_secret": "2026-10-26",
+  "control.invoice_number_sequence": "2026-10-26",
+  "control.platform_operator": "2026-10-26",
+  "control.platform_operator_mfa": "2026-10-26",
+  "control.platform_session": "2026-10-26",
+  "control.platform_tax_rate": "2026-10-26",
+  "identity.redirect_host": "2026-10-26",
+  "identity.subject_data_export": "2026-10-26",
+  "orders.refund_line": "2026-10-26",
+  "orders.refund_payment": "2026-10-26",
+  "whitelabel.ui_string_pack": "2026-10-26"
  },
  "renames": [
   {
@@ -1649,5 +1661,5 @@
   "platform.device_heartbeat": "2026-10-14"
  },
  "baseline": "2026-09-19",
- "generated": "2026-10-22"
+ "generated": "2026-10-26"
 }

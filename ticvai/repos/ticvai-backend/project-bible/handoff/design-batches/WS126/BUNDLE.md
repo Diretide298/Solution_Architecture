@@ -106,9 +106,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-697` | Event Schedule Command Center | B | 0 | 9 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-698` | Dynamic Performance Duration Configuration | B | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-699` | Schedule Change & Rescheduling Configuration | B | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-697` | Event Schedule Command Center | B | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-698` | Dynamic Performance Duration Configuration | B | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-699` | Schedule Change & Rescheduling Configuration | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -162,11 +162,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Code | text | — |
 | Name | text | — |
 | Venue | the name it points at, never the id | — |
-| Parent event | the name it points at, never the id | For grouped events. |
+| Parent event | the name it points at, never the id | For grouped events. The parent is an existing event at the same venue, not the event itself, and has no parent of its own (one level; ADAM … |
 | Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
 | Is active | yes / no (icon or chip) | — |
 | Lifecycle state | chip: Draft, Planned, On sale, Live, Closed, Cancelled… | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). |
 | Lifecycle state changed at | 1 Oct 2026, 14:30 | — |
+| Scheduled lifecycle state | chip: Draft, Planned, On sale, Live, Closed, Cancelled… | A move waiting for its effectiveFrom (ADAM CR-109, option 2; CHG-R10CAT-009): written by `setEventLifecycleState` when `effectiveFrom` is … |
+| Scheduled lifecycle at | 1 Oct 2026, 14:30 | When the waiting move is applied (the request's `effectiveFrom`; ADAM CR-109). |
+| Scheduled lifecycle reason | text | The reason given with the waiting move, carried on `event.lifecycleChanged` when it is applied (ADAM CR-109). |
 
 **Actions and what each produces**
 
@@ -245,7 +248,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-697?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save event schedule, Cancel.
 - [ ] Every transition is wired: `BO-100`, `BO-698`, `BO-699`.
@@ -303,11 +306,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Code | text | — |
 | Name | text | — |
 | Venue | the name it points at, never the id | — |
-| Parent event | the name it points at, never the id | For grouped events. |
+| Parent event | the name it points at, never the id | For grouped events. The parent is an existing event at the same venue, not the event itself, and has no parent of its own (one level; ADAM … |
 | Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
 | Is active | yes / no (icon or chip) | — |
 | Lifecycle state | chip: Draft, Planned, On sale, Live, Closed, Cancelled… | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). |
 | Lifecycle state changed at | 1 Oct 2026, 14:30 | — |
+| Scheduled lifecycle state | chip: Draft, Planned, On sale, Live, Closed, Cancelled… | A move waiting for its effectiveFrom (ADAM CR-109, option 2; CHG-R10CAT-009): written by `setEventLifecycleState` when `effectiveFrom` is … |
+| Scheduled lifecycle at | 1 Oct 2026, 14:30 | When the waiting move is applied (the request's `effectiveFrom`; ADAM CR-109). |
+| Scheduled lifecycle reason | text | The reason given with the waiting move, carried on `event.lifecycleChanged` when it is applied (ADAM CR-109). |
 
 **The selected dynamic performance duration** (detail panel): The pack groups this record's detail under its own headings: “Set”.
 
@@ -376,7 +382,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-698?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-697`.
@@ -428,11 +434,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Code | text | — |
 | Name | text | — |
 | Venue | the name it points at, never the id | — |
-| Parent event | the name it points at, never the id | For grouped events. |
+| Parent event | the name it points at, never the id | For grouped events. The parent is an existing event at the same venue, not the event itself, and has no parent of its own (one level; ADAM … |
 | Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
 | Is active | yes / no (icon or chip) | — |
 | Lifecycle state | chip: Draft, Planned, On sale, Live, Closed, Cancelled… | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). |
 | Lifecycle state changed at | 1 Oct 2026, 14:30 | — |
+| Scheduled lifecycle state | chip: Draft, Planned, On sale, Live, Closed, Cancelled… | A move waiting for its effectiveFrom (ADAM CR-109, option 2; CHG-R10CAT-009): written by `setEventLifecycleState` when `effectiveFrom` is … |
+| Scheduled lifecycle at | 1 Oct 2026, 14:30 | When the waiting move is applied (the request's `effectiveFrom`; ADAM CR-109). |
+| Scheduled lifecycle reason | text | The reason given with the waiting move, carried on `event.lifecycleChanged` when it is applied (ADAM CR-109). |
 
 **Actions and what each produces**
 
@@ -510,7 +519,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-699?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-697`.
@@ -632,7 +641,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"Event": {"x-ticvai-persistence":"catalogue.event","type":"object","required":["id","code","name","venueId","scopePath"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentEventId":{"type":"string","format":"uuid","nullable":true,"description":"For grouped events."},"performanceCount":{"type":"integer","readOnly":true,"description":"How many performances the event has. Counted by the server; never sent by a client."},"isActive":{"type":"boolean"},"lifecycleState":{"type":"string","readOnly":true,"enum":["draft","planned","onSale","live","closed","cancelled","archived"],"description":"**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."},"lifecycleStateChangedAt":{"type":"string","format":"date-time","readOnly":true,"nullable":true}}},
+"Event": {"x-ticvai-persistence":"catalogue.event","type":"object","required":["id","code","name","venueId","scopePath"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentEventId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"catalogue.event","description":"For grouped events. The parent is an existing event at the same venue, not the event itself, and has no parent of its own (one level; ADAM CR-256). Declared as a key onto `catalogue.event`."},"performanceCount":{"type":"integer","readOnly":true,"description":"How many performances the event has. Counted by the server; never sent by a client."},"isActive":{"type":"boolean"},"lifecycleState":{"type":"string","readOnly":true,"enum":["draft","planned","onSale","live","closed","cancelled","archived"],"description":"**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState` and the event lifecycle job, which check the transition against `states/event.yaml` (ADAM CR-109); `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."},"lifecycleStateChangedAt":{"type":"string","format":"date-time","readOnly":true,"nullable":true},"scheduledLifecycleState":{"type":"string","readOnly":true,"nullable":true,"enum":["draft","planned","onSale","live","closed","cancelled","archived"],"description":"**A move waiting for its effectiveFrom** (ADAM CR-109, option 2; CHG-R10CAT-009): written by `setEventLifecycleState` when `effectiveFrom` is in the future, applied and cleared by the event lifecycle job in the workers host at `scheduledLifecycleAt`. Null when nothing waits."},"scheduledLifecycleAt":{"type":"string","format":"date-time","readOnly":true,"nullable":true,"description":"When the waiting move is applied (the request's `effectiveFrom`; ADAM CR-109)."},"scheduledLifecycleReason":{"type":"string","maxLength":500,"readOnly":true,"nullable":true,"description":"The reason given with the waiting move, carried on `event.lifecycleChanged` when it is applied (ADAM CR-109)."}}},
 "EventReschedule": {"type":"object","x-ticvai-persistence":"catalogue.event_reschedule","description":"Event boards 7.4 and 7.5. **The decision that generates every phone call.**","required":["kind","reason"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["moveTime","moveDate","moveVenue","cancel","abandon"]},"performanceIds":{"type":"array","items":{"type":"string","format":"uuid"}},"newStartsAt":{"type":"string","format":"date-time","nullable":true},"newSpaceId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string"},"ticketTreatment":{"type":"string","enum":["moveAutomatically","offerChoice","refund","creditToWallet","honourAtAnyPerformance"],"description":"**Made once and applied consistently**, rather than per guest at a desk."},"refundFees":{"type":"boolean","default":true},"notifyGuests":{"type":"boolean","default":true},"notificationTemplateId":{"type":"string","format":"uuid","nullable":true},"affectedOrders":{"type":"integer","readOnly":true},"affectedGuests":{"type":"integer","readOnly":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
 "EventSchedule": {"type":"object","x-ticvai-persistence":"catalogue.event_schedule","description":"Event board 2.2. **A performance that overruns pushes the next one.**","properties":{"eventId":{"type":"string","format":"uuid"},"performances":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"performanceId":{"type":"string","format":"uuid","nullable":true},"startsAt":{"type":"string","format":"date-time"},"plannedMinutes":{"type":"integer"},"turnaroundMinutes":{"type":"integer","default":0},"spaceId":{"type":"string","format":"uuid","nullable":true},"seatMapId":{"type":"string","format":"uuid","nullable":true}}}},"durationIsDynamic":{"type":"boolean","default":false},"maximumOverrunMinutes":{"type":"integer","nullable":true},"cascadeOverrun":{"type":"boolean","default":true,"description":"**Whether a late finish moves everything after it**, which is the honest behaviour and the one venues forget to ask for until the first time it happens.\n"},"scopePath":{"type":"string"}}}
 }

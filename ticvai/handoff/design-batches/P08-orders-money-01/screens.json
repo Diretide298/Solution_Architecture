@@ -1876,9 +1876,10 @@
      "to": "BO-008",
      "trigger": "Product Detail & Variants",
      "carries": [
-      "variantId"
+      "variantId",
+      "version"
      ],
-     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-026 holds variantId, so an edge into it carries them"
+     "provenance": "derived — BO-008 declares entryState.params productId, variantId, version and BO-026 holds variantId, version, so an edge into it carries them"
     }
    ]
   },

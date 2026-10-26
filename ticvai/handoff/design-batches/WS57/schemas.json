@@ -367,10 +367,12 @@
         "service",
         "delivery",
         "payment"
-       ]
+       ],
+       "description": "Maps to `catalogue.fee.fee_type`: booking -> bookingFee, transaction -> transactionFee, channel -> channelFee, service -> serviceFee, delivery -> deliveryFee, payment -> paymentFee (ADAM CR-212)."
       },
       "feeProfileId": {
-       "type": "string"
+       "type": "string",
+       "description": "A `catalogue.fee` of the mapped type that is `active`, else `feeProfileMissing` (ADAM CR-212)."
       }
      }
     },
@@ -458,10 +460,12 @@
         "service",
         "delivery",
         "payment"
-       ]
+       ],
+       "description": "Maps to `catalogue.fee.fee_type`: booking -> bookingFee, transaction -> transactionFee, channel -> channelFee, service -> serviceFee, delivery -> deliveryFee, payment -> paymentFee (ADAM CR-212)."
       },
       "feeProfileId": {
-       "type": "string"
+       "type": "string",
+       "description": "A `catalogue.fee` of the mapped type that is `active`, else `feeProfileMissing` (ADAM CR-212)."
       }
      }
     },
@@ -794,7 +798,13 @@
    },
    "overrideWarnings": {
     "type": "boolean",
-    "description": "Proceed despite warnings (needs the override permission and a reason); critical issues cannot be overridden"
+    "description": "Proceed despite warnings (needs `SALES_CHANNEL_OVERRIDE` and a reason; ADAM CR-211); critical issues cannot be overridden"
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The approved approval request `submitForApproval` raised; required by `scheduleActivation` and `activate` from `pendingApproval`, which are refused `409 approval-required` without an approved one (ADAM CR-211)."
    }
   }
  },
@@ -810,7 +820,63 @@
    },
    "status": {
     "type": "string",
-    "description": "Status after the action: draft, configuration, validation, approved, scheduled, active, suspended, disabled or archived (the pack's suggested lifecycle, p.5)"
+    "enum": [
+     "draft",
+     "pendingApproval",
+     "scheduled",
+     "active",
+     "suspended"
+    ],
+    "description": "Status after the action: the channel's `SalesChannelProfile.status`, the five values of the state model and the DDL (ADAM CR-211, option A; CHG-R10CAT-003). The pack's suggested lifecycle (p.5) is not a second vocabulary."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The approval request `submitForApproval` raised, to send back with `scheduleActivation` or `activate` once approved (ADAM CR-211)."
+   },
+   "preview": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The effective chain `preview` returns**, Product -> Channel -> Customer -> Price -> Capacity -> Payment -> Fulfillment, one step per link in that order; null for any other action (ADAM CR-211).",
+    "properties": {
+     "steps": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "required": [
+        "stage"
+       ],
+       "properties": {
+        "stage": {
+         "type": "string",
+         "enum": [
+          "product",
+          "channel",
+          "customer",
+          "price",
+          "capacity",
+          "payment",
+          "fulfillment"
+         ]
+        },
+        "summary": {
+         "type": "string",
+         "description": "What is in effect at this link for the channel."
+        },
+        "result": {
+         "type": "string",
+         "enum": [
+          "passed",
+          "warning",
+          "failed",
+          "notRequired"
+         ]
+        }
+       }
+      }
+     }
+    }
    },
    "readinessScore": {
     "type": "number",

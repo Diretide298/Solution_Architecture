@@ -77,6 +77,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from contract_shapes import (load_contracts, path_params,  # noqa: E402
                              response_schemas, schema_fields)
 import screen_patterns as SP  # noqa: E402 — the 3 October rules (CHG-SPF-001..004), shared with the check
+import contract_shapes as CS  # noqa: E402 — the r10 patterns (CHG-R10GEN-007)
 
 # **Is the platform being built a phone or a handheld?** Set by `main()` per platform file; it caps
 # every list and panel at five columns there (CHG-SPF-002).
@@ -1023,6 +1024,13 @@ def build(screen: dict, ops: dict, schemas: dict, report: Counter) -> dict:
                      and o.get("id") not in {x.get("id") for x in overlays}]
     if overlays or kept_overlays:
         out["overlays"] = overlays + kept_overlays
+    # **(d) A generated screen shows only what its declared operations answer or send** (r10, CHG-R10GEN-007; ADAM
+    # CR-187, CR-220, CR-221, CR-233; check-screen-value-sources). A component of this generator's bound to a schema
+    # no declared operation returns or takes is unbound, with a note, instead of promising a value with no source.
+    report["unsourced unbound"] += CS.drop_unsourced(
+        (out.get("layout") or {}).get("regions"), out.get("overlays"),
+        *CS.declared_io([a.get("operationId") for a in (screen.get("apis") or []) if a.get("operationId")],
+                        ops, schemas), mine=("contract ",))
     out["states"] = states
     out["apis"] = [dict(a, **({"invalidates": [collection_op]}
                               if a.get("trigger") == "onAction" and collection_op else {}))

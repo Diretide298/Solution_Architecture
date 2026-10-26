@@ -103,40 +103,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listMyVisitPlans": {
-  "method": "GET",
-  "path": "/visit-plans",
-  "contract": "venue-map",
-  "summary": "The caller's own visit plans, by date or status",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "date",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listVisitPlanAlternatives": {
   "method": "GET",
   "path": "/visit-plans/{planId}/items/{itemId}/alternatives",

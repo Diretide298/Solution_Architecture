@@ -197,7 +197,8 @@
    "venueId",
    "scopePath",
    "isSellable",
-   "hasVariants"
+   "hasVariants",
+   "createdAt"
   ],
   "properties": {
    "id": {
@@ -230,7 +231,7 @@
      }
     ],
     "nullable": true,
-    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+    "description": "**The product's name in each of the tenant's enabled languages** (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
    },
    "descriptionLocalised": {
     "allOf": [
@@ -282,6 +283,12 @@
     "format": "date-time",
     "nullable": true,
     "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**The last moment the product's entitlements are valid; null means the same as `onSaleTo`** (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). A season pass stops selling at `onSaleTo` and is used until `validTo`: an entitlement template's `expiryAnchor` of `seasonEnd` ends here (`access#issueOrderEntitlements`). Sales closing is not validity ending.\n"
    },
    "categoryId": {
     "type": "string",
@@ -396,6 +403,15 @@
     },
     "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
    },
+   "addOnProductIds": {
+    "type": "array",
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The add-ons offered with this product, in display order** (accepted 26 October 2026, Chinmay, ADAM CR-252 option A): each a `kind: addOn` product of the same venue (a coffee break, a working lunch, an AV technician offered with a meeting-room type), set in the back office. `listProducts` answers it, so WEB-048 and GST-075 read a room type's add-ons from the load they already make and fetch those products; the guest adds one as a cart line with `parentLineId`. An id that is not a `kind: addOn` product of the same venue is `400 validation` on `addOnProductIds`. Empty when none is offered."
+   },
    "requiresTimeWindow": {
     "type": "boolean",
     "default": false,
@@ -460,6 +476,19 @@
     "format": "uuid",
     "nullable": true,
     "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "**When the product was created** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): `catalogue.product.created_at`, NOT NULL DEFAULT now(), set by the server and never by a request. Rows that predate it are backfilled by the migration task (the earliest of the product's first version's `published_at` and the migration time), then the NOT NULL and the DEFAULT are set. `listProductLifecycle` orders and filters on it."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true,
+    "description": "**When the product last changed** (ADAM CR-204): set by `updateProduct` and by every product sub-resource PUT and bulk change that versions the product; null until the first change after creation. `listProductLifecycle`'s `lastModifiedAt` and `modifiedSince` read it."
    }
   }
  },
@@ -560,6 +589,24 @@
    "displayOrder": {
     "type": "integer",
     "default": 100
+   },
+   "url": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The asset's stable CDN address, for a guest card** (ADAM CR-221, option A, decided 25 October 2026; CHG-R10CAT-014): the asset library's public address for the asset, set on guest-facing reads (`searchCatalogue`, `listProducts` and `getProduct` for a guest or a visitor) when the asset is public and `ready`, as `getPublishedTenantConfig` returns white-label assets (`brandUrls`). Null otherwise, and on staff reads, which are unchanged. Catalogue reads the asset in process, a read the lead granted across deployables (XDR-005, 25 October 2026; CHG-R10CAT-015)."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The asset library's thumbnail address for the asset, on the same reads and with the same rule as `url` (ADAM CR-221)."
    },
    "altText": {
     "allOf": [

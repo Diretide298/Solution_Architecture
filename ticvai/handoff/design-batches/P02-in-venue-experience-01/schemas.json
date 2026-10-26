@@ -53,6 +53,12 @@
  "Entitlement": {
   "type": "object",
   "x-ticvai-persistence": "access.entitlement",
+  "x-ticvai-index": [
+   [
+    "venueId",
+    "changeVersion"
+   ]
+  ],
   "description": "**What a guest actually holds.** Found missing on 18 August by the schema audit — 33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.\nThe package sold products, defined `EntitlementTemplate`, recorded `ScanEvent.ticketId`, transferred `ticket_transfer.ticketIds` and issued `wallet_pass.entitlementId` — **five artefacts referring to a thing that did not exist.** `validateAccess` read the *template* and never the instance, and `suspendEntitlement` suspended the template, **which would have suspended it for every guest who held one.**\n**The template is the definition and this is the instance.** A template says *an annual pass admits once a day for a year*; this says *this guest's annual pass, bought on 3 March, used eleven times, frozen for two weeks in July, valid until 2 March.*\n",
   "required": [
    "id",
@@ -62,7 +68,8 @@
    "subjectId",
    "status",
    "validFrom",
-   "validTo"
+   "validTo",
+   "changeVersion"
   ],
   "properties": {
    "id": {
@@ -122,7 +129,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed.\n"
+    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed. **Null for a guest checkout** (ADAM CR-167, CHG-R10ORD-010): `issueOrderEntitlements` leaves it null where `order.paid` names no subject; the field is always present, null or not.\n"
    },
    "venueId": {
     "type": "string",
@@ -134,6 +141,28 @@
    "mediaCode": {
     "type": "string",
     "description": "What is scanned — a QR payload, a wristband serial, a card number. **Rotatable without reissuing**, because a guest whose wristband broke should not need a new ticket.\n"
+   },
+   "changeVersion": {
+    "type": "integer",
+    "format": "int64",
+    "readOnly": true,
+    "x-ticvai-change-version": true,
+    "description": "**What the offline package's delta counts** (ADAM CR-239, option A; Chinmay, 25 October 2026; CHG-R10ORD-011). Set from a per-database sequence by a BEFORE INSERT OR UPDATE trigger, so every operation that writes `access.entitlement` (seventeen of them, in three contracts) moves it without remembering to; never set by an operation and never sent. `OfflinePackage.entitlementsVersion` is the highest of the package's rows, and `sinceVersion` selects the rows above it, void and used ones included. Indexed with `venueId`."
+   },
+   "mediaLinkedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**When the entitlement was put on its media** (ADAM CR-226, option A; Chinmay, 25 October 2026; CHG-R10ORD-012): written when `mediaCode` is set or rotated: at issue (`issueOrderEntitlements`, onto new media or, through `appendEntitlementToMedia`'s order, onto media the guest already holds), and whenever an operation replaces or rotates the code (`replaceCredential`, `getEntitlementCredential` with `rotate=true`). Not `validFrom`, which is the validity window's start. `MediaEntitlements` answers it as `addedAt`."
+   },
+   "rotationSecret": {
+    "type": "string",
+    "nullable": true,
+    "writeOnly": true,
+    "x-ticvai-column": "rotation_secret_ciphertext",
+    "x-ticvai-secret": "field-encrypted",
+    "description": "**The rotation seed, stored on the entitlement** (ADAM CR-167, option A; CHG-R10ORD-010): the Base32 shared secret the rotating code is derived from (`getEntitlementCredential` `rotation.secret`, audit R230), written by `issueOrderEntitlements` at issue for a `platformSignedQr` entitlement and replaced by `getEntitlementCredential` with `rotate=true`; encrypted with the tenant's field key (ADR-0063). Null for a `staticQr` or `rfidCard` entitlement, which does not rotate. Never returned except as `rotation` to the holder or a staff caller."
    },
    "credentialFormat": {
     "allOf": [
@@ -584,18 +613,25 @@
    },
    "dropReference": {
     "type": "string",
-    "description": "Short and readable. Printed on the slip a guest may or may not keep."
+    "readOnly": true,
+    "maxLength": 32,
+    "x-ticvai-unique": "tenant",
+    "x-ticvai-unique-compare": "exact",
+    "description": "Short and readable. Printed on the slip a guest may or may not keep. **Server-assigned, the venue prefix and a sequence per venue** (ADAM CR-104; as `orderNumber`), for example `DXB1-SD-000123`, unique in the tenant."
    },
    "saleId": {
     "type": "string",
     "nullable": true,
-    "description": "The till sale. Null for an online order, which sets `orderId` (audit R236)."
+    "x-ticvai-unique": "tenant",
+    "x-ticvai-unique-compare": "exact",
+    "description": "The till sale. Null for an online order, which sets `orderId` (audit R236). **One drop per sale** (ADAM CR-104), unique where set, which is what `alreadyDropped` refuses."
    },
    "orderId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "The paid online order that created this collection (audit R236)."
+    "x-ticvai-unique": "tenant",
+    "description": "The paid online order that created this collection (audit R236). **One drop per order** (ADAM CR-104), unique where set."
    },
    "entitlementId": {
     "type": "string",
@@ -672,6 +708,12 @@
    "verifiedBy": {
     "type": "string",
     "nullable": true
+   },
+   "collectionNote": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "description": "The `note` given with the latest `collectShopAndDrop` (ADAM CR-104, CHG-R10ORD-017); null when none was given."
    }
   }
  },

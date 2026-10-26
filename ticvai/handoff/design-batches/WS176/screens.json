@@ -446,42 +446,42 @@
        "kind": "numberField",
        "label": "Cart hold (seconds)",
        "bindsTo": "VenueSettings.cartLeaseSeconds",
-       "operation": "setVenueSettings",
+       "operation": "getVenueSettings",
        "provenance": "contract tenancy.yaml VenueSettings.cartLeaseSeconds (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "numberField",
        "label": "Cart extension (minutes)",
        "bindsTo": "VenueSettings.cartHoldExtensionMinutes",
-       "operation": "setVenueSettings",
+       "operation": "getVenueSettings",
        "provenance": "contract tenancy.yaml VenueSettings.cartHoldExtensionMinutes (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "numberField",
        "label": "Cart extensions allowed",
        "bindsTo": "VenueSettings.cartMaxExtensions",
-       "operation": "setVenueSettings",
+       "operation": "getVenueSettings",
        "provenance": "contract tenancy.yaml VenueSettings.cartMaxExtensions (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "numberField",
        "label": "Seat hold extension (seconds)",
        "bindsTo": "VenueSettings.seating.seatHoldExtensionSeconds",
-       "operation": "setVenueSettings",
+       "operation": "getVenueSettings",
        "provenance": "contract tenancy.yaml VenueSettings.seating.seatHoldExtensionSeconds (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "numberField",
        "label": "Seat hold extensions allowed",
        "bindsTo": "VenueSettings.seating.seatHoldMaxExtensions",
-       "operation": "setVenueSettings",
+       "operation": "getVenueSettings",
        "provenance": "contract tenancy.yaml VenueSettings.seating.seatHoldMaxExtensions (defined 4 October 2026, CHG-FXS-001)"
       },
       {
        "kind": "numberField",
        "label": "Seats per guest booking",
        "bindsTo": "VenueSettings.seating.maxSeatsPerGuestOrder",
-       "operation": "setVenueSettings",
+       "operation": "getVenueSettings",
        "provenance": "contract tenancy.yaml VenueSettings.seating.maxSeatsPerGuestOrder (defined 4 October 2026, CHG-FXS-001)"
       },
       {
@@ -1525,7 +1525,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Promotes this configuration to the target environment.** What is running there now is replaced, and the previous version stays restorable.",
-       "provenance": "authored — required by check-screens, 19 September 2026"
+       "provenance": "authored — required by check-screens, 19 September 2026",
+       "operation": "deployConfigurationProfile"
       }
      ]
     }

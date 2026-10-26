@@ -632,6 +632,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-301`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 3
 - Flow F173 *Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry*, step 6: Works in Fees, Seller Proceeds & Listing Confirmation → Provide complete financial transparency before the seller commits to publishing the listing. This is essential to prevent later disputes.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -821,6 +822,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-302`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 3
 - Flow F173 *Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry*, step 8: Works in My Resale Listings & Seller Dashboard → Give sellers a dedicated self-service workspace to manage their resale activity after publishing.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1217,6 +1219,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS170 Ticket Resale Marketplace Board 3.dc.html#adm-305`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 3
 - Flow F173 *Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry*, step 14: Works in Buyer Checkout, Inventory Hold & Secure Payment → Provide a normal, secure TICVAI checkout while protecting the resale listing from simultaneous purchase.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

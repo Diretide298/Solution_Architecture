@@ -75,6 +75,8 @@
     "identity.mfa_method",
     "identity.mfa_recovery_code",
     "identity.otp_challenge",
+    "identity.refresh_token",
+    "identity.subject_data_export",
     "identity.subject_holding",
     "pii.subject_biometric",
     "pii.subject_contact",

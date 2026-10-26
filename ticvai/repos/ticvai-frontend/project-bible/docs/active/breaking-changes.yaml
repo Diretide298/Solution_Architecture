@@ -1361,3 +1361,225 @@ changes:
     tag: r8
     producer-tickets: [AM-WALLET-CASHLESS-P08-2, VM-WALLET-WALLET-1]
     consumer-tickets: [AM-WALLET-CASHLESS-P08-5]
+  - id: BC-464
+    contract: public-api
+    operation: registerDeveloper
+    change: "removed"
+    reason: 'ADAM CR-098 (Deep Khanvilkar, ticket 27976), accepted 15 October 2026 (CHG-R10ID-011): registerDeveloper
+      took DeveloperAccount, whose required id and status (and verifiedAt) are the server''s, so a caller had to send
+      read-only fields. The body is now CreateDeveloperAccountRequest (organisationName, contactEmail, websiteUrl,
+      countryCode, partnerId); the response is unchanged. Request fields removed cannot be additive.'
+    approved-by: 'Chinmay, CR-098 accepted for r10 (cr-34 decision: "registerDeveloper as public with no permission, a create-request body")'
+    tag: r10
+    producer-tickets: [SVC-PLATFORM-PUBLICAPI-2]
+    consumer-tickets: [APP-SETUP-DEV-002, APP-SETUP-DEV-002-REST, TEST-AM-SETUP-PLATFORM-FOUNDATION-P14]
+  - id: BC-465
+    contract: public-api
+    operation: registerDeveloper
+    change: "x-ticvai-permission changed"
+    reason: 'ADAM CR-098 (CHG-R10ID-011): registerDeveloper is public (security []) yet declared DEVELOPER_VIEW and tenant
+      scope, though a developer account has no tenant and an anonymous caller holds no permission. It now declares no
+      permission and platform scope. A permission change cannot be additive.'
+    approved-by: 'Chinmay, CR-098 accepted for r10 (cr-34 decision: "registerDeveloper as public with no permission")'
+    tag: r10
+    producer-tickets: [SVC-PLATFORM-PUBLICAPI-2]
+    consumer-tickets: [APP-SETUP-DEV-002, APP-SETUP-DEV-002-REST, TEST-AM-SETUP-PLATFORM-FOUNDATION-P14]
+  - id: BC-466
+    contract: public-api
+    operation: listIntegrationListings
+    change: "security changed"
+    reason: 'ADAM CR-203, option B (Surendra Loke, ticket 28008), settled 25 October 2026 (CHG-R10ID-014): the one list
+      served the anonymous marketplace, a developer''s drafts and the staff certification queue, so an anonymous caller
+      received every draft, private and rejected listing. The public marketplace is the new listMarketplaceListings
+      (security {}); listIntegrationListings drops the anonymous alternative and is paged, with status and developerId
+      filters. Removing a security alternative cannot be additive.'
+    approved-by: 'Chinmay, 25 October 2026, CR-203 settled with option B ("listIntegrationListings becomes authenticated only")'
+    tag: r10
+    producer-tickets: [SVC-PLATFORM-PUBLICAPI-10]
+    consumer-tickets: [APP-DEVPORTAL-DEV-007, APP-SETUP-DEV-008, APP-SETUP-DEV-008-REST, TEST-AM-PUBLIC-API-P14, TEST-AM-SETUP-PLATFORM-FOUNDATION-P14-REST]
+  - id: BC-480
+    contract: approvals
+    operation: listApprovalRequests
+    operations: [listApprovalRequests, createApprovalRequest, submitApprovalRequest, decideApprovalRequest, withdrawApprovalRequest, cancelApprovalRequest, reopenApprovalRequest, assignApprovalRequest, escalateApprovalRequest, resubmitApprovalRequest, recordExternalApprovalDecision, getApprovalRequest]
+    change: "requestedByPrincipalId` is no longer guaranteed"
+    reason: 'ADAM CR-101 (CHG-R10ID-016): a guest''s privacy request (exportSubjectData, deleteGuestAccount) is raised for
+      a guest, who is a pii.subject and not a principal, so the request records requestedBySubjectId and leaves
+      requestedByPrincipalId null (exactly one of the two is set). A response field that may now be absent cannot be
+      additive.'
+    approved-by: 'Chinmay Parab, 15 October 2026 (ADAM CR-101 accepted: "the requester recorded as a subject (a requested_by_subject_id beside a nullable requested_by_principal_id)")'
+    tag: r10
+    producer-tickets: [SVC-TENANCY-REQUEST-1, SVC-TENANCY-REQUEST-2, SVC-TENANCY-REQUEST-3, VM-TENANCY-REQUEST-1]
+    consumer-tickets: [AM-ADMISSION-ACCESS-P08, AM-ADMISSION-ACCESS-P08-5, AM-APPROVALS-P04, AM-APPROVALS-P08, AM-APPROVALS-P08-4, AM-APPROVALS-P08-5, AM-APPROVALS-P08-BLOCK-A, AM-APPROVALS-P09, AM-FOOD-BEVERAGE-P08-BLOCK-A, AM-ORDERS-RESERVATIONS-P04, AM-PAYMENTS-P08, AM-PRICING-PROMOTIONS-P08-4, AM-TICKETING-P08-2, AM-TICKETING-P08-7, AM-WALLET-CASHLESS-P08-7, AM-WORKFORCE-P06, APP-SETUP-BO-045, APP-SETUP-BO-045-REST, TEST-AM-APPROVALS-P04, TEST-AM-APPROVALS-P08-BLOCK-A]
+  - id: BC-481
+    contract: identity
+    operation: exportSubjectData
+    operations: [exportSubjectData, deleteGuestAccount]
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-101 (CHG-R10ID-016): a guest''s data export or erasure enters Marketing''s privacy queue by an event,
+      so the response period gives it a dueAt; both operations now emit identity.privacyRequestRaised. An emitted event
+      added to an operation is breaking by the compat rule; no response shape changes.'
+    approved-by: 'Chinmay Parab, 15 October 2026 (ADAM CR-101 accepted: "The request enters the privacy queue by event, so its due date applies")'
+    tag: r10
+    producer-tickets: [SVC-IDENTITY-IDENTITY-1, SVC-IDENTITY-GUESTAUTH-1]
+    consumer-tickets: [APP-MOB-GST-066, APP-WEB-WEB-024]
+  - id: BC-467
+    contract: subscription
+    operation: generateInvoice
+    operations: [generateInvoice, listSubscriptionInvoices]
+    change: "invoiceNumber` is no longer guaranteed"
+    reason: 'ADAM CR-202, option B (Surendra Loke, ticket 28000), settled 25 October 2026 (CHG-R10ID-013): generateInvoice
+      creates the invoice as a draft with invoice_number null, and the number is assigned at issue (issueInvoice) from
+      the gapless per-legal-entity sequence, so a draft carries no number. A response field no longer required cannot
+      be additive.'
+    approved-by: 'Chinmay, 25 October 2026, CR-202 settled with option B ("generateInvoice creates the invoice as draft with invoice_number null")'
+    tag: r10
+    producer-tickets: [SVC-PLATFORM-BILLING-6]
+    consumer-tickets: [APP-SETUP-ADM-008, APP-SETUP-ADM-008-REST, APP-CONSOLE-ADM-009, APP-CONSOLE-ADM-459, APP-CONSOLE-ADM-460, APP-CONSOLE-ADM-462, TEST-AM-SETUP-PLATFORM-FOUNDATION-P09-REST, TEST-AM-SUBSCRIPTION-LICENSING-P09-2, TEST-AM-SUBSCRIPTION-LICENSING-P09-5, TEST-AM-SUBSCRIPTION-LICENSING-P09-6]
+  - id: BC-468
+    contract: subscription
+    operation: issueCreditNote
+    operations: [issueCreditNote, listCreditNotes]
+    change: "invoiceId` type string -> string:uuid"
+    reason: 'ADAM CR-202 (CHG-R10ID-013): credit_note.invoice_id becomes uuid, as the control.invoice key it references
+      is. The value was always an invoice id; the declared format now says so. A type change cannot be additive.'
+    approved-by: 'Chinmay, 25 October 2026, CR-202 settled ("credit_note.invoice_id becomes uuid")'
+    tag: r10
+    producer-tickets: [SVC-PLATFORM-BILLING-4, SVC-PLATFORM-BILLING-2]
+    consumer-tickets: [APP-CONSOLE-ADM-462, APP-CONSOLE-ADM-467, TEST-AM-SUBSCRIPTION-LICENSING-P09-6]
+  - id: BC-482
+    contract: identity
+    operation: getGuestSession
+    change: "response `tokens"
+    reason: 'ADAM CR-100 (Deep Khanvilkar, ticket 30655), accepted 15 October 2026 (CHG-R10ID-009): getGuestSession had
+      to return a TokenPair it cannot read back (refresh tokens are kept only as a hash), so every read would have
+      issued and rotated a new pair. It now answers GuestSessionView, the session without tokens; only the guest
+      sign-ins (GuestSession, unchanged) and refreshToken issue tokens, as on the staff side. A removed response field
+      cannot be additive.'
+    approved-by: 'Chinmay, ADAM CR-100 accepted 15 October 2026 ("approved by the lead as a breaking response change (no tokens on a read of the guest session)")'
+    tag: r10
+    producer-tickets: [SVC-IDENTITY-GUESTAUTH-1]
+    consumer-tickets: [APP-MOB-GST-042, APP-MOB-GST-073, APP-WEB-WEB-016, TEST-AM-IDENTITY-SECURITY-P01, TEST-AM-IDENTITY-SECURITY-P02]
+  - id: BC-483
+    contract: identity
+    operation: listDelegatedAccess
+    operations: [listDelegatedAccess, createDelegatedAccess, listDelegations, grantDelegation]
+    change: "delegationKind` gained enum value(s) ['sharedEntitlement']"
+    reason: 'ADAM CR-209, option A (Surendra Loke, ticket 28285), settled 25 October 2026 (CHG-R10ID-004): an entitlement
+      share is an identity.delegated_access row of kind sharedEntitlement, so the grant lists can return that value. A
+      response enum gaining a value is breaking by the compat rule; a client that does not know it shows the grant
+      without a relationship label.'
+    approved-by: 'Chinmay, 25 October 2026, CR-209 settled ("delegation_kind sharedEntitlement (new CHECK value)")'
+    tag: r10
+    producer-tickets: [SVC-IDENTITY-ADMINISTRATION-8, SVC-IDENTITY-IDENTITY-2]
+    consumer-tickets: [APP-MOB-GST-015, APP-MOB-GST-069, APP-PARTNER-PTR-020, APP-WEB-WEB-024, TEST-AM-ADMISSION-ACCESS-P02, TEST-AM-IDENTITY-SECURITY-P10, TEST-AM-MARKETING-CRM-P01, TEST-AM-ORDERS-RESERVATIONS-P02]
+  - id: BC-484
+    contract: white-label
+    operation: recordStorefrontSessionEvents
+    change: "params `header:Idempotency-Key` removed"
+    reason: 'ADAM CR-107 (CHG-R10TEN-013): the storefront runtime posts this as a beacon, and navigator.sendBeacon cannot
+      set a header, so a required Idempotency-Key could never be sent. Each batch carries its own key, batchId, and the
+      operation de-duplicates on it. Numbered BC-480 so the r10 lanes do not collide on the next free number.'
+    approved-by: 'Chinmay, ADAM CR-107 accepted 15 October 2026, option 1: "drops Idempotency-Key from this operation in
+      favour of batchId"; put in r10 on 25 October 2026 ("update and get r10 out")'
+    tag: r10
+    producer-tickets: [SVC-WHITELABEL-OVERVIEW-2]
+    consumer-tickets: [AM-WHITE-LABEL-P01, AM-WHITE-LABEL-P02]
+  # BC-480 to BC-482: lane B of r10 (CHG-R10CAT-003, -009, -011). Numbered from 480 so the parallel r10 lanes never
+  # take one id twice; integration may renumber.
+  - id: BC-485
+    contract: catalogue
+    operation: publishChannelReadinessValidation
+    change: "response `status`"
+    reason: 'ADAM CR-211 (CHG-R10CAT-003): the view''s status was free text describing a nine-value lifecycle that
+      SalesChannelProfile.status and its DDL check do not have; the decision makes it the five values of the state
+      model, so a client can branch on it. Typing a response string as an enum is not additive.'
+    approved-by: 'Chinmay, 25 October 2026, CR-211 resolution: "The view''s status uses the five values of
+      SalesChannelProfile and the DDL: draft, pendingApproval, scheduled, active, suspended."'
+    tag: r10
+    producer-tickets: ['29762', '35237']
+    consumer-tickets: ['29774', '35819', '35820', '35821']
+  - id: BC-486
+    contract: catalogue
+    operation: setEventLifecycleState
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-109 (CHG-R10CAT-009): every lifecycle move now writes event.lifecycleChanged (events/
+      event-lifecycleChanged.yaml, consumed by reporting and ai). A new emitted event is labelled breaking by the
+      compat rule.'
+    approved-by: 'Chinmay, 15 October 2026, CR-109 decision (option 2): "The next release adds: ... an
+      event.lifecycleChanged event"'
+    tag: r10
+    producer-tickets: ['28020', '31410']
+    consumer-tickets: ['28041', '29902', '31464', '35442']
+  - id: BC-487
+    contract: promotions
+    operation: updatePromotion
+    change: "request `isPaused` removed"
+    reason: 'ADAM CR-111 (CHG-R10CAT-011): pausePromotion owns pausing (a reason, the channel rows suspended), and
+      updatePromotion''s isPaused bypassed both. The decision removes it from the body.'
+    approved-by: 'Chinmay, 15 October 2026, CR-111 decision (option 1): "remove isPaused from updatePromotion"'
+    tag: r10
+    producer-tickets: ['28027', '31429']
+    consumer-tickets: ['28043', '31470', '31471', '31472']
+  # BC-480 onward: r10 lane C (orders, shift, F&B, queue, access, AI, venue map, retail). Numbered from 480 so the
+  # r10 lanes, which add entries on separate branches the same day, do not collide on an id.
+  - id: BC-488
+    contract: queue
+    operation: redeemWaitingGuest
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-238, option B (CHG-R10ORD-007): redeemWaitingGuest no longer calls access.validateAccess across
+      deployables; for an entry with a Fast Pass entitlement it writes queueEntry.redeemed through the outbox and
+      Access consumes it (recordQueueRedemptionUse, new at r10, built on the Access side). Adding an emitted event is
+      labelled breaking by the check; the response is unchanged except that entitlementRemaining, already nullable,
+      is null.'
+    approved-by: 'Chinmay, 25 October 2026 (the 48 CRs settled that day; CR-238 option B)'
+    tag: r10
+    producer-tickets: [SVC-VENUEOPS-ENTRY-2]
+    consumer-tickets: [SVC-ACCESS-VALIDATION-2]
+  - id: BC-489
+    contract: identity
+    operation: linkGuestCheckout
+    change: "x-ticvai-emits changed"
+    reason: 'r10 integration, the lead''s ruling on the ADR-0028 tiers (CHG-R10ID-018): Identity is Foundation and no
+      longer reads or writes orders.sales_order; linkGuestCheckout matches the orders in its own projection
+      (orders#guestCheckoutOrders, identity.subject_holding) and emits identity.guestCheckoutLinked, which Orders''
+      attachGuestCheckoutOrders consumes and announces as order.linkedToGuest. The response is unchanged; an emitted
+      event added to an operation is breaking by the compat rule.'
+    approved-by: 'Chinmay, 25 October 2026, r10 lane E rulings, accepted by default (linkGuestCheckout "fix it the ADR-0028 way, by a projection or an event, not raw")'
+    tag: r10
+    producer-tickets: [SVC-IDENTITY-GUESTAUTH-2]
+    consumer-tickets: [APP-MOB-GST-010, APP-MOB-GST-042, APP-WEB-WEB-013, APP-WEB-WEB-016, TEST-AM-IDENTITY-SECURITY-P01, TEST-AM-IDENTITY-SECURITY-P02]
+  - id: BC-490
+    contract: white-label
+    operation: claimCustomDomain
+    operations: [claimCustomDomain, verifyCustomDomain, relinquishCustomDomain, setPrimaryDomain, regenerateDomainToken]
+    change: "x-ticvai-emits changed"
+    reason: 'r10 integration, the lead''s ruling on the ADR-0028 tiers (CHG-R10ID-018): guestUaePassLogin checks its
+      redirect URI against Identity''s projection of the tenant''s custom domains (identity.redirect_host,
+      white-label#customDomainRedirectHosts), fed by the new whitelabel.customDomainChanged that these five domain
+      writes emit. No response changes; an emitted event added to an operation is breaking by the compat rule.'
+    approved-by: 'Chinmay, 25 October 2026, r10 lane E rulings, accepted by default (guestUaePassLogin "redirect URIs come from a projection of white-label''s custom domains, fed by white-label''s domain events")'
+    tag: r10
+    producer-tickets: [SVC-WHITELABEL-WHITE-LABEL-1, SVC-WHITELABEL-WHITE-LABEL-2]
+    consumer-tickets: [APP-WL-ADM-017, APP-WL-CMS-017, TEST-AM-WHITE-LABEL-P09, TEST-AM-WHITE-LABEL-P13]
+  - id: BC-491
+    contract: queue
+    operation: overrideWaitingGuest
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-238 as the lead answered on 25 October 2026 (CHG-R10ORD-023): an override that admits a Fast Pass
+      entry writes queueEntry.redeemed as redeemWaitingGuest does (BC-488), so Access takes the entitlement''s use.
+      Adding an emitted event is labelled breaking by the check; the response is unchanged.'
+    approved-by: 'Chinmay, 25 October 2026 (the answers to the r10 lanes'' questions, question 19)'
+    tag: r10
+    producer-tickets: [SVC-VENUEOPS-ENTRY-2]
+    consumer-tickets: [SVC-ACCESS-VALIDATION-2]
+  - id: BC-492
+    contract: orders
+    operation: updateGroupBooking
+    change: "lost enum value"
+    reason: 'ADAM CR-257, option A (CHG-R10CRF-018): the state model wins, so namesPending is set only by the timer and
+      leaves UpdateGroupBookingRequest.status; a PATCH sending it is 400 on status. Removing a request enum value is
+      breaking by the compat rule; a client that sent it was asking for a move the server never allowed.'
+    approved-by: 'Chinmay, 26 October 2026 ("Accept all (Recommended)", "Comment now + in r10")'
+    tag: r10
+    producer-tickets: ['28375', '32269']
+    consumer-tickets: ['30025', '30031', '30032']

@@ -216,6 +216,15 @@ CHECKS = [
     # 20 October (r8 second fix round, generators lane, CHG-R8GEN-001..003): one permission vocabulary -- every place
     # that names a permission names a value of the Permission enum, and the derived copies agree with it.
     "check-permission-vocabulary",
+    # 25 October (r10 lane E, PROCESS-LOG P-30: 48 CRs in four days on gaps the builds passed): one check per kind no
+    # check could see. Money answered or accepted with no source for its currency (CHG-R10GEN-002); a screen value no
+    # declared operation answers, or a write the screen does not declare (CHG-R10GEN-003); a list order on a nullable
+    # key with no place for nulls, or no order at all (CHG-R10GEN-004); a 409 whose states disagree with the state
+    # model (CHG-R10GEN-005). Never baselined: a new check blocks in the release it arrives (the lead, 25 October).
+    "check-money-currency",
+    "check-screen-value-sources",
+    "check-list-order",
+    "check-state-refusals",
     # 20 October (same round, CHG-R8GEN-002): a refresh step that writes into an authored input (the lineage, the
     # screens, the flows, the contracts' consumed-by, roles-by-app.yaml ...) is a fixed point: run once more after the
     # refresh it changes nothing. Runs alone (SERIAL: it writes while it runs, then puts every file back) and with the

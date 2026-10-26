@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy`, `kernel` |
-| Operations in the slice | 34 of 214 |
+| Operations in the slice | 37 of 214 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -28,6 +28,7 @@
 | [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal`, `identity.role`, `identity.role_permission`, `identity.segregation_rule` |
 | [OrderService](OrderService.md) | `orders.pos_shift` |
 | [PlatformService](PlatformService.md) | `control.api_client` |
+| [VenueOpsService](VenueOpsService.md) | `assets.media_asset` |
 
 ## Operations in the first release
 
@@ -37,12 +38,14 @@
 | approvals | [`approveRoleAuthorityDelegation`](#approveroleauthoritydelegation) | PUT | `/role-authority-delegation` | setup | 1 |  |
 | attendance | [`recordAttendance`](#recordattendance) | POST | `/attendance/clock` | core | 1 | BO-889, BO-935, BO-936, EMP-024, EMP-025, POS-009 |
 | delegation | [`createApprovalDelegation`](#createapprovaldelegation) | POST | `/delegations` | setup | 1 | ADM-243, ADM-534, BO-087, BO-385 |
+| devices | [`createDeviceFirmware`](#createdevicefirmware) | POST | `/device-firmware` | setup | 1 | ADM-587, BO-129 |
 | devices | [`setDeviceAssignment`](#setdeviceassignment) | PUT | `/devices/{deviceId}/assignment` | core | 1 | ADM-582, BO-732, POS-016 |
+| devices | [`setDeviceFirmwareStatus`](#setdevicefirmwarestatus) | POST | `/device-firmware/{firmwareId}/status` | setup | 1 | BO-129 |
 | general | [`getDeviceAssignment`](#getdeviceassignment) | GET | `/devices/{deviceId}/assignment` | core | 1 | POS-016 |
 | identity | [`setRolePermissions`](#setrolepermissions) | PUT | `/roles/{roleId}/permissions` | setup | 1 | BO-054 |
 | matrix | [`setApprovalExternalProvider`](#setapprovalexternalprovider) | PUT | `/approval-external-providers/{externalProviderId}` | setup | 1 | ADM-354 |
 | matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices/{matrixId}` | setup | 1 | ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334 … |
-| region | [`getRegionSettings`](#getregionsettings) | GET | `/regions/{regionId}/settings` | core | 1 | ADM-037, ADM-426, BO-1064, BO-1065 |
+| region | [`getRegionSettings`](#getregionsettings) | GET | `/regions/{regionId}/settings` | core | 1 | ADM-037, ADM-426, BO-044, BO-1064, BO-1065 |
 | region | [`updateRegionSettings`](#updateregionsettings) | PUT | `/regions/{regionId}/settings` | setup | 1 | ADM-426, BO-1065 |
 | request | [`createApprovalRequest`](#createapprovalrequest) | POST | `/approval-requests` | core | 1 | ADM-567, BO-045, BO-1010, BO-1031, BO-1080, BO-1181 … |
 | request | [`decideApprovalRequest`](#decideapprovalrequest) | POST | `/approval-requests/{requestId}/decide` | core | 1 | ADM-145, BO-084, BO-085, BO-243, BO-367, BO-374 … |
@@ -52,10 +55,11 @@
 | rota | [`listRotaAssignments`](#listrotaassignments) | GET | `/rota-assignments` | core | 1 | BO-055, BO-712, BO-714, BO-883, BO-884, EMP-021 … |
 | rota | [`updateRotaAssignment`](#updaterotaassignment) | PATCH | `/rota-assignments/{assignmentId}` | setup | 1 | BO-055 |
 | scope | [`createOrgUnit`](#createorgunit) | POST | `/org-units` | setup | 1 | ADM-006, ADM-420, ADM-421, BO-064, BO-145 |
-| scope | [`listOrgUnits`](#listorgunits) | GET | `/org-units` | core | 1 | ADM-006, ADM-412, ADM-421, BO-055, BO-064, BO-068 … |
+| scope | [`listOrgUnits`](#listorgunits) | GET | `/org-units` | core | 1 | ADM-006, ADM-412, ADM-421, ADM-540, BO-055, BO-064 … |
 | scope | [`updateOrgUnit`](#updateorgunit) | PATCH | `/org-units/{orgUnitId}` | setup | 1 | BO-064, BO-145 |
 | tenancy | [`getWorkstationHealth`](#getworkstationhealth) | GET | `/workstations/{workstationId}/health` | core | 1 | BO-036, BO-128, BO-129, POS-001, POS-025 |
 | tenancy | [`listAuditRecords`](#listauditrecords) | GET | `/audit-records` | core | 1 | ADM-004, ANL-070, BO-035, BO-068, BO-1079, BO-1162 … |
+| tenancy | [`setConfigurationProfile`](#setconfigurationprofile) | PUT | `/configuration-profiles/{profileId}` | setup | 1 | BO-1070, BO-123, BO-129 |
 | tenancy | [`setVenueSettings`](#setvenuesettings) | PUT | `/venues/{venueId}/settings` | setup | 1 | BO-065, BO-1063, BO-136, BO-187, BO-600 |
 | tenancy | [`setVenueSettingsDefaults`](#setvenuesettingsdefaults) | PUT | `/venue-settings-defaults` | setup | 1 | ADM-019, ADM-426, BO-1062 |
 | workstation | [`configureWorkstation`](#configureworkstation) | PUT | `/workstations/{workstationId}` | core | 1 | BO-036, BO-602, POS-016 |
@@ -63,8 +67,8 @@
 | workstation | [`createSaleBoard`](#createsaleboard) | POST | `/sale-boards` | setup | 1 | BO-109, BO-124 |
 | workstation | [`getOutlet`](#getoutlet) | GET | `/outlets/{outletId}` | core | 1 | POS-021 |
 | workstation | [`getWorkstation`](#getworkstation) | GET | `/workstations/{workstationId}` | core | 1 | BO-036, POS-016 |
-| workstation | [`listDevices`](#listdevices) | GET | `/devices` | core | 1 | ADM-580, ANL-003, BO-036, BO-124, BO-405, BO-732 … |
-| workstation | [`listSaleBoards`](#listsaleboards) | GET | `/sale-boards` | core | 1 | BO-109, BO-116, BO-122, BO-123, BO-124, BO-126 … |
+| workstation | [`listDevices`](#listdevices) | GET | `/devices` | core | 1 | ANL-003, BO-036, BO-124, BO-405, BO-732, EMP-043 … |
+| workstation | [`listSaleBoards`](#listsaleboards) | GET | `/sale-boards` | core | 1 | BO-036, BO-109, BO-116, BO-122, BO-123, BO-124 … |
 | workstation | [`updateOutlet`](#updateoutlet) | PATCH | `/outlets/{outletId}` | setup | 1 | BO-044, BO-063, BO-731 |
 | workstation | [`updateSaleBoard`](#updatesaleboard) | PUT | `/sale-boards/{saleBoardId}` | setup | 1 | BO-109, BO-116, BO-124, BO-125, BO-126 |
 
@@ -96,7 +100,7 @@ in-flight requests keep theirs, R129):
 | `product`, `department`, `customerType`, `risk`, `exceptionType`, `legalEntity` | `matchAttributes` (with `module`) |
 | `minimumApprovals`, `rejectionBehavior` | the same-named rule fields |
 | `requestChanges`, `delegate`, `reassign` | `allowRequestChanges`, `allowDelegate`, `allowReassign` |
-| `skipConditions` | `condition`, negated: the rule is skipped where it holds. **Refused `422 condition-not-supported` when not empty** until a condition language exists (APPROVALS-TENANCY-C06, CHG-R8SPN-016) |
+| `skipConditions` | `condition`, negated: the rule is skipped where it holds (ADAM CR-102, CHG-R10ID-015). It is one or more clauses of the condition language (`ApprovalRule.condition`) joined by ` OR ` (skip when any holds); the stored `condition` is each clause negated (`=` and `!=`, `<` and `>=`, `>` and `<=`, `in` and `notIn` swap) joined by ` AND `. A clause that does not parse, or an ` AND ` inside `skipConditions` (its negation would need an OR), is `422 condition-invalid` and nothing is stored. As for any condition, a request missing the attribute does not match the rule |
 | `requiredApproverRole` | `requiredApproverRoleId`, and `approverRoleIds` = [it] when the rule is new. **Required when the rule is new** (`400 approver-role-required`), so `approver_role_ids` is never empty; an existing rule keeps the list it has |
 | (not sent) `sort_order` | a new rule gets **last + 1 in its matrix**, so it is the last rule tried; an existing rule keeps its place. `setApprovalMatrix` reorders |
 
@@ -185,7 +189,7 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 | 201 |  | Created. |
 | 400 |  | Validation failed: module missing or not an ApprovalKind; venue not the venue the caller acts at (audit R183); or a new rule with no requiredApproverRole (approver-role-required). |
 | 409 |  | Refused, and nothing is stored: the rule would loosen a rule set above (loosensParentRule) or can never match because an earlier rule always does (unreachableRule), as setApprovalMatrix refuses it. |
-| 422 |  | skipConditions is not empty, and no condition language exists yet (pull audit R104; APPROVALS-TENANCY-C06, CHG-R8SPN-016): it would be the rule's condition, negated, and a condition is refused, never… |
+| 422 |  | skipConditions cannot become the rule's condition (ADAM CR-102, CHG-R10ID-015): a clause does not parse in the condition language (ApprovalRule.condition), or it joins clauses with AND , whose negati… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### approveRoleAuthorityDelegation
@@ -208,8 +212,9 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 | `delegator`, `delegate` (principal ids; `user` is the delegator when `delegator` is absent) | `delegatorPrincipalId`, `delegatePrincipalId` |
 | `start`, `end`, `reason` | `from`, `to`, `reason` |
 | `requestKind` | `kinds` = [it] (an `ApprovalKind`; absent, every kind) |
-| `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it) |
-| `scope`, `venue`, `region`, `businessUnit`, `legalEntity`, `department` | `scopePath`: the most specific scope node given |
+| `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix, its own approval limit as `createApprovalDelegation` defines it (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it) |
+| `scope`, `venue`, `region`, `department` | `scopePath`: the most specific scope node given |
+| `businessUnit`, `legalEntity` | **not a scope, and not stored** (ADAM CR-102, option 1; CHG-R10ID-015): neither is a level of the scope tree, so neither sets `scopePath`. Kept in the schema so an r1 client still validates; a value sent is ignored |
 | `delegationType` | `delegationType` |
 | `requiredRole` (and `role`, `position`) | `requiredRoleId`: the delegate must hold it (`409 delegateLacksRequiredRole` otherwise); `role` and `position` are display only |
 
@@ -244,8 +249,8 @@ Authority limits of a role stay in `setApprovalMatrix`; this sets the limit of o
 | position | string |  | Position |
 | department | string |  | Department |
 | venue | string |  | Venue |
-| businessUnit | string |  | Business Unit |
-| legalEntity | string |  | Legal Entity |
+| businessUnit | string |  | Business Unit. |
+| legalEntity | string |  | Legal Entity. |
 | region | string |  | Region |
 | delegator | string | yes | Delegator |
 | delegate | string | yes | Delegate |
@@ -463,6 +468,82 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 
 ## Group: devices
 
+### createDeviceFirmware
+
+**`POST /device-firmware`**: Register a firmware or software release before it is deployed
+
+16.6.30 and 16.6.33. **`startDeviceFirmwareRollout` pointed at a release nothing had written.** This is the write: one vendor image for one device kind, with the artefact, its checksum and the version it must be applied from.
+
+**A release starts `draft`** and cannot be rolled out until `setDeviceFirmwareStatus` makes it `released` — registering an image and deciding the fleet may run it are two acts, and usually two people.
+
+The artefact is an uploaded asset (`artefactAssetId`); the device verifies `checksum` before it installs, so an image altered in transit is refused on the device rather than installed. `id`, `status`, `releasedAt`, `installedCount` and `scopePath` are the server's and ignored on input. A second release with the same `deviceKind` and `version` is `409`.
+
+|  |  |
+|---|---|
+| Permission | `DEVICE_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `tenancy.device_firmware` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `assets.media_asset`, `cache:idempotency`, `tenancy.device_firmware` |
+| Writes | `cache:idempotency`, `tenancy.device_firmware` |
+| Called by | ADM-587, BO-129 |
+| State model | Device firmware release ([states/device-firmware.yaml](../../../states/device-firmware.yaml)): created as `draft` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `DeviceFirmware`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| deviceKind | string | yes |  |
+| version | string | yes | (read-only) |
+| vendor | string |  | Who built the image, as the device's driver names its maker. (nullable) |
+| checksumAlgorithm | enum (sha256, sha512) |  | (default sha256) |
+| releaseNotes | string |  | (nullable) |
+| artefactAssetId | string (uuid) |  | (nullable) |
+| checksum | string |  | (nullable) |
+| minimumPreviousVersion | string |  | Some updates cannot be applied from any starting point. (nullable) |
+| releasedAt | string (date-time) |  | Set when setDeviceFirmwareStatus first makes the release released. (read-only; nullable) |
+| installedCount | integer |  | (read-only) |
+| status | enum (draft, released, deprecated, withdrawn) |  | (default draft; read-only) |
+| statusReason | string |  | The reason given when the release was deprecated or withdrawn. (read-only; nullable) |
+| scopePath | string |  | The tenant the release belongs to. (read-only) |
+
+**Response**: `DeviceFirmware`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| deviceKind | string | yes |  |
+| version | string | yes | (read-only) |
+| vendor | string |  | Who built the image, as the device's driver names its maker. (nullable) |
+| checksumAlgorithm | enum (sha256, sha512) |  | (default sha256) |
+| releaseNotes | string |  | (nullable) |
+| artefactAssetId | string (uuid) |  | (nullable) |
+| checksum | string |  | (nullable) |
+| minimumPreviousVersion | string |  | Some updates cannot be applied from any starting point. (nullable) |
+| releasedAt | string (date-time) |  | Set when setDeviceFirmwareStatus first makes the release released. (read-only; nullable) |
+| installedCount | integer |  | (read-only) |
+| status | enum (draft, released, deprecated, withdrawn) |  | (default draft; read-only) |
+| statusReason | string |  | The reason given when the release was deprecated or withdrawn. (read-only; nullable) |
+| scopePath | string |  | The tenant the release belongs to. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Registered, as draft |
+| 400 | BadRequest | Validation failed |
+| 409 |  | A release with this deviceKind and version already exists |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### setDeviceAssignment
 
 **`PUT /devices/{deviceId}/assignment`**: Who owns it, who holds it, and where it is
@@ -471,6 +552,8 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 **Custody is what makes a loss investigable.** A scanner that disappears is a scanner somebody last had, and a model that only knows its workstation cannot say who.
 
 **PUT semantics** (pull audit R103). The target is the device in the path, which has one assignment. The first call creates it and later calls replace it whole, answered `200` either way; an omitted field is cleared to null. `deviceId` comes from the path, and `lastSeenLocation` (reported by the heartbeat), `assignedAt` and `scopePath` are server-owned; all four are `readOnly` and ignored on input.
+
+**One row per device, and its references checked** (ADAM CR-103, option 3, accepted 15 October 2026; CHG-R10TEN-007). The row is keyed by `device_id`, which is required and unique, so two first calls make one row. An `assignedWorkstationId` that is not a workstation of the tenant, an `ownerOrgUnitId` that is not a scope node, a `custodianPrincipalId` that is not a principal, or a `locationScopePath` outside the caller's scope is refused `422` `unknown-reference`, naming the field, and nothing is written.
 
 |  |  |
 |---|---|
@@ -529,6 +612,71 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 |---|---|---|
 | 200 |  | Assigned |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | A reference in the body names nothing the caller can use (unknown-reference, ADAM CR-103): the assigned workstation, the owning scope node or the custodian does not exist, or the location is outside… |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setDeviceFirmwareStatus
+
+**`POST /device-firmware/{firmwareId}/status`**: Release, deprecate or withdraw a firmware release
+
+16.6.30. **The decision that the fleet may run an image.** `draft` → `released` → `deprecated` → `withdrawn`, and `draft` → `withdrawn` for an image that never shipped. Nothing goes back to `draft`, and `withdrawn` is terminal (409).
+
+**Withdrawing is not rolling back.** A withdrawn release cannot start a new rollout, and a running rollout of it is halted; devices already on it stay on it until `rollbackDeviceFirmware` or a newer release moves them. `reason` is required for `deprecated` and `withdrawn` and is written to the device audit.
+
+|  |  |
+|---|---|
+| Permission | `DEVICE_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `tenancy.device_firmware` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `tenancy.device_firmware`, `tenancy.device_rollout` |
+| Writes | `cache:idempotency`, `platform.outbox`, `tenancy.device_audit`, `tenancy.device_firmware`, `tenancy.device_rollout` |
+| Called by | BO-129 |
+| State model | Device firmware release ([states/device-firmware.yaml](../../../states/device-firmware.yaml)): moves `draft` -> `released`, `draft` -> `withdrawn`, `released` -> `deprecated`, `released` -> `withdrawn`, `deprecated` -> `withdrawn` |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| firmwareId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| status | enum (released, deprecated, withdrawn) | yes |  |
+| reason | string |  | Required with deprecated and withdrawn. (max length 500) |
+
+**Response**: `DeviceFirmware`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| deviceKind | string | yes |  |
+| version | string | yes | (read-only) |
+| vendor | string |  | Who built the image, as the device's driver names its maker. (nullable) |
+| checksumAlgorithm | enum (sha256, sha512) |  | (default sha256) |
+| releaseNotes | string |  | (nullable) |
+| artefactAssetId | string (uuid) |  | (nullable) |
+| checksum | string |  | (nullable) |
+| minimumPreviousVersion | string |  | Some updates cannot be applied from any starting point. (nullable) |
+| releasedAt | string (date-time) |  | Set when setDeviceFirmwareStatus first makes the release released. (read-only; nullable) |
+| installedCount | integer |  | (read-only) |
+| status | enum (draft, released, deprecated, withdrawn) |  | (default draft; read-only) |
+| statusReason | string |  | The reason given when the release was deprecated or withdrawn. (read-only; nullable) |
+| scopePath | string |  | The tenant the release belongs to. (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Status set |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The move is not allowed from the release's current status (back to draft, out of withdrawn, or deprecated before released) |
+| 422 |  | deprecated or withdrawn without a reason. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -655,7 +803,11 @@ What requires approval, and who grants it
 
 **The provider decides a level; it does not replace the controls.** Segregation of duties, the reason on a rejection and the immutability of a completed record hold exactly as for a person. If the provider does not answer inside `timeoutMinutes`, `onTimeout` says what happens — by default the level falls back to the rule's `approverRoleIds`, so a dead integration cannot hold a refund for ever.
 
-**PUT semantics — an upsert keyed on `code`**, as `setApprovalSlaPolicy`. Where no provider has that `code` one is created (`201`); where one does, the body replaces it whole (`200`). `id`, `status` changes by the platform, and `lastSuccessAt` are the server's. `outboundCredential` and `signingSecret` are write-only; omitting them on a replace keeps the stored ones. An `endpointUrl` that is not `https`, an `apiClientId` that is not an active API client of the tenant, or a `decisionMapping` that maps no value to `approve` and `reject` is `422`.
+**PUT semantics — an upsert keyed on `code`**, as `setApprovalSlaPolicy`. Where no provider has that `code` one is created with the path's `externalProviderId` as its id (a client UUIDv7) (`201`); where one does, the path's `externalProviderId` must equal its id, else `409 external-provider-id-mismatch` and nothing changes, and the body replaces it whole (`200`) (accepted 26 October 2026, Chinmay, ADAM CR-245 option B). A body `id`, when sent, must equal the path's; `status` changes by the platform and `lastSuccessAt` are the server's. An `endpointUrl` that is not `https`, an `apiClientId` that is not an active API client of the tenant, or a `decisionMapping` that maps no value to `approve` and `reject` is `422`.
+
+**The API-client check is a granted in-process read** (accepted 26 October 2026, Chinmay, ADAM CR-243 option A). `api-client-not-active` is answered from Platform's `public-api#apiClientRecords`, asked in process (served `in-process` as well as `service`) over the control connection commerce already holds for routing (#27692, CR-161): the read XDR-006 of docs/active/cross-deployable-writes.yaml. An `apiClientId` with no row there, whose row's `status` is not `active`, or whose `allowedTenantIds` does not hold the caller's tenant, is the `422`.
+
+**The secrets are kept in the Key Vault secret store** (ADAM CR-243 option A). `outboundCredential` and `signingSecret` are write-only: each is written through the Application's secret-store abstraction (`ISecretStore`, with the Azure Key Vault adapter), and the row keeps the secret's reference, never the value (CHG-R1S-020); omitting either on a replace keeps the stored one. The store is built by its own ticket, ordered before this one; until it lands this operation is built against the abstraction with a test double, never a plaintext column. The same store serves ADR-0071's PIN pepper and every other `*_secret_ref` column.
 
 |  |  |
 |---|---|
@@ -674,7 +826,7 @@ What requires approval, and who grants it
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| externalProviderId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
+| externalProviderId | path | yes | string (uuid) | The record's id (ADAM CR-245). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ApprovalExternalProvider`
@@ -733,6 +885,7 @@ What requires approval, and who grants it
 |---|---|---|
 | 200 |  | Set — an existing provider with this code, replaced |
 | 201 |  | Created — no provider had this code |
+| 409 |  | Refused, and nothing is stored. |
 | 422 |  | The endpoint is not https, the API client is not an active client of the tenant, or the decision mapping has no value for approve or for reject |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -747,7 +900,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 
 **Which level a caller sets — decided 28 September, audit R183.** A caller sets only the matrix of the scope node they act at: a venue sets the venue matrix, a region the region matrix and the tenant the tenant default. The body's `scopeLevel` must be that node's level, or the call is refused `400`; nobody writes a matrix for a level above or below their own through this call.
 
-**PUT semantics — keyed on `kind` and the scope, never on an id.** There is no id in the path and `ApprovalMatrix.id` is read-only, so the body names its target: the matrix for `kind` at `scopeLevel`, on the scope node the caller is acting at (`scopePath` is read-only and set from it). Where no matrix exists for that pair, this creates version 1 and answers `201`; where one does, it stores a new version and answers `200`. **The body replaces the rule set whole**: the new version holds exactly the rules in `rules`, in their `order`, and a rule omitted from the body is not in the new version. Rule `id`s are read-only and ignored on input — each version carries its own rule rows. The previous version is kept, never edited, because requests in flight still point at it.
+**PUT semantics — the matrix is found by `kind` and the scope; the path's `matrixId` is its id** (accepted 26 October 2026, Chinmay, ADAM CR-245 option B). The body names its target: the matrix for `kind` at `scopeLevel`, on the scope node the caller is acting at (`scopePath` is read-only and set from it). Where no matrix exists for that pair, this creates version 1 with the path's `matrixId` as its id (a client UUIDv7, the same idempotency key as a body `id`) and answers `201`; where one does, the path's `matrixId` must equal that matrix's id, and the call stores a new version of it and answers `200`. A `matrixId` that is not the id of the matrix for (`kind`, scope), including one naming another kind's matrix, is `409 matrix-id-mismatch` and nothing changes. `ApprovalMatrix.id` is read-only in the body. **The body replaces the rule set whole**: the new version holds exactly the rules in `rules`, in their `order`, and a rule omitted from the body is not in the new version. Rule `id`s are read-only and ignored on input — each version carries its own rule rows. The previous version is kept, never edited, because requests in flight still point at it.
 
 |  |  |
 |---|---|
@@ -766,7 +919,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| matrixId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
+| matrixId | path | yes | string (uuid) | The record's id (ADAM CR-245). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ApprovalMatrix`
@@ -777,20 +930,20 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | kind | ApprovalKind: enum (refund, priceOverride, discountOverride, complimentaryTicket, membershipCancellation, accessPermissionChange, configurationChange, aiRecommendation, …) | yes | 11.1.7 and 11.1.30–11.1.37. |
 | scopeLevel | enum (tenant, region, venue) | yes |  |
 | scopePath | string |  | (read-only) |
-| version | integer |  | 11.1.80. (read-only) |
+| version | integer | yes | 11.1.80. (read-only) |
 | rules | array of ApprovalRule | yes |  |
 | rules[].id | string (uuid) |  | Added 20 August. (read-only) |
 | rules[].order | integer | yes | First match wins. |
-| rules[].minAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| rules[].minAmount | object |  | Amounts compare in the venue's currency (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020): a request amount in another currency (a supplier's, a tender's) is converted into the cur… |
 | rules[].minAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | rules[].minAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | rules[].minAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| rules[].maxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| rules[].maxAmount | object |  | The upper bound, compared as minAmount is (venue currency, the day''s FX rate; CR-102). |
 | rules[].maxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | rules[].maxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | rules[].maxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | rules[].riskScoreAbove | number |  | 11.1.12. (nullable) |
-| rules[].condition | string |  | 11.1.13. (nullable) |
+| rules[].condition | string |  | 11.1.13. (max length 500; nullable) |
 | rules[].approverRoleIds | array of string (uuid) | yes | Role ids from identity.listRoles (Role.id), which is where an editor gets the names to show and pick from. (min items 1) |
 | rules[].approverScopeLevel | enum (venue, department, region, tenant) |  | 11.1.39. |
 | rules[].mode | ApprovalMode: enum (sequential, parallel, consensus, majority) | yes | 11.1.43–11.1.46. |
@@ -804,7 +957,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].subjectTypes | array of string |  | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
 | rules[].signatureMethods | array of enum (platformKey, uaePass, externalCertificate, drawnSignature) |  | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | rules[].externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
-| rules[].code | string |  | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005). (max length 64; nullable) |
+| rules[].code | string |  | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005; enforced by a unique index on (matrix_id, code) since ADAM CR-102, CHG-R10ID-015, compared without case). (max length 64; nullable) |
 | rules[].minimumApprovals | integer |  | N in N-of-M (CHG-FXC-005). (min 1; nullable) |
 | rules[].requiredApproverRoleId | string (uuid) |  | A role that must be among the approvals whatever N is (the CFO in an N-of-M group); it is also one of approverRoleIds (CHG-FXC-005). (nullable) |
 | rules[].rejectionBehavior | enum (rejectRequest, returnToPreviousLevel, returnToRequester) |  | What a rejection at this rule does; null is rejectRequest (CHG-FXC-005). (nullable) |
@@ -824,20 +977,20 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | kind | ApprovalKind: enum (refund, priceOverride, discountOverride, complimentaryTicket, membershipCancellation, accessPermissionChange, configurationChange, aiRecommendation, …) | yes | 11.1.7 and 11.1.30–11.1.37. |
 | scopeLevel | enum (tenant, region, venue) | yes |  |
 | scopePath | string |  | (read-only) |
-| version | integer |  | 11.1.80. (read-only) |
+| version | integer | yes | 11.1.80. (read-only) |
 | rules | array of ApprovalRule | yes |  |
 | rules[].id | string (uuid) |  | Added 20 August. (read-only) |
 | rules[].order | integer | yes | First match wins. |
-| rules[].minAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| rules[].minAmount | object |  | Amounts compare in the venue's currency (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020): a request amount in another currency (a supplier's, a tender's) is converted into the cur… |
 | rules[].minAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | rules[].minAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | rules[].minAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| rules[].maxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| rules[].maxAmount | object |  | The upper bound, compared as minAmount is (venue currency, the day''s FX rate; CR-102). |
 | rules[].maxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | rules[].maxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | rules[].maxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | rules[].riskScoreAbove | number |  | 11.1.12. (nullable) |
-| rules[].condition | string |  | 11.1.13. (nullable) |
+| rules[].condition | string |  | 11.1.13. (max length 500; nullable) |
 | rules[].approverRoleIds | array of string (uuid) | yes | Role ids from identity.listRoles (Role.id), which is where an editor gets the names to show and pick from. (min items 1) |
 | rules[].approverScopeLevel | enum (venue, department, region, tenant) |  | 11.1.39. |
 | rules[].mode | ApprovalMode: enum (sequential, parallel, consensus, majority) | yes | 11.1.43–11.1.46. |
@@ -851,7 +1004,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | rules[].subjectTypes | array of string |  | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
 | rules[].signatureMethods | array of enum (platformKey, uaePass, externalCertificate, drawnSignature) |  | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | rules[].externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
-| rules[].code | string |  | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005). (max length 64; nullable) |
+| rules[].code | string |  | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005; enforced by a unique index on (matrix_id, code) since ADAM CR-102, CHG-R10ID-015, compared without case). (max length 64; nullable) |
 | rules[].minimumApprovals | integer |  | N in N-of-M (CHG-FXC-005). (min 1; nullable) |
 | rules[].requiredApproverRoleId | string (uuid) |  | A role that must be among the approvals whatever N is (the CFO in an N-of-M group); it is also one of approverRoleIds (CHG-FXC-005). (nullable) |
 | rules[].rejectionBehavior | enum (rejectRequest, returnToPreviousLevel, returnToRequester) |  | What a rejection at this rule does; null is rejectRequest (CHG-FXC-005). (nullable) |
@@ -871,7 +1024,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | 201 |  | Created — no matrix existed for this kind and scope, so this is version 1 |
 | 400 |  | Validation failed. |
 | 409 |  | Refused, and nothing is stored. |
-| 422 |  | A rule carries a condition (not null), and no condition language exists yet (pull audit R104; APPROVALS-TENANCY-C06, CHG-R8SPN-016). |
+| 422 |  | A rule's condition does not parse in the condition language (ApprovalRule.condition: clauses <attribute> <operator> <value> joined by AND , at most 10; ADAM CR-102, CHG-R10ID-015), so it could never… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -894,7 +1047,7 @@ Currency, decimal scale, time zone, date format and fiscal year. These inherit t
 | Read routing | replica |
 | Reads | `cache:resolution`, `platform.region_settings` |
 | Writes | `cache:resolution` |
-| Called by | ADM-037, ADM-426, BO-1064, BO-1065 |
+| Called by | ADM-037, ADM-426, BO-044, BO-1064, BO-1065 |
 
 **Parameters**
 
@@ -1061,7 +1214,8 @@ Raising, deciding and tracking an approval
 Called by the contract that needs the authorisation, not by a person. `createRefund` asks `evaluateApprovalRequirement` first, and where one is required it raises this and holds the refund at `pendingApproval`.
 **The subject is a reference, never a copy.** The request points at the order, the shift or the proposed action; it does not embed it. A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists.
 Draft is supported (11.1.51) for the case where a person raises it themselves and wants to gather detail first.
-**A draft is saved, not routed — decided 28 September, audit R129 (3).** `isDraft: true` stores the request at `draft`: nobody is asked, no SLA runs, and it does not count as an open request for the `409` below, so a person may keep a draft while a contract raises the real one. The draft is sent with `submitApprovalRequest`, which is when the matrix is read, the approvers are resolved and `matrixVersion` is fixed. A contract raising a request never drafts.
+**A draft is saved, not routed — decided 28 September, audit R129 (3).** `isDraft: true` stores the request at `draft`: nobody is asked, no SLA runs, and it does not count as an open request for the `409` below, so a person may keep a draft while a contract raises the real one. The draft is sent with `submitApprovalRequest`, which is when the matrix is read, the approvers are resolved and `matrixVersion` is fixed. A contract raising a request never drafts. A request that is not a draft is routed here the same way: the matrix id and version are fixed and the approver chain is stored (`ApprovalRequest.approvers`; ADAM CR-102, CHG-R10ID-015).
+**A guest's request** (ADAM CR-101; CHG-R10ID-016). Identity raises a guest's privacy request in process for the guest (`exportSubjectData`, `deleteGuestAccount`): the request records the guest as `requestedBySubjectId`, and `requestedByPrincipalId` stays null. Every other request names its principal.
 **No route, no request** (lead's ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015). A request that is not a draft and matches no active rule (no rule of its kind and subject type at its `scopePath`, or for subject type `tenant` no active platform rule) is refused `422 no-approval-route` and nothing is written: it is never approved automatically and never left `pending` with nobody to ask. The calling operation passes the refusal on to its own caller (`suspendTenant`, `reactivateTenant`). A rule that matches but whose roles have no holder is a different case (`rerouteOnNoApprover`, `noApproverAvailable`).
 
 |  |  |
@@ -1072,8 +1226,8 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `approvals.decision`, `approvals.delegation`, `approvals.escalation`, `approvals.matrix`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
-| Writes | `approvals.escalation`, `approvals.request`, `cache:idempotency` |
+| Reads | `approvals.decision`, `approvals.delegation`, `approvals.escalation`, `approvals.matrix`, `approvals.request`, `approvals.request_approver`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
+| Writes | `approvals.escalation`, `approvals.request`, `approvals.request_approver`, `cache:idempotency` |
 | Called by | ADM-567, BO-045, BO-1010, BO-1031, BO-1080, BO-1181, BO-163, BO-243, BO-301, BO-718, BO-771, BO-922, POS-002, POS-020 |
 | State model | Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): created as `draft` or `pending` |
 
@@ -1124,12 +1278,17 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | attributes | object |  | The attributes the raising contract sent (CreateApprovalRequest.attributes), stored as given (ADAM CR-172, fix round 3; CHG-CRA-005). (read-only; nullable) |
 | justification | string |  | (nullable) |
-| requestedByPrincipalId | string (uuid) | yes |  |
+| requestedByPrincipalId | string (uuid) |  | The principal who raised the request, or for whom the raising contract raised it. (nullable) |
+| requestedBySubjectId | string (uuid) |  | The guest who raised the request (ADAM CR-101; CHG-R10ID-016), set by the server from the guest session; null for a request a principal raised. (read-only; nullable) |
 | matrixVersion | integer |  |  |
 | mode | ApprovalMode: enum (sequential, parallel, consensus, majority) |  | 11.1.43–11.1.46. |
 | currentLevel | integer |  |  |
 | totalLevels | integer |  |  |
-| pendingApprovers | array of object |  |  |
+| approvers | array of object |  | The approver chain, fixed when the request is routed (ADAM CR-102, option 1, accepted 15 October 2026; CHG-R10ID-015). (read-only) |
+| approvers[].level | integer | yes | The level of the chain this approver decides at. (min 1) |
+| approvers[].principalId | string (uuid) | yes | The approver, a principal of the tenant. |
+| approvers[].isDelegate | boolean | yes | True when the approver stands in for another through an ApprovalDelegation in force at routing. |
+| pendingApprovers | array of object |  | The rows of approvers at currentLevel who have not decided yet, with their names; derived, not stored (CHG-R10ID-015). |
 | pendingApprovers[].principalId | string (uuid) |  |  |
 | pendingApprovers[].displayName | string |  |  |
 | pendingApprovers[].isDelegate | boolean |  |  |
@@ -1211,8 +1370,8 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `approvals.decision`, `approvals.delegation`, `approvals.escalation`, `approvals.matrix`, `approvals.request`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
-| Writes | `approvals.decision`, `approvals.request`, `cache:idempotency`, `control.partner_agreement`, `control.partner_application`, `control.partner_change_request`, `marketing.privacy_notice_governance`, `platform.outbox` |
+| Reads | `approvals.decision`, `approvals.delegation`, `approvals.escalation`, `approvals.matrix`, `approvals.request`, `approvals.request_approver`, `approvals.rule`, `cache:idempotency`, `identity.principal` |
+| Writes | `approvals.decision`, `approvals.request`, `approvals.request_approver`, `cache:idempotency`, `control.partner_agreement`, `control.partner_application`, `control.partner_change_request`, `marketing.privacy_notice_governance`, `platform.outbox` |
 | Called by | ADM-145, BO-084, BO-085, BO-243, BO-367, BO-374, BO-377, BO-378, BO-940, POS-020 |
 | State model | AccessConfigurationVersion ([states/access-configuration-version.yaml](../../../states/access-configuration-version.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `draft`<br/>AccessDynamicPolicyVersion ([states/access-dynamic-policy-version.yaml](../../../states/access-dynamic-policy-version.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `rejected`<br/>AccessDynamicPolicy ([states/access-dynamic-policy.yaml](../../../states/access-dynamic-policy.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `draft`<br/>AccessMediaTemplateVersion ([states/access-media-template-version.yaml](../../../states/access-media-template-version.yaml)): moves `pendingApproval` -> `published`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `rejected`<br/>AccessMediaTemplate ([states/access-media-template.yaml](../../../states/access-media-template.yaml)): moves `pendingApproval` -> `published`, `pendingApproval` -> `scheduled`, `pendingApproval` -> `draft`<br/>Approval request ([states/approval-request.yaml](../../../states/approval-request.yaml)): moves `escalated` -> `pending`, `pending` -> `approved`, `escalated` -> `approved`, `pending` -> `rejected`, `escalated` -> `rejected`, `pending` -> `returned`, `escalated` -> `returned`, `pending` -> `informationRequested`, `escalated` -> `informationRequested`<br/>Partner agreement ([states/partner-agreement.yaml](../../../states/partner-agreement.yaml)): moves `pendingApproval` -> `active`, `pendingApproval` -> `terminated`<br/>Partner application ([states/partner-application.yaml](../../../states/partner-application.yaml)): moves `inReview` -> `approved`, `inReview` -> `rejected`<br/>Partner change request ([states/partner-change-request.yaml](../../../states/partner-change-request.yaml)): moves `pendingApproval` -> `approved`, `pendingApproval` -> `rejected`<br/>Privacy notice governance ([states/privacy-notice-governance.yaml](../../../states/privacy-notice-governance.yaml)): moves `review` -> `approved`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `pendingApproval` -> `pendingGateway`, `pendingApproval` -> `declined`<br/>Shift swap ([states/shift-swap.yaml](../../../states/shift-swap.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `rejected` |
 
@@ -1255,12 +1414,17 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | attributes | object |  | The attributes the raising contract sent (CreateApprovalRequest.attributes), stored as given (ADAM CR-172, fix round 3; CHG-CRA-005). (read-only; nullable) |
 | justification | string |  | (nullable) |
-| requestedByPrincipalId | string (uuid) | yes |  |
+| requestedByPrincipalId | string (uuid) |  | The principal who raised the request, or for whom the raising contract raised it. (nullable) |
+| requestedBySubjectId | string (uuid) |  | The guest who raised the request (ADAM CR-101; CHG-R10ID-016), set by the server from the guest session; null for a request a principal raised. (read-only; nullable) |
 | matrixVersion | integer |  |  |
 | mode | ApprovalMode: enum (sequential, parallel, consensus, majority) |  | 11.1.43–11.1.46. |
 | currentLevel | integer |  |  |
 | totalLevels | integer |  |  |
-| pendingApprovers | array of object |  |  |
+| approvers | array of object |  | The approver chain, fixed when the request is routed (ADAM CR-102, option 1, accepted 15 October 2026; CHG-R10ID-015). (read-only) |
+| approvers[].level | integer | yes | The level of the chain this approver decides at. (min 1) |
+| approvers[].principalId | string (uuid) | yes | The approver, a principal of the tenant. |
+| approvers[].isDelegate | boolean | yes | True when the approver stands in for another through an ApprovalDelegation in force at routing. |
+| pendingApprovers | array of object |  | The rows of approvers at currentLevel who have not decided yet, with their names; derived, not stored (CHG-R10ID-015). |
 | pendingApprovers[].principalId | string (uuid) |  |  |
 | pendingApprovers[].displayName | string |  |  |
 | pendingApprovers[].isDelegate | boolean |  |  |
@@ -1332,7 +1496,7 @@ A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.2
 **The operation every other contract calls.** It answers before the action, not after, so a cashier learns a discount needs a manager while the guest is still at the counter.
 Returns the matching rule and the resolved approver chain, so the caller can say *"this needs Sara, and she has four hours"* rather than *"this needs approval"*.
 Read-only and deliberately cheap. It runs on the hot path — every refund, every discount, every price override — and a slow answer here is a slow till.
-**Rules match without a condition** (APPROVALS-TENANCY-C06, CHG-R8SPN-016): no stored rule has one, because `setApprovalMatrix` and `approveMatrixMultiLevel` refuse a condition or skip condition `422 condition-not-supported` until a condition language exists (`ApprovalRule.condition`). `createApprovalRequest` and `submitApprovalRequest` route by the same match.
+**Rules match on their condition too** (ADAM CR-102, option 1; CHG-R10ID-015, which replaces the no-condition rule of APPROVALS-TENANCY-C06): the matrix in force (`ApprovalMatrix`) is matched on kind, scope, subject type, amount and `matchAttributes`, and then on the rule's `condition`, evaluated against `attributes` in the language `ApprovalRule.condition` defines; the first rule that matches wins. `createApprovalRequest` and `submitApprovalRequest` route by the same match.
 
 |  |  |
 |---|---|
@@ -1373,16 +1537,16 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 | matchedRule | object |  | (nullable) |
 | matchedRule.id | string (uuid) |  | Added 20 August. (read-only) |
 | matchedRule.order | integer | yes | First match wins. |
-| matchedRule.minAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| matchedRule.minAmount | object |  | Amounts compare in the venue's currency (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020): a request amount in another currency (a supplier's, a tender's) is converted into the cur… |
 | matchedRule.minAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | matchedRule.minAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | matchedRule.minAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| matchedRule.maxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| matchedRule.maxAmount | object |  | The upper bound, compared as minAmount is (venue currency, the day''s FX rate; CR-102). |
 | matchedRule.maxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | matchedRule.maxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | matchedRule.maxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | matchedRule.riskScoreAbove | number |  | 11.1.12. (nullable) |
-| matchedRule.condition | string |  | 11.1.13. (nullable) |
+| matchedRule.condition | string |  | 11.1.13. (max length 500; nullable) |
 | matchedRule.approverRoleIds | array of string (uuid) | yes | Role ids from identity.listRoles (Role.id), which is where an editor gets the names to show and pick from. (min items 1) |
 | matchedRule.approverScopeLevel | enum (venue, department, region, tenant) |  | 11.1.39. |
 | matchedRule.mode | ApprovalMode: enum (sequential, parallel, consensus, majority) | yes | 11.1.43–11.1.46. |
@@ -1396,7 +1560,7 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 | matchedRule.subjectTypes | array of string |  | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
 | matchedRule.signatureMethods | array of enum (platformKey, uaePass, externalCertificate, drawnSignature) |  | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | matchedRule.externalProviderId | string (uuid) |  | 11.1.65 (29 September). (nullable) |
-| matchedRule.code | string |  | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005). (max length 64; nullable) |
+| matchedRule.code | string |  | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005; enforced by a unique index on (matrix_id, code) since ADAM CR-102, CHG-R10ID-015, compared without case). (max length 64; nullable) |
 | matchedRule.minimumApprovals | integer |  | N in N-of-M (CHG-FXC-005). (min 1; nullable) |
 | matchedRule.requiredApproverRoleId | string (uuid) |  | A role that must be among the approvals whatever N is (the CFO in an N-of-M group); it is also one of approverRoleIds (CHG-FXC-005). (nullable) |
 | matchedRule.rejectionBehavior | enum (rejectRequest, returnToPreviousLevel, returnToRequester) |  | What a rejection at this rule does; null is rejectRequest (CHG-FXC-005). (nullable) |
@@ -1439,7 +1603,7 @@ Sorted by SLA proximity rather than age. **A request breaching in ten minutes ma
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `approvals.decision`, `approvals.delegation`, `approvals.escalation`, `approvals.matrix`, `approvals.request` |
+| Reads | `approvals.decision`, `approvals.delegation`, `approvals.escalation`, `approvals.matrix`, `approvals.request`, `approvals.request_approver` |
 | Writes | - |
 | Called by | ADM-130, ADM-145, ADM-224, BO-084, BO-085, BO-1181, BO-364, BO-366, BO-367, BO-368, BO-369, BO-371, BO-374, BO-375, BO-393, BO-940, EMP-037, POS-020 |
 
@@ -1479,12 +1643,17 @@ Sorted by SLA proximity rather than age. **A request breaching in ten minutes ma
 | items[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].attributes | object |  | The attributes the raising contract sent (CreateApprovalRequest.attributes), stored as given (ADAM CR-172, fix round 3; CHG-CRA-005). (read-only; nullable) |
 | items[].justification | string |  | (nullable) |
-| items[].requestedByPrincipalId | string (uuid) | yes |  |
+| items[].requestedByPrincipalId | string (uuid) |  | The principal who raised the request, or for whom the raising contract raised it. (nullable) |
+| items[].requestedBySubjectId | string (uuid) |  | The guest who raised the request (ADAM CR-101; CHG-R10ID-016), set by the server from the guest session; null for a request a principal raised. (read-only; nullable) |
 | items[].matrixVersion | integer |  |  |
 | items[].mode | ApprovalMode: enum (sequential, parallel, consensus, majority) |  | 11.1.43–11.1.46. |
 | items[].currentLevel | integer |  |  |
 | items[].totalLevels | integer |  |  |
-| items[].pendingApprovers | array of object |  |  |
+| items[].approvers | array of object |  | The approver chain, fixed when the request is routed (ADAM CR-102, option 1, accepted 15 October 2026; CHG-R10ID-015). (read-only) |
+| items[].approvers[].level | integer | yes | The level of the chain this approver decides at. (min 1) |
+| items[].approvers[].principalId | string (uuid) | yes | The approver, a principal of the tenant. |
+| items[].approvers[].isDelegate | boolean | yes | True when the approver stands in for another through an ApprovalDelegation in force at routing. |
+| items[].pendingApprovers | array of object |  | The rows of approvers at currentLevel who have not decided yet, with their names; derived, not stored (CHG-R10ID-015). |
 | items[].pendingApprovers[].principalId | string (uuid) |  |  |
 | items[].pendingApprovers[].displayName | string |  |  |
 | items[].pendingApprovers[].isDelegate | boolean |  |  |
@@ -1851,7 +2020,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | Read routing | replica |
 | Reads | `cache:resolution`, `platform.scope` |
 | Writes | `cache:resolution` |
-| Called by | ADM-006, ADM-412, ADM-421, BO-055, BO-064, BO-068, BO-145, CMS-016 |
+| Called by | ADM-006, ADM-412, ADM-421, ADM-540, BO-055, BO-064, BO-068, BO-145, CMS-016, CMS-066 |
 
 **Parameters**
 
@@ -1954,6 +2123,16 @@ Deactivating a node causes every permission query at or beneath it to resolve to
 Board 1 of the client's POS design set. **The package held `lastHeartbeatAt` and a heartbeat timestamp is not a score** — a fleet dashboard exists so somebody can open the worst workstation first, and that needs a ranking.
 **Derived, never reported.** A workstation does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.
 **Returns the contributors, not just the number.** A score of 62 tells a manager to look; the three things dragging it down tell them what to do.
+**The formula, the bands and the windows, proposed defaults the client can correct** (ADAM CR-103, option 3, accepted 15 October 2026; CHG-R10TEN-007; **made exact by ADAM CR-244, option A, accepted 26 October 2026, Chinmay, CHG-R10CRF-004**, so the score is defined here and nowhere else). Computed live from the workstation's active devices (`platform.device`), their heartbeat series (`tenancy.device_telemetry`), the released firmware (`tenancy.device_firmware`) and the workstation's profile (`platform.configuration_profile`):
+- `score` = 40 device online share (the share of its active devices whose last status is `online` or `localMode`) + 25 heartbeat freshness + 20 firmware and profile currency + 15 error rate, rounded to a whole number.
+- **Heartbeat freshness** is the **stalest** active device's last heartbeat: 25 at one minute old or less, 0 at 15 minutes or more, linear between.
+- **Firmware currency**: a device's latest firmware is the newest `released` `tenancy.device_firmware` row for its device kind, ordered by semantic version (major, minor, patch, compared as numbers): 100% on it, 50% one version behind, 0 older. **Profile currency**: a device is current when its `configurationProfileId` equals the workstation's and the workstation's `configurationProfileVersion` equals that profile's `version` (its latest published version, one row per version since CR-228); 100% current, 0 not. The workstation takes the lowest of its active devices' firmware and profile currency, and **the 20 points are the average of the two**.
+- **Error rate**: 15 at no errors in the last hour, 0 at 10 or more, linear between (the sum of `errorCount` in the heartbeat series over the last hour). **Until `tenancy.device_telemetry` lands in the database, this term is dropped and the other three are re-weighted to 100** (each weight times 100/85: online share 47, freshness 29, currency 24, before rounding the sum), and `syncBacklog` and `errorRate` have no source.
+- **A workstation with no active devices** is `offline` with `score` 0 and no `contributors`.
+- `status`: `healthy` at 80 or more, `warning` at 60 or more, `degraded` below 60 (the "failure" of the `Workstation.healthScore` note); **`offline` when every active device is offline** (no heartbeat for 15 minutes, the device window below), whatever the score. A battery under 15% on any device caps it at `warning`, and so, once the heartbeat series lands, does a sync backlog over 100 records on any device.
+- `contributors`: **every factor that has a source**, ordered by the points it lost, most first: `weight` is the points lost out of 100 (0 for a factor that lost none), and `detail` a short phrase naming the device and the value (for example "till printer offline 22 min", "firmware 2.3.1, latest 2.4.0"). The factors are `deviceOffline` (online share), `heartbeatAge` (freshness), `firmwareOutdated` and `profileDrift` (currency), `deviceBattery` (the cap, weight 0), and `errorRate` and `syncBacklog` once the heartbeat series lands.
+- **The device windows** (`states/registered-device.yaml`): a device with no heartbeat for 15 minutes is `offline`, and one silent for 7 days after that is `unknown`.
+- **Ships on this in Sprint 1** (#31204); the client corrects these defaults in one place, here.
 
 |  |  |
 |---|---|
@@ -1964,7 +2143,7 @@ Board 1 of the client's POS design set. **The package held `lastHeartbeatAt` and
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `platform.device`, `platform.workstation` |
+| Reads | `platform.configuration_profile`, `platform.device`, `platform.workstation`, `tenancy.device_firmware`, `tenancy.device_telemetry` |
 | Writes | - |
 | Called by | BO-036, BO-128, BO-129, POS-001, POS-025 |
 
@@ -1997,9 +2176,10 @@ Board 1 of the client's POS design set. **The package held `lastHeartbeatAt` and
 
 **`GET /audit-records`**: Who did what, where, and when
 
-POS board 1 and 4, 24 August. **`platform.audit_record` existed and nothing read it** — fifteen operations write an audit trail and no operation, screen or flow could show one. `BO-068 Audit Log` had zero operations declared.
+POS board 1 and 4, 24 August. **`platform.audit_record` existed and nothing read it** — every write leaves an audit row (the platform writes it in the write's transaction; ADAM CR-179) and no operation, screen or flow could show one. `BO-068 Audit Log` had zero operations declared.
+**A venue caller reads its own venue's trail** (ADAM CR-185, option B, decided 21 October 2026; CHG-R10TEN-006). The table's read policy is the tenant root, or a grant over the scope node a row's `orgUnitId` names: a venue manager holding `AUDIT_VIEW` sees the rows of the venue and the nodes beneath it, a region the rows of its venues, and head office every row. Rows with no `orgUnitId` (consumers, jobs, the webhook) stay the tenant root's. The policy does the narrowing, so the operation's code does not change; `orgUnitId` filters within what the caller may read.
 Found by mapping the POS pack: four separate frames wanted an audit view — station events, profile deployments, limit unlocks, override history — and **every one of them is this operation with a filter.**
-**Reading the audit log is itself audited.** `platform.audit_read` exists for that reason: a trail nobody can inspect is useless, and one anybody can inspect without trace is a different problem. Each call writes one `AuditRead` row (`target` `auditRecord`, the caller, the time, the filters and the number of rows returned; CHG-R8MIG-004).
+**Reading the audit log is itself audited.** `platform.audit_read` exists for that reason: a trail nobody can inspect is useless, and one anybody can inspect without trace is a different problem. Each call writes one `AuditRead` row (`target` `auditRecord`, the caller, the time, the filters and the number of rows returned; CHG-R8MIG-004), with the org unit the caller's session acts at (`orgUnitId`, CHG-R10TEN-019).
 **Never deletes and never edits.** The only operations on an audit record are write and read — which is why there is no `updateAuditRecord` here and never will be.
 **Typed and paged** (pull audit R198, 26 September). The rows were free-form objects in a bare array, so no screen could name a column and BO-035's *cursor pagination, never offset* had nothing to page with. Each row is an `AuditRecord`, carrying exactly the fields this operation filters on, and the list is the shared `Page`. **Gated by `AUDIT_VIEW`, not `AI_AUDIT_VIEW`**: this is the platform trail of every principal's actions, and the AI key covers only what an assistant did.
 **Order.** Newest first, by `occurredAt` descending, then by `id`.
@@ -2041,7 +2221,7 @@ Found by mapping the POS pack: four separate frames wanted an audit view — sta
 | items[].principalId | string (uuid) |  | Who acted. |
 | items[].orgUnitId | string (uuid) |  | The scope node the action happened in. (nullable) |
 | items[].workstationId | string (uuid) |  | The workstation it was done from, where there was one. (nullable) |
-| items[].action | string | yes | What was done, as the writing operation names it. |
+| items[].action | string | yes | What was done, as the writing operation names it; the operation's operationId, or the consumer's or the job's name (ADAM CR-179). |
 | items[].subjectRef | string |  | The thing acted on — a profile, a shift, an order. (nullable) |
 | items[].occurredAt | string (date-time) | yes | When. |
 | items[].platformStaffGrantId | string (uuid) |  | Set when a TICVAI platform operator acted, naming the grant they acted under (identity.openPlatformStaffGrant; decided 28 September, audit R098). (nullable) |
@@ -2054,6 +2234,83 @@ Found by mapping the POS pack: four separate frames wanted an audit view — sta
 |---|---|---|
 | 200 |  | Records, most recent first |
 | 401 | Unauthorized | Missing, expired or superseded session |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setConfigurationProfile
+
+**`PUT /configuration-profiles/{profileId}`**: What a class of workstation is configured to be
+
+Board 1 of the client's POS set. **A profile is what a venue changes; a version is what it deploys**, and the package had a firmware version field and no profile at all.
+**Publishing makes the version immutable.** A workstation still running v2.3 must be able to say what v2.3 was, and a profile edited underneath its deployments cannot.
+**PUT semantics — an upsert keyed on the path's `profileId`** (pull audit R103; corrected 20 October 2026, R8 blocker cause APPROVALS-TENANCY-C07, CHG-R8SPN-017: the path carries the id, and the body's `id` is server-owned). A body that sends `id` must send the path's value, else `400` `validation`:
+- **No profile has that `profileId`:** the profile is created at version 1 with it as its id, and the
+  answer is `201`.
+- **Its latest version is `draft`:** the body replaces that draft whole, the version number
+  stays, and the answer is `200`.
+- **Its latest version is `published` or later:** that version is left exactly as it is and
+  the body becomes the next version (`version` + 1), answered `200`. This is what *a change
+  makes a new version* means, and why no edit of a published version is ever refused — it
+  is never attempted.
+
+**`status` on input is `draft` or `published`**, and sending `published` is how a version is published. `deploying`, `deployed`, `superseded` and `rolledBack` belong to `deployConfigurationProfile`; a body carrying one is a `400` with problem type `validation`. `version`, `deployedCount` and `publishedAt` are server-owned and ignored on input. Omitted optional fields are cleared, not kept.
+
+|  |  |
+|---|---|
+| Permission | `TENANT_CONFIGURE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `platform.configuration_profile` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `platform.configuration_profile` |
+| Writes | `cache:idempotency`, `cache:resolution`, `platform.configuration_profile` |
+| Called by | BO-1070, BO-123, BO-129 |
+| State model | ConfigurationProfile ([states/configuration-profile.yaml](../../../states/configuration-profile.yaml)): created as `draft`; moves `draft` -> `published` **(not settled: see the Gaps sheet)** |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| profileId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `ConfigurationProfile`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| name | string | yes |  |
+| scopePath | string |  |  |
+| venueKindScope | array of string | yes | Which workstation types it applies to. |
+| version | integer | yes | Immutable once deployed anywhere. (read-only) |
+| settings | object |  |  |
+| status | enum (draft, published, deploying, deployed, superseded, rolledBack) | yes | On input only draft or published; sending published publishes this version. |
+| deployedCount | integer |  | (read-only) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+
+**Response**: `ConfigurationProfile`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| name | string | yes |  |
+| scopePath | string |  |  |
+| venueKindScope | array of string | yes | Which workstation types it applies to. |
+| version | integer | yes | Immutable once deployed anywhere. (read-only) |
+| settings | object |  |  |
+| status | enum (draft, published, deploying, deployed, superseded, rolledBack) | yes | On input only draft or published; sending published publishes this version. |
+| deployedCount | integer |  | (read-only) |
+| publishedAt | string (date-time) |  | (read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set — the draft replaced, or a new version stored after a published one |
+| 201 |  | Created — no profile had this profileId |
+| 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -2146,6 +2403,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | alerting.escalateAfterMinutes | integer |  | (nullable) |
 | displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
 | chargeCurrencies | array of string |  | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). (nullable) |
+| stepMinutes | enum (15, 30, 60) |  | The venue's start-time step for a space sold by the hour (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times resources.listProductStartTimes offers (WEB-048, GST… (nullable) |
 | cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
 | cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
 | cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
@@ -2259,6 +2517,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | alerting.escalateAfterMinutes | integer |  | (nullable) |
 | displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
 | chargeCurrencies | array of string |  | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). (nullable) |
+| stepMinutes | enum (15, 30, 60) |  | The venue's start-time step for a space sold by the hour (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times resources.listProductStartTimes offers (WEB-048, GST… (nullable) |
 | cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
 | cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
 | cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
@@ -2408,6 +2667,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | alerting.escalateAfterMinutes | integer |  | (nullable) |
 | displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
 | chargeCurrencies | array of string |  | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). (nullable) |
+| stepMinutes | enum (15, 30, 60) |  | The venue's start-time step for a space sold by the hour (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times resources.listProductStartTimes offers (WEB-048, GST… (nullable) |
 | cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
 | cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
 | cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
@@ -2521,6 +2781,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | alerting.escalateAfterMinutes | integer |  | (nullable) |
 | displayCurrencies | array of string |  | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). (nullable) |
 | chargeCurrencies | array of string |  | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). (nullable) |
+| stepMinutes | enum (15, 30, 60) |  | The venue's start-time step for a space sold by the hour (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times resources.listProductStartTimes offers (WEB-048, GST… (nullable) |
 | cartLeaseSeconds | integer |  | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. (min 30; max 3600; default 900; nullable) |
 | cartHoldExtensionMinutes | integer |  | How long one orders.extendCart extension adds. (min 1; max 30; default 5; nullable) |
 | cartMaxExtensions | integer |  | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). (min 0; max 5; default 1; nullable) |
@@ -3028,7 +3289,7 @@ Physical devices bound to workstations, and staff handsets (`mobileHandset`), wh
 | Read routing | replica |
 | Reads | `platform.device` |
 | Writes | - |
-| Called by | ADM-580, ANL-003, BO-036, BO-124, BO-405, BO-732, EMP-043, POS-016, POS-025 |
+| Called by | ANL-003, BO-036, BO-124, BO-405, BO-732, EMP-043, POS-016, POS-025 |
 
 **Parameters**
 
@@ -3098,6 +3359,7 @@ Physical devices bound to workstations, and staff handsets (`mobileHandset`), wh
 **`GET /sale-boards`**: List sale boards
 
 The configured front ends a workstation may load. A board determines presentation and layout, never authorisation (ADR-0002).
+**Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -3110,7 +3372,7 @@ The configured front ends a workstation may load. A board determines presentatio
 | Read routing | replica |
 | Reads | `platform.sale_board`, `platform.sale_board_page`, `platform.sale_board_tile` |
 | Writes | - |
-| Called by | BO-109, BO-116, BO-122, BO-123, BO-124, BO-126, POS-002, POS-016, POS-025 |
+| Called by | BO-036, BO-109, BO-116, BO-122, BO-123, BO-124, BO-126, POS-002, POS-016, POS-025 |
 
 **Parameters**
 
@@ -3213,6 +3475,7 @@ The configured front ends a workstation may load. A board determines presentatio
 
 Changes reach terminals with the next catalogue bundle, not immediately — a board that rearranged itself mid-transaction would be worse than one that lags.
 **PUT semantics** (pull audit R103). The target is the board in the path; this never creates one. The body replaces the board whole — every page and every tile — so a page or tile left out is removed. `id` is `readOnly` and ignored on input. Tiles are checked as `createSaleBoard` checks them: every product tile's variant is asked of Catalogue's `variantsSellableAt` in process, in the same transaction (ADAM CR-081; CHG-TEN-002), and a refused tile is `422 unknown-variant` or `422 variant-not-sellable`, naming the tile. A `code` already used by another board of the venue is `409 duplicate-code` (CHG-TEN-001).
+**`venueId` must be the board's own venue** (ADAM CR-224, option A, as built; CHG-R10TEN-001): any other value is `400` `validation` on `venueId`, "a sale board does not move between venues", and nothing is written.
 
 |  |  |
 |---|---|
@@ -3377,7 +3640,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | kind | text | yes |  |
 | scope_level | text | yes |  |
 | scope_path | text | no |  |
-| version | integer | no | 11.1.80. |
+| version | integer | yes | 11.1.80. |
 | is_active | boolean | no |  |
 
 ### `approvals.request`
@@ -3399,7 +3662,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | amount | numeric(18,4) | no |  |
 | attributes | jsonb | no | The attributes the raising contract sent (CreateApprovalRequest.attributes), stored as given (ADAM CR-172, fix round 3; CHG-CRA-005). |
 | justification | text | no |  |
-| requested_by_principal_id | uuid | yes |  |
+| requested_by_principal_id | uuid | no | The principal who raised the request, or for whom the raising contract raised it. |
+| requested_by_subject_id | uuid | no | The guest who raised the request (ADAM CR-101; CHG-R10ID-016), set by the server from the guest session; null for a request a principal raised. |
 | matrix_version | integer | no |  |
 | mode | text | no |  |
 | current_level | integer | no |  |
@@ -3420,14 +3684,24 @@ Every table this service owns that the slice reads or writes, with its columns a
 | completed_at | timestamptz | no |  |
 | ai_assessment | jsonb | no | AI context for the reviewer, never an input to the decision (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). |
 
+### `approvals.request_approver`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| request_id | text | yes | The parent row. |
+| level | integer | yes | The level of the chain this approver decides at. |
+| principal_id | uuid | yes | The approver, a principal of the tenant. |
+| is_delegate | boolean | yes | True when the approver stands in for another through an ApprovalDelegation in force at routing. |
+
 ### `approvals.rule`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes | Added 20 August. |
 | sort_order | integer | yes | First match wins. |
-| min_amount | numeric(18,4) | no |  |
-| max_amount | numeric(18,4) | no |  |
+| min_amount | numeric(18,4) | no | Amounts compare in the venue's currency (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020): a request amount in another currency (a supplier's, a tender's) is converted into the cur… |
+| max_amount | numeric(18,4) | no | The upper bound, compared as minAmount is (venue currency, the day''s FX rate; CR-102). |
 | risk_score_above | numeric | no | 11.1.12. |
 | condition | text | no | 11.1.13. |
 | approver_role_ids | text[] | yes | Role ids from identity.listRoles (Role.id), which is where an editor gets the names to show and pick from. |
@@ -3443,7 +3717,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | subject_types | text[] | no | Which subjects of the kind this rule matches (decided 2 October 2026, Chinmay; CHG-CSP-028, CHG-CSP-036, CHG-CSP-031): the CreateApprovalRequest.subjectType values, for example topologyPublication or… |
 | signature_methods | text[] | no | The signature methods this level accepts, where requiresSignature is true (design-notes correction on ADM-344, Block B: "Configuring which stages need a signature is a policy write"; CHG-CSP-045). |
 | external_provider_id | uuid | no | 11.1.65 (29 September). |
-| code | text | no | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005). |
+| code | text | no | A stable code for the rule, unique within its matrix (4 October 2026, CHG-FXC-005; enforced by a unique index on (matrix_id, code) since ADAM CR-102, CHG-R10ID-015, compared without case). |
 | minimum_approvals | integer | no | N in N-of-M (CHG-FXC-005). |
 | required_approver_role_id | uuid | no | A role that must be among the approvals whatever N is (the CFO in an N-of-M group); it is also one of approverRoleIds (CHG-FXC-005). |
 | rejection_behavior | text | no | What a rejection at this rule does; null is rejectRequest (CHG-FXC-005). |
@@ -3466,6 +3740,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | target | text | yes | What was read. |
 | filter | jsonb | no | The query parameters the read was made with (for auditRecord, the list''s filters and cursor). |
 | record_count | integer | no | How many rows the read returned. |
+| org_unit_id | uuid | no | The venue the reader's session acts at, else its region; null for a session at the tenant root (CHG-R10TEN-019). |
 
 ### `platform.audit_record`
 
@@ -3475,10 +3750,24 @@ Every table this service owns that the slice reads or writes, with its columns a
 | principal_id | uuid | no | Who acted. |
 | org_unit_id | uuid | no | The scope node the action happened in. |
 | workstation_id | uuid | no | The workstation it was done from, where there was one. |
-| action | text | yes | What was done, as the writing operation names it. |
+| action | text | yes | What was done, as the writing operation names it; the operation's operationId, or the consumer's or the job's name (ADAM CR-179). |
 | subject_ref | text | no | The thing acted on — a profile, a shift, an order. |
 | occurred_at | timestamptz | yes | When. |
 | platform_staff_grant_id | uuid | no | Set when a TICVAI platform operator acted, naming the grant they acted under (identity.openPlatformStaffGrant; decided 28 September, audit R098). |
+
+### `platform.configuration_profile`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| name | text | yes |  |
+| scope_path | text | no |  |
+| venue_kind_scope | text[] | yes | Which workstation types it applies to. |
+| version | integer | yes | Immutable once deployed anywhere. |
+| settings | jsonb | no |  |
+| status | text | yes | On input only draft or published; sending published publishes this version. |
+| deployed_count | integer | no |  |
+| published_at | timestamptz | no |  |
 
 ### `platform.device`
 
@@ -3671,6 +3960,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | alerting | jsonb | no | CF-134. |
 | display_currencies | text[] | no | Which currencies this venue shows guests (decided 28 September, audit R120 (a)). |
 | charge_currencies | text[] | no | Which currencies a guest may select and pay in (decided 2 October 2026, Chinmay; CHG-FIN-001; MoM 10 Aug 2026 4.7 option (b), DI-211). |
+| step_minutes | integer | no | The venue's start-time step for a space sold by the hour (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times resources.listProductStartTimes offers (WEB-048, GST… |
 | cart_lease_seconds | integer | no | How long a cart holds capacity (decided 28 September, audit R169): 15 minutes, the default catalogue.acquireInventoryHold takes for ttlSeconds. |
 | cart_hold_extension_minutes | integer | no | How long one orders.extendCart extension adds. |
 | cart_max_extensions | integer | no | How many extensions a cart may take before extensionCapReached (Cart.maxExtensions). |
@@ -3734,6 +4024,77 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |
 
+### `tenancy.device_audit`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| device_id | uuid | no |  |
+| at | timestamptz | no |  |
+| kind | text | no |  |
+| action | text | no |  |
+| actor_principal_id | uuid | no |  |
+| previous_value | text | no |  |
+| new_value | text | no |  |
+| source_ip | text | no |  |
+| correlation_id | text | no |  |
+| scope_path | text | no |  |
+
+### `tenancy.device_firmware`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| device_kind | text | yes |  |
+| version | text | yes |  |
+| vendor | text | no | Who built the image, as the device's driver names its maker. |
+| checksum_algorithm | text | no |  |
+| release_notes | text | no |  |
+| artefact_asset_id | uuid | no |  |
+| checksum | text | no |  |
+| minimum_previous_version | text | no | Some updates cannot be applied from any starting point. |
+| released_at | timestamptz | no | Set when setDeviceFirmwareStatus first makes the release released. |
+| installed_count | integer | no |  |
+| status | text | no |  |
+| status_reason | text | no | The reason given when the release was deprecated or withdrawn. |
+| scope_path | text | no | The tenant the release belongs to. |
+
+### `tenancy.device_rollout`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| firmware_id | uuid | yes |  |
+| target_scope_path | text | no |  |
+| target_device_ids | text[] | no |  |
+| waves | jsonb | no | A canary first. |
+| maintenance_window | jsonb | no | When a device may be updated. |
+| is_previous_version_retained | boolean | no | Rollback is only possible if the old image is still there, so this is a property of the rollout rather than of the rollback. |
+| status | text | no |  |
+| succeeded_count | integer | no |  |
+| failed_count | integer | no |  |
+| scope_path | text | no |  |
+
+### `tenancy.device_telemetry`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| device_id | uuid | no |  |
+| at | timestamptz | no |  |
+| battery_percent | integer | no |  |
+| battery_health_percent | integer | no |  |
+| is_charging | boolean | no |  |
+| signal_strength | integer | no |  |
+| cpu_percent | numeric | no |  |
+| memory_percent | numeric | no |  |
+| storage_free_mb | integer | no |  |
+| consumables | jsonb | no | Paper, ribbon, wristband stock — whatever the device kind reports. |
+| uptime_seconds | integer | no |  |
+| sync_backlog | integer | no | The offline records the device held unsynced when it sent this heartbeat (ADAM CR-103; CHG-R10TEN-007). |
+| error_count | integer | no | The errors the device logged since its previous heartbeat (ADAM CR-103; CHG-R10TEN-007). |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ### `workforce.attendance`
 
 | Column | Type | Required | Notes |
@@ -3790,7 +4151,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-180 operations, added to this service in later releases without changing any of the above.
+177 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -3800,11 +4161,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | approvals | `actOnWorkflowInstance`, `approveUnifiedDecision`, `approveVersioningGovernance`, `createApprovalEvidencePackage`, `createAutomationAutonomouAction`, `getApprovalRecord`, `issueAccreditationBadge`, `listAccreditationBadges`, `listApprovalControlPolicies`, `listAutomationExecutions`, `listConditionDecisionLogic`, `listCrossModuleOrchestration`, `listProcessAutomationOpportunity`, `listRuleWorkflow`, `listSlaEscalationBottleneck`, `listSlaEscalationReminder`, `listWorkflow`, `listWorkflowAutonomouGovernance`, `listWorkflowExceptionFailure`, `listWorkflowInstanceProcess`, `listWorkflowProcessPerformance`, `setApprovalControlPolicy`, `setApprovalRetentionPolicy`, `setApprovalSlaPolicy`, `setApproverAvailability`, `setTriggerActionCross`, `setVisualBusinessRule`, `setVisualWorkflow`, `signApprovalDecision`, `simulateWorkflowTestingImpact` |
 | attendance | `amendAttendance`, `listAttendance` |
 | delegation | `listApprovalDelegations`, `revokeApprovalDelegation` |
-| devices | `approveDevice`, `createDeviceFirmware`, `enrolDevice`, `getDeviceFirmware`, `getDeviceTelemetry`, `issueDeviceCredential`, `listDeviceAuditRecords`, `listDeviceFirmware`, `listDeviceTamperEvents`, `recordDeviceTamperEvent`, `revokeDeviceCredential`, `rollbackDeviceFirmware`, `setDeviceFirmwareStatus`, `startDeviceFirmwareRollout` |
+| devices | `approveDevice`, `enrolDevice`, `getDeviceFirmware`, `getDeviceTelemetry`, `issueDeviceCredential`, `listDeviceAuditRecords`, `listDeviceFirmware`, `listDeviceTamperEvents`, `recordDeviceTamperEvent`, `revokeDeviceCredential`, `rollbackDeviceFirmware`, `startDeviceFirmwareRollout` |
 | matrix | `listApprovalExternalProviders`, `listApprovalMatrices`, `listStepUpPolicies`, `setStepUpPolicy` |
 | request | `assignApprovalRequest`, `cancelApprovalRequest`, `escalateApprovalRequest`, `getApprovalRequest`, `listApprovalExternalDispatches`, `listApprovedActionExecutions`, `recordApprovedActionOutcome`, `recordExternalApprovalDecision`, `reopenApprovalRequest`, `resolveApprovedActionExecution`, `resubmitApprovalRequest`, `submitApprovalRequest`, `withdrawApprovalRequest` |
 | rota | `requestShiftSwap` |
 | scope | `getOrgUnit` |
-| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettings`, `getVenueSettingsDefaults`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `requeueDeadLetter`, `resolveTenantHost`, `setConfigurationProfile`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setTenantDomainMapping` |
+| tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettings`, `getVenueSettingsDefaults`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `requeueDeadLetter`, `resolveTenantHost`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setTenantDomainMapping` |
 | workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setStaffingRules`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
 | workstation | `getDevice`, `listOutlets`, `listWorkstations`, `recordDeviceHeartbeat`, `registerDevice` |

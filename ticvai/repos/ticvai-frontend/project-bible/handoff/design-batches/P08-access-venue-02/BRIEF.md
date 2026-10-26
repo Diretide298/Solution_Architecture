@@ -1,6 +1,6 @@
 # P08-access-venue-02 — P08 · Access & Venue (2 of 3)
 
-**10 screens · 47 operations · 68 schemas · 19 permissions**
+**10 screens · 48 operations · 70 schemas · 20 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 19 permissions apply here:
-  `AI_USE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, ASSET_MANAGE, ASSET_VIEW, AUDIT_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, ORDER_MODIFY, ORDER_VIEW, PRODUCT_VIEW`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 20 permissions apply here:
+  `AI_USE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, ASSET_MANAGE, ASSET_VIEW, AUDIT_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, INSPECTION_VIEW, ORDER_MODIFY, ORDER_VIEW`…. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -134,7 +134,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-034` | Scan Activity | C | 7 | 10 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 | `BO-035` | Override Audit | C | 7 | 17 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 | `BO-038` | Reconciliation Queue | C | 3 | 20 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-069` | Asset Register | A | 42 | 22 | 6 | 23 | 3 | 0 | — | notStarted (generated) |
+| `BO-069` | Asset Register | A | 42 | 22 | 6 | 24 | 3 | 0 | — | notStarted (generated) |
 | `BO-071` | Planned Maintenance | D | 20 | 21 | 6 | 5 | 2 | 2 | — | notStarted (generated) |
 | `BO-072` | Incident Log | D | 35 | 22 | 6 | 10 | 0 | 0 | — | notStarted (generated) |
 | `BO-092` | Venue Maps | A | 14 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |

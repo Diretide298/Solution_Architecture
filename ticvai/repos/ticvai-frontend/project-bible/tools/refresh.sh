@@ -448,6 +448,7 @@ cr-watch                                                           # the lead's 
 build-decisions-workbook build-hld-lld build-readiness-page build-readiness-questions build-client-readiness build-closeout-register build-audit-decisions   # hand-run documents for people; each carries dated content a rebuild must not churn
 fix-audit-contract-screens fix-audit-conventions fix-audit-derived-labels fix-audit-load-triggers fix-audit-op-descriptions fix-audit-stale-graph-refs fix-audit-stale-inventory-questions fix-audit-state-models   # one-off audit fixes, already applied
 link-reference-frames md-to-docx                                   # one-off / on request
+fix-read-routes fix-money-currency fix-order-and-refusals            # standing fixers of authored contracts (x-ticvai-read-via, order and refusal sentences), run by hand when check-cross-module-reads, check-money-currency, check-list-order or check-state-refusals names them; a refresh never writes authored inputs (26 October 2026, CHG-R10GEN-006)
 "
 _missing=""
 for _t in tools/*.py; do

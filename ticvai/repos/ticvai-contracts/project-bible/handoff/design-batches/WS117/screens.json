@@ -326,12 +326,11 @@
     "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P10",
      "P11",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }
@@ -567,12 +566,11 @@
     "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P10",
      "P11",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }
@@ -808,12 +806,11 @@
     "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P10",
      "P11",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }
@@ -1049,12 +1046,11 @@
     "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P10",
      "P11",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }
@@ -1313,12 +1309,11 @@
     "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P10",
      "P11",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }
@@ -1554,12 +1549,11 @@
     "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P10",
      "P11",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }
@@ -1795,12 +1789,11 @@
     "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P10",
      "P11",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }
@@ -2036,12 +2029,11 @@
     "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P10",
      "P11",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }
@@ -2293,12 +2285,11 @@
     "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P10",
      "P11",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }
@@ -2594,12 +2585,11 @@
     "name": "TICVAI Control",
     "shell": "web",
     "siblings": [
-     "P10",
      "P11",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }

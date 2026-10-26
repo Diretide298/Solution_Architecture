@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 36 of 101 |
+| Operations in the slice | 37 of 102 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -20,7 +20,6 @@
 | Service | Tables it reads |
 |---|---|
 | [MarketingService](MarketingService.md) | `marketing.consent_record`, `marketing.form_submission`, `marketing.guest_document`, `marketing.guest_profile` |
-| [OrderService](OrderService.md) | `orders.sales_order` |
 | [TenancyService](TenancyService.md) | `platform.scope`, `platform.workstation` |
 
 ## Operations in the first release
@@ -49,6 +48,7 @@
 | identity | [`exportSubjectData`](#exportsubjectdata) | POST | `/guests/{subjectId}/data-export` | core | 1 | GST-066, WEB-024 |
 | identity | [`forceLogout`](#forcelogout) | POST | `/auth/sessions/{sessionId}/force-logout` | core | 1 | BO-053, POS-000 |
 | identity | [`getCurrentSession`](#getcurrentsession) | GET | `/auth/session` | core | 1 | ADM-001, EMP-001, EMP-002, EMP-042, POS-000, PTR-001 … |
+| identity | [`getSubjectDataExport`](#getsubjectdataexport) | GET | `/guests/{subjectId}/data-export/{requestId}` | core | 1 | GST-066, WEB-024 |
 | identity | [`grantDelegation`](#grantdelegation) | POST | `/guests/{subjectId}/delegations` | core | 1 | GST-015 |
 | identity | [`listDelegations`](#listdelegations) | GET | `/guests/{subjectId}/delegations` | core | 1 | GST-015, GST-069, WEB-024 |
 | identity | [`login`](#login) | POST | `/auth/login` | core | 1 | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
@@ -56,7 +56,7 @@
 | identity | [`selectRole`](#selectrole) | POST | `/auth/select-role` | core | 1 | ADM-001, EMP-001, EMP-002, POS-000, POS-001, PTR-001 … |
 | identity | [`setPasswordPolicy`](#setpasswordpolicy) | PUT | `/password-policy` | setup | 1 | ADM-342, ADM-422 |
 | identity | [`setSegregationRules`](#setsegregationrules) | PUT | `/segregation-rules` | setup | 1 | ADM-340 |
-| identity | [`verifyGuestEmail`](#verifyguestemail) | POST | `/auth/guest/verify-email` | core | 1 | GST-010, GST-073, WEB-013, WEB-020 |
+| identity | [`verifyGuestEmail`](#verifyguestemail) | POST | `/auth/guest/verify-email` | core | 1 | GST-010, GST-042, GST-073, WEB-013, WEB-016, WEB-020 |
 | mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | ADM-001, ADM-018, ADM-247, ADM-699, ADM-700, BO-053 … |
 | mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | core | 1 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 |
 | mfa | [`listMfaMethods`](#listmfamethods) | GET | `/auth/mfa/methods` | core | 1 | ADM-342, ADM-699, EMP-042, GST-073, WEB-024 |
@@ -75,6 +75,8 @@
 **The role-time segregation check** (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). The initial set is checked as `setRolePermissions` checks it: every `SegregationRule` is evaluated against the role's permissions, **whatever its `scopeSensitive`**, because every permission of one role is granted together at one scope, so a pair inside a role always overlaps. Only a rule whose `severity` is `block` refuses, with `409 segregation-breach` (`common.yaml`) naming the rule and both permissions; `requireApproval` and `warn` are accepted, and surface when a grant attaches the role (`createDelegatedAccess`, `createPrincipal`) and in `listSegregationViolations`. The status was `422` until r6 (approved breaking change BC-079). **The create is audited**: one `platform.audit_record` row in the same transaction, as `setRolePermissions` writes for a permission change.
 
 **Tenant scope** (decided 14 October 2026, ADAM CR-076; CHG-IDR-001): roles are tenant-wide (`code` is unique per tenant, compared case-insensitively) and their rows are written only at the tenant root, so the operation is called at the tenant scope, as `setRolePermissions` always was (approved breaking change BC-076). A venue manager reads the roles (`listRoles`) and grants them; it does not create them.
+
+**`ROLE_MANAGE` must hold at the tenant root** (decided 25 October 2026, Chinmay, ADAM CR-189 option A; CHG-R10ID-001; the rule on `Session.permissionsByScope`), read from the per-scope set: a caller holding `ROLE_MANAGE` only below the root is `403`, even when it holds another permission (for example `REPORT_VIEW`) at the root, which puts the root among its scope paths. Nothing is written.
 
 |  |  |
 |---|---|
@@ -124,6 +126,7 @@
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | The code is already used in the tenant, compared case-insensitively (duplicate-code), or the initial permission set breaches a segregation rule whose severity is block (segregation-breach, naming the… |
 | 422 |  | A preset code that does not exist (unknown-preset). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -133,6 +136,8 @@
 **`GET /platform-staff-grants/mine`**: The calling platform operator's own grants into this tenant
 
 **How a P09 screen finds a grant already open after a reload** (decided 28 September, audit R098). Callable with `PLATFORM_TENANT_ACCESS`, the permission that opens a grant, so the operator needs no tenant grant to read it; `listPlatformStaffGrants` needs `AUDIT_VIEW`, which the operator only has if a grant carries it. Returns only grants whose `operatorPrincipalId` is the caller, most recent first: **ordered by `openedAt` descending, `id` as the tiebreak** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002).
+
+**The caller is the verified Control Plane token's `sub`** (ADAM CR-175 option A; ADR-0072; CHG-R10ID-007), admitted as `openPlatformStaffGrant` admits it: no tenant session, no tenant principal.
 
 |  |  |
 |---|---|
@@ -186,6 +191,8 @@
 **`GET /principals`**: List principals
 
 **What a venue-scoped caller sees** (decided 14 October 2026, ADAM CR-076; CHG-IDR-001). `USER_MANAGE` is checked at the caller's scope, as before. Any staff grant may read `identity.principal` rows, so the database does not hide a venue's staff from a venue manager; the list is the principals whose home scope (`identity.principal.home_scope_id`, a `platform.scope` row) is at or beneath a node where the caller's `USER_MANAGE` holds, and `scopePath` narrows that further. A `scopePath` outside the caller's reach is `403`. A venue manager therefore lists the venue's people and those homed beneath it, never a sibling venue's.
+
+**The reach is read from the per-scope set, never the flat one** (decided 25 October 2026, Chinmay, ADAM CR-189 option A; CHG-R10ID-001; the rule on `Session.permissionsByScope`): the reach is the scope paths at which `USER_MANAGE` holds after deny resolution, not the session's scope paths. A caller with `USER_MANAGE` at venue A and any other permission (for example `POS_SELL`) at venue B lists A's principals only, and a `scopePath` under B is `403`.
 
 **Each item's `roles`** are read with it from the principal's live role grants (`identity.delegated_access` joined to `identity.role`; see `Principal.roles`).
 
@@ -318,6 +325,8 @@ A role is a grouping for permission management — code, name, description and t
 Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA (audit R135).
 **How the cell admits the operator here and in `listOwnPlatformStaffGrants`** (R8 blocker IDENTITY-C20, CHG-R8MIG-006; the lead's answer, option A). The operator is not a principal of this tenant: the cell validates the Control Plane token, takes its subject as `operatorPrincipalId` (a plain uuid, no foreign key) and reads the MFA step-up from the token's `amr` claim, never from a tenant session. The transaction runs with `ticvai.scope_paths` set to the tenant root and the operator as the audited actor (`AuditRecord.platformStaffGrantId` once the grant exists).
 
+**The token and where the step-up lives** (ADAM CR-175 option A, accepted 21 October 2026; ADR-0072; CHG-R10ID-007). The Control Plane token is a JWT signed by the Control Plane, verified against its JWKS (trusted by configuration), with this cell as its audience; `sub` is the operator (a Control Plane operator, ADR-0072), `ticvai_platform_permissions` the `PLATFORM_*` set, `sid` the platform session. The MFA step-up is recorded in the Control Plane on the operator's platform session and carried as `ticvai_step_up` (`{action, at}`) beside `amr`: this operation accepts it when its action names this operation and it is at most 5 minutes old, in a token that lives at most 15 minutes (ADR-0072), and never reads `identity.mfa_challenge` for an operator. The verification is built in the cell hosts by the platform-auth ticket; until it lands this ticket waits.
+
 |  |  |
 |---|---|
 | Permission | `PLATFORM_TENANT_ACCESS` |
@@ -375,6 +384,8 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 
 **`PUT /capability-templates/{capabilityTemplateId}`**: Save a tick-set under a name
 
+**Presets are read-only; a tenant saves its own beside them** (accepted 21 October 2026, Chinmay, ADAM CR-176 option A; CHG-R10ID-005). A PUT addressed to a preset's id (a row with `isPreset` true, seeded by the platform) is `409 capability-template-is-preset` and changes nothing, so a later reseed of the presets stays safe. On a tenant's own template the server sets `isPreset` false and `presetLevel` null whatever the body says; `module` is kept as sent, so a tenant may file its template under a module.
+
 |  |  |
 |---|---|
 | Permission | `ROLE_MANAGE` |
@@ -428,6 +439,7 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Saved |
+| 409 |  | The id is a platform preset's (isPreset true), which a tenant cannot overwrite (capability-template-is-preset, ADAM CR-176). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updatePrincipal
@@ -435,6 +447,8 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 **`PATCH /principals/{principalId}`**: Update or deactivate a principal
 
 Deactivation invalidates any live session immediately. **A change to `validTo`, to `primaryRoleId` or to the principal's permissions ends every live session of the principal at once** (decided 28 September, audit R126 (1)): the person signs in again and is resolved afresh. A change to `displayName` alone ends nothing.
+
+**Every session and refresh token, at every venue, through one function** (accepted 21 October 2026, Chinmay, ADAM CR-180 option A; CHG-R10ID-006). The caller acts at a venue, but `identity.refresh_token` is tenant-root and `identity.session` venue-isolated, so ending them with the caller's own row security would revoke no token and leave sessions at other venues live while answering 200. So the operation ends them by calling `identity.end_principal_sessions(principal_id, ended_by, reason)`, a SECURITY DEFINER function in the same transaction as the update: it first checks the caller may update that principal (the principal's own write rule: the tenant root, or a grant over its home scope), then sets every `active` session of the principal `terminated` with `ended_at`, `ended_by_principal_id` and `end_reason`, and revokes every live refresh token (`revoked_at`, `revocation_reason`), whatever the venue. No grant or policy is widened. A refusal by the function fails the whole update. Any other operation that must end all of a principal's sessions calls the same function (`forceLogout` ends one session, at the caller's own venue, and does not need it).
 
 **It never grants or removes a role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C15, option A; CHG-R8SPN-024). A role held at a scope is a grant: `createDelegatedAccess` gives one (role, scope, validity) and `deleteDelegatedAccess` takes one away. CMS-019's Change access calls those two for the roles it adds and removes, and this operation only for the display name, active flag and validity.
 
@@ -568,7 +582,9 @@ Raises an erasure request rather than deleting immediately. PII is removed from 
 
 **What blocks it, and where Identity reads it from** (ADAM CR-084, decided 14 October 2026, CHG-GDL-001). The request is refused with `409` while the guest still holds something a deletion would strand: an **open order** (`open-orders-remain`: an order whose status is `pending`, `held`, `partiallyPaid` or `paid`, the rule `orders#openOrdersForSubject` states) or a **live entitlement** (`live-entitlement-remains`: an entitlement whose status is `issued` or `partiallyConsumed` and whose `validTo` is still ahead, the rule `access#liveEntitlementsForSubject` states; a frozen or suspended pass is still `issued`). Identity is Foundation and reads nothing above it (ADR-0028), and Access is another deployable (ADR-0055 rule 4), so neither orders.sales_order nor access.entitlement is read: Identity answers from `identity.subject_holding`, its own projection of the order and entitlement events (`SubjectHolding`). **The erasure job checks the same two conditions again when it runs**, against the projection as it stands then; if a blocking holding appeared after the `202`, it erases nothing and closes the request unfulfilled, naming the problem type that held.
 
-**The request is an Approvals request.** `requestId` is the `approvals.request` id, raised in the same transaction through Approvals' in-process `createApprovalRequest` (Approvals is in the Tenancy module, in `commerce` with Identity; ADR-0055 rule 3). A guest's own erasure needs no human approval step (ADR-0047 section 7); the tenant's approval matrix may add one, and then the erasure job waits for the decision.
+**The request is an Approvals request.** `requestId` is the `approvals.request` id, raised in the same transaction through Approvals' in-process `createApprovalRequest` (Approvals is in the Tenancy module, in `commerce` with Identity; ADR-0055 rule 3). A guest's own erasure needs no human approval step (ADR-0047 section 7); the tenant's approval matrix may add one, and then the erasure job waits for the decision. **It is raised for the guest** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016): kind `configurationChange`, `subjectContract` `identity`, subject type `subjectErasure`, `subjectId` the guest's `pii.subject` id, with the guest recorded as the request's `requestedBySubjectId` and `requestedByPrincipalId` null, since a guest is not a principal.
+
+**It enters the privacy queue** (CR-101, as for `exportSubjectData`). The call emits `identity.privacyRequestRaised` (request type `deletion`), which Marketing turns into a privacy request, so the request's `dueAt` applies; the statutory period is the client's to give. **The erasure job also deletes the guest's data exports**: every `identity.subject_data_export` row of the subject and its file in the tenant's storage, since an export on a signed link is a copy of the guest's data (ADR-0023).
 
 **Every guest is erased locally; only a linked guest fans out.** The job tombstones the guest's `pii.subject` row (`is_erased`, `erased_at`, and `erasure_request_id` = `requestId`; ADR-0047), for every guest. Only where the guest is linked across cells (the session's `GuestSession.guestLinkId` is set; ADR-0010) does it also call cross-region `createDsarRequest` (`kind: erasure`, `serviceAuth`), which raises the cross-cell sync.dsar_request and fans out. A guest who never transacted across regions has no link (cross-region.yaml) and raises no DSAR record.
 
@@ -583,7 +599,7 @@ Raises an erasure request rather than deleting immediately. PII is removed from 
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.subject_holding`, `pii.subject` |
-| Writes | `approvals.request`, `cache:idempotency`, `pii.subject` |
+| Writes | `approvals.request`, `cache:idempotency`, `identity.subject_data_export`, `pii.subject`, `platform.outbox` |
 | Called by | GST-066, WEB-024 |
 
 **Parameters**
@@ -611,6 +627,8 @@ Raises an erasure request rather than deleting immediately. PII is removed from 
 
 **`GET /auth/guest/session`**: Read the current guest session
 
+**A read: it issues no token** (accepted 15 October 2026, ADAM CR-100; CHG-R10ID-009; BC-482). The answer is `GuestSessionView`, the session without `tokens`; only the guest sign-ins and `refreshToken` issue them, as on the staff side. Nothing is rotated, so a cached copy stays true and the read stays offline-capable.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -624,16 +642,12 @@ Raises an erasure request rather than deleting immediately. PII is removed from 
 | Writes | - |
 | Called by | GST-042, GST-073, WEB-016 |
 
-**Response**: `GuestSession`
+**Response**: `GuestSessionView`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
 | displayName | string |  | (nullable) |
-| tokens | TokenPair | yes |  |
-| tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
-| tokens.refreshToken | string | yes |  |
-| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
@@ -738,10 +752,6 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
 | displayName | string |  | (nullable) |
-| tokens | TokenPair | yes |  |
-| tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
-| tokens.refreshToken | string | yes |  |
-| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
@@ -763,6 +773,10 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
 | expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
+| tokens | object | yes | The new access and refresh tokens; refreshToken returns the next pair. |
+| tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
+| tokens.refreshToken | string | yes |  |
+| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 
 **Responses**
 
@@ -815,10 +829,6 @@ Where the provider's verified email matches an existing account, the identities 
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
 | displayName | string |  | (nullable) |
-| tokens | TokenPair | yes |  |
-| tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
-| tokens.refreshToken | string | yes |  |
-| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
@@ -840,6 +850,10 @@ Where the provider's verified email matches an existing account, the identities 
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
 | expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
+| tokens | object | yes | The new access and refresh tokens; refreshToken returns the next pair. |
+| tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
+| tokens.refreshToken | string | yes |  |
+| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 
 **Responses**
 
@@ -857,7 +871,7 @@ Where the provider's verified email matches an existing account, the identities 
 OAuth authorisation-code exchange. Returns a verified identity, so an account created this way needs no further verification.
 Government onboarding has lead time and should be started before it becomes the critical path.
 
-**UAE Pass is integrated in release 1, and so is the ICP identity check** (decided 2 October 2026, Chinmay, critical set 2, BO-627; DEC-457; CHG-CSP-034). Both need the client's access to the providers (UAE Pass onboarding and an ICP service agreement), which is an external dependency the client owns. A UAE Pass identity counts as ID-verified (`IdentityGuestVerificationPolicy.uaePassSatisfiesIdDocument`); the ICP check is a document verification, not a sign-in (`IdentityGuestVerificationPolicy.verificationProvider` `icp`). Each venue's own redirect URI is part of its domain setup (white-label `CustomDomain`; DEC-547).
+**UAE Pass is integrated in release 1, and so is the ICP identity check** (decided 2 October 2026, Chinmay, critical set 2, BO-627; DEC-457; CHG-CSP-034). Both need the client's access to the providers (UAE Pass onboarding and an ICP service agreement), which is an external dependency the client owns. A UAE Pass identity counts as ID-verified (`IdentityGuestVerificationPolicy.uaePassSatisfiesIdDocument`); the ICP check is a document verification, not a sign-in (`IdentityGuestVerificationPolicy.verificationProvider` `icp`). Each venue's own redirect URI is part of its domain setup (DEC-547). **The redirect URI's host is checked against Identity's projection of the tenant's domains** (`white-label#customDomainRedirectHosts`, route projection: `identity.redirect_host`, fed by `whitelabel.customDomainChanged`; r10 ruling on ADR-0028, CHG-R10ID-018): a host that is not an active domain with its UAE Pass redirect ready is refused as a failed exchange (401) and nothing is exchanged.
 
 **What it stores** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): a `pii.subject_identity` row (`provider` `uaePass`, the UAE Pass user id as `providerSubject`), and on a new account a `pii.subject_document` of kind `emiratesId` with the number from the UAE Pass identity-number claim (the claim's name to be confirmed with the client's UAE Pass sandbox).
 
@@ -869,7 +883,7 @@ Government onboarding has lead time and should be started before it becomes the 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.mfa_method`, `pii.subject_contact`, `pii.subject_identity` |
+| Reads | `cache:idempotency`, `identity.mfa_method`, `identity.redirect_host`, `pii.subject_contact`, `pii.subject_identity` |
 | Writes | `cache:idempotency`, `identity.guest_session`, `pii.subject`, `pii.subject_document`, `pii.subject_identity`, `platform.outbox` |
 | Called by | GST-042, WEB-016 |
 
@@ -895,10 +909,6 @@ Government onboarding has lead time and should be started before it becomes the 
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
 | displayName | string |  | (nullable) |
-| tokens | TokenPair | yes |  |
-| tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
-| tokens.refreshToken | string | yes |  |
-| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
@@ -920,6 +930,10 @@ Government onboarding has lead time and should be started before it becomes the 
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
 | expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
+| tokens | object | yes | The new access and refresh tokens; refreshToken returns the next pair. |
+| tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
+| tokens.refreshToken | string | yes |  |
+| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 
 **Responses**
 
@@ -936,7 +950,7 @@ Government onboarding has lead time and should be started before it becomes the 
 A guest who bought without an account, then registered. **The guest names one booking** (`orderReference`, with `verificationCode` from its confirmation); it is attached only when its contact detail matches the caller's verified identifier, and 403 otherwise. Other guest-checkout orders carrying the same verified contact detail are attached in the same call, and `attachedOrderCount` counts every order attached.
 **Only orders whose contact detail matches the now-verified identifier.** Attaching on an unverified claim would hand someone else's booking history to whoever asked for it.
 
-**Each attached order is announced as `order.linkedToGuest`** (ADAM CR-084, decided 14 October 2026, CHG-GDL-003), one event per order with its `subjectId` and current status, written to `platform.outbox` in the attaching transaction (ADR-0033). Identity's projection identity.subject_holding consumes it, so an attached order and the entitlements issued from it block `deleteGuestAccount` like any other the guest holds; without it a guest could erase an account holding a valid ticket bought before registering.
+**Read from Identity's own projection, attached by Orders** (r10, the lead's ruling on the ADR-0028 tiers, 25 October 2026; CHG-R10ID-018). Identity is Foundation and reads nothing above it but a projection, so it never reads or writes an Orders table. It finds the named booking in `identity.subject_holding` (an `order` row with no subject yet, by `orderNumber`, fed by `order.created`) and compares the row's `verifiedContactRef` with the keyed hash of the caller's verified identifier (ADR-0045); a mismatch is 403 and nothing is emitted. Every other subject-less order row with the same `verifiedContactRef` is attached with it. It then emits `identity.guestCheckoutLinked` (the subject and the order ids) to `platform.outbox` in its transaction (ADR-0033); Orders' consumer (`orders.attachGuestCheckoutOrders`) sets each order's subject and announces it as `order.linkedToGuest`, which sets the subject on the projection's order and entitlement rows, so an attached order and its tickets block `deleteGuestAccount` like any other the guest holds (ADAM CR-084, CHG-GDL-003). `attachedOrderCount` counts the orders sent to be attached.
 
 |  |  |
 |---|---|
@@ -946,8 +960,8 @@ A guest who bought without an account, then registered. **The guest names one bo
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.sales_order`, `pii.subject_contact` |
-| Writes | `cache:idempotency`, `orders.sales_order`, `pii.subject`, `platform.outbox` |
+| Reads | `cache:idempotency`, `identity.subject_holding` |
+| Writes | `cache:idempotency`, `platform.outbox` |
 | Called by | GST-010, GST-042, WEB-013, WEB-016 |
 
 **Parameters**
@@ -1008,7 +1022,7 @@ Email or mobile. Verification follows via OTP; the account exists but is unverif
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | identifier | string | yes | Email address or mobile number in E.164. (max length 256) |
-| channel | enum (email, sms, whatsapp) | yes |  |
+| channel | enum (email, sms, whatsapp) |  | Optional for a mobile number (ADAM CR-222, 25 October 2026): left out, the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delive… |
 | displayName | string |  | (max length 200) |
 | password | string |  | Optional. (min length 8; max length 256) |
 | preferredLanguage | string |  | (pattern ^[a-z]{2}$) |
@@ -1023,10 +1037,6 @@ Email or mobile. Verification follows via OTP; the account exists but is unverif
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
 | displayName | string |  | (nullable) |
-| tokens | TokenPair | yes |  |
-| tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
-| tokens.refreshToken | string | yes |  |
-| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
@@ -1048,6 +1058,10 @@ Email or mobile. Verification follows via OTP; the account exists but is unverif
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
 | expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
+| tokens | object | yes | The new access and refresh tokens; refreshToken returns the next pair. |
+| tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
+| tokens.refreshToken | string | yes |  |
+| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 
 **Responses**
 
@@ -1088,7 +1102,7 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | identifier | string | yes | (max length 256) |
-| channel | enum (whatsapp, sms, email) | yes |  |
+| channel | enum (whatsapp, sms, email) |  | Optional for a mobile number (ADAM CR-222, 25 October 2026): left out, the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delive… |
 | purpose | enum (login, register, verify, passwordReset, stepUp) |  | (default login) |
 
 **Response**: `object`
@@ -1142,10 +1156,6 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 |---|---|---|---|
 | subjectId | string (uuid) | yes |  |
 | displayName | string |  | (nullable) |
-| tokens | TokenPair | yes |  |
-| tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
-| tokens.refreshToken | string | yes |  |
-| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 | isVerified | boolean | yes | False until an OTP or a verified provider identity confirms ownership. |
 | identityProviders | array of enum (password, otp, apple, google, uaePass) |  | Linked providers. |
 | guestLinkId | string |  | Present where the guest is linked across cells (ADR-0010). (nullable) |
@@ -1167,6 +1177,10 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 | homeCellName | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
 | expiresAt | string (date-time) | yes | 30 days, sliding (decided 28 September, audit R126 (2)): each use of the session moves this to 30 days from now, and 30 days unused ends it. |
+| tokens | object | yes | The new access and refresh tokens; refreshToken returns the next pair. |
+| tokens.accessToken | string | yes | JWT carrying sid, validated per request against the session registry. |
+| tokens.refreshToken | string | yes |  |
+| tokens.expiresIn | integer | yes | Seconds until the access token expires: PasswordPolicy.accessTokenMinutes x 60, 900 by default (15 minutes; proposed, client to correct). |
 
 **Responses**
 
@@ -1185,7 +1199,7 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 
 **`createPrincipal` defaults `mustChangeCredential` to true and nothing could change a credential**, so every new member of staff was issued an initial secret they could never replace: the first sign-in could not complete. `identity.principal_credential` was read by `login` and written by nothing after creation.
 **The current credential is required even inside a session.** A till left signed in is a session somebody else can use, and changing its PIN without knowing the old one is how that session becomes theirs permanently.
-Held to `setPasswordPolicy` (length, breach check); a PIN is held to the tenant's PIN settings only (`PasswordPolicy.pinLength` digits, `pinReusePrevention`; CHG-CRD-002), because it is valid only on a registered workstation (see `LoginRequest.method`). **Every other session of the principal is ended** on success, since a credential changed because it leaked is not fixed while the leaked one is still signed in.
+Held to `setPasswordPolicy` (length, breach check); a PIN is held to the tenant's PIN settings only (`PasswordPolicy.pinLength` digits, `pinReusePrevention`; CHG-CRD-002), because it is valid only on a registered workstation (see `LoginRequest.method`). **Every other session of the principal is ended** on success, since a credential changed because it leaked is not fixed while the leaked one is still signed in. **What ending them writes** (accepted 26 October 2026, Chinmay, ADAM CR-242 option A): each other live `identity.session` row of the principal takes `status` `terminated`, `endedAt` now, `endedByPrincipalId` the principal itself and `endReason` `credential-changed`; the session that made the change stays signed in. The three columns are V0108's (CHG-R8MIG-015) and the CHECK that `endedAt` is null exactly while `active` is the next forward migration's: until the migration is applied to a database, the change that writes them carries the columns behind it.
 **What it writes** (14 October 2026, CHG-CRD-001, ADAM CR-078): the principal's `identity.principal_credential` row for `method` takes the new PHC hash (ADR-0071), `setAt` now, `failedAttempts` 0 and `lockedUntil` null; the replaced hash goes to `identity.principal_credential_history`, which the reuse check reads; and a successful change **clears `Principal.mustChangeCredential`**, so the session that signed in with a temporary credential becomes usable. **A wrong `currentCredential` is 422 `current-credential-wrong`, not 401**: the session is valid and stays signed in; the wrong attempt counts towards the lockout like a wrong sign-in, and at the threshold the method locks (429 `credential-locked`). A principal provisioned by single sign-on (`Principal.ssoProviderId`) has no local password to change: `method: password` is 409 `credential-managed-by-sso` (a PIN issued to them by `resetPrincipalCredential` is changed here like anyone's).
 
 |  |  |
@@ -1237,6 +1251,16 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 
 **The request is an Approvals request, as for `deleteGuestAccount`.** `requestId` is the `approvals.request` id, raised through Approvals' in-process `createApprovalRequest` (ADR-0055 rule 3); the guest's own export needs no human approval step and the tenant's matrix may add one. Only where the guest is linked across cells (`GuestSession.guestLinkId`; ADR-0010) does the export job also call cross-region `createDsarRequest` (`kind: access`, `serviceAuth`), which raises the cross-cell sync.dsar_request; an unlinked guest raises no DSAR record.
 
+**Which request, and who raised it** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016). Kind `configurationChange`, `subjectContract` `identity`, subject type `subjectDataExport`, `subjectId` the guest's `pii.subject` id (`ApprovalKind`). A guest caller is recorded as the request's `requestedBySubjectId`, with `requestedByPrincipalId` null; a staff caller (`GUEST_VIEW_PII`) as `requestedByPrincipalId`.
+
+**The export job and the file** (CR-101). The call writes an `identity.subject_data_export` row (`SubjectDataExport`, status `awaitingApproval`; `running` where no request is raised) beside the request. The job runs when the request is approved (Identity consumes `approval.granted` for subject type `subjectDataExport`), or at once where the tenant's matrix asks for no approval step; a rejected, withdrawn or expired request ends the row `rejected` with no file. **No matrix means it runs at once** (the lead, 25 October 2026, r10 round 3; CHG-R10ID-024): where Approvals answers `createApprovalRequest` with `no-approval-route` (no rule of the tenant's matrix matches the subject type), no request is raised, the job runs at once, and `requestId` is the export's own id (a UUIDv7 Identity mints), used the same way by the privacy case. The job writes the file in the asked format to the tenant's private object storage and sets the row `ready`. **The file is kept 7 days** from `readyAt` (r10 round 3): then the job deletes it and the row becomes `expired`; a guest who needs it again asks again. **The guest and staff read where it has got to, and download it, with `getSubjectDataExport`**, which issues a short-lived signed link to a `ready` file; no link is ever stored or sent by message.
+
+**The statutory clock** (CR-101). The call emits `identity.privacyRequestRaised`, which Marketing turns into a privacy case in its queue (request type `access`), so the request sits in the privacy queue and its `dueAt` (the jurisdiction's configured response period) applies. **The jurisdiction is the country of the venue the request is raised at** (the request's venue, CR-198; the lead, 25 October 2026, r10 round 3), carried on the event, and **the case carries the request id** (`approvalRequestId`), so the queue and the request are one. **The statutory period itself is the client's to give** (`setPrivacyRequestTypes` `deadlines[].responseDays`); until it is configured the queue shows no deadline, and `estimatedCompletionAt` stays null.
+
+**Which tables it reads** (CR-101). The table set comes from the derived subject-data marker, not from a list kept by hand: a table holds a guest's data when its declared storage has a `subject_id` column, and `handoff/subject-data-register.json` (derived each refresh by `tools/derive-subject-data-register.py`, r8 cause IDENTITY-C65, CHG-R8GEN-015) lists every such table under the module that owns it, so a new table joins the export by its own column. Identity reads its own tables directly; every other owner answers through its `subjectDataRecords(subjectId)` query, which this operation asks in turn as each owner declares it. Until an owner has declared it, the export assembles that owner's data from what the lineage lists for this operation today.
+
+**An erased guest** (CR-101). A subject whose `pii.subject` row is tombstoned (`is_erased` true) is answered `410 subject-erased` and nothing is raised: there is nothing left to export, and the tombstone is the record that the erasure was done.
+
 |  |  |
 |---|---|
 | Permission | `GUEST_VIEW_PII` |
@@ -1247,7 +1271,7 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 | Conflict policy | serverWins |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `identity.subject_holding`, `marketing.consent_record`, `marketing.form_submission`, `marketing.guest_document`, `marketing.guest_profile`, `pii.subject` |
-| Writes | `approvals.request`, `cache:idempotency` |
+| Writes | `approvals.request`, `cache:idempotency`, `identity.subject_data_export`, `platform.outbox` |
 | Called by | GST-066, WEB-024 |
 
 **Parameters**
@@ -1276,6 +1300,8 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Export started, as an Approvals request (and, for a guest linked across cells, a cross-cell sync.dsar_request raised by createDsarRequest). |
+| 404 |  | No such guest, or a guest caller naming a subject that is not its own (never 403, which would confirm the subject exists). |
+| 410 |  | The guest was erased (pii.subject.is_erased true): there is no data left to export, and nothing is raised (subject-erased; ADAM CR-101, CHG-R10ID-016). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### forceLogout
@@ -1362,7 +1388,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | scope[].code | string |  | (nullable) |
 | scope[].name | string |  | (nullable) |
 | effectivePermissions | object | yes | Flattened set across all granted scopes, after deny resolution. |
-| permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path. |
+| permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path, after deny resolution. |
 | permissionsByScope[].scopePath | string | yes | (pattern ^[a-z0-9_]+(\.[a-z0-9_]+)*$) |
 | permissionsByScope[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
 | saleBoardId | string (uuid) |  | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
@@ -1404,6 +1430,57 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | 200 |  | Active session |
 | 409 |  | The session is pending (session-pending); pending names the steps left. |
 | 401 | Unauthorized | Missing, expired or superseded session |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### getSubjectDataExport
+
+**`GET /guests/{subjectId}/data-export/{requestId}`**: Where a guest's data export has got to, and its download link
+
+**The status and download read of a data export** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016). Answers the `identity.subject_data_export` row of the request (`SubjectDataExport`) with the approval's outcome folded in: `awaitingApproval`, `running`, `ready`, `failed` or `rejected`. For a `ready` export it issues a signed link to the file in the tenant's private storage, valid for five minutes; each read issues a new one and none is stored (ADR-0023: an export on a signed URL is personal data, so the link is short and the file is never public). A guest reads its own exports only; staff read any guest's with `GUEST_VIEW_PII`. An erased guest's exports are gone with it: 410.
+
+|  |  |
+|---|---|
+| Permission | `GUEST_VIEW_PII` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Guest callable | True |
+| Reads | `identity.subject_data_export` |
+| Writes | - |
+| Called by | GST-066, WEB-024 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| subjectId | path | yes | string (uuid) |  |
+| requestId | path | yes | string (uuid) | The requestId exportSubjectData answered with. |
+
+**Response**: `SubjectDataExportStatus`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| requestId | string (uuid) | yes |  |
+| subjectId | string (uuid) | yes |  |
+| format | enum (json, csv, pdf) | yes |  |
+| status | enum (awaitingApproval, running, ready, failed, rejected, expired) | yes | As SubjectDataExport.status. |
+| requestedAt | string (date-time) | yes |  |
+| readyAt | string (date-time) |  | (nullable) |
+| downloadUrl | string (uri) |  | A signed link to the file in the tenant's private storage, valid for five minutes from this answer (as the package's other short-lived signed links); null unless status is ready. (nullable) |
+| downloadUrlExpiresAt | string (date-time) |  | When downloadUrl stops working; null with no link. (nullable) |
+| fileSizeBytes | integer (int64) |  | (nullable) |
+| failureReason | string |  | Why the job failed, with failed; null otherwise. (nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The export's status, and a fresh download link when it is ready |
+| 404 |  | No export with this requestId for this guest, or a guest caller naming a subject that is not its own (never 403). |
+| 410 |  | The guest was erased after the export was made; the file went with the erasure (subject-erased). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### grantDelegation
@@ -1468,13 +1545,15 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 | overSubjectName | string |  | The display name of the guest acted for (pii.subject.display_name), read with the grant; null for a staff grant. (read-only; nullable) |
 | overSubjectIsMinor | boolean |  | Whether the guest acted for is under the region's RegionSettings.minorAgeThreshold today, computed from their date of birth, which is never returned; null when no date of birth is held. (read-only; nullable) |
 | overObjectRef | string |  | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. (nullable) |
-| delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
+| delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer, sharedEntitlement) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
 | quota | integer |  | 2.14.15 and 4.3.11. (nullable) |
 | isRevocableBySubject | boolean |  | Whether the person it is over can end it. (default True) |
 | scopePath | string | yes |  |
 | effect | enum (ALLOW, DENY) | yes |  |
 | permissionId | string (uuid) |  | Taken from identity.user_access, 20 September, when that table was collapsed into this one. (nullable) |
 | revokedAt | string (date-time) |  | Taken from identity.user_access. (read-only; nullable) |
+| revokedByKind | enum (principal, subject, system) |  | Who revoked the grant (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004): a staff member (revoked_by_principal_id), a guest (revokedBySubjectId, for example the owner taking back… (read-only; nullable) |
+| revokedBySubjectId | string (uuid) |  | The guest who revoked the grant; set when revokedByKind is subject (ADAM CR-209), since a guest is not a principal and cannot fill revoked_by_principal_id. (read-only; nullable) |
 | validFrom | string (date-time) |  | (nullable) |
 | validTo | string (date-time) |  | (nullable) |
 | createdByPrincipalId | string (uuid) |  |  |
@@ -1535,13 +1614,15 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | items.heldByThisGuest[].overSubjectName | string |  | The display name of the guest acted for (pii.subject.display_name), read with the grant; null for a staff grant. (read-only; nullable) |
 | items.heldByThisGuest[].overSubjectIsMinor | boolean |  | Whether the guest acted for is under the region's RegionSettings.minorAgeThreshold today, computed from their date of birth, which is never returned; null when no date of birth is held. (read-only; nullable) |
 | items.heldByThisGuest[].overObjectRef | string |  | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. (nullable) |
-| items.heldByThisGuest[].delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
+| items.heldByThisGuest[].delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer, sharedEntitlement) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
 | items.heldByThisGuest[].quota | integer |  | 2.14.15 and 4.3.11. (nullable) |
 | items.heldByThisGuest[].isRevocableBySubject | boolean |  | Whether the person it is over can end it. (default True) |
 | items.heldByThisGuest[].scopePath | string | yes |  |
 | items.heldByThisGuest[].effect | enum (ALLOW, DENY) | yes |  |
 | items.heldByThisGuest[].permissionId | string (uuid) |  | Taken from identity.user_access, 20 September, when that table was collapsed into this one. (nullable) |
 | items.heldByThisGuest[].revokedAt | string (date-time) |  | Taken from identity.user_access. (read-only; nullable) |
+| items.heldByThisGuest[].revokedByKind | enum (principal, subject, system) |  | Who revoked the grant (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004): a staff member (revoked_by_principal_id), a guest (revokedBySubjectId, for example the owner taking back… (read-only; nullable) |
+| items.heldByThisGuest[].revokedBySubjectId | string (uuid) |  | The guest who revoked the grant; set when revokedByKind is subject (ADAM CR-209), since a guest is not a principal and cannot fill revoked_by_principal_id. (read-only; nullable) |
 | items.heldByThisGuest[].validFrom | string (date-time) |  | (nullable) |
 | items.heldByThisGuest[].validTo | string (date-time) |  | (nullable) |
 | items.heldByThisGuest[].createdByPrincipalId | string (uuid) |  |  |
@@ -1559,13 +1640,15 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | items.heldOverThisGuest[].overSubjectName | string |  | The display name of the guest acted for (pii.subject.display_name), read with the grant; null for a staff grant. (read-only; nullable) |
 | items.heldOverThisGuest[].overSubjectIsMinor | boolean |  | Whether the guest acted for is under the region's RegionSettings.minorAgeThreshold today, computed from their date of birth, which is never returned; null when no date of birth is held. (read-only; nullable) |
 | items.heldOverThisGuest[].overObjectRef | string |  | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. (nullable) |
-| items.heldOverThisGuest[].delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
+| items.heldOverThisGuest[].delegationKind | enum (primaryHolder, familyMember, groupLeader, attendee, corporateAdmin, corporateMember, carer, sharedEntitlement) |  | What kind of relationship this expresses, for display and for reporting. (nullable) |
 | items.heldOverThisGuest[].quota | integer |  | 2.14.15 and 4.3.11. (nullable) |
 | items.heldOverThisGuest[].isRevocableBySubject | boolean |  | Whether the person it is over can end it. (default True) |
 | items.heldOverThisGuest[].scopePath | string | yes |  |
 | items.heldOverThisGuest[].effect | enum (ALLOW, DENY) | yes |  |
 | items.heldOverThisGuest[].permissionId | string (uuid) |  | Taken from identity.user_access, 20 September, when that table was collapsed into this one. (nullable) |
 | items.heldOverThisGuest[].revokedAt | string (date-time) |  | Taken from identity.user_access. (read-only; nullable) |
+| items.heldOverThisGuest[].revokedByKind | enum (principal, subject, system) |  | Who revoked the grant (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004): a staff member (revoked_by_principal_id), a guest (revokedBySubjectId, for example the owner taking back… (read-only; nullable) |
+| items.heldOverThisGuest[].revokedBySubjectId | string (uuid) |  | The guest who revoked the grant; set when revokedByKind is subject (ADAM CR-209), since a guest is not a principal and cannot fill revoked_by_principal_id. (read-only; nullable) |
 | items.heldOverThisGuest[].validFrom | string (date-time) |  | (nullable) |
 | items.heldOverThisGuest[].validTo | string (date-time) |  | (nullable) |
 | items.heldOverThisGuest[].createdByPrincipalId | string (uuid) |  |  |
@@ -1586,6 +1669,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 
 One sign-in for every staff and partner door. **A browser door sends no `workstationId`** (the TICVAI Console ADM-001, Venue Management SUP-001, the partner portal PTR-001): a desk browser is not a registered device, and requiring one locked every web door out (CHG-DOOR-001, Chinmay, 2 October 2026: fix the Block A blockers now). **A device door sends it** (the till POS-000, the staff handheld EMP-001, the scanner SCN-001), and a device-bound `method` (`pin`, `card`, `rfid`) without it is refused 400 (problem type `workstation-required`), because the device is what bounds a PIN. Nothing else about the sign-in changes: the second factor is asked by permission (audit R135), five wrong codes lock step-up (R126), a second sign-in is refused 409 (R184), and several roles mean a role prompt (ADR-0003). Where the tenant has SSO, the same doors offer `startSsoAuthorization` / `completeSsoAuthorization`, which return the same `LoginResponse`.
 **The credential is checked against `identity.principal_credential`** (`PrincipalCredential`, 14 October 2026, CHG-CRD-001, ADAM CR-078): the row for the principal and `method`, its PHC hash (ADR-0071), and its lockout. A wrong password or PIN adds to `failedAttempts`; at `PasswordPolicy.lockoutAfterAttempts` (password) or `pinLockoutAfterAttempts` (PIN) the method is locked until `lockedUntil`, and a locked method is refused 429 `credential-locked` without the credential being checked. A PIN must be `PasswordPolicy.pinLength` digits. **A principal provisioned by single sign-on** (`Principal.ssoProviderId`) has no local password: a `password` sign-in, or a `pin` sign-in before `resetPrincipalCredential` has issued a PIN, is refused 401 `sso-sign-in-required`, and the door offers `startSsoAuthorization`. A temporary credential (`Principal.mustChangeCredential`) signs in with `LoginResponse.mustChangeCredential` true.
+**A device sign-in is recorded on the device** (ADAM CR-232, the lead's answer to r10 question 23, 25 October 2026; CHG-R10TEN-018). A successful sign-in that names a `workstationId` asks Tenancy's in-process API `tenancy#recordDeviceSignIn` in the same transaction as the session, so each device bound to that workstation gets a `tenancy.device_audit` row of kind `access`, action `signIn`, which `listDeviceAuditRecords` returns.
 
 |  |  |
 |---|---|
@@ -1665,7 +1749,7 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | session.scope[].code | string |  | (nullable) |
 | session.scope[].name | string |  | (nullable) |
 | session.effectivePermissions | object | yes | Flattened set across all granted scopes, after deny resolution. |
-| session.permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path. |
+| session.permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path, after deny resolution. |
 | session.permissionsByScope[].scopePath | string | yes | (pattern ^[a-z0-9_]+(\.[a-z0-9_]+)*$) |
 | session.permissionsByScope[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
 | session.saleBoardId | string (uuid) |  | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
@@ -1707,6 +1791,8 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 **`POST /auth/refresh`**: Rotate the access token
 
 Exchanges a refresh token for a new access token **and a new refresh token**; the one sent is retired (rotation). A staff refresh token slides: it lives `PasswordPolicy.refreshTokenHours` (12 hours by default, proposed, client to correct) from its last use, and never past the session's `expiresAt`. **A retired refresh token sent again is a reuse**: the server ends the session, revokes every refresh token issued from the same sign-in, and answers 401, so a stolen token works at most once (IDENTITY-C25, FOUNDATION-AI-C27; CHG-R8SPN-014; the rule is written once on `bearerAuth`).
+
+**A guest's refresh token is stored as a staff one is** (accepted 15 October 2026, ADAM CR-100; CHG-R10ID-009): an `identity.refresh_token` row with `subject_id` set and `principal_id` null (exactly one of the two), so rotation, reuse detection and revocation (`guestLogout`, `endGuestDeviceSessions`) work the same way for both.
 
 |  |  |
 |---|---|
@@ -1800,7 +1886,7 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | scope[].code | string |  | (nullable) |
 | scope[].name | string |  | (nullable) |
 | effectivePermissions | object | yes | Flattened set across all granted scopes, after deny resolution. |
-| permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path. |
+| permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path, after deny resolution. |
 | permissionsByScope[].scopePath | string | yes | (pattern ^[a-z0-9_]+(\.[a-z0-9_]+)*$) |
 | permissionsByScope[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
 | saleBoardId | string (uuid) |  | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
@@ -2008,7 +2094,7 @@ Two modes on one operation: **`send` issues a single-use token; `confirm` consum
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.otp_challenge`, `pii.subject`, `pii.subject_contact` |
 | Writes | `cache:idempotency`, `identity.otp_challenge`, `marketing.message_dispatch`, `pii.subject` |
-| Called by | GST-010, GST-073, WEB-013, WEB-020 |
+| Called by | GST-010, GST-042, GST-073, WEB-013, WEB-016, WEB-020 |
 
 **Parameters**
 
@@ -2153,6 +2239,8 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 
 **`GET /auth/mfa/methods`**: Enrolled MFA methods
 
+**Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -2225,7 +2313,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | session.scope[].code | string |  | (nullable) |
 | session.scope[].name | string |  | (nullable) |
 | session.effectivePermissions | object | yes | Flattened set across all granted scopes, after deny resolution. |
-| session.permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path. |
+| session.permissionsByScope | array of ScopedPermissions |  | Permissions effective at each granted scope path, after deny resolution. |
 | session.permissionsByScope[].scopePath | string | yes | (pattern ^[a-z0-9_]+(\.[a-z0-9_]+)*$) |
 | session.permissionsByScope[].permissions | array of Permission: enum (SESSION_FORCE_LOGOUT, USER_MANAGE, ROLE_MANAGE, PERMISSION_GRANT, PERMISSION_VIEW, PERMISSION_MANAGE, PLATFORM_TENANT_VIEW, PLATFORM_TENANT_MANAGE, …) | yes |  |
 | session.saleBoardId | string (uuid) |  | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). |
@@ -2367,9 +2455,9 @@ Who is logged in, on which workstation, since when. There was previously no way 
 | items[].sessionId | string | yes | The session's identity.session.id, written as text, and the key forceLogout takes in its path (R8 blocker fix, IDENTITY-C02). |
 | items[].principalId | string (uuid) | yes |  |
 | items[].principalName | string |  | Read from identity.principal with the row. |
-| items[].endedAt | string (date-time) |  | When the session ended; null while active (R8 blocker IDENTITY-C46, CHG-R8MIG-015). (read-only; nullable) |
-| items[].endedByPrincipalId | string (uuid) |  | Who ended it (forceLogout's caller or supervisor); null when the principal signed out or it expired. (read-only; nullable) |
-| items[].endReason | string |  | Why it was ended, as forceLogout was given it (or supervisor-takeover from the till door). (min length 3; max length 500; read-only; nullable) |
+| items[].endedAt | string (date-time) |  | When the session ended; null exactly while active, and set on every other status (R8 blocker IDENTITY-C46, CHG-R8MIG-015; a table CHECK since ADAM CR-242, 26 October 2026). (read-only; nullable) |
+| items[].endedByPrincipalId | string (uuid) |  | Who ended it (forceLogout's caller or supervisor; the principal itself when changeOwnCredential ended its other sessions); null when the principal signed out or it expired. (read-only; nullable) |
+| items[].endReason | string |  | Why it was ended, as forceLogout was given it (or supervisor-takeover from the till door, or credential-changed when changeOwnCredential ended it; ADAM CR-242). (min length 3; max length 500; read-only; nullable) |
 | items[].roleId | string (uuid) |  | (nullable) |
 | items[].roleName | string |  | Read from identity.role with the row. (nullable) |
 | items[].workstationId | string (uuid) |  | (nullable) |
@@ -2431,6 +2519,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | effect | text | yes |  |
 | permission_id | uuid | no | Taken from identity.user_access, 20 September, when that table was collapsed into this one. |
 | revoked_at | timestamptz | no | Taken from identity.user_access. |
+| revoked_by_kind | text | no | Who revoked the grant (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004): a staff member (revoked_by_principal_id), a guest (revokedBySubjectId, for example the owner taking back… |
+| revoked_by_subject_id | uuid | no | The guest who revoked the grant; set when revokedByKind is subject (ADAM CR-209), since a guest is not a principal and cannot fill revoked_by_principal_id. |
 | valid_from | timestamptz | no |  |
 | valid_to | timestamptz | no |  |
 | created_by_principal_id | uuid | no |  |
@@ -2595,12 +2685,24 @@ Every table this service owns that the slice reads or writes, with its columns a
 | replaced_at | timestamptz | yes | When it stopped being the current credential. |
 | id | uuid | yes | Synthesised key. |
 
+### `identity.redirect_host`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| domain_id | uuid | yes | The custom domain''s id in White-label. |
+| hostname | text | yes |  |
+| status | text | yes | The domain''s status as the last event applied gave it. |
+| uae_pass_redirect | text | no |  |
+| last_event_at | timestamptz | yes | The changedAt of the event last applied; an older redelivery changes nothing. |
+
 ### `identity.refresh_token`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| principal_id | uuid | yes |  |
+| principal_id | uuid | no | The staff member or partner the token belongs to; null on a guest's token (ADAM CR-100). |
+| subject_id | uuid | no | The guest the token belongs to (a pii.subject, never a principal); null on a staff token (ADAM CR-100). |
 | hash | text | yes |  |
 | expires_at | timestamptz | yes |  |
 | created_at | timestamptz | yes |  |
@@ -2654,9 +2756,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | yes | A registry that only holds live sessions cannot answer why one ended. |
 | session_id | text | yes | The session's identity.session.id, written as text, and the key forceLogout takes in its path (R8 blocker fix, IDENTITY-C02). |
 | principal_id | uuid | yes |  |
-| ended_at | timestamptz | no | When the session ended; null while active (R8 blocker IDENTITY-C46, CHG-R8MIG-015). |
-| ended_by_principal_id | uuid | no | Who ended it (forceLogout's caller or supervisor); null when the principal signed out or it expired. |
-| end_reason | text | no | Why it was ended, as forceLogout was given it (or supervisor-takeover from the till door). |
+| ended_at | timestamptz | no | When the session ended; null exactly while active, and set on every other status (R8 blocker IDENTITY-C46, CHG-R8MIG-015; a table CHECK since ADAM CR-242, 26 October 2026). |
+| ended_by_principal_id | uuid | no | Who ended it (forceLogout's caller or supervisor; the principal itself when changeOwnCredential ended its other sessions); null when the principal signed out or it expired. |
+| end_reason | text | no | Why it was ended, as forceLogout was given it (or supervisor-takeover from the till door, or credential-changed when changeOwnCredential ended it; ADAM CR-242). |
 | role_id | uuid | no |  |
 | workstation_id | uuid | no |  |
 | venue_id | uuid | no |  |
@@ -2668,6 +2770,20 @@ Every table this service owns that the slice reads or writes, with its columns a
 | working_venue_id | uuid | no | The session's working venue; null while a session that may choose has not chosen. |
 | id | uuid | yes | Synthesised key. |
 
+### `identity.subject_data_export`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | The Approvals request id exportSubjectData answered with; one export per request. |
+| subject_id | uuid | yes | The guest whose data is exported. |
+| format | text | yes |  |
+| status | text | yes | running by default: no matrix means it runs at once (the lead, 25 October 2026, r10 round 3; CHG-R10ID-024), so a row written with no approval request starts with the job running. |
+| file_ref | text | no | The object key of the file in the tenant's private storage; null until ready. |
+| file_size_bytes | bigint | no |  |
+| failure_reason | text | no |  |
+| requested_at | timestamptz | yes |  |
+| ready_at | timestamptz | no |  |
+
 ### `identity.subject_holding`
 
 | Column | Type | Required | Notes |
@@ -2677,6 +2793,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | holding_id | uuid | yes | The order id (orders.sales_order.id) or the entitlement id (access.entitlement.id). |
 | order_id | uuid | no | For an entitlement, the order it was issued from (null for one an invitation issued), so a refund of that order reaches its entitlements. |
 | order_line_id | uuid | no | For an entitlement, the order line it was issued from, so a partial refund reaches only its lines. |
+| order_number | text | no | For an order, its number as the confirmation shows it (order.created orderNumber), so linkGuestCheckout finds a guest''s booking here, never in orders.sales_order (r10 ruling; CHG-R10ID-018). |
+| verified_contact_ref | text | no | For a guest-checkout order, the keyed hash of its verified checkout contact (order.created verifiedContactRef, ADR-0045); linkGuestCheckout compares the caller''s verified identifier with it. |
 | status | text | yes | The owner's status value as the last event applied gave it, an OrderStatus value for an order and an EntitlementStatus value for an entitlement. |
 | valid_to | timestamptz | no | For an entitlement, the end of its validity; null for an order. |
 | last_event_at | timestamptz | no | The occurredAt of the event last applied to the row; an older redelivery changes nothing. |

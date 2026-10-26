@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 214 operations, 106 tables
+title: TenancyService — 214 operations, 107 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -38,7 +38,7 @@ schemas:
   - postgres
   largestTable: workforce.rota_assignment
 - schema: approvals
-  tables: 30
+  tables: 31
   stores:
   - postgres
   largestTable: approvals.request
@@ -51,7 +51,7 @@ schemas:
   tables: 8
   stores:
   - postgres
-  largestTable: tenancy.device_firmware
+  largestTable: tenancy.device_telemetry
 - schema: kernel
   tables: 1
   stores:
@@ -107,16 +107,16 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 6
-    writes: 3
+    reads: 7
+    writes: 4
   - operation: cancelApprovalRequest
     verb: POST
     path: /approval-requests/{requestId}/cancel
     scope: venue
     permission: APPROVAL_CONFIGURE
     offline: false
-    reads: 4
-    writes: 2
+    reads: 5
+    writes: 3
   - operation: createApprovalDelegation
     verb: POST
     path: /delegations
@@ -139,8 +139,8 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 8
-    writes: 3
+    reads: 9
+    writes: 4
   - operation: createAutomationAutonomouAction
     verb: POST
     path: /automation-autonomou-action
@@ -155,16 +155,16 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 8
-    writes: 8
+    reads: 9
+    writes: 9
   - operation: escalateApprovalRequest
     verb: POST
     path: /approval-requests/{requestId}/escalate
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 6
-    writes: 4
+    reads: 7
+    writes: 5
   - operation: evaluateApprovalRequirement
     verb: POST
     path: /approval-requests/evaluate
@@ -195,7 +195,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 3
+    reads: 4
     writes: 0
   - operation: issueAccreditationBadge
     verb: POST
@@ -259,7 +259,7 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_VIEW
     offline: false
-    reads: 5
+    reads: 6
     writes: 0
   - operation: listApprovedActionExecutions
     verb: GET
@@ -387,16 +387,16 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_DECIDE
     offline: false
-    reads: 7
-    writes: 5
+    reads: 8
+    writes: 6
   - operation: reopenApprovalRequest
     verb: POST
     path: /approval-requests/{requestId}/reopen
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 4
-    writes: 3
+    reads: 5
+    writes: 4
   - operation: resolveApprovedActionExecution
     verb: POST
     path: /approved-action-executions/{executionId}/resolve
@@ -411,8 +411,8 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 6
-    writes: 4
+    reads: 7
+    writes: 5
   - operation: revokeApprovalDelegation
     verb: DELETE
     path: /delegations/{delegationId}
@@ -523,16 +523,16 @@ operationsByContract:
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 7
-    writes: 3
+    reads: 8
+    writes: 4
   - operation: withdrawApprovalRequest
     verb: POST
     path: /approval-requests/{requestId}/withdraw
     scope: venue
     permission: APPROVAL_REQUEST
     offline: false
-    reads: 4
-    writes: 3
+    reads: 5
+    writes: 4
 - contract: tenancy
   count: 58
   operations:
@@ -710,7 +710,7 @@ operationsByContract:
     scope: venue
     permission: DEVICE_VIEW
     offline: false
-    reads: 2
+    reads: 5
     writes: 0
   - operation: issueDeviceCredential
     verb: POST
@@ -831,7 +831,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 3
-    writes: 3
+    writes: 4
   - operation: recordDeviceTamperEvent
     verb: POST
     path: /device-tamper-events
@@ -2438,7 +2438,7 @@ tables:
   foreignWriters:
   - white-label
 - table: approvals.request
-  columns: 35
+  columns: 36
   store: postgres
   parent: null
   writtenBy:
@@ -2453,6 +2453,13 @@ tables:
   - identity
   - subscription
   - white-label
+- table: approvals.request_approver
+  columns: 5
+  store: postgres
+  parent: approvals.request
+  writtenBy:
+  - approvals
+  foreignWriters: null
 - table: approvals.retention_policy
   columns: 9
   store: postgres
@@ -2544,7 +2551,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: platform.audit_read
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -2652,6 +2659,7 @@ tables:
   - orders
   - payments
   - promotions
+  - queue
   - reporting
   - seating
   - shift
@@ -2671,6 +2679,7 @@ tables:
   - orders
   - payments
   - promotions
+  - queue
   - reporting
   - seating
   - shift
@@ -2754,7 +2763,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: platform.venue_settings
-  columns: 32
+  columns: 33
   store: postgres
   parent: null
   writtenBy:
@@ -2819,10 +2828,11 @@ tables:
   - tenancy
   foreignWriters: null
 - table: tenancy.device_telemetry
-  columns: 13
+  columns: 15
   store: postgres
   parent: platform.device
-  writtenBy: []
+  writtenBy:
+  - tenancy
   foreignWriters: null
 - table: workforce.announcement
   columns: 14
@@ -3159,7 +3169,6 @@ screens:
 - P08:ADM-367 AI Optimization & What-If Simulator
 - P08:ADM-368 AI Governance Executive Advisor
 - P08:ADM-567 Payment Policy, Governance & Approval Manager
-- P08:ADM-580 Payment Terminal & Device Inventory
 - P08:ADM-581 Terminal Provisioning & Device Configuration
 - P08:ADM-582 POS, Kiosk & Terminal Assignment Manager
 - P08:ADM-584 Payment Server & Terminal Connectivity Manager
@@ -3381,6 +3390,7 @@ screens:
 - P09:ADM-530 AI Approval Requirement & Routing Configuration
 - P09:ADM-532 Conditional Approval & Approval Conditions
 - P09:ADM-534 Escalation, Delegation & Approval SLA Management
+- P09:ADM-540 AI Decision Explorer & Search
 - P11:ACC-002 Registration Form
 - P11:ACC-003 Application Review & Submit
 - P11:ACC-004 Application Status Tracking
@@ -3389,6 +3399,7 @@ screens:
 - P11:ACC-007 Reviewer Application Detail
 - P11:ACC-008 Credential Register
 - P13:CMS-016 Site Settings
+- P13:CMS-066 Tags, Keywords & Classification
 - P16:ANL-003 Operational Performance
 - P16:ANL-050 Retention, Archive & Governance Policy
 - P16:ANL-070 Analytics Governance, Security & Audit Center

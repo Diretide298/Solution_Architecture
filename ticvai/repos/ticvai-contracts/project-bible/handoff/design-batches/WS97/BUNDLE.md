@@ -336,6 +336,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - … and 1 more flow steps (`flows/`)
 - Flow F206 branch at step 1 (expected): when Nothing has been set up on Rental Executive Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F206 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1167,6 +1168,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS125 Rental Management Board 10.dc.html#bo-588`
 - Workshop pack: Rental_Management.pdf board 10
 - Flow F206 *Rental Management board 10: Rental Executive Command Center*, step 8: Works in Rental Duration, Extension & Return Analytics → Understand customer usage behavior after checkout. The source explicitly requires reporting on rental duration and late returns.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1291,6 +1293,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS125 Rental Management Board 10.dc.html#bo-589`
 - Workshop pack: Rental_Management.pdf board 10
 - Flow F206 *Rental Management board 10: Rental Executive Command Center*, step 10: Works in Damage, Loss, Deposit & Exception Analytics → Give management visibility into operational and financial risk. The original scope explicitly requires reporting on damaged items and deposit collection/refund.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1457,6 +1460,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS125 Rental Management Board 10.dc.html#bo-590`
 - Workshop pack: Rental_Management.pdf board 10
 - Flow F206 *Rental Management board 10: Rental Executive Command Center*, step 12: Works in Location & Channel Performance → Compare rental performance across physical locations and sales channels.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

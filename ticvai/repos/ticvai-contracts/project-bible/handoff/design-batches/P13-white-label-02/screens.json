@@ -2644,6 +2644,12 @@
    {
     "id": "formCreateGuidedChoice",
     "component": "modal",
+    "reads": [
+     "listProducts",
+     "listProductCategories",
+     "listEvents",
+     "listBookingFlows"
+    ],
     "trigger": "New set-up",
     "body": "**Collects what `createGuidedChoice` sends before it is called.** Required: `name` (staff-facing), `mode`, `questions` (one or two, each with two to four answers and a target per answer). Optional: `showBanner` (default on). Created as a draft; guests see nothing until it is published. Dismissing sends nothing; the screen behind is unchanged. **One to four questions; the answers filter the catalogue by default and a target per answer is optional** (W4, 29 September) (CHG-SGU-022).",
     "bindsTo": "GuidedChoice",

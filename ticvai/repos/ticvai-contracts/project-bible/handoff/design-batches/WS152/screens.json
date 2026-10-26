@@ -62,7 +62,10 @@
     {
      "to": "ADM-613",
      "trigger": "Void, Reversal & Cancellation Manager\\t120",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "paymentId"
+     ]
     },
     {
      "to": "ADM-614",
@@ -75,7 +78,10 @@
     {
      "to": "ADM-615",
      "trigger": "Refund Processing, Provider Status & Recovery Center\\t122",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "paymentId"
+     ]
     },
     {
      "to": "ADM-616",

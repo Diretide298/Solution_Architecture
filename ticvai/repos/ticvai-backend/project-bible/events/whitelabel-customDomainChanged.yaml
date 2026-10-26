@@ -1,0 +1,46 @@
+# whitelabel.customDomainChanged v1 — published by white-label
+# Added 25 October 2026 (r10, the lead's ruling on the ADR-0028 tiers; CHG-R10ID-018): Identity checks a UAE Pass
+# redirect URI against its own projection of the tenant's custom domains, so the domain rows reach it by this event.
+
+name: whitelabel.customDomainChanged
+version: 1
+publisher: white-label
+description: A tenant's custom domain was claimed, verified, made primary, re-tokened or relinquished.
+aggregate: customDomain
+emittedWhen: claimCustomDomain, verifyCustomDomain, setPrimaryDomain, regenerateDomainToken or relinquishCustomDomain
+  writes the domain row
+emittedBy:
+- white-label.claimCustomDomain
+- white-label.verifyCustomDomain
+- white-label.relinquishCustomDomain
+- white-label.setPrimaryDomain
+- white-label.regenerateDomainToken
+payload:
+- field: domainId
+  type: uuid
+- field: hostname
+  type: string
+- field: kind
+  type: string
+  notes: CustomDomain.kind
+- field: status
+  type: string
+  notes: CustomDomain.status after the change
+- field: isPrimary
+  type: boolean
+- field: uaePassRedirect
+  type: string
+  notes: CustomDomain.readiness.uaePassRedirect after the change (ready, pending, notApplicable)
+- field: changedAt
+  type: timestamp
+consumers:
+- context: identity
+  purpose: Keep identity.redirect_host, the hosts a guest sign-in may redirect to (white-label#customDomainRedirectHosts),
+    so guestUaePassLogin checks its redirect URI without reading whitelabel.custom_domain (ADR-0028)
+  writes:
+  - identity.redirect_host
+  idempotencyKey: domainId + changedAt
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: No state model emits this. An older redelivery (changedAt before the row's) changes nothing.

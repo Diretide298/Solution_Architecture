@@ -47,6 +47,7 @@ operations:
   - whitelabel.custom_domain
   writes:
   - cache:idempotency
+  - platform.outbox
   - whitelabel.custom_domain
 - operation: createBanner
   verb: POST
@@ -156,6 +157,7 @@ operations:
   - whitelabel.tenant_config
   writes:
   - cache:idempotency
+  - platform.outbox
   - whitelabel.tenant_config
 - operation: createPromoBlock
   verb: POST
@@ -293,6 +295,7 @@ operations:
   - whitelabel.site_package
   writes:
   - cache:idempotency
+  - platform.outbox
   - whitelabel.site_package
 - operation: getAppBuild
   verb: GET
@@ -1013,10 +1016,8 @@ operations:
   - guest
   - anonymous
   offline: false
-  reads:
-  - cache:idempotency
+  reads: []
   writes:
-  - cache:idempotency
   - platform.outbox
 - operation: regenerateDomainToken
   verb: POST
@@ -1031,6 +1032,7 @@ operations:
   - whitelabel.custom_domain
   writes:
   - cache:idempotency
+  - platform.outbox
   - whitelabel.custom_domain
 - operation: relinquishCustomDomain
   verb: DELETE
@@ -1045,6 +1047,7 @@ operations:
   - whitelabel.custom_domain
   writes:
   - cache:idempotency
+  - platform.outbox
   - whitelabel.custom_domain
 - operation: requestAppBuild
   verb: POST
@@ -1061,6 +1064,7 @@ operations:
   - whitelabel.store_account
   writes:
   - cache:idempotency
+  - platform.outbox
   - whitelabel.app_build
 - operation: restoreConfigVersion
   verb: POST
@@ -1291,7 +1295,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - whitelabel.banner
+  - whitelabel.content_page
+  - whitelabel.faq_entry
+  - whitelabel.policy
+  - whitelabel.promo_block
   - whitelabel.tenant_config
+  - whitelabel.ui_string_pack
   writes:
   - cache:idempotency
   - whitelabel.tenant_config
@@ -1375,6 +1385,7 @@ operations:
   - whitelabel.custom_domain
   writes:
   - cache:idempotency
+  - platform.outbox
   - whitelabel.custom_domain
 - operation: setPublishReviewPolicy
   verb: PUT
@@ -1608,4 +1619,5 @@ operations:
   - whitelabel.custom_domain
   writes:
   - cache:idempotency
+  - platform.outbox
   - whitelabel.custom_domain

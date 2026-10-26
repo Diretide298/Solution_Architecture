@@ -685,7 +685,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Carried, not typed: `caseCategoryId`
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Retiring a category that still has active subcategories.; 422 The parent is not a top-level category of this venue, or the row names itself as its parent.
+Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Retiring a category that still has active subcategories. `case-category-id-mismatch` (ADAM CR-245): a record for `code` exists and the path's `caseCategoryId` …; 422 The parent is not a top-level category of this venue, or the row names itself as its parent.
 
 **Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -711,7 +711,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save case category definition (primary button) | `setCaseCategoryDefinition` PUT `/case-categories/{caseCategoryId}` | CaseCategory | CaseCategory | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Retiring a category that still has active subcategories. | gated `CASE_MANAGE`; opens modal first |
+| Save case category definition (primary button) | `setCaseCategoryDefinition` PUT `/case-categories/{caseCategoryId}` | CaseCategory | CaseCategory | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Retiring a category that still has active subcategories. `case-category-id-mismatch` (ADAM CR-245): a record for `code` exists and … | gated `CASE_MANAGE`; opens modal first |
 
 **Data it reads**: `listCaseCategories` (onLoad, List case categories and subcategories)
 
@@ -729,7 +729,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the classification workflow are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Retiring a category that still has active subcategories.; 422 The parent is not a top-level category of this venue, or the row names itself as its parent. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Retiring a category that still has active subcategories. `case-category-id-mismatch` (ADAM CR-245): a record for `code` exists and the path's `caseCategoryId` …; 422 The parent is not a top-level category of this venue, or the row names itself as its parent. |
 
 #### Sample data for the mock-up
 

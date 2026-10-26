@@ -17,7 +17,9 @@ transitions:
 - from: provisional
   to: confirmed
   trigger: operation
-  guard: Deposit taken or terms agreed
+  operation: updateGroupBooking
+  guard: 'Deposit taken or terms agreed: an orders.deposit of the group''s order captured in full, or the group''s
+    orders.group_quote accepted (ADAM CR-257)'
 - from: confirmed
   to: namesPending
   trigger: timer
@@ -26,19 +28,35 @@ transitions:
 - from: namesPending
   to: complete
   trigger: operation
-  guard: Names collected
+  operation: updateGroupBooking
+  guard: 'Names collected: every participant on the group''s participant list (orders.group_participant) has a
+    full name (ADAM CR-257)'
 - from: confirmed
   to: complete
   trigger: operation
-  guard: No capture required
+  operation: updateGroupBooking
+  guard: No capture required (attendeeCaptureRequired false)
 - from: provisional
   to: cancelled
   trigger: operation
+  operation: updateGroupBooking
   guard: Never confirmed
 - from: confirmed
   to: cancelled
   trigger: operation
+  operation: updateGroupBooking
   guard: Cancelled after confirmation, under the terms
+- from: namesPending
+  to: cancelled
+  trigger: operation
+  operation: updateGroupBooking
+  guard: 'A group still collecting names cancels, under the terms (added 26 October 2026, ADAM CR-257 option A: the
+    state model wins)'
 notes: '**`namesPending` is a state rather than a flag** because it changes what the venue does — a
   group in it gets a chase, and one that arrives in it gets a conversation at the gate rather than a
-  refusal.'
+  refusal.
+
+
+  **What updateGroupBooking refuses** (ADAM CR-257, 26 October 2026): a move this model does not allow, a skip or a
+  guard that does not hold, is 409 refusedReason statusNotAllowed (group-booking-status-not-allowed); a backward
+  move is 409 statusBackwards; a PATCH to namesPending, which only the timer sets, is 400 on status.'

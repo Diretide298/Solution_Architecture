@@ -995,6 +995,13 @@ def main() -> int:
         # so unlike a posting it has nothing to resolve a currency from.
         "platform.venue_settings",
         "ledger.settlement",
+        # **TICVAI's own prices and invoices to its tenants** (ADAM CR-202, decided 25 October 2026, and the lead's
+        # r10 ruling "the currency is stored on the row"; CHG-R10ID-013, CHG-R10ID-017). A control-plane row belongs
+        # to no venue and no region, so there is no scope walk to resolve a currency from: the plan, contract,
+        # add-on, capacity pack, module listing and licensing model are priced in their own currency, and an invoice
+        # and its credit note are fixed in the billing currency copied at generation.
+        "control.plan", "control.contract", "control.licence_add_on", "control.capacity_pack",
+        "control.module_listing", "control.licensing_model", "control.invoice", "control.credit_note",
     }
     _schema = ROOT / "handoff" / "schema-reference.json"
     if _schema.exists():

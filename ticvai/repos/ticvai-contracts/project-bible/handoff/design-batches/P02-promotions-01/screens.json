@@ -51,12 +51,12 @@
       {
        "kind": "cardList",
        "label": "Offers",
-       "bindsTo": "Promotion",
+       "bindsTo": "GuestPromotion",
        "columns": [
-        "Promotion.code",
-        "Promotion.name",
-        "Promotion.description",
-        "Promotion.validFrom"
+        "GuestPromotion.code",
+        "GuestPromotion.name",
+        "GuestPromotion.description",
+        "GuestPromotion.validFrom"
        ],
        "operation": "listPromotions",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
@@ -71,13 +71,13 @@
       {
        "kind": "detailPanel",
        "label": "The selected promotion",
-       "bindsTo": "Promotion",
+       "bindsTo": "GuestPromotion",
        "columns": [
-        "Promotion.code",
-        "Promotion.name",
-        "Promotion.description",
-        "Promotion.discount",
-        "Promotion.validFrom"
+        "GuestPromotion.code",
+        "GuestPromotion.name",
+        "GuestPromotion.description",
+        "GuestPromotion.discount",
+        "GuestPromotion.validFrom"
        ],
        "operation": "getPromotion",
        "provenance": "contract promotions.yaml GET /promotions/{promotionId}"
@@ -85,13 +85,12 @@
       {
        "kind": "detailPanel",
        "label": "The coupon code",
-       "bindsTo": "CouponCode",
+       "bindsTo": "GuestCouponCode",
        "columns": [
-        "CouponCode.code",
-        "CouponCode.status",
-        "CouponCode.redemptionCount",
-        "CouponCode.discount",
-        "CouponCode.validFrom"
+        "GuestCouponCode.code",
+        "GuestCouponCode.status",
+        "GuestCouponCode.discount",
+        "GuestCouponCode.validFrom"
        ],
        "operation": "getGuestCouponCode",
        "provenance": "contract promotions.yaml GET /coupon-codes/{code}"
@@ -145,11 +144,11 @@
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `promotionId`.",
    "preloaded": [
-    "Promotion.code",
-    "Promotion.name",
-    "Promotion.description",
-    "Promotion.venueId",
-    "Promotion.discount"
+    "GuestPromotion.code",
+    "GuestPromotion.name",
+    "GuestPromotion.description",
+    "GuestPromotion.venues",
+    "GuestPromotion.discount"
    ]
   },
   "wireframe": {

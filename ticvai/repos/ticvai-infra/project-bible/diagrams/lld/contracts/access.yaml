@@ -1,5 +1,5 @@
 id: LLD-access
-title: access — 258 operations
+title: access — 259 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -2150,6 +2150,20 @@ operations:
   - access.configuration_change
   - access.configuration_version
   - access.hardware_deployment
+  - cache:idempotency
+- operation: recordQueueRedemptionUse
+  verb: POST
+  path: /internal/queue-redemptions
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - access.entitlement
+  - cache:idempotency
+  writes:
+  - access.entitlement
   - cache:idempotency
 - operation: releaseCredentialDevice
   verb: POST

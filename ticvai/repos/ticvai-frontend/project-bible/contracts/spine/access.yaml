@@ -73,6 +73,25 @@ x-ticvai-queries:
   # Rule questions other modules ask Access, answered by the owner (ADR-0055 amendment, 14 October 2026; the shape is
   # the r6 shared convention: module, inputs, returns, rule, served). An asking operation names one in
   # `x-ticvai-read-via`.
+  mediaEncodingProfileRecords:
+    module: access
+    table: access.media_encoding_profile
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The access.media_encoding_profile rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as venueId or isActive); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Access stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AccessMediaEncodingProfile'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October; ADAM CR-212, decided 25 October 2026, CHG-R10CAT-004). Access answers with its
+      access.media_encoding_profile rows, as it stores them and as the caller's scope lets it see them (the table's
+      row-level security, under the caller's connection and transaction). It decides nothing: Catalogue's
+      setChannelFeePayment states its own rule (mediaProfileMissing). It is asked in process from commerce, a read the
+      lead granted across deployables (docs/active/cross-deployable-writes.yaml XDR-002, as XDR-001), and from another
+      deployable through Access's service route (serviceAuth).
+    served: [in-process, service]
   liveEntitlementsForSubject:
     module: access
     inputs:
@@ -100,6 +119,9 @@ x-ticvai-queries:
         issued->fullyConsumed:validateAccess: access.validated carries no status; the rule's validTo bounds it, so a
           pass used up early counts as live until validTo, which errs towards refusing a deletion
         partiallyConsumed->fullyConsumed:validateAccess: as issued->fullyConsumed
+        issued->fullyConsumed:recordQueueRedemptionUse: as issued->fullyConsumed by validateAccess (ADAM CR-238), the use
+          a redeemed queue entry takes carries no status event; validTo bounds it
+        partiallyConsumed->fullyConsumed:recordQueueRedemptionUse: as issued->fullyConsumed
         issued->expired:timer: the rule's own condition, validTo > now(); the projection holds validTo
         partiallyConsumed->expired:timer: as issued->expired
         issued->cancelled:cancelPerformance: every holder is made whole by createRefund (F09), whose order.refunded
@@ -183,7 +205,8 @@ x-ticvai-queries:
       another deployable through Access' service route (serviceAuth), and in process by commerce (ADAM CR-196,
       option B, decided 21 October 2026; CHG-R9CR-005): DB-ROLES grants the commerce role SELECT on
       access.scan_event (docs/active/cross-deployable-writes.yaml XDR-001), so Orders' getMediaEntitlements calls the
-      C# query interface Access implements, in its own transaction, under the caller's own scope.
+      C# query interface Access implements, in its own transaction, under the caller's own scope. Tenancy's
+      listDeviceAuditRecords reads its device's scans the same way (ADAM CR-232, option A, 25 October 2026).
     served: [in-process, service]
 paths:
   /access/validate:
@@ -200,8 +223,8 @@ paths:
         - "P08 BO-060 Attendance & Footfall"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       x-ticvai-latency-budget-ms: 300
       x-ticvai-audience:
       - staff
@@ -365,8 +388,8 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
@@ -468,8 +491,8 @@ paths:
         - "P08 BO-355 Virtual Ticket & Credential 360° Workspace"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: identity#delegatedAccessRecords
         route: service
         for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
@@ -734,6 +757,9 @@ paths:
       - query: identity#subjectBiometricRecords
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-write-via:
       - table: pii.subject_biometric
         event: biometric.enrolmentChanged
@@ -1024,6 +1050,12 @@ paths:
       - query: marketing-crm#consentRecords
         route: service
         for: 'its read of marketing.consent_record, Marketing''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "tenancy.RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-write-via:
       - table: marketing.consent_record
         event: biometric.enrolmentChanged
@@ -1415,6 +1447,7 @@ paths:
           format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       x-ticvai-permission: PARKING_CONFIGURE
       x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
@@ -1436,7 +1469,13 @@ paths:
                       items:
                         $ref: '#/components/schemas/ParkingFacility'
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          description: The request breaks a schema rule (`validation`), or names no venue
+            (`venue-required`; ADAM CR-198, CHG-R10ID-022).
+          x-ticvai-problem-types: [validation, venue-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /parking-facilities/{parkingFacilityId}:
@@ -1527,21 +1566,31 @@ paths:
       operationId: issueOrderEntitlements
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
-        for: 'the issued entitlements'' productName and imageUrl, from catalogue.product and its catalogue.product_media,
-          Catalogue''s data (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)'
+        route: in-process
+        for: 'the line''s product (its entitlement_template_id, credentialFormatOverride, guest category) and the issued
+          entitlements'' productName and imageUrl, from catalogue.product and its catalogue.product_media, Catalogue''s
+          data (CHG-R8MIG-009); in process in the workers host (ADAM CR-167)'
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'the template the line''s entitlements are issued against: validityKind, offsets, expiryAnchor, entries
+          allowed, catalogue.entitlement_template, Catalogue''s data; in process in the workers host (ADAM CR-167)'
       - query: catalogue#variantRecords
-        route: service
-        for: 'its read of catalogue.variant, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.variant, Catalogue''s data (CHG-MOD-001); in process in the workers host (ADAM CR-167)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'a dated line''s performance: its startsAt and endsAt give the entitlement''s valid_from and valid_to,
+          catalogue.performance, Catalogue''s data; in process in the workers host (ADAM CR-167)'
+      - query: catalogue#salesChannelRecords
+        route: in-process
+        for: 'the order''s sales channel profile and its ticketCredentialFormat, catalogue.sales_channel, Catalogue''s
+          data; in process in the workers host (ADAM CR-167)'
       - query: orders#orderLineRecords
-        route: service
-        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001); in process in the workers host (ADAM CR-167)'
       - query: orders#salesOrderRecords
-        route: service
-        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001); in process in the workers host (ADAM CR-167)'
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -1568,6 +1617,33 @@ paths:
         `ticketCredentialFormat` of the sales channel profile the order came through (`channelProfileId`, catalogue
         `SalesChannelProfile`: a partner''s or reseller''s channel), else `platformSignedQr`, the platform''s signed
         QR. A `staticQr` entitlement gets no rotation seed; an `rfidCard` one gets no QR payload.
+
+
+        **Run by the `workers` host, which reads in process** (ADAM CR-167, option A; Chinmay, 18 October 2026;
+        CHG-R10ORD-010). The consumer runs in workers, which composes every module (ADR-0055: "event consumers for
+        every module"), as `finance.postOrderRevenue`, the other consumer of `order.paid`, does; so its reads of
+        Orders and Catalogue are in process, in the consumer''s transaction under its row-level security, never by a
+        service route. `order.paid` v1 carries each line''s `lineId`, `productId` and `performanceId` (additive).
+
+
+        **Issuance** (ADAM CR-167). **One entitlement per unit**: a line of quantity 3 holds three. The template is
+        the product''s `entitlement_template_id` (`catalogue#productRecords`); a line whose product has no template
+        is issued nothing. `valid_from` and `valid_to` follow from the template''s `validityKind`, its offsets
+        (`validFromOffsetDays`, `validForDays`) and `expiryAnchor` (`expiryDate` where it is `fixedDate`), and for a
+        dated line from the performance''s `startsAt` and `endsAt` (`catalogue#performanceRecords`); an `expiryAnchor`
+        of `seasonEnd` ends at the end of the product''s validity: the product''s `validTo`, or its `onSaleTo` where
+        `validTo` is null (the lead''s answer of 25 October 2026 to the r10 lanes'' questions, question 28; CHG-R10ORD-026;
+        the end of validity, not the close of sales: the lead, 26 October 2026, ADAM CR-167, CHG-R10OPN-003). **`mediaCode` is minted here, at issue**, by Access: the venue prefix and 12
+        base32 characters (for example `DXB1-7K3QW9MZ2PXA`), unique in the tenant; **the rotation seed is stored on
+        the entitlement**
+        (`Entitlement.rotationSecret`, field-encrypted; `getEntitlementCredential` returns it as `rotation` and
+        `rotate=true` replaces it). **`subjectId` is null for a guest checkout** (the order''s subject, where
+        `order.paid` names one).
+
+
+        **Completion** (ADAM CR-167): every `entitlement.issued` this writes reaches the orders consumer, and the
+        order moves `paid` to `completed` when every line with a template holds `quantity` entitlements; a line
+        without a template needs none (`states/order.yaml`).
 
         '
       tags:
@@ -1623,6 +1699,11 @@ paths:
                       quantity:
                         type: integer
                         minimum: 1
+                      productId:
+                        type: string
+                        format: uuid
+                        description: The line's product, from `order.paid` lines[].productId (v1, additive; ADAM CR-167). Its
+                          `entitlement_template_id` names the template; a product with none is issued nothing.
                       performanceId:
                         type: string
                         format: uuid
@@ -1645,6 +1726,89 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Entitlement'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/queue-redemptions:
+    post:
+      operationId: recordQueueRedemptionUse
+      x-ticvai-writes:
+      - table: access.entitlement
+        for: 'the Fast Pass entitlement''s use: entriesUsed, lastEntryAt, firstEntryAt and its status (ADAM CR-238)'
+      x-ticvai-reads:
+      - table: access.entitlement
+        for: 'the entitlement named by the event (ADAM CR-238)'
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      summary: Take a Fast Pass's use when its queue entry is redeemed
+      description: '**The `queueEntry.redeemed` consumer, modelled as an operation so it has lineage and a ticket**
+        (ADAM CR-238, option B; Chinmay, 25 October 2026; CHG-R10ORD-007). Queue''s `redeemWaitingGuest` no longer
+        calls `validateAccess` across deployables; it writes `queueEntry.redeemed` through the outbox, and Access, which
+        owns `access.entitlement`, takes the use here. Run by the `workers` host, which runs every module''s consumers
+        (ADR-0055). Invoked by the event relay with the event''s payload, never by a screen.
+
+
+        **One use, as `validateAccess` would have taken at the queue''s access point**: `entriesUsed` goes up by one,
+        `lastEntryAt` (and `firstEntryAt`, where it was null) take the event''s `recordedAt`, and the status moves as
+        `states/entitlement-status.yaml` says (`issued` to `partiallyConsumed` or `fullyConsumed`,
+        `partiallyConsumed` to `fullyConsumed`). An entitlement already `fullyConsumed`, `expired`, `cancelled` or
+        `surrendered` takes no use and the event is recorded as handled, not retried: the party was admitted at the
+        ride and the redemption stands. **Idempotent on `entryId`**: a redelivered event finds the use already taken
+        and changes nothing. A failure is retried, then dead-lettered.'
+      tags:
+      - validation
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-consumes:
+      - queueEntry.redeemed
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - eventId
+              - entryId
+              - entitlementId
+              - recordedAt
+              properties:
+                eventId:
+                  type: string
+                  description: The `queueEntry.redeemed` event id, for the consumer's inbox record.
+                entryId:
+                  type: string
+                  format: uuid
+                  description: The redeemed queue entry, from the event; the consumer's idempotency key.
+                entitlementId:
+                  type: string
+                  format: uuid
+                accessPointId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The queue's access point, from the event.
+                admittedCount:
+                  type: integer
+                  minimum: 1
+                  nullable: true
+                recordedAt:
+                  type: string
+                  format: date-time
+      responses:
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The use is taken, or was already taken for this entry, or the entitlement had none left to take.
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
@@ -1935,8 +2099,8 @@ paths:
         - "P08 BO-358 Media Binding, Activation & Assignment Operations"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
@@ -2152,6 +2316,16 @@ paths:
         - "P07 SCN-014 Sync & reconciliation"
         - "P07 SCN-015 Offline package"
         - "P08 BO-060 Attendance & Footfall"
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the session''s access point: platform.workstation.access_point_id of the caller''s workstation, Tenancy''s
+          data, in process in the access host (ADAM CR-240; ADR-0055 as amended 25 October 2026; XDR-003)'
+      - query: catalogue#entitlementTemplateRecords
+        route: in-process
+        for: 'each entitlement''s reentryAllowed and admissionRulesId: catalogue.entitlement_template.is_reentry_allowed
+          and admission_rules_id through access.entitlement.template_id, Catalogue''s data, in process in the access
+          host (ADAM CR-240; XDR-003)'
       x-ticvai-note: >-
         **The active admission policy version travels in the package** (ADR-0068, accepted 1 October): the
         dynamic policies at their active versions with their closed-format `conditionRule`, and `policySetVersion`,
@@ -2182,6 +2356,30 @@ paths:
         is venue-wide and gets them unfiltered. A holder status change or a replacement changes the `etag`, so the next conditional refresh
         takes it.
 
+
+        **What Access does not store, it reads in process** (ADAM CR-240, option A; Chinmay, 25 October 2026;
+        CHG-R10ORD-009). The session''s access point is its workstation''s `access_point_id`, read through
+        `tenancy#workstationRecords`; each entitlement''s `reentryAllowed` and `admissionRulesId` are its template''s
+        `is_reentry_allowed` and `admission_rules_id` (`access.entitlement.template_id`), read through
+        `catalogue#entitlementTemplateRecords`. Both are asked in process: the access host composes Tenancy''s and
+        Catalogue''s query interfaces as CR-167 lets the workers host (the same tenant database, the caller''s
+        transaction and row-level security; ADR-0055 as amended 25 October 2026, `reads` XDR-003).
+        **`performanceId` is null** until a source is decided. Pinning the template''s values onto
+        `access.entitlement` at issue (CR-240 option C) is a later, separate change, not part of this operation.
+
+
+        **The delta counts `access.entitlement.change_version`** (ADAM CR-239, option A; Chinmay, 25 October 2026;
+        CHG-R10ORD-011), which a trigger moves on every insert and update: `entitlementsVersion` is the highest
+        `change_version` of the rows in the package, and `sinceVersion` returns the rows whose `change_version` is
+        above it, void and used ones included, so the device drops them. **How a delta says so** (ADAM CR-248, option
+        A, accepted 26 October 2026): the answer carries `isDelta` true and `baseVersion` the `sinceVersion` it
+        answers; the changed rows that still admit are in `entitlements`, and the ones that no longer admit
+        (`fullyConsumed`, `expired`, `cancelled`, `surrendered`) are listed by id in `removedTicketIds`, never as an
+        entitlement. A device replaces or adds `entitlements`, drops `removedTicketIds`, and merges only when
+        `isDelta` is true; otherwise it replaces the whole package. **The whole-package path ships first**
+        (`ETag`, `If-None-Match`, `304`); the delta is served once the column is in the database (a migration for
+        the migration owner); until then every call is served the whole package.
+
         '
       tags:
       - sync
@@ -2192,7 +2390,9 @@ paths:
       parameters:
       - name: sinceVersion
         in: query
-        description: The `entitlementsVersion` of the package the device holds; omitted, the whole package (SD-052).
+        description: 'The `entitlementsVersion` of the package the device holds; omitted, the whole package (SD-052).
+          Given, only the entitlements whose `change_version` is above it: those that still admit in `entitlements`,
+          the void and used ones by id in `removedTicketIds` (ADAM CR-239, CR-248).'
         schema:
           type: integer
       - $ref: '../shared/common.yaml#/components/parameters/ConsistencyToken'
@@ -2683,6 +2883,13 @@ paths:
         - "P08 BO-032 Admission Profiles"
         - "P08 BO-154 Access Rule Command Center"
         - "P08 BO-222 Special Event, Free View & Alternative Admission"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -2736,6 +2943,13 @@ paths:
         - "P08 BO-160 Multi-Park & Crossover Rules"
         - "P08 BO-219 Re-entry & Temporary Exit Journey"
         - "P08 BO-220 Multi-Park & Crossover Journey Orchestrator"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -2802,7 +3016,7 @@ paths:
       operationId: listBlacklist
       x-ticvai-consumed-by:
         - "P08 BO-033 Blacklist Management"
-      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `addedByPrincipalId`.'
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `addedByPrincipalId`. Where `expiresAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -2836,6 +3050,10 @@ paths:
       operationId: addBlacklistEntry
       x-ticvai-consumed-by:
         - "P08 BO-033 Blacklist Management"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Blacklist a media code
@@ -2974,8 +3192,8 @@ paths:
         - "P08 BO-060 Attendance & Footfall"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
         route: service
         for: 'the group entitlement''s productName and imageUrl, from catalogue.product and its catalogue.product_media,
@@ -3128,8 +3346,8 @@ paths:
         - "P08 BO-334 Virtual Ticket Command Center"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
@@ -4256,6 +4474,10 @@ paths:
       operationId: setRfidNfcCard
       x-ticvai-consumed-by:
         - "P08 BO-349 RFID, NFC, Card & Wristband Media Designer"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RfidNfcCardWristbandMediaDesignerInput.depositReferenceWhereApplicable, RfidNfcCardWristbandMediaDesignerView.depositReferenceWhereApplicable (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [templateId]
       x-ticvai-body-key-note: 'Keyed by the body''s `templateId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per ticket media template within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
@@ -4740,8 +4962,8 @@ paths:
       operationId: setVirtualTicketCredential
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
@@ -5972,6 +6194,10 @@ paths:
       operationId: publishTopologyValidation
       x-ticvai-consumed-by:
         - "P08 BO-153 Topology Validation & Publication"
+      x-ticvai-read-via:
+      - query: approvals#ruleRecords
+        route: service
+        for: 'what its text calls "ApprovalRule.subjectTypes": approvals.rule, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-body-key: [configurationVersionId]
       x-ticvai-body-key-note: 'Keyed by the body''s `configurationVersionId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access configuration version within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
@@ -6319,8 +6545,8 @@ paths:
         - "P08 BO-158 Access Validity & Time Rules"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6689,8 +6915,8 @@ paths:
         - "P08 BO-163 Rule Simulation, Conflict Check & Publication"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       x-ticvai-body-key: [ruleVersionId]
       x-ticvai-body-key-note: 'Keyed by the body''s `ruleVersionId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access rule version within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
@@ -7144,8 +7370,8 @@ paths:
         - "P08 BO-169 Credential Transfer & Rebinding"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7631,8 +7857,8 @@ paths:
         - "P08 BO-176 Virtual Credential & Media Association"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.46 (4.3); MoM 2 Sep 2026 key decision
@@ -8434,6 +8660,13 @@ paths:
       operationId: listBiometricConsentGuardian
       x-ticvai-consumed-by:
         - "P08 BO-187 Biometric Consent & Guardian Management"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'what its text calls "tenancy.RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "tenancy.VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -8541,6 +8774,10 @@ paths:
       operationId: listFaceTagTemporary
       x-ticvai-consumed-by:
         - "P08 BO-188 Face Tag Temporary Enrollment"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "tenancy.VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -8589,6 +8826,10 @@ paths:
       operationId: setFaceTagTemporaryEnrollment
       x-ticvai-consumed-by:
         - "P08 BO-188 Face Tag Temporary Enrollment"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "tenancy.VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: VM close-out; pack ''Access Control Module'' p.61 (BO-188); MoM 2 Sep 2026
@@ -9736,8 +9977,8 @@ paths:
         - "P08 BO-204 Offline & Edge Operations Command Center"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: cross-region#rejectionRecords
         route: service
         for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
@@ -10115,8 +10356,8 @@ paths:
         - "P08 BO-212 Offline Simulation & Resilience Testing"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -10475,8 +10716,8 @@ paths:
         - "P08 BO-218 Family, Child, POD & Companion Journey"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10630,8 +10871,8 @@ paths:
         - "P08 BO-221 Fast Pass & Attraction Access Journey"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10847,8 +11088,8 @@ paths:
         - "P08 BO-226 Ticket & Credential Investigation Console"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
@@ -12627,6 +12868,10 @@ paths:
       operationId: listSecurityDetectionGovernance
       x-ticvai-consumed-by:
         - "P08 BO-253 Security Analytics, AI Detection & Governance"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SecurityAnalyticsAiDetectionGovernanceView.estimatedFraudPrevented, SecurityAnalyticsAiDetectionGovernanceView.financialExposure (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.164 (11.10 Show, Analyze by, Measure,
@@ -12744,8 +12989,8 @@ paths:
         - "P08 BO-254 Access Monitoring & Analytics Command Center"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.168 (12.1 Show tiles, Venue Comparison
@@ -12923,8 +13168,8 @@ paths:
         - "P08 BO-257 Attendance & Admission Analytics"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
@@ -13253,8 +13498,8 @@ paths:
         - "P08 BO-261 Guest Dwell Time, Length of Stay & Attraction Flow"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: venue-map#pointRecords
         route: service
         for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
@@ -13787,8 +14032,8 @@ paths:
         - "P08 BO-223 Journey Simulation, Audit & Publication"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: VM close-out; pack ''Access Control Module'' p.111 (BO-223); label ''Free
@@ -14733,6 +14978,10 @@ paths:
       operationId: placeAccessDevice
       x-ticvai-consumed-by:
         - "P08 BO-196 Physical Device Registration & Provisioning"
+      x-ticvai-read-via:
+      - query: tenancy#deviceRecords
+        route: service
+        for: 'what its text calls "platform.device": platform.device, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
       - staff
@@ -14820,6 +15069,10 @@ paths:
       operationId: updateAccessDevicePlacement
       x-ticvai-consumed-by:
         - "P08 BO-196 Physical Device Registration & Provisioning"
+      x-ticvai-read-via:
+      - query: tenancy#deviceRecords
+        route: service
+        for: 'what its text calls "platform.device": platform.device, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
       - staff
@@ -14921,7 +15174,7 @@ paths:
       - name: gateModePolicyId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `mode` and `accessPointGroupId`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 gate-mode-policy-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -14955,6 +15208,14 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'Refused, and nothing is stored. `gate-mode-policy-id-mismatch` (ADAM CR-245): a record for `mode` and `accessPointGroupId` exists and the path''s `gateModePolicyId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - gate-mode-policy-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gate-mode-changes/{changeId}/cancel:
@@ -16491,6 +16752,10 @@ paths:
         - "P08 BO-229 Credential Disable, Blacklist & Whitelist Operations"
         - "P08 BO-244 Access Security & Fraud Command Center"
         - "P08 BO-247 Unified Identity & Credential Lock Manager"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listUnifiedIdentityCredential reads (pack ''Access
@@ -16582,6 +16847,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-229 Credential Disable, Blacklist & Whitelist Operations"
         - "P08 BO-247 Unified Identity & Credential Lock Manager"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listUnifiedIdentityCredential reads (pack ''Access
@@ -25541,6 +25810,7 @@ components:
     Entitlement:
       type: object
       x-ticvai-persistence: access.entitlement
+      x-ticvai-index: [[venueId, changeVersion]]   # the offline package's delta: a venue's rows changed after N (ADAM CR-239)
       description: '**What a guest actually holds.** Found missing on 18 August by the schema audit —
         33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.
 
@@ -25564,6 +25834,7 @@ components:
       - status
       - validFrom
       - validTo
+      - changeVersion
       properties:
         id:
           type: string
@@ -25630,7 +25901,9 @@ components:
           format: uuid
           nullable: true
           description: 'Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a
-            till to somebody who gave no details has no subject until it is claimed.
+            till to somebody who gave no details has no subject until it is claimed. **Null for a guest checkout**
+            (ADAM CR-167, CHG-R10ORD-010): `issueOrderEntitlements` leaves it null where `order.paid` names no
+            subject; the field is always present, null or not.
 
             '
         venueId:
@@ -25644,6 +25917,39 @@ components:
             without reissuing**, because a guest whose wristband broke should not need a new ticket.
 
             '
+        changeVersion:
+          type: integer
+          format: int64
+          readOnly: true
+          x-ticvai-change-version: true
+          description: '**What the offline package''s delta counts** (ADAM CR-239, option A; Chinmay, 25 October 2026;
+            CHG-R10ORD-011). Set from a per-database sequence by a BEFORE INSERT OR UPDATE trigger, so every operation
+            that writes `access.entitlement` (seventeen of them, in three contracts) moves it without remembering to;
+            never set by an operation and never sent. `OfflinePackage.entitlementsVersion` is the highest of the
+            package''s rows, and `sinceVersion` selects the rows above it, void and used ones included. Indexed with
+            `venueId`.'
+        mediaLinkedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: '**When the entitlement was put on its media** (ADAM CR-226, option A; Chinmay, 25 October 2026;
+            CHG-R10ORD-012): written when `mediaCode` is set or rotated: at issue (`issueOrderEntitlements`, onto new
+            media or, through `appendEntitlementToMedia`''s order, onto media the guest already holds), and whenever an
+            operation replaces or rotates the code (`replaceCredential`, `getEntitlementCredential` with `rotate=true`).
+            Not `validFrom`, which is the validity window''s start. `MediaEntitlements` answers it as `addedAt`.'
+        rotationSecret:
+          type: string
+          nullable: true
+          writeOnly: true
+          x-ticvai-column: rotation_secret_ciphertext
+          x-ticvai-secret: field-encrypted
+          description: '**The rotation seed, stored on the entitlement** (ADAM CR-167, option A; CHG-R10ORD-010): the
+            Base32 shared secret the rotating code is derived from (`getEntitlementCredential` `rotation.secret`, audit
+            R230), written by `issueOrderEntitlements` at issue for a `platformSignedQr` entitlement and replaced by
+            `getEntitlementCredential` with `rotate=true`; encrypted with the tenant''s field key (ADR-0063). Null for a
+            `staticQr` or `rfidCard` entitlement, which does not rotate. Never returned except as `rotation` to the
+            holder or a staff caller.'
         credentialFormat:
           allOf:
           - $ref: '#/components/schemas/TicketCredentialFormat'
@@ -27508,9 +27814,10 @@ components:
           format: uuid
         entitlementsVersion:
           type: integer
-          description: The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it
-            as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent
-            whole.
+          description: 'The highest `access.entitlement` change included (SD-052, 29 September): the maximum
+            `change_version` of the package''s rows (ADAM CR-239, option A; CHG-R10ORD-011). A refresh sends it as
+            `sinceVersion` and receives only the rows whose `change_version` is above it, void and used ones included,
+            so a 60,000-guest venue is not re-sent whole.'
         policySetVersion:
           type: string
           description: '**The active admission policy version the package carries** (ADR-0068, 1 October): a
@@ -27524,10 +27831,30 @@ components:
             online one.
           items:
             $ref: '#/components/schemas/AccessDynamicPolicy'
+        isDelta:
+          type: boolean
+          description: 'True when this answers a `sinceVersion` with only what changed after it; false (always sent) on
+            a whole package. A device merges only when `isDelta` is true, and otherwise replaces the whole package it
+            holds (ADAM CR-248, option A, accepted 26 October 2026; mirrors `CatalogueBundle.isDelta`).'
+        baseVersion:
+          type: integer
+          nullable: true
+          description: 'The `sinceVersion` this delta answers; null on a whole package (ADAM CR-248; mirrors
+            `CatalogueBundle.baseVersion`).'
+        removedTicketIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: 'On a delta, the entitlements changed after `sinceVersion` that no longer admit (`access.entitlement`
+            status `fullyConsumed`, `expired`, `cancelled` or `surrendered`), by `ticketId`. A device drops them; they are
+            never sent in `entitlements`. Empty on a whole package (ADAM CR-248).'
         entitlements:
           type: array
-          description: Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed
-            after it, including ones now void or used, so a device removes them.
+          description: 'Read from `access.entitlement` (SD-052). **Only rows that still admit** (`issued` or
+            `partiallyConsumed`): nothing that does not admit is ever sent here (ADAM CR-248, option A, accepted 26
+            October 2026). With `sinceVersion`, only the admitting rows changed after it; a device adds or replaces
+            these by `ticketId`, and drops `removedTicketIds`.'
           items:
             type: object
             required:
@@ -27557,6 +27884,7 @@ components:
                 type: string
                 format: uuid
                 nullable: true
+                description: Null until a source is decided (ADAM CR-240); access.entitlement has no performance column.
               entriesAllowed:
                 type: integer
                 nullable: true
@@ -27564,9 +27892,13 @@ components:
                 type: integer
               reentryAllowed:
                 type: boolean
+                description: The template's `is_reentry_allowed`, read through `catalogue#entitlementTemplateRecords`
+                  (ADAM CR-240).
               admissionRulesId:
                 type: string
                 format: uuid
+                description: The template's `admission_rules_id`, read through `catalogue#entitlementTemplateRecords`
+                  (ADAM CR-240).
         delegatedRights:
           type: array
           description: 'Redemption rights issued by other cells and valid at this access point. Included

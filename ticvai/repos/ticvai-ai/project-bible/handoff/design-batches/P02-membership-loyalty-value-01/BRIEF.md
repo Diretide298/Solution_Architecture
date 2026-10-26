@@ -1,6 +1,6 @@
 # P02-membership-loyalty-value-01 — P02 · Membership, Loyalty & Value
 
-**3 screens · 23 operations · 37 schemas · 10 permissions**
+**3 screens · 23 operations · 38 schemas · 10 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·

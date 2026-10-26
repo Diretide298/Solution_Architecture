@@ -125,7 +125,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `WEB-001` | Home / Landing | A | 1 | 67 | 6 | 21 | 8 | 0 | guest | review (client-verified) |
 | `WEB-002` | Event & Attraction Listing | A | 3 | 87 | 6 | 22 | 10 | 0 | guest | review (client-verified) |
-| `WEB-003` | Search Results | A | 2 | 18 | 6 | 15 | 0 | 0 | guest | review (client-verified) |
+| `WEB-003` | Search Results | A | 2 | 20 | 6 | 15 | 0 | 0 | guest | review (client-verified) |
 | `WEB-004` | Attraction Details | A | 1 | 81 | 8 | 24 | 17 | 0 | guest | review (client-verified) |
 | `WEB-050` | Plan Your Visit | A | 40 | 60 | 7 | 3 | 7 | 1 | guest | review (client-verified) |
 

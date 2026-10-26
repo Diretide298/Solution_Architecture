@@ -38,6 +38,58 @@ def hand_db_tables(task: dict) -> list:
     return [b.split(" ", 1)[1].strip() for b in task.get("builds") or [] if str(b).startswith("table ")]
 
 
+# **A database update task takes every new forward migration by itself** (r10 gate 2, 26 October 2026, CHG-R10GFC-006).
+# The eleven R8-DB tasks (R8-DB-LOCAL-<person> and R8-DB-SHARED) list the files a developer applies; r9 added V0113 to
+# V0115 to their `builds` and text by hand (CHG-R9INT-002), and r10's V0116 was missing from all eleven until
+# check-ticket-builds B-DB-FILES failed on 22 lines. The file's name is not known while the contracts change: derive-ddl
+# names it at the derive that writes it (`V<the next number>__after_<tag>_<the run's date>.sql`, one number for the run,
+# shared by both databases), so a name typed in by hand is wrong the day the gate runs again. So a hand-written task
+# that builds a forward migration (`file backend/<db>/V01xx__*.sql`, which is what B-DB-FILES calls a database update
+# task) keeps what it names and gains, at every plan build, each forward migration on disk newer than the newest it
+# names for that database, in its `builds` and in its text. The authored task is not changed (CLAUDE.md rule 10).
+FORWARD_MIGRATION = re.compile(r"^V(01\d\d)([a-z]?)__.+\.sql$")
+
+
+def _fwd_order(name: str) -> tuple:
+    m = FORWARD_MIGRATION.match(name)
+    return (int(m.group(1)), m.group(2)) if m else (0, "")
+
+
+def db_update_task(task: dict, root) -> dict:
+    """`task` with the forward migrations it does not name yet added: for each database it builds a
+    `file backend/<db>/V01xx__*.sql` of, every file in backend/<db>/ that sorts after the newest one it names (a
+    database it names no file of gains none). The new files are added to `builds` and named in `detail`, in one
+    sentence before its check (`How to check`, `4. Check`) or its `Done when`. A task that builds no forward migration,
+    or names the newest already, is returned as it is."""
+    from pathlib import Path as _P
+    named: dict = {}
+    for b in task.get("builds") or []:
+        kind, _, name = str(b).partition(" ")
+        parts = name.split("/")
+        if kind == "file" and len(parts) == 3 and parts[0] == "backend" and FORWARD_MIGRATION.match(parts[2]):
+            named.setdefault(parts[1], set()).add(parts[2])
+    new = []
+    for db in sorted(named, key=lambda d: (d != "tenant", d)):
+        newest = max(named[db], key=_fwd_order)
+        on_disk = sorted((p.name for p in (_P(root) / "backend" / db).glob("V*.sql") if FORWARD_MIGRATION.match(p.name)),
+                         key=_fwd_order)
+        new += [f"backend/{db}/{f}" for f in on_disk if _fwd_order(f) > _fwd_order(newest) and f not in named[db]]
+    if not new:
+        return task
+    out = dict(task)
+    out["builds"] = list(task.get("builds") or []) + [f"file {f}" for f in new]
+    sentence = ("Newer files, added to this task by the plan as each release derives them: " + ", ".join(new)
+                + ". Apply each after the files above, in name order, against its own database, with "
+                "`psql -1 -v ON_ERROR_STOP=1 -f`, twice: each is written to apply as one transaction, twice, on any "
+                "database (CHG-R9MIG-002), so the second run changes nothing; its header says what it adds. Any "
+                "error: write it in a comment here and stop.")
+    detail = str(task.get("detail") or "")
+    at = min([i for i in (detail.find(" How to check"), detail.find(" 4. Check"), detail.find(" Done when:")) if i >= 0]
+             or [len(detail)])
+    out["detail"] = detail[:at].rstrip() + " " + sentence + detail[at:]
+    return out
+
+
 def built_tables(description: str, key: str = "") -> list:
     """The tables a [DB] ticket's text says it creates: its "Tables: ..." sentence, else, for a hand-written
     migration (not a MIG- key: MIG-PARTITIONS lists the tables it partitions, which other migrations create), the

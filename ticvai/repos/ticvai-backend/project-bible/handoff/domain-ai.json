@@ -1362,6 +1362,7 @@
   "ConversationState",
   "CountStatus",
   "EntitlementStatus",
+  "EventLifecycleState",
   "IndexJob.status",
   "KnowledgeDocument.status",
   "LayoutDraft.status",
@@ -1646,6 +1647,19 @@
    "emits": [
     "access.validated",
     "entitlement.voided"
+   ]
+  },
+  {
+   "file": "event.yaml",
+   "entity": "Event lifecycle",
+   "contract": "catalogue",
+   "enum": "EventLifecycleState",
+   "foreignContract": true,
+   "reachedVia": [
+    "event.lifecycleChanged"
+   ],
+   "emits": [
+    "event.lifecycleChanged"
    ]
   },
   {
@@ -1944,7 +1958,7 @@
    "name": "approval.expired",
    "publisher": "approvals",
    "role": "consumes",
-   "critical": false
+   "critical": true
   },
   {
    "name": "approval.granted",
@@ -2017,6 +2031,12 @@
    "publisher": "catalogue",
    "role": "consumes",
    "critical": true
+  },
+  {
+   "name": "event.lifecycleChanged",
+   "publisher": "catalogue",
+   "role": "consumes",
+   "critical": false
   },
   {
    "name": "fnb.menuPublished",
@@ -5306,8 +5326,8 @@
  "counts": {
   "operations": 148,
   "schemas": 125,
-  "states": 42,
-  "events": 52,
+  "states": 43,
+  "events": 53,
   "tables": 139,
   "screens": 183,
   "flows": 11,

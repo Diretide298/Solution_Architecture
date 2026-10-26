@@ -98,7 +98,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-369` | Commercial Command Center | B | 0 | 108 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-370` | Customer Subscription & Commercial Portfolio | B | 2 | 34 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-371` | Customer Commercial 360° | B | 0 | 13 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-371` | Customer Commercial 360° | B | 0 | 15 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-372` | Operational Profile, VSI & Commercial Model Intelligence | B | 0 | 72 | 6 | 2 | 2 | 0 | — | notStarted (—) |
 | `ADM-373` | Revenue & Commercial Model Analytics | B | 0 | 91 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `ADM-374` | Trial & Conversion Monitor | B | 0 | 72 | 6 | 0 | 2 | 0 | — | notStarted (—) |

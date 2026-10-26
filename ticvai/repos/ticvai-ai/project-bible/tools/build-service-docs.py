@@ -1554,17 +1554,24 @@ def main() -> int:
          "The frontend mock API is SETUP-MOCK-API's (since 21 October 2026): it mirrors this fixture's reference data "
          "beside the prototypes' sample venues. Done when: it loads on a migrated database and integration tests run "
          "against it."),
-        ("SETUP-CLIENTS", "Generate the typed API clients from contracts/ for the frontend workspace", 3, ["SETUP-CI"],
+        ("SETUP-CLIENTS", "Publish @ticvai/api-client as a versioned package, generated from ticvai-contracts at each release tag", 3, ["SETUP-CI"],
          # **Where the client lives** (r8 re-walk, CHG-R8RW-006): the text said "ticvai-frontend packages/api-client", a
          # repository and folder that do not exist since the frontend became six repositories (ADR-0007 amendment,
          # docs/active/frontend-repos.yaml). The client is generated and published from ticvai-contracts.
+         # **Re-scoped to the package** (ADAM CR-195, settled by Chinmay 25 October 2026, option A; CHG-R10UI-011): the
+         # title still said "for the frontend workspace", the one-workspace layout retired on 13 October, and no app
+         # repository depended on the client, so every FE "connect to API" sub-task stubbed its calls.
          "In **ticvai-contracts**, the repository that holds the OpenAPI, the event schemas and the generated "
-         "clients: `@ticvai/api-client` is generated from `contracts/` by one command, checked in GitLab CI, and "
-         "published to the `ticvai-frontend` group's GitLab npm registry on each contracts tag (`v*`); each of the "
-         "six frontend repositories pins it by exact version (ADR-0007 amendment; setup/dependencies.md, since 20 "
-         "October 2026). No frontend repository generates or holds its own copy. Done when: every in-release "
-         "operation has a typed call in the published package, the contracts pipeline fails if the contracts change "
-         "without a re-generate, and screen tickets stop stubbing calls."),
+         "clients: `@ticvai/api-client` is generated from `contracts/` by one command at each release tag (the `v*` "
+         "tag the contracts repository takes when the package releases), checked in GitLab CI, and published as a "
+         "versioned package to the `ticvai-frontend` group's GitLab package registry (npm). Every app repository "
+         "depends on it by exact version, **ticvai-guest-web first**, then each repository as its first screen is "
+         "connected (ADR-0007 amendment; setup/dependencies.md, since 20 October 2026). No frontend repository "
+         "generates, holds or hand-writes its own client, and there is no per-repository generator (ADAM CR-195). "
+         "Every FE screen task's \"connect to API\" sub-task uses this package and waits for it. Done when: every "
+         "in-release operation has a typed call in the published package, the contracts pipeline fails if the "
+         "contracts change without a re-generate, ticvai-guest-web builds against the published version, and screen "
+         "tickets stop stubbing calls."),
         ("SETUP-AUTH", "Sign-in working end to end against IdentityService", 5, ["SETUP-DB"],
          # **Names the operations it wires** (4 October, the Sprint 1-2 judging; CHG-FXP-005): "the identity sign-in
          # operations" named none and the pull linked nothing, so request, response and the permission set were unknown.
@@ -2316,6 +2323,8 @@ def main() -> int:
         for e in ex.get("epics") or []:
             task(e["key"], "", "Epic", e["subject"], e["detail"], 1, area=e.get("area", "backend"))
         for t_ in ex.get("tasks") or []:
+            # a database update task gains each forward migration newer than those it names (CHG-R10GFC-006)
+            t_ = ticket_done.db_update_task(t_, ROOT)
             # **A task for a later block is recorded, not ticketed** (1 October): the ADRs of that day name
             # build work for B1 (the waiting room, the admission rule evaluators), kept beside the Block A
             # tasks so it is not lost, and cut into tickets when that block is planned.
@@ -3544,6 +3553,27 @@ def main() -> int:
     later_b = sp.LATER_BLOCKS
     budget = {b_: min(done_by[b_], run + rest * (i + 1) / len(later_b)) for i, b_ in enumerate(later_b)}
     cur = sp.BLOCKS.index("B")
+    # **A pushed app-module keeps the ticketed block it was pushed in** (r10 gate 2, 26 October 2026, CHG-R10GFP-001).
+    # The fill is a running sum against a third of the later work, so a module on the boundary flips when the work
+    # before it grows by a few points: at r10, Pricing & Promotions · Venue Management 3 of 8, ticketed task by task in
+    # Block B at r9 (27 New tickets in OpenProject), came out 3 points over B's 7,248 and fell to Block C, which is not
+    # ticketed, though no decision moved it (check-plan-closure C-UNTICKETED, CHG-RONEP-002). An app-module the last
+    # release bundle (op-release.json) pushed under a later block that is ticketed (team.json sprintPlan.ticketBlocks)
+    # is never placed after that block by the fill or by pass 2; the running sum still counts it, so what follows it is
+    # placed as before. Moving one out of a ticketed block is a plan change: a `departures` entry, decided by the lead.
+    kept_block = {}
+    try:
+        _bundle = json.loads((OUT / "op-release.json").read_text(encoding="utf-8"))
+        _pushed = set(_bundle.get("ids") or {})
+        if (OUT / "pms-map.json").exists():
+            _pushed |= {x for x in json.loads((OUT / "pms-map.json").read_text(encoding="utf-8")) if "#" not in x}
+        for t_ in _bundle.get("tickets") or []:
+            b_ = str(t_.get("parent") or "").removeprefix("BLOCK-")
+            if (t_.get("type") == "Feature" and t_.get("key") in am_info and t_["key"] in _pushed
+                    and b_ in sp.LATER_BLOCKS and b_ in settings["ticketBlocks"]):
+                kept_block[t_["key"]] = b_
+    except (OSError, ValueError):            # no bundle yet: nothing has been pushed, nothing is kept
+        kept_block = {}
     for k, a in sorted(am_info.items(), key=lambda x: x[1]["order"]):
         if a["block"] in sp.BLOCK_A_FAMILY:
             continue
@@ -3554,6 +3584,10 @@ def main() -> int:
         while cur < len(sp.BLOCKS) - 1 and run > budget[sp.BLOCKS[cur]] + 1e-6:
             cur += 1
         a["block"] = sp.BLOCKS[cur]
+        if k in kept_block and BRANK[kept_block[k]] < BRANK[a["block"]]:
+            print(f"  kept in Block {kept_block[k]}: {k}, pushed there by release {_bundle.get('release')}; the fill "
+                  f"would place it in Block {a['block']} (CHG-R10GFP-001)")
+            a["block"] = kept_block[k]
     # **Each block is complete and testable on its own.** What an app-module's tasks wait on to be finished -- the
     # back end a screen is wired to, the migration a service writes into, the migration a key points into, a task
     # of the same service -- must be in its block or an earlier one. Shared back end and migrations are pulled into
@@ -3726,9 +3760,13 @@ def main() -> int:
                      "evidence each asks for. ")
             done_ = "Done when every one of those done-whens holds on the integration environment with no open severity 1 or 2 defect. "
         elif kinds_ == {"table"}:
+            # **Matches the package DDL, not a record that lagged it** (ADAM CR-092, accepted 15 October 2026;
+            # CHG-R10TEN-014): the DDL is right and the records followed it late (CR-067), so the test compares with the
+            # DDL itself; the ADAM record is now built from the same DDL (derive-ddl `records`).
             what_ = ("the migrations of its tickets, in plan order, on an empty database and on the previous release's "
-                     "schema: each applies once and a second run applies nothing, every table matches its record in ADAM "
-                     "(columns, keys, indexes, row-level security forced), a row in another tenant's or venue's scope is "
+                     "schema: each applies once and a second run applies nothing, every table matches the package DDL "
+                     "(backend/<area>/010-*.sql, 900, 910 and 920, then the forward migrations V0100 onwards in order: "
+                     "columns, keys, indexes, row-level security forced), a row in another tenant's or venue's scope is "
                      "not visible under a scoped session, and a row pointing at a missing parent is refused. ")
             done_ = f"Done when it passes for {named} with no open severity 1 or 2 defect. "
         else:
@@ -3855,7 +3893,9 @@ def main() -> int:
         moved = 0
         for b in sp.LATER_BLOCKS[:-1]:
             limit = sp.window_of(targets[b], tests["days"])[0]
-            late = {k for k, a in am_info.items() if a["block"] == b and fin.get(k, 0.0) > limit + 1e-6}
+            # a module pushed in a ticketed block stays in it (CHG-R10GFP-001): its block's end moves instead
+            late = {k for k, a in am_info.items() if a["block"] == b and fin.get(k, 0.0) > limit + 1e-6
+                    and kept_block.get(k) != b}
             if not late:
                 continue
             # the late app-modules move to the next block; the back end an app-module left in this block still

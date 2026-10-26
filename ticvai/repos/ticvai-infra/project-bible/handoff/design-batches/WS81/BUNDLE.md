@@ -326,6 +326,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - … and 1 more flow steps (`flows/`)
 - Flow F190 branch at step 1 (expected): when Nothing has been set up on Gameplay Validation Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F190 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -503,6 +504,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS61 Game and Ride Board 4.dc.html#bo-425`
 - Workshop pack: Game_and_Ride_Module.pdf board 4
 - Flow F190 *Game and Ride board 4: Gameplay Validation Command Center*, step 2: Works in Gameplay Validation Rule Configuration → Configure the checks TICVAI performs before allowing a game or ride to start. The source requires validation before game start against balance, bonus and applicable entitlements.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -664,6 +666,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS61 Game and Ride Board 4.dc.html#bo-426`
 - Workshop pack: Game_and_Ride_Module.pdf board 4
 - Flow F190 *Game and Ride board 4: Gameplay Validation Command Center*, step 4: Works in Deduction Priority & Funding Source Rules → Determine which wallet/value source TICVAI consumes when more than one valid funding source is available. Requirement 10.2.7 explicitly states: “Bonus deduction should be done first.”
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1890,6 +1893,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS61 Game and Ride Board 4.dc.html#bo-433`
 - Workshop pack: Game_and_Ride_Module.pdf board 4
 - Flow F190 *Game and Ride board 4: Gameplay Validation Command Center*, step 18: Works in Validation Simulator & Exception Analysis → Allow administrators to test entitlement and payment configurations before deployment and investigate rejected gameplay transactions.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

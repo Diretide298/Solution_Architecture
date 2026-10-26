@@ -116,11 +116,10 @@
     "shell": "web",
     "siblings": [
      "P09",
-     "P10",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }
@@ -337,11 +336,10 @@
     "shell": "web",
     "siblings": [
      "P09",
-     "P10",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }
@@ -519,11 +517,10 @@
     "shell": "web",
     "siblings": [
      "P09",
-     "P10",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }
@@ -576,16 +573,17 @@
       {
        "kind": "banner",
        "label": "With a reviewer",
-       "bindsTo": "ApprovalRequest.status",
-       "notes": "Where it is now, and **the date a decision is due** — `ApprovalRequest.slaDueAt`. *\"Fourth in the queue\"* was considered and rejected on the frame: a position moves backwards and a date does not.\n",
+       "operation": "listMyAccreditationApplications",
+       "bindsTo": "AccreditationApplication.status",
+       "notes": "Where it is now, and **the date a decision is due** — `AccreditationApplication.decisionDueAt`. *\"Fourth in the queue\"* was considered and rejected on the frame: a position moves backwards and a date does not.",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-004"
       },
       {
        "kind": "timeline",
        "label": "Where it has been",
-       "bindsTo": "ApprovalRequest.decisions",
+       "bindsTo": "AccreditationApplication",
        "operation": "listMyAccreditationApplications",
-       "notes": "Received, documents checked, decision — each with its date.",
+       "notes": "From the application itself: `submittedAt`, `requirementStatus` and `missingRequirements` (documents checked), `decidedAt` (check-screen-value-sources, CHG-R10UI-015). Received, documents checked, decision — each with its date.",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-004"
       }
      ]
@@ -597,9 +595,9 @@
       {
        "kind": "detailPanel",
        "label": "Application",
-       "bindsTo": "ApprovalRequest.summary",
+       "bindsTo": "AccreditationApplication",
        "operation": "listMyAccreditationApplications",
-       "notes": "The reference, the performances, and what was requested.",
+       "notes": "`AccreditationApplication.reference`, `programmeId`, `categoryCode` and `subject` (check-screen-value-sources, CHG-R10UI-015). The reference, the performances, and what was requested.",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-004"
       }
      ]
@@ -701,11 +699,10 @@
     "shell": "web",
     "siblings": [
      "P09",
-     "P10",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }
@@ -761,7 +758,8 @@
       {
        "kind": "credentialDisplay",
        "label": "Your badge",
-       "bindsTo": "AccreditationBadge",
+       "operation": "listMyAccreditationCredentials",
+       "bindsTo": "AccreditationCredential",
        "notes": "The scannable credential, rendered large and bright. **Offline is required** — a stage door is the worst signal in the building, and the 2 September decision that a dynamic-QR ticket is redirected into the app exists for exactly this reason.\n",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-005"
       }
@@ -774,14 +772,16 @@
       {
        "kind": "detailPanel",
        "label": "Holder",
-       "bindsTo": "AccreditationBadge.holderName",
+       "operation": "listMyAccreditationCredentials",
+       "bindsTo": "AccreditationCredential.holderName",
        "notes": "Name, role and outlet, as printed. Photographer · The Northern Review.",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-005"
       },
       {
        "kind": "detailPanel",
        "label": "Where it works",
-       "bindsTo": "AccreditationBadge.zones",
+       "operation": "listMyAccreditationCredentials",
+       "bindsTo": "AccreditationCredential.zones",
        "notes": "**Stage door, stalls and pit, named performances — and *any other door, refused*.** The negative case is stated on the badge because the steward reads this, not a policy.\n",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-005"
       }
@@ -794,8 +794,9 @@
       {
        "kind": "banner",
        "label": "Valid until",
-       "bindsTo": "AccreditationBadge.expiresAt",
-       "notes": "**`expired` and `revoked` must be unmistakable and must not resemble `loading`.** `AccreditationBadge.state` carries both, and `revokedReason` says why.\n",
+       "operation": "listMyAccreditationCredentials",
+       "bindsTo": "AccreditationCredential.validTo",
+       "notes": "**`expired` and `revoked` must be unmistakable and must not resemble `loading`.** `AccreditationCredential.status` carries both (CHG-R10UI-016).",
        "provenance": "contract approvals.yaml AccreditationBadge.state"
       }
      ]
@@ -903,11 +904,10 @@
     "shell": "web",
     "siblings": [
      "P09",
-     "P10",
      "P14",
      "P17"
     ],
-    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them.",
+    "note": "**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake, the developer portal and the sign-up are outward faces of the control plane, not separate products — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added 11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its own app in ticvai-partner-web, so TICVAI Control serves the other four.",
     "decided": "10 September 2026"
    }
   }

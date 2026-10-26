@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 50 |
-| Operations | 204 |
+| Operations | 206 |
 | Contracts | 19 |
 | Modules | 14 |
 | Undrawn | 0 |
-| Operations with no screen | 22 |
+| Operations with no screen | 23 |
 | Waves | wave1 50 |
 
 ## Gaps
 
-### 22 operations with no screen here
+### 23 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -42,6 +42,7 @@
 | `getUpsellSuggestions` | promotions | POST | Suggestions for a cart |
 | `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
 | `listMyWaitingGuests` | queue | GET | The caller's own queue entries |
+| `listMyVisitPlans` | venue-map | GET | The caller's own visit plans, by date or status |
 
 ## Modules
 
@@ -72,7 +73,7 @@
 | `WEB-004` | Attraction Details | Discovery & Browse | 1 | 6 | yes |
 | `WEB-005` | Ticket Type Selection | Booking & Selection | 1 | 7 | yes |
 | `WEB-006` | Date & Performance Selection | Booking & Selection | 1 | 12 | yes |
-| `WEB-007` | Interactive Seat Selection | Booking & Selection | 1 | 7 | yes |
+| `WEB-007` | Interactive Seat Selection | Booking & Selection | 1 | 8 | yes |
 | `WEB-008` | Add-ons & Upsell | Booking & Selection | 1 | 5 | yes |
 | `WEB-009` | Wishlist | Booking & Selection | 1 | 3 | yes |
 | `WEB-010` | Shopping Cart | Cart & Checkout | 1 | 14 | yes |
@@ -81,15 +82,15 @@
 | `WEB-013` | Booking Confirmation | Cart & Checkout | 1 | 5 | yes |
 | `WEB-014` | Pay for a Booking | Cart & Checkout | 1 | 2 | yes |
 | `WEB-015` | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 | yes |
-| `WEB-016` | Login / Register | Account & Self-Service | 1 | 14 | yes |
+| `WEB-016` | Login / Register | Account & Self-Service | 1 | 15 | yes |
 | `WEB-017` | My Account Dashboard | Account & Self-Service | 1 | 8 | yes |
 | `WEB-018` | My Tickets | Account & Self-Service | 1 | 9 | yes |
 | `WEB-019` | Order History | Account & Self-Service | 1 | 9 | yes |
 | `WEB-020` | Profile & Preferences | Account & Self-Service | 1 | 7 | yes |
 | `WEB-021` | Wallet & Gift Cards | Membership, Loyalty & Value | 1 | 9 | yes |
 | `WEB-022` | Membership Plans | Membership, Loyalty & Value | 1 | 3 | yes |
-| `WEB-023` | Membership Management | Membership, Loyalty & Value | 1 | 5 | yes |
-| `WEB-024` | Devices, Wishlist & Consent | Membership, Loyalty & Value | 1 | 14 | yes |
+| `WEB-023` | Membership Management | Membership, Loyalty & Value | 1 | 6 | yes |
+| `WEB-024` | Devices, Wishlist & Consent | Membership, Loyalty & Value | 1 | 15 | yes |
 | `WEB-025` | Help Centre / FAQ | Engagement & Support | 1 | 5 | yes |
 | `WEB-026` | Survey & Feedback | Engagement & Support | 1 | 5 | yes |
 | `WEB-027` | Newsletter Subscription | Engagement & Support | 1 | 5 | yes |

@@ -158,10 +158,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-013` | SEO & Metadata | A | 25 | 14 | 5 | 12 | 0 | 0 | configures | notStarted (generated) |
 | `CMS-011` | Translations | A | 8 | 29 | 5 | 14 | 2 | 0 | configures | notStarted (generated) |
 | `CMS-012` | RTL Preview | A | 0 | 8 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `CMS-014` | Publishing Workflow | A | 9 | 31 | 5 | 1 | 2 | 6 | — | notStarted (generated) |
+| `CMS-014` | Publishing Workflow | A | 9 | 32 | 5 | 1 | 2 | 6 | — | notStarted (generated) |
 | `CMS-015` | Version History | A | 1 | 14 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
 | `CMS-016` | Site Settings | A | 71 | 24 | 6 | 6 | 3 | 6 | configures | notStarted (generated) |
-| `CMS-017` | Domain & Certificate | A | 3 | 21 | 6 | 0 | 1 | 0 | configures | notStarted (generated) |
+| `CMS-017` | Domain & Certificate | A | 4 | 21 | 6 | 0 | 1 | 0 | configures | notStarted (generated) |
 | `CMS-018` | Consent & Legal | A | 23 | 44 | 6 | 4 | 2 | 4 | configures | notStarted (generated) |
 | `CMS-019` | User Access | A | 6 | 21 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `CMS-101` | Help Me Choose | A | 28 | 23 | 6 | 3 | 4 | 0 | configures | notStarted (generated) |

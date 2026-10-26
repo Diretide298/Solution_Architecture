@@ -1573,8 +1573,10 @@
     "BO-077",
     "BO-089",
     "BO-090",
+    "BO-1088",
     "BO-1094",
     "BO-1111",
+    "BO-1144",
     "BO-1146",
     "BO-1162",
     "BO-1179"
@@ -1712,6 +1714,11 @@
      "provenance": "derived — BO-028 declares entryState.params refundId and BO-101 holds none of them. The edge carries nothing: refundId only pre-selects (deep link or optional), and BO-028 opens on its own"
     },
     {
+     "to": "BO-1088",
+     "trigger": "Opens Credit & Balance Type Configuration",
+     "provenance": "CHG-R10OPN-004 (ADAM CR-261; Chinmay, 26 October 2026): the section home links to the Block A screen it leads to, as CHG-RONEP-007 did; its command centre is not in Block A"
+    },
+    {
      "to": "BO-1094",
      "trigger": "Opens Funding Method Configuration",
      "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
@@ -1720,6 +1727,11 @@
      "to": "BO-1111",
      "trigger": "Opens Credit Expiry, Extension & Forfeiture Operations",
      "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    },
+    {
+     "to": "BO-1144",
+     "trigger": "Opens Peer-to-Peer Transfer Configuration",
+     "provenance": "CHG-R10OPN-004 (ADAM CR-261; Chinmay, 26 October 2026): the section home links to the Block A screen it leads to, as CHG-RONEP-007 did; its command centre is not in Block A"
     },
     {
      "to": "BO-1146",

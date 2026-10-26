@@ -369,6 +369,11 @@
     "name": "outletId",
     "in": "query",
     "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -492,6 +497,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": "OrgUnit"
+ },
+ "getRegionSettings": {
+  "method": "GET",
+  "path": "/regions/{regionId}/settings",
+  "contract": "tenancy",
+  "summary": "Read region settings",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "RegionSettings"
  },
  "getReport": {
   "method": "GET",
@@ -1004,6 +1022,30 @@
   ],
   "requestBody": null,
   "responds": "Page"
+ },
+ "listSaleBoards": {
+  "method": "GET",
+  "path": "/sale-boards",
+  "contract": "tenancy",
+  "summary": "List sale boards",
+  "permission": "SCOPE_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "venueId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "kind",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "SaleBoard"
  },
  "listScans": {
   "method": "GET",

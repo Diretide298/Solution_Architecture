@@ -436,6 +436,14 @@
     "minLength": 2,
     "maxLength": 2
    },
+   "billingCurrency": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "nullable": true,
+    "pattern": "^[A-Z]{3}$",
+    "description": "**The currency TICVAI invoices this tenant in** (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013), an ISO 4217 code. Required on save (`setBillingEntity`, 400 otherwise); null only while the record rides on an onboarding application. `generateInvoice` copies it onto each new invoice as `currencyCode`, so a later change never moves an invoice already generated."
+   },
    "address": {
     "type": "string",
     "maxLength": 1000,

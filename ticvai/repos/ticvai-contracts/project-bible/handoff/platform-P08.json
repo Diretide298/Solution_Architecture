@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-22",
+ "generated": "2026-10-26",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1663,
@@ -15,7 +15,7 @@
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
-  "operationsWithNoScreen": 206
+  "operationsWithNoScreen": 211
  },
  "waves": {
   "wave1": 143,
@@ -202,27 +202,27 @@
    "operations": 77
   },
   {
-   "contract": "wallet",
-   "operations": 62
-  },
-  {
    "contract": "finance",
    "operations": 62
   },
   {
-   "contract": "resources",
-   "operations": 56
+   "contract": "wallet",
+   "operations": 62
   },
   {
    "contract": "ai",
    "operations": 56
   },
   {
-   "contract": "seating",
-   "operations": 53
+   "contract": "resources",
+   "operations": 56
   },
   {
    "contract": "inventory",
+   "operations": 53
+  },
+  {
+   "contract": "seating",
    "operations": 53
   },
   {
@@ -246,11 +246,11 @@
    "operations": 44
   },
   {
-   "contract": "identity",
+   "contract": "maintenance",
    "operations": 41
   },
   {
-   "contract": "maintenance",
+   "contract": "identity",
    "operations": 41
   },
   {
@@ -3450,7 +3450,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/payment-terminal-device-inventory-t49-adm-580",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -4638,7 +4638,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/venue-operations/session-calendar",
-   "operations": 12,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -4827,7 +4827,7 @@
    "module": "Venue Operations",
    "wave": 2,
    "route": "/venue-operations/device-registry",
-   "operations": 9,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -4899,7 +4899,7 @@
    "module": "Venue Operations",
    "wave": 1,
    "route": "/venue-operations/f-b-outlets",
-   "operations": 17,
+   "operations": 18,
    "drawn": true
   },
   {
@@ -5124,7 +5124,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/venue-operations/asset-register",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -6834,7 +6834,7 @@
    "module": "Orders & Money",
    "wave": 1,
    "route": "/orders-money/peer-to-peer-transfer-configuration-bo-1144",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -16198,6 +16198,12 @@
     "summary": "Rule Test, Simulation & AI Recommendation Workspace"
    },
    {
+    "operation": "verifyDeveloper",
+    "contract": "public-api",
+    "verb": "POST",
+    "summary": "Verify a registered developer organisation"
+   },
+   {
     "operation": "overrideWaitingGuest",
     "contract": "queue",
     "verb": "POST",
@@ -16208,6 +16214,12 @@
     "contract": "queue",
     "verb": "POST",
     "summary": "Admit a party at the ride"
+   },
+   {
+    "operation": "resolveCalledWaitingGuest",
+    "contract": "queue",
+    "verb": "POST",
+    "summary": "Record a called party's no-show, or return it to the queue"
    },
    {
     "operation": "createRentalAgreement",
@@ -16306,6 +16318,12 @@
     "summary": "What a plan tier allows and includes"
    },
    {
+    "operation": "issueInvoice",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Issue a draft invoice, giving it its number"
+   },
+   {
     "operation": "launchCellCluster",
     "contract": "subscription",
     "verb": "POST",
@@ -16328,6 +16346,12 @@
     "contract": "subscription",
     "verb": "GET",
     "summary": "Users beneath a partner, by branch"
+   },
+   {
+    "operation": "listPlatformTaxRates",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "The tax rates TICVAI charges on its own invoices, per country"
    },
    {
     "operation": "listTenantMigrations",
@@ -16376,6 +16400,12 @@
     "contract": "subscription",
     "verb": "PUT",
     "summary": "Set a plan tier's allowances and modules"
+   },
+   {
+    "operation": "setPlatformTaxRate",
+    "contract": "subscription",
+    "verb": "PUT",
+    "summary": "Set a country's tax rate on TICVAI's own invoices"
    },
    {
     "operation": "updatePartnerAgreement",

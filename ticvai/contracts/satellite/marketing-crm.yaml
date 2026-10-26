@@ -3164,6 +3164,7 @@ paths:
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-001 Home"
         - "P02 GST-039 Profile"
+        - "P02 GST-043 Arabic / RTL Experience"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: service
@@ -3207,6 +3208,7 @@ paths:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-039 Profile"
+        - "P02 GST-043 Arabic / RTL Experience"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: service

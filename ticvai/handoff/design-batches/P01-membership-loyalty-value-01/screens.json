@@ -40,7 +40,7 @@
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId only pre-select (deep link or optional), and WEB-024 opens on its own"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own"
     }
    ]
   },
@@ -423,7 +423,7 @@
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId only pre-select (deep link or optional), and WEB-024 opens on its own"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own"
     }
    ]
   },
@@ -450,7 +450,7 @@
        ],
        "operation": "listProducts",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "Membership products only, for the guest's venue. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "notes": "**The photo is the primary item's `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset read. Membership products only, for the guest's venue. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -640,7 +640,7 @@
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId only pre-select (deep link or optional), and WEB-024 opens on its own"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own"
     }
    ]
   },
@@ -792,6 +792,14 @@
     "trigger": "onAction"
    },
    {
+    "operationId": "listPaymentTokens",
+    "contract": "orders",
+    "purpose": "Called when the guest chooses Use another card: the saved cards the retry modal lists (masked identifier, method, expiry, default first); the chosen one's id goes to retryMyDunningPayment as paymentTokenId (ADAM CR-233, 25 October 2026)",
+    "trigger": "onAction",
+    "shownBy": "Use another card",
+    "provenance": "ADAM CR-233 (option A), settled by Chinmay 25 October 2026"
+   },
+   {
     "operationId": "getMyMemberships",
     "contract": "catalogue",
     "purpose": "A guest's own memberships, benefits and history",
@@ -857,7 +865,7 @@
     "id": "formRetryMyDunningPayment",
     "component": "modal",
     "trigger": "Retry the payment",
-    "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. **Use another card lists the guest's saved cards** from `listPaymentTokens` (masked identifier, method, expiry, the default first) and sends the chosen one's id as `paymentTokenId`; a hard decline is never retried on the same card (ADAM CR-233, 25 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RetryDunningPaymentRequest",
     "confirm": {
      "label": "Retry my dunning payment",
@@ -1271,6 +1279,12 @@
     "trigger": "onAction"
    },
    {
+    "operationId": "getSubjectDataExport",
+    "contract": "identity",
+    "purpose": "Where the requested data export has got to, and a fresh short-lived download link once it is ready (ADAM CR-101, CHG-R10ID-016); polled with the requestId exportSubjectData answered while the export is not yet ready, and read again for a new link when an old one has lapsed",
+    "trigger": "onInterval"
+   },
+   {
     "operationId": "getFacePassEnrolment",
     "contract": "access",
     "purpose": "Whether a face pass is enrolled on this account",
@@ -1349,6 +1363,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMfaMethods` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "requestId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen makes one with `exportSubjectData`."
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",

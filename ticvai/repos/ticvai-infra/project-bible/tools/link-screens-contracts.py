@@ -102,7 +102,9 @@ def main() -> int:
             # and the next tool to open it dies pointing at the wrong culprit.
             with f.open("w", encoding="utf-8") as out:
                 out.write(head + "\n")
-                yaml.safe_dump(doc, out, sort_keys=False, allow_unicode=True, width=98)
+                # width 100, the derivers' form: at 98 it rewrapped long notes that the width-100 screen writers
+                # wrap back (check-regenerate-twice RT-CHAIN, r10 gate 2, CHG-R10GFP-003)
+                yaml.safe_dump(doc, out, sort_keys=False, allow_unicode=True, width=100)
 
     # --- write `x-ticvai-consumed-by` back into the contracts
     #

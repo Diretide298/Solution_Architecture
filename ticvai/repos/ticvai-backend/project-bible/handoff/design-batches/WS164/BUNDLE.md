@@ -418,6 +418,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - … and 1 more flow steps (`flows/`)
 - Flow F273 branch at step 1 (expected): when Nothing has been set up on Resource Analytics Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F273 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -821,6 +822,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS135 Resource Management Configuration Board 10.dc.html#bo-945`
 - Workshop pack: Resource_Management_Configuration_Reference.pdf board 10
 - Flow F273 *Resource Management Configuration board 10: Resource Analytics Command Center*, step 4: Works in Resource Cost, Revenue & Efficiency Analytics → Measure the financial and operational efficiency of resources.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

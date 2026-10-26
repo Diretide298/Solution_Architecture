@@ -299,7 +299,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the finance are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 400 Validation failed (`validation`). Includes a day filter (`from`, `to`) sent by a caller whose scope gives no single region; `errors[]` names `from`, "filter by …; 400 Validation failed (`validation`). Includes a day filter (`issuedFrom`, `issuedTo`) sent by a caller whose scope gives no single region; `errors[]` names … |
 
 #### Edge cases to draw
 

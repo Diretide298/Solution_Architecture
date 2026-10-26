@@ -1,6 +1,6 @@
 {
  "about": "What the contracts cannot state about an operation's tables, one entry per operation, each with its reason. tools/derive-lineage.py adds `reads`/`writes` to what the contract derives and takes `notReads`/`notWrites` away. Authored by hand: nothing in the refresh writes it. An entry marked `carried` was copied from the hand-kept lineage when it became derived (20 October 2026, CHG-R8GEN-001); their number may only fall (carriedCeiling, check-lineage LN-OVERRIDE). To change an operation's tables, change its contract (a persisted schema, x-ticvai-read-via, x-ticvai-write-via, x-ticvai-config-change-log); add an override only for what no contract fact can say, with a reason, and without `carried`.",
- "carriedCeiling": 1616,
+ "carriedCeiling": 1615,
  "operations": {
   "abandonCart": {
    "reads": [
@@ -4689,16 +4689,6 @@
    "reason": "persistence: projection; stops with coordinates (station.latitude/longitude) and order; neighbour getTransportRoute reads the same three (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "getTrialBalance": {
-   "reads": [
-    "ledger.account",
-    "ledger.event_budget",
-    "ledger.fiscal_period",
-    "ledger.posting"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "getUnifiedReconciliation": {
    "reads": [
     "ledger.posting",
@@ -5249,18 +5239,6 @@
     "catalogue.waitlist_entry"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "linkGuestCheckout": {
-   "reads": [
-    "orders.sales_order",
-    "pii.subject_contact"
-   ],
-   "writes": [
-    "orders.sales_order",
-    "pii.subject"
-   ],
-   "reason": "14 October 2026 (ADAM CR-084, CHG-GDL-003): each attached order is announced as order.linkedToGuest through the outbox in the attaching transaction (ADR-0033), which Identity's identity.subject_holding consumes (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "list86Events": {

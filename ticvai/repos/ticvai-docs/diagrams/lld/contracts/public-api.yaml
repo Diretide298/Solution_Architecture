@@ -1,5 +1,5 @@
 id: LLD-public-api
-title: public-api — 36 operations
+title: public-api — 38 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -38,6 +38,7 @@ operations:
   writes:
   - cache:idempotency
   - control.api_client
+  - control.api_client_secret
 - operation: createSandbox
   verb: POST
   path: /sandboxes
@@ -138,6 +139,7 @@ operations:
   reads:
   - cache:idempotency
   - control.api_client
+  - control.api_client_secret
   - control.api_licence
   writes:
   - cache:idempotency
@@ -179,7 +181,7 @@ operations:
 - operation: listApiLicences
   verb: GET
   path: /api-licensing
-  scope: tenant
+  scope: platform
   permission: DEVELOPER_ADMIN
   audience:
   - staff
@@ -241,9 +243,19 @@ operations:
   scope: tenant
   permission: DEVELOPER_VIEW
   audience:
-  - public
   - staff
   - partner
+  offline: false
+  reads:
+  - control.integration_listing
+  writes: []
+- operation: listMarketplaceListings
+  verb: GET
+  path: /marketplace/listings
+  scope: platform
+  permission: null
+  audience:
+  - public
   offline: false
   reads:
   - control.integration_listing
@@ -310,8 +322,8 @@ operations:
 - operation: registerDeveloper
   verb: POST
   path: /developers
-  scope: tenant
-  permission: DEVELOPER_VIEW
+  scope: platform
+  permission: null
   audience:
   - public
   offline: false
@@ -321,6 +333,7 @@ operations:
   writes:
   - cache:idempotency
   - control.developer_account
+  - control.developer_member
 - operation: replayEvents
   verb: POST
   path: /webhook-subscriptions/{subscriptionId}/replay
@@ -384,6 +397,7 @@ operations:
   writes:
   - cache:idempotency
   - control.api_client
+  - control.api_client_secret
 - operation: rotateApiCredential
   verb: POST
   path: /api-clients/{clientId}/credentials
@@ -399,6 +413,7 @@ operations:
   writes:
   - cache:idempotency
   - control.api_client
+  - control.api_client_secret
 - operation: setApiAnomalyRule
   verb: PUT
   path: /api-anomaly-rules/{anomalyRuleId}
@@ -431,7 +446,7 @@ operations:
 - operation: setApiLicensing
   verb: PUT
   path: /api-licensing/{licenceId}
-  scope: tenant
+  scope: platform
   permission: DEVELOPER_ADMIN
   audience:
   - staff
@@ -439,6 +454,7 @@ operations:
   reads:
   - cache:idempotency
   - control.api_licence
+  - control.tenant
   writes:
   - cache:idempotency
   - cache:resolution
@@ -505,3 +521,17 @@ operations:
   writes:
   - cache:idempotency
   - control.webhook_delivery
+- operation: verifyDeveloper
+  verb: POST
+  path: /developers/{developerId}/verify
+  scope: platform
+  permission: DEVELOPER_ADMIN
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - control.developer_account
+  writes:
+  - cache:idempotency
+  - control.developer_account

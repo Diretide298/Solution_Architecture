@@ -235,7 +235,7 @@
   "permission": "DEVELOPER_ADMIN",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "platform",
   "parameters": [
    {
     "name": null,
@@ -340,14 +340,35 @@
   "method": "GET",
   "path": "/listings",
   "contract": "public-api",
-  "summary": "Published third-party integrations",
+  "summary": "A developer's own listings, or the certification queue",
   "permission": "DEVELOPER_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "developerId",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "IntegrationListing"
+  "responds": "Page"
  },
  "listProductionAccessRequests": {
   "method": "GET",
@@ -428,10 +449,10 @@
   "path": "/developers",
   "contract": "public-api",
   "summary": "Register a developer or organisation",
-  "permission": "DEVELOPER_VIEW",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "platform",
   "parameters": [
    {
     "name": null,
@@ -439,7 +460,7 @@
     "required": null
    }
   ],
-  "requestBody": "DeveloperAccount",
+  "requestBody": "CreateDeveloperAccountRequest",
   "responds": "DeveloperAccount"
  },
  "replayEvents": {
@@ -569,7 +590,7 @@
   "permission": "DEVELOPER_ADMIN",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
+  "scopeLevel": "platform",
   "parameters": [
    {
     "name": "licenceId",

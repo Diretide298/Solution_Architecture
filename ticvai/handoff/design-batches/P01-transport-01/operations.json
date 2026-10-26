@@ -90,6 +90,11 @@
     "name": "at",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -113,6 +118,11 @@
    {
     "name": "toStationId",
     "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
     "required": null
    }
   ],
@@ -167,6 +177,11 @@
     "name": "toStationId",
     "in": "query",
     "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    },
    {
     "name": null,
@@ -325,6 +340,11 @@
    {
     "name": "passengers",
     "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
     "required": null
    },
    {

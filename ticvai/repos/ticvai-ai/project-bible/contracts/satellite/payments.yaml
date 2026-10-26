@@ -78,6 +78,32 @@ x-ticvai-queries:
       (white-label's getPublishedTenantConfig, for paymentTokenisation) through the service route (serviceAuth; r8
       integration, CHG-R8INT-005).
     served: [in-process, service]
+  approvedPaymentMethods:
+    module: payments
+    table: payments.method
+    reads: [payments.method, payments.method_config]
+    inputs:
+      venueId: {type: string, format: uuid, description: 'The venue asked about.'}
+      channelId: {type: string, format: uuid, description: 'Optional: the sales channel, where a method_config row names one.'}
+    returns:
+      type: array
+      description: 'The payment methods approved at the venue, each once; an empty list when none is.'
+      items:
+        type: object
+        required: [paymentMethodId, code, kind]
+        properties:
+          paymentMethodId: {type: string, format: uuid}
+          code: {type: string}
+          kind: {type: string}
+    rule: >-
+      A rule question (ADAM CR-212, option A, decided 25 October 2026; CHG-R10CAT-004). A payment method is approved
+      at a venue when its payments.method row is active and its venue_ids is empty or holds the venue, and the
+      payments.method_config row for it at the venue's path or the nearest ancestor that has one (the channel's own
+      row first, where channelId is given and one names it) is enabled and active. Orders answers under the caller's
+      scope (the tables' row-level security, under the caller's connection and transaction). Catalogue's
+      setChannelFeePayment reports a method that is not approved as paymentMethodNotApproved. It is asked in process
+      within commerce, through the C# query interface Orders implements.
+    served: [in-process]
   storedForwardRecords:
     module: payments
     table: payments.stored_forward
@@ -330,7 +356,7 @@ paths:
 
         
 
-        **Order.** Fewest attempts remaining first, by `attemptsMade` descending, then by `nextAttemptAt` ascending, then by `id`.'
+        **Order.** Fewest attempts remaining first, by `attemptsMade` descending, then by `nextAttemptAt` ascending, then by `id`. Where `nextAttemptAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - payments
       x-ticvai-permission: PAYMENT_CONFIGURE
@@ -434,6 +460,10 @@ paths:
         - "P08 ADM-567 Payment Policy, Governance & Approval Manager"
         - "P08 ADM-590 Digital & Alternative Payment Method Manager"
         - "P08 ADM-591 Digital Wallet & Mobile Payment Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PaymentMethod.fixed, PaymentMethod.maximumAmount, PaymentMethod.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: The methods this tenant can offer, and where
       description: 'Board 1.2. **A method is not a provider.** *Apple Pay* is a method; the acquirer
         behind it is a routing decision, and a venue that models them as one thing cannot change
@@ -472,6 +502,13 @@ paths:
       operationId: createPaymentMethod
       x-ticvai-consumed-by:
         - "P08 ADM-560 Payment Method Catalogue"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: PaymentMethod.fixed, PaymentMethod.maximumAmount, PaymentMethod.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PaymentMethod.fixed, PaymentMethod.maximumAmount, PaymentMethod.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Add a payment method to the catalogue
       tags:
@@ -522,6 +559,13 @@ paths:
         - "P08 ADM-566 Payment Fees, Surcharges & Commercial Rules"
         - "P08 ADM-590 Digital & Alternative Payment Method Manager"
         - "P08 ADM-591 Digital Wallet & Mobile Payment Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: PaymentMethod.fixed, PaymentMethod.maximumAmount, PaymentMethod.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PaymentMethod.fixed, PaymentMethod.maximumAmount, PaymentMethod.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Change availability, fees and eligibility
       description: 'Boards 1.4, 1.7 and 1.8. **Eligibility, fees and availability travel together
@@ -576,7 +620,7 @@ paths:
         multi-capture, or refund beyond a window — and routing that does not know this will send a
         transaction to a provider that cannot take it.
 
-        '
+         **Order.** Sorted by `code` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - payments
       x-ticvai-permission: PAYMENT_VIEW
@@ -793,6 +837,13 @@ paths:
         - "P08 ADM-573 Payment Routing Rule Builder"
         - "P08 ADM-574 Routing Strategy, Priority & Load Distribution"
         - "P08 ADM-578 Payment Routing Simulator, Decision Trace & AI Advisor"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: PaymentRoutingRule.maximumAmount, PaymentRoutingRule.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PaymentRoutingRule.maximumAmount, PaymentRoutingRule.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Which provider takes which transaction
       tags:
       - payments
@@ -817,6 +868,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-573 Payment Routing Rule Builder"
         - "P08 ADM-574 Routing Strategy, Priority & Load Distribution"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: PaymentRoutingRule.maximumAmount, PaymentRoutingRule.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PaymentRoutingRule.maximumAmount, PaymentRoutingRule.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
@@ -1055,13 +1113,17 @@ paths:
         - "P08 ADM-583 EMV & Card-Present Processing Configuration"
         - "P08 ADM-585 Card-Present Transaction Monitor & Operations"
         - "P08 BO-1141 Device, Terminal & Acceptance Point Mapping"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PaymentTerminal.contactlessLimit, PaymentTerminal.floorLimit, PaymentTerminal.maximumHeldTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Terminals, and the payment configuration on each
       description: 'Board 3.2. **The device register is `tenancy`''s; this is the payment layer on top
         of it.** Merchant id, terminal id, the acquirer it talks to, EMV configuration and its
         store-and-forward state — none of which belong in a device inventory, and all of which are
         meaningless without one.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - payments
       x-ticvai-permission: PAYMENT_VIEW
@@ -1093,6 +1155,13 @@ paths:
         - "P08 ADM-581 Terminal Provisioning & Device Configuration"
         - "P08 ADM-583 EMV & Card-Present Processing Configuration"
         - "P08 ADM-586 Degraded, Offline & Store-and-Forward Manager"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: PaymentTerminal.contactlessLimit, PaymentTerminal.floorLimit, PaymentTerminal.maximumHeldTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PaymentTerminal.contactlessLimit, PaymentTerminal.floorLimit, PaymentTerminal.maximumHeldTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Merchant account, acquirer, EMV and offline behaviour
       description: 'Boards 3.3, 3.5 and 3.8. **Store-and-forward is the setting that decides whether a
@@ -1159,6 +1228,13 @@ paths:
       operationId: listStoredForwardTransactions
       x-ticvai-consumed-by:
         - "P08 ADM-586 Degraded, Offline & Store-and-Forward Manager"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: StoredForwardTransaction.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: StoredForwardTransaction.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: What a terminal took offline and has not yet sent
       description: 'Board 3.8. **Money the venue has taken and the platform does not know about.** Until
         these land, the till total, the acquirer and the ledger all disagree, and a terminal that dies
@@ -1166,7 +1242,7 @@ paths:
 
         This is the queue somebody has to be able to look at.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - payments
       x-ticvai-permission: PAYMENT_VIEW
@@ -1236,6 +1312,13 @@ paths:
       operationId: setPaymentAuthenticationPolicy
       x-ticvai-consumed-by:
         - "P08 ADM-596 Authentication, Tokenization & Recurring Payment Controls"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: PaymentAuthenticationPolicy.threeDSecureThreshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PaymentAuthenticationPolicy.threeDSecureThreshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
@@ -1361,6 +1444,13 @@ paths:
         - "P08 ADM-602 B2B Credit Account & Limit Manager"
         - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
         - "P08 ADM-608 Mixed Tender Simulator, Credit Exposure & AI Advisor"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: B2bCreditAccount.availableCredit, B2bCreditAccount.creditLimit, B2bCreditAccount.outstandingInvoiced, B2bCreditAccount.outstandingUnbilled (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: B2bCreditAccount.availableCredit, B2bCreditAccount.creditLimit, B2bCreditAccount.outstandingInvoiced, B2bCreditAccount.outstandingUnbilled (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: On-account customers, their limits and their exposure
       description: 'Boards 5.4 and 5.5. **`CREDIT_MANAGE` and `CREDIT_OVERRIDE` existed as permissions
         and the account they govern did not.** A school booking on account, a tour operator with thirty
@@ -1371,7 +1461,7 @@ paths:
         outstanding invoices and eighty thousand of bookings next month is not within their limit; they
         have simply not been billed yet.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - payments
       x-ticvai-permission: PAYMENT_VIEW
@@ -1399,6 +1489,13 @@ paths:
       operationId: createB2bCreditAccount
       x-ticvai-consumed-by:
         - "P08 ADM-602 B2B Credit Account & Limit Manager"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: B2bCreditAccount.availableCredit, B2bCreditAccount.creditLimit, B2bCreditAccount.outstandingInvoiced, B2bCreditAccount.outstandingUnbilled (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: B2bCreditAccount.availableCredit, B2bCreditAccount.creditLimit, B2bCreditAccount.outstandingInvoiced, B2bCreditAccount.outstandingUnbilled (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Open an on-account relationship
       tags:
@@ -1439,6 +1536,13 @@ paths:
       operationId: getB2bPaymentTerms
       x-ticvai-consumed-by:
         - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: B2bPaymentTerms.creditLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: B2bPaymentTerms.creditLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1470,6 +1574,13 @@ paths:
       operationId: setB2bPaymentTerms
       x-ticvai-consumed-by:
         - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: B2bPaymentTerms.creditLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: B2bPaymentTerms.creditLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Limit, terms, billing cycle and what happens at the limit
       description: 'Board 5.5. **What happens at the limit is the decision, not the limit.** Refuse,
@@ -1518,7 +1629,7 @@ paths:
         means — because a settlement file that did not arrive is indistinguishable from a day with no
         settlements unless somebody said one was expected.
 
-        '
+         **Order.** Sorted by `code` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - payments
       x-ticvai-permission: PAYMENT_VIEW
@@ -1634,7 +1745,7 @@ paths:
         two entities settles into two bank accounts on two calendars, and a payout arriving in the wrong
         one is an inter-entity obligation `finance` then has to unwind.
 
-        '
+         **Order.** Sorted by `code` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - payments
       x-ticvai-permission: PAYMENT_VIEW
@@ -2000,6 +2111,8 @@ paths:
         The deposit referenced is `orders.deposit`, the authorisation lifecycle, **not**
         `ledger.deposit`, which is the liability posting. Both exist, both are called deposit, and
         the convention matcher correctly refused to guess — so the reference is declared.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - payments
       x-ticvai-permission: PAYMENT_VIEW
@@ -2190,6 +2303,13 @@ paths:
       operationId: getInstalmentPolicy
       x-ticvai-consumed-by:
         - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: PayInstalmentPolicy.instalmentFee, PayInstalmentPolicy.minimumOrderValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PayInstalmentPolicy.instalmentFee, PayInstalmentPolicy.minimumOrderValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 4.2.17, 2.14.19); shape follows getDunningPolicy'
@@ -2214,6 +2334,13 @@ paths:
       operationId: setInstalmentPolicy
       x-ticvai-consumed-by:
         - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: PayInstalmentPolicy.instalmentFee, PayInstalmentPolicy.minimumOrderValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PayInstalmentPolicy.instalmentFee, PayInstalmentPolicy.minimumOrderValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:

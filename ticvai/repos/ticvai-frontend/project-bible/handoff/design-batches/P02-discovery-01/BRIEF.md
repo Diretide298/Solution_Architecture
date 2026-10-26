@@ -96,7 +96,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-063` | Explore – Search Results | A | 2 | 14 | 5 | 3 | 0 | 0 | guest | notStarted (client-verified) |
+| `GST-063` | Explore – Search Results | A | 2 | 16 | 5 | 3 | 0 | 0 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 

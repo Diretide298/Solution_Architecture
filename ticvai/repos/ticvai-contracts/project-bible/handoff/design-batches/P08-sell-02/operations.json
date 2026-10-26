@@ -279,7 +279,13 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Performance"
  },
@@ -325,6 +331,11 @@
     "name": "mode",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -357,6 +368,11 @@
     "name": "venueId",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -405,6 +421,11 @@
     "name": "venueId",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    },
    {
     "name": null,
@@ -516,6 +537,11 @@
    {
     "name": "language",
     "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
     "required": null
    },
    {

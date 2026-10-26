@@ -57,6 +57,15 @@ WHAT = {
         "it is null far more often than `state` being `completed` suggests. `scope` names what "
         "was taken — a cell, a tenant database — because ADR-0038 makes those different sizes "
         "of loss."),
+    # ADAM CR-242, option A, accepted 26 October 2026 (CHG-R10CRF-002): the note kept saying "Redis, not Postgres",
+    # carried forward from before CHG-R1S-008 made the row the record of record.
+    "identity.session": (
+        "**The staff session record** (3 October 2026, CHG-R1S-008): one row per signed-in session of a principal, "
+        "tenant-scoped and under row-level security. **The row is the record of record; Redis is the token cache in "
+        "front of it** (ADR-0004: a session is a token with a validity window, and the cache answers that check). "
+        "An ended session keeps `status`, `ended_at`, `ended_by_principal_id` and `end_reason` (R8 blocker "
+        "IDENTITY-C46, CHG-R8MIG-015), and `ended_at` is null exactly while the session is `active` (ADAM CR-242), so a "
+        "supervisor asking what happened to till 4 gets who ended it and why rather than an absence."),
     # ADAM CR-182, option A, decided 21 October 2026 (CHG-R9CR-001): the table had no description.
     "platform.idempotency_record": (
         "**The durable record of one keyed write** (SD-024): the `Idempotency-Key` a client sent, the "

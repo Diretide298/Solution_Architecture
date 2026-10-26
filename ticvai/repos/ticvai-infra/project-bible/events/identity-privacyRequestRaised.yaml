@@ -1,0 +1,53 @@
+# identity.privacyRequestRaised v1 — published by identity
+# Added 25 October 2026 (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016): a guest's data export or erasure,
+# raised as an Approvals request by Identity, enters Marketing's privacy queue, so the jurisdiction's response
+# period gives it a dueAt. Identity is Foundation and does not read the queue (ADR-0028); it only tells it.
+
+name: identity.privacyRequestRaised
+version: 1
+publisher: identity
+description: A guest's privacy request (a data export or an erasure) was raised, as an Approvals request.
+aggregate: subject
+emittedWhen: exportSubjectData or deleteGuestAccount raises its Approvals request
+emittedBy:
+- identity.exportSubjectData
+- identity.deleteGuestAccount
+payload:
+- field: subjectId
+  type: uuid
+  notes: The guest the request is about (pii.subject)
+- field: approvalRequestId
+  type: uuid
+  notes: The approvals.request id the operation answered with as requestId; where no matrix rule matched and the
+    job ran at once, the export's own id (r10 round 3)
+- field: requestType
+  type: string
+  notes: 'access for exportSubjectData, deletion for deleteGuestAccount: the configured privacy request type codes
+    (setPrivacyRequestTypes)'
+- field: format
+  type: string
+  required: false
+  notes: For an export, json, csv or pdf
+- field: raisedByGuest
+  type: boolean
+  notes: True when the guest raised it (source self-service); false when staff raised it for the guest
+- field: jurisdiction
+  type: string
+  notes: 'ISO 3166-1 alpha-2 country of the venue the request was raised at (the request''s venue; the lead, 25 October
+    2026, r10 round 3, CHG-R10ID-024); selects the response period'
+- field: raisedAt
+  type: timestamp
+consumers:
+- context: marketing
+  purpose: 'Open a privacy request in the privacy queue (marketing.privacy_request: subjectId, requestType, requesterRole
+    self, source customerPortal when raisedByGuest is true and customerService otherwise, jurisdiction, approvalRequestId,
+    submittedAt = raisedAt), so
+    its dueAt is submittedAt plus the response period configured for the request type and jurisdiction; with no
+    period configured it shows no deadline (the statutory period is the client''s to give)'
+  writes:
+  - marketing.privacy_request
+  idempotencyKey: eventId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: No state model emits this.

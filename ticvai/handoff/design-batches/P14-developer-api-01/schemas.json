@@ -267,7 +267,8 @@
    "tenantId": {
     "type": "string",
     "format": "uuid",
-    "readOnly": true
+    "x-ticvai-references": "control.tenant",
+    "description": "The tenant licensed, sent by TICVAI staff (ADAM CR-098; CHG-R10ID-011). A tenant's licences never overlap in time (`setApiLicensing`, 409 `api-licence-period-overlap`)."
    },
    "licensedModules": {
     "type": "array",
@@ -583,10 +584,49 @@
    }
   }
  },
+ "CreateDeveloperAccountRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; stored as control.developer_account (DeveloperAccount) and its owner control.developer_member",
+  "description": "**What `registerDeveloper` takes** (ADAM CR-098, accepted for r10; CHG-R10ID-011): the organisation and its contact, never the read-only `id`, `status` or `verifiedAt`, which the server sets.",
+  "required": [
+   "organisationName",
+   "contactEmail"
+  ],
+  "properties": {
+   "organisationName": {
+    "type": "string",
+    "maxLength": 300
+   },
+   "contactEmail": {
+    "type": "string",
+    "format": "email"
+   },
+   "websiteUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "countryCode": {
+    "type": "string",
+    "minLength": 2,
+    "maxLength": 2
+   },
+   "partnerId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where this developer is also a commercial partner."
+   }
+  }
+ },
  "DeveloperAccount": {
   "type": "object",
   "x-ticvai-persistence": "control.developer_account",
   "description": "13.1.6 to 13.1.9. **An organisation, because an integration outlives the engineer who built it.** A credential tied to somebody's personal account dies when they leave.\n**Not a tenant and not a partner.** A partner resells tickets; a developer writes software, and one organisation may be both.\n",
+  "x-ticvai-unique-together": [
+   [
+    "contactEmail"
+   ]
+  ],
   "required": [
    "id",
    "organisationName",
@@ -604,7 +644,8 @@
    },
    "contactEmail": {
     "type": "string",
-    "format": "email"
+    "format": "email",
+    "description": "The organisation's contact, who becomes its owner member on registration; unique without case (`registerDeveloper` 409 `developer-already-registered`; ADAM CR-098)."
    },
    "websiteUrl": {
     "type": "string",

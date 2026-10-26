@@ -1020,6 +1020,12 @@
  "Entitlement": {
   "type": "object",
   "x-ticvai-persistence": "access.entitlement",
+  "x-ticvai-index": [
+   [
+    "venueId",
+    "changeVersion"
+   ]
+  ],
   "description": "**What a guest actually holds.** Found missing on 18 August by the schema audit — 33 tables in `orders`, seven in `access`, and none of them stored an issued ticket.\nThe package sold products, defined `EntitlementTemplate`, recorded `ScanEvent.ticketId`, transferred `ticket_transfer.ticketIds` and issued `wallet_pass.entitlementId` — **five artefacts referring to a thing that did not exist.** `validateAccess` read the *template* and never the instance, and `suspendEntitlement` suspended the template, **which would have suspended it for every guest who held one.**\n**The template is the definition and this is the instance.** A template says *an annual pass admits once a day for a year*; this says *this guest's annual pass, bought on 3 March, used eleven times, frozen for two weeks in July, valid until 2 March.*\n",
   "required": [
    "id",
@@ -1029,7 +1035,8 @@
    "subjectId",
    "status",
    "validFrom",
-   "validTo"
+   "validTo",
+   "changeVersion"
   ],
   "properties": {
    "id": {
@@ -1089,7 +1096,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed.\n"
+    "description": "Who holds it. **Null is legitimate** — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is claimed. **Null for a guest checkout** (ADAM CR-167, CHG-R10ORD-010): `issueOrderEntitlements` leaves it null where `order.paid` names no subject; the field is always present, null or not.\n"
    },
    "venueId": {
     "type": "string",
@@ -1101,6 +1108,28 @@
    "mediaCode": {
     "type": "string",
     "description": "What is scanned — a QR payload, a wristband serial, a card number. **Rotatable without reissuing**, because a guest whose wristband broke should not need a new ticket.\n"
+   },
+   "changeVersion": {
+    "type": "integer",
+    "format": "int64",
+    "readOnly": true,
+    "x-ticvai-change-version": true,
+    "description": "**What the offline package's delta counts** (ADAM CR-239, option A; Chinmay, 25 October 2026; CHG-R10ORD-011). Set from a per-database sequence by a BEFORE INSERT OR UPDATE trigger, so every operation that writes `access.entitlement` (seventeen of them, in three contracts) moves it without remembering to; never set by an operation and never sent. `OfflinePackage.entitlementsVersion` is the highest of the package's rows, and `sinceVersion` selects the rows above it, void and used ones included. Indexed with `venueId`."
+   },
+   "mediaLinkedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**When the entitlement was put on its media** (ADAM CR-226, option A; Chinmay, 25 October 2026; CHG-R10ORD-012): written when `mediaCode` is set or rotated: at issue (`issueOrderEntitlements`, onto new media or, through `appendEntitlementToMedia`'s order, onto media the guest already holds), and whenever an operation replaces or rotates the code (`replaceCredential`, `getEntitlementCredential` with `rotate=true`). Not `validFrom`, which is the validity window's start. `MediaEntitlements` answers it as `addedAt`."
+   },
+   "rotationSecret": {
+    "type": "string",
+    "nullable": true,
+    "writeOnly": true,
+    "x-ticvai-column": "rotation_secret_ciphertext",
+    "x-ticvai-secret": "field-encrypted",
+    "description": "**The rotation seed, stored on the entitlement** (ADAM CR-167, option A; CHG-R10ORD-010): the Base32 shared secret the rotating code is derived from (`getEntitlementCredential` `rotation.secret`, audit R230), written by `issueOrderEntitlements` at issue for a `platformSignedQr` entitlement and replaced by `getEntitlementCredential` with `rotate=true`; encrypted with the tenant's field key (ADR-0063). Null for a `staticQr` or `rfidCard` entitlement, which does not rotate. Never returned except as `rotation` to the holder or a staff caller."
    },
    "credentialFormat": {
     "allOf": [
@@ -1514,7 +1543,7 @@
      }
     ],
     "readOnly": true,
-    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192; common.yaml `Money.scale`), when it is not the currency the venue trades in."
    },
    "chargeRateLockedUntil": {
     "type": "string",
@@ -1917,7 +1946,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+    "description": "The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-018)."
    },
    "fxRate": {
     "allOf": [
@@ -2231,7 +2260,7 @@
    },
    "timeBands": {
     "type": "array",
-    "description": "Refundable percentage by time before the performance. Evaluated most-specific first.\n",
+    "description": "Refundable percentage by time before the performance. Evaluated most-specific first.\n\n**Each band names the refund type that applies in it** (`refundType`, ADAM CR-208; (the lead's answer of 25 October 2026 to the r10 lanes' questions; CHG-R10ORD-021)). A venue that has set no bands refunds in full (`fullRefund`) before the cut-off (the performance start time of each line; for an undated line, the end of `refundWindowDays`, ADAM CR-208) and nothing after it.\n",
     "items": {
      "type": "object",
      "required": [
@@ -2247,6 +2276,18 @@
        "type": "number",
        "minimum": 0,
        "maximum": 100
+      },
+      "refundType": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "fullRefund",
+        "partialRefund",
+        "percentageRefund",
+        "proRataRefund",
+        "originalValueLessFees"
+       ],
+       "description": "The refund type that applies in this band (the values of `RefundCalculationPolicyView.refundTypes`; ADAM CR-208). Null on a band saved before r10, which is `percentageRefund` at its `percentage`."
       }
      }
     }

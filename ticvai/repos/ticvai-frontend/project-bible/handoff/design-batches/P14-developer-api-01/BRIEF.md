@@ -1,6 +1,6 @@
 # P14-developer-api-01 — P14 · Developer & API
 
-**8 screens · 32 operations · 18 schemas · 3 permissions**
+**8 screens · 32 operations · 19 schemas · 3 permissions**
 
 Platform P14 Developer · ships as **ticvai-control** ·
 partner audience · web ·
@@ -103,7 +103,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `DEV-005` | Webhooks | B | 9 | 42 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
 | `DEV-006` | Usage & Limits | B | 0 | 25 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
 | `DEV-007` | Marketplace Listing | B | 8 | 17 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
-| `DEV-008` | Programme Administration | A | 40 | 43 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
+| `DEV-008` | Programme Administration | A | 41 | 43 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

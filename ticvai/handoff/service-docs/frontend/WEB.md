@@ -34,7 +34,7 @@
 | [WEB-004](#web-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 6 |
 | [WEB-005](#web-005-ticket-type-selection) | Ticket Type Selection | Booking & Selection | 1 | 7 |
 | [WEB-006](#web-006-date-performance-selection) | Date & Performance Selection | Booking & Selection | 1 | 12 |
-| [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 1 | 7 |
+| [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 1 | 8 |
 | [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 1 | 5 |
 | [WEB-009](#web-009-wishlist) | Wishlist | Booking & Selection | 1 | 3 |
 | [WEB-010](#web-010-shopping-cart) | Shopping Cart | Cart & Checkout | 1 | 14 |
@@ -43,15 +43,15 @@
 | [WEB-013](#web-013-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 5 |
 | [WEB-014](#web-014-pay-for-a-booking) | Pay for a Booking | Cart & Checkout | 1 | 2 |
 | [WEB-015](#web-015-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 |
-| [WEB-016](#web-016-login-register) | Login / Register | Account & Self-Service | 1 | 14 |
+| [WEB-016](#web-016-login-register) | Login / Register | Account & Self-Service | 1 | 15 |
 | [WEB-017](#web-017-my-account-dashboard) | My Account Dashboard | Account & Self-Service | 1 | 8 |
 | [WEB-018](#web-018-my-tickets) | My Tickets | Account & Self-Service | 1 | 9 |
 | [WEB-019](#web-019-order-history) | Order History | Account & Self-Service | 1 | 9 |
 | [WEB-020](#web-020-profile-preferences) | Profile & Preferences | Account & Self-Service | 1 | 7 |
 | [WEB-021](#web-021-wallet-gift-cards) | Wallet & Gift Cards | Membership, Loyalty & Value | 1 | 9 |
 | [WEB-022](#web-022-membership-plans) | Membership Plans | Membership, Loyalty & Value | 1 | 3 |
-| [WEB-023](#web-023-membership-management) | Membership Management | Membership, Loyalty & Value | 1 | 5 |
-| [WEB-024](#web-024-devices-wishlist-consent) | Devices, Wishlist & Consent | Membership, Loyalty & Value | 1 | 14 |
+| [WEB-023](#web-023-membership-management) | Membership Management | Membership, Loyalty & Value | 1 | 6 |
+| [WEB-024](#web-024-devices-wishlist-consent) | Devices, Wishlist & Consent | Membership, Loyalty & Value | 1 | 15 |
 | [WEB-025](#web-025-help-centre-faq) | Help Centre / FAQ | Engagement & Support | 1 | 5 |
 | [WEB-026](#web-026-survey-feedback) | Survey & Feedback | Engagement & Support | 1 | 5 |
 | [WEB-027](#web-027-newsletter-subscription) | Newsletter Subscription | Engagement & Support | 1 | 5 |
@@ -239,7 +239,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name | `None` |
+| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name, type-ahead: called once typing pauses (300 ms debounce), for 2 or more characters, Enter at once, the latest answer wins (ADAM CR-223) | `None` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 
 **States**
@@ -412,6 +412,7 @@
 | eventId | WEB-004 |
 | venueId | session |
 | entryId | navigation |
+| waitingEntryId | WEB-015 |
 
 **Operations**
 
@@ -448,7 +449,7 @@
 | WEB-005 | Picks a time; the tickets for it appear | performanceId |  |
 | WEB-008 | Add-ons & Upsell | bundleId |  |
 | WEB-010 | Reviews the cart and may enter a promotion code | cartId |  |
-| WEB-015 | Adds tickets for a performance whose on-sale waiting room is on | performanceId | `addCartLine` refused `403 admission-required`: this performance's room is on and the page holds no admission token for it |
+| WEB-015 | Adds tickets for a performance whose on-sale waiting room is on | performanceId, waitingEntryId | `addCartLine` refused `403 admission-required`: this performance's room is on and the browser sent no valid admission cookie for it. The edge carries the `waitingEntryId` the page got back from WEB-015, when it has one, so the guest keeps their place (ADAM CR-216) |
 | WEB-007 | Selects seats on the map | eventId, performanceId, productId |  |
 
 ## WEB-007 Interactive Seat Selection
@@ -477,8 +478,9 @@
 | performanceId | deepLink |
 | eventId | WEB-006 |
 | productId | WEB-004 |
-| holdId | navigation |
+| holdIds | navigation |
 | venueId | session |
+| holdId | navigation |
 
 **Operations**
 
@@ -490,6 +492,7 @@
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The event's other times, for the time bar and the date and time pop-up | `PRODUCT_VIEW` |
 | `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | background | Sent by the time bar when the guest switches time, not a control: releases the seats held for the old performance (decided 29 September), with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) | `ORDER_CREATE` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
+| `getSeatHold` | [CatalogueService](../backend/CatalogueService.md#getseathold) | onLoad | Called on load when the screen is opened with `holdIds`: reads each of the guest's own holds (seats and `expiresAt`), so the held seats show again and the countdown runs to the earliest expiry (ADAM CR-187, 25 October 2026). Only under the guest session that placed the holds, signed in or the anonymous guest session (ADAM CR-183, ADR-0045): a hold is read only by the session or subject that made it with `createSeatHold`, so a visitor with no session has no `holdIds` and the screen does not call it | `ORDER_VIEW` |
 | `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | background | Resolves a deep-linked performance (r8, GPS-C05): its `eventId` drives `listPerformances` (time bar, fixture strip) and its `startsAt` and `status` the cold entry (a performance that has happened offers the next one of the same event). No component of its own. | `PRODUCT_VIEW` |
 
 **States**
@@ -510,7 +513,7 @@
 | WEB-005 | Ticket Type Selection | productId |  |
 | WEB-008 | Add-ons & Upsell |  |  |
 | WEB-006 | Date & Performance Selection | eventId, performanceId, productId |  |
-| WEB-010 | Reviews the cart | holdId, performanceId |  |
+| WEB-010 | Reviews the cart | holdId, holdIds, performanceId |  |
 
 ## WEB-008 Add-ons & Upsell
 
@@ -646,6 +649,7 @@
 | code | deepLink |
 | lineId | deepLink |
 | performanceId | navigation |
+| holdIds | navigation |
 | holdId | navigation |
 | venueId | session |
 
@@ -932,14 +936,14 @@
 | Parameter | From |
 |---|---|
 | performanceId | WEB-006 |
-| waitingEntryId | WEB-015 |
+| waitingEntryId | WEB-006 |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `enterWaitingRoom` | [CatalogueService](../backend/CatalogueService.md#enterwaitingroom) | onAction | Take a place in the performance's on-sale waiting room (ADR-0066); `notRequired` when the room is off | `None` |
-| `getWaitingRoomPosition` | [CatalogueService](../backend/CatalogueService.md#getwaitingroomposition) | onInterval | The guest's place, polled every `pollAfterSeconds`; admitted, it carries the admission token for `addCartLine` | `None` |
+| `getWaitingRoomPosition` | [CatalogueService](../backend/CatalogueService.md#getwaitingroomposition) | onInterval | The guest's place, polled every `pollAfterSeconds`; admitted, the edge sets the admission cookie for `addCartLine` (ADAM CR-216). A `404` for a performance the page knows means the entry is gone: the guest re-enters with Take my place | `None` |
 
 **States**
 
@@ -955,7 +959,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-006 | Continue to your tickets | performanceId | `getWaitingRoomPosition` answers `admitted`. The page keeps `admission.token` and sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt` |
+| WEB-006 | Continue to your tickets | performanceId, waitingEntryId | `getWaitingRoomPosition` answers `admitted`. The admission token is kept in an HttpOnly, short-lived, per-performance cookie the edge sets on that admitted answer, and the browser sends it with `addCartLine` until `admission.expiresAt`; the page stores nothing (no script-readable copy, no localStorage or sessionStorage), so a reload or a second tab is still admitted (ADAM CR-216, 25 October 2026; ADR-0066 amendment of 25 October) |
 
 ## WEB-016 Login / Register
 
@@ -1000,6 +1004,7 @@
 | `refreshToken` | [IdentityService](../backend/IdentityService.md#refreshtoken) | background | Rotate the access token | `None` |
 | `requestGuestOtp` | [IdentityService](../backend/IdentityService.md#requestguestotp) | onAction | Request a one-time code | `None` |
 | `verifyGuestOtp` | [IdentityService](../backend/IdentityService.md#verifyguestotp) | onAction | Verify a one-time code and issue a session | `None` |
+| `verifyGuestEmail` | [IdentityService](../backend/IdentityService.md#verifyguestemail) | background | Sent by the Code field after Create an account, not a control of its own: confirms the code `registerGuest` sent (`mode` `code`) under the session `registerGuest` returned; `verifyGuestOtp` stays for Send me a code (ADAM CR-177, CR-222) | `None` |
 | `claimCart` | [OrderService](../backend/OrderService.md#claimcart) | onAction | Attach an anonymous cart to a guest | `None` |
 | `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | background | Sent by the screen after sign-in returns requiresMfa at a venue with guest two-step verification on (action signIn), not a control: the code is then typed in Verification code | `None` |
 | `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Check the second-factor code and release the session | `None` |
@@ -1412,6 +1417,7 @@
 | `getBillingStatement` | [OrderService](../backend/OrderService.md#getbillingstatement) | onAction | One statement, line by line | `ORDER_VIEW` |
 | `listMyPaymentIssues` | [OrderService](../backend/OrderService.md#listmypaymentissues) | onLoad | Declined renewals waiting on the guest | `None` |
 | `retryMyDunningPayment` | [OrderService](../backend/OrderService.md#retrymydunningpayment) | onAction | Retry a declined payment, on another card if needed | `None` |
+| `listPaymentTokens` | [OrderService](../backend/OrderService.md#listpaymenttokens) | onAction | Called when the guest chooses Use another card: the saved cards the retry modal lists (masked identifier, method, expiry, default first); the chosen one's id goes to retryMyDunningPayment as paymentTokenId (ADAM CR-233, 25 October 2026) | `ORDER_VIEW` |
 | `getMyMemberships` | [CatalogueService](../backend/CatalogueService.md#getmymemberships) | onLoad | A guest's own memberships, benefits and history | `PRODUCT_VIEW` |
 
 **States**
@@ -1461,6 +1467,7 @@
 | subjectId | session |
 | enrolmentId | navigation |
 | methodId | navigation |
+| requestId | navigation |
 
 **Operations**
 
@@ -1472,6 +1479,7 @@
 | `revokeGuestDevice` | [MarketingService](../backend/MarketingService.md#revokeguestdevice) | onAction | Revoke a device registration | `None` |
 | `deleteGuestAccount` | [IdentityService](../backend/IdentityService.md#deleteguestaccount) | onAction | Ask for the account to be deleted | `None` |
 | `exportSubjectData` | [IdentityService](../backend/IdentityService.md#exportsubjectdata) | onAction | Export everything held about this guest | `GUEST_VIEW_PII` |
+| `getSubjectDataExport` | [IdentityService](../backend/IdentityService.md#getsubjectdataexport) | onInterval | Where the requested data export has got to, and a fresh short-lived download link once it is ready (ADAM CR-101, CHG-R10ID-016); polled with the requestId exportSubjectData answered while the export is not yet ready, and read again for a new link when an old one has lapsed | `GUEST_VIEW_PII` |
 | `getFacePassEnrolment` | [AccessService](../backend/AccessService.md#getfacepassenrolment) | onAction | Whether a face pass is enrolled on this account | `GUEST_VIEW` |
 | `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | What this guest has consented to | `GUEST_VIEW` |
 | `getWaiverStatus` | [MarketingService](../backend/MarketingService.md#getwaiverstatus) | onLoad | Which waivers are signed and which are due | `GUEST_VIEW` |
@@ -1717,7 +1725,7 @@
 | Suggested location | `src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Layout pattern | statusTracker (structure only, not the look) |
 
-**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Footer 'Service status', or Discover → 'Service status'. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-029`, which adam_pull writes into the ticket folder as `wireframe-web-029.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; soldOut: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); closed: the status card, its closed variant (`wireframes/states/P01 Guest Web states.dc.html#web-state-closed`, pulled as `wireframe-web-state-closed.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; maintenance: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Footer 'Service status', or Discover → 'Service status'. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-029`, which adam_pull writes into the ticket folder as `wireframe-web-029.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; soldOut: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); closed: the status card, its closed variant (`wireframes/states/P01 Guest Web states.dc.html#web-state-closed`, pulled as `wireframe-web-state-closed.html`) [drawn by the package from the approved design, r9; not yet seen by the client]; open: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); maintenance: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`). The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
@@ -1737,9 +1745,17 @@
 | emptyFirstRun | — | the dashed empty card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.") |
 | emptyNoAccess | Nothing here needs a sign-in (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
 | offline | The offline banner shows instead of this page. Being offline is the guest's connection, not the venue's — an error or maintenance page shown for a dropped signal tells a guest the venue is down. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
-| soldOut | Sold out today. `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)). | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
-| closed | Closed. `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)). | the status card, its closed variant, `wireframes/states/P01 Guest Web states.dc.html#web-state-closed` (pulled as `wireframe-web-state-closed.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| soldOut | Sold out today. `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day (*Pick another day*, to the event and attraction listing), never a generic error (decided 28 September, audit R073 (f); ADAM CR-178). | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+| closed | Closed. `getTenantAppStatus.availability` is `closed`: the page says the site is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f); the site, not the venue: ADAM CR-178). | the status card, its closed variant, `wireframes/states/P01 Guest Web states.dc.html#web-state-closed` (pulled as `wireframe-web-state-closed.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+| open | Everything is running. The site is open and not in maintenance, and the page was reached directly (footer *Service status*): a short message that everything is running, and *Back to the home page* (ADAM CR-178). | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
 | maintenance | The venue's maintenance message and when it expects to be back; one way onward (try again at that time). Set live on CMS-001, never published. | the status card of WEB-029 (Error / Sold out / Maintenance), `wireframes/P01 Guest Web.dc.html#web-029` (pulled as `wireframe-web-029.html`) |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-002 | Pick another day | eventId | `getTenantAppStatus.availability` is `soldOut` (and the site is not in maintenance) |
+| WEB-001 | Back to the home page |  | the site is open and not in maintenance (the open state) |
 
 ## WEB-030 Ticket Transfer
 
@@ -1899,6 +1915,12 @@
 | emptyNoResults | Never shown as a filter result: no offer is active at this venue now, said plainly. | the "Nothing matched" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}") |
 | emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. | the "Sign in to see your account" card, `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html`, lines 3314-3322 (My account, signed out) |
 | offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. | the offline banner and the paused actions, `wireframes/states/P01 Guest Web states.dc.html#web-state-offline` (pulled as `wireframe-web-state-offline.html`); drawn by the package from the approved design (r9), not yet seen by the client |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-002 | Use this offer | code | the offer has a code (an automatic promotion needs nothing applied and stays on the list) |
 
 ## WEB-033 Shop
 
@@ -2671,9 +2693,9 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | Room types sold by the hour (`requiresTimeWindow`) and their add-ons | `PRODUCT_VIEW` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | Room types sold by the hour (`requiresTimeWindow`) and their add-ons (each room type's `addOnProductIds`, ADAM CR-252) | `PRODUCT_VIEW` |
 | `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onLoad | The lengths of a room type, each with its price | `PRODUCT_VIEW` |
-| `listProductStartTimes` | [VenueOpsService](../backend/VenueOpsService.md#listproductstarttimes) | onAction | Start times free for the room type and length on the date | `RESOURCE_VIEW` |
+| `listProductStartTimes` | [VenueOpsService](../backend/VenueOpsService.md#listproductstarttimes) | onAction | Start times free for the room type and length on the date; a public read, no session needed (ADAM CR-258), at the venue's `stepMinutes` (ADAM CR-253) | `RESOURCE_VIEW` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the room type for the booked window, then the add-ons | `None` |
 | `createCart` | [OrderService](../backend/OrderService.md#createcart) | background | Started by the runtime the first time a line is added, before the first addCartLine, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045; r8, GPS-C23), as on its app twin GST-075. | `None` |
 
@@ -2797,7 +2819,7 @@
 | `listVisitPlanAlternatives` | [VenueOpsService](../backend/VenueOpsService.md#listvisitplanalternatives) | onAction | Swap candidates for one item that suit everyone in the party | `None` |
 | `bookVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#bookvisitplan) | onAction | Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart | `None` |
 | `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | The tenant's active venues, for the park-per-day choice in a multi-venue tenant | `None` |
-| `getVisitPlannerOptions` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplanneroptions) | onLoad | The planner's choices from the venue's data (r8, GPS-C21): the interest tags of its parks fill What are you most interested in?, and the ready-made plans and Fast Track bundles come from the same read. | `VENUE_MAP_VIEW` |
+| `getVisitPlannerOptions` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplanneroptions) | onLoad | The planner's choices from the venue's data (r8, GPS-C21): the interest tags of its parks fill What are you most interested in?, its cuisineTags and retailTags fill the lunch and shop questions and the Not at the parks you chose chip (ADAM CR-220), and the ready-made plans and Fast Track bundles come from the same read. | `VENUE_MAP_VIEW` |
 
 **States**
 

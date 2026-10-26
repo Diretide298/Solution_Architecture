@@ -51,8 +51,9 @@ transitions:
 - from: released
   to: cancelled
   trigger: cancel
-  operation: releaseProductionPlan
-  guard: '**Committed stock has to be released back.** Cancelling after release is not the same act
+  guard: '**Committed stock has to be released back.** Not releaseProductionPlan, whose 409 refuses a released plan
+    (r10 ruling on check-state-refusals, the lead, 25 October 2026; CHG-R10ORD-020): no operation cancels a released
+    plan yet (see openQuestions). Cancelling after release is not the same act
     as cancelling a draft, and the requisition it raised does not disappear on its own.'
 openQuestions: '**Does cancelling a released plan reverse its requisition automatically, or raise a
   task?** Automatic reversal is tidy and wrong when the stock has already been picked. Undecided.'

@@ -280,6 +280,24 @@ x-ticvai-queries:
       commerce, through the C# query interface Ledger implements, and asked from another deployable through Ledger's
       service route (serviceAuth).
     served: [in-process, service]
+  journalLineRecords:
+    module: finance
+    table: ledger.journal_line
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ledger.journal_line rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ledger stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/JournalLine'}
+    rule: >-
+      A data read, not a rule question (r10 lane E, 25 October 2026, CHG-R10GEN-001; ADR-0055 rule 2 as amended 14
+      October). Ledger answers with its ledger.journal_line rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through Ledger's service route (serviceAuth).
+    served: [service]
 paths:
   /internal/order-postings:
     post:
@@ -294,6 +312,9 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -581,6 +602,13 @@ paths:
       operationId: settleDeposit
       x-ticvai-consumed-by:
         - "P08 BO-024 Payment Exceptions"
+      x-ticvai-read-via:
+      - query: orders#depositRecords
+        route: in-process
+        for: 'what its text calls "orders.deposit": orders.deposit, Order''s data (CHG-R10GEN-001)'
+      - query: orders#depositPolicyRecords
+        route: in-process
+        for: 'what its text calls "orders.DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
       summary: Convert to revenue, return it, or forfeit it
       description: 'Four outcomes and **none of them is a refund**. Converting recognises revenue against
         the completed sale; returning discharges the liability; forfeiting recognises it as income under
@@ -698,6 +726,9 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       summary: Every money source against the ledger, in one view
       description: '4.2.19. **Reconciliation was per provider and the question is not per provider.**
         `ingestSettlementFile` and its siblings are good and gateway-scoped; **a venue closing a day needs
@@ -713,6 +744,9 @@ paths:
         `to`, a business date that closes at the venue''s `businessDayCutoff` (tenancy `VenueSettings`, default
         00:00; CHG-R6-032). A longer range is a review of days already reconciled, never a reconciliation of its own;
         a provider that sends a monthly file (DI-268) is matched day by day against it.
+
+
+        **Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `from` or `to` are a day in the time zone of the region at or above the caller''s scope (`tenancy#regionSettingsRecords`, by the caller''s scope path). When the caller''s scope gives no single region (a brand or the tenant root) and `from` or `to` is sent, the answer is `400 validation` on `from` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
 
         '
       tags:
@@ -731,14 +765,14 @@ paths:
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on from when the caller''s scope gives no single region (ADAM CR-251).'
       - name: to
         in: query
         required: true
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on from when the caller''s scope gives no single region (ADAM CR-251).'
       responses:
         '200':
           description: Sources with variances
@@ -746,6 +780,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnifiedReconciliation'
+        '400':
+          description: 'Validation failed (`validation`). Includes a day filter (`from`, `to`) sent by a caller whose scope gives no single region; `errors[]` names `from`, "filter by day from one venue or region" (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /inter-entity-obligations/{obligationId}/settle:
@@ -1560,7 +1602,7 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List tax exemptions
-      description: Exemption by account, product class or channel — diplomatic, export, B2B.
+      description: Exemption by account, product class or channel — diplomatic, export, B2B. Where `validFrom` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
         **Order.** Soonest first, by `validFrom` ascending, then by `id`.
       tags:
@@ -1681,7 +1723,7 @@ paths:
       operationId: listRecognitionSchedules
       x-ticvai-consumed-by:
         - "P08 BO-076 Revenue Recognition"
-      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
+      description: '**Order.** Sorted by `priority` ascending, then by `id`. Where `priority` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1783,6 +1825,9 @@ paths:
         is not a balance. `totals` carries one `Money` per currency and each bucket is one ageing band in
         one currency. `total` is filled only when everything in scope is in a single currency.
 
+
+        **Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `asAt` is a day in the time zone of the region at or above the caller''s scope (`tenancy#regionSettingsRecords`, by the caller''s scope path). When the caller''s scope gives no single region (a brand or the tenant root) and `asAt` is sent, the answer is `400 validation` on `asAt` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
+
         '
       tags:
       - recognition
@@ -1796,7 +1841,7 @@ paths:
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on asAt when the caller''s scope gives no single region (ADAM CR-251).'
       - name: venueId
         in: query
         description: One venue. Omitted means every venue in the caller's scope, totalled per currency.
@@ -1810,6 +1855,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeferredRevenueReport'
+        '400':
+          description: 'Validation failed (`validation`). Includes a day filter (`asAt`) sent by a caller whose scope gives no single region; `errors[]` names `asAt`, "filter by day from one venue or region" (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recognition/run:
@@ -2271,6 +2324,10 @@ paths:
         - "P01 WEB-035 Multi-Currency & Pricing"
         - "P02 GST-044 Multi-Currency & Pricing"
         - "P08 BO-077 FX Rates & Variances"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "tenancy.VenueSettings.displayCurrencies": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2371,6 +2428,10 @@ paths:
       operationId: setFxRate
       x-ticvai-consumed-by:
         - "P08 BO-077 FX Rates & Variances"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "tenancy.VenueSettings.chargeCurrencies": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: region
@@ -2469,6 +2530,9 @@ paths:
         it will show you that this cashier has taken 100 dollars, 200 Qatari riyal."* A cashier declaring
         a drawer holding three currencies needs this to reconcile, and without it the variance is unexplainable.
 
+
+        **Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `from` or `to` are a day in the time zone of the region at or above the caller''s scope (`tenancy#regionSettingsRecords`, by the caller''s scope path). When the caller''s scope gives no single region (a brand or the tenant root) and `from` or `to` is sent, the answer is `400 validation` on `from` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
+
         '
       tags:
       - reporting
@@ -2488,13 +2552,13 @@ paths:
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on from when the caller''s scope gives no single region (ADAM CR-251).'
       - name: to
         in: query
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on from when the caller''s scope gives no single region (ADAM CR-251).'
       responses:
         '200':
           description: Foreign tender
@@ -2502,6 +2566,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ForeignTenderReport'
+        '400':
+          description: 'Validation failed (`validation`). Includes a day filter (`from`, `to`) sent by a caller whose scope gives no single region; `errors[]` names `from`, "filter by day from one venue or region" (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fx/inter-entity:
@@ -2650,7 +2722,18 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
-      description: '**Order.** Newest first, by `postedAt` descending, then by `id`.'
+      description: '**Order.** Newest first, by `postedAt` descending, then by `id`.
+
+
+        **Whose midnight bounds a day** (accepted 26 October 2026, Chinmay, ADAM CR-251 option A: the stop-gap the
+        owner of #32326 built is the rule). `postedFrom` and `postedTo` are days in the time zone of the region at or
+        above the caller''s scope (`tenancy#regionSettingsRecords`, by the caller''s scope path). When the caller''s
+        scope gives no single region (a brand or the tenant root) and `postedFrom` or `postedTo` is sent, the answer
+        is `400 validation` on `postedFrom` ("filter by day from one venue or region"). Without a day filter the list
+        works at any scope. Picking the region from `venueId` for a head-office caller (option B) can follow when
+        someone needs it.
+
+        '
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -2691,13 +2774,15 @@ paths:
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: A day in the time zone of the region at or above the caller's scope, local midnight to local
+            midnight. Refused 400 on postedFrom when the caller's scope gives no single region (ADAM CR-251).
       - name: postedTo
         in: query
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: A day in the time zone of the region at or above the caller's scope, local midnight to local
+            midnight. Refused 400 on postedFrom when the caller's scope gives no single region (ADAM CR-251).
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -2714,6 +2799,16 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/Posting'
+        '400':
+          description: 'Validation failed (`validation`). Includes a `postedFrom` or `postedTo` sent by a caller whose
+            scope gives no single region; `errors[]` names `postedFrom`, "filter by day from one venue or region"
+            (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ledger/trial-balance:
@@ -2722,10 +2817,34 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-043 Daily Reconciliation"
         - "P08 BO-090 Period Close"
+      x-ticvai-reads:
+      - table: ledger.fiscal_period
+        for: 'the period, and its legal entity (ADAM CR-246)'
+      - table: ledger.account
+        for: 'every postable account of the period''s legal entity, by code (ADAM CR-246)'
+      - table: ledger.journal_entry
+        for: 'which entries count: `posted` and `reversed` ones of the period (journal_entry.fiscal_period_id; ADAM CR-246)'
+      - table: ledger.posting
+        for: 'the debits and credits of those entries (ADAM CR-246)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
       summary: Trial balance for a period
+      description: '**What the figures are** (accepted 26 October 2026, Chinmay, ADAM CR-246 option A; proposed, the
+        client to correct). For each account, `debit` and `credit` are the sums of its postings over the journal
+        entries of the fiscal period whose `status` is `posted` or `reversed` (a reversal is its own offsetting entry,
+        so both count); `draft` and `pendingApproval` entries do not. `balance` is `debit` minus `credit`
+        (debit-positive, whatever the account''s type): **the period''s movement, not a carried-forward closing
+        balance**. Every postable account of the period''s legal entity is listed, including accounts with no
+        postings (zero rows), ordered by account `code`; non-postable parent accounts (`isPostable` false) are not
+        listed. `totalDebit` and `totalCredit` are the sums of the rows, and `isBalanced` is their equality.
+
+
+        **`legalEntityId`**, when sent, must be the fiscal period''s own legal entity (a fiscal period belongs to
+        exactly one); any other value is `404`, as an unknown or out-of-scope `fiscalPeriodId` is. A closing-balance
+        view (option B) can follow once year-end close is defined.
+
+        '
       tags:
       - ledger
       x-ticvai-permission: LEDGER_VIEW
@@ -2751,6 +2870,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TrialBalance'
+        '404':
+          description: 'No such fiscal period in the caller''s scope, or a `legalEntityId` that is not the period''s
+            legal entity (ADAM CR-246).'
+          x-ticvai-problem-types:
+          - not-found
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-variances:
@@ -2765,6 +2893,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'what its text calls "venue setting": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: orders#refundPolicyRecords
+        route: in-process
+        for: 'what its text calls "orders.RefundPolicy.varianceThreshold": orders.refund_policy, Order''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2780,7 +2911,11 @@ paths:
 
         
 
-        **Order.** Newest first, by `occurredAt` descending, then by `id`.'
+        **Order.** Newest first, by `occurredAt` descending, then by `id`.
+
+        **Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `occurredFrom` or `occurredTo` are a day in the time zone of the region at or above the caller''s scope (`tenancy#regionSettingsRecords`, by the caller''s scope path). When the caller''s scope gives no single region (a brand or the tenant root) and `occurredFrom` or `occurredTo` is sent, the answer is `400 validation` on `occurredFrom` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
+
+        '
       tags:
       - variance
       x-ticvai-permission: LEDGER_VIEW
@@ -2807,13 +2942,13 @@ paths:
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on occurredFrom when the caller''s scope gives no single region (ADAM CR-251).'
       - name: occurredTo
         in: query
         schema:
           type: string
           format: date
-          description: A day in the region's time zone, local midnight to local midnight.
+          description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on occurredFrom when the caller''s scope gives no single region (ADAM CR-251).'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -2830,6 +2965,14 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/PriceVariance'
+        '400':
+          description: 'Validation failed (`validation`). Includes a day filter (`occurredFrom`, `occurredTo`) sent by a caller whose scope gives no single region; `errors[]` names `occurredFrom`, "filter by day from one venue or region" (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-variances/{varianceId}/review:
@@ -2844,6 +2987,10 @@ paths:
       operationId: reviewPriceVariance
       x-ticvai-consumed-by:
         - "P08 BO-077 FX Rates & Variances"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PriceVariance.quotedPrice, PriceVariance.serverPrice, PriceVariance.variance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Record a review decision on an exception variance
@@ -2970,6 +3117,9 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
@@ -3248,7 +3398,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: The exception is already resolved.
+          description: The exception is already resolved. Also refused when the settlement is `failed`, `ingesting`, `matched`, `matching` or `parsing`; states/settlement.yaml moves this call only from `hasExceptions`. (r10 default ruling, CHG-R10GEN-005)
           x-ticvai-problem-types:
           - settlement-exception-resolved
           content:
@@ -3797,6 +3947,9 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'its read of platform.region_settings, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "tenancy.VenueSettings.chargeCurrencies": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       summary: Pull rates from the configured provider
       description: '**Scheduled ingestion, which had no home.** `setFxRate` is a `PUT` carrying `setByPrincipalId`
         — a person setting a rate — so a daily provider pull had to be modelled as a person doing it,
@@ -4095,6 +4248,8 @@ paths:
         issued to them (`buyerSubjectId` is the caller); staff see the legal entities their scope reaches.
 
         Ordered by `issuedAt` descending, `id` as the tiebreak.
+
+        **Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `issuedFrom` or `issuedTo` are a day in the time zone of the region at or above the caller's scope (`tenancy#regionSettingsRecords`, by the caller's scope path). When the caller's scope gives no single region (a brand or the tenant root) and `issuedFrom` or `issuedTo` is sent, the answer is `400 validation` on `issuedFrom` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
       tags:
       - tax
       x-ticvai-permission: LEDGER_VIEW
@@ -4127,13 +4282,13 @@ paths:
           $ref: '#/components/schemas/FinTaxInvoiceStatus'
       - name: issuedFrom
         in: query
-        description: A day in the region's time zone, local midnight to local midnight.
+        description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on issuedFrom when the caller''s scope gives no single region (ADAM CR-251).'
         schema:
           type: string
           format: date
       - name: issuedTo
         in: query
-        description: A day in the region's time zone, local midnight to local midnight.
+        description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on issuedFrom when the caller''s scope gives no single region (ADAM CR-251).'
         schema:
           type: string
           format: date
@@ -4153,6 +4308,14 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/FinTaxInvoice'
+        '400':
+          description: 'Validation failed (`validation`). Includes a day filter (`issuedFrom`, `issuedTo`) sent by a caller whose scope gives no single region; `errors[]` names `issuedFrom`, "filter by day from one venue or region" (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
@@ -4554,7 +4717,7 @@ paths:
       operationId: listTaxInvoiceTemplates
       x-ticvai-consumed-by:
         - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
-      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
+      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`. Where `effectiveFrom` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 5.7.93 template, numbering, language); shape follows listLegalEntities'
@@ -4619,7 +4782,7 @@ paths:
       - name: invoiceTemplateId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by its legal entity and document kind: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 invoice-template-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -4640,6 +4803,14 @@ paths:
                 $ref: '#/components/schemas/FinTaxInvoiceTemplate'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'Refused, and nothing is stored. `invoice-template-id-mismatch` (ADAM CR-245): a record for its legal entity and document kind exists and the path''s `invoiceTemplateId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - invoice-template-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: '`nextNumber` below the last number issued in the series, or a language the legal
             entity''s region does not offer.'
@@ -4719,7 +4890,7 @@ paths:
       - name: providerId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by its legal entity: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 provider-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -4739,9 +4910,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/FinEInvoicingProvider'
         '409':
-          description: '`live` requested before any `test` transmission from this legal entity was accepted.'
+          description: '`live` requested before any `test` transmission from this legal entity was accepted. `provider-id-mismatch` (ADAM CR-245): a record for its legal entity exists and the path''s `providerId` is not its id (or names another such record); nothing changes.'
           x-ticvai-problem-types:
           - einvoicing-not-tested
+          - provider-id-mismatch
           content:
             application/problem+json:
               schema:
@@ -4999,6 +5171,8 @@ paths:
         payable or refundable. Each box carries the tax codes and posting count behind it so it can be traced.
         `format` `csv` or `xlsx` returns the same boxes as a file link for the adviser; `json` for screens.
         Computed from the reporting replica; nothing is stored or filed by this call.
+
+        **Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `periodFrom` or `periodTo` are a day in the time zone of the region at or above the caller's scope (`tenancy#regionSettingsRecords`, by the caller's scope path). When the caller's scope gives no single region (a brand or the tenant root) and `periodFrom` or `periodTo` is sent, the answer is `400 validation` on `periodFrom` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
       tags:
       - reporting
       x-ticvai-permission: LEDGER_VIEW
@@ -5015,14 +5189,14 @@ paths:
       - name: periodFrom
         in: query
         required: true
-        description: A day in the region's time zone, local midnight to local midnight.
+        description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on periodFrom when the caller''s scope gives no single region (ADAM CR-251).'
         schema:
           type: string
           format: date
       - name: periodTo
         in: query
         required: true
-        description: A day in the region's time zone, local midnight to local midnight.
+        description: 'A day in the time zone of the region at or above the caller''s scope, local midnight to local midnight. Refused 400 on periodFrom when the caller''s scope gives no single region (ADAM CR-251).'
         schema:
           type: string
           format: date
@@ -5042,6 +5216,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FinVatReturn'
+        '400':
+          description: 'Validation failed (`validation`). Includes a day filter (`periodFrom`, `periodTo`) sent by a caller whose scope gives no single region; `errors[]` names `periodFrom`, "filter by day from one venue or region" (ADAM CR-251).'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [period-not-whole-tax-months, legal-entity-not-tax-registered]
           description: The period is not whole tax months, or the legal entity has no tax registration number.
@@ -7197,6 +7379,9 @@ components:
           format: date-time
     TrialBalance:
       x-ticvai-persistence: none — computed
+      description: 'Computed by `getTrialBalance` for one fiscal period (ADAM CR-246): each postable account''s
+        movement over the period''s `posted` and `reversed` journal entries, debit-positive, every postable account
+        listed (zero rows too) in account `code` order.'
       type: object
       required:
       - fiscalPeriodId
@@ -7240,11 +7425,19 @@ components:
               type:
                 $ref: '#/components/schemas/AccountType'
               debit:
-                $ref: ../shared/common.yaml#/components/schemas/Money
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                description: The sum of the account's debit postings over the period's `posted` and `reversed`
+                  entries (ADAM CR-246).
               credit:
-                $ref: ../shared/common.yaml#/components/schemas/Money
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                description: The sum of the account's credit postings over the same entries.
               balance:
-                $ref: ../shared/common.yaml#/components/schemas/Money
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                description: '`debit` minus `credit`, debit-positive for every account type: the period''s movement,
+                  not a carried-forward closing balance (ADAM CR-246).'
     VarianceReviewStatus:
       type: string
       enum:

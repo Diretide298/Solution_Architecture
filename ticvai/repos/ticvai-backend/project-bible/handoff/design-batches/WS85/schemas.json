@@ -195,6 +195,16 @@
     "type": "integer",
     "nullable": true
    },
+   "syncBacklog": {
+    "type": "integer",
+    "nullable": true,
+    "description": "The offline records the device held unsynced when it sent this heartbeat (ADAM CR-103; CHG-R10TEN-007). Written by `recordDeviceHeartbeat`."
+   },
+   "errorCount": {
+    "type": "integer",
+    "nullable": true,
+    "description": "The errors the device logged since its previous heartbeat (ADAM CR-103; CHG-R10TEN-007). Written by `recordDeviceHeartbeat`; the last hour's sum is the error rate of device and workstation health."
+   },
    "scopePath": {
     "type": "string"
    }

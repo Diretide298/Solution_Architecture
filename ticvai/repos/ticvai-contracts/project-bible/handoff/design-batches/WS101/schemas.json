@@ -9,6 +9,13 @@
    "quantity"
   ],
   "properties": {
+   "currencyCode": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "pattern": "^[A-Z]{3}$",
+    "description": "**The ISO 4217 currency of the pack's `price`** (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change writes a new row or version and never re-denominates one already sold."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -65,6 +72,13 @@
    "basePrice"
   ],
   "properties": {
+   "currencyCode": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "pattern": "^[A-Z]{3}$",
+    "description": "**The ISO 4217 currency of the plan's `basePrice` and every `overageUnitPrice` of its limits** (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change writes a new row or version and never re-denominates one already sold."
+   },
    "code": {
     "x-ticvai-unique": "tenant",
     "type": "string",
@@ -144,6 +158,13 @@
    "moduleCode"
   ],
   "properties": {
+   "currencyCode": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "pattern": "^[A-Z]{3}$",
+    "description": "**The ISO 4217 currency of the module's `price`** (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change writes a new row or version and never re-denominates one already sold."
+   },
    "moduleCode": {
     "type": "string",
     "description": "**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches."

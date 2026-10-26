@@ -148,6 +148,19 @@
   "requestBody": null,
   "responds": "ApprovalMatrix"
  },
+ "listCreditTypes": {
+  "method": "GET",
+  "path": "/credit-types",
+  "contract": "wallet",
+  "summary": "The kinds of value that may sit in a wallet",
+  "permission": "WALLET_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "CreditType"
+ },
  "listOrderRefunds": {
   "method": "GET",
   "path": "/orders/{orderId}/refunds",

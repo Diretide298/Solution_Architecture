@@ -1,6 +1,6 @@
 # P08-venue-operations-01 — P08 · Venue Operations (1 of 2)
 
-**10 screens · 75 operations · 105 schemas · 28 permissions**
+**10 screens · 77 operations · 109 schemas · 28 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

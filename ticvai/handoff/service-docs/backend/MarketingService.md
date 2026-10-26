@@ -80,7 +80,7 @@
 | marketing | [`getMarketingSubscription`](#getmarketingsubscription) | GET | `/marketing-subscriptions` | core | 1 | GST-065, WEB-027 |
 | marketing | [`getMyCase`](#getmycase) | GET | `/my/cases/{caseId}` | core | 1 | GST-068 |
 | marketing | [`getMyChallenges`](#getmychallenges) | GET | `/guests/me/challenges` | core | 1 | WEB-017 |
-| marketing | [`getMyProfile`](#getmyprofile) | GET | `/guests/me/profile` | core | 1 | GST-001, GST-039, WEB-011, WEB-020 |
+| marketing | [`getMyProfile`](#getmyprofile) | GET | `/guests/me/profile` | core | 1 | GST-001, GST-039, GST-043, WEB-011, WEB-020 |
 | marketing | [`getSeoMetadata`](#getseometadata) | GET | `/seo-metadata` | core | 1 | CMS-013 |
 | marketing | [`getWaiverStatus`](#getwaiverstatus) | GET | `/guests/{subjectId}/waiver-status` | core | 1 | BO-852, WEB-024 |
 | marketing | [`handoverToAgent`](#handovertoagent) | POST | `/conversations/{conversationId}/handover` | core | 1 | GST-031, GST-032, GST-033, KSK-013, KSK-015, WEB-044 |
@@ -98,7 +98,7 @@
 | marketing | [`setSeoMetadata`](#setseometadata) | PUT | `/seo-metadata` | core | 1 | BO-842, CMS-013 |
 | marketing | [`submitForm`](#submitform) | POST | `/form-submissions` | core | 1 | GST-035, WEB-026 |
 | marketing | [`updateGuestPreferences`](#updateguestpreferences) | PUT | `/guests/{subjectId}/preferences` | core | 1 | BO-740, WEB-020 |
-| marketing | [`updateMyProfile`](#updatemyprofile) | PATCH | `/guests/me/profile` | core | 1 | GST-039, WEB-011, WEB-020 |
+| marketing | [`updateMyProfile`](#updatemyprofile) | PATCH | `/guests/me/profile` | core | 1 | GST-039, GST-043, WEB-011, WEB-020 |
 | marketing | [`uploadGuestDocument`](#uploadguestdocument) | POST | `/guest-documents` | setup | 1 |  |
 | message | [`createMessageTemplate`](#createmessagetemplate) | POST | `/message-templates` | setup | 1 | BO-785, BO-786, BO-787, SUP-007 |
 | message | [`listMyNotifications`](#listmynotifications) | GET | `/me/notifications` | core | 1 | GST-030, WEB-046 |
@@ -329,7 +329,7 @@ Halts remaining sends immediately. Messages already dispatched cannot be recalle
 | Reads | `cache:idempotency`, `marketing.campaign`, `marketing.campaign_variant`, `marketing.segment_criterion` |
 | Writes | `cache:idempotency`, `marketing.campaign`, `marketing.segment_criterion` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
-| State model | Campaign ([states/campaign.yaml](../../../states/campaign.yaml)): moves `paused` -> `stopped` |
+| State model | Campaign ([states/campaign.yaml](../../../states/campaign.yaml)): moves `sending` -> `stopped`, `paused` -> `stopped` |
 
 **Parameters**
 
@@ -898,6 +898,7 @@ Current position per purpose and channel, with the version of the notice consent
 
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the active consent purposes a guest is asked for, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `GUEST_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 **Order.** Sorted by `displayName` ascending.
+Where `displayName` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -948,6 +949,7 @@ Current position per purpose and channel, with the version of the notice consent
 **`GET /consent-questions`**: The consent questions a venue asks at booking
 
 **Decided 29 September, rev 3 REV3-26: the swim question is a consent, not a data field.** A venue defines its own questions ("Are you able to swim?", "Do you hold a scuba certification?", "I accept the risk") and attaches one or several to a product or a booking flow. This lists them for Venue Management; a guest meets them through `orders.Cart.consentQuestions`, never by listing. Newest first, by `updatedAt` descending then `id`; the cursor is keyset on that pair.
+Where `updatedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -1208,7 +1210,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| bannerDesignId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
+| bannerDesignId | path | yes | string (uuid) | The new version's id (ADAM CR-245). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CookieBannerPreferenceCenterDesignerView`
@@ -1283,6 +1285,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 |---|---|---|
 | 200 |  | The new draft version |
 | 400 | BadRequest | Validation failed |
+| 409 |  | Refused, and nothing is stored. |
 | 422 |  | A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names ccpaCpra without a doNotSellOrShare button. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1413,7 +1416,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| technologyId | path | yes | string (uuid) | Addresses the item this write creates or replaces. |
+| technologyId | path | yes | string (uuid) | The record's id (ADAM CR-245). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CookieTrackingDigitalTechnologyRegistryView`
@@ -1476,6 +1479,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 |---|---|---|
 | 200 |  | The technology as stored |
 | 400 | BadRequest | Validation failed |
+| 409 |  | Refused, and nothing is stored. |
 | 422 |  | Approved with no category, or a non-essential technology marked as needing no consent. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1619,6 +1623,8 @@ Idempotent on the variant and performance — saving twice is one entry, not two
 **What the saved row holds** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002). The same call to Catalogue's service route asks `variantListingFacts(variantIds, channel, performanceIds)` too, whose `venueId` is the venue `variantsSellableAt` is asked about, and the row stores its `productName`, `imageAssetRef`, `listPrice` (as `list_price`), `performanceStartsAt` and `isAvailable: true` as they are at the save; `getWishlist` replaces them with Catalogue's current answer on every read. A performance that is not the variant's product's is the same `404` (`unknown-variant`).
 **The idempotency is the database's**: a unique index on (`subject_id`, `variant_id`, `performance_id`) with a null performance colliding too (`NULLS NOT DISTINCT`), so two saves racing under different `Idempotency-Key`s make one row. The second save meets the index, reads the existing row and answers `200` with it, its `note` replaced when it sends one.
 
+**Its currency** (CHG-R10ORD-019; the lead's ruling of 25 October 2026 on check-money-currency): the Money this operation answers or accepts is in the currency of the venue it acts at, the caller's working venue, read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -1686,6 +1692,8 @@ Items whose product has been withdrawn are returned with `isAvailable: false` ra
 **Newest first**: ordered by `addedAt` descending, `id` as the tiebreak.
 **What Catalogue knows is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002; ADR-0055 rule 4). Marketing runs in another deployable, so it never reads `catalogue.*`: it asks Catalogue's declared query `variantListingFacts(variantIds, channel, performanceIds)` through Catalogue's service route, once per read for every saved variant, with the guest's channel (`web` or `mobile`), and returns Catalogue's current `productName`, `imageAssetRef`, `price` and `performanceStartsAt`; `isAvailable` is false where Catalogue says the variant is not sellable (`unavailableReason` is its `reason`) or the saved performance has started (`performancePassed`). Nothing is written back: this read runs on a replica. **If Catalogue cannot be reached** the stored values are returned as they were when each item was saved, rather than an error. Catalogue's published service operation for the query is not written yet (a follow-up, as for `variantsSellableAt`, CHG-TEN-002).
 **Guests only** (ADR-0025): `bearerAuth` is not accepted; a staff token has no permission here (CHG-MKT-002, as the developer of ticket 30706 proposed).
+
+**Its currency** (CHG-R10ORD-019; the lead's ruling of 25 October 2026 on check-money-currency): the Money this operation answers or accepts is in the currency of the venue it acts at, the caller's working venue, read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.
 
 |  |  |
 |---|---|
@@ -1954,7 +1962,7 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 
 **Order.** Sorted by `displayName` ascending, then by `id`.
 
-**Decided 18 October 2026** (ADAM CR-141; CHG-CRA-007). **Without `GUEST_VIEW_PII`** the six personal fields (`displayName`, `email`, `phone`, `preferredLanguage`, `preferredChannel`, `guestLinkId`; marked `x-ticvai-data-class: personal` on `GuestProfile`, and Identity's subject record already treats preferred language as personal) are null, and the results are ordered by `id`, not by name, so the order discloses nothing. **`hasConsentFor`**: a guest has consent for a purpose when their `marketing.consent_record` for that purpose with `superseded_at` null has decision `granted`; it is Marketing's own table, so no read route is needed. **`lifetimeValue` is left out** until a guest's lifetime value has a currency (CR-094's rule, waiting on the client).
+**Decided 18 October 2026** (ADAM CR-141; CHG-CRA-007). **Without `GUEST_VIEW_PII`** the six personal fields (`displayName`, `email`, `phone`, `preferredLanguage`, `preferredChannel`, `guestLinkId`; marked `x-ticvai-data-class: personal` on `GuestProfile`, and Identity's subject record already treats preferred language as personal) are null, and the results are ordered by `id`, not by name, so the order discloses nothing. **`hasConsentFor`**: a guest has consent for a purpose when their `marketing.consent_record` for that purpose with `superseded_at` null has decision `granted`; it is Marketing's own table, so no read route is needed. **`lifetimeValue` is left out** until a guest's lifetime value has a currency (CR-094's rule, waiting on the client). Where `displayName` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -2229,7 +2237,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own badges (`customerId` is the caller's); another guest's badges is refused exactly as one that does not exist, never returned. `MARKETING_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
 
-**Order.** Soonest first, by `expiresAt` ascending, then by `id`.
+**Order.** Soonest first, by `expiresAt` ascending, then by `id`. Where `expiresAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -2355,6 +2363,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 | venueId | query |  | string (uuid) | Whose venue to read, for a caller with no venue (R8 blocker fix, as listProductCategories): a visitor with no credential, or an app before sign-in, must send it (missing is 400 venue-required, an id… |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -2392,6 +2401,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Programmes |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -2423,6 +2433,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | programmeId | query |  | string (uuid) |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -2447,6 +2458,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Rewards |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -3322,6 +3334,7 @@ Returns the points, the tier, and **how far from the next one** — the last is 
 
 **Drafted 4 September as a stub.** WEB-027 *Newsletter Subscription* sat on the wishlist and consent operations, which is why it read as a duplicate of the account dashboard. **A marketing subscription is not a consent record**: consent says what may be done with data, a subscription says what the guest asked to receive, and conflating them is how somebody unsubscribes and keeps getting email. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own marketing subscription; another guest's subscription is refused exactly as one that does not exist, never returned. `MARKETING_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+**Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -3468,7 +3481,7 @@ Read from the primary, because a reply the guest has just sent must be in the th
 | Guest callable | True |
 | Reads | `marketing.guest_preference`, `marketing.guest_profile` |
 | Writes | - |
-| Called by | GST-001, GST-039, WEB-011, WEB-020 |
+| Called by | GST-001, GST-039, GST-043, WEB-011, WEB-020 |
 
 **Response**: `object`
 
@@ -4667,7 +4680,7 @@ CF-96 fixed this class for 28 guest screens and the underlying pattern was never
 | Guest callable | True |
 | Reads | `cache:idempotency`, `marketing.guest_profile` |
 | Writes | `cache:idempotency`, `marketing.guest_preference`, `marketing.guest_profile`, `pii.subject` |
-| Called by | GST-039, WEB-011, WEB-020 |
+| Called by | GST-039, GST-043, WEB-011, WEB-020 |
 
 **Parameters**
 

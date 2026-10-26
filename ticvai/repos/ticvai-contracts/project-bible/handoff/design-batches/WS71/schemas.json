@@ -511,7 +511,8 @@
   "x-ticvai-append-only": "occurredAt",
   "type": "object",
   "x-ticvai-persistence": "platform.audit_record",
-  "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n",
+  "x-ticvai-rls": "audit-read-beneath",
+  "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Never edited and never deleted.\n\n**Every write leaves a row, written by the platform in the write's own transaction** (ADAM CR-179, option 1; PLATFORM-AUDIT #27694 and CR-005; CHG-R10TEN-016). Not a fixed set of operations that audit themselves: the request kernel writes one row for each transaction that writes, inside it, from every host. `action` is the operation's `operationId`, or the consumer's or the job's name; `principalId` is who acted; `orgUnitId` is the venue the session acts at, else its region; `workstationId` is the workstation where there is one; `subjectRef` is set only where the operation names what it acted on.\n\n**Who reads a row** (ADAM CR-185, option B; CHG-R10TEN-006): the tenant root reads every row; a venue or region grant reads the rows whose `orgUnitId` names a scope node at or beneath it. A row with no `orgUnitId` (a consumer, a job, the webhook) is the tenant root's alone. Appending is open to any grant, and correcting or removing a row to the tenant root only, as CR-005 settled.\n",
   "required": [
    "id",
    "action",
@@ -542,7 +543,7 @@
    },
    "action": {
     "type": "string",
-    "description": "What was done, as the writing operation names it."
+    "description": "What was done, as the writing operation names it; the operation's `operationId`, or the consumer's or the job's name (ADAM CR-179)."
    },
    "subjectRef": {
     "type": "string",

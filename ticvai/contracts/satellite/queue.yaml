@@ -154,6 +154,7 @@ paths:
         - "P01 WEB-039 Venue Map & Wait Times"
         - "P01 WEB-040 Virtual Queue"
         - "P02 GST-023 Virtual Queue"
+        - "P04 POS-025 Till Home"
         - "P06 EMP-031 Queue monitor"
         - "P08 BO-001 Queue Directory"
         - "P08 BO-002 Queue Configuration"
@@ -1131,6 +1132,7 @@ paths:
     get:
       operationId: listQueueFeeds
       x-ticvai-consumed-by:
+        - "P04 POS-029 Order Queue"
         - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
       x-ticvai-audience: [staff]

@@ -3,9 +3,9 @@
 **10 September 2026. Fifteen of seventeen checks pass; the two that do not are named below.**
 
 ```
-2845 operations · 33 contracts · 1149 tables · 3250 relationships
-208 state models · 97 events · 98 flows · 71 ADRs
-2453 screens · 16 platforms · 13 frontends · 5 apps · 218 boards
+2854 operations · 33 contracts · 1161 tables · 3300 relationships
+209 state models · 105 events · 98 flows · 72 ADRs
+2453 screens · 16 platforms · 13 frontends · 6 apps · 219 boards
 ```
 
 **`98 flows` counts authored journeys.** 106 more are derived from the client boards and carry
@@ -13,7 +13,7 @@
 why anyone walks them. `check-board-flows` reports the two apart, because a number a generator can
 move is not a measure of progress.
 
-**`13 frontends` and `5 apps` are different units and both are real.** A frontend is the build
+**`13 frontends` and `6 apps` are different units and both are real.** A frontend is the build
 unit, one per platform, each joining to a `frontend/*.yaml` manifest that `check-frontend` and
 `check-package` validate. An app is what a user installs — guest, venue-pos,
 venue-staff-mobile, venue-management, ticvai-control — decided 10 September and carried
@@ -78,18 +78,18 @@ decision somebody has to make, and the register says which.
 contracts/      28 OpenAPI files — the source of truth. Everything else derives from here.
 screens/        2453 screens across 16 platforms
 flows/          203 journey files · 106 derived from the client boards, one per board but B2B board 1
-states/         208 state models
+states/         209 state models
 events/         29 declared events
 docs/adr/       44 architecture decisions
 docs/active/    the working documents — audits, briefs, handoffs
 docs/registers/ conflicts (CF-*), backlog, decisions
 
-backend/        DDL, generated — 1149 tables, 815 foreign keys, 2924 indexes
+backend/        DDL, generated — 1161 tables, 815 foreign keys, 2924 indexes
 services/       16 FastAPI skeletons for topology benchmarking
 deploy/         four deployment configurations plus three burst variants
 tools/          the generators and the checks
 handoff/        derived artefacts for consumers — lineage, schema, burst scope, sizing
-wireframes/     218 boards · 16 per platform, 5 per shipped app, 1 index. All
+wireframes/     219 boards · 16 per platform, 5 per shipped app, 1 index. All
                 generated. The 65 client-pack boards were archived on 10 September, and
                 every screen that pointed at one was repointed rather than orphaned.
                 frames/ holds what a designer drew, one file per screen; the boards
@@ -169,7 +169,7 @@ specification problem and belongs in the log, not in a picture.
 **`handoff/api-data-lineage.json`** — every operation with its verb, path, scope, permission,
 audience, service, reads and writes. **The join everything else resolves through.**
 
-**`handoff/schema-reference.json`** — 1149 tables, every column, every reference, and a description
+**`handoff/schema-reference.json`** — 1161 tables, every column, every reference, and a description
 for all of them.
 
 **`handoff/burst-scope.json`** — what a flash-sale environment runs, and what it does not. **Thirteen

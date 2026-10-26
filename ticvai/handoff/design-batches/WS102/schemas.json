@@ -436,6 +436,14 @@
     "minLength": 2,
     "maxLength": 2
    },
+   "billingCurrency": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "nullable": true,
+    "pattern": "^[A-Z]{3}$",
+    "description": "**The currency TICVAI invoices this tenant in** (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013), an ISO 4217 code. Required on save (`setBillingEntity`, 400 otherwise); null only while the record rides on an onboarding application. `generateInvoice` copies it onto each new invoice as `currencyCode`, so a later change never moves an invoice already generated."
+   },
    "address": {
     "type": "string",
     "maxLength": 1000,
@@ -992,6 +1000,7 @@
    "PRODUCT_CONFIGURE",
    "PRODUCT_APPROVE",
    "PRODUCT_PUBLISH",
+   "SALES_CHANNEL_OVERRIDE",
    "PRICE_VIEW",
    "PRICE_CONFIGURE",
    "EVENT_CONFIGURE",
@@ -1039,6 +1048,7 @@
    "ACCESS_POINT_CONFIGURE",
    "TURNSTILE_MODE_SET",
    "TICKET_LOOKUP",
+   "ENTITLEMENT_USE",
    "ACCREDITATION_VIEW",
    "ACCREDITATION_APPLY",
    "ACCREDITATION_APPROVE",
@@ -1288,6 +1298,21 @@
    "startsAt"
   ],
   "properties": {
+   "issuingLegalEntity": {
+    "type": "string",
+    "enum": [
+     "ainfiniteAiUae",
+     "ainfiniteAiIndia"
+    ],
+    "description": "**The TICVAI legal entity that invoices this tenant** (the lead, 25 October 2026, r10 round 3, ADAM CR-202; CHG-R10ID-023): Ainfinite AI UAE or Ainfinite AI India. `generateInvoice` copies it onto each invoice and `issueInvoice` numbers the invoice from that entity's gapless sequence."
+   },
+   "currencyCode": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "pattern": "^[A-Z]{3}$",
+    "description": "**The ISO 4217 currency of this contract's `currentPrice`** (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change writes a new row or version and never re-denominates one already sold."
+   },
    "tenantId": {
     "x-ticvai-references": "control.tenant",
     "type": "string",

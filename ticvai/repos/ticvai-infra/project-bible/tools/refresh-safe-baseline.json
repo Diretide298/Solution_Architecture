@@ -3,10 +3,7 @@
  "checkers": {
   "check-package": {
    "why": "two errors in docs about build-readiness-21-september.md: a platform code/name mismatch and a platform code (P03) no screen file defines; the document is historical",
-   "known": [
-    "^build-readiness-21-september\\.md: writes 'P11 Accreditation is the other'",
-    "^build-readiness-21-september\\.md: names platform code P03, which no screen file defines"
-   ]
+   "known": []
   },
   "check-authored-inputs": {
    "why": "seven authored inputs written against an older contract surface; nothing in tools/ rebuilds them (docs/regenerating-authored-docs.md)",
@@ -31,18 +28,6 @@
    "known": [
     "^SP-NOACCESS\\s+P14-developer-portal\\.yaml DEV-001: emptyNoAccess names DEVELOPER_VIEW, which none of its operations requires \\(none\\)$",
     "^SP-NOACCESS\\s+P08-venue-back-office\\.yaml BO-293: emptyNoAccess names PLATFORM_CELL_MANAGE, which none of its operations requires \\(MEMBERSHIP_MANAGE, MEMBERSHIP_VIEW\\)$"
-   ]
-  },
-  "check-screen-wiring": {
-   "why": "approved screen lacks the element; listed for the client note: five reads a person sees on an approved screen that has no element to show them (GST-059 listMyVisitPlans, GST-048 listProductVariants, BO-015 listProductCategories, BO-291 listTaxProfiles, POS-004 listPerformances; S-OP-UNREACHED). The lead's ruling: no read a person sees is background, so they are not baselined in the check; the approved screens change only with the client's approval (check-approved-ui), so they stay visible until the client decides (r8 integration pass, CHG-R8INT-008; listed here as DEV-001 and BO-293 are, CHG-R8INT-027). The check prints S-OP-UNREACHED with counts, not screen ids, so the pattern accepts exactly five new: a sixth fails.",
-   "known": [
-    "^S-OP-UNREACHED\\s+\\d+ found,\\s+5 new,"
-   ]
-  },
-  "check-plan-closure": {
-   "why": "approved screen would have to change; listed for the client note: the wallet setup screens BO-1088 and BO-1144 (guest transfer rules, which family transfers read) are reached only from hubs outside Block A (C-REACH). The fix used elsewhere, a link from BO-101, changes a client-approved screen (check-approved-ui), so they wait on the client's approval of that link. The lead's ruling of 20 October: \"Accepting both as recommended\" (CHG-R8INT-030). The check prints C-REACH with counts, not screen ids, so the pattern accepts exactly two new: a third fails.",
-   "known": [
-    "^C-REACH\\s+\\d+ found,\\s+2 new,"
    ]
   }
  },

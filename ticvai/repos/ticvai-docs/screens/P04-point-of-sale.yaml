@@ -1560,7 +1560,6 @@ screens:
   - id: drawerSeatSelection
     component: drawer
     trigger: Continue from date and performance
-    bindsTo: SeatAvailability
     body: '**Seats, for a seated product only.** Carries the seating rules the venue configured — a group
       whose seats must stay together cannot be split here, and the map says so at the point of selection
       rather than at payment.'
@@ -2247,19 +2246,6 @@ screens:
         operation: listAlternativeCodes
         provenance: contract catalogue.yaml GET /products/{productId}/alternative-codes
       - kind: dataTable
-        label: Every inventory hold
-        bindsTo: InventoryHold
-        columns:
-        - InventoryHold.requestedUnits
-        - InventoryHold.channel
-        - InventoryHold.status
-        - InventoryHold.acquiredAt
-        - InventoryHold.expiresAt
-        - InventoryHold.releasedAt
-        provenance: contract catalogue.yaml GET /inventory-holds
-        notes: 'Never drawn (GPS-C12) and bound to nothing (r8 second round, GPS-C11): the till lists
-          no holds; the cart''s countdown is the only hold the cashier sees.'
-      - kind: dataTable
         label: Every product
         bindsTo: Product
         columns:
@@ -2289,13 +2275,6 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: secondaryButton
-        label: Acquire inventory hold
-        provenance: contract catalogue.yaml POST /inventory-holds
-        notes: '**Not a cashier control** (v2, POSV2-10): the terminal takes its lease when the line is
-          added and the cashier sees only the cart''s countdown. Never drawn as a button, and bound to
-          nothing since r8 (GPS-C11): `addCartLine` (on POS-002''s quantity step) takes the cart''s hold,
-          which is the only hold; this screen calls no `acquireInventoryHold`.'
       - kind: secondaryButton
         label: Resolve product by code
         operation: resolveProductByCode
@@ -2410,25 +2389,6 @@ screens:
   apisNote: 'Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
-  overlays:
-  - id: formAcquireInventoryHold
-    component: modal
-    trigger: Acquire inventory hold
-    body: '**Never opened** (r8 second round, GPS-C11): its button is never drawn and this screen takes
-      no hold; the cart''s hold, taken by `addCartLine`, is the only one. Kept only because the approved
-      snapshot lists it.'
-    bindsTo: AcquireLeaseRequest
-    confirm:
-      label: Acquire inventory hold
-    dismiss:
-      label: Cancel
-      discards:
-      - id
-      - channelCapacityId
-      - requestedUnits
-      - ttlSeconds
-      - channel
-    provenance: client-verified
 - id: POS-004
   name: Sell — Seat Map
   module: Sell
@@ -2678,15 +2638,6 @@ screens:
     contract: orders
     purpose: Take a payment against an order
     trigger: onAction
-  - operationId: listPerformances
-    contract: catalogue
-    purpose: 'The cold entry (r8, GPS-C05): a link to a performance that has happened offers the next
-      performance of the same event, the first upcoming one `listPerformances` returns for the performance''s
-      `eventId` (`getPerformance`). Not called on the ordinary way in. Not background (r8 integration,
-      CHG-R8INT-008): the cashier sees the performance it offers, and the approved screen has no element
-      of its own for the offer.'
-    trigger: onLoad
-    provenance: r8 second round, GPS-C05 (ticket 28206)
   entryState:
     params:
     - name: holdId
@@ -2699,10 +2650,11 @@ screens:
     - name: eventId
       from: navigation
       optional: true
-      notes: 'r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`); `listPerformances` takes
-        it on the cold entry.'
-    coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
-      event.'
+      notes: 'r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`).'
+    coldEntry: '**A link to a performance that has happened** shows that performance (`getPerformance`);
+      the cashier picks another on the sell screens. The next performance is not looked up here: the approved
+      screen has no element for the offer, so `listPerformances` is not declared (CHG-R10OPN-005, ADAM
+      CR-262; Chinmay, 26 October 2026).'
   wireframe:
     status: approved
     provenance: client-verified
@@ -3838,8 +3790,9 @@ screens:
       `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY`
       for `resumeOrder`, `holdOrder`, `modifyOrder`; `ORDER_REFUND` for `createRefund`; `ORDER_REPRINT`
       for `reprintOrder`.'
-    offline: Orders held at this terminal are listed. Those held elsewhere are not — resuming another
-      till's sale needs the server
+    offline: Orders held at this terminal are listed, and they can still be reprinted; a reprint is queued
+      and sent when the connection is back. Those held elsewhere are not — resuming another till's sale
+      needs the server
     denied: Held sales are listed and cannot be recalled without `sale.resume`. **The list is still shown**,
       because a cashier who cannot see the held sale fetches a supervisor to the wrong screen.
   apis:
@@ -5824,6 +5777,7 @@ screens:
         provenance: carried from the previous definition
       - kind: selectField
         label: Order type
+        operation: createFnbOrder
         notes: 'The cart''s order type, as drawn in v2 (POSV2-12, DEC-553): Dine-in, Quick service, Takeaway,
           Delivery. Delivery asks the fulfilment source, Own delivery or Delivery partner. Quick service
           is a counter order with no guest details whose number prints on the receipt and shows on the
@@ -5831,7 +5785,7 @@ screens:
           (design-notes correction fnb-retail POS-012). The delivery partner''s reference, driver and
           fee have no contract field yet (open entry CHG-SPO-019).'
         provenance: POS v2 candidate, accepted 2 October 2026 (POSV2-12)
-        bindsTo: FnbOrder.serviceMode
+        bindsTo: CreateFnbOrderRequest.serviceMode
     - name: contextPanel
       slot: selection
       components:
@@ -5928,6 +5882,11 @@ screens:
     purpose: Hand the dropped goods over
     trigger: onAction
     provenance: flow F17 step 5 and F51 step 4, 2 October 2026 (CHG-CLN-006)
+  - operationId: createFnbOrder
+    contract: fnb
+    purpose: 'Creates the F&B order from the cart, carrying the order type the cashier picked (`serviceMode`:
+      dine-in, quick service, takeaway, delivery; the lead, 25 October 2026, r10; CHG-R10UI-016)'
+    trigger: onAction
   entryState:
     params:
     - name: workstationId
@@ -9090,9 +9049,11 @@ screens:
           own loads the home (CHG-DOOR-005). A 404 `no-current-shift` is the no-shift state, not an error.'
       - kind: metricTile
         label: Open holds
-        bindsTo: Order
+        operation: listOrders
+        bindsTo: OrderSummary
       - kind: metricTile
         label: Queue waiting
+        operation: listQueues
         bindsTo: Queue
       - kind: cardList
         label: Sale boards — tickets, F&B, retail
@@ -9184,6 +9145,16 @@ screens:
       may reopen
     trigger: onLoad
     provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: listOrders
+    contract: orders
+    purpose: 'Open holds: the orders held at this till (`status` held, `workstationId`) (check-screen-value-sources,
+      CHG-R10UI-015)'
+    trigger: onLoad
+  - operationId: listQueues
+    contract: queue
+    purpose: 'Queue waiting: the venue''s open queues and their waiting counts (check-screen-value-sources,
+      CHG-R10UI-015)'
+    trigger: onLoad
   entryState:
     params:
     - name: workstationId
@@ -9380,10 +9351,6 @@ screens:
   - operationId: reprintReceipt
     contract: retail
     purpose: Print the receipt again
-    trigger: onAction
-  - operationId: reprintOrder
-    contract: orders
-    purpose: Print the whole order again
     trigger: onAction
   - operationId: reissueEntitlement
     contract: orders
@@ -10091,6 +10058,7 @@ screens:
         provenance: v2 build, Queue (the guest status board)
       - kind: cardList
         label: Feed health
+        operation: listQueueFeeds
         bindsTo: QueueFeed
       - kind: secondaryButton
         label: Accept order
@@ -10143,6 +10111,10 @@ screens:
       after ready)'
     trigger: onAction
     provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: listQueueFeeds
+    contract: queue
+    purpose: The delivery partners' order feeds and their health (check-screen-value-sources, CHG-R10UI-015)
+    trigger: onLoad
   entryState:
     params:
     - name: workstationId

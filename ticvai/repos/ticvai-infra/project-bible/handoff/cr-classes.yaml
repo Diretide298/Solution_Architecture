@@ -21,11 +21,19 @@ classes:
   name: Read routes between modules
   artefacts: [ADR-0055]
   words: [x-ticvai-read-via, read-via, readvia, read route, another module's, cross-module, x-ticvai-queries,
-          declared query, routes to]
-  crs: [CR-096, CR-135, CR-161, CR-167]
+          declared query, routes to, no reads, declares only, undeclared read, declares no read]
+  crs: [CR-096, CR-135, CR-161, CR-167, CR-218]
   checks:
-    check-cross-module-reads: [XR-UNCOVERED, XR-QUERY, XR-ROUTE, XR-FOUNDATION, XR-LINEAGE, XR-VIEW-ACROSS]
+    check-cross-module-reads: [XR-UNCOVERED, XR-QUERY, XR-ROUTE, XR-FOUNDATION, XR-LINEAGE, XR-VIEW-ACROSS, XR-FACT]
     check-error-sources: [E-READ-VIA, E-QUERY]
+  default_ruling:
+    status: proposed
+    text: >-
+      (r10 pattern e, CHG-R10GEN-008) Another module's fact is asked of its owner's query over that table
+      (x-ticvai-read-via; in-process within one deployable, service across), declaring a per-table data read where
+      the owner has none; a GET asks what its own words name or its response works out on read. Run
+      python tools/fix-read-routes.py --apply, then tools/derive-lineage.py --apply. Identity above the foundation
+      tier reads only by projection (ADR-0028), which is the lead's call.
   needs: lead
 - id: row-security
   name: Row security fits its callers
@@ -83,10 +91,21 @@ classes:
   needs: lead
 - id: money-currency
   name: Money currency
-  words: [currency, money, aed, denomination]
-  crs: [CR-094]
+  words: [currency, money, aed, denomination, currency source, trading currency, amount only, currency read,
+          venue-currency, venue's currency, currency and scale]
+  crs: [CR-094, CR-197, CR-202, CR-217, CR-234, CR-235]
   checks:
     check-contract-shapes: [C-MONEY-NUMBER]
+    check-money-currency: [MC-NO-CURRENCY]
+  default_ruling:
+    status: proposed
+    text: >-
+      (r10 pattern a, CHG-R10GEN-008) Money takes its currency from what denominates the amount
+      (naming-and-style 5.1, ADR-0018); a row that stores the amount only asks the venue's frozen trading currency
+      (tenancy#venueSettingsRecords) or, with only a region, tenancy#regionSettingsRecords, in-process within commerce
+      and service across (CR-234 option A). Run python tools/fix-money-currency.py --apply. A row that keeps only a
+      scope_path goes through tenancy#scopeRecords (CR-217); a platform billing row stores its billing currency
+      (CR-202).
   needs: client
 - id: forward-migration
   name: The forward migration and its review lose what the generator derived
@@ -104,7 +123,16 @@ classes:
   name: The state model and the operations disagree
   words: [state model, transition, requiresapproval, emittedwhen, terminal, resume, rolledback, from failed,
           pendingconfirmation, two different rules]
-  crs: [CR-160]
+  crs: [CR-160, CR-237]
+  checks:
+    check-state-refusals: [SR-ALLOWS-NO-MOVE, SR-TERMINAL-UNANSWERED]
+  default_ruling:
+    status: proposed
+    text: >-
+      (r10 pattern c, CHG-R10GEN-008) The state model is right: an operation's 409 refuses exactly the states
+      states/*.yaml does not move it from, and its words name no allowed state the model lacks. Run
+      python tools/fix-order-and-refusals.py --apply; where the operation's purpose contradicts the model (CR-237,
+      an override admits), the lead rules which one changes.
   needs: lead
 - id: build-place
   name: The ticket or platform record names the wrong place to build
@@ -115,8 +143,60 @@ classes:
 - id: screen-values
   name: A screen action needs a value nothing on the screen supplies
   words: [nothing on the screen, takes the id from, deep-link, deeplink, the screen declares no, consent block,
-          no source]
-  crs: [CR-142, CR-143]
+          no source, does not declare, declares no, no operation the screen, binds, screen cannot, cannot show,
+          returns them]
+  crs: [CR-142, CR-143, CR-186, CR-187, CR-220, CR-221, CR-233]
+  checks:
+    check-screen-value-sources: [SV-SCHEMA, SV-FIELD, SV-OPTIONS, SV-MEDIA, SV-PICK, SV-WRITE]
+  default_ruling:
+    status: proposed
+    text: >-
+      (r10 pattern d, CHG-R10GEN-008) A screen shows only what an operation in its apis answers, and declares
+      every write its text describes. Add the existing read or write to the screen (wired to the component that
+      uses it), or add the field to an answer the screen already reads (additive); never a value from nowhere.
+  needs: lead
+- id: list-order
+  name: A list's order is not stated, or not total
+  words: [ordered by, order by, sort order, nulls last, nulls first, no order, tiebreak, which comes first,
+          keyset, cursor, nullable, no stated order, orders by, sorts]
+  crs: [CR-190, CR-206, CR-236]
+  checks:
+    check-list-order: [LO-NULLABLE-KEY, LO-UNORDERED]
+  default_ruling:
+    status: proposed
+    text: >-
+      (r10 pattern b, CHG-R10GEN-008) Every list states its order and the order is total. A nullable key puts
+      the rows without it after every row that has it, then id (CR-236 option A), unless the operation has a
+      natural fallback key (CR-206, coalesce(recordedAt, openedAt)); a list with no order sorts by a never-null
+      name then id, else newest createdAt then id. Run python tools/fix-order-and-refusals.py --apply.
+  needs: lead
+- id: guest-venue
+  name: A public guest read of venue data names no venue
+  words: [guestvenue, x-venue-id, venue-required, no venue, which venue, public read, unauthenticated, guestauth]
+  crs: [CR-198]
+  checks:
+    check-business-rules: [BR-GUEST-VENUE]
+  default_ruling:
+    status: proposed
+    text: >-
+      (r10 pattern f, CHG-R10GEN-008) A GET a guest calls without a session at venue scope takes the shared
+      GuestVenue parameter (X-Venue-Id) and declares 400 venue-required, unless its path or a required query names
+      the venue (CR-198 option A). The generators write it (contract_shapes.add_guest_venue).
+  needs: lead
+- id: scope-authz
+  name: A permission is checked against the flat set, not per scope
+  words: [permissionsbyscope, effectivepermissions, per scope, per-scope, at the tenant root, sibling venue,
+          scope paths, flattened]
+  crs: [CR-189]
+  checks:
+    check-business-rules: [BR-SCOPE-AUTHZ]
+  default_ruling:
+    status: proposed
+    text: >-
+      (r10 pattern g, CHG-R10GEN-008) x-ticvai-permission is evaluated per scope from Session.permissionsByScope
+      after deny resolution, never from effectivePermissions - at the node acted on or an ancestor; a list reaches
+      the scope paths where it holds (outside is 403); a tenant-level operation needs it at the tenant root (CR-189
+      option A). The kernel (#27692) owns the seam.
   needs: lead
 - id: platform-plumbing
   name: Platform plumbing the kernel needs is not in the package

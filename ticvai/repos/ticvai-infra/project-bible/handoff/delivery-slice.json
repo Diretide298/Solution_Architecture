@@ -220,15 +220,15 @@
  },
  "deferredScreens": [],
  "counts": {
-  "core": 516,
-  "setup": 260,
-  "allOperations": 2845
+  "core": 517,
+  "setup": 268,
+  "allOperations": 2854
  },
  "services": {
   "AccessService": {
    "core": 13,
    "setup": 22,
-   "total": 258
+   "total": 259
   },
   "AiService": {
    "core": 42,
@@ -237,7 +237,7 @@
   },
   "CatalogueService": {
    "core": 36,
-   "setup": 56,
+   "setup": 59,
    "total": 470
   },
   "FnbService": {
@@ -246,9 +246,9 @@
    "total": 138
   },
   "IdentityService": {
-   "core": 31,
+   "core": 32,
    "setup": 5,
-   "total": 101
+   "total": 102
   },
   "InventoryService": {
    "core": 1,
@@ -268,12 +268,12 @@
   "OrderService": {
    "core": 90,
    "setup": 9,
-   "total": 304
+   "total": 305
   },
   "PlatformService": {
    "core": 3,
-   "setup": 17,
-   "total": 229
+   "setup": 18,
+   "total": 234
   },
   "ReportingService": {
    "core": 8,
@@ -287,13 +287,13 @@
   },
   "TenancyService": {
    "core": 17,
-   "setup": 17,
+   "setup": 20,
    "total": 214
   },
   "VenueOpsService": {
    "core": 45,
-   "setup": 34,
-   "total": 297
+   "setup": 35,
+   "total": 298
   },
   "WalletService": {
    "core": 8,
@@ -1040,7 +1040,8 @@
    ],
    "enables": [
     "catalogue.event",
-    "catalogue.performance"
+    "catalogue.performance",
+    "catalogue.price_assignment"
    ]
   },
   "cloneProduct": {
@@ -1189,6 +1190,22 @@
    ],
    "enables": [
     "ai.assistant_profile"
+   ]
+  },
+  "configureQueueFeed": {
+   "part": "setup",
+   "service": "VenueOpsService",
+   "contract": "queue",
+   "verb": "PUT",
+   "path": "/queue-feeds/{feedId}",
+   "perm": "QUEUE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-001",
+    "BO-003"
+   ],
+   "enables": [
+    "queue.feed"
    ]
   },
   "configureWorkstation": {
@@ -1674,6 +1691,22 @@
     "fnb.delivery_location_outlet"
    ]
   },
+  "createDeviceFirmware": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "POST",
+   "path": "/device-firmware",
+   "perm": "DEVICE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-587",
+    "BO-129"
+   ],
+   "enables": [
+    "tenancy.device_firmware"
+   ]
+  },
   "createEntitlementTemplate": {
    "part": "setup",
    "service": "CatalogueService",
@@ -1719,6 +1752,7 @@
    "screens": [
     "EMP-058",
     "EMP-059",
+    "POS-012",
     "POS-022"
    ],
    "enables": []
@@ -4636,6 +4670,7 @@
    "screens": [
     "GST-001",
     "GST-039",
+    "GST-043",
     "WEB-011",
     "WEB-020"
    ],
@@ -5041,6 +5076,7 @@
    "screens": [
     "ADM-037",
     "ADM-426",
+    "BO-044",
     "BO-1064",
     "BO-1065"
    ],
@@ -5177,12 +5213,14 @@
    "path": "/seat-holds/{holdId}",
    "perm": "ORDER_VIEW",
    "platforms": [
-    "POS"
+    "POS",
+    "WEB"
    ],
    "screens": [
     "BO-987",
     "BO-999",
-    "POS-004"
+    "POS-004",
+    "WEB-007"
    ],
    "enables": []
   },
@@ -5262,6 +5300,23 @@
    ],
    "screens": [
     "CMS-104"
+   ],
+   "enables": []
+  },
+  "getSubjectDataExport": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "GET",
+   "path": "/guests/{subjectId}/data-export/{requestId}",
+   "perm": "GUEST_VIEW_PII",
+   "platforms": [
+    "MOB",
+    "WEB"
+   ],
+   "screens": [
+    "GST-066",
+    "WEB-024"
    ],
    "enables": []
   },
@@ -7035,7 +7090,6 @@
     "POS"
    ],
    "screens": [
-    "ADM-580",
     "ANL-003",
     "BO-036",
     "BO-124",
@@ -7543,21 +7597,6 @@
    ],
    "enables": []
   },
-  "listMyVisitPlans": {
-   "part": "core",
-   "service": "VenueOpsService",
-   "contract": "venue-map",
-   "verb": "GET",
-   "path": "/visit-plans",
-   "perm": null,
-   "platforms": [
-    "MOB"
-   ],
-   "screens": [
-    "GST-059"
-   ],
-   "enables": []
-  },
   "listOperationalRequirements": {
    "part": "core",
    "service": "AiService",
@@ -7630,6 +7669,7 @@
     "POS-002",
     "POS-006",
     "POS-012",
+    "POS-025",
     "POS-030",
     "PTR-002",
     "PTR-005",
@@ -7654,11 +7694,13 @@
     "ADM-006",
     "ADM-412",
     "ADM-421",
+    "ADM-540",
     "BO-055",
     "BO-064",
     "BO-068",
     "BO-145",
-    "CMS-016"
+    "CMS-016",
+    "CMS-066"
    ],
    "enables": []
   },
@@ -7871,8 +7913,10 @@
    ],
    "screens": [
     "GST-011",
+    "GST-015",
     "GST-071",
-    "WEB-021"
+    "WEB-021",
+    "WEB-023"
    ],
    "enables": []
   },
@@ -7885,7 +7929,6 @@
    "perm": "PRODUCT_VIEW",
    "platforms": [
     "MOB",
-    "POS",
     "WEB"
    ],
    "screens": [
@@ -7897,7 +7940,6 @@
     "GST-005",
     "GST-007",
     "GST-049",
-    "POS-004",
     "WEB-002",
     "WEB-004",
     "WEB-006",
@@ -7955,7 +7997,6 @@
     "WL"
    ],
    "screens": [
-    "BO-015",
     "BO-048",
     "BO-115",
     "CMS-101",
@@ -8041,6 +8082,7 @@
     "BO-094",
     "BO-125",
     "BO-877",
+    "CMS-006",
     "CMS-101",
     "CMS-103",
     "EMP-034",
@@ -8193,6 +8235,23 @@
    ],
    "enables": []
   },
+  "listQueueFeeds": {
+   "part": "core",
+   "service": "VenueOpsService",
+   "contract": "queue",
+   "verb": "GET",
+   "path": "/queue-feeds",
+   "perm": "QUEUE_MANAGE",
+   "platforms": [
+    "POS"
+   ],
+   "screens": [
+    "BO-001",
+    "BO-003",
+    "POS-029"
+   ],
+   "enables": []
+  },
   "listQueues": {
    "part": "core",
    "service": "VenueOpsService",
@@ -8202,6 +8261,7 @@
    "perm": "QUEUE_VIEW",
    "platforms": [
     "MOB",
+    "POS",
     "WEB"
    ],
    "screens": [
@@ -8212,6 +8272,7 @@
     "BO-221",
     "EMP-031",
     "GST-023",
+    "POS-025",
     "WEB-039",
     "WEB-040"
    ],
@@ -8348,6 +8409,7 @@
     "POS"
    ],
    "screens": [
+    "BO-036",
     "BO-109",
     "BO-116",
     "BO-122",
@@ -9950,7 +10012,7 @@
    "contract": "public-api",
    "verb": "POST",
    "path": "/developers",
-   "perm": "DEVELOPER_VIEW",
+   "perm": null,
    "platforms": [],
    "screens": [
     "DEV-002"
@@ -10249,7 +10311,6 @@
     "KSK-012",
     "POS-002",
     "POS-006",
-    "POS-026",
     "POS-030",
     "PTR-002",
     "PTR-005",
@@ -11413,6 +11474,23 @@
     "promotions.coupon_code"
    ]
   },
+  "setConfigurationProfile": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "PUT",
+   "path": "/configuration-profiles/{profileId}",
+   "perm": "TENANT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-1070",
+    "BO-123",
+    "BO-129"
+   ],
+   "enables": [
+    "platform.configuration_profile"
+   ]
+  },
   "setConsentPurposes": {
    "part": "core",
    "service": "MarketingService",
@@ -11566,6 +11644,21 @@
    ],
    "enables": [
     "access.credential_policy"
+   ]
+  },
+  "setDeviceFirmwareStatus": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "tenancy",
+   "verb": "POST",
+   "path": "/device-firmware/{firmwareId}/status",
+   "perm": "DEVICE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-129"
+   ],
+   "enables": [
+    "tenancy.device_firmware"
    ]
   },
   "setDunningPolicy": {
@@ -12340,6 +12433,19 @@
    ],
    "enables": []
   },
+  "setProductChannelTexts": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/products/{productId}/channel-texts",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "catalogue.product_channel_text"
+   ]
+  },
   "setProductEligibilityRule": {
    "part": "setup",
    "service": "CatalogueService",
@@ -12353,6 +12459,32 @@
    ],
    "enables": [
     "catalogue.product_eligibility_rule"
+   ]
+  },
+  "setProductOwnerForms": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/products/{productId}/owner-forms",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "catalogue.product_owner_form"
+   ]
+  },
+  "setProductSalePermissionRules": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "verb": "PUT",
+   "path": "/products/{productId}/sale-permission-rules",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "catalogue.product_sale_permission"
    ]
   },
   "setProductServicePrice": {
@@ -13399,6 +13531,7 @@
     "BO-011"
    ],
    "enables": [
+    "catalogue.variant",
     "promotions.bundle",
     "promotions.bundle_component"
    ]
@@ -13692,6 +13825,7 @@
    ],
    "screens": [
     "GST-039",
+    "GST-043",
     "WEB-011",
     "WEB-020"
    ],
@@ -14240,6 +14374,19 @@
    ],
    "enables": []
   },
+  "verifyDeveloper": {
+   "part": "setup",
+   "service": "PlatformService",
+   "contract": "public-api",
+   "verb": "POST",
+   "path": "/developers/{developerId}/verify",
+   "perm": "DEVELOPER_ADMIN",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "control.developer_account"
+   ]
+  },
   "verifyGuestEmail": {
    "part": "core",
    "service": "IdentityService",
@@ -14253,8 +14400,10 @@
    ],
    "screens": [
     "GST-010",
+    "GST-042",
     "GST-073",
     "WEB-013",
+    "WEB-016",
     "WEB-020"
    ],
    "enables": []
@@ -14442,6 +14591,9 @@
    "setResourceBookingProgress",
    "updateResourceBooking"
   ],
+  "tenancy.device_telemetry": [
+   "recordDeviceHeartbeat"
+  ],
   "wallet.gift_card": [
    "activateGiftCard",
    "blockGiftCard",
@@ -14456,6 +14608,7 @@
   "catalogue.demand_forecast",
   "catalogue.rate",
   "fnb.sold_out_item",
+  "identity.redirect_host",
   "identity.subject_holding",
   "inventory.serialised_item",
   "inventory.stock_batch",
@@ -14467,6 +14620,7 @@
   "platform.sale_board_tile_for_catalogue",
   "promotions.promotion_rule",
   "seating.seat_block_item",
+  "whitelabel.ui_string_pack",
   "workforce.attendance_amendment"
  ],
  "missingFromLineage": []

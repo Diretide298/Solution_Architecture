@@ -53,6 +53,7 @@ operations:
   - retail.shop_and_drop_line
   writes:
   - cache:idempotency
+  - retail.shop_and_drop
   - retail.shop_and_drop_line
 - operation: createMerchandise
   verb: POST

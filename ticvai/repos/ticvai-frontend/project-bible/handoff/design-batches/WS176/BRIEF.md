@@ -158,13 +158,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1061` | Platform Command Center | C | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-1062` | Tenant & Brand Context | A | 90 | 11 | 6 | 28 | 0 | 6 | — | notStarted (—) |
-| `BO-1063` | Venue-Specific Configuration | B | 92 | 0 | 6 | 17 | 0 | 0 | — | notStarted (—) |
+| `BO-1062` | Tenant & Brand Context | A | 91 | 11 | 6 | 28 | 0 | 6 | — | notStarted (—) |
+| `BO-1063` | Venue-Specific Configuration | B | 93 | 0 | 6 | 17 | 0 | 0 | — | notStarted (—) |
 | `BO-1064` | Naming, Numbering & Localization | C | 0 | 20 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 | `BO-1065` | Currency, Timezone & Channels | A | 47 | 17 | 6 | 0 | 0 | 4 | — | notStarted (—) |
 | `BO-1066` | Roles, Permissions & Masking | B | 91 | 16 | 6 | 15 | 1 | 5 | — | notStarted (—) |
 | `BO-1067` | Seat Approval Workflows | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1068` | Lifecycle & Environment Promotion | B | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (—) |
+| `BO-1068` | Lifecycle & Environment Promotion | B | 7 | 0 | 6 | 0 | 0 | 2 | — | notStarted (—) |
 | `BO-1069` | Platform Health & Observability | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1070` | Setup, Clone & Inheritance | C | 0 | 30 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 

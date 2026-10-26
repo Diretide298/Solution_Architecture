@@ -301,8 +301,11 @@ operations:
   - staff
   offline: false
   reads:
+  - platform.configuration_profile
   - platform.device
   - platform.workstation
+  - tenancy.device_firmware
+  - tenancy.device_telemetry
   writes: []
 - operation: issueDeviceCredential
   verb: POST
@@ -489,6 +492,7 @@ operations:
   - cache:idempotency
   - platform.device
   - platform.outbox
+  - tenancy.device_telemetry
 - operation: recordDeviceTamperEvent
   verb: POST
   path: /device-tamper-events

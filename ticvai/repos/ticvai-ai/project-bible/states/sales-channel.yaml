@@ -18,7 +18,8 @@ transitions:
   operation: publishChannelReadinessValidation
   trigger: operation
   guard: '`submitForApproval`, and readiness validation has no failed critical item (or `overrideWarnings`
-    for warnings only)'
+    for warnings only, by a holder of `SALES_CHANNEL_OVERRIDE` with a reason). Raises the approval request through
+    `approvals.createApprovalRequest` (kind `configurationChange`, subject `salesChannel`; ADAM CR-211)'
 - from: pendingApproval
   to: draft
   operation: publishChannelReadinessValidation
@@ -28,18 +29,22 @@ transitions:
   to: scheduled
   operation: publishChannelReadinessValidation
   trigger: operation
-  guard: '`scheduleActivation` with a future `scheduledAt`, once approved'
+  guard: '`scheduleActivation` with a future `scheduledAt` (else `422 scheduled-at-invalid`), once approved: the
+    request takes the approved `approvalRequestId` and is refused `409 approval-required` without one (ADAM CR-211)'
   requiresApproval: true
 - from: pendingApproval
   to: active
   operation: publishChannelReadinessValidation
   trigger: operation
-  guard: '`activate`, once approved'
+  guard: '`activate`, once approved: the request takes the approved `approvalRequestId` and is refused `409
+    approval-required` without one (ADAM CR-211)'
   requiresApproval: true
 - from: scheduled
   to: active
-  trigger: timer
-  guard: The scheduled activation time is reached and readiness still passes
+  trigger: job
+  guard: 'The channel activation job in the workers host, at `activationScheduledAt`, when readiness still has no
+    critical issue; otherwise the channel stays `scheduled` and the job writes the issue to `catalogue.audit_entry`
+    (ADAM CR-211)'
 - from: active
   to: suspended
   operation: publishChannelReadinessValidation
@@ -51,6 +56,10 @@ transitions:
   trigger: operation
   guard: '`activate` again after the cause is fixed'
   isReversal: true
-notes: '**A channel is created `draft` by `createChannelProfile`** and never deleted; a channel that stops
+notes: '**A move this model does not allow is `409 invalid-channel-transition`** (for example `activate` from `draft`;
+  ADAM CR-211, option A, decided 25 October 2026; CHG-R10CAT-003).
+
+
+  **A channel is created `draft` by `createChannelProfile`** and never deleted; a channel that stops
   trading stays `suspended`, which keeps its history, allocations and audit reachable. There is no terminal
   state by design.'

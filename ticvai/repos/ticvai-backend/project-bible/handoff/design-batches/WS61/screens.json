@@ -392,110 +392,65 @@
       {
        "kind": "metricTile",
        "label": "Virtual Ticket ID",
+       "operation": "getEntitlement",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.virtualTicketId"
+       "bindsTo": "Entitlement.id"
       },
       {
        "kind": "metricTile",
        "label": "Ticket Holder",
+       "operation": "getEntitlement",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.ticketHolder"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Participant",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.participant"
+       "bindsTo": "Entitlement.holderName"
       },
       {
        "kind": "metricTile",
        "label": "Product",
+       "operation": "getEntitlement",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.product"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Event",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.event"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Performance",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.performance"
+       "bindsTo": "Entitlement.productName"
       },
       {
        "kind": "metricTile",
        "label": "Venue",
+       "operation": "getEntitlement",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.venue"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Seat",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.seat"
+       "bindsTo": "Entitlement.venueName"
       },
       {
        "kind": "metricTile",
        "label": "Order",
+       "operation": "getEntitlement",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.order"
+       "bindsTo": "Entitlement.orderId"
       },
       {
        "kind": "metricTile",
        "label": "Ticket Status",
+       "operation": "getEntitlement",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.ticketStatus"
+       "bindsTo": "Entitlement.status"
       },
       {
        "kind": "metricTile",
        "label": "Usage Status",
+       "operation": "getEntitlement",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.usageStatus"
+       "bindsTo": "Entitlement.entriesUsed"
       },
       {
        "kind": "metricTile",
        "label": "Validity",
+       "operation": "getEntitlement",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.validity"
+       "bindsTo": "Entitlement.validTo"
       },
       {
        "kind": "metricTile",
        "label": "Entitlements",
+       "operation": "getEntitlement",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.entitlements"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Primary",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.mediaRole"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Secondary",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.mediaRole"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Fallback",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.mediaRole"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Temporary",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.mediaRole"
-      },
-      {
-       "kind": "metricTile",
-       "label": "Revoked historical media",
-       "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView.mediaRole"
+       "bindsTo": "Entitlement.entriesAllowed"
       },
       {
        "kind": "detailPanel",
@@ -530,19 +485,16 @@
       {
        "kind": "detailPanel",
        "label": "The selected virtual ticket credential",
-       "bindsTo": "VirtualTicketCredential360WorkspaceView",
+       "operation": "getEntitlement",
+       "bindsTo": "Entitlement",
        "columns": [
-        "VirtualTicketCredential360WorkspaceView.bindingId",
-        "VirtualTicketCredential360WorkspaceView.mediaType",
-        "VirtualTicketCredential360WorkspaceView.provider",
-        "VirtualTicketCredential360WorkspaceView.issued",
-        "VirtualTicketCredential360WorkspaceView.delivered",
-        "VirtualTicketCredential360WorkspaceView.activated",
+        "Entitlement.credentialFormat",
+        "Entitlement.mediaCode",
+        "Entitlement.issuedVia",
+        "Entitlement.mediaLinkedAt",
         "Valid From/To",
-        "VirtualTicketCredential360WorkspaceView.lastUpdate",
-        "Last presentation/use",
-        "VirtualTicketCredential360WorkspaceView.deviceReferenceWhereAppropriate",
-        "VirtualTicketCredential360WorkspaceView.status"
+        "Entitlement.lastEntryAt",
+        "Entitlement.status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Credential Wallet”, “Media Status”, “Dynamic QR Active”, “Apple Wallet Active”, “Old RFID RF-88410”, “Provide one chronological timeline”.",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §For each media show"

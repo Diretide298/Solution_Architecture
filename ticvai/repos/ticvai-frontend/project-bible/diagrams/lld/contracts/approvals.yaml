@@ -112,9 +112,11 @@ operations:
   - approvals.escalation
   - approvals.matrix
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
   writes:
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
   - platform.outbox
 - operation: cancelApprovalRequest
@@ -129,9 +131,11 @@ operations:
   - approvals.decision
   - approvals.escalation
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
   writes:
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
 - operation: createApprovalDelegation
   verb: POST
@@ -179,12 +183,14 @@ operations:
   - approvals.escalation
   - approvals.matrix
   - approvals.request
+  - approvals.request_approver
   - approvals.rule
   - cache:idempotency
   - identity.principal
   writes:
   - approvals.escalation
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
 - operation: createAutomationAutonomouAction
   verb: POST
@@ -216,12 +222,14 @@ operations:
   - approvals.escalation
   - approvals.matrix
   - approvals.request
+  - approvals.request_approver
   - approvals.rule
   - cache:idempotency
   - identity.principal
   writes:
   - approvals.decision
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
   - control.partner_agreement
   - control.partner_application
@@ -240,12 +248,14 @@ operations:
   - approvals.decision
   - approvals.escalation
   - approvals.request
+  - approvals.request_approver
   - approvals.rule
   - approvals.sla_policy
   - cache:idempotency
   writes:
   - approvals.escalation
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
   - platform.outbox
 - operation: evaluateApprovalRequirement
@@ -302,6 +312,7 @@ operations:
   - approvals.decision
   - approvals.escalation
   - approvals.request
+  - approvals.request_approver
   writes: []
 - operation: issueAccreditationBadge
   verb: POST
@@ -399,6 +410,7 @@ operations:
   - approvals.escalation
   - approvals.matrix
   - approvals.request
+  - approvals.request_approver
   writes: []
 - operation: listApprovedActionExecutions
   verb: GET
@@ -639,12 +651,14 @@ operations:
   - approvals.external_dispatch
   - approvals.external_provider
   - approvals.request
+  - approvals.request_approver
   - approvals.rule
   - cache:idempotency
   writes:
   - approvals.decision
   - approvals.external_dispatch
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
   - platform.outbox
 - operation: reopenApprovalRequest
@@ -659,10 +673,12 @@ operations:
   - approvals.decision
   - approvals.escalation
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
   writes:
   - approvals.escalation
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
 - operation: resolveApprovedActionExecution
   verb: POST
@@ -692,10 +708,12 @@ operations:
   - approvals.escalation
   - approvals.matrix
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
   writes:
   - approvals.escalation
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
   - platform.outbox
 - operation: revokeApprovalDelegation
@@ -913,10 +931,12 @@ operations:
   - approvals.escalation
   - approvals.matrix
   - approvals.request
+  - approvals.request_approver
   - approvals.rule
   - cache:idempotency
   writes:
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
   - platform.outbox
 - operation: withdrawApprovalRequest
@@ -931,8 +951,10 @@ operations:
   - approvals.decision
   - approvals.escalation
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
   writes:
   - approvals.request
+  - approvals.request_approver
   - cache:idempotency
   - platform.outbox

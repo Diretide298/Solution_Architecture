@@ -128,7 +128,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-615` | Accreditation Command Center | D | 0 | 58 | 6 | 6 | 1 | 6 | — | notStarted (—) |
+| `BO-615` | Accreditation Command Center | D | 0 | 63 | 6 | 6 | 1 | 6 | — | notStarted (—) |
 | `BO-616` | Accreditation Application Directory | D | 0 | 24 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-617` | New Accreditation Application | D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
 | `BO-618` | Accreditation Form Builder | A | 1 | 46 | 6 | 75 | 1 | 6 | — | notStarted (—) |

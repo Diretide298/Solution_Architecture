@@ -3109,7 +3109,9 @@ paths:
       operationId: listPaymentTokens
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
+        - "P01 WEB-023 Membership Management"
         - "P02 GST-011 Wallet Overview"
+        - "P02 GST-015 Memberships"
         - "P02 GST-071 Payment Methods"
       security:
       - guestAuth: []
@@ -5163,6 +5165,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+        - "P04 POS-025 Till Home"
         - "P04 POS-030 Sales Journal"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
@@ -8184,7 +8187,6 @@ paths:
         - "P02 GST-010 Booking Confirmation"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
-        - "P04 POS-026 Receipt & Reprint"
         - "P04 POS-030 Sales Journal"
         - "P05 KSK-009 Ticket issued"
         - "P05 KSK-010 Print failure"
@@ -14042,12 +14044,12 @@ paths:
   /refund-dispute-resale:
     get:
       operationId: listRefundDisputeResale
+      x-ticvai-consumed-by:
+        - "P08 ADM-295 Refunds, Disputes & Resale Exceptions"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 ADM-295 Refunds, Disputes & Resale Exceptions"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true

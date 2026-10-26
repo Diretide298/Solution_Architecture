@@ -37,6 +37,13 @@ same kind that nothing held:
                            required fields (`kind`, `text`, ...) are what a PATCH must not require.
   C-PAGED-STATUS           a cursor-paged list whose items' status can end (revoked, cancelled, expired ...) that
                            says neither which statuses it returns nor takes a status filter (ADAM CR-088, CHG-MKT-003)
+  C-PUT-KEY                a PUT whose path id carries the stock "Addresses the item this write creates or
+                           replaces" text while its description keys the write on something else (`code`, `kind`
+                           and the scope, a selector set); a path parameter promising `409 <noun>-id-mismatch` on an
+                           operation whose 409 does not list it; or a PUT with a path id whose description still says
+                           "there is no id in the path" (ADAM CR-245, CHG-R10CRF-005). The rule CR-245 decided: the
+                           path id is the record's id, a create takes it, and a mismatch with the record the natural
+                           key finds is 409 and changes nothing.
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
@@ -84,7 +91,32 @@ RULES = {
     "C-PATCH-FULL-BODY": "a PATCH body is the full resource schema with its required list (ADAM CR-089, CHG-CNS-001)",
     "C-PAGED-STATUS": "a paged list of items whose status can end (revoked, cancelled ...) that says neither which "
                       "statuses it returns nor takes a status filter (ADAM CR-088, CHG-MKT-003)",
+    "C-PUT-KEY": "a PUT keyed on a natural key whose path id carries the stock 'creates or replaces' text, a promised "
+                 "409 <noun>-id-mismatch its 409 does not list, or 'no id in the path' beside a path id (ADAM CR-245, "
+                 "CHG-R10CRF-005)",
 }
+# ADAM CR-245 (CHG-R10CRF-005): the text the 14 October shapes pass stamped on every PUT path id it added
+# (tools/applied/shp-contract-shapes-14-october/apply_noaddr.py), right only for a PUT keyed on that id.
+STOCK_ADDRESS = "Addresses the item this write creates or replaces"
+PUT_KEYED = re.compile(r"(?:\bkeyed (?:on|by)|\bmatched on)\s*(.{0,160})", re.I | re.S)
+ID_MISMATCH = re.compile(r"`409 ([a-z0-9-]+-id-mismatch)`")
+
+
+def put_natural_keys(text: str, path_names: set) -> list:
+    """The phrases of a PUT's description that key the write on something other than its path id: `keyed on|by X`
+    or `matched on X`, where X is not the record's `id` (the body's or the path's) and is not led by a path parameter
+    (a path that names the key itself, `/{formId}/{key}`, is keyed on it). "never on an id" always counts."""
+    out = []
+    for mm in PUT_KEYED.finditer(text):
+        ph = re.split(r"[.:;(]\s|\*\*|\.$", " ".join(mm.group(1).split()))[0].strip()
+        lead = re.match(r"^(?:the (?:body's|path's) )?`?([A-Za-z][A-Za-z0-9]*)`?", ph)
+        tok = lead.group(1) if lead else ""
+        if tok == "id" or tok in path_names:
+            continue
+        out.append(ph)
+    if re.search(r"never on an id", text, re.I):
+        out.append("never on an id")
+    return out
 # CHG-IDR-003: a write that says it runs the segregation check names the rule schema in its description.
 SEGREGATION = re.compile(r"\bSegregationRule\b")
 CREATES = re.compile(r"^(create|add|register|import)[A-Z]")
@@ -539,6 +571,26 @@ def extra_rules(guard, ops, docs):
                           f"declare x-ticvai-body-key")
         if m in ("put", "patch", "delete") and not path_params and not op.get("x-ticvai-singleton")                 and not (f["item"] or {}).get("x-ticvai-singleton") and not (body_key and not missing_key):
             guard.add("C-NO-ADDRESS", oid, f"{oid}: {m.upper()} {path} has no path key and is not a singleton")
+        # C-PUT-KEY (ADAM CR-245, CHG-R10CRF-005): a PUT path id says what it is against the write's key.
+        if m == "put" and path_params:
+            ptext = " ".join(str(op.get(k) or "") for k in ("description", "summary"))
+            pnodes = [n for n, _ in params if n.get("in") == "path"]
+            natural = put_natural_keys(ptext, {str(n.get("name")) for n in pnodes})
+            r409, _ = deref((op.get("responses") or {}).get("409"), doc)
+            listed = (r409.get("x-ticvai-problem-types") or []) if isinstance(r409, dict) else []
+            for n in pnodes:
+                pd = str(n.get("description") or "")
+                if pd.startswith(STOCK_ADDRESS) and natural:
+                    guard.add("C-PUT-KEY", f"{oid}:{n.get('name')}",
+                              f"{oid}: path {{{n.get('name')}}} says it addresses the item, but the write is keyed on "
+                              f"{natural[0][:80]!r}: say the path id is the record's id, a create takes it and a "
+                              f"mismatch is 409 <noun>-id-mismatch (ADAM CR-245)")
+                for t in ID_MISMATCH.findall(pd):
+                    if t not in listed:
+                        guard.add("C-PUT-KEY", f"{oid}:{t}",
+                                  f"{oid}: path {{{n.get('name')}}} promises 409 {t}, which its 409 does not list")
+            if re.search(r"there is no id in the path", ptext, re.I):
+                guard.add("C-PUT-KEY", f"{oid}:no-id", f"{oid}: says there is no id in the path, and {path} has one")
         if m in ("put", "patch", "delete") and body_name and (f["contract"], body_name) in append_only:
             guard.add("C-APPEND-ONLY", oid, f"{oid}: {m.upper()} writes {body_name}, declared append-only")
         aud = op.get("x-ticvai-audience") or []

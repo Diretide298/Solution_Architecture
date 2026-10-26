@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `catalogue`, `promotions`, `seating` |
 | Schemas owned | `catalogue`, `pricing`, `promotions`, `seating` |
-| Operations in the slice | 92 of 470 |
+| Operations in the slice | 95 of 470 |
 | Scale | Read-heavy, bundle-published to tills. The catalogue bundle is this service's output (ADR-0013). |
 | If it is down | A bad publish reaches every workstation. Versioned and rollback-able for that reason. |
 
@@ -43,7 +43,7 @@
 | catalogue | [`getMyMemberships`](#getmymemberships) | GET | `/guests/me/memberships` | core | 1 | GST-015, WEB-022, WEB-023 |
 | catalogue | [`joinWaitlist`](#joinwaitlist) | POST | `/waitlist-entries` | core | 1 | GST-007, WEB-006 |
 | catalogue | [`leaveWaitlist`](#leavewaitlist) | DELETE | `/waitlist-entries/{entryId}` | core | 1 | GST-007, WEB-006 |
-| catalogue | [`listProductCategories`](#listproductcategories) | GET | `/product-categories` | core | 1 | BO-015, BO-048, BO-115, CMS-101, CMS-103, GST-001 … |
+| catalogue | [`listProductCategories`](#listproductcategories) | GET | `/product-categories` | core | 1 | BO-048, BO-115, CMS-101, CMS-103, GST-001, GST-002 … |
 | catalogue | [`searchCatalogue`](#searchcatalogue) | GET | `/search` | core | 1 | GST-001, GST-002, GST-003, GST-063, WEB-001, WEB-002 … |
 | catalogue | [`setChannelConnectionConfiguration`](#setchannelconnectionconfiguration) | PUT | `/channel-connections/{connectionId}` | setup | 1 | ADM-269 |
 | catalogue | [`setChannelSalesRule`](#setchannelsalesrule) | PUT | `/channel-sales-rules/{ruleId}` | setup | 1 | ADM-263, ADM-264, ADM-265 |
@@ -89,7 +89,7 @@
 | events | [`setEventLifecycleState`](#seteventlifecyclestate) | POST | `/events/{eventId}/lifecycle` | setup | 1 | BO-716, BO-717 |
 | hold | [`createSeatHold`](#createseathold) | POST | `/seat-holds` | core | 1 | BO-994, GST-049, POS-004, WEB-007 |
 | hold | [`extendSeatHold`](#extendseathold) | POST | `/seat-holds/{holdId}/extend` | core | 1 | WEB-011 |
-| hold | [`getSeatHold`](#getseathold) | GET | `/seat-holds/{holdId}` | core | 1 | BO-987, BO-999, POS-004 |
+| hold | [`getSeatHold`](#getseathold) | GET | `/seat-holds/{holdId}` | core | 1 | BO-987, BO-999, POS-004, WEB-007 |
 | hold | [`relinquishSeatHold`](#relinquishseathold) | DELETE | `/seat-holds/{holdId}` | core | 1 | BO-999, GST-049, POS-004, WEB-007 |
 | lease | [`convertInventoryHold`](#convertinventoryhold) | POST | `/inventory-holds/{inventoryHoldId}/convert` | setup | 1 |  |
 | pricing | [`copyPriceList`](#copypricelist) | POST | `/price-lists/{priceListId}/copy` | setup | 1 | BO-009 |
@@ -107,7 +107,10 @@
 | product | [`resolveProductByCode`](#resolveproductbycode) | GET | `/products/resolve` | core | 1 | BO-007, BO-012, EMP-034, POS-002, POS-003, PTR-006 |
 | product | [`setAlternativeCodes`](#setalternativecodes) | PUT | `/products/{productId}/alternative-codes` | setup | 1 | BO-007, BO-012 |
 | product | [`setGroupPackageDefinition`](#setgrouppackagedefinition) | PUT | `/products/{productId}/group-package` | setup | 1 | BO-011 |
+| product | [`setProductChannelTexts`](#setproductchanneltexts) | PUT | `/products/{productId}/channel-texts` | setup | 1 |  |
 | product | [`setProductEligibilityRule`](#setproducteligibilityrule) | PUT | `/products/{productId}/eligibility-rule` | setup | 1 | BO-161 |
+| product | [`setProductOwnerForms`](#setproductownerforms) | PUT | `/products/{productId}/owner-forms` | setup | 1 |  |
+| product | [`setProductSalePermissionRules`](#setproductsalepermissionrules) | PUT | `/products/{productId}/sale-permission-rules` | setup | 1 |  |
 | product | [`updateProduct`](#updateproduct) | PATCH | `/products/{productId}` | core | 1 | BO-007, BO-008, BO-012, CMS-103 |
 | product | [`updateProductVariant`](#updateproductvariant) | PATCH | `/products/{productId}/variants/{variantId}` | setup | 1 | BO-008 |
 | promotion | [`analysePromotionConflicts`](#analysepromotionconflicts) | GET | `/promotions/{promotionId}/conflicts` | core | 1 | BO-010, POS-002 |
@@ -156,6 +159,7 @@ Every seat with its current state — available, held, sold, blocked or buffered
 | categoryId | query |  | string (uuid) |  |
 | availableOnly | query |  | boolean |  |
 | mode | query |  | enum (auto, graphical, list) | graphical requires geometry and returns coordinates. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `SeatAvailability`
 
@@ -185,6 +189,7 @@ Every seat with its current state — available, held, sold, blocked or buffered
 | byCategory[].price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | byCategory[].price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | byCategory[].price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| maxSeatsPerGuestOrder | integer |  | The most seats one guest booking may hold at this performance's venue (ADAM CR-187, 25 October 2026): the venue's VenueSettings.seating.maxSeatsPerGuestOrder (default 10, bounds 1 to 50, decided 29 S… (min 1; max 50; read-only) |
 | zones | array of object |  | The standing zones and what is left in each (r8, GPS-C38): a zone has no seats, so it is sold by quantity (createSeatHold zoneId and quantity). |
 | zones[].zoneId | string (uuid) | yes |  |
 | zones[].name | string | yes |  |
@@ -210,6 +215,7 @@ Every seat with its current state — available, held, sold, blocked or buffered
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Availability |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -281,7 +287,7 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | choiceGroups[].options[].quantity | integer |  | (default 1) |
 | choiceGroups[].options[].isDefault | boolean |  | (default False) |
 | choiceGroups[].unavailableBehaviour | enum (hideOption, hideBundle) |  | An option that has sold out for the chosen date is not offered. (default hideOption) |
-| allocation | object | yes |  |
+| allocation | object | yes | Stored as promotions.allocation_split and promotions.allocation_component, the record of the split; promotions.bundle.allocation is a copy derived from them in the same transaction (ADAM CR-110, opti… |
 | allocation.method | object | yes | Proportional to list price by default. (default proRataListPrice) |
 | allocation.components | array of AllocationComponent | yes |  |
 | allocation.components[].id | string (uuid) |  | Added 20 August. (read-only) |
@@ -338,7 +344,7 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | choiceGroups[].options[].quantity | integer |  | (default 1) |
 | choiceGroups[].options[].isDefault | boolean |  | (default False) |
 | choiceGroups[].unavailableBehaviour | enum (hideOption, hideBundle) |  | An option that has sold out for the chosen date is not offered. (default hideOption) |
-| allocation | object | yes |  |
+| allocation | object | yes | Stored as promotions.allocation_split and promotions.allocation_component, the record of the split; promotions.bundle.allocation is a copy derived from them in the same transaction (ADAM CR-110, opti… |
 | allocation.method | object | yes | Proportional to list price by default. (default proRataListPrice) |
 | allocation.components | array of AllocationComponent | yes |  |
 | allocation.components[].id | string (uuid) |  | Added 20 August. (read-only) |
@@ -359,7 +365,7 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | requiredVariantIds | array of string (uuid) |  | Products that must already be in the basket for the bundle to be sold (the setup screen's "requires another product"). (nullable) |
 | id | string (uuid) | yes |  |
 | variantId | string (uuid) |  | The catalogue variant a cart line of this bundle names (R8 blocker ORDERS-MONEY-C43, CHG-R8MIG-023): each sold bundle has a catalogue product of kind bundle with one variant, made when the bundle is… (read-only; nullable) |
-| savingsAmount | object | yes | Sum of component list prices less the bundle price. |
+| savingsAmount | object | yes | Sum of component list prices less the bundle price: the list_price captured on each promotions.allocation_component when the bundle was created, not the variants' current prices (ADAM CR-110, option… |
 | savingsAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | savingsAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | savingsAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -383,6 +389,9 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 
 A published bundle as a guest or a visitor sees it (R8 blocker ORDERS-MONEY-C32, the lead's answer A of 20 October 2026; GST-004, GST-056, WEB-008). Answers `GuestBundle`: name, description, kind, price and savings, components and choice groups, and validity, never the allocation, owner, campaign, code or whether it has been sold. A bundle in draft, unpublished or withdrawn answers 404. `getBundle` stays the staff read and is unchanged. Published catalogue data, so no permission is needed.
 
+**Read under the venue the request names** (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule for every public guest read is on `guestAuth`): the guest app or site sends `X-Venue-Id`; the server checks it is one of the tenant's venues (else 404) and reads under a read-only scope of that venue's path, so `promotions.bundle`'s venue row-level security finds the venue's bundles with no session. An anonymous guest session carries the same venue scope (CR-183).
+**What a guest sees** (ADAM CR-197, option B, decided 25 October 2026; CHG-R10CAT-002). A bundle is **published** when `promotions.bundle.variant_id` is not null (r8, CHG-R8MIG-023: "null until published"), and **withdrawn** when `is_active` is false. A guest or a visitor gets the bundle only when `variant_id` is set, `is_active` is true and now is within `valid_from` / `valid_to` (a null bound is open); any other bundle, draft, unpublished, withdrawn or out of its window, answers 404, never a reason. `variant_id` is set by the step that creates the bundle's catalogue product, the publication step of `updateBundle`. `price` and `savingsAmount` are Money in the venue's currency and scale, read with `tenancy#venueSettingsRecords`.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -392,7 +401,7 @@ A published bundle as a guest or a visitor sees it (R8 blocker ORDERS-MONEY-C32,
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` |
+| Reads | `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` |
 | Writes | - |
 | Called by | GST-004, GST-056, WEB-008 |
 
@@ -401,6 +410,7 @@ A published bundle as a guest or a visitor sees it (R8 blocker ORDERS-MONEY-C32,
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | bundleId | path | yes | string (uuid) |  |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `GuestBundle`
 
@@ -450,6 +460,7 @@ A published bundle as a guest or a visitor sees it (R8 blocker ORDERS-MONEY-C32,
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | The guest's view of the bundle. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -485,8 +496,9 @@ Use `since` to request a delta instead of a full bundle — a terminal on a slow
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| version | string | yes |  |
+| version | string | yes | The venue's bundle number: a per-venue integer, 1 for the first publish and one more than the venue's highest for each publish after, as its decimal string; unique with venueId (ADAM CR-110, option 1… |
 | venueId | string (uuid) | yes |  |
+| note | string |  | The publisher's note from publishBundle's body; BundleSummary.note (ADAM CR-110, option 1; CHG-R10CAT-010). (max length 500; read-only; nullable) |
 | publishedAt | string (date-time) |  | When the bundle was published; BundleSummary.publishedAt (CHG-R8MIG-015). (read-only; nullable) |
 | publishedBy | string (uuid) |  | Who published it; BundleSummary.publishedBy (CHG-R8MIG-015). (read-only; nullable) |
 | isDelta | boolean | yes |  |
@@ -515,6 +527,8 @@ Snapshots current catalogue state for a venue, signs it, and publishes it for te
 Publishing is the act that makes a configuration change visible at point of sale. Until a bundle is published, an edited price exists only in the back office.
 **The bundle carries the venue's sale boards** (`platform.sale_board`, every page and tile; decided 28 September, audit R129 (4)). `tenancy.updateSaleBoard` promises its changes reach terminals with the next bundle, and this is where they do: the snapshot reads the venue's sale boards with the catalogue, so a board edit is live at the till once a bundle is published and applied. Tenancy owns the boards and both modules run in `commerce`, so the snapshot reads them in bulk through the views named for Catalogue (`platform.sale_board_for_catalogue`, `platform.sale_board_page_for_catalogue`, `platform.sale_board_tile_for_catalogue`; ADR-0055 rule 2, CHG-R6G-007), never the tables raw.
 **A tile whose product cannot be sold is left out of the bundle** (decided 14 October 2026, Chinmay, ADAM CR-081; CHG-TEN-002). The board was checked against `variantsSellableAt` when it was saved, but a product can be withdrawn, archived or taken off sale after that. When the bundle is cut, a `product` tile whose product is not `isSellable` in the bundle being published is dropped from the bundle's copy of the board (the stored board keeps it), so the till never draws a button it cannot sell; the tile comes back with the first bundle in which its product is sellable again.
+
+**Version, row and publisher** (ADAM CR-110, option 1 with option 2's stale default, decided 15 October 2026; CHG-R10CAT-010). Each publish writes **one** `catalogue.published_bundle` row, the full snapshot (`isDelta` false); a terminal's delta is computed by `getLatestBundle` from its `since`. `version` is a per-venue integer, 1 for the venue's first bundle and one more than the venue's highest for each publish after, carried on the wire as its decimal string; `(venue_id, version)` is unique, so two publishes can never take one number. The row keeps `published_at` (the commit time), `published_by` (the caller) and the body's `note`, which `BundleSummary` returns. **staleAfterHours** defaults to the venue's offline policy `maxOfflineHours` (the policy saved at the venue's node, read with `tenancy#offlinePolicyRecords` by the venue's path from `tenancy#scopeRecords`; 24, the schema default, where none is saved); no second bound is configured. Signing is Ed25519 with the key `signatureKeyId` names (CHG-R8SPN-022). A `venueId` that names no venue the caller can see is 404.
 
 |  |  |
 |---|---|
@@ -563,6 +577,7 @@ Publishing is the act that makes a configuration change visible at point of sale
 |---|---|---|
 | 201 |  | Published |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | A publish is already in progress for this venue |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -574,16 +589,20 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 **This body carries neither**, so it cannot change them: it amends the name, the price, the end date and whether the bundle is on sale. The one refusal it can meet is a price that breaks the split. Under a `fixedAmount` allocation the fixed amounts must sum to the bundle price (the same rule `createBundle` answers 400 for), and a new price with an unchanged split no longer does.
 **Writes `promotions.promotion_audit`** in the same transaction, as every promotions configuration change does (entityType `bundle`, eventType `modified`, the changed fields before and after) (decided 29 September, writers pass).
 
+**Publishing a bundle** (ADAM CR-197, option B, decided 25 October 2026; CHG-R10CAT-002). `createBundle` stores a bundle unpublished: `variant_id` null and `is_active` false. The first `isActive: true` on a bundle whose `variant_id` is null is the **publication step**: in the same transaction it creates the bundle's catalogue product (kind `bundle`, its code and name the bundle's, one variant at the bundle's price; Catalogue owns `catalogue.product` and `catalogue.variant`, and Promotions runs in the same service) and writes that variant's id to `promotions.bundle.variant_id`. From then on the bundle is published: `isActive: false` withdraws it, and `isActive: true` puts it back on sale with the same product and variant. A guest sees it only while published, active and within its validity window (`getGuestBundle`).
+
+**The split** (ADAM CR-110, option 1, decided 15 October 2026; CHG-R10CAT-010). `promotions.allocation_split` and `promotions.allocation_component` are the record of the split; `promotions.bundle.allocation` is a copy derived from them in the same transaction and never read for a rule. The `fixedAmount` 400 is judged on `allocation_component.fixed_amount`. `savingsAmount` is the sum of the components' `list_price` captured on `allocation_component` when the bundle was created, less the bundle price; a later change to a variant's price does not move it. An unknown bundle, or one outside the caller's scope, is 404.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, changes rows of `promotions.bundle`, `promotions.bundle_component` that another operation creates |
+| Part of slice | setup, changes rows of `catalogue.variant`, `promotions.bundle`, `promotions.bundle_component` that another operation creates |
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` |
-| Writes | `cache:idempotency`, `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_component`, `promotions.promotion_audit` |
+| Writes | `cache:idempotency`, `catalogue.product`, `catalogue.variant`, `promotions.allocation_component`, `promotions.allocation_split`, `promotions.bundle`, `promotions.bundle_component`, `promotions.promotion_audit` |
 | Called by | BO-011 |
 
 **Parameters**
@@ -642,7 +661,7 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 | choiceGroups[].options[].quantity | integer |  | (default 1) |
 | choiceGroups[].options[].isDefault | boolean |  | (default False) |
 | choiceGroups[].unavailableBehaviour | enum (hideOption, hideBundle) |  | An option that has sold out for the chosen date is not offered. (default hideOption) |
-| allocation | object | yes |  |
+| allocation | object | yes | Stored as promotions.allocation_split and promotions.allocation_component, the record of the split; promotions.bundle.allocation is a copy derived from them in the same transaction (ADAM CR-110, opti… |
 | allocation.method | object | yes | Proportional to list price by default. (default proRataListPrice) |
 | allocation.components | array of AllocationComponent | yes |  |
 | allocation.components[].id | string (uuid) |  | Added 20 August. (read-only) |
@@ -663,7 +682,7 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 | requiredVariantIds | array of string (uuid) |  | Products that must already be in the basket for the bundle to be sold (the setup screen's "requires another product"). (nullable) |
 | id | string (uuid) | yes |  |
 | variantId | string (uuid) |  | The catalogue variant a cart line of this bundle names (R8 blocker ORDERS-MONEY-C43, CHG-R8MIG-023): each sold bundle has a catalogue product of kind bundle with one variant, made when the bundle is… (read-only; nullable) |
-| savingsAmount | object | yes | Sum of component list prices less the bundle price. |
+| savingsAmount | object | yes | Sum of component list prices less the bundle price: the list_price captured on each promotions.allocation_component when the bundle was created, not the variants' current prices (ADAM CR-110, option… |
 | savingsAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | savingsAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | savingsAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -677,6 +696,7 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 |---|---|---|
 | 200 |  | Updated |
 | 400 |  | The bundle's allocation is fixedAmount and the new price no longer equals the sum of the fixed amounts. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -716,6 +736,7 @@ Display only. A terminal shows this to a guest but does not decide a sale on it 
 | to | query |  | string (date-time) | Required with eventId. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `PerformanceAvailabilityPage`
 
@@ -742,7 +763,7 @@ Display only. A terminal shows this to a guest but does not decide a sale on it 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Availability, one row per channel capacity, by performance start |
-| 400 | BadRequest | Validation failed |
+| 400 |  | The request breaks a schema rule (validation), or names no venue (venue-required; ADAM CR-198, CHG-R10ID-022). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -853,7 +874,7 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
-| nameLocalised | object |  | The product's name in each language the venue sells in (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. (nullable) |
+| nameLocalised | object |  | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. (nullable) |
 | descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
 | venueId | string (uuid) | yes |  |
@@ -863,6 +884,7 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | responsibleDepartmentId | string (uuid) |  | Who owns this product commercially. (nullable) |
 | onSaleFrom | string (date-time) |  | 1.4.8. (nullable) |
 | onSaleTo | string (date-time) |  | Retires the product automatically. (nullable) |
+| validTo | string (date-time) |  | The last moment the product's entitlements are valid; null means the same as onSaleTo (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). (nullable) |
 | categoryId | string (uuid) |  | Taken from their fnb.product and retail.product, 20 September. (nullable) |
 | lifecycleState | ProductLifecycleState: enum (draft, inReview, approved, live, withdrawn, archived) |  |  |
 | isSellable | boolean | yes | True only when live and carried by a published bundle. (read-only) |
@@ -891,8 +913,11 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | media[].kind | enum (image, video) | yes |  |
 | media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
 | media[].displayOrder | integer |  | (default 100) |
+| media[].url | string (uri) |  | The asset's stable CDN address, for a guest card (ADAM CR-221, option A, decided 25 October 2026; CHG-R10CAT-014): the asset library's public address for the asset, set on guest-facing reads (searchC… (read-only; nullable) |
+| media[].thumbnailUrl | string (uri) |  | The asset library's thumbnail address for the asset, on the same reads and with the same rule as url (ADAM CR-221). (read-only; nullable) |
 | media[].altText | object |  | (nullable) |
 | consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
+| addOnProductIds | array of string (uuid) |  | The add-ons offered with this product, in display order (accepted 26 October 2026, Chinmay, ADAM CR-252 option A): each a kind: addOn product of the same venue (a coffee break, a working lunch, an AV… |
 | requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
 | productOwnerPrincipalId | string (uuid) |  | The product owner (29 September, data model DM3), set with setProductContextOwnership. (nullable) |
 | operationalContact | string |  | A principal id or a name, as the context screen takes it. (max length 200; nullable) |
@@ -905,6 +930,8 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | marketCode | string |  | (max length 40; nullable) |
 | salesTerritory | string |  | (max length 100; nullable) |
 | eventId | string (uuid) |  | The event this product sells admission to (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (Performance.eventId) give it dates. (nullable) |
+| createdAt | string (date-time) | yes | When the product was created (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): catalogue.product.created_at, NOT NULL DEFAULT now(), set by the server and never by a request. (read-only) |
+| updatedAt | string (date-time) |  | When the product last changed (ADAM CR-204): set by updateProduct and by every product sub-resource PUT and bulk change that versions the product; null until the first change after creation. (read-only; nullable) |
 
 **Responses**
 
@@ -1135,7 +1162,7 @@ Retail Board 2. **`listSeatCategories` existed and a product category did not** 
 | Guest callable | True |
 | Reads | `catalogue.product`, `catalogue.product_category` |
 | Writes | - |
-| Called by | BO-015, BO-048, BO-115, CMS-101, CMS-103, GST-001, GST-002, GST-007, GST-008, WEB-002, WEB-005 |
+| Called by | BO-048, BO-115, CMS-101, CMS-103, GST-001, GST-002, GST-007, GST-008, WEB-002, WEB-005 |
 
 **Parameters**
 
@@ -1143,6 +1170,7 @@ Retail Board 2. **`listSeatCategories` existed and a product category did not** 
 |---|---|---|---|---|
 | kind | query |  | enum (category, brand, collection, season, department) | Only categories of this kind (category, brand, collection, season or department). |
 | venueId | query |  | string (uuid) | Whose venue to read, for a caller with no venue (R8 blocker fix, GPS-C01 and WHITE-C05). |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Responses**
 
@@ -1183,6 +1211,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | kind | query |  | enum (product, event, attraction, bundle, membership, merchandise, menuItem) |  |
 | guidedAnswerIds | query |  | array of string (uuid) | Help me choose answers, as filters (decided 29 September, W4). |
 | pageSize | query |  | integer |  |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Responses**
 
@@ -1216,7 +1245,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| connectionId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
+| connectionId | path | yes | string (uuid) | The record's id (ADAM CR-245). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ChannelConnection`
@@ -1280,6 +1309,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Saved |
+| 409 |  | Refused, and nothing is stored. |
 | 422 |  | secretNotReference. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1708,7 +1738,7 @@ Rules: `fixedAmount` needs `amount`, `percentage` needs `percentage`, `tiered` n
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| feeId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
+| feeId | path | yes | string (uuid) | The record's id (ADAM CR-245). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `PricingFee`
@@ -2840,6 +2870,8 @@ Rules: `reject` needs `rejectionReason`; `modify` needs `humanSelectedPrice`, wh
 
 **Agreed (decided 29 September, readiness close-out).** 17 fragments of the checklist became a request (channel, action, schedule, override reason) and a response (readiness score, per-area checklist, severity-graded issues, advisory AI findings, resulting status). Actions Validate, Preview, Submit for Approval, Schedule Activation, Activate, Return for Changes and Suspend on ADM-267 are this PUT's action; a critical issue blocks activation, warnings pass only with the override permission and a mandatory reason; preview returns the effective Product -> Channel -> Customer -> Price -> Capacity -> Payment -> Fulfillment chain without activating.
 
+**Approval, override, refusals and the timer** (ADAM CR-211, option A, decided 25 October 2026; CHG-R10CAT-003). The moves are `states/sales-channel.yaml`; the view's `status` is its five values. `submitForApproval` (draft -> pendingApproval) raises an approval request through `approvals.createApprovalRequest` (kind `configurationChange`, `subjectType` `salesChannel`, `subjectContract` `catalogue`, `subjectId` the channel) and answers its id as `approvalRequestId`. `scheduleActivation` and `activate` from `pendingApproval` take that `approvalRequestId`, and are refused `409 approval-required` unless it names an approved request for this channel (read with `approvals#requestRecords`). **Warnings** pass only with `overrideWarnings` from a holder of `SALES_CHANNEL_OVERRIDE` (`x-ticvai-permission-escalated`; 403 without it) and a `reason`; a critical issue is never overridden. **Refusals**: a move the state model does not allow (for example `activate` from `draft`) is `409 invalid-channel-transition`; a blocking critical issue is `422 critical-issue-blocks-activation`; a missing reason (overriding warnings, returning for changes, suspending) is `422 reason-required`; a missing or past `scheduledAt` on `scheduleActivation` is `422 scheduled-at-invalid`. Nothing changes on a refusal. **preview** carries the effective chain in the view's `preview`, and changes nothing. **The scheduled activation** is run by the channel activation job in the workers host: at `activation_scheduled_at` it moves a `scheduled` channel to `active` when readiness still has no critical issue, and otherwise leaves it `scheduled` and writes the issue to `catalogue.audit_entry` (result `failure`).
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
@@ -2868,14 +2900,21 @@ Rules: `reject` needs `rejectionReason`; `modify` needs `humanSelectedPrice`, wh
 | action | enum (validate, preview, submitForApproval, scheduleActivation, activate, returnForChanges, suspend) |  | Publication Action (pack p.17) |
 | scheduledAt | string (date-time) |  | Activation time for scheduleActivation (nullable) |
 | reason | string |  | Reason: mandatory when overriding warnings or returning for changes (nullable) |
-| overrideWarnings | boolean |  | Proceed despite warnings (needs the override permission and a reason); critical issues cannot be overridden |
+| overrideWarnings | boolean |  | Proceed despite warnings (needs SALES_CHANNEL_OVERRIDE and a reason; ADAM CR-211); critical issues cannot be overridden |
+| approvalRequestId | string (uuid) |  | The approved approval request submitForApproval raised; required by scheduleActivation and activate from pendingApproval, which are refused 409 approval-required without an approved one (ADAM CR-211). (nullable) |
 
 **Response**: `ChannelPublicationReadinessAiValidationView`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | channelId | string |  | Channel: the configured channel's ID from the Sales Channel Command Center (ADM-258) |
-| status | string |  | Status after the action: draft, configuration, validation, approved, scheduled, active, suspended, disabled or archived (the pack's suggested lifecycle, p.5) |
+| status | enum (draft, pendingApproval, scheduled, active, suspended) |  | Status after the action: the channel's SalesChannelProfile.status, the five values of the state model and the DDL (ADAM CR-211, option A; CHG-R10CAT-003). |
+| approvalRequestId | string (uuid) |  | The approval request submitForApproval raised, to send back with scheduleActivation or activate once approved (ADAM CR-211). (nullable) |
+| preview | object |  | The effective chain preview returns, Product -> Channel -> Customer -> Price -> Capacity -> Payment -> Fulfillment, one step per link in that order; null for any other action (ADAM CR-211). (nullable) |
+| preview.steps | array of object |  |  |
+| preview.steps[].stage | enum (product, channel, customer, price, capacity, payment, fulfillment) | yes |  |
+| preview.steps[].summary | string |  | What is in effect at this link for the channel. |
+| preview.steps[].result | enum (passed, warning, failed, notRequired) |  |  |
 | readinessScore | number |  | Channel Readiness % (min 0; max 100) |
 | checklist | array of object |  | Readiness Checklist (pack p.16) with each area's score (p.17) |
 | checklist[].area | enum (channelProfile, products, pricing, capacity, schedule, eligibility, salesRules, payment, …) |  |  |
@@ -2893,6 +2932,9 @@ Rules: `reject` needs `rejectionReason`; `modify` needs `humanSelectedPrice`, wh
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Channel Publication, Readiness & AI Validation |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 409 |  | The action is a move states/sales-channel.yaml does not allow from the channel's status (invalid-channel-transition), or scheduleActivation / activate from pendingApproval without an approved approva… |
+| 422 |  | A critical readiness issue blocks the move (critical-issue-blocks-activation); the reason is missing where it is mandatory (reason-required); or scheduledAt is missing or in the past on scheduleActiv… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setBookingVelocityTime
@@ -3005,6 +3047,8 @@ Rules: `reject` needs `rejectionReason`; `modify` needs `humanSelectedPrice`, wh
 
 **Agreed (decided 29 September, readiness close-out).** six fee amounts became fee-profile references (the Fee Engine owns amounts); 7 payment and 11 fulfilment fields became two enum lists; the per-channel example fields dropped; print-at-home, voucher, API delivery and bulk CSV added as fulfilment methods; validationIssues added. Saving exposes only methods approved in Payment and Ticket Media; an incompatible combination is reported in validationIssues and blocks readiness.
 
+**How each validation issue is found** (ADAM CR-212, option A, decided 25 October 2026; CHG-R10CAT-004). **paymentMethodNotApproved**: a method in `paymentMethods` (by kind: `card`, `cash`, `digitalWallet` and `paymentLink` as named, `accountCredit` as `storedValue`, `b2bCredit` as `onAccount`) or in `otherPaymentMethodCodes` (by code) that is not among the channel's venue's approved methods, asked of the payments module with `payments#approvedPaymentMethods` in process. **mediaProfileMissing**: an `rfid`, `nfc` or `wristband` fulfilment method with no active `access.media_encoding_profile` for the channel's venue, read in process with `access#mediaEncodingProfileRecords` (a granted read, XDR-002). **feeProfileMissing**: each `fees[].feeType` maps to `catalogue.fee.fee_type` (`booking` -> `bookingFee`, `transaction` -> `transactionFee`, `channel` -> `channelFee`, `service` -> `serviceFee`, `delivery` -> `deliveryFee`, `payment` -> `paymentFee`), and a referenced `feeProfileId` must name a `catalogue.fee` that exists, is of that type and is `active` (`CatalogueConfigStatus`); otherwise `feeProfileMissing`. The issues are answered in `validationIssues`; the configuration is still saved, and readiness is blocked until they are fixed.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
@@ -3030,8 +3074,8 @@ Rules: `reject` needs `rejectionReason`; `modify` needs `humanSelectedPrice`, wh
 |---|---|---|---|
 | channelId | string |  | Channel ID |
 | fees | array of object |  | Fee Associations (pack p.14-15): which approved fee profile applies for each fee type; amounts are the Pricing/Fee Engine's |
-| fees[].feeType | enum (booking, transaction, channel, service, delivery, payment) |  |  |
-| fees[].feeProfileId | string |  |  |
+| fees[].feeType | enum (booking, transaction, channel, service, delivery, payment) |  | Maps to catalogue.fee.fee_type: booking -> bookingFee, transaction -> transactionFee, channel -> channelFee, service -> serviceFee, delivery -> deliveryFee, payment -> paymentFee (ADAM CR-212). |
+| fees[].feeProfileId | string |  | A catalogue.fee of the mapped type that is active, else feeProfileMissing (ADAM CR-212). |
 | paymentMethods | array of enum (card, cash, digitalWallet, paymentLink, accountCredit, b2bCredit) |  | Payment Methods the channel may expose (pack p.15) |
 | otherPaymentMethodCodes | array of string |  | Other configured payment methods, by their Payment configuration code |
 | fulfillmentMethods | array of enum (digitalTicket, email, mobileApp, appleGoogleWallet, printAtHome, posPrint, kioskPrint, rfid, …) |  | Fulfillment Methods (pack p.15-16; bulkCsvExport is the pre-generated ticket batch for partners that do not integrate, MoM 31 Aug §4.3) |
@@ -3043,8 +3087,8 @@ Rules: `reject` needs `rejectionReason`; `modify` needs `humanSelectedPrice`, wh
 |---|---|---|---|
 | channelId | string |  | Channel ID |
 | fees | array of object |  | Fee Associations (pack p.14-15): which approved fee profile applies for each fee type; amounts are the Pricing/Fee Engine's |
-| fees[].feeType | enum (booking, transaction, channel, service, delivery, payment) |  |  |
-| fees[].feeProfileId | string |  |  |
+| fees[].feeType | enum (booking, transaction, channel, service, delivery, payment) |  | Maps to catalogue.fee.fee_type: booking -> bookingFee, transaction -> transactionFee, channel -> channelFee, service -> serviceFee, delivery -> deliveryFee, payment -> paymentFee (ADAM CR-212). |
+| fees[].feeProfileId | string |  | A catalogue.fee of the mapped type that is active, else feeProfileMissing (ADAM CR-212). |
 | paymentMethods | array of enum (card, cash, digitalWallet, paymentLink, accountCredit, b2bCredit) |  | Payment Methods the channel may expose (pack p.15) |
 | otherPaymentMethodCodes | array of string |  | Other configured payment methods, by their Payment configuration code |
 | fulfillmentMethods | array of enum (digitalTicket, email, mobileApp, appleGoogleWallet, printAtHome, posPrint, kioskPrint, rfid, …) |  | Fulfillment Methods (pack p.15-16; bulkCsvExport is the pre-generated ticket batch for partners that do not integrate, MoM 31 Aug §4.3) |
@@ -3763,6 +3807,10 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 
 **`POST /entitlement-templates`**: Create an entitlement template
 
+**Where the template is written** (ADAM CR-217, option A, decided 25 October 2026; CHG-R10CAT-001). `catalogue.entitlement_template.scope_path` is set by the server, never taken from the body: it is the path of the caller's working venue (the session's venue id), read with `tenancy#scopeRecords` by id. Catalogue never reads `platform.scope` raw (ADR-0055 rule 2 as amended). **A session with no working venue** (a head-office or region caller) is `403 working-venue-required`, and nothing is written; giving such a caller a venue in the body waits for its own decision.
+
+**includedValue** is common Money, and the column keeps the amount only (ADR-0018; naming-and-style 5.1): its currency and scale are the venue's (`tenancy#venueSettingsRecords`, by the working venue's id). A request whose `includedValue.currency` or `scale` differs from the venue's is `400 venue-currency-mismatch` or `venue-scale-mismatch`, and nothing is written. The 201 answers includedValue in the venue's currency and scale.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_CONFIGURE` |
@@ -3897,6 +3945,8 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 400 |  | includedValue is in another currency or scale than the working venue's (venue-currency-mismatch, venue-scale-mismatch). |
+| 403 |  | The session has no working venue, so the template has no venue to be written under (working-venue-required); or the caller lacks PRODUCT_CONFIGURE at the venue. |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -3905,6 +3955,10 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 **`PUT /entitlement-templates/{templateId}/blackout-dates`**: Set the dates a product's entitlement does not admit
 
 **Blackouts from the closures screen** (design-notes correction on BO-019, Block B: "No operation sets product blackout dates or a venue closure day; the screen only cancels performances and closes paths. Blackouts live on entitlement templates (blackoutDates) and are edited on BO-012; a closures screen needs a write for them"; DI-452; CHG-CSP-051). Replaces `EntitlementTemplate.blackoutDates` of one template, which until now could be set only when the template was created. An annual pass that excludes public holidays is the usual case. Applies to entitlements issued from the template from now on and to existing ones at their next validation; a date already admitted on is not undone. A whole-venue closure day is the access operating calendar's (`setOperatingCalendarEntry` with `venueClosed`).
+
+**includedValue in the answer** (ADAM CR-235, option A with CR-217, decided 25 October 2026; CHG-R10CAT-001). The 200 is the whole template, and its includedValue is answered in its venue's currency and scale: the template keeps only its `scope_path`, so Catalogue asks `tenancy#scopeRecords` by that path for the venue node, then `tenancy#venueSettingsRecords` by the venue's id. It is never guessed from the caller's working venue, and a template with includedValue is answered, not refused.
+
+**The audit row** (confirmed as built, ADAM CR-235): one `catalogue.audit_entry` with domain `product`, action `updated`, category `validity`, entity_type `entitlementTemplate`, entity id the template's, field `blackoutDates`, previous_value and new_value the two lists as JSON arrays, `reason` the body's, scope_path the template's, and actor_principal_id the caller.
 
 |  |  |
 |---|---|
@@ -4103,6 +4157,8 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 
 **`POST /events`**: Create an event
 
+**`parentEventId`, the group an event belongs to** (accepted 26 October 2026, Chinmay, ADAM CR-256 option A). It must name an existing event the caller can see, at the same venue; not the event itself; and one level only: a parent has no parent, and an event that is a parent cannot be given one. Otherwise `400 validation` on `parentEventId`. The key `catalogue.event.parent_event_id` -> `catalogue.event` is declared.
+
 |  |  |
 |---|---|
 | Permission | `EVENT_CONFIGURE` |
@@ -4144,12 +4200,16 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | isActive | boolean |  |  |
 | lifecycleState | enum (draft, planned, onSale, live, closed, cancelled, archived) |  | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). (read-only) |
 | lifecycleStateChangedAt | string (date-time) |  | (read-only; nullable) |
+| scheduledLifecycleState | enum (draft, planned, onSale, live, closed, cancelled, archived) |  | A move waiting for its effectiveFrom (ADAM CR-109, option 2; CHG-R10CAT-009): written by setEventLifecycleState when effectiveFrom is in the future, applied and cleared by the event lifecycle job in… (read-only; nullable) |
+| scheduledLifecycleAt | string (date-time) |  | When the waiting move is applied (the request's effectiveFrom; ADAM CR-109). (read-only; nullable) |
+| scheduledLifecycleReason | string |  | The reason given with the waiting move, carried on event.lifecycleChanged when it is applied (ADAM CR-109). (max length 500; read-only; nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 400 |  | Validation failed (validation), with errors[] naming the field. |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -4286,6 +4346,8 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a published performance, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
+**Published follows the event's lifecycle** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011): a performance is published when its event's `lifecycleState` is `onSale` or `live`, as `listEvents` shows a guest; `Performance.status` has no draft value and does not decide it. Any other performance answers a guest 404.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
@@ -4306,6 +4368,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | performanceId | path | yes | string (uuid) |  |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `Performance`
 
@@ -4328,6 +4391,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Performance |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -4339,6 +4403,8 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 **Polled by the waiting page, answered from the edge's cache** for a few seconds at a time (`pollAfterSeconds` says when to ask again). Reads the Redis counters only.
 
 **Admitted, it carries the admission token** (`WaitingRoomAdmission`): short-lived and signed, naming the tenant, the performance, its expiry and a unique id; the signing key is a Key Vault secret. The client sends it as `X-Admission-Token` on `orders.addCartLine`, which forwards it to `acquireInventoryHold`; both refuse a missing or invalid token `403 admission-required` for a performance whose room is on. The admitted answer is never cached at the edge.
+
+**On the guest web the edge also sets the token as an HttpOnly, short-lived, per-performance cookie** on the admitted answer (ADR-0066 amendment of 25 October 2026, ADAM CR-216): the browser sends it with `addCartLine` and the page stores nothing, so a reload or a second tab stays admitted. **A `404` for a performance the caller knows means the entry is gone** (evicted, or the room restarted): the guest re-enters with `enterWaitingRoom`.
 
 |  |  |
 |---|---|
@@ -4413,6 +4479,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | venueId | query |  | string (uuid) | Whose venue to read, for a caller with no venue (as listProductCategories; GPS-C30). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -4429,6 +4496,9 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | items[].isActive | boolean |  |  |
 | items[].lifecycleState | enum (draft, planned, onSale, live, closed, cancelled, archived) |  | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). (read-only) |
 | items[].lifecycleStateChangedAt | string (date-time) |  | (read-only; nullable) |
+| items[].scheduledLifecycleState | enum (draft, planned, onSale, live, closed, cancelled, archived) |  | A move waiting for its effectiveFrom (ADAM CR-109, option 2; CHG-R10CAT-009): written by setEventLifecycleState when effectiveFrom is in the future, applied and cleared by the event lifecycle job in… (read-only; nullable) |
+| items[].scheduledLifecycleAt | string (date-time) |  | When the waiting move is applied (the request's effectiveFrom; ADAM CR-109). (read-only; nullable) |
+| items[].scheduledLifecycleReason | string |  | The reason given with the waiting move, carried on event.lifecycleChanged when it is applied (ADAM CR-109). (max length 500; read-only; nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -4461,7 +4531,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.performance`, `catalogue.product`, `catalogue.product_category` |
 | Writes | - |
-| Called by | BO-015, BO-019, BO-725, GST-003, GST-004, GST-005, GST-007, GST-049, POS-004, WEB-002, WEB-004, WEB-006, WEB-007 |
+| Called by | BO-015, BO-019, BO-725, GST-003, GST-004, GST-005, GST-007, GST-049, WEB-002, WEB-004, WEB-006, WEB-007 |
 
 **Parameters**
 
@@ -4474,6 +4544,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | language | query |  | string | Only performances given in this language, e.g. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -4499,12 +4570,15 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Performances, by startsAt ascending with id as the tiebreak — the order a date-and-performance picker shows them in, and the key the cursor pages on. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateEvent
 
 **`PATCH /events/{eventId}`**: Amend an event
+
+**`parentEventId`, the group an event belongs to** (accepted 26 October 2026, Chinmay, ADAM CR-256 option A). It must name an existing event the caller can see, at the same venue; not the event itself; and one level only: a parent has no parent, and an event that is a parent cannot be given one. Otherwise `400 validation` on `parentEventId`. The key `catalogue.event.parent_event_id` -> `catalogue.event` is declared. Sending `null` takes the event out of its group.
 
 |  |  |
 |---|---|
@@ -4547,12 +4621,16 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | isActive | boolean |  |  |
 | lifecycleState | enum (draft, planned, onSale, live, closed, cancelled, archived) |  | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). (read-only) |
 | lifecycleStateChangedAt | string (date-time) |  | (read-only; nullable) |
+| scheduledLifecycleState | enum (draft, planned, onSale, live, closed, cancelled, archived) |  | A move waiting for its effectiveFrom (ADAM CR-109, option 2; CHG-R10CAT-009): written by setEventLifecycleState when effectiveFrom is in the future, applied and cleared by the event lifecycle job in… (read-only; nullable) |
+| scheduledLifecycleAt | string (date-time) |  | When the waiting move is applied (the request's effectiveFrom; ADAM CR-109). (read-only; nullable) |
+| scheduledLifecycleReason | string |  | The reason given with the waiting move, carried on event.lifecycleChanged when it is applied (ADAM CR-109). (max length 500; read-only; nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 400 |  | Validation failed (validation), with errors[] naming the field. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updatePerformance
@@ -4627,15 +4705,25 @@ Moving a performance that has sold tickets is refused. Use cancellation, which n
 
 Event board 1.3. **Most events are last year's event**, and the question is never whether to clone but what to bring: the schedule, the prices, the seat map, the resource plan, the staff roster — rarely all of them, and never the sales.
 
+**What each `include` copies** (ADAM CR-109, option 2, accepted 15 October 2026; CHG-R10CAT-009). The copy is a new `catalogue.event` in `draft`, and only Catalogue's own rows are copied:
+- `schedule`: the `catalogue.event_schedule` row and every `catalogue.performance` of the source that is not cancelled, each as a new performance in `scheduled`. With `capacityProfile` too, each copied performance gets its `catalogue.channel_capacity` rows with `sold` and `leased` 0 and `remaining` equal to `capacity`.
+- `pricing`: the `catalogue.price_assignment` rows whose `event_id` is the source, with `event_id` the copy; the price lists and prices they point at are shared, not copied.
+- `capacityProfile`: the `catalogue.event_capacity_profile` rows (the event's, and with `schedule` each copied performance's).
+- `seatMap`: the copied capacity profiles keep the source's `seat_map_id`, a reference to Seating's map, never a copy of it (without `seatMap` it is null on the copy).
+- `resourceRequirements`: the `catalogue.event_resource_plan` row's requirements and contractors, with nothing secured (`securedCount` 0, no `bookingIds`) and readiness worked out again.
+- `registrationForm`: the `catalogue.event_registration` row, naming the same form.
+- `staffPlan` and `accessRules` are another module's data (Workforce and Access) and have no route yet; asked for, they are refused `422 include-not-routed` and nothing is copied.
+**shiftDatesByDays** moves, by that many days, every copied time: the performances' `starts_at` and `ends_at`, the schedule's performance times, the resource requirements' `from` and `to`, and the price assignments' `effective_from` and `effective_to`. Sales, holds and orders are never copied. An unknown source event, or one outside the caller's scope, is 404.
+
 |  |  |
 |---|---|
 | Permission | `EVENT_CONFIGURE` |
 | Scope level | venue |
-| Part of slice | setup, makes `catalogue.event`, `catalogue.performance` non-empty |
+| Part of slice | setup, makes `catalogue.event`, `catalogue.performance`, `catalogue.price_assignment` non-empty |
 | Wave | 1 |
 | Offline | no |
-| Reads | `cache:idempotency`, `catalogue.event`, `catalogue.event_capacity_profile`, `catalogue.event_registration`, `catalogue.event_resource_plan`, `catalogue.event_schedule`, `catalogue.performance` |
-| Writes | `cache:idempotency`, `catalogue.event`, `catalogue.event_capacity_profile`, `catalogue.event_registration`, `catalogue.event_resource_plan`, `catalogue.event_schedule`, `catalogue.performance` |
+| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.event`, `catalogue.event_capacity_profile`, `catalogue.event_registration`, `catalogue.event_resource_plan`, `catalogue.event_schedule`, `catalogue.performance`, `catalogue.price_assignment` |
+| Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.event`, `catalogue.event_capacity_profile`, `catalogue.event_registration`, `catalogue.event_resource_plan`, `catalogue.event_schedule`, `catalogue.performance`, `catalogue.price_assignment` |
 | Called by | BO-696 |
 
 **Parameters**
@@ -4666,15 +4754,22 @@ Event board 1.3. **Most events are last year's event**, and the question is neve
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Cloned as a draft |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 422 |  | include names staffPlan or accessRules, another module's data with no route yet (ADAM CR-109). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setEventLifecycleState
 
 **`POST /events/{eventId}/lifecycle`**: Draft, planned, on sale, live, closed, cancelled
 
-Event boards 7.2 and 7.3. **The transitions are the product.** Going on sale requires a price, a capacity and a schedule; going live requires a resource plan; cancelling requires a treatment for everybody who bought.
-A change request above a configured impact routes through `approvals` — moving a sold-out performance is not a decision one person makes at a desk.
+Event boards 7.2 and 7.3. **The transitions are the product.** Going on sale requires a price, a capacity and a schedule; going live requires a resource plan.
+
+**The state model is `states/event.yaml`** (ADAM CR-109, option 2, accepted 15 October 2026; CHG-R10CAT-009): the moves allowed, and each precondition against named columns. A move it does not allow is `409 invalid-event-transition`; a move whose preconditions fail is `409 event-preconditions-not-met`, listing each one missing. **Cancelling** is refused `409 event-has-sales` while any performance of the event that is not cancelled has sales (`catalogue.channel_capacity.sold` above 0); cancelling the event cancels none of its performances, and each performance is cancelled with its own treatment through `cancelPerformance` (the approved screen has only Move to, Reason and Effective from, so this body carries no treatment). Each move writes `event.lifecycleChanged` to the outbox in the same transaction.
+
+**effectiveFrom.** Null or not in the future: the move is made now. In the future: the move is checked now, kept on the event (`scheduledLifecycleState`, `scheduledLifecycleAt`, `scheduledLifecycleReason`; a later request replaces it), and applied at that time by the event lifecycle job in the workers host, which checks the preconditions again and, if they no longer hold, clears the scheduled move and changes nothing else. The 200 answers the event as it is after the request.
+
+**Approval routing above a configured impact waits for its threshold** (CR-109): nothing routes through `approvals` yet. An unknown event, or one outside the caller's scope, is 404.
 
 |  |  |
 |---|---|
@@ -4683,9 +4778,10 @@ A change request above a configured impact routes through `approvals` — moving
 | Part of slice | setup, makes `catalogue.event`, `catalogue.performance` non-empty |
 | Wave | 1 |
 | Offline | no |
-| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.event`, `catalogue.event_capacity_profile`, `catalogue.event_resource_plan`, `catalogue.event_schedule`, `catalogue.performance`, `catalogue.price_list` |
+| Reads | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.event`, `catalogue.event_capacity_profile`, `catalogue.event_resource_plan`, `catalogue.event_schedule`, `catalogue.performance`, `catalogue.price`, `catalogue.price_list`, `catalogue.product`, `catalogue.variant` |
 | Writes | `cache:idempotency`, `catalogue.event`, `catalogue.performance`, `platform.outbox` |
 | Called by | BO-716, BO-717 |
+| State model | Event lifecycle ([states/event.yaml](../../../states/event.yaml)): moves `draft` -> `planned`, `planned` -> `draft`, `planned` -> `onSale`, `onSale` -> `planned`, `onSale` -> `live`, `live` -> `closed`, `closed` -> `archived`, `draft` -> `cancelled`, `planned` -> `cancelled`, `onSale` -> `cancelled`, `cancelled` -> `archived` |
 
 **Parameters**
 
@@ -4698,16 +4794,35 @@ A change request above a configured impact routes through `approvals` — moving
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| state | enum (draft, planned, onSale, live, closed, cancelled, archived) | yes |  |
-| reason | string |  | (nullable) |
-| effectiveFrom | string (date-time) |  | (nullable) |
+| state | enum (draft, planned, onSale, live, closed, cancelled, archived) | yes | The state to move to: written to lifecycle_state now, or to scheduled_lifecycle_state while the move waits for its effectiveFrom (ADAM CR-109). |
+| reason | string |  | Carried on event.lifecycleChanged; kept as scheduledLifecycleReason while a move waits for its effectiveFrom. (max length 500; nullable) |
+| effectiveFrom | string (date-time) |  | In the future, the move is scheduled and the event lifecycle job applies it then (ADAM CR-109); otherwise it is made now. (nullable) |
+
+**Response**: `Event`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| code | string | yes |  |
+| name | string | yes |  |
+| venueId | string (uuid) | yes |  |
+| scopePath | string | yes |  |
+| parentEventId | string (uuid) |  | For grouped events. (nullable) |
+| performanceCount | integer |  | How many performances the event has. (read-only) |
+| isActive | boolean |  |  |
+| lifecycleState | enum (draft, planned, onSale, live, closed, cancelled, archived) |  | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). (read-only) |
+| lifecycleStateChangedAt | string (date-time) |  | (read-only; nullable) |
+| scheduledLifecycleState | enum (draft, planned, onSale, live, closed, cancelled, archived) |  | A move waiting for its effectiveFrom (ADAM CR-109, option 2; CHG-R10CAT-009): written by setEventLifecycleState when effectiveFrom is in the future, applied and cleared by the event lifecycle job in… (read-only; nullable) |
+| scheduledLifecycleAt | string (date-time) |  | When the waiting move is applied (the request's effectiveFrom; ADAM CR-109). (read-only; nullable) |
+| scheduledLifecycleReason | string |  | The reason given with the waiting move, carried on event.lifecycleChanged when it is applied (ADAM CR-109). (max length 500; read-only; nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Moved |
-| 409 |  | Preconditions for the transition are not met; they are listed |
+| 200 |  | Moved, or scheduled for effectiveFrom; the event as it is now |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The preconditions for the move are not met, each listed (event-preconditions-not-met); the move is not one states/event.yaml allows (invalid-event-transition); or a cancel while a performance of the… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -4863,7 +4978,7 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 | Guest callable | True |
 | Reads | `seating.seat_reservation` |
 | Writes | - |
-| Called by | BO-987, BO-999, POS-004 |
+| Called by | BO-987, BO-999, POS-004, WEB-007 |
 
 **Parameters**
 
@@ -4905,7 +5020,7 @@ For a guest still completing payment. Bounded by the venue's maximum, so a hold 
 
 Releases buffered neighbours alongside the held seats.
 
-**A guest may release their own hold** (decided 29 September, readiness close-out; the seat-map time bar on WEB-007 / GST-049 lets a guest give seats back before the hold runs out rather than leaving them locked until `expiresAt`). On a guest channel only a hold the same guest session or subject placed with `createSeatHold` can be released; any other hold answers `404`, as anything outside the caller's scope does, so hold ids cannot be probed. A hold already converted to an order, released or expired answers `409` `holdNotActive`. Staff at a till keep releasing any hold at their venue under `ORDER_CREATE`.
+**A guest may release their own hold** (decided 29 September, readiness close-out; the seat-map time bar on WEB-007 / GST-049 lets a guest give seats back before the hold runs out rather than leaving them locked until `expiresAt`). On a guest channel only a hold the same guest session or subject placed with `createSeatHold` can be released; any other hold answers `404`, as anything outside the caller's scope does, so hold ids cannot be probed. A hold already converted to an order, released or expired answers `409` `hold-not-active`. Staff at a till keep releasing any hold at their venue under `ORDER_CREATE`.
 
 |  |  |
 |---|---|
@@ -4934,7 +5049,7 @@ Releases buffered neighbours alongside the held seats.
 |---|---|---|
 | 204 |  | Released |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | The hold is no longer active (holdNotActive) - converted to an order, already released or expired. |
+| 409 |  | The hold is no longer active (hold-not-active) - converted to an order, already released or expired. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -5422,6 +5537,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | productId | path | yes | string |  |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `GroupPackageDefinition`
 
@@ -5449,6 +5565,7 @@ Checks a party's declared ages and heights against every product in the booking 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | The current setting |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -5480,6 +5597,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | productId | path | yes | string (uuid) |  |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `Product`
 
@@ -5490,7 +5608,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
-| nameLocalised | object |  | The product's name in each language the venue sells in (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. (nullable) |
+| nameLocalised | object |  | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. (nullable) |
 | descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
 | venueId | string (uuid) | yes |  |
@@ -5500,6 +5618,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | responsibleDepartmentId | string (uuid) |  | Who owns this product commercially. (nullable) |
 | onSaleFrom | string (date-time) |  | 1.4.8. (nullable) |
 | onSaleTo | string (date-time) |  | Retires the product automatically. (nullable) |
+| validTo | string (date-time) |  | The last moment the product's entitlements are valid; null means the same as onSaleTo (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). (nullable) |
 | categoryId | string (uuid) |  | Taken from their fnb.product and retail.product, 20 September. (nullable) |
 | lifecycleState | ProductLifecycleState: enum (draft, inReview, approved, live, withdrawn, archived) |  |  |
 | isSellable | boolean | yes | True only when live and carried by a published bundle. (read-only) |
@@ -5528,8 +5647,11 @@ Checks a party's declared ages and heights against every product in the booking 
 | media[].kind | enum (image, video) | yes |  |
 | media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
 | media[].displayOrder | integer |  | (default 100) |
+| media[].url | string (uri) |  | The asset's stable CDN address, for a guest card (ADAM CR-221, option A, decided 25 October 2026; CHG-R10CAT-014): the asset library's public address for the asset, set on guest-facing reads (searchC… (read-only; nullable) |
+| media[].thumbnailUrl | string (uri) |  | The asset library's thumbnail address for the asset, on the same reads and with the same rule as url (ADAM CR-221). (read-only; nullable) |
 | media[].altText | object |  | (nullable) |
 | consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
+| addOnProductIds | array of string (uuid) |  | The add-ons offered with this product, in display order (accepted 26 October 2026, Chinmay, ADAM CR-252 option A): each a kind: addOn product of the same venue (a coffee break, a working lunch, an AV… |
 | requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
 | productOwnerPrincipalId | string (uuid) |  | The product owner (29 September, data model DM3), set with setProductContextOwnership. (nullable) |
 | operationalContact | string |  | A principal id or a name, as the context screen takes it. (max length 200; nullable) |
@@ -5542,11 +5664,14 @@ Checks a party's declared ages and heights against every product in the booking 
 | marketCode | string |  | (max length 40; nullable) |
 | salesTerritory | string |  | (max length 100; nullable) |
 | eventId | string (uuid) |  | The event this product sells admission to (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (Performance.eventId) give it dates. (nullable) |
+| createdAt | string (date-time) | yes | When the product was created (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): catalogue.product.created_at, NOT NULL DEFAULT now(), set by the server and never by a request. (read-only) |
+| updatedAt | string (date-time) |  | When the product last changed (ADAM CR-204): set by updateProduct and by every product sub-resource PUT and bulk change that versions the product; null until the first change after creation. (read-only; nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Product |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -5576,6 +5701,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | productId | path | yes | string |  |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `ProductEligibilityRule`
 
@@ -5601,6 +5727,7 @@ Checks a party's declared ages and heights against every product in the booking 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | The current setting |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
@@ -5611,6 +5738,7 @@ Checks a party's declared ages and heights against every product in the booking 
 **`GET /products/{productId}/alternative-codes`**: External identifiers for a product
 
 Partners and distributors use their own SKUs. Mapping them here means an inbound order can be matched without asking a partner to change their catalogue.
+**Order.** Sorted by `code` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -5666,6 +5794,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | kind | query |  | enum (school, party) |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -5707,6 +5836,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the published variants of a published product, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 **Each variant carries its list price** (20 October 2026, R8 blocker cause GPS-C27; CHG-R8SPN-028): `listPrice` is the price the guest listing shows for the variant on the caller's channel at this moment, in the venue's currency, resolved by the same price-list rule as `searchCatalogue`'s `fromPrice` and the `variantListingFacts` query's `listPrice`. It is what GST-008's stepper, GST-050, GST-075's price per length and WEB-005 show. It is the list price only: the total a guest pays is still decided at the basket by `promotions.evaluatePromotions` (offers, bundles) and tax is shown as the listing shows it. The channel is the caller's (`web` for the storefront, `mobile` for the guest app, from the credential or, for a visitor, the `channel` parameter); null where no price list prices the variant on that channel.
 **Order.** Sorted by `name` ascending, then by `id`.
+Where `name` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -5731,6 +5861,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | channel | query |  | Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) | The channel listPrice is priced for (GPS-C27, CHG-R8SPN-028). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -5739,6 +5870,8 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | items | array of ProductVariant | yes |  |
 | items[].id | string (uuid) | yes |  |
 | items[].listPrice | Money |  | The list price on the caller's channel now, resolved on read from the price lists (listProductVariants; R8 blocker cause GPS-C27, CHG-R8SPN-028). (read-only; nullable) |
+| items[].referencePrice | Money |  | The price a saving is measured against (accepted 26 October 2026, Chinmay, ADAM CR-253 option C), set by the back office on the variant (updateProductVariant). (nullable) |
+| items[].savingPercent | integer |  | Computed by the server, never in the browser (ADAM CR-253): with a referencePrice and a listPrice below it, the whole percent the list price saves, floor((referencePrice - listPrice) / referencePrice… (read-only; nullable) |
 | items[].productId | string (uuid) | yes |  |
 | items[].sku | string | yes |  |
 | items[].axisValues | object | yes |  |
@@ -5754,6 +5887,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Variants |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -5784,7 +5918,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.product`, `catalogue.product_category`, `catalogue.product_eligibility_rule`, `catalogue.product_media`, `whitelabel.guided_choice_answer` |
 | Writes | - |
-| Called by | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-048, BO-094, BO-125, BO-877, CMS-101, CMS-103, EMP-034, GST-001, GST-002, GST-003, GST-005, GST-007, GST-008, GST-015, GST-021, GST-038, GST-044, GST-050, GST-051, GST-075, KSK-001, KSK-003, KSK-015, POS-002, POS-003, PTR-006, WEB-001, WEB-002, WEB-003, WEB-005, WEB-022, WEB-035, WEB-048, WEB-050 |
+| Called by | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-048, BO-094, BO-125, BO-877, CMS-006, CMS-101, CMS-103, EMP-034, GST-001, GST-002, GST-003, GST-005, GST-007, GST-008, GST-015, GST-021, GST-038, GST-044, GST-050, GST-051, GST-075, KSK-001, KSK-003, KSK-015, POS-002, POS-003, PTR-006, WEB-001, WEB-002, WEB-003, WEB-005, WEB-022, WEB-035, WEB-048, WEB-050 |
 
 **Parameters**
 
@@ -5799,6 +5933,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | guidedAnswerIds | query |  | array of string (uuid) | Help me choose answers, as filters (decided 29 September, W4). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -5810,7 +5945,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | items[].familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | items[].name | string | yes | (max length 200) |
 | items[].description | string |  |  |
-| items[].nameLocalised | object |  | The product's name in each language the venue sells in (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. (nullable) |
+| items[].nameLocalised | object |  | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. (nullable) |
 | items[].descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | items[].kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
 | items[].venueId | string (uuid) | yes |  |
@@ -5820,6 +5955,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | items[].responsibleDepartmentId | string (uuid) |  | Who owns this product commercially. (nullable) |
 | items[].onSaleFrom | string (date-time) |  | 1.4.8. (nullable) |
 | items[].onSaleTo | string (date-time) |  | Retires the product automatically. (nullable) |
+| items[].validTo | string (date-time) |  | The last moment the product's entitlements are valid; null means the same as onSaleTo (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). (nullable) |
 | items[].categoryId | string (uuid) |  | Taken from their fnb.product and retail.product, 20 September. (nullable) |
 | items[].lifecycleState | ProductLifecycleState: enum (draft, inReview, approved, live, withdrawn, archived) |  |  |
 | items[].isSellable | boolean | yes | True only when live and carried by a published bundle. (read-only) |
@@ -5848,8 +5984,11 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | items[].media[].kind | enum (image, video) | yes |  |
 | items[].media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
 | items[].media[].displayOrder | integer |  | (default 100) |
+| items[].media[].url | string (uri) |  | The asset's stable CDN address, for a guest card (ADAM CR-221, option A, decided 25 October 2026; CHG-R10CAT-014): the asset library's public address for the asset, set on guest-facing reads (searchC… (read-only; nullable) |
+| items[].media[].thumbnailUrl | string (uri) |  | The asset library's thumbnail address for the asset, on the same reads and with the same rule as url (ADAM CR-221). (read-only; nullable) |
 | items[].media[].altText | object |  | (nullable) |
 | items[].consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
+| items[].addOnProductIds | array of string (uuid) |  | The add-ons offered with this product, in display order (accepted 26 October 2026, Chinmay, ADAM CR-252 option A): each a kind: addOn product of the same venue (a coffee break, a working lunch, an AV… |
 | items[].requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
 | items[].productOwnerPrincipalId | string (uuid) |  | The product owner (29 September, data model DM3), set with setProductContextOwnership. (nullable) |
 | items[].operationalContact | string |  | A principal id or a name, as the context screen takes it. (max length 200; nullable) |
@@ -5862,6 +6001,8 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | items[].marketCode | string |  | (max length 40; nullable) |
 | items[].salesTerritory | string |  | (max length 100; nullable) |
 | items[].eventId | string (uuid) |  | The event this product sells admission to (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (Performance.eventId) give it dates. (nullable) |
+| items[].createdAt | string (date-time) | yes | When the product was created (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): catalogue.product.created_at, NOT NULL DEFAULT now(), set by the server and never by a request. (read-only) |
+| items[].updatedAt | string (date-time) |  | When the product last changed (ADAM CR-204): set by updateProduct and by every product sub-resource PUT and bulk change that versions the product; null until the first change after creation. (read-only; nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -5879,6 +6020,8 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 **`GET /products/resolve`**: Resolve a partner code to a product
 
 Called on inbound distribution orders. Accepts a partner's own SKU and returns the variant it maps to.
+
+**Which partner, and which variant** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011). A partner caller resolves its own codes: `partnerId` is its own, and one naming another partner is 403. A staff caller must send `partnerId` (400 `partner-required` without it), so a code two partners share is never guessed. A code mapped to a variant returns that variant. A product-level code (the row's `variant_id` null) returns the product's default variant (`isDefault`), or `409 no-default-variant` when the product has none. A code that matches nothing for the partner is 404.
 
 |  |  |
 |---|---|
@@ -5898,7 +6041,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | code | query | yes | string |  |
-| partnerId | query |  | string (uuid) |  |
+| partnerId | query |  | string (uuid) | Required from a staff caller (400 partner-required); a partner caller's own, which it may omit (ADAM CR-111). |
 
 **Response**: `ProductVariant`
 
@@ -5906,6 +6049,8 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | listPrice | Money |  | The list price on the caller's channel now, resolved on read from the price lists (listProductVariants; R8 blocker cause GPS-C27, CHG-R8SPN-028). (read-only; nullable) |
+| referencePrice | Money |  | The price a saving is measured against (accepted 26 October 2026, Chinmay, ADAM CR-253 option C), set by the back office on the variant (updateProductVariant). (nullable) |
+| savingPercent | integer |  | Computed by the server, never in the browser (ADAM CR-253): with a referencePrice and a listPrice below it, the whole percent the list price saves, floor((referencePrice - listPrice) / referencePrice… (read-only; nullable) |
 | productId | string (uuid) | yes |  |
 | sku | string | yes |  |
 | axisValues | object | yes |  |
@@ -5920,7 +6065,10 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Resolved |
+| 400 |  | A staff caller sent no partnerId (ADAM CR-111). |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The code is a product-level code and the product has no default variant (ADAM CR-111). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAlternativeCodes
@@ -5928,6 +6076,8 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 **`PUT /products/{productId}/alternative-codes`**: Set external identifiers
 
 **What the PUT does.** The body is the product's whole set of alternative codes: a code left out is removed, a code sent is stored as sent, and an empty `codes` removes them all. A code is unique per partner. Every `variantId` must be a variant of this product; one that belongs to another product is a `400`.
+
+**Unique per partner on the index** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011): `catalogue.alternative_code` is unique on `(partner_id, lower(code))` across the tenant. Alternative codes are venue-scoped since r6, so a lookup under row security cannot see another venue's rows; the duplicate is found by the index refusing the insert, answered `409 duplicate-code`, never by a read first.
 
 |  |  |
 |---|---|
@@ -6049,6 +6199,83 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### setProductChannelTexts
+
+**`PUT /products/{productId}/channel-texts`**: Set the product's texts per sales channel
+
+**Replaces all of the product's channel texts** (CHG-R8PRD-003): a text sent as null, or left out, falls back to the product's name or description. Each text is keyed by language code, and every key must be an enabled language of the tenant (`422 language-not-enabled`). The length limits are per language value.
+**The languages are checked on the service route** (ADAM CR-213, option A, decided 25 October 2026; CHG-R10CAT-005): `white-label#tenantLanguageRecords` and, before the tenant's first publish, `white-label#tenantConfigRecords` are asked through WhiteLabel's service route, which answers at the tenant root rather than under the caller's row security, so a venue product administrator's save is checked against the tenant's languages before the first publish as after it. The draft configuration itself stays tenant-root only.
+**Versioned as `updateProduct` versions the product**, and refused on an archived product (`409 product-archived`). **Audited:** written to `catalogue.audit_entry` (`domain: product`, `action: update`, `category: channelTexts`, the texts before and after).
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.product_channel_text` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `catalogue.product_channel_text` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.product_channel_text`, `catalogue.product_version` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| productId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `ProductChannelTexts`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | The row's key, set by the server; absent while the product has saved nothing. (read-only) |
+| productId | string (uuid) |  | From the path. (read-only) |
+| posButtonLabel | object |  | The label on the till's sale button (4.10); at most 30 characters per language. (nullable) |
+| receiptName | object |  | The product's name as printed on the receipt and the ticket, which may differ from the button label (4.10); at most 80 characters per language. (nullable) |
+| partnerDescription | object |  | What resellers see in the B2B portal and through the API (4.10); at most 4000 characters per language. (nullable) |
+| webDescription | object |  | The description the website and the guest app show; null uses the product's description (wireframe B1-S06). (nullable) |
+| kioskLabel | object |  | The label on the kiosk's product tile (wireframe B1-S06); at most 40 characters per language. (nullable) |
+| visitInstructions | object |  | What the guest is told to do on the day (wireframe B1-S06); at most 2000 characters per language. (nullable) |
+| termsAndConditions | object |  | The product's own terms (wireframe B1-S06); at most 8000 characters per language. (nullable) |
+| enabledLanguages | array of string |  | The tenant's enabled languages, ISO 639-1 codes in the tenant's order: the published set, or the draft's before the first publish (white-label LanguageConfig.languages). (read-only) |
+| missingTranslations | array of object |  | Per enabled language of the tenant, the texts above (and name, description for the product's own) set in some language and not in this one. (read-only) |
+| missingTranslations[].language | string | yes | (pattern ^[a-z]{2}$) |
+| missingTranslations[].fields | array of enum (name, description, posButtonLabel, receiptName, partnerDescription, webDescription, kioskLabel, visitInstructions, …) | yes |  |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `ProductChannelTexts`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | The row's key, set by the server; absent while the product has saved nothing. (read-only) |
+| productId | string (uuid) |  | From the path. (read-only) |
+| posButtonLabel | object |  | The label on the till's sale button (4.10); at most 30 characters per language. (nullable) |
+| receiptName | object |  | The product's name as printed on the receipt and the ticket, which may differ from the button label (4.10); at most 80 characters per language. (nullable) |
+| partnerDescription | object |  | What resellers see in the B2B portal and through the API (4.10); at most 4000 characters per language. (nullable) |
+| webDescription | object |  | The description the website and the guest app show; null uses the product's description (wireframe B1-S06). (nullable) |
+| kioskLabel | object |  | The label on the kiosk's product tile (wireframe B1-S06); at most 40 characters per language. (nullable) |
+| visitInstructions | object |  | What the guest is told to do on the day (wireframe B1-S06); at most 2000 characters per language. (nullable) |
+| termsAndConditions | object |  | The product's own terms (wireframe B1-S06); at most 8000 characters per language. (nullable) |
+| enabledLanguages | array of string |  | The tenant's enabled languages, ISO 639-1 codes in the tenant's order: the published set, or the draft's before the first publish (white-label LanguageConfig.languages). (read-only) |
+| missingTranslations | array of object |  | Per enabled language of the tenant, the texts above (and name, description for the product's own) set in some language and not in this one. (read-only) |
+| missingTranslations[].language | string | yes | (pattern ^[a-z]{2}$) |
+| missingTranslations[].fields | array of enum (name, description, posButtonLabel, receiptName, partnerDescription, webDescription, kioskLabel, visitInstructions, …) | yes |  |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved |
+| 400 |  | A text longer than its limit in some language (validation; errors[] names the field and the language). |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The product is archived (product-archived). |
+| 422 |  | A text in a language that is not enabled for the tenant (language-not-enabled). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### setProductEligibilityRule
 
 **`PUT /products/{productId}/eligibility-rule`**: Set age, height and supervision limits
@@ -6127,11 +6354,151 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### setProductOwnerForms
+
+**`PUT /products/{productId}/owner-forms`**: Link a product to the forms its sale asks
+
+**Replaces the product's links** (CHG-R8PRD-004, CHG-R8PRD-009): at most one form per `appliesTo`, so a body naming `reservationOwner` twice is `400 validation`. A form that is not a form of the product's venue is `422 unknown-form`, one whose `kind` is not `dataCapture` or `registration` `422 form-kind-not-allowed`, one with no published version `422 form-not-published`. The link names the form, not a version: a sale asks the version published at the time of the sale, and the submission records which.
+**Versioned as `updateProduct` versions the product**, and refused on an archived product (`409 product-archived`). **Audited:** written to `catalogue.audit_entry` (`domain: product`, `action: update`, `category: ownerForms`, the links before and after).
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.product_owner_form` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `catalogue.product_owner_form` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.product_owner_form`, `catalogue.product_version` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| productId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `ProductOwnerFormSet`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| productId | string (uuid) |  | From the path. (read-only) |
+| forms | array of ProductOwnerForm | yes | (max items 2) |
+| forms[].id | string (uuid) |  | (read-only) |
+| forms[].productId | string (uuid) |  | From the path. (read-only) |
+| forms[].appliesTo | enum (reservationOwner, ticketOwner) | yes | reservationOwner: asked once per sale, of the buyer. |
+| forms[].formId | string (uuid) | yes | A Marketing form (marketing.form_definition), read through marketing-crm#formDefinitionRecords; not a database reference, because the form is Marketing's. |
+| forms[].formName | string |  | The form's name, for the product form; null if the form no longer exists. (read-only; nullable) |
+| forms[].publishedVersion | integer |  | The version a sale made now would ask; null if the form has no published version. (read-only; nullable) |
+| forms[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `ProductOwnerFormSet`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| productId | string (uuid) |  | From the path. (read-only) |
+| forms | array of ProductOwnerForm | yes | (max items 2) |
+| forms[].id | string (uuid) |  | (read-only) |
+| forms[].productId | string (uuid) |  | From the path. (read-only) |
+| forms[].appliesTo | enum (reservationOwner, ticketOwner) | yes | reservationOwner: asked once per sale, of the buyer. |
+| forms[].formId | string (uuid) | yes | A Marketing form (marketing.form_definition), read through marketing-crm#formDefinitionRecords; not a database reference, because the form is Marketing's. |
+| forms[].formName | string |  | The form's name, for the product form; null if the form no longer exists. (read-only; nullable) |
+| forms[].publishedVersion | integer |  | The version a sale made now would ask; null if the form has no published version. (read-only; nullable) |
+| forms[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved |
+| 400 |  | One appliesTo named twice, or the body breaks the schema (validation). |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The product is archived (product-archived). |
+| 422 |  | A form that is not the venue's (unknown-form), not a capture or registration form (form-kind-not-allowed), or never published (form-not-published). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setProductSalePermissionRules
+
+**`PUT /products/{productId}/sale-permission-rules`**: Set who can sell this product
+
+**Replaces the product's whole rule set** (CHG-R8PRD-005, CHG-R8PRD-009); an empty `rules` returns the product to selling wherever its channels allow.
+**What the server refuses.** A `global` rule with a `targetId`, any other rule without one, two rules with one `level` and `targetId` (`400 validation`); a set with a `DENY` and no `ALLOW` (`400 no-allow-rule`) or a `global` `DENY` (`400 global-deny`), either of which sells nowhere (withdraw the product for that); a new or changed rule whose `targetId` is not one `listSalePermissionTargets` offers for the product at its level (`422 unknown-sale-permission-target`); a rule sent unchanged (same `level`, `targetId` and `effect` as a saved one) is kept as it is and not checked again, so a rule naming a principal since deactivated, or a venue outside the editor's grants, does not block other changes; an `ALLOW` whose target is the caller (`principal`) or the caller's selected role (`role`), or a removed or changed `DENY` whose target is either of them (`403 sale-permission-self-grant`: nobody grants themselves the right to sell, by adding an allow or lifting a deny, as an approver is never the submitter); an archived product (`409 product-archived`).
+**Takes effect at once, as `updateProduct` does** (CHG-R8PRD-010), in every lifecycle state but `archived`, and is versioned as `updateProduct` versions the product. Whether a change on a live product should wait for approval is an open question for the client; it is not built. **Audited:** written to `catalogue.audit_entry` (`domain: product`, `action: update`, `category: salePermissions`, the rule set before and after).
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `catalogue.product_sale_permission` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `catalogue.product_sale_permission` |
+| Writes | `cache:idempotency`, `catalogue.audit_entry`, `catalogue.product_sale_permission`, `catalogue.product_version` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| productId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `ProductSalePermissionRuleSet`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| productId | string (uuid) |  | From the path. (read-only) |
+| rules | array of ProductSalePermissionRule | yes | (max items 200) |
+| rules[].id | string (uuid) |  | (read-only) |
+| rules[].productId | string (uuid) |  | From the path. (read-only) |
+| rules[].level | SalePermissionLevel: enum (global, venue, salesChannel, workstation, role, principal) | yes | The six levels at which the sale of a product is allowed or denied (16 October 2026 minutes, 4.8, CHG-R8PRD-005), in the package's words: global (every venue of the tenant), venue (the minutes' "site… |
+| rules[].targetId | string (uuid) |  | What the rule names at its level: a venue, a catalogue.sales_channel, a workstation, a role or a principal. (nullable) |
+| rules[].targetName | string |  | The target's name as listSalePermissionTargets gives it, so the rule reads in words; null for global, and for a target that no longer exists. (read-only; nullable) |
+| rules[].effect | enum (ALLOW, DENY) | yes | Resolved as the package resolves grants (permissions.yaml, deny overrides allow); see ProductSalePermissionRuleSet. |
+| rules[].note | string |  | Why the rule exists, for whoever reads it next. (max length 200; nullable) |
+| rules[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `ProductSalePermissionRuleSet`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| productId | string (uuid) |  | From the path. (read-only) |
+| rules | array of ProductSalePermissionRule | yes | (max items 200) |
+| rules[].id | string (uuid) |  | (read-only) |
+| rules[].productId | string (uuid) |  | From the path. (read-only) |
+| rules[].level | SalePermissionLevel: enum (global, venue, salesChannel, workstation, role, principal) | yes | The six levels at which the sale of a product is allowed or denied (16 October 2026 minutes, 4.8, CHG-R8PRD-005), in the package's words: global (every venue of the tenant), venue (the minutes' "site… |
+| rules[].targetId | string (uuid) |  | What the rule names at its level: a venue, a catalogue.sales_channel, a workstation, a role or a principal. (nullable) |
+| rules[].targetName | string |  | The target's name as listSalePermissionTargets gives it, so the rule reads in words; null for global, and for a target that no longer exists. (read-only; nullable) |
+| rules[].effect | enum (ALLOW, DENY) | yes | Resolved as the package resolves grants (permissions.yaml, deny overrides allow); see ProductSalePermissionRuleSet. |
+| rules[].note | string |  | Why the rule exists, for whoever reads it next. (max length 200; nullable) |
+| rules[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Saved |
+| 400 |  | A rule whose target does not fit its level, a level and target twice (validation; errors[] names the rule's index), a DENY with no ALLOW (no-allow-rule), or a global DENY (global-deny). |
+| 403 |  | The caller lacks the permission at this venue (forbidden), or the set adds an ALLOW for, or lifts a DENY on, the caller or the caller's role (sale-permission-self-grant). |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The product is archived (product-archived). |
+| 422 |  | A rule names a target listSalePermissionTargets does not offer at its level (unknown-sale-permission-target; errors[] names the rule's index). |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### updateProduct
 
 **`PATCH /products/{productId}`**: Update a product
 
 **Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation.
+
+**How a product is versioned**, defined here once for every write that says "versioned as `updateProduct`" (ADAM CR-214, option A, decided 25 October 2026; CHG-R10CAT-006). Every committed `updateProduct`, and every product sub-resource PUT that says so (`setProductChannelTexts`, `setProductSalePermissionRules`, `setProductClassification`, `setProductOwnerForms`) and each product `bulkUpdateCatalogueProducts` changes, creates one `catalogue.product_version` row: `version` the product's highest plus one, `is_current` moved to it in the same transaction, `published_at` and `published_by_principal_id` the write's time and caller, `content_hash` and `snapshot` as below. **Unless `content_hash` is unchanged**: a write that changes nothing the hash covers creates no version. `content_hash` is the SHA-256 of the product row and its sub-resources (its `catalogue.product_media`, `catalogue.product_channel_text`, `catalogue.product_sale_permission` and `catalogue.product_owner_form` rows) in canonical JSON; `snapshot` is that same JSON, so `restoreProductVersion` brings back the channel texts and sale-permission rules with the product. A validate-only call writes no version.
+
+**updatedAt** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): each of those writes also sets `catalogue.product.updated_at` to its time, whether or not a version is created.
 
 |  |  |
 |---|---|
@@ -6141,8 +6508,8 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.product`, `catalogue.product_media`, `whitelabel.booking_flow` |
-| Writes | `cache:idempotency`, `catalogue.product`, `catalogue.product_media` |
+| Reads | `cache:idempotency`, `catalogue.product`, `catalogue.product_channel_text`, `catalogue.product_media`, `catalogue.product_owner_form`, `catalogue.product_sale_permission`, `whitelabel.booking_flow` |
+| Writes | `cache:idempotency`, `catalogue.product`, `catalogue.product_media`, `catalogue.product_version` |
 | Called by | BO-007, BO-008, BO-012, CMS-103 |
 
 **Parameters**
@@ -6180,8 +6547,11 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | media[].kind | enum (image, video) | yes |  |
 | media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
 | media[].displayOrder | integer |  | (default 100) |
+| media[].url | string (uri) |  | The asset's stable CDN address, for a guest card (ADAM CR-221, option A, decided 25 October 2026; CHG-R10CAT-014): the asset library's public address for the asset, set on guest-facing reads (searchC… (read-only; nullable) |
+| media[].thumbnailUrl | string (uri) |  | The asset library's thumbnail address for the asset, on the same reads and with the same rule as url (ADAM CR-221). (read-only; nullable) |
 | media[].altText | object |  | (nullable) |
 | consentQuestionIds | array of string (uuid) |  | (max items 10) |
+| addOnProductIds | array of string (uuid) |  | The kind addOn products of the same venue offered with this product, in display order (Product.addOnProductIds; ADAM CR-252). |
 | requiresTimeWindow | boolean |  |  |
 
 **Response**: `Product`
@@ -6193,7 +6563,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
-| nameLocalised | object |  | The product's name in each language the venue sells in (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. (nullable) |
+| nameLocalised | object |  | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. (nullable) |
 | descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
 | venueId | string (uuid) | yes |  |
@@ -6203,6 +6573,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | responsibleDepartmentId | string (uuid) |  | Who owns this product commercially. (nullable) |
 | onSaleFrom | string (date-time) |  | 1.4.8. (nullable) |
 | onSaleTo | string (date-time) |  | Retires the product automatically. (nullable) |
+| validTo | string (date-time) |  | The last moment the product's entitlements are valid; null means the same as onSaleTo (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). (nullable) |
 | categoryId | string (uuid) |  | Taken from their fnb.product and retail.product, 20 September. (nullable) |
 | lifecycleState | ProductLifecycleState: enum (draft, inReview, approved, live, withdrawn, archived) |  |  |
 | isSellable | boolean | yes | True only when live and carried by a published bundle. (read-only) |
@@ -6231,8 +6602,11 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | media[].kind | enum (image, video) | yes |  |
 | media[].isPrimary | boolean | yes | The item *Read more* opens on and a listing shows. (default False) |
 | media[].displayOrder | integer |  | (default 100) |
+| media[].url | string (uri) |  | The asset's stable CDN address, for a guest card (ADAM CR-221, option A, decided 25 October 2026; CHG-R10CAT-014): the asset library's public address for the asset, set on guest-facing reads (searchC… (read-only; nullable) |
+| media[].thumbnailUrl | string (uri) |  | The asset library's thumbnail address for the asset, on the same reads and with the same rule as url (ADAM CR-221). (read-only; nullable) |
 | media[].altText | object |  | (nullable) |
 | consentQuestionIds | array of string (uuid) |  | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… (max items 10) |
+| addOnProductIds | array of string (uuid) |  | The add-ons offered with this product, in display order (accepted 26 October 2026, Chinmay, ADAM CR-252 option A): each a kind: addOn product of the same venue (a coffee break, a working lunch, an AV… |
 | requiresTimeWindow | boolean |  | True for a space sold by the hour, e.g. (default False) |
 | productOwnerPrincipalId | string (uuid) |  | The product owner (29 September, data model DM3), set with setProductContextOwnership. (nullable) |
 | operationalContact | string |  | A principal id or a name, as the context screen takes it. (max length 200; nullable) |
@@ -6245,13 +6619,15 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | marketCode | string |  | (max length 40; nullable) |
 | salesTerritory | string |  | (max length 100; nullable) |
 | eventId | string (uuid) |  | The event this product sells admission to (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (Performance.eventId) give it dates. (nullable) |
+| createdAt | string (date-time) | yes | When the product was created (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): catalogue.product.created_at, NOT NULL DEFAULT now(), set by the server and never by a request. (read-only) |
+| updatedAt | string (date-time) |  | When the product last changed (ADAM CR-204): set by updateProduct and by every product sub-resource PUT and bulk change that versions the product; null until the first change after creation. (read-only; nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated. |
-| 400 |  | media with no isPrimary item or more than one, or one asset twice. |
+| 400 |  | media with no isPrimary item or more than one, or one asset twice; or validation, with errors[] naming the field, which includes an addOnProductIds entry that is not a kind addOn product of the same… |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
@@ -6262,7 +6638,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 
 **`PATCH /products/{productId}/variants/{variantId}`**: Describe a variant
 
-**Only the words and codes a person reads or scans.** A variant's combination of values (`axisValues`) and its `sku` come from `setProductAttributes` and are not edited here; this sets the `name`, the `description` a guest reads behind the (i) on a ticket-type row (decided 29 September, 23SEP-6), the `barcode` and which variant is the default.
+**Only the words and codes a person reads or scans.** A variant's combination of values (`axisValues`) and its `sku` come from `setProductAttributes` and are not edited here; this sets the `name`, the `description` a guest reads behind the (i) on a ticket-type row (decided 29 September, 23SEP-6), the `barcode`, which variant is the default, and the `referencePrice` a length's saving is measured against (ADAM CR-253; the answer's `savingPercent` is worked out from it).
 Setting `isDefault` true clears it on the product's other variants. A retired variant is not edited: `409`.
 
 |  |  |
@@ -6293,6 +6669,7 @@ Setting `isDefault` true clears it on the product's other variants. A retired va
 | description | object |  | (nullable) |
 | barcode | string |  | (max length 64; nullable) |
 | isDefault | boolean |  |  |
+| referencePrice | Money |  | The price the variant's saving is measured against (ProductVariant.referencePrice; ADAM CR-253); null clears it. (nullable) |
 
 **Response**: `ProductVariant`
 
@@ -6300,6 +6677,8 @@ Setting `isDefault` true clears it on the product's other variants. A retired va
 |---|---|---|---|
 | id | string (uuid) | yes |  |
 | listPrice | Money |  | The list price on the caller's channel now, resolved on read from the price lists (listProductVariants; R8 blocker cause GPS-C27, CHG-R8SPN-028). (read-only; nullable) |
+| referencePrice | Money |  | The price a saving is measured against (accepted 26 October 2026, Chinmay, ADAM CR-253 option C), set by the back office on the variant (updateProductVariant). (nullable) |
+| savingPercent | integer |  | Computed by the server, never in the browser (ADAM CR-253): with a referencePrice and a listPrice below it, the whole percent the list price saves, floor((referencePrice - listPrice) / referencePrice… (read-only; nullable) |
 | productId | string (uuid) | yes |  |
 | sku | string | yes |  |
 | axisValues | object | yes |  |
@@ -6402,7 +6781,14 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 |---|---|---|---|
 | code | string | yes | Unique per tenant (6 October 2026, CHG-R4-015; the rule of audit R108 for configuration codes). (max length 64; pattern ^[A-Za-z0-9_-]+$) |
 | name | string | yes | (max length 200) |
+| nameLocalised | object |  | The promotion's name in each of the tenant's enabled languages (ADAM CR-231, option A, decided 25 October 2026; CHG-R10CAT-012), keyed by ISO 639-1 code, as Product.nameLocalised. (nullable) |
 | description | string |  | (max length 1000) |
+| descriptionLocalised | object |  | The description in each enabled language, as nameLocalised; falls back to description. (nullable) |
+| label | object |  | The guest-facing label, the pill on the offer card (BUNDLE, RENTAL, MEMBERSHIP, SEASON, PARKING on WEB-032), per language as nameLocalised (ADAM CR-225 and CR-231, option A, decided 25 October 2026;… (nullable) |
+| venues | array of PromotionVenue |  | Where a guest may use the offer, as the offer card's venue line shows it (ADAM CR-225, option A, decided 25 October 2026; CHG-R10CAT-012). |
+| venues[].venueId | string (uuid) | yes | A venue node of the tenant (checked with tenancy#scopeRecords on write). |
+| venues[].name | string | yes | The venue's name as the back office gives it for guests. (max length 200) |
+| venues[].nameLocalised | object |  | The name in each enabled language; falls back to name (ADAM CR-231). (nullable) |
 | venueId | string (uuid) | yes |  |
 | discount | Discount | yes |  |
 | discount.kind | DiscountKind: enum (percentage, fixedAmount, fixedPrice, buyXGetY, freeItem, tieredPercentage) | yes |  |
@@ -6472,7 +6858,14 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 |---|---|---|---|
 | code | string | yes | Unique per tenant (6 October 2026, CHG-R4-015; the rule of audit R108 for configuration codes). (max length 64; pattern ^[A-Za-z0-9_-]+$) |
 | name | string | yes | (max length 200) |
+| nameLocalised | object |  | The promotion's name in each of the tenant's enabled languages (ADAM CR-231, option A, decided 25 October 2026; CHG-R10CAT-012), keyed by ISO 639-1 code, as Product.nameLocalised. (nullable) |
 | description | string |  | (max length 1000) |
+| descriptionLocalised | object |  | The description in each enabled language, as nameLocalised; falls back to description. (nullable) |
+| label | object |  | The guest-facing label, the pill on the offer card (BUNDLE, RENTAL, MEMBERSHIP, SEASON, PARKING on WEB-032), per language as nameLocalised (ADAM CR-225 and CR-231, option A, decided 25 October 2026;… (nullable) |
+| venues | array of PromotionVenue |  | Where a guest may use the offer, as the offer card's venue line shows it (ADAM CR-225, option A, decided 25 October 2026; CHG-R10CAT-012). |
+| venues[].venueId | string (uuid) | yes | A venue node of the tenant (checked with tenancy#scopeRecords on write). |
+| venues[].name | string | yes | The venue's name as the back office gives it for guests. (max length 200) |
+| venues[].nameLocalised | object |  | The name in each enabled language; falls back to name (ADAM CR-231). (nullable) |
 | venueId | string (uuid) | yes |  |
 | discount | Discount | yes |  |
 | discount.kind | DiscountKind: enum (percentage, fixedAmount, fixedPrice, buyXGetY, freeItem, tieredPercentage) | yes |  |
@@ -6553,6 +6946,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 | 201 |  | Created in draft |
 | 400 |  | Conditions are unsatisfiable, or the discount exceeds the configured cap. |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 422 |  | A venues[].venueId that names no venue of the tenant (ADAM CR-225). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getPromotion
@@ -6581,11 +6975,13 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | promotionId | path | yes | string (uuid) |  |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Promotion. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -6655,7 +7051,7 @@ Also the enforcement surface for budget caps — a promotion may be configured t
 **`GET /promotions`**: List promotions
 
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets live, published promotions, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRICE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
-**Order.** Newest first, by `publishedAt` descending, then by `id`.
+**Order.** Newest first, by `publishedAt` descending, then by `id`. **A draft has no `publishedAt`** and sorts after every published promotion, newest first by its creation time, which its `id` carries (a UUIDv7), so `published_at DESC NULLS LAST, id DESC` (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011).
 
 |  |  |
 |---|---|
@@ -6681,6 +7077,7 @@ Also the enforcement surface for budget caps — a promotion may be configured t
 | activeAt | query |  | string (date-time) |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -6694,6 +7091,7 @@ Also the enforcement surface for budget caps — a promotion may be configured t
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Promotions. |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -6705,6 +7103,8 @@ Also the enforcement surface for budget caps — a promotion may be configured t
 Runs conflict analysis first. A promotion that stacks with an existing one to produce a negative or near-zero line price is refused — that combination is discovered at a till otherwise, usually by a guest.
 **The floor is zero: a combined line price of zero or below is refused** (decided 28 September, audit R101). A line that stays above zero, however small, publishes. One that falls below the near-zero minimum (`ConflictAnalysis`, audit R096 (5)) publishes too, flagged rather than refused.
 **Writes `promotions.promotion_channel_publication` and `promotions.promotion_audit`.** One row per sales channel the promotion runs on goes to `pendingPublication` (created there when the channel has none, resumed from `suspended` when it has), for the channel sync job to take up (states/promotion-channel-publication.yaml); the audit row is eventType `promotionActivated` with the published promotionVersion. The conflicts found here are recorded in `promotions.promotion_conflict` by the conflict detection job, not by this operation (decided 29 September, writers pass).
+
+**From which state** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011): a promotion is published from `draft` (to `scheduled`) or resumed from `paused` (to `live`), as `states/promotion.yaml` says. From any other state (`scheduled`, `live`, `expired`, `ended`) it is `409 invalid-promotion-state`. A paused promotion whose `validTo` has passed is not resumed: `409 promotion-window-ended` (end it instead). An unknown promotion, or one outside the caller's scope, is 404.
 
 |  |  |
 |---|---|
@@ -6732,7 +7132,14 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 |---|---|---|---|
 | code | string | yes | Unique per tenant (6 October 2026, CHG-R4-015; the rule of audit R108 for configuration codes). (max length 64; pattern ^[A-Za-z0-9_-]+$) |
 | name | string | yes | (max length 200) |
+| nameLocalised | object |  | The promotion's name in each of the tenant's enabled languages (ADAM CR-231, option A, decided 25 October 2026; CHG-R10CAT-012), keyed by ISO 639-1 code, as Product.nameLocalised. (nullable) |
 | description | string |  | (max length 1000) |
+| descriptionLocalised | object |  | The description in each enabled language, as nameLocalised; falls back to description. (nullable) |
+| label | object |  | The guest-facing label, the pill on the offer card (BUNDLE, RENTAL, MEMBERSHIP, SEASON, PARKING on WEB-032), per language as nameLocalised (ADAM CR-225 and CR-231, option A, decided 25 October 2026;… (nullable) |
+| venues | array of PromotionVenue |  | Where a guest may use the offer, as the offer card's venue line shows it (ADAM CR-225, option A, decided 25 October 2026; CHG-R10CAT-012). |
+| venues[].venueId | string (uuid) | yes | A venue node of the tenant (checked with tenancy#scopeRecords on write). |
+| venues[].name | string | yes | The venue's name as the back office gives it for guests. (max length 200) |
+| venues[].nameLocalised | object |  | The name in each enabled language; falls back to name (ADAM CR-231). (nullable) |
 | venueId | string (uuid) | yes |  |
 | discount | Discount | yes |  |
 | discount.kind | DiscountKind: enum (percentage, fixedAmount, fixedPrice, buyXGetY, freeItem, tieredPercentage) | yes |  |
@@ -6811,7 +7218,8 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Published |
-| 409 |  | Conflict analysis failed. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Conflict analysis failed, and the response names each conflicting promotion (stacking-conflict); the promotion is not in draft or paused (invalid-promotion-state); or a paused promotion's window has… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updatePromotion
@@ -6819,6 +7227,10 @@ Runs conflict analysis first. A promotion that stacks with an existing one to pr
 **`PATCH /promotions/{promotionId}`**: Amend a promotion
 
 Amending a live promotion changes behaviour mid-sale. Conditions and discount are editable only in draft; a live promotion may be paused, extended or ended, nothing more.
+
+**The terms lock and the refusals** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011). `conditions` and `discount` are editable in `draft` only: sent for a promotion that is `scheduled`, `live` or `paused` they are `409 live-promotion-terms-locked` (the problem type keeps its r9 name for all three), and for one that is `expired` or `ended` every field is `409 invalid-promotion-state`. Pausing is `pausePromotion`'s alone (it takes the reason and suspends the channel rows), so this body no longer carries `isPaused`. The discount cap and unsatisfiable conditions are refused `400` exactly as `createPromotion` refuses them. An unknown promotion, or one outside the caller's scope, is 404.
+
+**The guest-facing texts** (ADAM CR-225 and CR-231, option A, decided 25 October 2026; CHG-R10CAT-012): `nameLocalised`, `descriptionLocalised`, `label` and `venues` are display fields, editable in any state but `expired` and `ended`; each `venues[].venueId` must be a venue of the tenant (`tenancy#scopeRecords`), else `422 unknown-venue`.
 **Writes `promotions.promotion_channel_publication` and `promotions.promotion_audit`.** Each channel row of the promotion that is `published` moves to `outOfSync` (states/promotion-channel-publication.yaml) and the sync job pushes the new `version`; the audit row records the changed fields before and after (eventType `promotionEdited`, or `discountChanged`, `eligibilityChanged`, `datesChanged` where only that changed) with the new promotionVersion (decided 29 September, writers pass).
 
 |  |  |
@@ -6846,8 +7258,14 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | name | string |  | (max length 200) |
+| nameLocalised | object |  | As Promotion.nameLocalised (ADAM CR-231). (nullable) |
+| descriptionLocalised | object |  | As Promotion.descriptionLocalised (ADAM CR-231). (nullable) |
+| label | object |  | As Promotion.label (ADAM CR-225). (nullable) |
+| venues | array of PromotionVenue |  | As Promotion.venues; the whole list, an empty list meaning every venue (ADAM CR-225). |
+| venues[].venueId | string (uuid) | yes | A venue node of the tenant (checked with tenancy#scopeRecords on write). |
+| venues[].name | string | yes | The venue's name as the back office gives it for guests. (max length 200) |
+| venues[].nameLocalised | object |  | The name in each enabled language; falls back to name (ADAM CR-231). (nullable) |
 | validTo | string (date-time) |  |  |
-| isPaused | boolean |  |  |
 | conditions | PromotionConditions |  | All conditions must hold. |
 | conditions.variantIds | array of string (uuid) |  |  |
 | conditions.productKinds | array of string |  |  |
@@ -6902,7 +7320,14 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 |---|---|---|---|
 | code | string | yes | Unique per tenant (6 October 2026, CHG-R4-015; the rule of audit R108 for configuration codes). (max length 64; pattern ^[A-Za-z0-9_-]+$) |
 | name | string | yes | (max length 200) |
+| nameLocalised | object |  | The promotion's name in each of the tenant's enabled languages (ADAM CR-231, option A, decided 25 October 2026; CHG-R10CAT-012), keyed by ISO 639-1 code, as Product.nameLocalised. (nullable) |
 | description | string |  | (max length 1000) |
+| descriptionLocalised | object |  | The description in each enabled language, as nameLocalised; falls back to description. (nullable) |
+| label | object |  | The guest-facing label, the pill on the offer card (BUNDLE, RENTAL, MEMBERSHIP, SEASON, PARKING on WEB-032), per language as nameLocalised (ADAM CR-225 and CR-231, option A, decided 25 October 2026;… (nullable) |
+| venues | array of PromotionVenue |  | Where a guest may use the offer, as the offer card's venue line shows it (ADAM CR-225, option A, decided 25 October 2026; CHG-R10CAT-012). |
+| venues[].venueId | string (uuid) | yes | A venue node of the tenant (checked with tenancy#scopeRecords on write). |
+| venues[].name | string | yes | The venue's name as the back office gives it for guests. (max length 200) |
+| venues[].nameLocalised | object |  | The name in each enabled language; falls back to name (ADAM CR-231). (nullable) |
 | venueId | string (uuid) | yes |  |
 | discount | Discount | yes |  |
 | discount.kind | DiscountKind: enum (percentage, fixedAmount, fixedPrice, buyXGetY, freeItem, tieredPercentage) | yes |  |
@@ -6981,7 +7406,10 @@ Amending a live promotion changes behaviour mid-sale. Conditions and discount ar
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
-| 409 |  | Conditions or discount amended on a live promotion |
+| 400 |  | The discount exceeds the venue's cap, or the conditions cannot hold; the same refusals, with the same rules, as createPromotion's 400 (ADAM CR-111). |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Conditions or discount amended on a promotion that is scheduled, live or paused (live-promotion-terms-locked, its r9 name kept for all three), or any change to one that is expired or ended (invalid-p… |
+| 422 |  | A venues[].venueId that names no venue of the tenant (ADAM CR-225). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -7663,6 +8091,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_active | boolean | no |  |
 | lifecycle_state | text | no | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). |
 | lifecycle_state_changed_at | timestamptz | no |  |
+| scheduled_lifecycle_state | text | no | A move waiting for its effectiveFrom (ADAM CR-109, option 2; CHG-R10CAT-009): written by setEventLifecycleState when effectiveFrom is in the future, applied and cleared by the event lifecycle job in… |
+| scheduled_lifecycle_at | timestamptz | no | When the waiting move is applied (the request's effectiveFrom; ADAM CR-109). |
+| scheduled_lifecycle_reason | text | no | The reason given with the waiting move, carried on event.lifecycleChanged when it is applied (ADAM CR-109). |
 
 ### `catalogue.event_capacity_profile`
 
@@ -8096,7 +8527,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | family_key | text | no | The same product at another location (decided 29 September, rev 3 REV3-18). |
 | name | text | yes |  |
 | description | text | no |  |
-| name_localised | jsonb | no | The product's name in each language the venue sells in (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. |
+| name_localised | jsonb | no | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. |
 | description_localised | jsonb | no | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). |
 | kind | text | yes |  |
 | venue_id | uuid | yes |  |
@@ -8106,6 +8537,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | responsible_department_id | uuid | no | Who owns this product commercially. |
 | on_sale_from | timestamptz | no | 1.4.8. |
 | on_sale_to | timestamptz | no | Retires the product automatically. |
+| valid_to | timestamptz | no | The last moment the product's entitlements are valid; null means the same as onSaleTo (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). |
 | category_id | uuid | no | Taken from their fnb.product and retail.product, 20 September. |
 | lifecycle_state | text | no |  |
 | is_sellable | boolean | yes | True only when live and carried by a published bundle. |
@@ -8124,6 +8556,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | booking_flow_id | uuid | no | The booking flow this product is sold through (decided 29 September, W8 and W12): a white-label BookingFlow of the venue, which orders the guest's steps (for a workshop, the product first and then th… |
 | display_tags | jsonb | no | Short facts a guest reads on the ticket card and under *Read more*: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). |
 | consent_question_ids | text[] | no | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… |
+| add_on_product_ids | text[] | no | The add-ons offered with this product, in display order (accepted 26 October 2026, Chinmay, ADAM CR-252 option A): each a kind: addOn product of the same venue (a coffee break, a working lunch, an AV… |
 | requires_time_window | boolean | no | True for a space sold by the hour, e.g. |
 | product_owner_principal_id | uuid | no | The product owner (29 September, data model DM3), set with setProductContextOwnership. |
 | operational_contact | text | no | A principal id or a name, as the context screen takes it. |
@@ -8136,6 +8569,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | market_code | text | no |  |
 | sales_territory | text | no |  |
 | event_id | uuid | no | The event this product sells admission to (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (Performance.eventId) give it dates. |
+| created_at | timestamptz | yes | When the product was created (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): catalogue.product.created_at, NOT NULL DEFAULT now(), set by the server and never by a request. |
+| updated_at | timestamptz | no | When the product last changed (ADAM CR-204): set by updateProduct and by every product sub-resource PUT and bulk change that versions the product; null until the first change after creation. |
 
 ### `catalogue.product_category`
 
@@ -8176,6 +8611,21 @@ Every table this service owns that the slice reads or writes, with its columns a
 | created_at | timestamptz | no |  |
 | updated_at | timestamptz | no |  |
 
+### `catalogue.product_channel_text`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | The row's key, set by the server; absent while the product has saved nothing. |
+| product_id | uuid | yes | From the path. |
+| workstation_button_label | jsonb | no | The label on the till's sale button (4.10); at most 30 characters per language. |
+| receipt_name | jsonb | no | The product's name as printed on the receipt and the ticket, which may differ from the button label (4.10); at most 80 characters per language. |
+| partner_description | jsonb | no | What resellers see in the B2B portal and through the API (4.10); at most 4000 characters per language. |
+| web_description | jsonb | no | The description the website and the guest app show; null uses the product's description (wireframe B1-S06). |
+| kiosk_label | jsonb | no | The label on the kiosk's product tile (wireframe B1-S06); at most 40 characters per language. |
+| visit_instructions | jsonb | no | What the guest is told to do on the day (wireframe B1-S06); at most 2000 characters per language. |
+| terms_and_conditions | jsonb | no | The product's own terms (wireframe B1-S06); at most 8000 characters per language. |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `catalogue.product_eligibility_rule`
 
 | Column | Type | Required | Notes |
@@ -8208,17 +8658,40 @@ Every table this service owns that the slice reads or writes, with its columns a
 | alt_text | jsonb | no |  |
 | id | uuid | yes | Synthesised key. |
 
+### `catalogue.product_owner_form`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| product_id | uuid | no | From the path. |
+| applies_to | text | yes | reservationOwner: asked once per sale, of the buyer. |
+| form_id | uuid | yes | A Marketing form (marketing.form_definition), read through marketing-crm#formDefinitionRecords; not a database reference, because the form is Marketing's. |
+| scope_path | text | no | The partition key (ADR-0005). |
+
+### `catalogue.product_sale_permission`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| product_id | uuid | no | From the path. |
+| level | text | yes |  |
+| target_id | uuid | no | What the rule names at its level: a venue, a catalogue.sales_channel, a workstation, a role or a principal. |
+| effect | text | yes | Resolved as the package resolves grants (permissions.yaml, deny overrides allow); see ProductSalePermissionRuleSet. |
+| note | text | no | Why the rule exists, for whoever reads it next. |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `catalogue.product_version`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | version | integer | yes |  |
-| product_id | uuid | no |  |
+| product_id | uuid | yes | The product this is a version of, always set (ADAM CR-214; CHG-R10CAT-006). |
 | published_at | timestamptz | yes |  |
 | published_by_principal_id | uuid | yes |  |
 | note | text | no |  |
 | is_current | boolean | no |  |
 | content_hash | text | no | Lets a diff be cheap and a no-op change be recognised. |
+| snapshot | jsonb | no | What the version was, so a restore brings it all back (ADAM CR-214, option A, decided 25 October 2026; CHG-R10CAT-006): the product row and its product_media, product_channel_text, product_sale_permi… |
 | restored_from_version | integer | no | Set where this version was created by a restore. |
 | id | uuid | yes | Synthesised key. |
 
@@ -8226,8 +8699,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| version | text | yes |  |
+| version | text | yes | The venue's bundle number: a per-venue integer, 1 for the first publish and one more than the venue's highest for each publish after, as its decimal string; unique with venueId (ADAM CR-110, option 1… |
 | venue_id | uuid | yes |  |
+| note | text | no | The publisher's note from publishBundle's body; BundleSummary.note (ADAM CR-110, option 1; CHG-R10CAT-010). |
 | published_at | timestamptz | no | When the bundle was published; BundleSummary.publishedAt (CHG-R8MIG-015). |
 | published_by | uuid | no | Who published it; BundleSummary.publishedBy (CHG-R8MIG-015). |
 | is_delta | boolean | yes |  |
@@ -8317,6 +8791,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
+| reference_price | numeric(18,4) | no | The price a saving is measured against (accepted 26 October 2026, Chinmay, ADAM CR-253 option C), set by the back office on the variant (updateProductVariant). |
 | product_id | uuid | yes |  |
 | sku | text | yes |  |
 | axis_values | jsonb | yes |  |
@@ -8407,6 +8882,15 @@ Every table this service owns that the slice reads or writes, with its columns a
 | legal_entity_id | uuid | no | Set where the component is earned by a different legal entity. |
 | venue_id | uuid | no |  |
 
+### `promotions.allocation_split`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| bundle_id | uuid | yes |  |
+| method | text | yes |  |
+| crosses_legal_entities | boolean | no | True where components are earned by different legal entities. |
+
 ### `promotions.bundle`
 
 | Column | Type | Required | Notes |
@@ -8417,7 +8901,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | venue_id | uuid | yes |  |
 | kind | text | yes |  |
 | list_price | numeric(18,4) | yes |  |
-| allocation | jsonb | yes |  |
+| allocation | jsonb | yes | Stored as promotions.allocation_split and promotions.allocation_component, the record of the split; promotions.bundle.allocation is a copy derived from them in the same transaction (ADAM CR-110, opti… |
 | valid_from | timestamptz | no |  |
 | valid_to | timestamptz | no |  |
 | campaign_id | uuid | no | The commercial campaign (promotions.campaign) the bundle is sold under. |
@@ -8428,7 +8912,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | required_variant_ids | text[] | no | Products that must already be in the basket for the bundle to be sold (the setup screen's "requires another product"). |
 | id | uuid | yes |  |
 | variant_id | uuid | no | The catalogue variant a cart line of this bundle names (R8 blocker ORDERS-MONEY-C43, CHG-R8MIG-023): each sold bundle has a catalogue product of kind bundle with one variant, made when the bundle is… |
-| savings_amount | numeric(18,4) | yes | Sum of component list prices less the bundle price. |
+| savings_amount | numeric(18,4) | yes | Sum of component list prices less the bundle price: the list_price captured on each promotions.allocation_component when the bundle was created, not the variants' current prices (ADAM CR-110, option… |
 | savings_percentage | numeric | no |  |
 | has_been_sold | boolean | yes | True locks components and allocation against amendment. |
 | is_active | boolean | yes |  |
@@ -8549,7 +9033,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | code | text | yes | Unique per tenant (6 October 2026, CHG-R4-015; the rule of audit R108 for configuration codes). |
 | name | text | yes |  |
+| name_localised | jsonb | no | The promotion's name in each of the tenant's enabled languages (ADAM CR-231, option A, decided 25 October 2026; CHG-R10CAT-012), keyed by ISO 639-1 code, as Product.nameLocalised. |
 | description | text | no |  |
+| description_localised | jsonb | no | The description in each enabled language, as nameLocalised; falls back to description. |
+| label | jsonb | no | The guest-facing label, the pill on the offer card (BUNDLE, RENTAL, MEMBERSHIP, SEASON, PARKING on WEB-032), per language as nameLocalised (ADAM CR-225 and CR-231, option A, decided 25 October 2026;… |
+| venues | jsonb | no | Where a guest may use the offer, as the offer card's venue line shows it (ADAM CR-225, option A, decided 25 October 2026; CHG-R10CAT-012). |
 | venue_id | uuid | yes |  |
 | discount | jsonb | yes |  |
 | conditions | jsonb | no |  |
@@ -8785,7 +9273,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-378 operations, added to this service in later releases without changing any of the above.
+375 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -8804,7 +9292,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | import | `commitImportJob`, `getImportJob`, `importSeatGeometry`, `importSeatManifest` |
 | lease | `acquireInventoryHold`, `forceReleaseInventoryHold`, `listInventoryHolds`, `relinquishInventoryHold`, `renewInventoryHold` |
 | pricing | `getPriceList`, `listPriceLists`, `listPrices` |
-| product | `checkProductSalePermission`, `createProduct`, `getProductChannelTexts`, `getProductDashboard`, `getProductOwnerForms`, `getProductSalePermissionRules`, `listOwnerFormCandidates`, `listProductAttentionItems`, `listSalePermissionTargets`, `setProductAttributes`, `setProductChannelTexts`, `setProductClassification`, `setProductOwnerForms`, `setProductSalePermissionRules`, `transitionProductLifecycle` |
+| product | `checkProductSalePermission`, `createProduct`, `getProductChannelTexts`, `getProductDashboard`, `getProductOwnerForms`, `getProductSalePermissionRules`, `listOwnerFormCandidates`, `listProductAttentionItems`, `listSalePermissionTargets`, `setProductAttributes`, `setProductClassification`, `transitionProductLifecycle` |
 | promotion | `createCommercialCampaign`, `endPromotion`, `listCommercialCampaigns`, `pausePromotion`, `unschedulePromotion`, `updateCommercialCampaign` |
 | promotions | `getRecommendations`, `simulatePromotion`, `voidVoucher` |
 | recommendations | `concludeRecommendationExperiment`, `createRecommendationExperiment`, `createRecommendationStrategy`, `explainRecommendation`, `getProductAffinity`, `getRecommendationPerformance`, `listProductRelationships`, `listRecommendationExperiments`, `listRecommendationStrategies`, `recordRecommendationOutcome`, `setProductRelationships`, `setRecommendationSuppression`, `simulateRecommendationStrategy`, `updateRecommendationStrategy` |

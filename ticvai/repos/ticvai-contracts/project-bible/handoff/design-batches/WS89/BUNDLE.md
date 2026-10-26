@@ -346,6 +346,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - … and 1 more flow steps (`flows/`)
 - Flow F198 branch at step 1 (expected): when Nothing has been set up on Rental Inventory Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F198 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -468,6 +469,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS117 Rental Management Board 2.dc.html#bo-505`
 - Workshop pack: Rental_Management.pdf board 2
 - Flow F198 *Rental Management board 2: Rental Inventory Command Center*, step 2: Works in Serialized Equipment Registry → Manage individually identifiable rental assets.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -657,6 +659,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS117 Rental Management Board 2.dc.html#bo-506`
 - Workshop pack: Rental_Management.pdf board 2
 - Flow F198 *Rental Management board 2: Rental Inventory Command Center*, step 4: Works in Equipment / Asset Profile → Provide a complete digital record for every serialized rental asset.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -799,6 +802,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS117 Rental Management Board 2.dc.html#bo-507`
 - Workshop pack: Rental_Management.pdf board 2
 - Flow F198 *Rental Management board 2: Rental Inventory Command Center*, step 6: Works in Pooled Inventory Management → Manage products where individual physical items do not require serial-level tracking.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -985,6 +989,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS117 Rental Management Board 2.dc.html#bo-508`
 - Workshop pack: Rental_Management.pdf board 2
 - Flow F198 *Rental Management board 2: Rental Inventory Command Center*, step 8: Works in Equipment Status & Condition Management → Separate operational status from physical condition. This distinction is important.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1136,6 +1141,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS117 Rental Management Board 2.dc.html#bo-509`
 - Workshop pack: Rental_Management.pdf board 2
 - Flow F198 *Rental Management board 2: Rental Inventory Command Center*, step 10: Works in QR / Barcode Equipment Identification → Give every physical serialized rental item a scannable digital identity. This incorporates the equipment-assignment scanning recommendation from the source.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1580,6 +1586,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS117 Rental Management Board 2.dc.html#bo-512`
 - Workshop pack: Rental_Management.pdf board 2
 - Flow F198 *Rental Management board 2: Rental Inventory Command Center*, step 16: Works in Inventory Adjustment & Exception Management → Handle physical inventory discrepancies and exceptional conditions.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

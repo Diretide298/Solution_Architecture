@@ -310,10 +310,36 @@ subject; a `serviceAuth` call has no user, takes its tenant from the cell token'
 at the tenant root and is audited as the calling cell. The full rule is in backend/MIGRATIONS.md,
 "The connection context".
 
+**A public guest read of venue data runs under the venue the request names** (decided 25 October 2026, Chinmay,
+ADAM CR-198 option A; CHG-R10ID-010; stated once on `guestAuth` in `contracts/shared/common.yaml`): the path's
+`{venueId}` or a required `venueId` query parameter, else the `X-Venue-Id` header; the server checks it is one of the tenant's venues (else `404`) and sets
+`ticvai.scope_paths` to that venue's path, read-only, for the request. An anonymous guest session (CR-183) carries the
+same venue scope. Row-level security stays the line of defence; browsing needs no session.
+
 ### 7.2 Service layer — defence in depth
 
 Every operation declares `x-ticvai-permission` and `x-ticvai-scope-level` in the contract.
-The gateway checks the session's effective set before the handler runs.
+The server checks the permission before the handler runs, **at the scope the operation acts on**.
+
+**The per-scope rule, for every operation from now on** (decided 25 October 2026, Chinmay, ADAM CR-189
+option A; CHG-R10ID-001). The server keeps permissions per scope: the request's resolved session carries,
+beside the flat `effectivePermissions`, the permissions held at each scope path after deny resolution (the
+server-side form of `Session.permissionsByScope`). An operation's `x-ticvai-permission` is evaluated at the
+scope the operation acts on, from that per-scope set: it holds when it is in the set of the node acted on or
+of one of its ancestors. `effectivePermissions` is for coarse checks only (a menu, a first gate) and never
+decides an operation by itself, because a permission held at venue A plus any other permission at venue B
+puts both paths in `ticvai.scope_paths` and the permission in the flat set. Two shapes follow, and no later
+operation needs to ask again:
+
+- **A list's reach** is the scope paths where its permission holds; a filter (`scopePath` or a venue) outside
+  that reach is `403` (as `listPrincipals` states).
+- **A tenant-level operation** (`x-ticvai-scope-level: tenant`) needs its permission at the tenant root; held
+  only below the root it is `403`, even when another permission is held at the root (as `createRole` states).
+
+Row-level security is unchanged and still the line of defence for rows; this rule decides the operation. The
+request kernel's seam carries the per-scope set (#27692, the kernel ticket, owns the field); sign-in (#27666)
+fills it from the same resolution that fills `Session.permissionsByScope`; until sign-in lands, tests fill
+the seam. No wire shape changes.
 
 ### 7.3 Client — presentation only
 

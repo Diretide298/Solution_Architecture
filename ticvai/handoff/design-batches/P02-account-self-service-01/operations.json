@@ -182,7 +182,7 @@
   "scopeLevel": "tenant",
   "parameters": [],
   "requestBody": null,
-  "responds": "GuestSession"
+  "responds": "GuestSessionView"
  },
  "getMyProfile": {
   "method": "GET",
@@ -238,6 +238,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": null
+ },
+ "getSubjectDataExport": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/data-export/{requestId}",
+  "contract": "identity",
+  "summary": "Where a guest's data export has got to, and its download link",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SubjectDataExportStatus"
  },
  "getTaxDocumentRendition": {
   "method": "GET",
@@ -859,6 +872,25 @@
   ],
   "requestBody": null,
   "responds": "GuestProfile"
+ },
+ "verifyGuestEmail": {
+  "method": "POST",
+  "path": "/auth/guest/verify-email",
+  "contract": "identity",
+  "summary": "Send a verification link, or consume one",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": null
  },
  "verifyGuestOtp": {
   "method": "POST",

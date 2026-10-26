@@ -496,6 +496,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html#bo-825`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 10
 - Flow F253 *Marketing CRM Configuration Reference v1.0 board 10: Gamification Command Center*, step 2: Works in Challenge Builder → Create a governed challenge from objective through publication. Configure challenge name, objective, audience, actions, progress logic, start/end, recurrence and capacity. Define eligibility, terms …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -619,7 +620,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the achievement badge are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listBadges` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setBadge`, `awardBadge`. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The customer already holds this badge with status `awarded` and an `expiresAt` that is null or in the future (`badge-already-held`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A public guest read of venue data named no venue (`venue-required`; ADAM CR-198, CHG-R10ID-022): send `X-Venue-Id`.; 409 The customer already holds this badge with status `awarded` and an `expiresAt` that is null or in the future (`badge-already-held`). |
 
 #### Sample data for the mock-up
 
@@ -667,7 +668,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (22), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (22), with its required mark, default, format and its error state (400, 409).
 - [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-826?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: New badge, Save badge, Award to this guest, Cancel.
@@ -872,7 +873,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the points activity rules are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `getLoyaltyRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setLoyaltyRules`, `setLoyaltyCampaign`. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 A rule references a reward or product that does not exist |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A public guest read of venue data named no venue (`venue-required`; ADAM CR-198, CHG-R10ID-022): send `X-Venue-Id`.; 409 A rule references a reward or product that does not exist |
 
 #### Edge cases to draw
 
@@ -938,7 +939,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (63), with its required mark, default, format and its error state (404, 409).
+- [ ] Every input above is drawn (63), with its required mark, default, format and its error state (400, 404, 409).
 - [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-827?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save earning rules, Cancel, Save campaign, Save campaign rules.
@@ -1114,7 +1115,7 @@ Carried, not typed: `rewardId`
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the milestones reward rules are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listLoyaltyProgrammes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setReward`, `setLoyaltyRules`. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 A rule references a reward or product that does not exist |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A public guest read of venue data named no venue (`venue-required`; ADAM CR-198, CHG-R10ID-022): send `X-Venue-Id`.; 409 A rule references a reward or product that does not exist |
 
 #### Sample data for the mock-up
 
@@ -1169,7 +1170,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (62), with its required mark, default, format and its error state (404, 409).
+- [ ] Every input above is drawn (62), with its required mark, default, format and its error state (400, 404, 409).
 - [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-828?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save milestones, Cancel, Save reward.
@@ -1268,6 +1269,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html#bo-829`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 10
 - Flow F253 *Marketing CRM Configuration Reference v1.0 board 10: Gamification Command Center*, step 10: Works in Family, Team & Event Challenges → Support collaborative and competitive engagement formats. Configure family/household, team, group and event membership and joining rules. Define individual versus shared contribution, group scoring …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1788,7 +1790,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the gamification analytics audit are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A public guest read of venue data named no venue (`venue-required`; ADAM CR-198, CHG-R10ID-022): send `X-Venue-Id`.; 400 Validation failed |
 
 #### Consistency with other screens
 
@@ -1957,11 +1959,11 @@ Method, path, parameters, request and response for every operation these screens
 "getGuestLoyalty": {"method":"GET","path":"/guests/{subjectId}/loyalty","contract":"marketing-crm","summary":"A guest's loyalty position","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":true}],"requestBody":null,"responds":"LoyaltyPosition"},
 "getKpiValues": {"method":"GET","path":"/kpi-values","contract":"reporting","summary":"Current values, against target, with movement","permission":"REPORT_VIEW_VENUE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"kpiIds","in":"query","required":null},{"name":"kpiCodes","in":"query","required":null},{"name":"scopePath","in":"query","required":null},{"name":"period","in":"query","required":null},{"name":"compareTo","in":"query","required":null},{"name":"interval","in":"query","required":null},{"name":"groupBy","in":"query","required":null},{"name":"module","in":"query","required":null}],"requestBody":null,"responds":"KpiValue"},
 "getLoyaltyRules": {"method":"GET","path":"/loyalty/programmes/{programmeId}/rules","contract":"marketing-crm","summary":"Every rule a loyalty programme runs on","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"path","required":true}],"requestBody":null,"responds":"LoyaltyRuleSet"},
-"listBadges": {"method":"GET","path":"/badges","contract":"marketing-crm","summary":"Badges a guest can be awarded","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null},{"name":"venueId","in":"query","required":false}],"requestBody":null,"responds":"Page"},
+"listBadges": {"method":"GET","path":"/badges","contract":"marketing-crm","summary":"Badges a guest can be awarded","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null},{"name":"venueId","in":"query","required":false},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listChallenges": {"method":"GET","path":"/challenges","contract":"marketing-crm","summary":"The venue's challenges","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listLoyaltyCampaigns": {"method":"GET","path":"/loyalty/campaigns","contract":"marketing-crm","summary":"Time-boxed campaigns inside a programme","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":null},{"name":"activeOn","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listLoyaltyProgrammes": {"method":"GET","path":"/loyalty/programmes","contract":"marketing-crm","summary":"List loyalty programmes","permission":"MARKETING_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null},{"name":"venueId","in":"query","required":false}],"requestBody":null,"responds":"Page"},
-"listRewards": {"method":"GET","path":"/loyalty/rewards","contract":"marketing-crm","summary":"What points can be turned into","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listLoyaltyProgrammes": {"method":"GET","path":"/loyalty/programmes","contract":"marketing-crm","summary":"List loyalty programmes","permission":"MARKETING_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null},{"name":"venueId","in":"query","required":false},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listRewards": {"method":"GET","path":"/loyalty/rewards","contract":"marketing-crm","summary":"What points can be turned into","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setBadge": {"method":"PUT","path":"/badges/{badgeId}","contract":"marketing-crm","summary":"Define a badge","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"badgeId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"MarketingBadge","responds":"MarketingBadge"},
 "setLoyaltyCampaign": {"method":"PUT","path":"/loyalty/campaigns/{loyaltyCampaignId}","contract":"marketing-crm","summary":"Define a loyalty campaign and its window","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"loyaltyCampaignId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"MarketingLoyaltyCampaign","responds":"MarketingLoyaltyCampaign"},
 "setLoyaltyRules": {"method":"PUT","path":"/loyalty/programmes/{programmeId}/rules","contract":"marketing-crm","summary":"Replace a programme's rules as one set","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"LoyaltyRuleSet","responds":"LoyaltyRuleSet"},

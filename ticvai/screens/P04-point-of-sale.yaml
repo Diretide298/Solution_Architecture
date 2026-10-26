@@ -2651,9 +2651,10 @@ screens:
       from: navigation
       optional: true
       notes: 'r8 (GPS-C05): read from `Performance.eventId` (`getPerformance`).'
-    coldEntry: '**A link to a performance that has happened** shows that performance (`getPerformance`); the
-      cashier picks another on the sell screens. The next performance is not looked up here: the approved
-      screen has no element for the offer, so `listPerformances` is not declared (CHG-R10OPN-005, ADAM CR-262; Chinmay, 26 October 2026).'
+    coldEntry: '**A link to a performance that has happened** shows that performance (`getPerformance`);
+      the cashier picks another on the sell screens. The next performance is not looked up here: the approved
+      screen has no element for the offer, so `listPerformances` is not declared (CHG-R10OPN-005, ADAM
+      CR-262; Chinmay, 26 October 2026).'
   wireframe:
     status: approved
     provenance: client-verified
@@ -10112,7 +10113,7 @@ screens:
     provenance: defined 4 October 2026 (CHG-FXS-003)
   - operationId: listQueueFeeds
     contract: queue
-    purpose: 'The delivery partners'' order feeds and their health (check-screen-value-sources, CHG-R10UI-015)'
+    purpose: The delivery partners' order feeds and their health (check-screen-value-sources, CHG-R10UI-015)
     trigger: onLoad
   entryState:
     params:

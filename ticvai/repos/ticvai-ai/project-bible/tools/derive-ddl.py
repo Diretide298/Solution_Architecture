@@ -74,7 +74,9 @@ the schema a null member still collides (`NULLS NOT DISTINCT`, CHG-MKT-002). **A
 indexed as `lower(column)`**, so a code is unique whatever its case, as common.yaml says; an opaque
 external id marked `x-ticvai-unique-compare: exact` is not (CHG-GEN-001). `x-ticvai-required-when:
 {prop: {other: value}}` is a table CHECK that the column is set on rows where `other` is `value`
-(CHG-TEN-001: a product tile names its variant). Uniqueness and immutability rules
+(CHG-TEN-001: a product tile names its variant). `x-ticvai-null-exactly-when: {prop: {other: value}}` is a table
+CHECK that the column is null exactly on the rows where `other` is `value` (ADAM CR-242: a session's `ended_at` is null
+exactly while it is `active`). Uniqueness and immutability rules
 the contracts state only in prose are not -- there is nothing machine-readable to derive them from.
 **A storage-only column carries its own `enum`** (and `maxLength`, `default`) on its schema-reference
 record, and gets the same CHECK (CHG-R6-001).
@@ -302,6 +304,11 @@ SHARED_SCOPE = {
 # the rows of `Dashboard.tiles[]` (`dashboard_id`), and `report_id -> reporting.report_definition` names
 # what the tile shows. Each follows its parent.
 ROW_OWNER = {
+    # CHG-R10ORD-014 (ADAM CR-208, 25 October 2026): a refund's line and payment rows are the refund's. Each has a
+    # second protected candidate (`order_line_id -> orders.order_line`, `payment_id -> orders.payment`), which names
+    # what the refund took from; the payment rows fell to the tenant root ("several protected owners").
+    "orders.refund_line": "refund_id",            # CHG-R10ORD-014 (CR-208)
+    "orders.refund_payment": "refund_id",         # CHG-R10ORD-014 (CR-208)
     "catalogue.product_media": "product_id",   # CHG-R6-005 (CR-009)
     "inventory.quotation_line": "quotation_id",   # CHG-R6-013
     "reporting.dashboard_tile": "dashboard_id",   # CHG-R6-013
@@ -627,6 +634,17 @@ APPEND_AUDIT = {
     "identity.authz_audit",    # CHG-R6-014
 }
 
+# **A trail a venue reads its own part of** (CHG-R10TEN-006; ADAM CR-185, option B, decided 21 October 2026).
+# listAuditRecords is a venue operation behind six venue screens, and the tenant-root read gave a venue manager
+# holding AUDIT_VIEW an empty page with no error. `x-ticvai-rls: audit-read-beneath` on an APPEND_AUDIT table's
+# contract schema keeps every write where CR-005 put it (any grant appends; the tenant root alone corrects or
+# removes) and widens SELECT: the tenant root reads every row, and a grant reads the rows whose org-unit column
+# names a platform.scope node at or beneath it. A row with no org unit (a consumer, a job, the webhook) stays the
+# tenant root's. The value is the column the mark reads.
+APPEND_AUDIT_MARKS = {"audit-read-beneath": "org_unit_id"}
+APPEND_AUDIT_BENEATH = ("platform.tenant_root_in_scope() OR ({col} IS NOT NULL AND EXISTS (SELECT 1 FROM "
+                        "platform.scope au WHERE au.id = {col} AND platform.in_scope(au.path)))")
+
 RLS_APPEND_AUDIT = """
 -- **An append-only audit trail** (CHG-R6-002): any connection holding a grant may append a row, and
 -- only the tenant root may read, correct or remove one. A venue principal's business write audits itself
@@ -654,6 +672,22 @@ BEGIN
                    'WITH CHECK (platform.tenant_root_in_scope())', base || '_update', target);
     EXECUTE format('CREATE POLICY %I ON %s FOR DELETE USING (platform.tenant_root_in_scope())',
                    base || '_delete', target);
+END
+$$;
+
+-- **An append-only audit trail with a wider read** (CHG-R10TEN-006, ADAM CR-185): as apply_append_audit_rls,
+-- but SELECT is `read_check`, generated from the table's `x-ticvai-rls` mark (the tenant root, or a grant over
+-- the row's org unit). Appending, correcting and removing are unchanged.
+CREATE OR REPLACE FUNCTION platform.apply_append_audit_read_rls(target regclass, read_check text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    base text := (SELECT left(c.relname, 55) FROM pg_class c WHERE c.oid = target);
+BEGIN
+    PERFORM platform.apply_append_audit_rls(target);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', base || '_read', target);
+    EXECUTE format('CREATE POLICY %I ON %s FOR SELECT USING (%s)', base || '_read', target, read_check);
 END
 $$;
 """
@@ -1413,9 +1447,15 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
                  for t, why in tenant_only]
     if append_audit:
         body.append("\n-- Append-only audit trails (CHG-R6-002): any connection holding a grant appends, only the\n"
-                    "-- tenant root reads, corrects or removes.")
-        body += [f"SELECT platform.apply_append_audit_rls('{qual(t)}'::regclass);  -- was: {why}"
-                 for t, why in append_audit]
+                    "-- tenant root reads, corrects or removes; a trail marked audit-read-beneath (CHG-R10TEN-006,\n"
+                    "-- CR-185) is also read by a grant over the row's org unit.")
+        for t, why, *col in append_audit:
+            if col and col[0]:
+                read = APPEND_AUDIT_BENEATH.format(col=col[0])
+                body.append(f"SELECT platform.apply_append_audit_read_rls('{qual(t)}'::regclass, "
+                            f"{sql_literal(read)});  -- was: {why}")
+            else:
+                body.append(f"SELECT platform.apply_append_audit_rls('{qual(t)}'::regclass);  -- was: {why}")
     if unscoped:
         body.append("\n-- No policy. Each needs a scoping decision (carry scope_path or venue_id, or a\n"
                     "-- NOT NULL owning reference) before row-level security can hold for it.")
@@ -1486,13 +1526,25 @@ def sql_literal(v) -> str:
 CROSS_DEPLOYABLE = ROOT / "docs" / "active" / "cross-deployable-writes.yaml"
 
 
-def deployable_read_grants() -> str:
+def deployable_read_grants(db: str = "tenant") -> str:
     """The `reads` of docs/active/cross-deployable-writes.yaml as guarded GRANT blocks (ADAM CR-196, CHG-R9CR-005).
 
     One block per table: `GRANT <privileges> ON <table> TO <reader>` when the role and the table exist. DB-ROLES makes
-    the roles (`commerce`, `access`, `operations`, `workers`, `ticvai_ai`); a database without them is left alone."""
+    the roles (`commerce`, `access`, `operations`, `workers`, `ticvai_ai`); a database without them is left alone.
+
+    **The schema's USAGE comes with the table** (ADAM CR-247, option A, accepted 26 October 2026; CHG-R10CRF-007). A
+    SELECT on `catalogue.entitlement_template` is useless to a role with no USAGE on `catalogue`: DB-ROLES grants each
+    role only its own schemas, so CR-240's in-process reads failed with "permission denied for schema catalogue". Each
+    read now grants USAGE on the table's schema too (never anything else in it), guarded on the role and the schema.
+
+    **Each grant goes to the database that holds the table** (ADAM CR-243, option A, accepted 26 October 2026;
+    CHG-R10CRF-003): a `control.*` table is in the control database (ADR-0039), so its grant is written into the
+    control database's file and forward migration (`db` "control"), and the tenant file carries only tenant tables."""
     doc = yaml.safe_load(CROSS_DEPLOYABLE.read_text(encoding="utf-8")) or {}
     out = []
+    # Every host already uses the kernel's schema (the `kernel` tables, DB-ROLES), so no USAGE is written for it, and
+    # no rollback could revoke what the kernel needs.
+    kernel_schemas = {str(k.get("table") or "").split(".", 1)[0] for k in doc.get("kernel") or []}
     for r in doc.get("reads") or []:
         role = str(r.get("reader") or "")
         privs = ", ".join(str(p).upper() for p in r.get("privileges") or [])
@@ -1500,7 +1552,17 @@ def deployable_read_grants() -> str:
             print(f"  ! cross-deployable read {r.get('id')}: reader {role!r} with {privs!r} is not a role and SELECT; "
                   "no grant written")
             continue
+        used = {(role, s) for s in kernel_schemas}
         for t in r.get("tables") or []:
+            schema = str(t).split(".", 1)[0]
+            if area(schema) != db:
+                continue
+            if (role, schema) not in used:
+                used.add((role, schema))
+                out.append(f"-- {r.get('id')}: {role} may use schema {schema} for the tables granted below (ADAM CR-247)")
+                out.append(f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = {sql_literal(role)}) AND "
+                           f"EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = {sql_literal(schema)}) THEN "
+                           f"GRANT USAGE ON SCHEMA {schema} TO {role}; END IF; END $$;")
             out.append(f"-- {r.get('id')}: {role} reads {t} in process (ADR-0055 rule 4 as amended; "
                        f"{r.get('decision_ref') or ''})")
             out.append(f"DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = {sql_literal(role)}) AND "
@@ -1509,13 +1571,111 @@ def deployable_read_grants() -> str:
     if not out:
         return ""
     return ("\n-- **Reads granted across deployables** (docs/active/cross-deployable-writes.yaml `reads`; ADAM CR-196,\n"
-            "-- CHG-R9CR-005). Row-level security still applies to every row these roles read.\n" + "\n".join(out) + "\n")
+            "-- CHG-R9CR-005; the schema's USAGE with each, ADAM CR-247). Row-level security still applies to every row\n"
+            "-- these roles read.\n" + "\n".join(out) + "\n")
+
+
+# **Ending every session of a principal, whatever venue the caller acts at** (ADAM CR-180, option A, accepted 21 October
+# 2026; CHG-R10ID-006). updatePrincipal runs at venue scope, but identity.refresh_token is tenant-root and
+# identity.session venue-isolated, so a venue manager's revoke updated no token and only its own venue's sessions, and
+# the PATCH still answered 200. This one SECURITY DEFINER function first checks the caller may update the principal, by
+# the principal's own write rule (x-ticvai-rls home-scope-write: the tenant root, or a grant over its home scope), then
+# ends every live session and revokes every live refresh token of that principal. No grant or policy is widened: the
+# function lifts the connection to the tenant root for its own two statements only and puts the caller's scope back
+# before it returns. updatePrincipal (deactivation, validTo, primaryRoleId) and forceLogout call it.
+END_PRINCIPAL_SESSIONS_SQL = """
+-- **identity.end_principal_sessions** (ADAM CR-180, option A; CHG-R10ID-006): ends every live session and revokes every
+-- live refresh token of one principal, at every venue, once the caller is shown to be allowed to update that principal
+-- (identity.principal's write rule, home-scope-write). Returns the number of sessions ended. Whatever its owner, it
+-- reads and writes the two tables at the tenant root for these statements only, and restores the caller's
+-- ticvai.scope_paths before returning.
+CREATE OR REPLACE FUNCTION identity.end_principal_sessions(target_principal_id uuid, ended_by uuid, reason text)
+    RETURNS integer
+    LANGUAGE plpgsql
+    VOLATILE
+    SECURITY DEFINER
+    SET search_path = pg_catalog, public, pg_temp
+AS $$
+DECLARE
+    caller_paths text := current_setting('ticvai.scope_paths', true);
+    root_path text;
+    ended integer := 0;
+BEGIN
+    IF NOT (platform.tenant_root_in_scope() OR EXISTS (
+            SELECT 1 FROM identity.principal hp JOIN platform.scope hs ON hs.id = hp.home_scope_id
+             WHERE hp.id = target_principal_id AND platform.in_scope(hs.path))) THEN
+        RAISE EXCEPTION 'identity.end_principal_sessions: the caller may not update principal %', target_principal_id
+            USING ERRCODE = '42501';
+    END IF;
+    SELECT s.path::text INTO root_path FROM platform.scope s WHERE s.level = 'tenant' LIMIT 1;
+    PERFORM set_config('ticvai.scope_paths', COALESCE(root_path, ''), true);
+    UPDATE identity.session
+       SET status = 'terminated', ended_at = now(), ended_by_principal_id = ended_by, end_reason = left(reason, 500)
+     WHERE principal_id = target_principal_id AND status = 'active';
+    GET DIAGNOSTICS ended = ROW_COUNT;
+    UPDATE identity.refresh_token
+       SET revoked_at = now(), revocation_reason = left(reason, 250)
+     WHERE principal_id = target_principal_id AND revoked_at IS NULL;
+    PERFORM set_config('ticvai.scope_paths', COALESCE(caller_paths, ''), true);
+    RETURN ended;
+END
+$$;
+"""
 
 
 def exactly_one_sql(short: str, group: list) -> str:
     """`x-ticvai-exactly-one-of` (ADAM CR-158, CHG-CRA-002): the table CHECK line that exactly one column is set."""
     return (f"    CONSTRAINT {obj_name(short, *group, 'one', suffix='chk')} CHECK ("
             f"num_nonnulls({', '.join(q(k) for k in group)}) = 1)")
+
+
+# **A change version every writer moves** (ADAM CR-239, option A, settled 25 October 2026; CHG-R10ORD-011). The
+# property mark `x-ticvai-change-version: true` on a bigint property makes its column the row's change version: a
+# per-database sequence `<table>_<column>_seq`, and a BEFORE INSERT OR UPDATE trigger that sets the column from it, so
+# every operation that writes the table moves it without remembering to (access.entitlement has seventeen writers).
+# A delta read ("changed after N") then has something to count. One guarded block, written as it is into a forward
+# migration by tools/ddl_forward.py (CHANGE_VERSION); it does nothing where the table or the column is missing.
+CHANGE_VERSION_MARK = "x-ticvai-change-version"
+
+# **The value the rows already there take when a new column arrives** (ADAM CR-104 as the lead ruled it, 26 October
+# 2026; CHG-R10OPN-002). `x-ticvai-backfill: <value>` on a persisted property: a forward migration that adds the column
+# sets it to that value on every row already in the table, in the same guarded block (tools/ddl_forward.py
+# backfill_block); rows written later take the column's default. `MerchandiseItem.isPublished` defaults to false for a
+# new item and is true on every item that was there before it, so no item a guest sees today disappears. A scalar
+# only (boolean, number, string), typed as the column is; BACKFILL: table -> {column: SQL literal}, filled by main.
+BACKFILL_MARK = "x-ticvai-backfill"
+BACKFILL: dict = {}
+
+
+def backfill_literal(typ: str, v) -> str | None:
+    """The SQL literal of an `x-ticvai-backfill` value for a column of type `typ`, or None where they do not fit."""
+    if typ == "boolean" and isinstance(v, bool):
+        return "true" if v else "false"
+    if typ in ("integer", "bigint", "smallint") and isinstance(v, int) and not isinstance(v, bool):
+        return str(v)
+    if (typ.startswith(("numeric", "double precision", "real")) and isinstance(v, (int, float))
+            and not isinstance(v, bool)):
+        return str(v)
+    if typ == "text" and isinstance(v, str):
+        return sql_literal(v)
+    return None
+
+
+def change_version_sql(schema: str, short: str, table: str, col: str) -> str:
+    """The sequence, the function and the trigger behind `x-ticvai-change-version` (ADAM CR-239, CHG-R10ORD-011)."""
+    seq = f"{schema}.{short}_{col}_seq"
+    fn = f"{schema}.{short}_{col}_set"
+    trg = f"{short}_{col}_trg"
+    return (f"-- change version (x-ticvai-change-version): {table}.{col}, from {seq}, set on every insert and update\n"
+            f"DO $$ BEGIN IF to_regclass({sql_literal(table)}) IS NOT NULL AND EXISTS (SELECT 1 FROM "
+            f"information_schema.columns WHERE table_schema = {sql_literal(schema)} AND table_name = "
+            f"{sql_literal(short)} AND column_name = {sql_literal(col)}) THEN "
+            f"CREATE SEQUENCE IF NOT EXISTS {seq}; "
+            f"CREATE OR REPLACE FUNCTION {fn}() RETURNS trigger LANGUAGE plpgsql AS $f$ BEGIN "
+            f"NEW.{col} := nextval({sql_literal(seq)}); RETURN NEW; END $f$; "
+            f"DROP TRIGGER IF EXISTS {trg} ON {table}; "
+            f"CREATE TRIGGER {trg} BEFORE INSERT OR UPDATE ON {table} FOR EACH ROW EXECUTE FUNCTION {fn}(); "
+            "END IF; END $$;")
 
 
 def index_sql(schema: str, short: str, table: str, group: list) -> str:
@@ -1527,13 +1687,21 @@ def index_sql(schema: str, short: str, table: str, group: list) -> str:
 
 def unique_when_sql(schema: str, short: str, table: str, keycols: list, cond: dict, keys: list) -> str:
     """`x-ticvai-unique-when` (ADAM CR-154; CHG-CRA-004): a partial unique index. `keys` are the index's
-    expressions (a text key as `lower(...)`); `cond` maps a column to the value that selects the rows."""
+    expressions (a text key as `lower(...)`); `cond` maps a column to the value that selects the rows, or to
+    `{not: value}` for the rows whose value is anything else (CHG-R10TEN-011, ADAM CR-105: a hostname is unique among
+    a tenant's claims that are not revoked, since a revoked claim is kept and the domain may be claimed again), or to
+    `{in: [values]}` for the rows holding one of them (CHG-R10TEN-012, ADAM CR-106)."""
     preds = []
     for k, v in sorted(cond.items()):
         if v is True:
             preds.append(q(k))
         elif v is False:
             preds.append(f"NOT {q(k)}")
+        elif isinstance(v, dict) and set(v) == {"not"}:
+            preds.append(f"{q(k)} IS DISTINCT FROM {sql_literal(v['not'])}")
+        elif isinstance(v, dict) and set(v) == {"in"} and isinstance(v["in"], list) and v["in"]:
+            # one of several values (CHG-R10TEN-012, ADAM CR-106: one app build per platform while queued or building)
+            preds.append(f"{q(k)} IN ({', '.join(sql_literal(x) for x in v['in'])})")
         else:
             preds.append(f"{q(k)} = {sql_literal(v)}")
     where = " AND ".join(preds)
@@ -1793,6 +1961,16 @@ def table_marks(cols: dict, tables) -> dict:
                 (column_of(str(p)) or f"?{p}",
                  {(column_of(str(k)) or f"?{k}"): v for k, v in (cond or {}).items()})
                 for p, cond in rw.items() if isinstance(cond, dict) and cond]
+        # **A column null exactly while another holds a value** (ADAM CR-242, option A, accepted 26 October 2026;
+        # CHG-R10CRF-002): `x-ticvai-null-exactly-when: {endedAt: {status: active}}` is a table CHECK that the column is
+        # null on the rows where `status` is `active` and set on every other row, so an ended session always says when
+        # it ended. Becomes `CHECK ((<when> IS NOT DISTINCT FROM 'v') = (<col> IS NULL))`.
+        nw = marks.get("x-ticvai-null-exactly-when")
+        if isinstance(nw, dict) and nw:
+            entry["null_exactly_when"] = [
+                (column_of(str(p)) or f"?{p}",
+                 {(column_of(str(k)) or f"?{k}"): v for k, v in (cond or {}).items()})
+                for p, cond in nw.items() if isinstance(cond, dict) and len(cond) == 1]
         # **A row names exactly one of two things** (ADAM CR-158, 18 October 2026; CHG-CRA-002):
         # `x-ticvai-exactly-one-of: [[permission, roleId]]` on the schema is a table CHECK that exactly one column of
         # each set is set, `num_nonnulls(a, b) = 1`. A grant names a permission or a role, never both and never neither.
@@ -1921,6 +2099,72 @@ DDL_TYPES: dict = {}
 DDL_TYPES_FILE = ROOT / "handoff" / "ddl-column-types.json"
 
 
+def ddl_records(files: dict) -> dict:
+    """**The whole table record, read from the DDL this run generates** (CHG-R10TEN-014; ADAM CR-092, accepted 15
+    October 2026). The workbook's Columns sheet, and ADAM's table view built from it, took `Required` from the schema
+    reference, which leaves a `scope_path` optional where every scoped table's DDL says `ltree NOT NULL`, and listed
+    only the columns the schema reference names; #27686 was done when "every table matches its record", and 218 of
+    497 records disagreed with the DDL they come from. CR-067 settled that the DDL is right and took the types from it;
+    this takes the rest: per table, each column in the generated CREATE TABLE with whether it is NOT NULL (a primary-key
+    column always is), the declared keys (the primary key, every foreign key and every unique index, partial ones with
+    their condition) and the row-level-security helper the table's policy is made with.
+
+    Returns `{table: {"columns": [[column, notNull]], "primaryKey": [...], "keys": [...], "policy": helper}}`."""
+    out: dict = {}
+
+    def rec(t: str) -> dict:
+        return out.setdefault(t, {"columns": [], "primaryKey": [], "keys": [], "policy": ""})
+
+    for name in sorted(files):
+        if not name.endswith(".sql"):
+            continue
+        for st in ddl_forward.split_statements(files[name]):
+            s = ddl_forward.norm(st)
+            m = re.match(r"CREATE TABLE (?:IF NOT EXISTS )?(\S+)\s*\(", s, re.I)
+            if m:
+                t = ddl_forward.unq(m.group(1))
+                start = s.index("(", m.start(1))
+                body = s[start + 1:ddl_forward.balanced(s, start)]
+                r = rec(t)
+                for item in ddl_forward.top_level_split(body):
+                    head = item.split()[0].upper() if item.split() else ""
+                    if item.upper().startswith(ddl_forward.TABLE_LEVEL):
+                        pk = re.search(r"PRIMARY KEY\s*\(([^)]*)\)", item, re.I)
+                        if pk:
+                            r["primaryKey"] = [ddl_forward.unq(x.strip()) for x in pk.group(1).split(",")]
+                        continue
+                    if head in ("LIKE",):
+                        continue
+                    col = ddl_forward.unq(item.split()[0])
+                    is_pk = bool(re.search(r"\bPRIMARY KEY\b", item, re.I))
+                    if is_pk:
+                        r["primaryKey"] = [col]
+                    r["columns"].append([col, is_pk or bool(re.search(r"\bNOT NULL\b", item, re.I))])
+                continue
+            m = re.match(r"ALTER TABLE (?:ONLY )?(\S+) ADD CONSTRAINT (\S+) FOREIGN KEY \(([^)]*)\) REFERENCES "
+                         r"(\S+?)\s*\(([^)]*)\)", s, re.I)
+            if m:
+                rec(ddl_forward.unq(m.group(1)))["keys"].append(
+                    f"foreign key ({m.group(3).replace(chr(34), '')}) -> {ddl_forward.unq(m.group(4))}"
+                    f"({m.group(5).replace(chr(34), '')})")
+                continue
+            m = re.match(r"CREATE UNIQUE INDEX (?:IF NOT EXISTS )?\S+ ON (\S+)(?: USING \w+)? \((.*?)\)(?: WHERE (.+))?$",
+                         s.rstrip(";"), re.I)
+            if m:
+                rec(ddl_forward.unq(m.group(1)))["keys"].append(
+                    f"unique ({m.group(2).replace(chr(34), '')})" + (f" where {m.group(3)}" if m.group(3) else ""))
+                continue
+            m = re.match(r"SELECT platform\.(apply_\w*rls)\('([^']+)'::regclass", s, re.I)
+            if m:
+                rec(ddl_forward.unq(m.group(2)))["policy"] = m.group(1)
+    for t, r in out.items():
+        if r["primaryKey"]:
+            pkset = set(r["primaryKey"])
+            r["columns"] = [[c, nn or c in pkset] for c, nn in r["columns"]]
+        r["keys"] = sorted(set(r["keys"]))
+    return {t: r for t, r in sorted(out.items()) if r["columns"]}
+
+
 def key_of(table: str, cols: dict) -> str | None:
     """The column a foreign key should point at.
 
@@ -2047,7 +2291,8 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
                     ddl_forward.early_plan(area_dir, its), ev, baseline, stamp, before=nxt or "", rest="")
     for area_dir in (CONTROL, "tenant"):
         old, _fwd = old_model(area_dir)
-        plans.append(ddl_forward.diff(area_dir, old, news[area_dir], renames, retired=RETIRED, descoped=DESCOPED))
+        plans.append(ddl_forward.diff(area_dir, old, news[area_dir], renames, retired=RETIRED, descoped=DESCOPED,
+                                      backfill=BACKFILL))
     # **Root-level files are documentation of references that are not constraints** (990): nothing
     # applies them, so a change is listed rather than migrated.
     for name in sorted(n for n in files if "/" not in n and n.endswith(".sql")):
@@ -2261,6 +2506,7 @@ def main() -> int:
     # (`x-ticvai-append-only: <time property>`).
     marks = table_marks(cols, real)
     DESCOPED.clear()
+    BACKFILL.clear()
     for t, m in sorted(marks.items()):
         if m.get("scope") is None:
             continue
@@ -2457,6 +2703,20 @@ def main() -> int:
                 body.append(f"    {q(col):<33} {typ}{pk}{nn}{rules}")
                 col_type[col] = typ
                 n_cols += 1
+                # `x-ticvai-change-version` (ADAM CR-239, CHG-R10ORD-011): the sequence and trigger that move it.
+                if (column_spec(c, contract_props) or {}).get(CHANGE_VERSION_MARK) is True:
+                    if typ != "bigint":
+                        print(f"  ! {t}.{col}: x-ticvai-change-version needs a bigint (integer, int64), not {typ}")
+                    else:
+                        idx_lines.append((schema, change_version_sql(schema, short, t, col)))
+                # `x-ticvai-backfill` (CHG-R10OPN-002): the value a forward migration gives the rows already there.
+                bf = (column_spec(c, contract_props) or {}).get(BACKFILL_MARK)
+                if bf is not None:
+                    lit = backfill_literal(typ, bf)
+                    if lit is None:
+                        print(f"  ! {t}.{col}: x-ticvai-backfill {bf!r} does not fit a {typ} column; nothing backfilled")
+                    else:
+                        BACKFILL.setdefault(t, {})[col] = lit
 
                 ref = c.get("references")
                 if ref and ref in real:
@@ -2723,6 +2983,15 @@ def main() -> int:
                                   else f"{q(k)} IS NULL OR {q(k)} NOT IN ({lits})")
                 body.append(f"    CONSTRAINT {obj_name(short, rcol, 'when', suffix='chk')} CHECK ("
                             f"{' OR '.join(exempt)} OR {q(rcol)} IS NOT NULL)")
+            # `x-ticvai-null-exactly-when` (ADAM CR-242, CHG-R10CRF-002): null on exactly the rows of one value.
+            for ncol, cond in (marks.get(t) or {}).get("null_exactly_when") or []:
+                bad = [k[1:] for k in [ncol, *cond] if k.startswith("?")]
+                if bad:
+                    no_unique.append(f"{t} (x-ticvai-null-exactly-when {ncol}): {', '.join(bad)} is not a column")
+                    continue
+                (k, v), = cond.items()
+                body.append(f"    CONSTRAINT {obj_name(short, ncol, 'null', suffix='chk')} CHECK (("
+                            f"{q(k)} IS NOT DISTINCT FROM {sql_literal(v)}) = ({q(ncol)} IS NULL))")
             # `x-ticvai-exactly-one-of` (ADAM CR-158, CHG-CRA-002): exactly one column of the set is set.
             for group in (marks.get(t) or {}).get("exactly_one_of") or []:
                 bad = [k[1:] for k in group if k.startswith("?")]
@@ -2898,6 +3167,8 @@ def main() -> int:
         mark = (marks.get(t) or {}).get("rls") or TABLE_RLS.get(t)
         if not mark:
             continue
+        if t in APPEND_AUDIT and mark in APPEND_AUDIT_MARKS:
+            continue   # an append-only trail's wider read is its own helper (CHG-R10TEN-006), applied below
         if mark not in RLS_MARKS:
             print(f"  ! {t}: x-ticvai-rls {mark!r} is not one of {', '.join(RLS_MARKS)}; the base rule stands")
             continue
@@ -3126,7 +3397,15 @@ def main() -> int:
                 if t in split_calls:
                     continue
                 if t in APPEND_AUDIT:
-                    amine.append((t, why))
+                    amark = (marks.get(t) or {}).get("rls")
+                    acol = APPEND_AUDIT_MARKS.get(amark) if amark else None
+                    if amark and not acol:
+                        print(f"  ! {t}: x-ticvai-rls {amark!r} on an append-only trail is not one of "
+                              f"{', '.join(APPEND_AUDIT_MARKS)}; the append policy stands")
+                    if acol and not any(c["column"] == acol for c in cols[t]):
+                        print(f"  ! {t}: x-ticvai-rls {amark} needs a {acol} column; the append policy stands")
+                        acol = None
+                    amine.append((t, why, acol))
                 elif any(c["column"] == "subject_id" for c in cols[t]):
                     smine.append((t, why))
                 else:
@@ -3149,9 +3428,19 @@ def main() -> int:
     # docs/active/cross-deployable-writes.yaml, appended to the tenant row-level security file, so the forward
     # migration carries them to databases already built. Each is guarded on the role and the table existing: a
     # database built without DB-ROLES' roles, or before the table, is left as it is. Row-level security still
-    # applies to every row the role reads.
-    files["tenant/920-row-level-security.sql"] = (files["tenant/920-row-level-security.sql"].rstrip("\n") + "\n"
-                                                  + deployable_read_grants())
+    # applies to every row the role reads. A `control.*` table's grant goes to the control database's file (ADAM
+    # CR-243, CHG-R10CRF-003), and each read brings its schema's USAGE (ADAM CR-247, CHG-R10CRF-007).
+    for grant_db in ("tenant", CONTROL):
+        grants = deployable_read_grants(grant_db)
+        key = f"{grant_db}/920-row-level-security.sql"
+        if grants and key in files:
+            files[key] = files[key].rstrip("\n") + "\n" + grants
+
+    # ADAM CR-180 (CHG-R10ID-006): the one function that ends a principal's sessions everywhere, written beside the
+    # policies it works within; the forward migration carries it (CREATE OR REPLACE) to databases already built.
+    if all(t in cols for t in ("identity.session", "identity.refresh_token", "identity.principal")):
+        files["tenant/920-row-level-security.sql"] = (files["tenant/920-row-level-security.sql"].rstrip("\n") + "\n"
+                                                      + END_PRINCIPAL_SESSIONS_SQL)
 
     # **Range partitioning by month** (ADR-0056). The tables declare `PARTITION BY RANGE` where they
     # are created; this file holds each one's DEFAULT partition and the months ahead.
@@ -3195,13 +3484,20 @@ def main() -> int:
                 dest.chmod(0o755)
 
     if a.apply:
+        # `records` one table to a line (CHG-R10TEN-014): a column per line would add some 70,000 lines to the file.
+        _recs = ddl_records(files)
+        _rec_text = ("{\n" + ",\n".join(f"  {json.dumps(t_)}: {json.dumps(r_, ensure_ascii=False)}"
+                                         for t_, r_ in _recs.items()) + "\n }") if _recs else "{}"
         DDL_TYPES_FILE.write_text(json.dumps({
             "note": "Derived by tools/derive-ddl.py. Do not hand-edit. The type each column takes in the DDL this run "
                     "generates (ADR-0056 one id type, numeric(18,4)), under the names the tables and columns have now, "
                     "including those renamed after r1 whose rename is still a forward migration to write "
-                    "(handoff/migration-review.md). Read by build-schema-workbook.py for the Columns sheet (CR-067).",
+                    "(handoff/migration-review.md). Read by build-schema-workbook.py for the Columns sheet (CR-067). "
+                    "`records` is the rest of each table's record from the same DDL: its columns in order with "
+                    "NOT NULL, its primary key, its declared keys and its row-level-security helper (CR-092).",
             "tables": {t: dict(sorted(c.items())) for t, c in sorted(DDL_TYPES.items())},
-        }, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+            "records": "@RECORDS@",
+        }, indent=1, ensure_ascii=False).replace('"@RECORDS@"', _rec_text) + "\n", encoding="utf-8")
     print(f"  {n_tables} tables · {n_cols} columns · {n_fk} foreign keys · {n_idx} indexes · "
           f"{n_chk} checks · {n_def} defaults · {n_uniq} unique indexes")
     if no_unique:

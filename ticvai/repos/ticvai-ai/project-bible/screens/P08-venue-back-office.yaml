@@ -5529,9 +5529,11 @@ screens:
       - kind: calendarView
         label: Calendar
         operation: listPerformances
-        notes: Performances by day, week or month; a slot opens its performance. Day, week, month and
-          agenda views; the day starts at the venue's `calendarDayStartHour`. Sends the visible window
-          as `from`/`to` and the category filter as `categoryId`.
+        notes: 'Performances by day, week or month; a slot opens its performance. Day, week, month and
+          agenda views; the day starts at the venue''s `calendarDayStartHour`. Sends the visible window
+          as `from`/`to`. No category filter: the approved screen has no element for one, so its options
+          read (`listProductCategories`) is not declared here (CHG-R10OPN-005, ADAM CR-262; Chinmay, 26
+          October 2026).'
         provenance: decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)
       - kind: datePicker
         label: From
@@ -5781,14 +5783,6 @@ screens:
     contract: catalogue
     purpose: List performances of an event
     trigger: onAction
-  - operationId: listProductCategories
-    contract: catalogue
-    purpose: 'The options of the calendar''s category filter (r8, GPS-C18), read once when the screen
-      opens; the chosen category is sent to `listPerformances` as `categoryId`. No component of its own:
-      the filter is part of the calendar. Not background (r8 integration, CHG-R8INT-008): the user sees
-      the options, and the approved screen has no element of its own for the filter.'
-    trigger: onLoad
-    provenance: r8 second round, GPS-C18 (ticket 28195)
   - operationId: getPerformance
     contract: catalogue
     purpose: Read a performance
@@ -8826,8 +8820,9 @@ screens:
       trigger: Product Detail & Variants
       carries:
       - variantId
+      - version
       provenance: derived — BO-008 declares entryState.params productId, variantId, version and BO-026
-        holds variantId, so an edge into it carries them
+        holds variantId, version, so an edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. **Drawn 31 August**
@@ -11276,6 +11271,8 @@ screens:
     provenance: contract tenancy.yaml POST /devices
   - id: formConfigureWorkstation
     component: modal
+    reads:
+    - listSaleBoards
     trigger: Configure workstation
     body: '**Collects what `configureWorkstation` sends before it is called.** Required: `name`. Optional:
       `saleBoardId` (absent or null, the till uses its outlet''s board; DEC-183, CHG-CSP-006), `outletId`,
@@ -11375,6 +11372,11 @@ screens:
     - getWorkstation
     - getWorkstationHealth
     - listWorkstations
+  - operationId: listSaleBoards
+    contract: tenancy
+    purpose: The venue's sale boards, to pick the workstation's board in Configure workstation (check-screen-value-sources,
+      CHG-R10UI-015)
+    trigger: onLoad
   entryState:
     params:
     - name: venueId
@@ -13566,6 +13568,11 @@ screens:
       with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026'
     trigger: onLoad
     provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: getRegionSettings
+    contract: tenancy
+    purpose: 'Sent when an outlet form opens, not a control: the region''s localLanguageNameLocales, the
+      local-language names the form asks for (check-screen-value-sources, CHG-R10UI-015)'
+    trigger: background
   entryState:
     params:
     - name: outletId
@@ -13575,6 +13582,10 @@ screens:
       optional: true
     - name: venueId
       from: session
+    - name: regionId
+      from: session
+      notes: 'The region of the session''s venue, for `getRegionSettings` (its localLanguageNameLocales:
+        which local-language names an outlet asks for; check-screen-value-sources, CHG-R10UI-015).'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -16496,6 +16507,16 @@ screens:
           can be removed (ADAM CR-079; CHG-IDR-003).'
         provenance: contract tenancy.yaml PUT /roles/{roleId}/permissions; wiring fix, 2 October 2026
       - kind: secondaryButton
+        label: Save as preset
+        operation: setCapabilityTemplate
+        notes: '**Saves the ticked permissions as the tenant''s own preset**, listed beside the platform''s
+          in Start from presets. Needs `ROLE_MANAGE` at the tenant scope, as Create role; disabled for
+          a venue-scoped caller, naming the tenant scope (ADAM CR-076; CHG-IDR-001). A platform preset
+          is never overwritten: saving under a preset''s id is `409 capability-template-is-preset` (ADAM
+          CR-176; CHG-R10ID-005).'
+        provenance: contract identity.yaml PUT /capability-templates/{capabilityTemplateId}; ADAM CR-267,
+          26 October 2026 (CHG-R10WIR-003)
+      - kind: secondaryButton
         label: Grant role
         operation: updatePrincipal
         provenance: contract identity.yaml PATCH /principals/{principalId}; wiring fix, 2 October 2026
@@ -16664,6 +16685,30 @@ screens:
       - presetCodes
       - permissions
     provenance: contract identity.yaml POST /roles
+  - id: formSetCapabilityTemplate
+    component: modal
+    trigger: Save as preset
+    body: '**Collects what `setCapabilityTemplate` sends before it is called.** Required: `name`, `code`,
+      `capabilities` (the permissions ticked in Permissions by module, shown for a last look). Optional:
+      `description`, `module` (file the preset under one module, or none for a set that spans modules).
+      The client gives a new preset its id (the path `capabilityTemplateId`); the server files it as the
+      tenant''s own, never a platform preset. Dismissing sends nothing; the screen behind is unchanged.
+      A `409 capability-template-is-preset` stays in the dialog and says a platform preset cannot be overwritten,
+      offering to save under a new name (ADAM CR-176; CHG-R10ID-005).'
+    bindsTo: CapabilityTemplate
+    confirm:
+      label: Save preset
+      operation: setCapabilityTemplate
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+      - code
+      - capabilities
+      - description
+      - module
+    provenance: contract identity.yaml PUT /capability-templates/{capabilityTemplateId}; ADAM CR-267,
+      26 October 2026 (CHG-R10WIR-003)
 - id: BO-055
   name: Rota & Scheduling
   module: People & Access Rights
@@ -19350,7 +19395,7 @@ screens:
       - kind: toggle
         label: Guest two-step verification
         bindsTo: VenueSettings.identity.guestTwoStep.enabled
-        operation: setVenueSettings
+        operation: getVenueSettings
         notes: '**A venue option, off unless the venue enables it** (decided 29 September, rev 3 GAP-B1,
           per venue, superseding the second part of audit R167 "no guest MFA"; guests still never use
           enterprise SSO). On, a guest of this venue may enrol an authenticator app with email codes as
@@ -19361,7 +19406,7 @@ screens:
       - kind: multiSelect
         label: Actions that ask again
         bindsTo: VenueSettings.identity.guestTwoStep.stepUpActions
-        operation: setVenueSettings
+        operation: getVenueSettings
         notes: 'The guest actions at this venue that ask an enrolled guest for the factor again, whatever
           the age of the session: change contact details, change password, manage payment methods, transfer
           tickets, delete account. Proposed default all but transfer tickets, client to correct (rev 3
@@ -20258,6 +20303,11 @@ screens:
     trigger: onAction
     invalidates:
     - listAssets
+  - operationId: listInspections
+    contract: maintenance
+    purpose: The asset's inspections, to pick the one a status change cites in Save asset status (check-screen-value-sources,
+      CHG-R10UI-015)
+    trigger: onLoad
   entryState:
     params:
     - name: assetId
@@ -20317,6 +20367,8 @@ screens:
     provenance: contract maintenance.yaml POST /assets
   - id: formSetAssetStatus
     component: modal
+    reads:
+    - listInspections
     trigger: Save asset status
     body: '**Collects what `setAssetStatus` sends before it is called.** Required: `status`, `reason`,
       `recordedAt`. Optional: `inspectionId`, `raiseWorkOrder`. Dismissing sends nothing; the screen behind
@@ -28490,8 +28542,10 @@ screens:
     - BO-077
     - BO-089
     - BO-090
+    - BO-1088
     - BO-1094
     - BO-1111
+    - BO-1144
     - BO-1146
     - BO-1162
     - BO-1179
@@ -28620,6 +28674,10 @@ screens:
       provenance: 'derived — BO-028 declares entryState.params refundId and BO-101 holds none of them.
         The edge carries nothing: refundId only pre-selects (deep link or optional), and BO-028 opens
         on its own'
+    - to: BO-1088
+      trigger: Opens Credit & Balance Type Configuration
+      provenance: 'CHG-R10OPN-004 (ADAM CR-261; Chinmay, 26 October 2026): the section home links to the
+        Block A screen it leads to, as CHG-RONEP-007 did; its command centre is not in Block A'
     - to: BO-1094
       trigger: Opens Funding Method Configuration
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
@@ -28628,6 +28686,10 @@ screens:
       trigger: Opens Credit Expiry, Extension & Forfeiture Operations
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
+    - to: BO-1144
+      trigger: Opens Peer-to-Peer Transfer Configuration
+      provenance: 'CHG-R10OPN-004 (ADAM CR-261; Chinmay, 26 October 2026): the section home links to the
+        Block A screen it leads to, as CHG-RONEP-007 did; its command centre is not in Block A'
     - to: BO-1146
       trigger: Opens Refund-to-Wallet Policy Configuration
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
@@ -47166,7 +47228,8 @@ screens:
       components:
       - kind: detailPanel
         label: The selected journey simulation audit
-        bindsTo: Journey
+        operation: simulateGuestJourney
+        bindsTo: GuestJourneySimulationView
         columns:
         - impossible journey sequences
         - missing gates
@@ -49644,7 +49707,8 @@ screens:
       components:
       - kind: detailPanel
         label: The selected policy approval audit
-        bindsTo: Policy
+        operation: listDynamicPolicyEffectiveness
+        bindsTo: AccessDynamicPolicyEffectiveness
         columns:
         - →
         - Denial Rate
@@ -56350,6 +56414,9 @@ screens:
   overlays:
   - id: formSetMembershipCommercialConfig
     component: modal
+    reads:
+    - listPriceLists
+    - listTaxProfiles
     trigger: Save membership commercial config
     body: '**Collects what `setMembershipCommercialConfig` sends before it is called.** Required: `membershipCode`,
       `basePricingProfile`, `taxProfile`, `salesPeriod`. Optional: `feeProfile`, `upgradePricePolicy`,
@@ -58342,87 +58409,69 @@ screens:
       components:
       - kind: metricTile
         label: Order Number
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.orderNumber
+        bindsTo: Order.orderNumber
       - kind: metricTile
         label: Order Date/Time
+        operation: getOrder
+        bindsTo: Order.createdAt
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
       - kind: metricTile
         label: Order Status
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.orderStatus
-      - kind: metricTile
-        label: Reservation Status
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.reservationStatus
+        bindsTo: Order.status
       - kind: metricTile
         label: Customer
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.customer
+        bindsTo: Order.subjectId
       - kind: metricTile
         label: Channel
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.channel
+        bindsTo: Order.channel
       - kind: metricTile
         label: Sales Location
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.salesLocation
+        bindsTo: Order.workstationId
       - kind: metricTile
         label: Cashier/Agent
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.cashierAgent
+        bindsTo: Order.principalId
       - kind: metricTile
         label: Currency
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.currency
+        bindsTo: Order.currency
       - kind: metricTile
         label: Total
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.total
+        bindsTo: Order.grossAmount
       - kind: metricTile
         label: Payment Status
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.paymentStatus
-      - kind: metricTile
-        label: Fulfillment Status
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Display
-        bindsTo: OrderDetailTransactionWorkspaceView.fulfillmentStatus
+        bindsTo: Order.payments
       - kind: metricTile
         label: Tickets
+        operation: getOrder
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.tickets
-      - kind: metricTile
-        label: Reservations
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.reservations
+        bindsTo: Order.lines[].entitlementIds
       - kind: metricTile
         label: Payments
+        operation: getOrderStatement
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.payments
+        bindsTo: OrderStatement.totalPaid
       - kind: metricTile
         label: Refunds
+        operation: getOrderStatement
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.refunds
-      - kind: metricTile
-        label: Invoices
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.invoices
-      - kind: metricTile
-        label: Credentials
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.credentials
-      - kind: metricTile
-        label: Membership
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.membership
-      - kind: metricTile
-        label: Waivers
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.waivers
-      - kind: metricTile
-        label: Related Orders
-        provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Show
-        bindsTo: OrderDetailTransactionWorkspaceView.relatedOrders
+        bindsTo: OrderStatement.totalRefunded
       - kind: detailPanel
         label: Order
         bindsTo: Order
@@ -58441,23 +58490,19 @@ screens:
       components:
       - kind: detailPanel
         label: The selected order detail transaction
-        bindsTo: OrderDetailTransactionWorkspaceView
+        operation: getOrder
+        bindsTo: Order
         columns:
-        - OrderDetailTransactionWorkspaceView.lines[].product
-        - OrderDetailTransactionWorkspaceView.lines[].ticketType
-        - OrderDetailTransactionWorkspaceView.lines[].event
-        - OrderDetailTransactionWorkspaceView.lines[].performance
-        - OrderDetailTransactionWorkspaceView.date
-        - OrderDetailTransactionWorkspaceView.lines[].timeslot
-        - OrderDetailTransactionWorkspaceView.lines[].quantity
-        - OrderDetailTransactionWorkspaceView.lines[].personType
-        - OrderDetailTransactionWorkspaceView.lines[].seat
-        - OrderDetailTransactionWorkspaceView.lines[].unitPrice
-        - OrderDetailTransactionWorkspaceView.lines[].discount
-        - OrderDetailTransactionWorkspaceView.lines[].tax
-        - OrderDetailTransactionWorkspaceView.lines[].fee
-        - OrderDetailTransactionWorkspaceView.total
-        - OrderDetailTransactionWorkspaceView.lines[].ticketStatus
+        - Order.lines[].variantId
+        - Order.lines[].performanceId
+        - Order.createdAt
+        - Order.lines[].bookedWindow
+        - Order.lines[].quantity
+        - Order.lines[].seatIds
+        - Order.lines[].serverUnitPrice
+        - Order.lines[].discounts
+        - Order.lines[].taxAmount
+        - Order.grossAmount
         notes: 'The pack groups this record''s detail under its own headings: “Order Total”, “Internal
           Notes”.'
         provenance: pack Order___Reservation_Management_Reference.pdf, page 5 §Each line should display
@@ -65398,76 +65443,49 @@ screens:
       components:
       - kind: metricTile
         label: Virtual Ticket ID
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.virtualTicketId
+        bindsTo: Entitlement.id
       - kind: metricTile
         label: Ticket Holder
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.ticketHolder
-      - kind: metricTile
-        label: Participant
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.participant
+        bindsTo: Entitlement.holderName
       - kind: metricTile
         label: Product
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.product
-      - kind: metricTile
-        label: Event
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.event
-      - kind: metricTile
-        label: Performance
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.performance
+        bindsTo: Entitlement.productName
       - kind: metricTile
         label: Venue
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.venue
-      - kind: metricTile
-        label: Seat
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.seat
+        bindsTo: Entitlement.venueName
       - kind: metricTile
         label: Order
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.order
+        bindsTo: Entitlement.orderId
       - kind: metricTile
         label: Ticket Status
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.ticketStatus
+        bindsTo: Entitlement.status
       - kind: metricTile
         label: Usage Status
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.usageStatus
+        bindsTo: Entitlement.entriesUsed
       - kind: metricTile
         label: Validity
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.validity
+        bindsTo: Entitlement.validTo
       - kind: metricTile
         label: Entitlements
+        operation: getEntitlement
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Display
-        bindsTo: VirtualTicketCredential360WorkspaceView.entitlements
-      - kind: metricTile
-        label: Primary
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify
-        bindsTo: VirtualTicketCredential360WorkspaceView.mediaRole
-      - kind: metricTile
-        label: Secondary
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify
-        bindsTo: VirtualTicketCredential360WorkspaceView.mediaRole
-      - kind: metricTile
-        label: Fallback
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify
-        bindsTo: VirtualTicketCredential360WorkspaceView.mediaRole
-      - kind: metricTile
-        label: Temporary
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify
-        bindsTo: VirtualTicketCredential360WorkspaceView.mediaRole
-      - kind: metricTile
-        label: Revoked historical media
-        provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 43 §Identify
-        bindsTo: VirtualTicketCredential360WorkspaceView.mediaRole
+        bindsTo: Entitlement.entriesAllowed
       - kind: detailPanel
         label: The ticket
         bindsTo: Entitlement
@@ -65491,19 +65509,16 @@ screens:
       components:
       - kind: detailPanel
         label: The selected virtual ticket credential
-        bindsTo: VirtualTicketCredential360WorkspaceView
+        operation: getEntitlement
+        bindsTo: Entitlement
         columns:
-        - VirtualTicketCredential360WorkspaceView.bindingId
-        - VirtualTicketCredential360WorkspaceView.mediaType
-        - VirtualTicketCredential360WorkspaceView.provider
-        - VirtualTicketCredential360WorkspaceView.issued
-        - VirtualTicketCredential360WorkspaceView.delivered
-        - VirtualTicketCredential360WorkspaceView.activated
+        - Entitlement.credentialFormat
+        - Entitlement.mediaCode
+        - Entitlement.issuedVia
+        - Entitlement.mediaLinkedAt
         - Valid From/To
-        - VirtualTicketCredential360WorkspaceView.lastUpdate
-        - Last presentation/use
-        - VirtualTicketCredential360WorkspaceView.deviceReferenceWhereAppropriate
-        - VirtualTicketCredential360WorkspaceView.status
+        - Entitlement.lastEntryAt
+        - Entitlement.status
         notes: 'The pack groups this record''s detail under its own headings: “Credential Wallet”, “Media
           Status”, “Dynamic QR Active”, “Apple Wallet Active”, “Old RFID RF-88410”, “Provide one chronological
           timeline”.'
@@ -82196,6 +82211,7 @@ screens:
         provenance: pack Rental_Management.pdf, page 14 §Support
       - kind: secondaryButton
         label: Version history
+        operation: listAuditRecords
         provenance: pack Rental_Management.pdf, page 14 §Support
   states:
     loading: The product validation approval configuration as saved.
@@ -139128,12 +139144,37 @@ screens:
         derived: true
         impliedBy: createSeatHold
         label: Create seat hold
-        notes: The act the screen exists for.
+        operation: createSeatHold
+        notes: The act the screen exists for. Opens the form that collects the seats or places to hold
+          (ADAM CR-268, CHG-R10WIR-004).
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: createSeatHold
+  overlays:
+  - id: formCreateSeatHold
+    component: modal
+    trigger: Create seat hold
+    body: '**Collects what `createSeatHold` sends before it is called.** Required: `performanceId` (the
+      performance whose availability the screen shows) and either `seatIds` (the seats chosen, at most
+      10 per sale on a staff channel) or `zoneId` with `quantity` for a standing zone. Optional: `ttlSeconds`
+      (480 by default, at most 1800), `subjectId` (the guest the hold is for). The client gives the hold
+      its `id`, so a retry does not hold twice. A `422 seat-limit-exceeded` or a seat taken meanwhile
+      stays in the dialog and names the seats. Dismissing sends nothing; nothing is held.'
+    bindsTo: CreateSeatHoldRequest
+    confirm:
+      label: Hold these seats
+      operation: createSeatHold
+    dismiss:
+      label: Cancel
+      discards:
+      - seatIds
+      - zoneId
+      - quantity
+      - ttlSeconds
+      - subjectId
+    provenance: contract seating.yaml POST /seat-holds; ADAM CR-268, 26 October 2026 (CHG-R10WIR-004)
   states:
     loading: The choose seats list.
     error: Could not load. Names which read failed and leaves the choose seats untouched.
@@ -139830,7 +139871,10 @@ screens:
       - kind: primaryButton
         derived: true
         impliedBy: recommendSeats
-        notes: The act the screen exists for.
+        label: Compare seats
+        operation: recommendSeats
+        notes: The act the screen exists for. Opens the form that asks what `recommendSeats` needs (ADAM
+          CR-268, CHG-R10WIR-004).
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -139842,6 +139886,31 @@ screens:
         operation: getSeatAvailability
         provenance: contract seating.yaml GET /performances/{performanceId}/seat-availability; wiring
           fix, 2 October 2026
+  overlays:
+  - id: formRecommendSeats
+    component: modal
+    trigger: Compare seats
+    body: '**Collects what `recommendSeats` sends before it is called.** Required: `partySize` (1 to 50)
+      and `strategy` (best available, best value, closest to the stage, accessible, or seats together:
+      `SeatRecommendationStrategy`). Optional: `categoryIds` (price categories), `maxPrice`, `accessibleCount`
+      (wheelchair spaces; companions are added), `maxOptions` (3 by default, at most 10). The performance
+      is the one whose seat status the screen shows (path `performanceId`). Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: SeatRecommendationRequest
+    confirm:
+      label: Compare seats
+      operation: recommendSeats
+    dismiss:
+      label: Cancel
+      discards:
+      - partySize
+      - strategy
+      - categoryIds
+      - maxPrice
+      - accessibleCount
+      - maxOptions
+    provenance: contract seating.yaml POST /performances/{performanceId}/seat-recommendations; ADAM CR-268,
+      26 October 2026 (CHG-R10WIR-004)
   states:
     loading: The view preview compare list.
     error: Could not load. Names which read failed and leaves the view preview compare untouched.
@@ -139952,7 +140021,10 @@ screens:
       - kind: primaryButton
         derived: true
         impliedBy: recommendSeats
-        notes: The act the screen exists for.
+        label: Suggest seats
+        operation: recommendSeats
+        notes: The act the screen exists for. Opens the form that asks what `recommendSeats` needs (ADAM
+          CR-268, CHG-R10WIR-004).
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -139964,6 +140036,31 @@ screens:
         operation: getSeatAvailability
         provenance: contract seating.yaml GET /performances/{performanceId}/seat-availability; wiring
           fix, 2 October 2026
+  overlays:
+  - id: formRecommendSeats
+    component: modal
+    trigger: Suggest seats
+    body: '**Collects what `recommendSeats` sends before it is called.** Required: `partySize` (1 to 50)
+      and `strategy` (best available, best value, closest to the stage, accessible, or seats together:
+      `SeatRecommendationStrategy`). Optional: `categoryIds` (price categories), `maxPrice`, `accessibleCount`
+      (wheelchair spaces; companions are added), `maxOptions` (3 by default, at most 10). The performance
+      is the one whose seat status the screen shows (path `performanceId`). Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: SeatRecommendationRequest
+    confirm:
+      label: Suggest seats
+      operation: recommendSeats
+    dismiss:
+      label: Cancel
+      discards:
+      - partySize
+      - strategy
+      - categoryIds
+      - maxPrice
+      - accessibleCount
+      - maxOptions
+    provenance: contract seating.yaml POST /performances/{performanceId}/seat-recommendations; ADAM CR-268,
+      26 October 2026 (CHG-R10WIR-004)
   states:
     loading: The conversational seat assistant list.
     error: Could not load. Names which read failed and leaves the conversational seat assistant untouched.
@@ -144177,7 +144274,10 @@ screens:
       - kind: primaryButton
         derived: true
         impliedBy: recommendSeats
-        notes: The act the screen exists for.
+        label: Find upgrade options
+        operation: recommendSeats
+        notes: The act the screen exists for. Opens the form that asks what `recommendSeats` needs (ADAM
+          CR-268, CHG-R10WIR-004).
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -144189,6 +144289,31 @@ screens:
         operation: getSeatAvailability
         provenance: contract seating.yaml GET /performances/{performanceId}/seat-availability; wiring
           fix, 2 October 2026
+  overlays:
+  - id: formRecommendSeats
+    component: modal
+    trigger: Find upgrade options
+    body: '**Collects what `recommendSeats` sends before it is called.** Required: `partySize` (1 to 50)
+      and `strategy` (best available, best value, closest to the stage, accessible, or seats together:
+      `SeatRecommendationStrategy`). Optional: `categoryIds` (price categories), `maxPrice`, `accessibleCount`
+      (wheelchair spaces; companions are added), `maxOptions` (3 by default, at most 10). The performance
+      is the one whose seat status the screen shows (path `performanceId`). Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: SeatRecommendationRequest
+    confirm:
+      label: Find upgrade options
+      operation: recommendSeats
+    dismiss:
+      label: Cancel
+      discards:
+      - partySize
+      - strategy
+      - categoryIds
+      - maxPrice
+      - accessibleCount
+      - maxOptions
+    provenance: contract seating.yaml POST /performances/{performanceId}/seat-recommendations; ADAM CR-268,
+      26 October 2026 (CHG-R10WIR-004)
   states:
     loading: The seat upgrade recommendations list.
     error: Could not load. Names which read failed and leaves the seat upgrade recommendations untouched.
@@ -146909,35 +147034,35 @@ screens:
       - kind: numberField
         label: Cart hold (seconds)
         bindsTo: VenueSettings.cartLeaseSeconds
-        operation: setVenueSettings
+        operation: getVenueSettings
         provenance: contract tenancy.yaml VenueSettings.cartLeaseSeconds (defined 4 October 2026, CHG-FXS-001)
       - kind: numberField
         label: Cart extension (minutes)
         bindsTo: VenueSettings.cartHoldExtensionMinutes
-        operation: setVenueSettings
+        operation: getVenueSettings
         provenance: contract tenancy.yaml VenueSettings.cartHoldExtensionMinutes (defined 4 October 2026,
           CHG-FXS-001)
       - kind: numberField
         label: Cart extensions allowed
         bindsTo: VenueSettings.cartMaxExtensions
-        operation: setVenueSettings
+        operation: getVenueSettings
         provenance: contract tenancy.yaml VenueSettings.cartMaxExtensions (defined 4 October 2026, CHG-FXS-001)
       - kind: numberField
         label: Seat hold extension (seconds)
         bindsTo: VenueSettings.seating.seatHoldExtensionSeconds
-        operation: setVenueSettings
+        operation: getVenueSettings
         provenance: contract tenancy.yaml VenueSettings.seating.seatHoldExtensionSeconds (defined 4 October
           2026, CHG-FXS-001)
       - kind: numberField
         label: Seat hold extensions allowed
         bindsTo: VenueSettings.seating.seatHoldMaxExtensions
-        operation: setVenueSettings
+        operation: getVenueSettings
         provenance: contract tenancy.yaml VenueSettings.seating.seatHoldMaxExtensions (defined 4 October
           2026, CHG-FXS-001)
       - kind: numberField
         label: Seats per guest booking
         bindsTo: VenueSettings.seating.maxSeatsPerGuestOrder
-        operation: setVenueSettings
+        operation: getVenueSettings
         provenance: contract tenancy.yaml VenueSettings.seating.maxSeatsPerGuestOrder (defined 4 October
           2026, CHG-FXS-001)
       - kind: primaryButton
@@ -147726,6 +147851,7 @@ screens:
         notes: '**Promotes this configuration to the target environment.** What is running there now is
           replaced, and the previous version stays restorable.'
         provenance: authored — required by check-screens, 19 September 2026
+        operation: deployConfigurationProfile
   states:
     loading: The lifecycle environment promotion list.
     error: Could not load. Names which read failed and leaves the lifecycle environment promotion untouched.
@@ -150050,6 +150176,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1083
+    - BO-101
     exitTo:
     - BO-1083
     transitions:
@@ -157975,6 +158102,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1143
+    - BO-101
     exitTo:
     - BO-1143
     transitions:
@@ -157997,89 +158125,59 @@ screens:
     - name: contentBody
       slot: fields
       components:
-      - kind: selectField
+      - kind: toggle
         label: P2P enabled
         bindsTo: WalletTransferRules.peerToPeerAllowed
         operation: getWalletTransferRules
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Eligible wallet types
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Eligible customer types
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
+        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure; ADAM CR-193
+          (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
+      - kind: multiSelect
         label: Eligible credit types
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Supported currencies
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Minimum transfer
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
+        bindsTo: WalletTransferRules.transferableCreditTypeIds
+        operation: listCreditTypes
+        notes: The venue's credit types (`listCreditTypes`); the chosen ids are sent as `transferableCreditTypeIds`.
+        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure; ADAM CR-193
+          (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
+      - kind: numberField
         label: Maximum transfer
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
+        bindsTo: WalletTransferRules.maximumPerTransfer
+        operation: getWalletTransferRules
+        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure; ADAM CR-193
+          (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
+      - kind: numberField
         label: Daily transfer amount
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Monthly transfer amount
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Maximum transfer count
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Transfer fee
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
+        bindsTo: WalletTransferRules.maximumPerDay
+        operation: getWalletTransferRules
+        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure; ADAM CR-193
+          (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
+      - kind: numberField
+        label: Approval above amount
+        bindsTo: WalletTransferRules.approvalAboveAmount
+        operation: getWalletTransferRules
+        notes: A transfer above this amount waits for approval; empty means none does.
+        provenance: ADAM CR-193 (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
+      - kind: toggle
         label: Recipient verification
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Sender authentication
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Recipient confirmation
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Transfer expiry
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Cross-tenant transfer
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Cross-venue transfer
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Cross-currency transfer
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Example
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: selectField
-        label: Wallet A
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
-      - kind: textField
-        label: 'Cash Credit: AED 500'
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure
+        bindsTo: WalletTransferRules.bothPartiesIdentified
+        operation: getWalletTransferRules
+        notes: Both the sender and the recipient must be identified guests (default on).
+        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Configure; ADAM CR-193
+          (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
+      - kind: toggle
+        label: Within a shared wallet only
+        bindsTo: WalletTransferRules.withinSharedWalletOnly
+        operation: getWalletTransferRules
+        notes: Transfers only between members of one shared (family) wallet (default off).
+        provenance: ADAM CR-193 (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
     - name: actionBar
       slot: publish
       components:
       - kind: primaryButton
-        label: Wallet ID
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Support
-      - kind: secondaryButton
-        label: Customer ID
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Support
-      - kind: secondaryButton
-        label: Membership ID
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Support
-      - kind: secondaryButton
-        label: Contact selection
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Support
-      - kind: secondaryButton
-        label: API
-        provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 76 §Support
+        label: Save
+        operation: setWalletTransferRules
+        notes: Sends the whole `WalletTransferRules` with the version read for If-Match; a 412 says someone
+          else saved first and reloads.
+        provenance: ADAM CR-193 (option C), settled by Chinmay 25 October 2026; contract wallet.yaml WalletTransferRules
   states:
     loading: The peer-to-peer transfer configuration as saved.
     error: Could not load. Names which read failed and leaves the peer-to-peer transfer untouched.
@@ -158092,7 +158190,7 @@ screens:
   apis:
   - operationId: setWalletTransferRules
     contract: wallet
-    purpose: Whether guests may transfer
+    purpose: Save the transfer rules (the seven WalletTransferRules fields the form shows), with If-Match
     trigger: onAction
     provenance: board reading, 19 September 2026
   - operationId: getWalletTransferRules
@@ -158100,16 +158198,26 @@ screens:
     purpose: The transfer rules as saved, with their version for If-Match
     trigger: onLoad
     provenance: defined 21 October 2026 (r8 gate, CHG-R8RW-007; closes the CHG-WIR-027 gap)
+  - operationId: listCreditTypes
+    contract: wallet
+    purpose: The venue's credit types, the choices of Eligible credit types (ADAM CR-193)
+    trigger: onLoad
+    provenance: ADAM CR-193, settled by Chinmay 25 October 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1144
     workshopBoard: wireframes/WS192 Wallet Configuration Backend Structure v1.0 Board 7.dc.html#bo-1144
   apisNote: 'Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 76.
-    0 of 0 labels bound to a contract property; 26 of 39 pack bullets carried onto the screen — the rest
-    are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
-    rather than here. **Pack actions reconciled 29 September (VM close-out):** Wallet ID, Customer ID,
-    Membership ID, Contact selection, API are choices sent by `setWalletTransferRules` (field gap: add
-    recipientLookupMethods walletId|customerId|membershipId|contact|api).'
+    **Trimmed to the contract on 25 October 2026 (ADAM CR-193, option C, settled by Chinmay; raised by
+    Surendra Loke on #36207).** The form is WalletTransferRules as it stands: P2P enabled -> peerToPeerAllowed,
+    Eligible credit types -> transferableCreditTypeIds, Maximum transfer -> maximumPerTransfer, Daily
+    transfer amount -> maximumPerDay, Recipient verification -> bothPartiesIdentified, and two fields
+    added for approvalAboveAmount and withinSharedWalletOnly. Every pack field with no contract property
+    is dropped (eligible wallet and customer types, currencies, minimum, monthly and count limits, the
+    fee, sender authentication, recipient confirmation, expiry, the cross-tenant, cross-venue and cross-currency
+    switches, and the lookup methods Wallet ID, Customer ID, Membership ID, Contact selection and API),
+    with the pack''s example prose ("Example", "Wallet A", "Cash Credit: AED 500"). Those rules wait on
+    a client and compliance decision and come as a separate request (docs/active/left-out.yaml LO-R10UI-001).'
 - id: BO-1145
   name: Transfer Eligibility, Limits & Approval Rules
   module: Orders & Money
@@ -160548,7 +160656,7 @@ screens:
         - Approval status
         - Change Governance
         bindsTo: null
-        operation: null
+        operation: listWalletConfigurationVersions
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 §Display
       - kind: publishGate
         label: What publishing changes
@@ -160606,6 +160714,7 @@ screens:
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 §Support
       - kind: secondaryButton
         label: Security Audit
+        operation: listAuditRecords
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 §Support
   overlays:
   - id: confirmRollback
@@ -180014,6 +180123,7 @@ screens:
       - kind: detailPanel
         label: The selected promotion approval
         bindsTo: ApprovalRequest
+        operation: listPromotions
         columns:
         - Promotion
         - Request type
@@ -205101,11 +205211,6 @@ screens:
     purpose: The inventory
     trigger: onLoad
     provenance: board reading, 19 September 2026
-  - operationId: listDevices
-    contract: tenancy
-    purpose: The device register behind it
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   - operationId: listPaymentTerminalCertifications
     contract: payments
     purpose: Terminal model certifications
@@ -208831,6 +208936,8 @@ screens:
     - to: ADM-613
       trigger: Void, Reversal & Cancellation Manager\t120
       provenance: structural — pack board 6 wiring, 19 September 2026
+      carries:
+      - paymentId
     - to: ADM-614
       trigger: Refund Approval & Exception Workflow\t121
       provenance: structural — pack board 6 wiring, 19 September 2026
@@ -208839,6 +208946,8 @@ screens:
     - to: ADM-615
       trigger: Refund Processing, Provider Status & Recovery Center\t122
       provenance: structural — pack board 6 wiring, 19 September 2026
+      carries:
+      - paymentId
     - to: ADM-616
       trigger: Payment Adjustment & Financial Correction Manager\t123
       provenance: structural — pack board 6 wiring, 19 September 2026

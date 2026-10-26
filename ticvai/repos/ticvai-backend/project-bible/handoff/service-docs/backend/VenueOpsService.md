@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental`, `transport` |
 | Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental`, `transport` |
-| Operations in the slice | 79 of 297 |
+| Operations in the slice | 80 of 298 |
 | Scale | Low and steady. Queue readings are the only frequent write. |
 | If it is down | Down degrades venue operations. Selling and admitting continue. |
 
@@ -50,6 +50,8 @@
 | favourite | [`deleteFavouriteRoute`](#deletefavouriteroute) | DELETE | `/transport/favourite-routes/{favouriteId}` | core | 1 | GST-079, WEB-049 |
 | favourite | [`listMyFavouriteRoutes`](#listmyfavouriteroutes) | GET | `/transport/favourite-routes` | core | 1 | GST-079, WEB-049 |
 | favourite | [`saveFavouriteRoute`](#savefavouriteroute) | POST | `/transport/favourite-routes` | core | 1 | GST-077, WEB-049 |
+| feed | [`configureQueueFeed`](#configurequeuefeed) | PUT | `/queue-feeds/{feedId}` | setup | 1 | BO-001, BO-003 |
+| feed | [`listQueueFeeds`](#listqueuefeeds) | GET | `/queue-feeds` | core | 1 | BO-001, BO-003, POS-029 |
 | general | [`getTransportDeparture`](#gettransportdeparture) | GET | `/transport/departures/{departureId}` | core | 1 | GST-077 |
 | inspection | [`createInspectionTemplate`](#createinspectiontemplate) | POST | `/inspection-templates` | setup | 1 | BO-911 |
 | networkImport | [`applyTransportNetworkImport`](#applytransportnetworkimport) | POST | `/transport/network-imports/{importId}/apply` | setup | 1 | BO-1189 |
@@ -103,7 +105,6 @@
 | visitPlan | [`generateVisitPlan`](#generatevisitplan) | POST | `/visit-plans` | core | 1 | GST-051, GST-052, WEB-050 |
 | visitPlan | [`getVisitPlan`](#getvisitplan) | GET | `/visit-plans/{planId}` | core | 1 | GST-053, GST-054, GST-059, WEB-050 |
 | visitPlan | [`getVisitPlannerOptions`](#getvisitplanneroptions) | GET | `/venues/{venueId}/visit-planner-options` | core | 1 | GST-051, GST-052, WEB-050 |
-| visitPlan | [`listMyVisitPlans`](#listmyvisitplans) | GET | `/visit-plans` | core | 1 | GST-059 |
 | visitPlan | [`listVisitPlanAlternatives`](#listvisitplanalternatives) | GET | `/visit-plans/{planId}/items/{itemId}/alternatives` | core | 1 | GST-053, GST-059, WEB-050 |
 | visitPlan | [`setVisitPlanPreset`](#setvisitplanpreset) | PUT | `/venues/{venueId}/visit-plan-presets/{presetKey}` | setup | 1 |  |
 | visitPlan | [`updateVisitPlan`](#updatevisitplan) | PUT | `/visit-plans/{planId}` | core | 1 | GST-053, GST-054, GST-059, WEB-050 |
@@ -188,6 +189,7 @@ Returns every generated size and every place the asset is referenced. Usage is w
 | altText | object |  | Required before use in a guest-facing surface. |
 | width | integer |  | (nullable) |
 | height | integer |  | (nullable) |
+| hasTransparency | boolean |  | Whether the image has an alpha channel with any pixel not fully opaque, recorded from the file when the upload completes; null for a file that is not an image (ADAM CR-106, option 1; CHG-R10TEN-012). (read-only; nullable) |
 | durationSeconds | number |  | (nullable) |
 | customMetadata | object |  | BL-178. (nullable) |
 | sharedWithTenantIds | array of string (uuid) |  | BL-178. |
@@ -298,6 +300,7 @@ Derivatives regenerate. The previous version is retained for rollback.
 | asset.altText | object |  | Required before use in a guest-facing surface. |
 | asset.width | integer |  | (nullable) |
 | asset.height | integer |  | (nullable) |
+| asset.hasTransparency | boolean |  | Whether the image has an alpha channel with any pixel not fully opaque, recorded from the file when the upload completes; null for a file that is not an image (ADAM CR-106, option 1; CHG-R10TEN-012). (read-only; nullable) |
 | asset.durationSeconds | number |  | (nullable) |
 | asset.customMetadata | object |  | BL-178. (nullable) |
 | asset.sharedWithTenantIds | array of string (uuid) |  | BL-178. |
@@ -390,6 +393,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 | items[].altText | object |  | Required before use in a guest-facing surface. |
 | items[].width | integer |  | (nullable) |
 | items[].height | integer |  | (nullable) |
+| items[].hasTransparency | boolean |  | Whether the image has an alpha channel with any pixel not fully opaque, recorded from the file when the upload completes; null for a file that is not an image (ADAM CR-106, option 1; CHG-R10TEN-012). (read-only; nullable) |
 | items[].durationSeconds | number |  | (nullable) |
 | items[].customMetadata | object |  | BL-178. (nullable) |
 | items[].sharedWithTenantIds | array of string (uuid) |  | BL-178. |
@@ -498,6 +502,7 @@ A partial update: only the fields sent change. `collectionIds`, when sent, repla
 | altText | object |  | Required before use in a guest-facing surface. |
 | width | integer |  | (nullable) |
 | height | integer |  | (nullable) |
+| hasTransparency | boolean |  | Whether the image has an alpha channel with any pixel not fully opaque, recorded from the file when the upload completes; null for a file that is not an image (ADAM CR-106, option 1; CHG-R10TEN-012). (read-only; nullable) |
 | durationSeconds | number |  | (nullable) |
 | customMetadata | object |  | BL-178. (nullable) |
 | sharedWithTenantIds | array of string (uuid) |  | BL-178. |
@@ -720,6 +725,7 @@ Physical cards are pre-printed and activated at sale; digital cards live in the 
 **`GET /media/collections`**: List collections
 
 Folders — by campaign, venue, season or product line. An asset may sit in several.
+**Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -837,6 +843,7 @@ Only departures `onSale` and before the route's booking cut-off are returned; a 
 | passengers | query |  | array of string | The party as code:count pairs, one per passenger type (adult:2, child:1). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -877,6 +884,7 @@ Only departures `onSale` and before the route's booking cut-off are returned; a 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Departures by departure time at the boarding stop |
 | 422 |  | The stations are the same, or no active route serves them in this order. |
@@ -1153,6 +1161,7 @@ The passenger picker reads its types from here (adult, child, student, person of
 |---|---|---|---|---|
 | routeId | path | yes | string (uuid) |  |
 | at | query |  | string (date-time) | The instant whose table is returned (the travel time for a guest). |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `FareTable`
 
@@ -1196,6 +1205,7 @@ The passenger picker reads its types from here (adult, child, student, person of
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Fare table |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
@@ -1535,6 +1545,116 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 | 422 |  | The stations are the same, or no active route serves them in this order. |
 
 
+## Group: feed
+
+### configureQueueFeed
+
+**`PUT /queue-feeds/{feedId}`**: Configure a sensor feed
+
+Enables integration for a venue and selects an adaptor. **TICVAI ships no vendor adaptors** — the framework is vendor-agnostic and a named-vendor adaptor is bespoke work, quoted separately (ADR-0012).
+`mock` exists so the whole feature can be built and demonstrated with no vendor involvement at all.
+**PUT semantics — an upsert keyed on the path's `feedId`**, the feed's id (the body's `id`, when sent, must equal it; ADAM CR-245, 26 October 2026, corrected the text left from before the id moved into the path): where no feed has that id, one is created with it and the answer is `201`; where one does, the body replaces it whole and the answer is `200`. Omitted optional fields take their defaults or null — an omitted `credentialsRef` removes the stored reference, and an omitted `expectedIntervalSeconds` returns to 60. A feed never moves between queues: a body whose `queueId` differs from the stored feed's is refused with `409`. `health` is read-only and ignored on input.
+
+|  |  |
+|---|---|
+| Permission | `QUEUE_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `queue.feed` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `queue.feed` |
+| Writes | `cache:idempotency`, `queue.feed` |
+| Called by | BO-001, BO-003 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| feedId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `QueueFeed`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| queueId | string (uuid) | yes |  |
+| adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) | yes | Vendor adaptors are bespoke work (ADR-0012). |
+| adaptorName | string |  | Named vendor where adaptor is vendorAdaptor. (nullable) |
+| credentialsRef | string |  | Key vault reference. (nullable) |
+| expectedIntervalSeconds | integer |  | Beyond this without a reading, the feed is considered quiet. (default 60) |
+| isEnabled | boolean | yes |  |
+| health | object |  | Whether the feed is currently reporting, computed on read — what listQueueFeeds promises per row. (read-only) |
+| health.feedId | string (uuid) | yes |  |
+| health.adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) |  | Vendor adaptors are bespoke work (ADR-0012). |
+| health.isHealthy | boolean | yes | Healthy means the last reading arrived within the feed's expected interval (decided 28 September, audit R106 (1)): lastReadingAt is no older than expectedIntervalSeconds. |
+| health.isQuiet | boolean | yes | No reading within the expected interval. |
+| health.lastReadingAt | string (date-time) |  | (nullable) |
+| health.expectedIntervalSeconds | integer |  | The feed's expectedIntervalSeconds — the interval isQuiet is judged against, returned here so a health panel does not need the feed row as well. |
+| health.readingsLastHour | integer |  |  |
+| health.discardedLastHour | integer |  | Out-of-order readings rejected in the last hour — rows of queue.reading for this feed with disposition: discardedOutOfOrder. |
+
+**Response**: `QueueFeed`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| queueId | string (uuid) | yes |  |
+| adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) | yes | Vendor adaptors are bespoke work (ADR-0012). |
+| adaptorName | string |  | Named vendor where adaptor is vendorAdaptor. (nullable) |
+| credentialsRef | string |  | Key vault reference. (nullable) |
+| expectedIntervalSeconds | integer |  | Beyond this without a reading, the feed is considered quiet. (default 60) |
+| isEnabled | boolean | yes |  |
+| health | object |  | Whether the feed is currently reporting, computed on read — what listQueueFeeds promises per row. (read-only) |
+| health.feedId | string (uuid) | yes |  |
+| health.adaptor | QueueFeedAdaptor: enum (generic, mock, vendorAdaptor) |  | Vendor adaptors are bespoke work (ADR-0012). |
+| health.isHealthy | boolean | yes | Healthy means the last reading arrived within the feed's expected interval (decided 28 September, audit R106 (1)): lastReadingAt is no older than expectedIntervalSeconds. |
+| health.isQuiet | boolean | yes | No reading within the expected interval. |
+| health.lastReadingAt | string (date-time) |  | (nullable) |
+| health.expectedIntervalSeconds | integer |  | The feed's expectedIntervalSeconds — the interval isQuiet is judged against, returned here so a health panel does not need the feed row as well. |
+| health.readingsLastHour | integer |  |  |
+| health.discardedLastHour | integer |  | Out-of-order readings rejected in the last hour — rows of queue.reading for this feed with disposition: discardedOutOfOrder. |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Configured — an existing feed with this id, replaced |
+| 201 |  | Created — no feed had this id |
+| 409 |  | The feed with this id belongs to a different queue. |
+| 400 |  | Unknown adaptor, or credentials missing for the selected adaptor |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listQueueFeeds
+
+**`GET /queue-feeds`**: List configured sensor feeds
+
+Which third-party system supplies each queue, and whether it is currently reporting (`health` on each row, the same `QueueFeedHealth` that `getQueueFeedHealth` returns). A silent feed is the most common cause of a wrong wait time.
+**Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
+
+|  |  |
+|---|---|
+| Permission | `QUEUE_MANAGE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | `queue.feed` |
+| Writes | - |
+| Called by | BO-001, BO-003, POS-029 |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Feeds |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+
 ## Group: general
 
 ### getTransportDeparture
@@ -1561,6 +1681,7 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | departureId | path | yes | string (uuid) |  |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `DepartureOffer`
 
@@ -1589,6 +1710,7 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | One departure, as a guest books it |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
@@ -1919,6 +2041,7 @@ The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip car
 | toStationId | query | yes | string (uuid) |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -1951,6 +2074,7 @@ The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip car
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Pass offers, by sortOrder |
 | 422 |  | The stations are the same, or no active route serves them in this order. |
@@ -2162,7 +2286,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | Guest callable | True |
 | Reads | `queue.queue`, `queue.queue_operating_window` |
 | Writes | - |
-| Called by | BO-001, BO-002, BO-004, BO-005, BO-221, EMP-031, GST-023, WEB-039, WEB-040 |
+| Called by | BO-001, BO-002, BO-004, BO-005, BO-221, EMP-031, GST-023, POS-025, WEB-039, WEB-040 |
 
 **Parameters**
 
@@ -2172,6 +2296,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | openOnly | query |  | boolean |  |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -2227,6 +2352,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Queues |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -2799,6 +2925,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 | to | query | yes | string (date-time) |  |
 | kind | query |  | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) | Only resources of this kind, e.g. |
 | minCapacity | query |  | integer | Only resources that seat or hold at least this many guests (capacity), so a party can narrow the map to cabanas big enough for it (r8 walk of tickets 28163 and 28204; lead decision of 20 October 2026… |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `MapResourceAvailability`
 
@@ -2834,6 +2961,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Every placed resource with its status for the window |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -2901,6 +3029,10 @@ The countdown's source of truth, as `seating.getSeatHold`.
 
 **The guest's start-time step for a meeting room** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). A guest never names a room, so `getResourceAvailability`, which is per resource, cannot answer them. Given the product (a room type such as *boardroom*, `catalogue.Product.requiresTimeWindow` true), the chosen length variant and a date, this returns every start time at which **at least one resource satisfying the product's resource requirements** (`setExperienceResourceRequirements`, the experience being the product) is free for the variant's `durationMinutes`, setup and teardown included, with live bookings, resource holds and cart windows already counted as taken. `freeCount` says how many.
 Start times fall on `stepMinutes` from the venue's opening on that date, and a window must end by its close. The chosen start becomes the cart line's `bookedWindow`; `allocateResources` picks the room at checkout. **Display only**, like any availability read: the cart line is what holds.
+
+**A public read, like `listProducts` and `listProductVariants` beside it** (accepted 26 October 2026, Chinmay, ADAM CR-258 option A): `{}` is in its security, so a visitor sees start times with no session, and the read runs under the venue the request names (`X-Venue-Id`, ADAM CR-198's rule for every public guest read). The anonymous cart session still opens on the first add (`createCart`, CR-183).
+
+**The venue's step** (ADAM CR-253 option C): with no `stepMinutes` sent, the starts fall on the venue's own `VenueSettings.stepMinutes` (its tenant default where the venue sets none), read in process (`tenancy#venueSettingsRecords`, XDR-004).
 **Date, start and duration are checked together** (decided 29 September, W9 and W10). A start is offered only when a room is free for the whole of `startsAt` to `startsAt + durationMinutes`, plus its setup, teardown and `cleaningPolicy`: an `afterEveryBooking` buffer must fit after the window, and with `timesPerDay` every cleaning of the date must still be placeable once the window is taken. `freeCount` counts only rooms that pass all three.
 
 
@@ -2930,6 +3062,7 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 | stepMinutes | query |  | enum (15, 30, 60) | Spacing of the offered start times. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -2948,6 +3081,7 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Free start times, earliest first |
+| 400 |  | The request breaks a schema rule (validation), or names no venue (venue-required; ADAM CR-198, CR-258). |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | The product is not sold by time window, the variant is not one of its lengths, or it has no resource requirements (product-not-time-windowed, variant-has-no-duration, no-resource-requirements). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -3587,6 +3721,7 @@ The stop list from departure to arrival and the street map beside it (decided 29
 | routeId | path | yes | string (uuid) |  |
 | fromStationId | query |  | string (uuid) |  |
 | toStationId | query |  | string (uuid) |  |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `RouteMap`
 
@@ -3617,6 +3752,7 @@ The stop list from departure to arrival and the street map beside it (decided 29
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Route map |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
@@ -4217,7 +4353,7 @@ Removes its unsold future departures and stops releasing new ones. **Refused whi
 
 **`POST /media/uploads/{uploadId}/complete`**: Confirm an upload and create the asset
 
-Verifies the transfer, reads dimensions and duration, generates derivatives, and registers the asset.
+Verifies the transfer, reads dimensions and duration, generates derivatives, and registers the asset. For an image it also records `hasTransparency` from the file's alpha channel (ADAM CR-106; CHG-R10TEN-012).
 Files are scanned before becoming available. An asset that fails scanning is quarantined, not published — a tenant uploading a compromised file must not have it served to guests.
 **Scanning and derivatives run after this call returns** (`states/media.yaml`). The 201 carries the asset in `processing`; the job moves it to `ready`, `quarantined` or `failed`. A failed scan is therefore an asset in `quarantined`, not a refusal here — a client reads `status` rather than assuming the file is servable.
 **The same job writes the asset's `assets.media_fingerprint` row** (perceptual hash and embedding, stamped with the model version) once the file passes scanning, so `findSimilarMediaAssets` sees a new asset without anyone asking for it (decided 29 September, writers pass; DM4). A quarantined file gets no fingerprint.
@@ -4280,6 +4416,7 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 | altText | object |  | Required before use in a guest-facing surface. |
 | width | integer |  | (nullable) |
 | height | integer |  | (nullable) |
+| hasTransparency | boolean |  | Whether the image has an alpha channel with any pixel not fully opaque, recorded from the file when the upload completes; null for a file that is not an image (ADAM CR-106, option 1; CHG-R10TEN-012). (read-only; nullable) |
 | durationSeconds | number |  | (nullable) |
 | customMetadata | object |  | BL-178. (nullable) |
 | sharedWithTenantIds | array of string (uuid) |  | BL-178. |
@@ -4533,6 +4670,7 @@ A venue may have several — **a park map and a floor plan per building are diff
 | mapId | path | yes | string (uuid) |  |
 | version | query |  | integer | Absent means the published version. |
 | draft | query |  | boolean | Read the working draft instead of a published version. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `VenueMapDetail`
 
@@ -4646,6 +4784,7 @@ A venue may have several — **a park map and a floor plan per building are diff
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | The published version asked for, or the draft. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -4679,6 +4818,7 @@ Returns nodes, edges, precomputed distances and **the connected components**. A 
 | mapId | path | yes | string (uuid) |  |
 | draft | query |  | boolean | The working draft's graph instead of the published one. |
 | stepFreeOnly | query |  | boolean | Returns the step-free subgraph, not a filtered copy of the whole one. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `VenueMapGraph`
 
@@ -4706,6 +4846,7 @@ Returns nodes, edges, precomputed distances and **the connected components**. A 
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Graph |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -4714,6 +4855,7 @@ Returns nodes, edges, precomputed distances and **the connected components**. A 
 **`POST /venue-maps/{mapId}/import`**: Read a drawing into shapes
 
 21.2.1 to 21.2.4 and 1.4.24. **Deterministic, and it fails loudly.**
+**The job records what it read** (ADAM CR-207, option A; CHG-R10ORD-013): `sourceRef` and `format` are stored on the `venuemap.import_job` row with its `createdAt`, so `ai.proposeWalkways` finds the map's latest import, reads its raster and tells a vector source from a raster one.
 Accepts what a venue's drawing office actually holds: PDF, SVG, DWG, DXF and raster. **Converting CAD to PDF loses the layer names this depends on**, which is why native formats are accepted rather than requested as exports.
 Carries every lesson CF-122 taught on the seat importer, because it is the same problem: **layer roles are lists** — one real file had two distinct layers both named `Layer 1`; **section codes are digit-normalised** — `A١` and `A1` are one place to a person and two to a comparison; **layer names are decoded before matching** — PDF strings arrive UTF-16BE and read as mojibake taken as bytes.
 **A file that yields no shapes reports `nothingFound`, not success.**
@@ -4820,6 +4962,9 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 | scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) | yes |  |
 | mapId | string (uuid) |  |  |
+| sourceRef | string (uuid) |  | The drawing the import read: importVenueGeometry's sourceRef, an assets.MediaAsset id (ADAM CR-207, option A; CHG-R10ORD-013). (nullable) |
+| format | enum (pdfPlan, svgPlan, dwgPlan, dxfPlan, rasterPlan, glbModel, navigationFile) |  | The format importVenueGeometry took (ADAM CR-207). (nullable) |
+| createdAt | string (date-time) |  | When the import was started (ADAM CR-207). (read-only) |
 | status | enum (parsing, previewReady, committed, failed) | yes |  |
 | outcome | enum (parsed, parsedWithFindings, nothingFound, noLayersMatched, unreadable) | yes |  |
 | shapesFound | integer |  |  |
@@ -5647,6 +5792,11 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
   switched all of them off.
 - `interestTags`: per published park map of the venue, the interest tags its published points carry
   (`VenuePoint.interestTags`), each tag once.
+- `cuisineTags` and `retailTags` (ADAM CR-220, option A; CHG-R10ORD-015): per published park map, the
+  `VenuePoint.cuisineTags` of its published dining points (restaurant, cafe, food kiosk) and the
+  `VenuePoint.retailTags` of its published shops and retail kiosks, each tag once, in the shape of
+  `interestTags`. GST-051 and WEB-050 build the lunch and shop questions and the `preferenceNotAtVenue` chip
+  from them; no new operation on the screen.
 - `fastTrackBundles`: the venue's published bundles that carry Fast Track, read from Promotions
   (`promotions#bundleRecords`), as id and name only.
 
@@ -5696,6 +5846,14 @@ Published data only, whoever calls; a venue with no published map has an empty `
 | interestTags[].mapId | string (uuid) | yes |  |
 | interestTags[].mapName | string |  |  |
 | interestTags[].tags | array of string | yes | (max items 50) |
+| cuisineTags | array of object |  | Per published park map of the venue, the cuisine tags of its published dining points (kind restaurant, cafe, or a kiosk that sells food), each tag once (ADAM CR-220, option A; Chinmay, 25 October 202… (max items 50) |
+| cuisineTags[].mapId | string (uuid) | yes |  |
+| cuisineTags[].mapName | string |  |  |
+| cuisineTags[].tags | array of string | yes | (max items 50) |
+| retailTags | array of object |  | Per published park map of the venue, the retail tags of its published shops and retail kiosks (kind shop, or a kiosk that sells goods), each tag once (ADAM CR-220, option A; CHG-R10ORD-015). (max items 50) |
+| retailTags[].mapId | string (uuid) | yes |  |
+| retailTags[].mapName | string |  |  |
+| retailTags[].tags | array of string | yes | (max items 50) |
 | fastTrackBundles | array of object | yes | (max items 50) |
 | fastTrackBundles[].bundleId | string (uuid) | yes |  |
 | fastTrackBundles[].name | string | yes |  |
@@ -5708,100 +5866,6 @@ Published data only, whoever calls; a venue with no published map has an empty `
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### listMyVisitPlans
-
-**`GET /visit-plans`**: The caller's own visit plans, by date or status
-
-**How a screen finds today's plan without being handed a `planId`** (r8 walk of ticket 28694). GST-059 (Plan in Progress), opened cold, calls this with `date` set to today and `status=draft` or `booked`; it shows the plan it finds, or offers to make one when the list is empty.
-**Only the caller's own plans**, by the same owner rule as `getVisitPlan`: a signed-in guest's plans (`subjectId`), or the plans of the device session the anonymous guest holds (`sessionRef`). Another guest's plan is never listed. Ordered by `updatedAt`, newest first, then by `id`; paged.
-`date` keeps the plans whose current version has a day on that date (`VisitPlan.days[].date`). `status` keeps one status. With neither, every plan of the caller. An empty page is a 200, not a 404.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | yes |
-| Conflict policy | serverWins |
-| Read routing | primary |
-| Guest callable | True |
-| Reads | `venuemap.visit_plan`, `venuemap.visit_plan_item` |
-| Writes | - |
-| Called by | GST-059 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| date | query |  | string (date) | Only plans with a day on this date. |
-| status | query |  | enum (draft, booked, archived) | Only plans in this status. |
-| pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
-
-**Response**: `object`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| items | array of VisitPlan | yes |  |
-| items[].id | string (uuid) | yes | (read-only) |
-| items[].venueId | string (uuid) | yes |  |
-| items[].scopePath | string |  | Derived from venueId. (read-only) |
-| items[].subjectId | string (uuid) |  | The signed-in guest. (read-only; nullable) |
-| items[].sessionRef | string |  | The anonymous device session that owns the plan until sign-in. (read-only; nullable) |
-| items[].ownership | enum (anonymous, account) |  | anonymous while the plan belongs to a device session (built and changed only; it lapses with the session), account once the guest signed in and the plan moved to their account, where it is saved and… (read-only) |
-| items[].status | enum (draft, booked, archived) | yes | booked after bookVisitPlan; a booked plan is read-only. (read-only) |
-| items[].version | integer | yes | The current version. (min 1; read-only) |
-| items[].source | enum (rules, preset, aiAgent) |  | What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. (read-only) |
-| items[].inputs | VisitPlanRequest |  | What generateVisitPlan takes (29 September, MOB-6): the Plan tab's form on GST-051 and WEB-050. |
-| items[].inputs.venueId | string (uuid) | yes | The venue the guest picked in the app (GST-001 / WEB-001), which scopes the plan. |
-| items[].inputs.dayVenues | array of object |  | Which venue on which date, in a multi-venue tenant (30 September client meeting, MoM 4.7, Allam's requirement). (max items 7) |
-| items[].inputs.dates | array of string (date) | yes | (min items 1; max items 7) |
-| items[].inputs.party | array of object | yes | One entry per person. (min items 1; max items 20) |
-| items[].inputs.pace | enum (packed, balanced, relaxed) |  | (default relaxed) |
-| items[].inputs.interestTags | array of string |  | The same closed list as VenuePoint.interestTags. (max items 12) |
-| items[].inputs.cuisineTags | array of string |  | Matched per day against the cuisineTags of that day's venue's dining points only (30 September, MoM 4.7). (max items 8) |
-| items[].inputs.retailTags | array of string |  | Shops the party would like to visit (30 September client meeting, MoM 4.7: retail and kiosk shops join F&B as venue-linked planner options), e.g. (max items 8) |
-| items[].inputs.mustIncludePointIds | array of string (uuid) |  | Placed on a day whose venue has the point. (max items 10) |
-| items[].inputs.preset | enum (highlights, family, thrillSeeker, waterDay, relaxed, showsAndDining) |  | A ready-made day plan (GST-052 Suggested Itineraries): the preset fixes the interests and the pace, and the party still decides eligibility. (nullable) |
-| items[].inputs.presetKey | string |  | The ready-made plan the guest took on GST-052 (30 September, second wave of the 29 September pass, MOB-6): one of the built-in preset keys above, or a key of a ready-made plan the venue defines. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$; nullable) |
-| items[].inputs.startTime | string |  | When the party arrives. (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$; nullable) |
-| items[].inputs.locale | string |  | (nullable) |
-| items[].mapVersion | integer |  | The published map version the plan was laid out on. (read-only) |
-| items[].cartId | string (uuid) |  | The cart bookVisitPlan filled. (read-only; nullable) |
-| items[].excluded | array of object |  | What was left out and why, e.g. (read-only) |
-| items[].excluded[].pointId | string (uuid) |  |  |
-| items[].excluded[].productId | string (uuid) |  | (nullable) |
-| items[].excluded[].name | string |  | The point's name, worked out on read for the left-out banner (r8 walk of ticket 28693). (nullable) |
-| items[].excluded[].limit | object |  | The rule that left it out, worked out on read from the product's eligibility rule: for heightRule a minimum or maximum height in centimetres, for ageRule a minimum or maximum age in years. (nullable) |
-| items[].excluded[].reason | enum (heightRule, ageRule, closedOnDate, notInInterests, noTime, notAtVenue) |  | notAtVenue (30 September, MoM 4.7): a must-include point that is at none of the plan's venues, so no day could hold it. |
-| items[].estimate | object |  | An estimated total, computed on read from current catalogue prices and stored nowhere (r8 walk of tickets 28693 and 28200; lead decision of 20 October 2026, option A; DI-1098, "with associated costin… (read-only; nullable) |
-| items[].estimate.total | Money | yes | On the wire this is three fields; in the database it is one column. |
-| items[].estimate.currency | string | yes |  |
-| items[].unmatchedPreferences | array of object |  | A preference a day's venue cannot meet is said, never faked (30 September client meeting, MoM 4.7, Allam's requirement). (read-only) |
-| items[].unmatchedPreferences[].date | string (date) | yes |  |
-| items[].unmatchedPreferences[].venueId | string (uuid) | yes | The day's venue, which has no match. |
-| items[].unmatchedPreferences[].preference | enum (cuisine, retail, interest) | yes |  |
-| items[].unmatchedPreferences[].tag | string | yes | (max length 30) |
-| items[].unmatchedPreferences[].availableAtVenueIds | array of string (uuid) |  | Other active venues of the tenant where the tag is matched. |
-| items[].days | array of object | yes | One per date, in order. (read-only) |
-| items[].days[].date | string (date) | yes |  |
-| items[].days[].venueId | string (uuid) | yes | The venue this day is planned at (30 September, MoM 4.7): VisitPlanRequest.dayVenues for the date, else venueId. |
-| items[].days[].opensAt | string |  | (nullable) |
-| items[].days[].closesAt | string |  | (nullable) |
-| items[].days[].items | array of VisitPlanItem | yes |  |
-| items[].createdAt | string (date-time) |  | (read-only) |
-| items[].updatedAt | string (date-time) |  | (read-only) |
-| nextCursor | string |  |  |
-| hasMore | boolean | yes |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | The caller's plans, newest first |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### listVisitPlanAlternatives
 
 **`GET /visit-plans/{planId}/items/{itemId}/alternatives`**: What could take this item's place
@@ -5809,6 +5873,7 @@ Published data only, whoever calls; a venue with no published map has an empty `
 **The swap sheet** (29 September, MOB-6): points and performances the whole party is eligible for that fit the item's slot, best first by interest match, then by the time lost to walking and the expected wait. Each carries why it was offered, so the sheet can say *"Same thrill level, 4 minutes closer"*. Computed on read, never stored; choosing one is an `updateVisitPlan` `swap`.
 **Only from the item's day venue** (30 September client meeting, MoM 4.7): alternatives are points on that venue's published map and performances dated there, never another venue of the tenant, so a swap cannot move a meal or a shop to a park the party is not in that day. `kind=shop` returns the venue's retail points, shops and retail kiosks alike; `kind=meal` its dining points, food kiosks included.
 **Order.** Best first, by `matchedInterests` descending, then by `walkMinutes` ascending.
+Where `walkMinutes` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -6149,6 +6214,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | alt_text | jsonb | no | Required before use in a guest-facing surface. |
 | width | integer | no |  |
 | height | integer | no |  |
+| has_transparency | boolean | no | Whether the image has an alpha channel with any pixel not fully opaque, recorded from the file when the upload completes; null for a file that is not an image (ADAM CR-106, option 1; CHG-R10TEN-012). |
 | duration_seconds | numeric | no |  |
 | custom_metadata | jsonb | no | BL-178. |
 | shared_with_tenant_ids | text[] | no | BL-178. |
@@ -6407,6 +6473,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 | overridden_by_principal_id | uuid | no | Who let the party past the queue (overrideWaitingGuest, 4 October 2026, CHG-FXC-003), with overrideReason and overriddenAt. |
 | override_reason | text | no |  |
 | overridden_at | timestamptz | no |  |
+
+### `queue.feed`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| queue_id | uuid | yes |  |
+| adaptor | text | yes |  |
+| adaptor_name | text | no | Named vendor where adaptor is vendorAdaptor. |
+| credentials_ref | text | no | Key vault reference. |
+| expected_interval_seconds | integer | no | Beyond this without a reading, the feed is considered quiet. |
+| is_enabled | boolean | yes |  |
 
 ### `queue.queue`
 
@@ -6786,6 +6864,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | map_id | uuid | no |  |
+| source_ref | uuid | no | The drawing the import read: importVenueGeometry's sourceRef, an assets.MediaAsset id (ADAM CR-207, option A; CHG-R10ORD-013). |
+| format | text | no | The format importVenueGeometry took (ADAM CR-207). |
+| created_at | timestamptz | no | When the import was started (ADAM CR-207). |
 | status | text | yes |  |
 | outcome | text | yes |  |
 | shapes_found | integer | no |  |
@@ -6974,8 +7055,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | assets | `analyseMediaAsset`, `bulkUpdateMediaAssets`, `createMediaShare`, `findSimilarMediaAssets`, `getMediaDistribution`, `getMediaTaxonomy`, `getMediaUsageAnalytics`, `listMediaAssetAudit`, `listMediaAssetVersions`, `listMediaRenditions`, `requestMediaRendition`, `setMediaAssetApproval`, `setMediaAssetRights`, `setMediaAssetTags`, `setMediaDistributionChannels`, `setMediaTaxonomy` |
 | card | `transferGameCard` |
 | departure | `listTransportRouteDepartures` |
-| entry | `callNextParties`, `listMyWaitingGuests`, `listQueueEntries`, `overrideWaitingGuest`, `redeemWaitingGuest` |
-| feed | `configureQueueFeed`, `getQueueFeedHealth`, `listQueueFeeds`, `submitQueueReading`, `testQueueFeed` |
+| entry | `callNextParties`, `listMyWaitingGuests`, `listQueueEntries`, `overrideWaitingGuest`, `redeemWaitingGuest`, `resolveCalledWaitingGuest` |
+| feed | `getQueueFeedHealth`, `submitQueueReading`, `testQueueFeed` |
 | game | `cloneGame`, `createGame`, `listGames`, `updateGame` |
 | games | `authoriseGameplay`, `cloneReaderConfiguration`, `createGameEntitlement`, `deployReaderConfiguration`, `getGameEligibility`, `getGamePricing`, `getGameplaySyncStatus`, `getGameplayValidationRules`, `listAttractionTypes`, `listGameEntitlements`, `listGameplayTransactions`, `listReaders`, `reportReaderQueue`, `setAttractionType`, `setGameCardExpiryRules`, `setGameCardLifecycle`, `setGameKioskConfiguration`, `setGameOperationalConfiguration`, `setGamePricing`, `setGameplayValidationRules`, `setPrizeCost`, `setReaderConfiguration`, `setReaderProfile`, `setRedemptionRules`, `simulateGameplayAuthorisation`, `testReader`, `validateGameConfiguration` |
 | incident | `addIncidentPerson`, `getIncident`, `listIncidents`, `recordAuthorityNotification`, `reportIncident`, `updateIncident`, `uploadIncidentMedia` |
@@ -6994,7 +7075,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | timetable | `listTransportTimetables`, `updateTransportTimetable` |
 | upload | `completeGuestUpload`, `createGuestUpload` |
 | venueMap | `acceptVenueLabelProposals`, `acceptWalkwayProposals`, `getVenueMapImportJob`, `getVenueMapLive`, `getVenueNavigationFile`, `listVenueMaps`, `setPathClosure`, `validateVenueMapGraph` |
-| visitPlan | `listVisitPlanPresets` |
+| visitPlan | `listMyVisitPlans`, `listVisitPlanPresets` |
 | waitTime | `setWaitTime` |
 | work | `cancelWorkOrder` |
 | workOrder | `completeWorkOrder`, `createVendorServiceRequest`, `createWorkOrder`, `getWorkOrder`, `getWorkOrderPriorityPolicy`, `listVendorServiceRequests`, `listWorkOrders`, `recordWorkOrderParts`, `recordWorkOrderTime`, `setWorkOrderPriorityPolicy`, `suggestWorkOrderAssignee`, `updateVendorServiceRequest`, `updateWorkOrder`, `verifyWorkOrder` |

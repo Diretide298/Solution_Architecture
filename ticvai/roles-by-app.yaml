@@ -11,7 +11,7 @@ theTwoVocabularies:
   rolesYamlMapsTo: 14
   shared: 12
   note: '**One vocabulary: the `Permission` enum in contracts/shared/permissions.yaml.** The contracts
-    require 176 of its values across 2655 operations; `roles.yaml`''s 45 POS action keys are presets,
+    require 176 of its values across 2660 operations; `roles.yaml`''s 45 POS action keys are presets,
     each mapped to the enum values it covers (14 values, 12 of them required by an operation). check-permission-vocabulary
     holds every place that names a permission to the enum.'
 tiers:
@@ -29,7 +29,7 @@ apps:
     - P02
     - P05
     screens: 144
-    operations: 225
+    operations: 226
     permissions: 23
     permissionSet:
     - AI_USE
@@ -123,18 +123,100 @@ apps:
     - getPublishedBookingFlow
     - getPublishedGuidedChoice
     - getPublishedKioskConfig
-    operationsWithNoPermissionCount: 115
+    operationsWithNoPermissionCount: 114
+  partner-web:
+    name: Partner Web
+    platforms:
+    - P10
+    screens: 43
+    operations: 118
+    permissions: 26
+    permissionSet:
+    - CAPACITY_CONFIGURE
+    - CASE_MANAGE
+    - CASE_VIEW
+    - DEVELOPER_MANAGE
+    - DEVELOPER_VIEW
+    - GUEST_VIEW
+    - MARKETING_SEND
+    - ORDER_CREATE
+    - ORDER_EXCHANGE
+    - ORDER_MODIFY
+    - ORDER_REPRINT
+    - ORDER_RESCHEDULE
+    - ORDER_VIEW
+    - PARTNER_MANAGE
+    - PARTNER_VIEW
+    - PERMISSION_GRANT
+    - PERMISSION_VIEW
+    - PLATFORM_CELL_MANAGE
+    - PLATFORM_TENANT_VIEW
+    - PRICE_VIEW
+    - PRODUCT_VIEW
+    - REPORT_MANAGE
+    - REPORT_VIEW_VENUE
+    - SETTLEMENT_RECONCILE
+    - SETTLEMENT_VIEW
+    - USER_MANAGE
+    tiers:
+      read:
+      - CASE_VIEW
+      - DEVELOPER_VIEW
+      - GUEST_VIEW
+      - ORDER_VIEW
+      - PARTNER_VIEW
+      - PERMISSION_VIEW
+      - PLATFORM_TENANT_VIEW
+      - PRICE_VIEW
+      - PRODUCT_VIEW
+      - SETTLEMENT_VIEW
+      operate:
+      - MARKETING_SEND
+      - ORDER_CREATE
+      - ORDER_EXCHANGE
+      - ORDER_MODIFY
+      - ORDER_REPRINT
+      - ORDER_RESCHEDULE
+      - REPORT_VIEW_VENUE
+      - SETTLEMENT_RECONCILE
+      configure:
+      - CAPACITY_CONFIGURE
+      - CASE_MANAGE
+      - DEVELOPER_MANAGE
+      - PARTNER_MANAGE
+      - PERMISSION_GRANT
+      - PLATFORM_CELL_MANAGE
+      - REPORT_MANAGE
+      - USER_MANAGE
+    operationsWithNoPermission:
+    - addCartLine
+    - changeOwnCredential
+    - checkoutCart
+    - completeSsoAuthorization
+    - createMfaChallenge
+    - enrolMfaMethod
+    - getCart
+    - getCurrentSession
+    - listApiScopes
+    - listSsoProviders
+    - login
+    - removeCartLine
+    - selectRole
+    - startSsoAuthorization
+    - updateCartLine
+    - verifyMfaChallenge
+    - verifyMfaEnrolment
+    operationsWithNoPermissionCount: 17
   ticvai-control:
     name: TICVAI Control
     platforms:
     - P09
-    - P10
     - P11
     - P14
     - P17
-    screens: 294
-    operations: 400
-    permissions: 64
+    screens: 251
+    operations: 306
+    permissions: 49
     permissionSet:
     - ACCREDITATION_APPLY
     - ACCREDITATION_APPROVE
@@ -151,24 +233,11 @@ apps:
     - ASSET_LIBRARY_MANAGE
     - ASSET_LIBRARY_VIEW
     - AUDIT_VIEW
-    - CAPACITY_CONFIGURE
-    - CASE_MANAGE
-    - CASE_VIEW
     - DEVELOPER_ADMIN
     - DEVELOPER_MANAGE
     - DEVELOPER_VIEW
-    - GUEST_VIEW
-    - MARKETING_SEND
-    - ORDER_CREATE
-    - ORDER_EXCHANGE
-    - ORDER_MODIFY
-    - ORDER_REPRINT
-    - ORDER_RESCHEDULE
     - ORDER_VIEW
-    - PARTNER_MANAGE
-    - PARTNER_VIEW
     - PAYMENT_VIEW
-    - PERMISSION_GRANT
     - PERMISSION_VIEW
     - PLATFORM_AI_MANAGE
     - PLATFORM_BILLING_MANAGE
@@ -185,7 +254,6 @@ apps:
     - PLATFORM_TENANT_MANAGE
     - PLATFORM_TENANT_TERMINATE
     - PLATFORM_TENANT_VIEW
-    - PRICE_VIEW
     - PRODUCT_VIEW
     - REGION_CONFIGURE
     - REPORT_MANAGE
@@ -193,7 +261,6 @@ apps:
     - ROLE_MANAGE
     - SCOPE_MANAGE
     - SCOPE_VIEW
-    - SETTLEMENT_RECONCILE
     - SETTLEMENT_VIEW
     - TENANT_CONFIGURE
     - TENANT_PUBLISH
@@ -207,11 +274,8 @@ apps:
       - APPROVAL_VIEW
       - ASSET_LIBRARY_VIEW
       - AUDIT_VIEW
-      - CASE_VIEW
       - DEVELOPER_VIEW
-      - GUEST_VIEW
       - ORDER_VIEW
-      - PARTNER_VIEW
       - PAYMENT_VIEW
       - PERMISSION_VIEW
       - PLATFORM_BILLING_VIEW
@@ -219,7 +283,6 @@ apps:
       - PLATFORM_MIGRATION_VIEW
       - PLATFORM_RELEASE_VIEW
       - PLATFORM_TENANT_VIEW
-      - PRICE_VIEW
       - PRODUCT_VIEW
       - SCOPE_VIEW
       - SETTLEMENT_VIEW
@@ -232,29 +295,18 @@ apps:
       - AI_USE
       - APPROVAL_DECIDE
       - APPROVAL_REQUEST
-      - MARKETING_SEND
-      - ORDER_CREATE
-      - ORDER_EXCHANGE
-      - ORDER_MODIFY
-      - ORDER_REPRINT
-      - ORDER_RESCHEDULE
       - PLATFORM_MIGRATION_APPLY
       - PLATFORM_RELEASE_PROMOTE
       - PLATFORM_TENANT_ACCESS
       - PLATFORM_TENANT_TERMINATE
       - REPORT_VIEW_VENUE
-      - SETTLEMENT_RECONCILE
       configure:
       - ACCREDITATION_MANAGE
       - AI_CONFIGURE
       - APPROVAL_CONFIGURE
       - ASSET_LIBRARY_MANAGE
-      - CAPACITY_CONFIGURE
-      - CASE_MANAGE
       - DEVELOPER_ADMIN
       - DEVELOPER_MANAGE
-      - PARTNER_MANAGE
-      - PERMISSION_GRANT
       - PLATFORM_AI_MANAGE
       - PLATFORM_BILLING_MANAGE
       - PLATFORM_CELL_MANAGE
@@ -269,14 +321,11 @@ apps:
       - TENANT_PUBLISH
       - USER_MANAGE
     operationsWithNoPermission:
-    - addCartLine
     - changeOwnCredential
-    - checkoutCart
     - completeSsoAuthorization
     - createMfaChallenge
     - endOwnSession
     - enrolMfaMethod
-    - getCart
     - getCurrentSession
     - listApiScopes
     - listApiVersions
@@ -284,16 +333,15 @@ apps:
     - listOwnSessions
     - listSsoProviders
     - login
-    - removeCartLine
+    - registerDeveloper
     - removeMfaMethod
     - selectRole
     - startProspectSignup
     - startSsoAuthorization
-    - updateCartLine
     - verifyMfaChallenge
     - verifyMfaEnrolment
     - verifyProspectSignupCode
-    operationsWithNoPermissionCount: 24
+    operationsWithNoPermissionCount: 20
   venue-management:
     name: TICVAI Venue Management
     platforms:
@@ -642,8 +690,8 @@ apps:
     - P04
     - P15
     screens: 42
-    operations: 177
-    permissions: 41
+    operations: 178
+    permissions: 43
     permissionSet:
     - APPROVAL_DECIDE
     - APPROVAL_REQUEST
@@ -674,6 +722,8 @@ apps:
     - PRICE_VIEW
     - PRODUCT_CONFIGURE
     - PRODUCT_VIEW
+    - QUEUE_MANAGE
+    - QUEUE_VIEW
     - REPORT_VIEW_VENUE
     - REPORT_VIEW_WORKSTATION
     - SCOPE_VIEW
@@ -696,6 +746,7 @@ apps:
       - ORDER_VIEW
       - PRICE_VIEW
       - PRODUCT_VIEW
+      - QUEUE_VIEW
       - SCOPE_VIEW
       - WORKFORCE_VIEW
       operate:
@@ -730,6 +781,7 @@ apps:
       - DEVICE_MANAGE
       - GUEST_MANAGE
       - PRODUCT_CONFIGURE
+      - QUEUE_MANAGE
       - WORKSTATION_CONFIGURE
     operationsWithNoPermission:
     - addCartLine

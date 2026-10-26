@@ -1,6 +1,6 @@
 # WS123 — AI Governance board 3
 
-**10 screens · 9 operations · 19 schemas · 4 permissions**
+**10 screens · 10 operations · 20 schemas · 5 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `AI_AUDIT_VIEW, AI_USE, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `AI_AUDIT_VIEW, AI_USE, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_VIEW, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -96,7 +96,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-539` | AI Explainability & Audit Command Center | B | 8 | 206 | 7 | 5 | 0 | 0 | — | notStarted (—) |
-| `ADM-540` | AI Decision Explorer & Search | D | 9 | 26 | 7 | 5 | 2 | 0 | — | notStarted (—) |
+| `ADM-540` | AI Decision Explorer & Search | D | 9 | 26 | 7 | 11 | 2 | 0 | — | notStarted (—) |
 | `ADM-541` | AI Decision Explanation Workspace | B | 6 | 59 | 7 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-542` | Data, Feature & Evidence Provenance | B | 6 | 48 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-543` | Candidate, Rule & Decision Path Trace | B | 6 | 18 | 7 | 1 | 1 | 0 | — | notStarted (—) |

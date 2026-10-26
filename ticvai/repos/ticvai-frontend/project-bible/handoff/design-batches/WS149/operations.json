@@ -141,40 +141,6 @@
   "requestBody": null,
   "responds": "DeviceFirmware"
  },
- "listDevices": {
-  "method": "GET",
-  "path": "/devices",
-  "contract": "tenancy",
-  "summary": "List registered devices",
-  "permission": "DEVICE_VIEW",
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "workstationId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listKioskAssignments": {
   "method": "GET",
   "path": "/venues/{venueId}/kiosk-assignments",

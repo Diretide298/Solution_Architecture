@@ -31,7 +31,8 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "For grouped events."
+    "x-ticvai-references": "catalogue.event",
+    "description": "For grouped events. The parent is an existing event at the same venue, not the event itself, and has no parent of its own (one level; ADAM CR-256). Declared as a key onto `catalogue.event`."
    },
    "performanceCount": {
     "type": "integer",
@@ -53,13 +54,42 @@
      "cancelled",
      "archived"
     ],
-    "description": "**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."
+    "description": "**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState` and the event lifecycle job, which check the transition against `states/event.yaml` (ADAM CR-109); `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."
    },
    "lifecycleStateChangedAt": {
     "type": "string",
     "format": "date-time",
     "readOnly": true,
     "nullable": true
+   },
+   "scheduledLifecycleState": {
+    "type": "string",
+    "readOnly": true,
+    "nullable": true,
+    "enum": [
+     "draft",
+     "planned",
+     "onSale",
+     "live",
+     "closed",
+     "cancelled",
+     "archived"
+    ],
+    "description": "**A move waiting for its effectiveFrom** (ADAM CR-109, option 2; CHG-R10CAT-009): written by `setEventLifecycleState` when `effectiveFrom` is in the future, applied and cleared by the event lifecycle job in the workers host at `scheduledLifecycleAt`. Null when nothing waits."
+   },
+   "scheduledLifecycleAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true,
+    "description": "When the waiting move is applied (the request's `effectiveFrom`; ADAM CR-109)."
+   },
+   "scheduledLifecycleReason": {
+    "type": "string",
+    "maxLength": 500,
+    "readOnly": true,
+    "nullable": true,
+    "description": "The reason given with the waiting move, carried on `event.lifecycleChanged` when it is applied (ADAM CR-109)."
    }
   }
  },

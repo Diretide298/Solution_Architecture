@@ -267,6 +267,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-091` · status **notStarted** · provenance generated
 - Workshop pack:  board 8
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -407,6 +408,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-092` · status **notStarted** · provenance generated
 - Workshop pack:  board 8
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -530,6 +532,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-093` · status **notStarted** · provenance generated
 - Workshop pack:  board 8
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -900,6 +903,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-096` · status **notStarted** · provenance generated
 - Workshop pack:  board 8
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1027,6 +1031,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-097` · status **notStarted** · provenance generated
 - Workshop pack:  board 8
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1163,6 +1168,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-098` · status **notStarted** · provenance generated
 - Workshop pack:  board 8
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1304,6 +1310,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-099` · status **notStarted** · provenance generated
 - Workshop pack:  board 8
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1425,6 +1432,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-100` · status **notStarted** · provenance generated
 - Workshop pack:  board 8
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

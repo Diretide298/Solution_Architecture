@@ -1704,13 +1704,17 @@
       {
        "kind": "multiSelect",
        "label": "Any shops you'd like to visit?",
-       "notes": "**Shown when Shopping is chosen above** (client meeting 30 September, MoM 4.7: retail and kiosk shops join F&B in the planner). Options are the `retailTags` of the shops and retail kiosks of the chosen parks (souvenirs, toys, apparel ...); sent as `VisitPlanRequest.retailTags`. A shop stop is planned only at a shop or kiosk of that day's park.",
+       "bindsTo": "VisitPlannerOptions.retailTags",
+       "operation": "getVisitPlannerOptions",
+       "notes": "**Shown when Shopping is chosen above** (client meeting 30 September, MoM 4.7: retail and kiosk shops join F&B in the planner). Options are the `retailTags` of the shops and retail kiosks of the chosen parks (souvenirs, toys, apparel ...); sent as `VisitPlanRequest.retailTags`. A shop stop is planned only at a shop or kiosk of that day's park. **Bound to `VisitPlannerOptions.retailTags`** (per map, `{mapId, mapName, tags}`, from the published shops and retail kiosks; ADAM CR-220, 25 October 2026), read with `getVisitPlannerOptions` per chosen park, so each tag names the park(s) that have it and the preferenceNotAtVenue chip comes from the same read.",
        "provenance": "decided 30 September 2026, client meeting MoM 4.7 (Allam)"
       },
       {
        "kind": "selectField",
        "label": "What would you like for lunch?",
-       "notes": "**Cuisines from the dining points of the chosen parks only** (`VenuePoint.cuisineTags` of restaurants, cafes and food kiosks; client meeting 30 September, MoM 4.7). Lunch is planned at a restaurant **of that day's park** that serves it, never another park's. In a multi-venue plan each cuisine names the park(s) that serve it (*Indian · Summit Peaks only*), so the guest sees before planning that it will not be on every day.",
+       "bindsTo": "VisitPlannerOptions.cuisineTags",
+       "operation": "getVisitPlannerOptions",
+       "notes": "**Cuisines from the dining points of the chosen parks only** (`VenuePoint.cuisineTags` of restaurants, cafes and food kiosks; client meeting 30 September, MoM 4.7). Lunch is planned at a restaurant **of that day's park** that serves it, never another park's. In a multi-venue plan each cuisine names the park(s) that serve it (*Indian · Summit Peaks only*), so the guest sees before planning that it will not be on every day. **Bound to `VisitPlannerOptions.cuisineTags`** (per map, `{mapId, mapName, tags}`, from the published dining points: restaurant, cafe, food kiosk; ADAM CR-220, 25 October 2026), read with `getVisitPlannerOptions` per chosen park, so each cuisine names the park(s) that serve it and the preferenceNotAtVenue chip comes from the same read.",
        "provenance": "decided 29 September 2026, MOB-6; decided 30 September 2026, client meeting MoM 4.7 (Allam)"
       }
      ]
@@ -1769,7 +1773,7 @@
    {
     "operationId": "getVisitPlannerOptions",
     "contract": "venue-map",
-    "purpose": "The planner's choices from the venue's data (r8, GPS-C21): the interest tags of its parks fill What are you most interested in?, and the ready-made plans and Fast Track bundles come from the same read.",
+    "purpose": "The planner's choices from the venue's data (r8, GPS-C21): the interest tags of its parks fill What are you most interested in?, its cuisineTags and retailTags fill the lunch and shop questions and the preferenceNotAtVenue chip (ADAM CR-220), and the ready-made plans and Fast Track bundles come from the same read.",
     "trigger": "onLoad",
     "provenance": "r8 integration, GPS-C21 (CHG-R8INT-007)"
    }

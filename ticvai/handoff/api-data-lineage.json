@@ -29,6 +29,7 @@
   "note": "guidedAnswerIds (W4)",
   "readColumns": {
    "catalogue.product": [
+    "add_on_product_ids",
     "approved_by_principal_id",
     "attraction_id",
     "booking_flow_id",
@@ -39,6 +40,7 @@
     "code",
     "code_schema",
     "consent_question_ids",
+    "created_at",
     "created_by_principal_id",
     "data_mask_values",
     "description",
@@ -72,6 +74,8 @@
     "scope_path",
     "segment_tags",
     "site_id",
+    "updated_at",
+    "valid_to",
     "variant_count",
     "venue_id"
    ],
@@ -88,8 +92,8 @@
   "readVia": [
    {
     "query": "assets#mediaAssetRecords",
-    "route": "service",
-    "for": "a guest read's ProductMedia url and thumbnailUrl: the asset's stable CDN address when it is public and ready (assets.media_asset), Assets' data, in operations (ADAM CR-221, option A; CHG-R10CAT-014)"
+    "route": "in-process",
+    "for": "a guest read's ProductMedia url and thumbnailUrl: the asset's stable CDN address when it is public and ready (assets.media_asset), Assets' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)"
    },
    {
     "query": "white-label#guidedChoiceAnswerRecords",
@@ -101,6 +105,9 @@
     "route": "service",
     "for": "what its text calls \"GuidedChoice\": whitelabel.guided_choice, WhiteLabel's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "assets.media_asset"
   ]
  },
  "createProduct": {
@@ -135,6 +142,7 @@
   "note": "bookingFlowId validated against the venue's flows",
   "readColumns": {
    "catalogue.product": [
+    "add_on_product_ids",
     "approved_by_principal_id",
     "attraction_id",
     "booking_flow_id",
@@ -145,6 +153,7 @@
     "code",
     "code_schema",
     "consent_question_ids",
+    "created_at",
     "created_by_principal_id",
     "data_mask_values",
     "description",
@@ -178,6 +187,8 @@
     "scope_path",
     "segment_tags",
     "site_id",
+    "updated_at",
+    "valid_to",
     "variant_count",
     "venue_id"
    ],
@@ -230,6 +241,7 @@
   ],
   "readColumns": {
    "catalogue.product": [
+    "add_on_product_ids",
     "approved_by_principal_id",
     "attraction_id",
     "booking_flow_id",
@@ -240,6 +252,7 @@
     "code",
     "code_schema",
     "consent_question_ids",
+    "created_at",
     "created_by_principal_id",
     "data_mask_values",
     "description",
@@ -273,6 +286,8 @@
     "scope_path",
     "segment_tags",
     "site_id",
+    "updated_at",
+    "valid_to",
     "variant_count",
     "venue_id"
    ],
@@ -289,9 +304,12 @@
   "readVia": [
    {
     "query": "assets#mediaAssetRecords",
-    "route": "service",
-    "for": "a guest read's ProductMedia url and thumbnailUrl: the asset's stable CDN address when it is public and ready (assets.media_asset), Assets' data, in operations (ADAM CR-221, option A; CHG-R10CAT-014)"
+    "route": "in-process",
+    "for": "a guest read's ProductMedia url and thumbnailUrl: the asset's stable CDN address when it is public and ready (assets.media_asset), Assets' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)"
    }
+  ],
+  "readsInProcess": [
+   "assets.media_asset"
   ]
  },
  "updateProduct": {
@@ -330,6 +348,7 @@
   "note": "bookingFlowId validated",
   "readColumns": {
    "catalogue.product": [
+    "add_on_product_ids",
     "approved_by_principal_id",
     "attraction_id",
     "booking_flow_id",
@@ -340,6 +359,7 @@
     "code",
     "code_schema",
     "consent_question_ids",
+    "created_at",
     "created_by_principal_id",
     "data_mask_values",
     "description",
@@ -373,6 +393,8 @@
     "scope_path",
     "segment_tags",
     "site_id",
+    "updated_at",
+    "valid_to",
     "variant_count",
     "venue_id"
    ],
@@ -469,6 +491,7 @@
     "is_default",
     "name",
     "product_id",
+    "reference_price",
     "sku"
    ]
   },
@@ -724,6 +747,9 @@
     "name",
     "parent_event_id",
     "performance_count",
+    "scheduled_lifecycle_at",
+    "scheduled_lifecycle_reason",
+    "scheduled_lifecycle_state",
     "scope_path",
     "venue_id"
    ]
@@ -765,6 +791,9 @@
     "name",
     "parent_event_id",
     "performance_count",
+    "scheduled_lifecycle_at",
+    "scheduled_lifecycle_reason",
+    "scheduled_lifecycle_state",
     "scope_path",
     "venue_id"
    ]
@@ -1151,6 +1180,7 @@
     "content_hash",
     "id",
     "is_delta",
+    "note",
     "payload",
     "published_at",
     "published_by",
@@ -1480,6 +1510,7 @@
   "fixNote": "4 October 2026 (CHG-FXC-004): the archive rule and isSellable",
   "readColumns": {
    "catalogue.product": [
+    "add_on_product_ids",
     "approved_by_principal_id",
     "attraction_id",
     "booking_flow_id",
@@ -1490,6 +1521,7 @@
     "code",
     "code_schema",
     "consent_question_ids",
+    "created_at",
     "created_by_principal_id",
     "data_mask_values",
     "description",
@@ -1523,6 +1555,8 @@
     "scope_path",
     "segment_tags",
     "site_id",
+    "updated_at",
+    "valid_to",
     "variant_count",
     "venue_id"
    ],
@@ -1655,6 +1689,7 @@
     "is_default",
     "name",
     "product_id",
+    "reference_price",
     "sku"
    ]
   },
@@ -1873,6 +1908,9 @@
     "name",
     "parent_event_id",
     "performance_count",
+    "scheduled_lifecycle_at",
+    "scheduled_lifecycle_reason",
+    "scheduled_lifecycle_state",
     "scope_path",
     "venue_id"
    ]
@@ -1914,6 +1952,9 @@
     "name",
     "parent_event_id",
     "performance_count",
+    "scheduled_lifecycle_at",
+    "scheduled_lifecycle_reason",
+    "scheduled_lifecycle_state",
     "scope_path",
     "venue_id"
    ]
@@ -4320,6 +4361,20 @@
     "tax_reversal_entry_id",
     "tender_amount",
     "tender_currency"
+   ],
+   "orders.refund_line": [
+    "applied_percentage",
+    "id",
+    "order_line_id",
+    "refund_id",
+    "refunded_amount"
+   ],
+   "orders.refund_payment": [
+    "id",
+    "payment_id",
+    "refund_id",
+    "refunded_amount",
+    "tender_amount"
    ]
   }
  },
@@ -4385,6 +4440,20 @@
     "tax_reversal_entry_id",
     "tender_amount",
     "tender_currency"
+   ],
+   "orders.refund_line": [
+    "applied_percentage",
+    "id",
+    "order_line_id",
+    "refund_id",
+    "refunded_amount"
+   ],
+   "orders.refund_payment": [
+    "id",
+    "payment_id",
+    "refund_id",
+    "refunded_amount",
+    "tender_amount"
    ]
   }
  },
@@ -4442,6 +4511,20 @@
     "tax_reversal_entry_id",
     "tender_amount",
     "tender_currency"
+   ],
+   "orders.refund_line": [
+    "applied_percentage",
+    "id",
+    "order_line_id",
+    "refund_id",
+    "refunded_amount"
+   ],
+   "orders.refund_payment": [
+    "id",
+    "payment_id",
+    "refund_id",
+    "refunded_amount",
+    "tender_amount"
    ]
   }
  },
@@ -4584,7 +4667,8 @@
     "hours_before",
     "id",
     "percentage",
-    "refund_policy_id"
+    "refund_policy_id",
+    "refund_type"
    ]
   },
   "readVia": [
@@ -4652,7 +4736,8 @@
     "hours_before",
     "id",
     "percentage",
-    "refund_policy_id"
+    "refund_policy_id",
+    "refund_type"
    ]
   },
   "readVia": [
@@ -9190,6 +9275,11 @@
   },
   "readVia": [
    {
+    "query": "tenancy#recordDeviceSignIn",
+    "route": "in-process",
+    "for": "a device sign-in is recorded on the workstation's devices (tenancy.device_audit, kind access), for listDeviceAuditRecords (ADAM CR-232; r10 question 23; CHG-R10TEN-018)"
+   },
+   {
     "query": "tenancy#regionSettingsRecords",
     "route": "in-process",
     "for": "its read of the region's settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C10)"
@@ -9202,7 +9292,8 @@
   ],
   "readsInProcess": [
    "platform.region_settings",
-   "platform.workstation"
+   "platform.workstation",
+   "tenancy.device_audit"
   ]
  },
  "selectRole": {
@@ -9745,6 +9836,8 @@
     "principal_id",
     "quota",
     "revoked_at",
+    "revoked_by_kind",
+    "revoked_by_subject_id",
     "role_id",
     "scope_path",
     "subject_id",
@@ -9824,6 +9917,8 @@
     "principal_id",
     "quota",
     "revoked_at",
+    "revoked_by_kind",
+    "revoked_by_subject_id",
     "role_id",
     "scope_path",
     "subject_id",
@@ -10167,6 +10262,7 @@
   "reads": [
    "cache:idempotency",
    "identity.mfa_method",
+   "identity.redirect_host",
    "pii.subject_contact",
    "pii.subject_identity"
   ],
@@ -10215,6 +10311,11 @@
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
+   },
+   {
+    "query": "white-label#customDomainRedirectHosts",
+    "route": "projection",
+    "for": "whether the redirect URI's host is a domain of the tenant on which UAE Pass redirects may land, from Identity's projection identity.redirect_host (r10 ruling, ADR-0028; CHG-R10ID-018)"
    }
   ],
   "readsInProcess": [
@@ -10310,13 +10411,10 @@
   "path": "/auth/guest/link-checkout",
   "reads": [
    "cache:idempotency",
-   "orders.sales_order",
-   "pii.subject_contact"
+   "identity.subject_holding"
   ],
   "writes": [
    "cache:idempotency",
-   "orders.sales_order",
-   "pii.subject",
    "platform.outbox"
   ],
   "routing": "",
@@ -10333,7 +10431,14 @@
   "audience": [
    "guest"
   ],
-  "fixNote": "14 October 2026 (ADAM CR-084, CHG-GDL-003): each attached order is announced as order.linkedToGuest through the outbox in the attaching transaction (ADR-0033), which Identity's identity.subject_holding consumes"
+  "fixNote": "14 October 2026 (ADAM CR-084, CHG-GDL-003): each attached order is announced as order.linkedToGuest through the outbox in the attaching transaction (ADR-0033), which Identity's identity.subject_holding consumes",
+  "readVia": [
+   {
+    "query": "orders#guestCheckoutOrders",
+    "route": "projection",
+    "for": "the guest-checkout orders the caller may claim, from Identity's projection identity.subject_holding (r10 ruling, ADR-0028; CHG-R10ID-018)"
+   }
+  ]
  },
  "deleteGuestAccount": {
   "contract": "identity",
@@ -12457,8 +12562,8 @@
   "path": "/ledger/trial-balance",
   "reads": [
    "ledger.account",
-   "ledger.event_budget",
    "ledger.fiscal_period",
+   "ledger.journal_entry",
    "ledger.posting"
   ],
   "writes": [],
@@ -13439,8 +13544,10 @@
    "control.contract": [
     "billing_period",
     "cancelled_at",
+    "currency_code",
     "current_price",
     "id",
+    "issuing_legal_entity",
     "plan_id",
     "plan_name",
     "plan_version",
@@ -13717,6 +13824,7 @@
     "billing_period",
     "cell_tier",
     "code",
+    "currency_code",
     "description",
     "id",
     "included_ai_tokens",
@@ -13784,6 +13892,7 @@
     "billing_period",
     "cell_tier",
     "code",
+    "currency_code",
     "description",
     "id",
     "included_ai_tokens",
@@ -13842,6 +13951,7 @@
     "billing_period",
     "cell_tier",
     "code",
+    "currency_code",
     "description",
     "id",
     "included_ai_tokens",
@@ -13909,6 +14019,7 @@
     "billing_period",
     "cell_tier",
     "code",
+    "currency_code",
     "description",
     "id",
     "included_ai_tokens",
@@ -13963,8 +14074,10 @@
    "control.contract": [
     "billing_period",
     "cancelled_at",
+    "currency_code",
     "current_price",
     "id",
+    "issuing_legal_entity",
     "plan_id",
     "plan_name",
     "plan_version",
@@ -14010,8 +14123,10 @@
    "control.contract": [
     "billing_period",
     "cancelled_at",
+    "currency_code",
     "current_price",
     "id",
+    "issuing_legal_entity",
     "plan_id",
     "plan_name",
     "plan_version",
@@ -14059,11 +14174,6 @@
   "pure": "a preview of a plan change; setSubscription makes it",
   "readVia": [
    {
-    "query": "tenancy#regionSettingsRecords",
-    "route": "service",
-    "for": "the region's trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SubscriptionPreview.priceChange, SubscriptionPreview.proratedAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   },
-   {
     "query": "tenancy#tenantRecords",
     "route": "service",
     "for": "its read of platform.tenant, Tenancy's data (CHG-MOD-001)"
@@ -14106,14 +14216,7 @@
     "plan_id"
    ]
   },
-  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)",
-  "readVia": [
-   {
-    "query": "tenancy#regionSettingsRecords",
-    "route": "service",
-    "for": "the region's trading currency and scale (currency_code, currency_scale) for the Money it answers: EntitlementLimit.overageUnitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   }
-  ]
+  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "addLicenceAddOn": {
   "contract": "subscription",
@@ -14203,14 +14306,7 @@
     "plan_id"
    ]
   },
-  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)",
-  "readVia": [
-   {
-    "query": "tenancy#regionSettingsRecords",
-    "route": "service",
-    "for": "the region's trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: EntitlementLimit.overageUnitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   }
-  ]
+  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "getEntitlementUsage": {
   "contract": "subscription",
@@ -15032,11 +15128,13 @@
   "readColumns": {
    "control.invoice": [
     "credited_total",
+    "currency_code",
     "due_at",
     "gross_amount",
     "id",
     "invoice_number",
     "issued_at",
+    "issuing_legal_entity",
     "net_amount",
     "paid_at",
     "period_end",
@@ -15074,6 +15172,7 @@
    "control.module_listing",
    "control.plan",
    "control.plan_module",
+   "control.platform_tax_rate",
    "control.usage_record"
   ],
   "writes": [
@@ -15099,11 +15198,13 @@
   "readColumns": {
    "control.invoice": [
     "credited_total",
+    "currency_code",
     "due_at",
     "gross_amount",
     "id",
     "invoice_number",
     "issued_at",
+    "issuing_legal_entity",
     "net_amount",
     "paid_at",
     "period_end",
@@ -15184,12 +15285,18 @@
   ],
   "readVia": [
    {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the outlet's venue (platform.outlet.venue_id), since a menu reaches its venue only through fnb.menu.outlet_id: the venue whose settings give the Money's currency (ADAM CR-260 as the r10 package carries CR-234; XDR-004)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the currency and scale of the Money it answers: the venue's frozen trading currency, from platform.venue_settings, Tenancy's data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)"
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -15569,12 +15676,18 @@
   },
   "readVia": [
    {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the outlet's venue (platform.outlet.venue_id), since a menu reaches its venue only through fnb.menu.outlet_id: the venue whose settings give the Money's currency (ADAM CR-260 as the r10 package carries CR-234; XDR-004)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the currency and scale of the Money it answers: the venue's frozen trading currency, from platform.venue_settings, Tenancy's data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)"
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -15649,13 +15762,25 @@
   },
   "readVia": [
    {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the outlet's venue (platform.outlet.venue_id), since a menu reaches its venue only through fnb.menu.outlet_id: the venue whose settings give the Money's currency (ADAM CR-260 as the r10 package carries CR-234; XDR-004; CHG-R10INT-004)"
+   },
+   {
     "query": "tenancy#regionSettingsRecords",
     "route": "in-process",
     "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers: the venue's frozen trading currency, from platform.venue_settings, Tenancy's data, in process (ADAM CR-234; XDR-004; CHG-R10INT-004)"
    }
   ],
   "readsInProcess": [
-   "platform.region_settings"
+   "platform.outlet",
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "getMenu": {
@@ -15722,12 +15847,18 @@
   },
   "readVia": [
    {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the outlet's venue (platform.outlet.venue_id), since a menu reaches its venue only through fnb.menu.outlet_id: the venue whose settings give the Money's currency (ADAM CR-260 as the r10 package carries CR-234; XDR-004)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the currency and scale of the Money it answers: the venue's frozen trading currency, from platform.venue_settings, Tenancy's data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)"
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -15802,13 +15933,25 @@
   },
   "readVia": [
    {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the outlet's venue (platform.outlet.venue_id), since a menu reaches its venue only through fnb.menu.outlet_id: the venue whose settings give the Money's currency (ADAM CR-260 as the r10 package carries CR-234; XDR-004; CHG-R10INT-004)"
+   },
+   {
     "query": "tenancy#regionSettingsRecords",
     "route": "in-process",
     "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers: the venue's frozen trading currency, from platform.venue_settings, Tenancy's data, in process (ADAM CR-234; XDR-004; CHG-R10INT-004)"
    }
   ],
   "readsInProcess": [
-   "platform.region_settings"
+   "platform.outlet",
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "setMenuSections": {
@@ -15882,13 +16025,25 @@
   },
   "readVia": [
    {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the outlet's venue (platform.outlet.venue_id), since a menu reaches its venue only through fnb.menu.outlet_id: the venue whose settings give the Money's currency (ADAM CR-260 as the r10 package carries CR-234; XDR-004; CHG-R10INT-004)"
+   },
+   {
     "query": "tenancy#regionSettingsRecords",
     "route": "in-process",
     "for": "what its text calls \"Region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers: the venue's frozen trading currency, from platform.venue_settings, Tenancy's data, in process (ADAM CR-234; XDR-004; CHG-R10INT-004)"
    }
   ],
   "readsInProcess": [
-   "platform.region_settings"
+   "platform.outlet",
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "setItemAvailability": {
@@ -15941,12 +16096,18 @@
   },
   "readVia": [
    {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the outlet's venue (platform.outlet.venue_id), since a menu reaches its venue only through fnb.menu.outlet_id: the venue whose settings give the Money's currency (ADAM CR-260 as the r10 package carries CR-234; XDR-004)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the currency and scale of the Money it answers: the venue's frozen trading currency, from platform.venue_settings, Tenancy's data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)"
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -21765,6 +21926,7 @@
     "inventory_item_id",
     "is_active",
     "is_droppable",
+    "is_published",
     "is_returnable",
     "list_price",
     "name",
@@ -21820,6 +21982,7 @@
     "inventory_item_id",
     "is_active",
     "is_droppable",
+    "is_published",
     "is_returnable",
     "list_price",
     "name",
@@ -21875,6 +22038,7 @@
     "inventory_item_id",
     "is_active",
     "is_droppable",
+    "is_published",
     "is_returnable",
     "list_price",
     "name",
@@ -22822,7 +22986,17 @@
     "status",
     "subject_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "getGiftCard": {
   "contract": "wallet",
@@ -22860,7 +23034,17 @@
     "status",
     "subject_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "blockGiftCard": {
   "contract": "wallet",
@@ -22902,7 +23086,17 @@
     "status",
     "subject_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "getOutletStock": {
   "contract": "retail",
@@ -22971,6 +23165,7 @@
     "collected_at",
     "collected_by_principal_id",
     "collection_location_id",
+    "collection_note",
     "collection_point_name",
     "disposal_decided_at",
     "disposal_decided_by_principal_id",
@@ -23043,6 +23238,7 @@
     "collected_at",
     "collected_by_principal_id",
     "collection_location_id",
+    "collection_note",
     "collection_point_name",
     "disposal_decided_at",
     "disposal_decided_by_principal_id",
@@ -23113,6 +23309,7 @@
     "collected_at",
     "collected_by_principal_id",
     "collection_location_id",
+    "collection_note",
     "collection_point_name",
     "disposal_decided_at",
     "disposal_decided_by_principal_id",
@@ -25082,6 +25279,7 @@
     "duration_seconds",
     "extracted_text",
     "filename",
+    "has_transparency",
     "height",
     "id",
     "is_rights_expired",
@@ -25141,6 +25339,7 @@
     "duration_seconds",
     "extracted_text",
     "filename",
+    "has_transparency",
     "height",
     "id",
     "is_rights_expired",
@@ -25218,6 +25417,7 @@
     "duration_seconds",
     "extracted_text",
     "filename",
+    "has_transparency",
     "height",
     "id",
     "is_rights_expired",
@@ -25326,6 +25526,7 @@
     "duration_seconds",
     "extracted_text",
     "filename",
+    "has_transparency",
     "height",
     "id",
     "is_rights_expired",
@@ -25435,6 +25636,7 @@
     "duration_seconds",
     "extracted_text",
     "filename",
+    "has_transparency",
     "height",
     "id",
     "is_rights_expired",
@@ -27911,14 +28113,17 @@
     "code",
     "conditions",
     "description",
+    "description_localised",
     "discount",
     "discount_given",
     "id",
     "is_paused",
     "is_recommendable",
+    "label",
     "max_redemptions",
     "max_redemptions_per_guest",
     "name",
+    "name_localised",
     "precedence",
     "published_at",
     "recommendable_segment_ids",
@@ -27929,6 +28134,7 @@
     "valid_from",
     "valid_to",
     "venue_id",
+    "venues",
     "version"
    ]
   },
@@ -27979,14 +28185,17 @@
     "code",
     "conditions",
     "description",
+    "description_localised",
     "discount",
     "discount_given",
     "id",
     "is_paused",
     "is_recommendable",
+    "label",
     "max_redemptions",
     "max_redemptions_per_guest",
     "name",
+    "name_localised",
     "precedence",
     "published_at",
     "recommendable_segment_ids",
@@ -27997,6 +28206,7 @@
     "valid_from",
     "valid_to",
     "venue_id",
+    "venues",
     "version"
    ]
   },
@@ -28047,14 +28257,17 @@
     "code",
     "conditions",
     "description",
+    "description_localised",
     "discount",
     "discount_given",
     "id",
     "is_paused",
     "is_recommendable",
+    "label",
     "max_redemptions",
     "max_redemptions_per_guest",
     "name",
+    "name_localised",
     "precedence",
     "published_at",
     "recommendable_segment_ids",
@@ -28065,6 +28278,7 @@
     "valid_from",
     "valid_to",
     "venue_id",
+    "venues",
     "version"
    ]
   },
@@ -28117,14 +28331,17 @@
     "code",
     "conditions",
     "description",
+    "description_localised",
     "discount",
     "discount_given",
     "id",
     "is_paused",
     "is_recommendable",
+    "label",
     "max_redemptions",
     "max_redemptions_per_guest",
     "name",
+    "name_localised",
     "precedence",
     "published_at",
     "recommendable_segment_ids",
@@ -28135,6 +28352,7 @@
     "valid_from",
     "valid_to",
     "venue_id",
+    "venues",
     "version"
    ]
   },
@@ -28290,14 +28508,17 @@
     "code",
     "conditions",
     "description",
+    "description_localised",
     "discount",
     "discount_given",
     "id",
     "is_paused",
     "is_recommendable",
+    "label",
     "max_redemptions",
     "max_redemptions_per_guest",
     "name",
+    "name_localised",
     "precedence",
     "published_at",
     "recommendable_segment_ids",
@@ -28308,6 +28529,7 @@
     "valid_from",
     "valid_to",
     "venue_id",
+    "venues",
     "version"
    ]
   },
@@ -29724,19 +29946,24 @@
     "activity_id",
     "approval_level",
     "approval_request_id",
+    "basis",
     "change_set_hash",
+    "confidence",
     "decided_at",
     "decided_by_principal_id",
     "decision_reason",
+    "distance_metres",
     "draft_text",
     "expires_at",
     "field_path",
     "id",
     "kind",
     "locale",
+    "map_id",
     "payload",
     "plan_id",
     "proposed_at",
+    "reasoning",
     "scope_path",
     "status",
     "summary",
@@ -30223,19 +30450,24 @@
     "activity_id",
     "approval_level",
     "approval_request_id",
+    "basis",
     "change_set_hash",
+    "confidence",
     "decided_at",
     "decided_by_principal_id",
     "decision_reason",
+    "distance_metres",
     "draft_text",
     "expires_at",
     "field_path",
     "id",
     "kind",
     "locale",
+    "map_id",
     "payload",
     "plan_id",
     "proposed_at",
+    "reasoning",
     "scope_path",
     "status",
     "summary",
@@ -30284,19 +30516,24 @@
     "activity_id",
     "approval_level",
     "approval_request_id",
+    "basis",
     "change_set_hash",
+    "confidence",
     "decided_at",
     "decided_by_principal_id",
     "decision_reason",
+    "distance_metres",
     "draft_text",
     "expires_at",
     "field_path",
     "id",
     "kind",
     "locale",
+    "map_id",
     "payload",
     "plan_id",
     "proposed_at",
+    "reasoning",
     "scope_path",
     "status",
     "summary",
@@ -31178,6 +31415,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "queue.entry"
   ],
   "routing": "",
@@ -34614,6 +34852,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
+    "requested_by_subject_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
     "rule_id",
@@ -34625,6 +34864,13 @@
     "subject_type",
     "summary",
     "total_levels"
+   ],
+   "approvals.request_approver": [
+    "id",
+    "is_delegate",
+    "level",
+    "principal_id",
+    "request_id"
    ]
   },
   "readVia": [
@@ -34738,6 +34984,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
+    "requested_by_subject_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
     "rule_id",
@@ -34749,6 +34996,13 @@
     "subject_type",
     "summary",
     "total_levels"
+   ],
+   "approvals.request_approver": [
+    "id",
+    "is_delegate",
+    "level",
+    "principal_id",
+    "request_id"
    ]
   },
   "readVia": [
@@ -34967,6 +35221,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
+    "requested_by_subject_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
     "rule_id",
@@ -34978,6 +35233,13 @@
     "subject_type",
     "summary",
     "total_levels"
+   ],
+   "approvals.request_approver": [
+    "id",
+    "is_delegate",
+    "level",
+    "principal_id",
+    "request_id"
    ]
   },
   "readVia": [
@@ -35087,6 +35349,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
+    "requested_by_subject_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
     "rule_id",
@@ -35098,6 +35361,13 @@
     "subject_type",
     "summary",
     "total_levels"
+   ],
+   "approvals.request_approver": [
+    "id",
+    "is_delegate",
+    "level",
+    "principal_id",
+    "request_id"
    ]
   },
   "readVia": [
@@ -35197,6 +35467,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
+    "requested_by_subject_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
     "rule_id",
@@ -35208,6 +35479,13 @@
     "subject_type",
     "summary",
     "total_levels"
+   ],
+   "approvals.request_approver": [
+    "id",
+    "is_delegate",
+    "level",
+    "principal_id",
+    "request_id"
    ]
   },
   "readVia": [
@@ -35306,6 +35584,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
+    "requested_by_subject_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
     "rule_id",
@@ -35317,6 +35596,13 @@
     "subject_type",
     "summary",
     "total_levels"
+   ],
+   "approvals.request_approver": [
+    "id",
+    "is_delegate",
+    "level",
+    "principal_id",
+    "request_id"
    ]
   },
   "readVia": [
@@ -39106,8 +39392,8 @@
   "readVia": [
    {
     "query": "assets#mediaAssetRecords",
-    "route": "service",
-    "for": "a guest read's ProductMedia url and thumbnailUrl: the asset's stable CDN address when it is public and ready (assets.media_asset), Assets' data, in operations (ADAM CR-221, option A; CHG-R10CAT-014)"
+    "route": "in-process",
+    "for": "a guest read's ProductMedia url and thumbnailUrl: the asset's stable CDN address when it is public and ready (assets.media_asset), Assets' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
@@ -39126,6 +39412,7 @@
    }
   ],
   "readsInProcess": [
+   "assets.media_asset",
    "platform.venue_settings"
   ]
  },
@@ -39354,8 +39641,10 @@
    "control.contract": [
     "billing_period",
     "cancelled_at",
+    "currency_code",
     "current_price",
     "id",
+    "issuing_legal_entity",
     "plan_id",
     "plan_name",
     "plan_version",
@@ -39536,7 +39825,17 @@
     "status",
     "subject_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "redeemGiftCard": {
   "contract": "wallet",
@@ -39579,7 +39878,17 @@
     "status",
     "subject_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "suspendWallet": {
   "contract": "wallet",
@@ -39857,6 +40166,7 @@
     "collected_at",
     "collected_by_principal_id",
     "collection_location_id",
+    "collection_note",
     "collection_point_name",
     "disposal_decided_at",
     "disposal_decided_by_principal_id",
@@ -40475,11 +40785,6 @@
     "query": "ai#policyRecords",
     "route": "service",
     "for": "its read of ai.policy, AI's data (CHG-MOD-001)"
-   },
-   {
-    "query": "tenancy#regionSettingsRecords",
-    "route": "service",
-    "for": "the region's trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: body.billedAmount, body.providerCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
   "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
@@ -40828,6 +41133,7 @@
   "readColumns": {
    "access.entitlement": [
     "cancellation_kind",
+    "change_version",
     "credential_format",
     "entries_allowed",
     "entries_used",
@@ -40842,9 +41148,11 @@
     "issued_via",
     "last_entry_at",
     "media_code",
+    "media_linked_at",
     "order_id",
     "order_line_id",
     "product_id",
+    "rotation_secret_ciphertext",
     "scope_path",
     "shared_with_subject_ids",
     "status",
@@ -40907,6 +41215,7 @@
   "readColumns": {
    "access.entitlement": [
     "cancellation_kind",
+    "change_version",
     "credential_format",
     "entries_allowed",
     "entries_used",
@@ -40921,9 +41230,11 @@
     "issued_via",
     "last_entry_at",
     "media_code",
+    "media_linked_at",
     "order_id",
     "order_line_id",
     "product_id",
+    "rotation_secret_ciphertext",
     "scope_path",
     "shared_with_subject_ids",
     "status",
@@ -40979,6 +41290,7 @@
   ],
   "readColumns": {
    "catalogue.product": [
+    "add_on_product_ids",
     "approved_by_principal_id",
     "attraction_id",
     "booking_flow_id",
@@ -40989,6 +41301,7 @@
     "code",
     "code_schema",
     "consent_question_ids",
+    "created_at",
     "created_by_principal_id",
     "data_mask_values",
     "description",
@@ -41022,6 +41335,8 @@
     "scope_path",
     "segment_tags",
     "site_id",
+    "updated_at",
+    "valid_to",
     "variant_count",
     "venue_id"
    ],
@@ -41086,7 +41401,8 @@
     "kind",
     "reference",
     "scope_path",
-    "status"
+    "status",
+    "wallet_hold_id"
    ]
   },
   "readVia": [
@@ -41162,7 +41478,8 @@
     "kind",
     "reference",
     "scope_path",
-    "status"
+    "status",
+    "wallet_hold_id"
    ]
   },
   "readVia": [
@@ -41213,6 +41530,7 @@
     "published_at",
     "published_by_principal_id",
     "restored_from_version",
+    "snapshot",
     "version"
    ]
   }
@@ -41251,6 +41569,7 @@
   "lineageNote": "W-WE (changed): existing hand-mapped lineage plus catalogue.rollback_action (subject product, requested->executing->completed within the call) and catalogue.audit_entry (source rollback); description updated",
   "readColumns": {
    "catalogue.product": [
+    "add_on_product_ids",
     "approved_by_principal_id",
     "attraction_id",
     "booking_flow_id",
@@ -41261,6 +41580,7 @@
     "code",
     "code_schema",
     "consent_question_ids",
+    "created_at",
     "created_by_principal_id",
     "data_mask_values",
     "description",
@@ -41294,6 +41614,8 @@
     "scope_path",
     "segment_tags",
     "site_id",
+    "updated_at",
+    "valid_to",
     "variant_count",
     "venue_id"
    ],
@@ -41955,7 +42277,9 @@
   ],
   "readColumns": {
    "venuemap.import_job": [
+    "created_at",
     "findings",
+    "format",
     "hand_marked_paths",
     "id",
     "layers_found",
@@ -41969,6 +42293,7 @@
     "resources_found",
     "scope_path",
     "shapes_found",
+    "source_ref",
     "status",
     "unmapped_layers"
    ]
@@ -42549,6 +42874,7 @@
     "seating",
     "segregated_access",
     "shift_variance_threshold",
+    "step_minutes",
     "support_hours",
     "venue_id"
    ]
@@ -42624,6 +42950,7 @@
     "seating",
     "segregated_access",
     "shift_variance_threshold",
+    "step_minutes",
     "support_hours",
     "venue_id"
    ]
@@ -45087,6 +45414,7 @@
   "readColumns": {
    "control.billing_entity": [
     "address",
+    "billing_currency",
     "country_code",
     "documents",
     "id",
@@ -45340,6 +45668,8 @@
     "principal_id",
     "quota",
     "revoked_at",
+    "revoked_by_kind",
+    "revoked_by_subject_id",
     "role_id",
     "scope_path",
     "subject_id",
@@ -45409,6 +45739,8 @@
     "principal_id",
     "quota",
     "revoked_at",
+    "revoked_by_kind",
+    "revoked_by_subject_id",
     "role_id",
     "scope_path",
     "subject_id",
@@ -46387,11 +46719,13 @@
    "control.webhook_replay": [
     "completed_at",
     "event_types",
+    "failure_reason",
     "id",
     "queued_at",
     "requested_by_principal_id",
     "status",
     "subscription_id",
+    "tenant_id",
     "window_from",
     "window_to"
    ]
@@ -46694,7 +47028,7 @@
    "control.api_licence"
   ],
   "routing": "",
-  "scope": "tenant",
+  "scope": "platform",
   "perm": "DEVELOPER_ADMIN",
   "offline": false,
   "summary": "Which API modules a tenant has licensed, and on what terms",
@@ -47047,7 +47381,15 @@
     "query": "identity#subjectRecords",
     "route": "in-process",
     "for": "its read of pii.subject, Identity's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "proposeTranslations": {
@@ -47274,6 +47616,7 @@
   "readColumns": {
    "access.entitlement": [
     "cancellation_kind",
+    "change_version",
     "credential_format",
     "entries_allowed",
     "entries_used",
@@ -47288,9 +47631,11 @@
     "issued_via",
     "last_entry_at",
     "media_code",
+    "media_linked_at",
     "order_id",
     "order_line_id",
     "product_id",
+    "rotation_secret_ciphertext",
     "scope_path",
     "shared_with_subject_ids",
     "status",
@@ -47359,6 +47704,7 @@
   "readColumns": {
    "access.entitlement": [
     "cancellation_kind",
+    "change_version",
     "credential_format",
     "entries_allowed",
     "entries_used",
@@ -47373,9 +47719,11 @@
     "issued_via",
     "last_entry_at",
     "media_code",
+    "media_linked_at",
     "order_id",
     "order_line_id",
     "product_id",
+    "rotation_secret_ciphertext",
     "scope_path",
     "shared_with_subject_ids",
     "status",
@@ -47706,8 +48054,10 @@
   "verb": "GET",
   "path": "/workstations/{workstationId}/health",
   "reads": [
+   "platform.configuration_profile",
    "platform.device",
    "platform.workstation",
+   "tenancy.device_firmware",
    "tenancy.device_telemetry"
   ],
   "writes": [],
@@ -48194,6 +48544,7 @@
     "quote_sent_at",
     "risk_assessment_sent_at",
     "status",
+    "version",
     "year_group"
    ],
    "pii.subject": [
@@ -49413,6 +49764,11 @@
   },
   "readVia": [
    {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the outlet's venue (platform.outlet.venue_id), since a menu reaches its venue only through fnb.menu.outlet_id: the venue whose settings give the Money's currency (ADAM CR-260 as the r10 package carries CR-234; XDR-004)"
+   },
+   {
     "query": "tenancy#regionSettingsRecords",
     "route": "service",
     "for": "what its text calls \"RegionSettings.timeZone\": platform.region_settings, Tenancy's data (CHG-R10GEN-001)"
@@ -49424,6 +49780,7 @@
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -50635,12 +50992,18 @@
   },
   "readVia": [
    {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the outlet's venue (platform.outlet.venue_id), since a menu reaches its venue only through fnb.menu.outlet_id: the venue whose settings give the Money's currency (ADAM CR-260 as the r10 package carries CR-234; XDR-004)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the currency and scale of the Money it answers: the venue's frozen trading currency, from platform.venue_settings, Tenancy's data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)"
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -50859,12 +51222,18 @@
     "for": "what its text calls \"tax code\": ledger.tax_code, Ledger's data (CHG-RTE-001)"
    },
    {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the outlet's venue (platform.outlet.venue_id), since a menu reaches its venue only through fnb.menu.outlet_id: the venue whose settings give the Money's currency (ADAM CR-260 as the r10 package carries CR-234; XDR-004)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the currency and scale of the Money it accepts: the venue's frozen trading currency, from platform.venue_settings, Tenancy's data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)"
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -51835,6 +52204,7 @@
     "routing",
     "status",
     "tenant_id",
+    "validation_expires_at",
     "verification_method",
     "verification_record",
     "verification_token"
@@ -51852,6 +52222,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "whitelabel.custom_domain"
   ],
   "routing": "",
@@ -51884,6 +52255,7 @@
     "routing",
     "status",
     "tenant_id",
+    "validation_expires_at",
     "verification_method",
     "verification_record",
     "verification_token"
@@ -51916,6 +52288,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "whitelabel.custom_domain"
   ],
   "routing": "",
@@ -51948,6 +52321,7 @@
     "routing",
     "status",
     "tenant_id",
+    "validation_expires_at",
     "verification_method",
     "verification_record",
     "verification_token"
@@ -52117,6 +52491,7 @@
   "readColumns": {
    "access.entitlement": [
     "cancellation_kind",
+    "change_version",
     "credential_format",
     "entries_allowed",
     "entries_used",
@@ -52131,9 +52506,11 @@
     "issued_via",
     "last_entry_at",
     "media_code",
+    "media_linked_at",
     "order_id",
     "order_line_id",
     "product_id",
+    "rotation_secret_ciphertext",
     "scope_path",
     "shared_with_subject_ids",
     "status",
@@ -61622,6 +61999,7 @@
   "reads": [
    "access.entitlement",
    "approvals.request",
+   "control.billing_entity",
    "identity.principal"
   ],
   "writes": [],
@@ -65572,6 +65950,16 @@
   "stores": [
    "postgres",
    "redis"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listRelatedOrderTransaction": {
@@ -72682,6 +73070,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "whitelabel.custom_domain"
   ],
   "routing": null,
@@ -72850,7 +73239,8 @@
     "kind",
     "reference",
     "scope_path",
-    "status"
+    "status",
+    "wallet_hold_id"
    ]
   },
   "readVia": [
@@ -73081,6 +73471,7 @@
   "readColumns": {
    "control.capacity_pack": [
     "approved_by",
+    "currency_code",
     "id",
     "invoice_id",
     "is_temporary",
@@ -75176,7 +75567,17 @@
     "spend_cap_per_transaction",
     "subject_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "createVoucherType": {
   "contract": "wallet",
@@ -76068,14 +76469,7 @@
    "redis"
   ],
   "lineageNote": "Metered events control.usage_record against control.invoice/invoice_line (as generateInvoice/listSubscriptionInvoices), priced per subscription.contract and licensing_model.",
-  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)",
-  "readVia": [
-   {
-    "query": "tenancy#venueSettingsRecords",
-    "route": "service",
-    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: BillingReconciliation.amount, BillingReconciliation.unitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   }
-  ]
+  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "getCreditConsumptionPolicy": {
   "contract": "wallet",
@@ -76140,12 +76534,14 @@
     "consumables",
     "cpu_percent",
     "device_id",
+    "error_count",
     "id",
     "is_charging",
     "memory_percent",
     "scope_path",
     "signal_strength",
     "storage_free_mb",
+    "sync_backlog",
     "uptime_seconds"
    ]
   }
@@ -76599,14 +76995,7 @@
    "redis"
   ],
   "lineageNote": "Usage (control.usage_record, as getEntitlementUsage) against plan/tier limits, add-on limits and capacity packs, response per subscription.enforcement_policy (neighbour setLicenceEnforcementPolicy).",
-  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)",
-  "readVia": [
-   {
-    "query": "tenancy#venueSettingsRecords",
-    "route": "service",
-    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: LicenceEnforcement.overageCharge (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   }
-  ]
+  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "getMediaDistribution": {
   "contract": "assets",
@@ -79172,6 +79561,7 @@
    "control.licensing_model": [
     "billable_unit",
     "code",
+    "currency_code",
     "effective_from",
     "id",
     "included_allowances",
@@ -79362,6 +79752,7 @@
   "readColumns": {
    "control.module_listing": [
     "category",
+    "currency_code",
     "description",
     "id",
     "included_in_tiers",
@@ -80556,7 +80947,17 @@
     "spend_cap_per_transaction",
     "subject_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "listShiftTemplates": {
   "contract": "workforce",
@@ -81861,7 +82262,8 @@
   "verb": "POST",
   "path": "/vsi-assessments",
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -82704,7 +83106,24 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "transition guards: price (price_list), capacity (event_capacity_profile/channel_capacity), schedule, resource plan; updates event.is_active and performance status, emits via outbox (cancelPerformance pattern); event has no lifecycle_state column; approvals routed via approvals service"
+  "lineageNote": "transition guards: price (price_list), capacity (event_capacity_profile/channel_capacity), schedule, resource plan; updates event.is_active and performance status, emits via outbox (cancelPerformance pattern); event has no lifecycle_state column; approvals routed via approvals service",
+  "readColumns": {
+   "catalogue.event": [
+    "code",
+    "id",
+    "is_active",
+    "lifecycle_state",
+    "lifecycle_state_changed_at",
+    "name",
+    "parent_event_id",
+    "performance_count",
+    "scheduled_lifecycle_at",
+    "scheduled_lifecycle_reason",
+    "scheduled_lifecycle_state",
+    "scope_path",
+    "venue_id"
+   ]
+  }
  },
  "setEventRegistration": {
   "contract": "catalogue",
@@ -83466,6 +83885,7 @@
    "control.licensing_model": [
     "billable_unit",
     "code",
+    "currency_code",
     "effective_from",
     "id",
     "included_allowances",
@@ -83772,6 +84192,7 @@
   "readColumns": {
    "control.module_listing": [
     "category",
+    "currency_code",
     "description",
     "id",
     "included_in_tiers",
@@ -85232,7 +85653,17 @@
     "spend_cap_per_transaction",
     "subject_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "setShiftTemplate": {
   "contract": "workforce",
@@ -85957,14 +86388,7 @@
   ],
   "lineageNote": "Idempotent POST with no persisted result (schemas carry no persistence); composes tier, licensing model (billable unit, minimum guarantee), module_listing (dependencies, prices), add-ons and capacity packs into one number.",
   "pure": "a simulation: computes what would happen and stores nothing",
-  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)",
-  "readVia": [
-   {
-    "query": "tenancy#regionSettingsRecords",
-    "route": "service",
-    "for": "the region's trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PackageSimulation.amount, PackageSimulation.contractTotal, PackageSimulation.minimumGuarantee, PackageSimulation.oneOffTotal and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   }
-  ]
+  "fixNote": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097)"
  },
  "simulateCreditConsumption": {
   "contract": "wallet",
@@ -86155,6 +86579,16 @@
   "stores": [
    "postgres",
    "redis"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "simulateRentalPricing": {
@@ -91358,6 +91792,7 @@
     "quote_sent_at",
     "risk_assessment_sent_at",
     "status",
+    "version",
     "year_group"
    ],
    "pii.subject": [
@@ -91555,7 +91990,10 @@
   "path": "/group-bookings/{groupBookingId}",
   "reads": [
    "cache:idempotency",
+   "orders.deposit",
    "orders.group_booking",
+   "orders.group_participant",
+   "orders.group_quote",
    "pii.subject"
   ],
   "writes": [
@@ -91599,6 +92037,7 @@
     "quote_sent_at",
     "risk_assessment_sent_at",
     "status",
+    "version",
     "year_group"
    ],
    "pii.subject": [
@@ -92220,6 +92659,7 @@
     "quote_sent_at",
     "risk_assessment_sent_at",
     "status",
+    "version",
     "year_group"
    ]
   },
@@ -93026,7 +93466,9 @@
   ],
   "readColumns": {
    "venuemap.import_job": [
+    "created_at",
     "findings",
+    "format",
     "hand_marked_paths",
     "id",
     "layers_found",
@@ -93040,6 +93482,7 @@
     "resources_found",
     "scope_path",
     "shapes_found",
+    "source_ref",
     "status",
     "unmapped_layers"
    ]
@@ -93190,12 +93633,18 @@
   },
   "readVia": [
    {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the outlet's venue (platform.outlet.venue_id), since a menu reaches its venue only through fnb.menu.outlet_id: the venue whose settings give the Money's currency (ADAM CR-260 as the r10 package carries CR-234; XDR-004)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the currency and scale of the Money it answers: the venue's frozen trading currency, from platform.venue_settings, Tenancy's data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)"
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -93757,6 +94206,7 @@
     "seating",
     "segregated_access",
     "shift_variance_threshold",
+    "step_minutes",
     "support_hours",
     "venue_id"
    ]
@@ -94118,6 +94568,7 @@
     "seating",
     "segregated_access",
     "shift_variance_threshold",
+    "step_minutes",
     "support_hours",
     "venue_id"
    ]
@@ -94228,6 +94679,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
+    "requested_by_subject_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
     "rule_id",
@@ -94239,6 +94691,13 @@
     "subject_type",
     "summary",
     "total_levels"
+   ],
+   "approvals.request_approver": [
+    "id",
+    "is_delegate",
+    "level",
+    "principal_id",
+    "request_id"
    ]
   },
   "readVia": [
@@ -96145,7 +96604,15 @@
     "query": "catalogue#productRecords",
     "route": "service",
     "for": "whether the product is sold by time window and the variant's length (422) (CHG-MOD-003)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue's start-time step (VenueSettings.stepMinutes) when the request sends none (ADAM CR-253; XDR-004)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listScheduledLifecycleActions": {
@@ -99102,6 +99569,7 @@
     "is_default",
     "name",
     "product_id",
+    "reference_price",
     "sku"
    ]
   },
@@ -99496,6 +99964,7 @@
   "readColumns": {
    "access.entitlement": [
     "cancellation_kind",
+    "change_version",
     "credential_format",
     "entries_allowed",
     "entries_used",
@@ -99510,9 +99979,11 @@
     "issued_via",
     "last_entry_at",
     "media_code",
+    "media_linked_at",
     "order_id",
     "order_line_id",
     "product_id",
+    "rotation_secret_ciphertext",
     "scope_path",
     "shared_with_subject_ids",
     "status",
@@ -108829,14 +109300,7 @@
     "code",
     "id"
    ]
-  },
-  "readVia": [
-   {
-    "query": "tenancy#venueSettingsRecords",
-    "route": "service",
-    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SubscriptionPlanRecommendation.projectedAddedCost, SubscriptionPlanRecommendation.projectedMonthlyCost, SubscriptionPlanRecommendation.projectedSaving, body.currentMonthlyCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   }
-  ]
+  }
  },
  "getRiskCase": {
   "contract": "ai",
@@ -109326,6 +109790,7 @@
   "readColumns": {
    "control.credit_note": [
     "credit_note_number",
+    "currency_code",
     "gross_amount",
     "id",
     "invoice_id",
@@ -110594,6 +111059,7 @@
   "readColumns": {
    "control.credit_note": [
     "credit_note_number",
+    "currency_code",
     "gross_amount",
     "id",
     "invoice_id",
@@ -112815,6 +113281,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
+    "requested_by_subject_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
     "rule_id",
@@ -112826,6 +113293,13 @@
     "subject_type",
     "summary",
     "total_levels"
+   ],
+   "approvals.request_approver": [
+    "id",
+    "is_delegate",
+    "level",
+    "principal_id",
+    "request_id"
    ]
   },
   "readVia": [
@@ -114253,9 +114727,12 @@
    },
    {
     "query": "public-api#apiClientRecords",
-    "route": "service",
-    "for": "its read of control.api_client, Platform's data (CHG-MOD-001)"
+    "route": "in-process",
+    "for": "its read of control.api_client, Platform's data (CHG-MOD-001), asked in process over the control connection commerce holds for routing: the granted read XDR-006 (ADAM CR-243, option A, 26 October 2026)"
    }
+  ],
+  "readsInProcess": [
+   "control.api_client"
   ]
  },
  "setDataRetentionSetting": {
@@ -116830,6 +117307,7 @@
   "readColumns": {
    "access.entitlement": [
     "cancellation_kind",
+    "change_version",
     "credential_format",
     "entries_allowed",
     "entries_used",
@@ -116844,9 +117322,11 @@
     "issued_via",
     "last_entry_at",
     "media_code",
+    "media_linked_at",
     "order_id",
     "order_line_id",
     "product_id",
+    "rotation_secret_ciphertext",
     "scope_path",
     "shared_with_subject_ids",
     "status",
@@ -119229,6 +119709,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
+    "requested_by_subject_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
     "rule_id",
@@ -119240,6 +119721,13 @@
     "subject_type",
     "summary",
     "total_levels"
+   ],
+   "approvals.request_approver": [
+    "id",
+    "is_delegate",
+    "level",
+    "principal_id",
+    "request_id"
    ]
   },
   "readVia": [
@@ -119402,6 +119890,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
+    "requested_by_subject_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
     "rule_id",
@@ -119413,6 +119902,13 @@
     "subject_type",
     "summary",
     "total_levels"
+   ],
+   "approvals.request_approver": [
+    "id",
+    "is_delegate",
+    "level",
+    "principal_id",
+    "request_id"
    ]
   },
   "readVia": [
@@ -119663,6 +120159,7 @@
     "download_url",
     "expires_at",
     "id",
+    "package_asset_ref",
     "platform_staff_grant_id",
     "requested_by_principal_id",
     "scope_path",
@@ -119833,6 +120330,7 @@
   "readColumns": {
    "control.billing_entity": [
     "address",
+    "billing_currency",
     "country_code",
     "documents",
     "id",
@@ -120286,6 +120784,7 @@
     "download_url",
     "expires_at",
     "id",
+    "package_asset_ref",
     "platform_staff_grant_id",
     "requested_by_principal_id",
     "scope_path",
@@ -120387,6 +120886,16 @@
   "stores": [
    "postgres",
    "redis"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getWalletPreCloseChecks": {
@@ -120409,6 +120918,16 @@
   "stores": [
    "postgres",
    "redis"
+  ],
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getWasteApprovalPolicy": {
@@ -120716,6 +121235,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "whitelabel.custom_domain"
   ],
   "routing": null,
@@ -120749,6 +121269,7 @@
     "routing",
     "status",
     "tenant_id",
+    "validation_expires_at",
     "verification_method",
     "verification_record",
     "verification_token"
@@ -120938,6 +121459,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
+    "requested_by_subject_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
     "rule_id",
@@ -120949,6 +121471,13 @@
     "subject_type",
     "summary",
     "total_levels"
+   ],
+   "approvals.request_approver": [
+    "id",
+    "is_delegate",
+    "level",
+    "principal_id",
+    "request_id"
    ]
   },
   "readVia": [
@@ -121159,6 +121688,7 @@
   "readColumns": {
    "control.billing_entity": [
     "address",
+    "billing_currency",
     "country_code",
     "documents",
     "id",
@@ -121436,12 +121966,18 @@
   },
   "readVia": [
    {
+    "query": "tenancy#outletRecords",
+    "route": "in-process",
+    "for": "the outlet's venue (platform.outlet.venue_id), since a menu reaches its venue only through fnb.menu.outlet_id: the venue whose settings give the Money's currency (ADAM CR-260 as the r10 package carries CR-234; XDR-004)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the currency and scale of the Money it answers: the venue's frozen trading currency, from platform.venue_settings, Tenancy's data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)"
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -121495,6 +122031,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "whitelabel.custom_domain"
   ],
   "routing": null,
@@ -121528,6 +122065,7 @@
     "routing",
     "status",
     "tenant_id",
+    "validation_expires_at",
     "verification_method",
     "verification_record",
     "verification_token"
@@ -121740,7 +122278,16 @@
   "contract": "orders",
   "verb": "POST",
   "path": "/orders/{orderId}/refund-simulation",
-  "reads": [],
+  "reads": [
+   "orders.order_line",
+   "orders.payment",
+   "orders.refund_calculation_policy",
+   "orders.refund_line",
+   "orders.refund_payment",
+   "orders.refund_policy",
+   "orders.refund_policy_time_band",
+   "orders.sales_order"
+  ],
   "writes": [],
   "routing": "primary",
   "scope": "venue",
@@ -121756,7 +122303,17 @@
    "postgres",
    "redis"
   ],
-  "pure": "a simulation: computes what would happen and stores nothing"
+  "pure": "a simulation: computes what would happen and stores nothing",
+  "readVia": [
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "startProspectSignup": {
   "contract": "identity",
@@ -122557,7 +123114,7 @@
   ],
   "writes": [],
   "routing": "replica",
-  "scope": "tenant",
+  "scope": "platform",
   "perm": "DEVELOPER_ADMIN",
   "offline": false,
   "summary": "The API licences granted, per client",
@@ -123045,6 +123602,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
+    "requested_by_subject_id",
     "reroutes_on_no_approver",
     "resubmitted_from_id",
     "rule_id",
@@ -123056,6 +123614,13 @@
     "subject_type",
     "summary",
     "total_levels"
+   ],
+   "approvals.request_approver": [
+    "id",
+    "is_delegate",
+    "level",
+    "principal_id",
+    "request_id"
    ]
   },
   "readVia": [
@@ -124819,7 +125384,9 @@
   "contract": "subscription",
   "verb": "GET",
   "path": "/commercial-metrics",
-  "reads": [],
+  "reads": [
+   "control.billing_entity"
+  ],
   "writes": [],
   "routing": "replica",
   "scope": "platform",
@@ -124937,6 +125504,7 @@
     "quote_sent_at",
     "risk_assessment_sent_at",
     "status",
+    "version",
     "year_group"
    ]
   }
@@ -125046,6 +125614,20 @@
     "tax_reversal_entry_id",
     "tender_amount",
     "tender_currency"
+   ],
+   "orders.refund_line": [
+    "applied_percentage",
+    "id",
+    "order_line_id",
+    "refund_id",
+    "refunded_amount"
+   ],
+   "orders.refund_payment": [
+    "id",
+    "payment_id",
+    "refund_id",
+    "refunded_amount",
+    "tender_amount"
    ]
   },
   "readVia": [
@@ -125202,6 +125784,16 @@
    "redis"
   ],
   "readColumns": {
+   "promotions.bundle": [
+    "description",
+    "id",
+    "kind",
+    "name",
+    "savings_amount",
+    "savings_percentage",
+    "valid_from",
+    "valid_to"
+   ],
    "promotions.bundle_choice_group": [
     "allow_duplicates",
     "bundle_id",
@@ -130143,6 +130735,11 @@
     "query": "catalogue#variantListingFacts",
     "route": "service",
     "for": "items[] productName, imageAssetRef, price, performanceStartsAt, isAvailable, unavailableReason"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
    }
   ],
   "readColumns": {
@@ -130161,7 +130758,10 @@
     "variant_id"
    ]
   },
-  "fixNote": "14 October 2026: CHG-MKT-002: through Catalogue's variantListingFacts (x-ticvai-read-via; ADAM CR-087), by Catalogue's service route"
+  "fixNote": "14 October 2026: CHG-MKT-002: through Catalogue's variantListingFacts (x-ticvai-read-via; ADAM CR-087), by Catalogue's service route",
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "addToWishlist": {
   "contract": "marketing-crm",
@@ -130205,6 +130805,11 @@
     "query": "catalogue#variantsSellableAt",
     "route": "service",
     "for": "the saved variantId (404 unknown-variant, variant-not-sellable)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the currency and scale of the Money it answers or accepts: the venue it acts at (the caller's working venue), Tenancy's data (CHG-R10ORD-019, the lead's ruling of 25 October 2026)"
    }
   ],
   "readColumns": {
@@ -130223,7 +130828,10 @@
     "variant_id"
    ]
   },
-  "fixNote": "14 October 2026: reads catalogue.variant, catalogue.product (CHG-TEN-002: through Catalogue's variantsSellableAt (x-ticvai-read-via; ADAM CR-081), by Catalogue's service route); 14 October 2026: CHG-MKT-002: through Catalogue's variantListingFacts (x-ticvai-read-via; ADAM CR-087), by Catalogue's service route"
+  "fixNote": "14 October 2026: reads catalogue.variant, catalogue.product (CHG-TEN-002: through Catalogue's variantsSellableAt (x-ticvai-read-via; ADAM CR-081), by Catalogue's service route); 14 October 2026: CHG-MKT-002: through Catalogue's variantListingFacts (x-ticvai-read-via; ADAM CR-087), by Catalogue's service route",
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "removeFromWishlist": {
   "contract": "marketing-crm",
@@ -133656,6 +134264,7 @@
   ],
   "readColumns": {
    "marketing.privacy_request": [
+    "approval_request_id",
     "case_id",
     "completed_at",
     "days_remaining",
@@ -133715,6 +134324,7 @@
   ],
   "readColumns": {
    "marketing.privacy_request": [
+    "approval_request_id",
     "case_id",
     "completed_at",
     "days_remaining",
@@ -140020,7 +140630,19 @@
    "postgres",
    "redis",
    "release"
-  ]
+  ],
+  "readColumns": {
+   "control.developer_account": [
+    "contact_email",
+    "country_code",
+    "id",
+    "organisation_name",
+    "partner_id",
+    "status",
+    "verified_at",
+    "website_url"
+   ]
+  }
  },
  "listMarketplaceListings": {
   "contract": "public-api",
@@ -140044,7 +140666,23 @@
    "postgres",
    "redis",
    "release"
-  ]
+  ],
+  "readColumns": {
+   "control.integration_listing": [
+    "category",
+    "certified_against_version",
+    "certified_until",
+    "description",
+    "developer_id",
+    "id",
+    "integration_url",
+    "listing_fee_model",
+    "name",
+    "required_scopes",
+    "status",
+    "visibility"
+   ]
+  }
  },
  "resolveCalledWaitingGuest": {
   "contract": "queue",
@@ -140102,7 +140740,39 @@
    "postgres",
    "postgres-analytical",
    "redis"
-  ]
+  ],
+  "readColumns": {
+   "control.invoice": [
+    "credited_total",
+    "currency_code",
+    "due_at",
+    "gross_amount",
+    "id",
+    "invoice_number",
+    "issued_at",
+    "issuing_legal_entity",
+    "net_amount",
+    "paid_at",
+    "period_end",
+    "period_start",
+    "plan_version_used",
+    "status",
+    "tax_amount",
+    "tenant_id"
+   ],
+   "control.invoice_line": [
+    "amount",
+    "audience",
+    "description",
+    "id",
+    "invoice_id",
+    "kind",
+    "metric",
+    "module_code",
+    "quantity",
+    "unit_price"
+   ]
+  }
  },
  "recordQueueRedemptionUse": {
   "contract": "access",
@@ -140150,6 +140820,119 @@
    "guest"
   ],
   "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "identity.subject_data_export": [
+    "failure_reason",
+    "file_size_bytes",
+    "format",
+    "id",
+    "ready_at",
+    "requested_at",
+    "status",
+    "subject_id"
+   ]
+  }
+ },
+ "listPlatformTaxRates": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/platform-tax-rates",
+  "reads": [
+   "control.platform_tax_rate"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "PLATFORM_BILLING_VIEW",
+  "offline": false,
+  "summary": "The tax rates TICVAI charges on its own invoices, per country",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "readColumns": {
+   "control.platform_tax_rate": [
+    "country_code",
+    "effective_from",
+    "effective_to",
+    "id",
+    "rate_percent",
+    "tax_name",
+    "updated_at"
+   ]
+  }
+ },
+ "setPlatformTaxRate": {
+  "contract": "subscription",
+  "verb": "PUT",
+  "path": "/platform-tax-rates/{taxRateId}",
+  "reads": [
+   "cache:idempotency",
+   "control.platform_tax_rate"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "control.platform_tax_rate"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "PLATFORM_BILLING_MANAGE",
+  "offline": false,
+  "summary": "Set a country's tax rate on TICVAI's own invoices",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "readColumns": {
+   "control.platform_tax_rate": [
+    "country_code",
+    "effective_from",
+    "effective_to",
+    "id",
+    "rate_percent",
+    "tax_name",
+    "updated_at"
+   ]
+  }
+ },
+ "attachGuestCheckoutOrders": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/guest-checkout-links",
+  "reads": [
+   "cache:idempotency"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "orders.sales_order",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Attach the guest-checkout orders Identity matched to the guest's account",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "OrderService",
   "stores": [
    "postgres",
    "redis"

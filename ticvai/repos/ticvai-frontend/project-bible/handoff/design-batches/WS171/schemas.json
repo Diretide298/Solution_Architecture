@@ -2,6 +2,11 @@
  "AccessibleSeating": {
   "type": "object",
   "x-ticvai-persistence": "seating.accessible",
+  "x-ticvai-unique-together": [
+   [
+    "seatMapId"
+   ]
+  ],
   "description": "Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an accessible seat.**\n",
   "properties": {
    "seatMapId": {

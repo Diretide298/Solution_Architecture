@@ -1,6 +1,6 @@
 # P02-engagement-support-02 — P02 · Engagement & Support (2 of 2)
 
-**2 screens · 10 operations · 17 schemas · 1 permissions**
+**2 screens · 9 operations · 17 schemas · 1 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 1 permissions apply here:
   `AI_USE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **3 of these operations work offline**: getVisitPlan, getWaitTimes, listMyVisitPlans
+- **2 of these operations work offline**: getVisitPlan, getWaitTimes
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -149,7 +149,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-| Opens with | `planId` (GST-053), `venueId` (session), `itemId` (navigation) · cold entry: Opened from a reminder on the visit day: today's plan, or an offer to make one when there is none. `itemId` is the plan item the guest taps Swap on, picked on … |
+| Opens with | `planId` (GST-053), `venueId` (session), `itemId` (navigation) · cold entry: Opened from a reminder on the visit day. Without a `planId` it offers to make a plan (GST-051) and does not look the guest's plans up (CHG-R10OPN-005, ADAM … |
 | Route | `/general/plan-my-day-in-progress` |
 
 **What the spec says about it.** Minuted 10 Aug §4.9. **The in-visit half of GST-051** — one capability, two moments. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared. **Deferred on 28 September (audit R187), and brought back the next day**: the itinerary planner was put in `wave: 4` with a `deferred` block and kept rather than deleted; the 29 September re-plan below superseded that, and the screen is in Block A, wave 1 (3 October 2026, CHG-SPF-006). **Itinerary suggestion removed 28 September** (decided 28 September, audit R209): the planner was deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan. **Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan below. **Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1. **Mobile …
@@ -168,8 +168,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|
 | Category | picker: choose a category | — | — | `getWaitTimes` ?category |
 | Version | number field | — | min 1 | `getVisitPlan` ?version |
-| Date | date picker | — | — | `listMyVisitPlans` ?date |
-| Status | segmented control | — | Draft · Booked · Archived | `listMyVisitPlans` ?status |
 
 **Sent by *Re-order my day*** (`updateVisitPlan`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -247,7 +245,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 - **Directions**: Opens the map with walking navigation to the next item. *(source: screens/P02-guest-mobile-app.yaml#GST-059 transitions; DI-1102)*
 
-**Data it reads**: `getWaitTimes` (onLoad, Wait times across a venue); `getVisitPlan` (onLoad, The plan: days, timed items and add-on suggestions, at its …); `listMyVisitPlans` (onLoad, Only when signed in, like `getVisitPlan` (GFIX-6): on the …)
+**Data it reads**: `getWaitTimes` (onLoad, Wait times across a venue); `getVisitPlan` (onLoad, The plan: days, timed items and add-on suggestions, at its …)
 
 **Where the user goes next**
 
@@ -287,7 +285,6 @@ next: Next · 12:30 Lunch · The Crater Grill · 6 min walk
 - `getVisitPlan` → no permission · guest
 - `updateVisitPlan` → no permission · guest
 - `listVisitPlanAlternatives` → no permission · guest
-- `listMyVisitPlans` → no permission · guest
 
 **A refused user sees:** A guest holds no permission. A plan that is not theirs says so without saying whose it is; a signed-out guest can still build a plan and is asked to sign in only to save or book it.
 
@@ -316,7 +313,7 @@ Also apply: 41 for all of P02, 29 for every app (section *Design inputs from the
 
 This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (18, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (18, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (4, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
@@ -324,6 +321,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: client approval, confirmed by Chinmay Parab 19 October 2026
 - Flow F49 *A guest plans a day and follows it*, step 6: They follow it through the day. → **Re-ordered as waits change**, with the guest deciding. A plan fixed at 9am is a plan abandoned by 11.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 - ADR-0028 *Seventeen modules, and the data boundary decides where they split* (`docs/adr/0028-service-decomposition.md`)
 - ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 
@@ -505,7 +503,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (18, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (18, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (4, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
@@ -579,6 +577,7 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Custom domain hostname (`domains.hostname`) | `CMS-017`, `ADM-017` | — | — | — |
 | Custom domain kind (`domains.kind`) | `CMS-017`, `ADM-017` | Guest web · Guest app · Partner portal · Developer portal | — | — |
 | Verification method (`domains.verificationMethod`) | `CMS-017`, `ADM-017` | Dns txt · Cname · Http file | Dns txt | — |
+| Routing (`domains.routing`) | `CMS-017`, `ADM-017` | Cname · Delegated subdomain · Apex | Cname | How the hostname reaches TICVAI (`CustomDomain.routing`); `apex` is the only way to claim a bare domain (ADAM CR-105). |
 | Entity kind (`seo.entityKind`) | `CMS-013` | Content page · Product · Event · Performance · Membership · Promotion · Venue | — | — |
 | Entity (`seo.entityId`) | `CMS-013` | shows names, sends the id | — | — |
 | Locale (`seo.locale`) | `CMS-013` | — | — | — |
@@ -730,7 +729,6 @@ Method, path, parameters, request and response for every operation these screens
 "getWaitTimes": {"method":"GET","path":"/queues/wait-times","contract":"queue","summary":"Wait times across a venue","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":true},{"name":"category","in":"query","required":null}],"requestBody":null,"responds":"WaitTime"},
 "listAiConversations": {"method":"GET","path":"/conversations","contract":"ai","summary":"A principal's conversation history","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMyCases": {"method":"GET","path":"/my/cases","contract":"marketing-crm","summary":"The cases this guest raised","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listMyVisitPlans": {"method":"GET","path":"/visit-plans","contract":"venue-map","summary":"The caller's own visit plans, by date or status","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"date","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listVisitPlanAlternatives": {"method":"GET","path":"/visit-plans/{planId}/items/{itemId}/alternatives","contract":"venue-map","summary":"What could take this item's place","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "raiseMyCase": {"method":"POST","path":"/my/cases","contract":"marketing-crm","summary":"Report something — lost property, a complaint, a question","permission":null,"offlineCapable":false,"conflictPolicy":"append","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Case"},
 "replyToMyCase": {"method":"POST","path":"/my/cases/{caseId}/messages","contract":"marketing-crm","summary":"Reply on a case the guest raised","permission":null,"offlineCapable":false,"conflictPolicy":"append","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CaseDetail"},

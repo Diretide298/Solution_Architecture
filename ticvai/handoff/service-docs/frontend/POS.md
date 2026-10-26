@@ -42,7 +42,7 @@
 | [POS-001](#pos-001-begin-shift) | Begin Shift | Shift | 1 | 7 |
 | [POS-002](#pos-002-sell-ticket-catalogue) | Sell — Ticket Catalogue | Sell | 1 | 32 |
 | [POS-003](#pos-003-sell-timed-entry) | Sell — Timed Entry | Sell | 1 | 6 |
-| [POS-004](#pos-004-sell-seat-map) | Sell — Seat Map | Sell | 1 | 8 |
+| [POS-004](#pos-004-sell-seat-map) | Sell — Seat Map | Sell | 1 | 7 |
 | [POS-005](#pos-005-payment) | Payment | Payment | 1 | 14 |
 | [POS-006](#pos-006-held-orders) | Held Orders | Sell | 1 | 14 |
 | [POS-007](#pos-007-close-shift) | Close Shift | Shift | 1 | 10 |
@@ -50,7 +50,7 @@
 | [POS-009](#pos-009-staff-roster) | Staff Roster | Shift | 1 | 3 |
 | [POS-010](#pos-010-add-to-existing-ticket) | Add to Existing Ticket | Sell | 1 | 4 |
 | [POS-011](#pos-011-returns-refunds-exchanges) | Returns, Refunds & Exchanges | Sell | 1 | 8 |
-| [POS-012](#pos-012-omnichannel-order-fulfilment-center) | Omnichannel Order & Fulfilment Center | Sell | 1 | 6 |
+| [POS-012](#pos-012-omnichannel-order-fulfilment-center) | Omnichannel Order & Fulfilment Center | Sell | 1 | 7 |
 | [POS-013](#pos-013-mobile-pos-event-sales-offline-operations) | Mobile POS, Event Sales & Offline Operations | Sell | 1 | 3 |
 | [POS-014](#pos-014-sales-exceptions-controls-operational-actions) | Sales Exceptions, Controls & Operational Actions | Sell | 1 | 4 |
 | [POS-015](#pos-015-cash-operations-dashboard) | Cash Operations Dashboard | Sell | 1 | 2 |
@@ -63,11 +63,11 @@
 | [POS-022](#pos-022-send-to-kitchen) | Send to Kitchen | Sell | 1 | 5 |
 | [POS-023](#pos-023-sell-merchandise) | Sell — Merchandise | Sell | 1 | 3 |
 | [POS-024](#pos-024-outlet-setup) | Outlet Setup | Sell | 1 | 6 |
-| [POS-025](#pos-025-till-home) | Till Home | Sell | 1 | 8 |
-| [POS-026](#pos-026-receipt-reprint) | Receipt & Reprint | Sell | 1 | 8 |
+| [POS-025](#pos-025-till-home) | Till Home | Sell | 1 | 10 |
+| [POS-026](#pos-026-receipt-reprint) | Receipt & Reprint | Sell | 1 | 7 |
 | [POS-027](#pos-027-guest-lookup) | Guest Lookup | Sell | 1 | 5 |
 | [POS-028](#pos-028-table-service) | Table Service | Sell | 1 | 13 |
-| [POS-029](#pos-029-order-queue) | Order Queue | Sell | 1 | 4 |
+| [POS-029](#pos-029-order-queue) | Order Queue | Sell | 1 | 5 |
 | [POS-030](#pos-030-sales-journal) | Sales Journal | Sell | 1 | 8 |
 | [POS-031](#pos-031-reservations-group-arrivals) | Reservations & Group Arrivals | Sell | 1 | 9 |
 
@@ -914,7 +914,6 @@
 | `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | onAction | Release a hold | `ORDER_CREATE` |
 | `createOrder` | [OrderService](../backend/OrderService.md#createorder) | onAction | Create an order | `ORDER_CREATE` |
 | `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Take a payment against an order | `ORDER_CREATE` |
-| `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The cold entry (r8, GPS-C05): a link to a performance that has happened offers the next performance of the same event, the first upcoming one `listPerformances` returns for the performance's `eventId` (`getPerformance`). Not called on the ordinary way in. Not background (r8 integration, CHG-R8INT-008): the cashier sees the performance it offers, and the approved screen has no element of its own for the offer. | `PRODUCT_VIEW` |
 
 **States**
 
@@ -1061,7 +1060,7 @@
 | emptyFirstRun | No held orders yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. | the empty panel note, `sources/designs/TICVAI_POS_Terminal_v2.html`, the cart ("No items yet", "Tap a product, scan a barcode, or recall a held sale to begin.") and the order board ("No orders waiting") (decoded template) |
 | emptyNoResults | Nothing on this terminal matches the search; the holds are still there. Clear the search. | the nothing-matches panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-results` (pulled as `wireframe-pos-state-no-results.html`); drawn by the package from the approved design (r9), not yet seen by the client |
 | emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `resumeOrder`, `holdOrder`, `modifyOrder`; `ORDER_REFUND` for `createRefund`; `ORDER_REPRINT` for `reprintOrder`. | the no-access panel, `wireframes/states/P04 Venue POS states.dc.html#pos-state-no-access` (pulled as `wireframe-pos-state-no-access.html`); drawn by the package from the approved design (r9), not yet seen by the client |
-| offline | Orders held at this terminal are listed. Those held elsewhere are not — resuming another till's sale needs the server | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
+| offline | Orders held at this terminal are listed, and they can still be reprinted; a reprint is queued and sent when the connection is back. Those held elsewhere are not — resuming another till's sale needs the server | the network pill and the connection toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the header's network pill ("{{ netLabel }}", "Offline · queued locally") and the toast "Connection lost — sales continue and queue locally." (decoded template of the bundle) |
 | denied | Held sales are listed and cannot be recalled without `sale.resume`. The list is still shown, because a cashier who cannot see the held sale fetches a supervisor to the wrong screen. | the refusal toast, `sources/designs/TICVAI_POS_Terminal_v2.html`, the toast ("{{ toastMsg }}", flash(..., 'warn')), e.g. "Opening the drawer without a sale needs a Supervisor role or above" and "Approval declined." (decoded template) |
 
 **Goes to**
@@ -1396,6 +1395,7 @@
 | `getCurrentShift` | [OrderService](../backend/OrderService.md#getcurrentshift) | onLoad | The open or suspended shift on the session's workstation | `SHIFT_OPEN` |
 | `lookupShopAndDrop` | [RetailService](../backend/RetailService.md#lookupshopanddrop) | onAction | Find a guest's dropped goods | `ORDER_VIEW` |
 | `collectShopAndDrop` | [RetailService](../backend/RetailService.md#collectshopanddrop) | onAction | Hand the dropped goods over | `ORDER_MODIFY` |
+| `createFnbOrder` | [FnbService](../backend/FnbService.md#createfnborder) | onAction | Creates the F&B order from the cart, carrying the order type the cashier picked (`serviceMode`: dine-in, quick service, takeaway, delivery; the lead, 25 October 2026, r10; CHG-R10UI-016) | `ORDER_CREATE` |
 
 **States**
 
@@ -2107,6 +2107,8 @@
 | `suspendShift` | [OrderService](../backend/OrderService.md#suspendshift) | onAction | Suspend the shift so another user can sign in | `SHIFT_SUSPEND` |
 | `reopenShift` | [OrderService](../backend/OrderService.md#reopenshift) | onAction | Supervisor reopens a shift closed in error (PIN step-up, R144) | `SHIFT_REOPEN` |
 | `listShifts` | [OrderService](../backend/OrderService.md#listshifts) | onLoad | This till's last closed shift (query workstationId, status closed), the one a supervisor may reopen | `REPORT_VIEW_WORKSTATION` |
+| `listOrders` | [OrderService](../backend/OrderService.md#listorders) | onLoad | Open holds: the orders held at this till (`status` held, `workstationId`) (check-screen-value-sources, CHG-R10UI-015) | `ORDER_VIEW` |
+| `listQueues` | [VenueOpsService](../backend/VenueOpsService.md#listqueues) | onLoad | Queue waiting: the venue's open queues and their waiting counts (check-screen-value-sources, CHG-R10UI-015) | `QUEUE_VIEW` |
 
 **States**
 
@@ -2173,7 +2175,6 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `reprintReceipt` | [RetailService](../backend/RetailService.md#reprintreceipt) | onAction | Print the receipt again | `ORDER_REPRINT` |
-| `reprintOrder` | [OrderService](../backend/OrderService.md#reprintorder) | onAction | Print the whole order again | `ORDER_REPRINT` |
 | `reissueEntitlement` | [OrderService](../backend/OrderService.md#reissueentitlement) | onAction | Reissue the ticket or wristband | `ORDER_EXCHANGE` |
 | `issueTaxInvoice` | [LedgerService](../backend/LedgerService.md#issuetaxinvoice) | onAction | Issue a tax invoice | `LEDGER_POST` |
 | `getTaxInvoice` | [LedgerService](../backend/LedgerService.md#gettaxinvoice) | onLoad | Show a tax invoice | `LEDGER_VIEW` |
@@ -2353,6 +2354,7 @@
 | `acceptFnbOrder` | [FnbService](../backend/FnbService.md#acceptfnborder) | onAction | Received to preparing: the outlet takes the order | `ORDER_MODIFY` |
 | `setKitchenTicketStatus` | [FnbService](../backend/FnbService.md#setkitchenticketstatus) | onAction | Preparing to ready: advance the order's kitchen ticket | `ORDER_MODIFY` |
 | `recordOrderHandover` | [FnbService](../backend/FnbService.md#recordorderhandover) | onAction | Hand the order over: served, collected or delivered (contracts, ledger: these are the stages after ready) | `ORDER_MODIFY` |
+| `listQueueFeeds` | [VenueOpsService](../backend/VenueOpsService.md#listqueuefeeds) | onLoad | The delivery partners' order feeds and their health (check-screen-value-sources, CHG-R10UI-015) | `QUEUE_MANAGE` |
 
 **States**
 

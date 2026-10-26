@@ -122,7 +122,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-053` | Staff Directory | B | 30 | 25 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
-| `BO-054` | Role Assignment | A | 16 | 16 | 6 | 6 | 1 | 5 | — | notStarted (generated) |
+| `BO-054` | Role Assignment | A | 22 | 16 | 6 | 6 | 1 | 5 | — | notStarted (generated) |
 | `BO-055` | Rota & Scheduling | A | 32 | 19 | 6 | 21 | 0 | 0 | — | notStarted (generated) |
 | `BO-056` | Time & Attendance | D | 5 | 19 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 | `BO-057` | Training & Certification | B–D | 2 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |

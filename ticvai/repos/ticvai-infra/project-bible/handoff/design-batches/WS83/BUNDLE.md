@@ -1422,6 +1422,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS63 Game and Ride Board 6.dc.html#bo-450`
 - Workshop pack: Game_and_Ride_Module.pdf board 6
 - Flow F192 *Game and Ride board 6: Redemption Operations Dashboard*, step 12: Works in Prize Catalogue & Credit Cost Configuration → Configure the prize catalogue and how many redemption credits each prize requires.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1633,6 +1634,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS63 Game and Ride Board 6.dc.html#bo-451`
 - Workshop pack: Game_and_Ride_Module.pdf board 6
 - Flow F192 *Game and Ride board 6: Redemption Operations Dashboard*, step 14: Works in Prize Inventory Integration → Connect prize redemption directly with TICVAI inventory so redemption transactions reduce stock in real time. The source explicitly requires prizes at the redemption counter, skill games and …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1890,6 +1892,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS63 Game and Ride Board 6.dc.html#bo-452`
 - Workshop pack: Game_and_Ride_Module.pdf board 6
 - Flow F192 *Game and Ride board 6: Redemption Operations Dashboard*, step 16: Works in Direct-Pay / Crane & Prize Machine Configuration → Configure prize machines such as cranes or other direct-pay devices that may consume wallet value and dispense inventory items. The matrix specifically references skill games and direct pay machines …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -2119,6 +2122,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS63 Game and Ride Board 6.dc.html#bo-453`
 - Workshop pack: Game_and_Ride_Module.pdf board 6
 - Flow F192 *Game and Ride board 6: Redemption Operations Dashboard*, step 18: Works in Redemption Transaction Ledger, Reconciliation & Audit → Provide complete traceability of redemption credits earned, redeemed, adjusted and associated inventory movements.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design

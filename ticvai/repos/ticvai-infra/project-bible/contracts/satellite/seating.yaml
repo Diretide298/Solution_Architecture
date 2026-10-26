@@ -233,6 +233,10 @@ paths:
       operationId: assignSeats
       x-ticvai-consumed-by:
         - "P08 BO-995 Find Seats For Me"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: body.maxPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -405,7 +409,7 @@ paths:
         - "P08 BO-953 Seat Map Command Center"
         - "P08 BO-973 Layout Command Center"
         - "P08 BO-978 Multi-Performance Assignment"
-      description: '**Order.** Newest first, by `publishedAt` descending, then by `id`.'
+      description: '**Order.** Newest first, by `publishedAt` descending, then by `id`. Where `publishedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -759,7 +763,7 @@ paths:
         - "P08 BO-1051 Seat Analytics Command Center"
         - "P08 BO-956 Rows & Seats"
         - "P08 BO-991 Seat History"
-      description: '**Order.** Sorted by `position` ascending, then by `id`.'
+      description: '**Order.** Sorted by `position` ascending, then by `id`. Where `position` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1269,7 +1273,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ImportJob'
         '409':
-          description: Job has errors, or has already been committed
+          description: Job has errors, or has already been committed Also refused when the seat import job is `committing`, `failed` or `parsing`; states/import-job.yaml moves this call only from `previewReady`. (r10 default ruling, CHG-R10GEN-005)
           content:
             application/problem+json:
               schema:
@@ -1287,6 +1291,8 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: List reusable layout templates
+      description: >-
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - seatMap
       x-ticvai-permission: PRODUCT_VIEW
@@ -1360,6 +1366,10 @@ paths:
         - "P08 BO-1045 Price Bands & Categories"
         - "P08 BO-1055 Revenue by Seat Category"
         - "P08 BO-985 Status Model Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SeatPriceBand.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1396,6 +1406,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1045 Price Bands & Categories"
         - "P08 BO-985 Status Model Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SeatPriceBand.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Create a seat category
@@ -1475,6 +1489,10 @@ paths:
       operationId: updateSeatCategory
       x-ticvai-consumed-by:
         - "P08 BO-1045 Price Bands & Categories"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SeatPriceBand.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Rename, re-rank or re-price a seat category
@@ -1563,6 +1581,10 @@ paths:
         - "P08 BO-994 Choose My Seats"
         - "P08 BO-995 Find Seats For Me"
         - "P08 BO-996 Filters & Interactive Legend"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s maxSeatsPerGuestOrder (VenueSettings.seating) returned as SeatAvailability.maxSeatsPerGuestOrder, Tenancy''s data (ADAM CR-187)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -1622,7 +1644,10 @@ paths:
           - graphical
           - list
           default: auto
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Availability
           content:
@@ -1641,6 +1666,10 @@ paths:
         - "P02 GST-049 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-994 Choose My Seats"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings.seating": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1753,9 +1782,17 @@ paths:
     get:
       operationId: getSeatHold
       x-ticvai-consumed-by:
+        - "P01 WEB-007 Interactive Seat Selection"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-987 Hold Tracker"
         - "P08 BO-999 Cart & Multi-Seat Management"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: SeatHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SeatHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1812,7 +1849,7 @@ paths:
         leaving them locked until `expiresAt`). On a guest channel only a hold the same guest session or
         subject placed with `createSeatHold` can be released; any other hold answers `404`, as anything
         outside the caller''s scope does, so hold ids cannot be probed. A hold already converted to an
-        order, released or expired answers `409` `holdNotActive`. Staff at a till keep releasing any
+        order, released or expired answers `409` `hold-not-active`. Staff at a till keep releasing any
         hold at their venue under `ORDER_CREATE`.
 
         '
@@ -1835,8 +1872,9 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: The hold is no longer active (`holdNotActive`) - converted to an order, already
-            released or expired. Nothing changes.
+          description: The hold is no longer active (`hold-not-active`) - converted to an order, already
+            released or expired. Nothing changes. Also refused when the seat hold is `sold`; states/seat-hold.yaml moves this call only from `held`. (r10 default ruling, CHG-R10GEN-005)
+          x-ticvai-problem-types: [hold-not-active]
           content:
             application/problem+json:
               schema:
@@ -1855,6 +1893,10 @@ paths:
       operationId: extendSeatHold
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings.seating": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2061,6 +2103,13 @@ paths:
       operationId: allocateBlockedSeats
       x-ticvai-consumed-by:
         - "P10 PTR-009 Group / Bulk Booking"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: SeatHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SeatHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-api-scope: seating.write
       x-ticvai-audience:
       - staff
@@ -2210,6 +2259,10 @@ paths:
         - "P08 BO-1001 View Preview, Compare & Heat Map"
         - "P08 BO-1002 AI Conversational Seat Assistant"
         - "P08 BO-1039 Seat Upgrade Recommendations"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SeatRecommendation.totalPrice, SeatRecommendationRequest.maxPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-reads:
       - table: catalogue.performance
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -2521,7 +2574,7 @@ paths:
         seats nobody can explain, and it is always a hold somebody placed for one show and never took
         back.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - seating
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -2600,7 +2653,7 @@ paths:
         season''s allocation.** A sponsor pool that is never drawn down is seats the venue could have
         sold; one exhausted every night is a negotiation.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - seating
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -2840,6 +2893,11 @@ paths:
         they have none left for the guests who need them, and venues that gate them too hard turn people
         away at the door.
 
+
+        **Nothing saved answers the defaults, never 404** (ADAM CR-112, option 1, accepted 15 October 2026; CHG-R10CAT-013): a seat map with
+        no `seating.accessible` row answers `200` with that `seatMapId`, no `spaces`, and every other field at its
+        schema default. There is at most one row per seat map (unique on `seat_map_id`).
+
         '
       tags:
       - seating
@@ -2948,7 +3006,16 @@ paths:
         - "P08 BO-1029 Quote, Deposit & Payment"
         - "P08 BO-1030 Modify, Release & Cancel"
         - "P08 BO-1032 Group Reporting & Audit"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: GroupSeatRequest.budgetPerHead, GroupSeatRequest.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GroupSeatRequest.budgetPerHead, GroupSeatRequest.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Group bookings, their status and their deposits
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - seating
       x-ticvai-permission: ORDER_VIEW
@@ -2976,6 +3043,13 @@ paths:
       operationId: createGroupSeatRequest
       x-ticvai-consumed-by:
         - "P08 BO-1025 Group Request Intake"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: GroupSeatRequest.budgetPerHead, GroupSeatRequest.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GroupSeatRequest.budgetPerHead, GroupSeatRequest.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Take a group enquiry before any seat is held
       description: 'Board 8.3. **A group enquiry is not a booking and must not hold seats.** Sixty
         seats held for a school that never confirms is a sold-out show with sixty empty places.
@@ -3023,6 +3097,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-1026 Availability & Best-Fit Search"
         - "P08 BO-1027 Bulk Seat Allocation"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GroupSeatAllocation.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Find and hold the best contiguous block for a group
       description: 'Boards 8.6 and 8.7. **Best-fit for a group is not best-seat for one guest.** Sixty
         people want to sit together; splitting them across two tiers is worse than a poorer view, and
@@ -3137,6 +3215,16 @@ paths:
         - "P08 BO-1041 Scoring Rules & Model Governance"
         - "P08 BO-1042 Performance, Feedback & Audit"
       summary: What "best" means at this venue
+      description: '**The rules in force for a seat map and a performance** (ADAM CR-112, option 1, accepted 15 October 2026; CHG-R10CAT-013).
+        The approved Recommendation Command Center shows the configuration in force by seat map and performance, so
+        the read is asked for one: with `seatMapId` and `performanceId`, the row saved for both; else the seat map''s own
+        row (`performance_id` null); else the venue default, which is the schema''s defaults (no row can be saved without
+        a seat map). With `seatMapId` alone, the seat map''s row, else the venue default; with neither, the venue
+        default. `performanceId` without `seatMapId` is `400 seat-map-required`. The answer''s `seatMapId` and
+        `performanceId` say which level answered (both null, and no `id`, for the venue default). **Nothing saved
+        answers the defaults, never 404.**
+
+        '
       tags:
       - seating
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -3144,13 +3232,35 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
+      parameters:
+      - name: seatMapId
+        in: query
+        required: false
+        description: The seat map whose rules are asked for; omitted, the venue default (ADAM CR-112).
+        schema:
+          type: string
+          format: uuid
+      - name: performanceId
+        in: query
+        required: false
+        description: A performance on that seat map, for its override; read with `seatMapId` only (ADAM CR-112).
+        schema:
+          type: string
+          format: uuid
       responses:
         '200':
-          description: The rules
+          description: The rules in force at the level asked for, or the defaults
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatRecommendationRules'
+        '400':
+          x-ticvai-problem-types: [seat-map-required]
+          description: '`performanceId` sent without `seatMapId` (ADAM CR-112).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
@@ -3162,8 +3272,8 @@ paths:
         - "P08 BO-1037 Family Seating Recommendations"
         - "P08 BO-1038 Accessibility Recommendations"
         - "P08 BO-1041 Scoring Rules & Model Governance"
-      x-ticvai-body-key: [seatMapId]
-      x-ticvai-body-key-note: 'Keyed by the body''s `seatMapId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per seat map within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `seatMapId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
+      x-ticvai-body-key: [seatMapId, performanceId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `seatMapId` and `performanceId`, not a singleton (r8 walk fix, CHG-R8WFC-001; ADAM CR-112, CHG-R10CAT-013): one record for a seat map (`performanceId` null) and one for each performance overriding it, unique on `(seat_map_id, performance_id)` with a null performance counted as one value; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **seatMapId is required in fact**: a body without it is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       summary: Scoring for best seat, best value, closest, family and accessible
       description: 'Board 9, and it is the 21 August minute made configurable: *"best-seat ranking (e.g.
         last-row-is-best vs. first-row-is-best, depending on venue sightlines) must be configurable per
@@ -3208,6 +3318,13 @@ paths:
       operationId: reassignSeats
       x-ticvai-consumed-by:
         - "P08 BO-1040 Alternatives & Reseating"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: SeatReassignment.priceDifference (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SeatReassignment.priceDifference (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Move a booked party, and tell them
       description: 'Board 9.8. **A venue moves people: a broken seat, a changed stage, a production
         requirement, a guest who asks.** The move has to keep the party together, respect companion
@@ -3601,6 +3718,10 @@ components:
     AccessibleSeating:
       type: object
       x-ticvai-persistence: seating.accessible
+      # One record per seat map (ADAM CR-112; CHG-R10CAT-013). A null seat_map_id never collides, so the index holds
+      # only the rows that name a seat map, as the decision's partial index does.
+      x-ticvai-unique-together:
+      - [seatMapId]
       description: 'Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an
         accessible seat.**
 
@@ -3819,6 +3940,11 @@ components:
     SeatRecommendationRules:
       type: object
       x-ticvai-persistence: seating.recommendation_rule
+      # One record per seat map and one per performance override (ADAM CR-112; CHG-R10CAT-013): a null performance_id
+      # (the seat map's own row) collides with another null, so a seat map cannot have two.
+      x-ticvai-unique-together:
+      - [seatMapId, performanceId]
+      x-ticvai-unique-nulls: not-distinct
       description: 'Board 9, and the 21 August minute: *"best-seat ranking… must be configurable per
         seat map/event."* **Five kinds, one scoring model** — five algorithms would eventually
         contradict each other.
@@ -4970,6 +5096,17 @@ components:
                 type: integer
               price:
                 $ref: ../shared/common.yaml#/components/schemas/Money
+        maxSeatsPerGuestOrder:
+          type: integer
+          minimum: 1
+          maximum: 50
+          readOnly: true
+          description: '**The most seats one guest booking may hold at this performance''s venue** (ADAM CR-187, 25
+            October 2026): the venue''s `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50,
+            decided 29 September, rev 3 REV3-7), read through `tenancy#venueSettingsRecords` (the venue''s row,
+            else the tenant''s own row, else 10). A guest screen caps its party stepper with it before anything is
+            held (WEB-007, GST-049); `createSeatHold` still refuses more with `422` `seat-limit-exceeded`, whose
+            `maxSeats` is this value on a guest channel. Computed, not stored.'
         zones:
           type: array
           description: '**The standing zones and what is left in each** (r8, GPS-C38): a zone has no seats, so it is

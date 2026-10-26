@@ -359,7 +359,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 
 Carried, not typed: `purposeId`
 
-Errors to draw in the form: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.
+Errors to draw in the form: 400 Validation failed; 409 An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `purpose-id-mismatch` …
 
 #### Outputs: what the screen shows and produces
 
@@ -371,7 +371,7 @@ Errors to draw in the form: 400 Validation failed; 409 Idempotency conflict or o
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save purpose (secondary button) | `setDataProcessingPurpose` PUT `/data-processing-purpose/{purposeId}` | DataProcessingPurposeLawfulBasisRegistryView | DataProcessingPurposeLawfulBasisRegistryView | 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types. | opens modal first |
+| Save purpose (secondary button) | `setDataProcessingPurpose` PUT `/data-processing-purpose/{purposeId}` | DataProcessingPurposeLawfulBasisRegistryView | DataProcessingPurposeLawfulBasisRegistryView | 400 Validation failed; 409 An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `purpose-id-mismatch` … | opens modal first |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -393,7 +393,7 @@ Errors to draw in the form: 400 Validation failed; 409 Idempotency conflict or o
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the data processing purpose are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `purpose-id-mismatch` … |
 
 #### Sample data for the mock-up
 
@@ -798,7 +798,7 @@ Name, provider, domain or app, type, category, purpose, expiry in days, first or
 
 Carried, not typed: `technologyId`
 
-Errors to draw in the form: 400 Validation failed; 422 Approved with no category, or a non-essential technology marked as needing no consent.
+Errors to draw in the form: 400 Validation failed; 409 Refused, and nothing is stored. `technology-id-mismatch` (ADAM CR-245): a record for `name`, `provider` and `domainApplication` exists and the path's …; 422 Approved with no category, or a non-essential technology marked as needing no consent.
 
 **Form: Upload scan report** (modal, opened by *Upload scan report*; *Upload scan report* calls `recordCookieScan`, *Cancel* sends nothing)
 
@@ -845,7 +845,7 @@ Channel, frequency, who is alerted, and the source: the bought scanner (default)
 
 Carried, not typed: `scanPolicyId`
 
-Errors to draw in the form: 400 Validation failed; 422 A weekly schedule with no `dayOfWeek`, or a monthly one with no `dayOfMonth`
+Errors to draw in the form: 400 Validation failed; 409 Refused, and nothing is stored. `scan-policy-id-mismatch` (ADAM CR-245): a record for `channel` and `domainApplication` exists and the path's `scanPolicyId` is …; 422 A weekly schedule with no `dayOfWeek`, or a monthly one with no `dayOfMonth`
 
 **Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -958,9 +958,9 @@ Errors to draw in the form: 400 Validation failed; 422 A weekly schedule with no
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Add technology (primary button) | `setTrackingTechnology` PUT `/cookie-tracking-digital/{technologyId}` | CookieTrackingDigitalTechnologyRegistryView | CookieTrackingDigitalTechnologyRegistryView | 400 Validation failed; 422 Approved with no category, or a non-essential technology marked as needing no consent. | opens modal first |
+| Add technology (primary button) | `setTrackingTechnology` PUT `/cookie-tracking-digital/{technologyId}` | CookieTrackingDigitalTechnologyRegistryView | CookieTrackingDigitalTechnologyRegistryView | 400 Validation failed; 409 Refused, and nothing is stored. `technology-id-mismatch` (ADAM CR-245): a record for `name`, `provider` and `domainApplication` exists and the path's …; 422 Approved with no category, or a … | opens modal first |
 | Upload scan report (secondary button) | `recordCookieScan` POST `/cookie-tracking-digital/scans` | RecordCookieScanRequest | CookieScanRun | 400 Validation failed | opens modal first |
-| Save scan schedule (secondary button) | `setCookieScanPolicy` PUT `/cookie-scan-policy/{scanPolicyId}` | CookieScanPolicy | CookieScanPolicy | 400 Validation failed; 422 A weekly schedule with no `dayOfWeek`, or a monthly one with no `dayOfMonth` | opens modal first |
+| Save scan schedule (secondary button) | `setCookieScanPolicy` PUT `/cookie-scan-policy/{scanPolicyId}` | CookieScanPolicy | CookieScanPolicy | 400 Validation failed; 409 Refused, and nothing is stored. `scan-policy-id-mismatch` (ADAM CR-245): a record for `channel` and `domainApplication` exists and the path's `scanPolicyId` is …; 422 A weekly schedule with no … | opens modal first |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -984,7 +984,7 @@ Errors to draw in the form: 400 Validation failed; 422 A weekly schedule with no
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the technology type chosen; names it and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 A weekly schedule with no `dayOfWeek`, or a monthly one with no `dayOfMonth`; 422 Approved with no category, or a non-essential technology marked as needing no consent. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Refused, and nothing is stored. `scan-policy-id-mismatch` (ADAM CR-245): a record for `channel` and `domainApplication` exists and the path's `scanPolicyId` is …; 409 Refused, and nothing is stored. `technology-id-mismatch` (ADAM CR-245): a record for `name`, `provider` and `domainApplication` exists and the path's …; 422 A weekly schedule with no `dayOfWeek`, or a … |
 
 #### Consistency with other screens
 
@@ -1064,7 +1064,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (44), with its required mark, default, format and its error state (400, 403, 404, 422).
+- [ ] Every input above is drawn (44), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
 - [ ] Every output is drawn (67 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-025?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Add technology, Upload scan report, Save scan schedule.
@@ -1157,7 +1157,7 @@ Saves this design as version N+1 for its channel and brand; the published versio
 
 Carried, not typed: `bannerDesignId`
 
-Errors to draw in the form: 400 Validation failed; 422 A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button.
+Errors to draw in the form: 400 Validation failed; 409 Refused, and nothing is stored. `banner-design-id-mismatch` (ADAM CR-245): the path's `bannerDesignId` already names a stored design version; nothing changes.; 422 A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button.
 
 **Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -1185,7 +1185,7 @@ Errors to draw in the form: 400 Validation failed; 422 A design that makes rejec
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save version (primary button) | `setCookieBannerDesign` PUT `/cookie-banner-preference/{bannerDesignId}` | CookieBannerPreferenceCenterDesignerView | CookieBannerPreferenceCenterDesignerView | 400 Validation failed; 422 A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button. | opens confirmDialog first |
+| Save version (primary button) | `setCookieBannerDesign` PUT `/cookie-banner-preference/{bannerDesignId}` | CookieBannerPreferenceCenterDesignerView | CookieBannerPreferenceCenterDesignerView | 400 Validation failed; 409 Refused, and nothing is stored. `banner-design-id-mismatch` (ADAM CR-245): the path's `bannerDesignId` already names a stored design version; nothing changes.; 422 A design that makes … | opens confirmDialog first |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -1211,7 +1211,7 @@ Errors to draw in the form: 400 Validation failed; 422 A design that makes rejec
 | Empty, first run (`?state=emptyFirstRun`) | No cookie banner preference configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Refused, and nothing is stored. `banner-design-id-mismatch` (ADAM CR-245): the path's `bannerDesignId` already names a stored design version; nothing changes.; 422 A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button. |
 
 #### Consistency with other screens
 
@@ -1302,7 +1302,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (33), with its required mark, default, format and its error state (400, 403, 422).
+- [ ] Every input above is drawn (33), with its required mark, default, format and its error state (400, 403, 409, 422).
 - [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-026?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save version.

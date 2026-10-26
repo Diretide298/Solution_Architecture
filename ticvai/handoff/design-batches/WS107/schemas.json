@@ -291,7 +291,7 @@
    },
    "scale": {
     "type": "integer",
-    "description": "Resolved from the region alongside `currency`.",
+    "description": "Resolved from the region alongside `currency`. **A currency other than the venue's or region's trading currency** (a tourist's USD cash at an AED till, `Payment.tenderAmount`; a guest-selected charge currency, `Order.chargeTotal`; a refund in the tender currency) **takes its ISO 4217 minor units**, held as one fixed list in the kernel (`TICVAI.Domain`, beside Money), so every module resolves it the same way and no table, query or migration holds it (ADAM CR-192, option A; Chinmay, 21 October 2026; CHG-R10ORD-018). The venue and region settings keep their own `currency_scale` for the trading currency.",
     "minimum": 0,
     "maximum": 4
    }
@@ -482,6 +482,14 @@
    "issuedAt"
   ],
   "properties": {
+   "currencyCode": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "pattern": "^[A-Z]{3}$",
+    "readOnly": true,
+    "description": "**The currency of every Money on the credit note** (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): the credited invoice's `currencyCode` (the billing entity's billing currency, copied at generation), copied onto the credit note when it is issued."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -495,7 +503,8 @@
    "invoiceId": {
     "x-ticvai-references": "control.invoice",
     "type": "string",
-    "description": "The invoice credited."
+    "format": "uuid",
+    "description": "The invoice credited. A uuid, as `control.invoice.id` is (ADAM CR-202; CHG-R10ID-013). The credit note's own Money is in the credited invoice's `currencyCode`."
    },
    "tenantId": {
     "x-ticvai-references": "control.tenant",
@@ -584,13 +593,27 @@
  "SubscriptionInvoice": {
   "x-ticvai-persistence": "control.invoice + control.invoice_line",
   "type": "object",
+  "x-ticvai-unique-when": [
+   {
+    "columns": [
+     "tenantId",
+     "periodStart",
+     "periodEnd"
+    ],
+    "when": {
+     "status": {
+      "not": "cancelled"
+     }
+    }
+   }
+  ],
   "required": [
    "id",
-   "invoiceNumber",
    "tenantId",
    "periodStart",
    "periodEnd",
    "status",
+   "currencyCode",
    "total"
   ],
   "properties": {
@@ -600,8 +623,25 @@
    },
    "invoiceNumber": {
     "type": "string",
+    "nullable": true,
     "readOnly": true,
-    "description": "A tax invoice number, so **gapless, per legal entity** (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity that issues it, assigned when the invoice is issued, never reused. A cancelled invoice keeps its number.\n"
+    "description": "A tax invoice number, so **gapless, per legal entity** (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity that issues it, assigned when the invoice is issued, never reused. A cancelled invoice keeps its number. **Null while the invoice is a `draft`** (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013): `generateInvoice` creates the draft with no number and `issueInvoice` takes the next number from `control.invoice_number_sequence` (`InvoiceNumberSequence`) in the same transaction, so a number is never taken and lost.\n"
+   },
+   "issuingLegalEntity": {
+    "type": "string",
+    "enum": [
+     "ainfiniteAiUae",
+     "ainfiniteAiIndia"
+    ],
+    "readOnly": true,
+    "description": "The TICVAI legal entity that issues the invoice, copied at generation from the tenant's contract (`Subscription.issuingLegalEntity`); its number comes from that entity's sequence (`InvoiceNumberSequence` with `legalEntityCode` equal to this value). The lead, 25 October 2026, r10 round 3; CHG-R10ID-023."
+   },
+   "currencyCode": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "readOnly": true,
+    "description": "**The currency of every Money on this invoice** (ADAM CR-202, option B; CHG-R10ID-013): the billing entity's `billingCurrency`, copied at generation and never changed afterwards. Lines, subtotal, tax, total and the credited total are all in it, here and on `listSubscriptionInvoices`."
    },
    "tenantId": {
     "x-ticvai-references": "control.tenant",

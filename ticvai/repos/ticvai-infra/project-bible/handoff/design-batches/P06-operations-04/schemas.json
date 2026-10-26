@@ -311,7 +311,7 @@
  },
  "ApprovalKind": {
   "type": "string",
-  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A platform suspension or reactivation of a tenant** (`configurationChange`, subject `tenant`, `subjectContract` `subscription`; ADAM CR-172; lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015): decided by the platform, never by the tenant''s own approvers. It is routed only by the **platform rule**, held in the control plane and seeded when the platform is provisioned, whose approvers hold `PLATFORM_TENANT_MANAGE`, with four eyes (the operator who raised it cannot decide it). It is not off by default like the review steps below: the platform rule always exists, and without it `createApprovalRequest` refuses `422 no-approval-route`.\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n\n**A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request\nwith no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the\nShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.",
+  "description": "11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A platform suspension or reactivation of a tenant** (`configurationChange`, subject `tenant`, `subjectContract` `subscription`; ADAM CR-172; lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015): decided by the platform, never by the tenant''s own approvers. It is routed only by the **platform rule**, held in the control plane and seeded when the platform is provisioned, whose approvers hold `PLATFORM_TENANT_MANAGE`, with four eyes (the operator who raised it cannot decide it). It is not off by default like the review steps below: the platform rule always exists, and without it `createApprovalRequest` refuses `422 no-approval-route`.\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n\n**A sales channel going live** (ADAM CR-211, option A, decided 25 October 2026; CHG-R10CAT-003).\n`configurationChange`, subject `salesChannel`, `subjectContract` `catalogue`, `subjectId` the channel: raised by\ncatalogue `publishChannelReadinessValidation` on `submitForApproval`, and named by its `scheduleActivation` and\n`activate`, which are refused until it is approved. An existing kind narrowed by `subjectTypes`, so no kind is\nadded.\n\n**A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request\nwith no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the\nShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.\n\n**A guest's privacy request** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016). `configurationChange`,\n`subjectContract` `identity`, `subjectId` the guest's subject id, subject `subjectDataExport` for\n`exportSubjectData` and `subjectErasure` for `deleteGuestAccount`: an existing kind narrowed by `subjectTypes`,\nso no kind is added. Raised by Identity in process for the guest, it records the guest as `requestedBySubjectId`\n(`requestedByPrincipalId` null). A guest's own request needs no human approval step (ADR-0047 section 7); a\ntenant that wants one saves a rule for these subject types.",
   "enum": [
    "refund",
    "priceOverride",
@@ -346,12 +346,17 @@
  },
  "ApprovalRequest": {
   "type": "object",
-  "x-ticvai-persistence": "approvals.request + approvals.escalation",
+  "x-ticvai-persistence": "approvals.request + approvals.escalation + approvals.request_approver",
+  "x-ticvai-exactly-one-of": [
+   [
+    "requestedByPrincipalId",
+    "requestedBySubjectId"
+   ]
+  ],
   "required": [
    "id",
    "kind",
    "status",
-   "requestedByPrincipalId",
    "requestedAt"
   ],
   "properties": {
@@ -416,7 +421,18 @@
    },
    "requestedByPrincipalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "identity.principal",
+    "description": "The principal who raised the request, or for whom the raising contract raised it. **Null when a guest raised it** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016): a guest is a subject, not a principal, so a guest's privacy request (`exportSubjectData`, `deleteGuestAccount`) records `requestedBySubjectId` instead. Exactly one of the two is set."
+   },
+   "requestedBySubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "pii.subject",
+    "description": "**The guest who raised the request** (ADAM CR-101; CHG-R10ID-016), set by the server from the guest session; null for a request a principal raised. Segregation of duties holds for it too: no approver decides a request raised for their own subject."
    },
    "matrixVersion": {
     "type": "integer"
@@ -430,8 +446,39 @@
    "totalLevels": {
     "type": "integer"
    },
+   "approvers": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**The approver chain, fixed when the request is routed** (ADAM CR-102, option 1, accepted 15 October 2026; CHG-R10ID-015). One `approvals.request_approver` row per approver per level, written by `createApprovalRequest` (when not a draft) and `submitApprovalRequest` from the matched rule's roles and the delegations in force at that moment (`isDelegate` true for a delegate standing in). The chain is not recomputed at decision time: `decideApprovalRequest` refuses `notInApproverChain` to anyone with no row at the current level, so a role change after routing neither adds nor removes an approver of a request in flight. An escalation (`escalateApprovalRequest`, the SLA job) and a reroute (`rerouteOnNoApprover`) add rows; a returned or information-requested request keeps its chain when resubmitted. Rows are never edited or deleted.",
+    "items": {
+     "type": "object",
+     "required": [
+      "level",
+      "principalId",
+      "isDelegate"
+     ],
+     "properties": {
+      "level": {
+       "type": "integer",
+       "minimum": 1,
+       "description": "The level of the chain this approver decides at."
+      },
+      "principalId": {
+       "type": "string",
+       "format": "uuid",
+       "x-ticvai-references": "identity.principal",
+       "description": "The approver, a principal of the tenant."
+      },
+      "isDelegate": {
+       "type": "boolean",
+       "description": "True when the approver stands in for another through an `ApprovalDelegation` in force at routing."
+      }
+     }
+    }
+   },
    "pendingApprovers": {
     "x-ticvai-persisted": false,
+    "description": "The rows of `approvers` at `currentLevel` who have not decided yet, with their names; derived, not stored (CHG-R10ID-015).",
     "type": "array",
     "items": {
      "type": "object",
@@ -1041,7 +1088,8 @@
         "rental",
         "experience",
         "membership"
-       ]
+       ],
+       "description": "The product's kind (`catalogue.Product.kind`, read through `catalogue#productRecords` by the entitlement's `productId`), mapped onto these values (ADAM CR-226, option A; Chinmay, 25 October 2026; CHG-R10ORD-012): `admission`, `timedAdmission`, `datedAdmission`, `openDated` and `seated` are `admission`; `membership`, `fnb`, `retail` and `rental` are themselves. A product of any other kind is answered without `kind` (it is optional) until its value is decided; `locker`, `parking` and `experience` have no product kind yet, and are answered without `kind` until ProductKind gains them (the lead's answer of 25 October 2026 to the r10 lanes' questions; docs/active/left-out.yaml LO-R10ORD-001)."
       },
       "orderId": {
        "type": "string",
@@ -1049,7 +1097,8 @@
       },
       "addedAt": {
        "type": "string",
-       "format": "date-time"
+       "format": "date-time",
+       "description": "When the entitlement was put on this media: `access.entitlement.media_linked_at`, written when the media code is set or rotated (ADAM CR-226). Null for a row written before the column."
       },
       "status": {
        "allOf": [
@@ -1074,7 +1123,8 @@
       "transferredToSubjectId": {
        "type": "string",
        "format": "uuid",
-       "nullable": true
+       "nullable": true,
+       "description": "The `subjectId` of the entitlement whose `supersedesEntitlementId` names this one with `issuedVia` `transfer` (ADAM CR-226), read through `access#entitlementRecords`; null when it was not transferred."
       },
       "validTo": {
        "type": "string",
@@ -1183,7 +1233,7 @@
     "nullable": true,
     "writeOnly": true,
     "x-ticvai-secret": "field-encrypted",
-    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`."
+    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code."
    },
    "destination": {
     "type": "string",
@@ -1251,7 +1301,7 @@
    },
    "scale": {
     "type": "integer",
-    "description": "Resolved from the region alongside `currency`.",
+    "description": "Resolved from the region alongside `currency`. **A currency other than the venue's or region's trading currency** (a tourist's USD cash at an AED till, `Payment.tenderAmount`; a guest-selected charge currency, `Order.chargeTotal`; a refund in the tender currency) **takes its ISO 4217 minor units**, held as one fixed list in the kernel (`TICVAI.Domain`, beside Money), so every module resolves it the same way and no table, query or migration holds it (ADAM CR-192, option A; Chinmay, 21 October 2026; CHG-R10ORD-018). The venue and region settings keep their own `currency_scale` for the trading currency.",
     "minimum": 0,
     "maximum": 4
    }
@@ -1376,7 +1426,7 @@
      }
     ],
     "readOnly": true,
-    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192; common.yaml `Money.scale`), when it is not the currency the venue trades in."
    },
    "chargeRateLockedUntil": {
     "type": "string",
@@ -1583,7 +1633,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+    "description": "The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-018)."
    },
    "fxRate": {
     "allOf": [
@@ -1856,7 +1906,7 @@
      "unknown"
     ],
     "default": "unknown",
-    "description": "What the device last said on its heartbeat; `unknown` until it has. `localMode` is an access-control device validating from its offline package with its link down (ADR-0067).\n"
+    "description": "What the device last said on its heartbeat; `unknown` until it has. `localMode` is an access-control device validating from its offline package with its link down (ADR-0067). The timer sets `offline` after 15 minutes with no heartbeat, and `unknown` after 7 days offline; the next heartbeat sets whatever it reports (ADAM CR-103, proposed defaults the client can correct).\n"
    },
    "batteryPercent": {
     "type": "integer",
@@ -1884,7 +1934,7 @@
     ],
     "default": "unknown",
     "readOnly": true,
-    "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n**The formula, proposed, client to correct** (decided 20 October 2026, R8 blocker cause APPROVALS-TENANCY-C27; CHG-R8SPN-030), the weights of `Workstation.healthScore` applied to one device: score = 40 if its last reported `status` is `online` or `localMode` (0 otherwise) + 25 heartbeat freshness (25 at one minute old or less, 0 at 15 minutes or more, linear between) + 20 firmware currency (20 on the latest, 10 one version behind, 0 older) + 15 errors in the last hour (15 at none, 0 at 10 or more, linear between). `healthy` at 80 or more, `warning` at 60 or more, `degraded` below 60; `offline` after 15 minutes with no heartbeat, whatever the score; `unknown` until the first heartbeat. A battery under 15% caps the device at `warning`.\n"
+    "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n**The formula, proposed, client to correct** (decided 20 October 2026, R8 blocker cause APPROVALS-TENANCY-C27; CHG-R8SPN-030), the weights of `Workstation.healthScore` applied to one device: score = 40 if its last reported `status` is `online` or `localMode` (0 otherwise) + 25 heartbeat freshness (25 at one minute old or less, 0 at 15 minutes or more, linear between) + 20 firmware currency (20 on the latest, 10 one version behind, 0 older) + 15 errors in the last hour (15 at none, 0 at 10 or more, linear between). `healthy` at 80 or more, `warning` at 60 or more, `degraded` below 60; `offline` after 15 minutes with no heartbeat, whatever the score; `unknown` until the first heartbeat. A battery under 15% caps the device at `warning`. The latest firmware, and the error term until `tenancy.device_telemetry` lands (dropped, the other three re-weighted to 100), are as `getWorkstationHealth` states them (ADAM CR-244, 26 October 2026).\n"
    },
    "lastHeartbeatAt": {
     "type": "string",
@@ -1926,7 +1976,7 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
-    "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\n"
+    "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\nA reference to the profile's `id`, not to one version: the profile is keyed (`id`, `version`), so this is kept by convention rather than a declared key, and a read of it takes the profile's latest version (ADAM CR-228, option A; CHG-R10TEN-009).\n"
    },
    "approvalStatus": {
     "allOf": [
@@ -2115,11 +2165,11 @@
       "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
      }
     ],
-    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks only: it never decides an operation by itself (ADAM CR-189). Anything scope-sensitive uses `permissionsByScope`.\n"
    },
    "permissionsByScope": {
     "type": "array",
-    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "description": "Permissions effective at each granted scope path, after deny resolution. Clients filter navigation on this and never compute permissions themselves.\n\n**The server keeps the same set and authorises from it** (decided 25 October 2026, Chinmay, ADAM CR-189 option A; CHG-R10ID-001). The rule for every operation: `x-ticvai-permission` is evaluated at the scope the operation acts on, from the per-scope set (the node acted on or one of its ancestors); `effectivePermissions` is for coarse checks only. A list's reach is the scope paths where its permission holds, and a filter outside it is `403`; a tenant-level operation needs its permission at the tenant root. The request kernel's seam carries this set beside the flat one (#27692 owns the field) and sign-in (#27666) fills it from the same resolution that fills this property; tests fill the seam until sign-in lands. The full statement is `docs/architecture/specs/permission-resolution.md` section 7.2. No wire shape changes.\n",
     "items": {
      "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
     }

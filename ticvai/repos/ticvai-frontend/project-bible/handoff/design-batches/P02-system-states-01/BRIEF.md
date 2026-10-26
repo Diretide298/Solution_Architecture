@@ -1,6 +1,6 @@
 # P02-system-states-01 — P02 · System States
 
-**2 screens · 2 operations · 19 schemas · 0 permissions**
+**2 screens · 4 operations · 22 schemas · 1 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 0 permissions apply here:
-  ``. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 1 permissions apply here:
+  `GUEST_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **2 of these operations work offline**: getPublishedTenantConfig, getTenantAppStatus
   — and the rest do not. A surface that looks the same online and off is lying.
@@ -102,12 +102,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-043` | Arabic / RTL Experience | A | 1 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (client-verified) |
-| `GST-047` | Maintenance / Upgrade Page | A | 0 | 65 | 9 | 0 | 1 | 2 | guest | notStarted (client-verified) |
+| `GST-043` | Arabic / RTL Experience | A | 1 | 0 | 4 | 4 | 0 | 0 | guest | notStarted (client-verified) |
+| `GST-047` | Maintenance / Upgrade Page | A | 0 | 60 | 9 | 0 | 1 | 2 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 
-**GST-043 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**GST-043, GST-047 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

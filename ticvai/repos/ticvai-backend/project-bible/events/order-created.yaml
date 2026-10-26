@@ -25,6 +25,10 @@ payload:
   type: Money
 - field: createdAt
   type: timestamp
+- field: orderNumber
+  type: string
+  notes: The order's number as its confirmation shows it, so Identity's projection can find a guest checkout by it
+    (linkGuestCheckout; r10 ruling, CHG-R10ID-018)
 - field: verifiedContactRef
   type: string
   required: false
@@ -56,7 +60,8 @@ consumers:
   isCritical: true
 - context: identity
   purpose: Record a pending order in identity.subject_holding when the order names a subjectId, or without a subject
-    when it is a guest checkout (verifiedContactRef set), which order.linkedToGuest may later attach to an account, so
+    when it is a guest checkout (verifiedContactRef set, kept on the row with orderNumber so linkGuestCheckout finds it
+    there; CHG-R10ID-018), which order.linkedToGuest may later attach to an account, so
     deleteGuestAccount refuses while an open order remains without reading orders.sales_order (ADR-0028) (ADAM CR-084,
     CHG-GDL-001, CHG-GDL-003)
   writes:

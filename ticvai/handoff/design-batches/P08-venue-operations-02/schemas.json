@@ -221,7 +221,8 @@
   "x-ticvai-append-only": "occurredAt",
   "type": "object",
   "x-ticvai-persistence": "platform.audit_record",
-  "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n",
+  "x-ticvai-rls": "audit-read-beneath",
+  "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Never edited and never deleted.\n\n**Every write leaves a row, written by the platform in the write's own transaction** (ADAM CR-179, option 1; PLATFORM-AUDIT #27694 and CR-005; CHG-R10TEN-016). Not a fixed set of operations that audit themselves: the request kernel writes one row for each transaction that writes, inside it, from every host. `action` is the operation's `operationId`, or the consumer's or the job's name; `principalId` is who acted; `orgUnitId` is the venue the session acts at, else its region; `workstationId` is the workstation where there is one; `subjectRef` is set only where the operation names what it acted on.\n\n**Who reads a row** (ADAM CR-185, option B; CHG-R10TEN-006): the tenant root reads every row; a venue or region grant reads the rows whose `orgUnitId` names a scope node at or beneath it. A row with no `orgUnitId` (a consumer, a job, the webhook) is the tenant root's alone. Appending is open to any grant, and correcting or removing a row to the tenant root only, as CR-005 settled.\n",
   "required": [
    "id",
    "action",
@@ -252,7 +253,7 @@
    },
    "action": {
     "type": "string",
-    "description": "What was done, as the writing operation names it."
+    "description": "What was done, as the writing operation names it; the operation's `operationId`, or the consumer's or the job's name (ADAM CR-179)."
    },
    "subjectRef": {
     "type": "string",
@@ -308,6 +309,7 @@
  "ConfigurationProfile": {
   "type": "object",
   "x-ticvai-persistence": "platform.configuration_profile",
+  "x-ticvai-rls": "read-beneath",
   "x-ticvai-primary-key": [
    "id",
    "version"
@@ -342,7 +344,7 @@
    "version": {
     "type": "integer",
     "readOnly": true,
-    "description": "**Immutable once deployed anywhere.** A change makes a new version, and the old one stays readable — a workstation still running v2.3 must be able to say what v2.3 was. Assigned by the server: 1 on create, and one more each time a change lands on a published version (see `setConfigurationProfile`). **Each version is its own row, keyed (`id`, `version`)** (CHG-R8MIG-019): a new version is a new row, and `setConfigurationProfile` sets the older published row's `status` to `superseded`, its settings left exactly as they were.\n"
+    "description": "**Immutable once deployed anywhere.** A change makes a new version, and the old one stays readable — a workstation still running v2.3 must be able to say what v2.3 was. Assigned by the server: 1 on create, and one more each time a change lands on a published version (see `setConfigurationProfile`). **Each version is its own row, keyed (`id`, `version`)** (CHG-R8MIG-019): a new version is a new row, and `setConfigurationProfile` leaves the older row exactly as it is, `status` included. **`superseded` is set only by `deployConfigurationProfile`**, when the newer version is deployed: a deployed version is what workstations still run, so marking it superseded before the new one reaches them would misreport the fleet (ADAM CR-250, option A, accepted 26 October 2026, Chinmay). `id` is the profile and names every version of it; `platform.profile_deployment` keys a deployment to one version by (`profile_id`, `version`). **A read of \"the profile\" takes its latest version**; older versions stay readable by (`id`, `version`) (ADAM CR-228, option A, decided 25 October 2026; CHG-R10TEN-009).\n"
    },
    "settings": {
     "type": "object",
@@ -774,6 +776,7 @@
  "DeviceFirmware": {
   "type": "object",
   "x-ticvai-persistence": "tenancy.device_firmware",
+  "x-ticvai-rls": "read-beneath",
   "description": "16.6.30 and 16.6.32. **A release, and how much of the fleet is on it.** Written by `createDeviceFirmware` and moved through its life by `setDeviceFirmwareStatus` (29 September, build pass); `startDeviceFirmwareRollout` deploys only a `released` one.\n",
   "required": [
    "deviceKind",
@@ -1700,7 +1703,7 @@
     "minimum": 0,
     "maximum": 100,
     "readOnly": true,
-    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.**\n"
+    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.** The exact rules (whose heartbeat, which firmware is the latest, what profile currency compares, the error term until the heartbeat series lands, a workstation with no devices, the bands and the contributors) are `getWorkstationHealth`'s, the one place the score is defined (ADAM CR-244, 26 October 2026).\n"
    },
    "configurationProfileId": {
     "type": "string",

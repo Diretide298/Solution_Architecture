@@ -2442,7 +2442,7 @@
    },
    "scale": {
     "type": "integer",
-    "description": "Resolved from the region alongside `currency`.",
+    "description": "Resolved from the region alongside `currency`. **A currency other than the venue's or region's trading currency** (a tourist's USD cash at an AED till, `Payment.tenderAmount`; a guest-selected charge currency, `Order.chargeTotal`; a refund in the tender currency) **takes its ISO 4217 minor units**, held as one fixed list in the kernel (`TICVAI.Domain`, beside Money), so every module resolves it the same way and no table, query or migration holds it (ADAM CR-192, option A; Chinmay, 21 October 2026; CHG-R10ORD-018). The venue and region settings keep their own `currency_scale` for the trading currency.",
     "minimum": 0,
     "maximum": 4
    }
@@ -2568,7 +2568,7 @@
    },
    "entitlementsVersion": {
     "type": "integer",
-    "description": "The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."
+    "description": "The highest `access.entitlement` change included (SD-052, 29 September): the maximum `change_version` of the package's rows (ADAM CR-239, option A; CHG-R10ORD-011). A refresh sends it as `sinceVersion` and receives only the rows whose `change_version` is above it, void and used ones included, so a 60,000-guest venue is not re-sent whole."
    },
    "policySetVersion": {
     "type": "string",
@@ -2581,9 +2581,26 @@
      "$ref": "#/components/schemas/AccessDynamicPolicy"
     }
    },
+   "isDelta": {
+    "type": "boolean",
+    "description": "True when this answers a `sinceVersion` with only what changed after it; false (always sent) on a whole package. A device merges only when `isDelta` is true, and otherwise replaces the whole package it holds (ADAM CR-248, option A, accepted 26 October 2026; mirrors `CatalogueBundle.isDelta`)."
+   },
+   "baseVersion": {
+    "type": "integer",
+    "nullable": true,
+    "description": "The `sinceVersion` this delta answers; null on a whole package (ADAM CR-248; mirrors `CatalogueBundle.baseVersion`)."
+   },
+   "removedTicketIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "On a delta, the entitlements changed after `sinceVersion` that no longer admit (`access.entitlement` status `fullyConsumed`, `expired`, `cancelled` or `surrendered`), by `ticketId`. A device drops them; they are never sent in `entitlements`. Empty on a whole package (ADAM CR-248)."
+   },
    "entitlements": {
     "type": "array",
-    "description": "Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device removes them.",
+    "description": "Read from `access.entitlement` (SD-052). **Only rows that still admit** (`issued` or `partiallyConsumed`): nothing that does not admit is ever sent here (ADAM CR-248, option A, accepted 26 October 2026). With `sinceVersion`, only the admitting rows changed after it; a device adds or replaces these by `ticketId`, and drops `removedTicketIds`.",
     "items": {
      "type": "object",
      "required": [
@@ -2618,7 +2635,8 @@
       "performanceId": {
        "type": "string",
        "format": "uuid",
-       "nullable": true
+       "nullable": true,
+       "description": "Null until a source is decided (ADAM CR-240); access.entitlement has no performance column."
       },
       "entriesAllowed": {
        "type": "integer",
@@ -2628,11 +2646,13 @@
        "type": "integer"
       },
       "reentryAllowed": {
-       "type": "boolean"
+       "type": "boolean",
+       "description": "The template's `is_reentry_allowed`, read through `catalogue#entitlementTemplateRecords` (ADAM CR-240)."
       },
       "admissionRulesId": {
        "type": "string",
-       "format": "uuid"
+       "format": "uuid",
+       "description": "The template's `admission_rules_id`, read through `catalogue#entitlementTemplateRecords` (ADAM CR-240)."
       }
      }
     }
@@ -3046,6 +3066,32 @@
    }
   }
  },
+ "Placement": {
+  "x-ticvai-persistence": "none — embedded in region_settings",
+  "type": "object",
+  "description": "Read-only here. Set by the Control Plane at provisioning.\nEvery region is its own logical cell. Placement determines the infrastructure backing it, which is how cost is controlled without varying the split rule: `shared` puts several regions' databases on one cluster; `dedicated` and `isolated` give a region its own. Regions in different countries MUST have placements in their respective jurisdictions.\n",
+  "readOnly": true,
+  "required": [
+   "mode"
+  ],
+  "properties": {
+   "mode": {
+    "type": "string",
+    "enum": [
+     "shared",
+     "dedicated",
+     "isolated",
+     "clientHosted"
+    ]
+   },
+   "cellName": {
+    "type": "string"
+   },
+   "cloudRegion": {
+    "type": "string"
+   }
+  }
+ },
  "Recipient": {
   "x-ticvai-persistence": "reporting.schedule_recipient",
   "type": "object",
@@ -3070,6 +3116,185 @@
    "principalId": {
     "type": "string",
     "format": "uuid"
+   }
+  }
+ },
+ "RegionSettings": {
+  "x-ticvai-persistence": "platform.region_settings",
+  "x-ticvai-rls": "read-beneath",
+  "type": "object",
+  "required": [
+   "scopePath",
+   "countryCode",
+   "currencyCode",
+   "currencyScale",
+   "timeZone",
+   "fiscalYearStartMonth"
+  ],
+  "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005): the path of the region in `regionId`, set by the server when `updateRegionSettings` first saves the row, and ignored on input. **Always present, never null** (CHG-R6G-002): a row with no path is invisible to every grant under its policy, so the column is NOT NULL once the rows that predate it are backfilled from `org_unit_id` through `platform.scope.path` (handoff/migration-review.md). Row-level security reads the row at, above and beneath that path (`x-ticvai-rls: read-beneath`, CHG-GEN-008, ADAM CR-075), so a venue's `createOutlet` reads the languages its region requires, and only the region or a level above it writes the row.\n"
+   },
+   "countryCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{2}$",
+    "description": "ISO 3166-1 alpha-2. Determines the jurisdiction, and therefore the cell."
+   },
+   "currencyCode": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "currencyScale": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 4,
+    "description": "Decimal places for this region's currency. Varies by currency — some use 2, some use 3. Money columns are numeric(18,4) and carry the scale explicitly, because a fixed 2-place type silently truncates 3-place currencies.\n"
+   },
+   "timeZone": {
+    "type": "string",
+    "description": "IANA zone, e.g. `Asia/Dubai`."
+   },
+   "dateFormat": {
+    "type": "string",
+    "default": "dd/MM/yyyy"
+   },
+   "numberFormat": {
+    "type": "string",
+    "default": "#,##0.00"
+   },
+   "fiscalYearStartMonth": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 12,
+    "description": "Varies by country."
+   },
+   "allowedAiResidencies": {
+    "type": "array",
+    "description": "**The region's compliance gate on AI providers** (decided 28 September, audit R203; ADR-0009). The `AiProvider.residency` values a tenant in this region may use; empty means no restriction. `ai.setAiProvider` refuses any other residency with `409 residency-refused`. A prompt carrying guest data that reaches a provider hosted elsewhere is a cross-border transfer, and this is where a region says which it allows.\n**Derived from `aiResidencyClass` since 2 October 2026** (CHG-CSP-009): the class names the residencies, and this list narrows them further where a region needs it; it never widens them.\n",
+    "default": [],
+    "items": {
+     "type": "string"
+    }
+   },
+   "aiResidencyClass": {
+    "type": "string",
+    "enum": [
+     "uaeOnly",
+     "globalAllowed",
+     "onPrem"
+    ],
+    "default": "uaeOnly",
+    "description": "**The tenant's AI residency class** (decided 2 October 2026, Chinmay, \"AI residency: per-tenant residency class\"; DEC-539; CHG-CSP-009; amends AI-D02 and ADR-0009 section 1). Which AI endpoints the AI engine may route this tenant's calls to:\n- `uaeOnly` (the default, and mandatory for government, bank and health tenants): the small tier\n  is Core42 Compass GPT-4.1 mini (or Seraj if it wins the Arabic golden set), the strong tier\n  Compass GPT-5, reached through `AiProviderKind` `openaiCompatible`; fallback OpenAI UAE (no\n  in-cell model: we host none unless a client asks, CHG-R1S-002). No call leaves the UAE.\n- `globalAllowed`: a private venue that opts in under PDPL Article 23, with a vendor contract, a\n  DPIA and a notice to guests (`aiResidencyOptIn`). Azure gpt-5-mini and gpt-6-sol Global, or\n  the tenant's BYOK provider; fallback the `uaeOnly` chain. The tenant is listed in ADR-0009's\n  transfer register.\n- `onPrem`: models in the tenant's own estate (Qwen3.5 or gpt-oss; strong tier Qwen3.5-122B,\n  Falcon-H1 Arabic or Jais 2), only where the client asks for it (CHG-R1S-002).\n\n**Every LLM call is scrubbed of personal data in-cell first, whatever the class** (DEC-542): the class decides where a call may go, never whether personal data may travel. Moving from `uaeOnly` to `globalAllowed` without `aiResidencyOptIn` is refused `422 residency-opt-in-required`; on a tenant `aiResidencyClassLocked` holds, any change is refused `409 residency-class-locked`. The model choice per class is the AI engine's (ai `AiProvider`, ai-system-design 3.3), not a setting here.\n"
+   },
+   "aiResidencyClassLocked": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "**Set by TICVAI at onboarding for a government, bank or health tenant** (DEC-539), which must stay `uaeOnly`. Read-only to the tenant.\n"
+   },
+   "tenantCategory": {
+    "type": "string",
+    "readOnly": true,
+    "default": "private",
+    "enum": [
+     "private",
+     "semiGovernment",
+     "government",
+     "banking",
+     "payments",
+     "health",
+     "difc",
+     "adgm"
+    ],
+    "description": "**What kind of organisation the tenant is, for AI residency** (3 October 2026, CHG-R1S-016; the legal research `docs/active/research/openai-key-uae-3-october.md`, item 2, and Chinmay's per-tenant residency class, DEC-539). Recorded by TICVAI staff at onboarding, read-only to the tenant. **Only `private` may take `globalAllowed`**: a government or semi-government entity (DESC, ADISS and TDRA scope), a bank or payments firm, a health provider, or a DIFC or ADGM entity stays `uaeOnly` (or `onPrem` where it asks), and `updateRegionSettings` refuses the change `409 residency-category-refused`, naming the category. `aiResidencyClassLocked` stays as the per-tenant override TICVAI can set on any category.\n"
+   },
+   "aiResidencyOptIn": {
+    "type": "object",
+    "nullable": true,
+    "description": "**The evidence a `globalAllowed` opt-in needs under PDPL Article 23** (DEC-539; CHG-CSP-009): the tenant's references to its vendor contract, its DPIA and the notice guests see. The platform records that they were named, by whom and when; it does not hold or judge the documents. Null while the class is `uaeOnly` or `onPrem`.\n",
+    "properties": {
+     "vendorContractReference": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "dpiaReference": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "guestNoticeReference": {
+      "type": "string",
+      "maxLength": 200
+     },
+     "confirmedByPrincipalId": {
+      "type": "string",
+      "format": "uuid",
+      "readOnly": true
+     },
+     "confirmedAt": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true
+     }
+    }
+   },
+   "localLanguageNameLocales": {
+    "type": "array",
+    "default": [],
+    "description": "**The languages an outlet name must also be given in, in this country** (decided 2 October 2026, Chinmay, batch 2 #26: \"English plus the local language where the country needs it\"; DEC-031; CHG-CSP-005). ISO 639-1 codes; `[ar]` in the UAE. Empty asks for English only. `createOutlet` and `updateOutlet` refuse an outlet whose `nameTranslations` lacks one of them (`422 local-name-required`).\n",
+    "items": {
+     "type": "string",
+     "pattern": "^[a-z]{2}$"
+    }
+   },
+   "requiredBillingDocuments": {
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "type": "array",
+    "description": "**Which documents a TICVAI customer's billing entity must upload, in this country** (decided 2 October 2026, Chinmay, batch 6 set 7, ADM-411: \"Trade licence always; VAT certificate when a TRN is entered; configurable per country\"; DEC-210; CHG-CSP-008). The default for every country is the two rows below; TICVAI staff change them per country. The subscription contract's billing entity and `PartnerDocument` read this list; a missing required document holds the entity in verification.\n",
+    "default": [
+     {
+      "documentType": "tradeLicence",
+      "requiredWhen": "always"
+     },
+     {
+      "documentType": "vatCertificate",
+      "requiredWhen": "trnEntered"
+     }
+    ],
+    "items": {
+     "type": "object",
+     "properties": {
+      "documentType": {
+       "type": "string",
+       "maxLength": 64,
+       "description": "The document kind, as the subscription contract's `PartnerDocument` names it (`tradeLicence`, `vatCertificate`, ...)."
+      },
+      "requiredWhen": {
+       "type": "string",
+       "enum": [
+        "always",
+        "trnEntered"
+       ]
+      }
+     }
+    }
+   },
+   "minorAgeThreshold": {
+    "type": "integer",
+    "minimum": 0,
+    "maximum": 21,
+    "default": 18,
+    "description": "**The age below which a guest is a minor here, set per country** (decided 2 October 2026, Chinmay, critical set 1, BO-187: \"Guardian consent on the venue's form; minor age per country\"; DEC-237; CHG-CSP-019). A minor's biometric enrolment needs a guardian's consent on the venue's consent form (access `enrolFacePass`, `consent.guardianSubjectId`); a subject with no date of birth is treated as a minor (audit R126). The default 18 is the UAE's age of majority and is marked for counsel to confirm per country (R205); whether minors may enrol at all is the venue's switch (`VenueSettings.biometrics.allowMinors`).\n"
+   },
+   "placement": {
+    "$ref": "#/components/schemas/Placement"
+   },
+   "cellName": {
+    "type": "string",
+    "readOnly": true,
+    "description": "The cell serving this region. One cell per tenant per region (ADR-0014).\n"
    }
   }
  },
@@ -3238,7 +3463,7 @@
      "unknown"
     ],
     "default": "unknown",
-    "description": "What the device last said on its heartbeat; `unknown` until it has. `localMode` is an access-control device validating from its offline package with its link down (ADR-0067).\n"
+    "description": "What the device last said on its heartbeat; `unknown` until it has. `localMode` is an access-control device validating from its offline package with its link down (ADR-0067). The timer sets `offline` after 15 minutes with no heartbeat, and `unknown` after 7 days offline; the next heartbeat sets whatever it reports (ADAM CR-103, proposed defaults the client can correct).\n"
    },
    "batteryPercent": {
     "type": "integer",
@@ -3266,7 +3491,7 @@
     ],
     "default": "unknown",
     "readOnly": true,
-    "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n**The formula, proposed, client to correct** (decided 20 October 2026, R8 blocker cause APPROVALS-TENANCY-C27; CHG-R8SPN-030), the weights of `Workstation.healthScore` applied to one device: score = 40 if its last reported `status` is `online` or `localMode` (0 otherwise) + 25 heartbeat freshness (25 at one minute old or less, 0 at 15 minutes or more, linear between) + 20 firmware currency (20 on the latest, 10 one version behind, 0 older) + 15 errors in the last hour (15 at none, 0 at 10 or more, linear between). `healthy` at 80 or more, `warning` at 60 or more, `degraded` below 60; `offline` after 15 minutes with no heartbeat, whatever the score; `unknown` until the first heartbeat. A battery under 15% caps the device at `warning`.\n"
+    "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n**The formula, proposed, client to correct** (decided 20 October 2026, R8 blocker cause APPROVALS-TENANCY-C27; CHG-R8SPN-030), the weights of `Workstation.healthScore` applied to one device: score = 40 if its last reported `status` is `online` or `localMode` (0 otherwise) + 25 heartbeat freshness (25 at one minute old or less, 0 at 15 minutes or more, linear between) + 20 firmware currency (20 on the latest, 10 one version behind, 0 older) + 15 errors in the last hour (15 at none, 0 at 10 or more, linear between). `healthy` at 80 or more, `warning` at 60 or more, `degraded` below 60; `offline` after 15 minutes with no heartbeat, whatever the score; `unknown` until the first heartbeat. A battery under 15% caps the device at `warning`. The latest firmware, and the error term until `tenancy.device_telemetry` lands (dropped, the other three re-weighted to 100), are as `getWorkstationHealth` states them (ADAM CR-244, 26 October 2026).\n"
    },
    "lastHeartbeatAt": {
     "type": "string",
@@ -3308,7 +3533,7 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
-    "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\n"
+    "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\nA reference to the profile's `id`, not to one version: the profile is keyed (`id`, `version`), so this is kept by convention rather than a declared key, and a read of it takes the profile's latest version (ADAM CR-228, option A; CHG-R10TEN-009).\n"
    },
    "approvalStatus": {
     "allOf": [
@@ -4032,6 +4257,72 @@
    }
   }
  },
+ "SaleBoard": {
+  "x-ticvai-persistence": "platform.sale_board + platform.sale_board_page + platform.sale_board_tile",
+  "description": "**A board is stored as three tables** (decided 14 October 2026, Chinmay, ADAM CR-080; CHG-TEN-001): the board (`platform.sale_board`), one row per page (`pages[]`, `platform.sale_board_page`, keyed to the board) and one row per tile (`pages[].tiles[]`, `platform.sale_board_tile`, keyed to its page by a NOT NULL `sale_board_page_id`, so a tile follows its page's row-level security). Until then the persistence named the board alone, and the tile table held an id and a nullable page key and nothing a till could draw.\n",
+  "type": "object",
+  "required": [
+   "id",
+   "code",
+   "name",
+   "venueId",
+   "kind",
+   "pages"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64,
+    "x-ticvai-unique": "venue",
+    "description": "Unique within the venue (as the hand-written r0 table had it). A second board with the same code is `409 duplicate-code` (audit R108; ADAM CR-080; CHG-TEN-001).\n"
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "kind": {
+    "$ref": "#/components/schemas/SaleBoardKind"
+   },
+   "pages": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "object",
+     "required": [
+      "name",
+      "sortOrder",
+      "tiles"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "sortOrder": {
+       "type": "integer"
+      },
+      "tiles": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/SaleBoardTile"
+       }
+      }
+     }
+    }
+   },
+   "isActive": {
+    "type": "boolean"
+   }
+  }
+ },
  "SaleBoardKind": {
   "type": "string",
   "enum": [
@@ -4040,6 +4331,84 @@
    "retail",
    "mixed"
   ]
+ },
+ "SaleBoardTile": {
+  "x-ticvai-persistence": "platform.sale_board_tile",
+  "description": "**One button on one page of a till board** (ADAM CR-080, 14 October 2026; CHG-TEN-001): the rows of `SaleBoard.pages[].tiles[]`, each keyed to its page. A position holds one tile on a page (`x-ticvai-unique-together`).\n**A tile that acts names what it acts on** (`x-ticvai-required-when`, carried as a CHECK): a `product` tile names its variant, a `category` tile the catalogue category it opens, an `action` tile the till action it runs (`actionCode`); a `spacer` names nothing. The hand-written r0 table had the product rule as `sale_board_tile_product` (\"a product tile with no variant is a button that does nothing\", handoff/storage-design.md).\n**A tile's variant is checked when the board is saved and again when it is published.** `createSaleBoard` and `updateSaleBoard` ask Catalogue whether every product tile's variant is sellable at the board's venue (`catalogue#variantsSellableAt`, ADAM CR-081); `publishBundle` leaves out a tile whose product is not `isSellable` when the bundle is cut, and the till never draws it.\n",
+  "x-ticvai-unique-together": [
+   [
+    "sale_board_page_id",
+    "position"
+   ]
+  ],
+  "x-ticvai-required-when": {
+   "variantId": {
+    "kind": "product"
+   },
+   "categoryId": {
+    "kind": "category"
+   },
+   "actionCode": {
+    "kind": "action"
+   }
+  },
+  "type": "object",
+  "required": [
+   "position",
+   "kind"
+  ],
+  "properties": {
+   "position": {
+    "type": "integer"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "product",
+     "category",
+     "action",
+     "spacer"
+    ]
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The catalogue variant a `product` tile sells (`catalogue.variant`). Required when `kind` is `product`."
+   },
+   "categoryId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "**The catalogue category a `category` tile opens** (`catalogue.product_category`; ADAM CR-080, CHG-TEN-001). Required when `kind` is `category`; until 14 October a category tile referenced nothing.\n"
+   },
+   "actionCode": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "holdSale",
+     "recallHeld",
+     "applyDiscount",
+     "guestLookup",
+     "scanMedia",
+     "reprintReceipt"
+    ],
+    "description": "**The till action an `action` tile runs** (ADAM CR-080, CHG-TEN-001). Required when `kind` is `action`. The values are the sell screen's own actions (POS-002 hold and recall, discount, guest lookup, media scan, receipt reprint); proposed, client to correct. Until 14 October an action tile referenced nothing.\n"
+   },
+   "label": {
+    "type": "string"
+   },
+   "colour": {
+    "type": "string",
+    "nullable": true,
+    "pattern": "^#[0-9A-Fa-f]{6}$",
+    "description": "`#rrggbb`, as the hand-written r0 table held it (`char(7)`; audit R246; CHG-TEN-001)."
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   }
+  }
  },
  "ScanAnomalyRuleList": {
   "type": "array",
@@ -5387,6 +5756,17 @@
      "pattern": "^[A-Z]{3}$"
     }
    },
+   "stepMinutes": {
+    "type": "integer",
+    "enum": [
+     15,
+     30,
+     60
+    ],
+    "nullable": true,
+    "x-ticvai-persistence-column": "integer",
+    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13)."
+   },
    "cartLeaseSeconds": {
     "type": "integer",
     "nullable": true,
@@ -6568,7 +6948,7 @@
     "minimum": 0,
     "maximum": 100,
     "readOnly": true,
-    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.**\n"
+    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.** The exact rules (whose heartbeat, which firmware is the latest, what profile currency compares, the error term until the heartbeat series lands, a workstation with no devices, the bands and the contributors) are `getWorkstationHealth`'s, the one place the score is defined (ADAM CR-244, 26 October 2026).\n"
    },
    "configurationProfileId": {
     "type": "string",

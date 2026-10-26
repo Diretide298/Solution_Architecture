@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "posTerminal",
  "offlineCapable": true,
- "generated": "2026-10-22",
+ "generated": "2026-10-26",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 32,
-  "operations": 157,
-  "contracts": 18,
+  "operations": 158,
+  "contracts": 19,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 168
+  "operationsWithNoScreen": 171
  },
  "waves": {
   "wave1": 32
@@ -68,27 +68,19 @@
    "operations": 13
   },
   {
+   "contract": "tenancy",
+   "operations": 8
+  },
+  {
    "contract": "catalogue",
-   "operations": 9
+   "operations": 8
   },
   {
    "contract": "identity",
    "operations": 8
   },
   {
-   "contract": "tenancy",
-   "operations": 8
-  },
-  {
-   "contract": "promotions",
-   "operations": 5
-  },
-  {
    "contract": "reporting",
-   "operations": 5
-  },
-  {
-   "contract": "marketing-crm",
    "operations": 5
   },
   {
@@ -96,15 +88,27 @@
    "operations": 5
   },
   {
-   "contract": "approvals",
-   "operations": 4
+   "contract": "marketing-crm",
+   "operations": 5
+  },
+  {
+   "contract": "promotions",
+   "operations": 5
   },
   {
    "contract": "seating",
    "operations": 4
   },
   {
+   "contract": "approvals",
+   "operations": 4
+  },
+  {
    "contract": "access",
+   "operations": 2
+  },
+  {
+   "contract": "queue",
    "operations": 2
   },
   {
@@ -167,7 +171,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/sell-ticket-catalogue/seatmap",
-   "operations": 8,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -239,7 +243,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/omnichannel-order-fulfilment-center",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -356,7 +360,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/home",
-   "operations": 8,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -365,7 +369,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/receipt",
-   "operations": 8,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -392,7 +396,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/queue",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -1285,6 +1289,24 @@
     "contract": "promotions",
     "verb": "PUT",
     "summary": "Rule Test, Simulation & AI Recommendation Workspace"
+   },
+   {
+    "operation": "overrideWaitingGuest",
+    "contract": "queue",
+    "verb": "POST",
+    "summary": "Admit against a failed redemption"
+   },
+   {
+    "operation": "redeemWaitingGuest",
+    "contract": "queue",
+    "verb": "POST",
+    "summary": "Admit a party at the ride"
+   },
+   {
+    "operation": "resolveCalledWaitingGuest",
+    "contract": "queue",
+    "verb": "POST",
+    "summary": "Record a called party's no-show, or return it to the queue"
    },
    {
     "operation": "listAlertRules",

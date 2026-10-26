@@ -29,9 +29,9 @@ transitions:
     reset would stop resetting
 - from: resetting
   to: active
-  operation: resetSandbox
-  trigger: operation
-  guard: Regenerated
+  trigger: job
+  guard: Regenerated. The reset job ends the reset, not resetSandbox, which refuses a sandbox already
+    `resetting` (409 sandbox-already-resetting; r10 ruling, CHG-R10ID-019)
   isReversal: true
 - from: active
   to: expired

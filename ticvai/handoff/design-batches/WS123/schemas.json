@@ -1082,6 +1082,54 @@
    }
   }
  },
+ "OrgUnit": {
+  "x-ticvai-persistence": "platform.scope",
+  "type": "object",
+  "required": [
+   "id",
+   "level",
+   "path",
+   "code",
+   "name",
+   "isActive"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "level": {
+    "$ref": "#/components/schemas/tenancy::ScopeLevel"
+   },
+   "parentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "x-ticvai-references": "platform.scope"
+   },
+   "path": {
+    "type": "string",
+    "description": "Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`.",
+    "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$"
+   },
+   "code": {
+    "type": "string",
+    "maxLength": 64
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200
+   },
+   "isActive": {
+    "type": "boolean",
+    "description": "False causes every permission query at or beneath this node to resolve to DENY.\n"
+   },
+   "childCount": {
+    "type": "integer",
+    "minimum": 0
+   }
+  }
+ },
  "Page": {
   "type": "object",
   "required": [
@@ -1136,6 +1184,7 @@
    "PRODUCT_CONFIGURE",
    "PRODUCT_APPROVE",
    "PRODUCT_PUBLISH",
+   "SALES_CHANNEL_OVERRIDE",
    "PRICE_VIEW",
    "PRICE_CONFIGURE",
    "EVENT_CONFIGURE",
@@ -1183,6 +1232,7 @@
    "ACCESS_POINT_CONFIGURE",
    "TURNSTILE_MODE_SET",
    "TICKET_LOOKUP",
+   "ENTITLEMENT_USE",
    "ACCREDITATION_VIEW",
    "ACCREDITATION_APPLY",
    "ACCREDITATION_APPROVE",

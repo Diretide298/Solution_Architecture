@@ -574,6 +574,13 @@
       },
       {
        "kind": "secondaryButton",
+       "label": "Save as preset",
+       "operation": "setCapabilityTemplate",
+       "notes": "**Saves the ticked permissions as the tenant's own preset**, listed beside the platform's in Start from presets. Needs `ROLE_MANAGE` at the tenant scope, as Create role; disabled for a venue-scoped caller, naming the tenant scope (ADAM CR-076; CHG-IDR-001). A platform preset is never overwritten: saving under a preset's id is `409 capability-template-is-preset` (ADAM CR-176; CHG-R10ID-005).",
+       "provenance": "contract identity.yaml PUT /capability-templates/{capabilityTemplateId}; ADAM CR-267, 26 October 2026 (CHG-R10WIR-003)"
+      },
+      {
+       "kind": "secondaryButton",
        "label": "Grant role",
        "operation": "updatePrincipal",
        "provenance": "contract identity.yaml PATCH /principals/{principalId}; wiring fix, 2 October 2026"
@@ -782,6 +789,28 @@
      ]
     },
     "provenance": "contract identity.yaml POST /roles"
+   },
+   {
+    "id": "formSetCapabilityTemplate",
+    "component": "modal",
+    "trigger": "Save as preset",
+    "body": "**Collects what `setCapabilityTemplate` sends before it is called.** Required: `name`, `code`, `capabilities` (the permissions ticked in Permissions by module, shown for a last look). Optional: `description`, `module` (file the preset under one module, or none for a set that spans modules). The client gives a new preset its id (the path `capabilityTemplateId`); the server files it as the tenant's own, never a platform preset. Dismissing sends nothing; the screen behind is unchanged. A `409 capability-template-is-preset` stays in the dialog and says a platform preset cannot be overwritten, offering to save under a new name (ADAM CR-176; CHG-R10ID-005).",
+    "bindsTo": "CapabilityTemplate",
+    "confirm": {
+     "label": "Save preset",
+     "operation": "setCapabilityTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "code",
+      "capabilities",
+      "description",
+      "module"
+     ]
+    },
+    "provenance": "contract identity.yaml PUT /capability-templates/{capabilityTemplateId}; ADAM CR-267, 26 October 2026 (CHG-R10WIR-003)"
    }
   ],
   "_platform": {

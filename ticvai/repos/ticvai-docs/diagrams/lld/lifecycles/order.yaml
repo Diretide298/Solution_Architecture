@@ -64,8 +64,10 @@ transitions:
   - order.lapsed
 - from: paid
   to: completed
-  trigger: job
-  guard: Entitlements issued and fulfilment recorded
+  trigger: externalEvent
+  guard: 'entitlement.issued, consumed by the orders consumer (ADAM CR-167, option A; CHG-R10ORD-010):
+    every line with a template holds quantity entitlements; lines without a template (F&B, retail) need
+    none'
   emits:
   - order.completed
 - from: pending

@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/build-white-label-map.py",
- "generated": "2026-10-22",
+ "generated": "2026-10-26",
  "note": "Derived from the configuring operations' request schemas and the screens. Never edit; rerun the tool.",
  "elements": [
   {
@@ -1795,7 +1795,7 @@
    "required": false,
    "default": "—",
    "allowed": "Home · Explore · Plan · Tickets · Map · Account · Buy tickets; Required when `kind` is `appSection`.",
-   "help": "Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it.",
+   "help": "Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module enabled, or `setNavigation` refuses it; no other value needs a module (ADAM CR-230, option A, decided 25 October 2026, which settled that only …",
    "effect": "",
    "configuredOn": [
     {
@@ -1956,8 +1956,8 @@
    "mask": "",
    "required": true,
    "default": "—",
-   "allowed": "At most five may be visible in bottom navigation; the rest overflow.",
-   "help": "At most five may be visible in bottom navigation; the rest overflow.",
+   "allowed": "At most five may be visible when `kind` is `bottomNavigation`; the rest overflow.",
+   "help": "At most five may be visible when `kind` is `bottomNavigation`; the rest overflow.",
    "effect": "",
    "configuredOn": [
     {
@@ -6453,7 +6453,7 @@
    "required": false,
    "default": "—",
    "allowed": "Home · Explore · Plan · Tickets · Map · Account · Buy tickets; Required when `kind` is `appSection`.",
-   "help": "Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it.",
+   "help": "Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module enabled, or `setNavigation` refuses it; no other value needs a module (ADAM CR-230, option A, decided 25 October 2026, which settled that only …",
    "effect": "",
    "configuredOn": [
     {
@@ -6914,7 +6914,7 @@
    "required": false,
    "default": "—",
    "allowed": "Home · Explore · Plan · Tickets · Map · Account · Buy tickets; Required when `kind` is `appSection`.",
-   "help": "Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it.",
+   "help": "Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module enabled, or `setNavigation` refuses it; no other value needs a module (ADAM CR-230, option A, decided 25 October 2026, which settled that only …",
    "effect": "",
    "configuredOn": [
     {
@@ -8257,8 +8257,10 @@
    "effect": "",
    "configuredOn": [],
    "reach": "faqs",
-   "reachesText": "the FAQ screens",
-   "specific": [],
+   "reachesText": "WEB-029",
+   "specific": [
+    "WEB-029"
+   ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
    "venueOverride": false
@@ -9053,6 +9055,38 @@
    "default": "Dns txt",
    "allowed": "Dns txt · Cname · Http file",
    "help": "",
+   "effect": "",
+   "configuredOn": [
+    {
+     "screen": "CMS-017",
+     "name": "Domain & Certificate",
+     "op": "claimCustomDomain"
+    },
+    {
+     "screen": "ADM-017",
+     "name": "Domain & Certificate Management",
+     "op": "claimCustomDomain"
+    }
+   ],
+   "reach": "web",
+   "reachesText": "every website screen",
+   "specific": [],
+   "channel": "",
+   "change": "on publish (CMS-014): web at once, the app on its next launch",
+   "venueOverride": false
+  },
+  {
+   "id": "domains.routing",
+   "part": "domains",
+   "partLabel": "Custom domain",
+   "path": "routing",
+   "label": "Routing",
+   "control": "segmented control",
+   "mask": "",
+   "required": false,
+   "default": "Cname",
+   "allowed": "Cname · Delegated subdomain · Apex",
+   "help": "How the hostname reaches TICVAI (`CustomDomain.routing`); `apex` is the only way to claim a bare domain (ADAM CR-105).",
    "effect": "",
    "configuredOn": [
     {
@@ -11649,7 +11683,8 @@
    "elements": [
     "domains.hostname",
     "domains.kind",
-    "domains.verificationMethod"
+    "domains.verificationMethod",
+    "domains.routing"
    ]
   },
   {
@@ -12687,6 +12722,7 @@
   },
   "WEB-029": {
    "specific": [
+    "faqs.categories[].entries[].isPublished",
     "maintenance.isInMaintenance",
     "maintenance.message",
     "maintenance.expectedBackAt",
@@ -14069,12 +14105,14 @@
   "CMS-017": [
    "domains.hostname",
    "domains.kind",
-   "domains.verificationMethod"
+   "domains.verificationMethod",
+   "domains.routing"
   ],
   "ADM-017": [
    "domains.hostname",
    "domains.kind",
-   "domains.verificationMethod"
+   "domains.verificationMethod",
+   "domains.routing"
   ],
   "CMS-013": [
    "seo.entityKind",
@@ -14161,6 +14199,7 @@
   "domains.hostname",
   "domains.kind",
   "domains.verificationMethod",
+  "domains.routing",
   "seo.entityKind",
   "seo.entityId",
   "seo.locale",
@@ -14250,7 +14289,7 @@
   },
   {
    "label": "Custom domain (website)",
-   "count": 3,
+   "count": 4,
    "screens": [
     "CMS-017",
     "ADM-017"

@@ -922,6 +922,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-313`
 - Workshop pack: Ticket Upgrade, Exchange & Conversion_Reference.pdf board 1
 - Flow F174 *Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command …*, step 10: Works in Pro-Rata, Residual Value & Entitlement Credit Configuration → Handle complex upgrades where part of the original product has already been consumed.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

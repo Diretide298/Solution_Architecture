@@ -1176,6 +1176,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS169 Ticket Resale Marketplace Board 2.dc.html#adm-294`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 2
 - Flow F172 *Ticket Resale Marketplace board 2: Resale Operations Command Center*, step 12: Works in Seller Settlement & Payout Management → Manage the financial amount owed to sellers following successful resale.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1329,6 +1330,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS169 Ticket Resale Marketplace Board 2.dc.html#adm-295`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 2
 - Flow F172 *Ticket Resale Marketplace board 2: Resale Operations Command Center*, step 14: Works in Refunds, Disputes & Resale Exceptions → Handle exceptional scenarios that occur after a resale transaction.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

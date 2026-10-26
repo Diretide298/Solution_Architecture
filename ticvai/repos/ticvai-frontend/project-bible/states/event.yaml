@@ -1,0 +1,111 @@
+# Event lifecycle — state model
+# Contract: catalogue.EventLifecycleState (Event.lifecycleState)
+# Checked by tools/check-states.py.
+# ADAM CR-109, option 2, accepted 15 October 2026 (Chinmay); CHG-R10CAT-009.
+
+entity: Event lifecycle
+contract: catalogue
+enum: EventLifecycleState
+enumKind: named
+enumSchema: EventLifecycleState
+owner: catalogue
+initial:
+- draft
+terminal:
+- archived
+transitions:
+- from: draft
+  to: planned
+  operation: setEventLifecycleState
+  trigger: operation
+  guard: 'Planning starts. No precondition'
+  emits:
+  - event.lifecycleChanged
+- from: planned
+  to: draft
+  operation: setEventLifecycleState
+  trigger: operation
+  guard: 'Back to draft. No precondition'
+  isReversal: true
+  emits:
+  - event.lifecycleChanged
+- from: planned
+  to: onSale
+  operation: setEventLifecycleState
+  trigger: operation
+  guard: '**A price, a capacity and a schedule**, each against named columns (ADAM CR-109): a schedule is at least
+    one `catalogue.performance` with `event_id` the event and `status` not `cancelled`; a capacity is at least one
+    `catalogue.channel_capacity` row whose `performance_id` is such a performance; a price is at least one
+    `catalogue.price` row for a `catalogue.variant` of a `catalogue.product` whose `event_id` is the event. Each one
+    missing is listed in the `409 event-preconditions-not-met`'
+  emits:
+  - event.lifecycleChanged
+- from: onSale
+  to: planned
+  operation: setEventLifecycleState
+  trigger: operation
+  guard: 'Taken off sale without cancelling; what was sold stays sold. No precondition'
+  isReversal: true
+  emits:
+  - event.lifecycleChanged
+- from: onSale
+  to: live
+  operation: setEventLifecycleState
+  trigger: operation
+  guard: '**A resource plan** (ADAM CR-109): the event''s `catalogue.event_resource_plan` row has `readiness`
+    `ready`; no row, or any other readiness, is listed in the `409 event-preconditions-not-met`'
+  emits:
+  - event.lifecycleChanged
+- from: live
+  to: closed
+  operation: setEventLifecycleState
+  trigger: operation
+  guard: 'The event is over. No precondition'
+  emits:
+  - event.lifecycleChanged
+- from: closed
+  to: archived
+  operation: setEventLifecycleState
+  trigger: operation
+  guard: 'Filed away. No precondition'
+  emits:
+  - event.lifecycleChanged
+- from: draft
+  to: cancelled
+  operation: setEventLifecycleState
+  trigger: operation
+  guard: '**No performance of the event has sales** (ADAM CR-109): no `catalogue.channel_capacity` row of a
+    performance of the event that is not `cancelled` has `sold` above 0; otherwise `409 event-has-sales`. Cancelling
+    the event cancels none of its performances: each is cancelled with its own treatment through
+    `cancelPerformance`'
+  emits:
+  - event.lifecycleChanged
+- from: planned
+  to: cancelled
+  operation: setEventLifecycleState
+  trigger: operation
+  guard: 'No performance of the event has sales, as from `draft`; otherwise `409 event-has-sales`'
+  emits:
+  - event.lifecycleChanged
+- from: onSale
+  to: cancelled
+  operation: setEventLifecycleState
+  trigger: operation
+  guard: 'No performance of the event has sales, as from `draft`; otherwise `409 event-has-sales`. The approved
+    screen has no treatment field, so a sold performance is cancelled first, through `cancelPerformance`'
+  emits:
+  - event.lifecycleChanged
+- from: cancelled
+  to: archived
+  operation: setEventLifecycleState
+  trigger: operation
+  guard: 'Filed away. No precondition'
+  emits:
+  - event.lifecycleChanged
+notes: '**Every move is `setEventLifecycleState`, now or at `effectiveFrom`** (ADAM CR-109, option 2, accepted 15
+  October 2026; CHG-R10CAT-009). A move asked with an `effectiveFrom` in the future is checked against this model
+  when asked, kept on the event (`scheduledLifecycleState`, `scheduledLifecycleAt`, `scheduledLifecycleReason`), and
+  applied by the event lifecycle job in the workers host at `effectiveFrom`, which checks the guard again and, if it
+  no longer holds, clears the scheduled move and writes nothing else. A move not in this model is `409
+  invalid-event-transition`. `createEvent` and `cloneEvent` create an event in `draft`. Routing a move above a
+  configured impact through approvals waits for its threshold and is not in this model yet.'

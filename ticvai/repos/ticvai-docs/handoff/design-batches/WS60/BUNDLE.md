@@ -1306,6 +1306,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS166 Ticket Media   Credential Management Board 2.dc.html#bo-349`
 - Workshop pack: Ticket_Media___Credential_Management_Reference.pdf board 2
 - Flow F169 *Ticket Media Credential Management board 2: Media Design Studio Command Center*, step 10: Works in RFID, NFC, Card & Wristband Media Designer → Configure both the visual and technical profile of physical electronic credentials. This is important because RFID/NFC media are not merely artwork.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

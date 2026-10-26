@@ -1178,7 +1178,7 @@ screens:
     trigger: onAction
   - operationId: listProducts
     contract: catalogue
-    purpose: 'The products to choose from for the ticket preview (check-screen-value-sources, CHG-R10UI-015)'
+    purpose: The products to choose from for the ticket preview (check-screen-value-sources, CHG-R10UI-015)
     trigger: onLoad
   entryState:
     params:
@@ -10983,8 +10983,8 @@ screens:
     provenance: board reading, 19 September 2026
   - operationId: listOrgUnits
     contract: tenancy
-    purpose: 'The venues to tag an asset with (scope nodes at level venue) (check-screen-value-sources,
-      CHG-R10UI-015)'
+    purpose: The venues to tag an asset with (scope nodes at level venue) (check-screen-value-sources,
+      CHG-R10UI-015)
     trigger: onLoad
   wireframe:
     status: notStarted

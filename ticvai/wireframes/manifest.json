@@ -202,6 +202,7 @@
  "workshopBoardsNote": "**One board per workshop board, written by `tools/derive-pack-boards.py`.** The same screens the platform boards render, regrouped into the 59 boards of ten the client specified — a platform is what a team owns, and a board is what the workshop wrote. Regenerated from `screens/P*.yaml`, so never hand-edited.",
  "appBoards": [
   "APP guest.dc.html",
+  "APP partner-web.dc.html",
   "APP ticvai-control.dc.html",
   "APP venue-management.dc.html",
   "APP venue-pos.dc.html",
@@ -213,6 +214,7 @@
  "note": "Boards this package generates. **Anything in `wireframes/` not listed here and not a client pack is a leftover** — most often a board renamed on one side of a dump, since a copy never deletes.",
  "generated": [
   "APP guest.dc.html",
+  "APP partner-web.dc.html",
   "APP ticvai-control.dc.html",
   "APP venue-management.dc.html",
   "APP venue-pos.dc.html",

@@ -14,7 +14,9 @@ developer had to invent the column, and nothing in the package compared a parame
                      that its lineage neither reads nor writes: `scheduleMenuPublish` creates a `fnb.menu_schedule`
                      its lineage only read, `settleDeposit` named `orders.deposit` and listed it nowhere. A table
                      named only to explain the operation (a contrast, the table another module's operation writes)
-                     is listed in `x-ticvai-names-for-context` (CHG-STO-020), held to the text and the lineage
+                     is listed in `x-ticvai-names-for-context` (CHG-STO-020), held to the text and the lineage. A
+                     table read through its owner's declared query (`x-ticvai-read-via`, the lineage's `readVia`, by
+                     either route) counts as listed (CHG-R10GFC-003)
   P-DRAFTED-UNMAPPED a drafted workspace write whose request schema still says no table stores its fields while its
                      lineage writes one: `setCodeDistributionManager`, `approveMatrixMultiLevel` and
                      `setPdfPrintablePos` wrote tables with no field mapping, and the developer had to invent one
@@ -72,7 +74,16 @@ def main() -> int:
         aka.setdefault(r["to"], set()).add(str(r["from"]).split(".", 1)[-1])
     for r in declared("COLUMN_RENAMES"):
         cols.setdefault(r["table"], set()).add(r["from"])
-    for stem, _rel, doc in g.contracts():
+    docs = g.contracts()
+    # **A table read through its owner's declared query is read** (r10 gate 2, 26 October 2026, CHG-R10GFC-003). Since
+    # CHG-R10GEN-001 a named table of another module is reached by `x-ticvai-read-via` to the owner's query, and the
+    # lineage records it as `readVia`; only the in-process ones were counted (`readsInProcess`, CHG-R9INT-001), so
+    # cancelPerformance, which counts access.entitlement through access#entitlementRecords over the service route, was
+    # told its lineage did not list the table it is routed to. The query's table is counted for P-NAMED-TABLE only:
+    # a parameter is still matched against the tables the operation itself reads or writes.
+    query_table = {f"{st}#{n}": str(q.get("table") or "") for st, _r, d in docs
+                   for n, q in ((d or {}).get("x-ticvai-queries") or {}).items() if isinstance(q, dict)}
+    for stem, _rel, doc in docs:
         for path, item in ((doc or {}).get("paths") or {}).items():
             for verb, op in (item or {}).items():
                 if verb not in g.VERBS or not isinstance(op, dict) or not op.get("operationId"):
@@ -100,8 +111,10 @@ def main() -> int:
                         guard.add("P-NAMED-TABLE", f"{oid}.{t}:context",
                                   f"{stem}.{oid} declares {t} named for context, and "
                                   + ("its lineage uses it" if t in tables else "its description does not name it"))
+                via = {query_table.get(str(r.get("query") or ""), "") for r in e.get("readVia") or []
+                       if isinstance(r, dict)}
                 for t in sorted(named - context):
-                    if t in cols and t not in tables:
+                    if t in cols and t not in tables and t not in via:
                         guard.add("P-NAMED-TABLE", f"{oid}.{t}",
                                   f"{stem}.{oid}'s description names {t} and its lineage does not list it")
                 body = ((((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {})

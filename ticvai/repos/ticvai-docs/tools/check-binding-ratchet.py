@@ -44,6 +44,13 @@ each counted screen's block (`blocks`), and a screen that has moved since is com
 on a moved screen still rises where it was counted, and nothing leaves the comparison. A screen the baseline did not
 count keeps the block it has now. A baseline recorded before this has no `blocks`; the run says so and compares as
 before (the plan in the baseline's commit is not the one it was counted with: CHG-GTB-013).
+
+**And under the app it had then** (CHG-R10UI-010, r10, ADAM CR-153). A platform that leaves a shared app moves its
+screens' counts from one app to another with nothing added: P10 left TICVAI Control for its own app, partner-web,
+and ticvai-control B fell 357 -> 225 while partner-web B rose 0 -> 132, the same 132 controls. So `--update-baseline`
+also records each counted screen's app (`apps`), and a screen whose platform has changed app since is compared under
+the app it was counted in. A baseline recorded before this has no `apps`: each screen's app is read from the
+platform files at the baseline's own commit (`git show`), and the run says when it cannot.
 """
 from __future__ import annotations
 
@@ -267,6 +274,45 @@ def follow(fs: list[tuple], old: dict) -> tuple[list[tuple], collections.Counter
     return out, moved
 
 
+def baseline_apps(base: dict) -> dict:
+    """{screen id: the app it was counted under} when the baseline was recorded (CHG-R10UI-010): the baseline's own
+    `apps`, or else read from screens/P*.yaml at the baseline's commit. {} when neither can be read."""
+    if base.get("apps"):
+        return dict(base["apps"])
+    commit = str(base.get("commit") or "").strip()
+    if not commit:
+        return {}
+    out: dict = {}
+    import re
+    for f in sorted((ROOT / "screens").glob("P*.yaml")):
+        rel = f.relative_to(ROOT.parent).as_posix()
+        r = subprocess.run(["git", "show", f"{commit}:{rel}"], cwd=ROOT, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace")
+        if r.returncode != 0:
+            continue
+        text = r.stdout
+        m = re.search(r"^  targetApp:\s*\r?\n    app:\s*['\"]?([\w-]+)", text, re.M)
+        app = m.group(1) if m else None
+        if not app:
+            m = re.search(r"^  code:\s*['\"]?(P\d\d)", text, re.M)
+            app = m.group(1) if m else None
+        for sid in re.findall(r"^- id:\s*['\"]?([A-Z]{2,5}-\d{3,4})", text, re.M):
+            out[sid] = app
+    return out
+
+
+def follow_apps(fs: list[tuple], old: dict) -> tuple[list[tuple], collections.Counter]:
+    """Each finding under the app its screen had when the baseline was recorded; the moves it followed, counted."""
+    out, moved = [], collections.Counter()
+    for sid, app, blk, kind, item in fs:
+        oa = old.get(sid)
+        if oa and oa != app:
+            moved[(oa, app)] += 1
+            app = oa
+        out.append((sid, app, blk, kind, item))
+    return out, moved
+
+
 def compare(base: dict, cur: dict) -> tuple[list[tuple], list[tuple]]:
     """([(key, was, now)] risen, [(key, was, now)] fallen)."""
     up, down = [], []
@@ -364,7 +410,9 @@ def main() -> int:
             "block_source": meta["block_source"],
             "counts": cur,
             # each counted screen's block, so a screen the plan moves later is compared where it was (CHG-GT1-006)
-            "blocks": dict(sorted({sid: blk for sid, _app, blk, _k, _i in kept}.items()))},
+            "blocks": dict(sorted({sid: blk for sid, _app, blk, _k, _i in kept}.items())),
+            # and its app, so a platform that changes app is compared where it was counted (CHG-R10UI-010)
+            "apps": dict(sorted({sid: app for sid, app, _blk, _k, _i in kept}.items()))},
             indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
         print(f"baseline written: {BASELINE.relative_to(ROOT).as_posix()} ({len(cur)} counts)")
         return 0
@@ -393,6 +441,16 @@ def main() -> int:
     else:
         print("  note: the baseline records no screen blocks (recorded before CHG-GT1-006), so a screen the plan moved "
               "reads as a rise in its new block; re-record it with --update-baseline")
+    old_apps = baseline_apps(base)
+    if old_apps:
+        kept, app_moves = follow_apps(kept, old_apps)
+        cur = counts(kept)
+        if app_moves:
+            print("  note: findings on screens whose platform changed app since the baseline are compared under the app "
+                  "they were counted in: " + ", ".join(f"{oa} -> {na} ({n})" for (oa, na), n in sorted(app_moves.items())))
+    else:
+        print("  note: the baseline's apps could not be read (no `apps`, and its commit is not in this repository), so "
+              "a platform that changed app reads as a rise in its new app")
     up, down = compare(base.get("counts") or {}, cur)
     by_key = collections.defaultdict(collections.Counter)
     for sid, app, blk, kind, _item in kept:

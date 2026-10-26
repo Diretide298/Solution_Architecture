@@ -980,7 +980,7 @@
        "label": "Default fallback asset",
        "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
        "notes": "Picked from the library (e.g. DAM-IMG-009211, \"Default Dubai Park Hero\").",
-       "bindsTo": "MediaAsset.id",
+       "bindsTo": "MediaDistributionChannel.fallbackAssetId",
        "operation": "setMediaDistributionChannels"
       }
      ]

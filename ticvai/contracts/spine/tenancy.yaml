@@ -592,7 +592,9 @@ paths:
         - "P09 ADM-006 Tenant Hierarchy Explorer"
         - "P09 ADM-412 Payment Method & Settlement Setup"
         - "P09 ADM-421 Venue & Operational Structure Creation"
+        - "P09 ADM-540 AI Decision Explorer & Search"
         - "P13 CMS-016 Site Settings"
+        - "P13 CMS-066 Tags, Keywords & Classification"
       description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -1784,6 +1786,7 @@ paths:
     get:
       operationId: getRegionSettings
       x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
         - "P08 BO-1064 Naming, Numbering & Localization"
         - "P08 BO-1065 Currency, Timezone & Channels"
         - "P09 ADM-037 AI Provider & Credentials"
@@ -2302,6 +2305,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-016 Till Configuration"
         - "P04 POS-025 Till Home"
+        - "P08 BO-036 Device Registry"
         - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P08 BO-116 Merchandising & Product Presentation"
         - "P08 BO-122 POS Experience Dashboard"
@@ -2495,7 +2499,6 @@ paths:
         - "P04 POS-016 Till Configuration"
         - "P04 POS-025 Till Home"
         - "P06 EMP-043 Device settings"
-        - "P08 ADM-580 Payment Terminal & Device Inventory"
         - "P08 BO-036 Device Registry"
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-405 Reader Directory"

@@ -108,6 +108,7 @@ x-ticvai-permission-modules:
       - PRODUCT_CONFIGURE
       - PRODUCT_APPROVE
       - PRODUCT_PUBLISH
+      - SALES_CHANNEL_OVERRIDE
       - PRICE_VIEW
       - PRICE_CONFIGURE
       - EVENT_CONFIGURE
@@ -191,6 +192,7 @@ x-ticvai-permission-modules:
       - ACCESS_POINT_CONFIGURE
       - TURNSTILE_MODE_SET
       - TICKET_LOOKUP
+      - ENTITLEMENT_USE
       - ACCESS_AI_PUBLISH
       - BIOMETRIC_IMAGE_VIEW
       - ACCESS_DIRECTION_SET
@@ -316,6 +318,16 @@ x-ticvai-permission-modules:
       - PLATFORM_MIGRATION_VIEW
       - PLATFORM_MIGRATION_APPLY
       - PLATFORM_TENANT_ACCESS
+x-ticvai-share-only:
+  description: >
+    **Permissions a guest holds only through a share, never on a role** (the lead, 25 October 2026, r10 round 3,
+    ADAM CR-209; CHG-R10ID-021). Each sits in a module group because the vocabulary rule puts every value in exactly
+    one, but the role builder leaves it out: `listModuleCapabilities` shows it on no checklist, no preset copies it,
+    and `createRole`, `setRolePermissions`, `createDelegatedAccess` and `createPrincipal` refuse it with 400
+    `validation` (a staff grant that names it is never valid). Only `shareEntitlement` writes it, on a guest's
+    `identity.delegated_access` row of kind `sharedEntitlement`.
+  permissions:
+  - ENTITLEMENT_USE
 x-ticvai-module-ai-publish:
   description: >
     **Which permission publishes each module's AI** (Chinmay, 2 October, workbook Q3 and Q7: "the permission holder
@@ -592,6 +604,7 @@ components:
         # **Approving and publishing are different acts — decided 28 September, audit R091 (2).**
         # A product manager approves; an operator publishes. Both rode `PRODUCT_CONFIGURE`, so the
         # person who wrote a product could also approve and publish it.
+        - SALES_CHANNEL_OVERRIDE      # take a sales channel live past readiness warnings, with a reason (ADAM CR-211)
         - PRICE_VIEW
         - PRICE_CONFIGURE
         - EVENT_CONFIGURE
@@ -661,6 +674,13 @@ components:
         - ACCESS_POINT_CONFIGURE
         - TURNSTILE_MODE_SET          # the podium: operating mode, and free rotation or closed within it (R221)
         - TICKET_LOOKUP               # read-only validity check, no admission
+        - ENTITLEMENT_USE             # present an entitlement shared with you; held only through a share grant
+        # **Held through a share, not ticked on a role** (decided 25 October 2026, Chinmay, ADAM CR-209 option A;
+        # CHG-R10ID-004). `shareEntitlement` writes it on an `identity.delegated_access` row whose
+        # `over_object_ref` is `entitlement:<entitlementId>`; it lets the recipient present that one entitlement
+        # and is checked only against that row. **It stays off every staff role checklist** (the lead, 25 October
+        # 2026, r10 round 3; CHG-R10ID-021): it is listed in `x-ticvai-share-only` below, so no role, preset, staff
+        # grant or role checklist carries it.
 
         # --- Accreditation ----------------------------------------------------
         - ACCREDITATION_VIEW

@@ -1940,6 +1940,7 @@ paths:
       operationId: listInspections
       x-ticvai-consumed-by:
         - "P06 EMP-048 Opening checklist"
+        - "P08 BO-069 Asset Register"
         - "P08 BO-911 Inspection, Condition & Compliance Management"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica

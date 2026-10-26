@@ -168,6 +168,7 @@ SETUP-SEED): `gameCredit` (category `ride`, `monetary` false) and `gameBonusCred
 **`GET /gift-cards/{cardCode}`**: Check a gift card balance
 
 **A gift card is a bearer instrument, so any signed-in guest may check a card by its code** (R8 blocker ORDERS-MONEY-C27, the lead's answer of 20 October 2026, replacing the own-wallet-only rule of CHG-GCF-002; design input DI-533 "check balance by code (the 16 characters on the card)"). A guest caller needs no permission and gets the card's balance, status and expiry, with `subjectId` left out unless it is the caller's own. An unknown code is 404, exactly as a card the guest may not see would have been; the code is the secret (16 characters from a cryptographic generator) and the guest's requests are held to the existing `429` limits, so codes cannot be guessed by trying. `WALLET_VIEW` is what a staff caller must hold (ADR-0025).
+**Its currency** (CHG-R10ORD-019; the lead's ruling of 25 October 2026 on check-money-currency): the Money this operation answers or accepts is in the currency of the venue it acts at, the caller's working venue, read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.
 
 |  |  |
 |---|---|

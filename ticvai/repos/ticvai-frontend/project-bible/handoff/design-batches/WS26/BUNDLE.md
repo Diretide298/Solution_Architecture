@@ -575,7 +575,7 @@ Also apply: 7 for all of P12, 29 for every app (section *Design inputs from the 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the intelligent routing skills are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or … |
 
 #### Consistency with other screens
 

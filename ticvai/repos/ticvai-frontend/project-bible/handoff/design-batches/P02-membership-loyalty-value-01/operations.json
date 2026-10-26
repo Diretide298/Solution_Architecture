@@ -160,6 +160,11 @@
   "scopeLevel": "tenant",
   "parameters": [
    {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": "from",
     "in": "query",
     "required": null
@@ -294,6 +299,11 @@
     "name": "venueId",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -333,6 +343,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
    {
     "name": null,
     "in": null,
@@ -401,6 +416,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -440,6 +460,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -458,6 +483,11 @@
    {
     "name": "programmeId",
     "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
     "required": null
    },
    {

@@ -424,6 +424,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - … and 1 more flow steps (`flows/`)
 - Flow F187 branch at step 1 (expected): when Nothing has been set up on Game & Ride Operations Dashboard yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F187 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1411,6 +1412,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS58 Game and Ride Board 1.dc.html#bo-399`
 - Workshop pack: Game_and_Ride_Module.pdf board 1
 - Flow F187 *Game and Ride board 1: Game & Ride Operations Dashboard*, step 10: Works in Wallet & Credit Acceptance Mapping → Define at attraction level which payment/value mechanisms are accepted. The source specifically requires digital-wallet credits to support pay-as-you-go for redemption games, skill games, rides and …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1959,6 +1961,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS58 Game and Ride Board 1.dc.html#bo-402`
 - Workshop pack: Game_and_Ride_Module.pdf board 1
 - Flow F187 *Game and Ride board 1: Game & Ride Operations Dashboard*, step 16: Works in Configuration Health & Validation → Prevent incomplete or conflicting game/ride configurations from becoming operational.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

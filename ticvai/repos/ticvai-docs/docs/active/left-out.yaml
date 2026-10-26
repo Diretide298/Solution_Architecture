@@ -88,3 +88,64 @@ items:
   owner: Chinmay, to the client
   added: '2026-10-21'
   change: CHG-R9UI-005
+# ---------------------------------------------------------------- r10, screens lane
+- id: LO-R10UI-001
+  kind: deferred
+  platform: P08
+  screens: [BO-1144]
+  what: 'The peer-to-peer transfer rules of the wallet pack (Wallet_Configuration_Backend_Structure_v1.0.pdf, board 7,
+    page 76) that WalletTransferRules has no property for: eligible wallet and customer types, supported currencies,
+    minimum per transfer, monthly cap, transfers per day, the transfer fee, sender authentication, recipient
+    confirmation, transfer expiry, cross-tenant, cross-venue and cross-currency transfers, and the recipient lookup
+    methods (wallet id, customer id, membership id, contact, API). BO-1144 is built without them.'
+  source: 'ADAM CR-193 (Surendra Loke, #36207), settled by Chinmay on 25 October 2026, option C; CHG-R10UI-003'
+  reason: 'money-transmission rules (fees, monthly caps, cross-currency) need a client and compliance decision; they
+    are not invented in a form'
+  target: 'a separate change request once the client and compliance decide (not scheduled)'
+  owner: Chinmay, to the client
+  added: '2026-10-25'
+  change: CHG-R10UI-003
+- id: LO-R10ORD-001
+  kind: deferred
+  platform: P04
+  screens: [POS-010]
+  what: 'The product kinds locker, parking and experience. MediaEntitlements.entitlements[].kind maps the product''s
+    kind onto eight values, and catalogue ProductKind has no locker, parking or experience, so an entitlement of such a
+    product is answered without kind (it is optional), and POS-010 cannot tell a second locker from the kind alone.'
+  source: 'ADAM CR-226 (Pranay Shinde, #30686), settled by Chinmay on 25 October 2026, option A; the lead''s answer to
+    the r10 lanes'' question 20; CHG-R10ORD-024'
+  reason: 'adding a value to ProductKind is a response-enum change in every contract that returns a product (a breaking
+    change under ADR-0026) and needs the products that carry the kinds; not made inside a media read'
+  target: 'a catalogue change that adds the kinds to ProductKind (not scheduled)'
+  owner: Chinmay
+  added: '2026-10-25'
+  change: CHG-R10ORD-024
+- id: LO-R10UI-002
+  kind: deferred
+  platform: P08
+  screens: [BO-305]
+  what: 'The Order Detail & Transaction Workspace values no read answers: reservation status, fulfilment status,
+    reservations, invoices, credentials, membership, waivers and related orders (tiles), and each line''s product name,
+    event, person type, fee and ticket status (columns). BO-305 is built on getOrder and getOrderStatement without them.'
+  source: 'check-screen-value-sources (CHG-R10GEN-003); the lead''s answer of 25 October 2026 (r10 round 3): drop the
+    fields with no source and list them here; CHG-R10UI-017'
+  reason: the workspace view the pack drew has no read; each value needs its owner's read (reservations, invoices,
+    waivers, memberships) aggregated for one order
+  target: 'Block B: an order-workspace read that gathers them, decided with the order 360 screens'
+  owner: Chinmay
+  added: '2026-10-25'
+  change: CHG-R10UI-017
+- id: LO-R10UI-003
+  kind: deferred
+  platform: P08
+  screens: [BO-355]
+  what: 'The Virtual Ticket & Credential 360 values no read answers: participant, event, performance and seat (tiles),
+    the five media roles (primary, secondary, fallback, temporary, revoked historical media), and the binding id,
+    provider, issued, delivered, last update and device reference (columns). BO-355 is built on getEntitlement,
+    getEntitlementCredential and getEntitlementHistory without them.'
+  source: 'check-screen-value-sources (CHG-R10GEN-003); the lead''s answer of 25 October 2026 (r10 round 3); CHG-R10UI-017'
+  reason: no read answers a ticket's media bindings or its performance and seat; they need a credential-binding read
+  target: 'Block B: a ticket media-binding read, decided with the ticket 360 screens'
+  owner: Chinmay
+  added: '2026-10-25'
+  change: CHG-R10UI-017

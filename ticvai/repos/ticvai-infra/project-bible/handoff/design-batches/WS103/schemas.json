@@ -409,7 +409,7 @@
     "type": "array",
     "readOnly": true,
     "x-ticvai-derived": "onWrite",
-    "description": "Navigation items and homepage sections pointing at this module. Maintained by `setNavigation` and `setHomepageLayout` in the same transaction as the links they write.",
+    "description": "Navigation items and homepage sections pointing at this module. Maintained by `setNavigation` and `setHomepageLayout` in the same transaction as the links they write. Each entry is `navigationItem:<itemId>` (written by `setNavigation`) or `homepageSection:<sectionId>` (written by `setHomepageLayout`); each operation replaces only its own entries (ADAM CR-230; CHG-R10TEN-003).",
     "items": {
      "type": "string"
     }
@@ -424,6 +424,13 @@
    "moduleCode"
   ],
   "properties": {
+   "currencyCode": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "pattern": "^[A-Z]{3}$",
+    "description": "**The ISO 4217 currency of the module's `price`** (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change writes a new row or version and never re-denominates one already sold."
+   },
    "moduleCode": {
     "type": "string",
     "description": "**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches."
@@ -801,6 +808,7 @@
    "PRODUCT_CONFIGURE",
    "PRODUCT_APPROVE",
    "PRODUCT_PUBLISH",
+   "SALES_CHANNEL_OVERRIDE",
    "PRICE_VIEW",
    "PRICE_CONFIGURE",
    "EVENT_CONFIGURE",
@@ -848,6 +856,7 @@
    "ACCESS_POINT_CONFIGURE",
    "TURNSTILE_MODE_SET",
    "TICKET_LOOKUP",
+   "ENTITLEMENT_USE",
    "ACCREDITATION_VIEW",
    "ACCREDITATION_APPLY",
    "ACCREDITATION_APPROVE",
@@ -1880,6 +1889,17 @@
      "type": "string",
      "pattern": "^[A-Z]{3}$"
     }
+   },
+   "stepMinutes": {
+    "type": "integer",
+    "enum": [
+     15,
+     30,
+     60
+    ],
+    "nullable": true,
+    "x-ticvai-persistence-column": "integer",
+    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13)."
    },
    "cartLeaseSeconds": {
     "type": "integer",

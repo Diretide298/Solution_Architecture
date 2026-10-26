@@ -1,6 +1,6 @@
 # WS45 — Promotions   Bundles Management board 1
 
-**10 screens · 21 operations · 26 schemas · 4 permissions**
+**10 screens · 21 operations · 27 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

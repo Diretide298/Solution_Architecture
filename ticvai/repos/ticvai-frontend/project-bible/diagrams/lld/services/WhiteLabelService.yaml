@@ -1,5 +1,5 @@
 id: LLD-WhiteLabelService
-title: WhiteLabelService — 110 operations, 35 tables
+title: WhiteLabelService — 110 operations, 36 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
@@ -17,7 +17,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: whitelabel
-  tables: 35
+  tables: 36
   stores:
   - postgres
   largestTable: whitelabel.tenant_config
@@ -48,7 +48,7 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: createBanner
     verb: POST
     path: /tenant-config/banners
@@ -104,7 +104,7 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: createPromoBlock
     verb: POST
     path: /tenant-config/promo-blocks
@@ -176,7 +176,7 @@ operationsByContract:
     permission: TENANT_PUBLISH
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: getAppBuild
     verb: GET
     path: /tenant-config/app-builds/{appBuildId}
@@ -607,8 +607,8 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 1
-    writes: 2
+    reads: 0
+    writes: 1
   - operation: regenerateDomainToken
     verb: POST
     path: /tenant-domains/{domainId}/token
@@ -616,7 +616,7 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: relinquishCustomDomain
     verb: DELETE
     path: /tenant-domains/{domainId}
@@ -624,7 +624,7 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: requestAppBuild
     verb: POST
     path: /tenant-config/app-builds
@@ -632,7 +632,7 @@ operationsByContract:
     permission: TENANT_PUBLISH
     offline: false
     reads: 4
-    writes: 2
+    writes: 3
   - operation: restoreConfigVersion
     verb: POST
     path: /tenant-config/versions/{version}/restore
@@ -743,7 +743,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 8
     writes: 2
   - operation: setMaintenanceMode
     verb: PUT
@@ -784,7 +784,7 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: setPublishReviewPolicy
     verb: PUT
     path: /publish-review-policy
@@ -904,7 +904,7 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
 tables:
 - store: cache:idempotency
   kind: cache
@@ -940,7 +940,6 @@ tables:
   - publishGuidedChoice
   - publishKioskConfigs
   - publishTenantConfig
-  - recordStorefrontSessionEvents
   - regenerateDomainToken
   - relinquishCustomDomain
   - requestAppBuild
@@ -1001,7 +1000,6 @@ tables:
   - publishGuidedChoice
   - publishKioskConfigs
   - publishTenantConfig
-  - recordStorefrontSessionEvents
   - regenerateDomainToken
   - relinquishCustomDomain
   - requestAppBuild
@@ -1275,7 +1273,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.custom_domain
-  columns: 17
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -1436,7 +1434,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.site_package
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -1463,6 +1461,12 @@ tables:
   writtenBy:
   - white-label
   foreignWriters: null
+- table: whitelabel.ui_string_pack
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 readsFrom:
 - service: CatalogueService
   operations: 3
@@ -1476,13 +1480,22 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 4
+  operations: 12
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
     each inserts or updates, or which operation or event TenancyService published for it — check each
     against ADR-0028.'
   writes:
+  - operation: claimCustomDomain
+    tables:
+    - platform.outbox
+  - operation: createPreview
+    tables:
+    - platform.outbox
+  - operation: exportSitePackage
+    tables:
+    - platform.outbox
   - operation: publishContentBlock
     tables:
     - approvals.request
@@ -1493,9 +1506,24 @@ writesOutside:
   - operation: recordStorefrontSessionEvents
     tables:
     - platform.outbox
+  - operation: regenerateDomainToken
+    tables:
+    - platform.outbox
+  - operation: relinquishCustomDomain
+    tables:
+    - platform.outbox
+  - operation: requestAppBuild
+    tables:
+    - platform.outbox
+  - operation: setPrimaryDomain
+    tables:
+    - platform.outbox
   - operation: setPublishReviewPolicy
     tables:
     - approvals.matrix
+  - operation: verifyCustomDomain
+    tables:
+    - platform.outbox
 screens:
 - P01:WEB-001 Home / Landing
 - P01:WEB-002 Event & Attraction Listing

@@ -278,6 +278,11 @@
     "name": "draft",
     "in": "query",
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -301,6 +306,11 @@
    {
     "name": "stepFreeOnly",
     "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
     "required": null
    }
   ],
@@ -480,6 +490,11 @@
     "name": "venueId",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -512,6 +527,55 @@
    },
    {
     "name": "reportedBy",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listInspections": {
+  "method": "GET",
+  "path": "/inspections",
+  "contract": "maintenance",
+  "summary": "List completed inspections",
+  "permission": "INSPECTION_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "templateId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "assetId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "outcome",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "performedFrom",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "performedTo",
     "in": "query",
     "required": null
    },
@@ -607,6 +671,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -621,7 +690,18 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "targetOperation",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": "mapId",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "ProposedAction"
  },

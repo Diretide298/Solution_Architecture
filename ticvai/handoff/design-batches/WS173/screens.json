@@ -996,7 +996,9 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "recommendSeats",
-       "notes": "The act the screen exists for."
+       "label": "Find upgrade options",
+       "operation": "recommendSeats",
+       "notes": "The act the screen exists for. Opens the form that asks what `recommendSeats` needs (ADAM CR-268, CHG-R10WIR-004)."
       },
       {
        "kind": "secondaryButton",
@@ -1016,6 +1018,31 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formRecommendSeats",
+    "component": "modal",
+    "trigger": "Find upgrade options",
+    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize` (1 to 50) and `strategy` (best available, best value, closest to the stage, accessible, or seats together: `SeatRecommendationStrategy`). Optional: `categoryIds` (price categories), `maxPrice`, `accessibleCount` (wheelchair spaces; companions are added), `maxOptions` (3 by default, at most 10). The performance is the one whose seat status the screen shows (path `performanceId`). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SeatRecommendationRequest",
+    "confirm": {
+     "label": "Find upgrade options",
+     "operation": "recommendSeats"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partySize",
+      "strategy",
+      "categoryIds",
+      "maxPrice",
+      "accessibleCount",
+      "maxOptions"
+     ]
+    },
+    "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations; ADAM CR-268, 26 October 2026 (CHG-R10WIR-004)"
+   }
+  ],
   "states": {
    "loading": "The seat upgrade recommendations list.",
    "error": "Could not load. Names which read failed and leaves the seat upgrade recommendations untouched.",

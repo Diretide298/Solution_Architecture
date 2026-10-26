@@ -190,6 +190,19 @@ def required_body(op: dict) -> bool:
     return bool(rb.get("required", False)) or "$ref" in rb
 
 
+def overlay_refs(o: dict) -> set:
+    """The operations an overlay reaches: its confirm's and dismiss's, and the reads it names in `reads` (CHG-R10UI-016):
+    a picker inside a form is filled by a list read (SV-PICK, check-screen-value-sources), and an overlay has no
+    component to carry that read's name, so it names it there and the read counts as reached (S-OP-UNREACHED)."""
+    out = set()
+    for k in ("confirm", "dismiss"):
+        v = o.get(k)
+        if isinstance(v, dict) and v.get("operation"):
+            out.add(v["operation"])
+    out |= {r for r in (o.get("reads") or []) if isinstance(r, str) and r}
+    return out
+
+
 def self_test():
     """shown_in_prototype on made-up screens (CHG-R8INT-008): exact and view-naming partial prototypes accept a
     quoted string they hold; a partial without a view, a generated layout and an absent string are refused."""
@@ -214,6 +227,12 @@ def self_test():
         why = shown_in_prototype(s, shown, text_of)
         if (why is None) != ok:
             bad.append(f"shown_in_prototype: {name}: expected {'accepted' if ok else 'refused'}, got {why!r}")
+    # an overlay reaches its confirm's operation and the picker reads it names (CHG-R10UI-016)
+    form = {"id": "formConfigure", "confirm": {"operation": "configureWorkstation"}, "reads": ["listSaleBoards"]}
+    if overlay_refs(form) != {"configureWorkstation", "listSaleBoards"}:
+        bad.append(f"overlay_refs: a form's picker read is not reached: {overlay_refs(form)}")
+    if overlay_refs({"id": "x", "confirm": {"label": "OK"}}) != set():
+        bad.append("overlay_refs: an overlay with no operation reached something")
     return bad
 
 
@@ -347,10 +366,7 @@ def main() -> int:
         # --- R273 unreached operations ---------------------------------------------------------
         refs = {c.get("operation") for c in comps if c.get("operation")}
         for o in overlays:
-            for k in ("confirm", "dismiss"):
-                v = o.get(k)
-                if isinstance(v, dict) and v.get("operation"):
-                    refs.add(v["operation"])
+            refs |= overlay_refs(o)
         for t in ((s.get("navigation") or {}).get("transitions") or []):
             if isinstance(t, dict) and t.get("operation"):
                 refs.add(t["operation"])

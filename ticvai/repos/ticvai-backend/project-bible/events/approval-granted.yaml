@@ -116,6 +116,17 @@ consumers:
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: identity
+  purpose: 'A guest''s privacy request (`subjectContract` identity; ADAM CR-101, CHG-R10ID-016). Subject type
+    `subjectDataExport`: start the export job for the request''s identity.subject_data_export row (running, then ready
+    or failed). Subject type `subjectErasure`: start the erasure job deleteGuestAccount raised, which waits for this
+    decision where the tenant''s matrix adds an approval step'
+  writes:
+  - identity.subject_data_export
+  - pii.subject
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: Retained with the request. This is an audit record, not an operational message
 notes: '**The event that replaces four bespoke callbacks.** Each owning contract consumed its own approval
   signal before this existed; now there is one, and adding a fifth approval kind means adding a consumer

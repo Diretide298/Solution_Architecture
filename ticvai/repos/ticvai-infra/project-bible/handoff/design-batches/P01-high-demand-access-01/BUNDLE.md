@@ -120,7 +120,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getWaitingRoomPosition` reads one guest's place in one performance's room, polled — the screen is about that one thing |
 | Offline | **The offline banner shows.** The last known position stays on screen with its age, and polling resumes with the same entry when the connection is back. Admission needs the connection. |
-| Opens with | `performanceId` (WEB-006), `waitingEntryId` (WEB-015) · cold entry: **Opened with no performance, or one no longer selling, the room says so and offers the event** — never a 404. The room belongs to one performance's sale and … |
+| Opens with | `performanceId` (WEB-006), `waitingEntryId` (WEB-006) · cold entry: **Opened with no performance, or one no longer selling, the room says so and offers the event** — never a 404. The room belongs to one performance's sale and … |
 | Route | `/high-demand-access/virtual-waiting-room` |
 
 **What the spec says about it.** **The on-sale waiting room (Q2), not the ride queue (Q1). Re-pointed 1 October under ADR-0066** from `joinQueue`, `getWaitingGuest` and `getWaitTimes`, which are the ride queue and wrote a `queue.entry` row per arriving guest, the load the room exists to keep away. The ride queue stays on WEB-040. Arrival is `enterWaitingRoom` (a Redis counter, no database write, no sign-in, no personal data); the page polls `getWaitingRoomPosition` every `pollAfterSeconds`. Admitted, it holds a short-lived signed admission token that `addCartLine` needs for this performance while its room is on (online cart holds only: the 1 October amendment exempts tills, kiosks and venue workstations). **Reached from the sale, not the home screen:** WEB-006 lands here when `addCartLine` refuses `403 admission-required`, and admission returns there. `notRequired` (the room is off) goes straight back. **Renamed 31 August** from *Virtual Waiting Room*. **A guest surface is one product with two renderings** (GST-046).
@@ -170,7 +170,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `WEB-006` Date & Performance Selection: *Continue to your tickets*; carries `performanceId`; only when `getWaitingRoomPosition` answers `admitted`. The page keeps `admission.token` and sends it as `X-Admission-Token` on …
+- → `WEB-006` Date & Performance Selection: *Continue to your tickets*; carries `performanceId`, `waitingEntryId`; only when `getWaitingRoomPosition` answers `admitted`. The admission token is kept in an HttpOnly, short-lived, per-performance …
 
 #### States
 
@@ -235,7 +235,7 @@ Also apply: 39 for all of P01, 29 for every app (section *Design inputs from the
 
 This is a white-label guest screen: it is drawn in the venue's brand, never TICVAI's (except the *Powered by TICVAI* credit, a tenant toggle that is on by default: `brand.showPoweredBy`). It has no dark or light mode: the venue's theme applies on every device setting. Draw it with the **default theme**, and on the key screens one **alternate tenant theme** (`handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`).
 
-**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (18, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (3, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
+**Shell-wide, on every guest screen:** Brand (11, CMS-002, CMS-004, CMS-104); Theme (27, CMS-005, ADM-016); Fonts (5, CMS-003); Header (5, CMS-009); Navigation (18, CMS-009); Footer (website) (15, CMS-009); Languages and right-to-left (2, CMS-011, ADM-018); Modules shown to guests (3, CMS-001, ADM-424); Features (3, CMS-001); Custom domain (website) (4, CMS-017, ADM-017); SEO metadata (website) (13, CMS-013). Each element, its CMS field, allowed values and default: `handoff/design-batches/apps/1-guest-app/WHITE-LABEL.md`.
 
 #### References
 
@@ -309,6 +309,7 @@ Every guest screen in this batch is white-label. These elements are set by the t
 | Custom domain hostname (`domains.hostname`) | `CMS-017`, `ADM-017` | — | — | — |
 | Custom domain kind (`domains.kind`) | `CMS-017`, `ADM-017` | Guest web · Guest app · Partner portal · Developer portal | — | — |
 | Verification method (`domains.verificationMethod`) | `CMS-017`, `ADM-017` | Dns txt · Cname · Http file | Dns txt | — |
+| Routing (`domains.routing`) | `CMS-017`, `ADM-017` | Cname · Delegated subdomain · Apex | Cname | How the hostname reaches TICVAI (`CustomDomain.routing`); `apex` is the only way to claim a bare domain (ADAM CR-105). |
 | Entity kind (`seo.entityKind`) | `CMS-013` | Content page · Product · Event · Performance · Membership · Promotion · Venue | — | — |
 | Entity (`seo.entityId`) | `CMS-013` | shows names, sends the id | — | — |
 | Locale (`seo.locale`) | `CMS-013` | — | — | — |

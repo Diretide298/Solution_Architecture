@@ -14,7 +14,8 @@ payload:
   notes: UUIDv7 minted by the storefront for the batch. The idempotency key; a retried beacon carries the same one
 - field: sessionRef
   type: string
-  notes: 'The storefront session id hashed with the tenant key. **The join to a later checkout**: the checkout
+  notes: 'The storefront session id hashed with the tenant key (the tenant''s blind-index key, HMAC-SHA-256, 64
+    lowercase hex, ADR-0063; ADAM CR-107). **The join to a later checkout**: the checkout
     passes the same value to `ai.scoreTransactionRisk` as `sessionRef`, so the risk engine can read the browsing
     that preceded a payment without either side naming a person'
 - field: deviceIdHash
@@ -34,15 +35,17 @@ payload:
   type: string
   required: false
   notes: The client address hashed with the tenant key at the edge, the same hash `ai.scoreTransactionRisk`
-    receives as `ipHash`. The address itself is not carried
+    receives as `ipHash`. The address itself is not carried. From the edge's `X-Edge-Ip-Hash` header, which the
+    edge strips from client traffic; absent when the header is (ADAM CR-107)
 - field: ipCountry
   type: string
   required: false
-  notes: ISO 3166-1 alpha-2, resolved at the edge
+  notes: ISO 3166-1 alpha-2, resolved at the edge (the `X-Edge-Ip-Country` header; ADAM CR-107)
 - field: userAgentFamily
   type: string
   required: false
-  notes: Browser or app family and major version only, e.g. `chrome-128`, `ticvai-ios-4`
+  notes: Browser or app family and major version only, e.g. `chrome-128`, `ticvai-ios-4` (the `X-Edge-Ua-Family`
+    header; ADAM CR-107)
 - field: interactions
   type: array
   notes: Up to 50 items `{kind, pageKind, productId?, at, dwellMs?}`. kind is pageView, productView,
@@ -58,6 +61,7 @@ payload:
   type: timestamp
 - field: batchEndedAt
   type: timestamp
+  notes: The time the server received the batch (ADAM CR-107)
 - field: scopePath
   type: string
 - field: tenantId

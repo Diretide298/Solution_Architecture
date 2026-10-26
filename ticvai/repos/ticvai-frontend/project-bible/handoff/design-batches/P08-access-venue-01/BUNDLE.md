@@ -432,7 +432,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, openOnly and the queue are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown adaptor, or credentials missing for the selected adaptor; 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 The feed with this `id` belongs to a different queue. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A public guest read of venue data named no venue (`venue-required`; ADAM CR-198, CHG-R10ID-022): send `X-Venue-Id`.; 400 Unknown adaptor, or credentials missing for the selected adaptor; 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Edge cases to draw
 
@@ -779,7 +779,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status and the queue are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `QUEUE_VIEW`, which `getQueue` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `QUEUE_MANAGE` for `createQueue`, `updateQueue`, `callNextParties`, `setQueueStatus` and 1 more. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 The queue is `paused` or `closed`; parties are called only from an `open` or `atCapacity` queue. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A public guest read of venue data named no venue (`venue-required`; ADAM CR-198, CHG-R10ID-022): send `X-Venue-Id`.; 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 The queue is `paused` or `closed`; parties are called only from an `open` or … |
 
 #### Edge cases to draw
 
@@ -1279,7 +1279,7 @@ Errors to draw in the form: 409 The queue is `paused` or `closed`; parties are c
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, openOnly and the manual wait time are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `QUEUE_MANAGE` for `setWaitTime`, `callNextParties`. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The queue is `paused` or `closed`; parties are called only from an `open` or `atCapacity` queue. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A public guest read of venue data named no venue (`venue-required`; ADAM CR-198, CHG-R10ID-022): send `X-Venue-Id`.; 409 The queue is `paused` or `closed`; parties are called only from an `open` or `atCapacity` queue. |
 
 #### Edge cases to draw
 
@@ -1359,7 +1359,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (403, 404, 409).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
 - [ ] Every output is drawn (32 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-004?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save wait time, Call next parties, Publish.
@@ -1646,7 +1646,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status and the queue are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getKpiValues` requires to show this screen, and names that permission (the screen's other reads need `QUEUE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `requestSuggestion`; `QUEUE_MANAGE` for … |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 The queue is `paused` or `closed`; parties are called only from an `open` or `atCapacity` queue.; 422 A setting the answer cannot do without is missing (29 September, AI functions review). … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A public guest read of venue data named no venue (`venue-required`; ADAM CR-198, CHG-R10ID-022): send `X-Venue-Id`.; 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 The queue is `paused` or `closed`; parties are called only from an `open` or … |
 
 #### Consistency with other screens
 
@@ -1845,7 +1845,7 @@ Errors to draw in the form: 400 Validation failed; 404 The resource does not exi
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId and the parking are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PARKING_CONFIGURE`, which `listParkingFacilities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 The request breaks a schema rule (`validation`), or names no venue (`venue-required`; ADAM CR-198, CHG-R10ID-022).; 400 Validation failed |
 
 #### Edge cases to draw
 
@@ -2137,6 +2137,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-030` · status **notStarted** · provenance generated
 - Flow F12 *Asset fails and closes a queue*, step 4: Supervisor verifies → **By someone other than the person who did the work.** Safety-critical assets cannot return without it
 - Flow F12 branch at step 4 (requiresStaff): when Verifier is the person who did the work, **Refused.** This is the control, and it is enforced rather than trusted.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -2869,10 +2870,10 @@ Method, path, parameters, request and response for every operation these screens
 "listAdmissionRules": {"method":"GET","path":"/admission-rules","contract":"access","summary":"List admission profiles","permission":"SCOPE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listBlacklist": {"method":"GET","path":"/blacklist","contract":"access","summary":"List blacklisted media","permission":"SCOPE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listEntryRulePoints": {"method":"GET","path":"/admission-rules/{ruleId}/points","contract":"access","summary":"Which access points an admission rule covers","permission":"SCOPE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"ruleId","in":"path","required":true},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listParkingFacilities": {"method":"GET","path":"/parking-facilities","contract":"access","summary":"Car parks at a venue, and how each integrates","permission":"PARKING_CONFIGURE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listParkingFacilities": {"method":"GET","path":"/parking-facilities","contract":"access","summary":"Car parks at a venue, and how each integrates","permission":"PARKING_CONFIGURE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listQueueEntries": {"method":"GET","path":"/queues/{queueId}/entries","contract":"queue","summary":"List entries in a queue","permission":"QUEUE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listQueueFeeds": {"method":"GET","path":"/queue-feeds","contract":"queue","summary":"List configured sensor feeds","permission":"QUEUE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"QueueFeed"},
-"listQueues": {"method":"GET","path":"/queues","contract":"queue","summary":"List queues","permission":"QUEUE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"openOnly","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listQueues": {"method":"GET","path":"/queues","contract":"queue","summary":"List queues","permission":"QUEUE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"openOnly","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listWorkOrders": {"method":"GET","path":"/work-orders","contract":"maintenance","summary":"List work orders","permission":"WORK_ORDER_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"assignedToPrincipalId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"priority","in":"query","required":null},{"name":"assetId","in":"query","required":null},{"name":"overdueOnly","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "removeBlacklistEntry": {"method":"DELETE","path":"/blacklist/{mediaCode}","contract":"access","summary":"Remove a blacklist entry","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "requestSuggestion": {"method":"POST","path":"/ai/suggestions","contract":"ai","summary":"Ask for an answer, however it is currently produced","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Suggestion"},

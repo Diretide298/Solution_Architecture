@@ -548,7 +548,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAssets · getAsset · createAsset · getAssetHistory +3</div>
+          <div><b>OPERATIONS</b> &middot; listAssets · getAsset · createAsset · getAssetHistory +4</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; assetId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-070">BO-070</a>  &mdash; <i>Work Orders</i> <span class="car">workOrderId</span></div>
@@ -8974,7 +8974,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div><div class="panel"><b>Create seat hold</b><div class="chip cta">Create seat hold</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div><div class="panel"><b>Create seat hold</b><div class="chip cta">Create seat hold</div><span class="why">The act the screen exists for. Opens the form that collects the seats or places to hold (ADAM CR-268, CHG-R10WIR-004).</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
             </div>
           </div>
         </div>
@@ -8984,7 +8984,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; performanceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-993">BO-993</a>  &mdash; <i>Back to Experience Command Center</i> <span class="car">seatMapId</span></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateSeatHold &middot; <i>Create seat hold</i> &middot; <b>Hold these seats</b> &middot; Cancel <span class="dis">discards seatIds · zoneId · quantity · ttlSeconds · subjectId</span></div></div>
         </div>
       </div>
       <div id="bo-995" class="scr" data-ws="WS169">
@@ -9184,7 +9184,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Seat status for a performance</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Compare seats</b><div class="chip cta">Compare seats</div><span class="why">The act the screen exists for. Opens the form that asks what `recommendSeats` needs (ADAM CR-268, CHG-R10WIR-004).</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Seat status for a performance</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -9194,7 +9194,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; performanceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-993">BO-993</a>  &mdash; <i>Back to Experience Command Center</i> <span class="car">seatMapId</span></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecommendSeats &middot; <i>Compare seats</i> &middot; <b>Compare seats</b> &middot; Cancel <span class="dis">discards partySize · strategy · categoryIds · maxPrice · accessibleCount · maxOptions</span></div></div>
         </div>
       </div>
       <div id="bo-1002" class="scr" data-ws="WS169">
@@ -9214,7 +9214,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Seat status for a performance</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Suggest seats</b><div class="chip cta">Suggest seats</div><span class="why">The act the screen exists for. Opens the form that asks what `recommendSeats` needs (ADAM CR-268, CHG-R10WIR-004).</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Seat status for a performance</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -9224,7 +9224,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; performanceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-993">BO-993</a>  &mdash; <i>Back to Experience Command Center</i> <span class="car">seatMapId</span></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecommendSeats &middot; <i>Suggest seats</i> &middot; <b>Suggest seats</b> &middot; Cancel <span class="dis">discards partySize · strategy · categoryIds · maxPrice · accessibleCount · maxOptions</span></div></div>
         </div>
       </div>
       <div id="bo-1003" class="scr" data-ws="WS170">
@@ -10324,7 +10324,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">primaryButton</span><div class="chip cta">primaryButton</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Seat status for a performance</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Find upgrade options</b><div class="chip cta">Find upgrade options</div><span class="why">The act the screen exists for. Opens the form that asks what `recommendSeats` needs (ADAM CR-268, CHG-R10WIR-004).</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Seat status for a performance</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
             </div>
           </div>
         </div>
@@ -10334,7 +10334,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; performanceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-1033">BO-1033</a>  &mdash; <i>Back to Recommendation Command Center</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecommendSeats &middot; <i>Find upgrade options</i> &middot; <b>Find upgrade options</b> &middot; Cancel <span class="dis">discards partySize · strategy · categoryIds · maxPrice · accessibleCount · maxOptions</span></div></div>
         </div>
       </div>
       <div id="bo-1040" class="scr" data-ws="WS173">
@@ -11801,7 +11801,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPerformances · listProductCategories · getPerformance · createPerformances +8</div>
+          <div><b>OPERATIONS</b> &middot; listPerformances · getPerformance · createPerformances · cancelPerformance +7</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; eventId&larr;deepLink, performanceId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-007">BO-007</a>  &mdash; <i>Product Directory</i><br><a href="#bo-009">BO-009</a>  &mdash; <i>Pricing Rules</i><br><a href="#bo-099">BO-099</a>  &mdash; <i>Performance manifest</i> <span class="car">performanceId</span><br><a href="#bo-023">BO-023</a>  &mdash; <i>Cancels it and reviews the refund exposure</i></div>
@@ -15286,7 +15286,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; createGroupBooking · getGroupBooking · updateGroupBooking · listOrders +13</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;deepLink, groupBookingId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">variantId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i> <span class="car">variantId · version</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmVoidOrder &middot; <i>Void order</i></div><div class="ov"><b>modal</b> formCreateGroupBooking &middot; <i>Create group booking</i> &middot; <b>Create group booking</b> &middot; Cancel <span class="dis">discards orderId · leaderSubjectId · expectedSize · kind · packageProductId · yearGroup · accessAndDietaryNeeds · celebrantName · celebrantTurningAge · allergiesAndRequests · finalHeadcountDueBy · organisationName · minimumSize · attendeeCaptureRequired · attendeeCaptureDueBy</span></div><div class="ov"><b>modal</b> formUpdateGroupBooking &middot; <i>Save group booking</i> &middot; <b>Save group booking</b> &middot; Cancel <span class="dis">discards packageProductId · yearGroup · accessAndDietaryNeeds · celebrantName · celebrantTurningAge · allergiesAndRequests · finalHeadcountDueBy · leaderSubjectId · organisationName · expectedSize · confirmedSize · minimumSize · attendeeCaptureRequired · attendeeCaptureDueBy · status</span></div><div class="ov"><b>modal</b> formCreateOrder &middot; <i>Create order</i> &middot; <b>Create order</b> &middot; Cancel <span class="dis">discards id · venueId · channel · lines · recordedAt · shiftId · subjectId · guestLinkId · catalogueBundleVersion</span></div><div class="ov"><b>modal</b> formApplyManualDiscount &middot; <i>Apply manual discount</i> &middot; <b>Apply manual discount</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · lineId · amount · percentage · reasonCode · approverPrincipalId</span></div><div class="ov"><b>modal</b> formCreateRefund &middot; <i>Create refund</i> &middot; <b>Create refund</b> &middot; Cancel <span class="dis">discards id · amount · reason · recordedAt · lineIds · secondaryAuthorisation · refundToOriginalTender · alternateTender</span></div><div class="ov"><b>modal</b> formExchangeOrderLines &middot; <i>Exchange order lines</i> &middot; <b>Exchange order lines</b> &middot; Cancel <span class="dis">discards id · outgoingLineIds · incomingLines · recordedAt · waiveFee · reason</span></div><div class="ov"><b>modal</b> formHoldOrder &middot; <i>Hold order</i> &middot; <b>Hold order</b> &middot; Cancel <span class="dis">discards recordedAt · label · holdUntil</span></div><div class="ov"><b>modal</b> formModifyOrder &middot; <i>Modify order</i> &middot; <b>Modify order</b> &middot; Cancel <span class="dis">discards id · recordedAt · addLines · removeLineIds · reason</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div><div class="ov"><b>modal</b> formRescheduleOrder &middot; <i>Reschedule order</i> &middot; <b>Reschedule order</b> &middot; Cancel <span class="dis">discards targetPerformanceId · recordedAt · lineIds · waiveFee · reason</span></div></div>
         </div>
@@ -15916,7 +15916,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listOrders · listSettlements</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i><br><a href="#bo-022">BO-022</a>  &mdash; <i>Order Detail</i><br><a href="#bo-023">BO-023</a>  &mdash; <i>Refunds &amp; Exchanges</i><br><a href="#bo-024">BO-024</a>  &mdash; <i>Payment Exceptions</i><br><a href="#bo-025">BO-025</a>  &mdash; <i>Chargebacks &amp; Disputes</i> <span class="car">settlementId</span><br><a href="#bo-026">BO-026</a>  &mdash; <i>Group Bookings</i><br><a href="#bo-027">BO-027</a>  &mdash; <i>Reissue &amp; Media Replacement</i><br><a href="#bo-028">BO-028</a>  &mdash; <i>Refund Approval Queue</i><br><a href="#bo-029">BO-029</a>  &mdash; <i>Report Builder</i><br><a href="#bo-039">BO-039</a>  &mdash; <i>Shift Directory</i><br><a href="#bo-040">BO-040</a>  &mdash; <i>Variance Approval</i><br><a href="#bo-041">BO-041</a>  &mdash; <i>Cash Movements</i><br><a href="#bo-042">BO-042</a>  &mdash; <i>Banking &amp; Safe</i><br><a href="#bo-043">BO-043</a>  &mdash; <i>Daily Reconciliation</i> <span class="car">settlementId</span><br><a href="#bo-047">BO-047</a>  &mdash; <i>Order Corrections &amp; Exceptions</i><br><a href="#bo-048">BO-048</a>  &mdash; <i>Retail Products</i><br><a href="#bo-059">BO-059</a>  &mdash; <i>Sales Reports</i><br><a href="#bo-061">BO-061</a>  &mdash; <i>Scheduled Reports</i><br><a href="#bo-062">BO-062</a>  &mdash; <i>Venue Profile</i><br><a href="#bo-065">BO-065</a>  &mdash; <i>Venue Configuration</i><br><a href="#bo-074">BO-074</a>  &mdash; <i>Chart of Accounts</i><br><a href="#bo-075">BO-075</a>  &mdash; <i>Account Mapping</i><br><a href="#bo-076">BO-076</a> <br><a href="#bo-077">BO-077</a>  &mdash; <i>FX Rates &amp; Variances</i><br><a href="#bo-089">BO-089</a>  &mdash; <i>Journal Entries</i><br><a href="#bo-090">BO-090</a>  &mdash; <i>Period Close</i><br><a href="#bo-1094">BO-1094</a>  &mdash; <i>Opens Funding Method Configuration</i><br><a href="#bo-1111">BO-1111</a>  &mdash; <i>Opens Credit Expiry, Extension &amp; Forfeiture </i><br><a href="#bo-1146">BO-1146</a>  &mdash; <i>Opens Refund-to-Wallet Policy Configuration</i> <span class="car">venueId</span><br><a href="#bo-1162">BO-1162</a>  &mdash; <i>Opens Security Governance, Audit &amp; Rule Publ</i><br><a href="#bo-1179">BO-1179</a>  &mdash; <i>Opens Integration Monitoring &amp; Exception Wor</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-008">BO-008</a>  &mdash; <i>Product Detail &amp; Variants</i><br><a href="#bo-022">BO-022</a>  &mdash; <i>Order Detail</i><br><a href="#bo-023">BO-023</a>  &mdash; <i>Refunds &amp; Exchanges</i><br><a href="#bo-024">BO-024</a>  &mdash; <i>Payment Exceptions</i><br><a href="#bo-025">BO-025</a>  &mdash; <i>Chargebacks &amp; Disputes</i> <span class="car">settlementId</span><br><a href="#bo-026">BO-026</a>  &mdash; <i>Group Bookings</i><br><a href="#bo-027">BO-027</a>  &mdash; <i>Reissue &amp; Media Replacement</i><br><a href="#bo-028">BO-028</a>  &mdash; <i>Refund Approval Queue</i><br><a href="#bo-029">BO-029</a>  &mdash; <i>Report Builder</i><br><a href="#bo-039">BO-039</a>  &mdash; <i>Shift Directory</i><br><a href="#bo-040">BO-040</a>  &mdash; <i>Variance Approval</i><br><a href="#bo-041">BO-041</a>  &mdash; <i>Cash Movements</i><br><a href="#bo-042">BO-042</a>  &mdash; <i>Banking &amp; Safe</i><br><a href="#bo-043">BO-043</a>  &mdash; <i>Daily Reconciliation</i> <span class="car">settlementId</span><br><a href="#bo-047">BO-047</a>  &mdash; <i>Order Corrections &amp; Exceptions</i><br><a href="#bo-048">BO-048</a>  &mdash; <i>Retail Products</i><br><a href="#bo-059">BO-059</a>  &mdash; <i>Sales Reports</i><br><a href="#bo-061">BO-061</a>  &mdash; <i>Scheduled Reports</i><br><a href="#bo-062">BO-062</a>  &mdash; <i>Venue Profile</i><br><a href="#bo-065">BO-065</a>  &mdash; <i>Venue Configuration</i><br><a href="#bo-074">BO-074</a>  &mdash; <i>Chart of Accounts</i><br><a href="#bo-075">BO-075</a>  &mdash; <i>Account Mapping</i><br><a href="#bo-076">BO-076</a> <br><a href="#bo-077">BO-077</a>  &mdash; <i>FX Rates &amp; Variances</i><br><a href="#bo-089">BO-089</a>  &mdash; <i>Journal Entries</i><br><a href="#bo-090">BO-090</a>  &mdash; <i>Period Close</i><br><a href="#bo-1088">BO-1088</a>  &mdash; <i>Opens Credit &amp; Balance Type Configuration</i><br><a href="#bo-1094">BO-1094</a>  &mdash; <i>Opens Funding Method Configuration</i><br><a href="#bo-1111">BO-1111</a>  &mdash; <i>Opens Credit Expiry, Extension &amp; Forfeiture </i><br><a href="#bo-1144">BO-1144</a>  &mdash; <i>Opens Peer-to-Peer Transfer Configuration</i><br><a href="#bo-1146">BO-1146</a>  &mdash; <i>Opens Refund-to-Wallet Policy Configuration</i> <span class="car">venueId</span><br><a href="#bo-1162">BO-1162</a>  &mdash; <i>Opens Security Governance, Audit &amp; Rule Publ</i><br><a href="#bo-1179">BO-1179</a>  &mdash; <i>Opens Integration Monitoring &amp; Exception Wor</i></div>
           
           
         </div>
@@ -18698,12 +18698,12 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Takings</b><span>AED 62,480</span></div><div class="kpi"><b>Settled</b><span>18</span></div><div class="kpi"><b>Variance</b><span>AED 40</span></div><div class="kpi"><b>Open</b><span>3</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>P2P enabled</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Eligible wallet types</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Eligible customer types</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Eligible credit types</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Supported currencies</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>P2P enabled</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Eligible credit types</b><div class="chip">Eligible credit types</div><span class="why">The venue&#x27;s credit types (`listCreditTypes`); the chosen ids are sent as `transferableCreditTypeIds`.</span></div><div class="panel"><b>Maximum transfer</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div><div class="side"><div class="panel"><b>Daily transfer amount</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><b>Approval above amount</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">A transfer above this amount waits for approval; empty means none does.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setWalletTransferRules · getWalletTransferRules</div>
+          <div><b>OPERATIONS</b> &middot; setWalletTransferRules · getWalletTransferRules · listCreditTypes</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1143">BO-1143</a>  &mdash; <i>Back to Wallet Operations Command Center</i></div>
@@ -19873,7 +19873,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDevices · registerDevice · configureWorkstation · getWorkstation +5</div>
+          <div><b>OPERATIONS</b> &middot; listDevices · registerDevice · configureWorkstation · getWorkstation +6</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, workstationId&larr;deepLink, deviceId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-070">BO-070</a>  &mdash; <i>A work order is raised to fix it</i><br><a href="#bo-124">BO-124</a>  &mdash; <i>Layout &amp; Journey Builder</i> <span class="car">deviceId</span><br><a href="#bo-129">BO-129</a>  &mdash; <i>A configuration profile is set for it</i> <span class="car">workstationId</span></div>
@@ -19903,7 +19903,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getFnbDeliveryPolicy · setFnbDeliveryPolicy · listOutlets · createOutlet +13</div>
+          <div><b>OPERATIONS</b> &middot; getFnbDeliveryPolicy · setFnbDeliveryPolicy · listOutlets · createOutlet +14</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; outletId&larr;deepLink, actionId&larr;deepLink, venueId&larr;session</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
@@ -21738,7 +21738,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; principalId&larr;navigation, campaignId&larr;navigation, roleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; nothing declared</div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetRolePermissions &middot; <i>Save role permissions</i> &middot; <b>Save role permissions</b> &middot; Cancel</div><div class="ov"><b>modal</b> formUpdatePrincipal &middot; <i>Grant role</i> &middot; <b>Grant role</b> &middot; Cancel</div><div class="ov"><b>modal</b> formResolvePermissions &middot; <i>Preview effective permissions</i> &middot; <b>Preview effective permissions</b> &middot; Cancel</div><div class="ov"><b>modal</b> formCreateRole &middot; <i>Create role</i> &middot; <b>Create role</b> &middot; Cancel <span class="dis">discards code · name · description · presetCodes · permissions</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetRolePermissions &middot; <i>Save role permissions</i> &middot; <b>Save role permissions</b> &middot; Cancel</div><div class="ov"><b>modal</b> formUpdatePrincipal &middot; <i>Grant role</i> &middot; <b>Grant role</b> &middot; Cancel</div><div class="ov"><b>modal</b> formResolvePermissions &middot; <i>Preview effective permissions</i> &middot; <b>Preview effective permissions</b> &middot; Cancel</div><div class="ov"><b>modal</b> formCreateRole &middot; <i>Create role</i> &middot; <b>Create role</b> &middot; Cancel <span class="dis">discards code · name · description · presetCodes · permissions</span></div><div class="ov"><b>modal</b> formSetCapabilityTemplate &middot; <i>Save as preset</i> &middot; <b>Save preset</b> &middot; Cancel <span class="dis">discards name · code · capabilities · description · module</span></div></div>
         </div>
       </div>
       <div id="bo-055" class="scr">
@@ -43304,7 +43304,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPaymentTerminals · listDevices · listPaymentTerminalCertifications · recordPaymentTerminalCertification</div>
+          <div><b>OPERATIONS</b> &middot; listPaymentTerminals · listPaymentTerminalCertifications · recordPaymentTerminalCertification</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; modelCode&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-579">ADM-579</a>  &mdash; <i>Back to Terminal &amp; Card-Present Command Cent</i></div>
@@ -44177,7 +44177,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listOrderRefunds</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#adm-610">ADM-610</a>  &mdash; <i>Refund Request &amp; Eligibility Workspace\t117</i> <span class="car">orderId</span><br><a href="#adm-611">ADM-611</a>  &mdash; <i>Refund Policy &amp; Rule Configuration\t118</i><br><a href="#adm-612">ADM-612</a>  &mdash; <i>Refund Allocation &amp; Original Tender Manager\</i><br><a href="#adm-613">ADM-613</a>  &mdash; <i>Void, Reversal &amp; Cancellation Manager\t120</i><br><a href="#adm-614">ADM-614</a>  &mdash; <i>Refund Approval &amp; Exception Workflow\t121</i> <span class="car">refundId</span><br><a href="#adm-615">ADM-615</a>  &mdash; <i>Refund Processing, Provider Status &amp; Recover</i><br><a href="#adm-616">ADM-616</a>  &mdash; <i>Payment Adjustment &amp; Financial Correction Ma</i> <span class="car">orderId</span><br><a href="#adm-617">ADM-617</a>  &mdash; <i>Refund Transaction Trace &amp; Audit Investigati</i><br><a href="#adm-618">ADM-618</a>  &mdash; <i>Refund Simulator, Risk Analysis &amp; AI Advisor</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#adm-610">ADM-610</a>  &mdash; <i>Refund Request &amp; Eligibility Workspace\t117</i> <span class="car">orderId</span><br><a href="#adm-611">ADM-611</a>  &mdash; <i>Refund Policy &amp; Rule Configuration\t118</i><br><a href="#adm-612">ADM-612</a>  &mdash; <i>Refund Allocation &amp; Original Tender Manager\</i><br><a href="#adm-613">ADM-613</a>  &mdash; <i>Void, Reversal &amp; Cancellation Manager\t120</i> <span class="car">paymentId</span><br><a href="#adm-614">ADM-614</a>  &mdash; <i>Refund Approval &amp; Exception Workflow\t121</i> <span class="car">refundId</span><br><a href="#adm-615">ADM-615</a>  &mdash; <i>Refund Processing, Provider Status &amp; Recover</i> <span class="car">paymentId</span><br><a href="#adm-616">ADM-616</a>  &mdash; <i>Payment Adjustment &amp; Financial Correction Ma</i> <span class="car">orderId</span><br><a href="#adm-617">ADM-617</a>  &mdash; <i>Refund Transaction Trace &amp; Audit Investigati</i><br><a href="#adm-618">ADM-618</a>  &mdash; <i>Refund Simulator, Risk Analysis &amp; AI Advisor</i></div>
           
           
         </div>

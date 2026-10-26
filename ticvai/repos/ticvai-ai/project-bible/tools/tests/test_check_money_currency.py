@@ -1,0 +1,208 @@
+"""Tests for tools/check-money-currency.py and tools/fix-money-currency.py (CHG-R10GEN-002; ADAM CR-197,
+CR-202, CR-217, CR-234, CR-235).
+
+    python -m pytest ticvai/tools/tests/test_check_money_currency.py -q
+
+The synthetic tests give the detector a few schemas and columns; the last one reads the real package and checks that
+the five operations the CRs named answer or accept Money with no currency of their own (true before and after the
+fixer, which adds the read and leaves the rows as they are).
+"""
+import importlib.util
+from pathlib import Path
+
+import yaml
+
+TOOLS = Path(__file__).resolve().parents[1]
+
+
+def _load(name, path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+mc = _load("mc", TOOLS / "check-money-currency.py")
+fx = _load("fx", TOOLS / "fix-money-currency.py")
+
+MONEY = {"$ref": "../shared/common.yaml#/components/schemas/Money"}
+BY = {
+    ("common", "Money"): {"type": "object"},
+    ("fnb", "TableVisit"): {"x-ticvai-persistence": "fnb.table_visit", "properties": {
+        "runningTotal": MONEY, "orders": {"type": "array", "items": {"$ref": "#/components/schemas/FnbOrder"}}}},
+    ("fnb", "FnbOrder"): {"x-ticvai-persistence": "fnb.service_order", "properties": {"grossAmount": MONEY}},
+    ("fnb", "Summary"): {"properties": {"total": MONEY}},
+    ("fnb", "Wrapper"): {"properties": {"visit": {"$ref": "#/components/schemas/TableVisit"}}},
+}
+COLS = {
+    "fnb.table_visit": [{"column": "id"}, {"column": "outlet_id", "references": "platform.outlet"},
+                        {"column": "running_total"}],
+    "fnb.service_order": [{"column": "visit_id", "references": "fnb.table_visit", "required": "yes"}],
+    "ledger.account": [{"column": "currency"}],
+    "ledger.posting": [{"column": "account_id", "references": "ledger.account", "required": "no"}],
+    "ledger.line": [{"column": "posting_id", "references": "ledger.posting", "required": "no"}],
+    "ledger.req_line": [{"column": "posting_id", "references": "ledger.posting", "required": "yes"}],
+    "ledger.root": [{"column": "line_id", "references": "ledger.req_line", "required": "yes"}],
+    "orders.payment": [{"column": "tender_currency"}],
+    "orders.sale": [{"column": "payment_id", "references": "orders.payment"}],
+    "fnb.priced": [{"column": "payment_id", "references": "orders.payment"}],
+    "payments.provider": [{"column": "supported_currencies"}],
+    "catalogue.template": [{"column": "scope_path"}, {"column": "included_value"}],
+    "fnb.rule": [{"column": "region_id"}],
+    "fnb.lonely": [{"column": "id"}],
+}
+
+
+def module_of(t):
+    return t.split(".", 1)[0].replace("payments", "orders")
+
+
+def test_money_is_found_through_refs_with_the_row_that_stores_it():
+    hits = mc.money_hits("fnb", {"$ref": "#/components/schemas/Wrapper"}, BY, set(COLS))
+    assert ("fnb", "TableVisit", "fnb.table_visit", "TableVisit.runningTotal") in hits
+    assert ("fnb", "FnbOrder", "fnb.service_order", "FnbOrder.grossAmount") in hits
+
+
+def test_a_computed_answer_has_no_row():
+    hits = mc.money_hits("fnb", {"$ref": "#/components/schemas/Summary"}, BY, set(COLS))
+    assert hits == [("fnb", "Summary", None, "Summary.total")]
+
+
+def test_a_currency_column_of_its_own_or_of_a_parent_of_its_module_denominates():
+    assert mc.currency_source("orders.payment", COLS, module_of) == "orders.payment"
+    assert mc.currency_source("orders.sale", COLS, module_of) == "orders.payment"
+    assert mc.currency_source("ledger.posting", COLS, module_of) == "ledger.account"
+    # the second hop only by a required key
+    assert mc.currency_source("ledger.line", COLS, module_of) is None
+    assert mc.currency_source("ledger.root", COLS, module_of) is None  # three hops up
+    # another module's currency is not this row's
+    assert mc.currency_source("fnb.priced", COLS, module_of) is None
+    # a list of currencies a provider may charge is not a denomination
+    assert mc.currency_source("payments.provider", COLS, module_of) is None
+    assert mc.currency_source("fnb.table_visit", COLS, module_of) is None
+
+
+def test_judge_names_the_rows_that_store_the_amount_only():
+    hits = [("fnb", "TableVisit", "fnb.table_visit", "TableVisit.runningTotal"),
+            ("orders", "Sale", "orders.sale", "Sale.total"), ("fnb", "Summary", None, "Summary.total")]
+    assert mc.judge(hits, COLS, module_of, False) == (["fnb.table_visit"], ["fnb.Summary"])
+    # a computed answer beside a read of a row that keeps a currency passes (precision first)
+    assert mc.judge(hits, COLS, module_of, True) == (["fnb.table_visit"], [])
+
+
+def test_the_settings_read_by_query_or_view_counts():
+    qt = {"tenancy#venueSettingsRecords": {"platform.venue_settings"}, "x#other": {"x.y"}}
+    assert mc.asks_settings([{"query": "tenancy#venueSettingsRecords"}], qt, [])
+    assert not mc.asks_settings([{"query": "x#other"}], qt, ["fnb.table_visit"])
+    assert mc.asks_settings([], qt, ["platform.region_settings_for_fnb"])
+
+
+def test_the_fixer_classifies_by_what_the_row_holds():
+    f = {"contract": "fnb", "op": {}, "item": {}}
+    assert fx.classify(f, ["fnb.service_order"], [], ["fnb.service_order"], COLS, BY, set()) == "venue"  # parent
+    assert fx.classify(f, ["fnb.rule"], [], ["fnb.rule"], COLS, BY, set()) == "region"
+    assert fx.classify(f, ["catalogue.template"], [], ["catalogue.template"], COLS, BY, set()) == "scope"
+    assert fx.classify(f, ["control.invoice"], [], ["control.invoice"], COLS, BY, set()) == "platform"
+    assert fx.classify(f, ["fnb.lonely"], [], ["fnb.lonely"], COLS, BY, set()) == "no venue"
+    assert fx.classify(f, [], ["fnb.Summary"], [], COLS, BY, set()) == "no row"
+    named = {"contract": "fnb", "op": {"parameters": [{"name": "venueId", "in": "query"}]}, "item": {}}
+    assert fx.classify(named, ["fnb.lonely"], [], ["fnb.lonely"], COLS, BY, set()) == "venue"
+
+
+def test_a_scope_path_row_is_routed_only_once_tenancy_declares_scope_records():
+    assert fx.queries_for("scope", set()) == []
+    assert fx.queries_for("scope", {fx.SCOPE_Q}) == [fx.SCOPE_Q, fx.VENUE_Q]
+    assert fx.queries_for("venue", set()) == [fx.VENUE_Q]
+    assert fx.queries_for("platform", {fx.SCOPE_Q}) == []   # a platform row stores its currency instead
+
+
+CONTRACT = """paths:
+  /a:
+    post:
+      operationId: makeA
+      x-ticvai-read-via:
+        - query: other#xRecords
+          route: service
+          for: "already there"
+      summary: Make an A
+  /b:
+    get:
+      operationId: getB
+      x-ticvai-consumed-by:
+        - "P08 BO-001 Something"
+      summary: Get a B
+"""
+
+
+def test_a_route_is_written_at_the_lists_own_indent_once():
+    w = fx.why("venue", fx.VENUE_Q, "answers", ["A.total"])
+    out, n = fx.add_read_via(CONTRACT, "makeA", [(fx.VENUE_Q, "in-process", w)])
+    assert n == 1
+    via = yaml.safe_load(out)["paths"]["/a"]["post"]["x-ticvai-read-via"]
+    assert [v["query"] for v in via] == ["other#xRecords", fx.VENUE_Q]
+    assert fx.add_read_via(out, "makeA", [(fx.VENUE_Q, "in-process", w)]) == (out, 0)
+    out2, n2 = fx.add_read_via(CONTRACT, "getB", [(fx.VENUE_Q, "service", w)])
+    op = yaml.safe_load(out2)["paths"]["/b"]["get"]
+    assert n2 == 1 and op["x-ticvai-read-via"][0]["route"] == "service"
+    assert op["x-ticvai-consumed-by"] == ["P08 BO-001 Something"]
+
+
+def test_only_a_route_this_script_wrote_is_removed():
+    w = fx.why("venue", fx.VENUE_Q, "answers", ["A.total"])
+    assert fx.is_own({"for": w}) and not fx.is_own({"for": "already there"})
+    out, _ = fx.add_read_via(CONTRACT, "makeA", [(fx.VENUE_Q, "in-process", w)])
+    back, n = fx.remove_own(out, "makeA", fx.VENUE_Q)
+    assert n == 1 and yaml.safe_load(back) == yaml.safe_load(CONTRACT)
+    assert fx.remove_own(CONTRACT, "makeA", "other#xRecords") == (CONTRACT, 0)
+
+
+def test_the_five_operations_the_crs_named_now_have_a_currency_source():
+    """On r9 all five were findings (CHG-R10GEN-002). Since r10 each has a source: a settings read, or a stored
+    currency on the schema behind its Money (CR-202's control.* rows, CHG-R10ID-017), which the schema reference
+    carries once tools/derive-schema.py has run."""
+    ctx = mc.load()
+    found = {o: bare for o, _s, _f, bare, _c in mc.findings(ctx)}
+    for op in ("mergeTableVisits", "createEntitlementTemplate", "setEntitlementTemplateBlackoutDates",
+               "generateInvoice", "getGuestBundle"):
+        f = ctx["ops"][op]
+        for t in found.get(op, ()):
+            schemas = [s for (stem, _n), s in ctx["by"].items() if stem == f["contract"]
+                       and str((s or {}).get("x-ticvai-persistence") or "").strip().startswith(t)]
+            assert any("currencyCode" in ((s or {}).get("properties") or {}) for s in schemas), (op, t)
+
+
+PLATFORM = """components:
+  schemas:
+    Widget:
+      type: object
+      x-ticvai-persistence: control.widget
+      properties:
+        price:
+          $ref: '../shared/common.yaml#/components/schemas/Money'
+paths:
+  /w:
+    get:
+      operationId: getWidgetMetrics
+      summary: Metrics
+"""
+
+
+def test_a_platform_row_stores_its_billing_currency_once():
+    out, added = fx.add_currency_property(PLATFORM, "Widget", ["Widget.price"])
+    props = yaml.safe_load(out)["components"]["schemas"]["Widget"]["properties"]
+    assert added and list(props)[0] == "currencyCode" and props["currencyCode"]["pattern"] == "^[A-Z]{3}$"
+    assert "CR-202" in props["currencyCode"]["description"] and "billingCurrency" in props["currencyCode"]["description"]
+    assert fx.add_currency_property(out, "Widget", ["Widget.price"]) == (out, False)
+
+
+def test_a_platform_computed_answer_reads_the_billing_entity_once():
+    out, added = fx.add_billing_read(PLATFORM, "getWidgetMetrics", ["WidgetMetric.value"])
+    reads = yaml.safe_load(out)["paths"]["/w"]["get"]["x-ticvai-reads"]
+    assert added and reads[0]["table"] == "control.billing_entity" and "CR-202" in reads[0]["for"]
+    assert fx.add_billing_read(out, "getWidgetMetrics", ["x"]) == (out, False)
+
+
+def test_the_leads_defaults_are_the_fixers_defaults():
+    assert fx.queries_for("no venue", set()) == [fx.VENUE_Q]
+    assert fx.queries_for("no row", set()) == [fx.VENUE_Q]
+    assert "working venue" in fx.why("no row", fx.VENUE_Q, "answers", ["X.total"])

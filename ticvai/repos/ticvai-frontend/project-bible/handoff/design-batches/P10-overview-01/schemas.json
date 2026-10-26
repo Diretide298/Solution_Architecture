@@ -474,7 +474,7 @@
      }
     ],
     "readOnly": true,
-    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192; common.yaml `Money.scale`), when it is not the currency the venue trades in."
    },
    "chargeRateLockedUntil": {
     "type": "string",
@@ -1101,7 +1101,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+    "description": "The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-018)."
    },
    "fxRate": {
     "allOf": [
@@ -1210,7 +1210,7 @@
   }
  },
  "Refund": {
-  "x-ticvai-persistence": "orders.refund",
+  "x-ticvai-persistence": "orders.refund + orders.refund_line + orders.refund_payment",
   "type": "object",
   "required": [
    "id",
@@ -1286,7 +1286,7 @@
      }
     ],
     "readOnly": true,
-    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
+    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001), its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192)."
    },
    "amount": {
     "x-ticvai-column": "refunded_amount",
@@ -1294,7 +1294,70 @@
    },
    "appliedPercentage": {
     "type": "number",
-    "description": "From the venue's time bands, or an approver override."
+    "description": "From the venue's time bands, or an approver override. Where the refunded lines fall in different bands, each line's own percentage is on its `lines` row and this is the one the refund's lines share, or null when they differ (ADAM CR-208)."
+   },
+   "lines": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**What the refund took from each order line** (ADAM CR-208, option A; CHG-R10ORD-014): child rows, `orders.refund_line`, one per line refunded, written by `createRefund`. A line's refundable amount is what it paid minus its rows on earlier refunds.",
+    "items": {
+     "type": "object",
+     "required": [
+      "orderLineId",
+      "refundedAmount"
+     ],
+     "properties": {
+      "orderLineId": {
+       "type": "string",
+       "format": "uuid",
+       "x-ticvai-references": "orders.order_line"
+      },
+      "refundedAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "appliedPercentage": {
+       "type": "number",
+       "nullable": true,
+       "description": "The time band of this line's own performance (ADAM CR-208)."
+      }
+     }
+    }
+   },
+   "payments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**What the refund took from each payment** (ADAM CR-208, option A; CHG-R10ORD-014): child rows, `orders.refund_payment` (the decision's `refund_allocation`; naming-and-style bans `allocation` in DDL), one per payment refunded against, the most recent payment first and cash last. A payment's refundable amount is what it paid minus its rows on earlier refunds.",
+    "items": {
+     "type": "object",
+     "required": [
+      "paymentId",
+      "refundedAmount"
+     ],
+     "properties": {
+      "paymentId": {
+       "type": "string",
+       "format": "uuid",
+       "x-ticvai-references": "orders.payment"
+      },
+      "refundedAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "In the base currency, for the ledger."
+      },
+      "tenderAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true,
+       "description": "In the payment's tender currency (`Payment.tenderCurrency`), at that currency's scale; null where the payment was in the base currency."
+      }
+     }
+    }
    },
    "status": {
     "type": "string",

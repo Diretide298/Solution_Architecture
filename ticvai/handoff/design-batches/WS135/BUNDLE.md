@@ -325,6 +325,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - … and 1 more flow steps (`flows/`)
 - Flow F244 branch at step 1 (expected): when Nothing has been set up on CRM Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F244 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -602,6 +603,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-735`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 1
 - Flow F244 *Marketing CRM Configuration Reference v1.0 board 1: CRM Command Center*, step 2: Works in Guest Directory → Provide a permission-controlled directory for locating and managing every guest record. Search by name, email, mobile, guest ID, external ID, ticket, booking, membership or loyalty identifier. Filter …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -729,7 +731,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-736?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save guest attribute model, Cancel.
@@ -1006,6 +1008,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 1
 - Flow F244 *Marketing CRM Configuration Reference v1.0 board 1: CRM Command Center*, step 6: Works in Customer 360 Profile → Present a consolidated, actionable view of one guest. Display identity, contacts, preferences, household, organization, membership, loyalty, wallet, tickets, bookings and visits. Show LTV …
 - ADR-0023 *— Personal data lives apart from the append-only ledger* (`docs/adr/0023-pii-separation.md`)
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
@@ -1172,6 +1175,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-738`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 1
 - Flow F244 *Marketing CRM Configuration Reference v1.0 board 1: CRM Command Center*, step 8: Works in Activity Timeline → Provide a chronological record of guest activity across the connected platform. Ingest purchases, ticket usage, reservations, visits, membership changes, loyalty, wallet, campaigns, messages, cases …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1522,6 +1526,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html#bo-740`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 1
 - Flow F244 *Marketing CRM Configuration Reference v1.0 board 1: CRM Command Center*, step 12: Works in Family & Guardians → Model households, dependants and guardians while preserving each person's individual identity. Create family groups and link parent, guardian, spouse and dependant relationships with effective dates. …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

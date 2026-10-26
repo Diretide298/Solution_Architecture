@@ -953,7 +953,7 @@
       "currency": {
        "type": "string",
        "pattern": "^[A-Z]{3}$",
-       "description": "**Stored, because it is the one thing that is not in the box's own currency.** A foreign holding is by definition cash in a currency the till does not trade in, so it cannot resolve the way the box's own amounts do (naming-and-style 5.1; ADAM CR-135); it is the key of the row, one per currency per box. The amounts on this item are in this currency.\n"
+       "description": "**Stored, because it is the one thing that is not in the box's own currency.** A foreign holding is by definition cash in a currency the till does not trade in, so it cannot resolve the way the box's own amounts do (naming-and-style 5.1; ADAM CR-135); it is the key of the row, one per currency per box. The amounts on this item are in this currency, at its ISO 4217 minor units from the kernel's fixed list (ADAM CR-192; common.yaml `Money.scale`).\n"
       },
       "expectedAmount": {
        "allOf": [
@@ -982,16 +982,28 @@
     }
    },
    "expectedTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "x-ticvai-column": "expected_amount"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "x-ticvai-column": "expected_amount",
+    "nullable": true,
+    "description": "The figure the box's close count is measured against, filled when the box is counted. **Blind to its own cashier** (ADAM CR-218; as `Shift.expectedCash`, CHG-FIN-003): returned only to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue, null to everyone else on every read, the box's own cashier included.\n"
    },
    "countedTotal": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "x-ticvai-column": "counted_amount"
    },
    "variance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "x-ticvai-column": "variance_amount"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "x-ticvai-column": "variance_amount",
+    "nullable": true,
+    "description": "Counted minus expected; negative is short. Null to every caller without OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue, as `expectedTotal` (ADAM CR-218; CHG-FIN-003).\n"
    },
    "closedByPrincipalId": {
     "type": "string",
@@ -1264,7 +1276,8 @@
         "rental",
         "experience",
         "membership"
-       ]
+       ],
+       "description": "The product's kind (`catalogue.Product.kind`, read through `catalogue#productRecords` by the entitlement's `productId`), mapped onto these values (ADAM CR-226, option A; Chinmay, 25 October 2026; CHG-R10ORD-012): `admission`, `timedAdmission`, `datedAdmission`, `openDated` and `seated` are `admission`; `membership`, `fnb`, `retail` and `rental` are themselves. A product of any other kind is answered without `kind` (it is optional) until its value is decided; `locker`, `parking` and `experience` have no product kind yet, and are answered without `kind` until ProductKind gains them (the lead's answer of 25 October 2026 to the r10 lanes' questions; docs/active/left-out.yaml LO-R10ORD-001)."
       },
       "orderId": {
        "type": "string",
@@ -1272,7 +1285,8 @@
       },
       "addedAt": {
        "type": "string",
-       "format": "date-time"
+       "format": "date-time",
+       "description": "When the entitlement was put on this media: `access.entitlement.media_linked_at`, written when the media code is set or rotated (ADAM CR-226). Null for a row written before the column."
       },
       "status": {
        "allOf": [
@@ -1297,7 +1311,8 @@
       "transferredToSubjectId": {
        "type": "string",
        "format": "uuid",
-       "nullable": true
+       "nullable": true,
+       "description": "The `subjectId` of the entitlement whose `supersedesEntitlementId` names this one with `issuedVia` `transfer` (ADAM CR-226), read through `access#entitlementRecords`; null when it was not transferred."
       },
       "validTo": {
        "type": "string",
@@ -1513,7 +1528,7 @@
    },
    "scale": {
     "type": "integer",
-    "description": "Resolved from the region alongside `currency`.",
+    "description": "Resolved from the region alongside `currency`. **A currency other than the venue's or region's trading currency** (a tourist's USD cash at an AED till, `Payment.tenderAmount`; a guest-selected charge currency, `Order.chargeTotal`; a refund in the tender currency) **takes its ISO 4217 minor units**, held as one fixed list in the kernel (`TICVAI.Domain`, beside Money), so every module resolves it the same way and no table, query or migration holds it (ADAM CR-192, option A; Chinmay, 21 October 2026; CHG-R10ORD-018). The venue and region settings keep their own `currency_scale` for the trading currency.",
     "minimum": 0,
     "maximum": 4
    }
@@ -1638,7 +1653,7 @@
      }
     ],
     "readOnly": true,
-    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192; common.yaml `Money.scale`), when it is not the currency the venue trades in."
    },
    "chargeRateLockedUntil": {
     "type": "string",

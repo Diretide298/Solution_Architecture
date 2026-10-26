@@ -125,7 +125,7 @@
  "AccessDecision": {
   "type": "object",
   "x-ticvai-persistence": "identity.access_decision",
-  "description": "3.3.37. **The decision, the policy version behind it, and the attribute values it actually saw.** The third is what separates *the policy is wrong* from *the data was stale*.\n",
+  "description": "3.3.37. **The decision, the policy version behind it, and the attribute values it actually saw.** The third is what separates *the policy is wrong* from *the data was stale*.\n\n**Every authorisation check writes one** (decided 25 October 2026, Chinmay, ADAM CR-210 option A; CHG-R10ID-003): not only `evaluateAccess`, but the per-scope permission check the host makes before every operation (`decidedBy` `central`), permit and deny alike, so `listPermissionFindings` reads real use. Where the volume needs it, the host summarises the checks per principal, permission, scope and day instead of one row per check; the summary keeps the latest decision of the day.\n",
   "properties": {
    "id": {
     "type": "string",
@@ -504,6 +504,7 @@
  "ConfigurationProfile": {
   "type": "object",
   "x-ticvai-persistence": "platform.configuration_profile",
+  "x-ticvai-rls": "read-beneath",
   "x-ticvai-primary-key": [
    "id",
    "version"
@@ -538,7 +539,7 @@
    "version": {
     "type": "integer",
     "readOnly": true,
-    "description": "**Immutable once deployed anywhere.** A change makes a new version, and the old one stays readable — a workstation still running v2.3 must be able to say what v2.3 was. Assigned by the server: 1 on create, and one more each time a change lands on a published version (see `setConfigurationProfile`). **Each version is its own row, keyed (`id`, `version`)** (CHG-R8MIG-019): a new version is a new row, and `setConfigurationProfile` sets the older published row's `status` to `superseded`, its settings left exactly as they were.\n"
+    "description": "**Immutable once deployed anywhere.** A change makes a new version, and the old one stays readable — a workstation still running v2.3 must be able to say what v2.3 was. Assigned by the server: 1 on create, and one more each time a change lands on a published version (see `setConfigurationProfile`). **Each version is its own row, keyed (`id`, `version`)** (CHG-R8MIG-019): a new version is a new row, and `setConfigurationProfile` leaves the older row exactly as it is, `status` included. **`superseded` is set only by `deployConfigurationProfile`**, when the newer version is deployed: a deployed version is what workstations still run, so marking it superseded before the new one reaches them would misreport the fleet (ADAM CR-250, option A, accepted 26 October 2026, Chinmay). `id` is the profile and names every version of it; `platform.profile_deployment` keys a deployment to one version by (`profile_id`, `version`). **A read of \"the profile\" takes its latest version**; older versions stay readable by (`id`, `version`) (ADAM CR-228, option A, decided 25 October 2026; CHG-R10TEN-009).\n"
    },
    "settings": {
     "type": "object",
@@ -2291,6 +2292,17 @@
      "type": "string",
      "pattern": "^[A-Z]{3}$"
     }
+   },
+   "stepMinutes": {
+    "type": "integer",
+    "enum": [
+     15,
+     30,
+     60
+    ],
+    "nullable": true,
+    "x-ticvai-persistence-column": "integer",
+    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13)."
    },
    "cartLeaseSeconds": {
     "type": "integer",

@@ -42,15 +42,14 @@ transitions:
     is a till that ignores it silently.'
 - from: published
   to: deploying
-  trigger: deploy
-  operation: deployConfigurationProfile
-  guard: '**A target set is named** — a venue, a device class, one till. Deploying to everything is
-    a choice, not a default.'
+  trigger: job
+  guard: '**A deployment of it starts.** deployConfigurationProfile queues one, for the target set it names or,
+    naming none, for the profile''s whole fleet (its venueKindScope within its scope); the profile deployment job
+    in the workers host starts it and moves the version (ADAM CR-188, option A; CHG-R10TEN-008).'
 - from: deploying
   to: deployed
-  trigger: complete
-  operation: deployConfigurationProfile
-  guard: Every reachable device acknowledged.
+  trigger: job
+  guard: Every reachable device acknowledged (the profile deployment job, ADAM CR-188).
 - from: deploying
   to: rolledBack
   trigger: rollback
@@ -66,13 +65,16 @@ transitions:
 - from: deployed
   to: superseded
   trigger: supersede
-  operation: setConfigurationProfile
-  guard: A newer profile deployed over it.
+  operation: deployConfigurationProfile
+  guard: 'A newer version of the profile is deployed over it (the profile deployment job, when the newer version
+    reaches `deployed`). Storing a newer version with setConfigurationProfile leaves this row exactly as it is: a
+    deployed version is what workstations still run (ADAM CR-250, option A, accepted 26 October 2026).'
 - from: published
   to: superseded
   trigger: supersede
-  operation: setConfigurationProfile
-  guard: '**Replaced before it ever deployed.** Common and worth allowing without a rollback.'
+  operation: deployConfigurationProfile
+  guard: '**Replaced before it ever deployed**: a newer version of the profile is deployed. Common and worth allowing
+    without a rollback. setConfigurationProfile never sets it (ADAM CR-250).'
 openQuestions: '**What happens to a till that was offline for the whole rollout and wakes after a rollback?**
   It has never had the profile and the rollback does not apply to it. The current model says it takes
   whatever is current, which is right — but nothing says so explicitly.'

@@ -14,7 +14,7 @@ platform:
   - rtl
   screenCount: 43
   app: partner-web
-  appStatus: not scaffolded
+  appStatus: scaffolded
   packages:
   - design-tokens
   - ui
@@ -39,20 +39,19 @@ platform:
     `check-wireframes` has no unmatched-board concept, so the Python suite passed while the viewer flagged
     an orphan. **A board nobody references is a board nobody reviews.**'
   targetApp:
-    app: ticvai-control
-    name: TICVAI Control
+    app: partner-web
+    name: Partner Web
     shell: web
-    siblings:
-    - P09
-    - P11
-    - P14
-    - P17
-    note: '**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake,
-      the developer portal and the sign-up are outward faces of the control plane, not separate products
-      — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added
-      11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is
-      the only thing that can serve them.'
-    decided: 10 September 2026
+    siblings: []
+    note: '**P10 is its own app, in the ticvai-partner-web repository** (ADAM CR-153, raised by Chitrangi
+      Mestry on 16 October 2026 while scaffolding that repository; accepted by Chinmay, option A). It
+      follows the one-repository-per-app decision of 13 October 2026 and overrides the decision of 10
+      September 2026, which served P10 from the shared TICVAI Control app with P09, P11, P14 and P17.
+      Its sign-in, navigation and permission filtering are its own shell. The partner users are still
+      not TICVAI staff, and the permission model holds that line as before. The lead confirms that the
+      repository was created on purpose (docs/active/frontend-repos.yaml marks the mapping assumed until
+      then).'
+    decided: 25 October 2026 (ADAM CR-153)
 screens:
 - id: PTR-001
   name: Partner Login / MFA
@@ -63,7 +62,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/partner-login-mfa
-    component: apps/partner-web/src/routes/general/PartnerLoginMfaList.tsx
+    component: src/routes/general/PartnerLoginMfaList.tsx
     status: notStarted
   navigation:
     isEntryPoint: true
@@ -496,7 +495,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/partner-dashboard
-    component: apps/partner-web/src/routes/general/PartnerDashboard.tsx
+    component: src/routes/general/PartnerDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -946,7 +945,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/profile-and-company-details
-    component: apps/partner-web/src/routes/general/ProfileAndCompanyDetailsDetail.tsx
+    component: src/routes/general/ProfileAndCompanyDetailsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1132,7 +1131,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/notifications
-    component: apps/partner-web/src/routes/general/NotificationsDetail.tsx
+    component: src/routes/general/NotificationsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1254,7 +1253,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/inventory-and-allocation-view
-    component: apps/partner-web/src/routes/general/InventoryAndAllocationViewDetail.tsx
+    component: src/routes/general/InventoryAndAllocationViewDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1589,7 +1588,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/product-catalog-b2b-pricing
-    component: apps/partner-web/src/routes/general/ProductCatalogB2bPricingList.tsx
+    component: src/routes/general/ProductCatalogB2bPricingList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1818,7 +1817,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/availability-search
-    component: apps/partner-web/src/routes/general/AvailabilitySearchList.tsx
+    component: src/routes/general/AvailabilitySearchList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1896,7 +1895,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/booking-creation
-    component: apps/partner-web/src/routes/general/BookingCreationForm.tsx
+    component: src/routes/general/BookingCreationForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2314,7 +2313,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/group-bulk-booking
-    component: apps/partner-web/src/routes/general/GroupBulkBookingDetail.tsx
+    component: src/routes/general/GroupBulkBookingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2529,7 +2528,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/cart-and-quote
-    component: apps/partner-web/src/routes/general/CartAndQuoteDetail.tsx
+    component: src/routes/general/CartAndQuoteDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2845,7 +2844,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/quote-management
-    component: apps/partner-web/src/routes/general/QuoteManagementForm.tsx
+    component: src/routes/general/QuoteManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3031,7 +3030,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/checkout-credit-purchase
-    component: apps/partner-web/src/routes/general/CheckoutCreditPurchaseWizard.tsx
+    component: src/routes/general/CheckoutCreditPurchaseWizard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3185,7 +3184,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/credit-limit-and-balance
-    component: apps/partner-web/src/routes/general/CreditLimitAndBalanceDetail.tsx
+    component: src/routes/general/CreditLimitAndBalanceDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3289,7 +3288,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/settlement-and-payment-history
-    component: apps/partner-web/src/routes/general/SettlementAndPaymentHistoryList.tsx
+    component: src/routes/general/SettlementAndPaymentHistoryList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3484,7 +3483,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/order-history
-    component: apps/partner-web/src/routes/general/OrderHistoryList.tsx
+    component: src/routes/general/OrderHistoryList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3902,7 +3901,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/voucher-ticket-download
-    component: apps/partner-web/src/routes/general/VoucherTicketDownloadDetail.tsx
+    component: src/routes/general/VoucherTicketDownloadDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4146,7 +4145,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/commission-statement
-    component: apps/partner-web/src/routes/general/CommissionStatementDetail.tsx
+    component: src/routes/general/CommissionStatementDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4283,7 +4282,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/reports-and-sales-performance
-    component: apps/partner-web/src/routes/general/ReportsAndSalesPerformanceDashboard.tsx
+    component: src/routes/general/ReportsAndSalesPerformanceDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4587,7 +4586,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/api-credentials-and-integration
-    component: apps/partner-web/src/routes/general/ApiCredentialsAndIntegrationDetail.tsx
+    component: src/routes/general/ApiCredentialsAndIntegrationDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4838,7 +4837,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/sub-agent-management
-    component: apps/partner-web/src/routes/general/SubAgentManagementForm.tsx
+    component: src/routes/general/SubAgentManagementForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5014,7 +5013,7 @@ screens:
   implementation:
     app: partner-web
     route: /general/support-and-contact
-    component: apps/partner-web/src/routes/general/SupportAndContactDetail.tsx
+    component: src/routes/general/SupportAndContactDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5257,7 +5256,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-management-command-center-ptr-022
-    component: apps/partner-web/src/routes/partners/PartnerManagementCommandCenter.tsx
+    component: src/routes/partners/PartnerManagementCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5499,7 +5498,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-profile-organization-setup-ptr-023
-    component: apps/partner-web/src/routes/partners/PartnerProfileOrganizationSetup.tsx
+    component: src/routes/partners/PartnerProfileOrganizationSetup.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5628,7 +5627,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-onboarding-application-workflow-ptr-024
-    component: apps/partner-web/src/routes/partners/PartnerOnboardingApplicationWorkflow.tsx
+    component: src/routes/partners/PartnerOnboardingApplicationWorkflow.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5784,7 +5783,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-contacts-user-administration-ptr-025
-    component: apps/partner-web/src/routes/partners/PartnerContactsUserAdministration.tsx
+    component: src/routes/partners/PartnerContactsUserAdministration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6017,7 +6016,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-brand-venue-business-scope-assignment-ptr-027
-    component: apps/partner-web/src/routes/partners/PartnerBrandVenueBusinessScopeAssignment.tsx
+    component: src/routes/partners/PartnerBrandVenueBusinessScopeAssignment.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6106,7 +6105,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-documentation-compliance-repository-ptr-028
-    component: apps/partner-web/src/routes/partners/PartnerDocumentationComplianceRepository.tsx
+    component: src/routes/partners/PartnerDocumentationComplianceRepository.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6245,7 +6244,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-approval-status-lifecycle-management-ptr-030
-    component: apps/partner-web/src/routes/partners/PartnerApprovalStatusLifecycleManagement.tsx
+    component: src/routes/partners/PartnerApprovalStatusLifecycleManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6372,7 +6371,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-360-profile-readiness-ai-review-ptr-031
-    component: apps/partner-web/src/routes/partners/Partner360ProfileReadinessAiReview.tsx
+    component: src/routes/partners/Partner360ProfileReadinessAiReview.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6463,7 +6462,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/commercial-agreement-command-center-ptr-032
-    component: apps/partner-web/src/routes/partners/CommercialAgreementCommandCenter.tsx
+    component: src/routes/partners/CommercialAgreementCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6688,7 +6687,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/agreement-contract-terms-builder-ptr-033
-    component: apps/partner-web/src/routes/partners/AgreementContractTermsBuilder.tsx
+    component: src/routes/partners/AgreementContractTermsBuilder.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6847,7 +6846,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-rate-net-pricing-configuration-ptr-034
-    component: apps/partner-web/src/routes/partners/PartnerRateNetPricingConfiguration.tsx
+    component: src/routes/partners/PartnerRateNetPricingConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6946,7 +6945,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/payment-terms-billing-account-configuration-ptr-038
-    component: apps/partner-web/src/routes/partners/PaymentTermsBillingAccountConfiguration.tsx
+    component: src/routes/partners/PaymentTermsBillingAccountConfiguration.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7062,7 +7061,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/booking-limits-commercial-exceptions-approval-ptr-040
-    component: apps/partner-web/src/routes/partners/BookingLimitsCommercialExceptionsApproval.tsx
+    component: src/routes/partners/BookingLimitsCommercialExceptionsApproval.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7231,7 +7230,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/commercial-agreement-360-health-ai-review-ptr-041
-    component: apps/partner-web/src/routes/partners/CommercialAgreement360HealthAiReview.tsx
+    component: src/routes/partners/CommercialAgreement360HealthAiReview.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7334,7 +7333,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-operations-command-center-ptr-042
-    component: apps/partner-web/src/routes/partners/PartnerOperationsCommandCenter.tsx
+    component: src/routes/partners/PartnerOperationsCommandCenter.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7561,7 +7560,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-orders-booking-management-ptr-043
-    component: apps/partner-web/src/routes/partners/PartnerOrdersBookingManagement.tsx
+    component: src/routes/partners/PartnerOrdersBookingManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7714,7 +7713,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/reservations-holds-release-management-ptr-044
-    component: apps/partner-web/src/routes/partners/ReservationsHoldsReleaseManagement.tsx
+    component: src/routes/partners/ReservationsHoldsReleaseManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7847,7 +7846,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-cancellations-refunds-amendments-ptr-045
-    component: apps/partner-web/src/routes/partners/PartnerCancellationsRefundsAmendments.tsx
+    component: src/routes/partners/PartnerCancellationsRefundsAmendments.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7969,7 +7968,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-statement-account-activity-ptr-046
-    component: apps/partner-web/src/routes/partners/PartnerStatementAccountActivity.tsx
+    component: src/routes/partners/PartnerStatementAccountActivity.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8129,7 +8128,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-disputes-cases-service-management-ptr-049
-    component: apps/partner-web/src/routes/partners/PartnerDisputesCasesServiceManagement.tsx
+    component: src/routes/partners/PartnerDisputesCasesServiceManagement.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8314,7 +8313,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-performance-scorecard-risk-monitoring-ptr-050
-    component: apps/partner-web/src/routes/partners/PartnerPerformanceScorecardRiskMonitoring.tsx
+    component: src/routes/partners/PartnerPerformanceScorecardRiskMonitoring.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8400,7 +8399,7 @@ screens:
   implementation:
     app: partner-web
     route: /partners/partner-ai-intelligence-relationship-optimization-ptr-051
-    component: apps/partner-web/src/routes/partners/PartnerAiIntelligenceRelationshipOptimization.tsx
+    component: src/routes/partners/PartnerAiIntelligenceRelationshipOptimization.tsx
     status: notStarted
   navigation:
     entryFrom:

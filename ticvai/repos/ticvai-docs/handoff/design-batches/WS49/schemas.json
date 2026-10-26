@@ -24,7 +24,7 @@
       "nullable": true,
       "readOnly": true,
       "x-ticvai-references": "catalogue.variant",
-      "description": "**The catalogue variant a cart line of this bundle names** (R8 blocker ORDERS-MONEY-C43, CHG-R8MIG-023): each sold bundle has a catalogue product of kind bundle with one variant, made when the bundle is published; `addCartLine` sends it as `variantId`, with the picks in `attributes.bundle`. Null until published."
+      "description": "**The catalogue variant a cart line of this bundle names** (R8 blocker ORDERS-MONEY-C43, CHG-R8MIG-023): each sold bundle has a catalogue product of kind bundle with one variant, made when the bundle is published; `addCartLine` sends it as `variantId`, with the picks in `attributes.bundle`. Null until published.\n\n**It is the bundle's published mark** (ADAM CR-197, option B, decided 25 October 2026; CHG-R10CAT-002): not null is published, and `isActive` false is withdrawn. It is written once, by the publication step of `updateBundle` (the first `isActive: true` on a bundle with no variant), which creates the bundle's catalogue product, and is never cleared: withdrawing and putting the bundle back on sale keep the same product and variant."
      },
      "savingsAmount": {
       "allOf": [
@@ -32,7 +32,7 @@
         "$ref": "../shared/common.yaml#/components/schemas/Money"
        }
       ],
-      "description": "Sum of component list prices less the bundle price."
+      "description": "Sum of component list prices less the bundle price: the `list_price` captured on each `promotions.allocation_component` when the bundle was created, not the variants' current prices (ADAM CR-110, option 1; CHG-R10CAT-010)."
      },
      "savingsPercentage": {
       "type": "number"
@@ -625,6 +625,7 @@
    },
    "allocation": {
     "type": "object",
+    "description": "Stored as `promotions.allocation_split` and `promotions.allocation_component`, the record of the split; `promotions.bundle.allocation` is a copy derived from them in the same transaction (ADAM CR-110, option 1; CHG-R10CAT-010).",
     "required": [
      "method",
      "components"

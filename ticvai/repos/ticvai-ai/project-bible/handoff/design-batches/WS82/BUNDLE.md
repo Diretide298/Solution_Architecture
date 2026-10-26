@@ -353,6 +353,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - … and 1 more flow steps (`flows/`)
 - Flow F191 branch at step 1 (expected): when Nothing has been set up on Game & Ride Pricing Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F191 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -519,6 +520,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS62 Game and Ride Board 5.dc.html#bo-435`
 - Workshop pack: Game_and_Ride_Module.pdf board 5
 - Flow F191 *Game and Ride board 5: Game & Ride Pricing Command Center*, step 2: Works in Standard Game & Ride Price Configuration → Define the normal base price charged to play a specific game or ride. The source requires that prices be defined for each game.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -688,6 +690,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS62 Game and Ride Board 5.dc.html#bo-436`
 - Workshop pack: Game_and_Ride_Module.pdf board 5
 - Flow F191 *Game and Ride board 5: Game & Ride Pricing Command Center*, step 4: Works in Group Pricing Configuration → Allow multiple games or rides to share a common pricing rule instead of configuring each attraction individually.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -859,6 +862,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS62 Game and Ride Board 5.dc.html#bo-437`
 - Workshop pack: Game_and_Ride_Module.pdf board 5
 - Flow F191 *Game and Ride board 5: Game & Ride Pricing Command Center*, step 6: Works in Peak / Non-Peak Dynamic Pricing → Configure different game/ride prices based on date and time. The source explicitly requires peak/non-peak pricing for games/rides based on specific date/time.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1023,6 +1027,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS62 Game and Ride Board 5.dc.html#bo-438`
 - Workshop pack: Game_and_Ride_Module.pdf board 5
 - Flow F191 *Game and Ride board 5: Game & Ride Pricing Command Center*, step 8: Works in Pricing Calendar & Exception Dates → Provide a visual calendar for understanding and overriding time-based pricing.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1211,6 +1216,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS62 Game and Ride Board 5.dc.html#bo-439`
 - Workshop pack: Game_and_Ride_Module.pdf board 5
 - Flow F191 *Game and Ride board 5: Game & Ride Pricing Command Center*, step 10: Works in Normal & VIP Pricing Configuration → Configure different prices for Normal and VIP guests for the same game/ride and reader. The source explicitly requires one reader to show both Normal Price and VIP Price for a specific game, with VIP …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1379,6 +1385,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS62 Game and Ride Board 5.dc.html#bo-440`
 - Workshop pack: Game_and_Ride_Module.pdf board 5
 - Flow F191 *Game and Ride board 5: Game & Ride Pricing Command Center*, step 12: Works in Retry Price Configuration → Configure a discounted repeat-play price for applicable skill games. Requirement 10.2.16 describes a skill game where, before the game ends, the guest is offered: “Do you want to continue?” A …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1574,6 +1581,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Workshop pack: Game_and_Ride_Module.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 18: Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console → Determine the final dynamic price when multiple strategies and rules are simultaneously applicable. This is the final and most important control screen of Board 5.
 - Flow F191 *Game and Ride board 5: Game & Ride Pricing Command Center*, step 14: Works in Price Priority & Conflict Rules → Define which pricing rule wins when several valid prices apply simultaneously. This is required to make the source pricing models operational because Standard, Group, Peak, VIP and Retry prices can …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1785,6 +1793,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS62 Game and Ride Board 5.dc.html#bo-442`
 - Workshop pack: Game_and_Ride_Module.pdf board 5
 - Flow F191 *Game and Ride board 5: Game & Ride Pricing Command Center*, step 16: Works in Effective Pricing & Reader Price Preview → Allow an administrator to preview what price will actually be presented/applied for a selected game before publishing configuration.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

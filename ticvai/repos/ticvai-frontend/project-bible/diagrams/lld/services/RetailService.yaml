@@ -47,7 +47,7 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: createMerchandise
     verb: POST
     path: /merchandise
@@ -313,7 +313,7 @@ tables:
   - retail
   foreignWriters: null
 - table: retail.merchandise
-  columns: 17
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -375,7 +375,7 @@ tables:
   - retail
   foreignWriters: null
 - table: retail.shop_and_drop
-  columns: 19
+  columns: 20
   store: postgres
   parent: null
   writtenBy:

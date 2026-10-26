@@ -61,7 +61,7 @@
        "kind": "searchField",
        "label": "Search",
        "operation": "searchCatalogue",
-       "notes": "Sends `?q=` to `searchCatalogue`.",
+       "notes": "**Type-ahead** (ADAM CR-223, 25 October 2026, as built and as the client-approved prototype searches): `searchCatalogue` is called with `?q=` once typing pauses (300 ms debounce), only for 2 or more characters (the contract's minLength; fewer sends nothing), Enter searches at once, and the latest answer wins (an earlier one that arrives late is dropped). frontend-patterns 4.6.",
        "provenance": "contract catalogue.yaml GET /search"
       },
       {
@@ -76,7 +76,7 @@
        "label": "Results",
        "operation": "searchCatalogue",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "One card per result: name, summary, photo (`primaryMedia`), from-price (`fromPrice`), sold out shown rather than hidden (`isAvailable`), and `notBookableLabel` for an info-only product. `searchCatalogue` answers with no named schema, so the card binds none. Was the generated table 'Every money'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "notes": "**The photo is `primaryMedia.thumbnailUrl`** (`url` for the full-size view): the stable CDN address `searchCatalogue` returns to a guest for a public, ready asset (ADAM CR-221, 25 October 2026); the client never turns an `assetId` into an address and calls no asset read. One card per result: name, summary, photo (`primaryMedia`), from-price (`fromPrice`), sold out shown rather than hidden (`isAvailable`), and `notBookableLabel` for an info-only product. `searchCatalogue` answers with no named schema, so the card binds none. Was the generated table 'Every money'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     }
@@ -93,7 +93,7 @@
    {
     "operationId": "searchCatalogue",
     "contract": "catalogue",
-    "purpose": "Find something by name",
+    "purpose": "Find something by name, type-ahead: called once typing pauses (300 ms debounce), for 2 or more characters, Enter at once, the latest answer wins (ADAM CR-223)",
     "trigger": "onAction"
    }
   ],

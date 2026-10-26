@@ -2,7 +2,7 @@
 
 **8 screens · 11 operations · 16 schemas · 3 permissions**
 
-Platform P10 Partner Web · ships as **ticvai-control** ·
+Platform P10 Partner Web · ships as **partner-web** ·
 partner audience · web ·
 online only
 

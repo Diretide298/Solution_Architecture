@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-464` | Game & Ride Operations Control Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-465` | Live Gameplay Transaction Monitor | D | 0 | 24 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-466` | Reader & Device Health Monitor | D | 0 | 25 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-466` | Reader & Device Health Monitor | D | 0 | 27 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `BO-467` | Tap Validation & Decision Trace | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-468` | Rejected Transaction & Reason Analysis | D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-469` | Wallet & Deduction Transaction Monitor | C | 0 | 14 | 6 | 3 | 0 | 6 | — | notStarted (—) |

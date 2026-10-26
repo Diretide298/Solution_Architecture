@@ -614,7 +614,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | ID | text | — |
 | Kind | chip: Refund, Price override, Discount override, Complimentary ticket, Membership … | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. |
 | Subject contract | text | — |
-| Requested by principal | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | The principal who raised the request, or for whom the raising contract raised it. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Requested at | 1 Oct 2026, 14:30 | — |
 | Sla due at | 1 Oct 2026, 14:30 | — |
@@ -628,7 +628,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | ID | text | — |
 | Kind | chip: Refund, Price override, Discount override, Complimentary ticket, Membership … | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. |
 | Subject contract | text | — |
-| Requested by principal | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | The principal who raised the request, or for whom the raising contract raised it. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Requested at | 1 Oct 2026, 14:30 | — |
 | Sla due at | 1 Oct 2026, 14:30 | — |

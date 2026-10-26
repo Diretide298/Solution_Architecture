@@ -268,7 +268,8 @@
        "derived": true,
        "impliedBy": "createSeatHold",
        "label": "Create seat hold",
-       "notes": "The act the screen exists for."
+       "operation": "createSeatHold",
+       "notes": "The act the screen exists for. Opens the form that collects the seats or places to hold (ADAM CR-268, CHG-R10WIR-004)."
       },
       {
        "kind": "secondaryButton",
@@ -281,6 +282,30 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formCreateSeatHold",
+    "component": "modal",
+    "trigger": "Create seat hold",
+    "body": "**Collects what `createSeatHold` sends before it is called.** Required: `performanceId` (the performance whose availability the screen shows) and either `seatIds` (the seats chosen, at most 10 per sale on a staff channel) or `zoneId` with `quantity` for a standing zone. Optional: `ttlSeconds` (480 by default, at most 1800), `subjectId` (the guest the hold is for). The client gives the hold its `id`, so a retry does not hold twice. A `422 seat-limit-exceeded` or a seat taken meanwhile stays in the dialog and names the seats. Dismissing sends nothing; nothing is held.",
+    "bindsTo": "CreateSeatHoldRequest",
+    "confirm": {
+     "label": "Hold these seats",
+     "operation": "createSeatHold"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "seatIds",
+      "zoneId",
+      "quantity",
+      "ttlSeconds",
+      "subjectId"
+     ]
+    },
+    "provenance": "contract seating.yaml POST /seat-holds; ADAM CR-268, 26 October 2026 (CHG-R10WIR-004)"
+   }
+  ],
   "states": {
    "loading": "The choose seats list.",
    "error": "Could not load. Names which read failed and leaves the choose seats untouched.",
@@ -1189,7 +1214,9 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "recommendSeats",
-       "notes": "The act the screen exists for."
+       "label": "Compare seats",
+       "operation": "recommendSeats",
+       "notes": "The act the screen exists for. Opens the form that asks what `recommendSeats` needs (ADAM CR-268, CHG-R10WIR-004)."
       },
       {
        "kind": "secondaryButton",
@@ -1209,6 +1236,31 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formRecommendSeats",
+    "component": "modal",
+    "trigger": "Compare seats",
+    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize` (1 to 50) and `strategy` (best available, best value, closest to the stage, accessible, or seats together: `SeatRecommendationStrategy`). Optional: `categoryIds` (price categories), `maxPrice`, `accessibleCount` (wheelchair spaces; companions are added), `maxOptions` (3 by default, at most 10). The performance is the one whose seat status the screen shows (path `performanceId`). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SeatRecommendationRequest",
+    "confirm": {
+     "label": "Compare seats",
+     "operation": "recommendSeats"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partySize",
+      "strategy",
+      "categoryIds",
+      "maxPrice",
+      "accessibleCount",
+      "maxOptions"
+     ]
+    },
+    "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations; ADAM CR-268, 26 October 2026 (CHG-R10WIR-004)"
+   }
+  ],
   "states": {
    "loading": "The view preview compare list.",
    "error": "Could not load. Names which read failed and leaves the view preview compare untouched.",
@@ -1334,7 +1386,9 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "recommendSeats",
-       "notes": "The act the screen exists for."
+       "label": "Suggest seats",
+       "operation": "recommendSeats",
+       "notes": "The act the screen exists for. Opens the form that asks what `recommendSeats` needs (ADAM CR-268, CHG-R10WIR-004)."
       },
       {
        "kind": "secondaryButton",
@@ -1354,6 +1408,31 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formRecommendSeats",
+    "component": "modal",
+    "trigger": "Suggest seats",
+    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize` (1 to 50) and `strategy` (best available, best value, closest to the stage, accessible, or seats together: `SeatRecommendationStrategy`). Optional: `categoryIds` (price categories), `maxPrice`, `accessibleCount` (wheelchair spaces; companions are added), `maxOptions` (3 by default, at most 10). The performance is the one whose seat status the screen shows (path `performanceId`). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SeatRecommendationRequest",
+    "confirm": {
+     "label": "Suggest seats",
+     "operation": "recommendSeats"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partySize",
+      "strategy",
+      "categoryIds",
+      "maxPrice",
+      "accessibleCount",
+      "maxOptions"
+     ]
+    },
+    "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations; ADAM CR-268, 26 October 2026 (CHG-R10WIR-004)"
+   }
+  ],
   "states": {
    "loading": "The conversational seat assistant list.",
    "error": "Could not load. Names which read failed and leaves the conversational seat assistant untouched.",

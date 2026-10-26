@@ -363,6 +363,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### References
 
 - Wireframe frame: `wireframes/P16 Venue Analytics.dc.html#anl-071` · status **notStarted** · provenance generated
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 - ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 
 #### Acceptance for the design
@@ -610,7 +611,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The venue or product category filter matched no sales in the period. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which the money position and tax documents require, and names that permission. **Never an empty table** — that reads as *there is no data*. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 400 Validation failed (`validation`). Includes a day filter (`from`, `to`) sent by a caller whose scope gives no single region; `errors[]` names `from`, "filter by …; 400 Validation failed (`validation`). Includes a day filter (`issuedFrom`, `issuedTo`) sent by a caller whose scope gives no single region; `errors[]` names … |
 
 #### Permissions
 

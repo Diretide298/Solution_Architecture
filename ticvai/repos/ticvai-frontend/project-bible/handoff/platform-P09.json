@@ -7,7 +7,7 @@
  "audience": "platformAdmin",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-22",
+ "generated": "2026-10-26",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 211,
@@ -15,7 +15,7 @@
   "contracts": 15,
   "modules": 13,
   "undrawn": 0,
-  "operationsWithNoScreen": 120
+  "operationsWithNoScreen": 124
  },
  "waves": {
   "wave1": 28,
@@ -175,7 +175,7 @@
    "operations": 1
   },
   {
-   "contract": "catalogue",
+   "contract": "payments",
    "operations": 1
   },
   {
@@ -183,7 +183,7 @@
    "operations": 1
   },
   {
-   "contract": "payments",
+   "contract": "catalogue",
    "operations": 1
   }
  ],
@@ -1895,7 +1895,7 @@
    "module": "Platform",
    "wave": 3,
    "route": "/platform/ai-decision-explorer-search-adm-540",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -2619,6 +2619,12 @@
     "summary": "Exclude a cell from this wave"
    },
    {
+    "operation": "verifyDeveloper",
+    "contract": "public-api",
+    "verb": "POST",
+    "summary": "Verify a registered developer organisation"
+   },
+   {
     "operation": "listAlertRules",
     "contract": "reporting",
     "verb": "GET",
@@ -2667,6 +2673,12 @@
     "summary": "What a plan tier allows and includes"
    },
    {
+    "operation": "issueInvoice",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Issue a draft invoice, giving it its number"
+   },
+   {
     "operation": "launchCellCluster",
     "contract": "subscription",
     "verb": "POST",
@@ -2689,6 +2701,12 @@
     "contract": "subscription",
     "verb": "GET",
     "summary": "Users beneath a partner, by branch"
+   },
+   {
+    "operation": "listPlatformTaxRates",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "The tax rates TICVAI charges on its own invoices, per country"
    },
    {
     "operation": "listTenantMigrations",
@@ -2737,6 +2755,12 @@
     "contract": "subscription",
     "verb": "PUT",
     "summary": "Set a plan tier's allowances and modules"
+   },
+   {
+    "operation": "setPlatformTaxRate",
+    "contract": "subscription",
+    "verb": "PUT",
+    "summary": "Set a country's tax rate on TICVAI's own invoices"
    },
    {
     "operation": "updatePartnerAgreement",

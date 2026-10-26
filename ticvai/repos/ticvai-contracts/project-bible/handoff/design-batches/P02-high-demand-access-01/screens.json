@@ -27,7 +27,8 @@
      "trigger": "Continue to your tickets",
      "precondition": "`getWaitingRoomPosition` answers `admitted`. The app keeps `admission.token` and sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt`",
      "carries": [
-      "performanceId"
+      "performanceId",
+      "waitingEntryId"
      ],
      "provenance": "ADR-0066 (accepted 1 October 2026) and its 1 October amendment"
     }
@@ -108,8 +109,9 @@
     },
     {
      "name": "waitingEntryId",
-     "from": "GST-046",
-     "optional": true
+     "from": "GST-007",
+     "optional": true,
+     "notes": "Carried back on the GST-007 edge when an admitted guest is sent here again, so the poll resumes the same entry and the guest keeps their place, as on WEB-015 (ADAM CR-216, 25 October 2026). A `404` from `getWaitingRoomPosition` for a performance the app knows means the entry is gone: the guest re-enters."
     }
    ],
    "coldEntry": "**Named, closed or expired — never a 404** (ADR-0030). Opened with no performance, or one no longer selling, the room says so and offers the event."

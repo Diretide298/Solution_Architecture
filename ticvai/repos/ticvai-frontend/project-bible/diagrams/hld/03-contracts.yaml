@@ -48,18 +48,19 @@ contracts:
   - catalogue-productWithdrawn
   - entitlement-statusChanged
   - entitlement-transferred
+  - event-lifecycleChanged
   - inventoryHold-expired
   - performance-cancelled
   ref: diagrams/lld/contracts/catalogue.yaml
 - contract: access
   tier: spine
-  operations: 258
+  operations: 259
   holds: null
   service: AccessService
   verbs:
     GET: 134
     PUT: 82
-    POST: 32
+    POST: 33
     DELETE: 8
     PATCH: 2
   guestCallable: 12
@@ -73,12 +74,12 @@ contracts:
   ref: diagrams/lld/contracts/access.yaml
 - contract: orders
   tier: spine
-  operations: 227
+  operations: 228
   holds: null
   service: OrderService
   verbs:
     GET: 108
-    POST: 78
+    POST: 79
     PUT: 34
     DELETE: 4
     PATCH: 3
@@ -105,13 +106,13 @@ contracts:
   ref: diagrams/lld/contracts/orders.yaml
 - contract: subscription
   tier: satellite
-  operations: 153
+  operations: 156
   holds: null
   service: PlatformService
   verbs:
-    GET: 71
-    POST: 45
-    PUT: 33
+    GET: 72
+    POST: 46
+    PUT: 34
     PATCH: 3
     DELETE: 1
   guestCallable: 3
@@ -191,25 +192,28 @@ contracts:
     PATCH: 6
   guestCallable: 13
   offlineCapable: 10
-  events: null
+  events:
+  - whitelabel-customDomainChanged
   ref: diagrams/lld/contracts/white-label.yaml
 - contract: identity
   tier: spine
-  operations: 101
+  operations: 102
   holds: null
   service: IdentityService
   verbs:
     POST: 45
-    GET: 41
+    GET: 42
     PUT: 8
     DELETE: 4
     PATCH: 3
-  guestCallable: 18
+  guestCallable: 19
   offlineCapable: 6
   events:
   - identity-credentialResetRequested
+  - identity-guestCheckoutLinked
   - identity-guestRegistered
   - identity-loginRecorded
+  - identity-privacyRequestRaised
   ref: diagrams/lld/contracts/identity.yaml
 - contract: finance
   tier: spine
@@ -456,12 +460,12 @@ contracts:
   ref: diagrams/lld/contracts/platform-ops.yaml
 - contract: public-api
   tier: satellite
-  operations: 36
+  operations: 38
   holds: null
   service: PlatformService
   verbs:
-    GET: 16
-    POST: 15
+    GET: 17
+    POST: 16
     PUT: 4
     DELETE: 1
   guestCallable: 0
@@ -545,18 +549,19 @@ contracts:
   ref: diagrams/lld/contracts/retail.yaml
 - contract: queue
   tier: satellite
-  operations: 22
+  operations: 23
   holds: null
   service: VenueOpsService
   verbs:
     GET: 10
-    POST: 7
+    POST: 8
     PUT: 3
     PATCH: 1
     DELETE: 1
   guestCallable: 6
-  offlineCapable: 9
-  events: null
+  offlineCapable: 10
+  events:
+  - queueEntry-redeemed
   ref: diagrams/lld/contracts/queue.yaml
 - contract: cross-region
   tier: spine

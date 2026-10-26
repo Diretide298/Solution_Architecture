@@ -1,5 +1,5 @@
 id: LLD-Shift
-title: Shift — 14 transitions
+title: Shift — 15 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/shift.yaml
@@ -36,6 +36,12 @@ transitions:
   operation: closeShift
   trigger: operation
   guard: Blind count submitted. The expected figure is withheld until this point
+- from: suspended
+  to: pendingClosure
+  operation: closeShift
+  trigger: operation
+  guard: A suspended shift closed with its blind count; closeShift's 409 already allowed suspended (r10
+    ruling on check-state-refusals, the lead, 25 October 2026; CHG-R10ORD-020)
 - from: pendingClosure
   to: pendingVariance
   trigger: job

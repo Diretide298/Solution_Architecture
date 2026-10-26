@@ -125,7 +125,7 @@
   "scopeLevel": "tenant",
   "parameters": [],
   "requestBody": null,
-  "responds": "GuestSession"
+  "responds": "GuestSessionView"
  },
  "getLoyaltyPosition": {
   "method": "GET",
@@ -435,6 +435,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -461,6 +466,11 @@
    {
     "name": "programmeId",
     "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
     "required": null
    },
    {

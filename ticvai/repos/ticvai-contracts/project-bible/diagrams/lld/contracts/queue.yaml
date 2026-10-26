@@ -1,5 +1,5 @@
 id: LLD-queue
-title: queue — 22 operations
+title: queue — 23 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -212,12 +212,28 @@ operations:
   - queue.entry
   writes:
   - cache:idempotency
+  - platform.outbox
   - queue.entry
 - operation: redeemWaitingGuest
   verb: POST
   path: /waiting-guests/{entryId}/redeem
   scope: workstation
   permission: QUEUE_REDEEM
+  audience:
+  - staff
+  offline: true
+  reads:
+  - cache:idempotency
+  - queue.entry
+  writes:
+  - cache:idempotency
+  - platform.outbox
+  - queue.entry
+- operation: resolveCalledWaitingGuest
+  verb: POST
+  path: /waiting-guests/{entryId}/resolve-call
+  scope: venue
+  permission: QUEUE_MANAGE
   audience:
   - staff
   offline: true

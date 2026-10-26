@@ -403,6 +403,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS55 Event Management Configuration Backend Structure v1.0 Board 8.dc.html#bo-722`
 - Workshop pack: Event_Management_Configuration_Backend_Structure_v1.0.pdf board 8
 - Flow F241 *Event Management Configuration Backend Structure v1.0 board 8: Activity Session …*, step 2: Works in Prepaid Minute Package & Customer Balance Configuration → Configure dashboards used to measure event sales, attendance and check-in performance.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

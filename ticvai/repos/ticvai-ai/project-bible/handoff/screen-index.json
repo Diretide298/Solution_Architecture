@@ -27,7 +27,6 @@
   ],
   "reads": [
    "access.entitlement",
-   "cache:idempotency",
    "catalogue.entitlement_template",
    "catalogue.event",
    "catalogue.product",
@@ -55,7 +54,6 @@
    "whitelabel.tenant_config"
   ],
   "writes": [
-   "cache:idempotency",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -230,7 +228,7 @@
    {
     "to": "WEB-024",
     "trigger": "Devices, Wishlist & Consent",
-    "provenance": "derived \u2014 WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId only pre-select (deep link or optional), and WEB-024 opens on its own"
+    "provenance": "derived \u2014 WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own"
    },
    {
     "to": "WEB-027",
@@ -361,7 +359,8 @@
   "pattern": "listDetail",
   "entryFrom": [
    "WEB-001",
-   "WEB-003"
+   "WEB-003",
+   "WEB-032"
   ],
   "transitions": [
    {
@@ -689,7 +688,7 @@
      "eventId",
      "productId"
     ],
-    "provenance": "derived \u2014 WEB-007 declares entryState.params eventId, holdId, performanceId, productId and WEB-005 holds eventId, productId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-007 declares entryState.params eventId, holdId, holdIds, performanceId, productId and WEB-005 holds eventId, productId, so an edge into it carries them"
    },
    {
     "to": "WEB-008",
@@ -708,7 +707,7 @@
      "lineId",
      "performanceId"
     ],
-    "provenance": "derived \u2014 WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-005 holds cartId, code, lineId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-010 declares entryState.params cartId, code, holdId, holdIds, lineId, performanceId and WEB-005 holds cartId, code, lineId, performanceId, so an edge into it carries them"
    },
    {
     "to": "WEB-016",
@@ -876,9 +875,10 @@
     "to": "WEB-015",
     "trigger": "Adds tickets for a performance whose on-sale waiting room is on",
     "operation": "addCartLine",
-    "precondition": "`addCartLine` refused `403 admission-required`: this performance's room is on and the page holds no admission token for it",
+    "precondition": "`addCartLine` refused `403 admission-required`: this performance's room is on and the browser sent no valid admission cookie for it. The edge carries the `waitingEntryId` the page got back from WEB-015, when it has one, so the guest keeps their place (ADAM CR-216)",
     "carries": [
-     "performanceId"
+     "performanceId",
+     "waitingEntryId"
     ],
     "returnsTo": "WEB-006",
     "provenance": "ADR-0066 (accepted 1 October 2026) and its 1 October amendment"
@@ -956,6 +956,7 @@
    "listPerformances",
    "relinquishSeatHold",
    "getPublishedBookingFlow",
+   "getSeatHold",
    "getPerformance"
   ],
   "services": [
@@ -1028,7 +1029,7 @@
      "performanceId",
      "productId"
     ],
-    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId and WEB-007 holds eventId, performanceId, productId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId, waitingEntryId and WEB-007 holds eventId, performanceId, productId, so an edge into it carries them"
    },
    {
     "to": "WEB-010",
@@ -1036,6 +1037,7 @@
     "provenance": "flow F02 step 2\u21923",
     "carries": [
      "holdId",
+     "holdIds",
      "performanceId"
     ]
    }
@@ -1054,7 +1056,7 @@
     "id": "formRecommendSeats",
     "component": "modal",
     "trigger": "Recommend seats",
-    "body": "**How many seats, and best available or together.** The guest sets the party size (a How many seats stepper, at most `maxSeatsPerGuestOrder`) and picks the preference, then `recommendSeats` places them. Tickets are chosen after seats, so there are none to count yet.",
+    "body": "**How many seats, and best available or together.** The guest sets the party size (a How many seats stepper, at most `SeatAvailability.maxSeatsPerGuestOrder`, read with `getSeatAvailability`; ADAM CR-187) and picks the preference, then `recommendSeats` places them. A 422 still reads *Up to {maxSeats} seats per booking*. Tickets are chosen after seats, so there are none to count yet.",
     "bindsTo": "SeatRecommendationRequest",
     "confirm": {
      "label": "Recommend seats",
@@ -1136,6 +1138,7 @@
    "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line",
+   "promotions.bundle",
    "promotions.bundle_choice_group",
    "promotions.bundle_choice_option",
    "promotions.bundle_component",
@@ -1185,7 +1188,7 @@
      "cartId",
      "performanceId"
     ],
-    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId, waitingEntryId and WEB-008 holds cartId, performanceId, so an edge into it carries them"
    },
    {
     "to": "WEB-010",
@@ -1195,7 +1198,7 @@
      "lineId",
      "performanceId"
     ],
-    "provenance": "derived \u2014 WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-008 holds cartId, lineId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-010 declares entryState.params cartId, code, holdId, holdIds, lineId, performanceId and WEB-008 holds cartId, lineId, performanceId, so an edge into it carries them"
    },
    {
     "to": "WEB-016",
@@ -1299,7 +1302,7 @@
     "carries": [
      "performanceId"
     ],
-    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId and WEB-009 holds performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-006 declares entryState.params cartId, entryId, eventId, performanceId, productId, waitingEntryId and WEB-009 holds performanceId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -1727,7 +1730,7 @@
      "lineId",
      "performanceId"
     ],
-    "provenance": "derived \u2014 WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-012 holds cartId, lineId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-010 declares entryState.params cartId, code, holdId, holdIds, lineId, performanceId and WEB-012 holds cartId, lineId, performanceId, so an edge into it carries them"
    },
    {
     "to": "WEB-011",
@@ -1788,6 +1791,7 @@
    "cache:idempotency",
    "identity.mfa_method",
    "identity.otp_challenge",
+   "identity.subject_holding",
    "orders.order_line",
    "orders.order_line_discount",
    "orders.order_line_eligibility",
@@ -1833,7 +1837,7 @@
      "lineId",
      "performanceId"
     ],
-    "provenance": "derived \u2014 WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-013 holds lineId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 WEB-010 declares entryState.params cartId, code, holdId, holdIds, lineId, performanceId and WEB-013 holds lineId, performanceId, so an edge into it carries them"
    },
    {
     "to": "WEB-011",
@@ -1966,6 +1970,7 @@
    "orders.payment_link",
    "orders.reservation",
    "orders.sales_order",
+   "payments.payment_attempt",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -2039,11 +2044,12 @@
    {
     "to": "WEB-006",
     "trigger": "Continue to your tickets",
-    "precondition": "`getWaitingRoomPosition` answers `admitted`. The page keeps `admission.token` and sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt`",
+    "precondition": "`getWaitingRoomPosition` answers `admitted`. The admission token is kept in an HttpOnly, short-lived, per-performance cookie the edge sets on that admitted answer, and the browser sends it with `addCartLine` until `admission.expiresAt`; the page stores nothing (no script-readable copy, no localStorage or sessionStorage), so a reload or a second tab is still admitted (ADAM CR-216, 25 October 2026; ADR-0066 amendment of 25 October)",
     "carries": [
-     "performanceId"
+     "performanceId",
+     "waitingEntryId"
     ],
-    "provenance": "ADR-0066 (accepted 1 October 2026) and its 1 October amendment"
+    "provenance": "ADR-0066 (accepted 1 October 2026), its 1 October amendment, and its 25 October amendment (ADAM CR-216)"
    }
   ],
   "machine": null,
@@ -2074,6 +2080,7 @@
    "refreshToken",
    "requestGuestOtp",
    "verifyGuestOtp",
+   "verifyGuestEmail",
    "claimCart",
    "createMfaChallenge",
    "verifyMfaChallenge",
@@ -2097,8 +2104,10 @@
    "identity.mfa_recovery_code",
    "identity.otp_challenge",
    "identity.password_policy",
+   "identity.redirect_host",
    "identity.refresh_token",
    "identity.session",
+   "identity.subject_holding",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "marketing.consent_record",
@@ -2108,7 +2117,6 @@
    "marketing.tracking_technology",
    "orders.cart",
    "orders.cart_line",
-   "orders.sales_order",
    "pii.subject",
    "pii.subject_contact",
    "pii.subject_identity"
@@ -2125,9 +2133,9 @@
    "marketing.consent_propagation",
    "marketing.consent_record",
    "marketing.device_consent",
+   "marketing.message_dispatch",
    "orders.cart",
    "orders.cart_line",
-   "orders.sales_order",
    "pii.subject",
    "pii.subject_contact",
    "pii.subject_document",
@@ -2216,7 +2224,7 @@
     "id": "formRegisterGuest",
     "component": "modal",
     "trigger": "Create an account",
-    "body": "**Collects what `registerGuest` sends before it is called.** Required: `identifier`, `channel`. Optional: `displayName`, `password`, `preferredLanguage`, `consents`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `registerGuest` sends before it is called.** Required: `identifier`. The guest never picks a channel: an email address is sent with `channel` `email`; a mobile number is sent with none, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delivery (ADAM CR-222). Optional: `displayName`, `password`, `preferredLanguage`, `consents`. The code it sends is typed in the Code field and confirmed with `verifyGuestEmail` (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RegisterGuestRequest",
     "confirm": {
      "label": "Register guest",
@@ -2276,7 +2284,7 @@
     "id": "formRequestGuestOtp",
     "component": "modal",
     "trigger": "Send me a code",
-    "body": "**Collects only the email or mobile number.** The channel follows from the identifier and the tenant's configured delivery (WhatsApp, SMS or email, DI-209); the guest is never asked to pick one. Dismissing sends nothing.",
+    "body": "**Collects only the email or mobile number.** The guest is never asked to pick a channel: an email address is sent with `channel` `email`; a mobile number is sent with no `channel`, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delivery (DI-209; ADAM CR-222, 25 October 2026). Dismissing sends nothing.",
     "confirm": {
      "label": "Request guest OTP",
      "operation": "requestGuestOtp"
@@ -2636,6 +2644,8 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.refund_policy",
    "orders.sales_order",
    "pii.subject"
@@ -2986,7 +2996,7 @@
    {
     "to": "WEB-024",
     "trigger": "Devices, Wishlist & Consent",
-    "provenance": "derived \u2014 WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId only pre-select (deep link or optional), and WEB-024 opens on its own"
+    "provenance": "derived \u2014 WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own"
    }
   ],
   "machine": null,
@@ -3092,7 +3102,7 @@
    {
     "to": "WEB-024",
     "trigger": "Devices, Wishlist & Consent",
-    "provenance": "derived \u2014 WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId only pre-select (deep link or optional), and WEB-024 opens on its own"
+    "provenance": "derived \u2014 WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own"
    }
   ],
   "machine": null,
@@ -3118,6 +3128,7 @@
    "getBillingStatement",
    "listMyPaymentIssues",
    "retryMyDunningPayment",
+   "listPaymentTokens",
    "getMyMemberships"
   ],
   "services": [
@@ -3137,7 +3148,8 @@
    "orders.payment",
    "orders.sales_order",
    "payments.dunning_case",
-   "payments.dunning_policy"
+   "payments.dunning_policy",
+   "payments.token"
   ],
   "writes": [
    "cache:idempotency",
@@ -3175,7 +3187,7 @@
    {
     "to": "WEB-024",
     "trigger": "Devices, Wishlist & Consent",
-    "provenance": "derived \u2014 WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId only pre-select (deep link or optional), and WEB-024 opens on its own"
+    "provenance": "derived \u2014 WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId, requestId and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own"
    }
   ],
   "machine": null,
@@ -3192,7 +3204,7 @@
     "id": "formRetryMyDunningPayment",
     "component": "modal",
     "trigger": "Retry the payment",
-    "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. **Use another card lists the guest's saved cards** from `listPaymentTokens` (masked identifier, method, expiry, the default first) and sends the chosen one's id as `paymentTokenId`; a hard decline is never retried on the same card (ADAM CR-233, 25 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RetryDunningPaymentRequest",
     "confirm": {
      "label": "Retry my dunning payment",
@@ -3222,6 +3234,7 @@
    "revokeGuestDevice",
    "deleteGuestAccount",
    "exportSubjectData",
+   "getSubjectDataExport",
    "getFacePassEnrolment",
    "getGuestConsents",
    "getWaiverStatus",
@@ -3254,6 +3267,7 @@
    "catalogue.variant",
    "identity.delegated_access",
    "identity.mfa_method",
+   "identity.subject_data_export",
    "identity.subject_holding",
    "marketing.consent_purpose",
    "marketing.consent_purpose_channel",
@@ -3273,6 +3287,7 @@
    "cache:idempotency",
    "cache:resolution",
    "identity.guest_session",
+   "identity.subject_data_export",
    "marketing.consent_propagation",
    "marketing.consent_record",
    "marketing.guest_device",
@@ -3733,13 +3748,30 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "WEB-001"
+   "WEB-001",
+   "WEB-002"
   ],
   "pattern": "statusTracker",
   "entryFrom": [
    "WEB-001"
   ],
-  "transitions": [],
+  "transitions": [
+   {
+    "to": "WEB-002",
+    "trigger": "Pick another day",
+    "precondition": "`getTenantAppStatus.availability` is `soldOut` (and the site is not in maintenance)",
+    "provenance": "ADAM CR-178 (option A), accepted by Chinmay 21 October 2026",
+    "carries": [
+     "eventId"
+    ]
+   },
+   {
+    "to": "WEB-001",
+    "trigger": "Back to the home page",
+    "precondition": "the site is open and not in maintenance (the open state)",
+    "provenance": "ADAM CR-178 (option A), accepted by Chinmay 21 October 2026"
+   }
+  ],
   "machine": null,
   "states": {
    "loading": "\u2014",
@@ -3747,8 +3779,9 @@
    "emptyFirstRun": "\u2014",
    "emptyNoAccess": "**Nothing here needs a sign-in** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-2)): the screen reads only what the tenant has published, which is public, so there is no no-access case. A host that belongs to no tenant shows the platform's neutral holding page.",
    "offline": "**The offline banner shows instead of this page.** Being offline is the guest's connection, not the venue's \u2014 an error or maintenance page shown for a dropped signal tells a guest the venue is down.",
-   "soldOut": "**Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day, never a generic error (decided 28 September, audit R073 (f)).",
-   "closed": "**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f)).",
+   "soldOut": "**Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with the tenant's `availabilityMessage` and offers another day (*Pick another day*, to the event and attraction listing), never a generic error (decided 28 September, audit R073 (f); ADAM CR-178).",
+   "closed": "**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the site is not open, with the tenant's `availabilityMessage` and the opening hours from `contact` (decided 28 September, audit R073 (f); the site, not the venue: ADAM CR-178).",
+   "open": "**Everything is running.** The site is open and not in maintenance, and the page was reached directly (footer *Service status*): a short message that everything is running, and *Back to the home page* (ADAM CR-178).",
    "maintenance": "The venue's maintenance message and when it expects to be back; one way onward (try again at that time). Set live on CMS-001, never published."
   },
   "overlays": []
@@ -4047,13 +4080,24 @@
   "offline": true,
   "specified": true,
   "exits": [
-   "WEB-001"
+   "WEB-001",
+   "WEB-002"
   ],
   "pattern": "listDetail",
   "entryFrom": [
    "WEB-001"
   ],
-  "transitions": [],
+  "transitions": [
+   {
+    "to": "WEB-002",
+    "trigger": "Use this offer",
+    "precondition": "the offer has a code (an automatic promotion needs nothing applied and stays on the list)",
+    "carries": [
+     "code"
+    ],
+    "provenance": "ADAM CR-225 (option A), settled by Chinmay 25 October 2026: Use this offer opens the booking flow with the code, which the booking keeps (in memory, with the booking; never in storage) until WEB-010, where `applyCartPromoCode` applies it to the cart. WEB-032 has no cart and calls no cart operation."
+   }
+  ],
   "machine": null,
   "states": {
    "loading": "The offers promotions list.",
@@ -5759,7 +5803,6 @@
   ],
   "reads": [
    "access.entitlement",
-   "cache:idempotency",
    "catalogue.entitlement_template",
    "catalogue.event",
    "catalogue.product",
@@ -5789,7 +5832,6 @@
    "whitelabel.tenant_config"
   ],
   "writes": [
-   "cache:idempotency",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -5909,7 +5951,7 @@
     "carries": [
      "eventId"
     ],
-    "provenance": "derived \u2014 GST-007 declares entryState.params entryId, eventId and GST-001 holds eventId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-007 declares entryState.params entryId, eventId, waitingEntryId and GST-001 holds eventId, so an edge into it carries them"
    },
    {
     "to": "GST-008",
@@ -6085,7 +6127,7 @@
     "carries": [
      "productId"
     ],
-    "provenance": "derived \u2014 GST-041 declares entryState.params holdId, lineId, performanceId, productId and GST-001 holds productId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-041 declares entryState.params holdId, holdIds, lineId, performanceId, productId and GST-001 holds productId, so an edge into it carries them"
    },
    {
     "to": "GST-042",
@@ -6109,7 +6151,7 @@
     "carries": [
      "eventId"
     ],
-    "provenance": "derived \u2014 GST-049 declares entryState.params eventId, holdId, performanceId and GST-001 holds eventId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-049 declares entryState.params eventId, holdId, holdIds, performanceId and GST-001 holds eventId, so an edge into it carries them"
    },
    {
     "to": "GST-052",
@@ -6138,7 +6180,7 @@
    {
     "to": "GST-059",
     "trigger": "Plan My Day \u2013 In Progress",
-    "provenance": "derived \u2014 GST-059 declares entryState.params itemId, planId and GST-001 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 finds planId (listMyVisitPlans) itself, and GST-059 opens on its own"
+    "provenance": "derived \u2014 GST-059 declares entryState.params itemId, planId and GST-001 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 opens on getWaitTimes, and planId has no source on GST-059 yet (a gap in GST-059, not in this edge)"
    },
    {
     "to": "GST-061",
@@ -6550,6 +6592,7 @@
    "catalogue.product_category",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
+   "promotions.bundle",
    "promotions.bundle_choice_group",
    "promotions.bundle_choice_option",
    "promotions.bundle_component",
@@ -6729,6 +6772,11 @@
      "performanceId"
     ],
     "provenance": "authored 3 October 2026 (CHG-SPF-004): GST-005 lists them, and GST-006 cannot load without the one the user picks"
+   },
+   {
+    "to": "GST-002",
+    "trigger": "See everything",
+    "provenance": "accepted 26 October 2026, Chinmay, ADAM CR-259 option A: the client-approved frame's *See everything* button opens Explore with nothing carried"
    }
   ],
   "machine": null,
@@ -6932,9 +6980,10 @@
     "to": "GST-046",
     "trigger": "Adds tickets for a performance whose on-sale waiting room is on",
     "operation": "addCartLine",
-    "precondition": "`addCartLine` refused `403 admission-required`: this performance's room is on and the app holds no admission token for it",
+    "precondition": "`addCartLine` refused `403 admission-required`: this performance's room is on and the app holds no admission token for it. The edge carries the `waitingEntryId` the app got back from GST-046, when it has one, so the guest keeps their place (ADAM CR-216)",
     "carries": [
-     "performanceId"
+     "performanceId",
+     "waitingEntryId"
     ],
     "returnsTo": "GST-007",
     "provenance": "ADR-0066 (accepted 1 October 2026) and its 1 October amendment"
@@ -7309,6 +7358,7 @@
    "cache:idempotency",
    "identity.mfa_method",
    "identity.otp_challenge",
+   "identity.subject_holding",
    "orders.order_line",
    "orders.order_line_discount",
    "orders.order_line_eligibility",
@@ -7823,6 +7873,7 @@
    "getBillingStatement",
    "listMyPaymentIssues",
    "retryMyDunningPayment",
+   "listPaymentTokens",
    "getMyMemberships",
    "listDelegations",
    "grantDelegation",
@@ -7851,6 +7902,7 @@
    "orders.sales_order",
    "payments.dunning_case",
    "payments.dunning_policy",
+   "payments.token",
    "pii.subject",
    "whitelabel.guided_choice_answer"
   ],
@@ -7900,7 +7952,7 @@
     "id": "formRetryMyDunningPayment",
     "component": "modal",
     "trigger": "Retry the payment",
-    "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. **Use another card lists the guest's saved cards** from `listPaymentTokens` (masked identifier, method, expiry, the default first) and sends the chosen one's id as `paymentTokenId`; a hard decline is never retried on the same card (ADAM CR-233, 25 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RetryDunningPaymentRequest",
     "confirm": {
      "label": "Retry my dunning payment",
@@ -8513,7 +8565,7 @@
    {
     "to": "GST-059",
     "trigger": "Plan My Day \u2013 In Progress",
-    "provenance": "derived \u2014 GST-059 declares entryState.params itemId, planId and GST-022 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 finds planId (listMyVisitPlans) itself, and GST-059 opens on its own"
+    "provenance": "derived \u2014 GST-059 declares entryState.params itemId, planId and GST-022 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 opens on getWaitTimes, and planId has no source on GST-059 yet (a gap in GST-059, not in this edge)"
    }
   ],
   "machine": null,
@@ -8892,7 +8944,7 @@
      "lineId",
      "performanceId"
     ],
-    "provenance": "derived \u2014 GST-041 declares entryState.params holdId, lineId, performanceId, productId and GST-026 holds lineId, performanceId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-041 declares entryState.params holdId, holdIds, lineId, performanceId, productId and GST-026 holds lineId, performanceId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -10626,6 +10678,7 @@
    "refreshToken",
    "requestGuestOtp",
    "verifyGuestOtp",
+   "verifyGuestEmail",
    "createMfaChallenge",
    "verifyMfaChallenge",
    "claimDeviceConsent"
@@ -10647,14 +10700,15 @@
    "identity.mfa_recovery_code",
    "identity.otp_challenge",
    "identity.password_policy",
+   "identity.redirect_host",
    "identity.refresh_token",
    "identity.session",
+   "identity.subject_holding",
    "marketing.consent_record",
    "marketing.device_consent",
    "marketing.device_consent_category",
    "marketing.guest_profile",
    "marketing.tracking_technology",
-   "orders.sales_order",
    "pii.subject",
    "pii.subject_contact",
    "pii.subject_identity"
@@ -10671,7 +10725,7 @@
    "marketing.consent_propagation",
    "marketing.consent_record",
    "marketing.device_consent",
-   "orders.sales_order",
+   "marketing.message_dispatch",
    "pii.subject",
    "pii.subject_contact",
    "pii.subject_document",
@@ -10738,7 +10792,7 @@
     "id": "formRegisterGuest",
     "component": "modal",
     "trigger": "Create an account",
-    "body": "**Collects what `registerGuest` sends before it is called.** Required: `identifier`, `channel`. Optional: `displayName`, `password`, `preferredLanguage`, `consents`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `registerGuest` sends before it is called.** Required: `identifier`. The guest never picks a channel: an email address is sent with `channel` `email`; a mobile number is sent with none, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delivery (ADAM CR-222). Optional: `displayName`, `password`, `preferredLanguage`, `consents`. The code it sends is typed in the Code field and confirmed with `verifyGuestEmail` (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RegisterGuestRequest",
     "confirm": {
      "label": "Register guest",
@@ -10798,7 +10852,7 @@
     "id": "formRequestGuestOtp",
     "component": "modal",
     "trigger": "Send me a code",
-    "body": "**Collects only the email or mobile number.** The channel follows from the identifier and the tenant's configured delivery (DI-209). Dismissing sends nothing.",
+    "body": "**Collects only the email or mobile number.** The guest is never asked to pick a channel: an email address is sent with `channel` `email`; a mobile number is sent with no `channel`, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delivery (DI-209; ADAM CR-222, 25 October 2026). Dismissing sends nothing.",
     "confirm": {
      "label": "Request guest OTP",
      "operation": "requestGuestOtp"
@@ -10842,9 +10896,12 @@
   "app": "guest-app",
   "route": "/general/arabic-rtl-experience",
   "operations": [
-   "getPublishedTenantConfig"
+   "getPublishedTenantConfig",
+   "updateMyProfile",
+   "getMyProfile"
   ],
   "services": [
+   "MarketingService",
    "WhiteLabelService"
   ],
   "stores": [
@@ -10852,6 +10909,9 @@
    "redis"
   ],
   "reads": [
+   "cache:idempotency",
+   "marketing.guest_preference",
+   "marketing.guest_profile",
    "whitelabel.analytics_provider",
    "whitelabel.config_version",
    "whitelabel.footer_config",
@@ -10863,7 +10923,12 @@
    "whitelabel.navigation_item",
    "whitelabel.tenant_config"
   ],
-  "writes": [],
+  "writes": [
+   "cache:idempotency",
+   "marketing.guest_preference",
+   "marketing.guest_profile",
+   "pii.subject"
+  ],
   "storedProcedures": [],
   "wave": 1,
   "offline": true,
@@ -11055,7 +11120,8 @@
     "trigger": "Continue to your tickets",
     "precondition": "`getWaitingRoomPosition` answers `admitted`. The app keeps `admission.token` and sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt`",
     "carries": [
-     "performanceId"
+     "performanceId",
+     "waitingEntryId"
     ],
     "provenance": "ADR-0066 (accepted 1 October 2026) and its 1 October amendment"
    }
@@ -11219,6 +11285,9 @@
    {
     "id": "formAddCartLine",
     "component": "modal",
+    "reads": [
+     "listProductVariants"
+    ],
     "trigger": "Add cart line",
     "body": "**Asks only what the guest decides** (r8, ORDERS-MONEY-C40): the quantity, and a date for a timed product. `variantId` (and `performanceId`) come from the suggestion (`AiRecommendationItem.variantId`); when the suggestion has none, the form lists the product's variants (`listProductVariants`) and the guest picks one. Never `seatIds`, `parentLineId` or `attributes`. The suggestion's `trackingId` is sent as `recommendationId`. An offer, reward or challenge suggestion has its own action and never opens this form. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "AddCartLineRequest",
@@ -11316,9 +11385,9 @@
    {
     "to": "GST-041",
     "trigger": "Go to basket",
-    "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction)",
+    "provenance": "corrected 2 October 2026 (CHG-SGU-020, design-notes correction). Carries the list of `holdIds`, one per seat held (seating.yaml `createSeatHold`: one hold per tap), as WEB-007 does (ADAM CR-187, 25 October 2026)",
     "carries": [
-     "holdId",
+     "holdIds",
      "performanceId"
     ]
    }
@@ -11336,7 +11405,7 @@
     "id": "formRecommendSeats",
     "component": "modal",
     "trigger": "Recommend seats",
-    "body": "**How many seats, and best available or together.** The guest sets the party size (a How many seats stepper, at most `maxSeatsPerGuestOrder`) and picks the preference, then `recommendSeats` places them. Tickets are chosen after seats, so there are none to count yet.",
+    "body": "**How many seats, and best available or together.** The guest sets the party size (a How many seats stepper, at most `SeatAvailability.maxSeatsPerGuestOrder`, read with `getSeatAvailability`; ADAM CR-187) and picks the preference, then `recommendSeats` places them. A 422 still reads *Up to {maxSeats} seats per booking*. Tickets are chosen after seats, so there are none to count yet.",
     "bindsTo": "SeatRecommendationRequest",
     "confirm": {
      "label": "Recommend seats",
@@ -12099,6 +12168,7 @@
    "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line",
+   "promotions.bundle",
    "promotions.bundle_choice_group",
    "promotions.bundle_choice_option",
    "promotions.bundle_component"
@@ -12314,8 +12384,7 @@
    "getWaitTimes",
    "getVisitPlan",
    "updateVisitPlan",
-   "listVisitPlanAlternatives",
-   "listMyVisitPlans"
+   "listVisitPlanAlternatives"
   ],
   "services": [
    "VenueOpsService"
@@ -12688,6 +12757,7 @@
   "route": "/account/privacy-my-data",
   "operations": [
    "exportSubjectData",
+   "getSubjectDataExport",
    "deleteGuestAccount",
    "getGuestConsents",
    "recordConsent",
@@ -12704,6 +12774,7 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
+   "identity.subject_data_export",
    "identity.subject_holding",
    "marketing.consent_purpose",
    "marketing.consent_purpose_channel",
@@ -12717,10 +12788,12 @@
    "approvals.request",
    "cache:idempotency",
    "cache:resolution",
+   "identity.subject_data_export",
    "marketing.consent_propagation",
    "marketing.consent_record",
    "marketing.guest_profile",
-   "pii.subject"
+   "pii.subject",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -12791,6 +12864,8 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.refund_policy",
    "orders.resale_listing",
    "orders.sales_order"
@@ -14372,11 +14447,14 @@
    "orders.pos_shift_approval",
    "orders.pos_shift_incident",
    "orders.till_shift_policy",
+   "platform.configuration_profile",
    "platform.denomination",
    "platform.device",
    "platform.region_settings",
    "platform.venue_settings",
-   "platform.workstation"
+   "platform.workstation",
+   "tenancy.device_firmware",
+   "tenancy.device_telemetry"
   ],
   "writes": [
    "cache:idempotency",
@@ -14692,6 +14770,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "catalogue.alternative_code",
@@ -14743,6 +14822,7 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "catalogue.channel_capacity",
    "catalogue.inventory_reservation",
@@ -15100,7 +15180,6 @@
     "id": "drawerSeatSelection",
     "component": "drawer",
     "trigger": "Continue from date and performance",
-    "bindsTo": "SeatAvailability",
     "body": "**Seats, for a seated product only.** Carries the seating rules the venue configured \u2014 a group whose seats must stay together cannot be split here, and the map says so at the point of selection rather than at payment.",
     "provenance": "client-verified",
     "confirm": {
@@ -15542,29 +15621,7 @@
    "offline": "**Availability is never served from the bundle.** A lease is acquired against the server; without one the terminal sells only from its allocated lease and refuses beyond it (ADR-0013)",
    "denied": "Session and date selection are readable; adding to a sale needs `payment.take` to complete. The hold is not taken until the sale can be charged."
   },
-  "overlays": [
-   {
-    "id": "formAcquireInventoryHold",
-    "component": "modal",
-    "trigger": "Acquire inventory hold",
-    "body": "**Never opened** (r8 second round, GPS-C11): its button is never drawn and this screen takes no hold; the cart's hold, taken by `addCartLine`, is the only one. Kept only because the approved snapshot lists it.",
-    "bindsTo": "AcquireLeaseRequest",
-    "confirm": {
-     "label": "Acquire inventory hold"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "id",
-      "channelCapacityId",
-      "requestedUnits",
-      "ttlSeconds",
-      "channel"
-     ]
-    },
-    "provenance": "client-verified"
-   }
-  ]
+  "overlays": []
  },
  "POS-004": {
   "name": "Sell \u2014 Seat Map",
@@ -15580,8 +15637,7 @@
    "getSeatHold",
    "relinquishSeatHold",
    "createOrder",
-   "createPayment",
-   "listPerformances"
+   "createPayment"
   ],
   "services": [
    "CatalogueService",
@@ -15595,8 +15651,6 @@
    "cache:idempotency",
    "catalogue.inventory_reservation",
    "catalogue.performance",
-   "catalogue.product",
-   "catalogue.product_category",
    "ledger.fx_rate",
    "orders.order_line",
    "orders.order_line_discount",
@@ -16243,6 +16297,8 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.refund_policy",
    "orders.sales_order"
   ],
@@ -16255,6 +16311,8 @@
    "orders.order_line_discount",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.sales_order",
    "platform.outbox",
    "promotions.promotion_evaluation_trace"
@@ -16308,7 +16366,7 @@
    "emptyFirstRun": "No held orders yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing on this terminal matches the search; the holds are still there. Clear the search.",
    "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `resumeOrder`, `holdOrder`, `modifyOrder`; `ORDER_REFUND` for `createRefund`; `ORDER_REPRINT` for `reprintOrder`.",
-   "offline": "Orders held at this terminal are listed. Those held elsewhere are not \u2014 resuming another till's sale needs the server",
+   "offline": "Orders held at this terminal are listed, and they can still be reprinted; a reprint is queued and sent when the connection is back. Those held elsewhere are not \u2014 resuming another till's sale needs the server",
    "denied": "Held sales are listed and cannot be recalled without `sale.resume`. **The list is still shown**, because a cashier who cannot see the held sale fetches a supervisor to the wrong screen."
   },
   "overlays": [
@@ -17227,6 +17285,8 @@
    "orders.order_line",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.refund_policy",
    "orders.sales_order",
    "retail.merchandise",
@@ -17250,6 +17310,8 @@
    "orders.order_event",
    "orders.order_line",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.sales_order",
    "platform.audit_record",
    "platform.outbox",
@@ -17423,7 +17485,8 @@
    "reserveMerchandise",
    "getCurrentShift",
    "lookupShopAndDrop",
-   "collectShopAndDrop"
+   "collectShopAndDrop",
+   "createFnbOrder"
   ],
   "services": [
    "FnbService",
@@ -17438,7 +17501,12 @@
    "cache:idempotency",
    "fnb.delivery_location",
    "fnb.delivery_location_outlet",
+   "fnb.kitchen_station",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
+   "fnb.menu_item",
    "fnb.service_order",
+   "fnb.service_order_line",
    "inventory.movement",
    "inventory.stock_earmark",
    "orders.order_line",
@@ -17457,10 +17525,16 @@
   ],
   "writes": [
    "cache:idempotency",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line",
    "fnb.service_order",
+   "fnb.service_order_line",
    "inventory.stock_earmark",
+   "platform.idempotency_record",
+   "platform.outbox",
    "retail.reservation",
    "retail.reservation_line",
+   "retail.shop_and_drop",
    "retail.shop_and_drop_line"
   ],
   "storedProcedures": [],
@@ -17885,7 +17959,8 @@
    "orders.cash_movement",
    "orders.deposit_box",
    "orders.deposit_box_foreign_holding",
-   "orders.deposit_box_opening_denomination"
+   "orders.deposit_box_opening_denomination",
+   "orders.payment"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -18158,7 +18233,8 @@
    "orders.cash_movement",
    "orders.deposit_box",
    "orders.deposit_box_foreign_holding",
-   "orders.deposit_box_opening_denomination"
+   "orders.deposit_box_opening_denomination",
+   "orders.payment"
   ],
   "writes": [
    "cache:idempotency",
@@ -18376,6 +18452,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal",
@@ -18392,6 +18469,7 @@
    "approvals.decision",
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "control.partner_agreement",
    "control.partner_application",
@@ -19163,12 +19241,15 @@
    "listDevices",
    "suspendShift",
    "reopenShift",
-   "listShifts"
+   "listShifts",
+   "listOrders",
+   "listQueues"
   ],
   "services": [
    "OrderService",
    "ReportingService",
-   "TenancyService"
+   "TenancyService",
+   "VenueOpsService"
   ],
   "stores": [
    "postgres",
@@ -19176,16 +19257,24 @@
   ],
   "reads": [
    "cache:idempotency",
+   "orders.order_line",
+   "orders.payment",
    "orders.pos_shift",
    "orders.pos_shift_approval",
    "orders.pos_shift_incident",
+   "orders.sales_order",
+   "platform.configuration_profile",
    "platform.device",
    "platform.sale_board",
    "platform.sale_board_page",
    "platform.sale_board_tile",
    "platform.workstation",
+   "queue.queue",
+   "queue.queue_operating_window",
    "reporting.alert",
-   "reporting.alert_rule"
+   "reporting.alert_rule",
+   "tenancy.device_firmware",
+   "tenancy.device_telemetry"
   ],
   "writes": [
    "cache:idempotency",
@@ -19340,7 +19429,6 @@
   "route": "/sell/receipt",
   "operations": [
    "reprintReceipt",
-   "reprintOrder",
    "reissueEntitlement",
    "issueTaxInvoice",
    "getTaxInvoice",
@@ -19381,9 +19469,6 @@
    "ledger.tax_invoice",
    "ledger.tax_invoice_line",
    "ledger.tax_invoice_template",
-   "orders.order_event",
-   "orders.order_line",
-   "orders.sales_order",
    "platform.audit_record",
    "platform.outbox",
    "retail.sale"
@@ -19764,10 +19849,12 @@
    "listFnbOrders",
    "acceptFnbOrder",
    "setKitchenTicketStatus",
-   "recordOrderHandover"
+   "recordOrderHandover",
+   "listQueueFeeds"
   ],
   "services": [
-   "FnbService"
+   "FnbService",
+   "VenueOpsService"
   ],
   "stores": [
    "postgres",
@@ -19780,7 +19867,8 @@
    "fnb.kitchen_ticket",
    "fnb.kitchen_ticket_line",
    "fnb.service_order",
-   "fnb.service_order_line"
+   "fnb.service_order_line",
+   "queue.feed"
   ],
   "writes": [
    "cache:idempotency",
@@ -22676,6 +22764,8 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.sales_order"
   ],
   "writes": [
@@ -24539,6 +24629,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.audit_entry",
    "catalogue.channel_envelope"
   ],
   "storedProcedures": [],
@@ -24657,6 +24748,8 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.refund_policy",
    "orders.sales_order",
    "whitelabel.guided_choice_answer"
@@ -24671,6 +24764,8 @@
    "orders.order_relationship",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.sales_order",
    "platform.outbox",
    "promotions.promotion_evaluation_trace"
@@ -25227,6 +25322,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "identity.principal",
    "workforce.announcement",
@@ -33944,8 +34040,11 @@
    "catalogue.alternative_code",
    "catalogue.product",
    "catalogue.product_category",
+   "catalogue.product_channel_text",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
+   "catalogue.product_owner_form",
+   "catalogue.product_sale_permission",
    "catalogue.published_bundle",
    "catalogue.variant",
    "catalogue.variant_dimension",
@@ -33962,6 +34061,7 @@
    "catalogue.alternative_code",
    "catalogue.product",
    "catalogue.product_media",
+   "catalogue.product_version",
    "catalogue.variant_dimension",
    "platform.outbox",
    "retail.merchandise"
@@ -34237,7 +34337,10 @@
    "assets.media_collection_member",
    "cache:idempotency",
    "catalogue.product",
+   "catalogue.product_channel_text",
    "catalogue.product_media",
+   "catalogue.product_owner_form",
+   "catalogue.product_sale_permission",
    "catalogue.product_version",
    "catalogue.variant",
    "catalogue.variant_dimension",
@@ -34967,10 +35070,13 @@
    "catalogue.audit_entry",
    "catalogue.group_package",
    "catalogue.package_pricing",
+   "catalogue.product",
+   "catalogue.variant",
    "fnb.combo",
    "fnb.combo_slot",
    "fnb.combo_slot_option",
    "promotions.allocation_component",
+   "promotions.allocation_split",
    "promotions.bundle",
    "promotions.bundle_choice_group",
    "promotions.bundle_choice_option",
@@ -35153,8 +35259,11 @@
    "catalogue.entitlement_template",
    "catalogue.product",
    "catalogue.product_category",
+   "catalogue.product_channel_text",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
+   "catalogue.product_owner_form",
+   "catalogue.product_sale_permission",
    "catalogue.published_bundle",
    "catalogue.variant",
    "catalogue.variant_dimension",
@@ -35167,6 +35276,7 @@
    "catalogue.entitlement_template",
    "catalogue.product",
    "catalogue.product_media",
+   "catalogue.product_version",
    "catalogue.variant_dimension",
    "platform.outbox"
   ],
@@ -35407,6 +35517,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.audit_entry",
    "catalogue.channel_capacity",
    "catalogue.channel_envelope",
    "catalogue.published_bundle",
@@ -35737,7 +35848,6 @@
   "route": "/venue-operations/session-calendar",
   "operations": [
    "listPerformances",
-   "listProductCategories",
    "getPerformance",
    "createPerformances",
    "cancelPerformance",
@@ -36066,6 +36176,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.audit_entry",
    "catalogue.channel_capacity",
    "catalogue.channel_envelope",
    "catalogue.inventory_reservation",
@@ -36777,6 +36888,8 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.refund_policy",
    "orders.sales_order"
   ],
@@ -36794,6 +36907,8 @@
    "orders.order_line_discount",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.sales_order",
    "platform.audit_record",
    "platform.outbox",
@@ -37073,6 +37188,8 @@
    "orders.payment",
    "orders.refund",
    "orders.refund_batch",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.refund_policy",
    "orders.refund_policy_time_band",
    "orders.sales_order"
@@ -37092,6 +37209,8 @@
    "orders.order_line_discount",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.sales_order",
    "platform.audit_record",
    "platform.outbox"
@@ -37605,8 +37724,10 @@
    "cache:idempotency",
    "ledger.posting",
    "orders.chargeback",
+   "orders.deposit",
    "orders.fraud_rule",
    "orders.group_booking",
+   "orders.group_participant",
    "orders.group_quote",
    "orders.order_event",
    "orders.order_fee",
@@ -37615,6 +37736,8 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.refund_policy",
    "orders.sales_order",
    "pii.subject"
@@ -37630,6 +37753,8 @@
    "orders.order_line_discount",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.sales_order",
    "platform.outbox",
    "promotions.promotion_evaluation_trace"
@@ -37648,9 +37773,10 @@
     "to": "BO-008",
     "trigger": "Product Detail & Variants",
     "carries": [
-     "variantId"
+     "variantId",
+     "version"
     ],
-    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-026 holds variantId, so an edge into it carries them"
+    "provenance": "derived \u2014 BO-008 declares entryState.params productId, variantId, version and BO-026 holds variantId, version, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -38071,12 +38197,16 @@
   ],
   "reads": [
    "cache:idempotency",
-   "orders.refund"
+   "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment"
   ],
   "writes": [
    "cache:idempotency",
    "orders.order_event",
-   "orders.refund"
+   "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -38733,7 +38863,8 @@
    "listWorkstations",
    "listAlerts",
    "issueDeviceCredential",
-   "revokeDeviceCredential"
+   "revokeDeviceCredential",
+   "listSaleBoards"
   ],
   "services": [
    "ReportingService",
@@ -38746,14 +38877,19 @@
   "reads": [
    "cache:idempotency",
    "orders.pos_shift",
+   "platform.configuration_profile",
    "platform.device",
    "platform.outlet",
    "platform.region_settings",
    "platform.sale_board",
+   "platform.sale_board_page",
+   "platform.sale_board_tile",
    "platform.workstation",
    "reporting.alert",
    "reporting.alert_rule",
-   "tenancy.device_credential"
+   "tenancy.device_credential",
+   "tenancy.device_firmware",
+   "tenancy.device_telemetry"
   ],
   "writes": [
    "cache:idempotency",
@@ -38839,6 +38975,9 @@
    {
     "id": "formConfigureWorkstation",
     "component": "modal",
+    "reads": [
+     "listSaleBoards"
+    ],
     "trigger": "Configure workstation",
     "body": "**Collects what `configureWorkstation` sends before it is called.** Required: `name`. Optional: `saleBoardId` (absent or null, the till uses its outlet's board; DEC-183, CHG-CSP-006), `outletId`, `cashDrawerLimit` (null inherits the venue's; DEC-179, CHG-CSP-016), `cashierInputMode`, `guestDisplayContent`, `departmentId`, `accessPointId`, `devices`, `deploymentProfile`, `edgeNodeId`, `isActive`. **The form opens filled with the workstation as `getWorkstation` returns it and sends it back whole**: the call replaces the configuration, so a field left out takes its default (`cashierInputMode` `hybrid`, `guestDisplayContent` line items only, `isActive` on) or is cleared (ADAM CR-082, CHG-TEN-003). Dismissing sends nothing; the screen behind is unchanged. Not asked: `loadedMediaStockId` and `mediaStockRemaining`, deprecated and stored nowhere until BL-095 (the media stock record, on the printer device, waits on the BOCA stock answer; CHG-TEN-003). Refused `409 shift-open` while a shift is open on the till, naming the shift (CHG-TEN-004).",
     "bindsTo": "ConfigureWorkstationRequest",
@@ -39422,6 +39561,7 @@
    "orders.deposit_box",
    "orders.deposit_box_foreign_holding",
    "orders.deposit_box_opening_denomination",
+   "orders.payment",
    "platform.scope",
    "platform.venue_settings"
   ],
@@ -39526,9 +39666,9 @@
   "reads": [
    "cache:idempotency",
    "ledger.account",
-   "ledger.event_budget",
    "ledger.fiscal_period",
    "ledger.fx_rate",
+   "ledger.journal_entry",
    "ledger.posting",
    "ledger.settlement",
    "ledger.settlement_exception",
@@ -39713,7 +39853,8 @@
    "closeCorrectiveAction",
    "setDeliveryLocationOutletMapping",
    "listDeliveryLocations",
-   "listCorrectiveActions"
+   "listCorrectiveActions",
+   "getRegionSettings"
   ],
   "services": [
    "FnbService",
@@ -39970,6 +40111,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "catalogue.price",
@@ -39994,6 +40136,7 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "cache:resolution",
    "fnb.allergen_verdict",
@@ -40351,6 +40494,8 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.refund_policy",
    "orders.sales_order"
   ],
@@ -40363,6 +40508,8 @@
    "orders.order_line_discount",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.sales_order",
    "platform.outbox",
    "promotions.promotion_evaluation_trace"
@@ -41450,6 +41597,28 @@
      ]
     },
     "provenance": "contract identity.yaml POST /roles"
+   },
+   {
+    "id": "formSetCapabilityTemplate",
+    "component": "modal",
+    "trigger": "Save as preset",
+    "body": "**Collects what `setCapabilityTemplate` sends before it is called.** Required: `name`, `code`, `capabilities` (the permissions ticked in Permissions by module, shown for a last look). Optional: `description`, `module` (file the preset under one module, or none for a set that spans modules). The client gives a new preset its id (the path `capabilityTemplateId`); the server files it as the tenant's own, never a platform preset. Dismissing sends nothing; the screen behind is unchanged. A `409 capability-template-is-preset` stays in the dialog and says a platform preset cannot be overwritten, offering to save under a new name (ADAM CR-176; CHG-R10ID-005).",
+    "bindsTo": "CapabilityTemplate",
+    "confirm": {
+     "label": "Save preset",
+     "operation": "setCapabilityTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "name",
+      "code",
+      "capabilities",
+      "description",
+      "module"
+     ]
+    },
+    "provenance": "contract identity.yaml PUT /capability-templates/{capabilityTemplateId}; ADAM CR-267, 26 October 2026 (CHG-R10WIR-003)"
    }
   ]
  },
@@ -43297,7 +43466,8 @@
    "getAssetHistory",
    "lookupAsset",
    "setAssetStatus",
-   "updateAsset"
+   "updateAsset",
+   "listInspections"
   ],
   "services": [
    "VenueOpsService"
@@ -43311,6 +43481,7 @@
    "maintenance.asset",
    "maintenance.asset_document",
    "maintenance.asset_status_change",
+   "maintenance.inspection",
    "maintenance.preventive_plan",
    "maintenance.work_order"
   ],
@@ -43389,6 +43560,9 @@
    {
     "id": "formSetAssetStatus",
     "component": "modal",
+    "reads": [
+     "listInspections"
+    ],
     "trigger": "Save asset status",
     "body": "**Collects what `setAssetStatus` sends before it is called.** Required: `status`, `reason`, `recordedAt`. Optional: `inspectionId`, `raiseWorkOrder`. Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "SetAssetStatusRequest",
@@ -45565,6 +45739,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "approvals.sla_policy",
    "cache:idempotency",
@@ -45574,6 +45749,7 @@
    "approvals.decision",
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "control.partner_agreement",
    "control.partner_application",
@@ -45705,6 +45881,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal"
@@ -45713,6 +45890,7 @@
    "approvals.decision",
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "control.partner_agreement",
    "control.partner_application",
@@ -46254,7 +46432,6 @@
    "approvals.rule",
    "cache:idempotency",
    "ledger.account",
-   "ledger.event_budget",
    "ledger.fiscal_period",
    "ledger.fiscal_period_event",
    "ledger.journal_entry",
@@ -48701,8 +48878,10 @@
    "BO-077",
    "BO-089",
    "BO-090",
+   "BO-1088",
    "BO-1094",
    "BO-1111",
+   "BO-1144",
    "BO-1146",
    "BO-1162",
    "BO-1179"
@@ -48844,6 +49023,11 @@
     "provenance": "derived \u2014 BO-028 declares entryState.params refundId and BO-101 holds none of them. The edge carries nothing: refundId only pre-selects (deep link or optional), and BO-028 opens on its own"
    },
    {
+    "to": "BO-1088",
+    "trigger": "Opens Credit & Balance Type Configuration",
+    "provenance": "CHG-R10OPN-004 (ADAM CR-261; Chinmay, 26 October 2026): the section home links to the Block A screen it leads to, as CHG-RONEP-007 did; its command centre is not in Block A"
+   },
+   {
     "to": "BO-1094",
     "trigger": "Opens Funding Method Configuration",
     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
@@ -48852,6 +49036,11 @@
     "to": "BO-1111",
     "trigger": "Opens Credit Expiry, Extension & Forfeiture Operations",
     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+   },
+   {
+    "to": "BO-1144",
+    "trigger": "Opens Peer-to-Peer Transfer Configuration",
+    "provenance": "CHG-R10OPN-004 (ADAM CR-261; Chinmay, 26 October 2026): the section home links to the Block A screen it leads to, as CHG-RONEP-007 did; its command centre is not in Block A"
    },
    {
     "to": "BO-1146",
@@ -52086,8 +52275,11 @@
    "postgres"
   ],
   "reads": [
+   "platform.configuration_profile",
    "platform.device",
-   "platform.workstation"
+   "platform.workstation",
+   "tenancy.device_firmware",
+   "tenancy.device_telemetry"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -52178,7 +52370,8 @@
    "platform.profile_deployment",
    "platform.workstation",
    "tenancy.device_firmware",
-   "tenancy.device_rollout"
+   "tenancy.device_rollout",
+   "tenancy.device_telemetry"
   ],
   "writes": [
    "cache:idempotency",
@@ -55086,6 +55279,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "catalogue.entitlement_template",
@@ -55096,6 +55290,7 @@
    "access.configuration_version",
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency"
   ],
   "storedProcedures": [],
@@ -60884,6 +61079,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal"
@@ -60895,6 +61091,7 @@
    "approvals.decision",
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "control.partner_agreement",
    "control.partner_application",
@@ -62965,7 +63162,9 @@
   ],
   "reads": [
    "cache:idempotency",
+   "orders.deposit",
    "orders.group_booking",
+   "orders.group_participant",
    "orders.group_payment_milestone",
    "orders.group_payment_schedule",
    "orders.group_quote",
@@ -63614,6 +63813,8 @@
    "orders.after_sale_request",
    "orders.deposit",
    "orders.group_booking",
+   "orders.group_participant",
+   "orders.group_quote",
    "orders.group_ticket_allocation_line",
    "orders.order_line",
    "orders.order_line_discount",
@@ -64444,6 +64645,10 @@
    {
     "id": "formSetMembershipCommercialConfig",
     "component": "modal",
+    "reads": [
+     "listPriceLists",
+     "listTaxProfiles"
+    ],
     "trigger": "Save membership commercial config",
     "body": "**Collects what `setMembershipCommercialConfig` sends before it is called.** Required: `membershipCode`, `basePricingProfile`, `taxProfile`, `salesPeriod`. Optional: `feeProfile`, `upgradePricePolicy`, `promotionalPricingEligibility`, `paymentTerms`. Dismissing sends nothing; the screen behind is unchanged. **Pickers** (r8, GPS-C34): `basePricingProfile` is picked from the price lists (`listPriceLists`), `taxProfile` from the tax profiles (`listTaxProfiles`); `feeProfile` and `upgradePricePolicy` are typed codes, since no entity holds them yet.",
     "bindsTo": "MembershipCommercialConfigInput",
@@ -65149,8 +65354,10 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
+   "control.billing_entity",
    "identity.principal",
    "orders.member_exception"
   ],
@@ -65158,6 +65365,7 @@
    "access.entitlement",
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "orders.member_exception",
    "platform.outbox"
@@ -69337,7 +69545,8 @@
    "approvals.delegation",
    "approvals.escalation",
    "approvals.matrix",
-   "approvals.request"
+   "approvals.request",
+   "approvals.request_approver"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -69499,7 +69708,8 @@
    "approvals.delegation",
    "approvals.escalation",
    "approvals.matrix",
-   "approvals.request"
+   "approvals.request",
+   "approvals.request_approver"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -69560,6 +69770,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal"
@@ -69567,6 +69778,7 @@
   "writes": [
    "approvals.decision",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "control.partner_agreement",
    "control.partner_application",
@@ -69630,7 +69842,8 @@
    "approvals.delegation",
    "approvals.escalation",
    "approvals.matrix",
-   "approvals.request"
+   "approvals.request",
+   "approvals.request_approver"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -69689,7 +69902,8 @@
    "approvals.delegation",
    "approvals.escalation",
    "approvals.matrix",
-   "approvals.request"
+   "approvals.request",
+   "approvals.request_approver"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -69743,6 +69957,7 @@
    "approvals.decision",
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "approvals.sla_policy",
    "approvals.workflow_definition",
@@ -69754,6 +69969,7 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "platform.outbox"
   ],
@@ -69807,7 +70023,8 @@
    "approvals.delegation",
    "approvals.escalation",
    "approvals.matrix",
-   "approvals.request"
+   "approvals.request",
+   "approvals.request_approver"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -69978,6 +70195,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal"
@@ -69985,6 +70203,7 @@
   "writes": [
    "approvals.decision",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "control.partner_agreement",
    "control.partner_application",
@@ -70133,6 +70352,7 @@
    "approvals.evidence_package",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency"
   ],
   "writes": [
@@ -70272,6 +70492,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "approvals.signature",
    "approvals.step_up_policy",
@@ -70281,6 +70502,7 @@
   "writes": [
    "approvals.decision",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.signature",
    "cache:idempotency",
    "control.partner_agreement",
@@ -70344,6 +70566,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal"
@@ -70351,6 +70574,7 @@
   "writes": [
    "approvals.decision",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "control.partner_agreement",
    "control.partner_application",
@@ -70413,11 +70637,13 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency"
   ],
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "platform.outbox"
   ],
@@ -70474,10 +70700,12 @@
    "approvals.decision",
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency"
   ],
   "writes": [
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "platform.outbox"
   ],
@@ -71375,6 +71603,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "approvals.sla_policy",
    "cache:idempotency"
@@ -71382,6 +71611,7 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "platform.outbox"
   ],
@@ -87183,6 +87413,7 @@
    "approvals.decision",
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "approvals.sla_policy",
    "cache:idempotency"
@@ -87190,6 +87421,7 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "platform.outbox"
   ],
@@ -90535,21 +90767,25 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.channel_capacity",
    "catalogue.event",
    "catalogue.event_capacity_profile",
    "catalogue.event_registration",
    "catalogue.event_resource_plan",
    "catalogue.event_schedule",
-   "catalogue.performance"
+   "catalogue.performance",
+   "catalogue.price_assignment"
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.channel_capacity",
    "catalogue.event",
    "catalogue.event_capacity_profile",
    "catalogue.event_registration",
    "catalogue.event_resource_plan",
    "catalogue.event_schedule",
-   "catalogue.performance"
+   "catalogue.performance",
+   "catalogue.price_assignment"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -91844,7 +92080,10 @@
    "catalogue.event_resource_plan",
    "catalogue.event_schedule",
    "catalogue.performance",
-   "catalogue.price_list"
+   "catalogue.price",
+   "catalogue.price_list",
+   "catalogue.product",
+   "catalogue.variant"
   ],
   "writes": [
    "cache:idempotency",
@@ -91940,7 +92179,10 @@
    "catalogue.event_resource_plan",
    "catalogue.event_schedule",
    "catalogue.performance",
-   "catalogue.price_list"
+   "catalogue.price",
+   "catalogue.price_list",
+   "catalogue.product",
+   "catalogue.variant"
   ],
   "writes": [
    "cache:idempotency",
@@ -92003,6 +92245,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal"
@@ -92010,6 +92253,7 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency"
   ],
   "storedProcedures": [],
@@ -95618,6 +95862,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal",
@@ -95629,6 +95874,7 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency"
   ],
   "storedProcedures": [],
@@ -99892,6 +100138,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "whitelabel.custom_domain"
   ],
   "storedProcedures": [],
@@ -105771,6 +106018,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "catalogue.event_resource_plan",
@@ -105779,6 +106027,7 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency"
   ],
   "storedProcedures": [],
@@ -107060,6 +107309,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal"
@@ -107067,6 +107317,7 @@
   "writes": [
    "approvals.decision",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "control.partner_agreement",
    "control.partner_application",
@@ -107648,6 +107899,7 @@
   "reads": [
    "access.entitlement",
    "approvals.request",
+   "control.billing_entity",
    "identity.principal"
   ],
   "writes": [],
@@ -110686,7 +110938,30 @@
    "emptyNoResults": "The filter narrowed it and the choose seats are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCreateSeatHold",
+    "component": "modal",
+    "trigger": "Create seat hold",
+    "body": "**Collects what `createSeatHold` sends before it is called.** Required: `performanceId` (the performance whose availability the screen shows) and either `seatIds` (the seats chosen, at most 10 per sale on a staff channel) or `zoneId` with `quantity` for a standing zone. Optional: `ttlSeconds` (480 by default, at most 1800), `subjectId` (the guest the hold is for). The client gives the hold its `id`, so a retry does not hold twice. A `422 seat-limit-exceeded` or a seat taken meanwhile stays in the dialog and names the seats. Dismissing sends nothing; nothing is held.",
+    "bindsTo": "CreateSeatHoldRequest",
+    "confirm": {
+     "label": "Hold these seats",
+     "operation": "createSeatHold"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "seatIds",
+      "zoneId",
+      "quantity",
+      "ttlSeconds",
+      "subjectId"
+     ]
+    },
+    "provenance": "contract seating.yaml POST /seat-holds; ADAM CR-268, 26 October 2026 (CHG-R10WIR-004)"
+   }
+  ]
  },
  "BO-995": {
   "name": "Find Seats For Me",
@@ -111079,7 +111354,31 @@
    "emptyNoResults": "The filter narrowed it and the view preview compare are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formRecommendSeats",
+    "component": "modal",
+    "trigger": "Compare seats",
+    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize` (1 to 50) and `strategy` (best available, best value, closest to the stage, accessible, or seats together: `SeatRecommendationStrategy`). Optional: `categoryIds` (price categories), `maxPrice`, `accessibleCount` (wheelchair spaces; companions are added), `maxOptions` (3 by default, at most 10). The performance is the one whose seat status the screen shows (path `performanceId`). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SeatRecommendationRequest",
+    "confirm": {
+     "label": "Compare seats",
+     "operation": "recommendSeats"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partySize",
+      "strategy",
+      "categoryIds",
+      "maxPrice",
+      "accessibleCount",
+      "maxOptions"
+     ]
+    },
+    "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations; ADAM CR-268, 26 October 2026 (CHG-R10WIR-004)"
+   }
+  ]
  },
  "BO-1002": {
   "name": "AI Conversational Seat Assistant",
@@ -111143,7 +111442,31 @@
    "emptyNoResults": "The filter narrowed it and the conversational seat assistant are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formRecommendSeats",
+    "component": "modal",
+    "trigger": "Suggest seats",
+    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize` (1 to 50) and `strategy` (best available, best value, closest to the stage, accessible, or seats together: `SeatRecommendationStrategy`). Optional: `categoryIds` (price categories), `maxPrice`, `accessibleCount` (wheelchair spaces; companions are added), `maxOptions` (3 by default, at most 10). The performance is the one whose seat status the screen shows (path `performanceId`). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SeatRecommendationRequest",
+    "confirm": {
+     "label": "Suggest seats",
+     "operation": "recommendSeats"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partySize",
+      "strategy",
+      "categoryIds",
+      "maxPrice",
+      "accessibleCount",
+      "maxOptions"
+     ]
+    },
+    "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations; ADAM CR-268, 26 October 2026 (CHG-R10WIR-004)"
+   }
+  ]
  },
  "BO-1003": {
   "name": "Hold Command Center",
@@ -111622,6 +111945,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal",
@@ -111630,6 +111954,7 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency"
   ],
   "storedProcedures": [],
@@ -112913,6 +113238,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal"
@@ -112920,6 +113246,7 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency"
   ],
   "storedProcedures": [],
@@ -113447,7 +113774,31 @@
    "emptyNoResults": "The filter narrowed it and the seat upgrade recommendations are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formRecommendSeats",
+    "component": "modal",
+    "trigger": "Find upgrade options",
+    "body": "**Collects what `recommendSeats` sends before it is called.** Required: `partySize` (1 to 50) and `strategy` (best available, best value, closest to the stage, accessible, or seats together: `SeatRecommendationStrategy`). Optional: `categoryIds` (price categories), `maxPrice`, `accessibleCount` (wheelchair spaces; companions are added), `maxOptions` (3 by default, at most 10). The performance is the one whose seat status the screen shows (path `performanceId`). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "SeatRecommendationRequest",
+    "confirm": {
+     "label": "Find upgrade options",
+     "operation": "recommendSeats"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "partySize",
+      "strategy",
+      "categoryIds",
+      "maxPrice",
+      "accessibleCount",
+      "maxOptions"
+     ]
+    },
+    "provenance": "contract seating.yaml POST /performances/{performanceId}/seat-recommendations; ADAM CR-268, 26 October 2026 (CHG-R10WIR-004)"
+   }
+  ]
  },
  "BO-1040": {
   "name": "Alternatives & Reseating",
@@ -116048,6 +116399,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal"
@@ -116055,6 +116407,7 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency"
   ],
   "storedProcedures": [],
@@ -116632,7 +116985,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-1083"
+   "BO-1083",
+   "BO-101"
   ],
   "transitions": [
    {
@@ -120164,7 +120518,8 @@
   "route": "/orders-money/peer-to-peer-transfer-configuration-bo-1144",
   "operations": [
    "setWalletTransferRules",
-   "getWalletTransferRules"
+   "getWalletTransferRules",
+   "listCreditTypes"
   ],
   "services": [
    "WalletService"
@@ -120175,6 +120530,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "wallet.credit_type",
    "wallet.transfer_rule"
   ],
   "writes": [
@@ -120190,7 +120546,8 @@
   ],
   "pattern": "configEditor",
   "entryFrom": [
-   "BO-1143"
+   "BO-1143",
+   "BO-101"
   ],
   "transitions": [
    {
@@ -120357,6 +120714,8 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.sales_order",
    "wallet.refund_policy"
   ],
@@ -120366,6 +120725,8 @@
    "ledger.posting",
    "orders.order_event",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "platform.outbox",
    "wallet.refund_policy"
   ],
@@ -122352,7 +122713,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "control.api_client"
+   "control.api_client",
+   "control.api_client_secret"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -122617,6 +122979,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal",
@@ -122637,6 +123000,7 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "wallet.configuration_version",
    "wallet.configuration_version_snapshot"
@@ -129920,6 +130284,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "catalogue.approval_policy",
    "catalogue.change_request",
@@ -131051,6 +131416,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal",
@@ -131059,6 +131425,7 @@
   "writes": [
    "approvals.decision",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "control.partner_agreement",
    "control.partner_application",
@@ -135986,6 +136353,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "promotions.promotion"
   ],
@@ -142844,6 +143212,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "cache:idempotency",
    "identity.principal",
@@ -142855,6 +143224,7 @@
   "writes": [
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "cache:idempotency",
    "payments.currency_rule",
    "payments.eligibility_rule",
@@ -143657,13 +144027,11 @@
   "route": "/commercial/payment-terminal-device-inventory-t49-adm-580",
   "operations": [
    "listPaymentTerminals",
-   "listDevices",
    "listPaymentTerminalCertifications",
    "recordPaymentTerminalCertification"
   ],
   "services": [
-   "OrderService",
-   "TenancyService"
+   "OrderService"
   ],
   "stores": [
    "postgres"
@@ -143673,8 +144041,7 @@
    "payments.provider_connection",
    "payments.terminal",
    "payments.terminal_certification",
-   "payments.terminal_certification_level3",
-   "platform.device"
+   "payments.terminal_certification_level3"
   ],
   "writes": [
    "cache:idempotency",
@@ -145476,7 +145843,9 @@
    "postgres"
   ],
   "reads": [
-   "orders.refund"
+   "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -145527,7 +145896,10 @@
    {
     "to": "ADM-613",
     "trigger": "Void, Reversal & Cancellation Manager\\t120",
-    "provenance": "structural \u2014 pack board 6 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 6 wiring, 19 September 2026",
+    "carries": [
+     "paymentId"
+    ]
    },
    {
     "to": "ADM-614",
@@ -145540,7 +145912,10 @@
    {
     "to": "ADM-615",
     "trigger": "Refund Processing, Provider Status & Recovery Center\\t122",
-    "provenance": "structural \u2014 pack board 6 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 6 wiring, 19 September 2026",
+    "carries": [
+     "paymentId"
+    ]
    },
    {
     "to": "ADM-616",
@@ -145595,6 +145970,8 @@
    "orders.fraud_rule",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.refund_policy",
    "orders.refund_policy_time_band",
    "orders.sales_order"
@@ -145606,6 +145983,8 @@
    "ledger.posting",
    "orders.order_event",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -145848,14 +146227,18 @@
   "reads": [
    "cache:idempotency",
    "orders.fraud_rule",
-   "orders.refund"
+   "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
    "orders.fraud_rule",
    "orders.order_event",
-   "orders.refund"
+   "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -145970,6 +146353,8 @@
    "orders.fraud_rule",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.sales_order"
   ],
   "writes": [
@@ -145978,6 +146363,8 @@
    "ledger.posting",
    "orders.order_event",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -157226,6 +157613,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.billing_entity",
    "control.cell",
    "control.cell_tenant",
    "control.contract",
@@ -157238,6 +157626,7 @@
    "control.plan",
    "control.plan_limit",
    "control.plan_module",
+   "control.platform_tax_rate",
    "control.tenant",
    "control.usage_record",
    "platform.tenant"
@@ -157448,6 +157837,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.billing_entity",
    "control.cell",
    "control.cell_tenant",
    "control.contract",
@@ -157459,6 +157849,7 @@
    "control.module_listing",
    "control.plan",
    "control.plan_module",
+   "control.platform_tax_rate",
    "control.tenant",
    "control.usage_record"
   ],
@@ -158550,6 +158941,7 @@
   "writes": [
    "cache:idempotency",
    "identity.platform_staff_grant",
+   "platform.outbox",
    "whitelabel.custom_domain"
   ],
   "storedProcedures": [],
@@ -158670,9 +159062,12 @@
    "identity.password_policy",
    "identity.platform_staff_grant",
    "identity.session",
+   "whitelabel.banner",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.config_version",
+   "whitelabel.content_page",
+   "whitelabel.faq_entry",
    "whitelabel.feature_toggle",
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
@@ -158682,7 +159077,10 @@
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
-   "whitelabel.tenant_config"
+   "whitelabel.policy",
+   "whitelabel.promo_block",
+   "whitelabel.tenant_config",
+   "whitelabel.ui_string_pack"
   ],
   "writes": [
    "cache:idempotency",
@@ -161518,7 +161916,9 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "control.billing_entity"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -161721,7 +162121,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -161776,6 +162177,7 @@
    "redis"
   ],
   "reads": [
+   "control.billing_entity",
    "control.contract",
    "control.invoice",
    "control.invoice_line",
@@ -161830,7 +162232,9 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "control.billing_entity"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -161879,7 +162283,9 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "control.billing_entity"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -161928,7 +162334,9 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "control.billing_entity"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -162045,6 +162453,7 @@
    "redis"
   ],
   "reads": [
+   "control.billing_entity",
    "control.capacity_pack",
    "control.contract",
    "control.enforcement_policy",
@@ -162264,7 +162673,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -162318,7 +162728,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -162372,7 +162783,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -162426,7 +162838,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -162480,7 +162893,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -162536,6 +162950,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.billing_entity",
    "control.module_listing"
   ],
   "writes": [
@@ -162590,7 +163005,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -162644,7 +163060,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -162699,6 +163116,7 @@
    "redis"
   ],
   "reads": [
+   "control.billing_entity",
    "control.licensing_model"
   ],
   "writes": [],
@@ -166071,6 +166489,7 @@
    "redis"
   ],
   "reads": [
+   "control.billing_entity",
    "control.invoice",
    "control.invoice_line"
   ],
@@ -166188,6 +166607,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.billing_entity",
    "control.contract",
    "control.credit_note",
    "control.invoice",
@@ -166195,6 +166615,7 @@
    "control.module_listing",
    "control.plan",
    "control.plan_module",
+   "control.platform_tax_rate",
    "control.tenant",
    "control.usage_record"
   ],
@@ -166328,7 +166749,8 @@
    "control.credit_note",
    "control.credit_note_line",
    "control.invoice",
-   "control.invoice_line"
+   "control.invoice_line",
+   "control.invoice_number_sequence"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -166432,7 +166854,9 @@
    "postgres-analytical",
    "redis"
   ],
-  "reads": [],
+  "reads": [
+   "control.billing_entity"
+  ],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -166624,7 +167048,8 @@
    "control.credit_note",
    "control.credit_note_line",
    "control.invoice",
-   "control.invoice_line"
+   "control.invoice_line",
+   "control.invoice_number_sequence"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -173613,6 +174038,7 @@
    "approvals.escalation",
    "approvals.matrix",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.rule",
    "approvals.sla_policy",
    "cache:idempotency",
@@ -173625,6 +174051,7 @@
    "approvals.delegation",
    "approvals.escalation",
    "approvals.request",
+   "approvals.request_approver",
    "approvals.sla_policy",
    "cache:idempotency",
    "identity.platform_staff_grant",
@@ -174332,12 +174759,14 @@
    "getAiDecisionTrace",
    "listTenants",
    "listOwnPlatformStaffGrants",
-   "openPlatformStaffGrant"
+   "openPlatformStaffGrant",
+   "listOrgUnits"
   ],
   "services": [
    "AiService",
    "IdentityService",
-   "PlatformService"
+   "PlatformService",
+   "TenancyService"
   ],
   "stores": [
    "postgres",
@@ -174352,11 +174781,14 @@
    "ai.decision_record",
    "ai.intervention",
    "cache:idempotency",
+   "cache:resolution",
    "control.tenant",
-   "identity.platform_staff_grant"
+   "identity.platform_staff_grant",
+   "platform.scope"
   ],
   "writes": [
    "cache:idempotency",
+   "cache:resolution",
    "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
@@ -176751,6 +177183,8 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.refund_policy",
    "orders.sales_order"
   ],
@@ -177182,10 +177616,13 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.sales_order"
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.audit_entry",
    "catalogue.channel_envelope",
    "orders.order_event",
    "orders.order_line",
@@ -177439,6 +177876,8 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.refund_policy",
    "orders.sales_order"
   ],
@@ -178333,6 +178772,8 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.refund_policy",
    "orders.sales_order"
   ],
@@ -178558,6 +178999,8 @@
    "orders.order_line_eligibility",
    "orders.payment",
    "orders.refund",
+   "orders.refund_line",
+   "orders.refund_payment",
    "orders.sales_order"
   ],
   "writes": [
@@ -178921,6 +179364,7 @@
   "writes": [
    "cache:idempotency",
    "control.api_client",
+   "control.api_client_secret",
    "control.production_access_request"
   ],
   "storedProcedures": [],
@@ -184657,9 +185101,11 @@
    "getFonts",
    "getBrandIdentity",
    "getBookingFlowConfig",
-   "previewProductTickets"
+   "previewProductTickets",
+   "listProducts"
   ],
   "services": [
+   "CatalogueService",
    "OrderService",
    "WhiteLabelService"
   ],
@@ -184670,11 +185116,17 @@
   "reads": [
    "cache:idempotency",
    "cache:resolution",
+   "catalogue.product",
+   "catalogue.product_category",
+   "catalogue.product_eligibility_rule",
+   "catalogue.product_media",
+   "whitelabel.guided_choice_answer",
    "whitelabel.tenant_config"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
+   "platform.outbox",
    "whitelabel.tenant_config"
   ],
   "storedProcedures": [],
@@ -185710,9 +186162,12 @@
    "cache:idempotency",
    "marketing.message_template",
    "marketing.message_template_version",
+   "whitelabel.banner",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.config_version",
+   "whitelabel.content_page",
+   "whitelabel.faq_entry",
    "whitelabel.feature_toggle",
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
@@ -185722,7 +186177,10 @@
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
-   "whitelabel.tenant_config"
+   "whitelabel.policy",
+   "whitelabel.promo_block",
+   "whitelabel.tenant_config",
+   "whitelabel.ui_string_pack"
   ],
   "writes": [
    "ai.activity",
@@ -185802,6 +186260,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "whitelabel.tenant_config"
   ],
   "storedProcedures": [],
@@ -186322,6 +186781,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "platform.outbox",
    "whitelabel.custom_domain"
   ],
   "storedProcedures": [],
@@ -189669,9 +190129,11 @@
   "route": "/media-library/tags-keywords-classification-cms-066",
   "operations": [
    "setMediaAssetTags",
-   "getMediaTaxonomy"
+   "getMediaTaxonomy",
+   "listOrgUnits"
   ],
   "services": [
+   "TenancyService",
    "VenueOpsService"
   ],
   "stores": [
@@ -189681,12 +190143,15 @@
   "reads": [
    "assets.tag",
    "assets.taxonomy",
-   "cache:idempotency"
+   "cache:idempotency",
+   "cache:resolution",
+   "platform.scope"
   ],
   "writes": [
    "assets.media_asset",
    "assets.tag",
-   "cache:idempotency"
+   "cache:idempotency",
+   "cache:resolution"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -191901,6 +192366,12 @@
    {
     "id": "formCreateGuidedChoice",
     "component": "modal",
+    "reads": [
+     "listProducts",
+     "listProductCategories",
+     "listEvents",
+     "listBookingFlows"
+    ],
     "trigger": "New set-up",
     "body": "**Collects what `createGuidedChoice` sends before it is called.** Required: `name` (staff-facing), `mode`, `questions` (one or two, each with two to four answers and a target per answer). Optional: `showBanner` (default on). Created as a draft; guests see nothing until it is published. Dismissing sends nothing; the screen behind is unchanged. **One to four questions; the answers filter the catalogue by default and a target per answer is optional** (W4, 29 September) (CHG-SGU-022).",
     "bindsTo": "GuidedChoice",
@@ -192219,8 +192690,11 @@
    "cache:idempotency",
    "catalogue.product",
    "catalogue.product_category",
+   "catalogue.product_channel_text",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
+   "catalogue.product_owner_form",
+   "catalogue.product_sale_permission",
    "marketing.consent_question",
    "marketing.consent_question_version",
    "whitelabel.analytics_provider",
@@ -192245,6 +192719,7 @@
    "catalogue.product",
    "catalogue.product_category",
    "catalogue.product_media",
+   "catalogue.product_version",
    "platform.outbox",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
@@ -192409,6 +192884,7 @@
    "ai.proposed_action",
    "cache:answer",
    "cache:idempotency",
+   "platform.outbox",
    "qdrant:knowledge",
    "whitelabel.app_build",
    "whitelabel.store_account",
@@ -192826,6 +193302,7 @@
   "writes": [
    "cache:idempotency",
    "control.api_client",
+   "control.api_client_secret",
    "control.production_access_request"
   ],
   "storedProcedures": [],
@@ -193335,7 +193812,8 @@
    "control.api_limit",
    "control.api_version",
    "control.integration_listing",
-   "control.production_access_request"
+   "control.production_access_request",
+   "control.tenant"
   ],
   "writes": [
    "cache:idempotency",
@@ -200334,7 +200812,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -200395,7 +200874,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -200456,7 +200936,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -200517,7 +200998,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -200578,7 +201060,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -200641,6 +201124,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "control.billing_entity",
    "control.module_listing"
   ],
   "writes": [
@@ -200702,7 +201186,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",
@@ -200763,7 +201248,8 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency"
+   "cache:idempotency",
+   "control.billing_entity"
   ],
   "writes": [
    "cache:idempotency",

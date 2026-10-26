@@ -401,7 +401,11 @@ paths:
       - {}
       - guestAuth: []
       - bearerAuth: []
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -577,7 +581,10 @@ paths:
         - name: toStationId
           in: query
           schema: { type: string, format: uuid }
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -606,6 +613,10 @@ paths:
         - "P01 WEB-049 Transport — Route & Schedule"
         - "P02 GST-077 Intercity Trip — Route & Passengers"
         - "P08 BO-1185 Transport Fares & Passenger Types"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SetFareTableRequest.baseFare, SetFareTableRequest.fare, SetFareTableRequest.perStopFare (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [guest, public, staff]
       x-ticvai-read-routing: replica
       summary: A route's fares and passenger types
@@ -634,7 +645,10 @@ paths:
           required: false
           schema: { type: string, format: date-time }
           description: The instant whose table is returned (the travel time for a guest). Default now (CHG-RUL-012).
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -648,6 +662,10 @@ paths:
       operationId: setTransportFareTable
       x-ticvai-consumed-by:
         - "P08 BO-1185 Transport Fares & Passenger Types"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SetFareTableRequest.baseFare, SetFareTableRequest.fare, SetFareTableRequest.perStopFare (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Set a route's fares and passenger types
       description: >
@@ -713,6 +731,10 @@ paths:
         - "P01 WEB-049 Transport — Route & Schedule"
         - "P02 GST-077 Intercity Trip — Route & Passengers"
         - "P08 BO-1185 Transport Fares & Passenger Types"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: FareQuote.adultFare, FareQuote.lineTotal, FareQuote.saving, FareQuote.total and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [guest, public, service]
       summary: Price a one-way trip or a pass for a party
       description: >
@@ -1028,6 +1050,9 @@ paths:
       - query: catalogue#channelCapacityRecords
         route: service
         for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DepartureOffer.fare, DepartureOffer.partyTotal, body.adultFare (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
       summary: Search Trips — departures between two stations on a date
@@ -1088,7 +1113,10 @@ paths:
             items: { type: string, pattern: '^[a-z][a-zA-Z0-9]{0,31}:[0-9]{1,2}$' }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -1130,6 +1158,9 @@ paths:
       - query: catalogue#channelCapacityRecords
         route: service
         for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DepartureOffer.fare, DepartureOffer.partyTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
       summary: Next Available Trip
@@ -1248,6 +1279,9 @@ paths:
       - query: catalogue#channelCapacityRecords
         route: service
         for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DepartureOffer.fare, DepartureOffer.partyTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
       summary: One departure, as a guest books it
@@ -1266,7 +1300,11 @@ paths:
         - {}
         - guestAuth: []
         - bearerAuth: []
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: One departure, as a guest books it
           content:
@@ -1339,6 +1377,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-049 Transport — Route & Schedule"
         - "P02 GST-078 Intercity Trip — Multi-trip Passes"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PassOffer.price, PassOffer.saving (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
       summary: Multi-trip passes for a pair of stations, priced, with the saving
@@ -1371,7 +1413,10 @@ paths:
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -1534,6 +1579,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-049 Transport — Route & Schedule"
         - "P02 GST-079 Intercity Trip — Favourite Routes"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: FavouriteRoute.adultFare (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [guest]
       x-ticvai-read-routing: primary
       summary: The caller's saved routes
@@ -1580,6 +1629,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-049 Transport — Route & Schedule"
         - "P02 GST-077 Intercity Trip — Route & Passengers"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: FavouriteRoute.adultFare (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [guest]
       summary: Save route
       description: >

@@ -5784,12 +5784,12 @@ paths:
   /member-exception-override:
     get:
       operationId: listMemberExceptionOverride
-      x-ticvai-reads:
-      - table: control.billing_entity
-        for: 'the platform billing currency its Money is in (billingCurrency; CHG-R10ORD-019, ADAM CR-202)'
       x-ticvai-consumed-by:
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
         - "P08 BO-949 Approval, Exception & Override Control Center"
+      x-ticvai-reads:
+      - table: control.billing_entity
+        for: 'the platform billing currency its Money is in (billingCurrency; CHG-R10ORD-019, ADAM CR-202)'
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -9187,9 +9187,6 @@ paths:
   /vsi-assessments:
     post:
       operationId: scoreVsiAssessment
-      x-ticvai-reads:
-      - table: control.billing_entity
-        for: 'the platform billing currency its Money is in (billingCurrency; CHG-R10ORD-019, ADAM CR-202)'
       x-ticvai-consumed-by:
         - "P09 ADM-372 Operational Profile, VSI & Commercial Model Intelligence"
         - "P09 ADM-381 Venue Type & Business Profile"
@@ -9208,6 +9205,9 @@ paths:
         - "P17 SGN-008 Additional Business Module Assessment"
         - "P17 SGN-009 Integration, Payment & Technical Readiness"
         - "P17 SGN-010 AI Assessment Summary & Handoff"
+      x-ticvai-reads:
+      - table: control.billing_entity
+        for: 'the platform billing currency its Money is in (billingCurrency; CHG-R10ORD-019, ADAM CR-202)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -9785,9 +9785,6 @@ paths:
   /commercial-metrics:
     get:
       operationId: getCommercialMetrics
-      x-ticvai-reads:
-      - table: control.billing_entity
-        for: 'the platform billing currency its Money is in (billingCurrency; CHG-R10ORD-019, ADAM CR-202)'
       x-ticvai-consumed-by:
         - "P09 ADM-369 Commercial Command Center"
         - "P09 ADM-372 Operational Profile, VSI & Commercial Model Intelligence"
@@ -9799,6 +9796,9 @@ paths:
         - "P09 ADM-389 Commercial Rules Engine Overview"
         - "P09 ADM-459 Billing & Commercial Command Center"
         - "P09 ADM-464 Renewal Management Center"
+      x-ticvai-reads:
+      - table: control.billing_entity
+        for: 'the platform billing currency its Money is in (billingCurrency; CHG-R10ORD-019, ADAM CR-202)'
       x-ticvai-agreed: '14 October: Block A audit, class S-METRIC-NO-OP (CHG-SCO-006); the P09 commercial command
         centres (pack Subscription_Licensing_AI_Self_Service.pdf boards 1, 3 and 10, Primary KPIs) show these figures
         and no operation read them; shape follows reporting getKpiValues'
@@ -11440,13 +11440,13 @@ paths:
         type: string
     post:
       operationId: issueCreditNote
+      x-ticvai-consumed-by:
+        - "P09 ADM-462 Invoice & Payment Management"
+        - "P09 ADM-467 Discount, Credit & Commercial Override Management"
       x-ticvai-writes:
       - table: control.invoice_number_sequence
         for: 'the issuing legal entity''s next credit-note number, taken and incremented in the same transaction (ADAM
           CR-202; CHG-R10ID-013)'
-      x-ticvai-consumed-by:
-        - "P09 ADM-462 Invoice & Payment Management"
-        - "P09 ADM-467 Discount, Credit & Commercial Override Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: matrix 20.7.7 (credit note generation); BL-140; the invoice number rule decided 28 September (audit R152, gapless per legal entity) applied to the credit note''s own sequence; shape follows cancelInvoice and generateInvoice'

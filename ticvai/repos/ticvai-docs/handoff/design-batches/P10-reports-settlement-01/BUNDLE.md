@@ -2,7 +2,7 @@
 
 **3 screens · 16 operations · 26 schemas · 6 permissions**
 
-Platform P10 Partner Web · ships as **ticvai-control** ·
+Platform P10 Partner Web · ships as **partner-web** ·
 partner audience · web ·
 online only
 
@@ -142,7 +142,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
+| App · platform | Partner Web · P10 Partner Web (web) |
 | Module | Reports & Settlement · wave 3 · needs the `partner` module |
 | Block | Block C · task APP-PARTNER-PTR-014 |
 | Who uses it | partner staff holding `SETTLEMENT_RECONCILE`, `SETTLEMENT_VIEW` (1 operate, 1 read); in the flows as finance controller |
@@ -203,7 +203,7 @@ Errors to draw in the form: 400 `fileReference` names no completed upload in the
 | Matched payment `matchedPaymentId` | picker: choose a matched payment | optional | — | — | shows names, sends the id | — | `resolveSettlementException` body |
 | Note `note` | text area | required | — | min length 3; max length 1000 | — | — | `resolveSettlementException` body |
 
-Errors to draw in the form: 400 `matchedManually` without a `matchedPaymentId`, or one that names no payment. `errors[]` names the field.; 404 The settlement, or an exception with this `exceptionId` under it, does not exist or is outside the caller's scope.; 409 The exception is already resolved.
+Errors to draw in the form: 400 `matchedManually` without a `matchedPaymentId`, or one that names no payment. `errors[]` names the field.; 404 The settlement, or an exception with this `exceptionId` under it, does not exist or is outside the caller's scope.; 409 The exception is already resolved. Also refused when the settlement is `failed`, `ingesting`, `matched`, `matching` or `parsing`; states/settlement.yaml moves …
 
 **Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -282,7 +282,7 @@ Errors to draw in the form: 400 `matchedManually` without a `matchedPaymentId`, 
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on providerName, status and the settlement payment history are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `SETTLEMENT_RECONCILE` for `ingestSettlementFile`, `resolveSettlementException`. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 `fileReference` names no completed upload in the caller's scope, or the period is not a single day (`settlement-period-not-a-day`, audit R110 (b)).; 400 `matchedManually` without a `matchedPaymentId`, or one that names no payment. `errors[]` names the field.; 409 The exception is already resolved. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 `fileReference` names no completed upload in the caller's scope, or the period is not a single day (`settlement-period-not-a-day`, audit R110 (b)).; 400 `matchedManually` without a `matchedPaymentId`, or one that names no payment. `errors[]` names the field.; 409 The exception is already resolved. Also refused when the settlement is `failed`, `ingesting`, `matched`, `matching` or `parsing` … |
 
 #### Edge cases to draw
 
@@ -358,7 +358,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
+| App · platform | Partner Web · P10 Partner Web (web) |
 | Module | Reports & Settlement · wave 3 · needs the `partner` module |
 | Block | Block B · ticket #29415 (APP-PARTNER-PTR-017) |
 | Who uses it | partner staff holding `PARTNER_MANAGE`, `PARTNER_VIEW` (1 configure, 1 read) |
@@ -517,7 +517,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
+| App · platform | Partner Web · P10 Partner Web (web) |
 | Module | Reports & Settlement · wave 3 · needs the `partner` module |
 | Block | Block D · task APP-PARTNER-PTR-018 |
 | Who uses it | partner staff holding `REPORT_MANAGE`, `REPORT_VIEW_VENUE` (1 configure, 1 operate) |

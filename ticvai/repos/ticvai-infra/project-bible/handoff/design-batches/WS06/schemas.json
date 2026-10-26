@@ -1876,7 +1876,7 @@
      "unknown"
     ],
     "default": "unknown",
-    "description": "What the device last said on its heartbeat; `unknown` until it has. `localMode` is an access-control device validating from its offline package with its link down (ADR-0067).\n"
+    "description": "What the device last said on its heartbeat; `unknown` until it has. `localMode` is an access-control device validating from its offline package with its link down (ADR-0067). The timer sets `offline` after 15 minutes with no heartbeat, and `unknown` after 7 days offline; the next heartbeat sets whatever it reports (ADAM CR-103, proposed defaults the client can correct).\n"
    },
    "batteryPercent": {
     "type": "integer",
@@ -1904,7 +1904,7 @@
     ],
     "default": "unknown",
     "readOnly": true,
-    "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n**The formula, proposed, client to correct** (decided 20 October 2026, R8 blocker cause APPROVALS-TENANCY-C27; CHG-R8SPN-030), the weights of `Workstation.healthScore` applied to one device: score = 40 if its last reported `status` is `online` or `localMode` (0 otherwise) + 25 heartbeat freshness (25 at one minute old or less, 0 at 15 minutes or more, linear between) + 20 firmware currency (20 on the latest, 10 one version behind, 0 older) + 15 errors in the last hour (15 at none, 0 at 10 or more, linear between). `healthy` at 80 or more, `warning` at 60 or more, `degraded` below 60; `offline` after 15 minutes with no heartbeat, whatever the score; `unknown` until the first heartbeat. A battery under 15% caps the device at `warning`.\n"
+    "description": "**Derived, not reported.** Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is healthy, and asking it produces a fleet that is 100% healthy and 12% broken.\n**The formula, proposed, client to correct** (decided 20 October 2026, R8 blocker cause APPROVALS-TENANCY-C27; CHG-R8SPN-030), the weights of `Workstation.healthScore` applied to one device: score = 40 if its last reported `status` is `online` or `localMode` (0 otherwise) + 25 heartbeat freshness (25 at one minute old or less, 0 at 15 minutes or more, linear between) + 20 firmware currency (20 on the latest, 10 one version behind, 0 older) + 15 errors in the last hour (15 at none, 0 at 10 or more, linear between). `healthy` at 80 or more, `warning` at 60 or more, `degraded` below 60; `offline` after 15 minutes with no heartbeat, whatever the score; `unknown` until the first heartbeat. A battery under 15% caps the device at `warning`. The latest firmware, and the error term until `tenancy.device_telemetry` lands (dropped, the other three re-weighted to 100), are as `getWorkstationHealth` states them (ADAM CR-244, 26 October 2026).\n"
    },
    "lastHeartbeatAt": {
     "type": "string",
@@ -1946,7 +1946,7 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
-    "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\n"
+    "description": "**The profile this device was provisioned with.** `enrolDevice` has accepted one since 16.1.3 and there was nowhere to keep it, so the answer to *\"what is this reader configured as\"* lived only in the request that set it.\nA reference to the profile's `id`, not to one version: the profile is keyed (`id`, `version`), so this is kept by convention rather than a declared key, and a read of it takes the profile's latest version (ADAM CR-228, option A; CHG-R10TEN-009).\n"
    },
    "approvalStatus": {
     "allOf": [

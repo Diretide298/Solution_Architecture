@@ -129,9 +129,11 @@ x-ticvai-queries:
       October). Tenancy answers with its approvals.request rows, as it stores them and as the caller's scope
       lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Tenancy's service route (serviceAuth).
-    served: [service]
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Tenancy implements (Catalogue's
+      publishChannelReadinessValidation checks the approval request a channel activation names: ADAM CR-211,
+      CHG-R10CAT-003), and asked from another deployable through Tenancy's service route (serviceAuth).
+    served: [in-process, service]
   slaPolicyRecords:
     module: approvals
     table: approvals.sla_policy
@@ -149,6 +151,24 @@ x-ticvai-queries:
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
       from another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
+  ruleRecords:
+    module: approvals
+    table: approvals.rule
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The approvals.rule rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ApprovalRule'}
+    rule: >-
+      A data read, not a rule question (r10 lane E, 25 October 2026, CHG-R10GEN-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its approvals.rule rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
+      an asker that refuses or chooses on these rows states that rule in its own operation, and a question with a
+      rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another deployable
+      through Tenancy's service route (serviceAuth).
     served: [service]
 paths:
   /approval-requests:
@@ -180,6 +200,9 @@ paths:
       - query: identity#delegatedAccessRecords
         route: in-process
         for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001; R8 lineage request)'
+      - query: ai#approvalRequestScoreRecords
+        route: service
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Requests awaiting a decision, or already decided
@@ -269,6 +292,9 @@ paths:
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: ai#approvalRequestScoreRecords
+        route: service
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Raise a request
@@ -287,7 +313,13 @@ paths:
         the request at `draft`: nobody is asked, no SLA runs, and it does not count as an open request
         for the `409` below, so a person may keep a draft while a contract raises the real one. The
         draft is sent with `submitApprovalRequest`, which is when the matrix is read, the approvers are
-        resolved and `matrixVersion` is fixed. A contract raising a request never drafts.
+        resolved and `matrixVersion` is fixed. A contract raising a request never drafts. A request that is not a
+        draft is routed here the same way: the matrix id and version are fixed and the approver chain is stored
+        (`ApprovalRequest.approvers`; ADAM CR-102, CHG-R10ID-015).
+
+        **A guest''s request** (ADAM CR-101; CHG-R10ID-016). Identity raises a guest''s privacy request in process for
+        the guest (`exportSubjectData`, `deleteGuestAccount`): the request records the guest as
+        `requestedBySubjectId`, and `requestedByPrincipalId` stays null. Every other request names its principal.
 
         **No route, no request** (lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015). A request
         that is not a draft and matches no active rule (no rule of its kind and subject type at its `scopePath`, or for
@@ -360,14 +392,20 @@ paths:
       - query: identity#delegatedAccessRecords
         route: in-process
         for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001; R8 lineage request)'
+      - query: ai#approvalRequestScoreRecords
+        route: service
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Send a saved draft, or a returned request, for approval
       description: '11.1.51. **Decided 28 September, audit R129 (3): a person may save a draft and submit
         it later.** Only the requester who saved the draft submits it.
 
-        Submitting is the moment the request is routed: the matrix in force now is read, its version is
-        fixed on the request as `matrixVersion`, the approver chain is resolved and the SLA starts. **The
+        Submitting is the moment the request is routed: the matrix in force now is read (`ApprovalMatrix`: the
+        nearest node''s matrix, its highest version), its id and version are fixed on the request as
+        `approvalMatrixId` and `matrixVersion`, the approver chain is resolved and stored as
+        `approvals.request_approver` rows (`ApprovalRequest.approvers`; ADAM CR-102, CHG-R10ID-015) and the SLA
+        starts. **The
         draft''s saving time decides nothing** — a draft saved last week is decided by this week''s rules,
         because nobody was asked under last week''s.
 
@@ -474,9 +512,10 @@ paths:
         Read-only and deliberately cheap. It runs on the hot path — every refund, every discount, every
         price override — and a slow answer here is a slow till.
 
-        **Rules match without a condition** (APPROVALS-TENANCY-C06, CHG-R8SPN-016): no stored rule has one, because
-        `setApprovalMatrix` and `approveMatrixMultiLevel` refuse a condition or skip condition `422
-        condition-not-supported` until a condition language exists (`ApprovalRule.condition`).
+        **Rules match on their condition too** (ADAM CR-102, option 1; CHG-R10ID-015, which replaces the
+        no-condition rule of APPROVALS-TENANCY-C06): the matrix in force (`ApprovalMatrix`) is matched on kind,
+        scope, subject type, amount and `matchAttributes`, and then on the rule''s `condition`, evaluated against
+        `attributes` in the language `ApprovalRule.condition` defines; the first rule that matches wins.
         `createApprovalRequest` and `submitApprovalRequest` route by the same match.
 
         '
@@ -546,6 +585,9 @@ paths:
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: ai#approvalRequestScoreRecords
+        route: service
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-write-via:
       - table: control.partner_agreement
         event: approval.granted
@@ -632,8 +674,9 @@ paths:
                 $ref: '#/components/schemas/ApprovalRequest'
         '403':
           description: 'The approver may not decide this request. **Always carries `refusedReason`**,
-            one value per cause — the approver is the requester (`approverIsRequester`), is not in the
-            resolved chain (`notInApproverChain`), lacks the permission the rule demands
+            one value per cause — the approver is the requester (`approverIsRequester`), has no row at the
+            current level of the chain stored at routing (`notInApproverChain`; `ApprovalRequest.approvers`,
+            never recomputed from current role holders, CHG-R10ID-015), lacks the permission the rule demands
             (`insufficientPermission`), gave no step-up token where the rule requires MFA
             (`mfaRequired`) or no signature where it requires one (`signatureRequired`), is deciding
             through a delegation that has ended (`delegationExpired`), or has already decided at this
@@ -671,6 +714,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-085 Approval Request"
         - "P08 BO-380 Withdrawal, Cancellation, Expiration & Reopening"
+      x-ticvai-read-via:
+      - query: ai#approvalRequestScoreRecords
+        route: service
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: The requester takes it back
@@ -732,6 +779,10 @@ paths:
         format: uuid
     post:
       operationId: cancelApprovalRequest
+      x-ticvai-read-via:
+      - query: ai#approvalRequestScoreRecords
+        route: service
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: An administrator cancels a request nobody should decide any more
@@ -797,6 +848,10 @@ paths:
         format: uuid
     post:
       operationId: reopenApprovalRequest
+      x-ticvai-read-via:
+      - query: ai#approvalRequestScoreRecords
+        route: service
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Reopen an expired or cancelled request as a new one
@@ -866,6 +921,9 @@ paths:
       - query: identity#delegatedAccessRecords
         route: in-process
         for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001; R8 lineage request)'
+      - query: ai#approvalRequestScoreRecords
+        route: service
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Assign, reassign or claim a request in a shared queue
@@ -954,6 +1012,10 @@ paths:
         - "P08 BO-393 AI SLA & Escalation Advisor"
         - "P08 BO-641 Escalation & Exception Management"
         - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
+      x-ticvai-read-via:
+      - query: ai#approvalRequestScoreRecords
+        route: service
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Move it up a level
@@ -1024,6 +1086,9 @@ paths:
       - query: identity#delegatedAccessRecords
         route: in-process
         for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001; R8 lineage request)'
+      - query: ai#approvalRequestScoreRecords
+        route: service
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Amend a rejected request and try again
@@ -1100,7 +1165,7 @@ paths:
         raise its own refund limit is not a control.** What counts as loosening is defined on
         `setApprovalMatrix` (decided 28 September, audit R129).
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - matrix
       x-ticvai-permission: APPROVAL_CONFIGURE
@@ -1177,11 +1242,14 @@ paths:
         refused `400`; nobody writes a matrix for a level above or below their own through this call.
 
 
-        **PUT semantics — keyed on `kind` and the scope, never on an id.** There is no id in the path
-        and `ApprovalMatrix.id` is read-only, so the body names its target: the matrix for `kind` at
-        `scopeLevel`, on the scope node the caller is acting at (`scopePath` is read-only and set from
-        it). Where no matrix exists for that pair, this creates version 1 and answers `201`; where one
-        does, it stores a new version and answers `200`. **The body replaces the rule set whole**: the
+        **PUT semantics — the matrix is found by `kind` and the scope; the path''s `matrixId` is its id**
+        (accepted 26 October 2026, Chinmay, ADAM CR-245 option B). The body names its target: the matrix for
+        `kind` at `scopeLevel`, on the scope node the caller is acting at (`scopePath` is read-only and set from
+        it). Where no matrix exists for that pair, this creates version 1 with the path''s `matrixId` as its id (a
+        client UUIDv7, the same idempotency key as a body `id`) and answers `201`; where one does, the path''s
+        `matrixId` must equal that matrix''s id, and the call stores a new version of it and answers `200`. A
+        `matrixId` that is not the id of the matrix for (`kind`, scope), including one naming another kind''s
+        matrix, is `409 matrix-id-mismatch` and nothing changes. `ApprovalMatrix.id` is read-only in the body. **The body replaces the rule set whole**: the
         new version holds exactly the rules in `rules`, in their `order`, and a rule omitted from the
         body is not in the new version. Rule `id`s are read-only and ignored on input — each version
         carries its own rule rows. The previous version is kept, never edited, because requests in
@@ -1199,7 +1267,7 @@ paths:
       - name: matrixId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `kind` and the scope node the caller acts at: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 matrix-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -1242,17 +1310,22 @@ paths:
             never match because an earlier one always does. `ruleOrder` names the offending rule, and
             `blockingRuleOrder` or `parentScopePath` names what it collides with.
 
+            `matrix-id-mismatch` (ADAM CR-245): a record for `kind` and the scope node the caller acts at exists and the path''s `matrixId` is not its id (or names another such record); nothing changes.
+
             '
+          x-ticvai-problem-types:
+          - matrix-id-mismatch
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ApprovalMatrixRefusedProblem'
         '422':
-          description: 'A rule carries a `condition` (not null), and no condition language exists yet (pull audit R104;
-            APPROVALS-TENANCY-C06, CHG-R8SPN-016). Nothing is stored; `errors[]` names the rule''s `order`. Send the
-            rule with `condition` null, or narrow it with `subjectTypes`, `minAmount`, `maxAmount` or
-            `matchAttributes`.'
-          x-ticvai-problem-types: [condition-not-supported]
+          description: 'A rule''s `condition` does not parse in the condition language (`ApprovalRule.condition`: clauses
+            `<attribute> <operator> <value>` joined by ` AND `, at most 10; ADAM CR-102, CHG-R10ID-015), so it could
+            never be evaluated. Nothing is stored; `errors[]` names the rule''s `order` and the first clause that failed.
+            Until r10 any non-null condition was refused here (`condition-not-supported`, APPROVALS-TENANCY-C06); the
+            grammar lifts that.'
+          x-ticvai-problem-types: [condition-invalid]
           content:
             application/problem+json:
               schema:
@@ -1276,7 +1349,7 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Who is standing in for whom
-      description: 11.1.8–11.1.10.
+      description: 11.1.8–11.1.10. **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - delegation
       x-ticvai-permission: APPROVAL_VIEW
@@ -1359,7 +1432,9 @@ paths:
           description: 'The delegation would hand over authority that is not there. `refusedReason` is
             `delegateLacksPermission` where the delegate does not hold the permission being delegated,
             or `exceedsDelegatorAuthority` where `kinds` or `maxAmount` go beyond what the delegator may
-            approve. The shared `Forbidden`, with no `refusedReason`, is the caller lacking
+            approve, that is **the delegator''s own approval limit**, the highest amount it may approve itself under the matrix
+            in force for that kind at the scope (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020).
+            The shared `Forbidden`, with no `refusedReason`, is the caller lacking
             `APPROVAL_DECIDE`.
 
             '
@@ -1827,7 +1902,7 @@ paths:
         | `product`, `department`, `customerType`, `risk`, `exceptionType`, `legalEntity` | `matchAttributes` (with `module`) |
         | `minimumApprovals`, `rejectionBehavior` | the same-named rule fields |
         | `requestChanges`, `delegate`, `reassign` | `allowRequestChanges`, `allowDelegate`, `allowReassign` |
-        | `skipConditions` | `condition`, negated: the rule is skipped where it holds. **Refused `422 condition-not-supported` when not empty** until a condition language exists (APPROVALS-TENANCY-C06, CHG-R8SPN-016) |
+        | `skipConditions` | `condition`, negated: the rule is skipped where it holds (ADAM CR-102, CHG-R10ID-015). It is one or more clauses of the condition language (`ApprovalRule.condition`) joined by ` OR ` (skip when any holds); the stored `condition` is each clause negated (`=` and `!=`, `<` and `>=`, `>` and `<=`, `in` and `notIn` swap) joined by ` AND `. A clause that does not parse, or an ` AND ` inside `skipConditions` (its negation would need an OR), is `422 condition-invalid` and nothing is stored. As for any condition, a request missing the attribute does not match the rule |
         | `requiredApproverRole` | `requiredApproverRoleId`, and `approverRoleIds` = [it] when the rule is new. **Required when the rule is new** (`400 approver-role-required`), so `approver_role_ids` is never empty; an existing rule keeps the list it has |
         | (not sent) `sort_order` | a new rule gets **last + 1 in its matrix**, so it is the last rule tried; an existing rule keeps its place. `setApprovalMatrix` reorders |
 
@@ -1889,10 +1964,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalMatrixRefusedProblem'
         '422':
-          description: '`skipConditions` is not empty, and no condition language exists yet (pull audit R104;
-            APPROVALS-TENANCY-C06, CHG-R8SPN-016): it would be the rule''s `condition`, negated, and a condition is
-            refused, never stored (`ApprovalRule.condition`). Nothing is stored. Send it empty or absent.'
-          x-ticvai-problem-types: [condition-not-supported]
+          description: '`skipConditions` cannot become the rule''s `condition` (ADAM CR-102, CHG-R10ID-015): a clause does
+            not parse in the condition language (`ApprovalRule.condition`), or it joins clauses with ` AND `, whose
+            negation the language cannot hold. Nothing is stored; `errors[]` names the clause.'
+          x-ticvai-problem-types: [condition-invalid]
           content:
             application/problem+json:
               schema:
@@ -1937,8 +2012,9 @@ paths:
         | `delegator`, `delegate` (principal ids; `user` is the delegator when `delegator` is absent) | `delegatorPrincipalId`, `delegatePrincipalId` |
         | `start`, `end`, `reason` | `from`, `to`, `reason` |
         | `requestKind` | `kinds` = [it] (an `ApprovalKind`; absent, every kind) |
-        | `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it) |
-        | `scope`, `venue`, `region`, `businessUnit`, `legalEntity`, `department` | `scopePath`: the most specific scope node given |
+        | `authorityAmount`, `authorityPercentage` | `maxAmount`, `maxPercentage`: the delegation's own cap, which never exceeds what the delegator may approve under the matrix, its own approval limit as `createApprovalDelegation` defines it (`403 exceedsDelegatorAuthority`, as `createApprovalDelegation` refuses it) |
+        | `scope`, `venue`, `region`, `department` | `scopePath`: the most specific scope node given |
+        | `businessUnit`, `legalEntity` | **not a scope, and not stored** (ADAM CR-102, option 1; CHG-R10ID-015): neither is a level of the scope tree, so neither sets `scopePath`. Kept in the schema so an r1 client still validates; a value sent is ignored |
         | `delegationType` | `delegationType` |
         | `requiredRole` (and `role`, `position`) | `requiredRoleId`: the delegate must hold it (`409 delegateLacksRequiredRole` otherwise); `role` and `position` are display only |
 
@@ -3052,7 +3128,7 @@ paths:
         and the strength in force here. Resolves up the scope tree the way the approval matrix does (ADR-0018):
         tenant default, region override, venue override.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - matrix
       x-ticvai-permission: APPROVAL_CONFIGURE
@@ -3185,7 +3261,7 @@ paths:
         control means two people *from different groups*, which is stronger and is what a finance
         auditor means.
 
-        '
+         **Order.** Sorted by `code` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - approvals
       x-ticvai-permission: APPROVAL_VIEW
@@ -3212,13 +3288,14 @@ paths:
         - "P08 ADM-341 Four-Eyes & Dual-Control Policy"
         - "P08 BO-863 Resource Lifecycle, Governance & Audit"
       summary: Require a second, independent pair of eyes
-      description: '**PUT semantics — an upsert keyed on `code`.** There is no id in the path, and
-        `code` is the policy''s required, stable name, so the body names its target by it at the tenant
-        the caller is acting at. Where no policy has that `code` one is created and the answer is
-        `201`; where one does, the body replaces it whole and the answer is `200`. Omitted optional
-        fields take their defaults or empty — an omitted `appliesToRequestKinds` or
-        `requiredApproverGroupIds` stores an empty list, not the previous one. `id` is set by the server
-        and ignored on input. There is no delete: a policy is switched off with `isActive: false`.
+      description: '**PUT semantics — an upsert keyed on `code`.** `code` is the policy''s required, stable
+        name, so the body names its target by it at the tenant the caller is acting at. Where no policy has
+        that `code` one is created with the path''s `controlPolicyId` as its id and the answer is `201`; where
+        one does, the path''s `controlPolicyId` must equal its id (else `409 control-policy-id-mismatch` and
+        nothing changes; ADAM CR-245, 26 October 2026) and the body replaces it whole and the answer is `200`.
+        Omitted optional fields take their defaults or empty — an omitted `appliesToRequestKinds` or
+        `requiredApproverGroupIds` stores an empty list, not the previous one. A body `id`, when sent, must
+        equal the path''s. There is no delete: a policy is switched off with `isActive: false`.
 
         '
       tags:
@@ -3232,7 +3309,7 @@ paths:
       - name: controlPolicyId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 control-policy-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -3257,6 +3334,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalControlPolicy'
+        '409':
+          description: 'Refused, and nothing is stored. `control-policy-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `controlPolicyId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - control-policy-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-requests/{requestId}/signature:
@@ -3392,13 +3477,14 @@ paths:
         breached by nine the next morning with nobody having done anything wrong.
 
 
-        **PUT semantics — an upsert keyed on `code`.** There is no id in the path, and `code` is the
-        policy''s required, stable name, so the body names its target by it at the tenant the caller
-        is acting at. Where no policy has that `code` one is created and the answer is `201`; where one
-        does, the body replaces it whole and the answer is `200`. Omitted optional fields take their
-        defaults or empty — an omitted `reminders` list stores no reminders, not the previous ones, and
-        an omitted `calendarId` or `escalationGroupId` clears it. `id` is set by the server and ignored
-        on input.
+        **PUT semantics — an upsert keyed on `code`.** `code` is the policy''s required, stable name, so
+        the body names its target by it at the tenant the caller is acting at. Where no policy has that
+        `code` one is created with the path''s `slaPolicyId` as its id and the answer is `201`; where one
+        does, the path''s `slaPolicyId` must equal its id (else `409 sla-policy-id-mismatch` and nothing
+        changes; ADAM CR-245, 26 October 2026) and the body replaces it whole and the answer is `200`.
+        Omitted optional fields take their defaults or empty — an omitted `reminders` list stores no
+        reminders, not the previous ones, and an omitted `calendarId` or `escalationGroupId` clears it. A
+        body `id`, when sent, must equal the path''s.
 
         '
       tags:
@@ -3412,7 +3498,7 @@ paths:
       - name: slaPolicyId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 sla-policy-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -3437,6 +3523,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalSlaPolicy'
+        '409':
+          description: 'Refused, and nothing is stored. `sla-policy-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `slaPolicyId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - sla-policy-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /approval-delegations/availability/{availabilityId}:
@@ -3451,12 +3545,12 @@ paths:
         that will be left on after the holiday, and every approval for a month goes to the wrong person.
 
 
-        **PUT semantics — keyed on the body''s `id`.** There is no id in the path. A body with no `id`
-        records a new period, the server assigns its `id`, and the answer is `201`; a body with the
-        `id` of an existing period replaces that period whole and the answer is `200`. Omitted optional
-        fields are cleared — an omitted `substitutePrincipalId`, `delegationId` or `reason` removes the
-        stored one, and an omitted `appliesToRequestKinds` stores an empty list. An `id` that names no
-        period is `404`.
+        **PUT semantics — keyed on the path''s `availabilityId`**, the period''s id (the body''s `id`, when
+        sent, must equal it; ADAM CR-245, 26 October 2026, which corrected the text left from before the id
+        moved into the path). Where no period has that id, a new period is recorded with it (a client
+        UUIDv7) and the answer is `201`; where one does, the body replaces that period whole and the answer
+        is `200`. Omitted optional fields are cleared — an omitted `substitutePrincipalId`, `delegationId` or
+        `reason` removes the stored one, and an omitted `appliesToRequestKinds` stores an empty list.
 
         '
       tags:
@@ -3489,7 +3583,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApproverAvailability'
         '201':
-          description: Recorded — a new period, with the `id` the server gave it
+          description: Recorded — a new period, with the path's `availabilityId` as its `id`
           content:
             application/json:
               schema:
@@ -3512,11 +3606,12 @@ paths:
         legal-hold interaction that has to be decided once rather than argued per request.
 
 
-        **PUT semantics — keyed on the body''s `id`.** There is no id in the path. A body with no `id`
-        creates a policy, the server assigns its `id`, and the answer is `201`; a body with the `id` of
-        an existing policy replaces it whole and the answer is `200`. Omitted optional fields take
-        their defaults or are cleared — an omitted `legalBasis` removes the stored one, and an omitted
-        `appliesToRequestKinds` stores an empty list. An `id` that names no policy is `404`.
+        **PUT semantics — keyed on the path''s `retentionPolicyId`**, the policy''s id (the body''s `id`,
+        when sent, must equal it; ADAM CR-245, 26 October 2026, which corrected the text left from before
+        the id moved into the path). Where no policy has that id, one is created with it (a client UUIDv7)
+        and the answer is `201`; where one does, the body replaces it whole and the answer is `200`.
+        Omitted optional fields take their defaults or are cleared — an omitted `legalBasis` removes the
+        stored one, and an omitted `appliesToRequestKinds` stores an empty list.
 
         '
       tags:
@@ -3550,7 +3645,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApprovalRetentionPolicy'
         '201':
-          description: Created — a new policy, with the `id` the server gave it
+          description: Created — a new policy, with the path's `retentionPolicyId` as its `id`
           content:
             application/json:
               schema:
@@ -3701,7 +3796,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
+        **Order.** Newest first, by `updatedAt` descending, then by `id`. Where `updatedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - request
       x-ticvai-permission: APPROVAL_VIEW
@@ -4064,6 +4159,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-349 Approval Integration Command Center"
         - "P08 ADM-354 External Workflow System Integration"
+      x-ticvai-read-via:
+      - query: ai#approvalRequestScoreRecords
+        route: service
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-agreed: '29 September: re-trace 11.1.65 (no registration of a third-party workflow system
         as a step or approver); MoM 8 Sep (API/webhook/external workflow integration with data mapping and
         retry); our build plan; shape follows listApprovalDelegations, paged as tenancy listDevices'
@@ -4118,8 +4217,12 @@ paths:
         - "P08 ADM-354 External Workflow System Integration"
       x-ticvai-read-via:
       - query: public-api#apiClientRecords
+        route: in-process
+        for: 'its read of control.api_client, Platform''s data (CHG-MOD-001), asked in process over the control connection
+          commerce holds for routing: the granted read XDR-006 (ADAM CR-243, option A, 26 October 2026)'
+      - query: ai#approvalRequestScoreRecords
         route: service
-        for: 'its read of control.api_client, Platform''s data (CHG-MOD-001)'
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-agreed: '29 September: re-trace 11.1.65 (external workflow connector: endpoint, mapping,
         callback into the decision); MoM 8 Sep (external workflow integration with data mapping and retry);
         our build plan; shape follows setApprovalSlaPolicy'
@@ -4141,11 +4244,30 @@ paths:
 
 
         **PUT semantics — an upsert keyed on `code`**, as `setApprovalSlaPolicy`. Where no provider has that
-        `code` one is created (`201`); where one does, the body replaces it whole (`200`). `id`, `status`
-        changes by the platform, and `lastSuccessAt` are the server''s. `outboundCredential` and
-        `signingSecret` are write-only; omitting them on a replace keeps the stored ones. An `endpointUrl`
-        that is not `https`, an `apiClientId` that is not an active API client of the tenant, or a
-        `decisionMapping` that maps no value to `approve` and `reject` is `422`.
+        `code` one is created with the path''s `externalProviderId` as its id (a client UUIDv7) (`201`); where
+        one does, the path''s `externalProviderId` must equal its id, else `409 external-provider-id-mismatch`
+        and nothing changes, and the body replaces it whole (`200`) (accepted 26 October 2026, Chinmay, ADAM
+        CR-245 option B). A body `id`, when sent, must equal the path''s; `status` changes by the platform and
+        `lastSuccessAt` are the server''s. An `endpointUrl` that is not `https`, an `apiClientId` that is not an
+        active API client of the tenant, or a `decisionMapping` that maps no value to `approve` and `reject` is
+        `422`.
+
+
+        **The API-client check is a granted in-process read** (accepted 26 October 2026, Chinmay, ADAM CR-243
+        option A). `api-client-not-active` is answered from Platform''s `public-api#apiClientRecords`, asked in
+        process (served `in-process` as well as `service`) over the control connection commerce already holds for
+        routing (#27692, CR-161): the read XDR-006 of docs/active/cross-deployable-writes.yaml. An `apiClientId`
+        with no row there, whose row''s `status` is not `active`, or whose `allowedTenantIds` does not hold the
+        caller''s tenant, is the `422`.
+
+
+        **The secrets are kept in the Key Vault secret store** (ADAM CR-243 option A). `outboundCredential` and
+        `signingSecret` are write-only: each is written through the Application''s secret-store abstraction
+        (`ISecretStore`, with the Azure Key Vault adapter), and the row keeps the secret''s reference, never the
+        value (CHG-R1S-020); omitting either on a replace keeps the stored one. The store is built by its own
+        ticket, ordered before this one; until it lands this operation is built against the abstraction with a
+        test double, never a plaintext column. The same store serves ADR-0071''s PIN pepper and every other
+        `*_secret_ref` column.
 
         '
       tags:
@@ -4159,7 +4281,7 @@ paths:
       - name: externalProviderId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 external-provider-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -4187,6 +4309,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApprovalExternalProvider'
+        '409':
+          description: 'Refused, and nothing is stored. `external-provider-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `externalProviderId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - external-provider-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [endpoint-not-https, api-client-not-active, decision-mapping-incomplete]
           description: The endpoint is not `https`, the API client is not an active client of the tenant, or
@@ -4215,7 +4345,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `sentAt` descending, then by `id`.'
+        **Order.** Newest first, by `sentAt` descending, then by `id`. Where `sentAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - request
       x-ticvai-permission: APPROVAL_VIEW
@@ -4276,6 +4406,10 @@ paths:
         format: uuid
     post:
       operationId: recordExternalApprovalDecision
+      x-ticvai-read-via:
+      - query: ai#approvalRequestScoreRecords
+        route: service
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-api-scope: core.write
       x-ticvai-agreed: '29 September: re-trace 11.1.65 (decision callback into the approval); our build
         plan; shape follows decideApprovalRequest'
@@ -4361,6 +4495,10 @@ paths:
       operationId: getApprovalRequest
       x-ticvai-consumed-by:
         - "P08 BO-085 Approval Request"
+      x-ticvai-read-via:
+      - query: ai#approvalRequestScoreRecords
+        route: service
+        for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
       summary: One approval request
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; VM-BO-085: listApprovalRequests has no id filter).** One request with its decisions so far.
@@ -5379,9 +5517,22 @@ components:
         - **A platform suspension or reactivation of a tenant** (`configurationChange`, subject `tenant`, `subjectContract` `subscription`; ADAM CR-172; lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015): decided by the platform, never by the tenant''s own approvers. It is routed only by the **platform rule**, held in the control plane and seeded when the platform is provisioned, whose approvers hold `PLATFORM_TENANT_MANAGE`, with four eyes (the operator who raised it cannot decide it). It is not off by default like the review steps below: the platform rule always exists, and without it `createApprovalRequest` refuses `422 no-approval-route`.
         - **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.
 
+        **A sales channel going live** (ADAM CR-211, option A, decided 25 October 2026; CHG-R10CAT-003).
+        `configurationChange`, subject `salesChannel`, `subjectContract` `catalogue`, `subjectId` the channel: raised by
+        catalogue `publishChannelReadinessValidation` on `submitForApproval`, and named by its `scheduleActivation` and
+        `activate`, which are refused until it is approved. An existing kind narrowed by `subjectTypes`, so no kind is
+        added.
+
         **A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request
         with no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the
         ShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.
+
+        **A guest's privacy request** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016). `configurationChange`,
+        `subjectContract` `identity`, `subjectId` the guest's subject id, subject `subjectDataExport` for
+        `exportSubjectData` and `subjectErasure` for `deleteGuestAccount`: an existing kind narrowed by `subjectTypes`,
+        so no kind is added. Raised by Identity in process for the guest, it records the guest as `requestedBySubjectId`
+        (`requestedByPrincipalId` null). A guest's own request needs no human approval step (ADR-0047 section 7); a
+        tenant that wants one saves a rule for these subject types.
       enum:
       - refund
       - priceOverride
@@ -5432,6 +5583,9 @@ components:
     ApprovalRule:
       type: object
       x-ticvai-persistence: approvals.rule
+      # A rule's code is unique within its matrix where it is set (ADAM CR-102, option 1; CHG-R10ID-015): a unique index
+      # on (matrix_id, code); rows with a null code do not collide.
+      x-ticvai-unique-together: [[matrix_id, code]]
       required:
       - order
       - approverRoleIds
@@ -5454,9 +5608,17 @@ components:
 
             '
         minAmount:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: '**Amounts compare in the venue''s currency** (the lead, 25 October 2026, r10 round 3, ADAM CR-102;
+            CHG-R10ID-020): a request amount in another currency (a supplier''s, a tender''s) is converted into the
+            currency of the venue the request is raised at, at that day''s FX rate (finance `listFxRates`), before it is
+            compared with `minAmount` and `maxAmount`; a tenant- or region-level matrix''s bounds are read in that same
+            venue currency.'
         maxAmount:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: The upper bound, compared as `minAmount` is (venue currency, the day''s FX rate; CR-102).
         riskScoreAbove:
           type: number
           nullable: true
@@ -5471,21 +5633,41 @@ components:
         condition:
           type: string
           nullable: true
-          description: '11.1.13. Evaluated against the attributes the caller supplied.
+          maxLength: 500
+          description: '11.1.13. Evaluated against the attributes the caller supplied (`CreateApprovalRequest.attributes`,
+            stored on the request).
 
 
-            **No condition language is defined yet** (pull audit R104, 26 September): the grammar, the
-            attributes it may name and how two conditions are compared for `unreachableRule` are an
-            open decision, not something to infer from this field.
+            **The condition language: attribute comparisons joined by AND** (ADAM CR-102, option 1, accepted 15 October
+            2026; the open decision of pull audit R104, settled for r10; CHG-R10ID-015). It lifts the refusal of R8
+            blocker cause APPROVALS-TENANCY-C06 (CHG-R8SPN-016), which held only until the grammar was decided. A
+            condition is one or more clauses separated by ` AND ` (upper case, single spaces); there is no OR, no NOT and
+            no parentheses (an OR is two rules). A clause is `<attribute> <operator> <value>`:
+
+            - `<attribute>` names a key of the request''s `attributes`, by name (`[a-z][A-Za-z0-9]{0,63}`; for example
+            `customerType`, `riskScore`, `department`);
+
+            - `<operator>` is one of `=`, `!=`, `<`, `<=`, `>`, `>=`, `in`, `notIn`;
+
+            - `<value>` is a single-quoted string (`''vip''`, a quote inside doubled), a number (`-12.5`), `true` or
+            `false`, or, for `in` and `notIn`, a bracketed list of strings or of numbers (`[''a'', ''b'']`, at most 50).
+
+            A condition holds when every clause holds. A clause holds only when the attribute is present and of the
+            value''s type (string, number or boolean; `<`, `<=`, `>` and `>=` take numbers only); an absent or
+            mistyped attribute makes the clause, and so the rule, not match. Strings compare exactly, case included. At
+            most 10 clauses. `setApprovalMatrix` parses a non-null `condition` and refuses one that does not parse with
+            `422 condition-invalid`, storing nothing, so a stored condition always parses. A rule matches when kind,
+            scope, subject type, amount and `matchAttributes` match and then its `condition`, if any, holds.
 
 
-            **So a condition is refused, never stored** (decided 20 October 2026, Chinmay, R8 blocker cause
-            APPROVALS-TENANCY-C06, option C; CHG-R8SPN-016). `setApprovalMatrix` refuses a rule whose `condition`
-            is not null, and `approveMatrixMultiLevel` one whose `skipConditions` is not empty, with `422
-            condition-not-supported`, and store nothing. Every stored rule therefore has no condition, and
-            `evaluateApprovalRequirement`, `createApprovalRequest` and `submitApprovalRequest` match on kind, scope,
-            subject type, amount and `matchAttributes` only. A rule meant to restrict can never route silently as if
-            unrestricted. The refusal is lifted when the grammar is decided.
+            **How two conditions are compared for `unreachableRule`.** A later rule is unreachable when an earlier rule
+            always matches first: every request that makes the later rule match also makes the earlier one match. For
+            conditions this is decided clause by clause, and only where it can be proved: the earlier rule''s condition
+            is null, or each of its clauses is implied by a clause of the later rule on the same attribute (equal
+            clauses; `= v` implies `!= w` for w other than v, `in` a list holding v and `notIn` a list without v; `> a`
+            implies `> b` and `>= b` for a >= b, and likewise for `<`; `in L` implies `in M` when L is within M). A
+            clause not provably implied counts as reachable, so the check never refuses a matrix that could route a
+            request to the later rule.
 
             '
         approverRoleIds:
@@ -5576,8 +5758,10 @@ components:
           type: string
           maxLength: 64
           nullable: true
-          description: '**A stable code for the rule, unique within its matrix** (4 October 2026, CHG-FXC-005). The composite
-            `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null.'
+          description: '**A stable code for the rule, unique within its matrix** (4 October 2026, CHG-FXC-005; enforced by a
+            unique index on (`matrix_id`, `code`) since ADAM CR-102, CHG-R10ID-015, compared without case). The composite
+            `approveMatrixMultiLevel` upserts a rule by it; `setApprovalMatrix` may leave it null, and two null codes do
+            not collide. A body with two rules of one code is `400 validation`.'
         minimumApprovals:
           type: integer
           minimum: 1
@@ -5639,10 +5823,21 @@ components:
       x-ticvai-rls: read-beneath   # ADAM CR-095, CHG-RSF-001: a matrix set at the tenant or a region governs every venue beneath it, so a venue reads the matrices it inherits (approvals.rule follows its matrix for reading) and still writes only its own
       # One matrix per kind, scope and version, as the contract promises (R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009).
       x-ticvai-unique-together: [[kind, scopePath, version]]
+      description: '**Which matrix routes a request, and which version of it** (ADAM CR-102, option 1, accepted 15 October
+        2026; CHG-R10ID-015). Matrices resolve up the scope tree as configuration does (ADR-0018: nearest ancestor
+        wins): for the request''s `kind` at its `scopePath`, the matrix of the nearest node, the venue''s, else the
+        region''s, else the tenant''s, routes it alone; its rules are not followed by an ancestor''s, because a venue or
+        region matrix may only tighten what it inherits (`loosensParentRule`), so the nearest matrix already holds the
+        ancestor''s floor. At a node, the matrix **in force** is its highest `version`; when that version has `isActive`
+        false, the node sets no matrix of that kind and the next ancestor''s applies (confirmed by the lead, 25 October
+        2026, r10 round 3; CHG-R10ID-020). The request stores the matrix it
+        was routed by (`approvalMatrixId`) and its `matrixVersion`, so a decision is checked against exactly that rule
+        set.'
       required:
       - kind
       - scopeLevel
       - rules
+      - version
       properties:
         id:
           type: string
@@ -5668,6 +5863,8 @@ components:
 
             **(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a
             request''s `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).
+            **Never null** (ADAM CR-102, CHG-R10ID-015): the server sets it, 1 for a new matrix and the previous
+            version plus one after; it is not sent and is ignored on input.
 
             '
         rules:
@@ -5844,12 +6041,15 @@ components:
     ApprovalRequest:
       type: object
       # The escalation history is a child table (14 October 2026, CHG-CRD-006, ADAM CR-078): `escalations[]` are its rows.
-      x-ticvai-persistence: approvals.request + approvals.escalation
+      # The approver chain fixed at routing is a child table too (ADAM CR-102, option 1; CHG-R10ID-015): `approvers[]`.
+      x-ticvai-persistence: approvals.request + approvals.escalation + approvals.request_approver
+      # Raised by a principal (staff, a contract acting for one) or by a guest subject, never both (ADAM CR-101;
+      # CHG-R10ID-016): a table CHECK, num_nonnulls(requested_by_principal_id, requested_by_subject_id) = 1.
+      x-ticvai-exactly-one-of: [[requestedByPrincipalId, requestedBySubjectId]]
       required:
       - id
       - kind
       - status
-      - requestedByPrincipalId
       - requestedAt
       properties:
         id:
@@ -5914,6 +6114,21 @@ components:
         requestedByPrincipalId:
           type: string
           format: uuid
+          nullable: true
+          x-ticvai-references: identity.principal
+          description: 'The principal who raised the request, or for whom the raising contract raised it. **Null when a
+            guest raised it** (ADAM CR-101, accepted 15 October 2026; CHG-R10ID-016): a guest is a subject, not a
+            principal, so a guest''s privacy request (`exportSubjectData`, `deleteGuestAccount`) records
+            `requestedBySubjectId` instead. Exactly one of the two is set.'
+        requestedBySubjectId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: pii.subject
+          description: '**The guest who raised the request** (ADAM CR-101; CHG-R10ID-016), set by the server from the
+            guest session; null for a request a principal raised. Segregation of duties holds for it too: no approver
+            decides a request raised for their own subject.'
         matrixVersion:
           type: integer
         mode:
@@ -5922,8 +6137,39 @@ components:
           type: integer
         totalLevels:
           type: integer
+        approvers:
+          type: array
+          readOnly: true
+          description: '**The approver chain, fixed when the request is routed** (ADAM CR-102, option 1, accepted 15
+            October 2026; CHG-R10ID-015). One `approvals.request_approver` row per approver per level, written by
+            `createApprovalRequest` (when not a draft) and `submitApprovalRequest` from the matched rule''s roles and the
+            delegations in force at that moment (`isDelegate` true for a delegate standing in). The chain is not
+            recomputed at decision time: `decideApprovalRequest` refuses `notInApproverChain` to anyone with no row at
+            the current level, so a role change after routing neither adds nor removes an approver of a request in
+            flight. An escalation (`escalateApprovalRequest`, the SLA job) and a reroute (`rerouteOnNoApprover`) add
+            rows; a returned or information-requested request keeps its chain when resubmitted. Rows are never edited
+            or deleted.'
+          items:
+            type: object
+            required: [level, principalId, isDelegate]
+            properties:
+              level:
+                type: integer
+                minimum: 1
+                description: The level of the chain this approver decides at.
+              principalId:
+                type: string
+                format: uuid
+                x-ticvai-references: identity.principal
+                description: The approver, a principal of the tenant.
+              isDelegate:
+                type: boolean
+                description: True when the approver stands in for another through an `ApprovalDelegation` in force at
+                  routing.
         pendingApprovers:
           x-ticvai-persisted: false
+          description: 'The rows of `approvers` at `currentLevel` who have not decided yet, with their names; derived, not
+            stored (CHG-R10ID-015).'
           type: array
           items:
             type: object
@@ -7068,10 +7314,14 @@ components:
           description: Venue
         businessUnit:
           type: string
-          description: Business Unit
+          deprecated: true
+          description: 'Business Unit. **Not a scope and not stored** (ADAM CR-102, option 1; CHG-R10ID-015): not a level
+            of `platform.scope`, so it never sets the delegation''s `scopePath`; a value sent is ignored.'
         legalEntity:
           type: string
-          description: Legal Entity
+          deprecated: true
+          description: 'Legal Entity. **Not a scope and not stored** (ADAM CR-102, option 1; CHG-R10ID-015): not a level
+            of `platform.scope`, so it never sets the delegation''s `scopePath`; a value sent is ignored.'
         region:
           type: string
           description: Region

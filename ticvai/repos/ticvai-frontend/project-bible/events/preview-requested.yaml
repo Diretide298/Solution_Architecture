@@ -1,0 +1,39 @@
+# preview.requested v1 — published by whitelabel
+# Added 25 October 2026 (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012): the white-label jobs
+# component on the workers host carries app builds, site packages and preview rendering, one event each.
+# Checked by tools/check-states.py.
+
+name: preview.requested
+version: 1
+publisher: whitelabel
+description: A tenant asked for a preview of its working draft.
+aggregate: preview
+emittedWhen: createPreview writes the preview's cache entry
+emittedBy:
+- createPreview
+payload:
+- field: previewId
+  type: uuid
+  notes: The preview's id, the event's aggregateId
+- field: platform
+  type: string
+  notes: ios, android or web
+- field: language
+  type: string
+  required: false
+- field: outputs
+  type: array
+  notes: app, pdfTicket, appleWalletPass, googleWalletPass
+- field: productId
+  type: uuid
+  required: false
+- field: expiresAt
+  type: timestamp
+consumers:
+- context: white-label
+  purpose: 'Render the draft for the platform and language, and the outputs asked for (the PDF ticket and the Wallet passes from the ticket and pass templates), into the preview''s cache entry, served at /previews/{previewId} on the tenant''s platform subdomain until expiresAt. The white-label jobs component in the workers host'
+  idempotencyKey: previewId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 30 days after publication
+notes: 'No state model emits this: the request is stored by the operation and the work is the jobs component''s.'

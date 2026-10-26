@@ -28,20 +28,18 @@ states:
 transitions:
 - from: queued
   to: inProgress
-  trigger: start
-  operation: deployConfigurationProfile
-  guard: The window opened.
+  trigger: job
+  guard: 'The window opened. The profile deployment job in the workers host takes the queued deployment
+    (ADAM CR-188, option A; CHG-R10TEN-008): deployConfigurationProfile only queues it.'
 - from: inProgress
   to: completed
-  trigger: complete
-  operation: deployConfigurationProfile
-  guard: All acknowledged.
+  trigger: job
+  guard: All acknowledged (the profile deployment job, ADAM CR-188).
 - from: inProgress
   to: partiallyFailed
-  trigger: partialFail
-  operation: deployConfigurationProfile
+  trigger: job
   guard: '**At least one device did not take it.** The unreachable ones are listed by name — a count
-    is not actionable and a list is.'
+    is not actionable and a list is. Set by the profile deployment job (ADAM CR-188).'
 - from: partiallyFailed
   to: inProgress
   trigger: retry

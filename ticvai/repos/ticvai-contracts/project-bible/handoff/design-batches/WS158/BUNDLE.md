@@ -1010,6 +1010,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-886`
 - Workshop pack: Resource_Management_Configuration_Reference.pdf board 4
 - Flow F267 *Resource Management Configuration board 4: Workforce Roster Command Center*, step 6: Works in Staffing Gap & Coverage Control Center → Identify workforce shortages before they create operational problems.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1870,7 +1871,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 Carried, not typed: `labourBudgetId`
 
-Errors to draw in the form: 409 The period overlaps another budget for the same venue and department; 422 periodEnd is before periodStart
+Errors to draw in the form: 409 The period overlaps another budget for the same venue and department `labour-budget-id-mismatch` (ADAM CR-245): a record for venue, department and …; 422 periodEnd is before periodStart
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1917,7 +1918,7 @@ Errors to draw in the form: 409 The period overlaps another budget for the same 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save labour budget (primary button) | `setLabourBudget` PUT `/labour-budgets/{labourBudgetId}` | LabourBudget | LabourBudget | 409 The period overlaps another budget for the same venue and department; 422 periodEnd is before periodStart | gated `WORKFORCE_MANAGE`; opens modal first |
+| Save labour budget (primary button) | `setLabourBudget` PUT `/labour-budgets/{labourBudgetId}` | LabourBudget | LabourBudget | 409 The period overlaps another budget for the same venue and department `labour-budget-id-mismatch` (ADAM CR-245): a record for venue, department and …; 422 periodEnd is before periodStart | gated `WORKFORCE_MANAGE`; opens modal first |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1947,7 +1948,7 @@ Errors to draw in the form: 409 The period overlaps another budget for the same 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the labor cost staffing are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The period overlaps another budget for the same venue and department; 422 periodEnd is before periodStart |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The period overlaps another budget for the same venue and department `labour-budget-id-mismatch` (ADAM CR-245): a record for venue, department and …; 422 periodEnd is before periodStart |
 
 #### Edge cases to draw
 

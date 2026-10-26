@@ -278,6 +278,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - … and 1 more flow steps (`flows/`)
 - Flow F202 branch at step 1 (expected): when Nothing has been set up on Rental Checkout Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F202 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -404,6 +405,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS121 Rental Management Board 6.dc.html#bo-545`
 - Workshop pack: Rental_Management.pdf board 6
 - Flow F202 *Rental Management board 6: Rental Checkout Command Center*, step 2: Works in Voucher Scan & Reservation Retrieval → Quickly identify the customer reservation when they arrive. The original requirement specifically requires scanning and validating the customer's voucher/ticket.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -538,6 +540,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS121 Rental Management Board 6.dc.html#bo-546`
 - Workshop pack: Rental_Management.pdf board 6
 - Flow F202 *Rental Management board 6: Rental Checkout Command Center*, step 4: Works in Checkout Readiness Validation → Prevent equipment from being handed over until mandatory requirements are satisfied.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -804,6 +807,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS121 Rental Management Board 6.dc.html#bo-548`
 - Workshop pack: Rental_Management.pdf board 6
 - Flow F202 *Rental Management board 6: Rental Checkout Command Center*, step 8: Works in Equipment Scan & Validation → Ensure the operator cannot accidentally assign the wrong, unavailable or unsafe equipment.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1024,6 +1028,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS121 Rental Management Board 6.dc.html#bo-550`
 - Workshop pack: Rental_Management.pdf board 6
 - Flow F202 *Rental Management board 6: Rental Checkout Command Center*, step 12: Works in Safety & Handover Checklist → Ensure mandatory operational and safety steps are completed before starting the rental. Example — Kayak ✓ Life jacket provided ✓ Paddle provided ✓ Safety briefing completed ✓ Emergency procedure …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1140,6 +1145,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS121 Rental Management Board 6.dc.html#bo-551`
 - Workshop pack: Rental_Management.pdf board 6
 - Flow F202 *Rental Management board 6: Rental Checkout Command Center*, step 14: Works in Deposit & Financial Handover Validation → Give the rental operator a clear commercial status without requiring them to enter the Finance module.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1354,6 +1360,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS121 Rental Management Board 6.dc.html#bo-553`
 - Workshop pack: Rental_Management.pdf board 6
 - Flow F202 *Rental Management board 6: Rental Checkout Command Center*, step 18: Works in Checkout Confirmation & Rental Activation → Officially start the rental and transition the reservation into an active rental.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

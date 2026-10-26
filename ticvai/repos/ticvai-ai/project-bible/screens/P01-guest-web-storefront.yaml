@@ -204,9 +204,9 @@ screens:
         link or optional), and WEB-023 opens on its own'
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
-      provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId
-        only pre-select (deep link or optional), and WEB-024 opens on its own'
+      provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId,
+        requestId and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId,
+        methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own'
     - to: WEB-027
       trigger: Newsletter Subscription
       provenance: 'derived — WEB-027 declares entryState.params unsubscribeToken and WEB-001 holds none
@@ -330,10 +330,13 @@ screens:
         - Product.displayTags
         operation: listProducts
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: Guest cards show name, image, from-price, tags and availability only (DI-026). The venue
-          is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was
-          the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay,
-          fix before Block A starts, 2 October 2026 (GFIX-3)).
+        notes: '**The photo is the primary item''s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for
+          the full-size view): the stable CDN address the guest read returns for a public, ready asset
+          (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls
+          no asset read. Guest cards show name, image, from-price, tags and availability only (DI-026).
+          The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never
+          typed. Was the generated table ''Every product''; staff and plumbing columns removed (decided
+          by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).'
       - kind: banner
         bindsTo: TenantAppStatus.maintenanceMessage
         notes: Only when isInMaintenance. Tenant-branded, never a generic error page
@@ -498,6 +501,7 @@ screens:
     entryFrom:
     - WEB-001
     - WEB-003
+    - WEB-032
     exitTo:
     - WEB-001
     - WEB-003
@@ -747,7 +751,11 @@ screens:
       - kind: searchField
         label: Search
         operation: searchCatalogue
-        notes: Sends `?q=` to `searchCatalogue`.
+        notes: '**Type-ahead** (ADAM CR-223, 25 October 2026, as built and as the client-approved prototype
+          searches): `searchCatalogue` is called with `?q=` once typing pauses (300 ms debounce), only
+          for 2 or more characters (the contract''s minLength; fewer sends nothing), Enter searches at
+          once, and the latest answer wins (an earlier one that arrives late is dropped). frontend-patterns
+          4.6.'
         provenance: contract catalogue.yaml GET /search
       - kind: selectField
         label: Kind
@@ -758,11 +766,14 @@ screens:
         label: Results
         operation: searchCatalogue
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: 'One card per result: name, summary, photo (`primaryMedia`), from-price (`fromPrice`),
-          sold out shown rather than hidden (`isAvailable`), and `notBookableLabel` for an info-only product.
-          `searchCatalogue` answers with no named schema, so the card binds none. Was the generated table
-          ''Every money''; staff and plumbing columns removed (decided by Chinmay, fix before Block A
-          starts, 2 October 2026 (GFIX-3)).'
+        notes: '**The photo is `primaryMedia.thumbnailUrl`** (`url` for the full-size view): the stable
+          CDN address `searchCatalogue` returns to a guest for a public, ready asset (ADAM CR-221, 25
+          October 2026); the client never turns an `assetId` into an address and calls no asset read.
+          One card per result: name, summary, photo (`primaryMedia`), from-price (`fromPrice`), sold out
+          shown rather than hidden (`isAvailable`), and `notBookableLabel` for an info-only product. `searchCatalogue`
+          answers with no named schema, so the card binds none. Was the generated table ''Every money'';
+          staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October
+          2026 (GFIX-3)).'
       - kind: cardList
         label: Suggestions
         bindsTo: Product
@@ -773,10 +784,13 @@ screens:
         - Product.displayTags
         operation: listProducts
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: 'Before the guest types: what is on sale at the venue. The venue is the one the guest picked
-          on Home (`venueId` from the session, audit R267), never typed. Was the generated table ''Every
-          product''; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts,
-          2 October 2026 (GFIX-3)).'
+        notes: '**The photo is the primary item''s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for
+          the full-size view): the stable CDN address the guest read returns for a public, ready asset
+          (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls
+          no asset read. Before the guest types: what is on sale at the venue. The venue is the one the
+          guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated
+          table ''Every product''; staff and plumbing columns removed (decided by Chinmay, fix before
+          Block A starts, 2 October 2026 (GFIX-3)).'
   states:
     loading: The search results list.
     error: Could not load. Names which read failed and leaves the search results untouched.
@@ -795,7 +809,8 @@ screens:
   apis:
   - operationId: searchCatalogue
     contract: catalogue
-    purpose: Find something by name
+    purpose: 'Find something by name, type-ahead: called once typing pauses (300 ms debounce), for 2 or
+      more characters, Enter at once, the latest answer wins (ADAM CR-223)'
     trigger: onAction
   - operationId: listProducts
     contract: catalogue
@@ -973,10 +988,14 @@ screens:
       - kind: detailPanel
         label: Photo and video
         bindsTo: Product.media
-        notes: '**The video plays directly, with no loader in front of it** (client meeting 30 September,
-          MoM 4.8): the info button reveals the details and starts the primary video in place; the poster
-          frame (the primary image, or the video''s first frame) shows while it buffers, never a spinner
-          or loading screen. Read more opens on the primary video or photo (`Product.media`, `isPrimary`).'
+        notes: '**Each item plays or shows from its `ProductMedia.url`** (`thumbnailUrl` as the poster
+          frame while it buffers): the stable CDN address `getProduct` returns to a guest for a public,
+          ready asset (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address
+          and calls no asset read. **The video plays directly, with no loader in front of it** (client
+          meeting 30 September, MoM 4.8): the info button reveals the details and starts the primary video
+          in place; the poster frame (the primary image, or the video''s first frame) shows while it buffers,
+          never a spinner or loading screen. Read more opens on the primary video or photo (`Product.media`,
+          `isPrimary`).'
         operation: getProduct
         provenance: decided 29 September, rev 3 23SEP-4; decided 30 September 2026, client meeting MoM
           4.8 (Qossai)
@@ -1182,8 +1201,8 @@ screens:
       carries:
       - eventId
       - productId
-      provenance: derived — WEB-007 declares entryState.params eventId, holdId, performanceId, productId
-        and WEB-005 holds eventId, productId, so an edge into it carries them
+      provenance: derived — WEB-007 declares entryState.params eventId, holdId, holdIds, performanceId,
+        productId and WEB-005 holds eventId, productId, so an edge into it carries them
     - to: WEB-008
       trigger: Add-ons & Upsell
       carries:
@@ -1197,8 +1216,9 @@ screens:
       - code
       - lineId
       - performanceId
-      provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId
-        and WEB-005 holds cartId, code, lineId, performanceId, so an edge into it carries them
+      provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, holdIds, lineId,
+        performanceId and WEB-005 holds cartId, code, lineId, performanceId, so an edge into it carries
+        them
     - to: WEB-016
       trigger: Continue, when sign-in is asked after add-ons and this booking has no add-ons step
       carries:
@@ -1261,8 +1281,8 @@ screens:
         provenance: decided 29 September, rev 3 REV3-11
       - kind: iconButton
         label: Quick tour
-        notes: Replays the four-step coach-mark tour. Shown only when `BookingFlowConfig.quickTour` is
-          on (default off).
+        notes: Replays the four-step coach-mark tour. Shown only when `BookingFlowLevelSettings.quickTour`
+          (`getPublishedBookingFlow`) is on (default off).
         provenance: decided 29 September, rev 3 REV3-20
       - kind: cardList
         bindsTo: ProductVariant[]
@@ -1514,9 +1534,11 @@ screens:
       trigger: Adds tickets for a performance whose on-sale waiting room is on
       operation: addCartLine
       precondition: '`addCartLine` refused `403 admission-required`: this performance''s room is on and
-        the page holds no admission token for it'
+        the browser sent no valid admission cookie for it. The edge carries the `waitingEntryId` the page
+        got back from WEB-015, when it has one, so the guest keeps their place (ADAM CR-216)'
       carries:
       - performanceId
+      - waitingEntryId
       returnsTo: WEB-006
       provenance: ADR-0066 (accepted 1 October 2026) and its 1 October amendment
     - to: WEB-007
@@ -1807,6 +1829,12 @@ screens:
       from: navigation
       optional: true
       notes: 'Optional: opened without it, the screen makes one with `joinWaitlist`.'
+    - name: waitingEntryId
+      from: WEB-015
+      optional: true
+      notes: 'The on-sale waiting-room entry the guest was admitted from (ADAM CR-216, 25 October 2026):
+        held only to carry back to WEB-015 if `addCartLine` is refused `403 admission-required`. The admission
+        token itself is the edge''s HttpOnly cookie, never held by the page.'
     preloaded:
     - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
       getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
@@ -1889,12 +1917,14 @@ screens:
       - performanceId
       - productId
       provenance: derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId,
-        productId and WEB-007 holds eventId, performanceId, productId, so an edge into it carries them
+        productId, waitingEntryId and WEB-007 holds eventId, performanceId, productId, so an edge into
+        it carries them
     - to: WEB-010
       trigger: Reviews the cart
       provenance: flow F02 step 2→3
       carries:
       - holdId
+      - holdIds
       - performanceId
   notes: 'A map with no geometry falls back to category and best-available selection. Availability returns
     renderMode: list, and the screen renders groups rather than a plan. Never refuses the seated flow.
@@ -1961,18 +1991,24 @@ screens:
         operation: getSeatAvailability
         provenance: contract seating.yaml GET /performances/{performanceId}/seat-availability
       - kind: banner
-        notes: '**One countdown: `Cart.expiresAt`** (the earliest lease in the cart), always visible.
-          The 8-minute seat hold and the 15-minute cart lease are never shown as two clocks; a selection
-          that expires silently while a guest enters card details is the worst outcome in this flow (CHG-SGU-020).'
-        provenance: carried from the previous definition
+        bindsTo: SeatHold.expiresAt
+        operation: getSeatHold
+        notes: '**One countdown: the earliest `SeatHold.expiresAt` of the guest''s held seats**, always
+          visible (ADAM CR-187, 25 October 2026). No cart exists on this step (WEB-010 creates it with
+          the first line), so the clock is the holds'': each `createSeatHold` returns its `expiresAt`,
+          and a screen opened again with `holdIds` reads them with `getSeatHold`. From WEB-010 on, `Cart.expiresAt`
+          takes over. The seat hold and the cart lease are never shown as two clocks; a selection that
+          expires silently while a guest enters card details is the worst outcome in this flow (CHG-SGU-020).'
+        provenance: carried from the previous definition; ADAM CR-187 (option A), settled 25 October 2026
       - kind: seatMap
         label: Choose seats
         notes: '**A seat selection screen with no seat map.** `noGeometry` is the state that matters:
           a map imported from a manifest alone can be sold from a list and not rendered, and the screen
-          has to say which it is rather than showing an empty frame. **At most `VenueSettings.seating.maxSeatsPerGuestOrder`
-          seats per booking** on the guest channel (default 10, bounds 1-50): a `422 seat-limit-exceeded`
-          from `createSeatHold` reads *Up to {maxSeats} seats per booking*, and the basket lists each
-          seat (decided 29 September, rev 3 REV3-7). Section zoom happens on the same map (23SEP-16).
+          has to say which it is rather than showing an empty frame. **At most `SeatAvailability.maxSeatsPerGuestOrder`
+          seats per booking** on the guest channel (the venue''s `VenueSettings.seating.maxSeatsPerGuestOrder`,
+          default 10, bounds 1-50, read with `getSeatAvailability`; ADAM CR-187): a `422 seat-limit-exceeded`
+          from `createSeatHold` still reads *Up to {maxSeats} seats per booking*, and the basket lists
+          each seat (decided 29 September, rev 3 REV3-7). Section zoom happens on the same map (23SEP-16).
           **Sections first** (W2): tap a section to zoom in and see its seats; scroll or pinch out, or
           *← Whole map*, to return and compare sections, keeping held seats. **A tap on a seat is the
           hold** (`createSeatHold`); its length is the server''s default and never a guest input (GFIX-3).'
@@ -2064,6 +2100,16 @@ screens:
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
     provenance: decided 29 September 2026, W12
+  - operationId: getSeatHold
+    contract: seating
+    purpose: 'Called on load when the screen is opened with `holdIds`: reads each of the guest''s own
+      holds (seats and `expiresAt`), so the held seats show again and the countdown runs to the earliest
+      expiry (ADAM CR-187, 25 October 2026). Only under the guest session that placed the holds, signed
+      in or the anonymous guest session (ADAM CR-183, ADR-0045): a hold is read only by the session or
+      subject that made it with `createSeatHold`, so a visitor with no session has no `holdIds` and the
+      screen does not call it'
+    trigger: onLoad
+    provenance: ADAM CR-187 (option A), settled by Chinmay 25 October 2026
   - operationId: getPerformance
     contract: catalogue
     purpose: 'Resolves a deep-linked performance (r8, GPS-C05): its `eventId` drives `listPerformances`
@@ -2086,13 +2132,18 @@ screens:
       notes: 'r8 (GPS-C05): carried by the WEB-004 edge and the deep link, for `getPublishedBookingFlow`.
         When it is absent the screen asks `getPublishedBookingFlow` by `flowTypeKey`: `seatedFixedPerformance`,
         or `seatedDateTimeSeatMap` when the venue''s `seatEventDateMode` puts the date over the map.'
+    - name: holdIds
+      from: navigation
+      optional: true
+      notes: 'The list of the guest''s seat holds, one per seat (seating.yaml `createSeatHold`: one hold
+        per tap; ADAM CR-187, 25 October 2026). Opened without it, each tap makes one with `createSeatHold`;
+        opened with it, `getSeatHold` reads each and the held seats show again.'
+    - name: venueId
+      from: session
     - name: holdId
       from: navigation
       optional: true
-      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatHold`;
-        a link or an edge that holds one opens it instead.'
-    - name: venueId
-      from: session
+      notes: 'Optional: opened without it, the screen makes one with `createSeatHold`.'
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event.'
     preloaded:
@@ -2128,8 +2179,9 @@ screens:
     component: modal
     trigger: Recommend seats
     body: '**How many seats, and best available or together.** The guest sets the party size (a How many
-      seats stepper, at most `maxSeatsPerGuestOrder`) and picks the preference, then `recommendSeats`
-      places them. Tickets are chosen after seats, so there are none to count yet.'
+      seats stepper, at most `SeatAvailability.maxSeatsPerGuestOrder`, read with `getSeatAvailability`;
+      ADAM CR-187) and picks the preference, then `recommendSeats` places them. A 422 still reads *Up
+      to {maxSeats} seats per booking*. Tickets are chosen after seats, so there are none to count yet.'
     bindsTo: SeatRecommendationRequest
     confirm:
       label: Recommend seats
@@ -2195,15 +2247,16 @@ screens:
       - cartId
       - performanceId
       provenance: derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId,
-        productId and WEB-008 holds cartId, performanceId, so an edge into it carries them
+        productId, waitingEntryId and WEB-008 holds cartId, performanceId, so an edge into it carries
+        them
     - to: WEB-010
       trigger: Shopping Cart
       carries:
       - cartId
       - lineId
       - performanceId
-      provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId
-        and WEB-008 holds cartId, lineId, performanceId, so an edge into it carries them
+      provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, holdIds, lineId,
+        performanceId and WEB-008 holds cartId, lineId, performanceId, so an edge into it carries them
     - to: WEB-016
       trigger: Continue — sign in or use a guest code (when sign-in is asked after add-ons)
       carries:
@@ -2262,16 +2315,14 @@ screens:
           `recordRecommendationEvents`.'
       - kind: detailPanel
         label: The bundle
-        bindsTo: Bundle
+        bindsTo: GuestBundle
         columns:
-        - Bundle.code
-        - Bundle.name
-        - Bundle.description
-        - Bundle.kind
-        - Bundle.price
-        - Bundle.savingsAmount
-        - Bundle.savingsPercentage
-        - Bundle.hasBeenSold
+        - GuestBundle.name
+        - GuestBundle.description
+        - GuestBundle.kind
+        - GuestBundle.price
+        - GuestBundle.savingsAmount
+        - GuestBundle.savingsPercentage
         operation: getGuestBundle
         provenance: contract promotions.yaml GET /bundles/{bundleId}
         notes: A bundle the recommendation slot names (`kind` bundle), opened from its card; signed catalogue
@@ -2422,7 +2473,7 @@ screens:
       carries:
       - performanceId
       provenance: derived — WEB-006 declares entryState.params cartId, entryId, eventId, performanceId,
-        productId and WEB-009 holds performanceId, so an edge into it carries them
+        productId, waitingEntryId and WEB-009 holds performanceId, so an edge into it carries them
   notes: 'Withdrawn products stay in the list marked unavailable. A guest who saved something and finds
     it silently gone assumes the feature is broken. Purpose derived from the screen name and its operations
     on 17 August, not from a requirement. Wishlist. **Device operations removed** — Sanket flagged that
@@ -2644,16 +2695,14 @@ screens:
         provenance: contract orders.yaml GET /carts/{cartId}
       - kind: detailPanel
         label: The coupon code
-        bindsTo: CouponCode
+        bindsTo: GuestCouponCode
         columns:
-        - CouponCode.code
-        - CouponCode.status
-        - CouponCode.redemptionCount
-        - CouponCode.discount
-        - CouponCode.invalidReason
-        - CouponCode.validFrom
-        - CouponCode.validTo
-        - CouponCode.redeemedAt
+        - GuestCouponCode.code
+        - GuestCouponCode.status
+        - GuestCouponCode.discount
+        - GuestCouponCode.invalidReason
+        - GuestCouponCode.validFrom
+        - GuestCouponCode.validTo
         operation: getGuestCouponCode
         provenance: contract promotions.yaml GET /coupon-codes/{code}
       - kind: textField
@@ -2826,13 +2875,26 @@ screens:
       from: WEB-008
     - name: code
       from: deepLink
+      optional: true
+      notes: 'A promo code: from a deep link, or carried from WEB-032''s Use this offer through the booking
+        flow, which keeps it with the booking (in memory, never in storage). Applied with `applyCartPromoCode`
+        as soon as the cart has a line, and refused as that operation says (ADAM CR-225, 25 October 2026).'
     - name: lineId
       from: deepLink
     - name: performanceId
       from: navigation
       optional: true
+    - name: holdIds
+      from: navigation
+      optional: true
+      notes: The seat holds WEB-007 carries, one per seat (ADAM CR-187, 25 October 2026); each becomes
+        a line's hold. `Cart.expiresAt` is the countdown from here on.
     - name: holdId
       from: navigation
+      optional: true
+      notes: 'The resource hold (a cabana or spot held on the venue map) that `getResourceHold` reads
+        for its countdown, when an edge carries one; otherwise each line''s own `resourceHoldId`. Not
+        a seat hold: the seat holds are `holdIds` (ADAM CR-187, 25 October 2026).'
     - name: venueId
       from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
@@ -3197,8 +3259,8 @@ screens:
       - cartId
       - lineId
       - performanceId
-      provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId
-        and WEB-012 holds cartId, lineId, performanceId, so an edge into it carries them
+      provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, holdIds, lineId,
+        performanceId and WEB-012 holds cartId, lineId, performanceId, so an edge into it carries them
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
       provenance: 'derived — WEB-011 declares entryState.params holdId and WEB-012 holds none of them.
@@ -3482,8 +3544,8 @@ screens:
       carries:
       - lineId
       - performanceId
-      provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId
-        and WEB-013 holds lineId, performanceId, so an edge into it carries them
+      provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, holdIds, lineId,
+        performanceId and WEB-013 holds lineId, performanceId, so an edge into it carries them
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
       provenance: 'derived — WEB-011 declares entryState.params holdId and WEB-013 holds none of them.
@@ -3853,11 +3915,16 @@ screens:
     transitions:
     - to: WEB-006
       trigger: Continue to your tickets
-      precondition: '`getWaitingRoomPosition` answers `admitted`. The page keeps `admission.token` and
-        sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt`'
+      precondition: '`getWaitingRoomPosition` answers `admitted`. The admission token is kept in an HttpOnly,
+        short-lived, per-performance cookie the edge sets on that admitted answer, and the browser sends
+        it with `addCartLine` until `admission.expiresAt`; the page stores nothing (no script-readable
+        copy, no localStorage or sessionStorage), so a reload or a second tab is still admitted (ADAM
+        CR-216, 25 October 2026; ADR-0066 amendment of 25 October)'
       carries:
       - performanceId
-      provenance: ADR-0066 (accepted 1 October 2026) and its 1 October amendment
+      - waitingEntryId
+      provenance: ADR-0066 (accepted 1 October 2026), its 1 October amendment, and its 25 October amendment
+        (ADAM CR-216)
   notes: '**The on-sale waiting room (Q2), not the ride queue (Q1). Re-pointed 1 October under ADR-0066**
     from `joinQueue`, `getWaitingGuest` and `getWaitTimes`, which are the ride queue and wrote a `queue.entry`
     row per arriving guest, the load the room exists to keep away. The ride queue stays on WEB-040. Arrival
@@ -3923,16 +3990,22 @@ screens:
     trigger: onAction
   - operationId: getWaitingRoomPosition
     contract: catalogue
-    purpose: The guest's place, polled every `pollAfterSeconds`; admitted, it carries the admission token
-      for `addCartLine`
+    purpose: 'The guest''s place, polled every `pollAfterSeconds`; admitted, the edge sets the admission
+      cookie for `addCartLine` (ADAM CR-216). A `404` for a performance the page knows means the entry
+      is gone: the guest re-enters with Take my place'
     trigger: onInterval
   entryState:
     params:
     - name: performanceId
       from: WEB-006
     - name: waitingEntryId
-      from: WEB-015
+      from: WEB-006
       optional: true
+      notes: 'Carried back on the WEB-006 edge when a guest who was admitted is sent here again (an expired
+        admission, a refused `addCartLine`), so the poll resumes the same entry and the guest keeps their
+        place instead of entering at the back (ADAM CR-216, 25 October 2026). A `404` from `getWaitingRoomPosition`
+        for a performance the page knows means the entry is gone (evicted or the room restarted): the
+        guest re-enters with *Take my place*.'
     coldEntry: '**Opened with no performance, or one no longer selling, the room says so and offers the
       event** — never a 404. The room belongs to one performance''s sale and has nothing to show without
       one.'
@@ -4090,7 +4163,11 @@ screens:
       - kind: textField
         label: Code
         operation: verifyGuestOtp
-        notes: Shown once a code has been sent; `verifyGuestOtp` returns the `GuestSession`.
+        notes: '**Two codes, one field.** After *Send me a code* the code goes to `verifyGuestOtp`, which
+          returns the `GuestSession`. **After *Create an account* the code `registerGuest` sent goes to
+          `verifyGuestEmail` with `mode` `code`**, under the `GuestSession` `registerGuest` returned (a
+          wrong code is 422 with `attemptsRemaining`), never to `verifyGuestOtp` (ADAM CR-177 and CR-222,
+          settled 21 and 25 October 2026).'
         provenance: contract identity.yaml POST /auth/guest/otp/verify
       - kind: primaryButton
         label: Sign in with the code
@@ -4171,9 +4248,12 @@ screens:
   - id: formRegisterGuest
     component: modal
     trigger: Create an account
-    body: '**Collects what `registerGuest` sends before it is called.** Required: `identifier`, `channel`.
-      Optional: `displayName`, `password`, `preferredLanguage`, `consents`. Dismissing sends nothing;
-      the screen behind is unchanged.'
+    body: '**Collects what `registerGuest` sends before it is called.** Required: `identifier`. The guest
+      never picks a channel: an email address is sent with `channel` `email`; a mobile number is sent
+      with none, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026,
+      r10 Q5), from the tenant''s configured delivery (ADAM CR-222). Optional: `displayName`, `password`,
+      `preferredLanguage`, `consents`. The code it sends is typed in the Code field and confirmed with
+      `verifyGuestEmail` (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: RegisterGuestRequest
     confirm:
       label: Register guest
@@ -4222,9 +4302,10 @@ screens:
   - id: formRequestGuestOtp
     component: modal
     trigger: Send me a code
-    body: '**Collects only the email or mobile number.** The channel follows from the identifier and the
-      tenant''s configured delivery (WhatsApp, SMS or email, DI-209); the guest is never asked to pick
-      one. Dismissing sends nothing.'
+    body: '**Collects only the email or mobile number.** The guest is never asked to pick a channel: an
+      email address is sent with `channel` `email`; a mobile number is sent with no `channel`, and the
+      server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the
+      tenant''s configured delivery (DI-209; ADAM CR-222, 25 October 2026). Dismissing sends nothing.'
     confirm:
       label: Request guest OTP
       operation: requestGuestOtp
@@ -4322,6 +4403,15 @@ screens:
     trigger: onAction
     invalidates:
     - getGuestSession
+  - operationId: verifyGuestEmail
+    contract: identity
+    purpose: 'Sent by the Code field after Create an account, not a control of its own: confirms the code
+      `registerGuest` sent (`mode` `code`) under the session `registerGuest` returned; `verifyGuestOtp`
+      stays for Send me a code (ADAM CR-177, CR-222)'
+    trigger: background
+    invalidates:
+    - getGuestSession
+    provenance: ADAM CR-177 option A (accepted 21 October 2026) and CR-222 (1), settled 25 October 2026
   - operationId: claimCart
     contract: orders
     purpose: Attach an anonymous cart to a guest
@@ -5510,9 +5600,9 @@ screens:
         holds orderId, so an edge into it carries them
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
-      provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId
-        only pre-select (deep link or optional), and WEB-024 opens on its own'
+      provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId,
+        requestId and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId,
+        methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
@@ -5819,9 +5909,9 @@ screens:
         link or optional), and WEB-023 opens on its own'
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
-      provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId
-        only pre-select (deep link or optional), and WEB-024 opens on its own'
+      provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId,
+        requestId and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId,
+        methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own'
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and
     could not fetch what it shows** — the app had these and the browser did not, and there is no reason
@@ -5846,10 +5936,13 @@ screens:
         - Product.media
         operation: listProducts
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: Membership products only, for the guest's venue. The venue is the one the guest picked
-          on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every
-          product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts,
-          2 October 2026 (GFIX-3)).
+        notes: '**The photo is the primary item''s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for
+          the full-size view): the stable CDN address the guest read returns for a public, ready asset
+          (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls
+          no asset read. Membership products only, for the guest''s venue. The venue is the one the guest
+          picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table
+          ''Every product''; staff and plumbing columns removed (decided by Chinmay, fix before Block
+          A starts, 2 October 2026 (GFIX-3)).'
     - name: contextPanel
       slot: selection
       components:
@@ -5982,9 +6075,9 @@ screens:
         so an edge into it carries them
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
-      provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId
-        only pre-select (deep link or optional), and WEB-024 opens on its own'
+      provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId,
+        requestId and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId,
+        methodId, requestId only pre-select (deep link or optional), and WEB-024 opens on its own'
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and
     could not fetch what it shows** — the app had these and the browser did not, and there is no reason
@@ -6113,6 +6206,14 @@ screens:
     contract: payments
     purpose: Retry a declined payment, on another card if needed
     trigger: onAction
+  - operationId: listPaymentTokens
+    contract: orders
+    purpose: 'Called when the guest chooses Use another card: the saved cards the retry modal lists (masked
+      identifier, method, expiry, default first); the chosen one''s id goes to retryMyDunningPayment as
+      paymentTokenId (ADAM CR-233, 25 October 2026)'
+    trigger: onAction
+    shownBy: Use another card
+    provenance: ADAM CR-233 (option A), settled by Chinmay 25 October 2026
   - operationId: getMyMemberships
     contract: catalogue
     purpose: A guest's own memberships, benefits and history
@@ -6168,7 +6269,10 @@ screens:
     component: modal
     trigger: Retry the payment
     body: '**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is
-      required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.'
+      required. Optional: `paymentTokenId`. **Use another card lists the guest''s saved cards** from `listPaymentTokens`
+      (masked identifier, method, expiry, the default first) and sends the chosen one''s id as `paymentTokenId`;
+      a hard decline is never retried on the same card (ADAM CR-233, 25 October 2026). Dismissing sends
+      nothing; the screen behind is unchanged.'
     bindsTo: RetryDunningPaymentRequest
     confirm:
       label: Retry my dunning payment
@@ -6513,6 +6617,12 @@ screens:
     contract: identity
     purpose: Export everything held about this guest
     trigger: onAction
+  - operationId: getSubjectDataExport
+    contract: identity
+    purpose: Where the requested data export has got to, and a fresh short-lived download link once it
+      is ready (ADAM CR-101, CHG-R10ID-016); polled with the requestId exportSubjectData answered while
+      the export is not yet ready, and read again for a new link when an old one has lapsed
+    trigger: onInterval
   - operationId: getFacePassEnrolment
     contract: access
     purpose: Whether a face pass is enrolled on this account
@@ -6570,6 +6680,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMfaMethods`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: requestId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen makes one with `exportSubjectData`.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -7268,11 +7382,34 @@ screens:
     inferred: true
     exitTo:
     - WEB-001
-  notes: Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's failure,
-    not ours. Purpose derived from the screen name and its operations on 17 August, not from a requirement.
-    **Bound 28 September** — sold out and closed come from `getTenantAppStatus.availability` (`open`,
-    `soldOut`, `closed`) and `availabilityMessage` (decided 28 September, audit R073 (f)). The forced
-    upgrade (`minimumAppVersion`) is the app's alone, since a website is always the current version.
+    - WEB-002
+    transitions:
+    - to: WEB-002
+      trigger: Pick another day
+      precondition: '`getTenantAppStatus.availability` is `soldOut` (and the site is not in maintenance)'
+      provenance: ADAM CR-178 (option A), accepted by Chinmay 21 October 2026
+      carries:
+      - eventId
+    - to: WEB-001
+      trigger: Back to the home page
+      precondition: the site is open and not in maintenance (the open state)
+      provenance: ADAM CR-178 (option A), accepted by Chinmay 21 October 2026
+  notes: 'Tenant-branded. An unbranded error page inside a tenant''s storefront reads as the tenant''s
+    failure, not ours. Purpose derived from the screen name and its operations on 17 August, not from
+    a requirement. **Bound 28 September** — sold out and closed come from `getTenantAppStatus.availability`
+    (`open`, `soldOut`, `closed`) and `availabilityMessage` (decided 28 September, audit R073 (f)). The
+    forced upgrade (`minimumAppVersion`) is the app''s alone, since a website is always the current version.
+
+
+    **Which state wins (ADAM CR-178, option A, accepted by Chinmay 21 October 2026; raised by Chitrangi
+    Mestry on #31062).** Maintenance (`getPublishedTenantConfig.isInMaintenance`) and availability (`getTenantAppStatus.availability`)
+    are set independently, so both can hold; the page shows one message, in this order: **maintenance,
+    then closed, then sold out**. Maintenance is temporary and has a back-at time, so it wins; closed
+    is the stronger *leave* message. Sold out offers another day through WEB-002 Event & Attraction Listing
+    (Pick another day). With the site open and not in maintenance the page, reached directly (footer Service
+    status), says everything is running and offers the way back to WEB-001. The CMS publishing fields
+    (`isPublished`, `publishedVersion`, `publishedAt`) are not shown to a guest (CHG-SPF-002). The contract
+    calls it the site, not the venue (r8, WHITE-C16).'
   density: compact
   pattern: statusTracker
   patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
@@ -7295,9 +7432,6 @@ screens:
         label: The tenant app status
         bindsTo: TenantAppStatus
         columns:
-        - TenantAppStatus.isPublished
-        - TenantAppStatus.publishedVersion
-        - TenantAppStatus.publishedAt
         - TenantAppStatus.isInMaintenance
         - TenantAppStatus.maintenanceMessage
         - TenantAppStatus.expectedBackAt
@@ -7311,8 +7445,9 @@ screens:
         operation: getTenantAppStatus
         notes: '**From `getTenantAppStatus.availability`** (`open`, `soldOut`, `closed`) and its `availabilityMessage`,
           set live from CMS-001 through `setMaintenanceMode` (decided 28 September, audit R073 (f)). `soldOut`
-          and `closed` read differently: sold out means come another day, closed means the venue is not
-          open. Nothing shows while it is `open`.'
+          and `closed` read differently: sold out means come another day, closed means the site is not
+          open. Not shown while the site is in maintenance (maintenance wins, then closed, then sold out;
+          ADAM CR-178). While it is `open` the page shows the open state instead.'
         provenance: contract white-label.yaml GET /tenant-config/status
   states:
     loading: —
@@ -7327,11 +7462,14 @@ screens:
       not the venue''s — an error or maintenance page shown for a dropped signal tells a guest the venue
       is down.'
     soldOut: '**Sold out today.** `getTenantAppStatus.availability` is `soldOut`: the page says so with
-      the tenant''s `availabilityMessage` and offers another day, never a generic error (decided 28 September,
-      audit R073 (f)).'
-    closed: '**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the venue is not
+      the tenant''s `availabilityMessage` and offers another day (*Pick another day*, to the event and
+      attraction listing), never a generic error (decided 28 September, audit R073 (f); ADAM CR-178).'
+    closed: '**Closed.** `getTenantAppStatus.availability` is `closed`: the page says the site is not
       open, with the tenant''s `availabilityMessage` and the opening hours from `contact` (decided 28
-      September, audit R073 (f)).'
+      September, audit R073 (f); the site, not the venue: ADAM CR-178).'
+    open: '**Everything is running.** The site is open and not in maintenance, and the page was reached
+      directly (footer *Service status*): a short message that everything is running, and *Back to the
+      home page* (ADAM CR-178).'
     maintenance: The venue's maintenance message and when it expects to be back; one way onward (try again
       at that time). Set live on CMS-001, never published.
   apis:
@@ -7366,6 +7504,7 @@ screens:
       soldOut: P01/status-card
       closed: P01/state-closed
       maintenance: P01/status-card
+      open: P01/status-card
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -7715,11 +7854,11 @@ screens:
         provenance: contract orders.yaml GET /group-bookings/{groupBookingId}
       - kind: detailPanel
         label: The resource availability
-        bindsTo: ResourceAvailability
+        bindsTo: ProductStartTime
         columns:
-        - ResourceAvailability.resourceId
-        - ResourceAvailability.freeWindows
-        - ResourceAvailability.blockedWindows
+        - ProductStartTime.startsAt
+        - ProductStartTime.endsAt
+        - ProductStartTime.freeCount
         operation: listProductStartTimes
         notes: 'Build note (r8 second round, ORDERS-MONEY-C08, option A): drawn as approved, filled from
           `listProductStartTimes` for the reserved line''s product and variant on the picked date: the
@@ -7948,7 +8087,19 @@ screens:
   navigation:
     exitTo:
     - WEB-001
+    - WEB-002
     inferred: false
+    transitions:
+    - to: WEB-002
+      trigger: Use this offer
+      precondition: the offer has a code (an automatic promotion needs nothing applied and stays on the
+        list)
+      carries:
+      - code
+      provenance: 'ADAM CR-225 (option A), settled by Chinmay 25 October 2026: Use this offer opens the
+        booking flow with the code, which the booking keeps (in memory, with the booking; never in storage)
+        until WEB-010, where `applyCartPromoCode` applies it to the cart. WEB-032 has no cart and calls
+        no cart operation.'
     entryFrom:
     - WEB-001
     notes: '**Reached from WEB-001** — a top-level section of the site. Stated on 4 September: this screen
@@ -7960,10 +8111,14 @@ screens:
     apply where the cart is, on WEB-005 and WEB-010, which keep the call.
 
 
-    Build note (r8 second round, ORDERS-MONEY-C11): **Use this offer** on a promotion with a code applies
-    it to the guest''s cart with `applyCartPromoCode` and that code; an automatic promotion needs nothing
-    applied, so it goes back to the list. The button is not drawn on this client-approved screen''s definition
-    yet; adding it and its binding waits for the client (pending entry ORDERS-MONEY-C11).'
+    **Use this offer, the pill and the venue line (ADAM CR-225, settled by Chinmay 25 October 2026, option
+    A; raised by Chinmay Patkar on #28185).** The client-approved frame draws all three on each card.
+    **Use this offer** on an offer with a code opens the booking flow (WEB-002) with that code; the booking
+    keeps it and WEB-010 applies it with `applyCartPromoCode` once the cart has a line, so this screen
+    needs no cart. An automatic promotion needs nothing applied and stays on the list. The pill is `GuestPromotion.label`
+    and the venue line `GuestPromotion.venues` (each `{venueId, name}`; an empty list reads *All venues*),
+    both set in the back office. This replaces the r8 build note (ORDERS-MONEY-C11), which left the button
+    waiting for the client.'
   density: compact
   pattern: listDetail
   patternReason: '`listPromotions` reads the population and `getPromotion` reads one of them — list, select,
@@ -7977,34 +8132,48 @@ screens:
       components:
       - kind: cardList
         label: Offers
-        bindsTo: Promotion
+        bindsTo: GuestPromotion
         columns:
-        - Promotion.code
-        - Promotion.name
-        - Promotion.description
-        - Promotion.discount
-        - Promotion.validFrom
-        - Promotion.validTo
+        - GuestPromotion.code
+        - GuestPromotion.name
+        - GuestPromotion.description
+        - GuestPromotion.discount
+        - GuestPromotion.validFrom
+        - GuestPromotion.validTo
+        - GuestPromotion.label
+        - GuestPromotion.venues
         operation: listPromotions
-        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: The offers active now at the guest's venue. The venue is the one the guest picked on Home
-          (`venueId` from the session, audit R267), never typed. Was the generated table 'Every promotion';
+        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3); label and
+          venues ADAM CR-225, 25 October 2026
+        notes: The offers active now at the guest's venue, in the guest shape a guest caller receives
+          (`GuestPromotion`). The venue is the one the guest picked on Home (`venueId` from the session,
+          audit R267), never typed. **The card's pill is `label`** (localised, set in the back office)
+          **and its venue line `venues`** (the names; an empty list reads *All venues*), as the client-approved
+          frame draws them (ADAM CR-225, 25 October 2026). Was the generated table 'Every promotion';
           staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October
           2026 (GFIX-3)).
+      - kind: primaryButton
+        label: Use this offer
+        notes: 'On each offer card that has a code: opens the booking flow (WEB-002) carrying the code;
+          WEB-010 applies it with `applyCartPromoCode` once the cart has a line (ADAM CR-225, 25 October
+          2026). Not shown on an automatic promotion, which needs nothing applied. Drawn on the client-approved
+          frame.'
+        provenance: client-approved frame (prototype rev 3, match exact); ADAM CR-225, settled 25 October
+          2026
     - name: contextPanel
       slot: selection
       components:
       - kind: detailPanel
         label: The selected promotion
-        bindsTo: Promotion
+        bindsTo: GuestPromotion
         columns:
-        - Promotion.code
-        - Promotion.name
-        - Promotion.description
-        - Promotion.discount
-        - Promotion.validFrom
-        - Promotion.validTo
-        - Promotion.maxRedemptionsPerGuest
+        - GuestPromotion.code
+        - GuestPromotion.name
+        - GuestPromotion.description
+        - GuestPromotion.discount
+        - GuestPromotion.validFrom
+        - GuestPromotion.validTo
+        - GuestPromotion.maxRedemptionsPerGuest
         operation: getPromotion
         provenance: contract promotions.yaml GET /promotions/{promotionId}
   states:
@@ -8042,11 +8211,11 @@ screens:
       came from** (the offers active now), with no name and no reason (r8, ORDERS-MONEY-C01; ADR-0030
       as relaxed for promotions). Never a 404 page. Arrives with `promotionId`.'
     preloaded:
-    - Promotion.code
-    - Promotion.name
-    - Promotion.description
-    - Promotion.venueId
-    - Promotion.discount
+    - GuestPromotion.code
+    - GuestPromotion.name
+    - GuestPromotion.description
+    - GuestPromotion.venues
+    - GuestPromotion.discount
   wireframe:
     status: review
     provenance: client-verified
@@ -11019,7 +11188,16 @@ screens:
 
     **29 September (W9).** Availability is checked against date, start time and length together (`listProductStartTimes`
     with `variantId` = length); changing any of the three re-checks every room, and a busy room shows
-    *free from*. Starts every 15 minutes where the venue sets `stepMinutes` 15.'
+    *free from*. Starts fall on the venue''s own `stepMinutes` (`VenueSettings.stepMinutes`, ADAM CR-253),
+    which `listProductStartTimes` applies when the screen sends none.
+
+
+    **26 October 2026 (ADAM CR-252, CR-253, CR-258).** A room type''s add-ons are its `addOnProductIds`,
+    in order. A length tile shows *Save n%* only from the server''s `savingPercent`, never worked out
+    here. The frame''s per-date price dots (*Cheapest / Mid price / Peak price*) and its pre-cart *Subtotal
+    / VAT / Total* are dropped (logged in docs/active/approved-ui-changes.yaml): the card shows list prices
+    with *tax and offers are worked out in your basket*, and totals come from the cart. Start times are
+    a public read, so a visitor sees them with no session.'
   density: compact
   pattern: multiStepForm
   patternReason: A staged booking — date, start time, length, room type, attendees, add-ons — ending in
@@ -11048,7 +11226,8 @@ screens:
         label: How long
         bindsTo: ProductVariant
         notes: '1 hour, 2 hours, half day (4 h), full day (8 h): the room type''s `length` variants, each
-          priced on its own (the prototype shows *Save 10%* and *Save 15%*).'
+          priced on its own. *Save n%* shows only where the variant has a `referencePrice`, from the server''s
+          `savingPercent` (ADAM CR-253).'
         operation: listProductVariants
         provenance: decided 29 September, rev 3 REV3-13
       - kind: cardList
@@ -11065,7 +11244,9 @@ screens:
       - kind: cardList
         label: Add to the booking
         bindsTo: Product
-        notes: 'Coffee break, working lunch, AV technician: add-on lines with `parentLineId`.'
+        notes: 'Coffee break, working lunch, AV technician: the chosen room type''s `addOnProductIds`,
+          in that order, read from the products `listProducts` already loaded (ADAM CR-252); each is an
+          add-on line with `parentLineId`.'
         operation: listProducts
         provenance: decided 29 September, rev 3 REV3-13
     - name: actionBar
@@ -11094,7 +11275,8 @@ screens:
   apis:
   - operationId: listProducts
     contract: catalogue
-    purpose: Room types sold by the hour (`requiresTimeWindow`) and their add-ons
+    purpose: Room types sold by the hour (`requiresTimeWindow`) and their add-ons (each room type's `addOnProductIds`,
+      ADAM CR-252)
     trigger: onLoad
   - operationId: listProductVariants
     contract: catalogue
@@ -11102,7 +11284,8 @@ screens:
     trigger: onLoad
   - operationId: listProductStartTimes
     contract: resources
-    purpose: Start times free for the room type and length on the date
+    purpose: Start times free for the room type and length on the date; a public read, no session needed
+      (ADAM CR-258), at the venue's `stepMinutes` (ADAM CR-253)
     trigger: onAction
   - operationId: addCartLine
     contract: orders
@@ -11568,15 +11751,23 @@ screens:
         provenance: decided 29 September 2026, MOB-6
       - kind: multiSelect
         label: Any shops you'd like to visit?
+        bindsTo: VisitPlannerOptions.retailTags
+        operation: getVisitPlannerOptions
         notes: 'Shown when Shopping is chosen (client meeting 30 September, MoM 4.7: retail and kiosk
           shops join F&B in the planner). The `retailTags` of the chosen parks'' shops and retail kiosks;
-          sent as `VisitPlanRequest.retailTags`.'
+          sent as `VisitPlanRequest.retailTags`. **Bound to `VisitPlannerOptions.retailTags`** (per map,
+          `{mapId, mapName, tags}`; ADAM CR-220, 25 October 2026), read with `getVisitPlannerOptions`,
+          which also gives the *Not at the parks you chose* chip.'
         provenance: decided 30 September 2026, client meeting MoM 4.7 (Allam)
       - kind: selectField
         label: What would you like for lunch?
+        bindsTo: VisitPlannerOptions.cuisineTags
+        operation: getVisitPlannerOptions
         notes: Cuisines of the chosen parks' dining points only (restaurants, cafes, food kiosks; client
           meeting 30 September, MoM 4.7). In a multi-venue plan each cuisine names the park(s) that serve
-          it, and lunch is planned only at a restaurant of that day's park.
+          it, and lunch is planned only at a restaurant of that day's park. **Bound to `VisitPlannerOptions.cuisineTags`**
+          (per map, `{mapId, mapName, tags}`; ADAM CR-220, 25 October 2026), read with `getVisitPlannerOptions`,
+          which also gives the *Not at the parks you chose* chip.
         provenance: decided 29 September 2026, MOB-6; decided 30 September 2026, client meeting MoM 4.7
           (Allam)
       - kind: primaryButton
@@ -11693,8 +11884,9 @@ screens:
   - operationId: getVisitPlannerOptions
     contract: venue-map
     purpose: 'The planner''s choices from the venue''s data (r8, GPS-C21): the interest tags of its parks
-      fill What are you most interested in?, and the ready-made plans and Fast Track bundles come from
-      the same read.'
+      fill What are you most interested in?, its cuisineTags and retailTags fill the lunch and shop questions
+      and the Not at the parks you chose chip (ADAM CR-220), and the ready-made plans and Fast Track bundles
+      come from the same read.'
     trigger: onLoad
     provenance: r8 integration, GPS-C21 (CHG-R8INT-007)
   entryState:

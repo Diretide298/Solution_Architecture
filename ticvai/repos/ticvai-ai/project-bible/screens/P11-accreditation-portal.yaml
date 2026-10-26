@@ -49,14 +49,14 @@ platform:
     shell: web
     siblings:
     - P09
-    - P10
     - P14
     - P17
     note: '**TICVAI operates all five**, whoever signs in. The partner portal, the accreditation intake,
       the developer portal and the sign-up are outward faces of the control plane, not separate products
       — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added
       11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is
-      the only thing that can serve them.'
+      the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal
+      is its own app in ticvai-partner-web, so TICVAI Control serves the other four.'
     decided: 10 September 2026
 screens:
 - id: ACC-001
@@ -515,27 +515,29 @@ screens:
       components:
       - kind: banner
         label: With a reviewer
-        bindsTo: ApprovalRequest.status
-        notes: 'Where it is now, and **the date a decision is due** — `ApprovalRequest.slaDueAt`. *"Fourth
-          in the queue"* was considered and rejected on the frame: a position moves backwards and a date
-          does not.
-
-          '
+        operation: listMyAccreditationApplications
+        bindsTo: AccreditationApplication.status
+        notes: 'Where it is now, and **the date a decision is due** — `AccreditationApplication.decisionDueAt`.
+          *"Fourth in the queue"* was considered and rejected on the frame: a position moves backwards
+          and a date does not.'
         provenance: frame claude-design/Accreditation Board.dc.html#acc-004
       - kind: timeline
         label: Where it has been
-        bindsTo: ApprovalRequest.decisions
+        bindsTo: AccreditationApplication
         operation: listMyAccreditationApplications
-        notes: Received, documents checked, decision — each with its date.
+        notes: 'From the application itself: `submittedAt`, `requirementStatus` and `missingRequirements`
+          (documents checked), `decidedAt` (check-screen-value-sources, CHG-R10UI-015). Received, documents
+          checked, decision — each with its date.'
         provenance: frame claude-design/Accreditation Board.dc.html#acc-004
     - name: contentBody
       slot: record
       components:
       - kind: detailPanel
         label: Application
-        bindsTo: ApprovalRequest.summary
+        bindsTo: AccreditationApplication
         operation: listMyAccreditationApplications
-        notes: The reference, the performances, and what was requested.
+        notes: '`AccreditationApplication.reference`, `programmeId`, `categoryCode` and `subject` (check-screen-value-sources,
+          CHG-R10UI-015). The reference, the performances, and what was requested.'
         provenance: frame claude-design/Accreditation Board.dc.html#acc-004
     - name: actionBar
       slot: actions
@@ -658,7 +660,8 @@ screens:
       components:
       - kind: credentialDisplay
         label: Your badge
-        bindsTo: AccreditationBadge
+        operation: listMyAccreditationCredentials
+        bindsTo: AccreditationCredential
         notes: 'The scannable credential, rendered large and bright. **Offline is required** — a stage
           door is the worst signal in the building, and the 2 September decision that a dynamic-QR ticket
           is redirected into the app exists for exactly this reason.
@@ -670,12 +673,14 @@ screens:
       components:
       - kind: detailPanel
         label: Holder
-        bindsTo: AccreditationBadge.holderName
+        operation: listMyAccreditationCredentials
+        bindsTo: AccreditationCredential.holderName
         notes: Name, role and outlet, as printed. Photographer · The Northern Review.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-005
       - kind: detailPanel
         label: Where it works
-        bindsTo: AccreditationBadge.zones
+        operation: listMyAccreditationCredentials
+        bindsTo: AccreditationCredential.zones
         notes: '**Stage door, stalls and pit, named performances — and *any other door, refused*.** The
           negative case is stated on the badge because the steward reads this, not a policy.
 
@@ -686,11 +691,10 @@ screens:
       components:
       - kind: banner
         label: Valid until
-        bindsTo: AccreditationBadge.expiresAt
-        notes: '**`expired` and `revoked` must be unmistakable and must not resemble `loading`.** `AccreditationBadge.state`
-          carries both, and `revokedReason` says why.
-
-          '
+        operation: listMyAccreditationCredentials
+        bindsTo: AccreditationCredential.validTo
+        notes: '**`expired` and `revoked` must be unmistakable and must not resemble `loading`.** `AccreditationCredential.status`
+          carries both (CHG-R10UI-016).'
         provenance: contract approvals.yaml AccreditationBadge.state
     - name: actionBar
       slot: actions
@@ -815,26 +819,24 @@ screens:
       components:
       - kind: dataTable
         label: Queue
-        bindsTo: ApprovalRequest[]
+        bindsTo: AccreditationApplication[]
         operation: listAccreditationApplications
         columns:
-        - ApprovalRequest.summary
-        - ApprovalRequest.requestedAt
-        - ApprovalRequest.slaDueAt
-        - ApprovalRequest.status
-        notes: '**Due first, and how long it has waited.** `slaDueAt` is the sort, not `requestedAt` —
-          an application for tonight outranks one submitted earlier for next month. Rows carry the signals
+        - AccreditationApplication.reference
+        - AccreditationApplication.submittedAt
+        - AccreditationApplication.decisionDueAt
+        - AccreditationApplication.status
+        notes: '**Due first, and how long it has waited.** `decisionDueAt` is the sort, not `submittedAt`
+          — an application for tonight outranks one submitted earlier for next month. Rows carry the signals
           a reviewer decides on: *no press card, no commission*, *commission letter attached*, *accredited
-          last season*.
-
-          '
+          last season*.'
         provenance: frame claude-design/Accreditation Board.dc.html#acc-006
     - name: contextPanel
       slot: item
       components:
       - kind: detailPanel
         label: Selected application
-        bindsTo: ApprovalRequest
+        bindsTo: AccreditationApplication
         operation: listAccreditationApplications
         notes: Enough to approve without opening `ACC-007`.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-006
@@ -961,7 +963,7 @@ screens:
       components:
       - kind: detailPanel
         label: The application
-        bindsTo: ApprovalRequest
+        bindsTo: AccreditationApplication
         operation: getAccreditationApplication
         notes: 'Role, outlet, press card, commission — **including the ones that are absent**, stated
           as *Not stated* and *None attached* rather than left blank. A blank field and a declared absence
@@ -978,7 +980,7 @@ screens:
         provenance: frame claude-design/Accreditation Board.dc.html#acc-007
       - kind: banner
         label: Decision due
-        bindsTo: ApprovalRequest.slaDueAt
+        bindsTo: AccreditationApplication.decisionDueAt
         operation: getAccreditationApplication
         provenance: frame claude-design/Accreditation Board.dc.html#acc-007
     - name: actionBar
@@ -1157,13 +1159,13 @@ screens:
       components:
       - kind: dataTable
         label: Credential register
-        bindsTo: AccreditationBadge[]
+        bindsTo: AccreditationCredential[]
         operation: listAccreditationCredentials
         columns:
-        - AccreditationBadge.holderName
-        - AccreditationBadge.zones
-        - AccreditationBadge.issuedAt
-        - AccreditationBadge.state
+        - AccreditationCredential.holderName
+        - AccreditationCredential.zones
+        - AccreditationCredential.issuedAt
+        - AccreditationCredential.status
         notes: 'Holder, valid for, issued, last used. **Revoked rows stay visible and read as revoked**
           — removing them from the register is how a revoked badge gets re-issued by mistake.
 
@@ -1174,7 +1176,7 @@ screens:
       components:
       - kind: detailPanel
         label: Credential
-        bindsTo: AccreditationBadge
+        bindsTo: AccreditationCredential
         operation: listAccreditationCredentials
         provenance: frame claude-design/Accreditation Board.dc.html#acc-008
     - name: actionBar

@@ -1,10 +1,10 @@
 id: LLD-OrderService
-title: OrderService — 304 operations, 115 tables
+title: OrderService — 305 operations, 117 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
 index: diagrams/hld/02-services.yaml
-why: '**The transactional core.** 304 operations, 115 tables, and the highest write rate in the platform.
+why: '**The transactional core.** 305 operations, 117 tables, and the highest write rate in the platform.
   Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday
   morning.
 
@@ -28,14 +28,14 @@ why: '**The transactional core.** 304 operations, 115 tables, and the highest wr
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 304
+  operations: 305
   inAFlow: 141
   percent: 46%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: orders
-  tables: 82
+  tables: 84
   stores:
   - postgres
   largestTable: orders.upgrade_rule
@@ -46,7 +46,7 @@ schemas:
   largestTable: payments.payment_attempt
 operationsByContract:
 - contract: orders
-  count: 227
+  count: 228
   operations:
   - operation: abandonCart
     verb: DELETE
@@ -126,8 +126,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_REFUND_APPROVE
     offline: false
-    reads: 2
-    writes: 3
+    reads: 4
+    writes: 5
   - operation: assignChargeback
     verb: POST
     path: /chargebacks/{chargebackId}/assign
@@ -135,6 +135,14 @@ operationsByContract:
     permission: ORDER_REFUND_APPROVE
     offline: false
     reads: 4
+    writes: 3
+  - operation: attachGuestCheckoutOrders
+    verb: POST
+    path: /guest-checkout-links
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 1
     writes: 3
   - operation: authoriseStoredValue
     verb: POST
@@ -318,8 +326,8 @@ operationsByContract:
     scope: venue
     permission: ORDER_REFUND
     offline: false
-    reads: 5
-    writes: 6
+    reads: 7
+    writes: 8
   - operation: createRefundRequest
     verb: POST
     path: /refund-requests
@@ -910,7 +918,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: true
-    reads: 1
+    reads: 3
     writes: 0
   - operation: listOrderReservation
     verb: GET
@@ -950,7 +958,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: false
-    reads: 1
+    reads: 3
     writes: 0
   - operation: listOwnResaleListings
     verb: GET
@@ -1335,7 +1343,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 5
-    writes: 7
+    writes: 8
   - operation: previewProductTickets
     verb: GET
     path: /products/{productId}/ticket-previews
@@ -1782,7 +1790,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_REFUND
     offline: false
-    reads: 0
+    reads: 8
     writes: 0
   - operation: splitOrder
     verb: POST
@@ -1830,7 +1838,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_MODIFY
     offline: false
-    reads: 3
+    reads: 6
     writes: 2
   - operation: updateTicketTemplate
     verb: PATCH
@@ -2396,7 +2404,7 @@ operationsByContract:
     scope: venue
     permission: SHIFT_OPEN
     offline: true
-    reads: 4
+    reads: 5
     writes: 0
   - operation: listShifts
     verb: GET
@@ -2515,6 +2523,7 @@ tables:
   - approveShiftClose
   - approveShiftOpen
   - assignChargeback
+  - attachGuestCheckoutOrders
   - authoriseStoredValue
   - cancelPaymentLink
   - cancelReservation
@@ -2680,6 +2689,7 @@ tables:
   - approveShiftClose
   - approveShiftOpen
   - assignChargeback
+  - attachGuestCheckoutOrders
   - authoriseStoredValue
   - cancelPaymentLink
   - cancelReservation
@@ -3045,7 +3055,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.group_booking
-  columns: 22
+  columns: 23
   store: postgres
   parent: null
   writtenBy:
@@ -3323,6 +3333,20 @@ tables:
   writtenBy:
   - orders
   foreignWriters: null
+- table: orders.refund_line
+  columns: 5
+  store: postgres
+  parent: orders.refund
+  writtenBy:
+  - orders
+  foreignWriters: null
+- table: orders.refund_payment
+  columns: 5
+  store: postgres
+  parent: orders.refund
+  writtenBy:
+  - orders
+  foreignWriters: null
 - table: orders.refund_policy
   columns: 8
   store: postgres
@@ -3331,7 +3355,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.refund_policy_time_band
-  columns: 4
+  columns: 5
   store: postgres
   parent: orders.refund_policy
   writtenBy:
@@ -3405,11 +3429,9 @@ tables:
   store: postgres
   parent: null
   writtenBy:
-  - identity
   - orders
   - subscription
   foreignWriters:
-  - identity
   - subscription
 - table: orders.sales_order_unassigned
   columns: 0
@@ -3425,7 +3447,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.stored_value_authorisation
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -3742,7 +3764,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 39
+  operations: 40
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -3764,6 +3786,9 @@ writesOutside:
   - operation: assignChargeback
     tables:
     - platform.audit_record
+  - operation: attachGuestCheckoutOrders
+    tables:
+    - platform.outbox
   - operation: capturePayment
     tables:
     - platform.idempotency_record

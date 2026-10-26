@@ -379,13 +379,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createApiClient
-      x-ticvai-writes:
-      - table: control.api_client_secret
-        for: 'the first secret''s keyed hash, one row (ADAM CR-098; CHG-R10ID-011)'
       x-ticvai-consumed-by:
         - "P08 BO-1177 API Security, Access & Integration Permissions"
         - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
+      x-ticvai-writes:
+      - table: control.api_client_secret
+        for: 'the first secret''s keyed hash, one row (ADAM CR-098; CHG-R10ID-011)'
       summary: Create a client with scopes and an environment
       description: >
         13.1.11 to 13.1.13, and **CF-135a: the credential model was owned by nobody.** 2.7.52,
@@ -478,14 +478,14 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: rotateApiCredential
+      x-ticvai-consumed-by:
+        - "P10 PTR-019 API Credentials & Integration"
+        - "P14 DEV-003 Clients & Credentials"
       x-ticvai-writes:
       - table: control.api_client_secret
         for: 'the new secret''s row, and the earlier live rows'' expires_at cut to the overlap (ADAM CR-098; CHG-R10ID-011)'
       - table: control.api_client
         for: 'expires_at renewed by credentialTtlDays; status never changes here (ADAM CR-098)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-019 API Credentials & Integration"
-        - "P14 DEV-003 Clients & Credentials"
       summary: Issue a new secret, with an overlap window
       description: >
         13.1.15. **Rotation without an overlap is an outage.** Both secrets are valid until
@@ -544,14 +544,14 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: revokeApiCredential
+      x-ticvai-consumed-by:
+        - "P10 PTR-019 API Credentials & Integration"
+        - "P14 DEV-003 Clients & Credentials"
       x-ticvai-writes:
       - table: control.api_client_secret
         for: 'revoked_at set on every row of the client (ADAM CR-098; CHG-R10ID-011)'
       - table: control.api_client
         for: 'status revoked, terminal (ADAM CR-098)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-019 API Credentials & Integration"
-        - "P14 DEV-003 Clients & Credentials"
       summary: Revoke immediately
       description: >
         13.1.15. **No overlap, by definition** — revocation is what you reach for when a secret has
@@ -1552,11 +1552,11 @@ paths:
   /api-licensing/{licenceId}:
     put:
       operationId: setApiLicensing
+      x-ticvai-consumed-by:
+        - "P14 DEV-008 Programme Administration"
       x-ticvai-reads:
       - table: control.tenant
         for: 'the tenant staff name, which must exist (ADAM CR-098; CHG-R10ID-011)'
-      x-ticvai-consumed-by:
-        - "P14 DEV-008 Programme Administration"
       x-ticvai-agreed: '29 September: 17 September minutes M17-04 (partners never create products, prices or performances through the API); the exception is platform-staff only'
       summary: Which API modules a tenant has licensed, and on what terms
       description: >

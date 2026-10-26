@@ -324,7 +324,8 @@
   "x-ticvai-append-only": "occurredAt",
   "type": "object",
   "x-ticvai-persistence": "platform.audit_record",
-  "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n",
+  "x-ticvai-rls": "audit-read-beneath",
+  "description": "26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Never edited and never deleted.\n\n**Every write leaves a row, written by the platform in the write's own transaction** (ADAM CR-179, option 1; PLATFORM-AUDIT #27694 and CR-005; CHG-R10TEN-016). Not a fixed set of operations that audit themselves: the request kernel writes one row for each transaction that writes, inside it, from every host. `action` is the operation's `operationId`, or the consumer's or the job's name; `principalId` is who acted; `orgUnitId` is the venue the session acts at, else its region; `workstationId` is the workstation where there is one; `subjectRef` is set only where the operation names what it acted on.\n\n**Who reads a row** (ADAM CR-185, option B; CHG-R10TEN-006): the tenant root reads every row; a venue or region grant reads the rows whose `orgUnitId` names a scope node at or beneath it. A row with no `orgUnitId` (a consumer, a job, the webhook) is the tenant root's alone. Appending is open to any grant, and correcting or removing a row to the tenant root only, as CR-005 settled.\n",
   "required": [
    "id",
    "action",
@@ -355,7 +356,7 @@
    },
    "action": {
     "type": "string",
-    "description": "What was done, as the writing operation names it."
+    "description": "What was done, as the writing operation names it; the operation's `operationId`, or the consumer's or the job's name (ADAM CR-179)."
    },
    "subjectRef": {
     "type": "string",
@@ -1139,6 +1140,80 @@
    "closed"
   ]
  },
+ "Inspection": {
+  "x-ticvai-persistence": "maintenance.inspection",
+  "type": "object",
+  "required": [
+   "id",
+   "templateId",
+   "venueId",
+   "outcome",
+   "performedByPrincipalId",
+   "performedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "templateId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "templateName": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "outcome": {
+    "$ref": "#/components/schemas/InspectionOutcome"
+   },
+   "failedItemCount": {
+    "type": "integer"
+   },
+   "failedSafetyCriticalCount": {
+    "type": "integer"
+   },
+   "performedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "An inspection nobody signed is not an inspection."
+   },
+   "performedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "syncedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "retainUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true
+   }
+  }
+ },
+ "InspectionOutcome": {
+  "type": "string",
+  "enum": [
+   "passed",
+   "passedWithObservations",
+   "failed"
+  ]
+ },
  "MaintenancePlan": {
   "x-ticvai-persistence": "maintenance.preventive_plan",
   "type": "object",
@@ -1289,6 +1364,12 @@
    "height": {
     "type": "integer",
     "nullable": true
+   },
+   "hasTransparency": {
+    "type": "boolean",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Whether the image has an alpha channel with any pixel not fully opaque, recorded from the file when the upload completes; null for a file that is not an image (ADAM CR-106, option 1; CHG-R10TEN-012). White Label's setAppIcons refuses a source where it is true."
    },
    "durationSeconds": {
     "type": "number",
@@ -1635,7 +1716,8 @@
    "venueId",
    "scopePath",
    "isSellable",
-   "hasVariants"
+   "hasVariants",
+   "createdAt"
   ],
   "properties": {
    "id": {
@@ -1668,7 +1750,7 @@
      }
     ],
     "nullable": true,
-    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+    "description": "**The product's name in each of the tenant's enabled languages** (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
    },
    "descriptionLocalised": {
     "allOf": [
@@ -1720,6 +1802,12 @@
     "format": "date-time",
     "nullable": true,
     "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**The last moment the product's entitlements are valid; null means the same as `onSaleTo`** (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). A season pass stops selling at `onSaleTo` and is used until `validTo`: an entitlement template's `expiryAnchor` of `seasonEnd` ends here (`access#issueOrderEntitlements`). Sales closing is not validity ending.\n"
    },
    "categoryId": {
     "type": "string",
@@ -1834,6 +1922,15 @@
     },
     "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
    },
+   "addOnProductIds": {
+    "type": "array",
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The add-ons offered with this product, in display order** (accepted 26 October 2026, Chinmay, ADAM CR-252 option A): each a `kind: addOn` product of the same venue (a coffee break, a working lunch, an AV technician offered with a meeting-room type), set in the back office. `listProducts` answers it, so WEB-048 and GST-075 read a room type's add-ons from the load they already make and fetch those products; the guest adds one as a cart line with `parentLineId`. An id that is not a `kind: addOn` product of the same venue is `400 validation` on `addOnProductIds`. Empty when none is offered."
+   },
    "requiresTimeWindow": {
     "type": "boolean",
     "default": false,
@@ -1898,6 +1995,19 @@
     "format": "uuid",
     "nullable": true,
     "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "**When the product was created** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): `catalogue.product.created_at`, NOT NULL DEFAULT now(), set by the server and never by a request. Rows that predate it are backfilled by the migration task (the earliest of the product's first version's `published_at` and the migration time), then the NOT NULL and the DEFAULT are set. `listProductLifecycle` orders and filters on it."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true,
+    "description": "**When the product last changed** (ADAM CR-204): set by `updateProduct` and by every product sub-resource PUT and bulk change that versions the product; null until the first change after creation. `listProductLifecycle`'s `lastModifiedAt` and `modifiedSince` read it."
    }
   }
  },
@@ -1998,6 +2108,24 @@
    "displayOrder": {
     "type": "integer",
     "default": 100
+   },
+   "url": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The asset's stable CDN address, for a guest card** (ADAM CR-221, option A, decided 25 October 2026; CHG-R10CAT-014): the asset library's public address for the asset, set on guest-facing reads (`searchCatalogue`, `listProducts` and `getProduct` for a guest or a visitor) when the asset is public and `ready`, as `getPublishedTenantConfig` returns white-label assets (`brandUrls`). Null otherwise, and on staff reads, which are unchanged. Catalogue reads the asset in process, a read the lead granted across deployables (XDR-005, 25 October 2026; CHG-R10CAT-015)."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The asset library's thumbnail address for the asset, on the same reads and with the same rule as `url` (ADAM CR-221)."
    },
    "altText": {
     "allOf": [
@@ -2108,6 +2236,43 @@
     "nullable": true,
     "readOnly": true,
     "description": "For a translation draft, the proposed text; null otherwise. `payload` stays the request body of the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "confidence": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment (`proposeWalkways`), the model's confidence in it (`WalkwayProposal.confidence`); null on every other proposal (ADAM CR-207, CHG-R10ORD-013)."
+   },
+   "basis": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "handMarked",
+     "seen"
+    ],
+    "description": "For a walkway segment, whether it was traced from a hand mark or seen in the picture (`WalkwayProposal.basis`); null otherwise (ADAM CR-207)."
+   },
+   "reasoning": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, why the model proposed it (`WalkwayProposal.reasoning`); null otherwise (ADAM CR-207)."
+   },
+   "distanceMetres": {
+    "type": "number",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, its length along the centreline; null where the plan has no georeference and on every other proposal (ADAM CR-207)."
+   },
+   "mapId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, the venue map it is on (the path's `mapId`, which the target's request body does not carry); null otherwise (ADAM CR-207). `listProposedActions` filters on it."
    },
    "kind": {
     "type": "string",
@@ -3339,6 +3504,32 @@
    "mapId": {
     "type": "string",
     "format": "uuid"
+   },
+   "sourceRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The drawing the import read: `importVenueGeometry`'s `sourceRef`, an `assets.MediaAsset` id (ADAM CR-207, option A; CHG-R10ORD-013). `ai.proposeWalkways` reads the raster through it. Null on a job recorded before r10.\n"
+   },
+   "format": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "pdfPlan",
+     "svgPlan",
+     "dwgPlan",
+     "dxfPlan",
+     "rasterPlan",
+     "glbModel",
+     "navigationFile"
+    ],
+    "description": "The `format` `importVenueGeometry` took (ADAM CR-207). With `shapesFound`, the vector-geometry test of `ai.proposeWalkways`' 409: `pdfPlan`, `svgPlan`, `dwgPlan` or `dxfPlan` with shapes found.\n"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "When the import was started (ADAM CR-207). The map's latest import, which `ai.proposeWalkways` reads when no `importJobId` is given, is the one with the latest `createdAt`.\n"
    },
    "status": {
     "type": "string",

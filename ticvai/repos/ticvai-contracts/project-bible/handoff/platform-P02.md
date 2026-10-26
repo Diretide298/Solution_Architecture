@@ -9,12 +9,12 @@
 | Contracts | 19 |
 | Modules | 17 |
 | Undrawn | 0 |
-| Operations with no screen | 22 |
+| Operations with no screen | 23 |
 | Waves | wave1 77 |
 
 ## Gaps
 
-### 22 operations with no screen here
+### 23 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -42,6 +42,7 @@
 | `getUpsellSuggestions` | promotions | POST | Suggestions for a cart |
 | `recordRecommendationOutcome` | promotions | POST | Shown, clicked, accepted or dismissed |
 | `listMyWaitingGuests` | queue | GET | The caller's own queue entries |
+| `listMyVisitPlans` | venue-map | GET | The caller's own visit plans, by date or status |
 
 ## Modules
 
@@ -83,7 +84,7 @@
 | `GST-012` | My Tickets | Account & Self-Service | 1 | 7 | yes |
 | `GST-013` | Ticket Details | Account & Self-Service | 1 | 6 | yes |
 | `GST-014` | Ticket Transfer | Ticketing | 1 | 3 | yes |
-| `GST-015` | Memberships | Membership, Loyalty & Value | 1 | 8 | yes |
+| `GST-015` | Memberships | Membership, Loyalty & Value | 1 | 9 | yes |
 | `GST-016` | My Reservations | Ticketing | 1 | 3 | yes |
 | `GST-017` | Reservation Details | Ticketing | 1 | 2 | yes |
 | `GST-018` | Add to Calendar / Reminders | Account & Self-Service | 1 | 5 | yes |
@@ -110,8 +111,8 @@
 | `GST-039` | Profile | Account & Self-Service | 1 | 5 | yes |
 | `GST-040` | Help & Support | Engagement & Support | 1 | 7 | yes |
 | `GST-041` | Checkout Entry | Cart & Checkout | 1 | 13 | yes |
-| `GST-042` | Simple Registration & OTP | Account & Self-Service | 1 | 13 | yes |
-| `GST-043` | Arabic / RTL Experience | System States | 1 | 1 | yes |
+| `GST-042` | Simple Registration & OTP | Account & Self-Service | 1 | 14 | yes |
+| `GST-043` | Arabic / RTL Experience | System States | 1 | 3 | yes |
 | `GST-044` | Multi-Currency & Pricing | Ticketing | 1 | 2 | yes |
 | `GST-045` | Ticket Delivery & Sharing | Account & Self-Service | 1 | 3 | yes |
 | `GST-046` | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 | yes |
@@ -127,12 +128,12 @@
 | `GST-056` | Bundle Package | Booking & Selection | 1 | 2 | yes |
 | `GST-057` | Accessibility Information | Discovery & Browse | 1 | 1 | yes |
 | `GST-058` | Resource Availability (Cabana) | Booking & Selection | 1 | 2 | yes |
-| `GST-059` | Plan in Progress | Engagement & Support | 1 | 5 | yes |
+| `GST-059` | Plan in Progress | Engagement & Support | 1 | 4 | yes |
 | `GST-061` | Menu Item Detail | In-Venue Experience | 1 | 1 | yes |
 | `GST-062` | Shop & Drop Collection | In-Venue Experience | 1 | 2 | yes |
 | `GST-063` | Explore – Search Results | Discovery | 1 | 1 | yes |
 | `GST-065` | Newsletter & Preferences | Marketing | 1 | 5 | yes |
-| `GST-066` | Privacy & My Data | Account & Self-Service | 1 | 5 | yes |
+| `GST-066` | Privacy & My Data | Account & Self-Service | 1 | 6 | yes |
 | `GST-067` | Refunds & Resale | Account & Self-Service | 1 | 6 | yes |
 | `GST-068` | Help & My Cases | Engagement & Support | 1 | 5 | yes |
 | `GST-069` | Face Pass | Account & Self-Service | 1 | 5 | yes |

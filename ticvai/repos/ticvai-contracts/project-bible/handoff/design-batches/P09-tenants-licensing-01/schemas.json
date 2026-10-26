@@ -567,6 +567,13 @@
    "basePrice"
   ],
   "properties": {
+   "currencyCode": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "pattern": "^[A-Z]{3}$",
+    "description": "**The ISO 4217 currency of the plan's `basePrice` and every `overageUnitPrice` of its limits** (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change writes a new row or version and never re-denominates one already sold."
+   },
    "code": {
     "x-ticvai-unique": "tenant",
     "type": "string",
@@ -850,6 +857,13 @@
    "moduleKey"
   ],
   "properties": {
+   "currencyCode": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "pattern": "^[A-Z]{3}$",
+    "description": "**The ISO 4217 currency of the add-on's `price`** (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change writes a new row or version and never re-denominates one already sold."
+   },
    "tenantId": {
     "type": "string",
     "format": "uuid",
@@ -1071,6 +1085,7 @@
    "PRODUCT_CONFIGURE",
    "PRODUCT_APPROVE",
    "PRODUCT_PUBLISH",
+   "SALES_CHANNEL_OVERRIDE",
    "PRICE_VIEW",
    "PRICE_CONFIGURE",
    "EVENT_CONFIGURE",
@@ -1118,6 +1133,7 @@
    "ACCESS_POINT_CONFIGURE",
    "TURNSTILE_MODE_SET",
    "TICKET_LOOKUP",
+   "ENTITLEMENT_USE",
    "ACCREDITATION_VIEW",
    "ACCREDITATION_APPLY",
    "ACCREDITATION_APPROVE",
@@ -1683,6 +1699,21 @@
    "startsAt"
   ],
   "properties": {
+   "issuingLegalEntity": {
+    "type": "string",
+    "enum": [
+     "ainfiniteAiUae",
+     "ainfiniteAiIndia"
+    ],
+    "description": "**The TICVAI legal entity that invoices this tenant** (the lead, 25 October 2026, r10 round 3, ADAM CR-202; CHG-R10ID-023): Ainfinite AI UAE or Ainfinite AI India. `generateInvoice` copies it onto each invoice and `issueInvoice` numbers the invoice from that entity's gapless sequence."
+   },
+   "currencyCode": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "pattern": "^[A-Z]{3}$",
+    "description": "**The ISO 4217 currency of this contract's `currentPrice`** (ADAM CR-202, option A as the lead ruled it for r10, 25 October 2026; CHG-R10ID-017): a platform price is stored with its currency on the row, since a platform row has no venue to resolve one from (naming-and-style 5.1). Set when the row is written; a later change writes a new row or version and never re-denominates one already sold."
+   },
    "tenantId": {
     "x-ticvai-references": "control.tenant",
     "type": "string",
@@ -1755,13 +1786,27 @@
  "SubscriptionInvoice": {
   "x-ticvai-persistence": "control.invoice + control.invoice_line",
   "type": "object",
+  "x-ticvai-unique-when": [
+   {
+    "columns": [
+     "tenantId",
+     "periodStart",
+     "periodEnd"
+    ],
+    "when": {
+     "status": {
+      "not": "cancelled"
+     }
+    }
+   }
+  ],
   "required": [
    "id",
-   "invoiceNumber",
    "tenantId",
    "periodStart",
    "periodEnd",
    "status",
+   "currencyCode",
    "total"
   ],
   "properties": {
@@ -1771,8 +1816,25 @@
    },
    "invoiceNumber": {
     "type": "string",
+    "nullable": true,
     "readOnly": true,
-    "description": "A tax invoice number, so **gapless, per legal entity** (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity that issues it, assigned when the invoice is issued, never reused. A cancelled invoice keeps its number.\n"
+    "description": "A tax invoice number, so **gapless, per legal entity** (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity that issues it, assigned when the invoice is issued, never reused. A cancelled invoice keeps its number. **Null while the invoice is a `draft`** (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013): `generateInvoice` creates the draft with no number and `issueInvoice` takes the next number from `control.invoice_number_sequence` (`InvoiceNumberSequence`) in the same transaction, so a number is never taken and lost.\n"
+   },
+   "issuingLegalEntity": {
+    "type": "string",
+    "enum": [
+     "ainfiniteAiUae",
+     "ainfiniteAiIndia"
+    ],
+    "readOnly": true,
+    "description": "The TICVAI legal entity that issues the invoice, copied at generation from the tenant's contract (`Subscription.issuingLegalEntity`); its number comes from that entity's sequence (`InvoiceNumberSequence` with `legalEntityCode` equal to this value). The lead, 25 October 2026, r10 round 3; CHG-R10ID-023."
+   },
+   "currencyCode": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "readOnly": true,
+    "description": "**The currency of every Money on this invoice** (ADAM CR-202, option B; CHG-R10ID-013): the billing entity's `billingCurrency`, copied at generation and never changed afterwards. Lines, subtotal, tax, total and the credited total are all in it, here and on `listSubscriptionInvoices`."
    },
    "tenantId": {
     "x-ticvai-references": "control.tenant",

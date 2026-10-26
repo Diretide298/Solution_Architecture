@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-10-22",
+ "generated": "2026-10-26",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 96,
@@ -15,7 +15,7 @@
   "contracts": 19,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 156
+  "operationsWithNoScreen": 157
  },
  "waves": {
   "wave1": 30,
@@ -110,19 +110,19 @@
    "operations": 6
   },
   {
-   "contract": "reporting",
-   "operations": 5
-  },
-  {
    "contract": "retail",
    "operations": 5
   },
   {
-   "contract": "venue-map",
-   "operations": 2
+   "contract": "reporting",
+   "operations": 5
   },
   {
    "contract": "tenancy",
+   "operations": 2
+  },
+  {
+   "contract": "venue-map",
    "operations": 2
   },
   {
@@ -1817,6 +1817,12 @@
     "contract": "queue",
     "verb": "POST",
     "summary": "Admit a party at the ride"
+   },
+   {
+    "operation": "resolveCalledWaitingGuest",
+    "contract": "queue",
+    "verb": "POST",
+    "summary": "Record a called party's no-show, or return it to the queue"
    },
    {
     "operation": "createRentalAgreement",

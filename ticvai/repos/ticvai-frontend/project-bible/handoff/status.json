@@ -1,40 +1,40 @@
 {
  "scope": "platform",
- "generated": "2026-10-22",
+ "generated": "2026-10-26",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 2845,
+  "operations": 2854,
   "contracts": 33,
-  "tables": 1149,
+  "tables": 1161,
   "stores": 10,
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3250,
-  "states": 208,
-  "events": 97,
+  "relationships": 3300,
+  "states": 209,
+  "events": 105,
   "flows": 98,
   "flowsDerived": 193,
-  "adrs": 71,
+  "adrs": 72,
   "screens": 2453,
   "platforms": 16,
   "frontends": 13,
-  "apps": 5,
-  "boards": 218
+  "apps": 6,
+  "boards": 219
  },
  "metrics": {
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 2812,
-    "total": 2845,
+    "done": 2822,
+    "total": 2854,
     "percent": 99,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 2845,
-    "total": 2845,
+    "done": 2854,
+    "total": 2854,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
@@ -68,15 +68,15 @@
    },
    {
     "name": "State models",
-    "done": 208,
-    "total": 399,
+    "done": 209,
+    "total": 404,
     "percent": 52,
     "note": "The denominator is status enums in contracts. Some models describe behaviour with no enum, so this can exceed 100%."
    },
    {
     "name": "Tables with a relationship",
-    "done": 1057,
-    "total": 1163,
+    "done": 1067,
+    "total": 1175,
     "percent": 91,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
@@ -104,7 +104,7 @@
    {
     "name": "Operations reaching a screen",
     "done": 2570,
-    "total": 2845,
+    "total": 2854,
     "percent": 90,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
@@ -127,8 +127,8 @@
    {
     "name": "Tables written",
     "done": 1123,
-    "total": 1149,
-    "percent": 98,
+    "total": 1161,
+    "percent": 97,
     "note": "Counted from backend/. ADR-0024 said DDL waits for the design to settle; ADR-0038 and ADR-0039 settled it."
    },
    {
@@ -172,8 +172,8 @@
   }
  },
  "headline": {
-  "design": 96,
-  "build": 33
+  "design": 95,
+  "build": 32
  },
  "waves": {
   "wave1": 422,
@@ -249,7 +249,7 @@
    "code": "P10",
    "name": "Partner Web",
    "app": "partner-web",
-   "targetApp": "ticvai-control",
+   "targetApp": "partner-web",
    "operator": "partner",
    "screens": 43
   },

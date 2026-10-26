@@ -67,6 +67,6 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "Event"
  }
 }

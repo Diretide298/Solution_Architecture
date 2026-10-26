@@ -97,9 +97,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ACC-006` | Reviewer Queue | D | 8 | 24 | 6 | 8 | 0 | 6 | — | notStarted (generated) |
-| `ACC-007` | Reviewer Application Detail | D | 6 | 40 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
-| `ACC-008` | Credential Register | D | 13 | 25 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `ACC-006` | Reviewer Queue | D | 8 | 24 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
+| `ACC-007` | Reviewer Application Detail | D | 6 | 40 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ACC-008` | Credential Register | D | 13 | 30 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

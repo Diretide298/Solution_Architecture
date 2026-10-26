@@ -122,10 +122,10 @@ screens:
         columns:
         - Product.name
         - Product.media
-        notes: '**The photo is the primary item''s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the
-          full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM
-          CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset
-          read. Published products only, primary media first; a touch opens the language choice
+        notes: '**The photo is the primary item''s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for
+          the full-size view): the stable CDN address the guest read returns for a public, ready asset
+          (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls
+          no asset read. Published products only, primary media first; a touch opens the language choice
           (CHG-R1S-022).'
         provenance: design cross-check, 3 October 2026 (CHG-R1S-022)
       - kind: canvas
@@ -375,11 +375,11 @@ screens:
         - Product.displayTags
         operation: listProducts
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: '**The photo is the primary item''s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the
-          full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM
-          CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset
-          read. The venue is the one the guest picked on Home (`venueId` from the session, audit R267),
-          never typed. Was the generated table ''Every product''; staff and plumbing columns removed
+        notes: '**The photo is the primary item''s `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for
+          the full-size view): the stable CDN address the guest read returns for a public, ready asset
+          (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls
+          no asset read. The venue is the one the guest picked on Home (`venueId` from the session, audit
+          R267), never typed. Was the generated table ''Every product''; staff and plumbing columns removed
           (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).'
   states:
     loading: The what are you list.

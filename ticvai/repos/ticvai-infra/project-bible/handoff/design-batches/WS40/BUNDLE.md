@@ -597,6 +597,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - … and 1 more flow steps (`flows/`)
 - Flow F149 branch at step 1 (expected): when Nothing has been set up on Revenue Optimization Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F149 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -888,6 +889,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-110`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
 - Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 4: Works in Scenario Modeling & What-If Analysis → Scenario Modeling & What-If Analysis
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1025,6 +1027,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-111`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
 - Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 6: Works in A/B Pricing Experiment Studio → Allow TICVAI to scientifically test different pricing strategies using controlled customer groups. This is essential because AI should learn from actual customer behavior, not only historical …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1333,6 +1336,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-113`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
 - Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 10: Works in AI Recommendation Review & Decision Queue → Provide the human decision workspace for recommendations produced by Board 6. This should be the Revenue Manager's inbox.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1515,6 +1519,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-114`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
 - Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 12: Works in Automation Policy & Autonomous Pricing Orchestrator → Control when TICVAI is allowed to execute pricing changes automatically. Board 5 defines the strategy-level automation permission. This screen manages operational autonomous execution at scale.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1668,6 +1673,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS101 Pricing   Revenue Management Board 7.dc.html#adm-115`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 7
 - Flow F149 *Pricing Revenue Management board 7: Revenue Optimization Command Center*, step 14: Works in Live Dynamic Price Execution & Deployment Monitor → Monitor pricing actions as they are executed across TICVAI's selling ecosystem.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1925,7 +1931,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Carried, not typed: `signalId`
 
-Errors to draw in the form: 422 `trustTooLow`.
+Errors to draw in the form: 409 Refused, and nothing is stored. `signal-id-mismatch` (ADAM CR-245): a record for `registryKind` and `name` exists and the path's `signalId` is not its id (or …; 422 `trustTooLow`.
 
 #### Outputs: what the screen shows and produces
 
@@ -1961,7 +1967,7 @@ Errors to draw in the form: 422 `trustTooLow`.
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save signal registry policy (primary button) | `setSignalRegistryPolicy` PUT `/signal-registry/{signalId}` | SignalRegistryEntry | SignalRegistryEntry | 422 `trustTooLow`. | gated `AI_CONFIGURE`; opens modal first |
+| Save signal registry policy (primary button) | `setSignalRegistryPolicy` PUT `/signal-registry/{signalId}` | SignalRegistryEntry | SignalRegistryEntry | 409 Refused, and nothing is stored. `signal-id-mismatch` (ADAM CR-245): a record for `registryKind` and `name` exists and the path's `signalId` is not its id (or …; 422 `trustTooLow`. | gated `AI_CONFIGURE`; opens modal first |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1979,7 +1985,7 @@ Errors to draw in the form: 422 `trustTooLow`.
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the learning model performance are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 422 `trustTooLow`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Refused, and nothing is stored. `signal-id-mismatch` (ADAM CR-245): a record for `registryKind` and `name` exists and the path's `signalId` is not its id (or …; 422 `trustTooLow`. |
 
 #### Sample data for the mock-up
 
@@ -2024,7 +2030,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (422).
+- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (409, 422).
 - [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-117?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save signal registry policy.

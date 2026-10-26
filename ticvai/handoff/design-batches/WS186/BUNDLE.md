@@ -277,6 +277,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - … and 1 more flow steps (`flows/`)
 - Flow F293 branch at step 1 (expected): when Nothing has been set up on Wallet Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F293 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -422,6 +423,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS186 Wallet Configuration Backend Structure v1.0 Board 1.dc.html#bo-1084`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 1
 - Flow F293 *Wallet Configuration Backend Structure v1.0 board 1: Wallet Command Center*, step 2: Works in Wallet Type Library → Create and maintain reusable wallet types used throughout TICVAI.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -581,6 +583,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS186 Wallet Configuration Backend Structure v1.0 Board 1.dc.html#bo-1085`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 1
 - Flow F293 *Wallet Configuration Backend Structure v1.0 board 1: Wallet Command Center*, step 4: Works in Wallet Creation & Provisioning Rules → Define how and when TICVAI automatically or manually creates a wallet.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -738,6 +741,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS186 Wallet Configuration Backend Structure v1.0 Board 1.dc.html#bo-1086`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 1
 - Flow F293 *Wallet Configuration Backend Structure v1.0 board 1: Wallet Command Center*, step 6: Works in Wallet Ownership & Account Association → Configure which customer, family or organization owns and controls a wallet.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
@@ -895,6 +899,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS186 Wallet Configuration Backend Structure v1.0 Board 1.dc.html#bo-1087`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 1
 - Flow F293 *Wallet Configuration Backend Structure v1.0 board 1: Wallet Command Center*, step 8: Works in Wallet Currency & Monetary Configuration → Define currencies and monetary rules applicable to wallet balances.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1181,6 +1186,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS186 Wallet Configuration Backend Structure v1.0 Board 1.dc.html#bo-1089`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 1
 - Flow F293 *Wallet Configuration Backend Structure v1.0 board 1: Wallet Command Center*, step 12: Works in Wallet Feature Profile → Control which capabilities are available for each wallet type.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1330,6 +1336,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS186 Wallet Configuration Backend Structure v1.0 Board 1.dc.html#bo-1090`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 1
 - Flow F293 *Wallet Configuration Backend Structure v1.0 board 1: Wallet Command Center*, step 14: Works in Wallet Lifecycle Configuration → Govern the complete wallet lifecycle from creation through closure.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1487,6 +1494,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS186 Wallet Configuration Backend Structure v1.0 Board 1.dc.html#bo-1091`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 1
 - Flow F293 *Wallet Configuration Backend Structure v1.0 board 1: Wallet Command Center*, step 16: Works in Wallet Numbering, Identity & Digital Credentials → Configure how wallets are uniquely identified across TICVAI.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

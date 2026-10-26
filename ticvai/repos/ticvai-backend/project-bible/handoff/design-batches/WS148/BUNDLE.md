@@ -977,6 +977,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS88 Payment Payment Orchestration Board 2.dc.html#adm-573`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 2
 - Flow F257 *Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27*, step 8: Works in Payment Routing Rule Builder\t31 → Configure the rules that determine which provider should receive each payment transaction.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1116,6 +1117,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS88 Payment Payment Orchestration Board 2.dc.html#adm-574`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 2
 - Flow F257 *Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27*, step 10: Works in Routing Strategy, Priority & Load Distribution\t33 → Manage how payment traffic is distributed when several valid providers are available.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1692,6 +1694,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS88 Payment Payment Orchestration Board 2.dc.html#adm-578`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 2
 - Flow F257 *Payment Payment Orchestration board 2: Payment Orchestration Command Center\t27*, step 18: Works in Payment Routing Simulator, Decision Trace & AI Advisor\t37 → Allow administrators to test exactly how a payment will be routed before deploying routing changes.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

@@ -2581,7 +2581,7 @@
      }
     ],
     "readOnly": true,
-    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192; common.yaml `Money.scale`), when it is not the currency the venue trades in."
    },
    "chargeRateLockedUntil": {
     "type": "string",
@@ -2993,7 +2993,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+    "description": "The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-018)."
    },
    "fxRate": {
     "allOf": [
@@ -3123,7 +3123,8 @@
    "venueId",
    "scopePath",
    "isSellable",
-   "hasVariants"
+   "hasVariants",
+   "createdAt"
   ],
   "properties": {
    "id": {
@@ -3156,7 +3157,7 @@
      }
     ],
     "nullable": true,
-    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+    "description": "**The product's name in each of the tenant's enabled languages** (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
    },
    "descriptionLocalised": {
     "allOf": [
@@ -3208,6 +3209,12 @@
     "format": "date-time",
     "nullable": true,
     "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**The last moment the product's entitlements are valid; null means the same as `onSaleTo`** (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). A season pass stops selling at `onSaleTo` and is used until `validTo`: an entitlement template's `expiryAnchor` of `seasonEnd` ends here (`access#issueOrderEntitlements`). Sales closing is not validity ending.\n"
    },
    "categoryId": {
     "type": "string",
@@ -3322,6 +3329,15 @@
     },
     "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
    },
+   "addOnProductIds": {
+    "type": "array",
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The add-ons offered with this product, in display order** (accepted 26 October 2026, Chinmay, ADAM CR-252 option A): each a `kind: addOn` product of the same venue (a coffee break, a working lunch, an AV technician offered with a meeting-room type), set in the back office. `listProducts` answers it, so WEB-048 and GST-075 read a room type's add-ons from the load they already make and fetch those products; the guest adds one as a cart line with `parentLineId`. An id that is not a `kind: addOn` product of the same venue is `400 validation` on `addOnProductIds`. Empty when none is offered."
+   },
    "requiresTimeWindow": {
     "type": "boolean",
     "default": false,
@@ -3386,6 +3402,19 @@
     "format": "uuid",
     "nullable": true,
     "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "**When the product was created** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): `catalogue.product.created_at`, NOT NULL DEFAULT now(), set by the server and never by a request. Rows that predate it are backfilled by the migration task (the earliest of the product's first version's `published_at` and the migration time), then the NOT NULL and the DEFAULT are set. `listProductLifecycle` orders and filters on it."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true,
+    "description": "**When the product last changed** (ADAM CR-204): set by `updateProduct` and by every product sub-resource PUT and bulk change that versions the product; null until the first change after creation. `listProductLifecycle`'s `lastModifiedAt` and `modifiedSince` read it."
    }
   }
  },
@@ -3486,6 +3515,24 @@
    "displayOrder": {
     "type": "integer",
     "default": 100
+   },
+   "url": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The asset's stable CDN address, for a guest card** (ADAM CR-221, option A, decided 25 October 2026; CHG-R10CAT-014): the asset library's public address for the asset, set on guest-facing reads (`searchCatalogue`, `listProducts` and `getProduct` for a guest or a visitor) when the asset is public and `ready`, as `getPublishedTenantConfig` returns white-label assets (`brandUrls`). Null otherwise, and on staff reads, which are unchanged. Catalogue reads the asset in process, a read the lead granted across deployables (XDR-005, 25 October 2026; CHG-R10CAT-015)."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The asset library's thumbnail address for the asset, on the same reads and with the same rule as `url` (ADAM CR-221)."
    },
    "altText": {
     "allOf": [
@@ -3596,6 +3643,43 @@
     "nullable": true,
     "readOnly": true,
     "description": "For a translation draft, the proposed text; null otherwise. `payload` stays the request body of the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40)."
+   },
+   "confidence": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment (`proposeWalkways`), the model's confidence in it (`WalkwayProposal.confidence`); null on every other proposal (ADAM CR-207, CHG-R10ORD-013)."
+   },
+   "basis": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "handMarked",
+     "seen"
+    ],
+    "description": "For a walkway segment, whether it was traced from a hand mark or seen in the picture (`WalkwayProposal.basis`); null otherwise (ADAM CR-207)."
+   },
+   "reasoning": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, why the model proposed it (`WalkwayProposal.reasoning`); null otherwise (ADAM CR-207)."
+   },
+   "distanceMetres": {
+    "type": "number",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, its length along the centreline; null where the plan has no georeference and on every other proposal (ADAM CR-207)."
+   },
+   "mapId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, the venue map it is on (the path's `mapId`, which the target's request body does not carry); null otherwise (ADAM CR-207). `listProposedActions` filters on it."
    },
    "kind": {
     "type": "string",
@@ -5212,6 +5296,62 @@
     "type": "array",
     "maxItems": 50,
     "description": "Per published park map of the venue, the interest tags its points carry.",
+    "items": {
+     "type": "object",
+     "required": [
+      "mapId",
+      "tags"
+     ],
+     "properties": {
+      "mapId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "mapName": {
+       "type": "string"
+      },
+      "tags": {
+       "type": "array",
+       "maxItems": 50,
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   },
+   "cuisineTags": {
+    "type": "array",
+    "maxItems": 50,
+    "description": "Per published park map of the venue, the cuisine tags of its published dining points (`kind` restaurant, cafe, or a kiosk that sells food), each tag once (ADAM CR-220, option A; Chinmay, 25 October 2026; CHG-R10ORD-015). GST-051 and WEB-050 build the lunch question from it, name the parks that serve each cuisine, and mark a cuisine no chosen park serves (`preferenceNotAtVenue`) before the plan is made. Additive; the same shape as `interestTags`.\n",
+    "items": {
+     "type": "object",
+     "required": [
+      "mapId",
+      "tags"
+     ],
+     "properties": {
+      "mapId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "mapName": {
+       "type": "string"
+      },
+      "tags": {
+       "type": "array",
+       "maxItems": 50,
+       "items": {
+        "type": "string"
+       }
+      }
+     }
+    }
+   },
+   "retailTags": {
+    "type": "array",
+    "maxItems": 50,
+    "description": "Per published park map of the venue, the retail tags of its published shops and retail kiosks (`kind` shop, or a kiosk that sells goods), each tag once (ADAM CR-220, option A; CHG-R10ORD-015). GST-051 and WEB-050 build the shop question and its `preferenceNotAtVenue` chip from it. Additive; the same shape as `interestTags`.\n",
     "items": {
      "type": "object",
      "required": [

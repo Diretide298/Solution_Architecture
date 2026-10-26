@@ -1,6 +1,11 @@
 {
  "ActiveSession": {
   "x-ticvai-persistence": "identity.session",
+  "x-ticvai-null-exactly-when": {
+   "endedAt": {
+    "status": "active"
+   }
+  },
   "description": "**The session record, in `identity.session`** (3 October 2026, CHG-R1S-008; the HLD/LLD cross-check and the r1 gate). Until then it was \"none — Redis session registry\", and 11 operations wrote a session no SQL created: nothing defined its columns, so `listActiveSessions` could not page, filter by workstation or venue, or run under row-level security. The row is the record of record, tenant-scoped and under RLS like every identity table; Redis stays the token cache in front of it (ADR-0004: a session is a token with a validity window, and the cache answers that check). The names and `hasOpenShift` are read with it, not stored.",
   "type": "object",
   "required": [
@@ -37,7 +42,7 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "When the session ended; null while `active` (R8 blocker IDENTITY-C46, CHG-R8MIG-015)."
+    "description": "When the session ended; null exactly while `active`, and set on every other status (R8 blocker IDENTITY-C46, CHG-R8MIG-015; a table CHECK since ADAM CR-242, 26 October 2026)."
    },
    "endedByPrincipalId": {
     "type": "string",
@@ -45,7 +50,7 @@
     "nullable": true,
     "readOnly": true,
     "x-ticvai-references": "identity.principal",
-    "description": "Who ended it (`forceLogout`'s caller or supervisor); null when the principal signed out or it expired."
+    "description": "Who ended it (`forceLogout`'s caller or supervisor; the principal itself when `changeOwnCredential` ended its other sessions); null when the principal signed out or it expired."
    },
    "endReason": {
     "type": "string",
@@ -53,7 +58,7 @@
     "maxLength": 500,
     "nullable": true,
     "readOnly": true,
-    "description": "Why it was ended, as `forceLogout` was given it (or `supervisor-takeover` from the till door)."
+    "description": "Why it was ended, as `forceLogout` was given it (or `supervisor-takeover` from the till door, or `credential-changed` when `changeOwnCredential` ended it; ADAM CR-242)."
    },
    "roleId": {
     "type": "string",
@@ -495,7 +500,7 @@
     "nullable": true,
     "writeOnly": true,
     "x-ticvai-secret": "field-encrypted",
-    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`."
+    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`. This is the encrypted column ADAM CR-173 asked for (option A, accepted 21 October 2026; in the package since r8, CHG-R8INT-024; CHG-R10ID-008), which `verifyMfaEnrolment` and `verifyMfaChallenge` decrypt to compute the expected code."
    },
    "destination": {
     "type": "string",
@@ -594,6 +599,7 @@
    "PRODUCT_CONFIGURE",
    "PRODUCT_APPROVE",
    "PRODUCT_PUBLISH",
+   "SALES_CHANNEL_OVERRIDE",
    "PRICE_VIEW",
    "PRICE_CONFIGURE",
    "EVENT_CONFIGURE",
@@ -641,6 +647,7 @@
    "ACCESS_POINT_CONFIGURE",
    "TURNSTILE_MODE_SET",
    "TICKET_LOOKUP",
+   "ENTITLEMENT_USE",
    "ACCREDITATION_VIEW",
    "ACCREDITATION_APPLY",
    "ACCREDITATION_APPROVE",
@@ -1037,11 +1044,11 @@
       "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
      }
     ],
-    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks only: it never decides an operation by itself (ADAM CR-189). Anything scope-sensitive uses `permissionsByScope`.\n"
    },
    "permissionsByScope": {
     "type": "array",
-    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "description": "Permissions effective at each granted scope path, after deny resolution. Clients filter navigation on this and never compute permissions themselves.\n\n**The server keeps the same set and authorises from it** (decided 25 October 2026, Chinmay, ADAM CR-189 option A; CHG-R10ID-001). The rule for every operation: `x-ticvai-permission` is evaluated at the scope the operation acts on, from the per-scope set (the node acted on or one of its ancestors); `effectivePermissions` is for coarse checks only. A list's reach is the scope paths where its permission holds, and a filter outside it is `403`; a tenant-level operation needs its permission at the tenant root. The request kernel's seam carries this set beside the flat one (#27692 owns the field) and sign-in (#27666) fills it from the same resolution that fills this property; tests fill the seam until sign-in lands. The full statement is `docs/architecture/specs/permission-resolution.md` section 7.2. No wire shape changes.\n",
     "items": {
      "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
     }

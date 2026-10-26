@@ -70,7 +70,7 @@
        ],
        "operation": "listProducts",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "Pins by point category (rides, dining, shows); a pin opens Item Detail. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "notes": "**The photo is the primary item's `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset read. Pins by point category (rides, dining, shows); a pin opens Item Detail. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "selectField",
@@ -300,7 +300,7 @@
     {
      "to": "GST-059",
      "trigger": "Plan My Day – In Progress",
-     "provenance": "derived — GST-059 declares entryState.params itemId, planId and GST-022 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 finds planId (listMyVisitPlans) itself, and GST-059 opens on its own"
+     "provenance": "derived — GST-059 declares entryState.params itemId, planId and GST-022 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 opens on getWaitTimes, and planId has no source on GST-059 yet (a gap in GST-059, not in this edge)"
     }
    ]
   },
@@ -1934,7 +1934,7 @@
        ],
        "operation": "listProducts",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "What is on at the venue under the chosen tab (map, waits, food, shows, shop, services). The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "notes": "**The photo is the primary item's `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset read. What is on at the venue under the chosen tab (map, waits, food, shows, shop, services). The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "selectField",

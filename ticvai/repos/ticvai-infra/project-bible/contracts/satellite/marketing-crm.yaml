@@ -394,6 +394,24 @@ x-ticvai-queries:
       own. It is asked from another deployable through Marketing's service route (serviceAuth). Added for the products
       module, wave 1 (CHG-R8PRD-009).
     served: [service]
+  guestMatchPolicyRecords:
+    module: marketing-crm
+    table: marketing.guest_match_policy
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.guest_match_policy rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/GuestMatchPolicy'}
+    rule: >-
+      A data read, not a rule question (r10 lane E, 25 October 2026, CHG-R10GEN-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.guest_match_policy rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Marketing implements.
+    served: [in-process]
 paths:
   /my/cases:
     get:
@@ -466,6 +484,10 @@ paths:
         - "P02 GST-035 Feedback & Ratings"
         - "P02 GST-040 Help & Support"
         - "P02 GST-068 Help & My Cases"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       security:
       - guestAuth: []
       summary: Report something — lost property, a complaint, a question
@@ -627,6 +649,10 @@ paths:
         - "P02 GST-034 Lost & Found"
         - "P02 GST-040 Help & Support"
         - "P02 GST-068 Help & My Cases"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -888,6 +914,11 @@ paths:
         match key (email, mobile or either), and `offerAtCheckout` off skips the check entirely (audit
         R149).
 
+
+        **A session acting at no venue is refused `404` `not-found`** ("no venue in this session") and nothing
+        is written: the policy is one per venue, the caller''s, and head office sets a venue''s by acting at that
+        venue (the rule ADAM CR-229 settled for the venue singletons, applied to this one; CHG-R10TEN-002).
+
         '
       tags:
       - guests
@@ -920,6 +951,8 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-checkout/profile-match:
@@ -1853,6 +1886,12 @@ paths:
       - query: catalogue#eventRecords
         route: service
         for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Define a challenge, mission or streak
       description: '22.6.1. **Gamification is not loyalty** — loyalty pays for spend, and a challenge
         pays for behaviour the venue wants that spend does not produce: a second visit, a quiet Tuesday,
@@ -1893,6 +1932,13 @@ paths:
       operationId: listChallenges
       x-ticvai-consumed-by:
         - "P08 BO-825 Challenge Builder"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1950,6 +1996,13 @@ paths:
       operationId: getChallenge
       x-ticvai-consumed-by:
         - "P08 BO-825 Challenge Builder"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1987,6 +2040,13 @@ paths:
       operationId: activateChallenge
       x-ticvai-consumed-by:
         - "P08 BO-825 Challenge Builder"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: contract gap CHG-WIR-007 (BO-825: no activate step); shape follows createChallenge'
@@ -2031,6 +2091,13 @@ paths:
       operationId: getMyChallenges
       x-ticvai-consumed-by:
         - "P01 WEB-017 My Account Dashboard"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: service
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2787,7 +2854,7 @@ paths:
       operationId: listMessageTriggers
       x-ticvai-consumed-by:
         - "P08 BO-776 Trigger Event Catalog"
-      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
+      description: '**Order.** Sorted by `priority` ascending, then by `id`. Where `priority` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       summary: What fires a message, and when
       tags:
       - marketing
@@ -3097,6 +3164,11 @@ paths:
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-001 Home"
         - "P02 GST-039 Profile"
+        - "P02 GST-043 Arabic / RTL Experience"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       summary: A guest reading their own details
@@ -3136,6 +3208,11 @@ paths:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-039 Profile"
+        - "P02 GST-043 Arabic / RTL Experience"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'The caller''s own profile: one per signed-in guest, so there is no key in the path.'
       x-ticvai-write-via:
@@ -4270,6 +4347,10 @@ paths:
         - "P06 EMP-026 Incident report"
         - "P08 BO-734 CRM Command Center"
         - "P08 BO-735 Guest Directory"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-reads:
       - table: marketing.consent_record
         for: 'the hasConsentFor filter: the guest''s current consent record for the purpose (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
@@ -4293,7 +4374,7 @@ paths:
         **`hasConsentFor`**: a guest has consent for a purpose when their `marketing.consent_record` for that purpose
         with `superseded_at` null has decision `granted`; it is Marketing''s own table, so no read route is needed.
         **`lifetimeValue` is left out** until a guest''s lifetime value has a currency (CR-094''s rule, waiting on the
-        client).'
+        client). Where `displayName` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - guest
       x-ticvai-permission: GUEST_VIEW
@@ -4370,6 +4451,9 @@ paths:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -4404,6 +4488,10 @@ paths:
       operationId: updateGuestProfile
       x-ticvai-consumed-by:
         - "P08 BO-735 Guest Directory"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Amend a guest profile
@@ -4942,6 +5030,8 @@ paths:
         (ADR-0025).
 
         **Order.** Sorted by `displayName` ascending.
+
+        Where `displayName` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - consent
       parameters:
@@ -5156,10 +5246,17 @@ paths:
         **Guests only** (ADR-0025): `bearerAuth` is not accepted; a staff token has no permission here
         (CHG-MKT-002, as the developer of ticket 30706 proposed).
 
+
+        **Its currency** (CHG-R10ORD-019; the lead''s ruling of 25 October 2026 on check-money-currency): the Money
+        this operation answers or accepts is in the currency of the venue it acts at, the caller''s working venue,
+        read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.
         '
       tags:
       - guest
       x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       - query: catalogue#variantListingFacts
         route: service
         for: "items[] productName, imageAssetRef, price, performanceStartsAt, isAvailable, unavailableReason"
@@ -5222,10 +5319,17 @@ paths:
         `Idempotency-Key`s make one row. The second save meets the index, reads the existing row and answers
         `200` with it, its `note` replaced when it sends one.
 
+
+        **Its currency** (CHG-R10ORD-019; the lead''s ruling of 25 October 2026 on check-money-currency): the Money
+        this operation answers or accepts is in the currency of the venue it acts at, the caller''s working venue,
+        read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.
         '
       tags:
       - guest
       x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       - query: catalogue#variantsSellableAt
         route: service
         for: "the saved variantId (404 unknown-variant, variant-not-sellable)"
@@ -5716,6 +5820,10 @@ paths:
       operationId: previewSegmentDraft
       x-ticvai-consumed-by:
         - "P08 BO-755 Dynamic Segment Builder"
+      x-ticvai-read-via:
+      - query: identity#delegatedAccessRecords
+        route: service
+        for: 'what its text calls "DelegatedAccess": identity.delegated_access, Identity''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: contract gap CHG-WIR-007 (BO-755: previewSegment works only on a saved segment, the
@@ -5807,11 +5915,15 @@ paths:
         format: uuid
     get:
       operationId: listSegmentMembers
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
       summary: List guests currently matching a segment
-      description: Evaluated live. Useful for spot-checking a definition before use.
+      description: Evaluated live. Useful for spot-checking a definition before use. Where `displayName` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
         **Order.** Sorted by `displayName` ascending, then by `id`.
       tags:
@@ -5847,6 +5959,10 @@ paths:
         - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-764 Campaign Command Center"
         - "P08 BO-766 Campaign Builder"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
@@ -5889,6 +6005,10 @@ paths:
         - "P08 BO-121 Personalized Offers & Guest Engagement"
         - "P08 BO-766 Campaign Builder"
         - "P08 BO-767 Audience & Offer Selection"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Create a campaign
@@ -5937,6 +6057,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-771 Budget, Goals & Forecast"
         - "P08 BO-772 A/B & AI Optimization"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Campaign.budgetCap, Campaign.budgetSpent, CampaignPerformance.attributedRevenue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5965,6 +6089,10 @@ paths:
         - "P08 BO-768 Multichannel Composer"
         - "P08 BO-769 Schedule & Trigger Rules"
         - "P08 BO-772 A/B & AI Optimization"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Amend, pause or resume a campaign
@@ -6230,6 +6358,10 @@ paths:
         format: uuid
     post:
       operationId: pauseCampaign
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Pause a campaign mid-send
@@ -6287,6 +6419,10 @@ paths:
         format: uuid
     post:
       operationId: unscheduleCampaign
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Pull a scheduled campaign before it sends
@@ -6331,6 +6467,10 @@ paths:
         format: uuid
     post:
       operationId: stopCampaign
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Stop a campaign mid-send
@@ -6393,6 +6533,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-772 A/B & AI Optimization"
         - "P08 BO-773 Attribution & Audit"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "VenueSettings.marketing": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -6643,6 +6787,10 @@ paths:
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       security:
       - guestAuth: []
@@ -6714,6 +6862,10 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-005 Live Chat Workspace"
         - "P12 SUP-012 Case Creation, Classification & Intelligent Routing"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -6777,6 +6929,10 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-005 Live Chat Workspace"
         - "P12 SUP-013 Case Investigation & Resolution Workspace"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       x-ticvai-api-scope: marketing.read
       x-ticvai-audience:
       - staff
@@ -6812,6 +6968,10 @@ paths:
         - "P12 SUP-013 Case Investigation & Resolution Workspace"
         - "P12 SUP-017 Case Resolution, Closure & Customer Feedback"
         - "P12 SUP-023 Agent Workload, Availability & Workforce Control"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
       - staff
@@ -6958,6 +7118,10 @@ paths:
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
       - staff
@@ -7024,6 +7188,10 @@ paths:
         - "P08 BO-802 Sentiment, Quality & Escalation"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       x-ticvai-api-scope: marketing.write
       x-ticvai-audience:
       - staff
@@ -7114,12 +7282,15 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       x-ticvai-permission: MARKETING_VIEW
       x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Programmes
           content:
@@ -7459,7 +7630,7 @@ paths:
         marketing subscription; another guest''s subscription is refused exactly as one that does not exist,
         never returned. `MARKETING_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - marketing
       x-ticvai-permission: MARKETING_VIEW
@@ -7631,7 +7802,7 @@ paths:
         - name: communicationProviderId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `channel`, `providerName`, `account` and `environment` within the caller''s scope: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 communication-provider-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -7647,7 +7818,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `communication-provider-id-mismatch` (ADAM CR-245): a record for `channel`, `providerName`, `account` and `environment` within the caller''s scope exists and the path''s `communicationProviderId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - communication-provider-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [provider-credentials-failed, provider-connection-failed, webhook-verification-failed, secret-reference-unresolved]
           description: >
@@ -7696,7 +7875,7 @@ paths:
         - name: senderIdentityId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by its channel''s sender key (`fromAddress`; `senderId` and `country`; `phoneNumber`; or `application`, `platform` and `environment`) within the caller''s scope: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 sender-identity-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -7712,7 +7891,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `sender-identity-id-mismatch` (ADAM CR-245): a record for its channel''s sender key (`fromAddress`; `senderId` and `country`; `phoneNumber`; or `application`, `platform` and `environment`) within the caller''s scope exists and the path''s `senderIdentityId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - sender-identity-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [sender-identity-not-verified, channel-fields-missing, provider-not-on-channel]
           description: >
@@ -7929,7 +8116,7 @@ paths:
         - name: eventId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces. The body''s `eventId`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `eventType`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `eventId`); where there is one, this must equal its id, else `409 event-id-mismatch` and nothing changes. The body''s `eventId`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -7951,7 +8138,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `event-id-mismatch` (ADAM CR-245): a record for `eventType` exists and the path''s `eventId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - event-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [event-type-not-registered, template-channel-mismatch, template-not-platform-owned]
           description: >
@@ -8062,7 +8257,7 @@ paths:
         - name: routingRuleId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by its selectors (`channel`, `country`, `brandId`, `messageClass`, `priorityClass`, `recipientType`): where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 routing-rule-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -8084,7 +8279,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `routing-rule-id-mismatch` (ADAM CR-245): a record for its selectors (`channel`, `country`, `brandId`, `messageClass`, `priorityClass`, `recipientType`) exists and the path''s `routingRuleId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - routing-rule-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [unknown-provider, provider-not-on-channel, provider-listed-twice, fallback-includes-own-channel]
           description: >
@@ -8351,6 +8554,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-046 Provider Health, Usage & Cost Monitoring"
         - "P08 BO-792 Deliverability & Analytics"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ProviderHealthUsageCostMonitoringView.cost, ProviderHealthUsageCostMonitoringView.costPerMessage, ProviderHealthUsageCostMonitoringView.costPerThousand (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.18-19'
@@ -8473,6 +8680,13 @@ paths:
       operationId: listDeliveryCommunicationPlatform
       x-ticvai-consumed-by:
         - "P08 ADM-047 AI Delivery Optimization & Communication Platform Diagnostics"
+      x-ticvai-read-via:
+      - query: ai#suggestionRecords
+        route: service
+        for: 'what its text calls "ai.suggestion": ai.suggestion, Ai''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiDeliveryOptimizationCommunicationPlatformDiagnostiView.estimatedMonthlySaving (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.6; pack ''Communication & Notification Platform Services'' pp.19-21'
@@ -8537,6 +8751,10 @@ paths:
       operationId: listPrivacyConsent
       x-ticvai-consumed-by:
         - "P13 CMS-021 Privacy & Consent Configuration Command Center"
+      x-ticvai-read-via:
+      - query: white-label#policyRecords
+        route: in-process
+        for: 'what its text calls "whitelabel.policy": whitelabel.policy, WhiteLabel''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' p.4 (17.1.1); MoM 20 Aug §4.3; filters are the pack''s Global Filters'
@@ -8736,7 +8954,7 @@ paths:
         - name: purposeId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces. The body''s `purposeId`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `purposeCode`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `purposeId`); where there is one, this must equal its id, else `409 purpose-id-mismatch` and nothing changes. The body''s `purposeId`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -8758,7 +8976,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `purpose-id-mismatch` (ADAM CR-245): a record for `purposeCode` exists and the path''s `purposeId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - purpose-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /communication-preference-marketing:
@@ -8948,7 +9174,7 @@ paths:
         - name: technologyId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces. The body''s `technologyId`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `name`, `provider` and `domainApplication`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `technologyId`); where there is one, this must equal its id, else `409 technology-id-mismatch` and nothing changes. The body''s `technologyId`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -8969,6 +9195,14 @@ paths:
                 $ref: '#/components/schemas/CookieTrackingDigitalTechnologyRegistryView'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: 'Refused, and nothing is stored. `technology-id-mismatch` (ADAM CR-245): a record for `name`, `provider` and `domainApplication` exists and the path''s `technologyId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - technology-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [category-required, non-essential-without-consent]
           description: Approved with no category, or a non-essential technology marked as needing no consent.
@@ -9081,7 +9315,7 @@ paths:
         - name: bannerDesignId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The new version''s id (ADAM CR-245). Every call stores a new version of the design for `brandId` and `channel`, and the new version takes this id (a client UUIDv7, the same key as a body `id`); an id that already names a stored design version is `409 banner-design-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -9102,6 +9336,14 @@ paths:
                 $ref: '#/components/schemas/CookieBannerPreferenceCenterDesignerView'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: 'Refused, and nothing is stored. `banner-design-id-mismatch` (ADAM CR-245): the path''s `bannerDesignId` already names a stored design version; nothing changes.'
+          x-ticvai-problem-types:
+          - banner-design-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [reject-harder-than-accept, non-essential-pre-ticked, do-not-sell-button-missing]
           description: A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button.
@@ -9176,6 +9418,10 @@ paths:
       operationId: listPrivacyNoticePolicy
       x-ticvai-consumed-by:
         - "P13 CMS-028 Privacy Notice, Policy & Terms Version Management"
+      x-ticvai-read-via:
+      - query: white-label#policyRecords
+        route: in-process
+        for: 'what its text calls "whitelabel.policy": whitelabel.policy, WhiteLabel''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.14-15 (17.1.8); the documents are white-label''s versioned policies (setPolicy), never rewritten'
@@ -9190,6 +9436,8 @@ paths:
         they accepted; publishing a new one never rewrites it (`getConsentHistory`). Ordered by
         `publishedAt` descending then `documentId`; keyset cursor. (decided 29 September, readiness
         close-out)
+
+        Where `publishedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW
@@ -9300,7 +9548,7 @@ paths:
         - name: governanceId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `policyId`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 governance-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -9326,9 +9574,10 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          x-ticvai-problem-types: [privacy-notice-transition-not-allowed, approval-fields-read-only, classification-locked-after-approval]
-          description: A status move the lifecycle does not allow, approval fields sent by the caller, or a
-            change to the classification after approval.
+          x-ticvai-problem-types: [privacy-notice-transition-not-allowed, approval-fields-read-only, classification-locked-after-approval, governance-id-mismatch]
+          description: 'A status move the lifecycle does not allow, approval fields sent by the caller, or a
+            change to the classification after approval. `governance-id-mismatch` (ADAM CR-245): a record for
+            `policyId` exists and the path''s `governanceId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -9347,8 +9596,8 @@ paths:
       operationId: setMinorGuardianAge
       x-ticvai-consumed-by:
         - "P13 CMS-029 Minor, Guardian & Age-Based Privacy Configuration"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [country]
+      x-ticvai-body-key-note: 'Keyed by the body''s `country` (the lead''s answer to r10 question 26, 25 October 2026; CHG-R10TEN-021): one rule per jurisdiction within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. Not one per venue: the note said so and the operation is an upsert on `country`.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.15-16 (17.1.9: configure by jurisdiction, do not hard-code 13, 16 or 18); the ages are the tenant''s configuration per country with no shipped default, so no age is guessed'
@@ -9578,7 +9827,7 @@ paths:
         - name: requestTypeId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 request-type-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -9600,8 +9849,8 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          x-ticvai-problem-types: [request-type-has-open-requests]
-          description: Retiring a type that still has open requests.
+          x-ticvai-problem-types: [request-type-has-open-requests, request-type-id-mismatch]
+          description: 'Retiring a type that still has open requests. `request-type-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `requestTypeId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -10170,6 +10419,10 @@ paths:
       operationId: listDataRetentionExpiry
       x-ticvai-consumed-by:
         - "P13 CMS-037 Data Retention, Expiry & Legal Hold Operations"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: ADR-0047 §§1-3, 6 (active/archived/erased, from last activity, floor-aware defaults, tenant notified 90 days before); MoM 20 Aug §4.3 (retention configurable per tenant/venue with a system default admins override); pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.30-31 (17.2.7)'
@@ -10686,6 +10939,13 @@ paths:
       x-ticvai-consumed-by:
         - "P12 SUP-009 Customer Service Command Center"
         - "P12 SUP-010 Customer 360° Service Profile"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1-4.2; pack ''Customer Service_Reference.pdf'' pp.3-5 (10.1.1); counts and queue read from marketing.case as listCases does'
@@ -10759,6 +11019,9 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+      - query: wallet#balanceRecords
+        route: service
+        for: 'what its text calls "wallet.balance": wallet.balance, Wallet''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1; pack ''Customer Service_Reference.pdf'' pp.5-7 (10.1.2); CRM stays the source of truth (pack p.7), ADR-0023 for the personal data'
@@ -10972,6 +11235,13 @@ paths:
       operationId: setCaseInvestigationResolution
       x-ticvai-consumed-by:
         - "P12 SUP-013 Case Investigation & Resolution Workspace"
+      x-ticvai-read-via:
+      - query: ai#suggestionRecords
+        route: service
+        for: 'what its text calls "ai.suggestion": ai.suggestion, Ai''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CaseInvestigationResolutionWorkspaceView.commercialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [caseId]
       x-ticvai-body-key-note: 'Keyed by the body''s `caseId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per case and linked record within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
@@ -11027,6 +11297,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: getCaseInvestigationResolution
+      x-ticvai-read-via:
+      - query: ai#suggestionRecords
+        route: service
+        for: 'what its text calls "ai.suggestion": ai.suggestion, Ai''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CaseInvestigationResolutionWorkspaceView.commercialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Customer Service_Reference.pdf'' pp.11-13 (10.1.5 Case Header, Workspace Layout); the workspace needs its read, and nothing else returns the linked records'
@@ -11073,6 +11350,15 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'the order and its policies (422 not-permitted-by-policy) (CHG-MOD-003)'
+      - query: access#entitlementRecords
+        route: service
+        for: 'what its text calls "access.entitlement": access.entitlement, Access''s data (CHG-R10GEN-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'what its text calls "orders.order_line": orders.order_line, Order''s data (CHG-R10GEN-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'what its text calls "orders.payment": orders.payment, Order''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1 (agents act on bookings from the case: date change, reschedule, resend); pack ''Customer Service_Reference.pdf'' pp.13-14 (10.1.6, Guardrail: agents cannot bypass Ticketing or Pricing rules)'
@@ -11143,6 +11429,25 @@ paths:
       operationId: setRefundCompensationService
       x-ticvai-consumed-by:
         - "P12 SUP-015 Refund, Compensation & Service Exception Workspace"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
+      - query: orders#orderFeeRecords
+        route: service
+        for: 'what its text calls "orders.order_fee": orders.order_fee, Order''s data (CHG-R10GEN-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'what its text calls "orders.refund": orders.refund, Order''s data (CHG-R10GEN-001)'
+      - query: orders#refundPolicyRecords
+        route: service
+        for: 'what its text calls "orders.refund_policy": orders.refund_policy, Order''s data (CHG-R10GEN-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'what its text calls "orders.sales_order": orders.sales_order, Order''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RefundCompensationServiceExceptionWorkspaceInput.value (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1 (refunds and compensation initiated from the case are routed for internal approval); pack ''Customer Service_Reference.pdf'' pp.15-16 (10.1.7); amounts bounded by the venue''s refund policy thresholds (getRefundPolicy)'
@@ -11221,6 +11526,8 @@ paths:
         team". Supervisor or management escalation of the case itself is `escalateCase`. Requests are
         written by `setCaseInternalRequest`. Ordered by `dueAt` then `id`, overdue first; keyset cursor.
         (decided 29 September, readiness close-out)
+
+        Where `dueAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
         - case
       x-ticvai-permission: CASE_VIEW
@@ -11363,6 +11670,13 @@ paths:
       operationId: listCaseResolutionClosure
       x-ticvai-consumed-by:
         - "P12 SUP-017 Case Resolution, Closure & Customer Feedback"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CaseResolutionClosureCustomerFeedbackView.financialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1-4.2 (quality scored on resolution and outcome; CSAT); pack ''Customer Service_Reference.pdf'' pp.17-19 (10.1.9)'
@@ -11469,6 +11783,13 @@ paths:
   /case-resolution-closure/{caseResolutionId}:
     put:
       operationId: setCaseResolution
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CaseResolutionClosureCustomerFeedbackView.financialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Customer Service_Reference.pdf'' pp.18-19 (10.1.9 Resolution Record: Capture); the list needs its write'
@@ -11490,7 +11811,7 @@ paths:
         - name: caseResolutionId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `caseId`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 case-resolution-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -11514,7 +11835,15 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `case-resolution-id-mismatch` (ADAM CR-245): a record for `caseId` exists and the path''s `caseResolutionId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - case-resolution-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /customer-service-copilot:
@@ -11522,6 +11851,13 @@ paths:
       operationId: getCustomerServiceCopilot
       x-ticvai-consumed-by:
         - "P08 BO-798 Intent & Knowledge Management"
+      x-ticvai-read-via:
+      - query: ai#knowledgeCollectionRecords
+        route: service
+        for: 'what its text calls "ai.knowledge_collection": ai.knowledge_collection, Ai''s data (CHG-R10GEN-001)'
+      - query: ai#policyRecords
+        route: service
+        for: 'what its text calls "ai.policy": ai.policy, Ai''s data (CHG-R10GEN-001)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The customer-service copilot configuration as saved
@@ -11550,8 +11886,15 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-798 Intent & Knowledge Management"
         - "P12 SUP-018 AI Customer Service Copilot & Knowledge Workspace"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-read-via:
+      - query: ai#knowledgeCollectionRecords
+        route: service
+        for: 'what its text calls "ai.knowledge_collection": ai.knowledge_collection, Ai''s data (CHG-R10GEN-001)'
+      - query: ai#policyRecords
+        route: service
+        for: 'what its text calls "ai.policy": ai.policy, Ai''s data (CHG-R10GEN-001)'
+      x-ticvai-body-key: [scopePath]
+      x-ticvai-body-key-note: 'Keyed by the body''s `scopePath` (the lead''s answer to r10 question 26, 25 October 2026; CHG-R10TEN-021): one configuration per scope node, the tenant row the default and a venue row narrowing it; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. Not one per venue: the note said so and the operation is an upsert on `scopePath`.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1 (AI summariser on a case); pack ''Customer Service_Reference.pdf'' pp.19-21 (10.1.10); inherits getAiPolicy (ADR-0018: a venue narrows, never widens)'
@@ -11757,7 +12100,7 @@ paths:
         - name: routingRuleId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 routing-rule-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -11773,7 +12116,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `routing-rule-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `routingRuleId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - routing-rule-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /sla-policy-service:
@@ -11868,6 +12219,10 @@ paths:
         - "P08 BO-808 Assignment & Workload"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-023 Agent Workload, Availability & Workforce Control"
+      x-ticvai-read-via:
+      - query: workforce#shiftRecords
+        route: service
+        for: 'what its text calls "workforce.shift": workforce.shift, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.2 (agent workload views, reassignment to balance load); pack ''Customer Service_Reference.pdf'' pp.31-32 (10.2.5)'
@@ -11992,7 +12347,7 @@ paths:
         - name: agentServiceProfileId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `principalId`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 agent-service-profile-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -12015,6 +12370,14 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'Refused, and nothing is stored. `agent-service-profile-id-mismatch` (ADAM CR-245): a record for `principalId` exists and the path''s `agentServiceProfileId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - agent-service-profile-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /escalation-critical-case:
@@ -12027,6 +12390,9 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.2 (escalation and case monitoring, unresolved cases escalated further); pack ''Customer Service_Reference.pdf'' pp.32-34 (10.2.6)'
@@ -12199,6 +12565,8 @@ paths:
         acknowledgement, beside the case's own resolution time and SLA outcome. Evaluations are written
         by `setQualityEvaluation`. Ordered by `evaluatedAt` descending then `id`; keyset cursor.
         (decided 29 September, readiness close-out)
+
+        Where `evaluatedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
         - case
       x-ticvai-permission: CASE_VIEW
@@ -12638,7 +13006,7 @@ paths:
         - name: automationId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 automation-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -12660,7 +13028,15 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `automation-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `automationId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - automation-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /waiver-consent:
@@ -12893,6 +13269,8 @@ paths:
         `waiverName` then `waiverId`; keyset cursor. (decided 29 September, readiness close-out)
 
         **Statuses.** Every `status` is returned, ended ones included (`archived`, `expired`); a screen that shows only live rows filters on `status` itself.
+
+        Where `waiverName` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW
@@ -13155,6 +13533,8 @@ paths:
         TICVAI record instead of asking again; the submitted value is still kept on the `FormSubmission`
         as evidence. Written by `setDynamicFieldQuestion`. Ordered by `sortOrder` then `key`; keyset
         cursor. (decided 29 September, readiness close-out)
+
+        Where `sortOrder` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW
@@ -13415,6 +13795,8 @@ paths:
         `id`; keyset cursor. (decided 29 September, readiness close-out)
 
         **Statuses.** Every `status` is returned, ended ones included (`removed`); a screen that shows only live rows filters on `status` itself.
+
+        Where `sequence` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW
@@ -13522,7 +13904,7 @@ paths:
         - name: associationId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `formId`, `targetType` and `targetId`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 association-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -13546,8 +13928,8 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          x-ticvai-problem-types: [waiver-retired]
-          description: The waiver is retired.
+          x-ticvai-problem-types: [waiver-retired, association-id-mismatch]
+          description: 'The waiver is retired. `association-id-mismatch` (ADAM CR-245): a record for `formId`, `targetType` and `targetId` exists and the path''s `associationId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -14238,6 +14620,8 @@ paths:
         verify is `setWaiverVerificationValidation`; record exception is `setWaiverException`; audit history
         is `listComplianceEvidenceWaiver`. Ordered by visit date, then participant name, then id; keyset
         cursor. (decided 29 September, readiness close-out)
+
+        Where `visitDate` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW_PII
@@ -14636,6 +15020,8 @@ paths:
         treated as the same person. With `groupBookingId` the page also carries `groupSummary`. Guardian
         links, resend missing and notify group leader are `actOnWaiverRequirements`. Ordered by visit date,
         minor's name, then id; keyset cursor. (decided 29 September, readiness close-out)
+
+        Where `visitDate` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW_PII
@@ -14832,6 +15218,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-852 Documents, Search & Retention"
         - "P13 CMS-055 Waiver Verification & Validation Workspace"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9; pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.33-34 (11.2.5 Verification Checks, Validation Result, Reviewer Actions, Human Governance)'
@@ -14865,7 +15255,7 @@ paths:
         - name: verificationId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `submissionId`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 verification-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -14883,7 +15273,15 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          $ref: ../shared/common.yaml#/components/responses/Conflict
+          description: 'An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or `verification-id-mismatch` (ADAM CR-245): a record for `submissionId` exists and the path''s `verificationId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - idempotency-conflict
+          - concurrency-conflict
+          - verification-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [checks-failing, reason-required]
           description: '`verified` while an automatic check fails or no signature is present
@@ -14928,6 +15326,8 @@ paths:
         `actOnWaiverRequirements`; contacting the customer or guardian is `sendTransactionalMessage` or
         `createCase`; verification is `setWaiverVerificationValidation`; an exception is
         `setWaiverException`. (decided 29 September, readiness close-out)
+
+        Where `visitTime` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW_PII
@@ -15051,6 +15451,16 @@ paths:
       operationId: listSiteWaiverException
       x-ticvai-consumed-by:
         - "P13 CMS-057 On-Site Waiver & Exception Handling"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'what its text calls "access.entitlement": access.entitlement, Access''s data (CHG-R10GEN-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'what its text calls "orders.order_line": orders.order_line, Order''s data (CHG-R10GEN-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'what its text calls "pii.subject": pii.subject, Identity''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (trigger on-site before entry; incomplete waiver can block check-in or access; waiver reachable by QR code); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.36-38 (11.2.7), whose Critical Rule is taken as written'
@@ -15681,6 +16091,8 @@ paths:
         - "P08 BO-740 Family & Guardians"
         - "P08 BO-741 Corporate & Groups"
       summary: Household, guardians, corporate and group links
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - guests
       x-ticvai-permission: GUEST_VIEW
@@ -16127,7 +16539,7 @@ paths:
       operationId: listAudienceLists
       x-ticvai-consumed-by:
         - "P08 BO-756 Static Lists & Imports"
-      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`. Where `expiresAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       summary: Static and imported audiences
       tags:
       - guests
@@ -16206,7 +16618,7 @@ paths:
         - "P08 BO-763 Activation & Governance"
       description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`.
 
-        **Statuses.** Every `status` is returned, ended ones included (`expired`, `failed`); a screen that shows only live rows filters on `status` itself.'
+        **Statuses.** Every `status` is returned, ended ones included (`expired`, `failed`); a screen that shows only live rows filters on `status` itself. Where `expiresAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       summary: Where audiences are being used, and whether they are still in sync
       tags:
       - guests
@@ -16638,7 +17050,10 @@ paths:
           format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Rewards
           content:
@@ -16816,7 +17231,10 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Badges
           content:
@@ -16894,7 +17312,7 @@ paths:
 
         
 
-        **Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
+        **Order.** Soonest first, by `expiresAt` ascending, then by `id`. Where `expiresAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
@@ -17034,6 +17452,11 @@ paths:
       description: >
         **Set whole, because removing an option is only safe when the values are in view.** An
         option deleted while guests still hold it leaves rows pointing at nothing.
+
+        **A session acting at no venue is refused `404` `not-found`** ("no venue in this session") and
+        nothing is written: the set is one per venue, the caller's, and head office sets a venue's by acting
+        at that venue (the rule ADAM CR-229 settled for the venue singletons, applied to this one;
+        CHG-R10TEN-002).
       tags:
       - marketing
       x-ticvai-permission: MARKETING_MANAGE
@@ -17065,6 +17488,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GuestExtraFieldDefinition'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{guestId}/extra-values:
@@ -17288,6 +17713,8 @@ paths:
         the risk") and attaches one or several to a product or a booking flow. This lists them for Venue
         Management; a guest meets them through `orders.Cart.consentQuestions`, never by listing.
         Newest first, by `updatedAt` descending then `id`; the cursor is keyset on that pair.
+
+        Where `updatedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - consent
       parameters:
@@ -17798,7 +18225,7 @@ paths:
         - name: caseCategoryId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 case-category-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -17822,8 +18249,8 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
-          x-ticvai-problem-types: [category-has-active-subcategories]
-          description: Retiring a category that still has active subcategories.
+          x-ticvai-problem-types: [category-has-active-subcategories, case-category-id-mismatch]
+          description: 'Retiring a category that still has active subcategories. `case-category-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `caseCategoryId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -17922,7 +18349,7 @@ paths:
         - name: queueId
           in: path
           required: true
-          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 queue-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
           schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
@@ -17946,9 +18373,10 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
-          x-ticvai-problem-types: [queue-named-by-routing-rule, queue-has-waiting-cases]
-          description: Retiring a queue that an active routing rule names, or that an unresolved case still
-            waits in.
+          x-ticvai-problem-types: [queue-named-by-routing-rule, queue-has-waiting-cases, queue-id-mismatch]
+          description: 'Retiring a queue that an active routing rule names, or that an unresolved case still
+            waits in. `queue-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `queueId` is not its
+            id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -18751,6 +19179,8 @@ paths:
       description: >
         **One scan schedule per channel and domain or app** (2.6.64), with who is alerted when a scan
         finds something new. Ordered by `channel` then `domainApplication`; keyset cursor.
+
+        Where `domainApplication` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - consent
       x-ticvai-permission: GUEST_VIEW
@@ -18807,7 +19237,7 @@ paths:
       - name: scanPolicyId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `channel` and `domainApplication`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 scan-policy-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -18828,6 +19258,14 @@ paths:
                 $ref: '#/components/schemas/CookieScanPolicy'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '409':
+          description: 'Refused, and nothing is stored. `scan-policy-id-mismatch` (ADAM CR-245): a record for `channel` and `domainApplication` exists and the path''s `scanPolicyId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - scan-policy-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [day-of-week-required, day-of-month-required]
           description: A weekly schedule with no `dayOfWeek`, or a monthly one with no `dayOfMonth`
@@ -29938,7 +30376,10 @@ components:
       type: object
       x-ticvai-persistence: marketing.privacy_request
       description: One customer privacy request (pack 17.2.4 Case Information). The case layer over the
-        cross-region `sync.dsar_request` fan-out, which it references when it raises one.
+        cross-region `sync.dsar_request` fan-out, which it references when it raises one. **A guest's data export or
+        erasure raised in Identity arrives here too** (ADAM CR-101; CHG-R10ID-016), by the event
+        `identity.privacyRequestRaised` (request type `access` or `deletion`, requester role `self`), so its `dueAt`
+        applies like any other request's.
       required:
       - subjectId
       - requestType
@@ -30082,6 +30523,14 @@ components:
           nullable: true
           readOnly: true
           description: The cross-region `DsarRequest.requestId`, when fulfilment fanned out.
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: 'The request a guest''s export or erasure was raised as (`identity.privacyRequestRaised`
+            `approvalRequestId`), so the case and the request are one (the lead, 25 October 2026, r10 round 3, ADAM
+            CR-101; CHG-R10ID-024). Null on a case opened by hand.'
         caseId:
           type: string
           format: uuid

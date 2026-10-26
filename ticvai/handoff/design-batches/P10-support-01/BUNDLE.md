@@ -2,7 +2,7 @@
 
 **1 screens · 5 operations · 9 schemas · 2 permissions**
 
-Platform P10 Partner Web · ships as **ticvai-control** ·
+Platform P10 Partner Web · ships as **partner-web** ·
 partner audience · web ·
 online only
 
@@ -117,7 +117,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
+| App · platform | Partner Web · P10 Partner Web (web) |
 | Module | Support · wave 3 · needs the `partner` module |
 | Block | Block D · task APP-PARTNER-PTR-021 |
 | Who uses it | partner staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read) |

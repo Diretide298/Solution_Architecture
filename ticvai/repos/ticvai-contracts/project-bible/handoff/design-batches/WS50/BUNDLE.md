@@ -266,6 +266,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - … and 1 more flow steps (`flows/`)
 - Flow F159 branch at step 1 (expected): when Nothing has been set up on Dynamic Bundle Operations Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F159 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -783,6 +784,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-192`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 6
 - Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 8: Works in Dynamic Component Substitution Engine → Automatically replace unavailable bundle components according to predefined commercial rules.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1428,6 +1430,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS111 Promotions   Bundles Management Board 6.dc.html#adm-197`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 6
 - Flow F159 *Promotions Bundles Management board 6: Dynamic Bundle Operations Command Center*, step 18: Works in Dynamic Bundle Simulation & AI Optimization → Test how a bundle behaves under different operational scenarios before activating dynamic rules.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

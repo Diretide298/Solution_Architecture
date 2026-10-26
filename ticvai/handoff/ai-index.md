@@ -8,8 +8,8 @@
 |---|---|
 | **Operations** | 148 |
 | **Schemas** | 125 |
-| **States** | 42 |
-| **Events** | 52 |
+| **States** | 43 |
+| **Events** | 53 |
 | **Tables** | 139 |
 | **Screens** | 183 |
 | **Flows** | 11 |
@@ -29,6 +29,7 @@
 | `content.yaml` | `white-label` | `whitelabel.contentPublished` |
 | `conversation.yaml` | `marketing-crm` | `conversation.handedOver` |
 | `entitlement-status.yaml` | `orders` | `access.validated` |
+| `event.yaml` | `catalogue` | `event.lifecycleChanged` |
 | `media.yaml` | `assets` | `assets.documentIndexed` |
 | `order.yaml` | `orders` | `order.cancelled`, `order.completed`, `order.paid`, `order.refunded` |
 | `payment.yaml` | `orders` | `order.paid` |
@@ -248,6 +249,7 @@
 | `content.yaml` | white-label | `ContentStatus` | `whitelabel.contentPublished` |
 | `conversation.yaml` | marketing-crm | `ConversationState` | `conversation.handedOver` |
 | `entitlement-status.yaml` | orders | `EntitlementStatus` | `access.validated`, `entitlement.voided` |
+| `event.yaml` | catalogue | `EventLifecycleState` | `event.lifecycleChanged` |
 | `media.yaml` | assets | `MediaStatus` | `assets.documentIndexed` |
 | `order.yaml` | orders | `OrderStatus` | `order.cancelled`, `order.completed`, `order.lapsed`, `order.paid`, `order.refunded` |
 | `payment.yaml` | orders | `Payment.status` | `order.paid` |
@@ -281,7 +283,7 @@
 | `ai.planFailed` | publishes | ai | yes |
 | `ai.riskAlertRaised` | publishes | ai | yes |
 | `ai.riskCaseClosed` | publishes | ai | yes |
-| `approval.expired` | consumes | approvals | no |
+| `approval.expired` | consumes | approvals | yes |
 | `approval.granted` | consumes | approvals | yes |
 | `approval.rejected` | consumes | approvals | yes |
 | `approval.withdrawn` | consumes | approvals | yes |
@@ -294,6 +296,7 @@
 | `entitlement.expiringSoon` | consumes | access | no |
 | `entitlement.issued` | consumes | access | yes |
 | `entitlement.transferred` | consumes | catalogue | yes |
+| `event.lifecycleChanged` | consumes | catalogue | no |
 | `fnb.menuPublished` | consumes | fnb | yes |
 | `identity.credentialResetRequested` | consumes | identity | no |
 | `identity.loginRecorded` | consumes | identity | no |

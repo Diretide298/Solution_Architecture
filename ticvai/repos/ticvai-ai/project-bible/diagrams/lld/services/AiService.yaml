@@ -1949,7 +1949,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.proposed_action
-  columns: 24
+  columns: 29
   store: postgres
   parent: null
   writtenBy:

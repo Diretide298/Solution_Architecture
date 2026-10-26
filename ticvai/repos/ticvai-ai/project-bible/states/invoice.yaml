@@ -16,9 +16,11 @@ terminal:
 transitions:
 - from: draft
   to: issued
-  operation: generateInvoice
+  operation: issueInvoice
   trigger: operation
-  guard: Sent to the tenant
+  guard: '**Issued and numbered** (ADAM CR-202, option B, 25 October 2026; CHG-R10ID-013): `generateInvoice` creates
+    the draft with no number; `issueInvoice` takes the next number of the issuing legal entity''s gapless sequence and
+    sends it to the tenant'
 - from: issued
   to: paid
   operation: recordInvoicePayment

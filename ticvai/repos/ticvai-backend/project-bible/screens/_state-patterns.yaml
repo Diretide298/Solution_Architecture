@@ -185,6 +185,10 @@ platforms:
     screens:
       WEB-007:
         emptyFirstRun: choose-first-note
+      # ADAM CR-178 (accepted 21 October 2026): WEB-029's open state is the same status card with a short
+      # everything-is-running message and the way back to WEB-001; the approved card is WEB-029's own drawing.
+      WEB-029:
+        open: status-card
 
   P02:
     name: Guest App

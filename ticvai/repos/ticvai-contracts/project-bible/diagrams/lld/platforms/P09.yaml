@@ -29,7 +29,7 @@ servicesCalled:
 - service: AiService
   operationCalls: 193
 - service: TenancyService
-  operationCalls: 24
+  operationCalls: 25
 - service: WhiteLabelService
   operationCalls: 24
 - service: ReportingService
@@ -5498,6 +5498,7 @@ screens:
   density: compact
   operations:
   - getAiDecisionTrace
+  - listOrgUnits
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant

@@ -39,7 +39,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | [CMS-003](#cms-003-typography) | Typography | White Label | 1 | 2 |
 | [CMS-004](#cms-004-logo-assets) | Logo & Assets | White Label | 1 | 7 |
 | [CMS-005](#cms-005-theme-editor) | Theme Editor | White Label | 1 | 2 |
-| [CMS-006](#cms-006-component-preview) | Component Preview | White Label | 1 | 6 |
+| [CMS-006](#cms-006-component-preview) | Component Preview | White Label | 1 | 7 |
 | [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 1 | 16 |
 | [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 1 | 11 |
 | [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 1 | 7 |
@@ -578,6 +578,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `getBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#getbrandidentity) | onLoad | The marks being previewed | `TENANT_CONFIGURE` |
 | `getBookingFlowConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getbookingflowconfig) | onLoad | The booking presentation being previewed | `TENANT_CONFIGURE` |
 | `previewProductTickets` | [OrderService](../backend/OrderService.md#previewproducttickets) | onAction | A product's PDF ticket and Apple and Google Wallet pass proofs with the draft theme (CHG-CSP-038) | `PRODUCT_VIEW` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | The products to choose from for the ticket preview (check-screen-value-sources, CHG-R10UI-015) | `PRODUCT_VIEW` |
 
 **States**
 

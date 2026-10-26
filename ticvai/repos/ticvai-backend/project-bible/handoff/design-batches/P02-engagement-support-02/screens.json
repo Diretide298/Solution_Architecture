@@ -46,7 +46,7 @@
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.9. **The in-visit half of GST-051** — one capability, two moments. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared. **Deferred on 28 September (audit R187), and brought back the next day**: the itinerary planner was put in `wave: 4` with a `deferred` block and kept rather than deleted; the 29 September re-plan below superseded that, and the screen is in Block A, wave 1 (3 October 2026, CHG-SPF-006). **Itinerary suggestion removed 28 September** (decided 28 September, audit R209): the planner was deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.\n\n**Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): \"Plan in Progress\".** Today's plan against live waits (`getWaitTimes`); rules-based, AI not required. Build note (r8, GPS-C15): the cold entry (no planId) reads `listMyVisitPlans` for today; the edges from GST-001, GST-022 and GST-041 carry the chosen plan's id, so the earlier \"planId has no source\" notes no longer apply.",
+  "notes": "Minuted 10 Aug §4.9. **The in-visit half of GST-051** — one capability, two moments. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared. **Deferred on 28 September (audit R187), and brought back the next day**: the itinerary planner was put in `wave: 4` with a `deferred` block and kept rather than deleted; the 29 September re-plan below superseded that, and the screen is in Block A, wave 1 (3 October 2026, CHG-SPF-006). **Itinerary suggestion removed 28 September** (decided 28 September, audit R209): the planner was deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.\n\n**Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): \"Plan in Progress\".** Today's plan against live waits (`getWaitTimes`); rules-based, AI not required. Build note (r8, GPS-C15): the edges from GST-001, GST-022 and GST-041 carry the chosen plan's id, so the earlier \"planId has no source\" notes no longer apply. The cold entry no longer looks the guest's plans up (`listMyVisitPlans` is not declared here, CHG-R10OPN-005, ADAM CR-262; Chinmay, 26 October 2026): opened without a `planId`, the screen shows its emptyFirstRun state, the offer to make a plan on GST-051.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act",
@@ -132,12 +132,6 @@
     "purpose": "Swap candidates for one item that suit everyone in the party",
     "trigger": "onAction",
     "provenance": "decided 29 September 2026, MOB-6"
-   },
-   {
-    "operationId": "listMyVisitPlans",
-    "contract": "venue-map",
-    "purpose": "Only when signed in, like `getVisitPlan` (GFIX-6): on the cold entry (no `planId`) it asks for the guest's plans with `date` today, newest first, and takes the first one's `id` for `getVisitPlan`. No component shows the list itself: what it finds fills the Today timeline, and an empty page is the emptyFirstRun state (offer to make a plan on GST-051). Opened with a `planId`, it is not called. Not background (r8 integration, CHG-R8INT-008): the guest sees what it finds, and the approved screen has no element of its own for it (the prototype has no view of this screen).",
-    "trigger": "onLoad"
    }
   ],
   "entryState": {
@@ -156,7 +150,7 @@
      "optional": true
     }
    ],
-   "coldEntry": "Opened from a reminder on the visit day: today's plan, or an offer to make one when there is none. `itemId` is the plan item the guest taps Swap on, picked on this screen."
+   "coldEntry": "Opened from a reminder on the visit day. Without a `planId` it offers to make a plan (GST-051) and does not look the guest's plans up (CHG-R10OPN-005, ADAM CR-262). `itemId` is the plan item the guest taps Swap on, picked on this screen."
   },
   "wireframe": {
    "status": "approved",

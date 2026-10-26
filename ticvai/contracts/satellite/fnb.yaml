@@ -289,12 +289,12 @@ paths:
   /service-charge-policy:
     get:
       operationId: getFnbServiceChargePolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-733 Service Channel Configuration"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-733 Service Channel Configuration"
       x-ticvai-names-for-context: [rental.fee_policy]
       summary: The service charge a venue applies, and on what
       description: '**`fnb.sub_bill.service_charge` was stored and nothing said what the rate was.**
@@ -327,12 +327,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFnbServiceChargePolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-733 Service Channel Configuration"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-733 Service Channel Configuration"
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Set the service charge
@@ -1406,12 +1406,12 @@ paths:
   /combos:
     get:
       operationId: listCombos
+      x-ticvai-consumed-by:
+        - "P08 BO-011 Packages & Bundles"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-011 Packages & Bundles"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The combos defined at the venue, with their slots
@@ -1564,6 +1564,8 @@ paths:
         format: uuid
     put:
       operationId: attachModifierGroup
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: in-process
@@ -1573,8 +1575,6 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-045 Menu Management"
       summary: Give an item its choices
       description: 'Board 2E. **Attachment is separate from definition** because that is what makes the
         group reusable — the same *cooked how* group on nine steaks, defined once.
@@ -1994,13 +1994,13 @@ paths:
         format: uuid
     post:
       operationId: markOrderCollected
+      x-ticvai-consumed-by:
+        - "P04 POS-022 Send to Kitchen"
+        - "P15 KIT-006 Expeditor & Order Assembly"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P04 POS-022 Send to Kitchen"
-        - "P15 KIT-006 Expeditor & Order Assembly"
       summary: The guest took it
       description: 'Board 3. **`recordOrderHandover` exists for a staff handover; a collection counter
         is the guest taking it themselves**, and the two close the ticket for different reasons.
@@ -2234,12 +2234,12 @@ paths:
         format: uuid
     put:
       operationId: setServiceStage
+      x-ticvai-consumed-by:
+        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-058 Live Table & Service Management"
       summary: Where this table is in its meal
       description: 'Board 4. **The floor plan colour that tells a manager everything** — seated, ordered,
         starters away, mains away, dessert, paying, plates cleared.
@@ -2774,6 +2774,8 @@ paths:
         format: uuid
     post:
       operationId: publishMenu
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: in-process
@@ -2786,8 +2788,6 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: service
         for: 'what its text calls "RegionSettings.timeZone": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-045 Menu Management"
       x-ticvai-config-scope: outlet
       summary: Make the draft live, now or on a date
       description: 'Board 2. **`updateMenu` existed, so a menu edited was a menu live** — no draft, no
@@ -2929,6 +2929,8 @@ paths:
         format: uuid
     get:
       operationId: listMenuVersions
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: in-process
@@ -2938,8 +2940,6 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-045 Menu Management"
       summary: Every published version of a menu
       description: '**Added 26 September.** `publishMenu` promised that the previous version stays readable
         and `rollbackMenu` takes a `toVersion`, and nothing listed the versions — so the number a rollback
@@ -3416,12 +3416,12 @@ paths:
         format: uuid
     post:
       operationId: moveTableVisit
+      x-ticvai-consumed-by:
+        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-058 Live Table & Service Management"
       summary: Move a party to a different table, mid-service
       description: 'Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` existed
         and moving a seated party did not** — a merge combines two bills and a transfer hands a visit
@@ -4384,13 +4384,13 @@ paths:
         format: uuid
     post:
       operationId: requestBill
+      x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
+        - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P04 POS-028 Table Service"
-        - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-audience:
       - staff
       summary: The party asked to pay
@@ -4614,6 +4614,10 @@ paths:
         format: uuid
     patch:
       operationId: updateTableReservation
+      x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
+        - "P01 WEB-036 F&B – Browse & Order"
+        - "P02 GST-070 Reserve a Table"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -4621,10 +4625,6 @@ paths:
       - query: orders#depositPolicyRecords
         route: service
         for: 'what its text calls "DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-031 My Reservations"
-        - "P01 WEB-036 F&B – Browse & Order"
-        - "P02 GST-070 Reserve a Table"
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -4681,13 +4681,13 @@ paths:
         format: uuid
     post:
       operationId: seatTableReservation
+      x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
+        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P04 POS-028 Table Service"
-        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-audience:
       - staff
       summary: The party arrived and has been sat down
@@ -4904,14 +4904,14 @@ paths:
   /me/table-reservations:
     get:
       operationId: listMyTableReservations
-      x-ticvai-read-via:
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       x-ticvai-agreed: '3 October: Chinmay, Block A business rules, GST-070 ("bind the guest''s own reservations/waitlist
         list, self-scoped"); CHG-RUL-013; shape follows listTableReservations (paged)'
       security:
@@ -4980,15 +4980,6 @@ paths:
         format: uuid
     get:
       operationId: getGuestMenu
-      x-ticvai-read-via:
-      - query: tenancy#outletRecords
-        route: in-process
-        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
-          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
-          carries CR-234; XDR-004)'
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P01 WEB-037 Menu Item Detail"
@@ -4999,6 +4990,15 @@ paths:
         - "P04 POS-021 Sell — Food & Drink"
         - "P04 POS-024 Outlet Setup"
         - "P05 KSK-016 Order Food"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the outlet''s venue (platform.outlet.venue_id), since a menu reaches its venue only through
+          fnb.menu.outlet_id: the venue whose settings give the Money''s currency (ADAM CR-260 as the r10 package
+          carries CR-234; XDR-004)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       x-ticvai-audience:
       - guest
       - staff
@@ -5449,14 +5449,14 @@ paths:
   /fnb-delivery-policy:
     get:
       operationId: getFnbDeliveryPolicy
-      x-ticvai-read-via:
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
         - "P08 BO-044 F&B Outlets"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -5502,12 +5502,12 @@ paths:
       x-ticvai-guest-callable: true
     put:
       operationId: setFnbDeliveryPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-044 F&B Outlets"
       x-ticvai-body-key: [outletId]
       x-ticvai-body-key-note: 'Keyed by the body''s `outletId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per outlet within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Set takeaway and delivery rules
@@ -5881,6 +5881,10 @@ paths:
   /menus:
     get:
       operationId: listMenus
+      x-ticvai-consumed-by:
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-011 Packages & Bundles"
+        - "P08 BO-045 Menu Management"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: in-process
@@ -5890,10 +5894,6 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-007 Product Directory"
-        - "P08 BO-011 Packages & Bundles"
-        - "P08 BO-045 Menu Management"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -6002,6 +6002,10 @@ paths:
         format: uuid
     get:
       operationId: getMenu
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
+        - "P08 BO-109 Menu Builder & POS Layout Designer"
+        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: in-process
@@ -6011,10 +6015,6 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-045 Menu Management"
-        - "P08 BO-109 Menu Builder & POS Layout Designer"
-        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -6174,6 +6174,11 @@ paths:
         format: uuid
     put:
       operationId: setItemAvailability
+      x-ticvai-consumed-by:
+        - "P04 POS-021 Sell — Food & Drink"
+        - "P04 POS-024 Outlet Setup"
+        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
+        - "P15 KIT-008 Exceptions, Re-Fire & Unavailable Items"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: in-process
@@ -6183,11 +6188,6 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P04 POS-021 Sell — Food & Drink"
-        - "P04 POS-024 Outlet Setup"
-        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
-        - "P15 KIT-008 Exceptions, Re-Fire & Unavailable Items"
       x-ticvai-audience:
       - staff
       summary: Mark an item available or eighty-sixed
@@ -6276,6 +6276,8 @@ paths:
         format: uuid
     put:
       operationId: setMenuItemDailyCount
+      x-ticvai-consumed-by:
+        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: in-process
@@ -6285,8 +6287,6 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q194 (BO-140, FNB-2H "Count set"): daily counts with automatic
@@ -6349,12 +6349,12 @@ paths:
   /modifier-groups:
     get:
       operationId: listModifierGroups
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-045 Menu Management"
       description: '**Order.** Sorted by `name` ascending, then by `id`.'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -6407,12 +6407,12 @@ paths:
         `createModifierGroup` and `attachModifierGroup` stay staff-only.'
     post:
       operationId: createModifierGroup
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-045 Menu Management"
       x-ticvai-audience:
       - staff
       summary: Create a modifier group
@@ -6466,16 +6466,16 @@ paths:
   /fnb-orders:
     get:
       operationId: listFnbOrders
-      x-ticvai-read-via:
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       x-ticvai-consumed-by:
         - "P04 POS-029 Order Queue"
         - "P06 EMP-051 Restaurant Service Command Center"
         - "P08 BO-020 F&B Order Management"
         - "P08 BO-021 Order Search"
         - "P15 KIT-001 Kitchen Operations Command Center"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
@@ -6523,6 +6523,7 @@ paths:
     post:
       operationId: createFnbOrder
       x-ticvai-consumed-by:
+        - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P04 POS-022 Send to Kitchen"
         - "P06 EMP-058 Live Table & Service Management"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
@@ -6712,13 +6713,13 @@ paths:
         format: uuid
     post:
       operationId: cancelFnbOrder
+      x-ticvai-consumed-by:
+        - "P04 POS-022 Send to Kitchen"
+        - "P08 BO-020 F&B Order Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P04 POS-022 Send to Kitchen"
-        - "P08 BO-020 F&B Order Management"
       x-ticvai-audience:
       - staff
       summary: Cancel an order
@@ -6826,13 +6827,13 @@ paths:
         format: uuid
     get:
       operationId: getFnbOrder
+      x-ticvai-consumed-by:
+        - "P08 BO-020 F&B Order Management"
+        - "P15 KIT-004 Active Order Management & Fulfilment Journey"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-020 F&B Order Management"
-        - "P15 KIT-004 Active Order Management & Fulfilment Journey"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -6856,12 +6857,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: amendFnbOrder
+      x-ticvai-consumed-by:
+        - "P08 BO-020 F&B Order Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-020 F&B Order Management"
       x-ticvai-audience:
       - staff
       summary: Amend an order before it is prepared
@@ -6937,10 +6938,6 @@ paths:
         format: uuid
     get:
       operationId: getTableMap
-      x-ticvai-read-via:
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       x-ticvai-consumed-by:
         - "P04 POS-024 Outlet Setup"
         - "P04 POS-028 Table Service"
@@ -6948,6 +6945,10 @@ paths:
         - "P06 EMP-052 Floor Plan & Table Map"
         - "P06 EMP-060 Reservation & Table Performance"
         - "P08 BO-044 F&B Outlets"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -6975,14 +6976,14 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setTableLayout
-      x-ticvai-read-via:
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       x-ticvai-consumed-by:
         - "P04 POS-024 Outlet Setup"
         - "P06 EMP-053 Table & Seating Configuration"
         - "P08 BO-044 F&B Outlets"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: outlet
@@ -7032,13 +7033,13 @@ paths:
   /table-visits:
     post:
       operationId: openTableVisit
+      x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
+        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P04 POS-028 Table Service"
-        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-audience:
       - staff
       summary: Seat a party and open a visit
@@ -7097,13 +7098,13 @@ paths:
         format: uuid
     get:
       operationId: getTableVisit
+      x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
+        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P04 POS-028 Table Service"
-        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -7127,13 +7128,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateTableVisit
+      x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
+        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P04 POS-028 Table Service"
-        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-audience:
       - staff
       summary: Amend covers, move table, or reassign server
@@ -7216,12 +7217,12 @@ paths:
         format: uuid
     post:
       operationId: mergeTableVisits
+      x-ticvai-consumed-by:
+        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-audience:
       - staff
       summary: Merge another visit into this one
@@ -7354,6 +7355,9 @@ paths:
         format: uuid
     post:
       operationId: splitBill
+      x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
+        - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -7361,9 +7365,6 @@ paths:
       - query: tenancy#outletRecords
         route: service
         for: 'what its text calls "tenancy.Outlet.paymentTiming": platform.outlet, Tenancy''s data (CHG-R10GEN-001)'
-      x-ticvai-consumed-by:
-        - "P04 POS-028 Table Service"
-        - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-audience:
       - staff
       summary: Split a bill
@@ -7570,12 +7571,12 @@ paths:
         format: uuid
     post:
       operationId: clearTable
+      x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P04 POS-028 Table Service"
       x-ticvai-audience:
       - staff
       summary: Mark a table cleared and free
@@ -7972,13 +7973,13 @@ paths:
   /recipes:
     get:
       operationId: listRecipes
+      x-ticvai-consumed-by:
+        - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
+        - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
-        - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -8742,12 +8743,12 @@ paths:
   /waste-approval-policy:
     get:
       operationId: getWasteApprovalPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -8776,12 +8777,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWasteApprovalPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
-      x-ticvai-consumed-by:
-        - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q192 (BO-139, FNB-5E bands AED 100 / 500 / 2,000, photo above
@@ -9093,6 +9094,9 @@ paths:
         format: uuid
     post:
       operationId: createTableReservationForGuest
+      x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
+        - "P06 EMP-055 Create / Edit Reservation"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -9100,9 +9104,6 @@ paths:
       - query: orders#depositPolicyRecords
         route: service
         for: 'what its text calls "orders.DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
-      x-ticvai-consumed-by:
-        - "P04 POS-028 Table Service"
-        - "P06 EMP-055 Create / Edit Reservation"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: contract gap CHG-WIR-011 (POS-028: the v2 Reservations tab needs a staff booking

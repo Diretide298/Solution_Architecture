@@ -184,7 +184,13 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
   "requestBody": null,
   "responds": "Product"
  },
@@ -206,6 +212,19 @@
   ],
   "requestBody": null,
   "responds": "PublishedTenantConfig"
+ },
+ "getSubjectDataExport": {
+  "method": "GET",
+  "path": "/guests/{subjectId}/data-export/{requestId}",
+  "contract": "identity",
+  "summary": "Where a guest's data export has got to, and its download link",
+  "permission": "GUEST_VIEW_PII",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "SubjectDataExportStatus"
  },
  "getWaiverStatus": {
   "method": "GET",
@@ -268,6 +287,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
    {
     "name": "from",
     "in": "query",
@@ -451,6 +475,11 @@
     "name": "venueId",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -543,6 +572,11 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": "subjectId",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": null,
     "in": null,
     "required": null
@@ -610,6 +644,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -649,6 +688,11 @@
     "name": null,
     "in": null,
     "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
    }
   ],
   "requestBody": null,
@@ -667,6 +711,11 @@
    {
     "name": "programmeId",
     "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
     "required": null
    },
    {

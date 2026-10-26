@@ -1,5 +1,5 @@
 id: LLD-Queue entry
-title: Queue entry — 7 transitions
+title: Queue entry — 10 transitions
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/04-lifecycles.yaml
 source: states/queue-entry.yaml
@@ -13,8 +13,6 @@ initial:
 - waiting
 terminal:
 - redeemed
-- expired
-- noShow
 - cancelled
 - released
 transitions:
@@ -37,7 +35,10 @@ transitions:
   to: redeemed
   operation: redeemWaitingGuest
   trigger: operation
-  guard: Guest presented within the window
+  guard: Guest presented within the window. An entry with a Fast Pass entitlement writes queueEntry.redeemed,
+    which Access consumes to take the entitlement's use (ADAM CR-238)
+  emits:
+  - queueEntry.redeemed
 - from: called
   to: expired
   trigger: timer
@@ -45,18 +46,44 @@ transitions:
     they were called and did not come
 - from: called
   to: noShow
-  operation: overrideWaitingGuest
+  operation: resolveCalledWaitingGuest
   trigger: operation
-  guard: Operator recorded a no-show
+  guard: Operator recorded a no-show (outcome noShow; ADAM CR-237 moved it out of overrideWaitingGuest)
 - from: called
   to: waiting
+  operation: resolveCalledWaitingGuest
+  trigger: operation
+  guard: Returned to the queue — called in error, or the guest asked for more time (outcome returnToQueue;
+    ADAM CR-237)
+  isReversal: true
+- from: called
+  to: redeemed
   operation: overrideWaitingGuest
   trigger: operation
-  guard: Returned to the queue — called in error, or the guest asked for more time
-  isReversal: true
-notes: 'A guest in a virtual queue. **`called` expires rather than restoring their place** — unlike
-  a waitlist, where being asleep is not declining, a called queue place lapses because the ride is running
-  and the next party is waiting.
+  guard: Admitted against a failed redemption, with the override fields set (ADAM CR-237, option A)
+  emits:
+  - queueEntry.redeemed
+- from: expired
+  to: redeemed
+  operation: overrideWaitingGuest
+  trigger: operation
+  guard: A late party admitted after its window passed, with the override fields set (ADAM CR-237)
+  emits:
+  - queueEntry.redeemed
+- from: noShow
+  to: redeemed
+  operation: overrideWaitingGuest
+  trigger: operation
+  guard: A party recorded as a no-show admitted after all, with the override fields set (ADAM CR-237)
+  emits:
+  - queueEntry.redeemed
+notes: '**expired and noShow are no longer terminal** (ADAM CR-237, 25 October 2026): an override admits
+  from them, so each has one way out, to redeemed by overrideWaitingGuest.
+
+
+  A guest in a virtual queue. **`called` expires rather than restoring their place** — unlike a waitlist,
+  where being asleep is not declining, a called queue place lapses because the ride is running and the
+  next party is waiting.
 
 
   `abandoned` and `expired` are distinct: one is a guest leaving, one is the queue closing under them,

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Venue map
   version: 1.0.0
-  x-ticvai-screen-count: 24
+  x-ticvai-screen-count: 23
   x-ticvai-tier: satellite
   x-ticvai-module: "21 — Seat Management & Venue Mapping"
   x-ticvai-platforms:
@@ -1700,8 +1700,6 @@ paths:
       x-ticvai-no-screen: 'No approved screen shows the guest''s plans: GST-059''s cold-entry read was removed because the
         approved screen has no element for it (ADAM CR-262, CHG-R10OPN-005; Chinmay, 26 October 2026). Kept and built
         (36219, 36305) for the planner; a screen that needs it comes back through a CR.'
-      x-ticvai-consumed-by:
-        - "P02 GST-059 Plan in Progress"
       x-ticvai-read-via:
       - query: tenancy#activeVenues
         route: service

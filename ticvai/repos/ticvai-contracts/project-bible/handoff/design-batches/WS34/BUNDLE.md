@@ -356,6 +356,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - … and 1 more flow steps (`flows/`)
 - Flow F143 branch at step 1 (expected): when Nothing has been set up on Commercial Pricing Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F143 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -628,7 +629,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Carried, not typed: `priceCategoryId`
 
-Errors to draw in the form: 409 `inUse`.; 422 `invalidParent`.
+Errors to draw in the form: 409 `inUse`. `price-category-id-mismatch` (ADAM CR-245): a record for `entryKind` and `code` exists and the path's `priceCategoryId` is not its id (or names …; 422 `invalidParent`.
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -646,7 +647,7 @@ Errors to draw in the form: 409 `inUse`.; 422 `invalidParent`.
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save price category rate type (primary button) | `setPriceCategoryRateType` PUT `/price-categories/{priceCategoryId}` | PriceCategory | PriceCategory | 409 `inUse`.; 422 `invalidParent`. | gated `PRICE_CONFIGURE`; opens modal first |
+| Save price category rate type (primary button) | `setPriceCategoryRateType` PUT `/price-categories/{priceCategoryId}` | PriceCategory | PriceCategory | 409 `inUse`. `price-category-id-mismatch` (ADAM CR-245): a record for `entryKind` and `code` exists and the path's `priceCategoryId` is not its id (or names …; 422 `invalidParent`. | gated `PRICE_CONFIGURE`; opens modal first |
 
 **Data it reads**: `listPriceCategoryRate` (onLoad, Price Category & Rate Type Library)
 
@@ -664,7 +665,7 @@ Errors to draw in the form: 409 `inUse`.; 422 `invalidParent`.
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the price category rate are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 `inUse`.; 422 `invalidParent`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 `inUse`. `price-category-id-mismatch` (ADAM CR-245): a record for `entryKind` and `code` exists and the path's `priceCategoryId` is not its id (or names …; 422 `invalidParent`. |
 
 #### Edge cases to draw
 
@@ -898,6 +899,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-051`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 1
 - Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 6: Works in Rate Structure Builder, a section of BO-009, which saves the record with setPrices (setRateStructure retired … → Define the actual monetary rates contained within a price list. This is the core commercial configuration screen.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1207,6 +1209,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS95 Pricing   Revenue Management Board 1.dc.html#adm-053`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 1
 - Flow F143 *Pricing Revenue Management board 1: Commercial Pricing Command Center*, step 10: Works in Package, Bundle & Add-On Pricing → Provide dedicated commercial structures for products containing multiple components. This is separate from the Product Relationship/Bundle module. Product Catalogue defines what the bundle contains. …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1592,7 +1595,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Carried, not typed: `configurationTemplateId`
 
-Errors to draw in the form: 422 `sourceRequired`.
+Errors to draw in the form: 409 Refused, and nothing is stored. `configuration-template-id-mismatch` (ADAM CR-245): a record for `subject` and `name` exists and the path's …; 422 `sourceRequired`.
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1609,7 +1612,7 @@ Errors to draw in the form: 422 `sourceRequired`.
 | Selected Categories (secondary button) | navigation or local | — | — | — | — |
 | Product Assignments (secondary button) | navigation or local | — | — | — | — |
 | Market Structure (secondary button) | navigation or local | — | — | — | — |
-| Save configuration template (secondary button) | `setConfigurationTemplate` PUT `/configuration-templates/{configurationTemplateId}` | ConfigurationTemplate | ConfigurationTemplate | 422 `sourceRequired`. | gated `PRODUCT_CONFIGURE`; opens modal first |
+| Save configuration template (secondary button) | `setConfigurationTemplate` PUT `/configuration-templates/{configurationTemplateId}` | ConfigurationTemplate | ConfigurationTemplate | 409 Refused, and nothing is stored. `configuration-template-id-mismatch` (ADAM CR-245): a record for `subject` and `name` exists and the path's …; 422 `sourceRequired`. | gated `PRODUCT_CONFIGURE`; opens modal first |
 
 **Data it reads**: `listPriceListTemplate` (onLoad, Price List Templates, Clone & Reuse)
 
@@ -1626,7 +1629,7 @@ Errors to draw in the form: 422 `sourceRequired`.
 | Empty, first run (`?state=emptyFirstRun`) | No price list templates configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 422 `sourceRequired`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Refused, and nothing is stored. `configuration-template-id-mismatch` (ADAM CR-245): a record for `subject` and `name` exists and the path's …; 422 `sourceRequired`. |
 
 #### Sample data for the mock-up
 
@@ -1678,7 +1681,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (422).
+- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-056?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Complete Price List, Rate Structure Only, Selected Categories, Product Assignments, Market Structure, Save configuration template.

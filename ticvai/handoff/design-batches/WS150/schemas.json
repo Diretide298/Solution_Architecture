@@ -187,7 +187,7 @@
    },
    "scale": {
     "type": "integer",
-    "description": "Resolved from the region alongside `currency`.",
+    "description": "Resolved from the region alongside `currency`. **A currency other than the venue's or region's trading currency** (a tourist's USD cash at an AED till, `Payment.tenderAmount`; a guest-selected charge currency, `Order.chargeTotal`; a refund in the tender currency) **takes its ISO 4217 minor units**, held as one fixed list in the kernel (`TICVAI.Domain`, beside Money), so every module resolves it the same way and no table, query or migration holds it (ADAM CR-192, option A; Chinmay, 21 October 2026; CHG-R10ORD-018). The venue and region settings keep their own `currency_scale` for the trading currency.",
     "minimum": 0,
     "maximum": 4
    }
@@ -404,7 +404,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+    "description": "The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-018)."
    },
    "fxRate": {
     "allOf": [
@@ -659,10 +659,12 @@
    },
    "token": {
     "x-ticvai-secret": "blind-index",
+    "x-ticvai-unique": "tenant",
+    "x-ticvai-unique-compare": "exact",
     "type": "string",
     "format": "password",
     "writeOnly": true,
-    "description": "**Write-only, single purpose, and it is the only thing the guest presents.** Long enough not to be guessed and scoped to one order — **a token that can read a second order is a token that read somebody else's booking.**\n"
+    "description": "**Write-only, single purpose, and it is the only thing the guest presents.** Long enough not to be guessed and scoped to one order — **a token that can read a second order is a token that read somebody else's booking.**\n\n**Stored hashed, with a unique index** (ADAM CR-099, option 1; CHG-R10ORD-016): the column holds a keyed hash of the token (the blind index, ADR-0063), never the token, unique in the tenant; `getPaymentLink` and `payByLink` hash the presented token and look the link up by it.\n"
    },
    "status": {
     "type": "string",

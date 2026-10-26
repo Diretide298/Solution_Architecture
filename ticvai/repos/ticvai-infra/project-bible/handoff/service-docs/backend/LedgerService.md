@@ -1045,6 +1045,7 @@ An invoice is never edited or deleted: a correction is a credit memo (`issueCred
 
 5.7.93. **Every guest tax invoice the platform has issued**, simplified, full and consolidated, filtered by order, legal entity, type, status or issue date. A guest sees only the invoices issued to them (`buyerSubjectId` is the caller); staff see the legal entities their scope reaches.
 Ordered by `issuedAt` descending, `id` as the tiebreak.
+**Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `issuedFrom` or `issuedTo` are a day in the time zone of the region at or above the caller's scope (`tenancy#regionSettingsRecords`, by the caller's scope path). When the caller's scope gives no single region (a brand or the tenant root) and `issuedFrom` or `issuedTo` is sent, the answer is `400 validation` on `issuedFrom` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
 
 |  |  |
 |---|---|
@@ -1067,8 +1068,8 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 | legalEntityId | query |  | string (uuid) |  |
 | invoiceType | query |  | FinTaxInvoiceType: enum (simplified, full, consolidated) |  |
 | status | query |  | FinTaxInvoiceStatus: enum (issued, partiallyCredited, fullyCredited, superseded) |  |
-| issuedFrom | query |  | string (date) | A day in the region's time zone, local midnight to local midnight. |
-| issuedTo | query |  | string (date) | A day in the region's time zone, local midnight to local midnight. |
+| issuedFrom | query |  | string (date) | A day in the time zone of the region at or above the caller's scope, local midnight to local midnight. |
+| issuedTo | query |  | string (date) | A day in the time zone of the region at or above the caller's scope, local midnight to local midnight. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -1169,6 +1170,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Invoices, newest first |
+| 400 |  | Validation failed (validation). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setEInvoicingProvider
@@ -1194,7 +1196,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| providerId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
+| providerId | path | yes | string (uuid) | The record's id (ADAM CR-245). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FinEInvoicingProvider`

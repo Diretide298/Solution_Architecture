@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 101 operations
+title: identity — 102 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -252,7 +252,9 @@ operations:
   writes:
   - approvals.request
   - cache:idempotency
+  - identity.subject_data_export
   - pii.subject
+  - platform.outbox
 - operation: endGuestDeviceSessions
   verb: POST
   path: /internal/guest-sessions/end-for-device
@@ -334,6 +336,8 @@ operations:
   writes:
   - approvals.request
   - cache:idempotency
+  - identity.subject_data_export
+  - platform.outbox
 - operation: forceLogout
   verb: POST
   path: /auth/sessions/{sessionId}/force-logout
@@ -505,6 +509,18 @@ operations:
   - identity.sso_group_mapping
   - identity.sso_provider
   writes: []
+- operation: getSubjectDataExport
+  verb: GET
+  path: /guests/{subjectId}/data-export/{requestId}
+  scope: tenant
+  permission: GUEST_VIEW_PII
+  audience:
+  - staff
+  - guest
+  offline: false
+  reads:
+  - identity.subject_data_export
+  writes: []
 - operation: grantDelegation
   verb: POST
   path: /guests/{subjectId}/delegations
@@ -584,6 +600,7 @@ operations:
   reads:
   - cache:idempotency
   - identity.mfa_method
+  - identity.redirect_host
   - pii.subject_contact
   - pii.subject_identity
   writes:
@@ -603,12 +620,9 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - orders.sales_order
-  - pii.subject_contact
+  - identity.subject_holding
   writes:
   - cache:idempotency
-  - orders.sales_order
-  - pii.subject
   - platform.outbox
 - operation: listAccessDecisions
   verb: GET

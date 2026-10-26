@@ -667,6 +667,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS112 Promotions   Bundles Management Board 7.dc.html#adm-201`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 7
 - Flow F160 *Promotions Bundles Management board 7: Targeting & Eligibility Command Center*, step 6: Works in Membership, Loyalty & Guest Eligibility → Configure targeting based on membership, loyalty status, guest categories, and entitlement relationships.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

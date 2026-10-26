@@ -412,7 +412,7 @@
        ],
        "operation": "listProducts",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "The venue's membership plans, to join or upgrade. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "notes": "**The photo is the primary item's `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset read. The venue's membership plans, to join or upgrade. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       }
      ]
     },
@@ -465,6 +465,13 @@
        "label": "Retry the payment",
        "operation": "retryMyDunningPayment",
        "provenance": "contract payments.yaml POST /dunning-cases/{caseId}/retry"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Use another card",
+       "operation": "listPaymentTokens",
+       "notes": "On a declined renewal (rev 3 DG-2: a soft decline offers it beside Retry now, a hard decline offers only this): lists the guest's saved cards (`listPaymentTokens`: masked identifier, method, expiry, default first) in the retry modal, and the chosen one's id is sent as `paymentTokenId` to `retryMyDunningPayment` (ADAM CR-233, 25 October 2026). Drawn on the client-approved frame (wireframes/frames/gst-015.html), which already shows it.",
+       "provenance": "ADAM CR-233 (option A), settled by Chinmay 25 October 2026; client-approved frame gst-015 (19 October 2026)"
       }
      ]
     }
@@ -502,6 +509,13 @@
     "contract": "payments",
     "purpose": "Retry a declined payment, on another card if needed",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listPaymentTokens",
+    "contract": "orders",
+    "purpose": "Called when the guest chooses Use another card: the saved cards the retry modal lists (masked identifier, method, expiry, default first); the chosen one's id goes to retryMyDunningPayment as paymentTokenId (ADAM CR-233, 25 October 2026)",
+    "trigger": "onAction",
+    "provenance": "ADAM CR-233 (option A), settled by Chinmay 25 October 2026"
    },
    {
     "operationId": "getMyMemberships",
@@ -592,7 +606,7 @@
     "id": "formRetryMyDunningPayment",
     "component": "modal",
     "trigger": "Retry the payment",
-    "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `retryMyDunningPayment` sends before it is called.** Nothing in the body is required. Optional: `paymentTokenId`. **Use another card lists the guest's saved cards** from `listPaymentTokens` (masked identifier, method, expiry, the default first) and sends the chosen one's id as `paymentTokenId`; a hard decline is never retried on the same card (ADAM CR-233, 25 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RetryDunningPaymentRequest",
     "confirm": {
      "label": "Retry my dunning payment",

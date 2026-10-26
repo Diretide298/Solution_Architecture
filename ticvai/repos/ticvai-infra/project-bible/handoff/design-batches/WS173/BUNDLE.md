@@ -112,7 +112,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1036` | Closest-to-Stage Recommendations | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1037` | Family Seating Recommendations | C | 0 | 10 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1038` | Accessibility Recommendations | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1039` | Seat Upgrade Recommendations | C | 0 | 20 | 6 | 20 | 0 | 6 | — | notStarted (—) |
+| `BO-1039` | Seat Upgrade Recommendations | C | 6 | 20 | 6 | 20 | 0 | 6 | — | notStarted (—) |
 | `BO-1040` | Alternatives & Reseating | C | 0 | 20 | 6 | 8 | 0 | 0 | — | notStarted (—) |
 | `BO-1041` | Scoring Rules & Model Governance | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1042` | Performance, Feedback & Audit | C | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -148,6 +148,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Seat recommendation performance: served, accepted, purchased, uplift, no-result rate.
 
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Seat map | picker: choose a seat map | — | — | `getSeatRecommendationRules` ?seatMapId |
+| Performance | picker: choose a performance | — | — | `getSeatRecommendationRules` ?performanceId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -234,6 +241,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the recommendation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 `performanceId` sent without `seatMapId` (ADAM CR-112). |
 
 #### Sample data for the mock-up
 
@@ -287,7 +295,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
 - [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1033?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -321,6 +329,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setSeatRecommendationRules and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Seat map | picker: choose a seat map | — | — | `getSeatRecommendationRules` ?seatMapId |
+| Performance | picker: choose a performance | — | — | `getSeatRecommendationRules` ?performanceId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -370,6 +385,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the best seat recommendations are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 `performanceId` sent without `seatMapId` (ADAM CR-112). |
 
 #### Sample data for the mock-up
 
@@ -423,7 +439,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
 - [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1034?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save, Cancel.
@@ -457,6 +473,13 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 **Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setSeatRecommendationRules and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Seat map | picker: choose a seat map | — | — | `getSeatRecommendationRules` ?seatMapId |
+| Performance | picker: choose a performance | — | — | `getSeatRecommendationRules` ?performanceId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -506,6 +529,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the best value recommendations are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 `performanceId` sent without `seatMapId` (ADAM CR-112). |
 
 #### Sample data for the mock-up
 
@@ -547,7 +571,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
 - [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1035?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save, Cancel.
@@ -581,6 +605,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setSeatRecommendationRules and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Seat map | picker: choose a seat map | — | — | `getSeatRecommendationRules` ?seatMapId |
+| Performance | picker: choose a performance | — | — | `getSeatRecommendationRules` ?performanceId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -630,6 +661,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the closest-to-stage recommendations are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 `performanceId` sent without `seatMapId` (ADAM CR-112). |
 
 #### Sample data for the mock-up
 
@@ -671,7 +703,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
 - [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1036?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save, Cancel.
@@ -705,6 +737,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setSeatRecommendationRules and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Seat map | picker: choose a seat map | — | — | `getSeatRecommendationRules` ?seatMapId |
+| Performance | picker: choose a performance | — | — | `getSeatRecommendationRules` ?performanceId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -754,6 +793,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the family seating recommendations are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 `performanceId` sent without `seatMapId` (ADAM CR-112). |
 
 #### Sample data for the mock-up
 
@@ -800,7 +840,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
 - [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1037?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save, Cancel.
@@ -955,7 +995,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Available only | toggle | off | — | `getSeatAvailability` ?availableOnly |
 | Mode | segmented control | Auto | Auto · Graphical · List | `getSeatAvailability` ?mode |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Find upgrade options** (modal, opened by *Find upgrade options*; *Find upgrade options* calls `recommendSeats`, *Cancel* sends nothing)
+
+**Collects what `recommendSeats` sends before it is called.** Required: `partySize` (1 to 50) and `strategy` (best available, best value, closest to the stage, accessible, or seats together: `SeatRecommendationStrategy`). Optional: `categoryIds` (price categories), `maxPrice`, `accessibleCount` (wheelchair spaces; companions are added), `maxOptions` (3 by default, at most 10). The performance is the one whose seat status the screen shows (path `performanceId`). Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Party size `partySize` | stepper or slider | required | — | min 1; max 50 | — | — | `recommendSeats` body |
+| Strategy `strategy` | radio group | required | — | Best available · Best value · Closest to stage · Accessible · Contiguous | — | — | `recommendSeats` body |
+| Categorys `categoryIds` | multi-picker: choose categorys | optional | — | — | — | — | `recommendSeats` body |
+| Max price `maxPrice` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `recommendSeats` body |
+| Accessible count `accessibleCount` | number field | optional | 0 | — | — | Wheelchair spaces in the party. Companions are added automatically. | `recommendSeats` body |
+| Max options `maxOptions` | number field | optional | 3 | max 10 | — | — | `recommendSeats` body |
+
+Errors to draw in the form: 404 No selection satisfies the constraints
 
 #### Outputs: what the screen shows and produces
 
@@ -990,7 +1043,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
+| Find upgrade options (primary button) | `recommendSeats` POST `/performances/{performanceId}/seat-recommendations` | SeatRecommendationRequest | inline | 404 No selection satisfies the constraints | opens modal first |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
@@ -1013,6 +1066,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the seat upgrade recommendations are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A public guest read of venue data named no venue (`venue-required`; ADAM CR-198, CHG-R10ID-022): send `X-Venue-Id`. |
 
 #### Sample data for the mock-up
 
@@ -1076,13 +1130,14 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 9
 - Flow F282 *Seat Management Venue Mapping Reference v1.0 board 9: Recommendation Command …*, step 12: Works in Seat Upgrade Recommendations → Offer an eligible higher-value alternative before or after purchase. Compare current and candidate seat on view, distance, level, amenities, accessibility and price difference. Apply membership …
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 404).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1039?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: , Cancel.
+- [ ] Every action is wired with its success and its failure: Find upgrade options, Cancel.
 - [ ] Every transition is wired: `BO-1033`.
 - [ ] Every gated control is gated: `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.
@@ -1181,6 +1236,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the alternatives reseating are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A public guest read of venue data named no venue (`venue-required`; ADAM CR-198, CHG-R10ID-022): send `X-Venue-Id`. |
 
 #### Sample data for the mock-up
 
@@ -1234,11 +1290,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1040`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 9
 - Flow F282 *Seat Management Venue Mapping Reference v1.0 board 9: Recommendation Command …*, step 14: Works in Alternatives & Reseating → Provide comparable options when selected or issued seats become unavailable. Rank same-price, better-price, better-view, same-section, accessible and adjacent alternatives. Support operational …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 404).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1040?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
@@ -1272,6 +1329,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **Fixed on main** (the package already carries these; draw what it says): No read operation: the screen declares only setSeatRecommendationRules and nothing that returns the current configuration. (CHG-WIR-025).
 
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Seat map | picker: choose a seat map | — | — | `getSeatRecommendationRules` ?seatMapId |
+| Performance | picker: choose a performance | — | — | `getSeatRecommendationRules` ?performanceId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -1321,6 +1385,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the scoring rules model are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 `performanceId` sent without `seatMapId` (ADAM CR-112). |
 
 #### Sample data for the mock-up
 
@@ -1362,7 +1427,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
 - [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1041?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save, Cancel.
@@ -1394,6 +1459,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Realised recommendation quality and the audit of accepted and rejected suggestions.
 
 #### Inputs: what the user enters or picks
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Seat map | picker: choose a seat map | — | — | `getSeatRecommendationRules` ?seatMapId |
+| Performance | picker: choose a performance | — | — | `getSeatRecommendationRules` ?performanceId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -1466,6 +1538,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the performance feedback audit are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 `performanceId` sent without `seatMapId` (ADAM CR-112). |
 
 #### Sample data for the mock-up
 
@@ -1508,7 +1581,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
 - [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1042?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1616,8 +1689,8 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "getAccessibleSeating": {"method":"GET","path":"/accessible-seating","contract":"seating","summary":"Accessible seats, their routes and who may buy them","permission":"CAPACITY_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"seatMapId","in":"query","required":true}],"requestBody":null,"responds":"AccessibleSeating"},
-"getSeatAvailability": {"method":"GET","path":"/performances/{performanceId}/seat-availability","contract":"seating","summary":"Seat status for a performance","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"sectionCode","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"availableOnly","in":"query","required":null},{"name":"mode","in":"query","required":null}],"requestBody":null,"responds":"SeatAvailability"},
-"getSeatRecommendationRules": {"method":"GET","path":"/seat-recommendation-rules","contract":"seating","summary":"What \"best\" means at this venue","permission":"CAPACITY_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"SeatRecommendationRules"},
+"getSeatAvailability": {"method":"GET","path":"/performances/{performanceId}/seat-availability","contract":"seating","summary":"Seat status for a performance","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"sectionCode","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"availableOnly","in":"query","required":null},{"name":"mode","in":"query","required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SeatAvailability"},
+"getSeatRecommendationRules": {"method":"GET","path":"/seat-recommendation-rules","contract":"seating","summary":"What \"best\" means at this venue","permission":"CAPACITY_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"seatMapId","in":"query","required":false},{"name":"performanceId","in":"query","required":false}],"requestBody":null,"responds":"SeatRecommendationRules"},
 "reassignSeats": {"method":"POST","path":"/seat-reassignment","contract":"seating","summary":"Move a booked party, and tell them","permission":"ORDER_MODIFY","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SeatReassignment"},
 "recommendSeats": {"method":"POST","path":"/performances/{performanceId}/seat-recommendations","contract":"seating","summary":"Recommend seats for a party","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SeatRecommendationRequest","responds":null},
 "setSeatRecommendationRules": {"method":"PUT","path":"/seat-recommendation-rules","contract":"seating","summary":"Scoring for best seat, best value, closest, family and accessible","permission":"CAPACITY_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SeatRecommendationRules","responds":"SeatRecommendationRules"}
@@ -1630,13 +1703,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AccessibleSeating": {"type":"object","x-ticvai-persistence":"seating.accessible","description":"Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an accessible seat.**\n","properties":{"seatMapId":{"type":"string","format":"uuid"},"spaces":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"seatId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["wheelchairSpace","transferSeat","ambulant","easyAccess","assistanceDog","hearingLoop","visuallyImpaired"]},"routeDescription":{"type":"string","nullable":true},"stepFree":{"type":"boolean","default":true},"nearestAccessibleWc":{"type":"string","nullable":true}}}},"eligibility":{"type":"string","enum":["open","selfDeclared","verifiedOnce","verifiedEachTime"],"default":"selfDeclared","description":"**Contested in both directions.** Open sale leaves none for the guests who need them; hard gating turns people away at the door.\n"},"minimumProvisionPercent":{"type":"number","nullable":true},"scopePath":{"type":"string"}}},
+"AccessibleSeating": {"type":"object","x-ticvai-persistence":"seating.accessible","x-ticvai-unique-together":[["seatMapId"]],"description":"Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an accessible seat.**\n","properties":{"seatMapId":{"type":"string","format":"uuid"},"spaces":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"seatId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["wheelchairSpace","transferSeat","ambulant","easyAccess","assistanceDog","hearingLoop","visuallyImpaired"]},"routeDescription":{"type":"string","nullable":true},"stepFree":{"type":"boolean","default":true},"nearestAccessibleWc":{"type":"string","nullable":true}}}},"eligibility":{"type":"string","enum":["open","selfDeclared","verifiedOnce","verifiedEachTime"],"default":"selfDeclared","description":"**Contested in both directions.** Open sale leaves none for the guests who need them; hard gating turns people away at the door.\n"},"minimumProvisionPercent":{"type":"number","nullable":true},"scopePath":{"type":"string"}}},
 "Point": {"type":"object","required":["x","y"],"properties":{"x":{"type":"number"},"y":{"type":"number"}}},
-"SeatAvailability": {"x-ticvai-persistence":"none — computed from seat, hold and block","type":"object","required":["performanceId","seatMapId","renderMode","totals","seats"],"properties":{"performanceId":{"type":"string","format":"uuid"},"seatMapId":{"type":"string","format":"uuid"},"renderMode":{"type":"string","enum":["graphical","list"],"description":"The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat map's `noGeometry` state), so the client sells from categories and best-available groups and does not draw a plan. `graphical` means every seat carries `position`.\n"},"viewBox":{"type":"object","nullable":true,"description":"The coordinate space the seat positions are in, as `SeatMap.viewBox`, so the section view is drawn from this response alone (WEB-007, GST-049; r8 walk of ticket 28197). Null when `renderMode` is `list`.\n","properties":{"width":{"type":"number"},"height":{"type":"number"}}},"stagePosition":{"allOf":[{"$ref":"#/components/schemas/Point"}],"nullable":true,"description":"Where the stage sits in the same space, as `SeatMap.stagePosition`; the section view orients the seats towards it. Null when `renderMode` is `list`.\n"},"totals":{"type":"object","properties":{"total":{"type":"integer"},"available":{"type":"integer"},"held":{"type":"integer"},"sold":{"type":"integer"},"blocked":{"type":"integer"},"buffered":{"type":"integer"}}},"byCategory":{"type":"array","items":{"type":"object","properties":{"categoryId":{"type":"string","format":"uuid"},"available":{"type":"integer"},"sold":{"type":"integer"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"zones":{"type":"array","description":"**The standing zones and what is left in each** (r8, GPS-C38): a zone has no seats, so it is sold by quantity (`createSeatHold` `zoneId` and `quantity`). `keepTogether` says whether the venue keeps a party in one zone (a party larger than `remaining` is then refused rather than split).","items":{"type":"object","required":["zoneId","name","remaining"],"properties":{"zoneId":{"type":"string","format":"uuid"},"name":{"type":"string"},"remaining":{"type":"integer","minimum":0},"keepTogether":{"type":"boolean","default":true}}}},"sections":{"type":"array","description":"The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the venue supplied one, otherwise null and the client renders the view from `boundary` and the seat positions. In this response so WEB-007 and GST-049 need no second call.\n","items":{"type":"object","required":["code","name"],"properties":{"code":{"type":"string"},"name":{"type":"string"},"viewAssetId":{"type":"string","format":"uuid","nullable":true,"description":"As `Section.viewAssetId`. Null means render the view from geometry."},"boundary":{"type":"array","nullable":true,"items":{"$ref":"#/components/schemas/Point"},"description":"As `Section.boundary`. Null when `renderMode` is `list`."}}}},"seats":{"type":"array","items":{"type":"object","required":["seatId","status"],"properties":{"seatId":{"type":"string"},"status":{"$ref":"#/components/schemas/SeatStatus"},"categoryId":{"type":"string","format":"uuid","nullable":true},"displayLabel":{"type":"string","description":"What the guest sees, e.g. `A2-7-11`, as on `Seat`."},"position":{"allOf":[{"$ref":"#/components/schemas/Point"}],"nullable":true,"description":"The seat's coordinates on the map, as on `Seat`. Present when `renderMode` is `graphical`; null when it is `list`."}}}}}},
+"SeatAvailability": {"x-ticvai-persistence":"none — computed from seat, hold and block","type":"object","required":["performanceId","seatMapId","renderMode","totals","seats"],"properties":{"performanceId":{"type":"string","format":"uuid"},"seatMapId":{"type":"string","format":"uuid"},"renderMode":{"type":"string","enum":["graphical","list"],"description":"The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat map's `noGeometry` state), so the client sells from categories and best-available groups and does not draw a plan. `graphical` means every seat carries `position`.\n"},"viewBox":{"type":"object","nullable":true,"description":"The coordinate space the seat positions are in, as `SeatMap.viewBox`, so the section view is drawn from this response alone (WEB-007, GST-049; r8 walk of ticket 28197). Null when `renderMode` is `list`.\n","properties":{"width":{"type":"number"},"height":{"type":"number"}}},"stagePosition":{"allOf":[{"$ref":"#/components/schemas/Point"}],"nullable":true,"description":"Where the stage sits in the same space, as `SeatMap.stagePosition`; the section view orients the seats towards it. Null when `renderMode` is `list`.\n"},"totals":{"type":"object","properties":{"total":{"type":"integer"},"available":{"type":"integer"},"held":{"type":"integer"},"sold":{"type":"integer"},"blocked":{"type":"integer"},"buffered":{"type":"integer"}}},"byCategory":{"type":"array","items":{"type":"object","properties":{"categoryId":{"type":"string","format":"uuid"},"available":{"type":"integer"},"sold":{"type":"integer"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"maxSeatsPerGuestOrder":{"type":"integer","minimum":1,"maximum":50,"readOnly":true,"description":"**The most seats one guest booking may hold at this performance's venue** (ADAM CR-187, 25 October 2026): the venue's `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7), read through `tenancy#venueSettingsRecords` (the venue's row, else the tenant's own row, else 10). A guest screen caps its party stepper with it before anything is held (WEB-007, GST-049); `createSeatHold` still refuses more with `422` `seat-limit-exceeded`, whose `maxSeats` is this value on a guest channel. Computed, not stored."},"zones":{"type":"array","description":"**The standing zones and what is left in each** (r8, GPS-C38): a zone has no seats, so it is sold by quantity (`createSeatHold` `zoneId` and `quantity`). `keepTogether` says whether the venue keeps a party in one zone (a party larger than `remaining` is then refused rather than split).","items":{"type":"object","required":["zoneId","name","remaining"],"properties":{"zoneId":{"type":"string","format":"uuid"},"name":{"type":"string"},"remaining":{"type":"integer","minimum":0},"keepTogether":{"type":"boolean","default":true}}}},"sections":{"type":"array","description":"The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the venue supplied one, otherwise null and the client renders the view from `boundary` and the seat positions. In this response so WEB-007 and GST-049 need no second call.\n","items":{"type":"object","required":["code","name"],"properties":{"code":{"type":"string"},"name":{"type":"string"},"viewAssetId":{"type":"string","format":"uuid","nullable":true,"description":"As `Section.viewAssetId`. Null means render the view from geometry."},"boundary":{"type":"array","nullable":true,"items":{"$ref":"#/components/schemas/Point"},"description":"As `Section.boundary`. Null when `renderMode` is `list`."}}}},"seats":{"type":"array","items":{"type":"object","required":["seatId","status"],"properties":{"seatId":{"type":"string"},"status":{"$ref":"#/components/schemas/SeatStatus"},"categoryId":{"type":"string","format":"uuid","nullable":true},"displayLabel":{"type":"string","description":"What the guest sees, e.g. `A2-7-11`, as on `Seat`."},"position":{"allOf":[{"$ref":"#/components/schemas/Point"}],"nullable":true,"description":"The seat's coordinates on the map, as on `Seat`. Present when `renderMode` is `graphical`; null when it is `list`."}}}}}},
 "SeatReassignment": {"type":"object","x-ticvai-persistence":"seating.reassignment","description":"Board 9.8. **Never silently downgrades.**","properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid","nullable":true},"fromSeatIds":{"type":"array","items":{"type":"string","format":"uuid"}},"toSeatIds":{"type":"array","items":{"type":"string","format":"uuid"}},"reason":{"type":"string"},"priceDifference":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundIssued":{"type":"boolean","default":false},"guestNotifiedAt":{"type":"string","format":"date-time","nullable":true},"performedBy":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"},"scopePath":{"type":"string"}}},
 "SeatRecommendation": {"x-ticvai-persistence":"none — computed","type":"object","required":["seatIds","totalPrice","isContiguous","rank"],"properties":{"seatIds":{"type":"array","items":{"type":"string"}},"displayLabels":{"type":"array","items":{"type":"string"}},"totalPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"categoryId":{"type":"string","format":"uuid"},"isContiguous":{"type":"boolean"},"rank":{"type":"integer","description":"Best first."},"rationale":{"type":"string","description":"Why this option was chosen — closest to stage, best value in category, only contiguous block remaining. Shown to a call-centre agent, not the guest.\n"}}},
 "SeatRecommendationRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["partySize","strategy"],"properties":{"partySize":{"type":"integer","minimum":1,"maximum":50},"strategy":{"$ref":"#/components/schemas/SeatRecommendationStrategy"},"categoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"maxPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"accessibleCount":{"type":"integer","default":0,"description":"Wheelchair spaces in the party. Companions are added automatically."},"maxOptions":{"type":"integer","default":3,"maximum":10}}},
-"SeatRecommendationRules": {"type":"object","x-ticvai-persistence":"seating.recommendation_rule","description":"Board 9, and the 21 August minute: *\"best-seat ranking… must be configurable per seat map/event.\"* **Five kinds, one scoring model** — five algorithms would eventually contradict each other.\n","properties":{"seatMapId":{"type":"string","format":"uuid","nullable":true},"performanceId":{"type":"string","format":"uuid","nullable":true},"profiles":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["bestSeat","bestValue","closestToStage","familyTogether","accessible","upgrade"]},"weights":{"type":"object","additionalProperties":{"type":"number"},"description":"Sightline, distance, centrality, row, price, availability, aisle proximity, legroom.\n"},"preferredSectionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"avoidSectionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"contiguityWeight":{"type":"number","nullable":true}}}},"reverseRowOrder":{"type":"boolean","default":false,"description":"**Last-row-is-best against first-row-is-best**, which the minute names as the worked example and which differs by venue sightline.\n"},"explainToGuest":{"type":"boolean","default":true},"scopePath":{"type":"string"}}},
+"SeatRecommendationRules": {"type":"object","x-ticvai-persistence":"seating.recommendation_rule","x-ticvai-unique-together":[["seatMapId","performanceId"]],"x-ticvai-unique-nulls":"not-distinct","description":"Board 9, and the 21 August minute: *\"best-seat ranking… must be configurable per seat map/event.\"* **Five kinds, one scoring model** — five algorithms would eventually contradict each other.\n","properties":{"seatMapId":{"type":"string","format":"uuid","nullable":true},"performanceId":{"type":"string","format":"uuid","nullable":true},"profiles":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["bestSeat","bestValue","closestToStage","familyTogether","accessible","upgrade"]},"weights":{"type":"object","additionalProperties":{"type":"number"},"description":"Sightline, distance, centrality, row, price, availability, aisle proximity, legroom.\n"},"preferredSectionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"avoidSectionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"contiguityWeight":{"type":"number","nullable":true}}}},"reverseRowOrder":{"type":"boolean","default":false,"description":"**Last-row-is-best against first-row-is-best**, which the minute names as the worked example and which differs by venue sightline.\n"},"explainToGuest":{"type":"boolean","default":true},"scopePath":{"type":"string"}}},
 "SeatRecommendationStrategy": {"type":"string","enum":["bestAvailable","bestValue","closestToStage","accessible","contiguous"]},
 "SeatStatus": {"type":"string","enum":["available","held","sold","blocked","buffered","unavailable"]}
 }

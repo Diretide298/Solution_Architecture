@@ -333,6 +333,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - … and 1 more flow steps (`flows/`)
 - Flow F179 branch at step 1 (expected): when Nothing has been set up on AI Analytics Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F179 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1148,6 +1149,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-056`
 - Workshop pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf board 9
 - Flow F179 *Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command …*, step 10: Works in Root-Cause Analysis Explorer → Help users understand why a KPI changed. This is one of the most important AI capabilities in the entire platform.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 - ADR-0054 *Natural-language analytics goes through the semantic layer* (`docs/adr/0054-natural-language-analytics-goes-through-the-semantic-layer.md`)
 - ADR-0059 *AI phasing against the six-month plan* (`docs/adr/0059-ai-phasing-against-the-six-month-plan.md`)
 
@@ -1469,6 +1471,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-058`
 - Workshop pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf board 9
 - Flow F179 *Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command …*, step 14: Works in AI Recommendation & Next-Best-Action Center → Convert analytical insights into prioritized business recommendations.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1666,6 +1669,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-059`
 - Workshop pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf board 9
 - Flow F179 *Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command …*, step 16: Works in AI Insight History, Evidence & Explainability → Create a full governance trail for AI-generated analytics and recommendations.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1828,6 +1832,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html#anl-060`
 - Workshop pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf board 9
 - Flow F179 *Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command …*, step 18: Works in AI Analytics Governance & Model Control → Provide administrators with centralized control over how AI may access and use TICVAI analytics. This screen is critical because Board 9 should not give an LLM unrestricted access to the TICVAI …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

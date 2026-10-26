@@ -342,6 +342,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - … and 1 more flow steps (`flows/`)
 - Flow F200 branch at step 1 (expected): when Nothing has been set up on Rental Pricing Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F200 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -457,6 +458,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS119 Rental Management Board 4.dc.html#bo-525`
 - Workshop pack: Rental_Management.pdf board 4
 - Flow F200 *Rental Management board 4: Rental Pricing Command Center*, step 2: Works in Pricing Profile Builder → Create the master commercial pricing profile associated with a rental product.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -568,6 +570,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS119 Rental Management Board 4.dc.html#bo-526`
 - Workshop pack: Rental_Management.pdf board 4
 - Flow F200 *Rental Management board 4: Rental Pricing Command Center*, step 4: Works in Duration & Tiered Pricing Configuration → Configure pricing according to rental duration. This directly implements the fixed and dynamic-duration requirements.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -674,6 +677,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS119 Rental Management Board 4.dc.html#bo-527`
 - Workshop pack: Rental_Management.pdf board 4
 - Flow F200 *Rental Management board 4: Rental Pricing Command Center*, step 6: Works in Calendar, Peak & Seasonal Pricing → Allow price differentiation according to date and time.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -882,6 +886,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS119 Rental Management Board 4.dc.html#bo-529`
 - Workshop pack: Rental_Management.pdf board 4
 - Flow F200 *Rental Management board 4: Rental Pricing Command Center*, step 10: Works in Deposit & Security Hold Policy → Configure financial security required before equipment is released. The original scope supports fixed and percentage deposits and multiple deposit methods.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -992,6 +997,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS119 Rental Management Board 4.dc.html#bo-530`
 - Workshop pack: Rental_Management.pdf board 4
 - Flow F200 *Rental Management board 4: Rental Pricing Command Center*, step 12: Works in Deposit Lifecycle & Settlement Rules → Control what happens to the deposit throughout the rental lifecycle.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1102,6 +1108,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS119 Rental Management Board 4.dc.html#bo-531`
 - Workshop pack: Rental_Management.pdf board 4
 - Flow F200 *Rental Management board 4: Rental Pricing Command Center*, step 14: Works in Late Fee, Grace Period & Extension Pricing → Configure the commercial treatment of rentals that extend beyond the original return time. The source explicitly requires automatic late-fee calculation and grace-period configuration.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1215,6 +1222,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS119 Rental Management Board 4.dc.html#bo-532`
 - Workshop pack: Rental_Management.pdf board 4
 - Flow F200 *Rental Management board 4: Rental Pricing Command Center*, step 16: Works in Commercial Exceptions, Waivers & Overrides → Control authorized deviations from normal commercial policies.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1323,6 +1331,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS119 Rental Management Board 4.dc.html#bo-533`
 - Workshop pack: Rental_Management.pdf board 4
 - Flow F200 *Rental Management board 4: Rental Pricing Command Center*, step 18: Works in Pricing Simulation, Validation & AI Commercial Intelligence → Allow administrators to test commercial configuration before publishing it. This is particularly important because rental pricing can involve duration, calendar, location, deposit and dynamic pricing …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

@@ -8,6 +8,35 @@
 
 ---
 
+## Amended 25 October 2026: which hosts compose which modules' in-process queries
+
+**Decided by Chinmay** (ADAM CR-167, option A, accepted 18 October 2026; CR-234 and CR-240, option A, settled 25
+October 2026; change entries CHG-R10ORD-010, CHG-R10ORD-008 and CHG-R10ORD-009). The 21 October amendment below allows
+a granted read across deployables in process. Three hosts now compose another module's query interfaces (the read
+side only, `IModuleQueries`), each read in the caller's transaction under the caller's own connection, so row-level
+security still scopes every row:
+
+1. **`workers` composes every module's query interfaces.** It runs every module's event consumers (the table above)
+   and DB-ROLES gives its role the schemas they touch, so a consumer's reads are in process wherever the owner sits:
+   `access.issueOrderEntitlements`, the `order.paid` consumer, reads Orders and Catalogue in process, as
+   `finance.postOrderRevenue` already did (CR-167). `tools/check-cross-module-reads.py` treats an operation with
+   `x-ticvai-consumes` as running in workers (XR-ROUTE).
+2. **`operations` composes Tenancy's venue and region settings queries** (`tenancy#venueSettingsRecords`,
+   `tenancy#regionSettingsRecords`), as the workers host does: every F&B operation that answers Money reads the
+   venue's frozen trading currency and its scale this way (naming-and-style 5.1, ADR-0018 as amended 20 September for currency), mergeTableVisits first
+   (CR-234). Granted read XDR-004 in `docs/active/cross-deployable-writes.yaml`.
+3. **`access` composes Tenancy's workstation query and Catalogue's entitlement template query**
+   (`tenancy#workstationRecords`, `catalogue#entitlementTemplateRecords`): getOfflinePackage reads the session's
+   access point and each entitlement's re-entry and admission rules this way, and so does every Access operation
+   that reads the template (CR-240). Granted read XDR-003. Pinning the template values onto `access.entitlement` at
+   issue (CR-240 option C) is a later change.
+
+Writes are unchanged: rule 3 and the cross-deployable write routes stand. A call into another host's write is still
+an event (Queue's Fast Pass redemption writes `queueEntry.redeemed`, which Access consumes; CR-238) or the owner's
+published operation.
+
+---
+
 ## Amended 21 October 2026: a granted read across deployables is asked in process
 
 **Decided by Chinmay, 21 October 2026** (ADAM CR-196, option B, as recommended; change entry CHG-R9CR-005). Orders'

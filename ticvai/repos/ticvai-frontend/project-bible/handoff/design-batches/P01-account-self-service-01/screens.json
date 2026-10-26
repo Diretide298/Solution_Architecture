@@ -107,7 +107,7 @@
        "kind": "textField",
        "label": "Code",
        "operation": "verifyGuestOtp",
-       "notes": "Shown once a code has been sent; `verifyGuestOtp` returns the `GuestSession`.",
+       "notes": "**Two codes, one field.** After *Send me a code* the code goes to `verifyGuestOtp`, which returns the `GuestSession`. **After *Create an account* the code `registerGuest` sent goes to `verifyGuestEmail` with `mode` `code`**, under the `GuestSession` `registerGuest` returned (a wrong code is 422 with `attemptsRemaining`), never to `verifyGuestOtp` (ADAM CR-177 and CR-222, settled 21 and 25 October 2026).",
        "provenance": "contract identity.yaml POST /auth/guest/otp/verify"
       },
       {
@@ -206,7 +206,7 @@
     "id": "formRegisterGuest",
     "component": "modal",
     "trigger": "Create an account",
-    "body": "**Collects what `registerGuest` sends before it is called.** Required: `identifier`, `channel`. Optional: `displayName`, `password`, `preferredLanguage`, `consents`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `registerGuest` sends before it is called.** Required: `identifier`. The guest never picks a channel: an email address is sent with `channel` `email`; a mobile number is sent with none, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delivery (ADAM CR-222). Optional: `displayName`, `password`, `preferredLanguage`, `consents`. The code it sends is typed in the Code field and confirmed with `verifyGuestEmail` (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RegisterGuestRequest",
     "confirm": {
      "label": "Register guest",
@@ -266,7 +266,7 @@
     "id": "formRequestGuestOtp",
     "component": "modal",
     "trigger": "Send me a code",
-    "body": "**Collects only the email or mobile number.** The channel follows from the identifier and the tenant's configured delivery (WhatsApp, SMS or email, DI-209); the guest is never asked to pick one. Dismissing sends nothing.",
+    "body": "**Collects only the email or mobile number.** The guest is never asked to pick a channel: an email address is sent with `channel` `email`; a mobile number is sent with no `channel`, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delivery (DI-209; ADAM CR-222, 25 October 2026). Dismissing sends nothing.",
     "confirm": {
      "label": "Request guest OTP",
      "operation": "requestGuestOtp"
@@ -387,6 +387,16 @@
     "invalidates": [
      "getGuestSession"
     ]
+   },
+   {
+    "operationId": "verifyGuestEmail",
+    "contract": "identity",
+    "purpose": "Sent by the Code field after Create an account, not a control of its own: confirms the code `registerGuest` sent (`mode` `code`) under the session `registerGuest` returned; `verifyGuestOtp` stays for Send me a code (ADAM CR-177, CR-222)",
+    "trigger": "background",
+    "invalidates": [
+     "getGuestSession"
+    ],
+    "provenance": "ADAM CR-177 option A (accepted 21 October 2026) and CR-222 (1), settled 25 October 2026"
    },
    {
     "operationId": "claimCart",

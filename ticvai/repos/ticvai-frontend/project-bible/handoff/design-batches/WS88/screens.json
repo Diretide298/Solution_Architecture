@@ -1708,6 +1708,7 @@
       {
        "kind": "secondaryButton",
        "label": "Version history",
+       "operation": "listAuditRecords",
        "provenance": "pack Rental_Management.pdf, page 14 §Support"
       }
      ]

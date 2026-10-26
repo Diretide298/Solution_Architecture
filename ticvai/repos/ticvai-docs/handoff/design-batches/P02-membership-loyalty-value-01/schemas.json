@@ -5,6 +5,7 @@
   "description": "2.14.19-2.14.23, 5.7.96, BL-100. **What a guest was charged over a period, and deliberately not a tax document.**\n**Computed rather than stored**, because a statement assembled at read time cannot disagree with the ledger it describes. A stored statement is a second source of truth about money, and the package already has one of those.\n",
   "required": [
    "id",
+   "agreementId",
    "periodStart",
    "periodEnd",
    "total",
@@ -13,7 +14,13 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "A name-based UUID (v5) of `agreementId`, `periodStart` and `periodEnd`, so the same statement has the same id on every read (ADAM CR-099)."
+   },
+   "agreementId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The membership agreement this statement is one billing cycle of (`identity.customer_membership.id`; ADAM CR-099)."
    },
    "subjectId": {
     "type": "string",
@@ -147,9 +154,45 @@
     "type": "string",
     "maxLength": 200
    },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**The promotion's name in each of the tenant's enabled languages** (ADAM CR-231, option A, decided 25 October 2026; CHG-R10CAT-012), keyed by ISO 639-1 code, as `Product.nameLocalised`. The back office collects one per enabled language; a guest screen shows the page language's entry and falls back to `name`. At most 200 characters per language, as `name`."
+   },
    "description": {
     "type": "string",
     "maxLength": 1000
+   },
+   "descriptionLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The description in each enabled language, as `nameLocalised`; falls back to `description`. At most 1000 characters per language (ADAM CR-231)."
+   },
+   "label": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**The guest-facing label**, the pill on the offer card (BUNDLE, RENTAL, MEMBERSHIP, SEASON, PARKING on WEB-032), per language as `nameLocalised` (ADAM CR-225 and CR-231, option A, decided 25 October 2026; CHG-R10CAT-012). Set in the back office; null shows no pill. At most 40 characters per language."
+   },
+   "venues": {
+    "type": "array",
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "description": "**Where a guest may use the offer**, as the offer card's venue line shows it (ADAM CR-225, option A, decided 25 October 2026; CHG-R10CAT-012). Set in the back office; empty or absent means every venue. Display only: `venueId` above stays the owning venue and the conditions still decide where the discount applies.",
+    "items": {
+     "$ref": "#/components/schemas/PromotionVenue"
+    }
    },
    "venueId": {
     "type": "string",
@@ -248,6 +291,9 @@
    },
    "grantedBySubjectId": {
     "grantedByKind": "subject"
+   },
+   "revokedBySubjectId": {
+    "revokedByKind": "subject"
    }
   },
   "type": "object",
@@ -334,7 +380,7 @@
    "overObjectRef": {
     "type": "string",
     "nullable": true,
-    "description": "**Where the authority is over a thing rather than a scope** — a wallet, an entitlement, a booking. `scopePath` answers *where*; this answers *what*, and a guest's authority is almost always over a specific object rather than a branch of the tree.\n"
+    "description": "**Where the authority is over a thing rather than a scope** — a wallet, an entitlement, a booking. `scopePath` answers *where*; this answers *what*, and a guest's authority is almost always over a specific object rather than a branch of the tree.\n\n**Written as `<kind>:<id>`.** An entitlement share is `entitlement:<entitlementId>` (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004).\n"
    },
    "delegationKind": {
     "type": "string",
@@ -346,9 +392,10 @@
      "attendee",
      "corporateAdmin",
      "corporateMember",
-     "carer"
+     "carer",
+     "sharedEntitlement"
     ],
-    "description": "**What kind of relationship this expresses**, for display and for reporting. The mechanism does not branch on it — a family member and a group attendee are the same grant with different words around them, which is the point.\n"
+    "description": "**What kind of relationship this expresses**, for display and for reporting. The mechanism does not branch on it — a family member and a group attendee are the same grant with different words around them, which is the point.\n\n**`sharedEntitlement` is the row an entitlement share is** (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004). `shareEntitlement` writes exactly: `overObjectRef` `entitlement:<entitlementId>`, `subjectId` the recipient, `overSubjectId` the owner, `permission` `ENTITLEMENT_USE` with `roleId` null, `delegationKind` `sharedEntitlement`, `effect` ALLOW, `validTo` the request's `validUntil`, `grantedByKind` `subject` with `grantedBySubjectId` the owner. `revokeEntitlementShare` finds the row by the path's `shareId` and matches it to the path's `entitlementId` through `overObjectRef`; a row that does not match is 404. Orders' `EntitlementShare` is this row seen through the share.\n"
    },
    "quota": {
     "type": "integer",
@@ -382,6 +429,25 @@
     "nullable": true,
     "readOnly": true,
     "description": "Taken from `identity.user_access`. This table recorded `revokedBy` and not when, so it could say who revoked a grant and not whether it was before or after the thing somebody is asking about.\n"
+   },
+   "revokedByKind": {
+    "type": "string",
+    "enum": [
+     "principal",
+     "subject",
+     "system"
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Who revoked the grant** (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004): a staff member (`revoked_by_principal_id`), a guest (`revokedBySubjectId`, for example the owner taking back an entitlement share) or the system (an expiry sweep). Null while the grant is live."
+   },
+   "revokedBySubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "pii.subject",
+    "description": "The guest who revoked the grant; set when `revokedByKind` is `subject` (ADAM CR-209), since a guest is not a principal and cannot fill `revoked_by_principal_id`."
    },
    "validFrom": {
     "type": "string",
@@ -826,6 +892,40 @@
    "maxRedemptionsPerGuest": {
     "type": "integer",
     "nullable": true
+   },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "`Promotion.nameLocalised`; the screen shows the page language's entry, else `name` (ADAM CR-231)."
+   },
+   "descriptionLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "`Promotion.descriptionLocalised`; the screen shows the page language's entry, else `description` (ADAM CR-231)."
+   },
+   "label": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The card's pill, `Promotion.label`, per language (ADAM CR-225, CR-231)."
+   },
+   "venues": {
+    "type": "array",
+    "description": "The card's venue line, `Promotion.venues`; empty means every venue (ADAM CR-225). WEB-032's \"Use this offer\" carries `code` into the booking flow to WEB-010, where `applyCartPromoCode` already runs, so the offers page needs no cart operation.",
+    "items": {
+     "$ref": "#/components/schemas/PromotionVenue"
+    }
    }
   }
  },
@@ -1288,7 +1388,8 @@
    "venueId",
    "scopePath",
    "isSellable",
-   "hasVariants"
+   "hasVariants",
+   "createdAt"
   ],
   "properties": {
    "id": {
@@ -1321,7 +1422,7 @@
      }
     ],
     "nullable": true,
-    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+    "description": "**The product's name in each of the tenant's enabled languages** (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
    },
    "descriptionLocalised": {
     "allOf": [
@@ -1373,6 +1474,12 @@
     "format": "date-time",
     "nullable": true,
     "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**The last moment the product's entitlements are valid; null means the same as `onSaleTo`** (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). A season pass stops selling at `onSaleTo` and is used until `validTo`: an entitlement template's `expiryAnchor` of `seasonEnd` ends here (`access#issueOrderEntitlements`). Sales closing is not validity ending.\n"
    },
    "categoryId": {
     "type": "string",
@@ -1487,6 +1594,15 @@
     },
     "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
    },
+   "addOnProductIds": {
+    "type": "array",
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The add-ons offered with this product, in display order** (accepted 26 October 2026, Chinmay, ADAM CR-252 option A): each a `kind: addOn` product of the same venue (a coffee break, a working lunch, an AV technician offered with a meeting-room type), set in the back office. `listProducts` answers it, so WEB-048 and GST-075 read a room type's add-ons from the load they already make and fetch those products; the guest adds one as a cart line with `parentLineId`. An id that is not a `kind: addOn` product of the same venue is `400 validation` on `addOnProductIds`. Empty when none is offered."
+   },
    "requiresTimeWindow": {
     "type": "boolean",
     "default": false,
@@ -1551,6 +1667,19 @@
     "format": "uuid",
     "nullable": true,
     "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "**When the product was created** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): `catalogue.product.created_at`, NOT NULL DEFAULT now(), set by the server and never by a request. Rows that predate it are backfilled by the migration task (the earliest of the product's first version's `published_at` and the migration time), then the NOT NULL and the DEFAULT are set. `listProductLifecycle` orders and filters on it."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true,
+    "description": "**When the product last changed** (ADAM CR-204): set by `updateProduct` and by every product sub-resource PUT and bulk change that versions the product; null until the first change after creation. `listProductLifecycle`'s `lastModifiedAt` and `modifiedSince` read it."
    }
   }
  },
@@ -1651,6 +1780,24 @@
    "displayOrder": {
     "type": "integer",
     "default": 100
+   },
+   "url": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The asset's stable CDN address, for a guest card** (ADAM CR-221, option A, decided 25 October 2026; CHG-R10CAT-014): the asset library's public address for the asset, set on guest-facing reads (`searchCatalogue`, `listProducts` and `getProduct` for a guest or a visitor) when the asset is public and `ready`, as `getPublishedTenantConfig` returns white-label assets (`brandUrls`). Null otherwise, and on staff reads, which are unchanged. Catalogue reads the asset in process, a read the lead granted across deployables (XDR-005, 25 October 2026; CHG-R10CAT-015)."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The asset library's thumbnail address for the asset, on the same reads and with the same rule as `url` (ADAM CR-221)."
    },
    "altText": {
     "allOf": [
@@ -1871,6 +2018,37 @@
    "expired",
    "ended"
   ]
+ },
+ "PromotionVenue": {
+  "x-ticvai-persistence": "none — jsonb column promotions.promotion.venues",
+  "type": "object",
+  "description": "One venue on a promotion's guest-facing venue line (ADAM CR-225; CR-231 localises its name; CHG-R10CAT-012).",
+  "required": [
+   "venueId",
+   "name"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "platform.scope",
+    "description": "A venue node of the tenant (checked with `tenancy#scopeRecords` on write)."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "The venue's name as the back office gives it for guests."
+   },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The name in each enabled language; falls back to `name` (ADAM CR-231)."
+   }
+  }
  },
  "Referral": {
   "type": "object",

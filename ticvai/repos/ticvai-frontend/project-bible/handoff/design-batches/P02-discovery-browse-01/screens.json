@@ -124,7 +124,7 @@
      "carries": [
       "eventId"
      ],
-     "provenance": "derived — GST-007 declares entryState.params entryId, eventId and GST-001 holds eventId, so an edge into it carries them"
+     "provenance": "derived — GST-007 declares entryState.params entryId, eventId, waitingEntryId and GST-001 holds eventId, so an edge into it carries them"
     },
     {
      "to": "GST-008",
@@ -300,7 +300,7 @@
      "carries": [
       "productId"
      ],
-     "provenance": "derived — GST-041 declares entryState.params holdId, lineId, performanceId, productId and GST-001 holds productId, so an edge into it carries them"
+     "provenance": "derived — GST-041 declares entryState.params holdId, holdIds, lineId, performanceId, productId and GST-001 holds productId, so an edge into it carries them"
     },
     {
      "to": "GST-042",
@@ -324,7 +324,7 @@
      "carries": [
       "eventId"
      ],
-     "provenance": "derived — GST-049 declares entryState.params eventId, holdId, performanceId and GST-001 holds eventId, so an edge into it carries them"
+     "provenance": "derived — GST-049 declares entryState.params eventId, holdId, holdIds, performanceId and GST-001 holds eventId, so an edge into it carries them"
     },
     {
      "to": "GST-052",
@@ -353,7 +353,7 @@
     {
      "to": "GST-059",
      "trigger": "Plan My Day – In Progress",
-     "provenance": "derived — GST-059 declares entryState.params itemId, planId and GST-001 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 finds planId (listMyVisitPlans) itself, and GST-059 opens on its own"
+     "provenance": "derived — GST-059 declares entryState.params itemId, planId and GST-001 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional); GST-059 opens on getWaitTimes, and planId has no source on GST-059 yet (a gap in GST-059, not in this edge)"
     },
     {
      "to": "GST-061",
@@ -894,13 +894,13 @@
        ],
        "operation": "listProducts",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "notes": "**The photo is the primary item's `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset read. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "searchField",
        "label": "Search the venue",
        "operation": "searchCatalogue",
-       "notes": "Sends `?q=` to `searchCatalogue`; results replace the tiles in place (GST-063, the same implementation).",
+       "notes": "**Type-ahead, as GST-063** (ADAM CR-223, 25 October 2026): `searchCatalogue` is called with `?q=` once typing pauses (300 ms debounce), only for 2 or more characters, Enter searches at once, and the latest answer wins; results replace the tiles in place (GST-063, the same implementation). frontend-patterns 4.6.",
        "provenance": "decided 29 September 2026, MOB-1"
       },
       {
@@ -938,7 +938,7 @@
    {
     "operationId": "searchCatalogue",
     "contract": "catalogue",
-    "purpose": "Search from the top of Explore; results are GST-063, a state of this screen",
+    "purpose": "Search from the top of Explore, type-ahead as on GST-063 (ADAM CR-223); results are GST-063, a state of this screen",
     "trigger": "onAction",
     "provenance": "decided 29 September 2026, MOB-1"
    }
@@ -1127,7 +1127,7 @@
        ],
        "operation": "listProducts",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "notes": "**The photo is the primary item's `ProductMedia.thumbnailUrl`** (`isPrimary`; `url` for the full-size view): the stable CDN address the guest read returns for a public, ready asset (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset read. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
       },
       {
        "kind": "banner",
@@ -1443,7 +1443,7 @@
        "kind": "detailPanel",
        "label": "Photo and video",
        "bindsTo": "Product.media",
-       "notes": "**The video plays directly, with no loader in front of it** (client meeting 30 September, MoM 4.8, Qossai; agreed by Chinmay). The info button reveals the ride details and starts the primary video in place, as the header video does elsewhere; while it buffers the poster frame (the primary image, or the video's first frame) shows, never a spinner or loading screen. Read more opens on the primary video or photo.",
+       "notes": "**Each item plays or shows from its `ProductMedia.url`** (`thumbnailUrl` as the poster frame while it buffers): the stable CDN address `getProduct` returns to a guest for a public, ready asset (ADAM CR-221, 25 October 2026). The client never turns an `assetId` into an address and calls no asset read. **The video plays directly, with no loader in front of it** (client meeting 30 September, MoM 4.8, Qossai; agreed by Chinmay). The info button reveals the ride details and starts the primary video in place, as the header video does elsewhere; while it buffers the poster frame (the primary image, or the video's first frame) shows, never a spinner or loading screen. Read more opens on the primary video or photo.",
        "operation": "getProduct",
        "provenance": "decided 29 September, rev 3 23SEP-4; decided 30 September 2026, client meeting MoM 4.8 (Qossai)"
       },
@@ -1731,6 +1731,11 @@
       "performanceId"
      ],
      "provenance": "authored 3 October 2026 (CHG-SPF-004): GST-005 lists them, and GST-006 cannot load without the one the user picks"
+    },
+    {
+     "to": "GST-002",
+     "trigger": "See everything",
+     "provenance": "accepted 26 October 2026, Chinmay, ADAM CR-259 option A: the client-approved frame's *See everything* button opens Explore with nothing carried"
     }
    ]
   },
@@ -1787,6 +1792,12 @@
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "See everything",
+       "notes": "Opens GST-002 Explore with nothing carried, the screen that browses the whole programme. Drawn in the client-approved frame under the list.",
+       "provenance": "accepted 26 October 2026, Chinmay, ADAM CR-259 option A"
       }
      ]
     },

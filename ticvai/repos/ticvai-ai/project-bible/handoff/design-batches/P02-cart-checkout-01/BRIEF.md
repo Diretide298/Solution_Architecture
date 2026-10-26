@@ -98,7 +98,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-009` | Review & Payment | A | 14 | 74 | 5 | 21 | 23 | 0 | guest | approved (client-verified) |
 | `GST-010` | Booking Confirmation | A | 20 | 5 | 5 | 14 | 4 | 6 | guest | notStarted (client-verified) |
-| `GST-041` | Checkout Entry | A | 14 | 31 | 6 | 27 | 14 | 6 | guest | notStarted (client-verified) |
+| `GST-041` | Checkout Entry | A | 14 | 33 | 6 | 27 | 14 | 6 | guest | notStarted (client-verified) |
 
 ## Design inputs from the client meetings
 

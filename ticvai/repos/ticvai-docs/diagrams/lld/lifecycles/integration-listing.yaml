@@ -54,9 +54,9 @@ transitions:
   guard: Certification expired and was not renewed
 - from: revoked
   to: delisted
-  operation: certifyIntegration
-  trigger: operation
-  guard: Removed from the marketplace
+  trigger: job
+  guard: Removed from the marketplace by the listing job once revoked; certifyIntegration refuses a
+    listing that is not `certified` (409 integration-listing-not-certified; r10 ruling, CHG-R10ID-019)
 notes: '**Certification gates the listing, not API access.** A developer may call the API uncertified;
   they may not appear in the marketplace uncertified, **because a listing is TICVAI vouching for something.**
 

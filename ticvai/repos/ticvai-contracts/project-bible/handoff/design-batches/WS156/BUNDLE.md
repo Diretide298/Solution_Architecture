@@ -473,6 +473,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS127 Resource Management Configuration Board 2.dc.html#bo-865`
 - Workshop pack: Resource_Management_Configuration_Reference.pdf board 2
 - Flow F265 *Resource Management Configuration board 2: Resource Calendar Command Center*, step 2: Works in Calendar Filters, Search & Smart Discovery → Allow users to quickly locate the correct resource instead of manually searching through hundreds or thousands of resources.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -693,6 +694,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS127 Resource Management Configuration Board 2.dc.html#bo-866`
 - Workshop pack: Resource_Management_Configuration_Reference.pdf board 2
 - Flow F265 *Resource Management Configuration board 2: Resource Calendar Command Center*, step 4: Works in Resource Availability Schedule Configuration → Define the baseline schedule controlling when each resource can be used.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 - ADR-0011 *The Hierarchy Is Binding* (`docs/adr/0011-hierarchy-is-binding.md`)
 
 #### Acceptance for the design

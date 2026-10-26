@@ -152,6 +152,7 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.product
+  - catalogue.product_version
 - operation: cancelPerformance
   verb: POST
   path: /performances/{performanceId}/cancel
@@ -218,20 +219,24 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - catalogue.channel_capacity
   - catalogue.event
   - catalogue.event_capacity_profile
   - catalogue.event_registration
   - catalogue.event_resource_plan
   - catalogue.event_schedule
   - catalogue.performance
+  - catalogue.price_assignment
   writes:
   - cache:idempotency
+  - catalogue.channel_capacity
   - catalogue.event
   - catalogue.event_capacity_profile
   - catalogue.event_registration
   - catalogue.event_resource_plan
   - catalogue.event_schedule
   - catalogue.performance
+  - catalogue.price_assignment
 - operation: cloneProduct
   verb: POST
   path: /products/{productId}/clone
@@ -2550,6 +2555,7 @@ operations:
   - catalogue.channel_envelope
   writes:
   - cache:idempotency
+  - catalogue.audit_entry
   - catalogue.channel_envelope
 - operation: relinquishInventoryHold
   verb: DELETE
@@ -3023,7 +3029,10 @@ operations:
   - catalogue.event_resource_plan
   - catalogue.event_schedule
   - catalogue.performance
+  - catalogue.price
   - catalogue.price_list
+  - catalogue.product
+  - catalogue.variant
   writes:
   - cache:idempotency
   - catalogue.event
@@ -3457,6 +3466,7 @@ operations:
   - cache:idempotency
   - catalogue.audit_entry
   - catalogue.product_channel_text
+  - catalogue.product_version
 - operation: setProductClassification
   verb: PUT
   path: /products/{productId}/classification
@@ -3471,6 +3481,7 @@ operations:
   - cache:idempotency
   - catalogue.audit_entry
   - catalogue.product
+  - catalogue.product_version
 - operation: setProductContextOwnership
   verb: PUT
   path: /product-context-ownership
@@ -3531,6 +3542,7 @@ operations:
   - cache:idempotency
   - catalogue.audit_entry
   - catalogue.product_owner_form
+  - catalogue.product_version
 - operation: setProductSalePermissionRules
   verb: PUT
   path: /products/{productId}/sale-permission-rules
@@ -3546,6 +3558,7 @@ operations:
   - cache:idempotency
   - catalogue.audit_entry
   - catalogue.product_sale_permission
+  - catalogue.product_version
 - operation: setProductServicePrice
   verb: PUT
   path: /product-service-price
@@ -3941,12 +3954,16 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.product
+  - catalogue.product_channel_text
   - catalogue.product_media
+  - catalogue.product_owner_form
+  - catalogue.product_sale_permission
   - whitelabel.booking_flow
   writes:
   - cache:idempotency
   - catalogue.product
   - catalogue.product_media
+  - catalogue.product_version
 - operation: updateProductVariant
   verb: PATCH
   path: /products/{productId}/variants/{variantId}

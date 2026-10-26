@@ -568,6 +568,17 @@
      "pattern": "^[A-Z]{3}$"
     }
    },
+   "stepMinutes": {
+    "type": "integer",
+    "enum": [
+     15,
+     30,
+     60
+    ],
+    "nullable": true,
+    "x-ticvai-persistence-column": "integer",
+    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13)."
+   },
    "cartLeaseSeconds": {
     "type": "integer",
     "nullable": true,

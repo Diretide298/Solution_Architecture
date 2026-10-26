@@ -158,7 +158,7 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | storeAccountId | string (uuid) |  | (read-only) |
 | versionName | string |  | The marketing version, e.g. (read-only) |
 | buildNumber | integer |  | (read-only) |
-| status | enum (queued, building, built, failed, submitted, inReview, approved, rejected, …) | yes | queued to built or failed is the build service's; from submitted on it is read from the store with the client's credential, or stays built when the client uploads by hand. (read-only) |
+| status | enum (queued, building, built, failed, submitted, inReview, approved, rejected, …) | yes | queued to built or failed is the white-label jobs component's, in the workers host, from appBuild.requested (ADAM CR-106); from submitted on it is read from the store with the client's credential, or… (read-only) |
 | failureReason | string |  | (read-only; nullable) |
 | packageAssetRef | string (uuid) |  | The signed .ipa or .aab in the assets library, for the client to download and upload. (read-only; nullable) |
 | releaseNotes | LocalisedText |  | Keyed by ISO 639-1 code. |
@@ -277,7 +277,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | items[].storeAccountId | string (uuid) |  | (read-only) |
 | items[].versionName | string |  | The marketing version, e.g. (read-only) |
 | items[].buildNumber | integer |  | (read-only) |
-| items[].status | enum (queued, building, built, failed, submitted, inReview, approved, rejected, …) | yes | queued to built or failed is the build service's; from submitted on it is read from the store with the client's credential, or stays built when the client uploads by hand. (read-only) |
+| items[].status | enum (queued, building, built, failed, submitted, inReview, approved, rejected, …) | yes | queued to built or failed is the white-label jobs component's, in the workers host, from appBuild.requested (ADAM CR-106); from submitted on it is read from the store with the client's credential, or… (read-only) |
 | items[].failureReason | string |  | (read-only; nullable) |
 | items[].packageAssetRef | string (uuid) |  | The signed .ipa or .aab in the assets library, for the client to download and upload. (read-only; nullable) |
 | items[].releaseNotes | LocalisedText |  | Keyed by ISO 639-1 code. |
@@ -303,6 +303,8 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 
 **Builds the tenant's app from a published configuration (decided 24 September, M24-08).** The build-time parts (app icons, splash, custom fonts, wallet and payment integrations: `ChangeScope` `buildTime`) come from the version named, or the current one; the intro video is streamed and needs no build. Signed for the client's own account and bundle id, never TICVAI's. Accepted as `queued`; the package is downloaded from `getAppBuild` for the client to upload, or submitted with the client's API credential when one is recorded and `submitToStore` is true. **Refused with 409** when the store's account is not recorded (`setStoreAccounts`), when no version has been published, or while a build for the same platform is running.
 
+**What this call does, and what the white-label jobs component does** (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012). This call stores the `AppBuild` `queued` and writes `appBuild.requested` to the outbox in the same transaction, and answers `202`. A `configVersion` that is not a published `ConfigVersion.version` is refused `409` `version-not-published`. **At most one build per platform is `queued` or `building`**, under a unique index on `platform` for those statuses: a second request, however close, is `409` `app-build-in-progress`. The white-label jobs component, in the workers host, consumes the event, builds and signs the package from the version's snapshot, stores it in Assets (`packageAssetRef`), and moves the build `queued` -> `building` -> `built` or `failed`; with `submitToStore` it submits it with the client's recorded credential and follows the store from `submitted` on.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_PUBLISH` |
@@ -312,7 +314,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.app_build`, `whitelabel.config_version`, `whitelabel.store_account` |
-| Writes | `cache:idempotency`, `whitelabel.app_build` |
+| Writes | `cache:idempotency`, `platform.outbox`, `whitelabel.app_build` |
 | Called by | CMS-104 |
 
 **Parameters**
@@ -340,7 +342,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | storeAccountId | string (uuid) |  | (read-only) |
 | versionName | string |  | The marketing version, e.g. (read-only) |
 | buildNumber | integer |  | (read-only) |
-| status | enum (queued, building, built, failed, submitted, inReview, approved, rejected, …) | yes | queued to built or failed is the build service's; from submitted on it is read from the store with the client's credential, or stays built when the client uploads by hand. (read-only) |
+| status | enum (queued, building, built, failed, submitted, inReview, approved, rejected, …) | yes | queued to built or failed is the white-label jobs component's, in the workers host, from appBuild.requested (ADAM CR-106); from submitted on it is read from the store with the client's credential, or… (read-only) |
 | failureReason | string |  | (read-only; nullable) |
 | packageAssetRef | string (uuid) |  | The signed .ipa or .aab in the assets library, for the client to download and upload. (read-only; nullable) |
 | releaseNotes | LocalisedText |  | Keyed by ISO 639-1 code. |
@@ -356,7 +358,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 |---|---|---|
 | 202 |  | Queued |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 409 |  | No store account for the platform, nothing published yet, or a build for the platform already running; the problem says which |
+| 409 |  | No store account for the platform, nothing published yet, a build for the platform already queued or building, or a configVersion that is not published (ADAM CR-106); the problem says which |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setStoreAccounts
@@ -785,7 +787,7 @@ Removed from the working draft; guests keep the published copy until the next pu
 The flows this venue has picked, each with its steps in the venue's order. Draft rows: guests read the published copy through `getPublishedBookingFlow` (decided 29 September, W12).
 
 
-**Order.** Newest first, by `updatedAt` descending, then by `id`.
+**Order.** Newest first, by `updatedAt` descending, then by `id`. Where `updatedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -1086,6 +1088,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 
 **Build-time.** Icons are baked into the binary, so a change here does not reach guests until the next store release. The response says whether a rebuild is needed (`requiresRebuild`) and which icon is currently live (`liveVersion`), so nobody expects an icon change to appear tomorrow. The sizes generated for each platform are listed in `derived`.
 Source is a single 1024×1024 PNG without transparency; derived sizes are generated.
+**Asked of Assets, answered pending** (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012). The transparency check reads the source's `MediaAsset.hasTransparency`, which Assets records from the image's alpha channel when the upload completes; `true` is `400` `icon-has-transparency`. This call stores the source and returns every derived size in `derived` in the same shape, each entry pending: `platform` and `size` set, `assetRef` absent. The renditions are asked of Assets after the write (`requestMediaRendition`, one per size) by the white-label jobs component, which fills each `assetRef` when Assets has made it; this call does not wait for them. Nothing on screen changes shape. Kept so by the lead (r10 question 27, 25 October 2026; CHG-R10TEN-022): `requestMediaRendition` is built in Block B, and this Block A operation does not call it.
 **Generated: the iOS and Android store sets, plus web favicons (decided 28 September, audit R163).** iOS: 1024 (App Store), 180, 167, 152, 120, 87, 80, 76, 60, 58, 40, 29 and 20 px. Android: 512 (Play Store), 432 adaptive foreground, 192, 144, 96, 72 and 48 px. Web: 16, 32 and 48 px favicons, the 180 px Apple touch icon, and 192 and 512 px manifest icons. The web icons are runtime and reach guests with the publish; the store sets need a release.
 
 |  |  |
@@ -2072,7 +2075,7 @@ A `published` choice is unpublished first, or 409.
 **A guest screen reads `listPublishedContentPages`** (decided 2 October, GFIX-2), which needs no session: help and accessibility pages are public.
 
 
-**Order.** Sorted by `sortOrder` ascending, then by `id`.
+**Order.** Sorted by `sortOrder` ascending, then by `id`. Where `sortOrder` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -2131,7 +2134,7 @@ A `published` choice is unpublished first, or 409.
 Drafts, AI suggestions awaiting review and the published one (decided 29 September, rev 3 REV3-11). Filter by `status` or `source` to show the suggestions waiting for a person.
 
 
-**Order.** Newest first, by `updatedAt` descending, then by `id`.
+**Order.** Newest first, by `updatedAt` descending, then by `id`. Where `updatedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -3120,6 +3123,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 **`GET /landing-page-templates`**: The landing-page templates TICVAI provides
 
 **For a tenant without its own landing page** (Chinmay, 2 October, batch 2 #41; CHG-CSA-037). One complete home page per Site Builder preset (`SiteSetupProgress.presetKey`): its sections, their order, card counts and animations, ordered by `presetKey`, then `templateKey`. Picking one in the page builder writes it as the draft `HomepageLayout` with its `templateKey`; nothing is published until the tenant publishes.
+Where `presetKey` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -3170,7 +3174,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 **`PUT /tenant-config/homepage`**: Set homepage section order
 
 The drag-and-drop builder. Sections are an ordered list; the order here is the order on the guest's home screen.
-**A section whose module is disabled is refused (400)**, by the mapping on `HomepageSectionKind`, which is proposed, client to correct (audit R163).
+**A section whose module is disabled is refused (400)**, by the mapping on `HomepageSectionKind`, which is proposed, client to correct (audit R163). A module with no `module_enablement` row in the draft is not enabled, so its section is refused the same way; this call keeps the module's `referenced_by` entries `homepageSection:<sectionId>`, replacing only those, in the same transaction as the sections (ADAM CR-230, the rule `setNavigation` follows; CHG-R10TEN-003).
 **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation; registered as an AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
 
 |  |  |
@@ -3244,6 +3248,8 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 
 **`GET /tenant-config/features`**: Read tenant feature toggles
 
+**Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -3270,6 +3276,7 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 
 Shows which modules the tenant has licensed and which are enabled. A module that is not licensed cannot be enabled, so the two are returned together.
 **`isLicensed` uses the map on `ModuleKey`** (common.yaml; R8 blocker fix, IDENTITY-C31): a feature here is licensed when its `x-ticvai-licence-module` is in the tenant's `LicencePosition.licensedModules`. **A platform operator sends `X-Tenant-Id`** (`TenantId`; APPROVALS-TENANCY-C44) to read a tenant's enablement from the cell that holds many tenants; the cell address is `Tenant.cellHost`.
+**Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -3346,6 +3353,10 @@ Several are build-time on native apps and are flagged accordingly. A tenant enab
 Enabling a language does not translate existing content. The response reports how many content items lack a version in each newly enabled language, so a tenant does not publish a half-translated app.
 **Any language, not only English and Arabic** (Chinmay, 2 October, workbook Q145; CHG-CSA-039): a venue adds its own interface languages here (ADM-018 for platform staff under a grant, CMS-011 for the tenant). The response's `uiStringCoverage` says how far the interface strings reach in each.
 
+**Where the two reports come from, decided 25 October 2026** (ADAM CR-194, option A; CHG-R10TEN-010):
+- **`translationGaps`** counts the WhiteLabel content the tenant translates, all of it this module's own: content pages (`whitelabel.content_page`), banners (`whitelabel.banner`), promo blocks (`whitelabel.promo_block`), FAQ entries (`whitelabel.faq_entry`) and policies (`whitelabel.policy`). An item is missing for a language when a `LocalisedText` of it has no value for that language. One entry per enabled language with any item missing: `missingCount` the items missing, `areas` the kinds they are, from the closed list `contentPages`, `banners`, `promoBlocks`, `faqs`, `policies`. Products are not counted here: their texts are Catalogue's, and Catalogue reports them.
+- **`uiStringCoverage`**: English and Arabic are `complete` (100). Any other language is read from `whitelabel.ui_string_pack`, the row a string pack writes when it ships: its `coveragePercent` and `status`. A language with no row is `missing` at 0.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -3354,7 +3365,7 @@ Enabling a language does not translate existing content. The response reports ho
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `whitelabel.tenant_config` |
+| Reads | `cache:idempotency`, `whitelabel.banner`, `whitelabel.content_page`, `whitelabel.faq_entry`, `whitelabel.policy`, `whitelabel.promo_block`, `whitelabel.tenant_config`, `whitelabel.ui_string_pack` |
 | Writes | `cache:idempotency`, `whitelabel.tenant_config` |
 | Called by | ADM-018, CMS-011 |
 
@@ -3385,7 +3396,7 @@ Enabling a language does not translate existing content. The response reports ho
 | translationGaps | array of object |  | Content lacking a version in an enabled language. (read-only) |
 | translationGaps[].language | string |  |  |
 | translationGaps[].missingCount | integer |  |  |
-| translationGaps[].areas | array of string |  |  |
+| translationGaps[].areas | array of string |  | The kinds of the missing items, from the closed list contentPages, banners, promoBlocks, faqs, policies (ADAM CR-194). |
 
 **Responses**
 
@@ -3564,7 +3575,7 @@ The CMS link builder (CHG-CSA-037): given a target, the URL to paste on the tena
 | items[].target.eventId | string (uuid) |  |  |
 | items[].target.date | string (date) |  | Used when kind is bookingFlow, the date the flow opens on. (nullable) |
 | items[].target.url | string |  |  |
-| items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
+| items[].isVisible | boolean | yes | At most five may be visible when kind is bottomNavigation; the rest overflow. |
 | items[].sortOrder | integer | yes |  |
 | buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
 | buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
@@ -3637,6 +3648,12 @@ The CMS link builder (CHG-CSA-037): given a target, the URL to paste on the tena
 Items pointing at a disabled module are refused. A navigation entry that leads nowhere is worse than an absent one.
 **Three editors, each saved on its own** (Chinmay, 2 October, workbook Q49; DI-285; CHG-CSA-037): the tab bar is this operation (`kind` `bottomNavigation`); the web header is `setHeader` and the web footer `setFooter`. Saving one never rewrites the others.
 Bottom navigation is capped at five visible items; the remainder moves to the overflow menu.
+**Five rules, as built** (ADAM CR-230, option A, decided 25 October 2026; CHG-R10TEN-003):
+1. **A new draft's version is `"draft"`.** Where this call creates the tenant's draft `tenant_config` row, its `version` is the text `draft`.
+2. **`module_enablement.referenced_by` entries are `navigationItem:<itemId>`** for this operation's links (`setHomepageLayout` writes `homepageSection:<sectionId>` for its own). This call replaces only the `navigationItem:` entries, in the same transaction as the items, and leaves every other entry as it is.
+3. **A module with no `module_enablement` row in the draft is not enabled:** an item pointing at it is refused `400` `module-disabled`, as an item pointing at a disabled module is.
+4. **Which links point at a module:** a target of kind `module` points at its `moduleKey`; a target of kind `appSection` with `appSection` `plan` points at `visitPlanner`. No other `appSection` needs a module.
+5. **The five-visible cap applies to `kind` `bottomNavigation` only.** A `drawer` or `tabs` set may mark any number of its items visible.
 **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation; registered as an AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
 
 |  |  |
@@ -3677,7 +3694,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | items[].target.eventId | string (uuid) |  |  |
 | items[].target.date | string (date) |  | Used when kind is bookingFlow, the date the flow opens on. (nullable) |
 | items[].target.url | string |  |  |
-| items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
+| items[].isVisible | boolean | yes | At most five may be visible when kind is bottomNavigation; the rest overflow. |
 | items[].sortOrder | integer | yes |  |
 | buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
 | buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
@@ -3702,7 +3719,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | items[].target.eventId | string (uuid) |  |  |
 | items[].target.date | string (date) |  | Used when kind is bookingFlow, the date the flow opens on. (nullable) |
 | items[].target.url | string |  |  |
-| items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
+| items[].isVisible | boolean | yes | At most five may be visible when kind is bottomNavigation; the rest overflow. |
 | items[].sortOrder | integer | yes |  |
 | buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
 | buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
@@ -3713,7 +3730,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
-| 400 |  | An item targets a disabled module, or more than five are marked visible |
+| 400 |  | An item targets a module that is disabled or has no enablement row (module-disabled), or more than five items of a bottomNavigation set are marked visible (too-many-visible-items; ADAM CR-230) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -3853,7 +3870,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | navigation.items[].label | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | navigation.items[].icon | string |  |  |
 | navigation.items[].target | LinkTarget | yes |  |
-| navigation.items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
+| navigation.items[].isVisible | boolean | yes | At most five may be visible when kind is bottomNavigation; the rest overflow. |
 | navigation.items[].sortOrder | integer | yes |  |
 | navigation.buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
 | navigation.buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
@@ -3948,7 +3965,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | languages.translationGaps | array of object |  | Content lacking a version in an enabled language. (read-only) |
 | languages.translationGaps[].language | string |  |  |
 | languages.translationGaps[].missingCount | integer |  |  |
-| languages.translationGaps[].areas | array of string |  |  |
+| languages.translationGaps[].areas | array of string |  | The kinds of the missing items, from the closed list contentPages, banners, promoBlocks, faqs, policies (ADAM CR-194). |
 | accessibility | AccessibilitySettings |  | BL-065, 2.1.27. |
 | accessibility.largeTextAvailable | boolean |  | (default True) |
 | accessibility.highContrastAvailable | boolean |  | (default True) |
@@ -4267,7 +4284,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | navigation.items[].label | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | navigation.items[].icon | string |  |  |
 | navigation.items[].target | LinkTarget | yes |  |
-| navigation.items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
+| navigation.items[].isVisible | boolean | yes | At most five may be visible when kind is bottomNavigation; the rest overflow. |
 | navigation.items[].sortOrder | integer | yes |  |
 | navigation.buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
 | navigation.buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
@@ -4309,7 +4326,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | languages.translationGaps | array of object |  | Content lacking a version in an enabled language. (read-only) |
 | languages.translationGaps[].language | string |  |  |
 | languages.translationGaps[].missingCount | integer |  |  |
-| languages.translationGaps[].areas | array of string |  |  |
+| languages.translationGaps[].areas | array of string |  | The kinds of the missing items, from the closed list contentPages, banners, promoBlocks, faqs, policies (ADAM CR-194). |
 | updatedAt | string (date-time) |  |  |
 | isInMaintenance | boolean |  | Written by setMaintenanceMode; read by getTenantAppStatus. (default False) |
 | maintenanceMessage | object |  | The message on the branded maintenance screen. (nullable) |
@@ -4370,6 +4387,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | venueId | query |  | string (uuid) | Staff, the rows of this venue only; guest, the venue being browsed, so its rows win over the tenant's |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -4396,6 +4414,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Analytics providers |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -4410,6 +4429,12 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 
 **Cheap and lossy by design.** Answers 202 without waiting for the publish; a batch dropped by the rate limit (per session and per address, `429`) is not retried. Nothing a guest sees depends on it. The address is hashed at the edge with the same tenant key as the `ipHash` `ai.scoreTransactionRisk` receives, and added to the event; the runtime never sends it.
 
+**The key, the edge fields and the batch, decided** (ADAM CR-107, option 1, accepted 15 October 2026, on ADR-0063; CHG-R10TEN-013):
+- **"The tenant key" is the tenant's blind-index key** (ADR-0063): every hash here is HMAC-SHA-256 under it, written as 64 lowercase hex characters, computed through the kernel's blind-index call, so no module calls Key Vault itself. White-label (`sessionRef`, `deviceIdHash`), the edge (`ipHash`) and Orders' checkout (the `sessionRef` it passes to `ai.scoreTransactionRisk`) use the same key and get the same value. `sessionRef` and `deviceIdHash` arrive as the browser's SHA-256, 64 lowercase hex; anything else is the `400` for an unhashed id.
+- **The edge fields come from three headers the edge sets**: `X-Edge-Ip-Hash` (the client address under the tenant key), `X-Edge-Ip-Country` (ISO 3166-1 alpha-2) and `X-Edge-Ua-Family` (browser or app family and major version). The edge strips all three from inbound client traffic before it sets them, so a caller cannot forge them; a header that is absent leaves its field out of the event.
+- **`batchEndedAt` is the time the server received the batch.**
+- **De-duplicated on `batchId`, with no `Idempotency-Key`.** A beacon cannot set headers, so the operation takes none; a batch whose `batchId` was already accepted is answered `202` and not published again.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -4418,23 +4443,17 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency` |
-| Writes | `cache:idempotency`, `platform.outbox` |
+| Reads | - |
+| Writes | `platform.outbox` |
 | Called by | GST-001, WEB-001 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `WhiteLabelStorefrontSessionBatch`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | batchId | string (uuid) | yes | UUIDv7 minted by the runtime; a retried beacon repeats it. |
-| sessionRef | string | yes | The runtime's own session id, SHA-256 hashed in the browser; hashed again with the tenant key on arrival and published as storefront.sessionEvent.sessionRef. (max length 128) |
-| deviceIdHash | string |  | (max length 128; nullable) |
+| sessionRef | string | yes | The runtime's own session id, SHA-256 hashed in the browser (64 lowercase hex); hashed again with the tenant's blind-index key on arrival (HMAC-SHA-256, ADR-0063) and published as storefront.sessionE… (max length 128; pattern ^[0-9a-f]{64}$) |
+| deviceIdHash | string |  | The runtime's own device id, SHA-256 hashed in the browser (64 lowercase hex); hashed again with the tenant's blind-index key on arrival (ADAM CR-107). (max length 128; pattern ^[0-9a-f]{64}$; nullable) |
 | surface | enum (guestWeb, guestApp) | yes |  |
 | venueId | string (uuid) |  | (nullable) |
 | sessionStartedAt | string (date-time) | yes |  |
@@ -4652,6 +4671,8 @@ A short-lived link rendering the working draft as the guest app would, for a cho
 **Also the PDF ticket and the Wallet passes, in Block A** (Chinmay, 2 October, workbook Q151; CHG-CSA-041). `outputs` asks for them; each is rendered from the draft's branding and the ticket and pass templates, for `productId` where one is named (a product's own ticket, as the catalogue's publish step needs, DI-444) or a sample ticket otherwise. **Simulate, then publish** (workbook Q156, CHG-CSA-042): this is the simulate step.
 **Where the preview is kept** (R8 blocker IDENTITY-C63): nothing is stored in a table. The rendered draft's reference is held in Redis under `cache:preview:{tenantId}:{previewId}` until `expiresAt` (its time to live), and `url` is served from that entry; after it expires the link answers 404. The read that serves the link is requested of the surface lane (`GET /tenant-config/preview/{previewId}`).
 
+**Rendered by the white-label jobs component, at a named route** (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012). This call writes the cache entry and `preview.requested` to the outbox, and answers `201`. The jobs component, in the workers host, consumes it and renders the draft for the platform and language asked, with the `outputs` (the PDF ticket and the Wallet passes from the ticket and pass templates), writing their references into the same cache entry. `url` is the route `https://<the tenant's platform subdomain>/previews/{previewId}`, served by the guest web host from that entry until `expiresAt`; `getPreview` reads the entry back.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -4661,7 +4682,7 @@ A short-lived link rendering the working draft as the guest app would, for a cho
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
-| Writes | `cache:idempotency`, `whitelabel.tenant_config` |
+| Writes | `cache:idempotency`, `platform.outbox`, `whitelabel.tenant_config` |
 | Called by | ADM-016, CMS-006, CMS-012, CMS-014 |
 
 **Parameters**
@@ -4761,6 +4782,8 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 **For a tenant that hosts its own site** (Chinmay, 2 October, workbook Q144; CHG-CSA-038). Builds a downloadable package of the published configuration: the storefront build, its configuration snapshot and the hosting instructions. A job: answers 202, followed with `getSitePackage`. Only from a published version; the working draft never leaves.
 **The job** (R8 blocker IDENTITY-C63): it runs in the workers host, reads the version's `whitelabel.config_version` snapshot, builds the package and stores it in the assets store; the package moves `building` -> `ready` (with its download link, which expires 24 hours after it is issued) or `failed` (with the reason). Nothing else is stored.
 
+**Through an event, as an asset** (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012): this call stores the `SitePackage` `building` and writes `sitePackage.requested` to the outbox in the same transaction; the job is the white-label jobs component's, which consumes it. The package is stored in the Assets library, named by `packageAssetRef`; `downloadUrl` is a short-lived link to it. A `version` that does not exist or is not published is refused `409` `version-not-published`.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_PUBLISH` |
@@ -4770,7 +4793,7 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.config_version`, `whitelabel.site_package` |
-| Writes | `cache:idempotency`, `whitelabel.site_package` |
+| Writes | `cache:idempotency`, `platform.outbox`, `whitelabel.site_package` |
 | Called by | ADM-016, CMS-014 |
 
 **Parameters**
@@ -4792,6 +4815,7 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 | id | string (uuid) | yes | (read-only) |
 | version | string |  |  |
 | status | enum (building, ready, failed) | yes |  |
+| packageAssetRef | string (uuid) |  | The package in the assets library, set when ready (ADAM CR-106; CHG-R10TEN-012). (read-only; nullable) |
 | downloadUrl | string |  | Short-lived; present when ready. (nullable) |
 | expiresAt | string (date-time) |  | (nullable) |
 | requestedByPrincipalId | string (uuid) |  | (read-only) |
@@ -4804,7 +4828,7 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Building |
-| 409 |  | Nothing is published yet (nothing-published). |
+| 409 |  | Nothing is published yet (nothing-published), or the version named is not a published version (version-not-published, ADAM CR-106). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getPublishReviewPolicy
@@ -4875,6 +4899,7 @@ The package job's status and, once `ready`, a short-lived download link (CHG-CSA
 | id | string (uuid) | yes | (read-only) |
 | version | string |  |  |
 | status | enum (building, ready, failed) | yes |  |
+| packageAssetRef | string (uuid) |  | The package in the assets library, set when ready (ADAM CR-106; CHG-R10TEN-012). (read-only; nullable) |
 | downloadUrl | string |  | Short-lived; present when ready. (nullable) |
 | expiresAt | string (date-time) |  | (nullable) |
 | requestedByPrincipalId | string (uuid) |  | (read-only) |
@@ -5254,7 +5279,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | navigation.items[].label | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | navigation.items[].icon | string |  |  |
 | navigation.items[].target | LinkTarget | yes |  |
-| navigation.items[].isVisible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
+| navigation.items[].isVisible | boolean | yes | At most five may be visible when kind is bottomNavigation; the rest overflow. |
 | navigation.items[].sortOrder | integer | yes |  |
 | navigation.buyButton | object |  | The persistent Buy tickets button (decided 29 September, MOB-2). (nullable) |
 | navigation.buyButton.style | enum (raised, floating, flat, hidden) |  | raised sits in the centre of the tab bar, as the v4 prototype shows; hidden turns it off. (default raised) |
@@ -5296,7 +5321,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | languages.translationGaps | array of object |  | Content lacking a version in an enabled language. (read-only) |
 | languages.translationGaps[].language | string |  |  |
 | languages.translationGaps[].missingCount | integer |  |  |
-| languages.translationGaps[].areas | array of string |  |  |
+| languages.translationGaps[].areas | array of string |  | The kinds of the missing items, from the closed list contentPages, banners, promoBlocks, faqs, policies (ADAM CR-194). |
 | updatedAt | string (date-time) |  |  |
 | isInMaintenance | boolean |  | Written by setMaintenanceMode; read by getTenantAppStatus. (default False) |
 | maintenanceMessage | object |  | The message on the branded maintenance screen. (nullable) |
@@ -5761,6 +5786,10 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 **Refused where another tenant already holds it** — with no detail about who, because telling one tenant that another owns a hostname is telling them something about a customer.
 **A CNAME to the Front Door endpoint is the default** (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043): the response lists every record to publish (`dnsRecords`: the TXT `_dnsauth` validation and the CNAME), and Front Door issues a managed certificate. `routing` asks for a delegated subdomain instead; the apex only on request. The tenant's platform subdomain (`getPlatformSubdomain`) keeps working throughout.
 
+**The guest app has no domain of its own** (ADAM CR-105, the lead's answer to r10 question 4, 25 October 2026; CHG-R10TEN-020). It is served on the tenant's `guestWeb` domain, where its app links are published (`readiness.appLinks`). A claim of `kind` `guestApp` is stored and mapped as `guestWeb` (channel `guestWeb` in `setTenantDomainMapping`); the value stays in the enum so a client built at r1 still validates.
+
+**What a claim checks and starts** (ADAM CR-105, option 1, accepted 15 October 2026; CHG-R10TEN-011). A `hostname` that is not a valid lower-case host name (labels of letters, digits and hyphens, at most 253 characters, at least one dot) is refused `400` `invalid-hostname`; a bare domain (an apex) sent without `routing` `apex` is refused `400` `apex-not-requested`. The tenant may hold a hostname once among its claims that are not `revoked` (`409` `domain-already-claimed`), and across tenants as above. The claim is stored `pending` with `validationExpiresAt` set 7 days ahead (the validation window, a proposed default the client can correct). Nothing here issues a certificate: issuing, renewal and revalidation are the white-label domain job's (see `verifyCustomDomain`).
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -5771,9 +5800,9 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | Config scope | tenant |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant`, `whitelabel.custom_domain` |
-| Writes | `cache:idempotency`, `whitelabel.custom_domain` |
+| Writes | `cache:idempotency`, `platform.outbox`, `whitelabel.custom_domain` |
 | Called by | ADM-017, BO-835, CMS-017 |
-| State model | CustomDomain ([states/custom-domain.yaml](../../../states/custom-domain.yaml)): created as `pending`; moves `verified` -> `issuing`, `issuing` -> `active`, `issuing` -> `failed`, `expired` -> `issuing` |
+| State model | CustomDomain ([states/custom-domain.yaml](../../../states/custom-domain.yaml)): created as `pending` |
 
 **Parameters**
 
@@ -5788,6 +5817,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | hostname | string | yes |  |
 | kind | enum (guestWeb, guestApp, partnerPortal, developerPortal) | yes |  |
 | verificationMethod | enum (dnsTxt, cname, httpFile) |  | (default dnsTxt) |
+| routing | enum (cname, delegatedSubdomain, apex) |  | How the hostname reaches TICVAI (CustomDomain.routing); apex is the only way to claim a bare domain (ADAM CR-105). (default cname) |
 
 **Response**: `CustomDomain`
 
@@ -5796,7 +5826,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | id | string (uuid) | yes |  |
 | tenantId | string (uuid) | yes |  |
 | hostname | string | yes |  |
-| kind | enum (guestWeb, guestApp, partnerPortal, developerPortal) |  |  |
+| kind | enum (guestWeb, guestApp, partnerPortal, developerPortal) |  | guestApp is stored as guestWeb: the guest app is served on the guestWeb domain and has no domain of its own (r10 question 4; CHG-R10TEN-020). |
 | status | enum (pending, verifying, verified, issuing, active, failed, expired, revoked) | yes |  |
 | verificationMethod | enum (dnsTxt, cname, httpFile) |  |  |
 | verificationToken | string |  | (read-only) |
@@ -5806,6 +5836,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | verificationRecord.value | string | yes | The record's value, CNAME target or file content. |
 | certificateExpiresAt | string (date-time) |  | Renewal is a job, not a reminder. (nullable) |
 | lastCheckedAt | string (date-time) |  | (nullable) |
+| validationExpiresAt | string (date-time) |  | When the validation window ends (ADAM CR-105, option 1; CHG-R10TEN-011): 7 days after claimCustomDomain or regenerateDomainToken issued the token (a proposed default the client can correct). (read-only; nullable) |
 | failureReason | string |  | (nullable) |
 | routing | enum (cname, delegatedSubdomain, apex) |  | How the hostname reaches TICVAI (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043). (default cname) |
 | dnsRecords | array of object |  | Every record the tenant must publish, with what is observed now (CHG-CSA-043): the TXT _dnsauth record, the CNAME, and CAA or NS where they apply. (read-only) |
@@ -5827,6 +5858,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Claimed, with the record to publish |
+| 400 |  | The hostname is not a valid host name (invalid-hostname), or is a bare domain claimed without routing apex (apex-not-requested; ADAM CR-105). |
 | 409 |  | Already claimed. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -5870,6 +5902,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 **`GET /tenant-domains`**: The domains this tenant has claimed
 
 **Status per domain, not just the hostname.** `pending`, `verifying`, `verified`, `issuing`, `active`, `failed`, `expired` or `revoked` (`states/custom-domain.yaml`) — a tenant looking at this screen is almost always looking because something is wrong. A certificate close to lapsing is an `active` domain with an early `certificateExpiresAt`; there is no separate status for it.
+**Order.** By `hostname`, then `id` (ADAM CR-105, option 1; CHG-R10TEN-011).
 
 |  |  |
 |---|---|
@@ -5895,7 +5928,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 
 **`POST /tenant-domains/{domainId}/token`**: Issue a new validation token
 
-**For a claim that timed out, or a revalidation that needs a fresh record** (CHG-CSA-043). Issues a new `_dnsauth` token, returns the records to publish again, and restarts the validation window. The old token stops validating.
+**For a claim that timed out, or a revalidation that needs a fresh record** (CHG-CSA-043). Issues a new `_dnsauth` token, returns the records to publish again, and restarts the validation window. The old token stops validating. The window is `validationExpiresAt`, set again 7 days ahead, and `revalidation` returns to `none` (ADAM CR-105; CHG-R10TEN-011).
 
 |  |  |
 |---|---|
@@ -5906,7 +5939,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.custom_domain` |
-| Writes | `cache:idempotency`, `whitelabel.custom_domain` |
+| Writes | `cache:idempotency`, `platform.outbox`, `whitelabel.custom_domain` |
 | Called by | ADM-017, CMS-017 |
 
 **Parameters**
@@ -5923,7 +5956,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | id | string (uuid) | yes |  |
 | tenantId | string (uuid) | yes |  |
 | hostname | string | yes |  |
-| kind | enum (guestWeb, guestApp, partnerPortal, developerPortal) |  |  |
+| kind | enum (guestWeb, guestApp, partnerPortal, developerPortal) |  | guestApp is stored as guestWeb: the guest app is served on the guestWeb domain and has no domain of its own (r10 question 4; CHG-R10TEN-020). |
 | status | enum (pending, verifying, verified, issuing, active, failed, expired, revoked) | yes |  |
 | verificationMethod | enum (dnsTxt, cname, httpFile) |  |  |
 | verificationToken | string |  | (read-only) |
@@ -5933,6 +5966,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | verificationRecord.value | string | yes | The record's value, CNAME target or file content. |
 | certificateExpiresAt | string (date-time) |  | Renewal is a job, not a reminder. (nullable) |
 | lastCheckedAt | string (date-time) |  | (nullable) |
+| validationExpiresAt | string (date-time) |  | When the validation window ends (ADAM CR-105, option 1; CHG-R10TEN-011): 7 days after claimCustomDomain or regenerateDomainToken issued the token (a proposed default the client can correct). (read-only; nullable) |
 | failureReason | string |  | (nullable) |
 | routing | enum (cname, delegatedSubdomain, apex) |  | How the hostname reaches TICVAI (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043). (default cname) |
 | dnsRecords | array of object |  | Every record the tenant must publish, with what is observed now (CHG-CSA-043): the TXT _dnsauth record, the CNAME, and CAA or NS where they apply. (read-only) |
@@ -5978,7 +6012,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.custom_domain` |
-| Writes | `cache:idempotency`, `whitelabel.custom_domain` |
+| Writes | `cache:idempotency`, `platform.outbox`, `whitelabel.custom_domain` |
 | Called by | ADM-017, CMS-017 |
 | State model | CustomDomain ([states/custom-domain.yaml](../../../states/custom-domain.yaml)): moves `active` -> `revoked`, `failed` -> `revoked`, `pending` -> `revoked` |
 
@@ -5994,6 +6028,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Code | Shape | Meaning |
 |---|---|---|
 | 204 |  | Released |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The only active domain for a live app. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -6004,6 +6039,8 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 **One primary domain per kind; the others redirect to it** (CHG-CSA-043). The domain must be `active`, or 409 `domain-not-active`. The tenant's platform subdomain redirects to the primary too, and is primary again when none is.
 **One mapping call per host** (r8, APPROVALS-TENANCY-C11): this sends one `setTenantDomainMapping` for the new primary; demoting the channel's other primary is the control plane consumer's, from the same event.
 
+**One primary per kind, kept by the database** (ADAM CR-105, option 1; CHG-R10TEN-011): this call sets `isPrimary` on this domain and clears it on the tenant's other domain of the same `kind`, in one transaction, under a unique index on `kind` where `isPrimary`; tenancy's routing row keeps one active primary per tenant and channel the same way.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -6013,7 +6050,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.custom_domain` |
-| Writes | `cache:idempotency`, `whitelabel.custom_domain` |
+| Writes | `cache:idempotency`, `platform.outbox`, `whitelabel.custom_domain` |
 | Called by | ADM-017, CMS-017 |
 
 **Parameters**
@@ -6030,7 +6067,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | id | string (uuid) | yes |  |
 | tenantId | string (uuid) | yes |  |
 | hostname | string | yes |  |
-| kind | enum (guestWeb, guestApp, partnerPortal, developerPortal) |  |  |
+| kind | enum (guestWeb, guestApp, partnerPortal, developerPortal) |  | guestApp is stored as guestWeb: the guest app is served on the guestWeb domain and has no domain of its own (r10 question 4; CHG-R10TEN-020). |
 | status | enum (pending, verifying, verified, issuing, active, failed, expired, revoked) | yes |  |
 | verificationMethod | enum (dnsTxt, cname, httpFile) |  |  |
 | verificationToken | string |  | (read-only) |
@@ -6040,6 +6077,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | verificationRecord.value | string | yes | The record's value, CNAME target or file content. |
 | certificateExpiresAt | string (date-time) |  | Renewal is a job, not a reminder. (nullable) |
 | lastCheckedAt | string (date-time) |  | (nullable) |
+| validationExpiresAt | string (date-time) |  | When the validation window ends (ADAM CR-105, option 1; CHG-R10TEN-011): 7 days after claimCustomDomain or regenerateDomainToken issued the token (a proposed default the client can correct). (read-only; nullable) |
 | failureReason | string |  | (nullable) |
 | routing | enum (cname, delegatedSubdomain, apex) |  | How the hostname reaches TICVAI (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043). (default cname) |
 | dnsRecords | array of object |  | Every record the tenant must publish, with what is observed now (CHG-CSA-043): the TXT _dnsauth record, the CNAME, and CAA or NS where they apply. (read-only) |
@@ -6073,6 +6111,13 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 **Connected means the edge resolves it** (r8, APPROVALS-TENANCY-C11): after the mapping is sent (`setTenantDomainMapping`, which reaches the control plane as `tenantDomain.mapped`), the domain is shown connected only once `resolveTenantHost` answers the hostname with this tenant; a `tenantDomain.rejected` (hostname taken by another tenant) shows the refusal instead.
 **Retried by a job rather than by the tenant.** DNS propagation takes hours and a tenant clicking *verify* every ten minutes is a tenant who will give up before it resolves.
 
+**The white-label domain job** (ADAM CR-105, option 1, accepted 15 October 2026; CHG-R10TEN-011). This call does the DNS check once, now: it moves a `pending` or `failed` domain to `verifying`, and to `verified` or `failed` by what DNS answers. Everything after it is the domain job's, in the workers host, every five minutes (a proposed default):
+- **verify**: a domain still `verifying` is checked again (the `_dnsauth` TXT record and the CNAME, or the NS delegation, through a public DNS resolver) until it verifies, or until `validationExpiresAt` passes, when it is `failed` with `revalidation` `timedOut` (`regenerateDomainToken` starts it again);
+- **issue**: a `verified` domain is added to the cell's Azure Front Door profile as a custom domain with a Front Door managed certificate and associated with the tenant's route (`issuing`); the job reads Front Door's validation and deployment state until it is `active` (with `certificateExpiresAt`) or `failed` (with `failureReason`);
+- **renew**: Front Door renews a managed certificate itself; a domain whose certificate lapsed anyway is `expired`, and the job requests it again (`issuing`);
+- **revalidate**: an `active` domain's records are re-checked; one that stopped resolving to us is `pendingRevalidation` and keeps serving, and when that times out the job calls tenancy `setTenantDomainMapping` with `status` `detached` and sets `isCnameLost`.
+The state model (`states/custom-domain.yaml`) credits these transitions to the job, not to `claimCustomDomain`.
+
 **Verification routes the hostname** (system-design review SD-021, 29 September; applied 30 September). In the same step that marks the domain verified, it calls tenancy `setTenantDomainMapping`, which writes `control.tenant_domain` (hostname, tenant, cell, database, channel, status `active`) so the edge's `resolveTenantHost` can route the host. Until that write succeeds the domain is not reported live. A hostname already routed to another tenant is refused 409 `hostname-taken` and nothing is issued.
 
 |  |  |
@@ -6084,7 +6129,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.custom_domain` |
-| Writes | `cache:idempotency`, `whitelabel.custom_domain` |
+| Writes | `cache:idempotency`, `platform.outbox`, `whitelabel.custom_domain` |
 | Called by | ADM-017, CMS-017 |
 | State model | CustomDomain ([states/custom-domain.yaml](../../../states/custom-domain.yaml)): moves `pending` -> `verifying`, `verifying` -> `verified`, `verifying` -> `failed`, `failed` -> `verifying` |
 
@@ -6102,7 +6147,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | id | string (uuid) | yes |  |
 | tenantId | string (uuid) | yes |  |
 | hostname | string | yes |  |
-| kind | enum (guestWeb, guestApp, partnerPortal, developerPortal) |  |  |
+| kind | enum (guestWeb, guestApp, partnerPortal, developerPortal) |  | guestApp is stored as guestWeb: the guest app is served on the guestWeb domain and has no domain of its own (r10 question 4; CHG-R10TEN-020). |
 | status | enum (pending, verifying, verified, issuing, active, failed, expired, revoked) | yes |  |
 | verificationMethod | enum (dnsTxt, cname, httpFile) |  |  |
 | verificationToken | string |  | (read-only) |
@@ -6112,6 +6157,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | verificationRecord.value | string | yes | The record's value, CNAME target or file content. |
 | certificateExpiresAt | string (date-time) |  | Renewal is a job, not a reminder. (nullable) |
 | lastCheckedAt | string (date-time) |  | (nullable) |
+| validationExpiresAt | string (date-time) |  | When the validation window ends (ADAM CR-105, option 1; CHG-R10TEN-011): 7 days after claimCustomDomain or regenerateDomainToken issued the token (a proposed default the client can correct). (read-only; nullable) |
 | failureReason | string |  | (nullable) |
 | routing | enum (cname, delegatedSubdomain, apex) |  | How the hostname reaches TICVAI (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043). (default cname) |
 | dnsRecords | array of object |  | Every record the tenant must publish, with what is observed now (CHG-CSA-043): the TXT _dnsauth record, the CNAME, and CAA or NS where they apply. (read-only) |
@@ -6133,6 +6179,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Verified, or the reason it is not yet |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | The hostname is already routed to another tenant (hostname-taken, from tenancy setTenantDomainMapping, SD-021); nothing was verified or issued. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -6215,6 +6262,8 @@ BL-172. **The CMS modelled configuration and not authoring** — a marketer coul
 **Added 4 October 2026 (CHG-FXC-011; CMS-007: the builder could create and publish a block and not load one).** The blocks of one page (`pageKey`, a content page's id or a homepage section key), ordered by `position`, drafts and published alike.
 
 **Statuses.** Every `status` is returned, ended ones included (`archived`, `expired`); a screen that shows only live rows filters on `status` itself.
+
+Where `position` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -6507,7 +6556,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | store_account_id | uuid | no |  |
 | version_name | text | no | The marketing version, e.g. |
 | build_number | integer | no |  |
-| status | text | yes | queued to built or failed is the build service's; from submitted on it is read from the store with the client's credential, or stays built when the client uploads by hand. |
+| status | text | yes | queued to built or failed is the white-label jobs component's, in the workers host, from appBuild.requested (ADAM CR-106); from submitted on it is read from the store with the client's credential, or… |
 | failure_reason | text | no |  |
 | package_asset_ref | uuid | no | The signed .ipa or .aab in the assets library, for the client to download and upload. |
 | release_notes | jsonb | no |  |
@@ -6624,13 +6673,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | tenant_id | uuid | yes |  |
 | hostname | text | yes |  |
-| kind | text | no |  |
+| kind | text | no | guestApp is stored as guestWeb: the guest app is served on the guestWeb domain and has no domain of its own (r10 question 4; CHG-R10TEN-020). |
 | status | text | yes |  |
 | verification_method | text | no |  |
 | verification_token | text | no |  |
 | verification_record | jsonb | no | The record the tenant must publish, which claimCustomDomain promises and the claim had nowhere to hold. |
 | certificate_expires_at | timestamptz | no | Renewal is a job, not a reminder. |
 | last_checked_at | timestamptz | no |  |
+| validation_expires_at | timestamptz | no | When the validation window ends (ADAM CR-105, option 1; CHG-R10TEN-011): 7 days after claimCustomDomain or regenerateDomainToken issued the token (a proposed default the client can correct). |
 | failure_reason | text | no |  |
 | routing | text | no | How the hostname reaches TICVAI (Chinmay, 2 October: "subdomain plus CNAME"; CHG-CSA-043). |
 | dns_records | jsonb | no | Every record the tenant must publish, with what is observed now (CHG-CSA-043): the TXT _dnsauth record, the CNAME, and CAA or NS where they apply. |
@@ -6798,7 +6848,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | label | jsonb | yes |  |
 | icon | text | no |  |
 | target | jsonb | yes |  |
-| is_visible | boolean | yes | At most five may be visible in bottom navigation; the rest overflow. |
+| is_visible | boolean | yes | At most five may be visible when kind is bottomNavigation; the rest overflow. |
 | sort_order | integer | yes |  |
 
 ### `whitelabel.policy`
@@ -6849,6 +6899,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | version | text | no |  |
 | status | text | yes |  |
+| package_asset_ref | uuid | no | The package in the assets library, set when ready (ADAM CR-106; CHG-R10TEN-012). |
 | download_url | text | no | Short-lived; present when ready. |
 | expires_at | timestamptz | no |  |
 | requested_by_principal_id | uuid | no |  |
@@ -6919,6 +6970,16 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes | Synthesised key. |
 | homepage_section_id | uuid | no | Points at whitelabel.homepage_section. |
 | navigation_item_id | uuid | no | Points at whitelabel.navigation_item. |
+
+### `whitelabel.ui_string_pack`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| language | text | yes | The ISO 639-1 language the pack is for. |
+| coverage_percent | numeric | yes | The share of the interface strings the pack translates. |
+| status | text | yes | complete once the pack is reviewed; draft while it is AI-translated and not yet reviewed. |
+| scope_path | text | no | The partition key (ADR-0005). |
 
 ## Not in the first release
 

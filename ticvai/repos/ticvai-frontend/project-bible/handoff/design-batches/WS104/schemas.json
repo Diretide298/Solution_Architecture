@@ -941,6 +941,43 @@
     "readOnly": true,
     "description": "For a translation draft, the proposed text; null otherwise. `payload` stays the request body of the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40)."
    },
+   "confidence": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment (`proposeWalkways`), the model's confidence in it (`WalkwayProposal.confidence`); null on every other proposal (ADAM CR-207, CHG-R10ORD-013)."
+   },
+   "basis": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "handMarked",
+     "seen"
+    ],
+    "description": "For a walkway segment, whether it was traced from a hand mark or seen in the picture (`WalkwayProposal.basis`); null otherwise (ADAM CR-207)."
+   },
+   "reasoning": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, why the model proposed it (`WalkwayProposal.reasoning`); null otherwise (ADAM CR-207)."
+   },
+   "distanceMetres": {
+    "type": "number",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, its length along the centreline; null where the plan has no georeference and on every other proposal (ADAM CR-207)."
+   },
+   "mapId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, the venue map it is on (the path's `mapId`, which the target's request body does not carry); null otherwise (ADAM CR-207). `listProposedActions` filters on it."
+   },
    "kind": {
     "type": "string",
     "enum": [
@@ -1398,6 +1435,17 @@
      "type": "string",
      "pattern": "^[A-Z]{3}$"
     }
+   },
+   "stepMinutes": {
+    "type": "integer",
+    "enum": [
+     15,
+     30,
+     60
+    ],
+    "nullable": true,
+    "x-ticvai-persistence-column": "integer",
+    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13)."
    },
    "cartLeaseSeconds": {
     "type": "integer",
@@ -1897,7 +1945,7 @@
     "minimum": 0,
     "maximum": 100,
     "readOnly": true,
-    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.**\n"
+    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.** The exact rules (whose heartbeat, which firmware is the latest, what profile currency compares, the error term until the heartbeat series lands, a workstation with no devices, the bands and the contributors) are `getWorkstationHealth`'s, the one place the score is defined (ADAM CR-244, 26 October 2026).\n"
    },
    "configurationProfileId": {
     "type": "string",

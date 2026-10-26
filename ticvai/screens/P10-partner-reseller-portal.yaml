@@ -43,13 +43,14 @@ platform:
     name: Partner Web
     shell: web
     siblings: []
-    note: '**P10 is its own app, in the ticvai-partner-web repository** (ADAM CR-153, raised by Chitrangi Mestry on
-      16 October 2026 while scaffolding that repository; accepted by Chinmay, option A). It follows the
-      one-repository-per-app decision of 13 October 2026 and overrides the decision of 10 September 2026, which
-      served P10 from the shared TICVAI Control app with P09, P11, P14 and P17. Its sign-in, navigation and
-      permission filtering are its own shell. The partner users are still not TICVAI staff, and the permission
-      model holds that line as before. The lead confirms that the repository was created on purpose
-      (docs/active/frontend-repos.yaml marks the mapping assumed until then).'
+    note: '**P10 is its own app, in the ticvai-partner-web repository** (ADAM CR-153, raised by Chitrangi
+      Mestry on 16 October 2026 while scaffolding that repository; accepted by Chinmay, option A). It
+      follows the one-repository-per-app decision of 13 October 2026 and overrides the decision of 10
+      September 2026, which served P10 from the shared TICVAI Control app with P09, P11, P14 and P17.
+      Its sign-in, navigation and permission filtering are its own shell. The partner users are still
+      not TICVAI staff, and the permission model holds that line as before. The lead confirms that the
+      repository was created on purpose (docs/active/frontend-repos.yaml marks the mapping assumed until
+      then).'
     decided: 25 October 2026 (ADAM CR-153)
 screens:
 - id: PTR-001

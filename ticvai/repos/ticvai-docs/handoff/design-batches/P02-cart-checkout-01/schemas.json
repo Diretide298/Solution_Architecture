@@ -785,10 +785,35 @@
  },
  "GuestSession": {
   "x-ticvai-persistence": "none — Redis session registry",
+  "description": "**A guest sign-in's answer: the session and its new tokens** (`registerGuest`, `verifyGuestOtp`, `guestPasswordLogin`, `guestSocialLogin`, `guestUaePassLogin`). **Tokens come with a sign-in, never with a read** (accepted 15 October 2026 and approved by the lead as a breaking response change, ADAM CR-100; CHG-R10ID-009; BC-482), as on the staff side, where `LoginResponse` carries tokens and `Session` does not: `getGuestSession` returns `GuestSessionView`, the same session without `tokens`.",
+  "allOf": [
+   {
+    "$ref": "#/components/schemas/GuestSessionView"
+   },
+   {
+    "type": "object",
+    "required": [
+     "tokens"
+    ],
+    "properties": {
+     "tokens": {
+      "allOf": [
+       {
+        "$ref": "#/components/schemas/TokenPair"
+       }
+      ],
+      "description": "The new access and refresh tokens; `refreshToken` returns the next pair. A guest's refresh token is stored as an `identity.refresh_token` row with `subjectId` set (`IdentityRefreshToken`)."
+     }
+    }
+   }
+  ]
+ },
+ "GuestSessionView": {
+  "x-ticvai-persistence": "none — Redis session registry",
   "type": "object",
+  "description": "**The guest session as `getGuestSession` reads it: no tokens** (accepted 15 October 2026, ADAM CR-100; CHG-R10ID-009; BC-482). A read never issues or rotates a token, so it stays a read and stays offline-capable; `GuestSession` (a sign-in's answer) is this plus `tokens`.",
   "required": [
    "subjectId",
-   "tokens",
    "isVerified",
    "expiresAt"
   ],
@@ -800,9 +825,6 @@
    "displayName": {
     "type": "string",
     "nullable": true
-   },
-   "tokens": {
-    "$ref": "#/components/schemas/TokenPair"
    },
    "isVerified": {
     "type": "boolean",
@@ -862,95 +884,6 @@
    "type": "string"
   }
  },
- "MfaMethod": {
-  "x-ticvai-persistence": "identity.mfa_method",
-  "type": "object",
-  "description": "**A second factor a principal or a guest has enrolled** (R8 blockers IDENTITY-C12 and IDENTITY-C34, CHG-R8MIG-007). Exactly one of `principalId` and `subjectId` is set, so a guest's method is stored like a staff member's and `GuestSession.requiresMfa` and `mfaMethods` are answered from here; the row is its owner's alone (`x-ticvai-rls: own-row`). Three fields are storage only and never returned (`handoff/schema-storage-only.md`): `secret` (a `totp` shared secret, which `verifyMfaChallenge` computes the code from), `destination` (the full phone number or email an `smsOtp` or `emailOtp` code is sent to; `maskedTarget` is the only form returned) and `pendingExpiresAt` (set while an enrolment awaits `verifyMfaEnrolment`; an expired pending row is deleted by the next `enrolMfaMethod` of its owner).",
-  "x-ticvai-exactly-one-of": [
-   [
-    "principalId",
-    "subjectId"
-   ]
-  ],
-  "x-ticvai-rls": "own-row",
-  "required": [
-   "id",
-   "kind",
-   "isActive",
-   "enrolledAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal",
-    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164; r8 gate residue, CHG-R8RES-008). A guest's own method has it null, so a guest screen never shows it.",
-    "description": "The principal who enrolled it; null for a guest."
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "pii.subject",
-    "description": "The guest who enrolled it; null for a principal."
-   },
-   "secret": {
-    "type": "string",
-    "nullable": true,
-    "writeOnly": true,
-    "x-ticvai-secret": "field-encrypted",
-    "description": "The `totp` shared secret, encrypted with the tenant's field key (ADR-0063); null for other kinds. Never returned after `MfaEnrolment.secret`."
-   },
-   "destination": {
-    "type": "string",
-    "nullable": true,
-    "writeOnly": true,
-    "x-ticvai-secret": "field-encrypted",
-    "description": "The full phone number (`smsOtp`) or email (`emailOtp`) the code goes to, encrypted with the tenant's field key (ADR-0063); null for other kinds. Only `maskedTarget` is ever returned."
-   },
-   "pendingExpiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "writeOnly": true,
-    "description": "While `isActive` is false, when the unconfirmed enrolment lapses; null once verified."
-   },
-   "kind": {
-    "$ref": "#/components/schemas/MfaKind"
-   },
-   "label": {
-    "type": "string",
-    "nullable": true
-   },
-   "maskedTarget": {
-    "type": "string",
-    "nullable": true,
-    "description": "Partially masked destination, so a person can tell two methods apart."
-   },
-   "isActive": {
-    "type": "boolean"
-   },
-   "isPrimary": {
-    "type": "boolean"
-   },
-   "enrolledAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "lastUsedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
  "Money": {
   "type": "object",
   "x-ticvai-persistence-kind": "valueObject",
@@ -974,7 +907,7 @@
    },
    "scale": {
     "type": "integer",
-    "description": "Resolved from the region alongside `currency`.",
+    "description": "Resolved from the region alongside `currency`. **A currency other than the venue's or region's trading currency** (a tourist's USD cash at an AED till, `Payment.tenderAmount`; a guest-selected charge currency, `Order.chargeTotal`; a refund in the tender currency) **takes its ISO 4217 minor units**, held as one fixed list in the kernel (`TICVAI.Domain`, beside Money), so every module resolves it the same way and no table, query or migration holds it (ADAM CR-192, option A; Chinmay, 21 October 2026; CHG-R10ORD-018). The venue and region settings keep their own `currency_scale` for the trading currency.",
     "minimum": 0,
     "maximum": 4
    }
@@ -1099,7 +1032,7 @@
      }
     ],
     "readOnly": true,
-    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192; common.yaml `Money.scale`), when it is not the currency the venue trades in."
    },
    "chargeRateLockedUntil": {
     "type": "string",
@@ -1462,7 +1395,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+    "description": "The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-018)."
    },
    "fxRate": {
     "allOf": [
@@ -1717,6 +1650,23 @@
     "x-ticvai-persisted": false,
     "description": "**The list price on the caller's channel now**, resolved on read from the price lists (`listProductVariants`; R8 blocker cause GPS-C27, CHG-R8SPN-028). Not stored on the variant and ignored on input. Null where no price list prices it on that channel. The list price, not the total: promotions and bundles are applied at the basket."
    },
+   "referencePrice": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The price a saving is measured against** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C), set by the back office on the variant (`updateProductVariant`). Null where the variant claims no saving, which is the default. In the same currency as `listPrice`."
+   },
+   "savingPercent": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**Computed by the server, never in the browser** (ADAM CR-253): with a `referencePrice` and a `listPrice` below it, the whole percent the list price saves, `floor((referencePrice - listPrice) / referencePrice * 100)` (rounded down, so the label never overstates; proposed, client to correct); null otherwise. A length tile shows *Save n%* only when this is set."
+   },
    "productId": {
     "type": "string",
     "format": "uuid"
@@ -1808,8 +1758,7 @@
  "RegisterGuestRequest": {
   "type": "object",
   "required": [
-   "identifier",
-   "channel"
+   "identifier"
   ],
   "properties": {
    "identifier": {
@@ -1823,7 +1772,8 @@
      "email",
      "sms",
      "whatsapp"
-    ]
+    ],
+    "description": "**Optional for a mobile number** (ADAM CR-222, 25 October 2026): left out, the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delivery (DI-209), as `requestGuestOtp` does; an email identifier sends email. A caller that sends `channel` still gets it (additive)."
    },
    "displayName": {
     "type": "string",

@@ -2,7 +2,7 @@
 
 **8 screens · 11 operations · 16 schemas · 3 permissions**
 
-Platform P10 Partner Web · ships as **ticvai-control** ·
+Platform P10 Partner Web · ships as **partner-web** ·
 partner audience · web ·
 online only
 
@@ -121,7 +121,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
+| App · platform | Partner Web · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | Block B · ticket #29557 (APP-PARTNER-PTR-042) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
@@ -606,7 +606,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
+| App · platform | Partner Web · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | Block B · ticket #29730 (APP-PARTNER-PTR-043) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
@@ -789,7 +789,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
+| App · platform | Partner Web · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | Block B · ticket #29733 (APP-PARTNER-PTR-044) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
@@ -1104,7 +1104,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
+| App · platform | Partner Web · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | Block B · ticket #29519 (APP-PARTNER-PTR-045) |
 | Who uses it | partner staff holding `ORDER_MODIFY`, `PLATFORM_TENANT_VIEW` (1 operate, 1 read); in the flows as partner |
@@ -1251,7 +1251,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
+| App · platform | Partner Web · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | Block B · ticket #29734 (APP-PARTNER-PTR-046) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
@@ -1519,7 +1519,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
+| App · platform | Partner Web · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | Block B · ticket #29520 (APP-PARTNER-PTR-049) |
 | Who uses it | partner staff holding `CASE_MANAGE`, `PLATFORM_TENANT_VIEW` (1 configure, 1 read); in the flows as partner |
@@ -1711,7 +1711,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
+| App · platform | Partner Web · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | Block B · ticket #29521 (APP-PARTNER-PTR-050) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
@@ -1841,7 +1841,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | | |
 |---|---|
-| App · platform | TICVAI Control · P10 Partner Web (web) |
+| App · platform | Partner Web · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
 | Block | Block B · ticket #29522 (APP-PARTNER-PTR-051) |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |

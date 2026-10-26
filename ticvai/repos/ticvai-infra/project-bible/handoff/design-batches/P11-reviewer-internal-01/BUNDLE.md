@@ -97,9 +97,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ACC-006` | Reviewer Queue | D | 8 | 24 | 6 | 8 | 0 | 6 | — | notStarted (generated) |
-| `ACC-007` | Reviewer Application Detail | D | 6 | 40 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
-| `ACC-008` | Credential Register | D | 13 | 25 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `ACC-006` | Reviewer Queue | D | 8 | 24 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
+| `ACC-007` | Reviewer Application Detail | D | 6 | 40 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ACC-008` | Credential Register | D | 13 | 30 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -183,14 +183,14 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Shown**
 
-**Queue** (data table, from `listAccreditationApplications`): **Due first, and how long it has waited.** `slaDueAt` is the sort, not `requestedAt` — an application for tonight outranks one submitted earlier for next month. Rows carry the signals a reviewer decides on: *no press card, no commission*, *commission letter attached*, *accredited last season*.
+**Queue** (data table, from `listAccreditationApplications`): **Due first, and how long it has waited.** `decisionDueAt` is the sort, not `submittedAt` — an application for tonight outranks one submitted earlier for next month. Rows carry the signals a reviewer decides on: *no press card, no commission*, *commission letter attached*, *accredited last season*.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Summary | text | — |
-| Requested at | 1 Oct 2026, 14:30 | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
-| Status | chip: Draft, Pending, Escalated, Returned, Information requested, Approved… | — |
+| Reference | text | — |
+| Submitted at | 1 Oct 2026, 14:30 | — |
+| Decision due at | 1 Oct 2026, 14:30 | When a decision is due — the approvals request's SLA. |
+| Status | chip: Draft, Submitted, Under review, Information requested, Approved, Rejected… | — |
 
 **Selected application** (detail panel, from `listAccreditationApplications`): Enough to approve without opening `ACC-007`.
 
@@ -299,18 +299,11 @@ Screen guard: `ACCREDITATION_VIEW`
 
 #### Requirements it meets
 
-8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 12.1.3 | Approval Workflow System shall support accreditation review and approval. | Accreditation & Credential Management | CONTRACTED | `decideAccreditationApplication` |
-| 11.1.10 | Out-of-Office Routing - System shall automatically reroute approvals when approvers are unavailable. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.28 | Mobile Approvals - System shall support approval actions through mobile applications. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.29 | Email-Based Approvals - System shall support approval actions through email links. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.54 | Approval Reopening - System shall support reopening previously completed approval requests. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.73 | AI Risk Assessment - System shall provide AI-generated risk assessments for approval requests. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.75 | AI Escalation Recommendations - System shall recommend escalation actions based on approval patterns. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.78 | Shared Service Approval Centers - System shall support centralized approval processing teams. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
 
 #### Client meeting inputs
 
@@ -550,18 +543,11 @@ Screen guard: `ACCREDITATION_VIEW`
 
 #### Requirements it meets
 
-8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 12.1.3 | Approval Workflow System shall support accreditation review and approval. | Accreditation & Credential Management | CONTRACTED | `decideAccreditationApplication` |
-| 11.1.10 | Out-of-Office Routing - System shall automatically reroute approvals when approvers are unavailable. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.28 | Mobile Approvals - System shall support approval actions through mobile applications. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.29 | Email-Based Approvals - System shall support approval actions through email links. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.54 | Approval Reopening - System shall support reopening previously completed approval requests. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.73 | AI Risk Assessment - System shall provide AI-generated risk assessments for approval requests. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.75 | AI Escalation Recommendations - System shall recommend escalation actions based on approval patterns. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.78 | Shared Service Approval Centers - System shall support centralized approval processing teams. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
 
 #### Client meeting inputs
 
@@ -688,10 +674,10 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| Holder name | text | — |
-| Zones | list or chips (count when long) | Where this badge admits, which is the whole point of it. |
+| Holder name | text | What the badge prints and the register lists (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's … |
+| Zones | list or chips (count when long) | Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with … |
 | Issued at | 1 Oct 2026, 14:30 | — |
-| State | chip: Issued, Collected, Suspended, Revoked, Expired | — |
+| Status | chip: Pending print, Issued, Active, Lost, Replaced, Revoked… | — |
 
 **Credential** (detail panel, from `listAccreditationCredentials`)
 
@@ -710,6 +696,11 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Status | chip: Pending print, Issued, Active, Lost, Replaced, Revoked… | — |
 | Replaces credential | the name it points at, never the id | — |
 | Replacement count | 1,234 | — |
+| Holder name | text | What the badge prints and the register lists (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's … |
+| Zones | list or chips (count when long) | Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with … |
+| Zone | the name it points at, never the id | — |
+| Zone name | text | — |
+| Valid to | 1 Oct 2026 | Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. |
 
 **Actions and what each produces**
 
@@ -800,7 +791,7 @@ Screen guard: `ACCREDITATION_VIEW`
 
 #### Requirements it meets
 
-4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -808,6 +799,7 @@ Screen guard: `ACCREDITATION_VIEW`
 | 12.1.48 | Accreditation Utilization Reporting - System shall provide accreditation utilization reports. | Accreditation & Credential Management | CONTRACTED | `listAccreditationAccessActivity` |
 | 12.1.49 | Accreditation Access Reporting - System shall provide reports on accreditation access activity. | Accreditation & Credential Management | CONTRACTED | `listAccreditationAccessActivity` |
 | 12.1.55 | Accreditation Export - System shall support export of accreditation data. | Accreditation & Credential Management | CONTRACTED | `exportAccreditationData` |
+| 12.1.22 | QR Credential Support - System shall support QR-based accreditation credentials. | Accreditation & Credential Management | CONTRACTED | data `AccreditationCredential` |
 
 #### Client meeting inputs
 
@@ -826,7 +818,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (13), with its required mark, default, format and its error state (403, 404, 422).
-- [ ] Every output is drawn (25 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ACC-008?state=<state>`: loading, emptyFirstRun, emptyNoResults, emptyNoAccess, error, offline.
 - [ ] Every action is wired with its success and its failure: Revoke, Export.
 - [ ] Every transition is wired: `ACC-006`, `ACC-007`.
@@ -938,7 +930,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "AccreditationAccessEvent": {"type":"object","description":"Board 8.4. **Granted access against used access is the whole of the annual review.**\n","properties":{"at":{"type":"string","format":"date-time"},"holderId":{"type":"string","format":"uuid"},"holderName":{"type":"string"},"zoneId":{"type":"string","format":"uuid"},"zoneName":{"type":"string"},"credentialId":{"type":"string","format":"uuid","nullable":true},"outcome":{"type":"string","enum":["admitted","denied","escorted"]},"deniedReason":{"type":"string","nullable":true}}},
 "AccreditationApplication": {"type":"object","x-ticvai-persistence":"accreditation.application","description":"Board 1.3. **Usually submitted by an organisation on behalf of its people.**","required":["programmeId"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"programmeId":{"x-ticvai-references":"accreditation.programme","type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"applicantType":{"type":"string"},"submittedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"organisationId":{"type":"string","format":"uuid","nullable":true},"subject":{"type":"object","additionalProperties":true,"description":"Name, date of birth, nationality, contact — shaped by the requirements matrix."},"requirementStatus":{"x-ticvai-persisted":false,"type":"array","readOnly":true,"items":{"type":"object","properties":{"requirementCode":{"type":"string"},"satisfied":{"type":"boolean"},"documentId":{"type":"string","format":"uuid","nullable":true}}}},"status":{"type":"string","enum":["draft","submitted","underReview","informationRequested","approved","rejected","withdrawn","expired"]},"decisionReason":{"type":"string","nullable":true},"missingRequirements":{"type":"array","readOnly":true,"description":"The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting","items":{"type":"string"}},"decisionDueAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a decision is due — the approvals request's SLA. **A date, not a queue position**"},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"holderId":{"type":"string","format":"uuid","nullable":true},"renewsHolderId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one"},"resubmissionOfApplicationId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.33. The rejected application this one resubmits, so the rejection stays in the record"},"resubmissionNote":{"type":"string","maxLength":1000,"nullable":true,"readOnly":true,"description":"What the applicant changed, from `resubmitAccreditationApplication`"},"submittedAt":{"type":"string","format":"date-time","nullable":true},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
-"AccreditationCredential": {"type":"object","x-ticvai-persistence":"accreditation.credential","description":"Board 4. **Not the accreditation** — reissuing one re-vets nobody.","required":["holderId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"x-ticvai-references":"accreditation.holder","type":"string","format":"uuid"},"kind":{"type":"string","enum":["printedBadge","mobileCredential","qr","nfcCard","rfidCard","wristband"]},"symbology":{"type":"string","nullable":true,"description":"12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n","enum":["qr","dataMatrix","pdf417","aztec","code128","nfcNdef","rfidEpc","none"]},"serialNumber":{"type":"string","nullable":true},"encodedIdentifier":{"type":"string","nullable":true},"badgeTemplateId":{"type":"string","format":"uuid","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"issuedBy":{"type":"string","format":"uuid"},"activatedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["pendingPrint","issued","active","lost","replaced","revoked","expired"]},"replacesCredentialId":{"type":"string","format":"uuid","nullable":true},"replacementCount":{"type":"integer","default":0},"scopePath":{"type":"string"}}},
+"AccreditationCredential": {"type":"object","x-ticvai-persistence":"accreditation.credential","description":"Board 4. **Not the accreditation** — reissuing one re-vets nobody.","required":["holderId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"x-ticvai-references":"accreditation.holder","type":"string","format":"uuid"},"kind":{"type":"string","enum":["printedBadge","mobileCredential","qr","nfcCard","rfidCard","wristband"]},"symbology":{"type":"string","nullable":true,"description":"12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n","enum":["qr","dataMatrix","pdf417","aztec","code128","nfcNdef","rfidEpc","none"]},"serialNumber":{"type":"string","nullable":true},"encodedIdentifier":{"type":"string","nullable":true},"badgeTemplateId":{"type":"string","format":"uuid","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"issuedBy":{"type":"string","format":"uuid"},"activatedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["pendingPrint","issued","active","lost","replaced","revoked","expired"]},"replacesCredentialId":{"type":"string","format":"uuid","nullable":true},"replacementCount":{"type":"integer","default":0},"scopePath":{"type":"string"},"holderName":{"type":"string","readOnly":true,"x-ticvai-persisted":false,"description":"**What the badge prints and the register lists** (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's `AccreditationHolder.fullName`, read with the credential, not stored on it."},"zones":{"type":"array","readOnly":true,"x-ticvai-persisted":false,"description":"Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with its name, as `verifyAccreditationCredential` answers them. Read with the credential, not stored on it (CHG-R10UI-016).","items":{"type":"object","properties":{"zoneId":{"type":"string","format":"uuid"},"zoneName":{"type":"string"}}}},"validTo":{"type":"string","format":"date","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"description":"Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. `status` `expired` or `revoked` overrides it. Read with the credential, not stored on it (CHG-R10UI-016)."}}},
 "AccreditationDataExport": {"type":"object","x-ticvai-persistence":"accreditation.data_export","description":"12.1.55. **A spreadsheet of accredited people leaving the platform is an event someone should own.** Requested by `exportAccreditationData`, listed for BO-682, and fetched once `ready`.\n","required":["dataset","format"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"dataset":{"type":"string","enum":["holders","applications","credentials","accessAssignments","documents"]},"format":{"type":"string","enum":["csv","xlsx"]},"programmeId":{"type":"string","format":"uuid","nullable":true},"statusFilter":{"type":"string","nullable":true},"organisationId":{"type":"string","format":"uuid","nullable":true},"categoryCode":{"type":"string","nullable":true},"validOn":{"type":"string","format":"date","nullable":true,"description":"Only accreditations valid on this date — the register for one performance"},"fields":{"type":"array","description":"The columns wanted. Omitted means the dataset's standard set","items":{"type":"string"}},"includePersonalData":{"type":"boolean","default":false,"description":"Contact details, date of birth, nationality and document references. Requires REPORT_EXPORT_PII and a purpose; recorded in the accreditation audit trail"},"purpose":{"type":"string","maxLength":500,"nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"requestedAt":{"type":"string","format":"date-time","readOnly":true},"recordCount":{"type":"integer","nullable":true,"readOnly":true},"status":{"type":"string","readOnly":true,"enum":["queued","running","ready","failed","expired"]},"downloadUrl":{"type":"string","nullable":true,"readOnly":true,"description":"Signed and expiring"},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string"}}}
 }
 ```

@@ -2278,6 +2278,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS28 Access Control Board 11.dc.html#bo-253`
 - Workshop pack: Access Control Module_Reference.pdf board 11
 - Flow F121 *Access Control board 11: Access Security & Fraud Command Center*, step 18: Works in Security Analytics, AI Detection & Governance → Provide long-term intelligence on fraud patterns, security controls and effectiveness.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

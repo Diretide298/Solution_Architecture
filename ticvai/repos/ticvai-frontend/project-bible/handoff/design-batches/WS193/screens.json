@@ -1819,7 +1819,7 @@
         "Change Governance"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listWalletConfigurationVersions",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 §Display"
       },
       {
@@ -1896,6 +1896,7 @@
       {
        "kind": "secondaryButton",
        "label": "Security Audit",
+       "operation": "listAuditRecords",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 §Support"
       }
      ]

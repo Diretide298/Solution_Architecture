@@ -1,6 +1,6 @@
 # P01-promotions-01 — P01 · Promotions
 
-**1 screens · 2 operations · 8 schemas · 1 permissions**
+**1 screens · 2 operations · 9 schemas · 1 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -95,7 +95,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-032` | Offers & Promotions | A | 0 | 13 | 6 | 1 | 0 | 2 | guest | review (client-verified) |
+| `WEB-032` | Offers & Promotions | A | 0 | 15 | 6 | 1 | 0 | 2 | guest | review (client-verified) |
 
 ## Thin screens in this batch
 

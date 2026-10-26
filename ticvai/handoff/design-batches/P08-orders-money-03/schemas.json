@@ -1565,6 +1565,7 @@
  },
  "TrialBalance": {
   "x-ticvai-persistence": "none — computed",
+  "description": "Computed by `getTrialBalance` for one fiscal period (ADAM CR-246): each postable account's movement over the period's `posted` and `reversed` journal entries, debit-positive, every postable account listed (zero rows too) in account `code` order.",
   "type": "object",
   "required": [
    "fiscalPeriodId",
@@ -1615,13 +1616,28 @@
        "$ref": "#/components/schemas/AccountType"
       },
       "debit": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "The sum of the account's debit postings over the period's `posted` and `reversed` entries (ADAM CR-246)."
       },
       "credit": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "The sum of the account's credit postings over the same entries."
       },
       "balance": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "`debit` minus `credit`, debit-positive for every account type: the period's movement, not a carried-forward closing balance (ADAM CR-246)."
       }
      }
     }

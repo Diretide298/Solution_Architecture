@@ -39,9 +39,10 @@ transitions:
     before it takes effect (audit R129 (6))
 - from: swapPending
   to: published
-  operation: requestShiftSwap
-  trigger: operation
-  guard: Swap rejected or withdrawn — the original assignment stands
+  trigger: cascade
+  guard: Swap rejected or withdrawn (the shift swap reaching rejected or withdrawn) — the original assignment
+    stands. Not requestShiftSwap, whose 409 refuses a swapPending assignment (r10 ruling on check-state-refusals,
+    the lead, 25 October 2026; CHG-R10ORD-020)
   isReversal: true
 - from: swapPending
   to: cancelled

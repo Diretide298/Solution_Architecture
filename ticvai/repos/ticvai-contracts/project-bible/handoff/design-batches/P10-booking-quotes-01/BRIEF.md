@@ -1,8 +1,8 @@
 # P10-booking-quotes-01 — P10 · Booking & Quotes
 
-**4 screens · 28 operations · 44 schemas · 11 permissions**
+**4 screens · 28 operations · 45 schemas · 11 permissions**
 
-Platform P10 Partner Web · ships as **ticvai-control** ·
+Platform P10 Partner Web · ships as **partner-web** ·
 partner audience · web ·
 online only
 

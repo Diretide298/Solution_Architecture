@@ -1313,7 +1313,7 @@
       {
        "kind": "selectField",
        "label": "Product for the ticket preview",
-       "operation": "previewProductTickets",
+       "operation": "listProducts",
        "notes": "The product whose ticket and passes are previewed.",
        "provenance": "corrected 2 October 2026 (CHG-SGU-008, decided by Chinmay 2 October 2026, DEC-151)",
        "bindsTo": "Product.id"
@@ -1400,6 +1400,12 @@
     "contract": "orders",
     "purpose": "A product's PDF ticket and Apple and Google Wallet pass proofs with the draft theme (CHG-CSP-038)",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "The products to choose from for the ticket preview (check-screen-value-sources, CHG-R10UI-015)",
+    "trigger": "onLoad"
    }
   ],
   "entryState": {

@@ -275,6 +275,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - … and 1 more flow steps (`flows/`)
 - Flow F203 branch at step 1 (expected): when Nothing has been set up on Active Rental Operations Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F203 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -404,6 +405,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS122 Rental Management Board 7.dc.html#bo-555`
 - Workshop pack: Rental_Management.pdf board 7
 - Flow F203 *Rental Management board 7: Active Rental Operations Command Center*, step 2: Works in Active Rental Detail & Live Timeline → Provide the complete operational view of one active rental.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -655,6 +657,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS122 Rental Management Board 7.dc.html#bo-557`
 - Workshop pack: Rental_Management.pdf board 7
 - Flow F203 *Rental Management board 7: Active Rental Operations Command Center*, step 6: Works in Extension Pricing & Confirmation → Calculate the commercial impact of an approved extension. Once Board 3 confirms availability, Board 4 calculates the extension charge.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -760,6 +763,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS122 Rental Management Board 7.dc.html#bo-558`
 - Workshop pack: Rental_Management.pdf board 7
 - Flow F203 *Rental Management board 7: Active Rental Operations Command Center*, step 8: Works in Equipment Swap / Replacement → Replace equipment during an active rental without terminating and recreating the rental. This is another capability I strongly recommend adding.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1002,6 +1006,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS122 Rental Management Board 7.dc.html#bo-560`
 - Workshop pack: Rental_Management.pdf board 7
 - Flow F203 *Rental Management board 7: Active Rental Operations Command Center*, step 12: Works in Due Soon & Customer Notification Management → Proactively communicate with customers before their rental becomes overdue. The original matrix requires overdue rental notifications.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1140,6 +1145,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS122 Rental Management Board 7.dc.html#bo-561`
 - Workshop pack: Rental_Management.pdf board 7
 - Flow F203 *Rental Management board 7: Active Rental Operations Command Center*, step 14: Works in Overdue Rental Management → Provide operators with a dedicated workflow for rentals that have exceeded their expected return time. The original requirement calls for automatic late-fee calculation, configurable grace periods …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1269,6 +1275,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS122 Rental Management Board 7.dc.html#bo-562`
 - Workshop pack: Rental_Management.pdf board 7
 - Flow F203 *Rental Management board 7: Active Rental Operations Command Center*, step 16: Works in Active Group Rental Management → Manage group rentals where multiple pieces of equipment may have different operational states.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1410,6 +1417,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS122 Rental Management Board 7.dc.html#bo-563`
 - Workshop pack: Rental_Management.pdf board 7
 - Flow F203 *Rental Management board 7: Active Rental Operations Command Center*, step 18: Works in Active Rental Intelligence & Operational Alerts → Use AI and real-time operational data to identify risks before they become operational problems.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

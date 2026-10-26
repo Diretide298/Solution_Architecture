@@ -42,7 +42,7 @@
 | [GST-012](#gst-012-my-tickets) | My Tickets | Account & Self-Service | 1 | 7 |
 | [GST-013](#gst-013-ticket-details) | Ticket Details | Account & Self-Service | 1 | 6 |
 | [GST-014](#gst-014-ticket-transfer) | Ticket Transfer | Ticketing | 1 | 3 |
-| [GST-015](#gst-015-memberships) | Memberships | Membership, Loyalty & Value | 1 | 8 |
+| [GST-015](#gst-015-memberships) | Memberships | Membership, Loyalty & Value | 1 | 9 |
 | [GST-016](#gst-016-my-reservations) | My Reservations | Ticketing | 1 | 3 |
 | [GST-017](#gst-017-reservation-details) | Reservation Details | Ticketing | 1 | 2 |
 | [GST-018](#gst-018-add-to-calendar-reminders) | Add to Calendar / Reminders | Account & Self-Service | 1 | 5 |
@@ -69,8 +69,8 @@
 | [GST-039](#gst-039-profile) | Profile | Account & Self-Service | 1 | 5 |
 | [GST-040](#gst-040-help-support) | Help & Support | Engagement & Support | 1 | 7 |
 | [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 13 |
-| [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 13 |
-| [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 1 |
+| [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 14 |
+| [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 3 |
 | [GST-044](#gst-044-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 1 | 2 |
 | [GST-045](#gst-045-ticket-delivery-sharing) | Ticket Delivery & Sharing | Account & Self-Service | 1 | 3 |
 | [GST-046](#gst-046-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 |
@@ -86,12 +86,12 @@
 | [GST-056](#gst-056-bundle-package) | Bundle Package | Booking & Selection | 1 | 2 |
 | [GST-057](#gst-057-accessibility-information) | Accessibility Information | Discovery & Browse | 1 | 1 |
 | [GST-058](#gst-058-resource-availability-cabana) | Resource Availability (Cabana) | Booking & Selection | 1 | 2 |
-| [GST-059](#gst-059-plan-in-progress) | Plan in Progress | Engagement & Support | 1 | 5 |
+| [GST-059](#gst-059-plan-in-progress) | Plan in Progress | Engagement & Support | 1 | 4 |
 | [GST-061](#gst-061-menu-item-detail) | Menu Item Detail | In-Venue Experience | 1 | 1 |
 | [GST-062](#gst-062-shop-drop-collection) | Shop & Drop Collection | In-Venue Experience | 1 | 2 |
 | [GST-063](#gst-063-explore-search-results) | Explore – Search Results | Discovery | 1 | 1 |
 | [GST-065](#gst-065-newsletter-preferences) | Newsletter & Preferences | Marketing | 1 | 5 |
-| [GST-066](#gst-066-privacy-my-data) | Privacy & My Data | Account & Self-Service | 1 | 5 |
+| [GST-066](#gst-066-privacy-my-data) | Privacy & My Data | Account & Self-Service | 1 | 6 |
 | [GST-067](#gst-067-refunds-resale) | Refunds & Resale | Account & Self-Service | 1 | 6 |
 | [GST-068](#gst-068-help-my-cases) | Help & My Cases | Engagement & Support | 1 | 5 |
 | [GST-069](#gst-069-face-pass) | Face Pass | Account & Self-Service | 1 | 5 |
@@ -252,7 +252,7 @@
 |---|---|---|---|---|
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onLoad | The category tiles (a tree, with images and descriptions) | `PRODUCT_VIEW` |
-| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Search from the top of Explore; results are GST-063, a state of this screen | `None` |
+| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Search from the top of Explore, type-ahead as on GST-063 (ADAM CR-223); results are GST-063, a state of this screen | `None` |
 
 **States**
 
@@ -452,6 +452,7 @@
 | GST-001 | Home – Default |  |  |
 | GST-003 | Event & Attraction Listing | eventId |  |
 | GST-006 | Item Detail – Event / Exhibition | performanceId |  |
+| GST-002 | See everything |  |  |
 
 ## GST-006 Item Detail – Event / Exhibition
 
@@ -531,6 +532,7 @@
 | cartId | session |
 | venueId | session |
 | entryId | navigation |
+| waitingEntryId | GST-046 |
 
 **Operations**
 
@@ -568,7 +570,7 @@
 | GST-008 | Picks a time; the tickets for it appear | performanceId |  |
 | GST-049 | Picks a time on a seated event (inline step) | performanceId, eventId |  |
 | GST-008 | Picks a date and time after choosing the workshop (product-first flow) | performanceId |  |
-| GST-046 | Adds tickets for a performance whose on-sale waiting room is on | performanceId | `addCartLine` refused `403 admission-required`: this performance's room is on and the app holds no admission token for it |
+| GST-046 | Adds tickets for a performance whose on-sale waiting room is on | performanceId, waitingEntryId | `addCartLine` refused `403 admission-required`: this performance's room is on and the app holds no admission token for it. The edge carries the `waitingEntryId` the app got back from GST-046, when it has one, so the guest keeps their place (ADAM CR-216) |
 
 ## GST-008 Tickets & Add-ons
 
@@ -1003,6 +1005,7 @@
 | `getBillingStatement` | [OrderService](../backend/OrderService.md#getbillingstatement) | onAction | One statement, line by line | `ORDER_VIEW` |
 | `listMyPaymentIssues` | [OrderService](../backend/OrderService.md#listmypaymentissues) | onLoad | Declined renewals waiting on the guest | `None` |
 | `retryMyDunningPayment` | [OrderService](../backend/OrderService.md#retrymydunningpayment) | onAction | Retry a declined payment, on another card if needed | `None` |
+| `listPaymentTokens` | [OrderService](../backend/OrderService.md#listpaymenttokens) | onAction | Called when the guest chooses Use another card: the saved cards the retry modal lists (masked identifier, method, expiry, default first); the chosen one's id goes to retryMyDunningPayment as paymentTokenId (ADAM CR-233, 25 October 2026) | `ORDER_VIEW` |
 | `getMyMemberships` | [CatalogueService](../backend/CatalogueService.md#getmymemberships) | onLoad | A guest's own memberships, benefits and history | `PRODUCT_VIEW` |
 | `listDelegations` | [IdentityService](../backend/IdentityService.md#listdelegations) | onLoad | Who may act for this guest, and for whom they may act | `GUEST_VIEW` |
 | `grantDelegation` | [IdentityService](../backend/IdentityService.md#grantdelegation) | onAction | Let one guest act for another | `GUEST_MANAGE` |
@@ -2381,6 +2384,7 @@
 | lineId | navigation |
 | productId | navigation |
 | performanceId | navigation |
+| holdIds | navigation |
 | holdId | navigation |
 | venueId | session |
 
@@ -2465,6 +2469,7 @@
 | `refreshToken` | [IdentityService](../backend/IdentityService.md#refreshtoken) | background | Rotate the access token | `None` |
 | `requestGuestOtp` | [IdentityService](../backend/IdentityService.md#requestguestotp) | onAction | Request a one-time code | `None` |
 | `verifyGuestOtp` | [IdentityService](../backend/IdentityService.md#verifyguestotp) | onAction | Verify a one-time code and issue a session | `None` |
+| `verifyGuestEmail` | [IdentityService](../backend/IdentityService.md#verifyguestemail) | background | Sent by the Code field after Create an account, not a control of its own: confirms the code `registerGuest` sent (`mode` `code`) under the session `registerGuest` returned; `verifyGuestOtp` stays for Send me a code (ADAM CR-177, CR-222) | `None` |
 | `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | background | Sent by the screen after sign-in returns requiresMfa at a venue with guest two-step verification on (action signIn), not a control: the code is then typed in Verification code | `None` |
 | `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Check the code and release the session | `None` |
 | `claimDeviceConsent` | [MarketingService](../backend/MarketingService.md#claimdeviceconsent) | background | Sent by the screen after sign-in or registration, not a control: attaches this device's tracking decision to the guest | `None` |
@@ -2512,6 +2517,8 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getPublishedTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedtenantconfig) | onLoad | The published languages | `None` |
+| `updateMyProfile` | [MarketingService](../backend/MarketingService.md#updatemyprofile) | background | Sent by the Language choice for a signed-in guest, not a control of its own: after the device copy is saved, the chosen language is written to the profile, sending only `preferredLanguage` (ADAM CR-186, 25 October 2026); signed out, nothing is sent | `GUEST_VIEW` |
+| `getMyProfile` | [MarketingService](../backend/MarketingService.md#getmyprofile) | onLoad | Signed in only: the profile's current `preferredLanguage`, so Language shows what the profile holds and the write above changes what was read (ADAM CR-186; check-screen-patterns READ: an edit reads what it edits). Signed out, nothing is read and the device copy is shown | `GUEST_VIEW` |
 
 **States**
 
@@ -2645,7 +2652,7 @@
 | Parameter | From |
 |---|---|
 | performanceId | GST-007 |
-| waitingEntryId | GST-046 |
+| waitingEntryId | GST-007 |
 
 **Operations**
 
@@ -2667,7 +2674,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-007 | Continue to your tickets | performanceId | `getWaitingRoomPosition` answers `admitted`. The app keeps `admission.token` and sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt` |
+| GST-007 | Continue to your tickets | performanceId, waitingEntryId | `getWaitingRoomPosition` answers `admitted`. The app keeps `admission.token` and sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt` |
 
 ## GST-047 Maintenance / Upgrade Page
 
@@ -2792,6 +2799,7 @@
 |---|---|
 | performanceId | deepLink |
 | eventId | GST-007 |
+| holdIds | navigation |
 | holdId | navigation |
 
 **Operations**
@@ -2821,7 +2829,7 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 | GST-008 | Continue to add-ons | performanceId |  |
-| GST-041 | Go to basket | holdId, performanceId |  |
+| GST-041 | Go to basket | holdIds, performanceId |  |
 
 ## GST-050 Resource Booking – Cabana
 
@@ -2907,7 +2915,7 @@
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `generateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#generatevisitplan) | onAction | Build a rules plan from the inputs (party, heights, dates, park per day, pace, interests, shops, cuisine); each day from its own park's points only | `None` |
 | `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | The tenant's active venues, for the park-per-day choice in a multi-venue tenant | `None` |
-| `getVisitPlannerOptions` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplanneroptions) | onLoad | The planner's choices from the venue's data (r8, GPS-C21): the interest tags of its parks fill What are you most interested in?, and the ready-made plans and Fast Track bundles come from the same read. | `VENUE_MAP_VIEW` |
+| `getVisitPlannerOptions` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplanneroptions) | onLoad | The planner's choices from the venue's data (r8, GPS-C21): the interest tags of its parks fill What are you most interested in?, its cuisineTags and retailTags fill the lunch and shop questions and the preferenceNotAtVenue chip (ADAM CR-220), and the ready-made plans and Fast Track bundles come from the same read. | `VENUE_MAP_VIEW` |
 
 **States**
 
@@ -3328,7 +3336,6 @@
 | `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
 | `listVisitPlanAlternatives` | [VenueOpsService](../backend/VenueOpsService.md#listvisitplanalternatives) | onAction | Swap candidates for one item that suit everyone in the party | `None` |
-| `listMyVisitPlans` | [VenueOpsService](../backend/VenueOpsService.md#listmyvisitplans) | onLoad | Only when signed in, like `getVisitPlan` (GFIX-6): on the cold entry (no `planId`) it asks for the guest's plans with `date` today, newest first, and takes the first one's `id` for `getVisitPlan`. No component shows the list itself: what it finds fills the Today timeline, and an empty page is the emptyFirstRun state (offer to make a plan on GST-051). Opened with a `planId`, it is not called. Not background (r8 integration, CHG-R8INT-008): the guest sees what it finds, and the approved screen has no element of its own for it (the prototype has no view of this screen). | `None` |
 
 **States**
 
@@ -3471,7 +3478,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name | `None` |
+| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name, type-ahead: called once typing pauses (300 ms debounce), for 2 or more characters, Enter at once, the latest answer wins (ADAM CR-223) | `None` |
 
 **States**
 
@@ -3567,12 +3574,14 @@
 | Parameter | From |
 |---|---|
 | subjectId | session |
+| requestId | navigation |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `exportSubjectData` | [IdentityService](../backend/IdentityService.md#exportsubjectdata) | onAction | Everything the platform holds about one guest | `GUEST_VIEW_PII` |
+| `getSubjectDataExport` | [IdentityService](../backend/IdentityService.md#getsubjectdataexport) | onInterval | Where the requested data export has got to, and a fresh short-lived download link once it is ready (ADAM CR-101, CHG-R10ID-016); polled with the requestId exportSubjectData answered while the export is not yet ready, and read again for a new link when an old one has lapsed | `GUEST_VIEW_PII` |
 | `deleteGuestAccount` | [IdentityService](../backend/IdentityService.md#deleteguestaccount) | onAction | Self-service account deletion | `None` |
 | `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | Read a guest's consent state | `GUEST_VIEW` |
 | `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Withdraw or give a consent from the privacy page: withdrawal as easy as granting | `GUEST_MANAGE` |
@@ -4080,9 +4089,9 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | Room types sold by the hour (`requiresTimeWindow`) and their add-ons | `PRODUCT_VIEW` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | Room types sold by the hour (`requiresTimeWindow`) and their add-ons (each room type's `addOnProductIds`, ADAM CR-252) | `PRODUCT_VIEW` |
 | `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onLoad | The lengths of a room type, each with its price | `PRODUCT_VIEW` |
-| `listProductStartTimes` | [VenueOpsService](../backend/VenueOpsService.md#listproductstarttimes) | onAction | Start times free for the room type and length on the date | `RESOURCE_VIEW` |
+| `listProductStartTimes` | [VenueOpsService](../backend/VenueOpsService.md#listproductstarttimes) | onAction | Start times free for the room type and length on the date; a public read, no session needed (ADAM CR-258), at the venue's `stepMinutes` (ADAM CR-253) | `RESOURCE_VIEW` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the room type for the booked window with the party as `attributes.attendees` (r8, GPS-C28), then the add-ons; 422 `attendees-over-capacity` sends the guest back to the length and start-time steps | `None` |
 | `createCart` | [OrderService](../backend/OrderService.md#createcart) | background | Started by the runtime the first time a line is added, before the first addCartLine, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045; r8, GPS-C23). | `None` |
 

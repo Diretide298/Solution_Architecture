@@ -107,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-304` | Order & Reservation Command Center | C | 0 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-305` | Order Detail & Transaction Workspace | C | 0 | 50 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `BO-305` | Order Detail & Transaction Workspace | C | 0 | 295 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `BO-306` | Reservation & Hold Policy Configuration | C | 12 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-307` | Order & Reservation Status Lifecycle Configuration | C | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-308` | Order Creation & Source/Channel Configuration | C | 24 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |

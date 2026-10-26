@@ -35,9 +35,9 @@ servicesCalled:
 - service: OrderService
   operationCalls: 99
 - service: FnbService
-  operationCalls: 31
+  operationCalls: 32
 - service: CatalogueService
-  operationCalls: 25
+  operationCalls: 24
 - service: TenancyService
   operationCalls: 19
 - service: RetailService
@@ -50,12 +50,12 @@ servicesCalled:
   operationCalls: 7
 - service: LedgerService
   operationCalls: 7
+- service: VenueOpsService
+  operationCalls: 3
 - service: WalletService
   operationCalls: 2
 - service: AccessService
   operationCalls: 2
-- service: VenueOpsService
-  operationCalls: 1
 - service: InventoryService
   operationCalls: 1
 coverage:
@@ -283,7 +283,6 @@ screens:
   - getPerformance
   - getSeatAvailability
   - getSeatHold
-  - listPerformances
   - relinquishSeatHold
   states:
   - denied
@@ -580,6 +579,7 @@ screens:
   density: touchLarge
   operations:
   - collectShopAndDrop
+  - createFnbOrder
   - getCurrentShift
   - listOrders
   - lookupShopAndDrop
@@ -990,6 +990,8 @@ screens:
   - getWorkstationShift
   - listAlerts
   - listDevices
+  - listOrders
+  - listQueues
   - listSaleBoards
   - listShifts
   - reopenShift
@@ -1038,7 +1040,6 @@ screens:
   - issueTaxInvoice
   - listTaxInvoices
   - reissueEntitlement
-  - reprintOrder
   - reprintReceipt
   states:
   - emptyFirstRun
@@ -1138,6 +1139,7 @@ screens:
   operations:
   - acceptFnbOrder
   - listFnbOrders
+  - listQueueFeeds
   - recordOrderHandover
   - setKitchenTicketStatus
   states:

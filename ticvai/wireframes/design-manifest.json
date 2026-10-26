@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/derive-design-manifest.py",
- "generated": "2026-10-22",
+ "generated": "2026-10-26",
  "note": "The Claude Design work list. Status is read off wireframes/frames/ every run and never stored, so a batch cannot claim to be finished and not be. Batches with thin screens sort last: a screen with fewer than 4 components cannot be drawn from what it declares, and drawing it invents requirements.",
  "batchSize": 10,
  "drawableAt": 4,
@@ -5921,20 +5921,6 @@
    "status": "drawn"
   },
   {
-   "id": "P02-system-states-01",
-   "kind": "module",
-   "label": "P02 · System States",
-   "platform": "P02",
-   "screens": [
-    "GST-043",
-    "GST-047"
-   ],
-   "drawable": 1,
-   "thin": 1,
-   "frames": 2,
-   "status": "drawn"
-  },
-  {
    "id": "P02-transport-01",
    "kind": "module",
    "label": "P02 · Transport",
@@ -6043,6 +6029,20 @@
    "drawable": 8,
    "thin": 2,
    "frames": 10,
+   "status": "drawn"
+  },
+  {
+   "id": "P02-system-states-01",
+   "kind": "module",
+   "label": "P02 · System States",
+   "platform": "P02",
+   "screens": [
+    "GST-043",
+    "GST-047"
+   ],
+   "drawable": 0,
+   "thin": 2,
+   "frames": 2,
    "status": "drawn"
   },
   {

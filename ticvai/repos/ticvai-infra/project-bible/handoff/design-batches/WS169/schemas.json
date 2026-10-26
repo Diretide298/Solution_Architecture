@@ -2,6 +2,11 @@
  "AccessibleSeating": {
   "type": "object",
   "x-ticvai-persistence": "seating.accessible",
+  "x-ticvai-unique-together": [
+   [
+    "seatMapId"
+   ]
+  ],
   "description": "Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an accessible seat.**\n",
   "properties": {
    "seatMapId": {
@@ -139,7 +144,7 @@
    },
    "scale": {
     "type": "integer",
-    "description": "Resolved from the region alongside `currency`.",
+    "description": "Resolved from the region alongside `currency`. **A currency other than the venue's or region's trading currency** (a tourist's USD cash at an AED till, `Payment.tenderAmount`; a guest-selected charge currency, `Order.chargeTotal`; a refund in the tender currency) **takes its ISO 4217 minor units**, held as one fixed list in the kernel (`TICVAI.Domain`, beside Money), so every module resolves it the same way and no table, query or migration holds it (ADAM CR-192, option A; Chinmay, 21 October 2026; CHG-R10ORD-018). The venue and region settings keep their own `currency_scale` for the trading currency.",
     "minimum": 0,
     "maximum": 4
    }
@@ -279,6 +284,13 @@
       }
      }
     }
+   },
+   "maxSeatsPerGuestOrder": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 50,
+    "readOnly": true,
+    "description": "**The most seats one guest booking may hold at this performance's venue** (ADAM CR-187, 25 October 2026): the venue's `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7), read through `tenancy#venueSettingsRecords` (the venue's row, else the tenant's own row, else 10). A guest screen caps its party stepper with it before anything is held (WEB-007, GST-049); `createSeatHold` still refuses more with `422` `seat-limit-exceeded`, whose `maxSeats` is this value on a guest channel. Computed, not stored."
    },
    "zones": {
     "type": "array",

@@ -14,15 +14,27 @@
   },
   "navigation": {
    "exitTo": [
-    "WEB-001"
+    "WEB-001",
+    "WEB-002"
    ],
    "inferred": false,
+   "transitions": [
+    {
+     "to": "WEB-002",
+     "trigger": "Use this offer",
+     "precondition": "the offer has a code (an automatic promotion needs nothing applied and stays on the list)",
+     "carries": [
+      "code"
+     ],
+     "provenance": "ADAM CR-225 (option A), settled by Chinmay 25 October 2026: Use this offer opens the booking flow with the code, which the booking keeps (in memory, with the booking; never in storage) until WEB-010, where `applyCartPromoCode` applies it to the cart. WEB-032 has no cart and calls no cart operation."
+    }
+   ],
    "entryFrom": [
     "WEB-001"
    ],
    "notes": "**Reached from WEB-001** — a top-level section of the site. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely."
   },
-  "notes": "Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93. **`evaluatePromotions` removed 27 September 2026 (audit root R292).** It evaluates promotions against a cart — `EvaluatePromotionsRequest` requires `venueId`, `channel` and at least one line with a variant, quantity and unit price — and this screen has no cart: it arrives with `promotionId` alone. Offers apply where the cart is, on WEB-005 and WEB-010, which keep the call.\n\nBuild note (r8 second round, ORDERS-MONEY-C11): **Use this offer** on a promotion with a code applies it to the guest's cart with `applyCartPromoCode` and that code; an automatic promotion needs nothing applied, so it goes back to the list. The button is not drawn on this client-approved screen's definition yet; adding it and its binding waits for the client (pending entry ORDERS-MONEY-C11).",
+  "notes": "Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93. **`evaluatePromotions` removed 27 September 2026 (audit root R292).** It evaluates promotions against a cart — `EvaluatePromotionsRequest` requires `venueId`, `channel` and at least one line with a variant, quantity and unit price — and this screen has no cart: it arrives with `promotionId` alone. Offers apply where the cart is, on WEB-005 and WEB-010, which keep the call.\n\n**Use this offer, the pill and the venue line (ADAM CR-225, settled by Chinmay 25 October 2026, option A; raised by Chinmay Patkar on #28185).** The client-approved frame draws all three on each card. **Use this offer** on an offer with a code opens the booking flow (WEB-002) with that code; the booking keeps it and WEB-010 applies it with `applyCartPromoCode` once the cart has a line, so this screen needs no cart. An automatic promotion needs nothing applied and stays on the list. The pill is `GuestPromotion.label` and the venue line `GuestPromotion.venues` (each `{venueId, name}`; an empty list reads *All venues*), both set in the back office. This replaces the r8 build note (ORDERS-MONEY-C11), which left the button waiting for the client.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPromotions` reads the population and `getPromotion` reads one of them — list, select, act",
@@ -37,18 +49,26 @@
       {
        "kind": "cardList",
        "label": "Offers",
-       "bindsTo": "Promotion",
+       "bindsTo": "GuestPromotion",
        "columns": [
-        "Promotion.code",
-        "Promotion.name",
-        "Promotion.description",
-        "Promotion.discount",
-        "Promotion.validFrom",
-        "Promotion.validTo"
+        "GuestPromotion.code",
+        "GuestPromotion.name",
+        "GuestPromotion.description",
+        "GuestPromotion.discount",
+        "GuestPromotion.validFrom",
+        "GuestPromotion.validTo",
+        "GuestPromotion.label",
+        "GuestPromotion.venues"
        ],
        "operation": "listPromotions",
-       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "The offers active now at the guest's venue. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every promotion'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3); label and venues ADAM CR-225, 25 October 2026",
+       "notes": "The offers active now at the guest's venue, in the guest shape a guest caller receives (`GuestPromotion`). The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. **The card's pill is `label`** (localised, set in the back office) **and its venue line `venues`** (the names; an empty list reads *All venues*), as the client-approved frame draws them (ADAM CR-225, 25 October 2026). Was the generated table 'Every promotion'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Use this offer",
+       "notes": "On each offer card that has a code: opens the booking flow (WEB-002) carrying the code; WEB-010 applies it with `applyCartPromoCode` once the cart has a line (ADAM CR-225, 25 October 2026). Not shown on an automatic promotion, which needs nothing applied. Drawn on the client-approved frame.",
+       "provenance": "client-approved frame (prototype rev 3, match exact); ADAM CR-225, settled 25 October 2026"
       }
      ]
     },
@@ -59,15 +79,15 @@
       {
        "kind": "detailPanel",
        "label": "The selected promotion",
-       "bindsTo": "Promotion",
+       "bindsTo": "GuestPromotion",
        "columns": [
-        "Promotion.code",
-        "Promotion.name",
-        "Promotion.description",
-        "Promotion.discount",
-        "Promotion.validFrom",
-        "Promotion.validTo",
-        "Promotion.maxRedemptionsPerGuest"
+        "GuestPromotion.code",
+        "GuestPromotion.name",
+        "GuestPromotion.description",
+        "GuestPromotion.discount",
+        "GuestPromotion.validFrom",
+        "GuestPromotion.validTo",
+        "GuestPromotion.maxRedemptionsPerGuest"
        ],
        "operation": "getPromotion",
        "provenance": "contract promotions.yaml GET /promotions/{promotionId}"
@@ -109,11 +129,11 @@
    ],
    "coldEntry": "**A dead promotion link says \"This offer is no longer available\" and shows the list it came from** (the offers active now), with no name and no reason (r8, ORDERS-MONEY-C01; ADR-0030 as relaxed for promotions). Never a 404 page. Arrives with `promotionId`.",
    "preloaded": [
-    "Promotion.code",
-    "Promotion.name",
-    "Promotion.description",
-    "Promotion.venueId",
-    "Promotion.discount"
+    "GuestPromotion.code",
+    "GuestPromotion.name",
+    "GuestPromotion.description",
+    "GuestPromotion.venues",
+    "GuestPromotion.discount"
    ]
   },
   "wireframe": {

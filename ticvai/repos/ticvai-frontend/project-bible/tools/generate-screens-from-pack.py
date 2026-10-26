@@ -92,6 +92,7 @@ import yaml
 # or 2 must not carry them, so the generator says them in exactly these words.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from screen_patterns import NEEDS_PERSON  # noqa: E402
+import contract_shapes as CS  # noqa: E402 — the r10 patterns (CHG-R10GEN-007)
 
 # Provenance prefixes this generator owns; anything else on an overlay is somebody's
 # decision and is carried through a rebuild.
@@ -848,6 +849,13 @@ def build(screen: dict, entry: dict, ops: dict, schemas: dict, report: Counter,
                      and o.get("id") not in {x.get("id") for x in overlays}]
     if overlays or kept_overlays:
         out["overlays"] = overlays + kept_overlays
+    # **(d) A generated screen shows only what its declared operations answer or send** (r10, CHG-R10GEN-007; ADAM
+    # CR-187, CR-220, CR-221, CR-233; check-screen-value-sources). A component of this generator's bound to a schema
+    # no declared operation returns or takes is unbound, with a note, instead of promising a value with no source.
+    report["unsourced unbound"] += CS.drop_unsourced(
+        (out.get("layout") or {}).get("regions"), out.get("overlays"),
+        *CS.declared_io([a.get("operationId") for a in (screen.get("apis") or []) if a.get("operationId")],
+                        ops, schemas), mine=("pack ", "contract "))
     out["states"] = states
     # **A mutation invalidates the query it changes.** `decideApprovalRequest` recorded
     # `invalidates: [listPromotions]` because `op_ids[0]` is declaration order; the queue it

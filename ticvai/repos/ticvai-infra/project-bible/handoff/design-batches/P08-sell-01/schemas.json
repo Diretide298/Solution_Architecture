@@ -61,6 +61,12 @@
  "AlternativeCode": {
   "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "catalogue.alternative_code",
+  "x-ticvai-unique-together": [
+   [
+    "partnerId",
+    "code"
+   ]
+  ],
   "type": "object",
   "required": [
    "code",
@@ -409,7 +415,7 @@
       "nullable": true,
       "readOnly": true,
       "x-ticvai-references": "catalogue.variant",
-      "description": "**The catalogue variant a cart line of this bundle names** (R8 blocker ORDERS-MONEY-C43, CHG-R8MIG-023): each sold bundle has a catalogue product of kind bundle with one variant, made when the bundle is published; `addCartLine` sends it as `variantId`, with the picks in `attributes.bundle`. Null until published."
+      "description": "**The catalogue variant a cart line of this bundle names** (R8 blocker ORDERS-MONEY-C43, CHG-R8MIG-023): each sold bundle has a catalogue product of kind bundle with one variant, made when the bundle is published; `addCartLine` sends it as `variantId`, with the picks in `attributes.bundle`. Null until published.\n\n**It is the bundle's published mark** (ADAM CR-197, option B, decided 25 October 2026; CHG-R10CAT-002): not null is published, and `isActive` false is withdrawn. It is written once, by the publication step of `updateBundle` (the first `isActive: true` on a bundle with no variant), which creates the bundle's catalogue product, and is never cleared: withdrawing and putting the bundle back on sale keep the same product and variant."
      },
      "savingsAmount": {
       "allOf": [
@@ -417,7 +423,7 @@
         "$ref": "../shared/common.yaml#/components/schemas/Money"
        }
       ],
-      "description": "Sum of component list prices less the bundle price."
+      "description": "Sum of component list prices less the bundle price: the `list_price` captured on each `promotions.allocation_component` when the bundle was created, not the variants' current prices (ADAM CR-110, option 1; CHG-R10CAT-010)."
      },
      "savingsPercentage": {
       "type": "number"
@@ -751,6 +757,12 @@
  },
  "CatalogueBundle": {
   "x-ticvai-persistence": "catalogue.published_bundle",
+  "x-ticvai-unique-together": [
+   [
+    "venueId",
+    "version"
+   ]
+  ],
   "type": "object",
   "required": [
    "version",
@@ -764,11 +776,20 @@
   ],
   "properties": {
    "version": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique-compare": "exact",
+    "description": "The venue's bundle number: a per-venue integer, 1 for the first publish and one more than the venue's highest for each publish after, as its decimal string; unique with `venueId` (ADAM CR-110, option 1; CHG-R10CAT-010)."
    },
    "venueId": {
     "type": "string",
     "format": "uuid"
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The publisher's note from `publishBundle`'s body; `BundleSummary.note` (ADAM CR-110, option 1; CHG-R10CAT-010)."
    },
    "publishedAt": {
     "type": "string",
@@ -1075,7 +1096,8 @@
    },
    "isSeated": {
     "type": "boolean",
-    "description": "Seated envelopes cannot be leased and are blocked offline. A seat map is not a count.\n"
+    "readOnly": true,
+    "description": "Seated envelopes cannot be leased and are blocked offline. A seat map is not a count.\n\n**Derived by the server**: true when the capacity has a `seatCategoryId`, false otherwise (ADAM CR-111, option 1; CHG-R10CAT-011).\n"
    }
   }
  },
@@ -1726,6 +1748,7 @@
    },
    "allocation": {
     "type": "object",
+    "description": "Stored as `promotions.allocation_split` and `promotions.allocation_component`, the record of the split; `promotions.bundle.allocation` is a copy derived from them in the same transaction (ADAM CR-110, option 1; CHG-R10CAT-010).",
     "required": [
      "method",
      "components"
@@ -1965,6 +1988,11 @@
     "type": "boolean",
     "default": true,
     "description": "Whether the item may go to shop-and-drop; the venue sets chilled, fragile or oversized items false (R8 blocker APPROVALS-TENANCY-C34)."
+   },
+   "isPublished": {
+    "type": "boolean",
+    "default": false,
+    "description": "Whether guests and visitors may see the item (`MerchandiseItem.isPublished`; CHG-R10ORD-025)."
    }
   }
  },
@@ -2309,6 +2337,15 @@
      "format": "uuid"
     }
    },
+   "addOnProductIds": {
+    "type": "array",
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "The `kind` addOn products of the same venue offered with this product, in display order (`Product.addOnProductIds`; ADAM CR-252). Any other id is `400 validation` on `addOnProductIds`."
+   },
    "requiresTimeWindow": {
     "type": "boolean"
    }
@@ -2336,9 +2373,45 @@
     "type": "string",
     "maxLength": 200
    },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**The promotion's name in each of the tenant's enabled languages** (ADAM CR-231, option A, decided 25 October 2026; CHG-R10CAT-012), keyed by ISO 639-1 code, as `Product.nameLocalised`. The back office collects one per enabled language; a guest screen shows the page language's entry and falls back to `name`. At most 200 characters per language, as `name`."
+   },
    "description": {
     "type": "string",
     "maxLength": 1000
+   },
+   "descriptionLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The description in each enabled language, as `nameLocalised`; falls back to `description`. At most 1000 characters per language (ADAM CR-231)."
+   },
+   "label": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "**The guest-facing label**, the pill on the offer card (BUNDLE, RENTAL, MEMBERSHIP, SEASON, PARKING on WEB-032), per language as `nameLocalised` (ADAM CR-225 and CR-231, option A, decided 25 October 2026; CHG-R10CAT-012). Set in the back office; null shows no pill. At most 40 characters per language."
+   },
+   "venues": {
+    "type": "array",
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "description": "**Where a guest may use the offer**, as the offer card's venue line shows it (ADAM CR-225, option A, decided 25 October 2026; CHG-R10CAT-012). Set in the back office; empty or absent means every venue. Display only: `venueId` above stays the owning venue and the conditions still decide where the discount applies.",
+    "items": {
+     "$ref": "#/components/schemas/PromotionVenue"
+    }
    },
    "venueId": {
     "type": "string",
@@ -2738,7 +2811,7 @@
      "fixedDate",
      "seasonEnd"
     ],
-    "description": "1.1.90 to 1.1.92. **A pass bought on the 20th and expiring on the 31st cannot be expressed by an offset in days.** `offsetDays` is the existing behaviour and stays the default.\n`seasonEnd` anchors to the venue's own season rather than the calendar — a water park closing in October is not a quarter boundary.\n"
+    "description": "1.1.90 to 1.1.92. **A pass bought on the 20th and expiring on the 31st cannot be expressed by an offset in days.** `offsetDays` is the existing behaviour and stays the default.\n`seasonEnd` anchors to the venue's own season rather than the calendar — a water park closing in October is not a quarter boundary. The season ends at the end of the product's validity, `Product.validTo`, or its `onSaleTo` where `validTo` is null (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003).\n"
    },
    "expiryDate": {
     "type": "string",
@@ -3074,7 +3147,8 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "For grouped events."
+    "x-ticvai-references": "catalogue.event",
+    "description": "For grouped events. The parent is an existing event at the same venue, not the event itself, and has no parent of its own (one level; ADAM CR-256). Declared as a key onto `catalogue.event`."
    },
    "performanceCount": {
     "type": "integer",
@@ -3096,13 +3170,42 @@
      "cancelled",
      "archived"
     ],
-    "description": "**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."
+    "description": "**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState` and the event lifecycle job, which check the transition against `states/event.yaml` (ADAM CR-109); `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."
    },
    "lifecycleStateChangedAt": {
     "type": "string",
     "format": "date-time",
     "readOnly": true,
     "nullable": true
+   },
+   "scheduledLifecycleState": {
+    "type": "string",
+    "readOnly": true,
+    "nullable": true,
+    "enum": [
+     "draft",
+     "planned",
+     "onSale",
+     "live",
+     "closed",
+     "cancelled",
+     "archived"
+    ],
+    "description": "**A move waiting for its effectiveFrom** (ADAM CR-109, option 2; CHG-R10CAT-009): written by `setEventLifecycleState` when `effectiveFrom` is in the future, applied and cleared by the event lifecycle job in the workers host at `scheduledLifecycleAt`. Null when nothing waits."
+   },
+   "scheduledLifecycleAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true,
+    "description": "When the waiting move is applied (the request's `effectiveFrom`; ADAM CR-109)."
+   },
+   "scheduledLifecycleReason": {
+    "type": "string",
+    "maxLength": 500,
+    "readOnly": true,
+    "nullable": true,
+    "description": "The reason given with the waiting move, carried on `event.lifecycleChanged` when it is applied (ADAM CR-109)."
    }
   }
  },
@@ -3123,6 +3226,11 @@
  "GroupPackageDefinition": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.group_package",
+  "x-ticvai-unique-together": [
+   [
+    "productId"
+   ]
+  ],
   "required": [
    "kind",
    "maxParticipants",
@@ -3341,6 +3449,40 @@
    "maxRedemptionsPerGuest": {
     "type": "integer",
     "nullable": true
+   },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "`Promotion.nameLocalised`; the screen shows the page language's entry, else `name` (ADAM CR-231)."
+   },
+   "descriptionLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "`Promotion.descriptionLocalised`; the screen shows the page language's entry, else `description` (ADAM CR-231)."
+   },
+   "label": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The card's pill, `Promotion.label`, per language (ADAM CR-225, CR-231)."
+   },
+   "venues": {
+    "type": "array",
+    "description": "The card's venue line, `Promotion.venues`; empty means every venue (ADAM CR-225). WEB-032's \"Use this offer\" carries `code` into the booking flow to WEB-010, where `applyCartPromoCode` already runs, so the offers page needs no cart operation.",
+    "items": {
+     "$ref": "#/components/schemas/PromotionVenue"
+    }
    }
   }
  },
@@ -3403,6 +3545,12 @@
    "height": {
     "type": "integer",
     "nullable": true
+   },
+   "hasTransparency": {
+    "type": "boolean",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Whether the image has an alpha channel with any pixel not fully opaque, recorded from the file when the upload completes; null for a file that is not an image (ADAM CR-106, option 1; CHG-R10TEN-012). White Label's setAppIcons refuses a source where it is true."
    },
    "durationSeconds": {
     "type": "number",
@@ -3707,6 +3855,16 @@
  },
  "MerchandiseItem": {
   "x-ticvai-persistence": "retail.merchandise",
+  "x-ticvai-unique-together": [
+   [
+    "outletId",
+    "barcode"
+   ],
+   [
+    "outletId",
+    "sku"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -3728,12 +3886,14 @@
     "format": "uuid"
    },
    "sku": {
-    "type": "string"
+    "type": "string",
+    "description": "Unique per outlet (ADAM CR-104, CHG-R10ORD-017); `lookupMerchandise` matches it exactly."
    },
    "barcode": {
     "type": "string",
     "nullable": true,
-    "x-ticvai-unique": "venue"
+    "x-ticvai-unique-compare": "exact",
+    "description": "Unique per outlet where set (ADAM CR-104; was unique per venue, which the table has no venue column to key); `lookupMerchandise` matches it exactly and returns one row."
    },
    "name": {
     "type": "string"
@@ -3784,6 +3944,12 @@
    "isActive": {
     "type": "boolean"
    },
+   "isPublished": {
+    "type": "boolean",
+    "default": false,
+    "x-ticvai-backfill": true,
+    "description": "**Whether a guest or a visitor may see the item** (the lead's answer of 25 October 2026 to the r10 lanes' questions, question 22; CHG-R10ORD-025): the flag `listMerchandise` and `lookupMerchandise` already named for \"published\" (r8 walk of ticket 27820). A guest sees an item only while it is active and published; staff see every item. Set by `PRODUCT_CONFIGURE` holders with `createMerchandise` and `updateMerchandise`; a new item is false until set. **Every item that existed when the column arrived is published** (the lead, 26 October 2026, ADAM CR-104; CHG-R10OPN-002): the forward migration sets it true on those rows (`x-ticvai-backfill`), so no item a guest sees today disappears."
+   },
    "isDroppable": {
     "type": "boolean",
     "default": true,
@@ -3814,7 +3980,7 @@
    },
    "scale": {
     "type": "integer",
-    "description": "Resolved from the region alongside `currency`.",
+    "description": "Resolved from the region alongside `currency`. **A currency other than the venue's or region's trading currency** (a tourist's USD cash at an AED till, `Payment.tenderAmount`; a guest-selected charge currency, `Order.chargeTotal`; a refund in the tender currency) **takes its ISO 4217 minor units**, held as one fixed list in the kernel (`TICVAI.Domain`, beside Money), so every module resolves it the same way and no table, query or migration holds it (ADAM CR-192, option A; Chinmay, 21 October 2026; CHG-R10ORD-018). The venue and region settings keep their own `currency_scale` for the trading currency.",
     "minimum": 0,
     "maximum": 4
    }
@@ -4601,7 +4767,8 @@
    "venueId",
    "scopePath",
    "isSellable",
-   "hasVariants"
+   "hasVariants",
+   "createdAt"
   ],
   "properties": {
    "id": {
@@ -4634,7 +4801,7 @@
      }
     ],
     "nullable": true,
-    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+    "description": "**The product's name in each of the tenant's enabled languages** (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
    },
    "descriptionLocalised": {
     "allOf": [
@@ -4686,6 +4853,12 @@
     "format": "date-time",
     "nullable": true,
     "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**The last moment the product's entitlements are valid; null means the same as `onSaleTo`** (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). A season pass stops selling at `onSaleTo` and is used until `validTo`: an entitlement template's `expiryAnchor` of `seasonEnd` ends here (`access#issueOrderEntitlements`). Sales closing is not validity ending.\n"
    },
    "categoryId": {
     "type": "string",
@@ -4800,6 +4973,15 @@
     },
     "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
    },
+   "addOnProductIds": {
+    "type": "array",
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The add-ons offered with this product, in display order** (accepted 26 October 2026, Chinmay, ADAM CR-252 option A): each a `kind: addOn` product of the same venue (a coffee break, a working lunch, an AV technician offered with a meeting-room type), set in the back office. `listProducts` answers it, so WEB-048 and GST-075 read a room type's add-ons from the load they already make and fetch those products; the guest adds one as a cart line with `parentLineId`. An id that is not a `kind: addOn` product of the same venue is `400 validation` on `addOnProductIds`. Empty when none is offered."
+   },
    "requiresTimeWindow": {
     "type": "boolean",
     "default": false,
@@ -4864,114 +5046,21 @@
     "format": "uuid",
     "nullable": true,
     "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
-   }
-  }
- },
- "ProductCategory": {
-  "type": "object",
-  "x-ticvai-persistence": "catalogue.product_category",
-  "description": "Retail Board 2 of the client's design set, 20 August. **`listSeatCategories` existed and a product category did not** — a seat category prices a seat, and a merchandise hierarchy groups a catalogue.\n**Brand sits here rather than as its own entity.** A venue with four brands and a hierarchy five levels deep can express that with a parent; a venue with one brand should not have to maintain a table containing one row.\n**`displayOrder` is not alphabetical and that is the point.** A retail category list runs in the order the merchandiser wants a guest to see it, and sorting by name puts *Accessories* above *Apparel* forever.\n",
-  "required": [
-   "id",
-   "name",
-   "kind"
-  ],
-  "properties": {
-   "id": {
+   },
+   "createdAt": {
     "type": "string",
-    "format": "uuid"
-   },
-   "name": {
-    "type": "string"
-   },
-   "code": {
-    "type": "string",
-    "maxLength": 64,
-    "nullable": true,
-    "x-ticvai-unique": "tenant",
-    "description": "**Taken from their category tables, 20 September.** Ours had a uuid and a localised name, so an importer matching *Beverages* had to match on a display string that a venue is free to translate.\n**Unique per tenant where set** (decided 28 September, audit R108): two categories in one tenant never share a code, and `setProductCategories` refuses a body that would, with `409 duplicate-code`.\n"
-   },
-   "nameLocalised": {
-    "type": "object",
-    "additionalProperties": {
-     "type": "string"
-    }
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "category",
-     "brand",
-     "collection",
-     "season",
-     "department"
-    ]
-   },
-   "parentId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**One tree, not four.** A brand under a department under a category is how a real merchandise hierarchy runs, and separate tables for each level cannot express a venue that nests them differently.\n"
-   },
-   "scopePath": {
-    "type": "string",
+    "format": "date-time",
     "readOnly": true,
-    "description": "Set by the server from the venue the caller acts at; not sent."
+    "description": "**When the product was created** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): `catalogue.product.created_at`, NOT NULL DEFAULT now(), set by the server and never by a request. Rows that predate it are backfilled by the migration task (the earliest of the product's first version's `published_at` and the migration time), then the NOT NULL and the DEFAULT are set. `listProductLifecycle` orders and filters on it."
    },
-   "displayOrder": {
-    "type": "integer",
-    "default": 100
-   },
-   "imageAssetId": {
+   "updatedAt": {
     "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "description": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/catalogue::LocalisedText"
-     }
-    ],
+    "format": "date-time",
+    "readOnly": true,
     "nullable": true,
-    "description": "The short line a guest reads under a category option, e.g. *Surf lessons: learn on the beginner wave with a coach* (decided 29 September, rev 3 REV3-19). Each language value at most 200 characters.\n"
-   },
-   "bookingFlowId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**The booking flow for every product filed here** that names none of its own (decided 29 September, W12, BO-115). Null means the venue's flow for each product's `kind`. A white-label `BookingFlow` of the venue; `setProductCategories` refuses any other id with `422`.\n"
-   },
-   "isActive": {
-    "type": "boolean",
-    "default": true,
-    "description": "**Deactivated rather than deleted.** A category with a season behind it still names the products sold under it, and removing it rewrites last year's report.\n"
+    "description": "**When the product last changed** (ADAM CR-204): set by `updateProduct` and by every product sub-resource PUT and bulk change that versions the product; null until the first change after creation. `listProductLifecycle`'s `lastModifiedAt` and `modifiedSince` read it."
    }
   }
- },
- "ProductCategoryNode": {
-  "x-ticvai-persistence": "none — projection over catalogue.product_category",
-  "description": "**One node of the tree `listProductCategories` returns.** A `ProductCategory` with its children nested under it, in `displayOrder`, so no caller reassembles the hierarchy from `parentId`. `setProductCategories` still takes the flat list, because a write names each parent by id.\n",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/ProductCategory"
-   },
-   {
-    "type": "object",
-    "required": [
-     "children"
-    ],
-    "properties": {
-     "children": {
-      "type": "array",
-      "description": "Empty on a leaf.",
-      "items": {
-       "$ref": "#/components/schemas/ProductCategoryNode"
-      }
-     }
-    }
-   }
-  ]
  },
  "ProductChangeImpact": {
   "type": "object",
@@ -5107,6 +5196,24 @@
     "type": "integer",
     "default": 100
    },
+   "url": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The asset's stable CDN address, for a guest card** (ADAM CR-221, option A, decided 25 October 2026; CHG-R10CAT-014): the asset library's public address for the asset, set on guest-facing reads (`searchCatalogue`, `listProducts` and `getProduct` for a guest or a visitor) when the asset is public and `ready`, as `getPublishedTenantConfig` returns white-label assets (`brandUrls`). Null otherwise, and on staff reads, which are unchanged. Catalogue reads the asset in process, a read the lead granted across deployables (XDR-005, 25 October 2026; CHG-R10CAT-015)."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The asset library's thumbnail address for the asset, on the same reads and with the same rule as `url` (ADAM CR-221)."
+   },
    "altText": {
     "allOf": [
      {
@@ -5171,6 +5278,23 @@
     "x-ticvai-persisted": false,
     "description": "**The list price on the caller's channel now**, resolved on read from the price lists (`listProductVariants`; R8 blocker cause GPS-C27, CHG-R8SPN-028). Not stored on the variant and ignored on input. Null where no price list prices it on that channel. The list price, not the total: promotions and bundles are applied at the basket."
    },
+   "referencePrice": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The price a saving is measured against** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C), set by the back office on the variant (`updateProductVariant`). Null where the variant claims no saving, which is the default. In the same currency as `listPrice`."
+   },
+   "savingPercent": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**Computed by the server, never in the browser** (ADAM CR-253): with a `referencePrice` and a `listPrice` below it, the whole percent the list price saves, `floor((referencePrice - listPrice) / referencePrice * 100)` (rounded down, so the label never overstates; proposed, client to correct); null otherwise. A length tile shows *Save n%* only when this is set."
+   },
    "productId": {
     "type": "string",
     "format": "uuid"
@@ -5232,6 +5356,7 @@
   "description": "1.1.47, 1.4.9 to 1.4.11. **Follows `white-label.ConfigVersion`** — the same pattern for the same reason, and the fourth place this mechanism was asked for.\n",
   "required": [
    "version",
+   "productId",
    "publishedAt",
    "publishedByPrincipalId"
   ],
@@ -5241,7 +5366,9 @@
    },
    "productId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "catalogue.product",
+    "description": "**The product this is a version of**, always set (ADAM CR-214; CHG-R10CAT-006). Required, so the row follows its product's row security: a venue that writes a product writes its versions, which every product write that versions it now does (until r10 product_id was nullable and the table was tenant-root only)."
    },
    "publishedAt": {
     "type": "string",
@@ -5262,6 +5389,15 @@
    "contentHash": {
     "type": "string",
     "description": "**Lets a diff be cheap and a no-op change be recognised.** Republishing an unchanged product should not create a version.\n"
+   },
+   "snapshot": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "additionalProperties": true,
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "description": "**What the version was**, so a restore brings it all back (ADAM CR-214, option A, decided 25 October 2026; CHG-R10CAT-006): the product row and its `product_media`, `product_channel_text`, `product_sale_permission` and `product_owner_form` rows, in the canonical JSON `contentHash` is taken over. Null on a version written before r10."
    },
    "restoredFromVersion": {
     "type": "integer",
@@ -5655,6 +5791,37 @@
    }
   }
  },
+ "PromotionVenue": {
+  "x-ticvai-persistence": "none — jsonb column promotions.promotion.venues",
+  "type": "object",
+  "description": "One venue on a promotion's guest-facing venue line (ADAM CR-225; CR-231 localises its name; CHG-R10CAT-012).",
+  "required": [
+   "venueId",
+   "name"
+  ],
+  "properties": {
+   "venueId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "platform.scope",
+    "description": "A venue node of the tenant (checked with `tenancy#scopeRecords` on write)."
+   },
+   "name": {
+    "type": "string",
+    "maxLength": 200,
+    "description": "The venue's name as the back office gives it for guests."
+   },
+   "nameLocalised": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/promotions::LocalisedText"
+     }
+    ],
+    "nullable": true,
+    "description": "The name in each enabled language; falls back to `name` (ADAM CR-231)."
+   }
+  }
+ },
  "ReportResult": {
   "x-ticvai-persistence": "none — result set, cached in object storage",
   "type": "object",
@@ -5854,6 +6021,13 @@
       }
      }
     }
+   },
+   "maxSeatsPerGuestOrder": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 50,
+    "readOnly": true,
+    "description": "**The most seats one guest booking may hold at this performance's venue** (ADAM CR-187, 25 October 2026): the venue's `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7), read through `tenancy#venueSettingsRecords` (the venue's row, else the tenant's own row, else 10). A guest screen caps its party stepper with it before anything is held (WEB-007, GST-049); `createSeatHold` still refuses more with `422` `seat-limit-exceeded`, whose `maxSeats` is this value on a guest channel. Computed, not stored."
    },
    "zones": {
     "type": "array",
@@ -6252,6 +6426,15 @@
      "type": "string",
      "format": "uuid"
     }
+   },
+   "addOnProductIds": {
+    "type": "array",
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "The `kind` addOn products of the same venue offered with this product, in display order (`Product.addOnProductIds`; ADAM CR-252). Any other id is `400 validation` on `addOnProductIds`."
    },
    "requiresTimeWindow": {
     "type": "boolean"

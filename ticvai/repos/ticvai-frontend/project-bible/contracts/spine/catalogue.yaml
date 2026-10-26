@@ -223,6 +223,9 @@ x-ticvai-queries:
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked in process within commerce, through the C# query interface Catalogue implements, and
       asked from another deployable through Catalogue's service route (serviceAuth).
+      It is asked in process by the access host too (ADAM CR-240, option A, 25 October 2026; CHG-R10ORD-009; XDR-003),
+      and by the workers host for the consumers it runs, issueOrderEntitlements among them (ADAM CR-167; ADR-0055,
+      amended 25 October 2026).
     served: [in-process, service]
   eventRecords:
     module: catalogue
@@ -296,6 +299,27 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Catalogue implements, and asked from another
       deployable through Catalogue's service route (serviceAuth).
+      It is asked in process by the workers host for the consumers it runs, issueOrderEntitlements among them (ADAM
+      CR-167; ADR-0055, amended 25 October 2026).
+    served: [in-process, service]
+  salesChannelRecords:
+    module: catalogue
+    table: catalogue.sales_channel
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The catalogue.sales_channel rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/SalesChannelProfile'}
+    rule: >-
+      A data read, not a rule question (ADR-0055 rule 2 as amended 14 October; declared for ADAM CR-167, 25 October
+      2026, CHG-R10ORD-010, so access issueOrderEntitlements reads the order's sales channel profile and its
+      ticketCredentialFormat). Catalogue answers with its catalogue.sales_channel rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing. It is asked in process within commerce and by the workers host, which
+      composes every module's query interfaces for the event consumers it runs (ADR-0055, amended 25 October 2026),
+      and from another deployable through Catalogue's service route (serviceAuth).
     served: [in-process, service]
   priceRecords:
     module: catalogue
@@ -356,6 +380,8 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Catalogue implements, and asked from another
       deployable through Catalogue's service route (serviceAuth).
+      It is asked in process by the workers host for the consumers it runs, issueOrderEntitlements among them (ADAM
+      CR-167; ADR-0055, amended 25 October 2026).
     served: [in-process, service]
   bundleApplicationRecords:
     module: catalogue
@@ -463,6 +489,8 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Catalogue implements, and asked from another
       deployable through Catalogue's service route (serviceAuth).
+      It is asked in process by the workers host for the consumers it runs, issueOrderEntitlements among them (ADAM
+      CR-167; ADR-0055, amended 25 October 2026).
     served: [in-process, service]
   variantDimensionRecords:
     module: catalogue
@@ -493,7 +521,6 @@ paths:
         - "P02 GST-002 Explore"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-008 Tickets & Add-ons"
-        - "P08 BO-015 Performance Calendar"
         - "P08 BO-048 Retail Products"
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P13 CMS-101 Help Me Choose"
@@ -549,6 +576,7 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: The tree. The root categories in `displayOrder`, each carrying its `children`
@@ -706,7 +734,7 @@ paths:
             rather than rolled back** — three thousand products half-created is a state somebody has to
             see to repair.
 
-            '
+             Also refused when the catalogue import job is `committing`, `failed` or `parsing`; states/catalogue-import-job.yaml moves this call only from `previewReady`. (r10 default ruling, CHG-R10GEN-005)'
           content:
             application/problem+json:
               schema:
@@ -1025,6 +1053,13 @@ paths:
       operationId: restoreProductVersion
       x-ticvai-consumed-by:
         - "P08 BO-008 Product Detail & Variants"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
+      x-ticvai-writes:
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
       summary: Put a previous version back
       description: '1.4.10. **Restoring creates a new version rather than rewinding to an old one**, following
         `restoreConfigVersion`. A price that was wrong for three days stays visible in the history, because
@@ -1038,6 +1073,12 @@ paths:
         `requested` -> `executing` -> `completed` (or `failed`) within the call (`states/catalogue-rollback-action.yaml`),
         and one `catalogue.audit_entry` (`domain: product`, `source: rollback`, `rollbackActionId` set). ADM-132
         lists these rows.
+
+
+        **What comes back** (ADAM CR-214, option A, decided 25 October 2026; CHG-R10CAT-006): the restored version''s `snapshot`,
+        the product row with its media, channel texts, sale-permission rules and owner-form links, replaces the current
+        ones, and the result is a new version (`restoredFromVersion` the one restored). A version written before r10
+        has no snapshot and is `409 version-has-no-snapshot`; nothing changes.
 
         '
       tags:
@@ -1073,8 +1114,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Product'
         '409':
-          description: 'The product is `archived`; an archived product takes no new version. Nothing changes.'
-          x-ticvai-problem-types: [product-archived]
+          description: 'The product is `archived`, and an archived product takes no new version; or the version has no
+            `snapshot` to restore (`version-has-no-snapshot`, ADAM CR-214). Nothing changes.'
+          x-ticvai-problem-types: [product-archived, version-has-no-snapshot]
           content:
             application/problem+json:
               schema:
@@ -1155,6 +1197,9 @@ paths:
       operationId: bulkUpdateCatalogueProducts
       x-ticvai-consumed-by:
         - "P08 BO-007 Product Directory"
+      x-ticvai-writes:
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
       x-ticvai-agreed: '2 October: Chinmay, contract follow-ups ("BO-007 bulk edit: a new catalogue operation"); the
         BO-007 correction of CHG-WIR-027; shape follows bulkChangePrices and inventory bulkUpdateProducts'
       summary: Change many products at once, with a preview
@@ -1241,6 +1286,12 @@ paths:
                       format: date-time
                       nullable: true
                       description: Retires the matched products automatically at that time (retiring a season).
+                    validTo:
+                      type: string
+                      format: date-time
+                      nullable: true
+                      description: The last moment the matched products' entitlements are valid (`Product.validTo`;
+                        ADAM CR-167, CHG-R10OPN-003); null means the same as `onSaleTo`.
                     channels:
                       type: array
                       items:
@@ -1606,6 +1657,10 @@ paths:
       operationId: cloneProduct
       x-ticvai-consumed-by:
         - "P08 BO-008 Product Detail & Variants"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       summary: Copy a product as a new draft
       description: '1.1.47 and 1.1.48. `copyPriceList` and `cloneSeatMap` are the precedents and **the
         product equivalent did not exist**, so a seasonal variant was built by hand each year.
@@ -1671,6 +1726,15 @@ paths:
       - query: white-label#guidedChoiceAnswerRecords
         route: service
         for: 'its read of whitelabel.guided_choice_answer, WhiteLabel''s data (CHG-MOD-001)'
+      - query: assets#mediaAssetRecords
+        route: in-process
+        for: 'a guest read''s ProductMedia url and thumbnailUrl: the asset''s stable CDN address when it is public and ready (assets.media_asset), Assets'' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)'
+      - query: white-label#guidedChoiceRecords
+        route: service
+        for: 'what its text calls "GuidedChoice": whitelabel.guided_choice, WhiteLabel''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: body.fromPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -1757,6 +1821,7 @@ paths:
             type: string
             format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Results
@@ -1799,7 +1864,7 @@ paths:
 
                         '
         '400':
-          x-ticvai-problem-types: [unknown-guided-answer]
+          x-ticvai-problem-types: [unknown-guided-answer, venue-required]
           description: A `guidedAnswerIds` entry that is not an answer of the venue's published guided choice
             (W4, 29 September).
           content:
@@ -1813,13 +1878,17 @@ paths:
       operationId: listDonationCampaigns
       x-ticvai-consumed-by:
         - "P08 BO-1190 Donation Campaigns"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DonationCampaign.fixedAmounts, DonationCampaign.maxAmount, DonationCampaign.minAmount, DonationCampaign.raisedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Campaigns a guest can give to
       description: '1.1.128–1.1.133. **Multiple campaigns may run at once and a single transaction may
         give to several** (1.1.131), which is why a donation is a line and not a flag on the order.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - catalogue
       x-ticvai-permission: PRODUCT_VIEW
@@ -1846,6 +1915,9 @@ paths:
       - query: finance#accountRecords
         route: in-process
         for: 'its read of ledger.account, Ledger''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: DonationCampaign.fixedAmounts, DonationCampaign.maxAmount, DonationCampaign.minAmount, DonationCampaign.raisedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Create a campaign
@@ -1895,6 +1967,10 @@ paths:
       operationId: updateDonationCampaign
       x-ticvai-consumed-by:
         - "P08 BO-1190 Donation Campaigns"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: DonationCampaign.fixedAmounts, DonationCampaign.maxAmount, DonationCampaign.minAmount, DonationCampaign.raisedTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Amend or close a campaign
@@ -2071,6 +2147,10 @@ paths:
       operationId: offerWaitlistCapacity
       x-ticvai-consumed-by:
         - "P08 BO-017 Capacity Management"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings.catalogue": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Tell a waiting guest that capacity appeared
@@ -2154,6 +2234,7 @@ paths:
         - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-877 Qualification & Assignment Rule Engine"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+        - "P13 CMS-006 Component Preview"
         - "P13 CMS-101 Help Me Choose"
         - "P13 CMS-103 Booking Flows"
         - "P16 ANL-004 Product Performance"
@@ -2161,6 +2242,12 @@ paths:
       - query: white-label#guidedChoiceAnswerRecords
         route: service
         for: 'its read of whitelabel.guided_choice_answer, WhiteLabel''s data (CHG-MOD-001)'
+      - query: assets#mediaAssetRecords
+        route: in-process
+        for: 'a guest read''s ProductMedia url and thumbnailUrl: the asset''s stable CDN address when it is public and ready (assets.media_asset), Assets'' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)'
+      - query: white-label#guidedChoiceRecords
+        route: service
+        for: 'what its text calls "GuidedChoice": whitelabel.guided_choice, WhiteLabel''s data (CHG-R10GEN-001)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2290,6 +2377,7 @@ paths:
             format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Products
@@ -2305,7 +2393,7 @@ paths:
                       items:
                         $ref: '#/components/schemas/Product'
         '400':
-          x-ticvai-problem-types: [category-not-in-venue, guided-answer-not-published]
+          x-ticvai-problem-types: [category-not-in-venue, guided-answer-not-published, venue-required]
           description: A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is
             not an answer of the venue's published guided choice (W4, 29 September).
           content:
@@ -2326,6 +2414,9 @@ paths:
       - query: white-label#bookingFlowRecords
         route: service
         for: 'its read of whitelabel.booking_flow, WhiteLabel''s data (CHG-MOD-001)'
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -2369,7 +2460,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Product'
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          description: 'Validation failed (`validation`), with `errors[]` naming the field. Includes an
+            `addOnProductIds` entry that is not a `kind` addOn product of the same venue (ADAM CR-252).'
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
@@ -2420,6 +2517,8 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: The current setting
           content:
@@ -2439,6 +2538,7 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
     put:
       operationId: setProductEligibilityRule
       x-ticvai-consumed-by:
@@ -2544,6 +2644,10 @@ paths:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
         - "P08 BO-011 Packages & Bundles"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GroupPackageDefinition.unitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2562,6 +2666,8 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: The current setting
           content:
@@ -2579,10 +2685,15 @@ paths:
         required: true
         schema:
           type: string
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
     put:
       operationId: setGroupPackageDefinition
       x-ticvai-consumed-by:
         - "P08 BO-011 Packages & Bundles"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GroupPackageDefinition.unitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Define a school-trip format or party package
       description: '**Design gap, 23 September.** The kids club sells school trips (half-day, full-day,
         curriculum day, priced per pupil) and birthday parties (Explorer to Exclusive hire, priced per package,
@@ -2636,6 +2747,10 @@ paths:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
         - "P08 BO-268 Group Package & Experience Builder"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GroupPackageDefinition.unitPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -2677,6 +2792,7 @@ paths:
           - party
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Packages
@@ -2725,6 +2841,10 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: in-process
+        for: 'a guest read''s ProductMedia url and thumbnailUrl: the asset''s stable CDN address when it is public and ready (assets.media_asset), Assets'' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2763,7 +2883,11 @@ paths:
 
         '
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Product
           content:
@@ -2781,10 +2905,22 @@ paths:
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
         - "P13 CMS-103 Booking Flows"
+      x-ticvai-reads:
+      - table: catalogue.product_media
+        for: 'a sub-resource that content_hash and snapshot cover (ADAM CR-214; CHG-R10CAT-006)'
+      - table: catalogue.product_channel_text
+        for: 'a sub-resource that content_hash and snapshot cover (ADAM CR-214; CHG-R10CAT-006)'
+      - table: catalogue.product_sale_permission
+        for: 'a sub-resource that content_hash and snapshot cover (ADAM CR-214; CHG-R10CAT-006)'
+      - table: catalogue.product_owner_form
+        for: 'a sub-resource that content_hash and snapshot cover (ADAM CR-214; CHG-R10CAT-006)'
       x-ticvai-read-via:
       - query: white-label#bookingFlowRecords
         route: service
         for: 'its read of whitelabel.booking_flow, WhiteLabel''s data (CHG-MOD-001)'
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -2795,7 +2931,28 @@ paths:
       description: '**Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200
         with the would-be result without writing, for the AI executor''s plan validation.
 
+
+        **How a product is versioned**, defined here once for every write that says "versioned as `updateProduct`"
+        (ADAM CR-214, option A, decided 25 October 2026; CHG-R10CAT-006). Every committed `updateProduct`, and every product
+        sub-resource PUT that says so (`setProductChannelTexts`, `setProductSalePermissionRules`,
+        `setProductClassification`, `setProductOwnerForms`) and each product `bulkUpdateCatalogueProducts` changes,
+        creates one `catalogue.product_version` row: `version` the product''s highest plus one, `is_current` moved to it
+        in the same transaction, `published_at` and `published_by_principal_id` the write''s time and caller,
+        `content_hash` and `snapshot` as below. **Unless `content_hash` is unchanged**: a write that changes nothing the
+        hash covers creates no version. `content_hash` is the SHA-256 of the product row and its sub-resources (its
+        `catalogue.product_media`, `catalogue.product_channel_text`, `catalogue.product_sale_permission` and
+        `catalogue.product_owner_form` rows) in canonical JSON; `snapshot` is that same JSON, so `restoreProductVersion`
+        brings back the channel texts and sale-permission rules with the product. A validate-only call writes no
+        version.
+
+
+        **updatedAt** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): each of those writes also sets
+        `catalogue.product.updated_at` to its time, whether or not a version is created.
+
         '
+      x-ticvai-writes:
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged (ADAM CR-214; CHG-R10CAT-006)'
       tags:
       - product
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -2822,8 +2979,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Product'
         '400':
-          x-ticvai-problem-types: [primary-media-missing, multiple-primary-media, duplicate-media-asset]
-          description: '`media` with no `isPrimary` item or more than one, or one asset twice.'
+          x-ticvai-problem-types: [primary-media-missing, multiple-primary-media, duplicate-media-asset, validation]
+          description: '`media` with no `isPrimary` item or more than one, or one asset twice; or `validation`, with
+            `errors[]` naming the field, which includes an `addOnProductIds` entry that is not a `kind` addOn product
+            of the same venue (ADAM CR-252).'
           content:
             application/problem+json:
               schema:
@@ -2863,6 +3022,10 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: VariantDimension.priceDelta (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: A product's attribute axes
@@ -2897,6 +3060,10 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings.catalogue": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -3010,6 +3177,10 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-048 Retail Products"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ProductVariant.listPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -3040,6 +3211,8 @@ paths:
         for a visitor, the `channel` parameter); null where no price list prices the variant on that channel.
 
         **Order.** Sorted by `name` ascending, then by `id`.
+
+        Where `name` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - product
       x-ticvai-permission: PRODUCT_VIEW
@@ -3064,7 +3237,10 @@ paths:
           $ref: '#/components/schemas/Channel'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Variants
           content:
@@ -3098,13 +3274,18 @@ paths:
       operationId: updateProductVariant
       x-ticvai-consumed-by:
         - "P08 BO-008 Product Detail & Variants"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ProductVariant.listPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Describe a variant
       description: '**Only the words and codes a person reads or scans.** A variant''s combination of
         values (`axisValues`) and its `sku` come from `setProductAttributes` and are not edited here; this
         sets the `name`, the `description` a guest reads behind the (i) on a ticket-type row (decided 29
-        September, 23SEP-6), the `barcode` and which variant is the default.
+        September, 23SEP-6), the `barcode`, which variant is the default, and the `referencePrice` a length''s
+        saving is measured against (ADAM CR-253; the answer''s `savingPercent` is worked out from it).
 
         Setting `isDefault` true clears it on the product''s other variants. A retired variant is not
         edited: `409`.
@@ -3140,6 +3321,12 @@ paths:
                   nullable: true
                 isDefault:
                   type: boolean
+                referencePrice:
+                  oneOf:
+                  - $ref: ../shared/common.yaml#/components/schemas/Money
+                  nullable: true
+                  description: The price the variant's saving is measured against (`ProductVariant.referencePrice`;
+                    ADAM CR-253); null clears it. In the same currency as `listPrice`.
       responses:
         '200':
           headers:
@@ -3178,7 +3365,7 @@ paths:
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
-      description: '**Order.** Soonest first, by `validFrom` ascending, then by `id`.'
+      description: '**Order.** Soonest first, by `validFrom` ascending, then by `id`. Where `validFrom` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -3282,6 +3469,10 @@ paths:
         - "P08 BO-014 Catalogue Publishing"
         - "P08 BO-601 Product, Pricing & Sales Channel Setup"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Price.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
@@ -3435,6 +3626,7 @@ paths:
           format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '400':
           description: 'No `venueId` from a caller with no venue (`venue-required`), or one that is not a venue of the tenant
@@ -3467,6 +3659,7 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Create an event
+      description: '**`parentEventId`, the group an event belongs to** (accepted 26 October 2026, Chinmay, ADAM CR-256 option A). It must name an existing event the caller can see, at the same venue; not the event itself; and one level only: a parent has no parent, and an event that is a parent cannot be given one. Otherwise `400 validation` on `parentEventId`. The key `catalogue.event.parent_event_id` -> `catalogue.event` is declared.'
       tags:
       - event
       x-ticvai-permission: EVENT_CONFIGURE
@@ -3491,6 +3684,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Event'
+        '400':
+          description: 'Validation failed (`validation`), with `errors[]` naming the field. Includes a `parentEventId`
+            that names no event the caller can see, an event at another venue, the event itself, or an event that has
+            a parent; and, on `updateEvent`, a parent for an event that is itself a parent (ADAM CR-256).'
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
         '429':
@@ -3515,7 +3717,6 @@ paths:
         - "P02 GST-005 What's On"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-049 Interactive Seat Selection"
-        - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-725 Performance Operations Command Center"
@@ -3585,7 +3786,10 @@ paths:
           pattern: ^[A-Za-z]{2,3}(-[A-Za-z0-9]{1,8})*$
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Performances, by `startsAt` ascending with `id` as the tiebreak — the order a
             date-and-performance picker shows them in, and the key the cursor pages on.
@@ -3684,7 +3888,7 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
         - "P10 PTR-005 Inventory & Allocation View"
-      description: '**Order.** Sorted by `name` ascending, then by `id`.'
+      description: '**Order.** Sorted by `name` ascending, then by `id`. Where `name` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -3733,6 +3937,11 @@ paths:
         and partner prices (listProducts, getProduct, listPriceLists, getPriceList, listPrices). An exception is a
         platform grant through public-api setApiLicensing, never a default.'
       summary: Create a channel capacity
+      description: '**isSeated is derived** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011): true when the body names a
+        `seatCategoryId`, false otherwise; it is not taken from the body. A body that breaks the schema is `400`
+        (`errors[]` names the field); a `performanceId` that names no performance the caller can see is 404.
+
+        '
       tags:
       - capacity
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -3757,6 +3966,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelCapacity'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel-capacities/{channelCapacityId}/channel-allocations:
@@ -3896,6 +4109,11 @@ paths:
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-017 Capacity Management"
         - "P10 PTR-005 Inventory & Allocation View"
+      x-ticvai-writes:
+      - table: catalogue.channel_envelope
+        for: 'allocated_units set to sold_units + leased_units (ADAM CR-111; CHG-R10CAT-011)'
+      - table: catalogue.audit_entry
+        for: 'the release and its reason (ADAM CR-111; CHG-R10CAT-011)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -3903,6 +4121,17 @@ paths:
       summary: Return unsold channel allocation to the general pool
       description: 'The standard mechanism for freeing distribution holds close to a performance. May
         be scheduled on the allocation itself, or triggered manually.
+
+
+        **What it does** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011). For each channel named, the
+        `catalogue.channel_envelope` row of this channel capacity has `allocated_units` set to `sold_units +
+        leased_units`, so its unsold, unheld units return to the general pool and nothing sold or held moves; the row is
+        kept. A channel with no allocation on this capacity, or an allocation that is frozen (`is_frozen`), is `409`
+        and nothing is released. Each released row writes one `catalogue.audit_entry` (domain `channel`, action
+        `released`, category `capacity`, entity_type `channelAllocation`, field `allocatedUnits`, the units before and
+        after, and the body''s `reason`). **The scheduled release** (`releaseAt`, or `releaseHoursBeforeEvent` before
+        the performance starts) is run by the allocation release job in the workers host, which does the same with
+        source `scheduler` and no reason. An unknown channel capacity, or one outside the caller''s scope, is 404.
 
         '
       tags:
@@ -3928,6 +4157,7 @@ paths:
                   items:
                     $ref: '#/components/schemas/Channel'
                 reason:
+                  x-ticvai-stored-as: catalogue.audit_entry.reason
                   type: string
                   maxLength: 500
       responses:
@@ -3940,6 +4170,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelAllocationSet'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          x-ticvai-problem-types: [no-channel-allocation, channel-allocation-frozen]
+          description: 'A channel named has no allocation on this capacity (`no-channel-allocation`), or its allocation is
+            frozen (`channel-allocation-frozen`). Nothing is released (ADAM CR-111).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /catalogue/bundles:
@@ -3996,6 +4236,7 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Bundles, newest first
@@ -4039,6 +4280,14 @@ paths:
       - query: finance#taxCodeRecords
         route: in-process
         for: 'the tax codes the bundle carries (ADAM CR-110)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue: that venueId names a venue node the caller can see (404 otherwise), and its path, the key of
+          its offline policy (platform.scope), Tenancy''s data (ADAM CR-110, option 1; CHG-R10CAT-010)'
+      - query: tenancy#offlinePolicyRecords
+        route: in-process
+        for: 'the default staleAfterHours: the venue''s offline policy maxOfflineHours (platform.offline_policy),
+          Tenancy''s data (ADAM CR-110, option 2''s stale default; CHG-R10CAT-010)'
       x-ticvai-audience:
       - staff
       summary: Compute, sign and publish a catalogue bundle
@@ -4063,6 +4312,19 @@ paths:
         `product` tile whose product is not `isSellable` in the bundle being published is dropped from the
         bundle''s copy of the board (the stored board keeps it), so the till never draws a button it
         cannot sell; the tile comes back with the first bundle in which its product is sellable again.
+
+
+        **Version, row and publisher** (ADAM CR-110, option 1 with option 2''s stale default, decided 15 October 2026;
+        CHG-R10CAT-010). Each publish writes **one** `catalogue.published_bundle` row, the full snapshot
+        (`isDelta` false); a terminal''s delta is computed by `getLatestBundle` from its `since`. `version` is a
+        per-venue integer, 1 for the venue''s first bundle and one more than the venue''s highest for each publish
+        after, carried on the wire as its decimal string; `(venue_id, version)` is unique, so two publishes can never
+        take one number. The row keeps `published_at` (the commit time), `published_by` (the caller) and the body''s
+        `note`, which `BundleSummary` returns. **staleAfterHours** defaults to the venue''s offline policy
+        `maxOfflineHours` (the policy saved at the venue''s node, read with `tenancy#offlinePolicyRecords` by the
+        venue''s path from `tenancy#scopeRecords`; 24, the schema default, where none is saved); no second bound is
+        configured. Signing is Ed25519 with the key `signatureKeyId` names (CHG-R8SPN-022). A `venueId` that names no
+        venue the caller can see is 404.
 
         '
       tags:
@@ -4092,8 +4354,8 @@ paths:
                   type: integer
                   minimum: 1
                   description: 'How long a terminal may trade on this bundle before refusing. Defaults
-                    to the venue''s configured bound. A terminal offline for a week must not sell last
-                    month''s prices.
+                    to the venue''s offline policy `maxOfflineHours` (24 where none is saved; ADAM CR-110). A
+                    terminal offline for a week must not sell last month''s prices.
 
                     '
       responses:
@@ -4108,6 +4370,8 @@ paths:
                 $ref: '#/components/schemas/BundleSummary'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [bundle-publish-in-progress]
           description: A publish is already in progress for this venue
@@ -4895,6 +5159,7 @@ paths:
           format: date-time
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Availability, one row per channel capacity, by performance start
@@ -4903,7 +5168,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/PerformanceAvailabilityPage'
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          description: The request breaks a schema rule (`validation`), or names no venue
+            (`venue-required`; ADAM CR-198, CHG-R10ID-022).
+          x-ticvai-problem-types: [validation, venue-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /products/{productId}/lifecycle:
@@ -4924,6 +5195,9 @@ paths:
       - query: access#entitlementRecords
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -5049,7 +5323,7 @@ paths:
       description: 'Partners and distributors use their own SKUs. Mapping them here means an inbound order
         can be matched without asking a partner to change their catalogue.
 
-        '
+         **Order.** Sorted by `code` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - product
       x-ticvai-permission: PRODUCT_VIEW
@@ -5083,6 +5357,12 @@ paths:
         code left out is removed, a code sent is stored as sent, and an empty `codes` removes them all.
         A code is unique per partner. Every `variantId` must be a variant of this product; one that
         belongs to another product is a `400`.
+
+
+        **Unique per partner on the index** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011): `catalogue.alternative_code` is
+        unique on `(partner_id, lower(code))` across the tenant. Alternative codes are venue-scoped since r6, so a
+        lookup under row security cannot see another venue''s rows; the duplicate is found by the index refusing the
+        insert, answered `409 duplicate-code`, never by a read first.
 
         '
       tags:
@@ -5145,6 +5425,10 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-012 Membership Products"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ProductVariant.listPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -5153,6 +5437,14 @@ paths:
       summary: Resolve a partner code to a product
       description: 'Called on inbound distribution orders. Accepts a partner''s own SKU and returns the
         variant it maps to.
+
+
+        **Which partner, and which variant** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011). A partner caller resolves
+        its own codes: `partnerId` is its own, and one naming another partner is 403. A staff caller must send
+        `partnerId` (400 `partner-required` without it), so a code two partners share is never guessed. A code mapped to
+        a variant returns that variant. A product-level code (the row''s `variant_id` null) returns the product''s
+        default variant (`isDefault`), or `409 no-default-variant` when the product has none. A code that matches
+        nothing for the partner is 404.
 
         '
       tags:
@@ -5169,6 +5461,8 @@ paths:
           type: string
       - name: partnerId
         in: query
+        description: 'Required from a staff caller (400 `partner-required`); a partner caller''s own, which it may
+          omit (ADAM CR-111).'
         schema:
           type: string
           format: uuid
@@ -5179,8 +5473,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProductVariant'
+        '400':
+          x-ticvai-problem-types: [partner-required]
+          description: A staff caller sent no `partnerId` (ADAM CR-111).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          x-ticvai-problem-types: [no-default-variant]
+          description: The code is a product-level code and the product has no default variant (ADAM CR-111).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /price-lists/{priceListId}:
@@ -5473,6 +5783,7 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Amend an event
+      description: '**`parentEventId`, the group an event belongs to** (accepted 26 October 2026, Chinmay, ADAM CR-256 option A). It must name an existing event the caller can see, at the same venue; not the event itself; and one level only: a parent has no parent, and an event that is a parent cannot be given one. Otherwise `400 validation` on `parentEventId`. The key `catalogue.event.parent_event_id` -> `catalogue.event` is declared. Sending `null` takes the event out of its group.'
       tags:
       - event
       x-ticvai-permission: EVENT_CONFIGURE
@@ -5508,6 +5819,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Event'
+        '400':
+          description: 'Validation failed (`validation`), with `errors[]` naming the field. Includes a `parentEventId`
+            that names no event the caller can see, an event at another venue, the event itself, or an event that has
+            a parent; and, on `updateEvent`, a parent for an event that is itself a parent (ADAM CR-256).'
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /performances/{performanceId}:
@@ -5547,6 +5867,12 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a published performance,
         and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found.
         `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+
+        **Published follows the event's lifecycle** (ADAM CR-111, option 1, accepted 15 October 2026; CHG-R10CAT-011):
+        a performance is published when its event's `lifecycleState` is `onSale` or `live`, as `listEvents` shows a
+        guest; `Performance.status` has no draft value and does not decide it. Any other performance answers a guest
+        404.
       tags:
       - event
       x-ticvai-permission: PRODUCT_VIEW
@@ -5560,7 +5886,11 @@ paths:
 
         '
       x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Performance
           content:
@@ -5695,6 +6025,12 @@ paths:
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
+      - query: access#entitlementRecords
+        route: service
+        for: 'what its text calls "access.entitlement": access.entitlement, Access''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PerformanceCancellationResult.refundExposure (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-step-up-reason: Cancels a performance and queues refunds to every holder; a supervisor signs it in place (proposed by the coordinator, client to confirm, audit R144).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5843,6 +6179,10 @@ paths:
         - "P08 BO-1192 Entitlement Templates"
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
         - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: EntitlementTemplate.includedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5851,7 +6191,7 @@ paths:
         transferability. Separate from the product, because several products may grant the same right
         at different prices.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - entitlement
       x-ticvai-permission: PRODUCT_VIEW
@@ -5875,10 +6215,36 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-1192 Entitlement Templates"
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
+      x-ticvai-writes:
+      - table: catalogue.entitlement_template
+        for: 'the template, its scope_path the working venue''s path from tenancy#scopeRecords (ADAM CR-217; CHG-R10CAT-001)'
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the caller''s working venue''s path (platform.scope, by id), written as the template''s scope_path,
+          Tenancy''s data (ADAM CR-217, option A; CHG-R10CAT-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s currency and scale, against which includedValue is checked (platform.venue_settings),
+          Tenancy''s data (ADAM CR-217, option A; CHG-R10CAT-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
       summary: Create an entitlement template
+      description: '**Where the template is written** (ADAM CR-217, option A, decided 25 October 2026; CHG-R10CAT-001).
+        `catalogue.entitlement_template.scope_path` is set by the server, never taken from the body: it is the path of
+        the caller''s working venue (the session''s venue id), read with `tenancy#scopeRecords` by id. Catalogue never
+        reads `platform.scope` raw (ADR-0055 rule 2 as amended). **A session with no working venue** (a head-office or
+        region caller) is `403 working-venue-required`, and nothing is written; giving such a caller a venue in the body
+        waits for its own decision.
+
+
+        **includedValue** is common Money, and the column keeps the amount only (ADR-0018; naming-and-style 5.1): its
+        currency and scale are the venue''s (`tenancy#venueSettingsRecords`, by the working venue''s id). A request whose
+        `includedValue.currency` or `scale` differs from the venue''s is `400 venue-currency-mismatch` or
+        `venue-scale-mismatch`, and nothing is written. The 201 answers includedValue in the venue''s currency and scale.
+
+        '
       tags:
       - entitlement
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -5903,6 +6269,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EntitlementTemplate'
+        '400':
+          description: '`includedValue` is in another currency or scale than the working venue''s (`venue-currency-mismatch`,
+            `venue-scale-mismatch`). Nothing is written.'
+          x-ticvai-problem-types: [venue-currency-mismatch, venue-scale-mismatch]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'The session has no working venue, so the template has no venue to be written under
+            (`working-venue-required`); or the caller lacks PRODUCT_CONFIGURE at the venue. Nothing is written.'
+          x-ticvai-problem-types: [working-venue-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
@@ -6017,6 +6399,12 @@ paths:
         runs through the lifecycle transition operations. The by-state tiles MoM 31 Aug §4.10 asks for are the
         list filtered by lifecycleState.
 
+
+        **The dates** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): a row''s `createdAt` is
+        `catalogue.product.created_at` and its `lastModifiedAt` is `catalogue.product.updated_at` (null until the first
+        change). `createdFrom` and `createdTo` filter on `created_at` (whole days, inclusive), and `modifiedSince` keeps
+        rows whose `updated_at` is on or after that day.
+
         **Order.** Newest first, by `createdAt` descending, then by `productId`.'
       tags:
         - drafted
@@ -6090,14 +6478,14 @@ paths:
           schema:
             type: string
             format: date
-          description: Creation date to
+          description: Creation date to (catalogue.product.created_at; ADAM CR-204)
         - name: modifiedSince
           in: query
           required: false
           schema:
             type: string
             format: date
-          description: Last modification on or after
+          description: Last modification on or after (catalogue.product.updated_at; ADAM CR-204)
         - name: search
           in: query
           required: false
@@ -8002,7 +8390,7 @@ paths:
         times TICVAI opens sales, closes sales, suspends availability, releases allocation (ADM-262 rules) or
         switches the applicable rule; the window never changes the product''s own validity.
 
-        **Order.** Sorted by `product` ascending, then by `channelId`.'
+        **Order.** Sorted by `product` ascending, then by `channelId`. Where `product` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -8084,7 +8472,7 @@ paths:
         -> eligible / not eligible with explanation) is a button on ADM-264 evaluated by the same rule engine;
         eligibility is checked before a product is purchased; AI flags contradictory rules.
 
-        **Order.** Sorted by `product` ascending, then by `ruleId`.'
+        **Order.** Sorted by `product` ascending, then by `ruleId`. Where `product` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -8221,6 +8609,18 @@ paths:
       operationId: setChannelFeePayment
       x-ticvai-consumed-by:
         - "P08 ADM-266 Channel Fees, Payment & Fulfillment Configuration"
+      x-ticvai-read-via:
+      - query: payments#approvedPaymentMethods
+        route: in-process
+        for: 'the payment methods approved at the channel''s venue, for paymentMethodNotApproved (payments.method,
+          payments.method_config), the payments module''s data (ADAM CR-212, option A; CHG-R10CAT-004)'
+      - query: access#mediaEncodingProfileRecords
+        route: in-process
+        for: 'the venue''s active media encoding profiles, for mediaProfileMissing (access.media_encoding_profile),
+          Access''s data, a granted read (XDR-002; ADAM CR-212, option A; CHG-R10CAT-004)'
+      x-ticvai-reads:
+      - table: catalogue.fee
+        for: 'each referenced fee profile: it exists, is of the mapped fee_type and is active (ADAM CR-212; CHG-R10CAT-004)'
       x-ticvai-body-key: [channelId]
       x-ticvai-body-key-note: 'Keyed by the body''s `channelId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per sales channel within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `channelId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
@@ -8238,7 +8638,21 @@ paths:
         (the Fee Engine owns amounts); 7 payment and 11 fulfilment fields became two enum lists; the per-channel
         example fields dropped; print-at-home, voucher, API delivery and bulk CSV added as fulfilment methods;
         validationIssues added. Saving exposes only methods approved in Payment and Ticket Media; an incompatible
-        combination is reported in validationIssues and blocks readiness.'
+        combination is reported in validationIssues and blocks readiness.
+
+
+        **How each validation issue is found** (ADAM CR-212, option A, decided 25 October 2026; CHG-R10CAT-004). **paymentMethodNotApproved**: a
+        method in `paymentMethods` (by kind: `card`, `cash`, `digitalWallet` and `paymentLink` as named, `accountCredit`
+        as `storedValue`, `b2bCredit` as `onAccount`) or in `otherPaymentMethodCodes` (by code) that is not among the
+        channel''s venue''s approved methods, asked of the payments module with `payments#approvedPaymentMethods` in
+        process. **mediaProfileMissing**: an `rfid`, `nfc` or `wristband` fulfilment method with no active
+        `access.media_encoding_profile` for the channel''s venue, read in process with `access#mediaEncodingProfileRecords`
+        (a granted read, XDR-002). **feeProfileMissing**: each `fees[].feeType` maps to `catalogue.fee.fee_type`
+        (`booking` -> `bookingFee`, `transaction` -> `transactionFee`, `channel` -> `channelFee`, `service` ->
+        `serviceFee`, `delivery` -> `deliveryFee`, `payment` -> `paymentFee`), and a referenced `feeProfileId` must name
+        a `catalogue.fee` that exists, is of that type and is `active` (`CatalogueConfigStatus`); otherwise
+        `feeProfileMissing`. The issues are answered in `validationIssues`; the configuration is still saved, and
+        readiness is blocked until they are fixed.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -8271,6 +8685,11 @@ paths:
       operationId: publishChannelReadinessValidation
       x-ticvai-consumed-by:
         - "P08 ADM-267 Channel Publication, Readiness & AI Validation"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: in-process
+        for: 'the approvalRequestId scheduleActivation and activate take: an approvals.request of kind
+          configurationChange, subject salesChannel, for this channel, approved (ADAM CR-211, option A; CHG-R10CAT-003)'
       x-ticvai-body-key: [channelId]
       x-ticvai-body-key-note: 'Keyed by the body''s `channelId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per sales channel within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `channelId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
@@ -8290,10 +8709,29 @@ paths:
         Activation, Activate, Return for Changes and Suspend on ADM-267 are this PUT''s action; a critical issue
         blocks activation, warnings pass only with the override permission and a mandatory reason; preview returns
         the effective Product -> Channel -> Customer -> Price -> Capacity -> Payment -> Fulfillment chain without
-        activating.'
+        activating.
+
+
+        **Approval, override, refusals and the timer** (ADAM CR-211, option A, decided 25 October 2026; CHG-R10CAT-003). The moves are
+        `states/sales-channel.yaml`; the view''s `status` is its five values. `submitForApproval` (draft ->
+        pendingApproval) raises an approval request through `approvals.createApprovalRequest` (kind
+        `configurationChange`, `subjectType` `salesChannel`, `subjectContract` `catalogue`, `subjectId` the channel) and
+        answers its id as `approvalRequestId`. `scheduleActivation` and `activate` from `pendingApproval` take that
+        `approvalRequestId`, and are refused `409 approval-required` unless it names an approved request for this
+        channel (read with `approvals#requestRecords`). **Warnings** pass only with `overrideWarnings` from a holder of
+        `SALES_CHANNEL_OVERRIDE` (`x-ticvai-permission-escalated`; 403 without it) and a `reason`; a critical issue is
+        never overridden. **Refusals**: a move the state model does not allow (for example `activate` from `draft`) is
+        `409 invalid-channel-transition`; a blocking critical issue is `422 critical-issue-blocks-activation`; a missing
+        reason (overriding warnings, returning for changes, suspending) is `422 reason-required`; a missing or past
+        `scheduledAt` on `scheduleActivation` is `422 scheduled-at-invalid`. Nothing changes on a refusal. **preview**
+        carries the effective chain in the view''s `preview`, and changes nothing. **The scheduled activation** is run by
+        the channel activation job in the workers host: at `activation_scheduled_at` it moves a `scheduled` channel to
+        `active` when readiness still has no critical issue, and otherwise leaves it `scheduled` and writes the issue to
+        `catalogue.audit_entry` (result `failure`).'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-permission-escalated: SALES_CHANNEL_OVERRIDE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -8316,6 +8754,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelPublicationReadinessAiValidationView'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '409':
+          x-ticvai-problem-types: [invalid-channel-transition, approval-required]
+          description: 'The action is a move `states/sales-channel.yaml` does not allow from the channel''s status
+            (`invalid-channel-transition`), or `scheduleActivation` / `activate` from `pendingApproval` without an approved
+            approval request for this channel (`approval-required`). Nothing changes (ADAM CR-211).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          x-ticvai-problem-types: [critical-issue-blocks-activation, reason-required, scheduled-at-invalid]
+          description: 'A critical readiness issue blocks the move (`critical-issue-blocks-activation`); the reason is
+            missing where it is mandatory (`reason-required`); or `scheduledAt` is missing or in the past on
+            `scheduleActivation` (`scheduled-at-invalid`). Nothing changes (ADAM CR-211).'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /channel:
@@ -8702,7 +9160,7 @@ paths:
         the approval threshold (10% of event capacity by default (decided 29 September, readiness close-out))
         needs Commercial Manager approval.
 
-        **Order.** Sorted by `product` ascending.'
+        **Order.** Sorted by `product` ascending. Where `product` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -8752,6 +9210,10 @@ paths:
       operationId: listChannelExceptionIncident
       x-ticvai-consumed-by:
         - "P08 ADM-273 Channel Exceptions, Incidents & Recovery"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ChannelExceptionsIncidentsRecoveryView.businessImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.27-29 (Exception Categories,
@@ -8770,7 +9232,7 @@ paths:
         Escalate and Assign Incident are buttons on ADM-273; technical details show only to technical users
         and sensitive data is masked.
 
-        **Order.** Newest first, by `timestamp` descending, then by `incidentId`.'
+        **Order.** Newest first, by `timestamp` descending, then by `incidentId`. Where `timestamp` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -9215,6 +9677,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-268 Channel Operations Command Center"
         - "P08 ADM-277 AI Channel Optimization & Intelligence Center"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiChannelOptimizationIntelligenceCenterView.revenueImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Sales_Channel_Management_Reference.pdf'' pp.33-35 (AI Analysis,
@@ -11056,6 +11522,10 @@ paths:
       operationId: setTaxRuleTreatment
       x-ticvai-consumed-by:
         - "P08 ADM-070 Tax Rule & Treatment Builder"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: TaxRuleTreatmentBuilderInput.fixedAmount, TaxRuleTreatmentBuilderInput.fromAmount, TaxRuleTreatmentBuilderView.fixedAmount, TaxRuleTreatmentBuilderView.fromAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [taxRuleId]
       x-ticvai-body-key-note: 'Keyed by the body''s `taxRuleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per tax rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `taxRuleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
@@ -11107,6 +11577,13 @@ paths:
       operationId: listFeeSurcharge
       x-ticvai-consumed-by:
         - "P08 ADM-071 Fee & Surcharge Library"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: FeeSurchargeLibraryView.amount, FeeSurchargeLibraryView.fromOrderValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: FeeSurchargeLibraryView.amount, FeeSurchargeLibraryView.fromOrderValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.43-44 (10.3.4 Fee
@@ -11195,6 +11672,13 @@ paths:
       operationId: setFeeApplicabilityCharging
       x-ticvai-consumed-by:
         - "P08 ADM-072 Fee Applicability & Charging Rule Builder"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: FeeApplicabilityChargingRuleBuilderInput.orderValueMax, FeeApplicabilityChargingRuleBuilderInput.orderValueMin, FeeApplicabilityChargingRuleBuilderView.orderValueMax, FeeApplicabilityChargingRuleBuilderView.orderValueMin (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: FeeApplicabilityChargingRuleBuilderInput.orderValueMax, FeeApplicabilityChargingRuleBuilderInput.orderValueMin, FeeApplicabilityChargingRuleBuilderView.orderValueMax, FeeApplicabilityChargingRuleBuilderView.orderValueMin (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [ruleId]
       x-ticvai-body-key-note: 'Keyed by the body''s `ruleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per fee rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `ruleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
@@ -11247,6 +11731,13 @@ paths:
       operationId: listFeeWaiverTax
       x-ticvai-consumed-by:
         - "P08 ADM-073 Fee Waiver, Tax Exemption & Exception Rules"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: FeeWaiverTaxExemptionExceptionRulesView.reductionAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: FeeWaiverTaxExemptionExceptionRulesView.reductionAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.46-47 (10.3.6 Exception
@@ -12184,7 +12675,7 @@ paths:
         Retry, Queue, Investigate, Rollback Target and Suspend Target are actions on a failed row on ADM-085;
         alerts flag a target still on an older version than production.
 
-        **Order.** Sorted by `targetName` ascending.'
+        **Order.** Sorted by `targetName` ascending. Where `targetName` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -12286,7 +12777,7 @@ paths:
         default (decided 29 September, readiness close-out); AI may recommend a rollback but never executes
         one.
 
-        **Order.** Newest first, by `timestamp` descending, then by `actionId`.'
+        **Order.** Newest first, by `timestamp` descending, then by `actionId`. Where `timestamp` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -12575,6 +13066,10 @@ paths:
   /seat-pricing-rules:
     get:
       operationId: listSeatPricingRules
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SeatPricingRule.ceilingPrice, SeatPricingRule.floorPrice, SeatPricingRule.stepPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-read-routing: replica
@@ -12583,7 +13078,7 @@ paths:
         screen only lists strategies; nothing writes a seat pricing rule"; CHG-CSP-049). Filter by strategy, seat map or
         performance. **Ordered by priority, highest first, then `id`.**
 
-        '
+         Where `priority` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -12634,6 +13129,10 @@ paths:
         format: uuid
     put:
       operationId: setSeatPricingRule
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SeatPricingRule.ceilingPrice, SeatPricingRule.floorPrice, SeatPricingRule.stepPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-config-scope: venue
@@ -12703,6 +13202,10 @@ paths:
         - "P08 ADM-088 Dynamic Pricing Strategy Command Center"
         - "P08 ADM-089 Dynamic Pricing Strategy Builder"
         - "P08 BO-1044 Dynamic Seat Pricing"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DynamicPricingStrategyCommandCenterView.currentPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.75-76 (KPI Cards,
@@ -12868,6 +13371,10 @@ paths:
       operationId: setDemandOccupancyAvailability
       x-ticvai-consumed-by:
         - "P08 ADM-090 Demand, Occupancy & Availability Rule Builder"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: DemandOccupancyAvailabilityRuleBuilderInput.amount, DemandOccupancyAvailabilityRuleBuilderView.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [ruleId]
       x-ticvai-body-key-note: 'Keyed by the body''s `ruleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per pricing rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `ruleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
@@ -12921,6 +13428,10 @@ paths:
       operationId: setBookingVelocityTime
       x-ticvai-consumed-by:
         - "P08 ADM-091 Booking Velocity & Time-to-Event Rule Builder"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: BookingVelocityTimeToEventRuleBuilderInput.amount, BookingVelocityTimeToEventRuleBuilderView.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [ruleId]
       x-ticvai-body-key-note: 'Keyed by the body''s `ruleId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per pricing rule within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `ruleId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
@@ -13091,7 +13602,7 @@ paths:
         B2B and partner (reseller/OTA contract) sales are excluded from dynamic adjustment (decided 29 September,
         readiness close-out).
 
-        **Order.** Sorted by `channel` ascending, then by `locationId`.'
+        **Order.** Sorted by `channel` ascending, then by `locationId`. Where `channel` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -13175,6 +13686,10 @@ paths:
       operationId: listDynamicPriceBand
       x-ticvai-consumed-by:
         - "P08 ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DynamicPriceBandsLaddersAdjustmentMatrixView.allowedEndpoints, DynamicPriceBandsLaddersAdjustmentMatrixView.basePrice, DynamicPriceBandsLaddersAdjustmentMatrixView.maximumPrice, DynamicPriceBandsLaddersAdjustmentMatrixView.minimumPrice and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.84-86 (Price Ladder
@@ -13244,6 +13759,13 @@ paths:
       operationId: listDynamicPricingGuardrail
       x-ticvai-consumed-by:
         - "P08 ADM-095 Dynamic Pricing Guardrails & Commercial Protection"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: DynamicPricingGuardrailsCommercialProtectionView.absoluteMaximumPrice, DynamicPricingGuardrailsCommercialProtectionView.absoluteMinimumPrice, DynamicPricingGuardrailsCommercialProtectionView.minimumMargin (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DynamicPricingGuardrailsCommercialProtectionView.absoluteMaximumPrice, DynamicPricingGuardrailsCommercialProtectionView.absoluteMinimumPrice, DynamicPricingGuardrailsCommercialProtectionView.minimumMargin (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.86-87 (Core Guardrails,
@@ -13314,6 +13836,13 @@ paths:
       operationId: listDynamicPricingAutomation
       x-ticvai-consumed-by:
         - "P08 ADM-096 Dynamic Pricing Automation Policy & Control"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: DynamicPricingAutomationPolicyControlView.overridePrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DynamicPricingAutomationPolicyControlView.overridePrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.87-89 (Automation
@@ -13392,6 +13921,13 @@ paths:
       operationId: listRulePriorityConflict
       x-ticvai-consumed-by:
         - "P08 BO-441 Price Priority & Conflict Rules"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: RulePriorityConflictResolutionDynamicPricingTestConsView.basePrice, RulePriorityConflictResolutionDynamicPricingTestConsView.expectedPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.finalPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.ladderPrice and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RulePriorityConflictResolutionDynamicPricingTestConsView.basePrice, RulePriorityConflictResolutionDynamicPricingTestConsView.expectedPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.finalPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.ladderPrice and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.89-91 (Example,
@@ -13484,6 +14020,13 @@ paths:
       operationId: setRulePriorityConflict
       x-ticvai-consumed-by:
         - "P08 BO-441 Price Priority & Conflict Rules"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: RulePriorityConflictResolutionDynamicPricingTestConsView.basePrice, RulePriorityConflictResolutionDynamicPricingTestConsView.expectedPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.finalPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.ladderPrice and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RulePriorityConflictResolutionDynamicPricingTestConsView.basePrice, RulePriorityConflictResolutionDynamicPricingTestConsView.expectedPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.finalPrice, RulePriorityConflictResolutionDynamicPricingTestConsView.ladderPrice and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
@@ -13557,6 +14100,10 @@ paths:
       operationId: listPricing
       x-ticvai-consumed-by:
         - "P08 ADM-098 AI Pricing Intelligence Command Center"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiPricingIntelligenceCommandCenterSummary.estimatedRevenueOpportunity, AiPricingIntelligenceCommandCenterView.currentPrice, AiPricingIntelligenceCommandCenterView.recommendedPrice, AiPricingIntelligenceCommandCenterView.revenueOpportunity (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.94-95 (10.6.1 AI
@@ -13679,7 +14226,7 @@ paths:
         line dropped. Read model over TICVAI''s own transactions (highest-confidence signals, no vendor involved);
         anomaly lines are advisory AI output.
 
-        **Order.** Sorted by `product` ascending.'
+        **Order.** Sorted by `product` ascending. Where `product` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -13971,6 +14518,10 @@ paths:
       operationId: listCompetitorPricingMarket
       x-ticvai-consumed-by:
         - "P08 ADM-102 Competitor Pricing & Market Position Intelligence"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CompetitorPricingMarketPositionIntelligenceView.marketMedianPrice, CompetitorPricingMarketPositionIntelligenceView.memberPriceWherePubliclyAvailable, CompetitorPricingMarketPositionIntelligenceView.peakPrice, CompetitorPricingMarketPositionIntelligenceView.promotionalPrice and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.100-102 (10.6.5
@@ -14082,7 +14633,7 @@ paths:
         signal contributions), not by adding percentages; transport and market signals are optional where data
         is available; the source name is data, so any provider the client licenses fits.
 
-        **Order.** Soonest first, by `periodStart` ascending, then by `signalId`.'
+        **Order.** Soonest first, by `periodStart` ascending, then by `signalId`. Where `periodStart` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -14416,6 +14967,10 @@ paths:
       operationId: listPricingRecommendationExplainability
       x-ticvai-consumed-by:
         - "P08 ADM-106 AI Pricing Recommendation & Explainability Center"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiPricingRecommendationExplainabilityCenterView.currentPrice, AiPricingRecommendationExplainabilityCenterView.expectedRevenueImpact, AiPricingRecommendationExplainabilityCenterView.recommendedPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.107-108 (10.6.9
@@ -14542,6 +15097,13 @@ paths:
       operationId: listSignalDataQuality
       x-ticvai-consumed-by:
         - "P08 ADM-107 AI Signal Registry, Data Quality & Model Governance"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: AiSignalRegistryDataQualityModelGovernanceView.revenuePerformance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiSignalRegistryDataQualityModelGovernanceView.revenuePerformance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.108-110 (10.6.10
@@ -14637,6 +15199,10 @@ paths:
         - "P08 ADM-108 Revenue Optimization Command Center"
         - "P08 BO-1043 Revenue Command Center"
         - "P08 BO-1050 Revenue Analytics & Audit"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RevenueOptimizationCommandCenterSummary.incrementalRevenueGenerated, RevenueOptimizationCommandCenterSummary.revenueAtRisk, RevenueOptimizationCommandCenterSummary.revenueOpportunity, RevenueOptimizationCommandCenterView.currentPrice and 4 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.114-115 (10.7.1
@@ -14802,6 +15368,10 @@ paths:
       operationId: listScenarioModelingWhat
       x-ticvai-consumed-by:
         - "P08 ADM-110 Scenario Modeling & What-If Analysis"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ScenarioModelingWhatIfAnalysisView.averagePrice, ScenarioModelingWhatIfAnalysisView.competitorPrice, ScenarioModelingWhatIfAnalysisView.margin, ScenarioModelingWhatIfAnalysisView.price and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.117-119 (10.7.3
@@ -14887,6 +15457,10 @@ paths:
       operationId: setPricingExperiment
       x-ticvai-consumed-by:
         - "P08 ADM-111 A/B Pricing Experiment Studio"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ABPricingExperimentStudioInput.maximumPrice, ABPricingExperimentStudioInput.minimumPrice, ABPricingExperimentStudioInput.price, ABPricingExperimentStudioView.maximumPrice and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -15025,6 +15599,10 @@ paths:
       operationId: listRecommendationReviewDecision
       x-ticvai-consumed-by:
         - "P08 ADM-113 AI Recommendation Review & Decision Queue"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiRecommendationReviewDecisionQueueView.currentPrice, AiRecommendationReviewDecisionQueueView.humanSelectedPrice, AiRecommendationReviewDecisionQueueView.recommendedPrice, AiRecommendationReviewDecisionQueueView.revenueOpportunity and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.122-123 (10.7.6
@@ -15048,7 +15626,7 @@ paths:
         createLiveDynamicPrice; the outcome feeds listLearningModelPerformance (decided 29 September, readiness
         close-out).
 
-        **Order.** Soonest first, by `scheduledFor` ascending, then by `recommendationId`.'
+        **Order.** Soonest first, by `scheduledFor` ascending, then by `recommendationId`. Where `scheduledFor` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -15209,6 +15787,10 @@ paths:
       operationId: createLiveDynamicPrice
       x-ticvai-consumed-by:
         - "P08 ADM-115 Live Dynamic Price Execution & Deployment Monitor"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: LiveDynamicPriceExecutionDeploymentMonitorInput.newPrice, LiveDynamicPriceExecutionDeploymentMonitorView.newPrice, LiveDynamicPriceExecutionDeploymentMonitorView.previousPrice, LiveDynamicPriceExecutionDeploymentMonitorView.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.125-126 (10.7.8
@@ -15409,7 +15991,7 @@ paths:
         suggestions need governance and never silently change production logic; override analysis is for learning,
         not employee scoring (pack p.130); model governance stays with the registry in listSignalDataQuality.
 
-        **Order.** Sorted by `product` ascending.'
+        **Order.** Sorted by `product` ascending. Where `product` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -15505,7 +16087,7 @@ paths:
         Shipping one event shape and configuring around it is how a platform ends up with a festival
         modelled as 400 performances.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - events
       x-ticvai-permission: EVENT_CONFIGURE
@@ -15574,10 +16156,74 @@ paths:
       operationId: cloneEvent
       x-ticvai-consumed-by:
         - "P08 BO-696 Event Duplication & Clone Configuration"
+      x-ticvai-writes:
+      - table: catalogue.event
+        for: 'the copy, in draft (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_schedule
+        for: 'include schedule (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.performance
+        for: 'include schedule: the performances, status scheduled (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.channel_capacity
+        for: 'include schedule with capacityProfile: the copied performances'' envelopes, sold and leased 0 (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.price_assignment
+        for: 'include pricing (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_capacity_profile
+        for: 'include capacityProfile, and seatMap''s reference (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_resource_plan
+        for: 'include resourceRequirements (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_registration
+        for: 'include registrationForm (ADAM CR-109; CHG-R10CAT-009)'
+      x-ticvai-reads:
+      - table: catalogue.event
+        for: 'the source event (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_schedule
+        for: 'the source''s schedule (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.performance
+        for: 'the source''s performances (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.channel_capacity
+        for: 'the source performances'' envelopes (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.price_assignment
+        for: 'the source''s price assignments (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_capacity_profile
+        for: 'the source''s capacity profiles (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_resource_plan
+        for: 'the source''s resource plan (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_registration
+        for: 'the source''s registration form (ADAM CR-109; CHG-R10CAT-009)'
       summary: Copy an event, choosing what comes with it
       description: 'Event board 1.3. **Most events are last year''s event**, and the question is never
         whether to clone but what to bring: the schedule, the prices, the seat map, the resource plan,
         the staff roster — rarely all of them, and never the sales.
+
+
+        **What each `include` copies** (ADAM CR-109, option 2, accepted 15 October 2026; CHG-R10CAT-009). The copy is a
+        new `catalogue.event` in `draft`, and only Catalogue''s own rows are copied:
+
+        - `schedule`: the `catalogue.event_schedule` row and every `catalogue.performance` of the source that is not
+        cancelled, each as a new performance in `scheduled`. With `capacityProfile` too, each copied performance gets
+        its `catalogue.channel_capacity` rows with `sold` and `leased` 0 and `remaining` equal to `capacity`.
+
+        - `pricing`: the `catalogue.price_assignment` rows whose `event_id` is the source, with `event_id` the copy; the
+        price lists and prices they point at are shared, not copied.
+
+        - `capacityProfile`: the `catalogue.event_capacity_profile` rows (the event''s, and with `schedule` each copied
+        performance''s).
+
+        - `seatMap`: the copied capacity profiles keep the source''s `seat_map_id`, a reference to Seating''s map, never
+        a copy of it (without `seatMap` it is null on the copy).
+
+        - `resourceRequirements`: the `catalogue.event_resource_plan` row''s requirements and contractors, with nothing
+        secured (`securedCount` 0, no `bookingIds`) and readiness worked out again.
+
+        - `registrationForm`: the `catalogue.event_registration` row, naming the same form.
+
+        - `staffPlan` and `accessRules` are another module''s data (Workforce and Access) and have no route yet; asked
+        for, they are refused `422 include-not-routed` and nothing is copied.
+
+        **shiftDatesByDays** moves, by that many days, every copied time: the performances'' `starts_at` and `ends_at`,
+        the schedule''s performance times, the resource requirements'' `from` and `to`, and the price assignments''
+        `effective_from` and `effective_to`. Sales, holds and orders are never copied. An unknown source event, or one
+        outside the caller''s scope, is 404.
 
         '
       tags:
@@ -15612,8 +16258,18 @@ paths:
                     type: string
                     description: The copy's event code, as sent in `newCode` or as the server chose it
                       (CHG-R4-016).
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '422':
+          x-ticvai-problem-types: [include-not-routed]
+          description: '`include` names `staffPlan` or `accessRules`, another module''s data with no route yet (ADAM
+            CR-109). Nothing is copied.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /events/{eventId}/schedule:
@@ -15748,6 +16404,10 @@ paths:
       operationId: getEntitlementTemplate
       x-ticvai-consumed-by:
         - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: EntitlementTemplate.includedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -15782,6 +16442,10 @@ paths:
       operationId: updateEntitlementTemplate
       x-ticvai-consumed-by:
         - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: EntitlementTemplate.includedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -15845,6 +16509,10 @@ paths:
       operationId: archiveEntitlementTemplate
       x-ticvai-consumed-by:
         - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: EntitlementTemplate.includedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Archive an entitlement template
@@ -15913,6 +16581,15 @@ paths:
       operationId: setEntitlementTemplateBlackoutDates
       x-ticvai-consumed-by:
         - "P08 BO-1192 Entitlement Templates"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the template''s venue: its scope_path to the venue node (platform.scope, by path), Tenancy''s data (ADAM
+          CR-235, option A; CHG-R10CAT-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'that venue''s currency and scale, for the includedValue it answers (platform.venue_settings), Tenancy''s
+          data (ADAM CR-235, option A; CHG-R10CAT-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-config-scope: venue
@@ -15925,6 +16602,19 @@ paths:
         entitlements issued from the template from now on and to existing ones at their next validation; a date already
         admitted on is not undone. A whole-venue closure day is the access operating calendar''s
         (`setOperatingCalendarEntry` with `venueClosed`).
+
+
+        **includedValue in the answer** (ADAM CR-235, option A with CR-217, decided 25 October 2026; CHG-R10CAT-001).
+        The 200 is the whole template, and its includedValue is answered in its venue''s currency and scale: the
+        template keeps only its `scope_path`, so Catalogue asks `tenancy#scopeRecords` by that path for the venue node,
+        then `tenancy#venueSettingsRecords` by the venue''s id. It is never guessed from the caller''s working venue, and
+        a template with includedValue is answered, not refused.
+
+
+        **The audit row** (confirmed as built, ADAM CR-235): one `catalogue.audit_entry` with domain `product`, action
+        `updated`, category `validity`, entity_type `entitlementTemplate`, entity id the template''s, field
+        `blackoutDates`, previous_value and new_value the two lists as JSON arrays, `reason` the body''s, scope_path the
+        template''s, and actor_principal_id the caller.
 
         '
       tags:
@@ -16039,7 +16729,7 @@ paths:
         navigable**, and they are usually the same physical room described for two purposes.
         `venue-map` owns the geometry; this owns whether it can be used, by whom, and when.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - events
       x-ticvai-permission: EVENT_CONFIGURE
@@ -16292,13 +16982,48 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-716 Event Lifecycle & Change Command Center"
         - "P08 BO-717 Lifecycle Transition Configuration"
+      x-ticvai-writes:
+      - table: catalogue.event
+        for: 'lifecycle_state, or the scheduled move (scheduled_lifecycle_state, _at, _reason) (ADAM CR-109; CHG-R10CAT-009)'
+      x-ticvai-reads:
+      - table: catalogue.performance
+        for: 'the schedule precondition, and the performances whose sales refuse a cancel (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.channel_capacity
+        for: 'the capacity precondition, and sold above 0 refuses a cancel (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.price
+        for: 'the price precondition (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.product
+        for: 'the event''s products (event_id), for the price precondition (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.variant
+        for: 'the event''s products'' variants, for the price precondition (ADAM CR-109; CHG-R10CAT-009)'
+      - table: catalogue.event_resource_plan
+        for: 'the resource plan precondition, readiness ready (ADAM CR-109; CHG-R10CAT-009)'
+      x-ticvai-emits:
+      - event.lifecycleChanged
       summary: Draft, planned, on sale, live, closed, cancelled
       description: 'Event boards 7.2 and 7.3. **The transitions are the product.** Going on sale
-        requires a price, a capacity and a schedule; going live requires a resource plan; cancelling
-        requires a treatment for everybody who bought.
+        requires a price, a capacity and a schedule; going live requires a resource plan.
 
-        A change request above a configured impact routes through `approvals` — moving a sold-out
-        performance is not a decision one person makes at a desk.
+
+        **The state model is `states/event.yaml`** (ADAM CR-109, option 2, accepted 15 October 2026; CHG-R10CAT-009):
+        the moves allowed, and each precondition against named columns. A move it does not allow is `409
+        invalid-event-transition`; a move whose preconditions fail is `409 event-preconditions-not-met`, listing each
+        one missing. **Cancelling** is refused `409 event-has-sales` while any performance of the event that is not
+        cancelled has sales (`catalogue.channel_capacity.sold` above 0); cancelling the event cancels none of its
+        performances, and each performance is cancelled with its own treatment through `cancelPerformance` (the
+        approved screen has only Move to, Reason and Effective from, so this body carries no treatment). Each move
+        writes `event.lifecycleChanged` to the outbox in the same transaction.
+
+
+        **effectiveFrom.** Null or not in the future: the move is made now. In the future: the move is checked now,
+        kept on the event (`scheduledLifecycleState`, `scheduledLifecycleAt`, `scheduledLifecycleReason`; a later
+        request replaces it), and applied at that time by the event lifecycle job in the workers host, which checks the
+        preconditions again and, if they no longer hold, clears the scheduled move and changes nothing else. The 200
+        answers the event as it is after the request.
+
+
+        **Approval routing above a configured impact waits for its threshold** (CR-109): nothing routes through
+        `approvals` yet. An unknown event, or one outside the caller''s scope, is 404.
 
         '
       tags:
@@ -16328,22 +17053,40 @@ paths:
                   - closed
                   - cancelled
                   - archived
+                  x-ticvai-stored-as: catalogue.event.lifecycle_state
+                  description: 'The state to move to: written to `lifecycle_state` now, or to `scheduled_lifecycle_state`
+                    while the move waits for its `effectiveFrom` (ADAM CR-109).'
                 reason:
                   type: string
+                  maxLength: 500
                   nullable: true
+                  x-ticvai-stored-as: catalogue.event.scheduled_lifecycle_reason
+                  description: 'Carried on `event.lifecycleChanged`; kept as `scheduledLifecycleReason` while a move waits
+                    for its `effectiveFrom`.'
                 effectiveFrom:
                   type: string
                   format: date-time
                   nullable: true
+                  x-ticvai-stored-as: catalogue.event.scheduled_lifecycle_at
+                  description: 'In the future, the move is scheduled and the event lifecycle job applies it then (ADAM
+                    CR-109); otherwise it is made now.'
       responses:
         '200':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Moved
+          description: Moved, or scheduled for `effectiveFrom`; the event as it is now
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          x-ticvai-problem-types: [event-preconditions-not-met]
-          description: Preconditions for the transition are not met; they are listed
+          x-ticvai-problem-types: [event-preconditions-not-met, invalid-event-transition, event-has-sales]
+          description: 'The preconditions for the move are not met, each listed (`event-preconditions-not-met`); the
+            move is not one `states/event.yaml` allows (`invalid-event-transition`); or a cancel while a performance of
+            the event has sales (`event-has-sales`). Nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -16372,7 +17115,7 @@ paths:
         session is a Performance, and a template is how a day becomes performances. Formerly
         `listSessionTemplates` on `/session-templates`.
 
-        '
+         **Order.** Sorted by `code` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - events
       x-ticvai-permission: PERFORMANCE_CONFIGURE
@@ -16441,6 +17184,13 @@ paths:
       operationId: setPrepaidMinutePackage
       x-ticvai-consumed-by:
         - "P08 BO-722 Prepaid Minute Package & Customer Balance Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: PrepaidMinutePackage.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PrepaidMinutePackage.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Time bought in advance and drawn down per visit
       description: 'Event board 8.2. **Minutes are a credit type, and `wallet` already models those** —
         what is here is the product that sells them and the rule for how they are consumed: rounding,
@@ -16682,6 +17432,13 @@ paths:
         a missing or invalid token `403 admission-required` for a performance whose room is on. The admitted
         answer is never cached at the edge.
 
+
+        **On the guest web the edge also sets the token as an HttpOnly, short-lived, per-performance cookie** on
+        the admitted answer (ADR-0066 amendment of 25 October 2026, ADAM CR-216): the browser sends it with
+        `addCartLine` and the page stores nothing, so a reload or a second tab stays admitted. **A `404` for a
+        performance the caller knows means the entry is gone** (evicted, or the room restarted): the guest
+        re-enters with `enterWaitingRoom`.
+
         '
       tags:
       - event
@@ -16808,6 +17565,7 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Programmes
@@ -16900,6 +17658,7 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Benefits
@@ -16988,7 +17747,10 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Benefits granted
           content:
@@ -17171,6 +17933,10 @@ paths:
       operationId: estimateEventResourceCost
       x-ticvai-consumed-by:
         - "P08 BO-920 Event Resource Cost Estimator"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: EventResourceCostEstimate.total, EventResourceCostEstimate.totalsByKind, EventResourceCostEstimate.unitCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: VM close-out; pack labels on BO-920 (Venue cost, Equipment cost, External resource cost); shape follows getEventResourcePlan, one line per requirement'
@@ -17360,6 +18126,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-078 Pricing Governance Command Center"
         - "P08 ADM-079 Pricing Change Request & Workspace"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PricingChangeRequestWorkspaceView.currentAmount, PricingChangeRequestWorkspaceView.differenceAmount, PricingChangeRequestWorkspaceView.proposedAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: readiness close-out (QB: approve is an action on the ADM-078 change queue); pack ''Pricing___Revenue_Management_Reference.pdf'' pp.57-58 and p.65; MoM 1 Sep 2026 §4.6 (approval workflow before publishing); shape follows approveReviewDecision'
@@ -17444,6 +18214,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-106 AI Pricing Recommendation & Explainability Center"
         - "P08 ADM-113 AI Recommendation Review & Decision Queue"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PricingRecommendationDecision.humanSelectedPrice, PricingRecommendationDecision.recommendedPrice, PricingRecommendationDecisionInput.humanSelectedPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: readiness close-out (QB: Accept / Modify / Reject are actions, the row carries the decision record); pack ''Pricing___Revenue_Management_Reference.pdf'' pp.94, 107-112 (an LLM alone must not set prices; guardrails before execution); MoM 1 Sep 2026 §4.8; shape follows approveReviewDecision'
@@ -17625,7 +18399,7 @@ paths:
       - name: configurationTemplateId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `subject` and `name`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 configuration-template-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -17644,6 +18418,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConfigurationTemplate'
+        '409':
+          description: 'Refused, and nothing is stored. `configuration-template-id-mismatch` (ADAM CR-245): a record for `subject` and `name` exists and the path''s `configurationTemplateId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - configuration-template-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [source-required]
           description: '`sourceRequired`.'
@@ -17849,7 +18631,7 @@ paths:
       - name: connectionId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `salesChannelId`, `connectorName` and `environment`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 connection-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -17868,6 +18650,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ChannelConnection'
+        '409':
+          description: 'Refused, and nothing is stored. `connection-id-mismatch` (ADAM CR-245): a record for `salesChannelId`, `connectorName` and `environment` exists and the path''s `connectionId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - connection-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [secret-not-reference]
           description: '`secretNotReference`.'
@@ -18097,6 +18887,10 @@ paths:
       operationId: updateChannelIncident
       x-ticvai-consumed-by:
         - "P08 ADM-273 Channel Exceptions, Incidents & Recovery"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ChannelIncident.businessImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Own, investigate, resolve or close a channel incident
       description: '**The person''s moves on a channel incident** (29 September, writers pass). Sets the owner,
         the SLA due time and the status of a `catalogue.channel_incident` along `states/channel-incident.yaml`:
@@ -18184,6 +18978,10 @@ paths:
       operationId: retryChannelIncident
       x-ticvai-consumed-by:
         - "P08 ADM-273 Channel Exceptions, Incidents & Recovery"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ChannelIncident.businessImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Retry the failed channel call behind an incident
       description: '**Retry, as a call** (29 September, writers pass). Moves an `open` or `investigating`
         `catalogue.channel_incident` to `retrying`, increments `retryCount` and queues the failed call again with
@@ -18258,7 +19056,7 @@ paths:
       - name: priceCategoryId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `entryKind` and `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 price-category-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -18278,8 +19076,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/PriceCategory'
         '409':
-          x-ticvai-problem-types: [in-use]
-          description: '`inUse`.'
+          x-ticvai-problem-types: [in-use, price-category-id-mismatch]
+          description: '`inUse`. `price-category-id-mismatch` (ADAM CR-245): a record for `entryKind` and `code` exists and the path''s `priceCategoryId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -18298,6 +19096,10 @@ paths:
       operationId: getPackagePricingDefinition
       x-ticvai-consumed-by:
         - "P08 BO-011 Packages & Bundles"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PackagePricing.packagePrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The package pricing definition as saved
@@ -18325,6 +19127,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-053 Package, Bundle & Add-On Pricing"
         - "P08 BO-011 Packages & Bundles"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PackagePricing.packagePrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [productId]
       x-ticvai-body-key-note: 'Keyed by the body''s `productId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per package product within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Set how a package, bundle or add-on is priced
@@ -18456,6 +19262,13 @@ paths:
       operationId: setFeeDefinition
       x-ticvai-consumed-by:
         - "P08 ADM-071 Fee & Surcharge Library"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: PricingFee.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PricingFee.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-names-for-context: [catalogue.fee_rule, orders.order_fee, payments.fee_rule]
       summary: Create or update a fee or surcharge
       description: '**The fee and surcharge library** (29 September, writers pass). Creates or updates a
@@ -18487,7 +19300,7 @@ paths:
       - name: feeId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `code`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 fee-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -18507,8 +19320,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/PricingFee'
         '409':
-          x-ticvai-problem-types: [change-request-required]
-          description: '`changeRequestRequired`.'
+          x-ticvai-problem-types: [change-request-required, fee-id-mismatch]
+          description: '`changeRequestRequired`. `fee-id-mismatch` (ADAM CR-245): a record for `code` exists and the path''s `feeId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -18558,7 +19371,7 @@ paths:
       - name: calculationProfileId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `code` and `version`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 calculation-profile-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -18578,8 +19391,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/CalculationProfile'
         '409':
-          x-ticvai-problem-types: [version-in-use]
-          description: '`versionInUse`.'
+          x-ticvai-problem-types: [version-in-use, calculation-profile-id-mismatch]
+          description: '`versionInUse`. `calculation-profile-id-mismatch` (ADAM CR-245): a record for `code` and `version` exists and the path''s `calculationProfileId` is not its id (or names another such record); nothing changes.'
           content:
             application/problem+json:
               schema:
@@ -18600,7 +19413,7 @@ paths:
         - "P08 ADM-075 Currency Precision, Rounding & Monetary Rules"
       summary: Set precision and rounding for a currency
       description: '**One rounding profile per currency the tenant sells in** (29 September, writers pass).
-        Creates or updates the `catalogue.rounding_profile` for `currency`: decimal places (up to three, and the
+        Creates or updates the `catalogue.rounding_profile` for `currency` (keyed on `currency`; the path id is the profile''s id, ADAM CR-245): decimal places (up to three, and the
         third is kept, not rounded away, MoM 1 Sep 2026 §4.5), calculation and display precision, method, stage
         and cash rounding increment. `calculationPrecision` may not be below `decimalPlaces` (`422`
         `precisionBelowDecimals`). A change applies to calculations from the next price publication, never to a
@@ -18624,7 +19437,7 @@ paths:
       - name: roundingProfileId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `currency`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 rounding-profile-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -18643,6 +19456,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RoundingProfile'
+        '409':
+          description: 'Refused, and nothing is stored. `rounding-profile-id-mismatch` (ADAM CR-245): a record for `currency` exists and the path''s `roundingProfileId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - rounding-profile-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [precision-below-decimals]
           description: '`precisionBelowDecimals`.'
@@ -18659,6 +19480,13 @@ paths:
         - "P08 ADM-095 Dynamic Pricing Guardrails & Commercial Protection"
         - "P08 ADM-096 Dynamic Pricing Automation Policy & Control"
         - "P08 ADM-114 Automation Policy & Autonomous Pricing Orchestrator"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: DynamicPricingControl.absoluteMaximumPrice, DynamicPricingControl.absoluteMinimumPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: DynamicPricingControl.absoluteMaximumPrice, DynamicPricingControl.absoluteMinimumPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [scopeId]
       x-ticvai-body-key-note: 'Keyed by the body''s `scopeId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per scope node within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `scopeId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       summary: Set the guardrails and automation level of dynamic pricing at one scope
@@ -18732,6 +19560,10 @@ paths:
       operationId: setPriceLadderMatrix
       x-ticvai-consumed-by:
         - "P08 ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PriceLadder.basePrice, PriceLadder.maximumPrice, PriceLadder.minimumPrice, PriceLadder.price and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Set a strategy's price ladder
       description: '**The bands a strategy''s price moves between, and how fast** (29 September, writers pass).
         Creates or replaces the strategy''s `catalogue.price_ladder`: the adjustment model, the bands (ascending),
@@ -18992,7 +19824,7 @@ paths:
       - name: signalId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245). This write finds its record by `registryKind` and `name`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 signal-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -19011,6 +19843,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SignalRegistryEntry'
+        '409':
+          description: 'Refused, and nothing is stored. `signal-id-mismatch` (ADAM CR-245): a record for `registryKind` and `name` exists and the path''s `signalId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types:
+          - signal-id-mismatch
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [trust-too-low]
           description: '`trustTooLow`.'
@@ -19094,6 +19934,8 @@ paths:
 
         Wireframe of 9 October (products module): the new Tags screen of the Setup Library, the tag picker on B1-S04
         Identity & Classification, the tag line on B11-S04 Promotion & Discount Link.
+
+        Where `displayOrder` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - catalogue
       x-ticvai-permission: PRODUCT_VIEW
@@ -19277,6 +20119,8 @@ paths:
       - table: catalogue.audit_entry
         for: 'the audit row (category classification, the category and tags before and after) (r8 integration,
           CHG-R8INT-019)'
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
       summary: File a product under a category and give it its tags, both from the master lists
       description: >-
         **The product form's category drop-down and tag picker write here** (16 October 2026 minutes, 4.6 and
@@ -19471,6 +20315,13 @@ paths:
         **A product with nothing saved** answers every text null, which means each channel shows the product's own
         `nameLocalised` and `descriptionLocalised`. `missingTranslations` lists, per enabled language of the tenant,
         the texts that are set in some language and not in that one.
+
+        **enabledLanguages** (ADAM CR-213, option A, decided 25 October 2026; CHG-R10CAT-005): the answer carries the tenant's enabled
+        languages (the published set, or the draft's before the first publish), so B1-S06 draws one block per enabled
+        language from this one call, under `PRODUCT_VIEW` at venue scope, even when every text is complete. The two
+        white-label reads run on WhiteLabel's service route, which answers at the tenant root (serviceAuth's
+        connection context), so a venue-scoped caller gets the languages; the draft configuration itself stays readable
+        only at the tenant root (`getTenantConfig`).
       tags:
       - product
       x-ticvai-permission: PRODUCT_VIEW
@@ -19498,6 +20349,8 @@ paths:
       x-ticvai-writes:
       - table: catalogue.audit_entry
         for: 'the audit row (category channelTexts, the texts before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
       x-ticvai-read-via:
       - query: white-label#tenantLanguageRecords
         route: service
@@ -19510,6 +20363,12 @@ paths:
         **Replaces all of the product's channel texts** (CHG-R8PRD-003): a text sent as null, or left out, falls
         back to the product's name or description. Each text is keyed by language code, and every key must be an
         enabled language of the tenant (`422 language-not-enabled`). The length limits are per language value.
+
+        **The languages are checked on the service route** (ADAM CR-213, option A, decided 25 October 2026; CHG-R10CAT-005):
+        `white-label#tenantLanguageRecords` and, before the tenant's first publish, `white-label#tenantConfigRecords`
+        are asked through WhiteLabel's service route, which answers at the tenant root rather than under the caller's
+        row security, so a venue product administrator's save is checked against the tenant's languages before the
+        first publish as after it. The draft configuration itself stays tenant-root only.
 
         **Versioned as `updateProduct` versions the product**, and refused on an archived product
         (`409 product-archived`). **Audited:** written to `catalogue.audit_entry` (`domain: product`, `action:
@@ -19641,6 +20500,8 @@ paths:
       x-ticvai-writes:
       - table: catalogue.audit_entry
         for: 'the audit row (category ownerForms, the links before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
       x-ticvai-read-via:
       - query: marketing-crm#formDefinitionRecords
         route: service
@@ -19804,9 +20665,10 @@ paths:
     get:
       operationId: getProductSalePermissionRules
       x-ticvai-read-via:
-      - query: tenancy#activeVenues
-        route: service
-        for: 'the name of a `venue` rule''s target: platform.scope, Tenancy''s data'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the name of a `venue` rule''s target, active or not (platform.scope, by id), Tenancy''s data (sibling of
+          ADAM CR-227: a saved rule on a venue since deactivated keeps its name; CHG-R10CAT-001)'
       - query: tenancy#workstationRecords
         route: in-process
         for: 'the name of a `workstation` rule''s target: platform.workstation, Tenancy''s data'
@@ -19855,6 +20717,8 @@ paths:
       x-ticvai-writes:
       - table: catalogue.audit_entry
         for: 'the audit row (category salePermissions, the rule set before and after) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
+      - table: catalogue.product_version
+        for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
       x-ticvai-read-via:
       - query: tenancy#activeVenues
         route: service
@@ -19974,6 +20838,13 @@ paths:
 
         A guest channel (website, app, kiosk) has no seller: send no `roleId` and no `principalId`, and only `global`,
         `venue`, `salesChannel` and `workstation` rules can match.
+
+        **Testing a draft before saving it** (ADAM CR-215, option A, decided 25 October 2026; CHG-R10CAT-008): a body
+        with `rules` (a draft `ProductSalePermissionRuleSet`) is evaluated instead of the saved rules of each product
+        asked, by the same rule engine, and nothing is saved; the back office sends the one product it is editing. The
+        result then names the deciding rule by `decidedByRuleIndex`, its index in the draft''s `rules`, and
+        `decidedByRuleId` is null. Without `rules`, the saved rules decide and `decidedByRuleId` names the rule, as
+        before.
       tags:
       - product
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -22260,6 +23131,7 @@ components:
         '
       required:
       - version
+      - productId
       - publishedAt
       - publishedByPrincipalId
       properties:
@@ -22268,6 +23140,11 @@ components:
         productId:
           type: string
           format: uuid
+          x-ticvai-references: catalogue.product
+          description: '**The product this is a version of**, always set (ADAM CR-214; CHG-R10CAT-006). Required, so the
+            row follows its product''s row security: a venue that writes a product writes its versions, which every
+            product write that versions it now does (until r10 product_id was nullable and the table was tenant-root
+            only).'
         publishedAt:
           type: string
           format: date-time
@@ -22286,6 +23163,17 @@ components:
             product should not create a version.
 
             '
+        snapshot:
+          type: object
+          nullable: true
+          readOnly: true
+          additionalProperties: true
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          description: '**What the version was**, so a restore brings it all back (ADAM CR-214, option A, decided 25
+            October 2026; CHG-R10CAT-006): the product row and its `product_media`, `product_channel_text`,
+            `product_sale_permission` and `product_owner_form` rows, in the canonical JSON `contentHash` is taken over.
+            Null on a version written before r10.'
         restoredFromVersion:
           type: integer
           nullable: true
@@ -22396,6 +23284,9 @@ components:
     AlternativeCode:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listAlternativeCodes, setAlternativeCodes
       x-ticvai-persistence: catalogue.alternative_code
+      # A code is unique per partner across the tenant, case-insensitively (ADAM CR-111; CHG-R10CAT-011).
+      x-ticvai-unique-together:
+      - [partnerId, code]
       type: object
       required:
       - code
@@ -22621,7 +23512,9 @@ components:
             default.
 
             `seasonEnd` anchors to the venue''s own season rather than the calendar — a water park closing
-            in October is not a quarter boundary.
+            in October is not a quarter boundary. The season ends at the end of the product''s validity,
+            `Product.validTo`, or its `onSaleTo` where `validTo` is null (ADAM CR-167 as the lead ruled it, 26
+            October 2026; CHG-R10OPN-003).
 
             '
         expiryDate:
@@ -23131,6 +24024,9 @@ components:
     ProductEligibilityRule:
       type: object
       x-ticvai-persistence: catalogue.product_eligibility_rule
+      # One rule per product: setProductEligibilityRule is a per-product PUT (ADAM CR-111; CHG-R10CAT-011).
+      x-ticvai-unique-together:
+      - [productId]
       description: Participation limits for one product. Absent means anyone may take part, and
         `getProductEligibilityRule` returns that absence as this schema with every limit null, never as
         a `404`.
@@ -23293,6 +24189,9 @@ components:
     GroupPackageDefinition:
       type: object
       x-ticvai-persistence: catalogue.group_package
+      # One definition per product: setGroupPackageDefinition is a per-product PUT (ADAM CR-111; CHG-R10CAT-011).
+      x-ticvai-unique-together:
+      - [productId]
       required:
       - kind
       - maxParticipants
@@ -23386,6 +24285,7 @@ components:
       - scopePath
       - isSellable
       - hasVariants
+      - createdAt
       properties:
         id:
           type: string
@@ -23419,8 +24319,8 @@ components:
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
           nullable: true
-          description: '**The product''s name in each language the venue sells in** (6 October 2026,
-            CHG-R4-011), keyed by ISO 639-1 code, e.g. `{"en": "Aquarium entry", "ar": "دخول الأكواريوم"}`.
+          description: '**The product''s name in each of the tenant''s enabled languages** (6 October 2026,
+            CHG-R4-011; the tenant''s languages, not the venue''s: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. `{"en": "Aquarium entry", "ar": "دخول الأكواريوم"}`.
             Every guest surface shows the entry for the guest''s language and falls back to `name`, which
             stays the name staff search and reports print. Null, or a language missing from it, means
             `name` is shown. At most 200 characters per language, as `name`.
@@ -23477,6 +24377,16 @@ components:
           nullable: true
           description: 'Retires the product automatically. **Retirement is not deletion** — the product
             stops selling and every order that referenced it still resolves.
+
+            '
+        validTo:
+          type: string
+          format: date-time
+          nullable: true
+          description: '**The last moment the product''s entitlements are valid; null means the same as
+            `onSaleTo`** (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). A season pass stops
+            selling at `onSaleTo` and is used until `validTo`: an entitlement template''s `expiryAnchor` of
+            `seasonEnd` ends here (`access#issueOrderEntitlements`). Sales closing is not validity ending.
 
             '
         categoryId:
@@ -23651,6 +24561,18 @@ components:
             no active consent question of the tenant is a `422`.
 
             '
+        addOnProductIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+          description: '**The add-ons offered with this product, in display order** (accepted 26 October 2026,
+            Chinmay, ADAM CR-252 option A): each a `kind: addOn` product of the same venue (a coffee break, a working
+            lunch, an AV technician offered with a meeting-room type), set in the back office. `listProducts` answers
+            it, so WEB-048 and GST-075 read a room type''s add-ons from the load they already make and fetch those
+            products; the guest adds one as a cart line with `parentLineId`. An id that is not a `kind: addOn`
+            product of the same venue is `400 validation` on `addOnProductIds`. Empty when none is offered.'
         requiresTimeWindow:
           type: boolean
           default: false
@@ -23718,6 +24640,23 @@ components:
           description: '**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a
             product page finds its event and the event''s performances (`Performance.eventId`) give it dates. Null for a product
             not tied to an event (merchandise, a pass, a membership).'
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: '**When the product was created** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007):
+            `catalogue.product.created_at`, NOT NULL DEFAULT now(), set by the server and never by a request. Rows that
+            predate it are backfilled by the migration task (the earliest of the product''s first version''s
+            `published_at` and the migration time), then the NOT NULL and the DEFAULT are set. `listProductLifecycle`
+            orders and filters on it.'
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: '**When the product last changed** (ADAM CR-204): set by `updateProduct` and by every product
+            sub-resource PUT and bulk change that versions the product; null until the first change after creation.
+            `listProductLifecycle`''s `lastModifiedAt` and `modifiedSince` read it.'
     CreateProductRequest:
       type: object
       required:
@@ -23806,6 +24745,14 @@ components:
           items:
             type: string
             format: uuid
+        addOnProductIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+          description: The `kind` addOn products of the same venue offered with this product, in display order
+            (`Product.addOnProductIds`; ADAM CR-252). Any other id is `400 validation` on `addOnProductIds`.
         requiresTimeWindow:
           type: boolean
     UpdateProductRequest:
@@ -23876,6 +24823,14 @@ components:
           items:
             type: string
             format: uuid
+        addOnProductIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+          description: The `kind` addOn products of the same venue offered with this product, in display order
+            (`Product.addOnProductIds`; ADAM CR-252). Any other id is `400 validation` on `addOnProductIds`.
         requiresTimeWindow:
           type: boolean
     VariantDimension:
@@ -23948,6 +24903,23 @@ components:
             (`listProductVariants`; R8 blocker cause GPS-C27, CHG-R8SPN-028). Not stored on the variant and ignored on
             input. Null where no price list prices it on that channel. The list price, not the total: promotions
             and bundles are applied at the basket.'
+        referencePrice:
+          oneOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: '**The price a saving is measured against** (accepted 26 October 2026, Chinmay, ADAM CR-253
+            option C), set by the back office on the variant (`updateProductVariant`). Null where the variant
+            claims no saving, which is the default. In the same currency as `listPrice`.'
+        savingPercent:
+          type: integer
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**Computed by the server, never in the browser** (ADAM CR-253): with a `referencePrice` and a
+            `listPrice` below it, the whole percent the list price saves, `floor((referencePrice - listPrice) /
+            referencePrice * 100)` (rounded down, so the label never overstates; proposed, client to correct); null
+            otherwise. A length tile shows *Save n%* only when this is set.'
         productId:
           type: string
           format: uuid
@@ -24097,6 +25069,28 @@ components:
         displayOrder:
           type: integer
           default: 100
+        url:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**The asset''s stable CDN address, for a guest card** (ADAM CR-221, option A, decided 25 October
+            2026; CHG-R10CAT-014): the asset library''s public address for the asset, set on guest-facing reads (`searchCatalogue`,
+            `listProducts` and `getProduct` for a guest or a visitor) when the asset is public and `ready`, as
+            `getPublishedTenantConfig` returns white-label assets (`brandUrls`). Null otherwise, and on staff reads,
+            which are unchanged. Catalogue reads the asset in process, a read the lead granted across deployables
+            (XDR-005, 25 October 2026; CHG-R10CAT-015).'
+        thumbnailUrl:
+          type: string
+          format: uri
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: 'The asset library''s thumbnail address for the asset, on the same reads and with the same rule as
+            `url` (ADAM CR-221).'
         altText:
           allOf:
           - $ref: '#/components/schemas/LocalisedText'
@@ -24428,7 +25422,9 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: For grouped events.
+          x-ticvai-references: catalogue.event
+          description: For grouped events. The parent is an existing event at the same venue, not the event itself,
+            and has no parent of its own (one level; ADAM CR-256). Declared as a key onto `catalogue.event`.
         performanceCount:
           type: integer
           readOnly: true
@@ -24447,13 +25443,57 @@ components:
           - cancelled
           - archived
           description: '**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to
-            keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent`
-            create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state.'
+            keep it). Written only by `setEventLifecycleState` and the event lifecycle job, which check the transition
+            against `states/event.yaml` (ADAM CR-109); `createEvent` and `cloneEvent` create an event in `draft`.
+            `isActive` stays the switch that hides an event from sale without changing its state.'
         lifecycleStateChangedAt:
           type: string
           format: date-time
           readOnly: true
           nullable: true
+        scheduledLifecycleState:
+          type: string
+          readOnly: true
+          nullable: true
+          enum:
+          - draft
+          - planned
+          - onSale
+          - live
+          - closed
+          - cancelled
+          - archived
+          description: '**A move waiting for its effectiveFrom** (ADAM CR-109, option 2; CHG-R10CAT-009): written by
+            `setEventLifecycleState` when `effectiveFrom` is in the future, applied and cleared by the event lifecycle job
+            in the workers host at `scheduledLifecycleAt`. Null when nothing waits.'
+        scheduledLifecycleAt:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+          description: When the waiting move is applied (the request's `effectiveFrom`; ADAM CR-109).
+        scheduledLifecycleReason:
+          type: string
+          maxLength: 500
+          readOnly: true
+          nullable: true
+          description: The reason given with the waiting move, carried on `event.lifecycleChanged` when it is applied
+            (ADAM CR-109).
+    EventLifecycleState:
+      type: string
+      description: '**An event''s lifecycle** (4 October 2026, CHG-FXC-003). Its moves and their preconditions are
+        `states/event.yaml` (ADAM CR-109, option 2, accepted 15 October 2026; CHG-R10CAT-009); named here so the state
+        model checks against it. `Event.lifecycleState`, `scheduledLifecycleState` and `setEventLifecycleState`''s
+        `state` carry the same values inline, as they did before it was named (the column keeps its CHECK and the wire
+        shape does not change).'
+      enum:
+      - draft
+      - planned
+      - onSale
+      - live
+      - closed
+      - cancelled
+      - archived
     CreateEventRequest:
       type: object
       required:
@@ -24773,8 +25813,13 @@ components:
             '
         isSeated:
           type: boolean
+          readOnly: true
           description: 'Seated envelopes cannot be leased and are blocked offline. A seat map is not a
             count.
+
+
+            **Derived by the server**: true when the capacity has a `seatCategoryId`, false otherwise (ADAM CR-111,
+            option 1; CHG-R10CAT-011).
 
             '
     CreateEnvelopeRequest:
@@ -25051,6 +26096,9 @@ components:
           nullable: true
     CatalogueBundle:
       x-ticvai-persistence: catalogue.published_bundle
+      # One row per publish, numbered per venue (ADAM CR-110, option 1; CHG-R10CAT-010).
+      x-ticvai-unique-together:
+      - [venueId, version]
       type: object
       required:
       - version
@@ -25064,9 +26112,20 @@ components:
       properties:
         version:
           type: string
+          x-ticvai-unique-compare: exact
+          description: 'The venue''s bundle number: a per-venue integer, 1 for the first publish and one more than
+            the venue''s highest for each publish after, as its decimal string; unique with `venueId` (ADAM CR-110,
+            option 1; CHG-R10CAT-010).'
         venueId:
           type: string
           format: uuid
+        note:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: 'The publisher''s note from `publishBundle`''s body; `BundleSummary.note` (ADAM CR-110, option 1;
+            CHG-R10CAT-010).'
         publishedAt:
           type: string
           format: date-time
@@ -25550,11 +26609,13 @@ components:
           nullable: true
         createdAt:
           type: string
-          description: Creation date-time
+          description: Creation date-time, `catalogue.product.created_at` (ADAM CR-204)
           format: date-time
         lastModifiedAt:
           type: string
-          description: Last modification date-time
+          nullable: true
+          description: Last modification date-time, `catalogue.product.updated_at`; null until the first change (ADAM
+            CR-204)
           format: date-time
         validationIssues:
           type: array
@@ -28844,8 +29905,12 @@ components:
                   - service
                   - delivery
                   - payment
+                description: 'Maps to `catalogue.fee.fee_type`: booking -> bookingFee, transaction -> transactionFee,
+                  channel -> channelFee, service -> serviceFee, delivery -> deliveryFee, payment -> paymentFee (ADAM
+                  CR-212).'
               feeProfileId:
                 type: string
+                description: A `catalogue.fee` of the mapped type that is `active`, else `feeProfileMissing` (ADAM CR-212).
           description: 'Fee Associations (pack p.14-15): which approved fee profile applies for each fee type;
             amounts are the Pricing/Fee Engine''s'
         paymentMethods:
@@ -28927,8 +29992,12 @@ components:
                   - service
                   - delivery
                   - payment
+                description: 'Maps to `catalogue.fee.fee_type`: booking -> bookingFee, transaction -> transactionFee,
+                  channel -> channelFee, service -> serviceFee, delivery -> deliveryFee, payment -> paymentFee (ADAM
+                  CR-212).'
               feeProfileId:
                 type: string
+                description: A `catalogue.fee` of the mapped type that is `active`, else `feeProfileMissing` (ADAM CR-212).
           description: 'Fee Associations (pack p.14-15): which approved fee profile applies for each fee type;
             amounts are the Pricing/Fee Engine''s'
         paymentMethods:
@@ -29000,8 +30069,54 @@ components:
           description: 'Channel: the configured channel''s ID from the Sales Channel Command Center (ADM-258)'
         status:
           type: string
-          description: 'Status after the action: draft, configuration, validation, approved, scheduled, active,
-            suspended, disabled or archived (the pack''s suggested lifecycle, p.5)'
+          enum:
+          - draft
+          - pendingApproval
+          - scheduled
+          - active
+          - suspended
+          description: 'Status after the action: the channel''s `SalesChannelProfile.status`, the five values of the
+            state model and the DDL (ADAM CR-211, option A; CHG-R10CAT-003). The pack''s suggested lifecycle (p.5) is not
+            a second vocabulary.'
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The approval request `submitForApproval` raised, to send back with `scheduleActivation` or
+            `activate` once approved (ADAM CR-211).
+        preview:
+          type: object
+          nullable: true
+          description: '**The effective chain `preview` returns**, Product -> Channel -> Customer -> Price -> Capacity ->
+            Payment -> Fulfillment, one step per link in that order; null for any other action (ADAM CR-211).'
+          properties:
+            steps:
+              type: array
+              items:
+                type: object
+                required:
+                - stage
+                properties:
+                  stage:
+                    type: string
+                    enum:
+                    - product
+                    - channel
+                    - customer
+                    - price
+                    - capacity
+                    - payment
+                    - fulfillment
+                  summary:
+                    type: string
+                    description: What is in effect at this link for the channel.
+                  result:
+                    type: string
+                    enum:
+                    - passed
+                    - warning
+                    - failed
+                    - notRequired
         readinessScore:
           type: number
           description: Channel Readiness %
@@ -29105,8 +30220,15 @@ components:
           nullable: true
         overrideWarnings:
           type: boolean
-          description: Proceed despite warnings (needs the override permission and a reason); critical issues
-            cannot be overridden
+          description: Proceed despite warnings (needs `SALES_CHANNEL_OVERRIDE` and a reason; ADAM CR-211); critical
+            issues cannot be overridden
+        approvalRequestId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'The approved approval request `submitForApproval` raised; required by `scheduleActivation` and
+            `activate` from `pendingApproval`, which are refused `409 approval-required` without an approved one (ADAM
+            CR-211).'
     ChannelOperationsCommandCenterView:
       type: object
       x-ticvai-drafted-shape: true
@@ -45266,6 +46388,17 @@ components:
               maxLength: 8000
           nullable: true
           description: The product's own terms (wireframe B1-S06); at most 8000 characters per language.
+        enabledLanguages:
+          type: array
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**The tenant''s enabled languages**, ISO 639-1 codes in the tenant''s order: the published set,
+            or the draft''s before the first publish (white-label `LanguageConfig.languages`). B1-S06 shows one block per
+            language here (ADAM CR-213, option A; CHG-R10CAT-005). Ignored in a request body.'
+          items:
+            type: string
+            pattern: ^[a-z]{2}$
         missingTranslations:
           type: array
           readOnly: true
@@ -45544,6 +46677,12 @@ components:
           format: uuid
           nullable: true
           description: The seller; absent on a guest channel.
+        rules:
+          allOf:
+          - $ref: '#/components/schemas/ProductSalePermissionRuleSet'
+          nullable: true
+          description: '**A draft rule set to test**, evaluated instead of the saved rules, by the same engine; nothing is
+            saved (ADAM CR-215, option A; CHG-R10CAT-008). The result names the deciding rule by `decidedByRuleIndex`.'
     SalePermissionCheckResult:
       type: object
       x-ticvai-persistence: none — computed
@@ -45577,7 +46716,14 @@ components:
                 type: string
                 format: uuid
                 nullable: true
-                description: For `deniedByRule`, a matching DENY; for `allowedByRule`, a matching ALLOW; the first by level in the order of `SalePermissionLevel`, then by id. Null for `noRules` and `noMatchingRule`.
+                description: For `deniedByRule`, a matching DENY; for `allowedByRule`, a matching ALLOW; the first by level in the order of `SalePermissionLevel`, then by id. Null for `noRules` and `noMatchingRule`, and when a draft `rules` was evaluated (ADAM CR-215).
+              decidedByRuleIndex:
+                type: integer
+                minimum: 0
+                nullable: true
+                description: 'When the request sent a draft `rules`: the deciding rule''s index in it, chosen as
+                  `decidedByRuleId` is (the first by level, then by position). Null when the saved rules were evaluated,
+                  and for `noRules` and `noMatchingRule` (ADAM CR-215, option A; CHG-R10CAT-008).'
               decidedAtLevel:
                 allOf:
                 - $ref: '#/components/schemas/SalePermissionLevel'

@@ -53,6 +53,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from packshape import screen_shape                                    # noqa: E402
+import contract_shapes as CS                                          # noqa: E402 -- r10 patterns (CHG-R10GEN-007)
 
 ROOT = Path(__file__).resolve().parents[1]
 MONEY = "../shared/common.yaml#/components/schemas/Money"
@@ -183,7 +184,51 @@ DERIVED_NOTE = (
 )
 
 
-def build(op, rec, name, contract, owned, cols):
+def _services() -> dict:
+    p = ROOT / "handoff" / "service-decomposition.json"
+    return (json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}).get("services") or {}
+
+
+SERVICES = _services()
+SERVICE_OF = {c: s for s, v in SERVICES.items() for c in v.get("contracts") or []}
+
+
+def apply_r10(new: dict, schemas: dict, contract: str, method: str, route, purpose: str, is_list: bool,
+              view_props: dict, routes=None) -> dict:
+    """**The r10 patterns a shaped operation carries from its first draft** (CHG-R10GEN-007), in place:
+    (a) Money it answers or accepts declares its currency read, the venue's or the region's settings (naming-and-style
+    5.1, ADR-0018; CR-234, CR-197, CR-217, CR-235, CR-202); (e) a fact another module owns named in the screen's
+    purpose is asked of its owner's query (ADR-0055 rule 2; CHG-R10GEN-001); (b) a list states its order, nulls last
+    then `id` (CR-206, CR-236, CR-190); (g) its permission is evaluated per scope (CR-189); (f) a public guest read of
+    venue data takes GuestVenue and declares `400 venue-required` (CR-198). (c) does not arise: no refusal is
+    drafted. `routes` replaces the fact lookup (tests)."""
+    reader = SERVICE_OF.get(contract)
+    scope = new.get("x-ticvai-scope-level")
+    via = []
+    if CS.has_money({k: v for k, v in schemas.items()}, schemas):
+        via += CS.money_read_via(True, scope, (SERVICES.get(reader) or {}).get("deployable"))
+    facts = routes if routes is not None else (CS.fact_routes(purpose, reader) if reader and purpose else [])
+    via += [v for v in facts if v["query"] not in {x["query"] for x in via}]
+    out = {}
+    for k, v in new.items():
+        out[k] = v
+        if k == "x-ticvai-consumed-by" and via:
+            out["x-ticvai-read-via"] = via
+    if via and "x-ticvai-read-via" not in out:
+        out = {"x-ticvai-read-via": via, **out}
+    extra = []
+    if is_list:
+        extra.append(CS.order_sentence(view_props, []))
+    if out.get("x-ticvai-permission"):
+        extra.append(CS.scope_sentence(out["x-ticvai-permission"], scope, is_list))
+    if extra:
+        nl = "\n"
+        out["description"] = out.get("description", "").rstrip(nl) + nl + nl + (nl + nl).join(extra)
+    CS.add_guest_venue(out, method, route)
+    return out
+
+
+def build(op, rec, name, contract, owned, cols, method="get", route=None, routes=None):
     """Returns (new op dict, {schema name: schema}) for one drafted operation."""
     shape = screen_shape(rec, money_ref=MONEY)
     props = dict(list(shape["props"].items())[:MAX_PROPS])
@@ -276,6 +321,8 @@ def build(op, rec, name, contract, owned, cols):
         "description": rec["title"],
         "content": {"application/json": {
             "schema": {"type": "array", "items": ref} if verb_is_read else ref}}}}
+    new = apply_r10(new, schemas, contract, method, route, (rec.get("purpose") or rec["title"]).strip(),
+                    verb_is_read, props, routes)
     return new, schemas
 
 
@@ -393,7 +440,7 @@ def main() -> int:
                     name, k = "%s%d" % (base, k), k + 1
                 taken.add(name + "View")
                 taken.add(name + "Input")
-                new, sch = build(op, rec, name, path.stem, owned[path.stem], cols)
+                new, sch = build(op, rec, name, path.stem, owned[path.stem], cols, verb, route)
                 drafted.setdefault(route, {})[verb] = new
                 schemas.update(sch)
                 if not op["operationId"].startswith(("list", "get", "search")):

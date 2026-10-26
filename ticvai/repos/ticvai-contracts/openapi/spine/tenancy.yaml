@@ -109,6 +109,25 @@ x-ticvai-queries:
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October).
+  # **A staff sign-in on a device, recorded on the device** (ADAM CR-232 as the lead answered, 25 October 2026, r10
+  # question 23; CHG-R10TEN-018). Identity's login asks it in process within commerce (ADR-0055 rule 3: another
+  # module writes only through the owner's in-process API), so listDeviceAuditRecords reads sign-ins from Tenancy's
+  # own tenancy.device_audit.
+  recordDeviceSignIn:
+    module: tenancy
+    table: tenancy.device_audit
+    inputs:
+      workstationId: uuid, the workstation the sign-in named (LoginRequest.workstationId); a browser door sends none and does not ask
+      principalId: uuid, who signed in
+      at: date-time, when the session opened
+    returns:
+      recorded: integer, the device_audit rows written (one per device bound to the workstation; 0 when none is)
+    rule: 'Called by identity.login on a successful device sign-in, in the same transaction as the session it opens.
+      Tenancy writes one tenancy.device_audit row for each registered device bound to the workstation (platform.device
+      workstation_id): kind access, action signIn, actorPrincipalId the principal, at the session''s opening time,
+      previousValue and newValue absent. A failed sign-in opens no session and records nothing here
+      (identity.loginRecorded carries it). listDeviceAuditRecords returns these rows with the scans.'
+    served: [in-process]
   deadLetterRecords:
     module: tenancy
     table: platform.dead_letter
@@ -197,8 +216,10 @@ x-ticvai-queries:
       it see them (the table's row-level security, under the caller's connection and transaction). It decides
       nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
-      another deployable through Tenancy's service route (serviceAuth).
-    served: [service]
+      another deployable through Tenancy's service route (serviceAuth), and in process by the operations host for
+      the F&B menu operations, whose menus reach their venue only through `fnb.menu.outlet_id` (ADAM CR-260 as the
+      r10 package carries CR-234; docs/active/cross-deployable-writes.yaml XDR-004).
+    served: [in-process, service]
   regionSettingsRecords:
     module: tenancy
     table: platform.region_settings
@@ -217,6 +238,8 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Tenancy implements, and asked from another
       deployable through Tenancy's service route (serviceAuth).
+      It is asked in process by the operations host too (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008;
+      XDR-004), and by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
     served: [in-process, service]
   tenantRecords:
     module: tenancy
@@ -254,6 +277,9 @@ x-ticvai-queries:
       with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process within
       commerce, through the C# query interface Tenancy implements, and asked from another deployable through
       Tenancy's service route (serviceAuth).
+      It is asked in process by the operations host too, which composes it for every F&B operation that answers Money
+      (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008; docs/active/cross-deployable-writes.yaml XDR-004), and
+      by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
     served: [in-process, service]
   workstationRecords:
     module: tenancy
@@ -273,6 +299,9 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Tenancy implements, and asked from another
       deployable through Tenancy's service route (serviceAuth).
+      It is asked in process by the access host too, for the session's access point (ADAM CR-240, option A, 25 October
+      2026; CHG-R10ORD-009; XDR-003), and by the workers host for the consumers it runs (ADR-0055, amended 25 October
+      2026).
     served: [in-process, service]
   dataRetentionSettingRecords:
     module: tenancy
@@ -292,6 +321,47 @@ x-ticvai-queries:
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked from another deployable through Tenancy's service route (serviceAuth).
     served: [service]
+  scopeRecords:
+    module: tenancy
+    table: platform.scope
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The platform.scope rows asked for, by id (a venue id from a session or an order, for its path or its name).'}
+      paths: {type: array, items: {type: string, pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'}, description: 'Or the rows whose path equals one of these ltree paths exactly (a row''s scope_path, for the node it names: ADAM CR-235); ids, paths and where together narrow.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as level or parentId); ids, paths and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it, active or not; an id or a path with no visible row is absent.'
+      items: {$ref: '#/components/schemas/OrgUnit'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October; ADAM CR-217, CR-235 and CR-227, decided 25 October 2026, CHG-R10CAT-001). Tenancy answers with its
+      platform.scope rows, as it stores them and as the caller's scope lets it see them (the table's row-level
+      security, under the caller's connection and transaction), whether or not the node is still active: an asker
+      that wants active venues only asks activeVenues, which is a rule question. It decides nothing: an asker that
+      refuses or chooses on these rows states that rule in its own operation. A path is matched exactly, never as an
+      ancestor or a descendant. It is asked in process within commerce, through the C# query interface Tenancy
+      implements (Catalogue: a venue's path for a venue-scoped row, and a row's path back to its venue; Orders: a
+      venue's name), and asked from another deployable through Tenancy's service route (serviceAuth).
+    served: [in-process, service]
+  offlinePolicyRecords:
+    module: tenancy
+    table: platform.offline_policy
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The platform.offline_policy rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as scopePath); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent, and a node with nothing saved has no row.'
+      items: {$ref: '#/components/schemas/OfflinePolicy'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October; ADAM CR-110, decided 15 October 2026, CHG-R10CAT-010). Tenancy answers with its
+      platform.offline_policy rows, as it stores them and as the caller's scope lets it see them (the table's
+      row-level security, under the caller's connection and transaction). It decides nothing: an asker that falls
+      back to the schema's defaults where no row is saved (as getOfflinePolicy does) states that rule in its own
+      operation. It is asked in process within commerce, through the C# query interface Tenancy implements, and
+      asked from another deployable through Tenancy's service route (serviceAuth).
+    served: [in-process, service]
   activeVenues:
     module: tenancy
     table: platform.scope
@@ -326,11 +396,14 @@ paths:
     get:
       operationId: resolveTenantHost
       # The placement is read through subscription#cellTenantRecords (x-ticvai-read-via), never raw (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
-      x-ticvai-names-for-context: [control.cell_tenant]
+      x-ticvai-names-for-context: [control.cell_tenant, control.tenant]
       x-ticvai-read-via:
       - query: platform-ops#tenantDomainRecords
         route: service
         for: 'its read of control.tenant_domain, Platform''s data (CHG-MOD-001)'
+      - query: subscription#tenantRecords
+        route: service
+        for: 'the tenant''s status (control.tenant), for the terminated check: a terminated tenant answers 404 (ADAM CR-205, option A; CHG-R10TEN-004)'
       - query: subscription#cellTenantRecords
         route: service
         for: 'the tenant''s placement: its cell, instance and database name (control.cell_tenant), Platform''s data (r8 integration, CHG-R8INT-014)'
@@ -368,12 +441,19 @@ paths:
         **The routing outcomes, decided 18 October 2026** (ADAM CR-162, option A: what the resolver does today
         becomes the rule; CHG-CRA-007). A request on a host that is not the tenant''s primary is answered **308
         Permanent Redirect** to `redirectToHostname`. A **`terminated`** tenant answers 404; every other tenant
-        status is routed, and its operations apply the suspension mode. The address is the tenant''s
+        status is routed, and its operations apply the suspension mode. The tenant''s status is the
+        `status` of its `control.tenant` row, read through `subscription#tenantRecords` (ADAM CR-205, option A; CHG-R10TEN-004):
+        `CellTenant.status` is the database''s status, not the tenant''s. The address is the tenant''s
         `control.cell_tenant` row: its cell, instance and database name, of a database that is `live`,
         `suspended` or `draining` (`provisioning` and `dropped` are not opened), and none or more than one such
         row answers 404. `tenant_domain.cell_id` narrows the cell; `tenant_domain.database_name` is
         informational. A platform subdomain is written with `verifiedAt` set at provisioning, so one rule
         serves both kinds of host.
+
+
+        **What the edge takes from the `200`** (ADAM CR-205, option A; CHG-R10TEN-004): the answer is the
+        `TenantDomain` row, and the edge uses only its `hostname`, `tenantId` and `cellId`. No instance is added to
+        the answer.
 
 
         **Installed staff apps resolve the same way** (R8 blocker FOUNDATION-AI-C26, CHG-R8MIG-004): a handheld,
@@ -408,6 +488,10 @@ paths:
       - query: subscription#tenantRecords
         route: service
         for: 'its read of control.tenant, Platform''s data (CHG-MOD-001)'
+      - query: subscription#cellTenantRecords
+        route: service
+        for: 'the tenant''s placement (control.cell_tenant): the 403 when the tenant is not one of the calling cell''s tenants (ADAM CR-205, option A; CHG-R10TEN-004)'
+      x-ticvai-names-for-context: [control.cell_tenant]
       x-ticvai-write-via:
       - table: control.tenant_domain
         event: tenantDomain.mapped
@@ -442,8 +526,11 @@ paths:
         Platform''s consumer has written the row**, whatever the answer''s `status` says: white-label shows a domain as connected when
         `verifyCustomDomain`, polling, finds it routed (`resolveTenantHost` on the host), never on this answer. **Whose host**:
         `tenantId` is sent in the body (no longer server-owned: the service token names only the calling cell),
-        and is refused `403` unless the tenant is one of that cell''s tenants, as the tenant records it already reads say
-        (`subscription#tenantRecords`).
+        and is refused `403` unless the tenant is one of that cell''s tenants: a `control.cell_tenant` row with the
+        tenant and the calling cell, read through `subscription#cellTenantRecords` (ADAM CR-205, option A;
+        CHG-R10TEN-004). `control.tenant` has no cell column, so placement is never read from the tenant records.
+        **Only version 2 of `tenantDomain.mapped` is emitted**: its one consumer was built to v2 at r8, so no v1
+        envelope is written.
 
 
         **`hostname-taken` is decided twice**: here, as a quick refusal (`409`) when the host is already active for
@@ -505,7 +592,9 @@ paths:
         - "P09 ADM-006 Tenant Hierarchy Explorer"
         - "P09 ADM-412 Payment Method & Settlement Setup"
         - "P09 ADM-421 Venue & Operational Structure Creation"
+        - "P09 ADM-540 AI Decision Explorer & Search"
         - "P13 CMS-016 Site Settings"
+        - "P13 CMS-066 Tags, Keywords & Classification"
       description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -603,8 +692,15 @@ paths:
       summary: Who did what, where, and when
       description: >
         POS board 1 and 4, 24 August. **`platform.audit_record` existed and nothing read it** —
-        fifteen operations write an audit trail and no operation, screen or flow could show one.
-        `BO-068 Audit Log` had zero operations declared.
+        every write leaves an audit row (the platform writes it in the write's transaction; ADAM CR-179) and no
+        operation, screen or flow could show one. `BO-068 Audit Log` had zero operations declared.
+
+        **A venue caller reads its own venue's trail** (ADAM CR-185, option B, decided 21 October 2026;
+        CHG-R10TEN-006). The table's read policy is the tenant root, or a grant over the scope node a row's
+        `orgUnitId` names: a venue manager holding `AUDIT_VIEW` sees the rows of the venue and the nodes beneath
+        it, a region the rows of its venues, and head office every row. Rows with no `orgUnitId` (consumers,
+        jobs, the webhook) stay the tenant root's. The policy does the narrowing, so the operation's code does
+        not change; `orgUnitId` filters within what the caller may read.
 
         Found by mapping the POS pack: four separate frames wanted an audit view — station events,
         profile deployments, limit unlocks, override history — and **every one of them is this
@@ -613,7 +709,8 @@ paths:
         **Reading the audit log is itself audited.** `platform.audit_read` exists for that reason:
         a trail nobody can inspect is useless, and one anybody can inspect without trace is a
         different problem. Each call writes one `AuditRead` row (`target` `auditRecord`, the
-        caller, the time, the filters and the number of rows returned; CHG-R8MIG-004).
+        caller, the time, the filters and the number of rows returned; CHG-R8MIG-004), with the org unit the
+        caller's session acts at (`orgUnitId`, CHG-R10TEN-019).
 
         **Never deletes and never edits.** The only operations on an audit record are write and
         read — which is why there is no `updateAuditRecord` here and never will be.
@@ -803,6 +900,17 @@ paths:
         - "P08 BO-036 Device Registry"
         - "P08 BO-128 Live Workstation Health Monitor"
         - "P08 BO-129 Software, Configuration & Version Management"
+      x-ticvai-reads:
+      - table: platform.device
+        for: 'the workstation''s devices: last status, heartbeat, firmware, battery (ADAM CR-103; was path-inferred in the lineage)'
+      - table: platform.workstation
+        for: 'the workstation and its configurationProfileVersion (was path-inferred in the lineage)'
+      - table: tenancy.device_telemetry
+        for: 'the heartbeat series: errorCount over the last hour and syncBacklog (ADAM CR-103, option 3; CHG-R10TEN-007)'
+      - table: tenancy.device_firmware
+        for: 'the newest released firmware for each device kind, the firmware currency term (ADAM CR-244)'
+      - table: platform.configuration_profile
+        for: 'the profile''s version, the profile currency term (ADAM CR-244)'
       summary: A score a manager can sort by, and what is dragging it down
       description: >
         Board 1 of the client's POS design set. **The package held `lastHeartbeatAt` and a heartbeat
@@ -814,6 +922,50 @@ paths:
 
         **Returns the contributors, not just the number.** A score of 62 tells a manager to look; the
         three things dragging it down tell them what to do.
+
+        **The formula, the bands and the windows, proposed defaults the client can correct** (ADAM CR-103,
+        option 3, accepted 15 October 2026; CHG-R10TEN-007; **made exact by ADAM CR-244, option A, accepted 26 October
+        2026, Chinmay, CHG-R10CRF-004**, so the score is defined here and nowhere else). Computed live from the
+        workstation's active devices (`platform.device`), their heartbeat series (`tenancy.device_telemetry`), the
+        released firmware (`tenancy.device_firmware`) and the workstation's profile (`platform.configuration_profile`):
+
+        - `score` = 40 device online share (the share of its active devices whose last status is `online` or
+        `localMode`) + 25 heartbeat freshness + 20 firmware and profile currency + 15 error rate, rounded to a whole
+        number.
+
+        - **Heartbeat freshness** is the **stalest** active device's last heartbeat: 25 at one minute old or less, 0 at
+        15 minutes or more, linear between.
+
+        - **Firmware currency**: a device's latest firmware is the newest `released` `tenancy.device_firmware` row for
+        its device kind, ordered by semantic version (major, minor, patch, compared as numbers): 100% on it, 50% one
+        version behind, 0 older. **Profile currency**: a device is current when its `configurationProfileId` equals the
+        workstation's and the workstation's `configurationProfileVersion` equals that profile's `version` (its latest
+        published version, one row per version since CR-228); 100% current,
+        0 not. The workstation takes the lowest of its active devices' firmware and profile currency, and **the 20
+        points are the average of the two**.
+
+        - **Error rate**: 15 at no errors in the last hour, 0 at 10 or more, linear between (the sum of `errorCount`
+        in the heartbeat series over the last hour). **Until `tenancy.device_telemetry` lands in the database, this
+        term is dropped and the other three are re-weighted to 100** (each weight times 100/85: online share 47,
+        freshness 29, currency 24, before rounding the sum), and `syncBacklog` and `errorRate` have no source.
+
+        - **A workstation with no active devices** is `offline` with `score` 0 and no `contributors`.
+
+        - `status`: `healthy` at 80 or more, `warning` at 60 or more, `degraded` below 60 (the "failure" of the
+        `Workstation.healthScore` note); **`offline` when every active device is offline** (no heartbeat for 15
+        minutes, the device window below), whatever the score. A battery under 15% on any device caps it at
+        `warning`, and so, once the heartbeat series lands, does a sync backlog over 100 records on any device.
+
+        - `contributors`: **every factor that has a source**, ordered by the points it lost, most first: `weight` is
+        the points lost out of 100 (0 for a factor that lost none), and `detail` a short phrase naming the device and
+        the value (for example "till printer offline 22 min", "firmware 2.3.1, latest 2.4.0"). The factors are
+        `deviceOffline` (online share), `heartbeatAge` (freshness), `firmwareOutdated` and `profileDrift` (currency),
+        `deviceBattery` (the cap, weight 0), and `errorRate` and `syncBacklog` once the heartbeat series lands.
+
+        - **The device windows** (`states/registered-device.yaml`): a device with no heartbeat for 15 minutes
+        is `offline`, and one silent for 7 days after that is `unknown`.
+
+        - **Ships on this in Sprint 1** (#31204); the client corrects these defaults in one place, here.
       tags: [tenancy]
       x-ticvai-permission: DEVICE_VIEW
       x-ticvai-audience: [staff]
@@ -861,6 +1013,8 @@ paths:
         through `getConfigurationProfile` with `version`.
 
         **Order.** Newest first, by `publishedAt` descending, then by `id`.
+
+        Where `publishedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-scope-level: tenant
@@ -1003,6 +1157,8 @@ paths:
         26 September, pull audit R206. **`deployConfigurationProfile` said the board shows recent
         deployments, and nothing read `platform.profile_deployment`.** Most recent first, by
         `startedAt`.
+
+        Where `startedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-scope-level: tenant
@@ -1069,6 +1225,23 @@ paths:
         `failureReasons`, `startedAt` and `completedAt` are the server's. **Only a published
         version deploys** — a draft is still editable, and a version edited underneath its
         deployments is what publishing exists to prevent.
+
+        **No target means the profile's whole fleet** (ADAM CR-188, option A, accepted 21 October 2026;
+        CHG-R10TEN-008). A request naming neither `targetWorkstationIds` nor `targetFilter` deploys to every
+        workstation within the profile's `scopePath` whose type (the kind of its effective sale board) is in the
+        profile's `venueKindScope`. It is recorded as sent and is never refused for having no target.
+
+        **This operation queues; the profile deployment job runs it** (ADAM CR-188, option A; CHG-R10TEN-008).
+        The answer is the deployment, `queued`. The profile deployment job, in the workers host, takes each
+        queued deployment, applies its `strategy` to its workstations (`immediate` at once, `staged` a group at a
+        time, `onNextIdle` each one when it is between transactions), writes `platform.workstation`
+        `configuration_profile_id` and `configuration_profile_version` as each workstation takes the version,
+        and keeps the deployment's `status`, `succeededCount`, `failedCount`, `failureReasons`, `startedAt` and
+        `completedAt` and the deployed version's `status` (`deploying`, then `deployed`) up to date
+        (`states/profile-deployment.yaml`, `states/configuration-profile.yaml`). **When the version is
+        deployed, the profile's older `published` or `deployed` versions become `superseded`**; that is the only
+        place `superseded` is set (ADAM CR-250, option A, accepted 26 October 2026). The job is its own piece of
+        work with its own ticket; this operation does not wait for it.
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience: [staff]
@@ -1170,6 +1343,10 @@ paths:
         `maxOfflineHours` to 24, `onCeilingBreach` to `blockNewSales`, `requiresManagerToExtend`
         to true — and an omitted `offlineValueCeiling`, `offlineTransactionCeiling` or
         `allowedOffline` is cleared.
+
+        **A session acting at no venue is refused `404` `not-found`** ("no venue in this session") and nothing is
+        written (ADAM CR-229, option A, as built; CHG-R10TEN-002). Head office sets a venue's policy by acting at
+        that venue.
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience: [staff]
@@ -1261,6 +1438,10 @@ paths:
         Where nothing is saved at that node a row is created (`201`); where one is, the body
         replaces it whole (`200`). `id` is server-owned and ignored on input, and **an omitted
         field returns to its default.**
+
+        **A session acting at no venue is refused `404` `not-found`** ("no venue in this session") and nothing is
+        written (ADAM CR-229, option A, as built; CHG-R10TEN-002). Head office sets a venue's thresholds by acting
+        at that venue.
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience: [staff]
@@ -1475,6 +1656,13 @@ paths:
         - "P08 BO-1062 Tenant & Brand Context"
         - "P09 ADM-019 Global Configuration & Defaults"
         - "P09 ADM-426 Initial Configuration & Regional Defaults"
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'what its text calls "FxRate": ledger.fx_rate, Ledger''s data (CHG-R10GEN-001)'
+      - query: orders#venueChargeCurrencies
+        route: in-process
+        for: 'what its text calls "orders.PaymentProvider.presentmentCurrencies": payments.provider, Order''s data (CHG-R10GEN-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience: [staff]
@@ -1598,6 +1786,7 @@ paths:
     get:
       operationId: getRegionSettings
       x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
         - "P08 BO-1064 Naming, Numbering & Localization"
         - "P08 BO-1065 Currency, Timezone & Channels"
         - "P09 ADM-037 AI Provider & Credentials"
@@ -1939,6 +2128,8 @@ paths:
 
         An outlet is not a workstation. Several workstations sit in one outlet, and the outlet
         is what carries the menu, the stock location and the revenue attribution.
+
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags: [workstation]
       x-ticvai-permission: SCOPE_VIEW
       x-ticvai-scope-level: venue
@@ -2114,6 +2305,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-016 Till Configuration"
         - "P04 POS-025 Till Home"
+        - "P08 BO-036 Device Registry"
         - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P08 BO-116 Merchandising & Product Presentation"
         - "P08 BO-122 POS Experience Dashboard"
@@ -2126,6 +2318,8 @@ paths:
       description: >
         The configured front ends a workstation may load. A board determines presentation and
         layout, never authorisation (ADR-0002).
+
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags: [workstation]
       x-ticvai-permission: SCOPE_VIEW
       x-ticvai-scope-level: venue
@@ -2247,6 +2441,10 @@ paths:
         `variantsSellableAt` in process, in the same transaction (ADAM CR-081; CHG-TEN-002), and a refused
         tile is `422 unknown-variant` or `422 variant-not-sellable`, naming the tile. A `code` already used
         by another board of the venue is `409 duplicate-code` (CHG-TEN-001).
+
+        **`venueId` must be the board's own venue** (ADAM CR-224, option A, as built; CHG-R10TEN-001): any other
+        value is `400` `validation` on `venueId`, "a sale board does not move between venues", and nothing is
+        written.
       tags: [workstation]
       x-ticvai-permission: WORKSTATION_CONFIGURE
       x-ticvai-scope-level: venue
@@ -2301,7 +2499,6 @@ paths:
         - "P04 POS-016 Till Configuration"
         - "P04 POS-025 Till Home"
         - "P06 EMP-043 Device settings"
-        - "P08 ADM-580 Payment Terminal & Device Inventory"
         - "P08 BO-036 Device Registry"
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-405 Reader Directory"
@@ -2473,6 +2670,8 @@ paths:
       x-ticvai-writes:
       - table: platform.device
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: tenancy.device_telemetry
+        for: 'the heartbeat series: one row appended per heartbeat (ADAM CR-103, option 3; CHG-R10TEN-007)'
       x-ticvai-reads:
       - table: tenancy.device_credential
         for: 'the deviceAuth credential the heartbeat is signed with (APPROVALS-TENANCY-C27) (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE)'
@@ -2507,6 +2706,13 @@ paths:
         when the stored status changes, with `previousStatus` the value stored before this heartbeat (`unknown`
         for a device's first). `lastHeartbeatAt` is set on every heartbeat; `health` is recomputed (see
         `RegisteredDevice.health`).
+
+        **Every heartbeat is also appended to the series** (ADAM CR-103, option 3, accepted 15 October 2026;
+        CHG-R10TEN-007): one `tenancy.device_telemetry` row (`DeviceTelemetryPoint`) for the device, `at` the
+        body's `recordedAt`, with its `syncBacklog` and `errorCount`. That series is what the error rate of
+        `RegisteredDevice.health` and `getWorkstationHealth` counts (the `errorCount` of the last hour) and where
+        the sync backlog is read. A reported status is accepted from every state, `offline` and `unknown` included
+        (`states/registered-device.yaml`).
       tags: [workstation]
       x-ticvai-permission: null   # a registered device, authenticated by its enrolment rather than a person
       x-ticvai-scope-level: workstation
@@ -2537,6 +2743,16 @@ paths:
                 cameraHealth: { type: string, maxLength: 100 }
                 connectivity: { type: string, maxLength: 100 }
                 recordedAt: { type: string, format: date-time }
+                syncBacklog:
+                  type: integer
+                  minimum: 0
+                  description: How many offline records the device holds that have not yet synced; absent where the
+                    device keeps none (ADAM CR-103).
+                errorCount:
+                  type: integer
+                  minimum: 0
+                  description: How many errors the device logged since its previous heartbeat; absent counts as 0
+                    (ADAM CR-103).
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
@@ -2771,6 +2987,13 @@ paths:
         `lastSeenLocation` (reported by the heartbeat), `assignedAt` and `scopePath` are
         server-owned; all four are `readOnly` and ignored on input.
 
+
+        **One row per device, and its references checked** (ADAM CR-103, option 3, accepted 15 October 2026;
+        CHG-R10TEN-007). The row is keyed by `device_id`, which is required and unique, so two first calls make one
+        row. An `assignedWorkstationId` that is not a workstation of the tenant, an `ownerOrgUnitId` that is not a
+        scope node, a `custodianPrincipalId` that is not a principal, or a `locationScopePath` outside the
+        caller''s scope is refused `422` `unknown-reference`, naming the field, and nothing is written.
+
         '
       tags:
       - devices
@@ -2798,6 +3021,14 @@ paths:
               $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '422':
+          description: 'A reference in the body names nothing the caller can use (`unknown-reference`, ADAM CR-103):
+            the assigned workstation, the owning scope node or the custodian does not exist, or the location is
+            outside the caller''s scope. The problem names the field.'
+          x-ticvai-problem-types: [unknown-reference]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /devices/{deviceId}/telemetry:
@@ -2823,7 +3054,7 @@ paths:
         handheld that dies during the afternoon rush, and the venue can act on that only if somebody
         stored the number.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - devices
       x-ticvai-permission: DEVICE_VIEW
@@ -2870,7 +3101,7 @@ paths:
         is this scanner on* is rarely asked; *how many scanners are still on the version with the scan
         bug* is asked constantly.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - devices
       x-ticvai-permission: DEVICE_VIEW
@@ -3314,13 +3545,30 @@ paths:
       operationId: listDeviceAuditRecords
       x-ticvai-read-via:
       - query: access#scanEventRecords
-        route: service
-        for: 'its read of access.scan_event, Access''s data: Access is its own deployable (CHG-MOD-001; R8 lineage request)'
+        route: in-process
+        for: 'its read of access.scan_event, Access''s data, in process as CR-196 settled for the same table: the commerce role reads access.scan_event (docs/active/cross-deployable-writes.yaml XDR-001; ADAM CR-232, option A; CHG-R10TEN-005)'
       summary: What was done to this device, and what it did
       description: '16.7.38 and 16.7.39. **Two logs, one read.** The device audit is what administrators
         did to it — enrolled, reconfigured, re-keyed, retired. The access log is what it did — who signed
         in on it and what they scanned. An investigation almost always needs both interleaved, and
         joining them at read time is the only way to get the order right.
+
+
+        **Where each half comes from, decided 25 October 2026** (ADAM CR-232, option A, as CR-196; CHG-R10TEN-005):
+
+        - **The device audit** is `tenancy.device_audit`, Tenancy''s own, every kind as stored. **Sign-ins are
+        rows of it** of kind `access`, action `signIn`, written by Identity''s `login` on a device sign-in through
+        Tenancy''s in-process API `tenancy#recordDeviceSignIn` (the lead''s answer to r10 question 23;
+        CHG-R10TEN-018).
+
+        - **The scans** are `access.scan_event` rows of this device (`device_id`), read in process through
+        `access#scanEventRecords` (the commerce role reads the table; XDR-001), under the caller''s own scope. A
+        scan becomes a `DeviceAuditRecord` of `kind` `access`, `action` `scan.` + its outcome (`scan.admitted`,
+        `scan.denied`, `scan.overridden`), `actorPrincipalId` its `operator_principal_id`, `at` its `recorded_at`,
+        `newValue` its `deny_reason` where denied, and `sourceIp` and `correlationId` absent. Every outcome is
+        included.
+
+        - **Both are interleaved by time** (`at`). `kind`, `from` and `to` filter both halves alike.
 
         '
       tags:
@@ -3461,7 +3709,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
+        **Order.** Newest first, by `updatedAt` descending, then by `id`. Where `updatedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - tenancy
       x-ticvai-permission: TENANT_VIEW
@@ -3900,12 +4148,18 @@ components:
     AuditRead:
       type: object
       x-ticvai-persistence: platform.audit_read
+      # Read by the tenant root and by a grant over the row's org unit, as platform.audit_record (ADAM CR-185 sibling,
+      # the lead's answer to r10 question 24; CHG-R10TEN-019): derive-ddl APPEND_AUDIT_MARKS.
+      x-ticvai-rls: audit-read-beneath
       description: '**Who read audited data, when, and what they asked for** (R8 blocker APPROVALS-TENANCY-C09,
         CHG-R8MIG-004; the lead''s answer, option A). One row per audited read, never edited: a read of a guest''s
         PII (`target` `subject`, `subjectId` set) and every `listAuditRecords` call (`target` `auditRecord`, the
         filter it was called with and how many rows it returned; `subjectId` null). Written by the reading
         operation in its own transaction; storage only, no operation returns it. Any principal holding a grant
-        appends a row and only the tenant root reads one, as `platform.audit_record` (CHG-R6-002).'
+        appends a row, as `platform.audit_record` (CHG-R6-002). **Read as `platform.audit_record` is** (the lead''s
+        answer to r10 question 24, 25 October 2026; CHG-R10TEN-019): the tenant root reads every row, and a venue or
+        region grant reads the rows whose `orgUnitId` names a scope node at or beneath it; a row with no `orgUnitId`
+        is the tenant root''s.'
       required:
       - id
       - principalId
@@ -3946,16 +4200,39 @@ components:
           type: integer
           nullable: true
           description: How many rows the read returned.
+        orgUnitId:
+          type: string
+          format: uuid
+          nullable: true
+          x-ticvai-references: platform.scope
+          description: The venue the reader's session acts at, else its region; null for a session at the tenant root
+            (CHG-R10TEN-019). What a venue or region grant reads the row by.
     AuditRecord:
       x-ticvai-append-only: occurredAt
       type: object
       x-ticvai-persistence: "platform.audit_record"
+      # A venue or region grant reads the rows of its own scope nodes (ADAM CR-185, option B; CHG-R10TEN-006):
+      # derive-ddl APPEND_AUDIT_MARKS, the helper platform.apply_append_audit_read_rls.
+      x-ticvai-rls: audit-read-beneath
       description: >
         26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords`
         returns it.** It was a free-form object, so nothing said what an audit row carries. These
         are the fields the operation already filters on — who, where, on which workstation, what
-        action, on what, and when — and nothing more. Written by the operations that audit
-        themselves; never edited and never deleted.
+        action, on what, and when — and nothing more. Never edited and never deleted.
+
+
+        **Every write leaves a row, written by the platform in the write's own transaction** (ADAM CR-179,
+        option 1; PLATFORM-AUDIT #27694 and CR-005; CHG-R10TEN-016). Not a fixed set of operations that audit
+        themselves: the request kernel writes one row for each transaction that writes, inside it, from every
+        host. `action` is the operation's `operationId`, or the consumer's or the job's name; `principalId`
+        is who acted; `orgUnitId` is the venue the session acts at, else its region; `workstationId` is the
+        workstation where there is one; `subjectRef` is set only where the operation names what it acted on.
+
+
+        **Who reads a row** (ADAM CR-185, option B; CHG-R10TEN-006): the tenant root reads every row; a venue or
+        region grant reads the rows whose `orgUnitId` names a scope node at or beneath it. A row with no
+        `orgUnitId` (a consumer, a job, the webhook) is the tenant root's alone. Appending is open to any grant,
+        and correcting or removing a row to the tenant root only, as CR-005 settled.
       required: [id, action, occurredAt]
       properties:
         id: { type: string, format: uuid, readOnly: true }
@@ -3975,7 +4252,8 @@ components:
           description: The workstation it was done from, where there was one.
         action:
           type: string
-          description: What was done, as the writing operation names it.
+          description: What was done, as the writing operation names it; the operation's `operationId`, or the
+            consumer's or the job's name (ADAM CR-179).
         subjectRef:
           type: string
           nullable: true
@@ -4039,6 +4317,10 @@ components:
       x-ticvai-unique-when:
       - columns: [hostname]
         when: {status: active}
+      # One active primary per tenant and channel (ADAM CR-105, option 1; CHG-R10TEN-011): the consumer demotes the
+      # channel's other primary in the same transaction, and this index makes two primaries impossible.
+      - columns: [tenantId, channel]
+        when: {isPrimary: true, status: active}
       description: '**Hostname to tenant, outside every tenant database** (SD-021, 29 September). In the control
         database, because the edge must answer it before it knows which tenant database to open.
         `whitelabel.custom_domain` stays the tenant''s own record of its domain and its verification.'
@@ -4463,11 +4745,23 @@ components:
         uptimeSeconds:
           type: integer
           nullable: true
+        syncBacklog:
+          type: integer
+          nullable: true
+          description: The offline records the device held unsynced when it sent this heartbeat (ADAM CR-103;
+            CHG-R10TEN-007). Written by `recordDeviceHeartbeat`.
+        errorCount:
+          type: integer
+          nullable: true
+          description: The errors the device logged since its previous heartbeat (ADAM CR-103; CHG-R10TEN-007).
+            Written by `recordDeviceHeartbeat`; the last hour's sum is the error rate of device and workstation
+            health.
         scopePath:
           type: string
     DeviceFirmware:
       type: object
       x-ticvai-persistence: tenancy.device_firmware
+      x-ticvai-rls: read-beneath   # r10 gate 3, CHG-R10INT-002: read below the tenant by getWorkstationHealth (ADAM CR-244)
       description: '16.6.30 and 16.6.32. **A release, and how much of the fleet is on it.** Written by
         `createDeviceFirmware` and moved through its life by `setDeviceFirmwareStatus` (29 September,
         build pass); `startDeviceFirmwareRollout` deploys only a `released` one.
@@ -4822,6 +5116,7 @@ components:
     ConfigurationProfile:
       type: object
       x-ticvai-persistence: "platform.configuration_profile"
+      x-ticvai-rls: read-beneath   # r10 gate 3, CHG-R10INT-002: read below the tenant by getWorkstationHealth (ADAM CR-244)
       # Each version is its own row, so an earlier one stays readable (R8 blocker APPROVALS-TENANCY-C08, CHG-R8MIG-019).
       x-ticvai-primary-key: [id, version]
       description: >
@@ -4855,8 +5150,14 @@ components:
             Assigned by the server: 1 on create, and one more each time a change lands on a
             published version (see `setConfigurationProfile`). **Each version is its own row,
             keyed (`id`, `version`)** (CHG-R8MIG-019): a new version is a new row, and
-            `setConfigurationProfile` sets the older published row's `status` to `superseded`, its
-            settings left exactly as they were.
+            `setConfigurationProfile` leaves the older row exactly as it is, `status` included.
+            **`superseded` is set only by `deployConfigurationProfile`**, when the newer version is
+            deployed: a deployed version is what workstations still run, so marking it superseded before
+            the new one reaches them would misreport the fleet (ADAM CR-250, option A, accepted 26 October
+            2026, Chinmay). `id` is the profile and names every version of it;
+            `platform.profile_deployment` keys a deployment to one version by (`profile_id`, `version`).
+            **A read of "the profile" takes its latest version**; older versions stay readable by
+            (`id`, `version`) (ADAM CR-228, option A, decided 25 October 2026; CHG-R10TEN-009).
         settings:
           type: object
           additionalProperties: true
@@ -5453,6 +5754,8 @@ components:
           description: >
             What the device last said on its heartbeat; `unknown` until it has. `localMode` is an
             access-control device validating from its offline package with its link down (ADR-0067).
+            The timer sets `offline` after 15 minutes with no heartbeat, and `unknown` after 7 days offline;
+            the next heartbeat sets whatever it reports (ADAM CR-103, proposed defaults the client can correct).
         batteryPercent:
           type: integer
           nullable: true
@@ -5491,7 +5794,9 @@ components:
             firmware currency (20 on the latest, 10 one version behind, 0 older) + 15 errors in the last hour
             (15 at none, 0 at 10 or more, linear between). `healthy` at 80 or more, `warning` at 60 or more,
             `degraded` below 60; `offline` after 15 minutes with no heartbeat, whatever the score; `unknown`
-            until the first heartbeat. A battery under 15% caps the device at `warning`.
+            until the first heartbeat. A battery under 15% caps the device at `warning`. The latest firmware,
+            and the error term until `tenancy.device_telemetry` lands (dropped, the other three re-weighted to
+            100), are as `getWorkstationHealth` states them (ADAM CR-244, 26 October 2026).
         lastHeartbeatAt: { type: string, format: date-time, nullable: true, readOnly: true }
         capabilities:
           type: array
@@ -5545,6 +5850,10 @@ components:
             **The profile this device was provisioned with.** `enrolDevice` has accepted one since
             16.1.3 and there was nowhere to keep it, so the answer to *"what is this reader
             configured as"* lived only in the request that set it.
+
+            A reference to the profile's `id`, not to one version: the profile is keyed (`id`,
+            `version`), so this is kept by convention rather than a declared key, and a read of it takes
+            the profile's latest version (ADAM CR-228, option A; CHG-R10TEN-009).
         approvalStatus:
           allOf:
             - $ref: '#/components/schemas/DeviceApprovalStatus'
@@ -6117,6 +6426,14 @@ components:
             currency only and the other display currencies stay approximate. The ledger is always
             in the base currency, with the rate recorded on every payment and refund.
           items: { type: string, pattern: '^[A-Z]{3}$' }
+        stepMinutes:
+          type: integer
+          enum: [15, 30, 60]
+          nullable: true
+          x-ticvai-persistence-column: integer
+          description: '**The venue''s start-time step for a space sold by the hour** (accepted 26 October 2026,
+            Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers
+            (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13).'
         cartLeaseSeconds:
           type: integer
           nullable: true
@@ -6897,7 +7214,10 @@ components:
             minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile
             currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0
             errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80
-            is a warning and below 60 a failure.**
+            is a warning and below 60 a failure.** The exact rules (whose heartbeat, which firmware is the
+            latest, what profile currency compares, the error term until the heartbeat series lands, a
+            workstation with no devices, the bands and the contributors) are `getWorkstationHealth`'s, the
+            one place the score is defined (ADAM CR-244, 26 October 2026).
         configurationProfileId:
           type: string
           format: uuid

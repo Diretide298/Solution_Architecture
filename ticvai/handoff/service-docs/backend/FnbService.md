@@ -95,7 +95,7 @@
 | menu | [`setMenuSections`](#setmenusections) | PUT | `/menus/{menuId}/sections` | setup | 1 | BO-045, BO-109 |
 | menu | [`updateMenu`](#updatemenu) | PATCH | `/menus/{menuId}` | setup | 1 | BO-045 |
 | modifier | [`createModifierGroup`](#createmodifiergroup) | POST | `/modifier-groups` | setup | 1 | BO-045 |
-| order | [`createFnbOrder`](#createfnborder) | POST | `/fnb-orders` | core | 1 | EMP-058, EMP-059, POS-022 |
+| order | [`createFnbOrder`](#createfnborder) | POST | `/fnb-orders` | core | 1 | EMP-058, EMP-059, POS-012, POS-022 |
 | order | [`getFnbOrder`](#getfnborder) | GET | `/fnb-orders/{orderId}` | core | 1 | BO-020, KIT-004 |
 | order | [`listFnbOrders`](#listfnborders) | GET | `/fnb-orders` | core | 1 | BO-020, BO-021, EMP-051, KIT-001, POS-029 |
 | production | [`setRecipe`](#setrecipe) | PUT | `/recipes/{recipeId}` | setup | 1 | BO-111 |
@@ -2239,7 +2239,7 @@ The label matters: planned quantities against the forecast are what make a model
 | Reads | `cache:idempotency`, `fnb.production_plan`, `fnb.production_plan_line` |
 | Writes | `cache:idempotency`, `fnb.production_plan`, `fnb.production_run` |
 | Called by | BO-112 |
-| State model | ProductionPlan ([states/production-plan.yaml](../../../states/production-plan.yaml)): moves `draft` -> `released`, `released` -> `superseded`, `released` -> `cancelled` |
+| State model | ProductionPlan ([states/production-plan.yaml](../../../states/production-plan.yaml)): moves `draft` -> `released`, `released` -> `superseded` |
 
 **Parameters**
 
@@ -3408,6 +3408,7 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | outletId | query | yes | string (uuid) |  |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `FnbDeliveryPolicy`
 
@@ -3443,6 +3444,7 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | The current setting |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -3551,6 +3553,7 @@ Allergens are always present. Omitting them is not an option a tenant gets to ch
 | outletId | path | yes | string (uuid) |  |
 | at | query |  | string (date-time) | Evaluate menu availability at this time rather than now. |
 | language | query |  | string |  |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `GuestMenu`
 
@@ -3582,6 +3585,7 @@ Allergens are always present. Omitting them is not an option a tenant gets to ch
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | The menu in force |
 | 404 |  | No menu in force at that time. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -3843,6 +3847,7 @@ Computed from the outlet's `FnbDeliveryPolicy` and its current load: ASAP plus f
 | date | query |  | string (date) | A calendar day, in the Region's time zone, not UTC. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -3860,6 +3865,7 @@ Computed from the outlet's `FnbDeliveryPolicy` and its current load: ASAP plus f
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
 | 200 |  | Open slots |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -4193,6 +4199,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 The rail. Read by P15 Kitchen Display — TICVAI's own kitchen display on commodity hardware (19 Sep; the 31 Jul *KDS integration only* position is superseded) — and by the back-office and till views of the same queue.
 **Rail order is the server's.** Tickets come back ordered by `priority` and the outlet's priority weights (`setKitchenSla`: age, promise time — `targetReadyAt` —, table stage, VIP), and a display renders them in the order returned rather than re-sorting by arrival or by promise time.
 **A kitchen display does not choose its station** (decided 28 September, audit R277). Where the caller is a workstation named in a station's `displayWorkstationIds` and sends no `stationId`, the station resolves from that assignment; a `stationId` sent by an assigned display is ignored. The station-load tile is not in the first release.
+Where `priority` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -4869,7 +4876,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `fnb.kitchen_station`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.menu_item`, `fnb.service_order`, `fnb.service_order_line` |
 | Writes | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.service_order`, `fnb.service_order_line`, `platform.idempotency_record`, `platform.outbox` |
-| Called by | EMP-058, EMP-059, POS-022 |
+| Called by | EMP-058, EMP-059, POS-012, POS-022 |
 | State model | F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): created as `ordered`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `seated` -> `ordered` |
 
 **Parameters**

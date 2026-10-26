@@ -331,7 +331,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Save tax profile (primary button) | `setTaxProfileJurisdiction` PUT `/tax-profile-jurisdiction` | TaxProfileJurisdictionConfigurationInput | TaxProfileJurisdictionConfigurationView | — | — |
-| Save template (secondary button) | `setTaxInvoiceTemplate` PUT `/tax-invoice-templates/{invoiceTemplateId}` | FinTaxInvoiceTemplate | FinTaxInvoiceTemplate | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 `nextNumber` below the last number issued in the series, or a language the legal entity's region does not offer. | — |
+| Save template (secondary button) | `setTaxInvoiceTemplate` PUT `/tax-invoice-templates/{invoiceTemplateId}` | FinTaxInvoiceTemplate | FinTaxInvoiceTemplate | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Refused, and nothing is stored. `invoice-template-id-mismatch` (ADAM CR-245): a record for its legal entity and … | — |
 | Save e-invoicing (secondary button) | `setEInvoicingProvider` PUT `/e-invoicing/providers/{providerId}` | FinEInvoicingProvider | FinEInvoicingProvider | 409 `live` requested before any `test` transmission from this legal entity was accepted. | — |
 
 **Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
@@ -360,7 +360,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Empty, first run (`?state=emptyFirstRun`) | No tax profile saved yet: the form is empty and Save creates it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listTaxInvoiceTemplates` requires to show this screen, and names that permission (the screen's other reads need `PRODUCT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setTaxProfileJurisdiction` … |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 `live` requested before any `test` transmission from this legal entity was accepted.; 422 `nextNumber` below the last number issued in the series, or a language the legal entity's region does not offer. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Refused, and nothing is stored. `invoice-template-id-mismatch` (ADAM CR-245): a record for its legal entity and document kind exists and the path's …; 409 `live` requested before any `test` transmission from this legal entity was accepted.; 422 `nextNumber` below the last number issued in the series, or a language the legal entity's region does not offer. |
 
 #### Edge cases to draw
 
@@ -549,6 +549,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-070`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 3
 - Flow F145 *Pricing Revenue Management board 3: Tax, Fee & Calculation Command Center*, step 4: Works in Tax Rule & Treatment Builder → Define how taxes are applied to products and transactions.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -639,7 +640,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Carried, not typed: `feeId`
 
-Errors to draw in the form: 409 `changeRequestRequired`.; 422 `valueRequired`.
+Errors to draw in the form: 409 `changeRequestRequired`. `fee-id-mismatch` (ADAM CR-245): a record for `code` exists and the path's `feeId` is not its id (or names another such record) …; 422 `valueRequired`.
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -659,7 +660,7 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `valueRequired`.
 | Handling Fee (secondary button) | navigation or local | — | — | — | — |
 | Modification Fee (secondary button) | navigation or local | — | — | — | — |
 | Rescheduling Fee (secondary button) | navigation or local | — | — | — | — |
-| Save fee definition (secondary button) | `setFeeDefinition` PUT `/fees/{feeId}` | PricingFee | PricingFee | 409 `changeRequestRequired`.; 422 `valueRequired`. | gated `PRICE_CONFIGURE`; opens modal first |
+| Save fee definition (secondary button) | `setFeeDefinition` PUT `/fees/{feeId}` | PricingFee | PricingFee | 409 `changeRequestRequired`. `fee-id-mismatch` (ADAM CR-245): a record for `code` exists and the path's `feeId` is not its id (or names another such record) …; 422 `valueRequired`. | gated `PRICE_CONFIGURE`; opens modal first |
 
 **Data it reads**: `listFeeSurcharge` (onLoad, Fee & Surcharge Library)
 
@@ -677,7 +678,7 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `valueRequired`.
 | Empty, first run (`?state=emptyFirstRun`) | No fee surcharge configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 `changeRequestRequired`.; 422 `valueRequired`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 `changeRequestRequired`. `fee-id-mismatch` (ADAM CR-245): a record for `code` exists and the path's `feeId` is not its id (or names another such record) …; 422 `valueRequired`. |
 
 #### Sample data for the mock-up
 
@@ -724,6 +725,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-071`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 3
 - Flow F145 *Pricing Revenue Management board 3: Tax, Fee & Calculation Command Center*, step 6: Works in Fee & Surcharge Library → Create standardized reusable non-base-price charges.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -855,6 +857,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-072`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 3
 - Flow F145 *Pricing Revenue Management board 3: Tax, Fee & Calculation Command Center*, step 8: Works in Fee Applicability & Charging Rule Builder → Determine when a fee or surcharge should apply. Screen 10.3.4 defines the fee. Screen 10.3.5 defines the conditions that trigger it.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1001,6 +1004,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS97 Pricing   Revenue Management Board 3.dc.html#adm-073`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 3
 - Flow F145 *Pricing Revenue Management board 3: Tax, Fee & Calculation Command Center*, step 10: Works in Fee Waiver, Tax Exemption & Exception Rules → Govern circumstances under which a normally applicable tax or fee may be reduced, waived or exempted.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1082,7 +1086,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 Carried, not typed: `calculationProfileId`
 
-Errors to draw in the form: 409 `versionInUse`.; 422 `invalidSequence` or `circularDependency`.
+Errors to draw in the form: 409 `versionInUse`. `calculation-profile-id-mismatch` (ADAM CR-245): a record for `code` and `version` exists and the path's `calculationProfileId` is not its id …; 422 `invalidSequence` or `circularDependency`.
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1094,7 +1098,7 @@ Errors to draw in the form: 409 `versionInUse`.; 422 `invalidSequence` or `circu
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save price calculation policy (primary button) | `setPriceCalculationPolicy` PUT `/calculation-profiles/{calculationProfileId}` | CalculationProfile | CalculationProfile | 409 `versionInUse`.; 422 `invalidSequence` or `circularDependency`. | gated `PRICE_CONFIGURE`; opens modal first |
+| Save price calculation policy (primary button) | `setPriceCalculationPolicy` PUT `/calculation-profiles/{calculationProfileId}` | CalculationProfile | CalculationProfile | 409 `versionInUse`. `calculation-profile-id-mismatch` (ADAM CR-245): a record for `code` and `version` exists and the path's `calculationProfileId` is not its id …; 422 `invalidSequence` or `circularDependency`. | gated `PRICE_CONFIGURE`; opens modal first |
 
 **Data it reads**: `listPriceCalculationSequence` (onLoad, Price Calculation Sequence & Formula Engine)
 
@@ -1112,7 +1116,7 @@ Errors to draw in the form: 409 `versionInUse`.; 422 `invalidSequence` or `circu
 | Empty, first run (`?state=emptyFirstRun`) | No price calculation sequence configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 `versionInUse`.; 422 `invalidSequence` or `circularDependency`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 `versionInUse`. `calculation-profile-id-mismatch` (ADAM CR-245): a record for `code` and `version` exists and the path's `calculationProfileId` is not its id …; 422 `invalidSequence` or `circularDependency`. |
 
 #### Sample data for the mock-up
 
@@ -1217,7 +1221,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Carried, not typed: `roundingProfileId`
 
-Errors to draw in the form: 422 `precisionBelowDecimals`.
+Errors to draw in the form: 409 Refused, and nothing is stored. `rounding-profile-id-mismatch` (ADAM CR-245): a record for `currency` exists and the path's `roundingProfileId` is not its id …; 422 `precisionBelowDecimals`.
 
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1245,7 +1249,7 @@ Errors to draw in the form: 422 `precisionBelowDecimals`.
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Round Down (primary button) | navigation or local | — | — | — | — |
-| Save currency rounding rule (secondary button) | `setCurrencyRoundingRule` PUT `/rounding-profiles/{roundingProfileId}` | RoundingProfile | RoundingProfile | 422 `precisionBelowDecimals`. | gated `PRICE_CONFIGURE`; opens modal first |
+| Save currency rounding rule (secondary button) | `setCurrencyRoundingRule` PUT `/rounding-profiles/{roundingProfileId}` | RoundingProfile | RoundingProfile | 409 Refused, and nothing is stored. `rounding-profile-id-mismatch` (ADAM CR-245): a record for `currency` exists and the path's `roundingProfileId` is not its id …; 422 `precisionBelowDecimals`. | gated `PRICE_CONFIGURE`; opens modal first |
 
 **Data it reads**: `listCurrencyPrecisionRounding` (onLoad, Currency Precision, Rounding & Monetary Rules)
 
@@ -1264,7 +1268,7 @@ Errors to draw in the form: 422 `precisionBelowDecimals`.
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the currency precision rounding are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 422 `precisionBelowDecimals`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Refused, and nothing is stored. `rounding-profile-id-mismatch` (ADAM CR-245): a record for `currency` exists and the path's `roundingProfileId` is not its id …; 422 `precisionBelowDecimals`. |
 
 #### Edge cases to draw
 
@@ -1322,7 +1326,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (422).
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409, 422).
 - [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-075?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Round Down, Save currency rounding rule.

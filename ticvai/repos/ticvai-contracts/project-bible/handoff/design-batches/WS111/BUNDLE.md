@@ -97,15 +97,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-644` | Credential Issuance Command Center | D | 0 | 43 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `BO-645` | Credential Generation Workspace | D | 14 | 13 | 6 | 4 | 1 | 0 | — | notStarted (—) |
+| `BO-644` | Credential Issuance Command Center | D | 0 | 48 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `BO-645` | Credential Generation Workspace | D | 14 | 18 | 6 | 4 | 1 | 0 | — | notStarted (—) |
 | `BO-646` | Credential Media Configuration | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-647` | Badge Template Designer | D | 0 | 11 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-648` | Badge Printing & Print Queue | D | 9 | 10 | 6 | 1 | 1 | 6 | — | notStarted (—) |
-| `BO-649` | Digital & Mobile Credential Management | D | 0 | 13 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-650` | NFC & RFID Credential Encoding | D | 2 | 33 | 6 | 10 | 0 | 0 | — | notStarted (—) |
-| `BO-651` | Credential Activation & Delivery | D | 0 | 13 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-653` | Credential Registry & Credential History | D | 0 | 25 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-649` | Digital & Mobile Credential Management | D | 0 | 18 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-650` | NFC & RFID Credential Encoding | D | 2 | 38 | 6 | 10 | 0 | 0 | — | notStarted (—) |
+| `BO-651` | Credential Activation & Delivery | D | 0 | 18 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-653` | Credential Registry & Credential History | D | 0 | 30 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -186,6 +186,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Status | chip: Pending print, Issued, Active, Lost, Replaced, Revoked… | — |
 | Replaces credential | the name it points at, never the id | — |
 | Replacement count | 1,234 | — |
+| Holder name | text | What the badge prints and the register lists (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's … |
+| Zones | list or chips (count when long) | Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with … |
+| Zone | the name it points at, never the id | — |
+| Zone name | text | — |
+| Valid to | 1 Oct 2026 | Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. |
 
 **Holders** (data table, from `listAccreditationHolders`)
 
@@ -359,7 +364,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (43 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (48 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-644?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-645`, `BO-646`, `BO-647`, `BO-648`, `BO-649`, `BO-650`, `BO-651`, `BO-027`, `BO-653`.
@@ -462,6 +467,11 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Status | chip: Pending print, Issued, Active, Lost, Replaced, Revoked… | — |
 | Replaces credential | the name it points at, never the id | — |
 | Replacement count | 1,234 | — |
+| Holder name | text | What the badge prints and the register lists (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's … |
+| Zones | list or chips (count when long) | Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with … |
+| Zone | the name it points at, never the id | — |
+| Zone name | text | — |
+| Valid to | 1 Oct 2026 | Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. |
 
 **Actions and what each produces**
 
@@ -570,7 +580,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-645?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Key requirement: 12.1.4, Generate credential.
 - [ ] Every transition is wired: `BO-644`.
@@ -1172,6 +1182,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Status | chip: Pending print, Issued, Active, Lost, Replaced, Revoked… | — |
 | Replaces credential | the name it points at, never the id | — |
 | Replacement count | 1,234 | — |
+| Holder name | text | What the badge prints and the register lists (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's … |
+| Zones | list or chips (count when long) | Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with … |
+| Zone | the name it points at, never the id | — |
+| Zone name | text | — |
+| Valid to | 1 Oct 2026 | Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. |
 
 **Actions and what each produces**
 
@@ -1281,7 +1296,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-649?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-644`.
@@ -1406,6 +1421,11 @@ Errors to draw in the form: 409 The credential was already `replaced` (`accredit
 | Status | chip: Pending print, Issued, Active, Lost, Replaced, Revoked… | — |
 | Replaces credential | the name it points at, never the id | — |
 | Replacement count | 1,234 | — |
+| Holder name | text | What the badge prints and the register lists (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's … |
+| Zones | list or chips (count when long) | Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with … |
+| Zone | the name it points at, never the id | — |
+| Zone name | text | — |
+| Valid to | 1 Oct 2026 | Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. |
 
 **Actions and what each produces**
 
@@ -1531,7 +1551,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-650?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel, Replace medium.
 - [ ] Every transition is wired: `BO-644`.
@@ -1616,6 +1636,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Status | chip: Pending print, Issued, Active, Lost, Replaced, Revoked… | — |
 | Replaces credential | the name it points at, never the id | — |
 | Replacement count | 1,234 | — |
+| Holder name | text | What the badge prints and the register lists (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's … |
+| Zones | list or chips (count when long) | Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with … |
+| Zone | the name it points at, never the id | — |
+| Zone name | text | — |
+| Valid to | 1 Oct 2026 | Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. |
 
 **Actions and what each produces**
 
@@ -1734,7 +1759,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-651?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-644`.
@@ -1811,6 +1836,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Status | chip: Pending print, Issued, Active, Lost, Replaced, Revoked… | — |
 | Replaces credential | the name it points at, never the id | — |
 | Replacement count | 1,234 | — |
+| Holder name | text | What the badge prints and the register lists (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's … |
+| Zones | list or chips (count when long) | Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with … |
+| Zone | the name it points at, never the id | — |
+| Zone name | text | — |
+| Valid to | 1 Oct 2026 | Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. |
 
 **History** (data table, from `listAccreditationAudit`)
 
@@ -1935,7 +1965,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (25 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-653?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-644`.
@@ -2063,7 +2093,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "AccreditationAuditRecord": {"type":"object","x-ticvai-persistence":"accreditation.audit","description":"Board 8.7. **Who gave this person access to that place, when, and on whose authority.**\n","properties":{"id":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"},"holderId":{"type":"string","format":"uuid","nullable":true},"action":{"type":"string"},"actorPrincipalId":{"type":"string","format":"uuid","nullable":true},"previousValue":{"nullable":true},"newValue":{"nullable":true},"reason":{"type":"string","nullable":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"previousRecordHash":{"type":"string","nullable":true},"recordHash":{"type":"string"},"integrity":{"type":"string","readOnly":true,"enum":["intact","broken","unverifiable"]},"scopePath":{"type":"string"}}},
-"AccreditationCredential": {"type":"object","x-ticvai-persistence":"accreditation.credential","description":"Board 4. **Not the accreditation** — reissuing one re-vets nobody.","required":["holderId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"x-ticvai-references":"accreditation.holder","type":"string","format":"uuid"},"kind":{"type":"string","enum":["printedBadge","mobileCredential","qr","nfcCard","rfidCard","wristband"]},"symbology":{"type":"string","nullable":true,"description":"12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n","enum":["qr","dataMatrix","pdf417","aztec","code128","nfcNdef","rfidEpc","none"]},"serialNumber":{"type":"string","nullable":true},"encodedIdentifier":{"type":"string","nullable":true},"badgeTemplateId":{"type":"string","format":"uuid","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"issuedBy":{"type":"string","format":"uuid"},"activatedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["pendingPrint","issued","active","lost","replaced","revoked","expired"]},"replacesCredentialId":{"type":"string","format":"uuid","nullable":true},"replacementCount":{"type":"integer","default":0},"scopePath":{"type":"string"}}},
+"AccreditationCredential": {"type":"object","x-ticvai-persistence":"accreditation.credential","description":"Board 4. **Not the accreditation** — reissuing one re-vets nobody.","required":["holderId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"x-ticvai-references":"accreditation.holder","type":"string","format":"uuid"},"kind":{"type":"string","enum":["printedBadge","mobileCredential","qr","nfcCard","rfidCard","wristband"]},"symbology":{"type":"string","nullable":true,"description":"12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n","enum":["qr","dataMatrix","pdf417","aztec","code128","nfcNdef","rfidEpc","none"]},"serialNumber":{"type":"string","nullable":true},"encodedIdentifier":{"type":"string","nullable":true},"badgeTemplateId":{"type":"string","format":"uuid","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"issuedBy":{"type":"string","format":"uuid"},"activatedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["pendingPrint","issued","active","lost","replaced","revoked","expired"]},"replacesCredentialId":{"type":"string","format":"uuid","nullable":true},"replacementCount":{"type":"integer","default":0},"scopePath":{"type":"string"},"holderName":{"type":"string","readOnly":true,"x-ticvai-persisted":false,"description":"**What the badge prints and the register lists** (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's `AccreditationHolder.fullName`, read with the credential, not stored on it."},"zones":{"type":"array","readOnly":true,"x-ticvai-persisted":false,"description":"Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with its name, as `verifyAccreditationCredential` answers them. Read with the credential, not stored on it (CHG-R10UI-016).","items":{"type":"object","properties":{"zoneId":{"type":"string","format":"uuid"},"zoneName":{"type":"string"}}}},"validTo":{"type":"string","format":"date","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"description":"Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. `status` `expired` or `revoked` overrides it. Read with the credential, not stored on it (CHG-R10UI-016)."}}},
 "AccreditationCredentialDelivery": {"type":"object","x-ticvai-persistence":"accreditation.mobile_credential_delivery","description":"12.1.21. **Issuing a mobile credential and getting it onto a phone are two acts**, and the second is recorded so *\"I never got it\"* has an answer. Written by `deliverAccreditationCredential` (the accreditation team sends it) and `issueMyAccreditationWalletPass` (the holder adds it to a wallet).\n","required":["credentialId","channel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"credentialId":{"x-ticvai-references":"accreditation.credential","type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid","readOnly":true},"channel":{"type":"string","enum":["email","sms","holderApp","appleWallet","googleWallet"]},"destinationMasked":{"type":"string","nullable":true,"readOnly":true,"description":"The address or number used, masked (`j***@agency.com`). Always the holder's own"},"walletPassSerial":{"type":"string","nullable":true,"readOnly":true},"walletPassUrl":{"type":"string","nullable":true,"readOnly":true,"description":"Signed and expiring; adds the pass to the wallet"},"status":{"type":"string","readOnly":true,"enum":["queued","sent","delivered","opened","failed","superseded"]},"failureReason":{"type":"string","nullable":true,"readOnly":true},"requestedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time","readOnly":true},"deliveredAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string"}}},
 "AccreditationHolder": {"type":"object","x-ticvai-persistence":"accreditation.holder","description":"**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n","required":["id","fullName"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"accreditationNumber":{"type":"string"},"fullName":{"type":"string"},"photoAssetId":{"type":"string","format":"uuid","nullable":true},"dateOfBirth":{"type":"string","format":"date","nullable":true},"nationality":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true,"description":"12.1.16. The holder's own address — where a mobile credential and renewal notices go"},"phone":{"type":"string","nullable":true,"description":"12.1.16. E.164"},"identityDocumentVerified":{"type":"boolean","default":false},"organisationId":{"type":"string","format":"uuid","nullable":true},"affiliationRole":{"type":"string","nullable":true},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","suspended","revoked","expired","archived"]},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"completenessPercent":{"type":"integer","readOnly":true},"scopePath":{"type":"string"},"statusEffectiveFrom":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the status `setAccreditationStatus` set takes effect."},"statusReviewAt":{"type":"string","format":"date","nullable":true,"readOnly":true,"description":"When the status is due for review (`setAccreditationStatus`)."}}},
 "BadgePrintJob": {"type":"object","x-ticvai-persistence":"accreditation.print_job","description":"Board 4.5. **Printing fails mid-batch and the operator needs to know which landed.**","properties":{"id":{"type":"string","format":"uuid"},"credentialIds":{"type":"array","items":{"type":"string","format":"uuid"}},"printerDeviceId":{"type":"string","format":"uuid","nullable":true},"queuedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["queued","printing","completed","partiallyFailed","failed"]},"printed":{"type":"integer","readOnly":true},"failed":{"type":"integer","readOnly":true},"failures":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"credentialId":{"type":"string","format":"uuid"},"reason":{"type":"string"}}}},"scopePath":{"type":"string"}}},

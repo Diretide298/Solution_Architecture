@@ -15,8 +15,9 @@ terminal:
 transitions:
 - from: pending
   to: verified
+  operation: verifyDeveloper
   trigger: operation
-  guard: '**Checks passed. Nothing was provisioned before this** — an unverified account with live credentials
+  guard: '**Checks passed, by TICVAI staff** (`verifyDeveloper`, ADAM CR-098, 25 October 2026; CHG-R10ID-011). **Nothing was provisioned before this** — an unverified account with live credentials
     is an open door'
 - from: pending
   to: closed

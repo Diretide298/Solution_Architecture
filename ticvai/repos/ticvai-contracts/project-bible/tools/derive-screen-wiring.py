@@ -230,11 +230,17 @@ def label_fits(label: str, op: str) -> int:
 
 
 def reached(s: dict) -> set:
+    """What the check counts as reached (check-screen-wiring overlay_refs): a component's or transition's
+    `operation`, an overlay's confirm and dismiss, and the picker reads an overlay names in `reads` (CHG-R10UI-016).
+    Without `reads` here a form's picker read looked unreached, and the rules below went looking for another
+    component to bind it to (r10 gate 2, CHG-R10WIR-001)."""
     refs = {c.get("operation") for _, c in comps(s) if c.get("operation")}
     for o in s.get("overlays") or []:
         for k in ("confirm", "dismiss"):
             if isinstance(o, dict) and isinstance(o.get(k), dict) and o[k].get("operation"):
                 refs.add(o[k]["operation"])
+        if isinstance(o, dict):
+            refs |= {r for r in (o.get("reads") or []) if isinstance(r, str) and r}
     for t in ((s.get("navigation") or {}).get("transitions") or []):
         if isinstance(t, dict) and t.get("operation"):
             refs.add(t["operation"])
@@ -309,7 +315,10 @@ def fix_unreached(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
             bind(scored[0][2], op, "its label names it")
             continue
         gates = [c for c in free if c.get("kind") == "publishGate"]
-        if op.startswith("publish") and len(gates) == 1:
+        # A deploy is a publish to a target (r10 gate 2, CHG-R10WIR-001): BO-1068's one gate, "Promotes this
+        # configuration to the target environment", is the confirm deployConfigurationProfile's body-less call needs;
+        # its derived button collects nothing for the body, so binding the button would only move the finding.
+        if op.startswith(("publish", "deploy")) and len(gates) == 1:
             bind(gates[0], op, "the screen's one publish gate")
             continue
         left.append(a)

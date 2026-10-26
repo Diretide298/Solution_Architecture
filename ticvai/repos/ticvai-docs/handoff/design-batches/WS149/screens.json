@@ -349,13 +349,6 @@
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "listDevices",
-    "contract": "tenancy",
-    "purpose": "The device register behind it",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "listPaymentTerminalCertifications",
     "contract": "payments",
     "purpose": "Terminal model certifications",

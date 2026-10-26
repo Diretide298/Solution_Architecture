@@ -558,6 +558,43 @@
     "readOnly": true,
     "description": "For a translation draft, the proposed text; null otherwise. `payload` stays the request body of the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40)."
    },
+   "confidence": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment (`proposeWalkways`), the model's confidence in it (`WalkwayProposal.confidence`); null on every other proposal (ADAM CR-207, CHG-R10ORD-013)."
+   },
+   "basis": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "handMarked",
+     "seen"
+    ],
+    "description": "For a walkway segment, whether it was traced from a hand mark or seen in the picture (`WalkwayProposal.basis`); null otherwise (ADAM CR-207)."
+   },
+   "reasoning": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, why the model proposed it (`WalkwayProposal.reasoning`); null otherwise (ADAM CR-207)."
+   },
+   "distanceMetres": {
+    "type": "number",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, its length along the centreline; null where the plan has no georeference and on every other proposal (ADAM CR-207)."
+   },
+   "mapId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, the venue map it is on (the path's `mapId`, which the target's request body does not carry); null otherwise (ADAM CR-207). `listProposedActions` filters on it."
+   },
    "kind": {
     "type": "string",
     "enum": [

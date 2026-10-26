@@ -348,6 +348,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - … and 1 more flow steps (`flows/`)
 - Flow F171 branch at step 1 (expected): when Nothing has been set up on Resale Marketplace Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F171 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -488,6 +489,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-279`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 2: Works in Resale Eligibility Rule Configuration → Define whether a ticket is allowed to enter the resale marketplace. Not every TICVAI ticket should automatically be resellable.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -686,6 +688,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-280`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 4: Works in Resale Policy & Marketplace Settings → Configure the overall business policies governing a resale marketplace.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -848,6 +851,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-281`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 6: Works in Listing Creation & Seller Configuration → Define how eligible ticket holders create resale listings.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1043,6 +1047,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-282`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 8: Works in Resale Pricing & Price Guardrails → Control the permitted resale price while protecting the operator, seller and buyer.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1185,6 +1190,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-283`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 10: Works in Resale Fees, Commission & Seller Proceeds → Configure the commercial model of the resale marketplace.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1357,6 +1363,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-284`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 12: Works in Listing Approval & Moderation → Determine whether listings are published automatically or require operator review.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1586,6 +1593,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-286`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 16: Works in Listing Lifecycle, Expiry & Cancellation → Control the full lifecycle of a resale listing from creation until sale, withdrawal or expiry.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1734,6 +1742,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS168 Ticket Resale Marketplace Board 1.dc.html#adm-287`
 - Workshop pack: Ticket Resale Marketplace_Reference.pdf board 1
 - Flow F171 *Ticket Resale Marketplace board 1: Resale Marketplace Command Center*, step 18: Works in AI Resale Configuration & Marketplace Recommendations → Provide TICVAI's AI intelligence layer for optimizing resale configuration while keeping commercial control with the operator. Board 2 manages what happens once a resale listing attracts a buyer and …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

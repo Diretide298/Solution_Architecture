@@ -412,11 +412,11 @@
       {
        "kind": "detailPanel",
        "label": "The resource availability",
-       "bindsTo": "ResourceAvailability",
+       "bindsTo": "ProductStartTime",
        "columns": [
-        "ResourceAvailability.resourceId",
-        "ResourceAvailability.freeWindows",
-        "ResourceAvailability.blockedWindows"
+        "ProductStartTime.startsAt",
+        "ProductStartTime.endsAt",
+        "ProductStartTime.freeCount"
        ],
        "operation": "listProductStartTimes",
        "notes": "Build note (r8 second round, ORDERS-MONEY-C08, option A): drawn as approved, filled from `listProductStartTimes` for the reserved line's product and variant on the picked date: the free windows are its start times (`startsAt` to `endsAt`, with `freeCount`); no resource is named, so the resource column stays empty, and nothing is blocked that the guest needs to see.",

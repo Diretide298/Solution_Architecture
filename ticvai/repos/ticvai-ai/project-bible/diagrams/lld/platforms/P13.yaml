@@ -31,12 +31,12 @@ servicesCalled:
 - service: AiService
   operationCalls: 14
 - service: CatalogueService
-  operationCalls: 7
+  operationCalls: 8
 - service: IdentityService
   operationCalls: 6
-- service: OrderService
-  operationCalls: 1
 - service: TenancyService
+  operationCalls: 2
+- service: OrderService
   operationCalls: 1
 coverage:
   screens: 104
@@ -213,6 +213,7 @@ screens:
   - getBrandIdentity
   - getFonts
   - getTheme
+  - listProducts
   - previewProductTickets
   states:
   - emptyFirstRun
@@ -1718,6 +1719,7 @@ screens:
   density: compact
   operations:
   - getMediaTaxonomy
+  - listOrgUnits
   - setMediaAssetTags
   states:
   - emptyFirstRun

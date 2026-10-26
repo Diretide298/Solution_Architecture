@@ -40,4 +40,13 @@ consumers:
   idempotencyKey: requestId
   onFailure: retry
   isCritical: false
+- context: identity
+  purpose: 'A guest''s privacy request withdrawn (`subjectContract` identity; ADAM CR-101, CHG-R10ID-016): a
+    `subjectDataExport` request''s identity.subject_data_export row ends `rejected` with no file; a `subjectErasure`
+    request closes unfulfilled and nothing is erased'
+  writes:
+  - identity.subject_data_export
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: 30 days after publication

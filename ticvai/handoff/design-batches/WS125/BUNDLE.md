@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-694` | Event Catalogue Command Center | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-694` | Event Catalogue Command Center | B | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-695` | Event Type & Behaviour Configuration | B | 12 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-696` | Event Duplication & Clone Configuration | A | 8 | 3 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
@@ -159,11 +159,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Code | text | — |
 | Name | text | — |
 | Venue | the name it points at, never the id | — |
-| Parent event | the name it points at, never the id | For grouped events. |
+| Parent event | the name it points at, never the id | For grouped events. The parent is an existing event at the same venue, not the event itself, and has no parent of its own (one level; ADAM … |
 | Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
 | Is active | yes / no (icon or chip) | — |
 | Lifecycle state | chip: Draft, Planned, On sale, Live, Closed, Cancelled… | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). |
 | Lifecycle state changed at | 1 Oct 2026, 14:30 | — |
+| Scheduled lifecycle state | chip: Draft, Planned, On sale, Live, Closed, Cancelled… | A move waiting for its effectiveFrom (ADAM CR-109, option 2; CHG-R10CAT-009): written by `setEventLifecycleState` when `effectiveFrom` is … |
+| Scheduled lifecycle at | 1 Oct 2026, 14:30 | When the waiting move is applied (the request's `effectiveFrom`; ADAM CR-109). |
+| Scheduled lifecycle reason | text | The reason given with the waiting move, carried on `event.lifecycleChanged` when it is applied (ADAM CR-109). |
 | Next cursor | text | — |
 | Has more | yes / no (icon or chip) | — |
 
@@ -238,7 +241,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-694?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-695`, `BO-696`.
@@ -471,7 +474,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Copy event (primary button) | `cloneEvent` POST `/events/{eventId}/clone` | CloneEventRequest | inline | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | — |
+| Copy event (primary button) | `cloneEvent` POST `/events/{eventId}/clone` | CloneEventRequest | inline | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 A business code the request names is already used within its uniqueness scope (the scope the property's … | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
@@ -494,7 +497,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the event duplication clone are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getEvent` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `cloneEvent`. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 422 `include` names `staffPlan` or `accessRules`, another module's data with no route yet (ADAM CR-109). |
 
 #### Sample data for the mock-up
 
@@ -543,7 +546,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (404, 409).
+- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (404, 409, 422).
 - [ ] Every output is drawn (3 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-696?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Copy event, Cancel.
@@ -656,7 +659,7 @@ Method, path, parameters, request and response for every operation these screens
 "cloneEvent": {"method":"POST","path":"/events/{eventId}/clone","contract":"catalogue","summary":"Copy an event, choosing what comes with it","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CloneEventRequest","responds":null},
 "getEvent": {"method":"GET","path":"/events/{eventId}","contract":"catalogue","summary":"Read an event","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Event"},
 "listEventTypes": {"method":"GET","path":"/event-types","contract":"catalogue","summary":"The kinds of event, and how each behaves","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"EventType"},
-"listEvents": {"method":"GET","path":"/events","contract":"catalogue","summary":"List events","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listEvents": {"method":"GET","path":"/events","contract":"catalogue","summary":"List events","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setEventType": {"method":"PUT","path":"/event-types/{eventTypeId}","contract":"catalogue","summary":"Define an event kind and its behaviour","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"eventTypeId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"EventType","responds":"EventType"}
 }
 ```
@@ -668,7 +671,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "CloneEventRequest": {"x-ticvai-persistence":"none — request only","type":"object","description":"The body of `cloneEvent`. Named on 6 October 2026 (CHG-R4-016) so the clone screen (BO-696) can bind its fields; the first three properties are unchanged from the inline body.\n","properties":{"include":{"type":"array","items":{"type":"string","enum":["schedule","pricing","seatMap","capacityProfile","resourceRequirements","staffPlan","registrationForm","accessRules"]}},"shiftDatesByDays":{"type":"integer","nullable":true},"newName":{"type":"string","nullable":true},"newCode":{"type":"string","maxLength":64,"nullable":true,"x-ticvai-unique":"tenant","description":"**The copy's event code** (6 October 2026, CHG-R4-016). Event codes are unique per tenant (`CreateEventRequest.code`, audit R108), so a copy cannot keep its source's. A code any event in the tenant already uses is refused `409 duplicate-code`. Omitted or null: the server gives the copy the source's code with the first free suffix `-2`, `-3`, ..., and returns it.\n"}}},
-"Event": {"x-ticvai-persistence":"catalogue.event","type":"object","required":["id","code","name","venueId","scopePath"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentEventId":{"type":"string","format":"uuid","nullable":true,"description":"For grouped events."},"performanceCount":{"type":"integer","readOnly":true,"description":"How many performances the event has. Counted by the server; never sent by a client."},"isActive":{"type":"boolean"},"lifecycleState":{"type":"string","readOnly":true,"enum":["draft","planned","onSale","live","closed","cancelled","archived"],"description":"**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."},"lifecycleStateChangedAt":{"type":"string","format":"date-time","readOnly":true,"nullable":true}}},
+"Event": {"x-ticvai-persistence":"catalogue.event","type":"object","required":["id","code","name","venueId","scopePath"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentEventId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"catalogue.event","description":"For grouped events. The parent is an existing event at the same venue, not the event itself, and has no parent of its own (one level; ADAM CR-256). Declared as a key onto `catalogue.event`."},"performanceCount":{"type":"integer","readOnly":true,"description":"How many performances the event has. Counted by the server; never sent by a client."},"isActive":{"type":"boolean"},"lifecycleState":{"type":"string","readOnly":true,"enum":["draft","planned","onSale","live","closed","cancelled","archived"],"description":"**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState` and the event lifecycle job, which check the transition against `states/event.yaml` (ADAM CR-109); `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."},"lifecycleStateChangedAt":{"type":"string","format":"date-time","readOnly":true,"nullable":true},"scheduledLifecycleState":{"type":"string","readOnly":true,"nullable":true,"enum":["draft","planned","onSale","live","closed","cancelled","archived"],"description":"**A move waiting for its effectiveFrom** (ADAM CR-109, option 2; CHG-R10CAT-009): written by `setEventLifecycleState` when `effectiveFrom` is in the future, applied and cleared by the event lifecycle job in the workers host at `scheduledLifecycleAt`. Null when nothing waits."},"scheduledLifecycleAt":{"type":"string","format":"date-time","readOnly":true,"nullable":true,"description":"When the waiting move is applied (the request's `effectiveFrom`; ADAM CR-109)."},"scheduledLifecycleReason":{"type":"string","maxLength":500,"readOnly":true,"nullable":true,"description":"The reason given with the waiting move, carried on `event.lifecycleChanged` when it is applied (ADAM CR-109)."}}},
 "EventType": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"catalogue.event_type","description":"Event board 1.2. **The type decides behaviour, not just a label.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"hasPerformances":{"type":"boolean","default":true,"description":"**An open-run exhibition has none**, and modelling it as 400 daily performances is how a schedule becomes unmanageable.\n"},"capacityBasis":{"type":"string","enum":["perPerformance","perDay","unlimited"],"description":"`perSession` was removed: a session is a Performance (decided 28 September, audit R165), so `perPerformance` covers it.\n"},"ticketNamesDate":{"type":"boolean","default":true},"multiDay":{"type":"boolean","default":false},"requiresRegistration":{"type":"boolean","default":false},"requiresAccreditation":{"type":"boolean","default":false},"seatingModesAllowed":{"type":"array","items":{"type":"string"}},"defaultLifecycle":{"type":"array","items":{"type":"string"}},"scopePath":{"type":"string"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}}
 }

@@ -340,8 +340,17 @@ ws.cell(2,1,_CAP).font=SUB
 # **`Was` added 19 September.** Three tables moved schema that day and the workbook had no
 # way to say so, which meant a reader comparing two weeks saw three vanish and three
 # appear — and the safe reading of a table vanishing is that its data was dropped.
-hdr(ws,['Module','Table','Was','Database','What it is','Service','Columns','Written','New','PII','Foreign writers','Parent','Anchors on','Derived from','Migration'],
-    [12,32,26,10,74,17,9,8,6,6,20,26,30,26,34])
+# **`Keys` and `Row security` added 25 October** (ADAM CR-092; CHG-R10TEN-014): the table's record carries its declared
+# keys (primary, foreign, unique) and the helper its row-level-security policy is made with, from the generated DDL
+# (`records` in handoff/ddl-column-types.json, written by derive-ddl), so a module test compares a table with one record.
+_RECS_P = _H / 'ddl-column-types.json'
+_RECS = (json.loads(_RECS_P.read_text(encoding='utf-8')).get('records') or {}) if _RECS_P.exists() else {}
+def _keys_of(t):
+    rc = _RECS.get(t) or {}
+    ks = (['primary key (' + ', '.join(rc['primaryKey']) + ')'] if rc.get('primaryKey') else []) + list(rc.get('keys') or [])
+    return '; '.join(ks)
+hdr(ws,['Module','Table','Was','Database','What it is','Service','Columns','Written','New','PII','Foreign writers','Parent','Anchors on','Derived from','Migration','Keys','Row security'],
+    [12,32,26,10,74,17,9,8,6,6,20,26,30,26,34,60,26])
 r=5
 for t in sorted(set(cols)|set(storage)):
     m=t.split('.')[0]; cs=cols.get(t,[])
@@ -366,7 +375,8 @@ for t in sorted(set(cols)|set(storage)):
                           # **A renamed table keeps its migration** (CR-067, CHG-DDL-002): the plan this reads
                           # is the previous refresh's (the ordering caveat above), so on the run that renames a
                           # table the MIG task still lists it under its old name, and the cell went empty.
-                          src,MIG_OF.get(t,'') or MIG_OF.get(_was,'')],1):
+                          src,MIG_OF.get(t,'') or MIG_OF.get(_was,''),
+                          _keys_of(t), (_RECS.get(t) or {}).get('policy','')],1):
         c=ws.cell(r,i,v); c.font=M if i in (2,3) else B; c.border=BOX
         if i==5: c.alignment=Alignment(wrap_text=True,vertical='top')
         if i in (4,7,8,9,10): c.alignment=Alignment(horizontal='center')
@@ -383,7 +393,7 @@ for t in sorted(set(cols)|set(storage)):
         elif t in written: c.fill=GREEN
         elif t in storage: c.fill=GREY
     r+=1
-ws.auto_filter.ref=f"A4:N{r-1}"
+ws.auto_filter.ref=f"A4:Q{r-1}"
 
 ws=wb.create_sheet('Columns'); ws.cell(1,1,'Every column').font=T
 ws.cell(2,1,f"{sum(len(v) for v in cols.values())} columns. **References says where a column points; "
@@ -396,15 +406,31 @@ ws.cell(2,1,f"{sum(len(v) for v in cols.values())} columns. **References says wh
 # r1 (`seating.seat_reservation`, `inventory.inventory_item`) had none, and its ids read `text`. The DDL's type
 # now comes from `handoff/ddl-column-types.json` (written by derive-ddl), and the contract's shape stays
 # beside it as `Contract type` where the two differ.
+# **`Required` and the column list come from the DDL too** (ADAM CR-092, accepted 15 October 2026; CHG-R10TEN-014).
+# Required read the schema reference, so 175 scoped tables showed `scope_path` optional where the DDL says
+# `ltree NOT NULL`, and a column the DDL has and the schema reference does not was missing from the record. Required
+# is now the DDL's NOT NULL (a primary-key column is always required), and a DDL column with no schema-reference row
+# gets one, its source `DDL`. Keys and the row-level-security helper are on the Tables sheet.
 _DDLT_P = _H / 'ddl-column-types.json'
-_DDLT = (json.loads(_DDLT_P.read_text(encoding='utf-8')).get('tables') or {}) if _DDLT_P.exists() else {}
+_DDLJ = json.loads(_DDLT_P.read_text(encoding='utf-8')) if _DDLT_P.exists() else {}
+_DDLT = _DDLJ.get('tables') or {}
+_DDLR = _DDLJ.get('records') or {}
 hdr(ws,['Table','Column','Type','Required','References','Link','Enforced','Source','Description','Contract type'],
     [30,26,15,9,30,14,10,32,54,15])
 r=5
+def _ddl_required(t, col, fallback):
+    for c, nn in (_DDLR.get(t) or {}).get('columns') or []:
+        if c == col:
+            return 'yes' if nn else 'no'
+    return fallback
 for t in sorted(cols):
-    for c_ in cols[t]:
+    _named = {c_['column'] for c_ in cols.get(t, [])}
+    _extra = [{'table': t, 'column': c, 'type': (_DDLT.get(t) or {}).get(c, ''), 'required': 'yes' if nn else 'no',
+               'source': 'DDL', 'description': 'In the generated DDL and in no contract schema (CR-092).'}
+              for c, nn in (_DDLR.get(t) or {}).get('columns') or [] if c not in _named] if t in cols else []
+    for c_ in cols.get(t, []) + _extra:
         _dt=(_DDLT.get(t) or {}).get(c_['column']) or c_['type']
-        row=[c_['table'],c_['column'],_dt,c_['required'],
+        row=[c_['table'],c_['column'],_dt,_ddl_required(t, c_['column'], c_['required']),
              c_.get('references',''),c_.get('referenceHow',''),c_.get('enforced',''),
              c_['source'],c_['description'],c_['type'] if _dt!=c_['type'] else '']
         for i,v in enumerate(row,1):

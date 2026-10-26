@@ -1,4 +1,17 @@
 {
+ "getMyProfile": {
+  "method": "GET",
+  "path": "/guests/me/profile",
+  "contract": "marketing-crm",
+  "summary": "A guest reading their own details",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "subject",
+  "parameters": [],
+  "requestBody": null,
+  "responds": null
+ },
  "getPublishedTenantConfig": {
   "method": "GET",
   "path": "/storefront/tenant-config",
@@ -30,5 +43,24 @@
   "parameters": [],
   "requestBody": null,
   "responds": "TenantAppStatus"
+ },
+ "updateMyProfile": {
+  "method": "PATCH",
+  "path": "/guests/me/profile",
+  "contract": "marketing-crm",
+  "summary": "A guest correcting their own details",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "lastWriterWins",
+  "scopeLevel": "subject",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "GuestProfile"
  }
 }

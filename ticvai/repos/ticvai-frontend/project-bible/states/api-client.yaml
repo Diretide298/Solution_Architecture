@@ -15,27 +15,17 @@ terminal:
 transitions:
 - from: active
   to: suspended
-  operation: revokeApiCredential
-  trigger: operation
-  guard: '**Quota breach, security event or a licence lapsing.** Reversible — a suspension is a conversation,
-    a revocation is not'
-- from: suspended
-  to: active
-  operation: rotateApiCredential
-  trigger: operation
-  guard: Resolved
-  isReversal: true
-- from: active
-  to: suspended
   operation: setApiClientStatus
   trigger: operation
   guard: '**An integration misbehaving, paused on purpose.** Credentials, subscriptions and mappings are
-    kept; `reason` is required (VM close-out, 29 September)'
+    kept; `reason` is required (VM close-out, 29 September). Quota breach, a security event or a licence lapsing
+    suspend through here too: a suspension is a conversation, a revocation is not'
 - from: suspended
   to: active
   operation: setApiClientStatus
   trigger: operation
-  guard: Resumed by the integration owner
+  guard: '**Resumed by the integration owner, the only way back to active** (ADAM CR-098, 25 October 2026;
+    CHG-R10ID-011): `rotateApiCredential` never reactivates a client (409 `api-client-suspended`)'
   isReversal: true
 - from: active
   to: revoked
@@ -48,7 +38,12 @@ transitions:
   operation: revokeApiCredential
   trigger: operation
   guard: Never resolved
-notes: '**`revoked` is terminal and the record stays.** An audit asking who called what last March needs
+notes: '**Revocation never suspends and rotation never reactivates** (ADAM CR-098, 25 October 2026; CHG-R10ID-011):
+  the r1 model had `revokeApiCredential` moving active to suspended and `rotateApiCredential` moving suspended back to
+  active, which skipped `setApiClientStatus` and its reason. Both are gone.
+
+
+  **`revoked` is terminal and the record stays.** An audit asking who called what last March needs
   the client to still resolve.
 
 

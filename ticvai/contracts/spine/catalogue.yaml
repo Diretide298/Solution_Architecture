@@ -521,7 +521,6 @@ paths:
         - "P02 GST-002 Explore"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-008 Tickets & Add-ons"
-        - "P08 BO-015 Performance Calendar"
         - "P08 BO-048 Retail Products"
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P13 CMS-101 Help Me Choose"
@@ -1052,6 +1051,8 @@ paths:
         type: integer
     post:
       operationId: restoreProductVersion
+      x-ticvai-consumed-by:
+        - "P08 BO-008 Product Detail & Variants"
       x-ticvai-read-via:
       - query: assets#mediaAssetRecords
         route: service
@@ -1059,8 +1060,6 @@ paths:
       x-ticvai-writes:
       - table: catalogue.product_version
         for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
-      x-ticvai-consumed-by:
-        - "P08 BO-008 Product Detail & Variants"
       summary: Put a previous version back
       description: '1.4.10. **Restoring creates a new version rather than rewinding to an old one**, following
         `restoreConfigVersion`. A price that was wrong for three days stays visible in the history, because
@@ -1196,11 +1195,11 @@ paths:
   /products/bulk-update:
     post:
       operationId: bulkUpdateCatalogueProducts
+      x-ticvai-consumed-by:
+        - "P08 BO-007 Product Directory"
       x-ticvai-writes:
       - table: catalogue.product_version
         for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
-      x-ticvai-consumed-by:
-        - "P08 BO-007 Product Directory"
       x-ticvai-agreed: '2 October: Chinmay, contract follow-ups ("BO-007 bulk edit: a new catalogue operation"); the
         BO-007 correction of CHG-WIR-027; shape follows bulkChangePrices and inventory bulkUpdateProducts'
       summary: Change many products at once, with a preview
@@ -2235,6 +2234,7 @@ paths:
         - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-877 Qualification & Assignment Rule Engine"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+        - "P13 CMS-006 Component Preview"
         - "P13 CMS-101 Help Me Choose"
         - "P13 CMS-103 Booking Flows"
         - "P16 ANL-004 Product Performance"
@@ -2827,10 +2827,6 @@ paths:
         format: uuid
     get:
       operationId: getProduct
-      x-ticvai-read-via:
-      - query: assets#mediaAssetRecords
-        route: in-process
-        for: 'a guest read''s ProductMedia url and thumbnailUrl: the asset''s stable CDN address when it is public and ready (assets.media_asset), Assets'' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)'
       x-ticvai-consumed-by:
         - "P01 WEB-004 Attraction Details"
         - "P01 WEB-006 Date & Performance Selection"
@@ -2845,6 +2841,10 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-014 Catalogue Publishing"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: in-process
+        for: 'a guest read''s ProductMedia url and thumbnailUrl: the asset''s stable CDN address when it is public and ready (assets.media_asset), Assets'' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2900,6 +2900,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateProduct
+      x-ticvai-consumed-by:
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-008 Product Detail & Variants"
+        - "P08 BO-012 Membership Products"
+        - "P13 CMS-103 Booking Flows"
       x-ticvai-reads:
       - table: catalogue.product_media
         for: 'a sub-resource that content_hash and snapshot cover (ADAM CR-214; CHG-R10CAT-006)'
@@ -2909,11 +2914,6 @@ paths:
         for: 'a sub-resource that content_hash and snapshot cover (ADAM CR-214; CHG-R10CAT-006)'
       - table: catalogue.product_owner_form
         for: 'a sub-resource that content_hash and snapshot cover (ADAM CR-214; CHG-R10CAT-006)'
-      x-ticvai-consumed-by:
-        - "P08 BO-007 Product Directory"
-        - "P08 BO-008 Product Detail & Variants"
-        - "P08 BO-012 Membership Products"
-        - "P13 CMS-103 Booking Flows"
       x-ticvai-read-via:
       - query: white-label#bookingFlowRecords
         route: service
@@ -3717,7 +3717,6 @@ paths:
         - "P02 GST-005 What's On"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-049 Interactive Seat Selection"
-        - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-015 Performance Calendar"
         - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-725 Performance Operations Command Center"
@@ -6212,13 +6211,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createEntitlementTemplate
-      x-ticvai-writes:
-      - table: catalogue.entitlement_template
-        for: 'the template, its scope_path the working venue''s path from tenancy#scopeRecords (ADAM CR-217; CHG-R10CAT-001)'
       x-ticvai-consumed-by:
         - "P08 BO-012 Membership Products"
         - "P08 BO-1192 Entitlement Templates"
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
+      x-ticvai-writes:
+      - table: catalogue.entitlement_template
+        for: 'the template, its scope_path the working venue''s path from tenancy#scopeRecords (ADAM CR-217; CHG-R10CAT-001)'
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
         route: in-process
@@ -16980,12 +16979,12 @@ paths:
         format: uuid
     post:
       operationId: setEventLifecycleState
-      x-ticvai-writes:
-      - table: catalogue.event
-        for: 'lifecycle_state, or the scheduled move (scheduled_lifecycle_state, _at, _reason) (ADAM CR-109; CHG-R10CAT-009)'
       x-ticvai-consumed-by:
         - "P08 BO-716 Event Lifecycle & Change Command Center"
         - "P08 BO-717 Lifecycle Transition Configuration"
+      x-ticvai-writes:
+      - table: catalogue.event
+        for: 'lifecycle_state, or the scheduled move (scheduled_lifecycle_state, _at, _reason) (ADAM CR-109; CHG-R10CAT-009)'
       x-ticvai-reads:
       - table: catalogue.performance
         for: 'the schedule precondition, and the performances whose sales refuse a cancel (ADAM CR-109; CHG-R10CAT-009)'

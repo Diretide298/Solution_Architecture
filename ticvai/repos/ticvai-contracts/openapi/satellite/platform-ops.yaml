@@ -877,7 +877,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `rollbackTestedAt` descending.'
+        **Order.** Newest first, by `rollbackTestedAt` descending. Where `rollbackTestedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - migration
       x-ticvai-permission: PLATFORM_MIGRATION_VIEW
@@ -1388,6 +1388,8 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: The environment registry
+      description: >-
+        **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - environment
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
@@ -1451,7 +1453,7 @@ paths:
         not be upgraded on a Saturday. Beyond that window the platform proceeds, because an indefinitely
         deferred tenant becomes a version nobody supports.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - notice
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
@@ -1521,6 +1523,8 @@ paths:
       - staff
       x-ticvai-read-routing: replica
       summary: End-of-support notices
+      description: >-
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags:
       - notice
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
@@ -1932,7 +1936,7 @@ paths:
       summary: Web application firewall rules in force
       description: '**Drafted 4 September as a stub.** ADM-032 *WAF & Security Policy View* had no operation of its own and sat on the seven generic cell operations. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - platform
       x-ticvai-permission: PLATFORM_CELL_VIEW
@@ -2005,7 +2009,7 @@ paths:
       summary: Backups taken and what they cover
       description: '**Drafted 4 September as a stub.** ADM-033 *Backup & DR Status* answers one question — **is there a restorable copy, and how old is it** — and nothing in the package could answer it. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - platform
       x-ticvai-permission: PLATFORM_CELL_VIEW
@@ -2034,7 +2038,7 @@ paths:
       summary: Archival and retention jobs
       description: '**Drafted 4 September as a stub.** **Retention is a legal obligation and an archival job that silently stops is a breach nobody is watching.** The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - platform
       x-ticvai-permission: PLATFORM_CELL_VIEW

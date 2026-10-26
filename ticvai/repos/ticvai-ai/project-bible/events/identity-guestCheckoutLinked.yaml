@@ -1,0 +1,37 @@
+# identity.guestCheckoutLinked v1 — published by identity
+# Added 25 October 2026 (r10, the lead's ruling on the ADR-0028 tiers; CHG-R10ID-018): Identity is Foundation and
+# never writes orders.sales_order, so it asks Orders, by this event, to attach the guest-checkout orders it matched.
+
+name: identity.guestCheckoutLinked
+version: 1
+publisher: identity
+description: A signed-in guest proved a guest-checkout booking was theirs; the matched orders are to be attached to them.
+aggregate: subject
+emittedWhen: linkGuestCheckout matches the named booking, and every other guest-checkout order with the same verified
+  contact, in identity.subject_holding
+emittedBy:
+- identity.linkGuestCheckout
+payload:
+- field: subjectId
+  type: uuid
+  notes: The account the orders are to belong to
+- field: orderIds
+  type: array
+  notes: The matched orders, each still without a subject in Identity's projection when matched
+- field: verifiedContactRef
+  type: string
+  notes: The keyed hash of the verified contact they were matched on (ADR-0045), kept for the audit trail
+- field: linkedAt
+  type: timestamp
+consumers:
+- context: orders
+  purpose: Set the subject on each listed order that still has none, and announce each as order.linkedToGuest
+    (attachGuestCheckoutOrders)
+  operation: orders.attachGuestCheckoutOrders
+  writes:
+  - orders.sales_order
+  idempotencyKey: eventId + orderId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: No state model emits this. Attaching an order changes its owner, not its status.

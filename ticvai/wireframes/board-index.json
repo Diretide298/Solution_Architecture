@@ -1,13 +1,13 @@
 {
  "generatedBy": "tools/index-boards.py",
- "generated": "2026-10-22",
+ "generated": "2026-10-26",
  "note": "One record per board file under `wireframes/`, keyed by content hash so an unchanged board is never re-read. **A frame in a `generated` board is the screen's own YAML rendered as boxes, not a drawing** \u2014 only `clientPack` and `claudeDesign` frames are evidence that somebody designed something.",
  "counts": {
-  "boards": 289,
+  "boards": 290,
   "boardsByProvenance": {
    "generated": 20,
    "workshop": 195,
-   "clientPack": 71,
+   "clientPack": 72,
    "claudeDesign": 0,
    "unrecognised": 3
   },
@@ -2479,8 +2479,8 @@
   {
    "file": "APP guest.dc.html",
    "provenance": "clientPack",
-   "bytes": 720013,
-   "sha256": "5de4a408dbae783e",
+   "bytes": 720503,
+   "sha256": "cf59009b29c3efb9",
    "frames": 144,
    "screensFramed": 144,
    "screens": [
@@ -2782,15 +2782,119 @@
     "P05"
    ],
    "firstIndexed": "2026-09-10",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
+  },
+  {
+   "file": "APP partner-web.dc.html",
+   "provenance": "clientPack",
+   "bytes": 153760,
+   "sha256": "a2160d24cad3cfd3",
+   "frames": 43,
+   "screensFramed": 43,
+   "screens": [
+    "PTR-001",
+    "PTR-002",
+    "PTR-003",
+    "PTR-004",
+    "PTR-005",
+    "PTR-006",
+    "PTR-007",
+    "PTR-008",
+    "PTR-009",
+    "PTR-010",
+    "PTR-011",
+    "PTR-012",
+    "PTR-013",
+    "PTR-014",
+    "PTR-015",
+    "PTR-016",
+    "PTR-017",
+    "PTR-018",
+    "PTR-019",
+    "PTR-020",
+    "PTR-021",
+    "PTR-022",
+    "PTR-023",
+    "PTR-024",
+    "PTR-025",
+    "PTR-027",
+    "PTR-028",
+    "PTR-030",
+    "PTR-031",
+    "PTR-032",
+    "PTR-033",
+    "PTR-034",
+    "PTR-038",
+    "PTR-040",
+    "PTR-041",
+    "PTR-042",
+    "PTR-043",
+    "PTR-044",
+    "PTR-045",
+    "PTR-046",
+    "PTR-049",
+    "PTR-050",
+    "PTR-051"
+   ],
+   "orphanFrames": [],
+   "anchors": [
+    "ptr-001",
+    "ptr-002",
+    "ptr-003",
+    "ptr-004",
+    "ptr-005",
+    "ptr-006",
+    "ptr-007",
+    "ptr-008",
+    "ptr-009",
+    "ptr-010",
+    "ptr-011",
+    "ptr-012",
+    "ptr-013",
+    "ptr-014",
+    "ptr-015",
+    "ptr-016",
+    "ptr-017",
+    "ptr-018",
+    "ptr-019",
+    "ptr-020",
+    "ptr-021",
+    "ptr-022",
+    "ptr-023",
+    "ptr-024",
+    "ptr-025",
+    "ptr-027",
+    "ptr-028",
+    "ptr-030",
+    "ptr-031",
+    "ptr-032",
+    "ptr-033",
+    "ptr-034",
+    "ptr-038",
+    "ptr-040",
+    "ptr-041",
+    "ptr-042",
+    "ptr-043",
+    "ptr-044",
+    "ptr-045",
+    "ptr-046",
+    "ptr-049",
+    "ptr-050",
+    "ptr-051"
+   ],
+   "platforms": [
+    "P10"
+   ],
+   "firstIndexed": "2026-10-26",
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "APP ticvai-control.dc.html",
    "provenance": "clientPack",
-   "bytes": 1026780,
-   "sha256": "1fbafb1b194a29be",
-   "frames": 294,
-   "screensFramed": 294,
+   "bytes": 883883,
+   "sha256": "4f657d6c749f30e8",
+   "frames": 251,
+   "screensFramed": 251,
    "screens": [
     "ACC-001",
     "ACC-002",
@@ -3019,49 +3123,6 @@
     "DEV-006",
     "DEV-007",
     "DEV-008",
-    "PTR-001",
-    "PTR-002",
-    "PTR-003",
-    "PTR-004",
-    "PTR-005",
-    "PTR-006",
-    "PTR-007",
-    "PTR-008",
-    "PTR-009",
-    "PTR-010",
-    "PTR-011",
-    "PTR-012",
-    "PTR-013",
-    "PTR-014",
-    "PTR-015",
-    "PTR-016",
-    "PTR-017",
-    "PTR-018",
-    "PTR-019",
-    "PTR-020",
-    "PTR-021",
-    "PTR-022",
-    "PTR-023",
-    "PTR-024",
-    "PTR-025",
-    "PTR-027",
-    "PTR-028",
-    "PTR-030",
-    "PTR-031",
-    "PTR-032",
-    "PTR-033",
-    "PTR-034",
-    "PTR-038",
-    "PTR-040",
-    "PTR-041",
-    "PTR-042",
-    "PTR-043",
-    "PTR-044",
-    "PTR-045",
-    "PTR-046",
-    "PTR-049",
-    "PTR-050",
-    "PTR-051",
     "SGN-001",
     "SGN-002",
     "SGN-003",
@@ -3316,49 +3377,6 @@
     "dev-006",
     "dev-007",
     "dev-008",
-    "ptr-001",
-    "ptr-002",
-    "ptr-003",
-    "ptr-004",
-    "ptr-005",
-    "ptr-006",
-    "ptr-007",
-    "ptr-008",
-    "ptr-009",
-    "ptr-010",
-    "ptr-011",
-    "ptr-012",
-    "ptr-013",
-    "ptr-014",
-    "ptr-015",
-    "ptr-016",
-    "ptr-017",
-    "ptr-018",
-    "ptr-019",
-    "ptr-020",
-    "ptr-021",
-    "ptr-022",
-    "ptr-023",
-    "ptr-024",
-    "ptr-025",
-    "ptr-027",
-    "ptr-028",
-    "ptr-030",
-    "ptr-031",
-    "ptr-032",
-    "ptr-033",
-    "ptr-034",
-    "ptr-038",
-    "ptr-040",
-    "ptr-041",
-    "ptr-042",
-    "ptr-043",
-    "ptr-044",
-    "ptr-045",
-    "ptr-046",
-    "ptr-049",
-    "ptr-050",
-    "ptr-051",
     "sgn-001",
     "sgn-002",
     "sgn-003",
@@ -3386,19 +3404,18 @@
    ],
    "platforms": [
     "P09",
-    "P10",
     "P11",
     "P14",
     "P17"
    ],
    "firstIndexed": "2026-09-10",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "APP venue-management.dc.html",
    "provenance": "clientPack",
-   "bytes": 5705798,
-   "sha256": "8f102222a27db2f3",
+   "bytes": 5707876,
+   "sha256": "169060358e4f0dd3",
    "frames": 1866,
    "screensFramed": 1866,
    "screens": [
@@ -7145,13 +7162,13 @@
     "P16"
    ],
    "firstIndexed": "2026-09-10",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "APP venue-pos.dc.html",
    "provenance": "clientPack",
-   "bytes": 384324,
-   "sha256": "0e0c6e2f81bdb455",
+   "bytes": 384048,
+   "sha256": "4d63c3a17322d5f5",
    "frames": 42,
    "screensFramed": 42,
    "screens": [
@@ -7248,7 +7265,7 @@
     "P15"
    ],
    "firstIndexed": "2026-09-10",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "APP venue-staff-mobile.dc.html",
@@ -7481,7 +7498,7 @@
     "P07"
    ],
    "firstIndexed": "2026-09-10",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "design-requests/missing-views-29-september/reference/web/TICVAI Guest Booking v2.dc.html",
@@ -7497,13 +7514,13 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-29",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P01 Guest Web.dc.html",
    "provenance": "generated",
-   "bytes": 128744,
-   "sha256": "1da0e790750874c7",
+   "bytes": 129023,
+   "sha256": "663f806fbbedcb37",
    "frames": 50,
    "screensFramed": 50,
    "screens": [
@@ -7615,13 +7632,13 @@
     "P01"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P02 Guest App.dc.html",
    "provenance": "generated",
-   "bytes": 549221,
-   "sha256": "8b387afe2abb7b13",
+   "bytes": 549356,
+   "sha256": "63c69a322109b135",
    "frames": 77,
    "screensFramed": 77,
    "screens": [
@@ -7787,13 +7804,13 @@
     "P02"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P04 Venue POS.dc.html",
    "provenance": "generated",
-   "bytes": 338400,
-   "sha256": "01a7bd592d8ea1a1",
+   "bytes": 338124,
+   "sha256": "f6ed3b90faedc0c7",
    "frames": 32,
    "screensFramed": 32,
    "screens": [
@@ -7869,13 +7886,13 @@
     "P04"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P05 Guest Kiosk.dc.html",
    "provenance": "generated",
-   "bytes": 60024,
-   "sha256": "8d4050f0af431d94",
+   "bytes": 60100,
+   "sha256": "571a8661f9ed2957",
    "frames": 17,
    "screensFramed": 17,
    "screens": [
@@ -7921,7 +7938,7 @@
     "P05"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P06 Venue Staff App.dc.html",
@@ -8131,7 +8148,7 @@
     "P06"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P07 Venue Scanner.dc.html",
@@ -8171,13 +8188,13 @@
     "P07"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P08 Venue Management.dc.html",
    "provenance": "generated",
-   "bytes": 5076927,
-   "sha256": "4f21a0eb86b34fc3",
+   "bytes": 5078989,
+   "sha256": "c3f9e0835e652e1b",
    "frames": 1663,
    "screensFramed": 1663,
    "screens": [
@@ -11516,13 +11533,13 @@
     "P08"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P09 TICVAI Web.dc.html",
    "provenance": "generated",
    "bytes": 766324,
-   "sha256": "d62716da63a5ce3a",
+   "sha256": "a001fdd7f97d0989",
    "frames": 211,
    "screensFramed": 211,
    "screens": [
@@ -11957,7 +11974,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P10 Partner Web.dc.html",
@@ -12062,13 +12079,13 @@
     "P10"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P11 Accreditation Web.dc.html",
    "provenance": "generated",
-   "bytes": 34076,
-   "sha256": "01c2f6db34043b6f",
+   "bytes": 34180,
+   "sha256": "17b3ade7397e7067",
    "frames": 8,
    "screensFramed": 8,
    "screens": [
@@ -12096,7 +12113,7 @@
     "P11"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P12 Venue Support.dc.html",
@@ -12171,13 +12188,13 @@
     "P12"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P13 Venue CMS.dc.html",
    "provenance": "generated",
-   "bytes": 338741,
-   "sha256": "138bdcce1e98f66e",
+   "bytes": 338757,
+   "sha256": "6df9bf9720c1723e",
    "frames": 104,
    "screensFramed": 104,
    "screens": [
@@ -12398,7 +12415,7 @@
     "P13"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P14 Developer.dc.html",
@@ -12432,7 +12449,7 @@
     "P14"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P15 Kitchen Display.dc.html",
@@ -12470,7 +12487,7 @@
     "P15"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P16 Venue Analytics.dc.html",
@@ -12631,7 +12648,7 @@
     "P16"
    ],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "P17 TICVAI Sign-up.dc.html",
@@ -12697,7 +12714,7 @@
     "P17"
    ],
    "firstIndexed": "2026-09-11",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Dashboards Board.dc.html",
@@ -12728,7 +12745,7 @@
     "P12"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/FnB Board 1.dc.html",
@@ -12759,7 +12776,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/FnB Board 2.dc.html",
@@ -12800,7 +12817,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/FnB Board 3.dc.html",
@@ -12842,7 +12859,7 @@
     "P15"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/FnB Board 4.dc.html",
@@ -12886,7 +12903,7 @@
     "P06"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/FnB Board 5.dc.html",
@@ -12920,7 +12937,7 @@
     "P06"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/FnB Board 6.dc.html",
@@ -12945,7 +12962,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Guest Mobile Board 1.dc.html",
@@ -12970,7 +12987,7 @@
     "P02"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Guest Mobile Board 2.dc.html",
@@ -12990,7 +13007,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Guest Mobile Board 3.dc.html",
@@ -13010,7 +13027,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Guest Mobile Board 4.dc.html",
@@ -13030,7 +13047,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Guest Mobile Board 5.dc.html",
@@ -13050,7 +13067,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Guest Mobile Board 6.dc.html",
@@ -13070,7 +13087,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Guest Mobile Board 7.dc.html",
@@ -13090,7 +13107,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Guest Mobile Board 8.dc.html",
@@ -13110,7 +13127,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Inventory Board 1.dc.html",
@@ -13135,7 +13152,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Inventory Board 2.dc.html",
@@ -13160,7 +13177,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Inventory Board 3.dc.html",
@@ -13185,7 +13202,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Inventory Board 4.dc.html",
@@ -13210,7 +13227,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Inventory Board 5.dc.html",
@@ -13235,7 +13252,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Inventory Board 6.dc.html",
@@ -13260,7 +13277,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Inventory Board 7.dc.html",
@@ -13285,7 +13302,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Kiosk Board 1.dc.html",
@@ -13321,7 +13338,7 @@
     "P05"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Kiosk Board 2.dc.html",
@@ -13355,7 +13372,7 @@
     "P05"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Marketing Board 1.dc.html",
@@ -13380,7 +13397,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Marketing Board 10.dc.html",
@@ -13405,7 +13422,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Marketing Board 11.dc.html",
@@ -13430,7 +13447,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Marketing Board 12.dc.html",
@@ -13455,7 +13472,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Marketing Board 2.dc.html",
@@ -13480,7 +13497,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Marketing Board 3.dc.html",
@@ -13505,7 +13522,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Marketing Board 4.dc.html",
@@ -13530,7 +13547,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Marketing Board 5.dc.html",
@@ -13555,7 +13572,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Marketing Board 6.dc.html",
@@ -13580,7 +13597,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Marketing Board 7.dc.html",
@@ -13605,7 +13622,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Marketing Board 8.dc.html",
@@ -13630,7 +13647,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Marketing Board 9.dc.html",
@@ -13655,7 +13672,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/POS Board 1.dc.html",
@@ -13687,7 +13704,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/POS Board 3.dc.html",
@@ -13719,7 +13736,7 @@
     "P04"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/POS Board 4.dc.html",
@@ -13753,7 +13770,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/POS Board 5.dc.html",
@@ -13787,7 +13804,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/POS Board 6.dc.html",
@@ -13808,7 +13825,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/POS Frontline Board 2.dc.html",
@@ -13836,7 +13853,7 @@
     "P04"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Retail Board 1.dc.html",
@@ -13869,7 +13886,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Retail Board 2.dc.html",
@@ -13912,7 +13929,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Retail Board 3.dc.html",
@@ -13951,7 +13968,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Retail Board 4.dc.html",
@@ -13998,7 +14015,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Retail Board 5.dc.html",
@@ -14036,7 +14053,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Retail Board 6.dc.html",
@@ -14072,7 +14089,7 @@
     "P16"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Board 1.dc.html",
@@ -14095,7 +14112,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Board 2.dc.html",
@@ -14122,7 +14139,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Board 3.dc.html",
@@ -14148,7 +14165,7 @@
     "P01"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Board 4.dc.html",
@@ -14176,7 +14193,7 @@
     "P06"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Platform Board 1.dc.html",
@@ -14201,7 +14218,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Platform Board 10.dc.html",
@@ -14226,7 +14243,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Platform Board 11.dc.html",
@@ -14251,7 +14268,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Platform Board 12.dc.html",
@@ -14276,7 +14293,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Platform Board 13.dc.html",
@@ -14306,7 +14323,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Platform Board 2.dc.html",
@@ -14331,7 +14348,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Platform Board 3.dc.html",
@@ -14356,7 +14373,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Platform Board 4.dc.html",
@@ -14381,7 +14398,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Platform Board 5.dc.html",
@@ -14406,7 +14423,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Platform Board 6.dc.html",
@@ -14431,7 +14448,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Platform Board 7.dc.html",
@@ -14461,7 +14478,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Platform Board 8.dc.html",
@@ -14486,7 +14503,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/Seat Platform Board 9.dc.html",
@@ -14511,7 +14528,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/TICVAI All Boards Index.dc.html",
@@ -14525,7 +14542,7 @@
    "anchors": [],
    "platforms": [],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "reference/TICVAI Boards v2.dc.html",
@@ -14553,7 +14570,7 @@
     "P04"
    ],
    "firstIndexed": "2026-09-28",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "states/P01 Guest Web states.dc.html",
@@ -14573,7 +14590,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-10-22",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "states/P02 Guest App states.dc.html",
@@ -14597,7 +14614,7 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-10-22",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "states/P04 Venue POS states.dc.html",
@@ -14618,13 +14635,13 @@
    ],
    "platforms": [],
    "firstIndexed": "2026-10-22",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "TICVAI Wireframe Boards.dc.html",
    "provenance": "generated",
-   "bytes": 15546,
-   "sha256": "b475c03b80272a7b",
+   "bytes": 15748,
+   "sha256": "5164d66b3088d3e4",
    "frames": 0,
    "screensFramed": 0,
    "screens": [],
@@ -14632,7 +14649,7 @@
    "anchors": [],
    "platforms": [],
    "firstIndexed": "2026-09-08",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "TICVAI Workshop Boards.dc.html",
@@ -14646,7 +14663,7 @@
    "anchors": [],
    "platforms": [],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS01 ACCREDITATION Board 1.dc.html",
@@ -14684,7 +14701,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS02 ACCREDITATION Board 2.dc.html",
@@ -14722,7 +14739,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS03 ACCREDITATION Board 3.dc.html",
@@ -14758,7 +14775,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS04 ACCREDITATION Board 4.dc.html",
@@ -14797,7 +14814,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS05 ACCREDITATION Board 5.dc.html",
@@ -14835,7 +14852,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS06 ACCREDITATION Board 6.dc.html",
@@ -14873,7 +14890,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS07 ACCREDITATION Board 7.dc.html",
@@ -14911,7 +14928,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS08 ACCREDITATION Board 8.dc.html",
@@ -14949,7 +14966,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS09 AI Configuration Assistant Board 1.dc.html",
@@ -14987,7 +15004,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS10 AI Configuration Assistant Board 2.dc.html",
@@ -15025,7 +15042,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS100 Pricing   Revenue Management Board 6.dc.html",
@@ -15063,7 +15080,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS101 Pricing   Revenue Management Board 7.dc.html",
@@ -15101,7 +15118,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS102 Privacy  Consent   Preference Management Board 1.dc.html",
@@ -15139,7 +15156,7 @@
     "P13"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS103 Privacy  Consent   Preference Management Board 2.dc.html",
@@ -15177,7 +15194,7 @@
     "P13"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS104 Product Lifecycle   Catalogue Governance Board 1.dc.html",
@@ -15215,7 +15232,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS105 Product Lifecycle   Catalogue Governance Board 2.dc.html",
@@ -15253,7 +15270,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS106 Promotions   Bundles Management Board 1.dc.html",
@@ -15291,7 +15308,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS107 Promotions   Bundles Management Board 2.dc.html",
@@ -15329,7 +15346,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS108 Promotions   Bundles Management Board 3.dc.html",
@@ -15367,7 +15384,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS109 Promotions   Bundles Management Board 4.dc.html",
@@ -15405,7 +15422,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS11 AI Configuration Assistant Board 3.dc.html",
@@ -15443,7 +15460,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS110 Promotions   Bundles Management Board 5.dc.html",
@@ -15481,7 +15498,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS111 Promotions   Bundles Management Board 6.dc.html",
@@ -15519,7 +15536,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS112 Promotions   Bundles Management Board 7.dc.html",
@@ -15557,7 +15574,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS113 Promotions   Bundles Management Board 8.dc.html",
@@ -15595,7 +15612,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS114 Promotions   Bundles Management Board 9.dc.html",
@@ -15633,7 +15650,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS115 Promotions   Bundles Management Board 10.dc.html",
@@ -15671,7 +15688,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS116 Rental Management Board 1.dc.html",
@@ -15709,7 +15726,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS117 Rental Management Board 2.dc.html",
@@ -15747,7 +15764,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS118 Rental Management Board 3.dc.html",
@@ -15785,7 +15802,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS119 Rental Management Board 4.dc.html",
@@ -15823,7 +15840,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS12 AI Forecasting and Predictive Intelligence Board 1.dc.html",
@@ -15861,7 +15878,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS120 Rental Management Board 5.dc.html",
@@ -15899,7 +15916,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS121 Rental Management Board 6.dc.html",
@@ -15937,7 +15954,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS122 Rental Management Board 7.dc.html",
@@ -15975,7 +15992,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS123 Rental Management Board 8.dc.html",
@@ -16013,7 +16030,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS124 Rental Management Board 9.dc.html",
@@ -16051,7 +16068,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS125 Rental Management Board 10.dc.html",
@@ -16089,7 +16106,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS126 Resource Management Configuration Board 1.dc.html",
@@ -16127,7 +16144,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS127 Resource Management Configuration Board 2.dc.html",
@@ -16163,7 +16180,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS128 Resource Management Configuration Board 3.dc.html",
@@ -16201,7 +16218,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS129 Resource Management Configuration Board 4.dc.html",
@@ -16239,7 +16256,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS13 AI Forecasting and Predictive Intelligence Board 2.dc.html",
@@ -16277,7 +16294,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS130 Resource Management Configuration Board 5.dc.html",
@@ -16315,7 +16332,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS131 Resource Management Configuration Board 6.dc.html",
@@ -16353,7 +16370,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS132 Resource Management Configuration Board 7.dc.html",
@@ -16391,7 +16408,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS133 Resource Management Configuration Board 8.dc.html",
@@ -16429,7 +16446,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS134 Resource Management Configuration Board 9.dc.html",
@@ -16467,7 +16484,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS135 Resource Management Configuration Board 10.dc.html",
@@ -16505,7 +16522,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS136 Rules  Workflow  Approval   Automation Engine Board 1.dc.html",
@@ -16543,7 +16560,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS137 Rules  Workflow  Approval   Automation Engine Board 2.dc.html",
@@ -16581,7 +16598,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS138 Sales Channel Management Board 1.dc.html",
@@ -16619,7 +16636,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS139 Sales Channel Management Board 2.dc.html",
@@ -16657,7 +16674,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS14 AI Governance Board 1.dc.html",
@@ -16695,7 +16712,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS140 Seat Management Venue Mapping Reference v1.0 Board 1.dc.html",
@@ -16733,7 +16750,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS141 Seat Management Venue Mapping Reference v1.0 Board 2.dc.html",
@@ -16771,7 +16788,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS142 Seat Management Venue Mapping Reference v1.0 Board 3.dc.html",
@@ -16809,7 +16826,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html",
@@ -16847,7 +16864,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS144 Seat Management Venue Mapping Reference v1.0 Board 5.dc.html",
@@ -16885,7 +16902,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS145 Seat Management Venue Mapping Reference v1.0 Board 6.dc.html",
@@ -16923,7 +16940,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS146 Seat Management Venue Mapping Reference v1.0 Board 7.dc.html",
@@ -16961,7 +16978,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS147 Seat Management Venue Mapping Reference v1.0 Board 8.dc.html",
@@ -16999,7 +17016,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html",
@@ -17037,7 +17054,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS149 Seat Management Venue Mapping Reference v1.0 Board 10.dc.html",
@@ -17071,7 +17088,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS15 AI Governance Board 2.dc.html",
@@ -17109,7 +17126,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS150 Seat Management Venue Mapping Reference v1.0 Board 11.dc.html",
@@ -17147,7 +17164,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS151 Seat Management Venue Mapping Reference v1.0 Board 12.dc.html",
@@ -17185,7 +17202,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS152 Seat Management Venue Mapping Reference v1.0 Board 13.dc.html",
@@ -17223,7 +17240,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS153 Subscription Licensing AI Self Service Board 1.dc.html",
@@ -17261,7 +17278,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS154 Subscription Licensing AI Self Service Board 2.dc.html",
@@ -17299,7 +17316,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS155 Subscription Licensing AI Self Service Board 3.dc.html",
@@ -17337,7 +17354,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS156 Subscription Licensing AI Self Service Board 4.dc.html",
@@ -17375,7 +17392,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS157 Subscription Licensing AI Self Service Board 5.dc.html",
@@ -17413,7 +17430,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS158 Subscription Licensing AI Self Service Board 6.dc.html",
@@ -17452,7 +17469,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS159 Subscription Licensing AI Self Service Board 7.dc.html",
@@ -17490,7 +17507,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS16 AI Governance Board 3.dc.html",
@@ -17528,7 +17545,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS160 Subscription Licensing AI Self Service Board 8.dc.html",
@@ -17566,7 +17583,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS161 Subscription Licensing AI Self Service Board 9.dc.html",
@@ -17604,7 +17621,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS162 Subscription Licensing AI Self Service Board 10.dc.html",
@@ -17642,7 +17659,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS163 TICVAI Finance Backend Structure Reference v1.0 Board 1.dc.html",
@@ -17662,7 +17679,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS164 TICVAI Finance Backend Structure Reference v1.0 Board 2.dc.html",
@@ -17682,7 +17699,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS165 Ticket Media   Credential Management Board 1.dc.html",
@@ -17720,7 +17737,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS166 Ticket Media   Credential Management Board 2.dc.html",
@@ -17758,7 +17775,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS167 Ticket Media   Credential Management Board 3.dc.html",
@@ -17796,7 +17813,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS168 Ticket Resale Marketplace Board 1.dc.html",
@@ -17834,7 +17851,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS169 Ticket Resale Marketplace Board 2.dc.html",
@@ -17872,7 +17889,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS17 AI Governance Board 4.dc.html",
@@ -17910,7 +17927,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS170 Ticket Resale Marketplace Board 3.dc.html",
@@ -17948,7 +17965,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS171 Ticket Upgrade, Exchange & Conversion Board 1.dc.html",
@@ -17986,7 +18003,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS172 Unified BI Reporting and AI Analytics Platform Board 1.dc.html",
@@ -18022,7 +18039,7 @@
     "P16"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS173 Unified BI Reporting and AI Analytics Platform Board 2.dc.html",
@@ -18060,7 +18077,7 @@
     "P16"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS174 Unified BI Reporting and AI Analytics Platform Board 3.dc.html",
@@ -18098,7 +18115,7 @@
     "P16"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS175 Unified BI Reporting and AI Analytics Platform Board 4.dc.html",
@@ -18136,7 +18153,7 @@
     "P16"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS176 Unified BI Reporting and AI Analytics Platform Board 9.dc.html",
@@ -18174,7 +18191,7 @@
     "P16"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS177 Unified BI Reporting and AI Analytics Platform Board 10.dc.html",
@@ -18212,7 +18229,7 @@
     "P16"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS178 Upsell,CrossSellEngine Board 1.dc.html",
@@ -18250,7 +18267,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS179 Upsell,CrossSellEngine Board 2.dc.html",
@@ -18288,7 +18305,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS18 Access Control Board 1.dc.html",
@@ -18326,7 +18343,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS180 Upsell,CrossSellEngine Board 3.dc.html",
@@ -18364,7 +18381,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS181 Upsell,CrossSellEngine Board 4.dc.html",
@@ -18402,7 +18419,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS182 Upsell,CrossSellEngine Board 5.dc.html",
@@ -18440,7 +18457,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS183 Upsell,CrossSellEngine Board 6.dc.html",
@@ -18478,7 +18495,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS184 Waiver, Consent & Digital Form Management Board 1.dc.html",
@@ -18516,7 +18533,7 @@
     "P13"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS185 Waiver, Consent & Digital Form Management Board 2.dc.html",
@@ -18554,7 +18571,7 @@
     "P13"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS186 Wallet Configuration Backend Structure v1.0 Board 1.dc.html",
@@ -18592,7 +18609,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS187 Wallet Configuration Backend Structure v1.0 Board 2.dc.html",
@@ -18630,7 +18647,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS188 Wallet Configuration Backend Structure v1.0 Board 3.dc.html",
@@ -18668,7 +18685,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS189 Wallet Configuration Backend Structure v1.0 Board 4.dc.html",
@@ -18706,7 +18723,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS19 Access Control Board 2.dc.html",
@@ -18744,7 +18761,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html",
@@ -18782,7 +18799,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS191 Wallet Configuration Backend Structure v1.0 Board 6.dc.html",
@@ -18820,7 +18837,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS192 Wallet Configuration Backend Structure v1.0 Board 7.dc.html",
@@ -18858,7 +18875,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS193 Wallet Configuration Backend Structure v1.0 Board 8.dc.html",
@@ -18896,7 +18913,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS194 Wallet Configuration Backend Structure v1.0 Board 9.dc.html",
@@ -18934,7 +18951,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS195 Wallet Configuration Backend Structure v1.0 Board 10.dc.html",
@@ -18972,7 +18989,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS20 Access Control Board 3.dc.html",
@@ -19010,7 +19027,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS21 Access Control Board 4.dc.html",
@@ -19048,7 +19065,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS22 Access Control Board 5.dc.html",
@@ -19086,7 +19103,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS23 Access Control Board 6.dc.html",
@@ -19124,7 +19141,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS24 Access Control Board 7.dc.html",
@@ -19162,7 +19179,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS25 Access Control Board 8.dc.html",
@@ -19200,7 +19217,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS26 Access Control Board 9.dc.html",
@@ -19238,7 +19255,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS27 Access Control Board 10.dc.html",
@@ -19276,7 +19293,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS28 Access Control Board 11.dc.html",
@@ -19314,7 +19331,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS29 Access Control Board 12.dc.html",
@@ -19352,7 +19369,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS30 Approval Workflows and Governance Board 1.dc.html",
@@ -19390,7 +19407,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS31 Approval Workflows and Governance Board 2.dc.html",
@@ -19426,7 +19443,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS32 Approval Workflows and Governance Board 3.dc.html",
@@ -19464,7 +19481,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS33 Approval Workflows and Governance Board 4.dc.html",
@@ -19502,7 +19519,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS34 Approval Workflows and Governance Board 5.dc.html",
@@ -19540,7 +19557,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS35 Approval Workflows and Governance Board 6.dc.html",
@@ -19578,7 +19595,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS36 Approval Workflows and Governance Board 7.dc.html",
@@ -19616,7 +19633,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS37 Approval Workflows and Governance Board 8.dc.html",
@@ -19654,7 +19671,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS38 B2B, Reseller & OTA Partner Management Board 1.dc.html",
@@ -19693,7 +19710,7 @@
     "P10"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS39 B2B, Reseller & OTA Partner Management Board 2.dc.html",
@@ -19732,7 +19749,7 @@
     "P10"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS40 B2B, Reseller & OTA Partner Management Board 3.dc.html",
@@ -19771,7 +19788,7 @@
     "P10"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS41 Communication & Notification Platform Services Board 1.dc.html",
@@ -19809,7 +19826,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS42 Customer Service Board 1.dc.html",
@@ -19847,7 +19864,7 @@
     "P12"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS43 Customer Service Board 2.dc.html",
@@ -19885,7 +19902,7 @@
     "P12"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS44 Digital Asset Management DAM Board 1.dc.html",
@@ -19923,7 +19940,7 @@
     "P13"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS45 Digital Asset Management DAM Board 2.dc.html",
@@ -19961,7 +19978,7 @@
     "P13"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS46 Digital Asset Management DAM Board 3.dc.html",
@@ -19999,7 +20016,7 @@
     "P13"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS47 Digital Asset Management DAM Board 4.dc.html",
@@ -20037,7 +20054,7 @@
     "P13"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS48 Event Management Configuration Backend Structure v1.0 Board 1.dc.html",
@@ -20061,7 +20078,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS49 Event Management Configuration Backend Structure v1.0 Board 2.dc.html",
@@ -20085,7 +20102,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS50 Event Management Configuration Backend Structure v1.0 Board 3.dc.html",
@@ -20109,7 +20126,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS51 Event Management Configuration Backend Structure v1.0 Board 4.dc.html",
@@ -20133,7 +20150,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS52 Event Management Configuration Backend Structure v1.0 Board 5.dc.html",
@@ -20159,7 +20176,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS53 Event Management Configuration Backend Structure v1.0 Board 6.dc.html",
@@ -20189,7 +20206,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS54 Event Management Configuration Backend Structure v1.0 Board 7.dc.html",
@@ -20217,7 +20234,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS55 Event Management Configuration Backend Structure v1.0 Board 8.dc.html",
@@ -20243,7 +20260,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS56 Event Management Configuration Backend Structure v1.0 Board 9.dc.html",
@@ -20265,7 +20282,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html",
@@ -20297,7 +20314,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS58 Game and Ride Board 1.dc.html",
@@ -20335,7 +20352,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS59 Game and Ride Board 2.dc.html",
@@ -20373,7 +20390,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS60 Game and Ride Board 3.dc.html",
@@ -20411,7 +20428,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS61 Game and Ride Board 4.dc.html",
@@ -20449,7 +20466,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS62 Game and Ride Board 5.dc.html",
@@ -20487,7 +20504,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS63 Game and Ride Board 6.dc.html",
@@ -20525,7 +20542,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS64 Game and Ride Board 7.dc.html",
@@ -20563,7 +20580,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS65 Game and Ride Board 8.dc.html",
@@ -20602,7 +20619,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS66 Game and Ride Board 9.dc.html",
@@ -20640,7 +20657,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS67 Game and Ride Board 10.dc.html",
@@ -20678,7 +20695,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS68 Group Sales   Corporate Booking Management Board 1.dc.html",
@@ -20716,7 +20733,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS69 Group Sales   Corporate Booking Management Board 2.dc.html",
@@ -20754,7 +20771,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS70 Marketing CRM Configuration Reference v1.0 Board 1.dc.html",
@@ -20792,7 +20809,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html",
@@ -20830,7 +20847,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS72 Marketing CRM Configuration Reference v1.0 Board 3.dc.html",
@@ -20868,7 +20885,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS73 Marketing CRM Configuration Reference v1.0 Board 4.dc.html",
@@ -20906,7 +20923,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS74 Marketing CRM Configuration Reference v1.0 Board 5.dc.html",
@@ -20944,7 +20961,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS75 Marketing CRM Configuration Reference v1.0 Board 6.dc.html",
@@ -20982,7 +20999,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS76 Marketing CRM Configuration Reference v1.0 Board 7.dc.html",
@@ -21020,7 +21037,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS77 Marketing CRM Configuration Reference v1.0 Board 8.dc.html",
@@ -21058,7 +21075,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS78 Marketing CRM Configuration Reference v1.0 Board 9.dc.html",
@@ -21096,7 +21113,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html",
@@ -21134,7 +21151,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS80 Marketing CRM Configuration Reference v1.0 Board 11.dc.html",
@@ -21172,7 +21189,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS81 Marketing CRM Configuration Reference v1.0 Board 12.dc.html",
@@ -21210,7 +21227,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS82 Membership   Annual Pass Management Board 1.dc.html",
@@ -21248,7 +21265,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS83 Membership   Annual Pass Management Board 2.dc.html",
@@ -21286,7 +21303,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS84 Order   Reservation Management Board 1.dc.html",
@@ -21324,7 +21341,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS85 Order   Reservation Management Board 2.dc.html",
@@ -21363,7 +21380,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS86 Order   Reservation Management Board 3.dc.html",
@@ -21401,7 +21418,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS87 Payment Payment Orchestration Board 1.dc.html",
@@ -21439,7 +21456,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS88 Payment Payment Orchestration Board 2.dc.html",
@@ -21477,7 +21494,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS89 Payment Payment Orchestration Board 3.dc.html",
@@ -21515,7 +21532,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS90 Payment Payment Orchestration Board 4.dc.html",
@@ -21553,7 +21570,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS91 Payment Payment Orchestration Board 5.dc.html",
@@ -21591,7 +21608,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS92 Payment Payment Orchestration Board 6.dc.html",
@@ -21629,7 +21646,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS93 Payment Payment Orchestration Board 7.dc.html",
@@ -21668,7 +21685,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS94 Payment Payment Orchestration Board 8.dc.html",
@@ -21706,7 +21723,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS95 Pricing   Revenue Management Board 1.dc.html",
@@ -21744,7 +21761,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS96 Pricing   Revenue Management Board 2.dc.html",
@@ -21782,7 +21799,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS97 Pricing   Revenue Management Board 3.dc.html",
@@ -21821,7 +21838,7 @@
     "P09"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS98 Pricing   Revenue Management Board 4.dc.html",
@@ -21859,7 +21876,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   },
   {
    "file": "WS99 Pricing   Revenue Management Board 5.dc.html",
@@ -21897,7 +21914,7 @@
     "P08"
    ],
    "firstIndexed": "2026-09-19",
-   "lastSeen": "2026-10-22"
+   "lastSeen": "2026-10-26"
   }
  ]
 }

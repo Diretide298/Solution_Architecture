@@ -44,7 +44,7 @@
 | Contracts | 32 | OpenAPI documents under `contracts/` |
 | Operations | 2,073 | distinct `operationId` across all contracts |
 | Screens | 2,427 | each with a purpose, a route and navigation |
-| Platforms | 16 | P01–P17, less the retired P03 |
+| Platforms | 16 | P01–P17, less one retired code (the kiosk, renumbered P05) |
 | Apps | 5 | the platforms collapse into five buildable front ends |
 | Services | 17 | deployables, across five tiers |
 | Tables | 627 | over 32 schemas, two databases |
@@ -176,7 +176,7 @@ flowchart LR
 | P16 | Venue Analytics | venue-management | venue | 69 | 68 | 53 |
 | P17 | TICVAI Sign-up | ticvai-control | public | 24 | 24 | 14 |
 
-**The 108 screens that name no operation are almost all in one place: 88 of them are P09.** TICVAI Web is the control plane — it provisions cells, ships releases and administers tenants — so a shell there is not a cosmetic gap; it is a screen somebody can draw and nobody can build. P11 Accreditation is the other, at four of eight, and it is small enough to close in a sitting.
+**The 108 screens that name no operation are almost all in one place: 88 of them are P09.** TICVAI Web is the control plane — it provisions cells, ships releases and administers tenants — so a shell there is not a cosmetic gap; it is a screen somebody can draw and nobody can build. P11 Accreditation Web is the other, at four of eight, and it is small enough to close in a sitting.
 
 **P01 and P02 are the same product and are deliberately counted twice.** Guest Web and Guest App call an identical 154 operations because the decision on 12 September was that the web and the app are one surface with one offline banner, not two builds. `tools/audit-guest-parity.py` fails the package if they diverge.
 

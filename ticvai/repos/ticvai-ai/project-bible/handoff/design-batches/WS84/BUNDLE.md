@@ -1151,6 +1151,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS64 Game and Ride Board 7.dc.html#bo-459`
 - Workshop pack: Game_and_Ride_Module.pdf board 7
 - Flow F193 *Game and Ride board 7: Card Lifecycle Command Center*, step 10: Works in Card Expiry Runtime Validation → Show how TICVAI automatically handles a card tap when the credential is active or expired.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1834,6 +1835,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS64 Game and Ride Board 7.dc.html#bo-463`
 - Workshop pack: Game_and_Ride_Module.pdf board 7
 - Flow F193 *Game and Ride board 7: Card Lifecycle Command Center*, step 18: Works in Card Lifecycle Audit & History → Maintain full traceability of card lifecycle changes.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

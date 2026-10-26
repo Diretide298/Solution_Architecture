@@ -101,7 +101,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `CMS-102` | Site Builder | A | 20 | 15 | 6 | 2 | 7 | 6 | configures | notStarted (generated) |
-| `CMS-103` | Booking Flows | A | 78 | 49 | 6 | 18 | 27 | 6 | configures | notStarted (generated) |
+| `CMS-103` | Booking Flows | A | 79 | 49 | 6 | 18 | 27 | 6 | configures | notStarted (generated) |
 | `CMS-104` | App Build & Store Publishing | A | 25 | 35 | 6 | 17 | 6 | 6 | configures | notStarted (generated) |
 
 ## Design inputs from the client meetings

@@ -1508,7 +1508,8 @@
       {
        "kind": "detailPanel",
        "label": "The selected policy approval audit",
-       "bindsTo": "Policy",
+       "operation": "listDynamicPolicyEffectiveness",
+       "bindsTo": "AccessDynamicPolicyEffectiveness",
        "columns": [
         "→",
         "Denial Rate",

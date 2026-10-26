@@ -327,6 +327,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - … and 1 more flow steps (`flows/`)
 - Flow F147 branch at step 1 (expected): when Nothing has been set up on Dynamic Pricing Strategy Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F147 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -524,6 +525,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-089`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 2: Works in Dynamic Pricing Strategy Builder → Create the master dynamic-pricing strategy and define what commercial objects it controls.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -683,6 +685,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-090`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 4: Works in Demand, Occupancy & Availability Rule Builder → Configure price movements driven by actual demand and capacity consumption. This directly covers the fundamental matrix requirements for: Demand-Based Pricing Occupancy-Based Pricing …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -846,6 +849,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-091`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 6: Works in Booking Velocity & Time-to-Event Rule Builder → Control price movement based on how quickly inventory is selling and how much time remains before the event or visit date. This is critical because occupancy alone is insufficient for effective …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1328,6 +1332,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-094`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 12: Works in Dynamic Price Bands, Ladders & Adjustment Matrix → Define the controlled monetary steps through which prices can move. This is preferable to allowing unrestricted price generation for many products.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1518,6 +1523,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-095`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 14: Works in Dynamic Pricing Guardrails & Commercial Protection → Establish the non-negotiable boundaries for every dynamic-pricing strategy.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1701,6 +1707,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS99 Pricing   Revenue Management Board 5.dc.html#adm-096`
 - Workshop pack: Pricing___Revenue_Management_Reference.pdf board 5
 - Flow F147 *Pricing Revenue Management board 5: Dynamic Pricing Strategy Command Center*, step 16: Works in Dynamic Pricing Automation Policy & Control → Define how much authority the pricing engine has to act on a calculated dynamic price. This is different from Board 4's approval workflow. Board 5 determines whether the engine may act automatically. …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

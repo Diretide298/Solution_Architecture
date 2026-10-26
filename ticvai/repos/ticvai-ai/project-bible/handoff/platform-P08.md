@@ -9,12 +9,12 @@
 | Contracts | 31 |
 | Modules | 19 |
 | Undrawn | 0 |
-| Operations with no screen | 206 |
+| Operations with no screen | 211 |
 | Waves | wave1 143 · wave2 58 · wave3 1462 |
 
 ## Gaps
 
-### 206 operations with no screen here
+### 211 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
-| … | | | 166 more |
+| … | | | 171 more |
 
 ### 14 modules split across waves
 
@@ -458,7 +458,7 @@
 | `ADM-577` | Provider Cost, Commercial & Routing Economics | Commercial | 3 | 1 | yes |
 | `ADM-578` | Payment Routing Simulator, Decision Trace & AI Advisor | Commercial | 3 | 2 | yes |
 | `ADM-579` | Terminal & Card-Present Command Center | Commercial | 3 | 1 | yes |
-| `ADM-580` | Payment Terminal & Device Inventory | Commercial | 3 | 4 | yes |
+| `ADM-580` | Payment Terminal & Device Inventory | Commercial | 3 | 3 | yes |
 | `ADM-581` | Terminal Provisioning & Device Configuration | Commercial | 3 | 2 | yes |
 | `ADM-582` | POS, Kiosk & Terminal Assignment Manager | Commercial | 3 | 4 | yes |
 | `ADM-583` | EMV & Card-Present Processing Configuration | Commercial | 3 | 2 | yes |
@@ -590,7 +590,7 @@
 | `BO-012` | Membership Products | Sell | 1 | 13 | yes |
 | `BO-013` | Channel & Distribution | Sell | 1 | 10 | yes |
 | `BO-014` | Catalogue Publishing | Sell | 1 | 5 | yes |
-| `BO-015` | Performance Calendar | Sell | 1 | 12 | yes |
+| `BO-015` | Performance Calendar | Sell | 1 | 11 | yes |
 | `BO-016` | Performance Template | Sell | 1 | 2 | yes |
 | `BO-017` | Capacity Management | Sell | 1 | 8 | yes |
 | `BO-018` | Allocation & Holds | Sell | 2 | 2 | yes |
@@ -611,7 +611,7 @@
 | `BO-033` | Blacklist Management | Access & Venue | 1 | 3 | yes |
 | `BO-034` | Scan Activity | Access & Venue | 1 | 2 | yes |
 | `BO-035` | Override Audit | Access & Venue | 1 | 3 | yes |
-| `BO-036` | Device Registry | Venue Operations | 2 | 9 | yes |
+| `BO-036` | Device Registry | Venue Operations | 2 | 10 | yes |
 | `BO-037` | Offline Package Status | Sell | 1 | 8 | yes |
 | `BO-038` | Reconciliation Queue | Access & Venue | 1 | 2 | yes |
 | `BO-039` | Shift Directory | Orders & Money | 1 | 4 | yes |
@@ -619,7 +619,7 @@
 | `BO-041` | Cash Movements | Orders & Money | 2 | 4 | yes |
 | `BO-042` | Banking & Safe | Orders & Money | 2 | 4 | yes |
 | `BO-043` | Daily Reconciliation | Orders & Money | 1 | 12 | yes |
-| `BO-044` | F&B Outlets | Venue Operations | 1 | 17 | yes |
+| `BO-044` | F&B Outlets | Venue Operations | 1 | 18 | yes |
 | `BO-045` | Menu Management | Food & Beverage | 1 | 18 | yes |
 | `BO-046` | Kitchen Display | Food & Beverage | 1 | 3 | yes |
 | `BO-047` | Order Corrections & Exceptions | Orders & Money | 2 | 14 | yes |
@@ -644,7 +644,7 @@
 | `BO-066` | Notification Settings | People & Access Rights | 2 | 3 | yes |
 | `BO-067` | Integrations | Venue Operations | 2 | 4 | yes |
 | `BO-068` | Audit Log | Guests & Marketing | 2 | 4 | yes |
-| `BO-069` | Asset Register | Access & Venue | 1 | 7 | yes |
+| `BO-069` | Asset Register | Access & Venue | 1 | 8 | yes |
 | `BO-070` | Work Orders | Venue Operations | 2 | 13 | yes |
 | `BO-071` | Planned Maintenance | Access & Venue | 3 | 4 | yes |
 | `BO-072` | Incident Log | Access & Venue | 2 | 5 | yes |
@@ -834,7 +834,7 @@
 | `BO-1141` | Device, Terminal & Acceptance Point Mapping | Orders & Money | 3 | 2 | yes |
 | `BO-1142` | Wallet Transaction Simulator, Monitoring & Channel Audit | Orders & Money | 3 | 2 | yes |
 | `BO-1143` | Wallet Operations Command Center | Orders & Money | 3 | 2 | yes |
-| `BO-1144` | Peer-to-Peer Transfer Configuration | Orders & Money | 1 | 2 | yes |
+| `BO-1144` | Peer-to-Peer Transfer Configuration | Orders & Money | 1 | 3 | yes |
 | `BO-1145` | Transfer Eligibility, Limits & Approval Rules | Orders & Money | 3 | 1 | yes |
 | `BO-1146` | Refund-to-Wallet Policy Configuration | Orders & Money | 1 | 4 | yes |
 | `BO-1147` | Refund Routing & Credit Restoration Engine | Orders & Money | 3 | 4 | yes |

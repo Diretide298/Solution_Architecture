@@ -648,6 +648,11 @@
     "type": "boolean",
     "default": true,
     "description": "Whether the item may go to shop-and-drop; the venue sets chilled, fragile or oversized items false (R8 blocker APPROVALS-TENANCY-C34)."
+   },
+   "isPublished": {
+    "type": "boolean",
+    "default": false,
+    "description": "Whether guests and visitors may see the item (`MerchandiseItem.isPublished`; CHG-R10ORD-025)."
    }
   }
  },
@@ -1250,7 +1255,7 @@
       "currency": {
        "type": "string",
        "pattern": "^[A-Z]{3}$",
-       "description": "**Stored, because it is the one thing that is not in the box's own currency.** A foreign holding is by definition cash in a currency the till does not trade in, so it cannot resolve the way the box's own amounts do (naming-and-style 5.1; ADAM CR-135); it is the key of the row, one per currency per box. The amounts on this item are in this currency.\n"
+       "description": "**Stored, because it is the one thing that is not in the box's own currency.** A foreign holding is by definition cash in a currency the till does not trade in, so it cannot resolve the way the box's own amounts do (naming-and-style 5.1; ADAM CR-135); it is the key of the row, one per currency per box. The amounts on this item are in this currency, at its ISO 4217 minor units from the kernel's fixed list (ADAM CR-192; common.yaml `Money.scale`).\n"
       },
       "expectedAmount": {
        "allOf": [
@@ -1279,16 +1284,28 @@
     }
    },
    "expectedTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "x-ticvai-column": "expected_amount"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "x-ticvai-column": "expected_amount",
+    "nullable": true,
+    "description": "The figure the box's close count is measured against, filled when the box is counted. **Blind to its own cashier** (ADAM CR-218; as `Shift.expectedCash`, CHG-FIN-003): returned only to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue, null to everyone else on every read, the box's own cashier included.\n"
    },
    "countedTotal": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
     "x-ticvai-column": "counted_amount"
    },
    "variance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "x-ticvai-column": "variance_amount"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "x-ticvai-column": "variance_amount",
+    "nullable": true,
+    "description": "Counted minus expected; negative is short. Null to every caller without OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue, as `expectedTotal` (ADAM CR-218; CHG-FIN-003).\n"
    },
    "closedByPrincipalId": {
     "type": "string",
@@ -1797,6 +1814,16 @@
  },
  "MerchandiseItem": {
   "x-ticvai-persistence": "retail.merchandise",
+  "x-ticvai-unique-together": [
+   [
+    "outletId",
+    "barcode"
+   ],
+   [
+    "outletId",
+    "sku"
+   ]
+  ],
   "type": "object",
   "required": [
    "id",
@@ -1818,12 +1845,14 @@
     "format": "uuid"
    },
    "sku": {
-    "type": "string"
+    "type": "string",
+    "description": "Unique per outlet (ADAM CR-104, CHG-R10ORD-017); `lookupMerchandise` matches it exactly."
    },
    "barcode": {
     "type": "string",
     "nullable": true,
-    "x-ticvai-unique": "venue"
+    "x-ticvai-unique-compare": "exact",
+    "description": "Unique per outlet where set (ADAM CR-104; was unique per venue, which the table has no venue column to key); `lookupMerchandise` matches it exactly and returns one row."
    },
    "name": {
     "type": "string"
@@ -1873,6 +1902,12 @@
    },
    "isActive": {
     "type": "boolean"
+   },
+   "isPublished": {
+    "type": "boolean",
+    "default": false,
+    "x-ticvai-backfill": true,
+    "description": "**Whether a guest or a visitor may see the item** (the lead's answer of 25 October 2026 to the r10 lanes' questions, question 22; CHG-R10ORD-025): the flag `listMerchandise` and `lookupMerchandise` already named for \"published\" (r8 walk of ticket 27820). A guest sees an item only while it is active and published; staff see every item. Set by `PRODUCT_CONFIGURE` holders with `createMerchandise` and `updateMerchandise`; a new item is false until set. **Every item that existed when the column arrived is published** (the lead, 26 October 2026, ADAM CR-104; CHG-R10OPN-002): the forward migration sets it true on those rows (`x-ticvai-backfill`), so no item a guest sees today disappears."
    },
    "isDroppable": {
     "type": "boolean",
@@ -1939,7 +1974,7 @@
    },
    "scale": {
     "type": "integer",
-    "description": "Resolved from the region alongside `currency`.",
+    "description": "Resolved from the region alongside `currency`. **A currency other than the venue's or region's trading currency** (a tourist's USD cash at an AED till, `Payment.tenderAmount`; a guest-selected charge currency, `Order.chargeTotal`; a refund in the tender currency) **takes its ISO 4217 minor units**, held as one fixed list in the kernel (`TICVAI.Domain`, beside Money), so every module resolves it the same way and no table, query or migration holds it (ADAM CR-192, option A; Chinmay, 21 October 2026; CHG-R10ORD-018). The venue and region settings keep their own `currency_scale` for the trading currency.",
     "minimum": 0,
     "maximum": 4
    }
@@ -2189,7 +2224,7 @@
      }
     ],
     "readOnly": true,
-    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192; common.yaml `Money.scale`), when it is not the currency the venue trades in."
    },
    "chargeRateLockedUntil": {
     "type": "string",
@@ -2974,7 +3009,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+    "description": "The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-018)."
    },
    "fxRate": {
     "allOf": [
@@ -3151,7 +3186,8 @@
    "venueId",
    "scopePath",
    "isSellable",
-   "hasVariants"
+   "hasVariants",
+   "createdAt"
   ],
   "properties": {
    "id": {
@@ -3184,7 +3220,7 @@
      }
     ],
     "nullable": true,
-    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+    "description": "**The product's name in each of the tenant's enabled languages** (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
    },
    "descriptionLocalised": {
     "allOf": [
@@ -3236,6 +3272,12 @@
     "format": "date-time",
     "nullable": true,
     "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**The last moment the product's entitlements are valid; null means the same as `onSaleTo`** (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). A season pass stops selling at `onSaleTo` and is used until `validTo`: an entitlement template's `expiryAnchor` of `seasonEnd` ends here (`access#issueOrderEntitlements`). Sales closing is not validity ending.\n"
    },
    "categoryId": {
     "type": "string",
@@ -3350,6 +3392,15 @@
     },
     "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
    },
+   "addOnProductIds": {
+    "type": "array",
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The add-ons offered with this product, in display order** (accepted 26 October 2026, Chinmay, ADAM CR-252 option A): each a `kind: addOn` product of the same venue (a coffee break, a working lunch, an AV technician offered with a meeting-room type), set in the back office. `listProducts` answers it, so WEB-048 and GST-075 read a room type's add-ons from the load they already make and fetch those products; the guest adds one as a cart line with `parentLineId`. An id that is not a `kind: addOn` product of the same venue is `400 validation` on `addOnProductIds`. Empty when none is offered."
+   },
    "requiresTimeWindow": {
     "type": "boolean",
     "default": false,
@@ -3414,6 +3465,19 @@
     "format": "uuid",
     "nullable": true,
     "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "**When the product was created** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): `catalogue.product.created_at`, NOT NULL DEFAULT now(), set by the server and never by a request. Rows that predate it are backfilled by the migration task (the earliest of the product's first version's `published_at` and the migration time), then the NOT NULL and the DEFAULT are set. `listProductLifecycle` orders and filters on it."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true,
+    "description": "**When the product last changed** (ADAM CR-204): set by `updateProduct` and by every product sub-resource PUT and bulk change that versions the product; null until the first change after creation. `listProductLifecycle`'s `lastModifiedAt` and `modifiedSince` read it."
    }
   }
  },
@@ -3621,6 +3685,24 @@
     "type": "integer",
     "default": 100
    },
+   "url": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The asset's stable CDN address, for a guest card** (ADAM CR-221, option A, decided 25 October 2026; CHG-R10CAT-014): the asset library's public address for the asset, set on guest-facing reads (`searchCatalogue`, `listProducts` and `getProduct` for a guest or a visitor) when the asset is public and `ready`, as `getPublishedTenantConfig` returns white-label assets (`brandUrls`). Null otherwise, and on staff reads, which are unchanged. Catalogue reads the asset in process, a read the lead granted across deployables (XDR-005, 25 October 2026; CHG-R10CAT-015)."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The asset library's thumbnail address for the asset, on the same reads and with the same rule as `url` (ADAM CR-221)."
+   },
    "altText": {
     "allOf": [
      {
@@ -3684,6 +3766,23 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "description": "**The list price on the caller's channel now**, resolved on read from the price lists (`listProductVariants`; R8 blocker cause GPS-C27, CHG-R8SPN-028). Not stored on the variant and ignored on input. Null where no price list prices it on that channel. The list price, not the total: promotions and bundles are applied at the basket."
+   },
+   "referencePrice": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The price a saving is measured against** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C), set by the back office on the variant (`updateProductVariant`). Null where the variant claims no saving, which is the default. In the same currency as `listPrice`."
+   },
+   "savingPercent": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**Computed by the server, never in the browser** (ADAM CR-253): with a `referencePrice` and a `listPrice` below it, the whole percent the list price saves, `floor((referencePrice - listPrice) / referencePrice * 100)` (rounded down, so the label never overstates; proposed, client to correct); null otherwise. A length tile shows *Save n%* only when this is set."
    },
    "productId": {
     "type": "string",
@@ -3758,7 +3857,7 @@
   }
  },
  "Refund": {
-  "x-ticvai-persistence": "orders.refund",
+  "x-ticvai-persistence": "orders.refund + orders.refund_line + orders.refund_payment",
   "type": "object",
   "required": [
    "id",
@@ -3834,7 +3933,7 @@
      }
     ],
     "readOnly": true,
-    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
+    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001), its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192)."
    },
    "amount": {
     "x-ticvai-column": "refunded_amount",
@@ -3842,7 +3941,70 @@
    },
    "appliedPercentage": {
     "type": "number",
-    "description": "From the venue's time bands, or an approver override."
+    "description": "From the venue's time bands, or an approver override. Where the refunded lines fall in different bands, each line's own percentage is on its `lines` row and this is the one the refund's lines share, or null when they differ (ADAM CR-208)."
+   },
+   "lines": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**What the refund took from each order line** (ADAM CR-208, option A; CHG-R10ORD-014): child rows, `orders.refund_line`, one per line refunded, written by `createRefund`. A line's refundable amount is what it paid minus its rows on earlier refunds.",
+    "items": {
+     "type": "object",
+     "required": [
+      "orderLineId",
+      "refundedAmount"
+     ],
+     "properties": {
+      "orderLineId": {
+       "type": "string",
+       "format": "uuid",
+       "x-ticvai-references": "orders.order_line"
+      },
+      "refundedAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "appliedPercentage": {
+       "type": "number",
+       "nullable": true,
+       "description": "The time band of this line's own performance (ADAM CR-208)."
+      }
+     }
+    }
+   },
+   "payments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**What the refund took from each payment** (ADAM CR-208, option A; CHG-R10ORD-014): child rows, `orders.refund_payment` (the decision's `refund_allocation`; naming-and-style bans `allocation` in DDL), one per payment refunded against, the most recent payment first and cash last. A payment's refundable amount is what it paid minus its rows on earlier refunds.",
+    "items": {
+     "type": "object",
+     "required": [
+      "paymentId",
+      "refundedAmount"
+     ],
+     "properties": {
+      "paymentId": {
+       "type": "string",
+       "format": "uuid",
+       "x-ticvai-references": "orders.payment"
+      },
+      "refundedAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "In the base currency, for the ledger."
+      },
+      "tenderAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true,
+       "description": "In the payment's tender currency (`Payment.tenderCurrency`), at that currency's scale; null where the payment was in the base currency."
+      }
+     }
+    }
    },
    "status": {
     "type": "string",
@@ -3940,7 +4102,7 @@
    },
    "timeBands": {
     "type": "array",
-    "description": "Refundable percentage by time before the performance. Evaluated most-specific first.\n",
+    "description": "Refundable percentage by time before the performance. Evaluated most-specific first.\n\n**Each band names the refund type that applies in it** (`refundType`, ADAM CR-208; (the lead's answer of 25 October 2026 to the r10 lanes' questions; CHG-R10ORD-021)). A venue that has set no bands refunds in full (`fullRefund`) before the cut-off (the performance start time of each line; for an undated line, the end of `refundWindowDays`, ADAM CR-208) and nothing after it.\n",
     "items": {
      "type": "object",
      "required": [
@@ -3956,6 +4118,18 @@
        "type": "number",
        "minimum": 0,
        "maximum": 100
+      },
+      "refundType": {
+       "type": "string",
+       "nullable": true,
+       "enum": [
+        "fullRefund",
+        "partialRefund",
+        "percentageRefund",
+        "proRataRefund",
+        "originalValueLessFees"
+       ],
+       "description": "The refund type that applies in this band (the values of `RefundCalculationPolicyView.refundTypes`; ADAM CR-208). Null on a band saved before r10, which is `percentageRefund` at its `percentage`."
       }
      }
     }
@@ -5226,6 +5400,7 @@
  },
  "TrialBalance": {
   "x-ticvai-persistence": "none — computed",
+  "description": "Computed by `getTrialBalance` for one fiscal period (ADAM CR-246): each postable account's movement over the period's `posted` and `reversed` journal entries, debit-positive, every postable account listed (zero rows too) in account `code` order.",
   "type": "object",
   "required": [
    "fiscalPeriodId",
@@ -5276,13 +5451,28 @@
        "$ref": "#/components/schemas/AccountType"
       },
       "debit": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "The sum of the account's debit postings over the period's `posted` and `reversed` entries (ADAM CR-246)."
       },
       "credit": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "The sum of the account's credit postings over the same entries."
       },
       "balance": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "`debit` minus `credit`, debit-positive for every account type: the period's movement, not a carried-forward closing balance (ADAM CR-246)."
       }
      }
     }
@@ -5617,6 +5807,17 @@
      "type": "string",
      "pattern": "^[A-Z]{3}$"
     }
+   },
+   "stepMinutes": {
+    "type": "integer",
+    "enum": [
+     15,
+     30,
+     60
+    ],
+    "nullable": true,
+    "x-ticvai-persistence-column": "integer",
+    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13)."
    },
    "cartLeaseSeconds": {
     "type": "integer",

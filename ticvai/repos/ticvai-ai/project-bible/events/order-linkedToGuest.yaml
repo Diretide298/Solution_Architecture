@@ -6,11 +6,11 @@ version: 1
 publisher: orders
 description: A guest-checkout order was attached to a guest's account, so it now belongs to that subject.
 aggregate: order
-emittedWhen: linkGuestCheckout attaches the named order and every other guest-checkout order with the same verified
-  contact detail (one event per order attached); setCustomerGuestAccount attaches a guest account to an order (one event
+emittedWhen: attachGuestCheckoutOrders, Orders' consumer of identity.guestCheckoutLinked, attaches the guest-checkout
+  orders linkGuestCheckout matched (one event per order attached; r10 ruling, CHG-R10ID-018); setCustomerGuestAccount attaches a guest account to an order (one event
   per order whose subject it sets; CHG-MOD-006)
 emittedBy:
-- identity.linkGuestCheckout
+- orders.attachGuestCheckoutOrders
 - orders.setCustomerGuestAccount
 payload:
 - field: orderId
@@ -47,9 +47,10 @@ notes: '**Added 14 October 2026 (ADAM CR-084, CHG-GDL-003).** linkGuestCheckout 
   changes the subject of a projected source table without emitting an event the projection consumes.
 
 
-  **Publisher is orders, as the order is the aggregate**, though linkGuestCheckout runs in IdentityService: it
-  attaches the orders through the Orders module''s in-process API inside its own transaction (ADR-0055 rule 3, both in
-  commerce), and the outbox row is written in that transaction (ADR-0033).
+  **Publisher is orders, as the order is the aggregate.** Since r10 (the lead''s ruling on ADR-0028, CHG-R10ID-018)
+  Identity no longer attaches the orders itself: linkGuestCheckout matches them in Identity''s own projection and emits
+  identity.guestCheckoutLinked; Orders'' attachGuestCheckoutOrders sets each order''s subject and writes this event in
+  its own transaction (ADR-0033).
 
 
   No state model emits this: attaching an order changes its owner, not its status.'

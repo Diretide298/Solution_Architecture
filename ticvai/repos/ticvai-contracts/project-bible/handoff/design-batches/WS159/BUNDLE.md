@@ -497,6 +497,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS130 Resource Management Configuration Board 5.dc.html#bo-894`
 - Workshop pack: Resource_Management_Configuration_Reference.pdf board 5
 - Flow F268 *Resource Management Configuration board 5: Experience Resource Requirement …*, step 2: Works in Staff-to-Experience Qualification Mapping → Define which types of employees are permitted to deliver a specific experience.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -680,6 +681,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS130 Resource Management Configuration Board 5.dc.html#bo-895`
 - Workshop pack: Resource_Management_Configuration_Reference.pdf board 5
 - Flow F268 *Resource Management Configuration board 5: Experience Resource Requirement …*, step 4: Works in Resource Combination Builder → Allow experiences to require multiple resources in valid combinations.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1242,6 +1244,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS130 Resource Management Configuration Board 5.dc.html#bo-898`
 - Workshop pack: Resource_Management_Configuration_Reference.pdf board 5
 - Flow F268 *Resource Management Configuration board 5: Experience Resource Requirement …*, step 10: Works in Skill-Based & Smart Resource Selection → Allow users to request the type or capability of resource they require without manually choosing an individual resource.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1448,6 +1451,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS130 Resource Management Configuration Board 5.dc.html#bo-899`
 - Workshop pack: Resource_Management_Configuration_Reference.pdf board 5
 - Flow F268 *Resource Management Configuration board 5: Experience Resource Requirement …*, step 12: Works in Customer / Cashier Resource Assignment Experience → Provide the fast, visual assignment interface shown during ticket or experience purchase. This screen shall be optimized for speed and simplicity.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

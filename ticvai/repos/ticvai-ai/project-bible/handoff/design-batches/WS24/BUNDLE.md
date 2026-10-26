@@ -363,7 +363,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No channel provider configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.; 422 The provider cannot be activated: credentials, connection or webhook verification failed, or the secret reference does not resolve. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or …; 422 The provider cannot be activated: credentials, connection or webhook verification failed, or the secret reference does not resolve. |
 
 #### Sample data for the mock-up
 
@@ -494,7 +494,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No sender identity domain configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.; 422 The identity cannot take this status (not yet verified), the channel-specific fields are missing, or the provider does not serve this channel. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 An idempotency conflict or an optimistic concurrency failure (`idempotency-conflict`, `concurrency-conflict`, the shared Conflict), or …; 422 The identity cannot take this status (not yet verified), the channel-specific fields are missing, or the provider does not serve this channel. |
 
 #### Sample data for the mock-up
 
@@ -1370,6 +1370,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-046`
 - Workshop pack: Communication & Notification Platform Services_Reference.pdf board 1
 - Flow F133 *Communication & Notification Platform Services board 1: Communication Service …*, step 16: Works in Provider Health, Usage & Cost Monitoring → Monitor the operational and commercial performance of communication providers.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1507,6 +1508,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS41 Communication & Notification Platform Services Board 1.dc.html#adm-047`
 - Workshop pack: Communication & Notification Platform Services_Reference.pdf board 1
 - Flow F133 *Communication & Notification Platform Services board 1: Communication Service …*, step 18: Works in AI Delivery Optimization & Communication Platform Diagnostics → Provide an AI intelligence layer focused specifically on communication infrastructure performance, not CRM marketing strategy.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 - ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 
 #### Acceptance for the design

@@ -677,6 +677,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-602`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 6: Works in B2B Credit Account & Limit Manager\t95 → Manage payment credit facilities granted to authorized B2B customers, resellers, corporate clients or partners. This is not the general B2B customer profile. The B2B/CRM module remains authoritative …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -839,6 +840,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-603`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 8: Works in B2B Invoice, On-Account & Payment Terms Configuration\t96 → Configure how approved B2B customers can transact without immediate full payment.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1519,6 +1521,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-608`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 18: Works in Mixed Tender Simulator, Credit Exposure & AI Advisor\t102 → Allow administrators to test complex tender combinations before activating rules.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

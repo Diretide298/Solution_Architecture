@@ -260,6 +260,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - … and 1 more flow steps (`flows/`)
 - Flow F204 branch at step 1 (expected): when Nothing has been set up on Rental Return Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F204 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -389,6 +390,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS123 Rental Management Board 8.dc.html#bo-565`
 - Workshop pack: Rental_Management.pdf board 8
 - Flow F204 *Rental Management board 8: Rental Return Command Center*, step 2: Works in Return Scan & Rental Retrieval → Quickly identify which active rental the returned equipment belongs to. The original requirements specifically require scanning the rented item and retrieving its reservation.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -494,6 +496,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS123 Rental Management Board 8.dc.html#bo-566`
 - Workshop pack: Rental_Management.pdf board 8
 - Flow F204 *Rental Management board 8: Rental Return Command Center*, step 4: Works in Return Summary & Actual Return Time → Establish the operational return event before inspection and financial settlement.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -823,6 +826,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS123 Rental Management Board 8.dc.html#bo-569`
 - Workshop pack: Rental_Management.pdf board 8
 - Flow F204 *Rental Management board 8: Rental Return Command Center*, step 10: Works in Damage Assessment & Charge Workflow → Convert confirmed equipment damage into a controlled operational and commercial case. The source specifically recommends a formal damage assessment workflow.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -928,6 +932,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS123 Rental Management Board 8.dc.html#bo-570`
 - Workshop pack: Rental_Management.pdf board 8
 - Flow F204 *Rental Management board 8: Rental Return Command Center*, step 12: Works in Partial Return & Missing Equipment → Handle multi-item and group rentals where equipment is returned at different times. This implements the partial-return capability we added in Board 7.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1033,6 +1038,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS123 Rental Management Board 8.dc.html#bo-571`
 - Workshop pack: Rental_Management.pdf board 8
 - Flow F204 *Rental Management board 8: Rental Return Command Center*, step 14: Works in Late Fees, Damage Fees & Final Settlement → Calculate the customer's final rental financial position. Board 8 should consume, not recreate, the commercial policies configured in Board 4.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1160,6 +1166,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS123 Rental Management Board 8.dc.html#bo-572`
 - Workshop pack: Rental_Management.pdf board 8
 - Flow F204 *Rental Management board 8: Rental Return Command Center*, step 16: Works in Deposit Release, Capture & Customer Confirmation → Complete the deposit lifecycle and provide the customer with a transparent final statement. The source requires full refund/release, partial refund and deposit forfeiture, together with transaction …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1265,6 +1272,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS123 Rental Management Board 8.dc.html#bo-573`
 - Workshop pack: Rental_Management.pdf board 8
 - Flow F204 *Rental Management board 8: Rental Return Command Center*, step 18: Works in Return Completion & Equipment Disposition → Complete the rental while determining exactly what happens to every returned physical asset. This is extremely important because returning an item does not necessarily mean it becomes immediately …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

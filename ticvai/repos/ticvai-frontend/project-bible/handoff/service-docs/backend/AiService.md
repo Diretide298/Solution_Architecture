@@ -704,6 +704,11 @@ Every response carries a trace id, the model and provider that produced it, toke
 | proposedAction.locale | string |  | For a translation draft, the language it is in (the job's targetLocale); null otherwise. (max length 20; read-only; nullable) |
 | proposedAction.fieldPath | string |  | For a translation draft, where it goes inside the target, as a dotted path in the target's own body (TranslationProposals.drafts[].fieldPath); null otherwise. (max length 300; read-only; nullable) |
 | proposedAction.draftText | string |  | For a translation draft, the proposed text; null otherwise. (read-only; nullable) |
+| proposedAction.confidence | number |  | For a walkway segment (proposeWalkways), the model's confidence in it (WalkwayProposal.confidence); null on every other proposal (ADAM CR-207, CHG-R10ORD-013). (min 0; max 1; read-only; nullable) |
+| proposedAction.basis | enum (handMarked, seen) |  | For a walkway segment, whether it was traced from a hand mark or seen in the picture (WalkwayProposal.basis); null otherwise (ADAM CR-207). (read-only; nullable) |
+| proposedAction.reasoning | string |  | For a walkway segment, why the model proposed it (WalkwayProposal.reasoning); null otherwise (ADAM CR-207). (read-only; nullable) |
+| proposedAction.distanceMetres | number |  | For a walkway segment, its length along the centreline; null where the plan has no georeference and on every other proposal (ADAM CR-207). (read-only; nullable) |
+| proposedAction.mapId | string (uuid) |  | For a walkway segment, the venue map it is on (the path's mapId, which the target's request body does not carry); null otherwise (ADAM CR-207). (read-only; nullable) |
 | proposedAction.kind | enum (pricing, promotion, operational, financial, configuration, content, audience) | yes | content (a marketing or storefront draft from proposeMarketingContent) and audience (a lookalike segment from proposeLookalikeSegment) added 29 September (build); both are applied by a person in the… |
 | proposedAction.targetContract | string | yes | Which contract would perform it. |
 | proposedAction.targetOperation | string | yes |  |
@@ -2512,6 +2517,11 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | locale | string |  | For a translation draft, the language it is in (the job's targetLocale); null otherwise. (max length 20; read-only; nullable) |
 | fieldPath | string |  | For a translation draft, where it goes inside the target, as a dotted path in the target's own body (TranslationProposals.drafts[].fieldPath); null otherwise. (max length 300; read-only; nullable) |
 | draftText | string |  | For a translation draft, the proposed text; null otherwise. (read-only; nullable) |
+| confidence | number |  | For a walkway segment (proposeWalkways), the model's confidence in it (WalkwayProposal.confidence); null on every other proposal (ADAM CR-207, CHG-R10ORD-013). (min 0; max 1; read-only; nullable) |
+| basis | enum (handMarked, seen) |  | For a walkway segment, whether it was traced from a hand mark or seen in the picture (WalkwayProposal.basis); null otherwise (ADAM CR-207). (read-only; nullable) |
+| reasoning | string |  | For a walkway segment, why the model proposed it (WalkwayProposal.reasoning); null otherwise (ADAM CR-207). (read-only; nullable) |
+| distanceMetres | number |  | For a walkway segment, its length along the centreline; null where the plan has no georeference and on every other proposal (ADAM CR-207). (read-only; nullable) |
+| mapId | string (uuid) |  | For a walkway segment, the venue map it is on (the path's mapId, which the target's request body does not carry); null otherwise (ADAM CR-207). (read-only; nullable) |
 | kind | enum (pricing, promotion, operational, financial, configuration, content, audience) | yes | content (a marketing or storefront draft from proposeMarketingContent) and audience (a lookalike segment from proposeLookalikeSegment) added 29 September (build); both are applied by a person in the… |
 | targetContract | string | yes | Which contract would perform it. |
 | targetOperation | string | yes |  |
@@ -2756,7 +2766,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 **Every AI capability operating in the tenant, and nothing that is not in it** (AIC-143..145; ADM-519..522). Owner, family, risk class, the autonomy level in force against its ceiling, data categories, lifecycle per environment and whether it is paused. The P09 governance area and ANL-060 read this first.
 
 
-**Order.** Newest first, by `updatedAt` descending, then by `id`.
+**Order.** Newest first, by `updatedAt` descending, then by `id`. Where `updatedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -2824,7 +2834,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 Every version of every governance policy at the scope, newest first (ADM-523, ADM-526..528). Filter by `policyId` for one policy's history, or by `status` for what is in force.
 
 
-**Order.** Newest first, by `publishedAt` descending, then by `id`.
+**Order.** Newest first, by `publishedAt` descending, then by `id`. Where `publishedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -2891,6 +2901,7 @@ Every version of every governance policy at the scope, newest first (ADM-523, AD
 
 8.3.61–8.3.66. Pricing, promotional, operational and financial proposals wait here for approval, and multi-level approval is supported because a pricing change and a discount rule do not carry the same authority.
 **What a caller sees follows who may decide** (audit R213 (3)): a caller holding `AI_APPROVE` sees every open proposal at the scope; a caller with `AI_USE` only sees the proposals they prompted, because those are the level 1 proposals they may approve themselves.
+**Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -2904,6 +2915,13 @@ Every version of every governance policy at the scope, newest first (ADM-523, AD
 | Reads | `ai.proposed_action` |
 | Writes | - |
 | Called by | ADM-529, ADM-534, ANL-009, BO-093, BO-762, BO-793, BO-928, BO-929, CMS-007, CMS-008 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| targetOperation | query |  | string | Only the proposals whose targetOperation is this, e.g. |
+| mapId | query |  | string (uuid) | Only the proposals about this venue map (ProposedAction.mapId): BO-093 re-reads a map's walkway segments with their confidence after a reload (ADAM CR-207). |
 
 **Responses**
 
@@ -3459,7 +3477,7 @@ Model catalogue, prompt registry, evaluation and release (design C1, C13)
 Runs with metrics and gate results, newest first.
 
 
-**Order.** Newest first, by `startedAt` descending, then by `id`.
+**Order.** Newest first, by `startedAt` descending, then by `id`. Where `startedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -3520,7 +3538,7 @@ Runs with metrics and gate results, newest first.
 **The registry of training runs** (29 September, AI functions review; design 3.5). Each trained producer is retrained weekly on the tenant's own data only (AIP-149), backtested against past actuals (`ai.eval_run` kind `backtest`), and run in shadow beside the live answer. A run whose shadow period passes the promotion gate raises a `promotionReady` governance alert to the admin; **nothing switches by itself** (AI-D16). Runs are scheduled by the platform; this reads them.
 
 
-**Order.** Newest first, by `startedAt` descending, then by `id`.
+**Order.** Newest first, by `startedAt` descending, then by `id`. Where `startedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -4037,7 +4055,7 @@ Records containment and performs it: pause a capability, roll back a release, re
 **Policy, control, data, behaviour and operational alerts in one place** (AIC-210..223; ADM-549..555), including `promotionReady` when a shadow model passes its gate (design 3.12), which the P09 governance area shows as a tile.
 
 
-**Order.** Newest first, by `raisedAt` descending, then by `id`.
+**Order.** Newest first, by `raisedAt` descending, then by `id`. Where `raisedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -4098,7 +4116,7 @@ Records containment and performs it: pause a capability, roll back a release, re
 Governance incidents from detection to closure (ADM-549, ADM-556), linked to operational incidents where both apply (AIC-250).
 
 
-**Order.** Newest first, by `openedAt` descending, then by `id`.
+**Order.** Newest first, by `openedAt` descending, then by `id`. Where `openedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -5506,6 +5524,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | locale | text | no | For a translation draft, the language it is in (the job's targetLocale); null otherwise. |
 | field_path | text | no | For a translation draft, where it goes inside the target, as a dotted path in the target's own body (TranslationProposals.drafts[].fieldPath); null otherwise. |
 | draft_text | text | no | For a translation draft, the proposed text; null otherwise. |
+| confidence | numeric | no | For a walkway segment (proposeWalkways), the model's confidence in it (WalkwayProposal.confidence); null on every other proposal (ADAM CR-207, CHG-R10ORD-013). |
+| basis | text | no | For a walkway segment, whether it was traced from a hand mark or seen in the picture (WalkwayProposal.basis); null otherwise (ADAM CR-207). |
+| reasoning | text | no | For a walkway segment, why the model proposed it (WalkwayProposal.reasoning); null otherwise (ADAM CR-207). |
+| distance_metres | numeric | no | For a walkway segment, its length along the centreline; null where the plan has no georeference and on every other proposal (ADAM CR-207). |
+| map_id | uuid | no | For a walkway segment, the venue map it is on (the path's mapId, which the target's request body does not carry); null otherwise (ADAM CR-207). |
 | kind | text | yes | content (a marketing or storefront draft from proposeMarketingContent) and audience (a lookalike segment from proposeLookalikeSegment) added 29 September (build); both are applied by a person in the… |
 | target_contract | text | yes | Which contract would perform it. |
 | target_operation | text | yes |  |

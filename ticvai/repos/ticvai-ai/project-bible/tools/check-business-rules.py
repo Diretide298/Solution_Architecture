@@ -17,9 +17,45 @@ the decision and passes after it. Two rules are general, because the same gap ca
 
 And one rule per decision:
 
-  BR-APPROVAL-ROUTE  (r8, CHG-R8SPN-016, CHG-R8GEN-013) setApprovalMatrix and approveMatrixMultiLevel refuse a
-                   condition the engine cannot evaluate (422 condition-not-supported); submitApprovalRequest's 409
-                   lists approval-no-longer-required and approval-no-approver-available.
+  BR-APPROVAL-ROUTE  (r8, CHG-R8SPN-016, CHG-R8GEN-013; r10, ADAM CR-102, CHG-R10ID-015) setApprovalMatrix and
+                   approveMatrixMultiLevel refuse a condition the engine cannot evaluate (422 condition-invalid, since
+                   the condition language exists); submitApprovalRequest's 409 lists approval-no-longer-required and
+                   approval-no-approver-available.
+  BR-APPROVAL-ENGINE (r10, ADAM CR-102, CHG-R10ID-015) the engine's rules have storage: ApprovalRule.condition
+                   defines its language (AND-joined comparisons) and the unreachableRule comparison; a rule's code is
+                   unique per matrix (x-ticvai-unique-together [matrix_id, code]); a matrix's version is required; the
+                   approver chain is stored (ApprovalRequest.approvers, approvals.request_approver); a decision can be
+                   return or requestInformation; the composite operations declare 400, 403 exceedsDelegatorAuthority
+                   and 409.
+  BR-PRIVACY-REQUEST (r10, ADAM CR-101, CHG-R10ID-016) a guest's privacy request records a subject, not a principal
+                   (ApprovalRequest exactly one of requestedByPrincipalId and requestedBySubjectId); exportSubjectData
+                   answers an erased subject 410 subject-erased and emits identity.privacyRequestRaised (as
+                   deleteGuestAccount does), which Marketing consumes; getSubjectDataExport reads the status and link.
+  BR-SCOPE-AUTHZ   (r10, ADAM CR-189, CHG-R10ID-001) the per-scope rule is stated once (Session.permissionsByScope and
+                   permission-resolution 7.2): x-ticvai-permission is evaluated at the scope acted on, from the per-scope
+                   set; listPrincipals reads its reach from it and createRole needs ROLE_MANAGE at the root (403).
+  BR-SSO-ACTIVE    (r10, ADAM CR-190, CHG-R10ID-002) listSsoProviders lists active providers only (a null is_active is not
+                   active), ordered by displayName then id.
+  BR-PERMISSION-FINDINGS (r10, ADAM CR-210, CHG-R10ID-003) listPermissionFindings states the 50% and 25% peer
+                   thresholds and that every authorisation check writes access_decision; listCapabilityTemplates and
+                   listAccessReviewItems state full orders.
+  BR-ENTITLEMENT-SHARE (r10, ADAM CR-209, CHG-R10ID-004) a share is a delegated_access row of kind sharedEntitlement
+                   with ENTITLEMENT_USE; a guest's revoke is recorded (revokedByKind, revokedBySubjectId);
+                   revokeEntitlementShare answers 404 for a share of another entitlement.
+  BR-PRESET-READONLY (r10, ADAM CR-176, CHG-R10ID-005) setCapabilityTemplate refuses a preset's id with 409
+                   capability-template-is-preset.
+  BR-END-SESSIONS  (r10, ADAM CR-180, CHG-R10ID-006) updatePrincipal ends a principal's sessions and refresh tokens through
+                   identity.end_principal_sessions, which tools/derive-ddl.py writes.
+  BR-PLATFORM-TOKEN (r10, ADAM CR-175, CHG-R10ID-007) ADR-0072 defines the platform token; the Control Plane holds the
+                   operator, its platform session and its second factors; openPlatformStaffGrant cites the ADR.
+  BR-GUEST-TOKENS  (r10, ADAM CR-100, CHG-R10ID-009) getGuestSession answers GuestSessionView, which has no tokens;
+                   a refresh token belongs to exactly one of a principal and a guest subject.
+  BR-PLATFORM-INVOICE (r10 round 3, ADAM CR-202, CHG-R10ID-023) the contract names the issuing legal entity, the
+                   platform tax-rate table exists, and the exact-period unique index skips cancelled invoices.
+  BR-GUEST-VENUE   (r10, ADAM CR-198, CHG-R10ID-010, general; 400 venue-required since round 3, CHG-R10ID-022) every venue-level read callable without a session by a
+                   guest, a visitor or the public names its venue: a path {venueId}, a required venueId query
+                   parameter or the shared GuestVenue header (X-Venue-Id); the rule is stated on guestAuth. Exempt:
+                   reads addressed by their own token, and the waiting room's own store (GUEST_VENUE_EXEMPT).
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -174,6 +210,14 @@ def body_schema(op):
 # BR-GUEST-SELF-403: guest operations scoped to the caller's subject that declared 403 on 20 October 2026 (13 on the
 # generators branch before the core lane's CHG-R8SPN-018 merged). Lower it as they are fixed; never raise it.
 GUEST_SELF_403_CEILING = 13
+
+
+# BR-GUEST-VENUE (ADAM CR-198, CHG-R10ID-010): public guest reads that need no venue scope, each with its reason.
+GUEST_VENUE_EXEMPT = {
+    "getOrder": "addressed by the order access token, which gives its one order's reach (CHG-R9CR-004)",
+    "getPaymentLink": "addressed by the payment link's own token",
+    "getWaitingRoomPosition": "reads the on-sale waiting room's own store (ADR-0066), no venue table",
+}
 
 
 def problem_types(op):
@@ -511,11 +555,165 @@ def main() -> int:
     # BR-APPROVAL-ROUTE (CHG-R8SPN-016): a matrix condition the engine cannot evaluate is refused when it is saved, and a
     # submission that no longer needs approval, or finds no approver, says so with its own problem type.
     for oid in ("setApprovalMatrix", "approveMatrixMultiLevel"):
-        need("BR-APPROVAL-ROUTE", "condition-not-supported" in problem_types(op(oid)[3]),
-             f"{oid} does not refuse a condition the engine cannot evaluate (422 condition-not-supported)")
+        need("BR-APPROVAL-ROUTE", "condition-invalid" in problem_types(op(oid)[3]),
+             f"{oid} does not refuse a condition the engine cannot evaluate (422 condition-invalid)")
     sub409 = text(((op("submitApprovalRequest")[3].get("responses") or {}).get("409")) or {})
     for pt in ("approval-no-longer-required", "approval-no-approver-available"):
         need("BR-APPROVAL-ROUTE", pt in sub409, f"submitApprovalRequest's 409 does not list {pt}")
+    # BR-APPROVAL-ENGINE (ADAM CR-102, CHG-R10ID-015): every engine rule the CR named has a place to live.
+    adoc = op("decideApprovalRequest")[4]
+    asch = ((adoc.get("components") or {}).get("schemas") or {})
+    rule_s = asch.get("ApprovalRule") or {}
+    cond = text((rule_s.get("properties") or {}).get("condition") or {})
+    need("BR-APPROVAL-ENGINE", " AND " in cond and "notIn" in cond and "unreachableRule" in cond,
+         "ApprovalRule.condition does not define the condition language (AND-joined clauses, operators) and the "
+         "unreachableRule comparison")
+    need("BR-APPROVAL-ENGINE", ["matrix_id", "code"] in (rule_s.get("x-ticvai-unique-together") or []),
+         "ApprovalRule has no unique (matrix_id, code)")
+    need("BR-APPROVAL-ENGINE", "version" in ((asch.get("ApprovalMatrix") or {}).get("required") or []),
+         "ApprovalMatrix.version is not required (a matrix version may be null)")
+    req_s = asch.get("ApprovalRequest") or {}
+    need("BR-APPROVAL-ENGINE", "approvals.request_approver" in str(req_s.get("x-ticvai-persistence") or "")
+         and "approvers" in (req_s.get("properties") or {}),
+         "ApprovalRequest does not store its approver chain (approvers[], approvals.request_approver)")
+    dec = (((asch.get("ApprovalDecision") or {}).get("properties") or {}).get("decision") or {}).get("enum") or []
+    need("BR-APPROVAL-ENGINE", {"return", "requestInformation"} <= set(dec),
+         "ApprovalDecision.decision cannot store return and requestInformation")
+    for oid in ("approveMatrixMultiLevel", "approveRoleAuthorityDelegation"):
+        codes = {str(k) for k in (op(oid)[3].get("responses") or {})}
+        need("BR-APPROVAL-ENGINE", {"400", "409"} <= codes, f"{oid} does not declare its 400 and 409 refusals")
+    for oid in ("createApprovalDelegation", "approveRoleAuthorityDelegation"):
+        r403 = text(((op(oid)[3].get("responses") or {}).get("403")) or {})
+        need("BR-APPROVAL-ENGINE", "exceeds-delegator-authority" in r403,
+             f"{oid} does not refuse exceedsDelegatorAuthority with 403")
+    # BR-PRIVACY-REQUEST (ADAM CR-101, CHG-R10ID-016): a guest's privacy request is recorded, clocked and readable.
+    need("BR-PRIVACY-REQUEST", ["requestedByPrincipalId", "requestedBySubjectId"]
+         in (req_s.get("x-ticvai-exactly-one-of") or []),
+         "ApprovalRequest does not record a guest requester (exactly one of requestedByPrincipalId, requestedBySubjectId)")
+    for oid in ("exportSubjectData", "deleteGuestAccount"):
+        need("BR-PRIVACY-REQUEST", "identity.privacyRequestRaised" in (op(oid)[3].get("x-ticvai-emits") or []),
+             f"{oid} does not put the request into the privacy queue (x-ticvai-emits identity.privacyRequestRaised)")
+    need("BR-PRIVACY-REQUEST", "subject-erased" in problem_types(op("exportSubjectData")[3]),
+         "exportSubjectData does not answer an erased subject (410 subject-erased)")
+    need("BR-PRIVACY-REQUEST", bool(op("getSubjectDataExport")[3]),
+         "no status and download read of a data export (getSubjectDataExport)")
+    ev = ROOT / "events" / "identity-privacyRequestRaised.yaml"
+    evd = yaml.safe_load(ev.read_text(encoding="utf-8")) if ev.exists() else {}
+    need("BR-PRIVACY-REQUEST", any((c or {}).get("context") == "marketing" for c in (evd or {}).get("consumers") or []),
+         "identity.privacyRequestRaised has no Marketing consumer (the privacy queue)")
+    # r10 round 3 (CHG-R10ID-024): the jurisdiction travels, the case carries the request id, the file expires.
+    need("BR-PRIVACY-REQUEST", any((x or {}).get("field") == "jurisdiction" for x in (evd or {}).get("payload") or []),
+         "identity.privacyRequestRaised carries no jurisdiction (the venue's country)")
+    mdoc = load("contracts/satellite/marketing-crm.yaml")
+    pr = ((mdoc.get("components") or {}).get("schemas") or {}).get("DataSubjectCustomerPrivacyRequestManagementView") or {}
+    need("BR-PRIVACY-REQUEST", "approvalRequestId" in (pr.get("properties") or {}),
+         "the privacy case does not carry the request id (approvalRequestId)")
+    sde = ((load("contracts/spine/identity.yaml").get("components") or {}).get("schemas") or {}).get("SubjectDataExport") or {}
+    need("BR-PRIVACY-REQUEST", "expired" in (((sde.get("properties") or {}).get("status") or {}).get("enum") or [])
+         and "7 days" in str(sde.get("description")), "a data export file has no stated keeping period (7 days)")
+    # BR-PLATFORM-INVOICE (r10 round 3, ADAM CR-202; CHG-R10ID-023): who issues, at what tax rate, and a cancelled
+    # invoice frees its period.
+    sub = load("contracts/satellite/subscription.yaml")
+    ssch = (sub.get("components") or {}).get("schemas") or {}
+    need("BR-PLATFORM-INVOICE", "issuingLegalEntity" in ((ssch.get("Subscription") or {}).get("properties") or {}),
+         "the contract names no issuing legal entity")
+    need("BR-PLATFORM-INVOICE", (ssch.get("PlatformTaxRate") or {}).get("x-ticvai-persistence") == "control.platform_tax_rate",
+         "no platform tax-rate table")
+    uw = (ssch.get("SubscriptionInvoice") or {}).get("x-ticvai-unique-when") or []
+    need("BR-PLATFORM-INVOICE", any("cancelled" in str(u.get("when")) for u in uw if isinstance(u, dict)),
+         "the exact-period unique index does not skip cancelled invoices")
+    # BR-SCOPE-AUTHZ (ADAM CR-189, CHG-R10ID-001): the per-scope rule, stated once, and its two first users.
+    idoc = load("contracts/spine/identity.yaml")
+    isch = (idoc.get("components") or {}).get("schemas") or {}
+    pbs = json.dumps(((isch.get("Session") or {}).get("properties") or {}).get("permissionsByScope") or {})
+    need("BR-SCOPE-AUTHZ", "CR-189" in pbs and "scope the operation acts on" in pbs,
+         "Session.permissionsByScope does not state the per-scope rule (CR-189)")
+    spec = (ROOT / "docs" / "architecture" / "specs" / "permission-resolution.md").read_text(encoding="utf-8")
+    need("BR-SCOPE-AUTHZ", "CR-189" in spec and "#27692" in spec and "#27666" in spec,
+         "permission-resolution 7.2 does not state the per-scope rule with its seam (#27692) and fill (#27666)")
+    need("BR-SCOPE-AUTHZ", "per-scope set" in text(op("listPrincipals")[3]),
+         "listPrincipals does not read its reach from the per-scope set")
+    cr = op("createRole")[3]
+    need("BR-SCOPE-AUTHZ", "tenant root" in text(cr) and "403" in {str(k) for k in (cr.get("responses") or {})},
+         "createRole does not need ROLE_MANAGE at the tenant root with a 403")
+    # BR-SSO-ACTIVE (ADAM CR-190, CHG-R10ID-002)
+    sso = text(op("listSsoProviders")[3])
+    need("BR-SSO-ACTIVE", "is_active" in sso and "null" in sso and "displayName" in sso,
+         "listSsoProviders does not state the active-only filter (null is not active) and its order")
+    # BR-PERMISSION-FINDINGS (ADAM CR-210, CHG-R10ID-003)
+    pf = text(op("listPermissionFindings")[3])
+    need("BR-PERMISSION-FINDINGS", "50%" in pf and "25%" in pf and "access_decision" in pf,
+         "listPermissionFindings does not state the peer thresholds and the usage source")
+    need("BR-PERMISSION-FINDINGS", "then `name`" in text(op("listCapabilityTemplates")[3]),
+         "listCapabilityTemplates states no full order")
+    need("BR-PERMISSION-FINDINGS", "`certify`" in text(op("listAccessReviewItems")[3]),
+         "listAccessReviewItems does not place review and certify in its order")
+    # BR-ENTITLEMENT-SHARE (ADAM CR-209, CHG-R10ID-004)
+    da = (isch.get("DelegatedAccess") or {}).get("properties") or {}
+    need("BR-ENTITLEMENT-SHARE", "sharedEntitlement" in ((da.get("delegationKind") or {}).get("enum") or []),
+         "DelegatedAccess.delegationKind has no sharedEntitlement")
+    need("BR-ENTITLEMENT-SHARE", "ENTITLEMENT_USE" in ((load("contracts/shared/permissions.yaml")
+                                                        .get("x-ticvai-share-only") or {}).get("permissions") or []),
+         "ENTITLEMENT_USE is not kept off role checklists (x-ticvai-share-only; r10 round 3)")
+    need("BR-ENTITLEMENT-SHARE", "revokedBySubjectId" in da and "revokedByKind" in da,
+         "DelegatedAccess cannot record a guest's revoke (revokedByKind, revokedBySubjectId)")
+    res = op("revokeEntitlementShare")[3]
+    need("BR-ENTITLEMENT-SHARE", "404" in {str(k) for k in (res.get("responses") or {})} and "over_object_ref" in text(res),
+         "revokeEntitlementShare does not match the share to its entitlement (404)")
+    # BR-PRESET-READONLY (ADAM CR-176, CHG-R10ID-005)
+    need("BR-PRESET-READONLY", "capability-template-is-preset" in problem_types(op("setCapabilityTemplate")[3]),
+         "setCapabilityTemplate does not refuse a preset's id")
+    # BR-END-SESSIONS (ADAM CR-180, CHG-R10ID-006)
+    need("BR-END-SESSIONS", "identity.end_principal_sessions" in text(op("updatePrincipal")[3]),
+         "updatePrincipal does not end sessions through identity.end_principal_sessions")
+    need("BR-END-SESSIONS", "FUNCTION identity.end_principal_sessions" in
+         (ROOT / "tools" / "derive-ddl.py").read_text(encoding="utf-8"),
+         "tools/derive-ddl.py does not write identity.end_principal_sessions")
+    # BR-PLATFORM-TOKEN (ADAM CR-175, CHG-R10ID-007)
+    need("BR-PLATFORM-TOKEN", any((ROOT / "docs" / "adr").glob("0072-*.md")), "ADR-0072 (the platform token) is missing")
+    need("BR-PLATFORM-TOKEN", "ADR-0072" in text(op("openPlatformStaffGrant")[3]),
+         "openPlatformStaffGrant does not cite ADR-0072")
+    sdoc = load("contracts/satellite/subscription.yaml")
+    persisted = {str(v.get("x-ticvai-persistence")) for v in ((sdoc.get("components") or {}).get("schemas") or {}).values()
+                 if isinstance(v, dict)}
+    for t in ("control.platform_operator", "control.platform_session", "control.platform_operator_mfa"):
+        need("BR-PLATFORM-TOKEN", t in persisted, f"no schema persists {t} (ADR-0072)")
+    # BR-GUEST-TOKENS (ADAM CR-100, CHG-R10ID-009)
+    ggs = json.dumps(((op("getGuestSession")[3].get("responses") or {}).get("200") or {}))
+    view = (isch.get("GuestSessionView") or {})
+    need("BR-GUEST-TOKENS", "GuestSessionView" in ggs and "tokens" not in (view.get("properties") or {}),
+         "getGuestSession answers a session with tokens, so a read must issue them")
+    need("BR-GUEST-TOKENS", ["principalId", "subjectId"] in ((isch.get("IdentityRefreshToken") or {})
+                                                              .get("x-ticvai-exactly-one-of") or []),
+         "IdentityRefreshToken is not a principal's or a guest's (exactly one of principalId, subjectId)")
+    # BR-GUEST-VENUE (ADAM CR-198, CHG-R10ID-010, general): a public guest read of venue data names its venue.
+    cdoc = load("contracts/shared/common.yaml")
+    ga = json.dumps(((cdoc.get("components") or {}).get("securitySchemes") or {}).get("guestAuth") or {})
+    need("BR-GUEST-VENUE", "CR-198" in ga and "X-Venue-Id" in ga, "guestAuth does not state the venue rule (CR-198)")
+    for oid, (f, path, method, o, d) in sorted(ops.items()):
+        sec = o.get("security")
+        if method != "get" or sec is None or not (sec == [] or any(x == {} for x in sec)):
+            continue
+        if not set(o.get("x-ticvai-audience") or []) & {"guest", "anonymous", "public"}:
+            continue
+        if o.get("x-ticvai-scope-level") != "venue" or oid in GUEST_VENUE_EXEMPT or "{venueId}" in path:
+            continue
+        item = ((d.get("paths") or {}).get(path) or {})
+        params = (o.get("parameters") or []) + (item.get("parameters") or [])
+        named = False
+        for pp in params:
+            if not isinstance(pp, dict):
+                continue
+            if str(pp.get("$ref", "")).endswith("/parameters/GuestVenue"):
+                named = True
+            if pp.get("name") == "venueId" and pp.get("in") == "query" and pp.get("required"):
+                named = True
+        need("BR-GUEST-VENUE", named, f"{oid} ({f.name}): a public guest read of venue data names no venue "
+             "(declare common GuestVenue)")
+        if any(str((pp or {}).get("$ref", "")).endswith("/parameters/GuestVenue") for pp in params if isinstance(pp, dict)):
+            r400 = (o.get("responses") or {}).get("400") or {}
+            need("BR-GUEST-VENUE", "venue-required" in str(r400) or "VenueRequired" in str(r400),
+                 f"{oid} ({f.name}): declares GuestVenue but no 400 venue-required (r10 round 3, CHG-R10ID-022)")
     # BR-ALERT-RECIPIENT (CHG-R8SPN-020): reporting's listAlerts says whose alerts come back (the recipient role; an
     # over/short alert only to a holder of OVERSHORT_ACCEPT).
     la = next((o for oid, (f, _p, _m, o, _d) in ops.items() if oid == "listAlerts" and f.stem == "reporting"),
@@ -540,7 +738,10 @@ def main() -> int:
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
              "BR-AI-CURRENCY", "BR-QR", "BR-NEW-OPS", "BR-GUEST-PII", "BR-HOST-ROUTING", "BR-CASH-RECEIPT",
              "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS", "BR-GATE-CANCEL", "BR-APPROVAL-ROUTE", "BR-GUEST-SELF-403",
-             "BR-APPROVED-OUTCOME"]
+             "BR-APPROVED-OUTCOME", "BR-APPROVAL-ENGINE", "BR-PRIVACY-REQUEST",
+             "BR-SCOPE-AUTHZ", "BR-SSO-ACTIVE", "BR-PERMISSION-FINDINGS", "BR-ENTITLEMENT-SHARE",
+             "BR-PRESET-READONLY", "BR-END-SESSIONS", "BR-PLATFORM-TOKEN", "BR-GUEST-TOKENS", "BR-GUEST-VENUE",
+             "BR-PLATFORM-INVOICE"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

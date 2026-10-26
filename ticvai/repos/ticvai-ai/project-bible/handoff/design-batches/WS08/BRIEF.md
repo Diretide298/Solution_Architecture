@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-220` | Multi-Park & Crossover Journey Orchestrator | C | 47 | 0 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
 | `BO-221` | Fast Pass & Attraction Access Journey | C | 25 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-222` | Special Event, Free View & Alternative Admission | C | 13 | 0 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
-| `BO-223` | Journey Simulation, Audit & Publication | C | 8 | 26 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
+| `BO-223` | Journey Simulation, Audit & Publication | C | 8 | 26 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

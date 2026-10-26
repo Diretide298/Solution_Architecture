@@ -314,6 +314,12 @@
  },
  "CatalogueBundle": {
   "x-ticvai-persistence": "catalogue.published_bundle",
+  "x-ticvai-unique-together": [
+   [
+    "venueId",
+    "version"
+   ]
+  ],
   "type": "object",
   "required": [
    "version",
@@ -327,11 +333,20 @@
   ],
   "properties": {
    "version": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique-compare": "exact",
+    "description": "The venue's bundle number: a per-venue integer, 1 for the first publish and one more than the venue's highest for each publish after, as its decimal string; unique with `venueId` (ADAM CR-110, option 1; CHG-R10CAT-010)."
    },
    "venueId": {
     "type": "string",
     "format": "uuid"
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The publisher's note from `publishBundle`'s body; `BundleSummary.note` (ADAM CR-110, option 1; CHG-R10CAT-010)."
    },
    "publishedAt": {
     "type": "string",
@@ -661,7 +676,8 @@
    },
    "isSeated": {
     "type": "boolean",
-    "description": "Seated envelopes cannot be leased and are blocked offline. A seat map is not a count.\n"
+    "readOnly": true,
+    "description": "Seated envelopes cannot be leased and are blocked offline. A seat map is not a count.\n\n**Derived by the server**: true when the capacity has a `seatCategoryId`, false otherwise (ADAM CR-111, option 1; CHG-R10CAT-011).\n"
    }
   }
  },
@@ -1067,7 +1083,8 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "For grouped events."
+    "x-ticvai-references": "catalogue.event",
+    "description": "For grouped events. The parent is an existing event at the same venue, not the event itself, and has no parent of its own (one level; ADAM CR-256). Declared as a key onto `catalogue.event`."
    },
    "performanceCount": {
     "type": "integer",
@@ -1089,13 +1106,42 @@
      "cancelled",
      "archived"
     ],
-    "description": "**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."
+    "description": "**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState` and the event lifecycle job, which check the transition against `states/event.yaml` (ADAM CR-109); `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."
    },
    "lifecycleStateChangedAt": {
     "type": "string",
     "format": "date-time",
     "readOnly": true,
     "nullable": true
+   },
+   "scheduledLifecycleState": {
+    "type": "string",
+    "readOnly": true,
+    "nullable": true,
+    "enum": [
+     "draft",
+     "planned",
+     "onSale",
+     "live",
+     "closed",
+     "cancelled",
+     "archived"
+    ],
+    "description": "**A move waiting for its effectiveFrom** (ADAM CR-109, option 2; CHG-R10CAT-009): written by `setEventLifecycleState` when `effectiveFrom` is in the future, applied and cleared by the event lifecycle job in the workers host at `scheduledLifecycleAt`. Null when nothing waits."
+   },
+   "scheduledLifecycleAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true,
+    "description": "When the waiting move is applied (the request's `effectiveFrom`; ADAM CR-109)."
+   },
+   "scheduledLifecycleReason": {
+    "type": "string",
+    "maxLength": 500,
+    "readOnly": true,
+    "nullable": true,
+    "description": "The reason given with the waiting move, carried on `event.lifecycleChanged` when it is applied (ADAM CR-109)."
    }
   }
  },
@@ -2620,6 +2666,13 @@
      }
     }
    },
+   "maxSeatsPerGuestOrder": {
+    "type": "integer",
+    "minimum": 1,
+    "maximum": 50,
+    "readOnly": true,
+    "description": "**The most seats one guest booking may hold at this performance's venue** (ADAM CR-187, 25 October 2026): the venue's `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7), read through `tenancy#venueSettingsRecords` (the venue's row, else the tenant's own row, else 10). A guest screen caps its party stepper with it before anything is held (WEB-007, GST-049); `createSeatHold` still refuses more with `422` `seat-limit-exceeded`, whose `maxSeats` is this value on a guest channel. Computed, not stored."
+   },
    "zones": {
     "type": "array",
     "description": "**The standing zones and what is left in each** (r8, GPS-C38): a zone has no seats, so it is sold by quantity (`createSeatHold` `zoneId` and `quantity`). `keepTogether` says whether the venue keeps a party in one zone (a party larger than `remaining` is then refused rather than split).",
@@ -3658,6 +3711,17 @@
      "pattern": "^[A-Z]{3}$"
     }
    },
+   "stepMinutes": {
+    "type": "integer",
+    "enum": [
+     15,
+     30,
+     60
+    ],
+    "nullable": true,
+    "x-ticvai-persistence-column": "integer",
+    "description": "**The venue's start-time step for a space sold by the hour** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C): the spacing of the start times `resources.listProductStartTimes` offers (WEB-048, GST-075). Null inherits the tenant default, proposed 30, client to correct (rev 3 REV3-13)."
+   },
    "cartLeaseSeconds": {
     "type": "integer",
     "nullable": true,
@@ -4235,7 +4299,7 @@
     "minimum": 0,
     "maximum": 100,
     "readOnly": true,
-    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.**\n"
+    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.** The exact rules (whose heartbeat, which firmware is the latest, what profile currency compares, the error term until the heartbeat series lands, a workstation with no devices, the bands and the contributors) are `getWorkstationHealth`'s, the one place the score is defined (ADAM CR-244, 26 October 2026).\n"
    },
    "configurationProfileId": {
     "type": "string",

@@ -315,6 +315,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - … and 1 more flow steps (`flows/`)
 - Flow F167 branch at step 1 (expected): when Nothing has been set up on Channel Operations Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F167 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -406,7 +407,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Carried, not typed: `connectionId`
 
-Errors to draw in the form: 422 `secretNotReference`.
+Errors to draw in the form: 409 Refused, and nothing is stored. `connection-id-mismatch` (ADAM CR-245): a record for `salesChannelId`, `connectorName` and `environment` exists and the path's …; 422 `secretNotReference`.
 
 **Form: Test channel connection** (modal, opened by *Test channel connection*; *Test channel connection* calls `testChannelConnection`, *Cancel* sends nothing)
 
@@ -430,7 +431,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Reseller API (secondary button) | navigation or local | — | — | — | — |
 | Partner API (secondary button) | navigation or local | — | — | — | — |
 | File/SFTP where required (secondary button) | navigation or local | — | — | — | — |
-| Save channel connection configuration (secondary button) | `setChannelConnectionConfiguration` PUT `/channel-connections/{connectionId}` | ChannelConnection | ChannelConnection | 422 `secretNotReference`. | gated `PRODUCT_CONFIGURE`; opens modal first |
+| Save channel connection configuration (secondary button) | `setChannelConnectionConfiguration` PUT `/channel-connections/{connectionId}` | ChannelConnection | ChannelConnection | 409 Refused, and nothing is stored. `connection-id-mismatch` (ADAM CR-245): a record for `salesChannelId`, `connectorName` and `environment` exists and the path's …; 422 `secretNotReference`. | gated `PRODUCT_CONFIGURE`; opens modal first |
 | Test channel connection (secondary button) | `testChannelConnection` POST `/channel-connections/{connectionId}/test` | inline | ChannelConnection | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `connectionDisabled`.; 422 `orderTestInProduction`. | gated `PRODUCT_CONFIGURE`; opens modal first |
 
 **What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
@@ -452,7 +453,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Empty, first run (`?state=emptyFirstRun`) | No channel connection integration configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 `connectionDisabled`.; 422 `orderTestInProduction`.; 422 `secretNotReference`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Refused, and nothing is stored. `connection-id-mismatch` (ADAM CR-245): a record for `salesChannelId`, `connectorName` and `environment` exists and the path's …; 409 `connectionDisabled`.; 422 `orderTestInProduction`.; 422 `secretNotReference`. |
 
 #### Sample data for the mock-up
 
@@ -1157,6 +1158,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-273`
 - Workshop pack: Sales_Channel_Management_Reference.pdf board 2
 - Flow F167 *Sales Channel Management board 2: Channel Operations Command Center*, step 10: Works in Channel Exceptions, Incidents & Recovery → Provide one operational workspace for resolving channel problems.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1757,6 +1759,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS139 Sales Channel Management Board 2.dc.html#adm-277`
 - Workshop pack: Sales_Channel_Management_Reference.pdf board 2
 - Flow F167 *Sales Channel Management board 2: Channel Operations Command Center*, step 18: Works in AI Channel Optimization & Intelligence Center → Create the AI intelligence layer that looks across all sales channels together rather than optimizing each channel in isolation.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

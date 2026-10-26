@@ -1,6 +1,6 @@
 # P02-promotions-01 — P02 · Promotions
 
-**1 screens · 3 operations · 10 schemas · 1 permissions**
+**1 screens · 3 operations · 11 schemas · 1 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -96,7 +96,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-037` | Offers & Promotions | A | 0 | 14 | 6 | 1 | 0 | 2 | guest | notStarted (client-verified) |
+| `GST-037` | Offers & Promotions | A | 0 | 13 | 6 | 1 | 0 | 2 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 

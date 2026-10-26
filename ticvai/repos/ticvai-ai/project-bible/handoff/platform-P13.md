@@ -86,7 +86,7 @@
 | `CMS-003` | Typography | White Label | 1 | 2 | yes |
 | `CMS-004` | Logo & Assets | White Label | 1 | 7 | yes |
 | `CMS-005` | Theme Editor | White Label | 1 | 2 | yes |
-| `CMS-006` | Component Preview | White Label | 1 | 6 | yes |
+| `CMS-006` | Component Preview | White Label | 1 | 7 | yes |
 | `CMS-007` | Page Builder | White Label | 1 | 16 | yes |
 | `CMS-008` | Content Blocks | White Label | 1 | 11 | yes |
 | `CMS-009` | Navigation & Menus | White Label | 1 | 7 | yes |
@@ -145,7 +145,7 @@
 | `CMS-063` | Upload & Asset Ingestion Workspace | Media Library | 3 | 3 | yes |
 | `CMS-064` | Folder, Collection & Workspace Management | Media Library | 3 | 2 | yes |
 | `CMS-065` | Metadata & Taxonomy Management | Media Library | 3 | 2 | yes |
-| `CMS-066` | Tags, Keywords & Classification | Media Library | 3 | 2 | yes |
+| `CMS-066` | Tags, Keywords & Classification | Media Library | 3 | 3 | yes |
 | `CMS-067` | Advanced Search & Discovery | Media Library | 3 | 1 | yes |
 | `CMS-068` | Digital Asset 360° Profile | Media Library | 3 | 3 | yes |
 | `CMS-069` | Bulk Asset Management Workspace | Media Library | 3 | 1 | yes |

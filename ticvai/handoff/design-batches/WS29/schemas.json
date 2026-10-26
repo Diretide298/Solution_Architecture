@@ -421,7 +421,7 @@
      "fixedDate",
      "seasonEnd"
     ],
-    "description": "1.1.90 to 1.1.92. **A pass bought on the 20th and expiring on the 31st cannot be expressed by an offset in days.** `offsetDays` is the existing behaviour and stays the default.\n`seasonEnd` anchors to the venue's own season rather than the calendar — a water park closing in October is not a quarter boundary.\n"
+    "description": "1.1.90 to 1.1.92. **A pass bought on the 20th and expiring on the 31st cannot be expressed by an offset in days.** `offsetDays` is the existing behaviour and stays the default.\n`seasonEnd` anchors to the venue's own season rather than the calendar — a water park closing in October is not a quarter boundary. The season ends at the end of the product's validity, `Product.validTo`, or its `onSaleTo` where `validTo` is null (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003).\n"
    },
    "expiryDate": {
     "type": "string",
@@ -3169,11 +3169,11 @@
       "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
      }
     ],
-    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
+    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks only: it never decides an operation by itself (ADAM CR-189). Anything scope-sensitive uses `permissionsByScope`.\n"
    },
    "permissionsByScope": {
     "type": "array",
-    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
+    "description": "Permissions effective at each granted scope path, after deny resolution. Clients filter navigation on this and never compute permissions themselves.\n\n**The server keeps the same set and authorises from it** (decided 25 October 2026, Chinmay, ADAM CR-189 option A; CHG-R10ID-001). The rule for every operation: `x-ticvai-permission` is evaluated at the scope the operation acts on, from the per-scope set (the node acted on or one of its ancestors); `effectivePermissions` is for coarse checks only. A list's reach is the scope paths where its permission holds, and a filter outside it is `403`; a tenant-level operation needs its permission at the tenant root. The request kernel's seam carries this set beside the flat one (#27692 owns the field) and sign-in (#27666) fills it from the same resolution that fills this property; tests fill the seam until sign-in lands. The full statement is `docs/architecture/specs/permission-resolution.md` section 7.2. No wire shape changes.\n",
     "items": {
      "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
     }

@@ -100,10 +100,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-420` | Tenant & Organization Provisioning | B | 16 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-421` | Venue & Operational Structure Creation | B | 14 | 7 | 7 | 7 | 0 | 0 | — | notStarted (—) |
 | `ADM-422` | Administrator & Security Initialization | B | 37 | 78 | 7 | 21 | 0 | 0 | — | notStarted (—) |
-| `ADM-423` | License & Entitlement Activation | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-423` | License & Entitlement Activation | B | 0 | 15 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-424` | Module Activation & Dependency Validation | A | 9 | 18 | 7 | 10 | 1 | 0 | configures | notStarted (—) |
 | `ADM-425` | Venue Template Application | B | 6 | 13 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-426` | Initial Configuration & Regional Defaults | B | 121 | 66 | 7 | 18 | 1 | 0 | — | notStarted (—) |
+| `ADM-426` | Initial Configuration & Regional Defaults | B | 122 | 66 | 7 | 18 | 1 | 0 | — | notStarted (—) |
 | `ADM-427` | Provisioning Validation & Exception Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

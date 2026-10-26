@@ -695,6 +695,12 @@
  },
  "CatalogueBundle": {
   "x-ticvai-persistence": "catalogue.published_bundle",
+  "x-ticvai-unique-together": [
+   [
+    "venueId",
+    "version"
+   ]
+  ],
   "type": "object",
   "required": [
    "version",
@@ -708,11 +714,20 @@
   ],
   "properties": {
    "version": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique-compare": "exact",
+    "description": "The venue's bundle number: a per-venue integer, 1 for the first publish and one more than the venue's highest for each publish after, as its decimal string; unique with `venueId` (ADAM CR-110, option 1; CHG-R10CAT-010)."
    },
    "venueId": {
     "type": "string",
     "format": "uuid"
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The publisher's note from `publishBundle`'s body; `BundleSummary.note` (ADAM CR-110, option 1; CHG-R10CAT-010)."
    },
    "publishedAt": {
     "type": "string",
@@ -962,7 +977,7 @@
    },
    "entitlementsVersion": {
     "type": "integer",
-    "description": "The highest `access.entitlement` change included (SD-052, 29 September). A refresh sends it as `sinceVersion` and receives only what changed after it, so a 60,000-guest venue is not re-sent whole."
+    "description": "The highest `access.entitlement` change included (SD-052, 29 September): the maximum `change_version` of the package's rows (ADAM CR-239, option A; CHG-R10ORD-011). A refresh sends it as `sinceVersion` and receives only the rows whose `change_version` is above it, void and used ones included, so a 60,000-guest venue is not re-sent whole."
    },
    "policySetVersion": {
     "type": "string",
@@ -975,9 +990,26 @@
      "$ref": "#/components/schemas/AccessDynamicPolicy"
     }
    },
+   "isDelta": {
+    "type": "boolean",
+    "description": "True when this answers a `sinceVersion` with only what changed after it; false (always sent) on a whole package. A device merges only when `isDelta` is true, and otherwise replaces the whole package it holds (ADAM CR-248, option A, accepted 26 October 2026; mirrors `CatalogueBundle.isDelta`)."
+   },
+   "baseVersion": {
+    "type": "integer",
+    "nullable": true,
+    "description": "The `sinceVersion` this delta answers; null on a whole package (ADAM CR-248; mirrors `CatalogueBundle.baseVersion`)."
+   },
+   "removedTicketIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "On a delta, the entitlements changed after `sinceVersion` that no longer admit (`access.entitlement` status `fullyConsumed`, `expired`, `cancelled` or `surrendered`), by `ticketId`. A device drops them; they are never sent in `entitlements`. Empty on a whole package (ADAM CR-248)."
+   },
    "entitlements": {
     "type": "array",
-    "description": "Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device removes them.",
+    "description": "Read from `access.entitlement` (SD-052). **Only rows that still admit** (`issued` or `partiallyConsumed`): nothing that does not admit is ever sent here (ADAM CR-248, option A, accepted 26 October 2026). With `sinceVersion`, only the admitting rows changed after it; a device adds or replaces these by `ticketId`, and drops `removedTicketIds`.",
     "items": {
      "type": "object",
      "required": [
@@ -1012,7 +1044,8 @@
       "performanceId": {
        "type": "string",
        "format": "uuid",
-       "nullable": true
+       "nullable": true,
+       "description": "Null until a source is decided (ADAM CR-240); access.entitlement has no performance column."
       },
       "entriesAllowed": {
        "type": "integer",
@@ -1022,11 +1055,13 @@
        "type": "integer"
       },
       "reentryAllowed": {
-       "type": "boolean"
+       "type": "boolean",
+       "description": "The template's `is_reentry_allowed`, read through `catalogue#entitlementTemplateRecords` (ADAM CR-240)."
       },
       "admissionRulesId": {
        "type": "string",
-       "format": "uuid"
+       "format": "uuid",
+       "description": "The template's `admission_rules_id`, read through `catalogue#entitlementTemplateRecords` (ADAM CR-240)."
       }
      }
     }
@@ -1296,7 +1331,7 @@
      }
     ],
     "readOnly": true,
-    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192; common.yaml `Money.scale`), when it is not the currency the venue trades in."
    },
    "chargeRateLockedUntil": {
     "type": "string",
@@ -1774,7 +1809,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+    "description": "The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-018)."
    },
    "fxRate": {
     "allOf": [
@@ -1954,6 +1989,43 @@
     "readOnly": true,
     "description": "For a translation draft, the proposed text; null otherwise. `payload` stays the request body of the target's write, with this text at `fieldPath` (R8 blocker FOUNDATION-AI-C40)."
    },
+   "confidence": {
+    "type": "number",
+    "minimum": 0,
+    "maximum": 1,
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment (`proposeWalkways`), the model's confidence in it (`WalkwayProposal.confidence`); null on every other proposal (ADAM CR-207, CHG-R10ORD-013)."
+   },
+   "basis": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "enum": [
+     "handMarked",
+     "seen"
+    ],
+    "description": "For a walkway segment, whether it was traced from a hand mark or seen in the picture (`WalkwayProposal.basis`); null otherwise (ADAM CR-207)."
+   },
+   "reasoning": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, why the model proposed it (`WalkwayProposal.reasoning`); null otherwise (ADAM CR-207)."
+   },
+   "distanceMetres": {
+    "type": "number",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, its length along the centreline; null where the plan has no georeference and on every other proposal (ADAM CR-207)."
+   },
+   "mapId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "For a walkway segment, the venue map it is on (the path's `mapId`, which the target's request body does not carry); null otherwise (ADAM CR-207). `listProposedActions` filters on it."
+   },
    "kind": {
     "type": "string",
     "enum": [
@@ -2055,7 +2127,7 @@
   }
  },
  "Refund": {
-  "x-ticvai-persistence": "orders.refund",
+  "x-ticvai-persistence": "orders.refund + orders.refund_line + orders.refund_payment",
   "type": "object",
   "required": [
    "id",
@@ -2131,7 +2203,7 @@
      }
     ],
     "readOnly": true,
-    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
+    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001), its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192)."
    },
    "amount": {
     "x-ticvai-column": "refunded_amount",
@@ -2139,7 +2211,70 @@
    },
    "appliedPercentage": {
     "type": "number",
-    "description": "From the venue's time bands, or an approver override."
+    "description": "From the venue's time bands, or an approver override. Where the refunded lines fall in different bands, each line's own percentage is on its `lines` row and this is the one the refund's lines share, or null when they differ (ADAM CR-208)."
+   },
+   "lines": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**What the refund took from each order line** (ADAM CR-208, option A; CHG-R10ORD-014): child rows, `orders.refund_line`, one per line refunded, written by `createRefund`. A line's refundable amount is what it paid minus its rows on earlier refunds.",
+    "items": {
+     "type": "object",
+     "required": [
+      "orderLineId",
+      "refundedAmount"
+     ],
+     "properties": {
+      "orderLineId": {
+       "type": "string",
+       "format": "uuid",
+       "x-ticvai-references": "orders.order_line"
+      },
+      "refundedAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "appliedPercentage": {
+       "type": "number",
+       "nullable": true,
+       "description": "The time band of this line's own performance (ADAM CR-208)."
+      }
+     }
+    }
+   },
+   "payments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**What the refund took from each payment** (ADAM CR-208, option A; CHG-R10ORD-014): child rows, `orders.refund_payment` (the decision's `refund_allocation`; naming-and-style bans `allocation` in DDL), one per payment refunded against, the most recent payment first and cash last. A payment's refundable amount is what it paid minus its rows on earlier refunds.",
+    "items": {
+     "type": "object",
+     "required": [
+      "paymentId",
+      "refundedAmount"
+     ],
+     "properties": {
+      "paymentId": {
+       "type": "string",
+       "format": "uuid",
+       "x-ticvai-references": "orders.payment"
+      },
+      "refundedAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "In the base currency, for the ledger."
+      },
+      "tenderAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true,
+       "description": "In the payment's tender currency (`Payment.tenderCurrency`), at that currency's scale; null where the payment was in the base currency."
+      }
+     }
+    }
    },
    "status": {
     "type": "string",

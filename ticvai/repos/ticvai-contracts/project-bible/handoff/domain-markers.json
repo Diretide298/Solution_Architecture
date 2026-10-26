@@ -383,6 +383,9 @@
  "event:entitlement.transferred": [
   "ai:consumes"
  ],
+ "event:event.lifecycleChanged": [
+  "ai:consumes"
+ ],
  "event:fnb.menuPublished": [
   "ai:consumes"
  ],
@@ -1567,6 +1570,9 @@
  ],
  "state:entitlement-status.yaml": [
   "ai:reached via access.validated"
+ ],
+ "state:event.yaml": [
+  "ai:reached via event.lifecycleChanged"
  ],
  "state:media.yaml": [
   "ai:reached via assets.documentIndexed"

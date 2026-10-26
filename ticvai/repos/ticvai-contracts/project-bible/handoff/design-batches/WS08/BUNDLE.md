@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-220` | Multi-Park & Crossover Journey Orchestrator | C | 47 | 0 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
 | `BO-221` | Fast Pass & Attraction Access Journey | C | 25 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-222` | Special Event, Free View & Alternative Admission | C | 13 | 0 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
-| `BO-223` | Journey Simulation, Audit & Publication | C | 8 | 26 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
+| `BO-223` | Journey Simulation, Audit & Publication | C | 8 | 26 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -1795,7 +1795,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Empty, first run (`?state=emptyFirstRun`) | No fast pass attraction configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 `totalUses` missing on a limited profile. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A public guest read of venue data named no venue (`venue-required`; ADAM CR-198, CHG-R10ID-022): send `X-Venue-Id`.; 400 Validation failed; 422 `totalUses` missing on a limited profile. |
 
 #### Edge cases to draw
 
@@ -2123,7 +2123,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Vip admissions | 1,234 | VIP Admissions |
 | Journey exceptions | 1,234 | Journey Exceptions |
 
-**The selected journey simulation audit** (detail panel): The pack groups this record's detail under its own headings: “Purchased”, “Arrive”, “Simulation Trace”, “Attendance”, “Remaining”, “Journey Audit”.
+**The selected journey simulation audit** (detail panel, from `simulateGuestJourney`): The pack groups this record's detail under its own headings: “Purchased”, “Arrive”, “Simulation Trace”, “Attendance”, “Remaining”, “Journey Audit”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -2174,19 +2174,7 @@ Screen guard: `SCOPE_VIEW`
 
 #### Requirements it meets
 
-9 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 22.3.1 | Visual Journey Builder | Marketing & CRM | CONTRACTED | data `Journey` |
-| 22.3.6 | Abandoned Cart Recovery Automation | Marketing & CRM | CONTRACTED | data `Journey` |
-| 22.3.7 | Membership Lifecycle Automation | Marketing & CRM | CONTRACTED | data `Journey` |
-| 22.3.8 | Loyalty Lifecycle Automation | Marketing & CRM | CONTRACTED | data `Journey` |
-| 22.3.9 | Wallet Automation | Marketing & CRM | CONTRACTED | data `Journey` |
-| 22.3.10 | Birthday & Anniversary Campaigns | Marketing & CRM | CONTRACTED | data `Journey` |
-| 22.3.14 | Cross-Sell & Upsell Automation | Marketing & CRM | CONTRACTED | data `Journey` |
-| 22.3.21 | Automation Analytics Dashboard | Marketing & CRM | CONTRACTED | data `Journey` |
-| 22.3.22 | Automation Audit Trail | Marketing & CRM | CONTRACTED | data `Journey` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -2328,7 +2316,7 @@ Method, path, parameters, request and response for every operation these screens
 "listGuestJourney": {"method":"GET","path":"/guest-journey","contract":"access","summary":"Guest Journey Command Center","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMultiParkCrossover": {"method":"GET","path":"/multi-park-crossover","contract":"access","summary":"Multi-Park & Crossover Rules","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MultiParkCrossoverRulesView"},
 "listMultiParkCrossover2": {"method":"GET","path":"/multi-park-crossover-2","contract":"access","summary":"Multi-Park & Crossover Journey Orchestrator","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listQueues": {"method":"GET","path":"/queues","contract":"queue","summary":"List queues","permission":"QUEUE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"openOnly","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listQueues": {"method":"GET","path":"/queues","contract":"queue","summary":"List queues","permission":"QUEUE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"openOnly","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSpecialEventFree": {"method":"GET","path":"/special-event-free","contract":"access","summary":"Special Event, Free View & Alternative Admission","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SpecialEventFreeViewAlternativeAdmissionView"},
 "setFastPassProfile": {"method":"PUT","path":"/fast-pass-profiles/{fastPassProfileId}","contract":"access","summary":"Create or replace a Fast Pass profile","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"fastPassProfileId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"AccessFastPassProfile","responds":"AccessFastPassProfile"},
 "setGroupAdmissionProfile": {"method":"PUT","path":"/group-admission-profile","contract":"access","summary":"Group & B2B Admission Profile Builder","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"GroupB2bAdmissionProfileBuilderInput","responds":"GroupB2bAdmissionProfileBuilderView"},

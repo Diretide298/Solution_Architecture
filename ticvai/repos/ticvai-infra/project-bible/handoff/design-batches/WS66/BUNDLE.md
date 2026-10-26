@@ -2892,6 +2892,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Flow F175 *Unified BI Reporting and AI Analytics Platform board 1: Multi-Site & …*, step 15: Returns to the board's landing screen → Ready for the next screen on this board
 - Flow F175 branch at step 1 (expected): when Nothing has been set up on Multi-Site & Performance Comparison yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F175 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

@@ -70,7 +70,7 @@ paths:
         model** and configuration status — the tracking model is a filter because it changes what the
         operator can do with the row.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - rental
       x-ticvai-permission: RENTAL_VIEW
@@ -364,7 +364,7 @@ paths:
         deposit behaviour, **and an individual product may override within a permitted set** — which is
         the part that makes inheritance safe to use.
 
-        '
+         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - rental
       x-ticvai-permission: RENTAL_VIEW
@@ -920,6 +920,10 @@ paths:
       operationId: listRentalPricingProfiles
       x-ticvai-consumed-by:
         - "P08 BO-524 Rental Pricing Command Center"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RentalPricingProfile.additionalIncrementPrice, RentalPricingProfile.basePrice, RentalPricingProfile.minimumCharge, RentalPricingProfile.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Pricing profiles, and the products with none
       description: 'Board 4.1. **Products without pricing is a KPI on the board and therefore a filter
         here** — an unpriced published product is the failure this screen exists to catch.
@@ -958,6 +962,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-524 Rental Pricing Command Center"
         - "P08 BO-525 Pricing Profile Builder"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalPricingProfile.additionalIncrementPrice, RentalPricingProfile.basePrice, RentalPricingProfile.minimumCharge, RentalPricingProfile.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Define how a rental is priced
       description: 'Board 4.2. Flat, duration-based, tiered, peak/off-peak, weekend, seasonal, dynamic
@@ -1010,6 +1018,10 @@ paths:
         - "P08 BO-525 Pricing Profile Builder"
         - "P08 BO-526 Duration & Tiered Pricing Configuration"
         - "P08 BO-527 Calendar, Peak & Seasonal Pricing"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalPricingProfile.additionalIncrementPrice, RentalPricingProfile.basePrice, RentalPricingProfile.minimumCharge, RentalPricingProfile.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Change a pricing profile
       tags:
@@ -1048,6 +1060,10 @@ paths:
         - "P08 BO-535 New Rental Booking Wizard"
         - "P08 BO-540 Booking Commercial Summary & Payment"
         - "P08 BO-557 Extension Pricing & Confirmation"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalQuote.addOnAmount, RentalQuote.depositAmount, RentalQuote.discountAmount, RentalQuote.rentalAmount and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       security:
       - guestAuth: []
@@ -1092,6 +1108,10 @@ paths:
       operationId: explainRentalPrice
       x-ticvai-consumed-by:
         - "P08 BO-533 Pricing Simulation, Validation & AI Commercial Intelligence"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalPriceExplanation.amountAfter, RentalPriceExplanation.amountBefore, RentalQuote.addOnAmount, RentalQuote.depositAmount and 4 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Why the price is what it is, rule by rule
       description: '**Board 4.10 asks for this in as many words** — *"the system should show why the
@@ -1134,6 +1154,10 @@ paths:
         - "P08 BO-529 Deposit & Security Hold Policy"
         - "P08 BO-530 Deposit Lifecycle & Settlement Rules"
         - "P08 BO-909 Deposit & Rental Financial Control"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalDepositPolicy.fixedAmount, RentalDepositPolicy.maximumAmount, RentalDepositPolicy.minimumAmount, RentalDepositPolicy.supervisorApprovalThreshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [productId]
       x-ticvai-body-key-note: 'Keyed by the body''s `productId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per rental product or category within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `productId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-conflict-policy: serverWins
@@ -1183,6 +1207,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-531 Late Fee, Grace Period & Extension Pricing"
         - "P08 BO-909 Deposit & Rental Financial Control"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalFeePolicy.amount, RentalFeePolicy.damageFeeApprovalAbove, RentalFeePolicy.damageFeeMaximum, RentalFeePolicy.extensionPricePerIncrement and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [productId]
       x-ticvai-body-key-note: 'Keyed by the body''s `productId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per rental product within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `productId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-conflict-policy: serverWins
@@ -1229,6 +1257,10 @@ paths:
       operationId: simulateRentalPricing
       x-ticvai-consumed-by:
         - "P08 BO-533 Pricing Simulation, Validation & AI Commercial Intelligence"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalQuote.addOnAmount, RentalQuote.depositAmount, RentalQuote.discountAmount, RentalQuote.rentalAmount and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Test a commercial configuration before publishing it
       description: 'Board 4.10. **Rental pricing is the stack most likely to be wrong in a way nobody
@@ -1273,6 +1305,10 @@ paths:
       operationId: requestRentalCommercialOverride
       x-ticvai-consumed-by:
         - "P08 BO-532 Commercial Exceptions, Waivers & Overrides"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalOverride.adjustedAmount, RentalOverride.originalAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Deviate from policy, with a reason and an approver
       description: 'Board 4.9. Price override, complimentary rental, deposit waiver or reduction, late-fee
@@ -1327,12 +1363,16 @@ paths:
         - "P08 BO-584 Rental Executive Command Center"
         - "P08 BO-588 Rental Duration, Extension & Return Analytics"
         - "P08 BO-589 Damage, Loss, Deposit & Exception Analytics"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Reservations across venues and locations
       description: 'Board 5.1. Today''s, upcoming, awaiting arrival, checked out, completed, cancelled,
         no-shows and group bookings — **the status set the command centre counts, which is why it is an
         enum and not a free string.**
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - rental
       x-ticvai-permission: RENTAL_VIEW
@@ -1376,6 +1416,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-535 New Rental Booking Wizard"
         - "P08 BO-538 Group Rental & Participant Management"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       security:
       - guestAuth: []
@@ -1457,6 +1501,10 @@ paths:
         - "P08 BO-562 Active Group Rental Management"
         - "P08 BO-565 Return Scan & Rental Retrieval"
         - "P08 BO-906 Resource Checkout Workspace"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: One booking, its timeline and its readiness
       description: 'Board 5.10. **Readiness is computed, not stored** — agreement signed, requirements
         captured, deposit authorised, equipment available. A counter that discovers an unsigned waiver
@@ -1484,6 +1532,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-537 Customer & Participant Information"
         - "P08 BO-542 Reservation Modification, Cancellation & No-Show"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Modify, cancel or mark a no-show
       description: 'Board 5.9. **A no-show is not a cancellation** and the money differs — a cancellation
@@ -1623,6 +1675,9 @@ paths:
       - query: orders#paymentRecords
         route: service
         for: 'the card deposit''s payment: refused 409 deposit-not-authorised until it is authorised (ADAM CR-146)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Hand it over, with the deposit held and the condition recorded
       description: 'Board 6. **The readiness gate is enforced here and not on the screen before it.** A
         checkout that proceeds without the signed agreement, the captured requirements or the authorised
@@ -1774,6 +1829,10 @@ paths:
         - "P06 EMP-084 Extension Pricing & Confirmation"
         - "P08 BO-557 Extension Pricing & Confirmation"
         - "P08 BO-908 Rental Duration, Extension & Return Management"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Keep it longer, if it is free and the guest accepts the price
       description: '**Board 4.10 traces this end to end and the order matters:** *"Can I keep the bike
@@ -1854,6 +1913,10 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-085 Equipment Swap / Replacement"
         - "P08 BO-558 Equipment Swap / Replacement"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Replace a faulty item mid-rental
       description: 'Board 7.5. **The rental continues; only the asset changes.** The deposit, the
@@ -1932,6 +1995,10 @@ paths:
         - "P08 BO-572 Deposit Release, Capture & Customer Confirmation"
         - "P08 BO-573 Return Completion & Equipment Disposition"
         - "P08 BO-908 Rental Duration, Extension & Return Management"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalDamageAssessment.amount, RentalSettlement.balanceDue, RentalSettlement.damageFee, RentalSettlement.depositCaptured and 4 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Take it back, inspect it, and settle everything at once
       description: 'Board 8, and **this is the operation the whole contract is shaped around.**
 
@@ -2057,6 +2124,10 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-096 Damage Assessment & Charge Workflow"
         - "P08 BO-569 Damage Assessment & Charge Workflow"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalDamageAssessment.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Price the damage, and say who approved it
       description: 'Board 8.6. **A damage charge is a commercial decision taken under pressure at a
@@ -2112,6 +2183,10 @@ paths:
         - "P08 BO-560 Due Soon & Customer Notification Management"
         - "P08 BO-561 Overdue Rental Management"
         - "P08 BO-563 Active Rental Intelligence & Operational Alerts"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: What is late, by how long, and what it is accruing
       description: 'Boards 7.7 and 7.8. **Due-soon and overdue are one query at two thresholds**, because
         the venue''s action is the same — contact the guest — and only the tone changes.
@@ -2119,7 +2194,7 @@ paths:
         Carries the accruing late fee so the conversation can be specific. *"Your bike is late"* moves
         nobody; *"it is 57 minutes late and that is AED 35 so far"* moves people.
 
-        '
+         **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - rental
       x-ticvai-permission: RENTAL_VIEW

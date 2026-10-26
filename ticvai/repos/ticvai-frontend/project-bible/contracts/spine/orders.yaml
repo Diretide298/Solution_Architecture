@@ -106,6 +106,32 @@ x-ticvai-queries:
       exists whose scope_path is scopePath or beneath it, in any status (a voided or refunded order still carried
       amounts at the old scale). Orders answers in process; Tenancy reads none of Orders' tables.
     served: [in-process, service]
+  # **The guest-checkout orders a signed-in guest may claim, as Identity's projection** (r10, the lead's ruling on the
+  # ADR-0028 tiers, 25 October 2026; CHG-R10ID-018): linkGuestCheckout matches them in identity.subject_holding and
+  # Orders attaches them (attachGuestCheckoutOrders), so Identity never reads orders.sales_order.
+  guestCheckoutOrders:
+    module: orders
+    inputs:
+      orderNumber: {type: string, description: The booking the guest names (the order's number on its confirmation).}
+      verifiedContactRef: {type: string, description: The keyed hash of the caller's verified identifier (ADR-0045).}
+    returns:
+      orderIds:
+        type: array
+        items: {type: string, format: uuid}
+        description: The named order and every other guest-checkout order with the same verified contact, none of them
+          yet attached to an account; empty when the named order's contact is another.
+    rule: 'An order is a guest checkout to claim while it has no subject and was written with a verified checkout contact
+      (`verifiedContactRef`, ADR-0045); it is claimable by the caller when that reference equals the keyed hash of the
+      caller''s verified identifier. Identity answers from identity.subject_holding (its rows of kind order with no
+      subject, with orderNumber and verifiedContactRef from order.created); order.linkedToGuest gives a row its subject.'
+    served: [projection]
+    projection:
+      context: identity
+      source: orders.sales_order
+      table: identity.subject_holding
+      feeds:
+      - order.created
+      - order.linkedToGuest
   openOrdersForSubject:
     module: orders
     inputs:
@@ -125,6 +151,9 @@ x-ticvai-queries:
       waitsOnActor:
         partiallyPaid: money was captured, so only a person may end it (createPayment for the balance, or createRefund);
           a timer that dropped it would strand the guest's money, and blocking the erasure until then is right
+        paid: completion follows the entitlements Access issues from order.paid (entitlement.issued, ADAM CR-167); an
+          issuance that fails is retried, then dead-lettered and replayed, never dropped, and until it completes the
+          guest holds a paid order with nothing issued, so blocking the erasure is right
     projection:
       context: identity
       table: identity.subject_holding
@@ -383,12 +412,88 @@ x-ticvai-queries:
       description: 'The ISO 4217 codes the venue''s payment providers can charge, as a set; empty when it has none.'
       items: {type: string, pattern: '^[A-Z]{3}$'}
     rule: >-
-      A rule question (ADAM CR-096, 15 October 2026, CHG-RTE-001; decision D7). The venue's payment providers are the
-      active payments.provider rows (is_active) at the nearest level that has any: the venue's own, then its
+      A rule question (ADAM CR-096, 15 October 2026, CHG-RTE-001; decision D7). The venue's payment providers are
+      the active payments.provider rows (is_active) at the nearest level that has any: the venue's own, then its
       region's, then the tenant's (ADR-0018, nearest wins). The answer is the union of their presentment_currencies
       (PaymentProvider.presentmentCurrencies). setVenueSettings refuses a chargeCurrencies code outside it with 400.
-      It is asked in process within commerce, through the C# query interface Orders implements.
-    served: [in-process]
+      It is asked in process within commerce, through the C# query interface Orders implements, and asked from
+      another deployable through Orders' service route (serviceAuth).
+    served: [in-process, service]
+  depositPolicyRecords:
+    module: orders
+    table: orders.deposit_policy
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.deposit_policy rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Order stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/DepositPolicy'}
+    rule: >-
+      A data read, not a rule question (r10 lane E, 25 October 2026, CHG-R10GEN-001; ADR-0055 rule 2 as amended 14
+      October). Order answers with its orders.deposit_policy rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process within
+      commerce, through the C# query interface Order implements, and asked from another deployable through Order's
+      service route (serviceAuth).
+    served: [in-process, service]
+  depositRecords:
+    module: orders
+    table: orders.deposit
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.deposit rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Order stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/OrdersDeposit'}
+    rule: >-
+      A data read, not a rule question (r10 lane E, 25 October 2026, CHG-R10GEN-001; ADR-0055 rule 2 as amended 14
+      October). Order answers with its orders.deposit rows, as it stores them and as the caller's scope lets it see
+      them (the table's row-level security, under the caller's connection and transaction). It decides nothing: an
+      asker that refuses or chooses on these rows states that rule in its own operation, and a question with a rule
+      of its own (open, live, sellable) is declared as a query of its own. It is asked in process within commerce,
+      through the C# query interface Order implements, and asked from another deployable through Order's service
+      route (serviceAuth).
+    served: [in-process, service]
+  orderFeeRecords:
+    module: orders
+    table: orders.order_fee
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.order_fee rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Order stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/OrdersOrderFee'}
+    rule: >-
+      A data read, not a rule question (r10 lane E, 25 October 2026, CHG-R10GEN-001; ADR-0055 rule 2 as amended 14
+      October). Order answers with its orders.order_fee rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
+      an asker that refuses or chooses on these rows states that rule in its own operation, and a question with a
+      rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another deployable
+      through Order's service route (serviceAuth).
+    served: [service]
+  refundPolicyRecords:
+    module: orders
+    table: orders.refund_policy
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.refund_policy rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Order stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/RefundPolicy'}
+    rule: >-
+      A data read, not a rule question (r10 lane E, 25 October 2026, CHG-R10GEN-001; ADR-0055 rule 2 as amended 14
+      October). Order answers with its orders.refund_policy rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process within
+      commerce, through the C# query interface Order implements, and asked from another deployable through Order's
+      service route (serviceAuth).
+    served: [in-process, service]
 paths:
   /carts:
     post:
@@ -419,6 +524,12 @@ paths:
         route: in-process
         for: 'the new cart''s window and cap: cartLeaseSeconds and cartMaxExtensions of the venue''s row, else of the
           tenant''s own row of platform.venue_settings (ADAM CR-184, option A; CHG-R9CR-003)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
+      - query: white-label#bookingFlowRecords
+        route: service
+        for: 'what its text calls "white-label.BookingFlow.settings": whitelabel.booking_flow, WhiteLabel''s data (CHG-R10GEN-001)'
       security:
       - guestAuth: []
       - {}
@@ -430,7 +541,10 @@ paths:
       - staff
       - partner
       summary: Start a cart
-      description: '**A cart holds leases; an order holds money.** Different lifetimes, different failure
+      description: '**A guest''s call runs its in-process scoped queries under the request''s venue scope** (the lead,
+        25 October 2026, r10 round 3, by CR-198''s rule on `guestAuth`; CHG-R10ID-022).
+
+        **A cart holds leases; an order holds money.** Different lifetimes, different failure
         modes, and merging them is why this contract did not exist until 17 August — `createOrder` takes
         a whole basket at once, which is correct for a till and cannot be resumed on another device.
 
@@ -854,7 +968,7 @@ paths:
         `x-ticvai-self-scoped: subject`): a guest sees only the groups they lead; another guest''s group is not in
         the list and, by id, is refused as one that does not exist.
 
-        **Order.** Soonest `preferredDate` first, then by `id`.'
+        **Order.** Soonest `preferredDate` first, then by `id`. Where `preferredDate` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - orders
       x-ticvai-permission: null
@@ -891,6 +1005,13 @@ paths:
       operationId: getDepositPolicy
       x-ticvai-consumed-by:
         - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: DepositPolicy.amount, DepositPolicy.bandSize, DiningDepositPolicy.amount, DiningDepositPolicy.minimumSpendPerGuest (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DepositPolicy.amount, DepositPolicy.bandSize, DiningDepositPolicy.amount, DiningDepositPolicy.minimumSpendPerGuest (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: What a deposit booking takes now and when the rest is due
       tags:
       - order
@@ -916,6 +1037,13 @@ paths:
       operationId: setDepositPolicy
       x-ticvai-consumed-by:
         - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: DepositPolicy.amount, DepositPolicy.bandSize, DiningDepositPolicy.amount, DiningDepositPolicy.minimumSpendPerGuest (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: DepositPolicy.amount, DepositPolicy.bandSize, DiningDepositPolicy.amount, DiningDepositPolicy.minimumSpendPerGuest (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Set how deposits work
@@ -1015,7 +1143,12 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: The group
+          description: The group. `ETag` is its `version` (ADAM CR-257), for `updateGroupBooking`'s `If-Match`.
+          headers:
+            ETag:
+              description: The group booking's `version` (orders.group_booking.version), quoted.
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -1028,6 +1161,16 @@ paths:
         - "P08 BO-026 Group Bookings"
         - "P08 BO-272 Quote-to-Booking Conversion & Confirmation"
         - "P08 BO-281 Group Amendments, Cancellation & Refund Operations"
+      x-ticvai-reads:
+      - table: orders.deposit
+        for: 'the guard "deposit taken" on provisional to confirmed: the order''s deposit is paid (ADAM CR-257;
+          CHG-R10INT-005)'
+      - table: orders.group_quote
+        for: 'the guard "terms agreed" on provisional to confirmed: the group''s quote is accepted (ADAM CR-257;
+          CHG-R10INT-005)'
+      - table: orders.group_participant
+        for: 'the guard "names collected" on namesPending to complete: every participant is named (ADAM CR-257;
+          CHG-R10INT-005)'
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: in-process
@@ -1037,8 +1180,22 @@ paths:
         below the minimum is allowed and recorded, because the group has already arrived. Whether the
         group rate still applies is for pricing to decide, not for this operation to refuse.
 
-        Status moves forward only (provisional, confirmed, namesPending, complete) or to cancelled.
-        Cancelling the group does not refund the order; that is `createRefund` against it.
+        **Status follows `states/group-booking.yaml`** (accepted 26 October 2026, Chinmay, ADAM CR-257 option A:
+        the state model wins). A PATCH may set `confirmed`, `complete` or `cancelled` only; `namesPending` is set by
+        the timer when attendee capture is required and not done, and sending it is `400` on `status`. The moves:
+        `provisional` to `confirmed` when the deposit is taken or the terms are agreed (an `orders.deposit` of the
+        group''s order captured in full, or the group''s `orders.group_quote` `accepted`); `confirmed` to
+        `complete` when no attendee capture is required; `namesPending` to `complete` when the names are collected
+        (every participant on the group''s participant list, `orders.group_participant`, has a `fullName`); and
+        `provisional`, `confirmed` or `namesPending` to `cancelled`. A backward move is `409 statusBackwards`; any
+        other move the model does not allow (a skip such as `provisional` to `complete`, or a guard that does not
+        hold) is `409` with `refusedReason` `statusNotAllowed` (`group-booking-status-not-allowed`). Cancelling the
+        group does not refund the order; that is `createRefund` against it.
+
+
+        **Its ETag is the row''s `version`** (ADAM CR-257): `orders.group_booking.version` is bumped on every write
+        and sent as `ETag` on `getGroupBooking` and here; an `If-Match` that is not the current version is `412`
+        and nothing changes.
 
         '
       tags:
@@ -1065,19 +1222,32 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+            ETag:
+              description: The group booking's new `version`, quoted (ADAM CR-257).
+              schema:
+                type: string
           description: Updated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GroupBooking'
+        '400':
+          description: 'Validation failed (`validation`), with `errors[]` naming the field. Includes `status`
+            `namesPending`, which only the timer sets (ADAM CR-257).'
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: The status change goes backwards (`statusBackwards`), or the group is already
-            cancelled or complete (`groupClosed`).
-          x-ticvai-problem-types: [status-backwards, group-closed]
+          description: The status change goes backwards (`statusBackwards`), the group is already cancelled or
+            complete (`groupClosed`), or the move is one the state model does not allow, a skip or a guard that does
+            not hold (`statusNotAllowed`, ADAM CR-257).
+          x-ticvai-problem-types: [status-backwards, group-closed, group-booking-status-not-allowed]
           content:
             application/problem+json:
               schema:
@@ -1149,6 +1319,19 @@ paths:
                     type: string
                   expiresInSeconds:
                     type: integer
+                  provider:
+                    type: object
+                    description: '**The provider the client tokenises against** (ADAM CR-099, option 1; CHG-R10ORD-016):
+                      the venue''s active `payments.provider` for the link''s channel, the one `payByLink` charges.'
+                    required:
+                    - providerId
+                    properties:
+                      providerId:
+                        type: string
+                        format: uuid
+                        x-ticvai-references: payments.provider
+                      providerName:
+                        type: string
         '410':
           description: '**Expired, paid, superseded or cancelled — and it says which**
             (`linkExpired`, `linkPaid`, `linkSuperseded`, `linkCancelled`, the four terminal states of
@@ -1178,6 +1361,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-014 Pay for a Booking"
         - "P02 GST-009 Review & Payment"
+      x-ticvai-writes:
+      - table: payments.payment_attempt
+        for: 'one row per provider call, as createPayment (ADAM CR-099)'
       x-ticvai-write-via:
       - table: access.entitlement
         event: order.paid
@@ -1194,6 +1380,20 @@ paths:
 
         **The card never reaches the platform.** Tokenised at the gateway like every other payment (CF-131),
         and the link carries no card data at any point.
+
+
+        **On `createPayment`''s rules** (ADAM CR-099, option 1; Chinmay, 15 October 2026; CHG-R10ORD-016). The
+        provider is the venue''s active provider for the link''s channel, which `getPaymentLink` returns so the
+        client tokenises against it. One `payments.payment_attempt` row per provider call and the cash-receipt
+        ledger posting follow `createPayment`; a decline is `402 providerDeclined`, as there. **The status moves**:
+        the order (`orders.sales_order`, already created when the link was, `payment_link.order_id`) goes from
+        `pending` or `held` to `paid`; where the link was issued against a reservation, the reservation goes from
+        `held` to `converted` with `converted_order_id` set to the order; the link goes to `paid` with `paidAt`;
+        `order.paid` is written in the same transaction. **`entitlementIds` is empty in the answer**: Access issues
+        the entitlements from `order.paid` after it (`x-ticvai-write-via`), and the client reads them from the order.
+        **The token**: the link is found by its blind index (`PaymentLink.token`, a keyed hash, unique in the
+        tenant), never by the token itself. An unknown token is `404`; a link that is expired, paid, superseded or
+        cancelled is `410` naming which, as `getPaymentLink` (ADR-0027: a superseded token answers 410, never 404).
 
         '
       tags:
@@ -1246,9 +1446,37 @@ paths:
                     format: uuid
                   entitlementIds:
                     type: array
+                    description: '**Empty at response time** (ADAM CR-099): the entitlements are written from
+                      `order.paid` after this answer; read them from the order. Optional, kept so a client built at
+                      r1 still validates.'
                     items:
                       type: string
                       format: uuid
+        '402':
+          description: The provider declined the payment (`providerDeclined`), as `createPayment` answers it (ADAM
+            CR-099). Nothing is converted and the link stays open.
+          x-ticvai-problem-types: [provider-declined]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/PaymentProblem'
+        '404':
+          description: No payment link has this token (ADAM CR-099). A real token is never 404; it is 410 once it
+            stops working.
+          x-ticvai-problem-types: [payment-link-not-found]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '410':
+          description: 'The link has expired, been paid, been superseded or been cancelled (`linkExpired`, `linkPaid`,
+            `linkSuperseded`, `linkCancelled`), as `getPaymentLink` answers it (ADAM CR-099; ADR-0027). Nothing is
+            charged.'
+          x-ticvai-problem-types: [link-expired, link-paid, link-superseded, link-cancelled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/PaymentLinkProblem'
         '409':
           description: '**The hold went while they were paying** (`linesUnavailable`). Rare and real
             — a link near its expiry and a guest reading slowly. Nothing is charged. The response names
@@ -1488,6 +1716,9 @@ paths:
     post:
       operationId: openGuestCreditAccount
       x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       - query: identity#subjectRecords
         route: in-process
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
@@ -1512,6 +1743,10 @@ paths:
         opens `pendingApproval` whatever the body says. A pending account is released by a supervisor holding
         `ORDER_DISCOUNT` through the approvals inbox (`decideApprovalRequest`); until then it extends no credit.
 
+
+        **Its currency** (CHG-R10ORD-019; the lead''s ruling of 25 October 2026 on check-money-currency): the Money
+        this operation answers or accepts is in the currency of the venue it acts at, the caller''s working venue,
+        read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.
         '
       tags:
       - orders
@@ -1783,6 +2018,14 @@ paths:
 
         Governed by `EntitlementTemplate.canShareMedia`, which already exists and had nothing behind it.
 
+
+        **The row a share is** (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004): one
+        `identity.delegated_access` row with `over_object_ref` `entitlement:<entitlementId>`, `subject_id` the
+        recipient (`toSubjectId`), `over_subject_id` the owner, `permission` `ENTITLEMENT_USE` and `role_id` null,
+        `delegation_kind` `sharedEntitlement`, `effect` ALLOW, `valid_to` the request''s `validUntil`, and
+        `granted_by_kind` `subject` with `granted_by_subject_id` the owner. `revokeEntitlementShare` matches by
+        exactly this mapping (Identity''s `DelegatedAccess.delegationKind`).
+
         '
       tags:
       - orders
@@ -1874,6 +2117,14 @@ paths:
         the entitlement at once. It moves nothing — the owner held the entitlement throughout — and an
         admission the recipient already used stays used.
 
+
+        **Which share, and who revoked it** (decided 25 October 2026, Chinmay, ADAM CR-209 option A;
+        CHG-R10ID-004). The path''s `shareId` is an `identity.delegated_access` row with `delegation_kind`
+        `sharedEntitlement`; its `over_object_ref` must be `entitlement:<entitlementId>` for the path''s
+        `entitlementId`, or the answer is `404` and nothing changes. Revoking sets `revoked_at` and records who:
+        a guest owner as `revoked_by_kind` `subject` with `revoked_by_subject_id`, a staff member as `principal`
+        with `revoked_by_principal_id`.
+
         '
       tags:
       - orders
@@ -1897,6 +2148,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EntitlementShare'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: The share is already revoked or has expired (`shareNotActive`).
           x-ticvai-problem-types: [share-not-active]
@@ -1916,6 +2169,9 @@ paths:
       - query: access#entitlementRecords
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: white-label#storeAccountRecords
+        route: service
+        for: 'what its text calls "StoreAccount.passCertificateExpiresAt": whitelabel.store_account, WhiteLabel''s data (CHG-R10GEN-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2044,6 +2300,13 @@ paths:
       operationId: getResaleFeePolicy
       x-ticvai-consumed-by:
         - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: ResaleFeePolicy.minimumAskPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ResaleFeePolicy.minimumAskPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-names-for-context: [orders.order_fee, orders.resale_listing, payments.fee_rule]
       summary: The commission and price cap a resale listing is created under
       description: '**`orders.resale_listing` stored `sellerFeePercent`, `buyerFeePercent` and
@@ -2082,6 +2345,13 @@ paths:
       operationId: setResaleFeePolicy
       x-ticvai-consumed-by:
         - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: ResaleFeePolicy.minimumAskPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ResaleFeePolicy.minimumAskPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [eventId]
       x-ticvai-body-key-note: 'Keyed by the body''s `eventId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per event or product within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `eventId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       summary: Set resale commission and the price ceiling
@@ -2204,6 +2474,13 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-030 Ticket Transfer"
         - "P02 GST-067 Refunds & Resale"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: ResaleListing.askPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ResaleListing.askPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - guest
       security:
@@ -2219,7 +2496,7 @@ paths:
         `x-ticvai-self-scoped: subject`): another guest''s listing, named by `entitlementId`, is refused exactly as
         one that does not exist (404).
 
-        **Order.** Newest first, by `listedAt` descending, then by `id`.'
+        **Order.** Newest first, by `listedAt` descending, then by `id`. Where `listedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - orders
       x-ticvai-permission: null
@@ -2723,6 +3000,13 @@ paths:
       operationId: listPaymentProviders
       x-ticvai-consumed-by:
         - "P09 ADM-412 Payment Method & Settlement Setup"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: PaymentProvider.offlineFloorLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PaymentProvider.offlineFloorLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Sorted by `name` ascending, then by `id`.'
       summary: Gateways configured for this scope
       tags:
@@ -2759,6 +3043,13 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-412 Payment Method & Settlement Setup"
         - "P17 SGN-021 Payment Method & Settlement Setup"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: PaymentProvider.offlineFloorLimit, PaymentRouting.maxAmount, PaymentRouting.minAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PaymentProvider.offlineFloorLimit, PaymentRouting.maxAmount, PaymentRouting.minAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Configure a gateway and its routing
       description: 'CF-131. **Network International and Stripe for Phase 1** — two gateways, which is
         the number that makes routing a real question rather than a future one.
@@ -2818,7 +3109,9 @@ paths:
       operationId: listPaymentTokens
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
+        - "P01 WEB-023 Membership Management"
         - "P02 GST-011 Wallet Overview"
+        - "P02 GST-015 Memberships"
         - "P02 GST-071 Payment Methods"
       security:
       - guestAuth: []
@@ -2830,10 +3123,19 @@ paths:
 
         
 
-        **Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
+        **Order.** The default method first (`isDefault`), then newest first, by `id` descending (a UUIDv7);
+        one order for the description and the response (ADAM CR-099; (the lead''s answer of 25 October 2026 to the r10 lanes'' questions; CHG-R10ORD-022)).'
       tags:
       - orders
       parameters:
+      - name: subjectId
+        in: query
+        required: false
+        description: 'The guest whose saved methods a staff caller reads (ADAM CR-099, option 1; CHG-R10ORD-016). A
+          guest caller reads its own: another subject is 403.'
+        schema:
+          type: string
+          format: uuid
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       x-ticvai-permission: ORDER_VIEW
@@ -2847,7 +3149,7 @@ paths:
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':
-          description: Tokens, the default first, then by `id`.
+          description: Tokens, the default first, then newest first by `id` descending (ADAM CR-099).
           content:
             application/json:
               schema:
@@ -3264,12 +3566,21 @@ paths:
       - query: wallet#walletRecords
         route: in-process
         for: 'its read of wallet.wallet, Wallet''s data (CHG-MOD-001)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: StoredValueAuthorisation.amount, StoredValueAuthorisation.capturedAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StoredValueAuthorisation.amount, StoredValueAuthorisation.capturedAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-note: >-
         **One wallet debit path** (system-design review SD-027, 29 September). For a platform wallet this is a
         reference to a WalletService hold: authorising calls `wallet.holdWalletFunds` (guarded decrement of
         `wallet.balance.available` under a row lock) and capturing calls `wallet.captureWalletHold`, each writing
         a `wallet.wallet_transaction` with its `walletId` in the same transaction. The order service never
         writes a wallet balance. An external stored-value card (`StoredValueKind`) keeps its provider path.
+        **The link is stored** (ADAM CR-254 option A, 26 October 2026): `authoriseStoredValue` keeps the id
+        `wallet.holdWalletFunds` returns as `walletHoldId` (orders.stored_value_authorisation.wallet_hold_id), and
+        `captureStoredValue` captures that hold with `wallet.captureWalletHold`.
       x-ticvai-calls:
       - wallet.holdWalletFunds
       - wallet.captureWalletHold
@@ -3363,12 +3674,22 @@ paths:
       operationId: captureStoredValue
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: StoredValueAuthorisation.amount, StoredValueAuthorisation.capturedAmount, body.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StoredValueAuthorisation.amount, StoredValueAuthorisation.capturedAmount, body.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-note: >-
         **One wallet debit path** (system-design review SD-027, 29 September). For a platform wallet this is a
         reference to a WalletService hold: authorising calls `wallet.holdWalletFunds` (guarded decrement of
         `wallet.balance.available` under a row lock) and capturing calls `wallet.captureWalletHold`, each writing
         a `wallet.wallet_transaction` with its `walletId` in the same transaction. The order service never
         writes a wallet balance. An external stored-value card (`StoredValueKind`) keeps its provider path.
+        **The link is stored** (ADAM CR-254 option A, 26 October 2026): `authoriseStoredValue` keeps the id
+        `wallet.holdWalletFunds` returns as `walletHoldId` (orders.stored_value_authorisation.wallet_hold_id), and
+        `captureStoredValue` captures that hold with `wallet.captureWalletHold`.
       x-ticvai-calls:
       - wallet.holdWalletFunds
       - wallet.captureWalletHold
@@ -3454,6 +3775,15 @@ paths:
       operationId: relinquishStoredValue
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: StoredValueAuthorisation.amount, StoredValueAuthorisation.capturedAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StoredValueAuthorisation.amount, StoredValueAuthorisation.capturedAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      x-ticvai-calls:
+      - wallet.releaseWalletHold
       security:
       - apiKeyAuth: []
       - serviceAuth: []
@@ -3462,6 +3792,12 @@ paths:
       description: 'The play failed, the guest left, the tab closed short. **Released holds return immediately**
         — and expiry releases automatically, because a hold nobody releases is a guest whose balance is
         short with no explanation.
+
+
+        **A wallet hold goes back through WalletService** (accepted 26 October 2026, Chinmay, ADAM CR-254 option A):
+        for kind `wallet` this calls `wallet.releaseWalletHold` with the authorisation''s `walletHoldId` in the same
+        transaction, so WalletService gives the held funds back itself (one wallet debit path, SD-027). The
+        other five kinds (gift card, game card, voucher, loyalty, prepaid entitlement) are released by their row.
 
         '
       tags:
@@ -3535,6 +3871,12 @@ paths:
       - query: promotions#promotionRecords
         route: in-process
         for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
+      - query: white-label#bookingFlowRecords
+        route: service
+        for: 'what its text calls "white-label.BookingFlow.settings": whitelabel.booking_flow, WhiteLabel''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Cart.discountTotal, Cart.subtotal, Cart.taxTotal, Cart.total and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-latency-budget-ms: 200
       parameters:
@@ -3803,6 +4145,12 @@ paths:
         - query: marketing-crm#consentQuestionVersionRecords
           route: service
           for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
+        - query: tenancy#venueSettingsRecords
+          route: in-process
+          for: 'what its text calls "VenueSettings.seating": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
+        - query: white-label#bookingFlowRecords
+          route: service
+          for: 'what its text calls "white-label.BookingFlow.settings": whitelabel.booking_flow, WhiteLabel''s data (CHG-R10GEN-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       - $ref: ../shared/common.yaml#/components/parameters/AdmissionToken
@@ -3887,6 +4235,15 @@ paths:
       - query: marketing-crm#consentQuestionVersionRecords
         route: service
         for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
+      - query: white-label#bookingFlowRecords
+        route: service
+        for: 'what its text calls "white-label.BookingFlow.settings": whitelabel.booking_flow, WhiteLabel''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Cart.discountTotal, Cart.subtotal, Cart.taxTotal, Cart.total and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
         **Holds go through Catalogue's one locked path, never a direct write** (system-design review SD-023,
@@ -3971,6 +4328,15 @@ paths:
       - query: marketing-crm#consentQuestionVersionRecords
         route: service
         for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
+      - query: white-label#bookingFlowRecords
+        route: service
+        for: 'what its text calls "white-label.BookingFlow.settings": whitelabel.booking_flow, WhiteLabel''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Cart.discountTotal, Cart.subtotal, Cart.taxTotal, Cart.total and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
         **Holds go through Catalogue's one locked path, never a direct write** (system-design review SD-023,
@@ -4039,6 +4405,12 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'what its text calls "venue settings": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
+      - query: white-label#bookingFlowRecords
+        route: service
+        for: 'what its text calls "white-label.BookingFlow.settings": whitelabel.booking_flow, WhiteLabel''s data (CHG-R10GEN-001)'
       x-ticvai-note: >-
         **Holds go through Catalogue's one locked path, never a direct write** (system-design review SD-023,
         29 September). The order service takes the cart's hold with `catalogue.acquireInventoryHold`
@@ -4124,6 +4496,15 @@ paths:
         route: in-process
         for: 'ends the anonymous guest session createCart opened for the cart, once the cart is the guest''s (ADAM CR-183,
           option A; CHG-R9CR-002)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
+      - query: white-label#bookingFlowRecords
+        route: service
+        for: 'what its text calls "white-label.BookingFlow.settings": whitelabel.booking_flow, WhiteLabel''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Cart.discountTotal, Cart.subtotal, Cart.taxTotal, Cart.total and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -4224,6 +4605,12 @@ paths:
       - query: marketing-crm#consentQuestionRecords
         route: service
         for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings.cartLeaseSeconds": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-write-via:
       - table: marketing.consent_record
         event: order.created
@@ -4485,6 +4872,9 @@ paths:
       - query: identity#subjectContactRecords
         route: in-process
         for: 'its read of pii.subject_contact, Identity''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AbandonedCart.value (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       summary: Carts that lapsed without checking out
@@ -4638,11 +5028,22 @@ paths:
         be wrong in the one direction with a regulator at the end of it.
 
         **A guest sees their own and nothing else** (`x-ticvai-self-scoped: subject`); supplying
-        another subject is 403 rather than silently honoured.
+        another subject is 403 rather than silently honoured. **Staff name the subject** with `subjectId`
+        (ADAM CR-099, option 1; CHG-R10ORD-016).
 
-        
 
-        **Order.** Newest first, by `occurredAt` descending, then by `id`.'
+        **What a statement is** (ADAM CR-099): one billing cycle of a membership agreement
+        (`identity.customer_membership`, read through `identity#customerMembershipRecords`), named by `agreementId`.
+        Its `id` is derived from the agreement and the period, a name-based UUID (v5) of `agreementId`,
+        `periodStart` and `periodEnd`, so `getBillingStatement` finds the same statement again.
+
+
+        **Order.** Most recent period first: `periodStart` descending, then `id` (one order; ADAM CR-099).'
+      x-ticvai-read-via:
+      - query: identity#customerMembershipRecords
+        route: in-process
+        for: 'the membership agreements whose billing cycles the statements are, identity.customer_membership, Identity''s
+          data (ADAM CR-099); same deployable (commerce)'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -4655,6 +5056,14 @@ paths:
       - guestAuth: []
       - bearerAuth: []
       parameters:
+      - name: subjectId
+        in: query
+        required: false
+        description: 'The guest whose statements a staff caller reads (ADAM CR-099). A guest caller reads its own:
+          another subject is 403.'
+        schema:
+          type: string
+          format: uuid
       - name: from
         in: query
         description: Only statements whose `periodEnd` is on or after this date.
@@ -4756,6 +5165,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+        - "P04 POS-025 Till Home"
         - "P04 POS-030 Sales Journal"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
@@ -4894,6 +5304,12 @@ paths:
       - query: catalogue#performanceRecords
         route: in-process
         for: 'the performance''s seat limit on the channel (422 seat-limit-exceeded) (CHG-MOD-003)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'what its text calls "VenueSettings.seating": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-latency-budget-ms: 400
       security:
@@ -5147,12 +5563,19 @@ paths:
         route: service
         for: 'the host of the link back: the tenant''s primary active web host (control.tenant_domain), Platform''s data,
           asked as Tenancy''s resolveTenantHost asks it (ADAM CR-199, option A; CHG-R9CR-006)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'LOCATION: the line''s venue node''s name (platform.scope, by the venue id), active or not, Tenancy''s data
+          (ADAM CR-227, option A; CHG-R10CAT-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
       summary: The visit as a calendar entry
       description: '**`GST-018 Add to Calendar / Reminders` had no calendar operation**, only the order
         and a wallet pass, so the screen named after a calendar could not put anything in one.
+
+        **A guest''s call runs its in-process scoped queries under the request''s venue scope** (the lead, 25 October
+        2026, r10 round 3, by CR-198''s rule on `guestAuth`; CHG-R10ID-022).
 
         Returns an iCalendar (RFC 5545) event per dated line: the venue, the session start and end, and
         a link back to the booking. **The event carries no ticket and no QR code**, because a calendar
@@ -5170,7 +5593,9 @@ paths:
         (`catalogue.performance`, read with `catalogue#performanceRecords`); a booked-window line''s are its
         `bookedWindow.startsAt` and `endsAt`. A line with both takes its booked window.
 
-        - **LOCATION** is the venue''s name (the line''s venue, `platform.scope`).
+        - **LOCATION** is the venue''s name: the name of the line''s venue node, read with `tenancy#scopeRecords` by the
+        venue id, whether or not the venue is still active (ADAM CR-227, option A, decided 25 October 2026;
+        CHG-R10CAT-001). Orders never reads `platform.scope` raw.
 
         - **UID** is `<order line id>@ticvai.app`: the line''s id and the product''s own domain, the stem of every
         platform subdomain (`<venue>.<cell>.ticvai.app`, resolveTenantHost). It never changes for the line, so a
@@ -5331,6 +5756,12 @@ paths:
       - query: seating#seatRecords
         route: in-process
         for: 'the seated lines'' leases (409 seat-lease-expiring) (CHG-MOD-003)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'heldUntil where the cashier sent no holdUntil: the venue''s next business-day cut-off (businessDayCutoff) (r10 read routes; CHG-R10GEN-001)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -5429,6 +5860,10 @@ paths:
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -5497,6 +5932,10 @@ paths:
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-047 Order Corrections & Exceptions"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -5608,6 +6047,9 @@ paths:
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity (r8 walk fix, CHG-R8WFC-005); same deployable (commerce)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
       tags:
       - order
       x-ticvai-permission: ORDER_VOID
@@ -5782,6 +6224,22 @@ paths:
         hands it to the guest; it is not a voucher and not a top-up of the guest''s wallet. POS-011 offers it as
         "Gift card".
 
+
+        **What each line and payment has left, and where it goes** (ADAM CR-208, option A; Chinmay, 25 October 2026;
+        CHG-R10ORD-014). Every refund records what it took: one `orders.refund_line` row per order line it refunds
+        (`refundedAmount`) and one `orders.refund_payment` row per payment it refunds against (`refundedAmount` in
+        the base currency, `tenderAmount` in the payment''s tender currency). **`refundableAmount`** is what each
+        line, or each payment, paid minus what earlier refunds took from it (their `refund_line` and
+        `refund_payment` rows). **Allocation across payments**: the most recent payment first, cash last. **Time
+        bands apply per line**, by that line''s own performance: each line''s percentage is the band its own
+        performance falls in, so one refund of lines for two performances can carry two percentages. **The refund
+        type is the band''s** (`RefundPolicy.timeBands[].refundType`; (the lead''s answer of 25 October 2026 to the r10 lanes'' questions; CHG-R10ORD-021)): a
+        venue with no bands refunds in full before the cut-off (the performance start time of each line; for an undated line, the end of `refundWindowDays`, ADAM CR-208) and nothing after it.
+        **`settleTo` onto the venue''s `refundDestinations`** (`RefundCalculationPolicyView`): `originalTender` is
+        `originalPayment`; `advanceBalance` is `walletCredit`; `storeCredit` is `voucherCreditNote` (issued as a
+        gift card, CHG-CSP-037); `wireTransfer` is `originalPayment`, paid out by transfer. A `settleTo` whose
+        destination the venue does not list is not offered. `exceedsRefundable` is an amount above the lines'' (or the order''s) `refundableAmount`.
+
         '
       tags:
       - refund
@@ -5836,6 +6294,31 @@ paths:
         format: uuid
     post:
       operationId: simulateRefund
+      # What the answer is computed from, as its text says (CHG-R10GFC-003): the order, its lines and payments, what
+      # earlier refunds took from each (CR-208's refund_line and refund_payment), the venue's refund policy and bands,
+      # and its refund calculation policy (refundDestinations). A simulation writes none of them.
+      x-ticvai-reads:
+      - table: orders.sales_order
+        for: the order named in the path, whose refundable balance is simulated
+      - table: orders.order_line
+        for: 'the lines refunded (lineIds, or all of them): what each paid, and its performance for the time band'
+      - table: orders.payment
+        for: 'the payments the refund would go back to: the allocation, most recent first and cash last, and each
+          tender''s currency'
+      - table: orders.refund_line
+        for: 'what earlier refunds took from each line, for its refundableAmount (ADAM CR-208, CHG-R10ORD-014)'
+      - table: orders.refund_payment
+        for: 'what earlier refunds took from each payment, for its refundableAmount (ADAM CR-208, CHG-R10ORD-014)'
+      - table: orders.refund_policy
+        for: the venue's refund policy, its authority thresholds and refundWindowDays
+      - table: orders.refund_policy_time_band
+        for: the time bands, each line's percentage and refund type (CHG-R10ORD-021)
+      - table: orders.refund_calculation_policy
+        for: the venue's refundDestinations, which settleTo maps onto
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       x-ticvai-idempotency-exempt: A simulation writes nothing and calls no provider; repeating it is harmless (CHG-CSP-046).
       x-ticvai-audience:
       - staff
@@ -5849,6 +6332,27 @@ paths:
         refund policy and the payments as they stand, and can differ from a later `createRefund` if any of them changes.
         A POST because the question is a body, not because anything changes.
 
+
+        **What each line and payment has left, and where it goes** (ADAM CR-208, option A; Chinmay, 25 October 2026;
+        CHG-R10ORD-014). Every refund records what it took: one `orders.refund_line` row per order line it refunds
+        (`refundedAmount`) and one `orders.refund_payment` row per payment it refunds against (`refundedAmount` in
+        the base currency, `tenderAmount` in the payment''s tender currency). **`refundableAmount`** is what each
+        line, or each payment, paid minus what earlier refunds took from it (their `refund_line` and
+        `refund_payment` rows). **Allocation across payments**: the most recent payment first, cash last. **Time
+        bands apply per line**, by that line''s own performance: each line''s percentage is the band its own
+        performance falls in, so one refund of lines for two performances can carry two percentages. **The refund
+        type is the band''s** (`RefundPolicy.timeBands[].refundType`; (the lead''s answer of 25 October 2026 to the r10 lanes'' questions; CHG-R10ORD-021)): a
+        venue with no bands refunds in full before the cut-off (the performance start time of each line; for an undated line, the end of `refundWindowDays`, ADAM CR-208) and nothing after it.
+        **`settleTo` onto the venue''s `refundDestinations`** (`RefundCalculationPolicyView`): `originalTender` is
+        `originalPayment`; `advanceBalance` is `walletCredit`; `storeCredit` is `voucherCreditNote` (issued as a
+        gift card, CHG-CSP-037); `wireTransfer` is `originalPayment`, paid out by transfer. A `settleTo` whose
+        destination the venue does not list is not offered. `tenderRoutes` is the allocation `createRefund` would write, one row per payment, in that
+        order.
+
+
+        **Its currency** (CHG-R10ORD-019; the lead''s ruling of 25 October 2026 on check-money-currency): the Money
+        this operation answers or accepts is in the currency of the venue it acts at, the caller''s working venue,
+        read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.
         '
       tags:
       - refund
@@ -6044,6 +6548,10 @@ paths:
       operationId: createBulkRefund
       x-ticvai-consumed-by:
         - "P08 BO-023 Refunds & Exchanges"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RefundBatch.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-writes:
       - table: orders.order_event
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -6326,6 +6834,10 @@ paths:
         - "P08 BO-065 Venue Configuration"
         - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
         - "P08 BO-318 Refund Policy & Refund Calculation Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RefundPolicy.requiresApprovalAbove, RefundPolicy.requiresSecondUserAbove, RefundPolicy.selfAuthoriseLimit, RefundPolicy.varianceThreshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -6890,6 +7402,10 @@ paths:
       operationId: convertReservation
       x-ticvai-consumed-by:
         - "P04 POS-031 Reservations & Group Arrivals"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Convert a reservation into an order
@@ -6917,7 +7433,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Order'
         '409':
-          description: Expired (`reservationExpired`) or already converted (`alreadyConverted`).
+          description: Expired (`reservationExpired`) or already converted (`alreadyConverted`). Also refused when the reservation is `cancelled`; states/reservation.yaml moves this call only from `held`. (r10 default ruling, CHG-R10GEN-005)
           content:
             application/problem+json:
               schema:
@@ -6941,6 +7457,9 @@ paths:
       - query: catalogue#variantRecords
         route: in-process
         for: 'its read of catalogue.variant, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-write-via:
       - table: sync.rejection
         operation: recordSyncRejection
@@ -7053,7 +7572,7 @@ paths:
 
         
 
-        **Order.** Newest first, by `recordedAt` descending, then by `id`.'
+        **Order.** Newest first, by `recordedAt` descending, then by `id`. Where `recordedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
       - sync
       x-ticvai-permission: ORDER_VIEW
@@ -7124,6 +7643,9 @@ paths:
       - query: cross-region#rejectionRecords
         route: service
         for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-write-via:
       - table: sync.rejection
         operation: recordSyncRejectionResolution
@@ -7211,6 +7733,9 @@ paths:
       - query: access#entitlementRecords
         route: service
         for: 'whether a targeted line''s entitlement is redeemed (409 line-redeemed) (CHG-MOD-003)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -7289,6 +7814,9 @@ paths:
       - query: catalogue#entitlementTemplateRecords
         route: in-process
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'each entitlement''s kind: the product''s kind (catalogue.product), Catalogue''s data (ADAM CR-226)'
       - query: identity#subjectRecords
         route: in-process
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
@@ -7344,6 +7872,9 @@ paths:
       - query: access#entitlementRecords
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-write-via:
       - table: access.entitlement
         event: order.paid
@@ -7452,6 +7983,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'what its text calls "venue setting": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -7653,7 +8187,6 @@ paths:
         - "P02 GST-010 Booking Confirmation"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
-        - "P04 POS-026 Receipt & Reprint"
         - "P04 POS-030 Sales Journal"
         - "P05 KSK-009 Ticket issued"
         - "P05 KSK-010 Print failure"
@@ -8191,6 +8724,10 @@ paths:
       operationId: createReservation
       x-ticvai-consumed-by:
         - "P04 POS-031 Reservations & Group Arrivals"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Hold without payment
@@ -8355,6 +8892,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'what its text calls "venue setting": platform.venue_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
       summary: Extend a reservation
@@ -8409,6 +8949,13 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-013 Credit Limit & Balance"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: CreditPosition.amount, CreditPosition.available, CreditPosition.creditLimit, CreditPosition.used (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CreditPosition.amount, CreditPosition.available, CreditPosition.creditLimit, CreditPosition.used (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -8438,6 +8985,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setB2bCreditLimit
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: CreditPosition.amount, CreditPosition.available, CreditPosition.creditLimit, CreditPosition.used (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CreditPosition.amount, CreditPosition.available, CreditPosition.creditLimit, CreditPosition.used (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -8502,6 +9056,13 @@ paths:
         format: uuid
     post:
       operationId: overrideCreditLimit
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: CreditPosition.amount, CreditPosition.available, CreditPosition.creditLimit, CreditPosition.used (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CreditPosition.amount, CreditPosition.available, CreditPosition.creditLimit, CreditPosition.used (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -8886,6 +9447,13 @@ paths:
       operationId: setProRataResidual
       x-ticvai-consumed-by:
         - "P08 ADM-313 Pro-Rata, Residual Value & Entitlement Credit Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: ProRataResidualValueEntitlementCreditConfigurationInput.fixedCreditAmount, ProRataResidualValueEntitlementCreditConfigurationInput.minimumUpgradeAmount, ProRataResidualValueEntitlementCreditConfigurationView.fixedCreditAmount, ProRataResidualValueEntitlementCreditConfigurationView.minimumUpgradeAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ProRataResidualValueEntitlementCreditConfigurationInput.fixedCreditAmount, ProRataResidualValueEntitlementCreditConfigurationInput.minimumUpgradeAmount, ProRataResidualValueEntitlementCreditConfigurationView.fixedCreditAmount, ProRataResidualValueEntitlementCreditConfigurationView.minimumUpgradeAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -9367,6 +9935,13 @@ paths:
       operationId: createGroupEnquiry
       x-ticvai-consumed-by:
         - "P08 BO-265 Group Enquiry & Opportunity Capture"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: GroupEnquiryInput.expectedValue, GroupEnquiryOpportunityView.expectedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GroupEnquiryInput.expectedValue, GroupEnquiryOpportunityView.expectedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Capture a group enquiry
       description: '**The screen listed enquiries and nothing captured one** (decided 29 September,
         readiness close-out). `source` records where it came from: `website`, `salesTeam`,
@@ -10917,6 +11492,81 @@ paths:
                 $ref: '#/components/schemas/CustomerGuestAccountAssignmentView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /guest-checkout-links:
+    post:
+      operationId: attachGuestCheckoutOrders
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-no-screen: 'The identity.guestCheckoutLinked consumer, invoked by the event relay, never by a screen.'
+      x-ticvai-writes:
+      - table: orders.sales_order
+        for: 'the subject of each guest-checkout order linkGuestCheckout matched (r10 ruling; CHG-R10ID-018)'
+      x-ticvai-emits:
+      - order.linkedToGuest
+      x-ticvai-consumes:
+      - identity.guestCheckoutLinked
+      summary: Attach the guest-checkout orders Identity matched to the guest's account
+      description: '**The `identity.guestCheckoutLinked` consumer** (r10, the lead''s ruling on the ADR-0028 tiers, 25
+        October 2026; CHG-R10ID-018), modelled as an operation so it has lineage and a ticket. Identity is Foundation and
+        never writes `orders.sales_order`: `linkGuestCheckout` matches a guest''s guest-checkout orders in its own
+        projection and emits the event; this sets `subject_id` on each listed order that still has none, and writes one
+        `order.linkedToGuest` per order it attaches to the outbox in the same transaction (ADR-0033), which
+        Identity''s projection consumes (ADAM CR-084, CHG-GDL-003). An order that already has a subject is left as it
+        is and not announced. **Idempotent on event id and order id**: a redelivery attaches nothing twice. Runs at the
+        tenant root as every `serviceAuth` call does.'
+      tags:
+      - orders
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - eventId
+              - subjectId
+              - orderIds
+              properties:
+                eventId:
+                  type: string
+                  description: The `identity.guestCheckoutLinked` event id, for the consumer's inbox record.
+                subjectId:
+                  type: string
+                  format: uuid
+                orderIds:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Attached
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attachedOrderIds:
+                    type: array
+                    description: The orders whose subject this call set; an order that already had one is not listed.
+                    items:
+                      type: string
+                      format: uuid
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /order-line-product:
     get:
       operationId: listOrderLineProduct
@@ -11380,6 +12030,10 @@ paths:
       operationId: setCancellationPartialPolicy
       x-ticvai-consumed-by:
         - "P08 BO-317 Cancellation & Partial Cancellation Policy Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CancellationPartialCancellationPolicyConfigurationInput.feeAmount, CancellationPartialCancellationPolicyConfigurationView.feeAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -12509,6 +13163,13 @@ paths:
       operationId: setResaleEligibilityRule
       x-ticvai-consumed-by:
         - "P08 ADM-279 Resale Eligibility Rule Configuration"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: ResaleEligibilityRuleConfigurationInput.priceCategory, ResaleEligibilityRuleConfigurationView.priceCategory (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ResaleEligibilityRuleConfigurationInput.priceCategory, ResaleEligibilityRuleConfigurationView.priceCategory (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -12568,6 +13229,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-278 Resale Marketplace Command Center"
         - "P08 ADM-280 Resale Policy & Marketplace Settings"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: ResalePolicyMarketplaceSettingsView.bankPayoutInformation (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ResalePolicyMarketplaceSettingsView.bankPayoutInformation (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12731,6 +13399,13 @@ paths:
       operationId: listResaleFeeCommission
       x-ticvai-consumed-by:
         - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: ResaleFeesCommissionSellerProceedsView.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ResaleFeesCommissionSellerProceedsView.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12892,6 +13567,13 @@ paths:
       operationId: listListingLifecycleExpiry
       x-ticvai-consumed-by:
         - "P08 ADM-286 Listing Lifecycle, Expiry & Cancellation"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: ListingLifecycleExpiryCancellationView.cancellationFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ListingLifecycleExpiryCancellationView.cancellationFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -13313,6 +13995,13 @@ paths:
       operationId: listSellerSettlementPayout
       x-ticvai-consumed-by:
         - "P08 ADM-294 Seller Settlement & Payout Management"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: SellerSettlementPayoutManagementView.commission, SellerSettlementPayoutManagementView.listingPrice, SellerSettlementPayoutManagementView.minimumPayoutThreshold, SellerSettlementPayoutManagementView.payoutMethod and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SellerSettlementPayoutManagementView.commission, SellerSettlementPayoutManagementView.listingPrice, SellerSettlementPayoutManagementView.minimumPayoutThreshold, SellerSettlementPayoutManagementView.payoutMethod and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -13357,6 +14046,10 @@ paths:
       operationId: listRefundDisputeResale
       x-ticvai-consumed-by:
         - "P08 ADM-295 Refunds, Disputes & Resale Exceptions"
+      x-ticvai-read-via:
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -13390,7 +14083,11 @@ paths:
         much: the resale buyer at the resale price, the original purchaser at face value, or a
         split, and is the seller''s payout clawed back if already paid? The pack itself says this
         ''cannot be assumed''. A wrong default changes what customers are refunded in a way the
-        client''s commercial and finance teams would reverse (c).'
+        client''s commercial and finance teams would reverse (c).
+
+        **Its currency** (CHG-R10ORD-019; the lead''s ruling of 25 October 2026 on check-money-currency): the Money
+        this operation answers or accepts is in the currency of the venue it acts at, the caller''s working venue,
+        read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.'
       tags:
       - drafted
       x-ticvai-permission: ORDER_VIEW
@@ -13787,6 +14484,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
         - "P08 ADM-301 Fees, Seller Proceeds & Listing Confirmation"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: FeesSellerProceedsListingConfirmationView.estimatedProceeds, FeesSellerProceedsListingConfirmationView.fee, FeesSellerProceedsListingConfirmationView.sellingPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: FeesSellerProceedsListingConfirmationView.estimatedProceeds, FeesSellerProceedsListingConfirmationView.fee, FeesSellerProceedsListingConfirmationView.sellingPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -13839,6 +14543,12 @@ paths:
       - query: catalogue#performanceRecords
         route: in-process
         for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: MyResaleListingsSellerDashboardView.listingPrice, MyResaleListingsSellerDashboardView.originalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: MyResaleListingsSellerDashboardView.listingPrice, MyResaleListingsSellerDashboardView.originalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -14002,6 +14712,9 @@ paths:
       - query: identity#subjectRecords
         route: in-process
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: BuyerCheckoutInventoryHoldSecurePaymentView.total (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -14448,6 +15161,15 @@ paths:
       - query: promotions#couponCodeRecords
         route: in-process
         for: 'its read of promotions.coupon_code, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
+      - query: white-label#bookingFlowRecords
+        route: service
+        for: 'what its text calls "white-label.BookingFlow.settings": whitelabel.booking_flow, WhiteLabel''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Cart.discountTotal, Cart.subtotal, Cart.taxTotal, Cart.total and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-api-scope: ticketing.write
       security:
       - guestAuth: []
@@ -15354,6 +16076,13 @@ paths:
         - "P08 ADM-282 Resale Pricing & Price Guardrails"
         - "P08 ADM-284 Listing Approval & Moderation"
         - "P08 ADM-287 AI Resale Configuration & Marketplace Recommendations"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: ResaleMarketplaceConfig.cancellationFee, ResaleMarketplaceConfig.minimumPayoutThreshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ResaleMarketplaceConfig.cancellationFee, ResaleMarketplaceConfig.minimumPayoutThreshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: How the venue's resale marketplace runs
       description: '**The one row per venue in `orders.resale_marketplace_config`**: pricing mode and
         guardrails, moderation, listing lifecycle, checkout hold, seller settlement timing and the
@@ -15388,6 +16117,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-280 Resale Policy & Marketplace Settings"
         - "P08 ADM-282 Resale Pricing & Price Guardrails"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: ResaleMarketplaceConfig.cancellationFee, ResaleMarketplaceConfig.minimumPayoutThreshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ResaleMarketplaceConfig.cancellationFee, ResaleMarketplaceConfig.minimumPayoutThreshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-names-for-context: [orders.resale_eligibility_rule, orders.resale_fee_policy]
@@ -15458,6 +16194,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-294 Seller Settlement & Payout Management"
         - "P08 ADM-295 Refunds, Disputes & Resale Exceptions"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: ResaleSettlement.adjustments, ResaleSettlement.listingPrice, ResaleSettlement.processingFee, ResaleSettlement.sellerFee and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ResaleSettlement.adjustments, ResaleSettlement.listingPrice, ResaleSettlement.processingFee, ResaleSettlement.sellerFee and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Put a seller's resale payout on manual hold
       description: '**A person stops a payout the job would otherwise make** (DM5 open item: the
         settlement job writes `orders.resale_settlement` and no operation could hold or release one).
@@ -15526,6 +16269,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-294 Seller Settlement & Payout Management"
         - "P08 ADM-295 Refunds, Disputes & Resale Exceptions"
+      x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: ResaleSettlement.adjustments, ResaleSettlement.listingPrice, ResaleSettlement.processingFee, ResaleSettlement.sellerFee and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ResaleSettlement.adjustments, ResaleSettlement.listingPrice, ResaleSettlement.processingFee, ResaleSettlement.sellerFee and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Release a manual or compliance hold on a seller's resale payout
       description: '**The release the settlement state model had no operation for** (DM5 open item).
         Moves an `onHold` settlement back to `scheduled` and clears `holdReason`; `expectedPayoutDate`
@@ -15669,6 +16419,10 @@ paths:
       operationId: mergeOrders
       x-ticvai-consumed-by:
         - "P08 BO-328 Order Split, Merge & Transaction Relationship Management"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'what its text calls "catalogue.Product.requiresTimeWindow": catalogue.product, Catalogue''s data (CHG-R10GEN-001)'
       summary: Merge orders into one
       description: '**The other half of `splitOrder`** (pack Order & Reservation Management p.46, BO-328
         Order Split, Merge & Transaction Relationship Management). Moves every line and every payment
@@ -20088,12 +20842,19 @@ components:
             '
         token:
           x-ticvai-secret: blind-index
+          x-ticvai-unique: tenant
+          x-ticvai-unique-compare: exact
           type: string
           format: password
           writeOnly: true
           description: '**Write-only, single purpose, and it is the only thing the guest presents.** Long
             enough not to be guessed and scoped to one order — **a token that can read a second order
             is a token that read somebody else''s booking.**
+
+
+            **Stored hashed, with a unique index** (ADAM CR-099, option 1; CHG-R10ORD-016): the column holds a
+            keyed hash of the token (the blind index, ADR-0063), never the token, unique in the tenant;
+            `getPaymentLink` and `payByLink` hash the presented token and look the link up by it.
 
             '
         status:
@@ -20335,9 +21096,10 @@ components:
           type: string
           enum:
           - confirmed
-          - namesPending
           - complete
           - cancelled
+          description: '`namesPending` is set by the timer, never by a PATCH: sending it is `400` on `status` (ADAM
+            CR-257). The state model decides which move is allowed (`updateGroupBooking`).'
     VisitReminder:
       type: object
       x-ticvai-persistence: orders.visit_reminder
@@ -20729,6 +21491,14 @@ components:
           - namesPending
           - complete
           - cancelled
+        version:
+          type: integer
+          minimum: 1
+          default: 1
+          readOnly: true
+          description: '**The row''s version, its ETag** (accepted 26 October 2026, Chinmay, ADAM CR-257 option A):
+            1 on create and bumped on every write; `getGroupBooking` and `updateGroupBooking` send it as `ETag`, and
+            `updateGroupBooking` checks `If-Match` against it (`412` on a mismatch).'
     WalletPass:
       type: object
       x-ticvai-persistence: orders.wallet_pass
@@ -22794,12 +23564,21 @@ components:
                 - rental
                 - experience
                 - membership
+                description: 'The product''s kind (`catalogue.Product.kind`, read through `catalogue#productRecords` by the
+                  entitlement''s `productId`), mapped onto these values (ADAM CR-226, option A; Chinmay, 25 October 2026;
+                  CHG-R10ORD-012): `admission`, `timedAdmission`, `datedAdmission`, `openDated` and `seated` are
+                  `admission`; `membership`, `fnb`, `retail` and `rental` are themselves. A product of any other kind is
+                  answered without `kind` (it is optional) until its value is decided; `locker`, `parking` and
+                  `experience` have no product kind yet, and are answered without `kind` until ProductKind gains them
+                  (the lead''s answer of 25 October 2026 to the r10 lanes'' questions; docs/active/left-out.yaml LO-R10ORD-001).'
               orderId:
                 type: string
                 format: uuid
               addedAt:
                 type: string
                 format: date-time
+                description: 'When the entitlement was put on this media: `access.entitlement.media_linked_at`, written
+                  when the media code is set or rotated (ADAM CR-226). Null for a row written before the column.'
               status:
                 allOf:
                 - $ref: '#/components/schemas/EntitlementStatus'
@@ -22821,6 +23600,9 @@ components:
                 type: string
                 format: uuid
                 nullable: true
+                description: 'The `subjectId` of the entitlement whose `supersedesEntitlementId` names this one with
+                  `issuedVia` `transfer` (ADAM CR-226), read through `access#entitlementRecords`; null when it was not
+                  transferred.'
               validTo:
                 type: string
                 format: date-time
@@ -23100,6 +23882,7 @@ components:
         about money, and the package already has one of those.
       required:
       - id
+      - agreementId
       - periodStart
       - periodEnd
       - total
@@ -23108,6 +23891,13 @@ components:
         id:
           type: string
           format: uuid
+          description: A name-based UUID (v5) of `agreementId`, `periodStart` and `periodEnd`, so the same statement
+            has the same id on every read (ADAM CR-099).
+        agreementId:
+          type: string
+          format: uuid
+          description: The membership agreement this statement is one billing cycle of (`identity.customer_membership.id`;
+            ADAM CR-099).
         subjectId:
           type: string
           format: uuid
@@ -24182,6 +24972,8 @@ components:
           description: >-
             `grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale:
             what the guest pays and what the payment request to the provider asks for (CHG-FIN-001).
+            The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192;
+            common.yaml `Money.scale`), when it is not the currency the venue trades in.
         chargeRateLockedUntil:
           type: string
           format: date-time
@@ -24391,6 +25183,11 @@ components:
           description: 'Refundable percentage by time before the performance. Evaluated most-specific
             first.
 
+
+            **Each band names the refund type that applies in it** (`refundType`, ADAM CR-208; (the lead''s answer of 25 October 2026 to the r10 lanes'' questions; CHG-R10ORD-021)).
+            A venue that has set no bands refunds in full (`fullRefund`) before the cut-off (the performance start time of each line; for an undated line, the end of
+            `refundWindowDays`, ADAM CR-208) and nothing after it.
+
             '
           items:
             type: object
@@ -24405,6 +25202,18 @@ components:
                 type: number
                 minimum: 0
                 maximum: 100
+              refundType:
+                type: string
+                nullable: true
+                enum:
+                - fullRefund
+                - partialRefund
+                - percentageRefund
+                - proRataRefund
+                - originalValueLessFees
+                description: 'The refund type that applies in this band (the values of
+                  `RefundCalculationPolicyView.refundTypes`; ADAM CR-208). Null on a band saved before r10, which is
+                  `percentageRefund` at its `percentage`.'
         allowPartial:
           type: boolean
           default: true
@@ -24501,7 +25310,7 @@ components:
           type: string
           format: date-time
     Refund:
-      x-ticvai-persistence: orders.refund
+      x-ticvai-persistence: "orders.refund + orders.refund_line + orders.refund_payment"
       type: object
       required:
       - id
@@ -24598,13 +25407,64 @@ components:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
           readOnly: true
-          description: The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001).
+          description: The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001), its ISO 4217 minor
+            units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192).
         amount:
           x-ticvai-column: refunded_amount
           $ref: ../shared/common.yaml#/components/schemas/Money
         appliedPercentage:
           type: number
-          description: From the venue's time bands, or an approver override.
+          description: From the venue's time bands, or an approver override. Where the refunded lines fall in
+            different bands, each line's own percentage is on its `lines` row and this is the one the refund's lines
+            share, or null when they differ (ADAM CR-208).
+        lines:
+          type: array
+          readOnly: true
+          description: '**What the refund took from each order line** (ADAM CR-208, option A; CHG-R10ORD-014): child
+            rows, `orders.refund_line`, one per line refunded, written by `createRefund`. A line''s refundable amount is
+            what it paid minus its rows on earlier refunds.'
+          items:
+            type: object
+            required:
+            - orderLineId
+            - refundedAmount
+            properties:
+              orderLineId:
+                type: string
+                format: uuid
+                x-ticvai-references: orders.order_line
+              refundedAmount:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              appliedPercentage:
+                type: number
+                nullable: true
+                description: The time band of this line's own performance (ADAM CR-208).
+        payments:
+          type: array
+          readOnly: true
+          description: '**What the refund took from each payment** (ADAM CR-208, option A; CHG-R10ORD-014): child rows,
+            `orders.refund_payment` (the decision''s `refund_allocation`; naming-and-style bans `allocation` in DDL), one per payment refunded against, the most recent payment first and cash
+            last. A payment''s refundable amount is what it paid minus its rows on earlier refunds.'
+          items:
+            type: object
+            required:
+            - paymentId
+            - refundedAmount
+            properties:
+              paymentId:
+                type: string
+                format: uuid
+                x-ticvai-references: orders.payment
+              refundedAmount:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                description: In the base currency, for the ledger.
+              tenderAmount:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Money
+                nullable: true
+                description: In the payment's tender currency (`Payment.tenderCurrency`), at that currency's scale;
+                  null where the payment was in the base currency.
         status:
           type: string
           enum:
@@ -24789,7 +25649,8 @@ components:
         tenderAmount:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
-          description: The amount in `tenderCurrency`, at that currency's own scale.
+          description: The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the
+            kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-018).
         fxRate:
           allOf:
           - $ref: '#/components/schemas/ExchangeRateDecimal'
@@ -25189,6 +26050,7 @@ components:
             - packageUnavailable      # requestGroupBooking
             - aboveParticipantLimit   # requestGroupBooking (422)
             - statusBackwards         # updateGroupBooking: status moves forward only
+            - statusNotAllowed        # updateGroupBooking: a move states/group-booking.yaml does not allow (ADAM CR-257)
             - groupClosed             # updateGroupBooking: already cancelled or complete; the setParticipantGuestList, setGroupPaymentSchedule, setGroupTicketAllocation and setGroupTicketFulfillment 409; recordGroupCheckIn on a cancelled booking
             - quoteNotConvertible     # createGroupBooking: the quote is draft, superseded, rejected, expired or already converted
     PaymentLinkView:
@@ -25224,10 +26086,10 @@ components:
           refusedReason:
             type: string
             enum:
-            - linkExpired        # getPaymentLink 410
-            - linkPaid           # getPaymentLink 410
-            - linkSuperseded     # getPaymentLink 410: resendPaymentLink retired it
-            - linkCancelled      # getPaymentLink 410
+            - linkExpired        # getPaymentLink 410, payByLink 410 (ADAM CR-099)
+            - linkPaid           # getPaymentLink 410, payByLink 410
+            - linkSuperseded     # getPaymentLink 410, payByLink 410: resendPaymentLink retired it
+            - linkCancelled      # getPaymentLink 410, payByLink 410
             - linesUnavailable   # payByLink 409: the hold went while the guest was paying
           unavailableLines:
             type: array
@@ -25342,7 +26204,10 @@ components:
       x-ticvai-persistence: none — a view of the identity.delegated_access row shareEntitlement writes
       description: '**A second person''s right to present an entitlement the owner still holds.** Returned
         by `shareEntitlement` and `revokeEntitlementShare`; its `id` is the delegated-access row the share
-        is.
+        is. **Read from that row** (ADAM CR-209; CHG-R10ID-004): `entitlementId` from `over_object_ref`
+        (`entitlement:<entitlementId>`), `toSubjectId` from `subject_id`, `validFrom` and `validUntil` from
+        `valid_from` and `valid_to`, `revokedAt` from `revoked_at`; `status` is `revoked` when `revoked_at` is
+        set, `expired` when `valid_to` has passed, else `active`.
 
         '
       required:
@@ -25484,7 +26349,8 @@ components:
         refundableAmount:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
-          description: What remains refundable on the order or lines, before this refund.
+          description: 'What remains refundable on the order or lines, before this refund: what each line paid minus
+            what earlier refunds took from it (`orders.refund_line`; ADAM CR-208).'
         amount:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -25509,7 +26375,9 @@ components:
           - storeCredit
         tenderRoutes:
           type: array
-          description: Where the money would go, one row per payment it would refund against.
+          description: Where the money would go, one row per payment it would refund against, the most recent payment
+            first and cash last, each up to what that payment has left after earlier refunds (`orders.refund_payment`;
+            ADAM CR-208).
           items:
             type: object
             required:

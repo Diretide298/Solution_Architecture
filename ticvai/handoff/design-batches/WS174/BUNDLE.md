@@ -290,6 +290,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Flow F283 *Seat Management Venue Mapping Reference v1.0 board 10: Revenue Command Center*, step 13: Returns to the board's landing screen → Ready for the next screen on this board
 - Flow F283 branch at step 1 (expected): when Nothing has been set up on Revenue Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F283 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -437,6 +438,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS149 Seat Management Venue Mapping Reference v1.0 Board 10.dc.html#bo-1044`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 10
 - Flow F283 *Seat Management Venue Mapping Reference v1.0 board 10: Revenue Command Center*, step 2: Works in Dynamic Seat Pricing → Configure rules that adjust assigned-seat prices within controlled boundaries. Apply rules by section, row, seat, category, event, performance, sales pace, demand, remaining inventory and time to …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -649,6 +651,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS149 Seat Management Venue Mapping Reference v1.0 Board 10.dc.html#bo-1045`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 10
 - Flow F283 *Seat Management Venue Mapping Reference v1.0 board 10: Revenue Command Center*, step 4: Works in Price Bands & Categories → Maintain the commercial hierarchy applied to seat inventory. Configure price band, seat category, display label, color, currency, channel, customer segment and effective period. Map bands to venue …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1342,6 +1345,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS149 Seat Management Venue Mapping Reference v1.0 Board 10.dc.html#bo-1050`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 10
 - Flow F283 *Seat Management Venue Mapping Reference v1.0 board 10: Revenue Command Center*, step 14: Works in Revenue Analytics & Audit → Measure actual financial outcomes and preserve decision evidence. Compare realized versus forecast revenue, occupancy, yield, average price and sell-through by section/category. Attribute change to …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

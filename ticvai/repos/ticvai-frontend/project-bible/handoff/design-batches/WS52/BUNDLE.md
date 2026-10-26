@@ -850,6 +850,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-213`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 8
 - Flow F161 *Promotions Bundles Management board 8: Stacking & Conflict Command Center*, step 10: Works in Best Offer & Customer Benefit Resolver → Determine which promotion or combination gives the guest the correct/best permitted commercial outcome.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -971,6 +972,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS113 Promotions   Bundles Management Board 8.dc.html#adm-214`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 8
 - Flow F161 *Promotions Bundles Management board 8: Stacking & Conflict Command Center*, step 12: Works in Discount Cap & Maximum Benefit Controller → Prevent stacked promotions from exceeding financial or contractual limits.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

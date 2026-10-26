@@ -2065,6 +2065,12 @@
     "type": "integer",
     "nullable": true
    },
+   "hasTransparency": {
+    "type": "boolean",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Whether the image has an alpha channel with any pixel not fully opaque, recorded from the file when the upload completes; null for a file that is not an image (ADAM CR-106, option 1; CHG-R10TEN-012). White Label's setAppIcons refuses a source where it is true."
+   },
    "durationSeconds": {
     "type": "number",
     "nullable": true

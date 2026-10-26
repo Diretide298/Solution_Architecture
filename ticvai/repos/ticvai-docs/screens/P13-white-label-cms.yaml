@@ -1109,7 +1109,7 @@ screens:
         provenance: contract white-label.yaml GET /tenant-config/booking-flow; wiring fix, 2 October 2026
       - kind: selectField
         label: Product for the ticket preview
-        operation: previewProductTickets
+        operation: listProducts
         notes: The product whose ticket and passes are previewed.
         provenance: corrected 2 October 2026 (CHG-SGU-008, decided by Chinmay 2 October 2026, DEC-151)
         bindsTo: Product.id
@@ -1176,6 +1176,10 @@ screens:
     contract: orders
     purpose: A product's PDF ticket and Apple and Google Wallet pass proofs with the draft theme (CHG-CSP-038)
     trigger: onAction
+  - operationId: listProducts
+    contract: catalogue
+    purpose: The products to choose from for the ticket preview (check-screen-value-sources, CHG-R10UI-015)
+    trigger: onLoad
   entryState:
     params:
     - name: productId
@@ -10934,14 +10938,14 @@ screens:
         label: Venue
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Dubai Park
-        bindsTo: MediaAsset.venueId
-        operation: setMediaAssetTags
+        bindsTo: OrgUnit.id
+        operation: listOrgUnits
       - kind: selectField
         label: Category
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Marketing
-        bindsTo: MediaAsset.categoryId
-        operation: setMediaAssetTags
+        bindsTo: MediaTaxonomy.categories
+        operation: getMediaTaxonomy
       - kind: selectField
         label: Campaign
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
@@ -10977,6 +10981,11 @@ screens:
     purpose: The controlled vocabularies
     trigger: onLoad
     provenance: board reading, 19 September 2026
+  - operationId: listOrgUnits
+    contract: tenancy
+    purpose: The venues to tag an asset with (scope nodes at level venue) (check-screen-value-sources,
+      CHG-R10UI-015)
+    trigger: onLoad
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-066
@@ -14561,7 +14570,7 @@ screens:
         label: Default fallback asset
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: Picked from the library (e.g. DAM-IMG-009211, "Default Dubai Park Hero").
-        bindsTo: MediaAsset.id
+        bindsTo: MediaDistributionChannel.fallbackAssetId
         operation: setMediaDistributionChannels
     - name: actionBar
       slot: publish
@@ -15275,6 +15284,11 @@ screens:
   overlays:
   - id: formCreateGuidedChoice
     component: modal
+    reads:
+    - listProducts
+    - listProductCategories
+    - listEvents
+    - listBookingFlows
     trigger: New set-up
     body: '**Collects what `createGuidedChoice` sends before it is called.** Required: `name` (staff-facing),
       `mode`, `questions` (one or two, each with two to four answers and a target per answer). Optional:

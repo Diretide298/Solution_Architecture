@@ -617,7 +617,7 @@
  "DataSubjectCustomerPrivacyRequestManagementView": {
   "type": "object",
   "x-ticvai-persistence": "marketing.privacy_request",
-  "description": "One customer privacy request (pack 17.2.4 Case Information). The case layer over the cross-region `sync.dsar_request` fan-out, which it references when it raises one.",
+  "description": "One customer privacy request (pack 17.2.4 Case Information). The case layer over the cross-region `sync.dsar_request` fan-out, which it references when it raises one. **A guest's data export or erasure raised in Identity arrives here too** (ADAM CR-101; CHG-R10ID-016), by the event `identity.privacyRequestRaised` (request type `access` or `deletion`, requester role `self`), so its `dueAt` applies like any other request's.",
   "required": [
    "subjectId",
    "requestType",
@@ -790,6 +790,13 @@
     "nullable": true,
     "readOnly": true,
     "description": "The cross-region `DsarRequest.requestId`, when fulfilment fanned out."
+   },
+   "approvalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "description": "The request a guest's export or erasure was raised as (`identity.privacyRequestRaised` `approvalRequestId`), so the case and the request are one (the lead, 25 October 2026, r10 round 3, ADAM CR-101; CHG-R10ID-024). Null on a case opened by hand."
    },
    "caseId": {
     "type": "string",

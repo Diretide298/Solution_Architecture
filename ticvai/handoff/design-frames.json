@@ -2792,6 +2792,14 @@
      "pulled": "wireframe-web-state-closed.html",
      "status": "drawn by the package from the approved design (r9), not yet seen by the client"
     },
+    "open": {
+     "pattern": "P01/status-card",
+     "name": "the status card of WEB-029 (Error / Sold out / Maintenance)",
+     "prototype": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
+     "where": "lines 4746-4782, the block marked \"WEB ERROR / SOLD OUT / MAINTENANCE\" (data-screen-label \"WEB Error / Sold out / Maintenance\")",
+     "frame": "wireframes/P01 Guest Web.dc.html#web-029",
+     "pulled": "wireframe-web-029.html"
+    },
     "maintenance": {
      "pattern": "P01/status-card",
      "name": "the status card of WEB-029 (Error / Sold out / Maintenance)",

@@ -43,17 +43,17 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 60
+  operationCalls: 61
 - service: MarketingService
   operationCalls: 58
 - service: CatalogueService
-  operationCalls: 49
+  operationCalls: 50
 - service: VenueOpsService
   operationCalls: 40
 - service: WhiteLabelService
   operationCalls: 25
 - service: IdentityService
-  operationCalls: 20
+  operationCalls: 22
 - service: FnbService
   operationCalls: 19
 - service: AccessService
@@ -304,6 +304,7 @@ screens:
   - eventId<-WEB-004
   - venueId<-session
   - entryId<-navigation
+  - waitingEntryId<-WEB-015
   goesTo:
   - WEB-001
   - WEB-005
@@ -327,6 +328,7 @@ screens:
   - getPerformance
   - getPublishedBookingFlow
   - getSeatAvailability
+  - getSeatHold
   - listPerformances
   - recommendSeats
   - relinquishSeatHold
@@ -342,7 +344,7 @@ screens:
   - performanceId<-deepLink
   - eventId<-WEB-006
   - productId<-WEB-004
-  - holdId<-navigation
+  - holdIds<-navigation
   - venueId<-session
   goesTo:
   - WEB-001
@@ -447,6 +449,7 @@ screens:
   - code<-deepLink
   - lineId<-deepLink
   - performanceId<-navigation
+  - holdIds<-navigation
   - holdId<-navigation
   - venueId<-session
   goesTo:
@@ -609,7 +612,7 @@ screens:
   offlineState: true
   entryParams:
   - performanceId<-WEB-006
-  - waitingEntryId<-WEB-015
+  - waitingEntryId<-WEB-006
   goesTo:
   - WEB-001
   - WEB-006
@@ -635,6 +638,7 @@ screens:
   - refreshToken
   - registerGuest
   - requestGuestOtp
+  - verifyGuestEmail
   - verifyGuestOtp
   - verifyMfaChallenge
   states:
@@ -879,6 +883,7 @@ screens:
   - getMyMemberships
   - listBillingStatements
   - listMyPaymentIssues
+  - listPaymentTokens
   - retryMyDunningPayment
   states:
   - emptyFirstRun
@@ -912,6 +917,7 @@ screens:
   - exportSubjectData
   - getFacePassEnrolment
   - getGuestConsents
+  - getSubjectDataExport
   - getWaiverStatus
   - getWishlist
   - listConsentPurposes
@@ -1075,11 +1081,13 @@ screens:
   - loading
   - maintenance
   - offline
+  - open
   - soldOut
   offlineState: true
   entryParams: []
   goesTo:
   - WEB-001
+  - WEB-002
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-029
   inFlows: null
@@ -1174,6 +1182,7 @@ screens:
   - promotionId<-deepLink
   goesTo:
   - WEB-001
+  - WEB-002
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-032
   inFlows: null

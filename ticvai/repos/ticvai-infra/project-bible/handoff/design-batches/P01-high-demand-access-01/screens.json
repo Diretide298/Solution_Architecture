@@ -23,11 +23,12 @@
     {
      "to": "WEB-006",
      "trigger": "Continue to your tickets",
-     "precondition": "`getWaitingRoomPosition` answers `admitted`. The page keeps `admission.token` and sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt`",
+     "precondition": "`getWaitingRoomPosition` answers `admitted`. The admission token is kept in an HttpOnly, short-lived, per-performance cookie the edge sets on that admitted answer, and the browser sends it with `addCartLine` until `admission.expiresAt`; the page stores nothing (no script-readable copy, no localStorage or sessionStorage), so a reload or a second tab is still admitted (ADAM CR-216, 25 October 2026; ADR-0066 amendment of 25 October)",
      "carries": [
-      "performanceId"
+      "performanceId",
+      "waitingEntryId"
      ],
-     "provenance": "ADR-0066 (accepted 1 October 2026) and its 1 October amendment"
+     "provenance": "ADR-0066 (accepted 1 October 2026), its 1 October amendment, and its 25 October amendment (ADAM CR-216)"
     }
    ]
   },
@@ -95,7 +96,7 @@
    {
     "operationId": "getWaitingRoomPosition",
     "contract": "catalogue",
-    "purpose": "The guest's place, polled every `pollAfterSeconds`; admitted, it carries the admission token for `addCartLine`",
+    "purpose": "The guest's place, polled every `pollAfterSeconds`; admitted, the edge sets the admission cookie for `addCartLine` (ADAM CR-216). A `404` for a performance the page knows means the entry is gone: the guest re-enters with Take my place",
     "trigger": "onInterval"
    }
   ],
@@ -107,8 +108,9 @@
     },
     {
      "name": "waitingEntryId",
-     "from": "WEB-015",
-     "optional": true
+     "from": "WEB-006",
+     "optional": true,
+     "notes": "Carried back on the WEB-006 edge when a guest who was admitted is sent here again (an expired admission, a refused `addCartLine`), so the poll resumes the same entry and the guest keeps their place instead of entering at the back (ADAM CR-216, 25 October 2026). A `404` from `getWaitingRoomPosition` for a performance the page knows means the entry is gone (evicted or the room restarted): the guest re-enters with *Take my place*."
     }
    ],
    "coldEntry": "**Opened with no performance, or one no longer selling, the room says so and offers the event** — never a 404. The room belongs to one performance's sale and has nothing to show without one."

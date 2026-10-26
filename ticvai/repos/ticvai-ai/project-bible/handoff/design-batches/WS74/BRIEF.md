@@ -1,6 +1,6 @@
 # WS74 — Digital Asset Management DAM board 1
 
-**10 screens · 15 operations · 14 schemas · 3 permissions**
+**10 screens · 16 operations · 15 schemas · 4 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `AI_USE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AI_USE, ASSET_LIBRARY_MANAGE, ASSET_LIBRARY_VIEW, SCOPE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -101,7 +101,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-063` | Upload & Asset Ingestion Workspace | B | 17 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `CMS-064` | Folder, Collection & Workspace Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `CMS-065` | Metadata & Taxonomy Management | B | 18 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-066` | Tags, Keywords & Classification | B | 4 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `CMS-066` | Tags, Keywords & Classification | B | 4 | 0 | 6 | 8 | 1 | 0 | — | notStarted (—) |
 | `CMS-067` | Advanced Search & Discovery | B | 0 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
 | `CMS-068` | Digital Asset 360° Profile | B | 0 | 36 | 6 | 1 | 2 | 0 | — | notStarted (—) |
 | `CMS-069` | Bulk Asset Management Workspace | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |

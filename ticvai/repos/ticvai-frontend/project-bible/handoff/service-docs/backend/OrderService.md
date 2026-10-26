@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `orders`, `shift`, `payments` |
 | Schemas owned | `orders`, `payments` |
-| Operations in the slice | 99 of 304 |
+| Operations in the slice | 99 of 305 |
 | Scale | Write-heavy, spiky, latency-critical. The one that autoscales. |
 | If it is down | Down means no sales. Highest availability target in the platform. |
 
@@ -84,7 +84,7 @@
 | orders | [`listMyOrders`](#listmyorders) | GET | `/my/orders` | core | 1 | GST-014, GST-019, GST-035, WEB-017, WEB-019, WEB-026 … |
 | orders | [`listOwnGroupBookings`](#listowngroupbookings) | GET | `/group-booking-requests` | core | 1 | WEB-031 |
 | orders | [`listOwnResaleListings`](#listownresalelistings) | GET | `/resale-listings` | core | 1 | GST-067, WEB-030 |
-| orders | [`listPaymentTokens`](#listpaymenttokens) | GET | `/payment-tokens` | core | 1 | GST-011, GST-071, WEB-021 |
+| orders | [`listPaymentTokens`](#listpaymenttokens) | GET | `/payment-tokens` | core | 1 | GST-011, GST-015, GST-071, WEB-021, WEB-023 |
 | orders | [`payByLink`](#paybylink) | POST | `/payment-links/{token}/pay` | core | 1 | GST-009, WEB-014 |
 | orders | [`previewProductTickets`](#previewproducttickets) | GET | `/products/{productId}/ticket-previews` | core | 1 | BO-008, CMS-006 |
 | orders | [`recordGroupCheckIn`](#recordgroupcheckin) | POST | `/group-bookings/{groupBookingId}/check-in` | core | 1 | BO-280, POS-031 |
@@ -662,7 +662,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | payments[].tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -842,6 +842,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 
 **`POST /carts`**: Start a cart
 
+**A guest's call runs its in-process scoped queries under the request's venue scope** (the lead, 25 October 2026, r10 round 3, by CR-198's rule on `guestAuth`; CHG-R10ID-022).
 **A cart holds leases; an order holds money.** Different lifetimes, different failure modes, and merging them is why this contract did not exist until 17 August — `createOrder` takes a whole basket at once, which is correct for a till and cannot be resumed on another device.
 Created against a guest subject where one is known, or an anonymous token where it is not. **The token is what lets a guest browse before signing in** and keep their cart when they do (2.1.31).
 **A visitor with no credential gets the token here** (decided 20 October 2026, Chinmay, R8 blocker cause GPS-C23, option A; CHG-R8SPN-031). Called with no credential, this creates the cart and an anonymous guest session for it, and returns the session's token in `Cart.anonymousSessionToken` (a `guestAuth` token with no subject, bound to this cart and the device, sliding like any guest token). The app calls this on the first Continue or Add (trigger background) and then `addCartLine` with that token; `checkBookingEligibility`, `joinWaitlist` and `leaveWaitlist` run under it too. On sign-in `claimCart` moves the cart to the account and the anonymous session ends. Nothing about the visitor is stored but the cart (ADR-0045: the contact is proven at checkout, not here). Called with a guest token, the token is the caller's and `anonymousSessionToken` is null.
@@ -1974,7 +1975,7 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | order.payments[].orderId | string (uuid) | yes |  |
 | order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | order.payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| order.payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| order.payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | order.payments[].fxRate | object |  | The rate applied, stored on the payment rather than looked up later (CF-37). (nullable) |
 | order.payments[].fxRateSource | enum (manual, feed, cardScheme) |  | 4.2.8. (nullable) |
 | order.payments[].changeCurrency | string |  | 4.6.11 is deliberately asymmetric: accept foreign currency, refund in local. (pattern ^[A-Z]{3}$; nullable) |
@@ -2008,14 +2009,14 @@ The media is the join, not the order. That is why this operation is keyed on `me
 | media.entitlements | array of object | yes |  |
 | media.entitlements[].entitlementId | string (uuid) |  |  |
 | media.entitlements[].name | string |  |  |
-| media.entitlements[].kind | enum (admission, locker, fnb, retail, parking, rental, experience, membership) |  |  |
+| media.entitlements[].kind | enum (admission, locker, fnb, retail, parking, rental, experience, membership) |  | The product's kind (catalogue.Product.kind, read through catalogue#productRecords by the entitlement's productId), mapped onto these values (ADAM CR-226, option A; Chinmay, 25 October 2026; CHG-R10OR… |
 | media.entitlements[].orderId | string (uuid) |  |  |
-| media.entitlements[].addedAt | string (date-time) |  |  |
+| media.entitlements[].addedAt | string (date-time) |  | When the entitlement was put on this media: access.entitlement.media_linked_at, written when the media code is set or rotated (ADAM CR-226). |
 | media.entitlements[].status | object |  | Replaced isRedeemed on 17 August. |
 | media.entitlements[].entriesUsed | integer |  |  |
 | media.entitlements[].entriesAllowed | integer |  | (nullable) |
 | media.entitlements[].redeemedAt | string (date-time) |  | (nullable) |
-| media.entitlements[].transferredToSubjectId | string (uuid) |  | (nullable) |
+| media.entitlements[].transferredToSubjectId | string (uuid) |  | The subjectId of the entitlement whose supersedesEntitlementId names this one with issuedVia transfer (ADAM CR-226), read through access#entitlementRecords; null when it was not transferred. (nullable) |
 | media.entitlements[].validTo | string (date-time) |  | (nullable) |
 | addedEntitlementIds | array of string (uuid) |  |  |
 
@@ -2189,7 +2190,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | payments[].tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -2483,7 +2484,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | payments[].tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -2673,14 +2674,14 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | entitlements | array of object | yes |  |
 | entitlements[].entitlementId | string (uuid) |  |  |
 | entitlements[].name | string |  |  |
-| entitlements[].kind | enum (admission, locker, fnb, retail, parking, rental, experience, membership) |  |  |
+| entitlements[].kind | enum (admission, locker, fnb, retail, parking, rental, experience, membership) |  | The product's kind (catalogue.Product.kind, read through catalogue#productRecords by the entitlement's productId), mapped onto these values (ADAM CR-226, option A; Chinmay, 25 October 2026; CHG-R10OR… |
 | entitlements[].orderId | string (uuid) |  |  |
-| entitlements[].addedAt | string (date-time) |  |  |
+| entitlements[].addedAt | string (date-time) |  | When the entitlement was put on this media: access.entitlement.media_linked_at, written when the media code is set or rotated (ADAM CR-226). |
 | entitlements[].status | object |  | Replaced isRedeemed on 17 August. |
 | entitlements[].entriesUsed | integer |  |  |
 | entitlements[].entriesAllowed | integer |  | (nullable) |
 | entitlements[].redeemedAt | string (date-time) |  | (nullable) |
-| entitlements[].transferredToSubjectId | string (uuid) |  | (nullable) |
+| entitlements[].transferredToSubjectId | string (uuid) |  | The subjectId of the entitlement whose supersedesEntitlementId names this one with issuedVia transfer (ADAM CR-226), read through access#entitlementRecords; null when it was not transferred. (nullable) |
 | entitlements[].validTo | string (date-time) |  | (nullable) |
 
 **Responses**
@@ -2840,7 +2841,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | payments[].tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -2890,12 +2891,13 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 **`GET /orders/{orderId}/calendar-event`**: The visit as a calendar entry
 
 **`GST-018 Add to Calendar / Reminders` had no calendar operation**, only the order and a wallet pass, so the screen named after a calendar could not put anything in one.
+**A guest's call runs its in-process scoped queries under the request's venue scope** (the lead, 25 October 2026, r10 round 3, by CR-198's rule on `guestAuth`; CHG-R10ID-022).
 Returns an iCalendar (RFC 5545) event per dated line: the venue, the session start and end, and a link back to the booking. **The event carries no ticket and no QR code**, because a calendar is synced to places a ticket should not go. Rescheduling the order changes the event UID's sequence, so a calendar that re-imports it updates the entry rather than adding a second one.
 
 **What each event holds** (ADAM CR-199, option A, decided 21 October 2026; CHG-R9CR-006):
 - **A dated line** is an order line with a `performanceId` or a `bookedWindow`. Any other line (a product with no date, a parking or transport line without either) is not dated and gives no event. An order with no dated line is `409 noDatedLine`.
 - **DTSTART and DTEND**, in UTC (`...Z`): a performance line's are the performance's `startsAt` and `endsAt` (`catalogue.performance`, read with `catalogue#performanceRecords`); a booked-window line's are its `bookedWindow.startsAt` and `endsAt`. A line with both takes its booked window.
-- **LOCATION** is the venue's name (the line's venue, `platform.scope`).
+- **LOCATION** is the venue's name: the name of the line's venue node, read with `tenancy#scopeRecords` by the venue id, whether or not the venue is still active (ADAM CR-227, option A, decided 25 October 2026; CHG-R10CAT-001). Orders never reads `platform.scope` raw.
 - **UID** is `<order line id>@ticvai.app`: the line's id and the product's own domain, the stem of every platform subdomain (`<venue>.<cell>.ticvai.app`, resolveTenantHost). It never changes for the line, so a re-import updates the entry.
 - **SEQUENCE** is the number of the order's `orders.order_event` rows with `eventType` `rescheduled`, which `rescheduleOrder` writes once per reschedule: 0 for an order never rescheduled.
 - **URL**, the link back, is the tenant's guest web order page: `https://<host>/cart-and-checkout/order-confirmation?orderId=<orderId>` (WEB-013 Booking Confirmation, the guest web screen that reads one order; a visitor with no session there sees its no-access state). `<host>` is the tenant's primary active host for the `web` channel (its domain marked `isPrimary`). Platform keeps the tenant's domains in the control database, which commerce has no connection to, so this operation reads no table for the host: it asks Platform with `platform-ops#tenantDomainRecords` over the service route, as Tenancy's `resolveTenantHost` asks it, and Platform reads its own rows. Until serviceAuth between deployables is built (ADAM CR-174), the event is written without URL; nothing else changes.
@@ -3198,7 +3200,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | payments[].tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -3263,7 +3265,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Read routing | replica |
 | Reads | `orders.order_line`, `orders.payment`, `orders.sales_order` |
 | Writes | - |
-| Called by | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-101, EMP-014, EMP-034, EMP-057, POS-002, POS-006, POS-012, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, SUP-014 |
+| Called by | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-101, EMP-014, EMP-034, EMP-057, POS-002, POS-006, POS-012, POS-025, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, SUP-014 |
 
 **Parameters**
 
@@ -3519,7 +3521,7 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 | order.payments[].orderId | string (uuid) | yes |  |
 | order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | order.payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| order.payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| order.payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | order.payments[].fxRate | object |  | The rate applied, stored on the payment rather than looked up later (CF-37). (nullable) |
 | order.payments[].fxRateSource | enum (manual, feed, cardScheme) |  | 4.2.8. (nullable) |
 | order.payments[].changeCurrency | string |  | 4.6.11 is deliberately asymmetric: accept foreign currency, refund in local. (pattern ^[A-Z]{3}$; nullable) |
@@ -3587,7 +3589,7 @@ Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.sales_order` |
-| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, GST-010, KSK-009, KSK-010, KSK-012, POS-002, POS-006, POS-026, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-013 |
+| Called by | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034, GST-010, KSK-009, KSK-010, KSK-012, POS-002, POS-006, POS-030, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016, WEB-013 |
 
 **Parameters**
 
@@ -3808,7 +3810,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | order.payments[].orderId | string (uuid) | yes |  |
 | order.payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | order.payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| order.payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| order.payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | order.payments[].fxRate | object |  | The rate applied, stored on the payment rather than looked up later (CF-37). (nullable) |
 | order.payments[].fxRateSource | enum (manual, feed, cardScheme) |  | 4.2.8. (nullable) |
 | order.payments[].changeCurrency | string |  | 4.6.11 is deliberately asymmetric: accept foreign currency, refund in local. (pattern ^[A-Z]{3}$; nullable) |
@@ -4141,7 +4143,7 @@ Only before settlement and only within the same shift. After that it is a refund
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | payments[].tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -4422,7 +4424,8 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | A name-based UUID (v5) of agreementId, periodStart and periodEnd, so the same statement has the same id on every read (ADAM CR-099). |
+| agreementId | string (uuid) | yes | The membership agreement this statement is one billing cycle of (identity.customer_membership.id; ADAM CR-099). |
 | subjectId | string (uuid) |  | (read-only) |
 | periodStart | string (date) | yes |  |
 | periodEnd | string (date) | yes |  |
@@ -4525,12 +4528,13 @@ BL-028. **`orders.group_booking` had ten columns and nothing read it** — a tab
 | attendeeCaptureRequired | boolean |  | Whether names are needed before admission. (default False) |
 | attendeeCaptureDueBy | string (date-time) |  | (nullable) |
 | status | enum (provisional, confirmed, namesPending, complete, cancelled) | yes |  |
+| version | integer |  | The row's version, its ETag (accepted 26 October 2026, Chinmay, ADAM CR-257 option A): 1 on create and bumped on every write; getGroupBooking and updateGroupBooking send it as ETag, and updateGroupBo… (min 1; default 1; read-only) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | The group |
+| 200 |  | The group. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getPaymentLink
@@ -4634,6 +4638,9 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 | amountDue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | venueName | string |  |  |
 | expiresInSeconds | integer |  |  |
+| provider | object |  | The provider the client tokenises against (ADAM CR-099, option 1; CHG-R10ORD-016): the venue's active payments.provider for the link's channel, the one payByLink charges. |
+| provider.providerId | string (uuid) | yes |  |
+| provider.providerName | string |  |  |
 
 **Responses**
 
@@ -4765,10 +4772,11 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 
 2.14.19-2.14.23, 5.7.96, BL-100. **A guest paying monthly could see their pass and not what they had been charged for it.** Auto-renewal, grace and mandates all existed; the record a guest reads was the piece missing.
 **A statement is not a tax invoice.** `isTaxInvoice` is false and read-only. UAE e-invoicing is Peppol five-corner with the FTA as the fifth corner, PINT AE XML and 51 mandatory fields, and **CF-133 is open on it** — a statement that implied otherwise would be wrong in the one direction with a regulator at the end of it.
-**A guest sees their own and nothing else** (`x-ticvai-self-scoped: subject`); supplying another subject is 403 rather than silently honoured.
+**A guest sees their own and nothing else** (`x-ticvai-self-scoped: subject`); supplying another subject is 403 rather than silently honoured. **Staff name the subject** with `subjectId` (ADAM CR-099, option 1; CHG-R10ORD-016).
 
+**What a statement is** (ADAM CR-099): one billing cycle of a membership agreement (`identity.customer_membership`, read through `identity#customerMembershipRecords`), named by `agreementId`. Its `id` is derived from the agreement and the period, a name-based UUID (v5) of `agreementId`, `periodStart` and `periodEnd`, so `getBillingStatement` finds the same statement again.
 
-**Order.** Newest first, by `occurredAt` descending, then by `id`.
+**Order.** Most recent period first: `periodStart` descending, then `id` (one order; ADAM CR-099).
 
 |  |  |
 |---|---|
@@ -4787,6 +4795,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| subjectId | query |  | string (uuid) | The guest whose statements a staff caller reads (ADAM CR-099). |
 | from | query |  | string (date) | Only statements whose periodEnd is on or after this date. |
 | to | query |  | string (date) | Only statements whose periodStart is on or before this date. |
 | pageSize | query |  | integer |  |
@@ -4797,7 +4806,8 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of BillingStatement | yes |  |
-| items[].id | string (uuid) | yes |  |
+| items[].id | string (uuid) | yes | A name-based UUID (v5) of agreementId, periodStart and periodEnd, so the same statement has the same id on every read (ADAM CR-099). |
+| items[].agreementId | string (uuid) | yes | The membership agreement this statement is one billing cycle of (identity.customer_membership.id; ADAM CR-099). |
 | items[].subjectId | string (uuid) |  | (read-only) |
 | items[].periodStart | string (date) | yes |  |
 | items[].periodEnd | string (date) | yes |  |
@@ -4952,7 +4962,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].payments[].orderId | string (uuid) | yes |  |
 | items[].payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | items[].payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| items[].payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| items[].payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | items[].payments[].fxRate | object |  | The rate applied, stored on the payment rather than looked up later (CF-37). (nullable) |
 | items[].payments[].fxRateSource | enum (manual, feed, cardScheme) |  | 4.2.8. (nullable) |
 | items[].payments[].changeCurrency | string |  | 4.6.11 is deliberately asymmetric: accept foreign currency, refund in local. (pattern ^[A-Z]{3}$; nullable) |
@@ -4992,7 +5002,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 
 Added for My Reservations (R8 blocker ORDERS-MONEY-C26): after `requestGroupBooking` answered 201 a guest could never see the request again, because `getGroupBooking` needs an id no screen carries and `listGroupBooking` is the staff command centre. Each item is a `GroupBooking` whose `leaderSubjectId` is the caller, provisional ones included. **Every status is returned, `cancelled` too**, so a guest sees a request the venue turned down; `status` narrows the list.
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest sees only the groups they lead; another guest's group is not in the list and, by id, is refused as one that does not exist.
-**Order.** Soonest `preferredDate` first, then by `id`.
+**Order.** Soonest `preferredDate` first, then by `id`. Where `preferredDate` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -5042,6 +5052,7 @@ Added for My Reservations (R8 blocker ORDERS-MONEY-C26): after `requestGroupBook
 | items[].attendeeCaptureRequired | boolean |  | Whether names are needed before admission. (default False) |
 | items[].attendeeCaptureDueBy | string (date-time) |  | (nullable) |
 | items[].status | enum (provisional, confirmed, namesPending, complete, cancelled) | yes |  |
+| items[].version | integer |  | The row's version, its ETag (accepted 26 October 2026, Chinmay, ADAM CR-257 option A): 1 on create and bumped on every write; getGroupBooking and updateGroupBooking send it as ETag, and updateGroupBo… (min 1; default 1; read-only) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -5058,7 +5069,7 @@ Added for My Reservations (R8 blocker ORDERS-MONEY-C26): after `requestGroupBook
 
 Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a listing made with `createResaleListing` was never readable again by the seller. Each item is a `ResaleListing` whose `sellerSubjectId` is the caller, with its `status`.
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): another guest's listing, named by `entitlementId`, is refused exactly as one that does not exist (404).
-**Order.** Newest first, by `listedAt` descending, then by `id`.
+**Order.** Newest first, by `listedAt` descending, then by `id`. Where `listedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -5124,7 +5135,7 @@ Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a listing 
 **Masked, always.** The last four digits and the brand — enough to choose between two saved cards and not enough to use one. A removed token (`revokedAt` set) is not returned (CHG-R8MIG-022).
 
 
-**Order.** Soonest first, by `expiresAt` ascending, then by `id`.
+**Order.** The default method first (`isDefault`), then newest first, by `id` descending (a UUIDv7); one order for the description and the response (ADAM CR-099; (the lead's answer of 25 October 2026 to the r10 lanes' questions; CHG-R10ORD-022)).
 
 |  |  |
 |---|---|
@@ -5138,12 +5149,13 @@ Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a listing 
 | Guest callable | True |
 | Reads | `payments.token` |
 | Writes | - |
-| Called by | GST-011, GST-071, WEB-021 |
+| Called by | GST-011, GST-015, GST-071, WEB-021, WEB-023 |
 
 **Parameters**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| subjectId | query |  | string (uuid) | The guest whose saved methods a staff caller reads (ADAM CR-099, option 1; CHG-R10ORD-016). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -5169,7 +5181,7 @@ Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a listing 
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Tokens, the default first, then by id. |
+| 200 |  | Tokens, the default first, then newest first by id descending (ADAM CR-099). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### payByLink
@@ -5179,6 +5191,8 @@ Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a listing 
 BL-072. **Payment against the link, by somebody with no account.**
 **Converts on success, and that is a decision rather than a mechanism** (ADR-0027). The reservation becomes an order the moment the money lands, because there is no staff member present at 11pm to press a button — **and a paid reservation that is still a reservation is inventory the venue thinks it can sell.**
 **The card never reaches the platform.** Tokenised at the gateway like every other payment (CF-131), and the link carries no card data at any point.
+
+**On `createPayment`'s rules** (ADAM CR-099, option 1; Chinmay, 15 October 2026; CHG-R10ORD-016). The provider is the venue's active provider for the link's channel, which `getPaymentLink` returns so the client tokenises against it. One `payments.payment_attempt` row per provider call and the cash-receipt ledger posting follow `createPayment`; a decline is `402 providerDeclined`, as there. **The status moves**: the order (`orders.sales_order`, already created when the link was, `payment_link.order_id`) goes from `pending` or `held` to `paid`; where the link was issued against a reservation, the reservation goes from `held` to `converted` with `converted_order_id` set to the order; the link goes to `paid` with `paidAt`; `order.paid` is written in the same transaction. **`entitlementIds` is empty in the answer**: Access issues the entitlements from `order.paid` after it (`x-ticvai-write-via`), and the client reads them from the order. **The token**: the link is found by its blind index (`PaymentLink.token`, a keyed hash, unique in the tenant), never by the token itself. An unknown token is `404`; a link that is expired, paid, superseded or cancelled is `410` naming which, as `getPaymentLink` (ADR-0027: a superseded token answers 410, never 404).
 
 |  |  |
 |---|---|
@@ -5190,7 +5204,7 @@ BL-072. **Payment against the link, by somebody with no account.**
 | Conflict policy | serverWins |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `orders.payment_link`, `orders.reservation`, `orders.sales_order`, `payments.provider` |
-| Writes | `access.entitlement`, `cache:idempotency`, `orders.payment`, `orders.payment_link`, `orders.reservation`, `orders.sales_order`, `platform.outbox` |
+| Writes | `access.entitlement`, `cache:idempotency`, `orders.payment`, `orders.payment_link`, `orders.reservation`, `orders.sales_order`, `payments.payment_attempt`, `platform.outbox` |
 | Called by | GST-009, WEB-014 |
 
 **Parameters**
@@ -5212,7 +5226,7 @@ BL-072. **Payment against the link, by somebody with no account.**
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | orderId | string (uuid) |  |  |
-| entitlementIds | array of string (uuid) |  |  |
+| entitlementIds | array of string (uuid) |  | Empty at response time (ADAM CR-099): the entitlements are written from order.paid after this answer; read them from the order. |
 
 **Responses**
 
@@ -5220,6 +5234,9 @@ BL-072. **Payment against the link, by somebody with no account.**
 |---|---|---|
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Paid, and the reservation converted |
+| 402 |  | The provider declined the payment (providerDeclined), as createPayment answers it (ADAM CR-099). |
+| 404 |  | No payment link has this token (ADAM CR-099). |
+| 410 |  | The link has expired, been paid, been superseded or been cancelled (linkExpired, linkPaid, linkSuperseded, linkCancelled), as getPaymentLink answers it (ADAM CR-099; ADR-0027). |
 | 409 |  | The hold went while they were paying (linesUnavailable). |
 
 ### previewProductTickets
@@ -5458,6 +5475,7 @@ Voids the old, issues the new. **The reason is recorded and the original is trac
 | attendeeCaptureRequired | boolean |  | Whether names are needed before admission. (default False) |
 | attendeeCaptureDueBy | string (date-time) |  | (nullable) |
 | status | enum (provisional, confirmed, namesPending, complete, cancelled) | yes |  |
+| version | integer |  | The row's version, its ETag (accepted 26 October 2026, Chinmay, ADAM CR-257 option A): 1 on create and bumped on every write; getGroupBooking and updateGroupBooking send it as ETag, and updateGroupBo… (min 1; default 1; read-only) |
 
 **Responses**
 
@@ -5581,6 +5599,8 @@ CF-131. **Network International and Stripe for Phase 1** — two gateways, which
 BL-014. **Transfer is contracted and sharing is not, and they are different acts.** A transfer changes the holder; a share lets a second person present the same entitlement while the first still owns it.
 **The owner can revoke; the recipient cannot transfer on.** That asymmetry is the whole point — a shared family pass should not become a resale chain.
 Governed by `EntitlementTemplate.canShareMedia`, which already exists and had nothing behind it.
+
+**The row a share is** (decided 25 October 2026, Chinmay, ADAM CR-209 option A; CHG-R10ID-004): one `identity.delegated_access` row with `over_object_ref` `entitlement:<entitlementId>`, `subject_id` the recipient (`toSubjectId`), `over_subject_id` the owner, `permission` `ENTITLEMENT_USE` and `role_id` null, `delegation_kind` `sharedEntitlement`, `effect` ALLOW, `valid_to` the request's `validUntil`, and `granted_by_kind` `subject` with `granted_by_subject_id` the owner. `revokeEntitlementShare` matches by exactly this mapping (Identity's `DelegatedAccess.delegationKind`).
 
 |  |  |
 |---|---|
@@ -5818,7 +5838,7 @@ Where the terminal captured the tip, this records what it reported. Where the gu
 | orderId | string (uuid) | yes |  |
 | tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -5905,7 +5925,7 @@ Captures an authorised payment. **Writes one `payments.payment_attempt` row for 
 | orderId | string (uuid) | yes |  |
 | tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -6016,7 +6036,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | orderId | string (uuid) | yes |  |
 | tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -6099,7 +6119,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | orderId | string (uuid) | yes |  |
 | tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -6382,6 +6402,7 @@ A venue with no refund policy answers `404`.
 | timeBands | array of object |  | Refundable percentage by time before the performance. |
 | timeBands[].hoursBefore | integer | yes | (min 0) |
 | timeBands[].percentage | number | yes | (min 0; max 100) |
+| timeBands[].refundType | enum (fullRefund, partialRefund, percentageRefund, proRataRefund, originalValueLessFees) |  | The refund type that applies in this band (the values of RefundCalculationPolicyView.refundTypes; ADAM CR-208). (nullable) |
 | allowPartial | boolean |  | (default True) |
 | refundWindowDays | integer |  | Days after purchase within which a refund may be made. (min 0; nullable) |
 | varianceThreshold | object |  | Price variance above this is an exception requiring review rather than a routine posting (CF-38). |
@@ -6410,6 +6431,7 @@ A venue with no refund policy answers `404`.
 | timeBands | array of object |  | Refundable percentage by time before the performance. |
 | timeBands[].hoursBefore | integer | yes | (min 0) |
 | timeBands[].percentage | number | yes | (min 0; max 100) |
+| timeBands[].refundType | enum (fullRefund, partialRefund, percentageRefund, proRataRefund, originalValueLessFees) |  | The refund type that applies in this band (the values of RefundCalculationPolicyView.refundTypes; ADAM CR-208). (nullable) |
 | allowPartial | boolean |  | (default True) |
 | refundWindowDays | integer |  | Days after purchase within which a refund may be made. (min 0; nullable) |
 | varianceThreshold | object |  | Price variance above this is an exception requiring review rather than a routine posting (CF-38). |
@@ -6441,6 +6463,8 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 
 **Store credit is a gift card** (decided 2 October 2026, Chinmay, batch 1, POS-011: "Gift card"; DEC-061; CHG-CSP-037; DI-796). A refund settled as store credit (`Refund.settleTo` `storeCredit`, or `alternateTender` `giftCard`) issues a new gift card for the refund amount (wallet `issueGiftCard`) and hands it to the guest; it is not a voucher and not a top-up of the guest's wallet. POS-011 offers it as "Gift card".
 
+**What each line and payment has left, and where it goes** (ADAM CR-208, option A; Chinmay, 25 October 2026; CHG-R10ORD-014). Every refund records what it took: one `orders.refund_line` row per order line it refunds (`refundedAmount`) and one `orders.refund_payment` row per payment it refunds against (`refundedAmount` in the base currency, `tenderAmount` in the payment's tender currency). **`refundableAmount`** is what each line, or each payment, paid minus what earlier refunds took from it (their `refund_line` and `refund_payment` rows). **Allocation across payments**: the most recent payment first, cash last. **Time bands apply per line**, by that line's own performance: each line's percentage is the band its own performance falls in, so one refund of lines for two performances can carry two percentages. **The refund type is the band's** (`RefundPolicy.timeBands[].refundType`; (the lead's answer of 25 October 2026 to the r10 lanes' questions; CHG-R10ORD-021)): a venue with no bands refunds in full before the cut-off (the performance start time of each line; for an undated line, the end of `refundWindowDays`, ADAM CR-208) and nothing after it. **`settleTo` onto the venue's `refundDestinations`** (`RefundCalculationPolicyView`): `originalTender` is `originalPayment`; `advanceBalance` is `walletCredit`; `storeCredit` is `voucherCreditNote` (issued as a gift card, CHG-CSP-037); `wireTransfer` is `originalPayment`, paid out by transfer. A `settleTo` whose destination the venue does not list is not offered. `exceedsRefundable` is an amount above the lines' (or the order's) `refundableAmount`.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_REFUND` |
@@ -6449,8 +6473,8 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.fraud_rule`, `orders.payment`, `orders.refund`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `ledger.journal_entry`, `ledger.posting`, `orders.order_event`, `orders.refund`, `platform.outbox` |
+| Reads | `cache:idempotency`, `orders.fraud_rule`, `orders.payment`, `orders.refund`, `orders.refund_line`, `orders.refund_payment`, `orders.sales_order` |
+| Writes | `cache:idempotency`, `ledger.journal_entry`, `ledger.posting`, `orders.order_event`, `orders.refund`, `orders.refund_line`, `orders.refund_payment`, `platform.outbox` |
 | Called by | ADM-610, ADM-616, BO-022, BO-023, BO-026, BO-047, BO-1147, EMP-034, POS-006, POS-011 |
 | State model | Coupon code ([states/coupon.yaml](../../../states/coupon.yaml)): moves `redeemed` -> `issued`<br/>Entitlement ([states/entitlement-status.yaml](../../../states/entitlement-status.yaml)): moves `issued` -> `cancelled`, `partiallyConsumed` -> `cancelled`<br/>F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): moves `served` -> `refunded`, `collected` -> `refunded`, `delivered` -> `refunded`<br/>Order ([states/order.yaml](../../../states/order.yaml)): moves `paid` -> `refunded`, `completed` -> `refunded`, `paid` -> `partiallyRefunded`, `completed` -> `partiallyRefunded`, `partiallyRefunded` -> `refunded`<br/>Payment ([states/payment.yaml](../../../states/payment.yaml)): moves `captured` -> `refunded`<br/>Refund ([states/refund.yaml](../../../states/refund.yaml)): moves `failed` -> `pendingGateway`<br/>Seat ([states/seat.yaml](../../../states/seat.yaml)): moves `sold` -> `available` |
 
@@ -6494,7 +6518,7 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 | fxVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | fxVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | tenderCurrency | string |  | A refund goes back in the currency the guest paid (decided 2 October 2026, Chinmay; CHG-FIN-001). (pattern ^[A-Z]{3}$; read-only; nullable) |
-| tenderAmount | object |  | The refund in tenderCurrency, at that currency's own scale (CHG-FIN-001). (read-only) |
+| tenderAmount | object |  | The refund in tenderCurrency, at that currency's own scale (CHG-FIN-001), its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192). (read-only) |
 | tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -6503,6 +6527,23 @@ Sequencing is ledger-first: the ledger entry is written, then the gateway is cal
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | appliedPercentage | number |  | From the venue's time bands, or an approver override. |
+| lines | array of object |  | What the refund took from each order line (ADAM CR-208, option A; CHG-R10ORD-014): child rows, orders.refund_line, one per line refunded, written by createRefund. (read-only) |
+| lines[].orderLineId | string (uuid) | yes |  |
+| lines[].refundedAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| lines[].refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| lines[].refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| lines[].appliedPercentage | number |  | The time band of this line's own performance (ADAM CR-208). (nullable) |
+| payments | array of object |  | What the refund took from each payment (ADAM CR-208, option A; CHG-R10ORD-014): child rows, orders.refund_payment (the decision's refund_allocation; naming-and-style bans allocation in DDL), one per… (read-only) |
+| payments[].paymentId | string (uuid) | yes |  |
+| payments[].refundedAmount | object | yes | In the base currency, for the ledger. |
+| payments[].refundedAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| payments[].refundedAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| payments[].refundedAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| payments[].tenderAmount | object |  | In the payment's tender currency (Payment.tenderCurrency), at that currency's scale; null where the payment was in the base currency. (nullable) |
+| payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| payments[].tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| payments[].tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | status | enum (pendingApproval, pendingGateway, completed, declined, failed) | yes |  |
 | reason | string |  |  |
 | requestedByPrincipalId | string (uuid) |  |  |
@@ -6588,7 +6629,7 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `orders.refund` |
+| Reads | `orders.refund`, `orders.refund_line`, `orders.refund_payment` |
 | Writes | - |
 | Called by | ADM-609, ADM-616, BO-022, BO-023, BO-026, BO-047, BO-1147, EMP-014, EMP-034, POS-006, POS-011, PTR-002, PTR-005, PTR-008, PTR-015, PTR-016 |
 
@@ -6616,7 +6657,7 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 | items[].fxVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].fxVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].tenderCurrency | string |  | A refund goes back in the currency the guest paid (decided 2 October 2026, Chinmay; CHG-FIN-001). (pattern ^[A-Z]{3}$; read-only; nullable) |
-| items[].tenderAmount | object |  | The refund in tenderCurrency, at that currency's own scale (CHG-FIN-001). (read-only) |
+| items[].tenderAmount | object |  | The refund in tenderCurrency, at that currency's own scale (CHG-FIN-001), its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192). (read-only) |
 | items[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -6625,6 +6666,14 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 | items[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].appliedPercentage | number |  | From the venue's time bands, or an approver override. |
+| items[].lines | array of object |  | What the refund took from each order line (ADAM CR-208, option A; CHG-R10ORD-014): child rows, orders.refund_line, one per line refunded, written by createRefund. (read-only) |
+| items[].lines[].orderLineId | string (uuid) | yes |  |
+| items[].lines[].refundedAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].appliedPercentage | number |  | The time band of this line's own performance (ADAM CR-208). (nullable) |
+| items[].payments | array of object |  | What the refund took from each payment (ADAM CR-208, option A; CHG-R10ORD-014): child rows, orders.refund_payment (the decision's refund_allocation; naming-and-style bans allocation in DDL), one per… (read-only) |
+| items[].payments[].paymentId | string (uuid) | yes |  |
+| items[].payments[].refundedAmount | object | yes | In the base currency, for the ledger. |
+| items[].payments[].tenderAmount | object |  | In the payment's tender currency (Payment.tenderCurrency), at that currency's scale; null where the payment was in the base currency. (nullable) |
 | items[].status | enum (pendingApproval, pendingGateway, completed, declined, failed) | yes |  |
 | items[].reason | string |  |  |
 | items[].requestedByPrincipalId | string (uuid) |  |  |
@@ -6662,7 +6711,7 @@ Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a request 
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `orders.refund` |
+| Reads | `orders.refund`, `orders.refund_line`, `orders.refund_payment` |
 | Writes | - |
 | Called by | GST-067, WEB-019 |
 
@@ -6690,7 +6739,7 @@ Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a request 
 | items[].fxVariance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].fxVariance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].tenderCurrency | string |  | A refund goes back in the currency the guest paid (decided 2 October 2026, Chinmay; CHG-FIN-001). (pattern ^[A-Z]{3}$; read-only; nullable) |
-| items[].tenderAmount | object |  | The refund in tenderCurrency, at that currency's own scale (CHG-FIN-001). (read-only) |
+| items[].tenderAmount | object |  | The refund in tenderCurrency, at that currency's own scale (CHG-FIN-001), its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192). (read-only) |
 | items[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -6699,6 +6748,14 @@ Added for the Refunds & Resale tracker (R8 blocker ORDERS-MONEY-C26): a request 
 | items[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | items[].appliedPercentage | number |  | From the venue's time bands, or an approver override. |
+| items[].lines | array of object |  | What the refund took from each order line (ADAM CR-208, option A; CHG-R10ORD-014): child rows, orders.refund_line, one per line refunded, written by createRefund. (read-only) |
+| items[].lines[].orderLineId | string (uuid) | yes |  |
+| items[].lines[].refundedAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].appliedPercentage | number |  | The time band of this line's own performance (ADAM CR-208). (nullable) |
+| items[].payments | array of object |  | What the refund took from each payment (ADAM CR-208, option A; CHG-R10ORD-014): child rows, orders.refund_payment (the decision's refund_allocation; naming-and-style bans allocation in DDL), one per… (read-only) |
+| items[].payments[].paymentId | string (uuid) | yes |  |
+| items[].payments[].refundedAmount | object | yes | In the base currency, for the ledger. |
+| items[].payments[].tenderAmount | object |  | In the payment's tender currency (Payment.tenderCurrency), at that currency's scale; null where the payment was in the base currency. (nullable) |
 | items[].status | enum (pendingApproval, pendingGateway, completed, declined, failed) | yes |  |
 | items[].reason | string |  |  |
 | items[].requestedByPrincipalId | string (uuid) |  |  |
@@ -6902,7 +6959,7 @@ Releases held capacity immediately rather than waiting for expiry. A guest cance
 | payments[].orderId | string (uuid) | yes |  |
 | payments[].tender | TenderKind: enum (cash, card, wallet, voucher, bankTransfer, hotelCharge, installment, giftCard, …) | yes | wallet is a digital wallet (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside card (decided 28 September, audit R080 (a)). |
 | payments[].tenderCurrency | string |  | 4.6.11. (pattern ^[A-Z]{3}$) |
-| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale. |
+| payments[].tenderAmount | object |  | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | payments[].tenderAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | payments[].tenderAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | payments[].tenderAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -7469,7 +7526,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | foreignHoldings[].baseEquivalent.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | foreignHoldings[].baseEquivalent.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | foreignHoldings[].baseEquivalent.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| expectedTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| expectedTotal | expectedTotal |  | The figure the box's close count is measured against, filled when the box is counted. (nullable) |
 | expectedTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | expectedTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | expectedTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -7477,7 +7534,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | countedTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | countedTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | countedTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| variance | Money |  | On the wire this is three fields; in the database it is one column. |
+| variance | variance |  | Counted minus expected; negative is short. (nullable) |
 | variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -7527,7 +7584,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | foreignHoldings[].baseEquivalent.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | foreignHoldings[].baseEquivalent.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | foreignHoldings[].baseEquivalent.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| expectedTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| expectedTotal | object |  | The figure the box's close count is measured against, filled when the box is counted. (nullable) |
 | expectedTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | expectedTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | expectedTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -7535,7 +7592,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | countedTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | countedTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | countedTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| variance | Money |  | On the wire this is three fields; in the database it is one column. |
+| variance | object |  | Counted minus expected; negative is short. (nullable) |
 | variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -7557,6 +7614,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 **`POST /shifts/{shiftId}/approve-open`**: Approve a shift opening outside tolerance
 
 A float that does not match the venue's expected amount holds the shift in `pendingApproval` until a supervisor accepts it. Without this the cashier cannot trade, and with it the variance at close has a known starting point.
+**Never the cashier who opened the shift, and always with a supervisor's PIN on the till** (ADAM CR-200, option A; Chinmay, 21 October 2026; CHG-R10ORD-003), as on `acceptShiftVariance`: the approval happens at POS-001 on the cashier's own till, where only a step-up proves a supervisor was present, and a cashier approving their own out-of-tolerance float is not a control. The principal who opened the shift (`Shift.principalId`) is refused `403 approver-is-cashier`, whether it is the caller or the supervisor in `supervisorStepUp`. `supervisorStepUp` carries the principal and PIN of the supervisor approving, entered on the device making this call and verified by Identity through `identity#verifySupervisorStepUp`, as `common.yaml` `SupervisorStepUp` says; the approving principal recorded is the step-up's. Optional in the schema so a client built before r10 still validates, **refused without it** (`403 supervisor-step-up-refused`).
 
 |  |  |
 |---|---|
@@ -7566,6 +7624,7 @@ A float that does not match the venue's expected amount holds the shift in `pend
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
+| Step-up auth | pin |
 | Reads | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident` |
 | Writes | `cache:idempotency`, `orders.pos_shift`, `orders.pos_shift_approval` |
 | Called by | POS-001 |
@@ -7583,6 +7642,10 @@ A float that does not match the venue's expected amount holds the shift in `pend
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | reason | string | yes | (min length 3; max length 300) |
+| supervisorStepUp | object |  | The supervisor approving, signing on this device (ADAM CR-200). |
+| supervisorStepUp.principalId | string (uuid) |  | The supervisor signing. |
+| supervisorStepUp.supervisorUsername | string |  | The supervisor's employee number, which is what the step-up prompt asks for (R8 blocker fix, IDENTITY-C44). (max length 200) |
+| supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Response**: `Shift`
 
@@ -7659,6 +7722,7 @@ A float that does not match the venue's expected amount holds the shift in `pend
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Approved and open |
+| 403 |  | The caller lacks SHIFT_APPROVE_OPEN at this venue, or the caller or the step-up's supervisor is the cashier who opened the shift (problem type approver-is-cashier; ADAM CR-200). |
 | 409 |  | Shift is not pendingApproval (problem type shift-not-awaiting-approval) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -7691,7 +7755,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | Reads | `cache:idempotency`, `ledger.fx_rate`, `orders.cash_count_line`, `orders.cash_movement`, `orders.payment`, `orders.pos_shift`, `orders.pos_shift_approval`, `orders.pos_shift_incident`, `orders.sales_order`, `orders.till_shift_policy`, `platform.venue_settings` |
 | Writes | `cache:idempotency`, `orders.cash_count_line`, `orders.pos_shift`, `platform.outbox` |
 | Called by | BO-040, BO-043, POS-007 |
-| State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `open` -> `pendingClosure` |
+| State model | Shift ([states/shift.yaml](../../../states/shift.yaml)): moves `open` -> `pendingClosure`, `suspended` -> `pendingClosure` |
 
 **Parameters**
 
@@ -7937,6 +8001,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 
 **The closing count, note by note, for the person reviewing it** (decided 2 October 2026, Chinmay, batch 6 #176, BO-040: "Add a read for the count lines"; DEC-176; CHG-CSP-014; DI-272: the closing receipt itemises denominations). Until 2 October the lines were written (`CashCountLine`) and nothing returned them, so BO-040 could show totals only. Returns the shift's `CashCountLine` rows, filtered by `countKind` (default all), **ordered by `countKind` (opening float, close, movement), then count number (a recount after the first count), then the denomination's counting order, `id` as the tiebreak**. Each recount line names the line it replaces (`recountOf`).
 **What the cashier counted, never what was expected**: a line carries counted quantity and value only (`CashCountLine.expectedQuantity` is derived and not returned), so the read is safe for the shift's own cashier as well as the supervisor; the expected figure and the variance stay on `Shift` for OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER holders (CHG-FIN-003).
+Where `countKind` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -8207,6 +8272,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 Raised by Tanmay in the 20 August review, and **the table was built and nothing read it** — found by auditing which tables no operation names.
 **Ordered for counting, not by value.** A cashier counts notes highest first and coins in the order they sit in the tray, and `sortOrder` is what makes the count screen match the physical drawer.
 **Inactive denominations are returned by default and marked**, because a till counting a note withdrawn last year still has to record the one in the drawer.
+**Whose denominations** (ADAM CR-219, option A, as built; Chinmay, 25 October 2026; CHG-R10ORD-002): the denominations of the trading currency of each region the caller can see (its own region for a venue caller, every region for the tenant root), each valued at its region's scale, read through `tenancy#regionSettingsRecords` under the caller's row-level security. A Dubai till gets AED's notes and coins, never Muscat's OMR.
 
 |  |  |
 |---|---|
@@ -8241,7 +8307,9 @@ Raised by Tanmay in the 20 August review, and **the table was built and nothing 
 5.8.1. **A deposit box is allocated to a cashier, not to a till.** A cashier moving between workstations takes their float with them, and a workstation used by three people in a day has three boxes through it.
 That separation is what makes a variance attributable to a person rather than to a counter.
 **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
-**Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.
+**Statuses.** Without `openOnly`, every `status` is returned, ended ones included (`closed`, `reconciled`). **`openOnly=true` returns the boxes not yet closed**: `allocated`, `open`, `suspended` and `closing` (ADAM CR-218, option A; Chinmay, 25 October 2026; CHG-R10ORD-001), which is how POS-015 and POS-018 use the list.
+**`overDrawerLimit` while a box trades** (ADAM CR-218). The box's expected cash is its opening float plus the cash payments taken on the box's shift (`orders.payment` of method cash on `shiftId`, in the box's currency) less the change given on them (`changeAmount`) less `withdrawnTotal`; once the box is counted it is `expectedTotal`. `overDrawerLimit` compares that figure against the workstation's `cashDrawerLimit` (`tenancy#workstationRecords`), else the venue's (`tenancy#venueSettingsRecords`); false where neither is set. The flag carries no figure.
+**The blind close holds for the box** (ADAM CR-218): `expectedTotal` and `variance` follow `Shift.expectedCash` (CHG-FIN-003). They are returned only to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue, and are null to everyone else, the box's own cashier included.
 
 |  |  |
 |---|---|
@@ -8252,7 +8320,7 @@ That separation is what makes a variance attributable to a person rather than to
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `identity.principal`, `orders.deposit_box`, `orders.deposit_box_foreign_holding`, `orders.deposit_box_opening_denomination` |
+| Reads | `identity.principal`, `orders.deposit_box`, `orders.deposit_box_foreign_holding`, `orders.deposit_box_opening_denomination`, `orders.payment` |
 | Writes | - |
 | Called by | BO-042, POS-015, POS-018 |
 
@@ -8260,7 +8328,7 @@ That separation is what makes a variance attributable to a person rather than to
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| openOnly | query |  | boolean |  |
+| openOnly | query |  | boolean | True: only the boxes not yet closed (allocated, open, suspended, closing). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -8294,7 +8362,7 @@ That separation is what makes a variance attributable to a person rather than to
 | items[].foreignHoldings[].countedAmount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | items[].foreignHoldings[].variance | Money |  | On the wire this is three fields; in the database it is one column. |
 | items[].foreignHoldings[].baseEquivalent | object |  | At the rates on the payments, not today's. |
-| items[].expectedTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].expectedTotal | object |  | The figure the box's close count is measured against, filled when the box is counted. (nullable) |
 | items[].expectedTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].expectedTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].expectedTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -8302,7 +8370,7 @@ That separation is what makes a variance attributable to a person rather than to
 | items[].countedTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].countedTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].countedTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| items[].variance | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].variance | object |  | Counted minus expected; negative is short. (nullable) |
 | items[].variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -8324,7 +8392,7 @@ That separation is what makes a variance attributable to a person rather than to
 
 **`GET /shifts`**: List shifts
 
-**Order.** Newest first, by `recordedAt` descending, then by `id`.
+**Order.** Newest first, by `recordedAt` where the device sent one and otherwise by `openedAt`, the server's open time: `coalesce(recorded_at, opened_at)` descending, then `id` (`ORDER BY coalesce(recorded_at, opened_at) DESC, id`), and `PageCursor` encodes that value and the id (ADAM CR-206, option A; Chinmay, 21 October 2026; CHG-R10ORD-004). `recordedAt` is optional on `openShift` and nullable on `orders.pos_shift`, so a shift opened online with no device time sorts by when the server opened it, and "newest first" holds for online and offline shifts alike.
 
 |  |  |
 |---|---|
@@ -9381,7 +9449,7 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | foreignHoldings[].baseEquivalent.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | foreignHoldings[].baseEquivalent.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | foreignHoldings[].baseEquivalent.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| expectedTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| expectedTotal | object |  | The figure the box's close count is measured against, filled when the box is counted. (nullable) |
 | expectedTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | expectedTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | expectedTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -9389,7 +9457,7 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | countedTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | countedTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | countedTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| variance | Money |  | On the wire this is three fields; in the database it is one column. |
+| variance | object |  | Counted minus expected; negative is short. (nullable) |
 | variance.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | variance.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | variance.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -9419,7 +9487,7 @@ Needs operator attention. These will not retry — surfacing them is the differe
 A rejection leaves this list's unresolved view when `resolveSyncRejection` records what was done about it.
 
 
-**Order.** Newest first, by `recordedAt` descending, then by `id`.
+**Order.** Newest first, by `recordedAt` descending, then by `id`. Where `recordedAt` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
 |---|---|
@@ -9724,9 +9792,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | no |  |
 | opening_float | numeric(18,4) | yes |  |
 | withdrawn_amount | numeric(18,4) | no | Reduces the expected close figure. |
-| expected_amount | numeric(18,4) | no |  |
+| expected_amount | numeric(18,4) | no | The figure the box's close count is measured against, filled when the box is counted. |
 | counted_amount | numeric(18,4) | no |  |
-| variance_amount | numeric(18,4) | no |  |
+| variance_amount | numeric(18,4) | no | Counted minus expected; negative is short. |
 | closed_by_principal_id | uuid | no | Flagged where it is not the holder. |
 | allocated_at | timestamptz | no | When the device recorded the allocation. |
 | closed_at | timestamptz | no |  |
@@ -9796,6 +9864,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_attendee_capture_required | boolean | no | Whether names are needed before admission. |
 | attendee_capture_due_by | timestamptz | no |  |
 | status | text | yes |  |
+| version | integer | no | The row's version, its ETag (accepted 26 October 2026, Chinmay, ADAM CR-257 option A): 1 on create and bumped on every write; getGroupBooking and updateGroupBooking send it as ETag, and updateGroupBo… |
 
 ### `orders.group_participant`
 
@@ -9959,7 +10028,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | order_id | uuid | yes |  |
 | tender | text | yes |  |
 | tender_currency | text | no | 4.6.11. |
-| tender_amount | numeric(18,4) | no | The amount in tenderCurrency, at that currency's own scale. |
+| tender_amount | numeric(18,4) | no | The amount in tenderCurrency, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-0… |
 | fx_rate | numeric(18,6) | no | The rate applied, stored on the payment rather than looked up later (CF-37). |
 | fx_rate_source | text | no | 4.2.8. |
 | change_currency | text | no | 4.6.11 is deliberately asymmetric: accept foreign currency, refund in local. |
@@ -10063,7 +10132,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | settle_to | text | no | BL-086. |
 | fx_variance | numeric(18,4) | no | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
 | tender_currency | text | no | A refund goes back in the currency the guest paid (decided 2 October 2026, Chinmay; CHG-FIN-001). |
-| tender_amount | numeric(18,4) | no | The refund in tenderCurrency, at that currency's own scale (CHG-FIN-001). |
+| tender_amount | numeric(18,4) | no | The refund in tenderCurrency, at that currency's own scale (CHG-FIN-001), its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192). |
 | refunded_amount | numeric(18,4) | yes |  |
 | applied_percentage | numeric | no | From the venue's time bands, or an approver override. |
 | status | text | yes |  |
@@ -10075,6 +10144,26 @@ Every table this service owns that the slice reads or writes, with its columns a
 | gateway_reference | text | no |  |
 | created_at | timestamptz | yes |  |
 | completed_at | timestamptz | no |  |
+
+### `orders.refund_line`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| refund_id | uuid | yes | The parent row. |
+| order_line_id | uuid | yes |  |
+| refunded_amount | numeric(18,4) | yes |  |
+| applied_percentage | numeric | no | The time band of this line's own performance (ADAM CR-208). |
+
+### `orders.refund_payment`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Synthesised key. |
+| refund_id | uuid | yes | The parent row. |
+| payment_id | uuid | yes |  |
+| refunded_amount | numeric(18,4) | yes | In the base currency, for the ledger. |
+| tender_amount | numeric(18,4) | no | In the payment's tender currency (Payment.tenderCurrency), at that currency's scale; null where the payment was in the base currency. |
 
 ### `orders.refund_policy`
 
@@ -10096,6 +10185,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | refund_policy_id | uuid | yes | The parent row. |
 | hours_before | integer | yes |  |
 | percentage | numeric | yes |  |
+| refund_type | text | no | The refund type that applies in this band (the values of RefundCalculationPolicyView.refundTypes; ADAM CR-208). |
 | id | uuid | yes | Synthesised key. |
 
 ### `orders.resale_listing`
@@ -10390,7 +10480,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-205 operations, added to this service in later releases without changing any of the above.
+206 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -10398,7 +10488,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | cart | `listAbandonedCarts` |
 | drafted | `approveExceptionServiceRecovery`, `approveGroupDiscountException`, `approveListingModeration`, `createListingSeller`, `createOrderSourceChannel`, `createUpgradeCredentialRegeneration`, `listAmendmentAfterSale`, `listAmendmentAfterSale2`, `listBulkGroupAssisted`, `listBuyerCheckoutInventory`, `listBuyerPurchaseResale`, `listCapacityInventoryReconciliation`, `listCapacityReservationInventory`, `listCreateListingResale`, `listCredentialRevocationRegeneration`, `listDepositPartialPayment`, `listExternalPaymentPartner`, `listFeeSellerProceed`, `listFinancialTraceability`, `listGroupAmendmentCancellation`, `listGroupBooking`, `listGroupBookingReconciliation`, `listGroupCustomerOrganization`, `listGroupEnquiryOpportunity`, `listGroupPaymentDeposit`, `listGroupRequirementAvailability`, `listGroupSale`, `listGroupSale2`, `listGroupTicketFulfillment`, `listGroupTicketSeat`, `listListingLifecycleExpiry`, `listOfficialResaleMarketplace`, `listOrderFinancialReconciliation`, `listOrderLifecycleTimeline`, `listOrderLineProduct`, `listOrderPaymentDetail`, `listOrderReservation`, `listOrderSplitMerge`, `listParticipantGuestList`, `listPaymentOrderFinancial`, `listPaymentReconciliationException`, `listPersonTypeProduct`, `listQuoteBookingConversion`, `listQuoteRevisionNegotiation`, `listRefundDisputeResale`, `listRelatedOrderTransaction`, `listResale`, `listResale2`, `listResaleConfirmationOwnership`, `listResaleEligibilityTicket`, `listResaleFeeCommission`, `listResaleFraudDuplicate`, `listResaleInventoryAvailability`, `listResaleListingSeller`, `listResaleMarketplace`, `listResaleOwnership`, `listResalePolicyMarketplace`, `listResalePricingPrice`, `listResaleTicketDetail`, `listReservationConfirmationExpiry`, `listSellerSettlementPayout`, `listTicketOwnershipTransfer`, `listTicketReissueFulfillment`, `listTicketResaleMarketplace`, `listUpgradeConversion`, `listUpgradeEligibilityQualification`, `listUpgradeException`, `listUpgradeFinancialTreatment`, `listUpgradeTimingUsage`, `listVoidReversalSame`, `listWhiteLabelMarketplace`, `setAfterSaleFinancial`, `setAmendmentEligibilityPolicy`, `setCancellationPartialPolicy`, `setCustomerGuestAccount`, `setGroupBookingHandover`, `setGroupOperationalPlanning`, `setGroupPackageExperience`, `setGroupQuotationProposal`, `setMultiPaymentSplit`, `setOrderAmendment`, `setOrderDetailTransaction`, `setOrderReservationStatus`, `setProRataResidual`, `setResaleEligibilityRule`, `setResaleMarketplaceRecommendation`, `setReservationHoldPolicy`, `setUpgradeConversionPath` |
 | order | `getDepositPolicy`, `setDepositPolicy` |
-| orders | `assignChargeback`, `authoriseStoredValue`, `cancelPaymentLink`, `captureStoredValue`, `cleanupFailedPayment`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `revokePaymentToken`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
+| orders | `assignChargeback`, `attachGuestCheckoutOrders`, `authoriseStoredValue`, `cancelPaymentLink`, `captureStoredValue`, `cleanupFailedPayment`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `revokePaymentToken`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
 | payments | `createB2bCreditAccount`, `createInstalmentPlan`, `createPaymentMethod`, `getB2bPaymentTerms`, `getDunningPolicy`, `getInstalmentPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listInstalmentPlans`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminalCertifications`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `receivePaymentProviderWebhook`, `recordDepositActivity`, `recordPaymentTerminalCertification`, `resolveDunningCase`, `setB2bPaymentTerms`, `setHostedCheckoutConfiguration`, `setInstalmentPolicy`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
 | policy | `getRefundPolicy`, `setRefundCalculationPolicy` |
 | refund | `approveRefund`, `createBulkRefund`, `simulateRefund` |

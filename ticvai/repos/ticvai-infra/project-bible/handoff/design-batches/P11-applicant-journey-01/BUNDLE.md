@@ -100,8 +100,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ACC-001` | Landing / Programme Overview | D | 0 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ACC-002` | Registration Form | D | 21 | 20 | 5 | 1 | 6 | 0 | — | notStarted (generated) |
 | `ACC-003` | Application Review & Submit | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ACC-004` | Application Status Tracking | D | 1 | 40 | 6 | 7 | 2 | 0 | — | notStarted (generated) |
-| `ACC-005` | Accreditation Badge | D | 0 | 0 | 5 | 2 | 2 | 6 | — | notStarted (generated) |
+| `ACC-004` | Application Status Tracking | D | 1 | 60 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ACC-005` | Accreditation Badge | D | 0 | 80 | 5 | 3 | 2 | 6 | — | notStarted (generated) |
 
 ---
 
@@ -732,9 +732,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Shown**
 
-**With a reviewer** (banner): Where it is now, and **the date a decision is due** — `ApprovalRequest.slaDueAt`. *"Fourth in the queue"* was considered and rejected on the frame: a position moves backwards and a date does not.
-
-**Where it has been** (timeline, from `listMyAccreditationApplications`): Received, documents checked, decision — each with its date.
+**With a reviewer** (banner, from `listMyAccreditationApplications`): Where it is now, and **the date a decision is due** — `AccreditationApplication.decisionDueAt`. *"Fourth in the queue"* was considered and rejected on the frame: a position moves backwards and a date does not.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -759,7 +757,32 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Holder | the name it points at, never the id | — |
 | Renews holder | the name it points at, never the id | 12.1.37. |
 
-**Application** (detail panel, from `listMyAccreditationApplications`): The reference, the performances, and what was requested.
+**Where it has been** (timeline, from `listMyAccreditationApplications`): From the application itself: `submittedAt`, `requirementStatus` and `missingRequirements` (documents checked), `decidedAt` (check-screen-value-sources, CHG-R10UI-015). Received, documents checked, decision — each with its date.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Reference | text | — |
+| Programme | the name it points at, never the id | — |
+| Category code | text | — |
+| Applicant type | text | — |
+| Submitted by principal | the name it points at, never the id | — |
+| Organisation | the name it points at, never the id | — |
+| Subject | grouped details | Name, date of birth, nationality, contact — shaped by the requirements matrix. |
+| Requirement status | list or chips (count when long) | — |
+| Requirement code | text | — |
+| Satisfied | yes / no (icon or chip) | — |
+| Document | the name it points at, never the id | — |
+| Status | chip: Draft, Submitted, Under review, Information requested, Approved, Rejected… | — |
+| Decision reason | text | — |
+| Missing requirements | list or chips (count when long) | The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting |
+| Decision due at | 1 Oct 2026, 14:30 | When a decision is due — the approvals request's SLA. |
+| Approval request | the name it points at, never the id | — |
+| Holder | the name it points at, never the id | — |
+| Renews holder | the name it points at, never the id | 12.1.37. |
+
+**Application** (detail panel, from `listMyAccreditationApplications`): `AccreditationApplication.reference`, `programmeId`, `categoryCode` and `subject` (check-screen-value-sources, CHG-R10UI-015). The reference, the performances, and what was requested.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -874,17 +897,7 @@ Screen guard: `ACCREDITATION_APPLY`
 
 #### Requirements it meets
 
-7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 11.1.10 | Out-of-Office Routing - System shall automatically reroute approvals when approvers are unavailable. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.28 | Mobile Approvals - System shall support approval actions through mobile applications. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.29 | Email-Based Approvals - System shall support approval actions through email links. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.54 | Approval Reopening - System shall support reopening previously completed approval requests. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.73 | AI Risk Assessment - System shall provide AI-generated risk assessments for approval requests. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.75 | AI Escalation Recommendations - System shall recommend escalation actions based on approval patterns. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
-| 11.1.78 | Shared Service Approval Centers - System shall support centralized approval processing teams. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -906,7 +919,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (403, 409).
-- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (60 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ACC-004?state=<state>`: loading, emptyNoResults, error, denied, emptyFirstRun, offline.
 - [ ] Every action is wired with its success and its failure: Add a document, Withdraw this application.
 - [ ] Every transition is wired: `ACC-005`.
@@ -967,13 +980,105 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Your badge** (credential display): The scannable credential, rendered large and bright. **Offline is required** — a stage door is the worst signal in the building, and the 2 September decision that a dynamic-QR ticket is redirected into the app exists for exactly this reason.
+**Your badge** (credential display, from `listMyAccreditationCredentials`): The scannable credential, rendered large and bright. **Offline is required** — a stage door is the worst signal in the building, and the 2 September decision that a dynamic-QR ticket is redirected into the app exists for exactly this reason.
 
-**Holder** (detail panel): Name, role and outlet, as printed. Photographer · The Northern Review.
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Holder | the name it points at, never the id | — |
+| Kind | chip: Printed badge, Mobile credential, QR, NFC card, RFID card, Wristband | — |
+| Symbology | chip: QR, Data matrix, Pdf417, Aztec, Code128, NFC ndef… | 12.1.22. How `encodedIdentifier` is carried, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a … |
+| Serial number | text | — |
+| Encoded identifier | text | — |
+| Badge template | the name it points at, never the id | — |
+| Issued at | 1 Oct 2026, 14:30 | — |
+| Issued by | the name it points at, never the id | — |
+| Activated at | 1 Oct 2026, 14:30 | — |
+| Status | chip: Pending print, Issued, Active, Lost, Replaced, Revoked… | — |
+| Replaces credential | the name it points at, never the id | — |
+| Replacement count | 1,234 | — |
+| Holder name | text | What the badge prints and the register lists (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's … |
+| Zones | list or chips (count when long) | Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with … |
+| Zone | the name it points at, never the id | — |
+| Zone name | text | — |
+| Valid to | 1 Oct 2026 | Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. |
+| Next cursor | text | — |
 
-**Where it works** (detail panel): **Stage door, stalls and pit, named performances — and *any other door, refused*.** The negative case is stated on the badge because the steward reads this, not a policy.
+**Holder** (detail panel, from `listMyAccreditationCredentials`): Name, role and outlet, as printed. Photographer · The Northern Review.
 
-**Valid until** (banner): **`expired` and `revoked` must be unmistakable and must not resemble `loading`.** `AccreditationBadge.state` carries both, and `revokedReason` says why.
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Holder | the name it points at, never the id | — |
+| Kind | chip: Printed badge, Mobile credential, QR, NFC card, RFID card, Wristband | — |
+| Symbology | chip: QR, Data matrix, Pdf417, Aztec, Code128, NFC ndef… | 12.1.22. How `encodedIdentifier` is carried, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a … |
+| Serial number | text | — |
+| Encoded identifier | text | — |
+| Badge template | the name it points at, never the id | — |
+| Issued at | 1 Oct 2026, 14:30 | — |
+| Issued by | the name it points at, never the id | — |
+| Activated at | 1 Oct 2026, 14:30 | — |
+| Status | chip: Pending print, Issued, Active, Lost, Replaced, Revoked… | — |
+| Replaces credential | the name it points at, never the id | — |
+| Replacement count | 1,234 | — |
+| Holder name | text | What the badge prints and the register lists (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's … |
+| Zones | list or chips (count when long) | Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with … |
+| Zone | the name it points at, never the id | — |
+| Zone name | text | — |
+| Valid to | 1 Oct 2026 | Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. |
+| Next cursor | text | — |
+
+**Where it works** (detail panel, from `listMyAccreditationCredentials`): **Stage door, stalls and pit, named performances — and *any other door, refused*.** The negative case is stated on the badge because the steward reads this, not a policy.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Holder | the name it points at, never the id | — |
+| Kind | chip: Printed badge, Mobile credential, QR, NFC card, RFID card, Wristband | — |
+| Symbology | chip: QR, Data matrix, Pdf417, Aztec, Code128, NFC ndef… | 12.1.22. How `encodedIdentifier` is carried, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a … |
+| Serial number | text | — |
+| Encoded identifier | text | — |
+| Badge template | the name it points at, never the id | — |
+| Issued at | 1 Oct 2026, 14:30 | — |
+| Issued by | the name it points at, never the id | — |
+| Activated at | 1 Oct 2026, 14:30 | — |
+| Status | chip: Pending print, Issued, Active, Lost, Replaced, Revoked… | — |
+| Replaces credential | the name it points at, never the id | — |
+| Replacement count | 1,234 | — |
+| Holder name | text | What the badge prints and the register lists (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's … |
+| Zones | list or chips (count when long) | Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with … |
+| Zone | the name it points at, never the id | — |
+| Zone name | text | — |
+| Valid to | 1 Oct 2026 | Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. |
+| Next cursor | text | — |
+
+**Valid until** (banner, from `listMyAccreditationCredentials`): **`expired` and `revoked` must be unmistakable and must not resemble `loading`.** `AccreditationCredential.status` carries both (CHG-R10UI-016).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Holder | the name it points at, never the id | — |
+| Kind | chip: Printed badge, Mobile credential, QR, NFC card, RFID card, Wristband | — |
+| Symbology | chip: QR, Data matrix, Pdf417, Aztec, Code128, NFC ndef… | 12.1.22. How `encodedIdentifier` is carried, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a … |
+| Serial number | text | — |
+| Encoded identifier | text | — |
+| Badge template | the name it points at, never the id | — |
+| Issued at | 1 Oct 2026, 14:30 | — |
+| Issued by | the name it points at, never the id | — |
+| Activated at | 1 Oct 2026, 14:30 | — |
+| Status | chip: Pending print, Issued, Active, Lost, Replaced, Revoked… | — |
+| Replaces credential | the name it points at, never the id | — |
+| Replacement count | 1,234 | — |
+| Holder name | text | What the badge prints and the register lists (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's … |
+| Zones | list or chips (count when long) | Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with … |
+| Zone | the name it points at, never the id | — |
+| Zone name | text | — |
+| Valid to | 1 Oct 2026 | Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. |
+| Next cursor | text | — |
 
 **Actions and what each produces**
 
@@ -1059,12 +1164,13 @@ Screen guard: `ACCREDITATION_APPLY`
 
 #### Requirements it meets
 
-2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 12.1.21 | Digital Credentials - System shall support mobile accreditation credentials. | Accreditation & Credential Management | CONTRACTED | `listMyAccreditationCredentials` |
 | 12.1.37 | Accreditation Renewal - System shall support accreditation renewal workflows. | Accreditation & Credential Management | CONTRACTED | `renewAccreditation` |
+| 12.1.22 | QR Credential Support - System shall support QR-based accreditation credentials. | Accreditation & Credential Management | CONTRACTED | data `AccreditationCredential` |
 
 #### Client meeting inputs
 
@@ -1093,7 +1199,7 @@ Also apply: 8 for all of P11, 29 for every app (section *Design inputs from the 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (80 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ACC-005?state=<state>`: loading, emptyNoResults, error, offline, emptyFirstRun.
 - [ ] Every action is wired with its success and its failure: Add to phone, Print.
 - [ ] Every transition is wired: `ACC-004`, `SCN-003`.
@@ -1206,7 +1312,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "AccreditationApplication": {"type":"object","x-ticvai-persistence":"accreditation.application","description":"Board 1.3. **Usually submitted by an organisation on behalf of its people.**","required":["programmeId"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"programmeId":{"x-ticvai-references":"accreditation.programme","type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"applicantType":{"type":"string"},"submittedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"organisationId":{"type":"string","format":"uuid","nullable":true},"subject":{"type":"object","additionalProperties":true,"description":"Name, date of birth, nationality, contact — shaped by the requirements matrix."},"requirementStatus":{"x-ticvai-persisted":false,"type":"array","readOnly":true,"items":{"type":"object","properties":{"requirementCode":{"type":"string"},"satisfied":{"type":"boolean"},"documentId":{"type":"string","format":"uuid","nullable":true}}}},"status":{"type":"string","enum":["draft","submitted","underReview","informationRequested","approved","rejected","withdrawn","expired"]},"decisionReason":{"type":"string","nullable":true},"missingRequirements":{"type":"array","readOnly":true,"description":"The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting","items":{"type":"string"}},"decisionDueAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a decision is due — the approvals request's SLA. **A date, not a queue position**"},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"holderId":{"type":"string","format":"uuid","nullable":true},"renewsHolderId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one"},"resubmissionOfApplicationId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.33. The rejected application this one resubmits, so the rejection stays in the record"},"resubmissionNote":{"type":"string","maxLength":1000,"nullable":true,"readOnly":true,"description":"What the applicant changed, from `resubmitAccreditationApplication`"},"submittedAt":{"type":"string","format":"date-time","nullable":true},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
-"AccreditationCredential": {"type":"object","x-ticvai-persistence":"accreditation.credential","description":"Board 4. **Not the accreditation** — reissuing one re-vets nobody.","required":["holderId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"x-ticvai-references":"accreditation.holder","type":"string","format":"uuid"},"kind":{"type":"string","enum":["printedBadge","mobileCredential","qr","nfcCard","rfidCard","wristband"]},"symbology":{"type":"string","nullable":true,"description":"12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n","enum":["qr","dataMatrix","pdf417","aztec","code128","nfcNdef","rfidEpc","none"]},"serialNumber":{"type":"string","nullable":true},"encodedIdentifier":{"type":"string","nullable":true},"badgeTemplateId":{"type":"string","format":"uuid","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"issuedBy":{"type":"string","format":"uuid"},"activatedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["pendingPrint","issued","active","lost","replaced","revoked","expired"]},"replacesCredentialId":{"type":"string","format":"uuid","nullable":true},"replacementCount":{"type":"integer","default":0},"scopePath":{"type":"string"}}},
+"AccreditationCredential": {"type":"object","x-ticvai-persistence":"accreditation.credential","description":"Board 4. **Not the accreditation** — reissuing one re-vets nobody.","required":["holderId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"x-ticvai-references":"accreditation.holder","type":"string","format":"uuid"},"kind":{"type":"string","enum":["printedBadge","mobileCredential","qr","nfcCard","rfidCard","wristband"]},"symbology":{"type":"string","nullable":true,"description":"12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n","enum":["qr","dataMatrix","pdf417","aztec","code128","nfcNdef","rfidEpc","none"]},"serialNumber":{"type":"string","nullable":true},"encodedIdentifier":{"type":"string","nullable":true},"badgeTemplateId":{"type":"string","format":"uuid","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"issuedBy":{"type":"string","format":"uuid"},"activatedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["pendingPrint","issued","active","lost","replaced","revoked","expired"]},"replacesCredentialId":{"type":"string","format":"uuid","nullable":true},"replacementCount":{"type":"integer","default":0},"scopePath":{"type":"string"},"holderName":{"type":"string","readOnly":true,"x-ticvai-persisted":false,"description":"**What the badge prints and the register lists** (r10, check-screen-value-sources; ACC-005, ACC-008; CHG-R10UI-016): the holder's `AccreditationHolder.fullName`, read with the credential, not stored on it."},"zones":{"type":"array","readOnly":true,"x-ticvai-persisted":false,"description":"Where the badge works: the holder's effective zones (`HolderAccess.effectiveZones`, from their access profiles and exceptions), each with its name, as `verifyAccreditationCredential` answers them. Read with the credential, not stored on it (CHG-R10UI-016).","items":{"type":"object","properties":{"zoneId":{"type":"string","format":"uuid"},"zoneName":{"type":"string"}}}},"validTo":{"type":"string","format":"date","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"description":"Valid until: the holder's `AccreditationHolder.validTo`; null means no end date. `status` `expired` or `revoked` overrides it. Read with the credential, not stored on it (CHG-R10UI-016)."}}},
 "AccreditationCredentialDelivery": {"type":"object","x-ticvai-persistence":"accreditation.mobile_credential_delivery","description":"12.1.21. **Issuing a mobile credential and getting it onto a phone are two acts**, and the second is recorded so *\"I never got it\"* has an answer. Written by `deliverAccreditationCredential` (the accreditation team sends it) and `issueMyAccreditationWalletPass` (the holder adds it to a wallet).\n","required":["credentialId","channel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"credentialId":{"x-ticvai-references":"accreditation.credential","type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid","readOnly":true},"channel":{"type":"string","enum":["email","sms","holderApp","appleWallet","googleWallet"]},"destinationMasked":{"type":"string","nullable":true,"readOnly":true,"description":"The address or number used, masked (`j***@agency.com`). Always the holder's own"},"walletPassSerial":{"type":"string","nullable":true,"readOnly":true},"walletPassUrl":{"type":"string","nullable":true,"readOnly":true,"description":"Signed and expiring; adds the pass to the wallet"},"status":{"type":"string","readOnly":true,"enum":["queued","sent","delivered","opened","failed","superseded"]},"failureReason":{"type":"string","nullable":true,"readOnly":true},"requestedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time","readOnly":true},"deliveredAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}}
 }

@@ -2,6 +2,12 @@
  "AlternativeCode": {
   "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "catalogue.alternative_code",
+  "x-ticvai-unique-together": [
+   [
+    "partnerId",
+    "code"
+   ]
+  ],
   "type": "object",
   "required": [
    "code",
@@ -286,7 +292,8 @@
    },
    "isSeated": {
     "type": "boolean",
-    "description": "Seated envelopes cannot be leased and are blocked offline. A seat map is not a count.\n"
+    "readOnly": true,
+    "description": "Seated envelopes cannot be leased and are blocked offline. A seat map is not a count.\n\n**Derived by the server**: true when the capacity has a `seatCategoryId`, false otherwise (ADAM CR-111, option 1; CHG-R10CAT-011).\n"
    }
   }
  },
@@ -426,7 +433,7 @@
      }
     ],
     "readOnly": true,
-    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."
+    "description": "`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001). The charge currency's scale is its ISO 4217 minor units, from the kernel's fixed list (ADAM CR-192; common.yaml `Money.scale`), when it is not the currency the venue trades in."
    },
    "chargeRateLockedUntil": {
     "type": "string",
@@ -904,7 +911,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "The amount in `tenderCurrency`, at that currency's own scale."
+    "description": "The amount in `tenderCurrency`, at that currency's own scale, its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192, option A; CHG-R10ORD-018)."
    },
    "fxRate": {
     "allOf": [
@@ -1327,7 +1334,8 @@
    "venueId",
    "scopePath",
    "isSellable",
-   "hasVariants"
+   "hasVariants",
+   "createdAt"
   ],
   "properties": {
    "id": {
@@ -1360,7 +1368,7 @@
      }
     ],
     "nullable": true,
-    "description": "**The product's name in each language the venue sells in** (6 October 2026, CHG-R4-011), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
+    "description": "**The product's name in each of the tenant's enabled languages** (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. `{\"en\": \"Aquarium entry\", \"ar\": \"دخول الأكواريوم\"}`. Every guest surface shows the entry for the guest's language and falls back to `name`, which stays the name staff search and reports print. Null, or a language missing from it, means `name` is shown. At most 200 characters per language, as `name`.\n"
    },
    "descriptionLocalised": {
     "allOf": [
@@ -1412,6 +1420,12 @@
     "format": "date-time",
     "nullable": true,
     "description": "Retires the product automatically. **Retirement is not deletion** — the product stops selling and every order that referenced it still resolves.\n"
+   },
+   "validTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "**The last moment the product's entitlements are valid; null means the same as `onSaleTo`** (ADAM CR-167 as the lead ruled it, 26 October 2026; CHG-R10OPN-003). A season pass stops selling at `onSaleTo` and is used until `validTo`: an entitlement template's `expiryAnchor` of `seasonEnd` ends here (`access#issueOrderEntitlements`). Sales closing is not validity ending.\n"
    },
    "categoryId": {
     "type": "string",
@@ -1526,6 +1540,15 @@
     },
     "description": "**The consent questions a guest answers when booking this product**, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I accept the risk*. Each id names a consent question defined in marketing-crm (`ConsentQuestion`), which owns the text, its version and whether it is asked per person or once per booking; the answer is stored there as a consent record (question version, answer, who answered, when). **One question or several, as the venue chooses.** A flow can carry its own list too (`white-label.BookingFlow.settings.consentQuestionIds`, on the product's published booking flow as `getPublishedBookingFlow` resolves it: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig` 29 September, W12); a booking asks the union of the flow's questions and those of every product in the cart, each question once (`orders.Cart.consentQuestions`). An id that names no active consent question of the tenant is a `422`.\n"
    },
+   "addOnProductIds": {
+    "type": "array",
+    "uniqueItems": true,
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    },
+    "description": "**The add-ons offered with this product, in display order** (accepted 26 October 2026, Chinmay, ADAM CR-252 option A): each a `kind: addOn` product of the same venue (a coffee break, a working lunch, an AV technician offered with a meeting-room type), set in the back office. `listProducts` answers it, so WEB-048 and GST-075 read a room type's add-ons from the load they already make and fetch those products; the guest adds one as a cart line with `parentLineId`. An id that is not a `kind: addOn` product of the same venue is `400 validation` on `addOnProductIds`. Empty when none is offered."
+   },
    "requiresTimeWindow": {
     "type": "boolean",
     "default": false,
@@ -1590,6 +1613,19 @@
     "format": "uuid",
     "nullable": true,
     "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "description": "**When the product was created** (ADAM CR-204, option A, decided 25 October 2026; CHG-R10CAT-007): `catalogue.product.created_at`, NOT NULL DEFAULT now(), set by the server and never by a request. Rows that predate it are backfilled by the migration task (the earliest of the product's first version's `published_at` and the migration time), then the NOT NULL and the DEFAULT are set. `listProductLifecycle` orders and filters on it."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true,
+    "nullable": true,
+    "description": "**When the product last changed** (ADAM CR-204): set by `updateProduct` and by every product sub-resource PUT and bulk change that versions the product; null until the first change after creation. `listProductLifecycle`'s `lastModifiedAt` and `modifiedSince` read it."
    }
   }
  },
@@ -1691,6 +1727,24 @@
     "type": "integer",
     "default": 100
    },
+   "url": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The asset's stable CDN address, for a guest card** (ADAM CR-221, option A, decided 25 October 2026; CHG-R10CAT-014): the asset library's public address for the asset, set on guest-facing reads (`searchCatalogue`, `listProducts` and `getProduct` for a guest or a visitor) when the asset is public and `ready`, as `getPublishedTenantConfig` returns white-label assets (`brandUrls`). Null otherwise, and on staff reads, which are unchanged. Catalogue reads the asset in process, a read the lead granted across deployables (XDR-005, 25 October 2026; CHG-R10CAT-015)."
+   },
+   "thumbnailUrl": {
+    "type": "string",
+    "format": "uri",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "The asset library's thumbnail address for the asset, on the same reads and with the same rule as `url` (ADAM CR-221)."
+   },
    "altText": {
     "allOf": [
      {
@@ -1755,6 +1809,23 @@
     "x-ticvai-persisted": false,
     "description": "**The list price on the caller's channel now**, resolved on read from the price lists (`listProductVariants`; R8 blocker cause GPS-C27, CHG-R8SPN-028). Not stored on the variant and ignored on input. Null where no price list prices it on that channel. The list price, not the total: promotions and bundles are applied at the basket."
    },
+   "referencePrice": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "**The price a saving is measured against** (accepted 26 October 2026, Chinmay, ADAM CR-253 option C), set by the back office on the variant (`updateProductVariant`). Null where the variant claims no saving, which is the default. In the same currency as `listPrice`."
+   },
+   "savingPercent": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**Computed by the server, never in the browser** (ADAM CR-253): with a `referencePrice` and a `listPrice` below it, the whole percent the list price saves, `floor((referencePrice - listPrice) / referencePrice * 100)` (rounded down, so the label never overstates; proposed, client to correct); null otherwise. A length tile shows *Save n%* only when this is set."
+   },
    "productId": {
     "type": "string",
     "format": "uuid"
@@ -1801,7 +1872,7 @@
   }
  },
  "Refund": {
-  "x-ticvai-persistence": "orders.refund",
+  "x-ticvai-persistence": "orders.refund + orders.refund_line + orders.refund_payment",
   "type": "object",
   "required": [
    "id",
@@ -1877,7 +1948,7 @@
      }
     ],
     "readOnly": true,
-    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001)."
+    "description": "The refund in `tenderCurrency`, at that currency's own scale (CHG-FIN-001), its ISO 4217 minor units from the kernel's fixed list where it is not the currency the venue trades in (ADAM CR-192)."
    },
    "amount": {
     "x-ticvai-column": "refunded_amount",
@@ -1885,7 +1956,70 @@
    },
    "appliedPercentage": {
     "type": "number",
-    "description": "From the venue's time bands, or an approver override."
+    "description": "From the venue's time bands, or an approver override. Where the refunded lines fall in different bands, each line's own percentage is on its `lines` row and this is the one the refund's lines share, or null when they differ (ADAM CR-208)."
+   },
+   "lines": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**What the refund took from each order line** (ADAM CR-208, option A; CHG-R10ORD-014): child rows, `orders.refund_line`, one per line refunded, written by `createRefund`. A line's refundable amount is what it paid minus its rows on earlier refunds.",
+    "items": {
+     "type": "object",
+     "required": [
+      "orderLineId",
+      "refundedAmount"
+     ],
+     "properties": {
+      "orderLineId": {
+       "type": "string",
+       "format": "uuid",
+       "x-ticvai-references": "orders.order_line"
+      },
+      "refundedAmount": {
+       "$ref": "../shared/common.yaml#/components/schemas/Money"
+      },
+      "appliedPercentage": {
+       "type": "number",
+       "nullable": true,
+       "description": "The time band of this line's own performance (ADAM CR-208)."
+      }
+     }
+    }
+   },
+   "payments": {
+    "type": "array",
+    "readOnly": true,
+    "description": "**What the refund took from each payment** (ADAM CR-208, option A; CHG-R10ORD-014): child rows, `orders.refund_payment` (the decision's `refund_allocation`; naming-and-style bans `allocation` in DDL), one per payment refunded against, the most recent payment first and cash last. A payment's refundable amount is what it paid minus its rows on earlier refunds.",
+    "items": {
+     "type": "object",
+     "required": [
+      "paymentId",
+      "refundedAmount"
+     ],
+     "properties": {
+      "paymentId": {
+       "type": "string",
+       "format": "uuid",
+       "x-ticvai-references": "orders.payment"
+      },
+      "refundedAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "description": "In the base currency, for the ledger."
+      },
+      "tenderAmount": {
+       "allOf": [
+        {
+         "$ref": "../shared/common.yaml#/components/schemas/Money"
+        }
+       ],
+       "nullable": true,
+       "description": "In the payment's tender currency (`Payment.tenderCurrency`), at that currency's scale; null where the payment was in the base currency."
+      }
+     }
+    }
    },
    "status": {
     "type": "string",

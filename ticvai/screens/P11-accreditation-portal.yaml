@@ -55,8 +55,8 @@ platform:
       the developer portal and the sign-up are outward faces of the control plane, not separate products
       — but their users are not TICVAI staff, and the permission model has to hold that line. **P17 added
       11 September 2026**: a prospect buying TICVAI has no tenant and no cell, so the control plane is
-      the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal is its
-      own app in ticvai-partner-web, so TICVAI Control serves the other four.'
+      the only thing that can serve them. **P10 left on 25 October 2026** (ADAM CR-153): the partner portal
+      is its own app in ticvai-partner-web, so TICVAI Control serves the other four.'
     decided: 10 September 2026
 screens:
 - id: ACC-001
@@ -518,8 +518,8 @@ screens:
         operation: listMyAccreditationApplications
         bindsTo: AccreditationApplication.status
         notes: 'Where it is now, and **the date a decision is due** — `AccreditationApplication.decisionDueAt`.
-          *"Fourth in the queue"* was considered and rejected on the frame: a position moves backwards and a
-          date does not.'
+          *"Fourth in the queue"* was considered and rejected on the frame: a position moves backwards
+          and a date does not.'
         provenance: frame claude-design/Accreditation Board.dc.html#acc-004
       - kind: timeline
         label: Where it has been
@@ -536,9 +536,8 @@ screens:
         label: Application
         bindsTo: AccreditationApplication
         operation: listMyAccreditationApplications
-        notes: '`AccreditationApplication.reference`, `programmeId`, `categoryCode` and `subject`
-          (check-screen-value-sources, CHG-R10UI-015). The reference, the performances, and what was
-          requested.'
+        notes: '`AccreditationApplication.reference`, `programmeId`, `categoryCode` and `subject` (check-screen-value-sources,
+          CHG-R10UI-015). The reference, the performances, and what was requested.'
         provenance: frame claude-design/Accreditation Board.dc.html#acc-004
     - name: actionBar
       slot: actions
@@ -694,8 +693,8 @@ screens:
         label: Valid until
         operation: listMyAccreditationCredentials
         bindsTo: AccreditationCredential.validTo
-        notes: '**`expired` and `revoked` must be unmistakable and must not resemble `loading`.**
-          `AccreditationCredential.status` carries both (CHG-R10UI-016).'
+        notes: '**`expired` and `revoked` must be unmistakable and must not resemble `loading`.** `AccreditationCredential.status`
+          carries both (CHG-R10UI-016).'
         provenance: contract approvals.yaml AccreditationBadge.state
     - name: actionBar
       slot: actions
@@ -827,10 +826,10 @@ screens:
         - AccreditationApplication.submittedAt
         - AccreditationApplication.decisionDueAt
         - AccreditationApplication.status
-        notes: '**Due first, and how long it has waited.** `decisionDueAt` is the sort, not `submittedAt` — an
-          application for tonight outranks one submitted earlier for next month. Rows carry the signals a
-          reviewer decides on: *no press card, no commission*, *commission letter attached*, *accredited last
-          season*.'
+        notes: '**Due first, and how long it has waited.** `decisionDueAt` is the sort, not `submittedAt`
+          — an application for tonight outranks one submitted earlier for next month. Rows carry the signals
+          a reviewer decides on: *no press card, no commission*, *commission letter attached*, *accredited
+          last season*.'
         provenance: frame claude-design/Accreditation Board.dc.html#acc-006
     - name: contextPanel
       slot: item

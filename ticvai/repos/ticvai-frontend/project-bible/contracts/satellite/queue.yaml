@@ -154,6 +154,7 @@ paths:
         - "P01 WEB-039 Venue Map & Wait Times"
         - "P01 WEB-040 Virtual Queue"
         - "P02 GST-023 Virtual Queue"
+        - "P04 POS-025 Till Home"
         - "P06 EMP-031 Queue monitor"
         - "P08 BO-001 Queue Directory"
         - "P08 BO-002 Queue Configuration"
@@ -200,7 +201,10 @@ paths:
           schema: { type: boolean, default: false }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+        - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/VenueRequired
         '200':
           description: Queues
           content:
@@ -432,7 +436,17 @@ paths:
         **Scoped to the caller, not filtered by it.** There is no subject parameter; the entries
         returned are the ones whose `subjectId` is the calling guest. With no `status` the list
         holds the active entries — `waiting` and `called` — which is what a returning guest is
-        looking for. Ordered by `estimatedCallAt`, soonest first, then `joinedAt`.
+        looking for.
+
+        **Order** (ADAM CR-236, option A, as built; Chinmay, 25 October 2026; CHG-R10ORD-005). By
+        `estimatedCallAt`, soonest first; an entry with no `estimatedCallAt` (a queue whose wait time is
+        unavailable) sorts after every entry with one (`NULLS LAST`); then `joinedAt`, then `id`
+        (`ORDER BY estimated_call_at ASC NULLS LAST, joined_at, id`). `PageCursor` encodes that position, so the
+        order is total and paging is stable.
+
+        **A signed-in caller with no guest subject** (a staff session on `bearerAuth`) gets an empty list, not
+        `401` (ADAM CR-236): the list is scoped to the caller's guest subject, and a session without one holds
+        no entries.
       tags: [entry]
       x-ticvai-permission: null   # a guest session. Reads and writes the guest’s own data only
       x-ticvai-scope-level: venue
@@ -482,6 +496,9 @@ paths:
       - query: promotions#promotionRecords
         route: service
         for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: service
+        for: 'what its text calls "VenueSettings.queue": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience: [guest]
       summary: Join a virtual queue
       description: >
@@ -633,6 +650,10 @@ paths:
       x-ticvai-writes:
       - table: queue.entry
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: platform.outbox
+        for: 'queueEntry.redeemed, for an entry with a Fast Pass entitlement, in the redemption''s transaction (ADAM CR-238)'
+      x-ticvai-emits:
+      - queueEntry.redeemed
       x-ticvai-reads:
       - table: queue.entry
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -640,13 +661,17 @@ paths:
       summary: Admit a party at the ride
       description: |-
         Scanned at the attraction. **Offline-capable**, like every other gate operation — a ride entrance loses signal as readily as a turnstile does.
-        Where the entry carries a Fast Pass entitlement, redemption decrements its counter through Product & Entitlement. The counter is not maintained here.
         Arriving outside the return window is a denial with a reason, not a silent refusal.
 
-        **A Fast Pass redemption** (4 October 2026, CHG-FXC-004). Where the entry carries an `entitlementId`, redeeming calls
-        `access.validateAccess` for that entitlement at the queue's access point, which decrements its uses in Product &
-        Entitlement; `entitlementRemaining` is the remaining uses that call returns. This operation writes only
-        `queue.entry`.
+        **A Fast Pass redemption does not call Access** (ADAM CR-238, option B; Chinmay, 25 October 2026; CHG-R10ORD-007;
+        replaces CHG-FXC-004's call to `access.validateAccess`). Queue runs in `operations` and Access in `access`
+        (ADR-0055), and a module publishes through the outbox rather than calling another host (backend-patterns 3.5).
+        Where the entry carries an `entitlementId`, redeeming records the redemption in `queue.entry` and, in the same
+        transaction, writes `queueEntry.redeemed` through the outbox with the `entitlementId` and the queue's
+        `accessPointId`; Access consumes it (`access.recordQueueRedemptionUse`) and takes the entitlement's use. The
+        counter is never maintained here. `entitlementRemaining` is null in the answer. **Offline**, the redemption is
+        recorded on the device and the event is written when the device syncs. An entry with no `entitlementId` writes
+        no event.
       tags: [entry]
       x-ticvai-permission: QUEUE_REDEEM
       x-ticvai-scope-level: workstation
@@ -692,6 +717,10 @@ paths:
       x-ticvai-writes:
       - table: queue.entry
         for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: platform.outbox
+        for: 'queueEntry.redeemed, for an entry with a Fast Pass entitlement, in the override''s transaction (ADAM CR-238; CHG-R10ORD-023)'
+      x-ticvai-emits:
+      - queueEntry.redeemed
       x-ticvai-reads:
       - table: queue.entry
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
@@ -700,6 +729,19 @@ paths:
       description: >
         Late arrival, a guest whose phone died, a genuine system fault. Records the
         overriding principal and a mandatory reason.
+
+        **An override admits** (ADAM CR-237, option A; Chinmay, 25 October 2026; CHG-R10ORD-006). It moves a
+        `called`, `expired` or `noShow` entry to `redeemed` (`states/queue-entry.yaml`), setting
+        `overriddenByPrincipalId`, `overrideReason`, `overriddenAt`, `redeemedAt` and `admittedCount`, and
+        answers `outcome: overridden`. Because the entry ends `redeemed`, a second override is `409
+        queue-entry-already-redeemed`; `cancelled` and `released` entries stay refused (`409
+        queue-entry-cancelled`). **It never records a no-show and never returns a party to the queue**: those are
+        `resolveCalledWaitingGuest`.
+
+        **A `waiting` entry is refused** (`409 queue-entry-not-called`; the lead's answer of 25 October 2026 to the r10 lanes' questions, CHG-R10ORD-023): it
+        has not been called, so no redemption has failed. **An override that admits a Fast Pass entry writes
+        `queueEntry.redeemed`** through the outbox in the same transaction, as `redeemWaitingGuest` does (ADAM CR-238),
+        so Access takes the entitlement's use; `entitlementRemaining` is null.
       tags: [entry]
       x-ticvai-permission: QUEUE_OVERRIDE
       x-ticvai-scope-level: venue
@@ -728,8 +770,89 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/QueueRedemptionResult' }
         '409':
-          description: 'The entry was already `redeemed` (`queue-entry-already-redeemed`), or was `cancelled` or `released` from the queue (`queue-entry-cancelled`); there is no failed redemption to override. Nobody is admitted.'
-          x-ticvai-problem-types: [queue-entry-already-redeemed, queue-entry-cancelled]
+          description: 'The entry was already `redeemed` (`queue-entry-already-redeemed`), or was `cancelled` or `released` from the queue (`queue-entry-cancelled`), or is still `waiting` and has not been called (`queue-entry-not-called`; CHG-R10ORD-023); there is no failed redemption to override. Nobody is admitted.'
+          x-ticvai-problem-types: [queue-entry-already-redeemed, queue-entry-cancelled, queue-entry-not-called]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
+  /waiting-guests/{entryId}/resolve-call:
+    parameters:
+      - name: entryId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: resolveCalledWaitingGuest
+      x-ticvai-writes:
+      - table: queue.entry
+        for: 'the called entry moved to noShow or back to waiting (ADAM CR-237)'
+      x-ticvai-reads:
+      - table: queue.entry
+        for: 'the entry, which must be called (ADAM CR-237)'
+      x-ticvai-audience: [staff]
+      summary: Record a called party's no-show, or return it to the queue
+      description: >
+        **The no-show and the return to the queue, moved out of `overrideWaitingGuest`** (ADAM CR-237, option A;
+        Chinmay, 25 October 2026; CHG-R10ORD-006). The state model gave both to the override, which admits; they
+        are a different action and have their own operation. From `called` only (`states/queue-entry.yaml`):
+        `outcome: noShow` moves the entry to `noShow` (the operator saw the party called and it did not come;
+        distinct from `expired`, which is the clock), and `outcome: returnToQueue` moves it back to `waiting`
+        (called in error, or the guest asked for more time), a reversal. A `noShow` entry can still be admitted
+        later by `overrideWaitingGuest`.
+
+        **The operator at the front of the queue**, with the permission that calls parties forward
+        (`QUEUE_MANAGE`, as `callNextParties`). Offline-capable, as the other entry operations at the ride.
+      tags: [entry]
+      x-ticvai-permission: QUEUE_MANAGE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: true
+      x-ticvai-conflict-policy: append
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [outcome, recordedAt]
+              properties:
+                outcome:
+                  type: string
+                  enum: [noShow, returnToQueue]
+                  description: '`noShow`: called -> noShow. `returnToQueue`: called -> waiting.'
+                reason:
+                  type: string
+                  maxLength: 500
+                  nullable: true
+                  description: Why, where the operator gives one (called in error, the guest asked for more time).
+                recordedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The entry, now `noShow` or `waiting`
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [entryId, status, recordedAt]
+                properties:
+                  entryId: { type: string, format: uuid }
+                  status: { $ref: '#/components/schemas/QueueEntryStatus' }
+                  recordedAt: { type: string, format: date-time }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '409':
+          description: 'The entry is not `called` (`queue-entry-not-called`): only a called party can be a no-show or
+            be returned to the queue. Nothing changes.'
+          x-ticvai-problem-types: [queue-entry-not-called]
           content:
             application/problem+json:
               schema:
@@ -829,7 +952,7 @@ paths:
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: List entries in a queue
-      description: Operator view. Position order, with no-shows and expiries visible.
+      description: Operator view. Position order, with no-shows and expiries visible. Where `positionInQueue` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
         **Order.** Sorted by `positionInQueue` ascending, then by `joinedAt`.
       tags: [entry]
@@ -883,6 +1006,10 @@ paths:
         - "P08 BO-002 Queue Configuration"
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
+      x-ticvai-read-via:
+      - query: catalogue#productCategoryRecords
+        route: service
+        for: 'what its text calls "ProductCategory": catalogue.product_category, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
       summary: Wait times across a venue
@@ -1005,6 +1132,7 @@ paths:
     get:
       operationId: listQueueFeeds
       x-ticvai-consumed-by:
+        - "P04 POS-029 Order Queue"
         - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
       x-ticvai-audience: [staff]
@@ -1014,6 +1142,8 @@ paths:
         Which third-party system supplies each queue, and whether it is currently reporting
         (`health` on each row, the same `QueueFeedHealth` that `getQueueFeedHealth` returns).
         A silent feed is the most common cause of a wrong wait time.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)
       tags: [feed]
       x-ticvai-permission: QUEUE_MANAGE
       x-ticvai-scope-level: venue
@@ -1046,8 +1176,9 @@ paths:
         `mock` exists so the whole feature can be built and demonstrated with no vendor
         involvement at all.
 
-        **PUT semantics — an upsert keyed on the body's `id`.** There is no id in the path, so
-        the body names its target: where no feed has that `id`, one is created and the answer is
+        **PUT semantics — an upsert keyed on the path's `feedId`**, the feed's id (the body's `id`,
+        when sent, must equal it; ADAM CR-245, 26 October 2026, corrected the text left from before the
+        id moved into the path): where no feed has that id, one is created with it and the answer is
         `201`; where one does, the body replaces it whole and the answer is `200`. Omitted
         optional fields take their defaults or null — an omitted `credentialsRef` removes the
         stored reference, and an omitted `expectedIntervalSeconds` returns to 60. A feed never
@@ -1755,8 +1886,8 @@ components:
           type: integer
           nullable: true
           description: >
-            Fast Pass counter after redemption. Decremented through Product & Entitlement,
-            not maintained here.
+            Null from `redeemWaitingGuest` and `overrideWaitingGuest` (ADAM CR-238): a Fast Pass's use is taken by
+            Access when it consumes `queueEntry.redeemed`, after this answer, and is never maintained here.
         recordedAt: { type: string, format: date-time }
         overriddenByPrincipalId: { type: string, format: uuid, nullable: true }
 

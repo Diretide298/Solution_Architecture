@@ -188,6 +188,8 @@ def main() -> int:
                                                       "service or ADR of the package")
 
     extra = g.load_json(g.ROOT / "docs" / "active" / "block-a-extra-tasks.json", {}) or {}
+    # as the plan builds them: a database update task gains each newer forward migration (CHG-R10GFC-006)
+    extra["tasks"] = [td.db_update_task(t, g.ROOT) for t in extra.get("tasks") or []]
     for t in extra.get("tasks") or []:
         if t["key"].startswith("AI-ENGINE-") and str(t.get("block") or "A") == "A" and t["key"] in rows                 and not builds.get(t["key"]):
             guard.add("B-AI-EMPTY", t["key"], f"{t['key']} builds nothing: name its operations, tables and ADRs in "

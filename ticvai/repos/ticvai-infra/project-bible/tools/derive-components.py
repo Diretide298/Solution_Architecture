@@ -183,6 +183,16 @@ def main() -> int:
     a = ap.parse_args()
 
     lin = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
+    # **A client-approved screen is not proposed to** (r10 gate 2, 26 October 2026, CHG-R10GFP-004). What this adds is
+    # visible UI, and the approved UI is fixed (CHG-GRD-002; since 22 October a change to it is a CR logged in ADAM and
+    # docs/active/approved-ui-changes.yaml). CR-186 added updateMyProfile to GST-043's apis, an onAction call made after
+    # the language is chosen, and this then gave the approved screen "Save my profile" and "Cancel", which no decision
+    # asked for. The approved screens are the snapshot check-approved-ui compares with (handoff/approved-ui.json).
+    try:
+        approved = set((json.loads((ROOT / "handoff" / "approved-ui.json").read_text(encoding="utf-8"))
+                        .get("screens") or {}))
+    except (OSError, ValueError):
+        approved = set()
     added = Counter()
     touched = 0
 
@@ -191,18 +201,23 @@ def main() -> int:
         code = (doc.get("platform") or {}).get("code", "")
         changed = False
         for s in doc.get("screens") or []:
-            layout = s.setdefault("layout", {})
-            regions = layout.setdefault("regions", [])
-            body = next((r for r in regions if r.get("name") == "contentBody"), None)
-            if body is None:
-                body = {"name": "contentBody", "components": []}
-                regions.append(body)
+            if s.get("id") in approved:
+                continue
+            regions = (s.get("layout") or {}).get("regions") or []
             n = sum(len(r.get("components") or []) for r in regions)
             if n >= a.min:
                 continue
             new = propose(s, lin, s.get("density", ""))
             if not new:
                 continue
+            # **The body region is made only for what goes into it** (CHG-R10GFP-004): it was appended, empty, to every
+            # screen without one before the count, and written whenever another screen of the file gained components,
+            # so five approved guest screens (GST-018, -042, -051, -056, -067) gained an empty region
+            regions = s.setdefault("layout", {}).setdefault("regions", regions)
+            body = next((r for r in regions if r.get("name") == "contentBody"), None)
+            if body is None:
+                body = {"name": "contentBody", "components": []}
+                regions.append(body)
             body.setdefault("components", []).extend(new)
             for c in new:
                 added[c["kind"]] += 1
@@ -211,8 +226,11 @@ def main() -> int:
         if changed and a.apply:
             head = "".join(x for x in f.read_text(encoding="utf-8").splitlines(keepends=True)
                            if x.startswith("#"))
+            # width 100, the derivers' form (derive-screen-wiring, derive-state-views): at 98 this rewrapped every long
+            # note of a file it touched and the next refresh's width-100 writers wrapped them back, so the refresh
+            # chain was no fixed point (check-regenerate-twice RT-CHAIN on P02, r10 gate 2, CHG-R10GFP-003)
             f.write_text(head + "\n" + yaml.safe_dump(doc, sort_keys=False, allow_unicode=True,
-                                                      width=98), encoding="utf-8")
+                                                      width=100), encoding="utf-8")
 
     print(f"  {touched} screens would gain components" if not a.apply
           else f"  {touched} screens enriched")

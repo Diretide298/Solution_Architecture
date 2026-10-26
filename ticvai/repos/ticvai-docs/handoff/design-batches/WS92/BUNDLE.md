@@ -269,6 +269,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - … and 1 more flow steps (`flows/`)
 - Flow F201 branch at step 1 (expected): when Nothing has been set up on Rental Booking Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F201 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -387,6 +388,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS120 Rental Management Board 5.dc.html#bo-535`
 - Workshop pack: Rental_Management.pdf board 5
 - Flow F201 *Rental Management board 5: Rental Booking Command Center*, step 2: Works in New Rental Booking Wizard → Allow POS/rental operators to create a reservation through a guided workflow.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -637,6 +639,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS120 Rental Management Board 5.dc.html#bo-537`
 - Workshop pack: Rental_Management.pdf board 5
 - Flow F201 *Rental Management board 5: Rental Booking Command Center*, step 6: Works in Customer & Participant Information → Capture the configurable customer information required by the rental product. The original requirements specifically support configurable mandatory fields such as name, mobile, email, nationality, ID …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -752,6 +755,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS120 Rental Management Board 5.dc.html#bo-538`
 - Workshop pack: Rental_Management.pdf board 5
 - Flow F201 *Rental Management board 5: Rental Booking Command Center*, step 8: Works in Group Rental & Participant Management → Handle reservations involving multiple participants. The source explicitly requires group reservations, participant demographics and configurable participant forms.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1004,6 +1008,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS120 Rental Management Board 5.dc.html#bo-540`
 - Workshop pack: Rental_Management.pdf board 5
 - Flow F201 *Rental Management board 5: Rental Booking Command Center*, step 12: Works in Booking Commercial Summary & Payment → Show the complete financial commitment before confirming the reservation.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1134,6 +1139,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS120 Rental Management Board 5.dc.html#bo-541`
 - Workshop pack: Rental_Management.pdf board 5
 - Flow F201 *Rental Management board 5: Rental Booking Command Center*, step 14: Works in Reservation Confirmation & QR Voucher → Create the confirmed rental reservation and customer credential. The original voucher flow specifically requires the system to generate a voucher/ticket that is later redeemed at the rental counter.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1263,6 +1269,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS120 Rental Management Board 5.dc.html#bo-542`
 - Workshop pack: Rental_Management.pdf board 5
 - Flow F201 *Rental Management board 5: Rental Booking Command Center*, step 16: Works in Reservation Modification, Cancellation & No-Show → Manage the reservation after confirmation but before/during fulfillment.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1368,6 +1375,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS120 Rental Management Board 5.dc.html#bo-543`
 - Workshop pack: Rental_Management.pdf board 5
 - Flow F201 *Rental Management board 5: Rental Booking Command Center*, step 18: Works in Reservation Detail, Timeline & Readiness → Provide the complete operational record before handing the reservation to Board 6 for checkout.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

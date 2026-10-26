@@ -57,11 +57,11 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 833
+  operationCalls: 832
 - service: VenueOpsService
-  operationCalls: 531
+  operationCalls: 532
 - service: TenancyService
-  operationCalls: 497
+  operationCalls: 498
 - service: OrderService
   operationCalls: 425
 - service: AccessService
@@ -69,7 +69,7 @@ servicesCalled:
 - service: MarketingService
   operationCalls: 237
 - service: WalletService
-  operationCalls: 223
+  operationCalls: 224
 - service: AiService
   operationCalls: 119
 - service: PlatformService
@@ -636,7 +636,6 @@ screens:
   - getSeatAvailability
   - listEvents
   - listPerformances
-  - listProductCategories
   - recommendSeats
   - updateEvent
   - updatePerformance
@@ -1259,6 +1258,7 @@ screens:
   - issueDeviceCredential
   - listAlerts
   - listDevices
+  - listSaleBoards
   - listWorkstations
   - registerDevice
   - revokeDeviceCredential
@@ -1497,6 +1497,7 @@ screens:
   - escalateCorrectiveAction
   - getFnbDeliveryPolicy
   - getHaccpStatus
+  - getRegionSettings
   - getReturnPolicy
   - getTableMap
   - listCorrectiveActions
@@ -1520,6 +1521,7 @@ screens:
   - outletId<-deepLink
   - actionId<-deepLink
   - venueId<-session
+  - regionId<-session
   goesTo: []
   boardFrames:
   - FnB Board 1.dc.html#fnb-1b
@@ -2288,6 +2290,7 @@ screens:
   - getAsset
   - getAssetHistory
   - listAssets
+  - listInspections
   - lookupAsset
   - setAssetStatus
   - updateAsset
@@ -3521,8 +3524,10 @@ screens:
   - BO-077
   - BO-089
   - BO-090
+  - BO-1088
   - BO-1094
   - BO-1111
+  - BO-1144
   - BO-1146
   - BO-1162
   - BO-1179
@@ -29078,6 +29083,7 @@ screens:
   density: compact
   operations:
   - getWalletTransferRules
+  - listCreditTypes
   - setWalletTransferRules
   states:
   - emptyFirstRun
@@ -37152,7 +37158,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listDevices
   - listPaymentTerminalCertifications
   - listPaymentTerminals
   - recordPaymentTerminalCertification

@@ -117,7 +117,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 2
+    writes: 3
   - operation: cancelPerformance
     verb: POST
     path: /performances/{performanceId}/cancel
@@ -156,8 +156,8 @@ operationsByContract:
     scope: venue
     permission: EVENT_CONFIGURE
     offline: false
-    reads: 7
-    writes: 7
+    reads: 9
+    writes: 9
   - operation: cloneProduct
     verb: POST
     path: /products/{productId}/clone
@@ -1501,7 +1501,7 @@ operationsByContract:
     permission: CAPACITY_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: relinquishInventoryHold
     verb: DELETE
     path: /inventory-holds/{inventoryHoldId}
@@ -1732,7 +1732,7 @@ operationsByContract:
     scope: venue
     permission: EVENT_CONFIGURE
     offline: false
-    reads: 8
+    reads: 11
     writes: 4
   - operation: setEventRegistration
     verb: PUT
@@ -1949,7 +1949,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 2
-    writes: 3
+    writes: 4
   - operation: setProductClassification
     verb: PUT
     path: /products/{productId}/classification
@@ -1957,7 +1957,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 1
-    writes: 3
+    writes: 4
   - operation: setProductContextOwnership
     verb: PUT
     path: /product-context-ownership
@@ -1989,7 +1989,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 2
-    writes: 3
+    writes: 4
   - operation: setProductSalePermissionRules
     verb: PUT
     path: /products/{productId}/sale-permission-rules
@@ -1997,7 +1997,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 2
-    writes: 3
+    writes: 4
   - operation: setProductServicePrice
     verb: PUT
     path: /product-service-price
@@ -2188,8 +2188,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 4
-    writes: 3
+    reads: 7
+    writes: 4
   - operation: updateProductVariant
     verb: PATCH
     path: /products/{productId}/variants/{variantId}
@@ -2375,7 +2375,7 @@ operationsByContract:
     scope: venue
     permission: null
     offline: true
-    reads: 3
+    reads: 4
     writes: 0
   - operation: getGuestCouponCode
     verb: GET
@@ -3320,7 +3320,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 6
-    writes: 5
+    writes: 8
   - operation: updateCommercialCampaign
     verb: PATCH
     path: /commercial-campaigns/{campaignId}
@@ -4440,7 +4440,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.event
-  columns: 10
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -4721,12 +4721,13 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.product
-  columns: 45
+  columns: 49
   store: postgres
   parent: null
   writtenBy:
   - catalogue
   - inventory
+  - promotions
   foreignWriters:
   - inventory
 - table: catalogue.product_category
@@ -4793,14 +4794,14 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.product_version
-  columns: 9
+  columns: 10
   store: postgres
   parent: catalogue.product
   writtenBy:
   - catalogue
   foreignWriters: null
 - table: catalogue.published_bundle
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -4869,11 +4870,12 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.variant
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
   - catalogue
+  - promotions
   foreignWriters: null
 - table: catalogue.variant_dimension
   columns: 5
@@ -4928,7 +4930,8 @@ tables:
   columns: 4
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - promotions
   foreignWriters: null
 - table: promotions.bundle
   columns: 21
@@ -5022,7 +5025,7 @@ tables:
   - promotions
   foreignWriters: null
 - table: promotions.promotion
-  columns: 24
+  columns: 28
   store: postgres
   parent: null
   writtenBy:
@@ -5920,6 +5923,7 @@ screens:
 - P10:PTR-007 Availability Search
 - P10:PTR-009 Group / Bulk Booking
 - P10:PTR-010 Cart & Quote
+- P13:CMS-006 Component Preview
 - P13:CMS-101 Help Me Choose
 - P13:CMS-103 Booking Flows
 - P16:ANL-004 Product Performance

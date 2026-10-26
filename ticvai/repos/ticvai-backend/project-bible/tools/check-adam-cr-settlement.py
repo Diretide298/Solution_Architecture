@@ -20,6 +20,8 @@ and OpenProject (no network) and reads the route's order:
     CS-LINK           (CHG-ADM-003) a child task made outside ADAM ("[CR-nnn] ...", tools/op-create.rb) is not linked by
                       settle_changes.py --link-existing, or is made again; or ADAM has no admin link route, or its
                       apply does not look for an existing child before and after a create
+    CS-NO-RELEASE     (25 October 2026, "we dont need a Release for these") an item with "release": false still tells
+                      the agent to leave the changed part to a release, or does not tell it to build the decision now
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
@@ -45,6 +47,7 @@ RULES = {
     "CS-ONCE": "a second run neither comments nor files again (CHG-ADM-002)",
     "CS-ROUTE": "the resolve route and the bulk settle tell the ticket, before the status is written (CHG-ADM-002)",
     "CS-LINK": "a child task made outside ADAM is linked, never made twice (CHG-ADM-003)",
+    "CS-NO-RELEASE": "a decision no release carries tells the agent to build it in the ticket now (25 October)",
 }
 API = g.ROOT.parent / "viewer" / "api"
 
@@ -225,6 +228,23 @@ def main() -> int:
             guard.add("CS-LINK", "settle", f"settle_changes.py --link-existing could not be run: {exc}")
     else:
         guard.add("CS-LINK", "settle", "settle_changes.py could not be run")
+
+    if mod:
+        try:
+            spec = {"project": "ticvai", "release": False, "items": [
+                {"cr": "CR-006", "status": "done", "resolution": "Add created_at to the product."}]}
+            adam, op = FakeAdam([dict(rows()[0], id="CR-006", number=6, ticket="7009")]), FakeOp(set())
+            with contextlib.redirect_stdout(io.StringIO()):
+                mod.settle(adam, op, spec, "ticvai", "", True, False, g.ROOT.parent)
+            said = [t for t in op.threads.get("7009", []) if t.startswith("**ADAM CR-006 · done")]
+            text = said[0] if len(said) == 1 else ""
+            if not text or "No release carries this" not in text or "release `" in text \
+                    or "lands in the next release" in text or "in this ticket" not in text:
+                guard.add("CS-NO-RELEASE", "comment", f"the no-release comment on #7009 is {said!r}")
+        except Exception as exc:  # noqa: BLE001
+            guard.add("CS-NO-RELEASE", "settle", f"settle_changes.py with release false could not be run: {exc}")
+    else:
+        guard.add("CS-NO-RELEASE", "settle", "settle_changes.py could not be run")
 
     main_py = API / "main.py"
     src = main_py.read_text(encoding="utf-8", errors="replace") if main_py.is_file() else ""

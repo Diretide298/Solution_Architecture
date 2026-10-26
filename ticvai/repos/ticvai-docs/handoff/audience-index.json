@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-22",
+ "generated": "2026-10-26",
  "note": "Derived from `x-ticvai-audience` on every operation. **One field, eight values** \u2014 `x-ticvai-guest-callable` and `x-ticvai-auth` were two vocabularies answering the same question differently and were collapsed on 18 August (ADR-0025).",
  "field": "x-ticvai-audience",
  "values": [
@@ -111,7 +111,7 @@
   }
  },
  "totals": {
-  "operations": 2845,
+  "operations": 2854,
   "screens": 2453,
   "flows": 291
  },
@@ -202,6 +202,7 @@
     "identity.principal",
     "identity.principal_credential",
     "identity.principal_external_identity",
+    "identity.redirect_host",
     "identity.refresh_token",
     "identity.role",
     "identity.role_permission",
@@ -224,6 +225,7 @@
     "orders.payment_link",
     "orders.reservation",
     "orders.sales_order",
+    "payments.payment_attempt",
     "payments.provider",
     "pii.consent_identifier",
     "pii.subject",
@@ -253,7 +255,7 @@
     "screens": 0,
     "flows": 14,
     "contracts": 7,
-    "tables": 70
+    "tables": 72
    }
   },
   "device": {
@@ -344,6 +346,7 @@
     "sync.rejection",
     "tenancy.device_credential",
     "tenancy.device_tamper_event",
+    "tenancy.device_telemetry",
     "wallet.gift_card",
     "wallet.wallet",
     "wallet.wallet_transaction",
@@ -370,7 +373,7 @@
     "screens": 0,
     "flows": 13,
     "contracts": 6,
-    "tables": 57
+    "tables": 58
    }
   },
   "guest": {
@@ -487,6 +490,7 @@
     "getResourceHold",
     "getSeatAvailability",
     "getSeatHold",
+    "getSubjectDataExport",
     "getTaxDocumentRendition",
     "getTaxInvoice",
     "getTenantAppStatus",
@@ -943,6 +947,7 @@
     "catalogue.published_bundle",
     "catalogue.variant",
     "catalogue.waitlist_entry",
+    "control.billing_entity",
     "control.capacity_pack",
     "control.licence_add_on",
     "control.licence_add_on_limit",
@@ -993,6 +998,7 @@
     "identity.principal",
     "identity.refresh_token",
     "identity.session",
+    "identity.subject_data_export",
     "identity.subject_holding",
     "inventory.movement",
     "inventory.stock_batch",
@@ -1071,6 +1077,8 @@
     "orders.payment",
     "orders.payment_link",
     "orders.refund",
+    "orders.refund_line",
+    "orders.refund_payment",
     "orders.refund_policy",
     "orders.resale_listing",
     "orders.reservation",
@@ -1212,11 +1220,11 @@
     "whitelabel.tenant_config"
    ],
    "counts": {
-    "operations": 291,
+    "operations": 292,
     "screens": 144,
     "flows": 23,
     "contracts": 23,
-    "tables": 341
+    "tables": 345
    }
   },
   "partner": {
@@ -1483,11 +1491,13 @@
     "approvals.external_dispatch",
     "approvals.external_provider",
     "approvals.request",
+    "approvals.request_approver",
     "approvals.rule",
     "approvals.sla_policy",
     "cache:idempotency",
     "cache:resolution",
     "catalogue.alternative_code",
+    "catalogue.audit_entry",
     "catalogue.channel_capacity",
     "catalogue.channel_envelope",
     "catalogue.inventory_reservation",
@@ -1501,6 +1511,7 @@
     "catalogue.variant",
     "control.api_anomaly",
     "control.api_client",
+    "control.api_client_secret",
     "control.api_licence",
     "control.api_version",
     "control.channel_listing",
@@ -1586,6 +1597,8 @@
     "orders.order_line_eligibility",
     "orders.payment",
     "orders.refund",
+    "orders.refund_line",
+    "orders.refund_payment",
     "orders.refund_policy",
     "orders.sales_order",
     "payments.payment_attempt",
@@ -1624,7 +1637,7 @@
     "screens": 51,
     "flows": 10,
     "contracts": 11,
-    "tables": 143
+    "tables": 148
    }
   },
   "prospect": {
@@ -1701,7 +1714,7 @@
     "getWaitTimes",
     "listApiScopes",
     "listApiVersions",
-    "listIntegrationListings",
+    "listMarketplaceListings",
     "listTransportPassOffers",
     "listTransportRoutes",
     "listTransportStations",
@@ -1729,6 +1742,7 @@
     "control.api_licence",
     "control.api_version",
     "control.developer_account",
+    "control.developer_member",
     "control.integration_listing",
     "marketing.invitation",
     "marketing.invitation_campaign",
@@ -1752,7 +1766,7 @@
     "screens": 1,
     "flows": 0,
     "contracts": 5,
-    "tables": 22
+    "tables": 23
    }
   },
   "service": {
@@ -1760,6 +1774,7 @@
    "operations": [
     "accrueLoyaltyPoints",
     "acquireInventoryHold",
+    "attachGuestCheckoutOrders",
     "awardBadge",
     "captureWalletHold",
     "convertInventoryHold",
@@ -1798,6 +1813,7 @@
     "recordCookieScan",
     "recordDeposit",
     "recordEInvoiceTransmissionStatus",
+    "recordQueueRedemptionUse",
     "recordSaleOwnerAnswers",
     "recordSyncRejection",
     "recordSyncRejectionResolution",
@@ -1884,6 +1900,7 @@
     "catalogue.inventory_reservation",
     "catalogue.variant",
     "control.api_client",
+    "control.api_client_secret",
     "control.api_licence",
     "control.tenant",
     "control.tenant_domain",
@@ -1986,11 +2003,11 @@
     "whitelabel.guided_choice_question"
    ],
    "counts": {
-    "operations": 64,
+    "operations": 66,
     "screens": 0,
     "flows": 5,
     "contracts": 18,
-    "tables": 132
+    "tables": 133
    }
   },
   "staff": {
@@ -2743,6 +2760,7 @@
     "getStockValuation",
     "getStoreAccounts",
     "getStorefrontInsights",
+    "getSubjectDataExport",
     "getSubscription",
     "getSuggestedRequisitions",
     "getSupplierPerformance",
@@ -2831,6 +2849,7 @@
     "issueGameCard",
     "issueGiftCard",
     "issueInvitation",
+    "issueInvoice",
     "issueReward",
     "issueTaxInvoice",
     "issueWalletPass",
@@ -3376,6 +3395,7 @@
     "listPhysicalDeviceRegistration",
     "listPlans",
     "listPlatformStaffGrants",
+    "listPlatformTaxRates",
     "listPodiumConsole",
     "listPolicies",
     "listPolicyEvaluationArchitecture",
@@ -3904,6 +3924,7 @@
     "resetSandbox",
     "resolveApprovedActionExecution",
     "resolveBookingConflict",
+    "resolveCalledWaitingGuest",
     "resolveCredentialException",
     "resolveDunningCase",
     "resolveIdentityConflict",
@@ -4268,6 +4289,7 @@
     "setPlacedResource",
     "setPlanBenefits",
     "setPlanTiers",
+    "setPlatformTaxRate",
     "setPodium",
     "setPolicy",
     "setPolicyEvaluationSetting",
@@ -4629,6 +4651,7 @@
     "verifyAccreditationDocument",
     "verifyAllergens",
     "verifyCustomDomain",
+    "verifyDeveloper",
     "verifyIdentity",
     "verifyMfaChallenge",
     "verifyMfaEnrolment",
@@ -7177,6 +7200,7 @@
     "approvals.external_provider",
     "approvals.matrix",
     "approvals.request",
+    "approvals.request_approver",
     "approvals.retention_policy",
     "approvals.rule",
     "approvals.signature",
@@ -7301,6 +7325,7 @@
     "control.api_anomaly",
     "control.api_anomaly_rule",
     "control.api_client",
+    "control.api_client_secret",
     "control.api_licence",
     "control.api_limit",
     "control.api_version",
@@ -7330,6 +7355,7 @@
     "control.integration_listing",
     "control.invoice",
     "control.invoice_line",
+    "control.invoice_number_sequence",
     "control.licence_add_on",
     "control.licence_add_on_limit",
     "control.licensing_model",
@@ -7369,6 +7395,7 @@
     "control.plan",
     "control.plan_limit",
     "control.plan_module",
+    "control.platform_tax_rate",
     "control.production_access_request",
     "control.release",
     "control.release_component",
@@ -7501,6 +7528,7 @@
     "identity.session",
     "identity.sso_group_mapping",
     "identity.sso_provider",
+    "identity.subject_data_export",
     "identity.subject_holding",
     "inventory.count",
     "inventory.count_line",
@@ -7756,6 +7784,8 @@
     "orders.refund",
     "orders.refund_batch",
     "orders.refund_calculation_policy",
+    "orders.refund_line",
+    "orders.refund_payment",
     "orders.refund_policy",
     "orders.refund_policy_time_band",
     "orders.resale_eligibility_rule",
@@ -8090,6 +8120,7 @@
     "whitelabel.site_setup_progress",
     "whitelabel.store_account",
     "whitelabel.tenant_config",
+    "whitelabel.ui_string_pack",
     "workforce.announcement",
     "workforce.announcement_receipt",
     "workforce.attendance",
@@ -8120,11 +8151,11 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 2639,
+    "operations": 2645,
     "screens": 2168,
     "flows": 138,
     "contracts": 33,
-    "tables": 1126
+    "tables": 1134
    }
   }
  }

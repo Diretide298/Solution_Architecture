@@ -1892,6 +1892,10 @@
    {
     "id": "formSetMembershipCommercialConfig",
     "component": "modal",
+    "reads": [
+     "listPriceLists",
+     "listTaxProfiles"
+    ],
     "trigger": "Save membership commercial config",
     "body": "**Collects what `setMembershipCommercialConfig` sends before it is called.** Required: `membershipCode`, `basePricingProfile`, `taxProfile`, `salesPeriod`. Optional: `feeProfile`, `upgradePricePolicy`, `promotionalPricingEligibility`, `paymentTerms`. Dismissing sends nothing; the screen behind is unchanged. **Pickers** (r8, GPS-C34): `basePricingProfile` is picked from the price lists (`listPriceLists`), `taxProfile` from the tax profiles (`listTaxProfiles`); `feeProfile` and `upgradePricePolicy` are typed codes, since no entity holds them yet.",
     "bindsTo": "MembershipCommercialConfigInput",

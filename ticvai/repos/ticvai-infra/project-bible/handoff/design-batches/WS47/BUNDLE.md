@@ -304,6 +304,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - … and 1 more flow steps (`flows/`)
 - Flow F156 branch at step 1 (expected): when Nothing has been set up on Coupon & Promo Code Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F156 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -462,6 +463,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-159`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 3
 - Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 2: Works in Coupon & Promo Code Builder, a section of BO-010, which saves the record with createCouponCampaign and … → Create the commercial definition of a coupon or promo-code campaign.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1230,6 +1232,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS108 Promotions   Bundles Management Board 3.dc.html#adm-164`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 3
 - Flow F156 *Promotions Bundles Management board 3: Coupon & Promo Code Command Center*, step 12: Works in Code Distribution & Assignment Manager → Manage how promotional codes are allocated and distributed.
+- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 

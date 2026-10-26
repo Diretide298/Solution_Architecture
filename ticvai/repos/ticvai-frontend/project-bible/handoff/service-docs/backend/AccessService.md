@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `access` |
 | Schemas owned | `access` |
-| Operations in the slice | 35 of 258 |
+| Operations in the slice | 35 of 259 |
 | Scale | Read-heavy, extreme latency sensitivity, edge-cached. `frozenDays` is held rather than replayed precisely because the gate cannot afford the arithmetic. |
 | If it is down | Down means the gates stop. Runs at the edge with a local decision cache. |
 
@@ -446,6 +446,9 @@ No image is stored — a template is. **The template cannot reconstruct the face
 | venueId | string (uuid) |  |  |
 | scopePath | string |  |  |
 | mediaCode | string |  | What is scanned — a QR payload, a wristband serial, a card number. |
+| changeVersion | integer (int64) | yes | What the offline package's delta counts (ADAM CR-239, option A; Chinmay, 25 October 2026; CHG-R10ORD-011). (read-only) |
+| mediaLinkedAt | string (date-time) |  | When the entitlement was put on its media (ADAM CR-226, option A; Chinmay, 25 October 2026; CHG-R10ORD-012): written when mediaCode is set or rotated: at issue (issueOrderEntitlements, onto new media… (read-only; nullable) |
+| rotationSecret | string |  | The rotation seed, stored on the entitlement (ADAM CR-167, option A; CHG-R10ORD-010): the Base32 shared secret the rotating code is derived from (getEntitlementCredential rotation.secret, audit R230)… (nullable) |
 | credentialFormat | object |  | The credential this entitlement was issued with, resolved once at issue by issueOrderEntitlements: the product's credentialFormatOverride, else the sales channel's ticketCredentialFormat, else platfo… (nullable) |
 | status | EntitlementStatus: enum (issued, partiallyConsumed, fullyConsumed, expired, cancelled, surrendered) | yes | What the storage layer holds, and what a guest is shown. |
 | statusNote | string |  | Not TicketStatus — that is a validation result with a misleading name, computed at scan time and carrying isValid and isInsideVenue. (nullable) |
@@ -673,6 +676,9 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].venueId | string (uuid) |  |  |
 | items[].scopePath | string |  |  |
 | items[].mediaCode | string |  | What is scanned — a QR payload, a wristband serial, a card number. |
+| items[].changeVersion | integer (int64) | yes | What the offline package's delta counts (ADAM CR-239, option A; Chinmay, 25 October 2026; CHG-R10ORD-011). (read-only) |
+| items[].mediaLinkedAt | string (date-time) |  | When the entitlement was put on its media (ADAM CR-226, option A; Chinmay, 25 October 2026; CHG-R10ORD-012): written when mediaCode is set or rotated: at issue (issueOrderEntitlements, onto new media… (read-only; nullable) |
+| items[].rotationSecret | string |  | The rotation seed, stored on the entitlement (ADAM CR-167, option A; CHG-R10ORD-010): the Base32 shared secret the rotating code is derived from (getEntitlementCredential rotation.secret, audit R230)… (nullable) |
 | items[].credentialFormat | object |  | The credential this entitlement was issued with, resolved once at issue by issueOrderEntitlements: the product's credentialFormatOverride, else the sales channel's ticketCredentialFormat, else platfo… (nullable) |
 | items[].status | EntitlementStatus: enum (issued, partiallyConsumed, fullyConsumed, expired, cancelled, surrendered) | yes | What the storage layer holds, and what a guest is shown. |
 | items[].statusNote | string |  | Not TicketStatus — that is a validation result with a misleading name, computed at scan time and carrying isValid and isInsideVenue. (nullable) |
@@ -760,6 +766,9 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | items[].venueId | string (uuid) |  |  |
 | items[].scopePath | string |  |  |
 | items[].mediaCode | string |  | What is scanned — a QR payload, a wristband serial, a card number. |
+| items[].changeVersion | integer (int64) | yes | What the offline package's delta counts (ADAM CR-239, option A; Chinmay, 25 October 2026; CHG-R10ORD-011). (read-only) |
+| items[].mediaLinkedAt | string (date-time) |  | When the entitlement was put on its media (ADAM CR-226, option A; Chinmay, 25 October 2026; CHG-R10ORD-012): written when mediaCode is set or rotated: at issue (issueOrderEntitlements, onto new media… (read-only; nullable) |
+| items[].rotationSecret | string |  | The rotation seed, stored on the entitlement (ADAM CR-167, option A; CHG-R10ORD-010): the Base32 shared secret the rotating code is derived from (getEntitlementCredential rotation.secret, audit R230)… (nullable) |
 | items[].credentialFormat | object |  | The credential this entitlement was issued with, resolved once at issue by issueOrderEntitlements: the product's credentialFormatOverride, else the sales channel's ticketCredentialFormat, else platfo… (nullable) |
 | items[].status | EntitlementStatus: enum (issued, partiallyConsumed, fullyConsumed, expired, cancelled, surrendered) | yes | What the storage layer holds, and what a guest is shown. |
 | items[].statusNote | string |  | Not TicketStatus — that is a validation result with a misleading name, computed at scan time and carrying isValid and isInsideVenue. (nullable) |
@@ -828,6 +837,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | venueId | query |  | string (uuid) | Required for a guest caller; optional for staff, where it narrows the list. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+| X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
 
 **Response**: `object`
 
@@ -856,7 +866,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Facilities |
-| 400 | BadRequest | Validation failed |
+| 400 |  | The request breaks a schema rule (validation), or names no venue (venue-required; ADAM CR-198, CHG-R10ID-022). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### revokeFacePass
@@ -1489,7 +1499,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| gateModePolicyId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
+| gateModePolicyId | path | yes | string (uuid) | The record's id (ADAM CR-245). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AccessGateModePolicy`
@@ -1535,6 +1545,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Refused, and nothing is stored. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setParkingFacility
@@ -2880,6 +2891,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | venue_id | uuid | no |  |
 | scope_path | text | no |  |
 | media_code | text | no | What is scanned — a QR payload, a wristband serial, a card number. |
+| change_version | bigint | yes | What the offline package's delta counts (ADAM CR-239, option A; Chinmay, 25 October 2026; CHG-R10ORD-011). |
+| media_linked_at | timestamptz | no | When the entitlement was put on its media (ADAM CR-226, option A; Chinmay, 25 October 2026; CHG-R10ORD-012): written when mediaCode is set or rotated: at issue (issueOrderEntitlements, onto new media… |
+| rotation_secret_ciphertext | text | no | The rotation seed, stored on the entitlement (ADAM CR-167, option A; CHG-R10ORD-010): the Base32 shared secret the rotating code is derived from (getEntitlementCredential rotation.secret, audit R230)… |
 | credential_format | text | no | The credential this entitlement was issued with, resolved once at issue by issueOrderEntitlements: the product's credentialFormatOverride, else the sales channel's ticketCredentialFormat, else platfo… |
 | status | text | yes |  |
 | status_note | text | no | Not TicketStatus — that is a validation result with a misleading name, computed at scan time and carrying isValid and isInsideVenue. |
@@ -3037,7 +3051,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-223 operations, added to this service in later releases without changing any of the above.
+224 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -3046,4 +3060,4 @@ Every table this service owns that the slice reads or writes, with its columns a
 | drafted | `listBiometricConsentGuardian`, `listBiometricLifecycleRetention` |
 | general | `getBiometricVerificationProfile`, `getBleBeaconGeofence`, `getFacePassEnrollmentConfiguration`, `getPdfPrintablePos`, `getVirtualTicketIdentity` |
 | sync | `getOfflinePackage`, `listScans`, `syncScans` |
-| validation | `issueOrderEntitlements`, `lookupTicket`, `overrideAccess`, `validateAccess`, `validateGroupAccess` |
+| validation | `issueOrderEntitlements`, `lookupTicket`, `overrideAccess`, `recordQueueRedemptionUse`, `validateAccess`, `validateGroupAccess` |
