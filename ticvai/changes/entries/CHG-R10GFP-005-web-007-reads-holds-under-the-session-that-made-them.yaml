@@ -1,0 +1,38 @@
+id: CHG-R10GFP-005
+date: '2026-10-26'
+source: audit
+kind: spec
+summary: 'WEB-007''s getSeatHold load says it runs only under the guest session that placed the holds, signed in or
+  the anonymous guest session: the screen calls it only when opened with `holdIds`, and a visitor with no session has
+  none.'
+decision:
+  what: 'screens/P01-guest-web-storefront.yaml WEB-007, the getSeatHold purpose (metadata, not visible UI): it is
+    called on load only when the screen is opened with `holdIds`, under the guest session that made the holds (signed
+    in, or the anonymous guest session of ADAM CR-183, ADR-0045). getSeatHold answers only a hold the same guest session
+    or subject placed with `createSeatHold` (seating.yaml), and createSeatHold itself needs guestAuth, so no load runs
+    without a session. No contract change.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-135604-1087), check-preauth-session (report only):
+  PS-LOAD-NEEDS-SESSION "P01 WEB-007 Interactive Seat Selection: loads getSeatHold (onLoad), which needs bearerAuth or
+  guestAuth", since ADAM CR-187 (CHG-R10UI-002, 25 October 2026) added the load. The rule is CR-183''s: a pre-sign-in
+  guest acts under the anonymous guest session, which owns its holds as a signed-in one does.'
+keys_touched:
+  screens: [WEB-007]
+  operations: [getSeatHold]
+  files:
+  - screens/P01-guest-web-storefront.yaml
+root_class: 'a load added to a pre-sign-in screen without saying which session it runs under'
+tickets:
+  started: []
+  unstarted: ['28197 (WEB-007), New: the purpose names the session the load runs under']
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-183
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-preauth-session.py
+status: open
+notes: 'Measured: check-preauth-session PASS, 0 findings. GST-049, the guest app''s seat selection, declares no
+  getSeatHold load, so it has no sibling to fix.'

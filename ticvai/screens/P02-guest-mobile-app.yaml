@@ -10474,6 +10474,8 @@ screens:
   overlays:
   - id: formAddCartLine
     component: modal
+    reads:
+    - listProductVariants
     trigger: Add cart line
     body: '**Asks only what the guest decides** (r8, ORDERS-MONEY-C40): the quantity, and a date for a
       timed product. `variantId` (and `performanceId`) come from the suggestion (`AiRecommendationItem.variantId`);

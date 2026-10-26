@@ -56375,6 +56375,9 @@ screens:
   overlays:
   - id: formSetMembershipCommercialConfig
     component: modal
+    reads:
+    - listPriceLists
+    - listTaxProfiles
     trigger: Save membership commercial config
     body: '**Collects what `setMembershipCommercialConfig` sends before it is called.** Required: `membershipCode`,
       `basePricingProfile`, `taxProfile`, `salesPeriod`. Optional: `feeProfile`, `upgradePricePolicy`,
