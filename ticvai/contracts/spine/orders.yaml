@@ -1161,6 +1161,16 @@ paths:
         - "P08 BO-026 Group Bookings"
         - "P08 BO-272 Quote-to-Booking Conversion & Confirmation"
         - "P08 BO-281 Group Amendments, Cancellation & Refund Operations"
+      x-ticvai-reads:
+      - table: orders.deposit
+        for: 'the guard "deposit taken" on provisional to confirmed: the order''s deposit is paid (ADAM CR-257;
+          CHG-R10INT-005)'
+      - table: orders.group_quote
+        for: 'the guard "terms agreed" on provisional to confirmed: the group''s quote is accepted (ADAM CR-257;
+          CHG-R10INT-005)'
+      - table: orders.group_participant
+        for: 'the guard "names collected" on namesPending to complete: every participant is named (ADAM CR-257;
+          CHG-R10INT-005)'
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: in-process

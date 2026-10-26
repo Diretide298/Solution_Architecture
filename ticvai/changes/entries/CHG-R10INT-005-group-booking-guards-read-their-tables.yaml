@@ -1,0 +1,32 @@
+id: CHG-R10INT-005
+date: '2026-10-26'
+source: audit
+kind: contract
+summary: 'updateGroupBooking declares the three tables its state guards read: orders.deposit (deposit taken),
+  orders.group_quote (terms agreed) and orders.group_participant (names collected).'
+decision:
+  what: 'updateGroupBooking gains x-ticvai-reads for orders.deposit, orders.group_quote and orders.group_participant,
+    the data CR-257 named for its guards (CHG-R10CRF-018). They are Orders'' own tables, so no cross-module route is
+    involved.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-257 (Sanket Keluskar, ticket 32269, accepted 26 October 2026: "Accept all (Recommended)"). The r10
+  integration gate of 26 October 2026 (run 20261026-192610-1140) failed check-parameter-columns P-NAMED-TABLE: the
+  description names the three tables and the lineage listed none.'
+keys_touched:
+  operations: [updateGroupBooking]
+  files:
+  - contracts/spine/orders.yaml
+root_class: 'a guard named in words with no declared read of the data it is judged on'
+tickets:
+  started: []
+  unstarted:
+  - '32269 (updateGroupBooking): told through CR-257''s comment.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-257
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open
