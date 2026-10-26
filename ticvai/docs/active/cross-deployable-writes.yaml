@@ -119,10 +119,10 @@ reads:
     option C) is a later change and removes the template read from getOfflinePackage.'
 - id: XDR-004
   reader: operations
-  tables: [platform.venue_settings, platform.region_settings]
+  tables: [platform.venue_settings, platform.region_settings, platform.outlet]
   privileges: [SELECT]
-  queries: [tenancy#venueSettingsRecords, tenancy#regionSettingsRecords]
-  operations: [getFnbServiceChargePolicy, setFnbServiceChargePolicy, buildProductionPlan, releaseProductionPlan,
+  queries: [tenancy#venueSettingsRecords, tenancy#regionSettingsRecords, tenancy#outletRecords]
+  operations: [listProductStartTimes, getFnbServiceChargePolicy, setFnbServiceChargePolicy, buildProductionPlan, releaseProductionPlan,
     resolveBookingConflict, applyMenuActions, listCombos, createCombo, setComboSlots, attachModifierGroup,
     list86Events, markOrderCollected, setServiceStage, transferOrderItems, publishMenu, rollbackMenu,
     listMenuVersions, moveTableVisit, reassignServer, compItem, listProductionRuns, transferTableVisit, requestBill,
@@ -141,7 +141,11 @@ reads:
     5.1, ADR-0018). The service route between deployables is not built (CR-174, CR-196), so the build had no allowed
     way to put a currency on the Money it answers. The operations host registers Tenancy''s in-process queries as the
     workers host does (IModuleQueries); the read runs in the caller''s transaction under the caller''s row-level
-    security. mergeTableVisits raised it (CR-234); every F&B operation that answers Money reads it the same way.'
+    security. mergeTableVisits raised it (CR-234); every F&B operation that answers Money reads it the same way.
+    platform.outlet and tenancy#outletRecords were added on 26 October 2026 (ADAM CR-260, which the lead answered as
+    already decided and carried by r10): a menu reaches its venue only through fnb.menu.outlet_id, so getMenu,
+    setMenuItemDailyCount and the other menu operations read the outlet''s venue in process too.
+    listProductStartTimes (resources, in operations) reads the venue''s stepMinutes the same way (ADAM CR-253).'
 - id: XDR-005
   reader: commerce
   tables: [assets.media_asset]

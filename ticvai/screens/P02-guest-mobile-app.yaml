@@ -1560,6 +1560,10 @@ screens:
       - performanceId
       provenance: 'authored 3 October 2026 (CHG-SPF-004): GST-005 lists them, and GST-006 cannot load
         without the one the user picks'
+    - to: GST-002
+      trigger: See everything
+      provenance: 'accepted 26 October 2026, Chinmay, ADAM CR-259 option A: the client-approved frame''s *See
+        everything* button opens Explore with nothing carried'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Drawn 31 August**
     — `Guest Mobile Board 1.dc.html` frame `gm-1b`. **Matched on frame title against screen name, constrained
@@ -1610,6 +1614,11 @@ screens:
         - Product.onSaleTo
         operation: listProducts
         provenance: contract catalogue.yaml GET /products
+      - kind: primaryButton
+        label: See everything
+        notes: Opens GST-002 Explore with nothing carried, the screen that browses the whole programme. Drawn in
+          the client-approved frame under the list.
+        provenance: accepted 26 October 2026, Chinmay, ADAM CR-259 option A
     - name: contextPanel
       slot: selection
       components:
@@ -15301,7 +15310,16 @@ screens:
 
     **29 September (W9).** Availability is checked against date, start time and length together (`listProductStartTimes`
     with `variantId` = length); changing any of the three re-checks every room, and a busy room shows
-    *free from*. Starts every 15 minutes where the venue sets `stepMinutes` 15.'
+    *free from*. Starts fall on the venue''s own `stepMinutes` (`VenueSettings.stepMinutes`, ADAM CR-253),
+    which `listProductStartTimes` applies when the screen sends none.
+
+
+    **26 October 2026 (ADAM CR-252, CR-253, CR-258).** A room type''s add-ons are its `addOnProductIds`, in
+    order. A length tile shows *Save n%* only from the server''s `savingPercent`, never worked out here. The
+    frame''s per-date price dots (*Cheapest / Mid price / Peak price*) and its pre-cart *Subtotal / VAT / Total*
+    are dropped (logged in docs/active/approved-ui-changes.yaml): the card shows list prices with *tax and offers
+    are worked out in your basket*, and totals come from the cart. Start times are a public read, so a visitor
+    sees them with no session.'
   density: comfortable
   pattern: multiStepForm
   patternReason: A staged booking — date, start time, length, room type, attendees, add-ons — ending in
@@ -15330,7 +15348,8 @@ screens:
         label: How long
         bindsTo: ProductVariant
         notes: '1 hour, 2 hours, half day (4 h), full day (8 h): the room type''s `length` variants, each
-          priced on its own (the prototype shows *Save 10%* and *Save 15%*).'
+          priced on its own. *Save n%* shows only where the variant has a `referencePrice`, from the server''s
+          `savingPercent` (ADAM CR-253).'
         operation: listProductVariants
         provenance: decided 29 September, rev 3 REV3-13
       - kind: cardList
@@ -15349,7 +15368,9 @@ screens:
       - kind: cardList
         label: Add to the booking
         bindsTo: Product
-        notes: 'Coffee break, working lunch, AV technician: add-on lines with `parentLineId`.'
+        notes: 'Coffee break, working lunch, AV technician: the chosen room type''s `addOnProductIds`, in that
+          order, read from the products `listProducts` already loaded (ADAM CR-252); each is an add-on line with
+          `parentLineId`.'
         operation: listProducts
         provenance: decided 29 September, rev 3 REV3-13
     - name: actionBar
@@ -15378,7 +15399,8 @@ screens:
   apis:
   - operationId: listProducts
     contract: catalogue
-    purpose: Room types sold by the hour (`requiresTimeWindow`) and their add-ons
+    purpose: Room types sold by the hour (`requiresTimeWindow`) and their add-ons (each room type's
+      `addOnProductIds`, ADAM CR-252)
     trigger: onLoad
   - operationId: listProductVariants
     contract: catalogue
@@ -15386,7 +15408,8 @@ screens:
     trigger: onLoad
   - operationId: listProductStartTimes
     contract: resources
-    purpose: Start times free for the room type and length on the date
+    purpose: Start times free for the room type and length on the date; a public read, no session needed
+      (ADAM CR-258), at the venue's `stepMinutes` (ADAM CR-253)
     trigger: onAction
   - operationId: addCartLine
     contract: orders

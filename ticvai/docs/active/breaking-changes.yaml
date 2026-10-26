@@ -1572,3 +1572,14 @@ changes:
     tag: r10
     producer-tickets: [SVC-VENUEOPS-ENTRY-2]
     consumer-tickets: [SVC-ACCESS-VALIDATION-2]
+  - id: BC-492
+    contract: orders
+    operation: updateGroupBooking
+    change: "lost enum value"
+    reason: 'ADAM CR-257, option A (CHG-R10CRF-018): the state model wins, so namesPending is set only by the timer and
+      leaves UpdateGroupBookingRequest.status; a PATCH sending it is 400 on status. Removing a request enum value is
+      breaking by the compat rule; a client that sent it was asking for a move the server never allowed.'
+    approved-by: 'Chinmay, 26 October 2026 ("Accept all (Recommended)", "Comment now + in r10")'
+    tag: r10
+    producer-tickets: ['28375', '32269']
+    consumer-tickets: ['30025', '30031', '30032']

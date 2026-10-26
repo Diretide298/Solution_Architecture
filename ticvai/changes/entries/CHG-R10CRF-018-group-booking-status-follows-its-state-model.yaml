@@ -1,0 +1,45 @@
+id: CHG-R10CRF-018
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'updateGroupBooking follows states/group-booking.yaml: a PATCH sets confirmed, complete or cancelled only
+  (namesPending is the timer''s and leaves the request enum, 400 on status); namesPending -> cancelled is added; a skip
+  or a guard that does not hold is 409 statusNotAllowed (group-booking-status-not-allowed); the guards name their data;
+  orders.group_booking gains version, sent as ETag on getGroupBooking and updateGroupBooking and checked against
+  If-Match (412).'
+decision:
+  what: 'ADAM CR-257, option A, as recommended: the state model wins. contracts/spine/orders.yaml: updateGroupBooking
+    (description, a 400, the 409''s new type, ETag on the 200), getGroupBooking (ETag), UpdateGroupBookingRequest.status
+    (namesPending removed), GroupBooking.version, GroupBookingProblem.refusedReason statusNotAllowed.
+    states/group-booking.yaml: namesPending -> cancelled, the guards named, the operation on each move, the refusals in
+    notes. docs/active/breaking-changes.yaml BC-492 (the request enum value removed).'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-257 (Sanket Keluskar, #32269 updateGroupBooking), accepted by the lead on 26 October 2026 ("Accept all
+  (Recommended)", "Comment now + in r10"): the operation and the state model disagreed on four transitions, the guards
+  had no data and If-Match had no ETag.'
+keys_touched:
+  operations: [updateGroupBooking, getGroupBooking]
+  schemas: [UpdateGroupBookingRequest, GroupBooking, GroupBookingProblem]
+  tables: [orders.group_booking, orders.deposit, orders.group_quote, orders.group_participant]
+  files:
+  - contracts/spine/orders.yaml
+  - states/group-booking.yaml
+  - docs/active/breaking-changes.yaml
+root_class: 'an operation and its state model saying two things (CHG-R10GEN-005''s class)'
+tickets:
+  started:
+  - '32269 (updateGroupBooking): through CR-257''s comment.'
+  unstarted:
+  - 'The migration child task under the orders MIG ticket; BO-026, BO-272 and BO-281 (30025, 30031, 30032) move to r10
+    with BC-492.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-257
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-state-refusals.py
+status: open
+notes: 'Database: orders.group_booking gains version integer DEFAULT 1 (forward migration). The deposit guard reads
+  "captured in full" as capturedAmount at least requiredAmount on an orders.deposit of the group''s order.'

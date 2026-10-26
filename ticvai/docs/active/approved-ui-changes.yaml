@@ -216,3 +216,41 @@ changes:
     The offline text says this till''s held orders can still be reprinted and the reprint queues, as reprintOrder''s
     contract allows (x-ticvai-offline-capable, P04)'
   change: CHG-R10OPN-006
+- screen: WEB-048
+  field: 'region:fields'
+  to: a66217b57cd8583f
+  approval: 'ADAM CR-253 (raised by Chinmay Patkar on #28149, 25 October 2026; accepted 26 October 2026, option C by Chinmay):
+    since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead, 22 October
+    2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log. Dropped from the
+    client-approved frame (prototype rev 3, House of Pages, Meeting room by the hour): the per-date price dots
+    (Cheapest / Mid price / Peak price) and the pre-cart Subtotal / VAT / Total; the card shows list prices with
+    "tax and offers are worked out in your basket". The screen record never drew them, so its fields are unchanged'
+  change: CHG-R10CRF-015
+- screen: GST-075
+  field: 'region:fields'
+  to: a66217b57cd8583f
+  approval: 'ADAM CR-253 (raised by Chinmay Patkar on #28149, 25 October 2026; accepted 26 October 2026, option C by Chinmay):
+    since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead, 22 October
+    2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log. Dropped from the
+    client-approved frame (prototype rev 3, House of Pages, Meeting room by the hour): the per-date price dots
+    (Cheapest / Mid price / Peak price) and the pre-cart Subtotal / VAT / Total; the card shows list prices with
+    "tax and offers are worked out in your basket". The screen record never drew them, so its fields are unchanged'
+  change: CHG-R10CRF-015
+- screen: GST-005
+  field: 'navigation'
+  to: 80be01de8d998c58
+  approval: 'ADAM CR-259 (raised by Chitrangi Mestry on #31769; accepted 26 October 2026, option A by Chinmay): since 22 October
+    2026 a developer may change approved UI when the change is logged in ADAM (the lead, 22 October 2026: "let
+    frontend change ui and log it in changes. dont worry about it"); this CR is that log. The See everything button
+    and its move to GST-002 are already in the client-approved frame (wireframes/P02 Guest App.dc.html#gst-005); the
+    record now carries them, so nothing the client sees changes'
+  change: CHG-R10CRF-020
+- screen: GST-005
+  field: 'region:collection'
+  to: 55d6e35050a632ac
+  approval: 'ADAM CR-259 (raised by Chitrangi Mestry on #31769; accepted 26 October 2026, option A by Chinmay): since 22 October
+    2026 a developer may change approved UI when the change is logged in ADAM (the lead, 22 October 2026: "let
+    frontend change ui and log it in changes. dont worry about it"); this CR is that log. The See everything button
+    and its move to GST-002 are already in the client-approved frame (wireframes/P02 Guest App.dc.html#gst-005); the
+    record now carries them, so nothing the client sees changes'
+  change: CHG-R10CRF-020

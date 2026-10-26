@@ -316,6 +316,15 @@ components:
           type: string
           format: uuid
           description: The wallet, card, voucher or position being held against.
+        walletHoldId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**The WalletService hold behind a `wallet` authorisation** (accepted 26 October 2026, Chinmay,
+            ADAM CR-254 option A): the id `wallet.holdWalletFunds` returns, stored by `authoriseStoredValue`, used by
+            `captureStoredValue` for `wallet.captureWalletHold` and by `relinquishStoredValue` for
+            `wallet.releaseWalletHold`. Null for every kind but `wallet`, whose holds are released by row.'
         amount:
           $ref: '#/components/schemas/Money'
         status:

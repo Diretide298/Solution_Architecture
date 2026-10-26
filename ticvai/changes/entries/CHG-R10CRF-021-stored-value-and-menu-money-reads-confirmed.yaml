@@ -1,0 +1,46 @@
+id: CHG-R10CRF-021
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'CR-255 and CR-260 confirmed as carried by r10, with one gap closed: authoriseStoredValue, captureStoredValue
+  and relinquishStoredValue already declare tenancy#scopeRecords and tenancy#venueSettingsRecords in process; getMenu
+  and setMenuItemDailyCount already declare tenancy#venueSettingsRecords under XDR-004, but a menu reaches its venue
+  only through fnb.menu.outlet_id, so XDR-004 gains platform.outlet and tenancy#outletRecords (now served in-process),
+  and the two operations and seven sibling menu operations declare it.'
+decision:
+  what: 'ADAM CR-255 and CR-260, the lead''s answer "already decided, and the r10 package carries it" (CR-217, CR-234).
+    docs/active/cross-deployable-writes.yaml XDR-004: platform.outlet, tenancy#outletRecords. contracts/spine/tenancy.yaml
+    outletRecords: served [in-process, service] and its rule. contracts/satellite/fnb.yaml: tenancy#outletRecords
+    in-process on getMenu, setMenuItemDailyCount, listMenus, listMenuVersions, getGuestMenu, setItemAvailability,
+    publishMenu, applyMenuActions and attachModifierGroup. handoff/cross-deployable-writes.md rewritten.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-255 (Sanket Keluskar, #32268) and CR-260 (Sanket Keluskar, #32301 getMenu), answered by the lead on 26
+  October 2026 ("Accept all (Recommended)", "Comment now + in r10"). The coordinator''s note for lane F: if getMenu needs
+  platform.outlet to reach its venue and XDR-004 lacks it, add it.'
+keys_touched:
+  operations: [authoriseStoredValue, captureStoredValue, relinquishStoredValue, getMenu, setMenuItemDailyCount,
+    listMenus, listMenuVersions, getGuestMenu, setItemAvailability, publishMenu, applyMenuActions, attachModifierGroup]
+  tables: [platform.outlet, platform.venue_settings]
+  files:
+  - docs/active/cross-deployable-writes.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/fnb.yaml
+  - handoff/cross-deployable-writes.md
+root_class: 'a cross-deployable read with no route that is built (the CR-240 class)'
+tickets:
+  started:
+  - '32268, 32301 and 32302: through CR-255''s and CR-260''s comments.'
+  unstarted:
+  - 'The migration child task under the platform MIG ticket (the grant on platform.outlet).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-260
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'Database: a guarded GRANT SELECT ON platform.outlet TO operations (the kernel''s platform USAGE already covers
+  the schema). Left for the lead: createMenu, updateMenu, setMenuSections and rollbackMenu are in XDR-004 but declare
+  regionSettingsRecords and no venueSettingsRecords, so they reach no venue currency yet. Also CR-255.'

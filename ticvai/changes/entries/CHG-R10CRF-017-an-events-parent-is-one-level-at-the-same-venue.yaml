@@ -1,0 +1,37 @@
+id: CHG-R10CRF-017
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'createEvent and updateEvent state the parentEventId rule: an existing event the caller can see, at the same
+  venue, not the event itself, one level only (a parent has no parent, and an event that is a parent cannot be given
+  one), else 400 validation on parentEventId; the key catalogue.event.parent_event_id -> catalogue.event is declared.'
+decision:
+  what: 'ADAM CR-256, option A, as recommended. contracts/spine/catalogue.yaml: createEvent and updateEvent (description
+    and a 400), Event.parentEventId (x-ticvai-references catalogue.event and its text).'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-256 (Chinmay Patkar, #31125 updateEvent), accepted by the lead on 26 October 2026 ("Accept all
+  (Recommended)", "Comment now + in r10"): nothing said which event may be a parent, and the column had no declared key.'
+keys_touched:
+  operations: [createEvent, updateEvent]
+  schemas: [Event]
+  tables: [catalogue.event]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'a self-reference with no rule and no key'
+tickets:
+  started:
+  - '31125 (updateEvent): through CR-256''s comment.'
+  unstarted:
+  - 'The migration child task under the catalogue MIG ticket, for the migration owner.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-256
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'Database: the foreign key event_parent_event_id_fkey (catalogue.event.parent_event_id -> catalogue.event.id),
+  added NOT VALID in the names file the generator writes (VALIDATE is the migration owner''s once rows are clean).
+  Screens BO-015 and BO-019 are lane G''s and unchanged.'

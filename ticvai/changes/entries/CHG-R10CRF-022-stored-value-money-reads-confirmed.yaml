@@ -1,0 +1,35 @@
+id: CHG-R10CRF-022
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'Confirmed, no new change: authoriseStoredValue, captureStoredValue and relinquishStoredValue declare
+  tenancy#scopeRecords (the hold''s venue from its scope_path) and tenancy#venueSettingsRecords (the currency and scale
+  of every Money), both in process in commerce, as the CR-217 class rule of r10 set; a wallet hold''s Money comes from
+  wallet#walletRecords.'
+decision:
+  what: 'ADAM CR-255, the lead''s answer "already decided, and the r10 package carries it" (CR-217, 25 October 2026).
+    contracts/spine/orders.yaml already carries both reads on the three operations (CHG-R10GEN-002); nothing edited for
+    CR-255. This entry records CR-255 against it so the CR settles with r10.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-255 (Sanket Keluskar, #32268), answered by the lead on 26 October 2026 ("Accept all (Recommended)",
+  "Comment now + in r10"): a stored-value hold''s Money had no venue and no declared read of the venue''s currency.'
+keys_touched:
+  operations: [authoriseStoredValue, captureStoredValue, relinquishStoredValue]
+  tables: [orders.stored_value_authorisation]
+  files:
+  - contracts/spine/orders.yaml
+root_class: 'a row that keeps only a scope_path answering Money (the CR-217 class)'
+tickets:
+  started:
+  - '32268: through CR-255''s comment; resolve the venue from scope_path, never the caller''s session.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-255
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'No database change.'

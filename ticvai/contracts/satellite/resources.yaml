@@ -3139,7 +3139,12 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'whether the product is sold by time window and the variant''s length (422) (CHG-MOD-003)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s start-time step (VenueSettings.stepMinutes) when the request sends none (ADAM CR-253;
+          XDR-004)'
       security:
+      - {}
       - guestAuth: []
       - bearerAuth: []
       summary: Start times a space sold by the hour can be booked at, for one length on one day
@@ -3155,6 +3160,17 @@ paths:
         Start times fall on `stepMinutes` from the venue''s opening on that date, and a window must end
         by its close. The chosen start becomes the cart line''s `bookedWindow`; `allocateResources` picks
         the room at checkout. **Display only**, like any availability read: the cart line is what holds.
+
+
+        **A public read, like `listProducts` and `listProductVariants` beside it** (accepted 26 October 2026,
+        Chinmay, ADAM CR-258 option A): `{}` is in its security, so a visitor sees start times with no session,
+        and the read runs under the venue the request names (`X-Venue-Id`, ADAM CR-198''s rule for every public
+        guest read). The anonymous cart session still opens on the first add (`createCart`, CR-183).
+
+
+        **The venue''s step** (ADAM CR-253 option C): with no `stepMinutes` sent, the starts fall on the venue''s
+        own `VenueSettings.stepMinutes` (its tenant default where the venue sets none), read in process
+        (`tenancy#venueSettingsRecords`, XDR-004).
 
         **Date, start and duration are checked together** (decided 29 September, W9 and W10). A start is
         offered only when a room is free for the whole of `startsAt` to `startsAt + durationMinutes`, plus
@@ -3202,7 +3218,8 @@ paths:
           format: date
       - name: stepMinutes
         in: query
-        description: Spacing of the offered start times. Proposed default 30, client to correct (rev 3 REV3-13).
+        description: Spacing of the offered start times. Omitted, the venue's `VenueSettings.stepMinutes` (ADAM
+          CR-253), itself proposed 30, client to correct (rev 3 REV3-13).
         schema:
           type: integer
           enum:
@@ -3212,6 +3229,7 @@ paths:
           default: 30
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '200':
           description: Free start times, earliest first
@@ -3226,6 +3244,14 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ProductStartTime'
+        '400':
+          description: The request breaks a schema rule (`validation`), or names no venue
+            (`venue-required`; ADAM CR-198, CR-258).
+          x-ticvai-problem-types: [validation, venue-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':

@@ -2460,7 +2460,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Product'
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          description: 'Validation failed (`validation`), with `errors[]` naming the field. Includes an
+            `addOnProductIds` entry that is not a `kind` addOn product of the same venue (ADAM CR-252).'
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
@@ -2973,8 +2979,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Product'
         '400':
-          x-ticvai-problem-types: [primary-media-missing, multiple-primary-media, duplicate-media-asset]
-          description: '`media` with no `isPrimary` item or more than one, or one asset twice.'
+          x-ticvai-problem-types: [primary-media-missing, multiple-primary-media, duplicate-media-asset, validation]
+          description: '`media` with no `isPrimary` item or more than one, or one asset twice; or `validation`, with
+            `errors[]` naming the field, which includes an `addOnProductIds` entry that is not a `kind` addOn product
+            of the same venue (ADAM CR-252).'
           content:
             application/problem+json:
               schema:
@@ -3276,7 +3284,8 @@ paths:
       description: '**Only the words and codes a person reads or scans.** A variant''s combination of
         values (`axisValues`) and its `sku` come from `setProductAttributes` and are not edited here; this
         sets the `name`, the `description` a guest reads behind the (i) on a ticket-type row (decided 29
-        September, 23SEP-6), the `barcode` and which variant is the default.
+        September, 23SEP-6), the `barcode`, which variant is the default, and the `referencePrice` a length''s
+        saving is measured against (ADAM CR-253; the answer''s `savingPercent` is worked out from it).
 
         Setting `isDefault` true clears it on the product''s other variants. A retired variant is not
         edited: `409`.
@@ -3312,6 +3321,12 @@ paths:
                   nullable: true
                 isDefault:
                   type: boolean
+                referencePrice:
+                  oneOf:
+                  - $ref: ../shared/common.yaml#/components/schemas/Money
+                  nullable: true
+                  description: The price the variant's saving is measured against (`ProductVariant.referencePrice`;
+                    ADAM CR-253); null clears it. In the same currency as `listPrice`.
       responses:
         '200':
           headers:
@@ -3644,6 +3659,7 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Create an event
+      description: '**`parentEventId`, the group an event belongs to** (accepted 26 October 2026, Chinmay, ADAM CR-256 option A). It must name an existing event the caller can see, at the same venue; not the event itself; and one level only: a parent has no parent, and an event that is a parent cannot be given one. Otherwise `400 validation` on `parentEventId`. The key `catalogue.event.parent_event_id` -> `catalogue.event` is declared.'
       tags:
       - event
       x-ticvai-permission: EVENT_CONFIGURE
@@ -3668,6 +3684,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Event'
+        '400':
+          description: 'Validation failed (`validation`), with `errors[]` naming the field. Includes a `parentEventId`
+            that names no event the caller can see, an event at another venue, the event itself, or an event that has
+            a parent; and, on `updateEvent`, a parent for an event that is itself a parent (ADAM CR-256).'
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
         '429':
@@ -5759,6 +5784,7 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Amend an event
+      description: '**`parentEventId`, the group an event belongs to** (accepted 26 October 2026, Chinmay, ADAM CR-256 option A). It must name an existing event the caller can see, at the same venue; not the event itself; and one level only: a parent has no parent, and an event that is a parent cannot be given one. Otherwise `400 validation` on `parentEventId`. The key `catalogue.event.parent_event_id` -> `catalogue.event` is declared. Sending `null` takes the event out of its group.'
       tags:
       - event
       x-ticvai-permission: EVENT_CONFIGURE
@@ -5794,6 +5820,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Event'
+        '400':
+          description: 'Validation failed (`validation`), with `errors[]` naming the field. Includes a `parentEventId`
+            that names no event the caller can see, an event at another venue, the event itself, or an event that has
+            a parent; and, on `updateEvent`, a parent for an event that is itself a parent (ADAM CR-256).'
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /performances/{performanceId}:
@@ -24527,6 +24562,18 @@ components:
             no active consent question of the tenant is a `422`.
 
             '
+        addOnProductIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+          description: '**The add-ons offered with this product, in display order** (accepted 26 October 2026,
+            Chinmay, ADAM CR-252 option A): each a `kind: addOn` product of the same venue (a coffee break, a working
+            lunch, an AV technician offered with a meeting-room type), set in the back office. `listProducts` answers
+            it, so WEB-048 and GST-075 read a room type''s add-ons from the load they already make and fetch those
+            products; the guest adds one as a cart line with `parentLineId`. An id that is not a `kind: addOn`
+            product of the same venue is `400 validation` on `addOnProductIds`. Empty when none is offered.'
         requiresTimeWindow:
           type: boolean
           default: false
@@ -24699,6 +24746,14 @@ components:
           items:
             type: string
             format: uuid
+        addOnProductIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+          description: The `kind` addOn products of the same venue offered with this product, in display order
+            (`Product.addOnProductIds`; ADAM CR-252). Any other id is `400 validation` on `addOnProductIds`.
         requiresTimeWindow:
           type: boolean
     UpdateProductRequest:
@@ -24769,6 +24824,14 @@ components:
           items:
             type: string
             format: uuid
+        addOnProductIds:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            format: uuid
+          description: The `kind` addOn products of the same venue offered with this product, in display order
+            (`Product.addOnProductIds`; ADAM CR-252). Any other id is `400 validation` on `addOnProductIds`.
         requiresTimeWindow:
           type: boolean
     VariantDimension:
@@ -24841,6 +24904,23 @@ components:
             (`listProductVariants`; R8 blocker cause GPS-C27, CHG-R8SPN-028). Not stored on the variant and ignored on
             input. Null where no price list prices it on that channel. The list price, not the total: promotions
             and bundles are applied at the basket.'
+        referencePrice:
+          oneOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: '**The price a saving is measured against** (accepted 26 October 2026, Chinmay, ADAM CR-253
+            option C), set by the back office on the variant (`updateProductVariant`). Null where the variant
+            claims no saving, which is the default. In the same currency as `listPrice`.'
+        savingPercent:
+          type: integer
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**Computed by the server, never in the browser** (ADAM CR-253): with a `referencePrice` and a
+            `listPrice` below it, the whole percent the list price saves, `floor((referencePrice - listPrice) /
+            referencePrice * 100)` (rounded down, so the label never overstates; proposed, client to correct); null
+            otherwise. A length tile shows *Save n%* only when this is set.'
         productId:
           type: string
           format: uuid
@@ -25343,7 +25423,9 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: For grouped events.
+          x-ticvai-references: catalogue.event
+          description: For grouped events. The parent is an existing event at the same venue, not the event itself,
+            and has no parent of its own (one level; ADAM CR-256). Declared as a key onto `catalogue.event`.
         performanceCount:
           type: integer
           readOnly: true
