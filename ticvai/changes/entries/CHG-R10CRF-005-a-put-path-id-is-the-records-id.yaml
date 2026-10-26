@@ -1,0 +1,72 @@
+id: CHG-R10CRF-005
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'Every PUT keyed on a natural key says what its path id is: the record''s id, which a create takes (a client
+  UUIDv7, the same key as a body id), and which must equal the id of the record the natural key finds, else 409
+  <noun>-id-mismatch and nothing changes. 34 operations, setApprovalMatrix (matrix-id-mismatch) and
+  setApprovalExternalProvider (external-provider-id-mismatch) among them; six descriptions that still said "there is no id
+  in the path" are corrected; a new rule, check-contract-shapes C-PUT-KEY, keeps the class from coming back.'
+decision:
+  what: 'ADAM CR-245, option B, as recommended, for every PUT whose description keys on a natural key. The path id text
+    was not generated: the 14 October shapes pass (tools/applied/shp-contract-shapes-14-october/apply_noaddr.py, a one-off
+    applier) stamped "Addresses the item this write creates or replaces: its `id`" on 115 PUT path parameters, and it
+    has lived in the contracts by hand since. Of the 115, the 34 keyed on something else take the rule text and the 409
+    (a new 409, a type added to the existing 409, or the shared Conflict made inline with its two types kept); the 81
+    keyed on the path id itself (or on a path that names the key, setPolicyScopeHierarchy, setDynamicFieldQuestion) keep
+    the stock text. setApprovalMatrix, setApprovalControlPolicy, setApprovalSlaPolicy and setApprovalExternalProvider
+    have their descriptions corrected to the rule; setApproverAvailability, setApprovalRetentionPolicy (approvals) and
+    configureQueueFeed (queue), keyed on the id, lose "there is no id in the path" and the server-assigned id that went
+    with it. tools/check-contract-shapes.py C-PUT-KEY: fails a stock path id on a PUT whose text keys it on something
+    else, a promised 409 <noun>-id-mismatch its 409 does not list, and "there is no id in the path" beside a path id
+    (39 findings on the parent commit, 0 after).'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-245 (Deep Khanvilkar, #31185 setApprovalMatrix; the same text on #31184 setApprovalExternalProvider),
+  accepted by the lead on 26 October 2026: "r10 corrects the descriptions and sweeps every PUT path parameter that
+  carries the stock text against its operation''s key, at the generator, so the next build cannot reintroduce it".'
+keys_touched:
+  operations: [setApprovalMatrix, setApprovalExternalProvider, setApprovalControlPolicy, setApprovalSlaPolicy,
+    setApproverAvailability, setApprovalRetentionPolicy, configureQueueFeed, setAgentServiceProfile,
+    setBusinessEventMapping, setCaseCategoryDefinition, setCaseResolution, setChannelProvider,
+    setCommunicationRoutingRule, setContactAutomation, setCookieBannerDesign, setCookieScanPolicy,
+    setDataProcessingPurpose, setIntelligentRoutingSkill, setPrivacyNoticePolicyGovernance, setPrivacyRequestTypes,
+    setSenderIdentityDomain, setServiceQueueDefinition, setTrackingTechnology, setWaiverAssociation,
+    setWaiverVerificationValidation, setApiAnomalyRule, setLabourBudget, setGateModePolicy,
+    setChannelConnectionConfiguration, setConfigurationTemplate, setFeeDefinition, setPriceCalculationPolicy,
+    setPriceCategoryRateType, setSignalRegistryPolicy, setCurrencyRoundingRule, setEInvoicingProvider,
+    setTaxInvoiceTemplate]
+  files:
+  - contracts/spine/approvals.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/public-api.yaml
+  - contracts/satellite/workforce.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/finance.yaml
+  - tools/check-contract-shapes.py
+root_class: 'a one-off applier''s stock text left on writes it did not fit (the 14 October shapes pass)'
+tickets:
+  started:
+  - '31185 (setApprovalMatrix) and 31184 (setApprovalExternalProvider): through CR-245''s comment; their text is not
+    rewritten.'
+  unstarted:
+  - 'The other 35 operations: through their pointer bodies at the r10 tag; a started one hears it from its next pull.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-245
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'One reading made: setCookieBannerDesign "always writes a new version", so it never replaces; its path id is the
+  new version''s id and a path id that already names a stored version is 409 banner-design-id-mismatch. The lead may
+  prefer otherwise. Problem types are the path parameter''s noun: communication-provider-, sender-identity-, event-,
+  routing-rule-, purpose-, technology-, banner-design-, governance-, request-type-, case-resolution-, agent-service-
+  profile-, automation-, association-, verification-, case-category-, queue-, scan-policy-, anomaly-rule-, labour-
+  budget-, gate-mode-policy-, matrix-, control-policy-, sla-policy-, external-provider-, configuration-template-,
+  connection-, price-category-, fee-, calculation-profile-, rounding-profile-, signal-, invoice-template- and
+  provider-id-mismatch. Additive: contract-compat passes with no breaking change. setApproverAvailability and
+  setApprovalRetentionPolicy keep their 404 response, which their text no longer names.'

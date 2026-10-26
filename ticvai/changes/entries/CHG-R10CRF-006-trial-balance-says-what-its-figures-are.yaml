@@ -1,0 +1,40 @@
+id: CHG-R10CRF-006
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'getTrialBalance says what its figures are: each account''s debit and credit are its postings over the period''s
+  posted and reversed journal entries, balance is debit minus credit (the period''s movement, debit-positive), every
+  postable account of the period''s legal entity is listed in code order with zero rows, parents are not, and a
+  legalEntityId other than the period''s is 404. Its reads are ledger.fiscal_period, account, journal_entry and posting,
+  stated in the contract; ledger.event_budget is dropped.'
+decision:
+  what: 'ADAM CR-246, option A, as recommended (client to correct). contracts/spine/finance.yaml getTrialBalance: the
+    description, x-ticvai-reads (the four tables) and a 404; TrialBalance and its account rows'' debit, credit and
+    balance descriptions. handoff/api-data-lineage-overrides.json: the carried entry that kept ledger.event_budget is
+    removed, since the contract now states the reads (the carried count only falls, LN-OVERRIDE).'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-246 (Deep Khanvilkar, #32325 getTrialBalance), accepted by the lead on 26 October 2026: the operation had
+  no description, so balance, which entries and accounts count, and what legalEntityId does were undefined, and the
+  ticket read ledger.event_budget and not ledger.journal_entry.'
+keys_touched:
+  operations: [getTrialBalance]
+  schemas: [TrialBalance]
+  tables: [ledger.journal_entry, ledger.posting, ledger.account, ledger.fiscal_period, ledger.event_budget]
+  files:
+  - contracts/spine/finance.yaml
+  - handoff/api-data-lineage-overrides.json
+root_class: 'a computed read with no stated rule, and a carried lineage override standing in for a contract fact'
+tickets:
+  started:
+  - '32325 (getTrialBalance): through CR-246''s comment; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-246
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-lineage.py
+status: open
+notes: 'A closing-balance view (option B) can follow once year-end close is defined. No database change.'

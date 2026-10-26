@@ -1,0 +1,53 @@
+id: CHG-R10CRF-002
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'identity.session carries ended_at, ended_by_principal_id (referencing identity.principal) and end_reason,
+  with a CHECK that ended_at is null exactly when status is active; changeOwnCredential says what ending the other
+  sessions writes (terminated, now, the principal itself, credential-changed); the table record''s storage note says the
+  row is the record of record and Redis the token cache in front of it (CHG-R1S-008).'
+decision:
+  what: 'ADAM CR-242, option A, as recommended. contracts/spine/identity.yaml: ActiveSession gains
+    x-ticvai-null-exactly-when {endedAt: {status: active}}; endedAt, endedByPrincipalId and endReason say what
+    changeOwnCredential writes; changeOwnCredential''s description says what ending the other sessions writes;
+    forceLogout already wrote its caller and the reason it was given (CHG-R8MIG-015). tools/derive-ddl.py: the new
+    schema mark x-ticvai-null-exactly-when becomes a table CHECK `(status IS NOT DISTINCT FROM ''active'') = (ended_at
+    IS NULL)`, which tools/ddl_forward.py writes to the forward migration (NOT VALID, then VALIDATE).
+    tools/derive-table-notes.py: a hand-written note for identity.session, so the derived storage note stops carrying
+    "Redis, not Postgres" forward.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-242 (Deep Khanvilkar, #30719 changeOwnCredential; #30721 forceLogout), accepted by the lead on 26
+  October 2026. The raiser found no ended_at, ended_by_principal_id or end_reason in the DDL his repository applied, and
+  the storage note still said Redis only, against ActiveSession (CHG-R1S-008).'
+keys_touched:
+  operations: [changeOwnCredential, forceLogout]
+  schemas: [ActiveSession]
+  tables: [identity.session]
+  files:
+  - contracts/spine/identity.yaml
+  - tools/derive-ddl.py
+  - tools/derive-table-notes.py
+root_class: 'a rule between two columns stated only in prose (null while active), and a derived note carried forward
+  after its fact changed'
+tickets:
+  started:
+  - '30719 (changeOwnCredential) and 30721 (forceLogout): through CR-242''s comment; their text is not rewritten.'
+  unstarted:
+  - 'The migration child task under the identity MIG ticket, for the migration owner (docs/active/team.json).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-242
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::null_exactly_when
+status: open
+notes: 'Partly in r9 already: the three columns and the foreign key are in the package''s forward migration
+  V0108__after_r1_20261020.sql (lines 338-342 and 628, CHG-R8MIG-015, applied by R8-DB-SHARED). The raiser''s
+  repository reports no migration up to 260-r9-v0114 altering identity.session, so V0108''s identity.session statements
+  look unapplied there: the migration owner should check that first. What r10''s forward migration adds is the CHECK
+  session_ended_at_null_chk, NOT VALID then VALIDATE: a row ended before the columns existed (status not active,
+  ended_at null) fails the VALIDATE, so the migration task backfills ended_at (for example from last_seen_at) on those
+  rows before applying it. The baseline 010-identity.sql comment ("Redis, not Postgres") is frozen at r1 and is not
+  rewritten.'

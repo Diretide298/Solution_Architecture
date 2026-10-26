@@ -1174,8 +1174,9 @@ paths:
         `mock` exists so the whole feature can be built and demonstrated with no vendor
         involvement at all.
 
-        **PUT semantics — an upsert keyed on the body's `id`.** There is no id in the path, so
-        the body names its target: where no feed has that `id`, one is created and the answer is
+        **PUT semantics — an upsert keyed on the path's `feedId`**, the feed's id (the body's `id`,
+        when sent, must equal it; ADAM CR-245, 26 October 2026, corrected the text left from before the
+        id moved into the path): where no feed has that id, one is created with it and the answer is
         `201`; where one does, the body replaces it whole and the answer is `200`. Omitted
         optional fields take their defaults or null — an omitted `credentialsRef` removes the
         stored reference, and an omitted `expectedIntervalSeconds` returns to 60. A feed never

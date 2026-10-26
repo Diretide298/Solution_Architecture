@@ -1,0 +1,34 @@
+id: CHG-R10CRF-009
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'Confirmed, no new change: setCapabilityTemplate carries the 409 capability-template-is-preset CR-176 decided
+  ("The template is a platform preset; presets are read-only"; nothing changes), and its description says a tenant''s
+  template is stored with isPreset false and presetLevel null whatever is sent. r10 carries it as CHG-R10ID-005.'
+decision:
+  what: 'ADAM CR-249, option A: what CR-176 already decided. contracts/spine/identity.yaml setCapabilityTemplate already
+    lists the 409 (x-ticvai-problem-types [capability-template-is-preset]) and the description since CHG-R10ID-005;
+    tools/check-business-rules.py BR-PRESET-READONLY holds it. This entry records CR-249 against that change so the CR
+    settles with it.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-249 (Sanket Keluskar, #30743 setCapabilityTemplate), accepted by the lead on 26 October 2026: CR-176''s
+  resolution said "fixed at the source in r9" and r9 had no 409. CHG-R10ID-005 fixed it in r10.'
+keys_touched:
+  operations: [setCapabilityTemplate]
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'a CR marked fixed at a release that did not carry it'
+tickets:
+  started:
+  - '30743 (setCapabilityTemplate): keep building to it, through CR-249''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-249
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Nothing edited for CR-249; check-business-rules passes on this tree.'

@@ -4689,16 +4689,6 @@
    "reason": "persistence: projection; stops with coordinates (station.latitude/longitude) and order; neighbour getTransportRoute reads the same three (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "getTrialBalance": {
-   "reads": [
-    "ledger.account",
-    "ledger.event_budget",
-    "ledger.fiscal_period",
-    "ledger.posting"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "getUnifiedReconciliation": {
    "reads": [
     "ledger.posting",

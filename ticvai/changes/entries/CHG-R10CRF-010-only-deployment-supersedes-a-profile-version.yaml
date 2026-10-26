@@ -1,0 +1,39 @@
+id: CHG-R10CRF-010
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'When setConfigurationProfile stores the next version, the older row is left exactly as it is, status included;
+  superseded is set only by deployConfigurationProfile (its job), when the newer version is deployed, because a deployed
+  version is what workstations still run.'
+decision:
+  what: 'ADAM CR-250, option A, as recommended. contracts/spine/tenancy.yaml: ConfigurationProfile.version''s sentence
+    corrected, and deployConfigurationProfile''s job text says it sets the older published or deployed versions
+    superseded once the new one is deployed. states/configuration-profile.yaml: the two transitions to superseded name
+    deployConfigurationProfile, not setConfigurationProfile.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'ADAM CR-250 (Sanket Keluskar, #30825 setConfigurationProfile), accepted by the lead on 26 October 2026: the
+  operation said the older version is left exactly as it is and the schema said setConfigurationProfile marks it
+  superseded; #30825 is already built the first way.'
+keys_touched:
+  operations: [setConfigurationProfile, deployConfigurationProfile]
+  schemas: [ConfigurationProfile]
+  files:
+  - contracts/spine/tenancy.yaml
+  - states/configuration-profile.yaml
+root_class: 'an operation and its schema saying two things about one write'
+tickets:
+  started:
+  - '30825 (setConfigurationProfile): already built this way; keep it, through CR-250''s comment.'
+  unstarted:
+  - 'The profile deployment job''s ticket (a plan item, CR-188): sets superseded when a newer version is deployed.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-250
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open
+notes: 'The state model was a sibling of the same contradiction (both supersede transitions named
+  setConfigurationProfile). Cross-lane: tenancy.yaml and the state model are lane A2''s. No database change.'
