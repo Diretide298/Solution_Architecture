@@ -1637,6 +1637,29 @@ def exactly_one_sql(short: str, group: list) -> str:
 # migration by tools/ddl_forward.py (CHANGE_VERSION); it does nothing where the table or the column is missing.
 CHANGE_VERSION_MARK = "x-ticvai-change-version"
 
+# **The value the rows already there take when a new column arrives** (ADAM CR-104 as the lead ruled it, 26 October
+# 2026; CHG-R10OPN-002). `x-ticvai-backfill: <value>` on a persisted property: a forward migration that adds the column
+# sets it to that value on every row already in the table, in the same guarded block (tools/ddl_forward.py
+# backfill_block); rows written later take the column's default. `MerchandiseItem.isPublished` defaults to false for a
+# new item and is true on every item that was there before it, so no item a guest sees today disappears. A scalar
+# only (boolean, number, string), typed as the column is; BACKFILL: table -> {column: SQL literal}, filled by main.
+BACKFILL_MARK = "x-ticvai-backfill"
+BACKFILL: dict = {}
+
+
+def backfill_literal(typ: str, v) -> str | None:
+    """The SQL literal of an `x-ticvai-backfill` value for a column of type `typ`, or None where they do not fit."""
+    if typ == "boolean" and isinstance(v, bool):
+        return "true" if v else "false"
+    if typ in ("integer", "bigint", "smallint") and isinstance(v, int) and not isinstance(v, bool):
+        return str(v)
+    if (typ.startswith(("numeric", "double precision", "real")) and isinstance(v, (int, float))
+            and not isinstance(v, bool)):
+        return str(v)
+    if typ == "text" and isinstance(v, str):
+        return sql_literal(v)
+    return None
+
 
 def change_version_sql(schema: str, short: str, table: str, col: str) -> str:
     """The sequence, the function and the trigger behind `x-ticvai-change-version` (ADAM CR-239, CHG-R10ORD-011)."""
@@ -2268,7 +2291,8 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
                     ddl_forward.early_plan(area_dir, its), ev, baseline, stamp, before=nxt or "", rest="")
     for area_dir in (CONTROL, "tenant"):
         old, _fwd = old_model(area_dir)
-        plans.append(ddl_forward.diff(area_dir, old, news[area_dir], renames, retired=RETIRED, descoped=DESCOPED))
+        plans.append(ddl_forward.diff(area_dir, old, news[area_dir], renames, retired=RETIRED, descoped=DESCOPED,
+                                      backfill=BACKFILL))
     # **Root-level files are documentation of references that are not constraints** (990): nothing
     # applies them, so a change is listed rather than migrated.
     for name in sorted(n for n in files if "/" not in n and n.endswith(".sql")):
@@ -2482,6 +2506,7 @@ def main() -> int:
     # (`x-ticvai-append-only: <time property>`).
     marks = table_marks(cols, real)
     DESCOPED.clear()
+    BACKFILL.clear()
     for t, m in sorted(marks.items()):
         if m.get("scope") is None:
             continue
@@ -2684,6 +2709,14 @@ def main() -> int:
                         print(f"  ! {t}.{col}: x-ticvai-change-version needs a bigint (integer, int64), not {typ}")
                     else:
                         idx_lines.append((schema, change_version_sql(schema, short, t, col)))
+                # `x-ticvai-backfill` (CHG-R10OPN-002): the value a forward migration gives the rows already there.
+                bf = (column_spec(c, contract_props) or {}).get(BACKFILL_MARK)
+                if bf is not None:
+                    lit = backfill_literal(typ, bf)
+                    if lit is None:
+                        print(f"  ! {t}.{col}: x-ticvai-backfill {bf!r} does not fit a {typ} column; nothing backfilled")
+                    else:
+                        BACKFILL.setdefault(t, {})[col] = lit
 
                 ref = c.get("references")
                 if ref and ref in real:

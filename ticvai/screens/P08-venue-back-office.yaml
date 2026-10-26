@@ -5529,9 +5529,10 @@ screens:
       - kind: calendarView
         label: Calendar
         operation: listPerformances
-        notes: Performances by day, week or month; a slot opens its performance. Day, week, month and
-          agenda views; the day starts at the venue's `calendarDayStartHour`. Sends the visible window
-          as `from`/`to` and the category filter as `categoryId`.
+        notes: 'Performances by day, week or month; a slot opens its performance. Day, week, month and
+          agenda views; the day starts at the venue''s `calendarDayStartHour`. Sends the visible window
+          as `from`/`to`. No category filter: the approved screen has no element for one, so its options read
+          (`listProductCategories`) is not declared here (CHG-R10OPN-005, ADAM CR-262; Chinmay, 26 October 2026).'
         provenance: decided 29 September 2026, 17 September minutes M17-03 (applied 30 September)
       - kind: datePicker
         label: From
@@ -5781,14 +5782,6 @@ screens:
     contract: catalogue
     purpose: List performances of an event
     trigger: onAction
-  - operationId: listProductCategories
-    contract: catalogue
-    purpose: 'The options of the calendar''s category filter (r8, GPS-C18), read once when the screen
-      opens; the chosen category is sent to `listPerformances` as `categoryId`. No component of its own:
-      the filter is part of the calendar. Not background (r8 integration, CHG-R8INT-008): the user sees
-      the options, and the approved screen has no element of its own for the filter.'
-    trigger: onLoad
-    provenance: r8 second round, GPS-C18 (ticket 28195)
   - operationId: getPerformance
     contract: catalogue
     purpose: Read a performance
@@ -28513,8 +28506,10 @@ screens:
     - BO-077
     - BO-089
     - BO-090
+    - BO-1088
     - BO-1094
     - BO-1111
+    - BO-1144
     - BO-1146
     - BO-1162
     - BO-1179
@@ -28643,6 +28638,10 @@ screens:
       provenance: 'derived — BO-028 declares entryState.params refundId and BO-101 holds none of them.
         The edge carries nothing: refundId only pre-selects (deep link or optional), and BO-028 opens
         on its own'
+    - to: BO-1088
+      trigger: Opens Credit & Balance Type Configuration
+      provenance: 'CHG-R10OPN-004 (ADAM CR-261; Chinmay, 26 October 2026): the section home links to the Block A
+        screen it leads to, as CHG-RONEP-007 did; its command centre is not in Block A'
     - to: BO-1094
       trigger: Opens Funding Method Configuration
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
@@ -28651,6 +28650,10 @@ screens:
       trigger: Opens Credit Expiry, Extension & Forfeiture Operations
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
+    - to: BO-1144
+      trigger: Opens Peer-to-Peer Transfer Configuration
+      provenance: 'CHG-R10OPN-004 (ADAM CR-261; Chinmay, 26 October 2026): the section home links to the Block A
+        screen it leads to, as CHG-RONEP-007 did; its command centre is not in Block A'
     - to: BO-1146
       trigger: Opens Refund-to-Wallet Policy Configuration
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
@@ -150026,6 +150029,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1083
+    - BO-101
     exitTo:
     - BO-1083
     transitions:
@@ -157951,6 +157955,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1143
+    - BO-101
     exitTo:
     - BO-1143
     transitions:

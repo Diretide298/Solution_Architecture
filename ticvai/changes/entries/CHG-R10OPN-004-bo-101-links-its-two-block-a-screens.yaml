@@ -1,0 +1,37 @@
+id: CHG-R10OPN-004
+date: '2026-10-26'
+source: audit
+kind: spec
+summary: 'BO-101 Orders & Money links to BO-1088 Credit & Balance Type Configuration and BO-1144 Peer-to-Peer Transfer
+  Configuration, so both are reached inside Block A and not only through their command centres.'
+decision:
+  what: 'ADAM CR-261, option A: screens/P08 BO-101 navigation exitTo and transitions gain BO-1088 and BO-1144 (worded as
+    CHG-RONEP-007''s links from the section home), and BO-1088 and BO-1144 name BO-101 in entryFrom. Logged in
+    docs/active/approved-ui-changes.yaml (BO-101 navigation) under CR-261.'
+  by: Chinmay
+  date: '2026-10-26'
+  quote: '"Yes, all six (Recommended)", then "actually get them build r10 thats fine"'
+why: 'The r10 integration gate of 26 October 2026: check-plan-closure C-REACH found BO-1088 reached only through BO-1083
+  and BO-1144 only through BO-1143, both outside Block A (CHG-RONEP-006). The lead''s six decisions of 26 October 2026, item 4, raised as ADAM CR-261.'
+keys_touched:
+  screens:
+  - BO-101
+  - BO-1088
+  - BO-1144
+  files:
+  - screens/P08-venue-back-office.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'a Block A screen whose only way in is a command centre outside Block A'
+tickets:
+  started: []
+  unstarted:
+  - '32074 to 32076 (BO-101, On hold), 36284 to 36299 (BO-1088 and BO-1144): pick the link up at the next tag.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-261
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+notes: 'Visible change to an approved screen, logged in ADAM as CR-261 (the rule of 22 October). No database change.'
+status: open

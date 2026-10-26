@@ -1,0 +1,47 @@
+id: CHG-R10OPN-005
+date: '2026-10-26'
+source: audit
+kind: spec
+summary: 'BO-015, GST-059 and POS-004 no longer declare reads no component reaches (listProductCategories,
+  listMyVisitPlans, listPerformances); nothing visible changes.'
+decision:
+  what: 'ADAM CR-262, option A: the three api declarations r8 added (GPS-C18, GPS-C15, GPS-C05) are removed, with the
+    notes and cold-entry text that relied on them: BO-015''s calendar sends no category; GST-059 opened without a planId
+    shows its emptyFirstRun offer to make a plan; POS-004 opened on a past performance shows it and does not look up the
+    next one. listProductCategories and listPerformances are still declared and reached on other screens (WEB-002,
+    GST-002, CMS-101, BO-048, BO-115; WEB-006, GST-005, GST-007, BO-015 itself, BO-725). listMyVisitPlans is left with no
+    screen; it stays in the contract and is still built by 36219 and 36305 (see notes).'
+  by: Chinmay
+  date: '2026-10-26'
+  quote: '"Yes, all six (Recommended)", then "actually get them build r10 thats fine"'
+why: 'The r10 integration gate of 26 October 2026: check-screen-wiring S-OP-UNREACHED on the three (R273). The screens are
+  client-approved and have no element for the data; the lead''s six decisions of 26 October 2026, item 5: if a screen
+  later needs it, it comes back through a CR.'
+keys_touched:
+  screens:
+  - BO-015
+  - GST-059
+  - POS-004
+  operations:
+  - listProductCategories
+  - listMyVisitPlans
+  - listPerformances
+  files:
+  - screens/P08-venue-back-office.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P04-point-of-sale.yaml
+root_class: 'a read declared for data the approved screen has no element to show'
+tickets:
+  started: []
+  unstarted:
+  - '28195 and 31845 to 31847 (BO-015), 28694 and 33026 to 33028 (GST-059), 28206 and 31868 to 31870 (POS-004): drop
+    the read at the next tag.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-262
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+notes: 'No visible change (apis, notes and entry state are invisible to check-approved-ui). No database change.'
+status: open

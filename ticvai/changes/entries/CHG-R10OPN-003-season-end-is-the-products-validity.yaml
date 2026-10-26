@@ -1,0 +1,49 @@
+id: CHG-R10OPN-003
+date: '2026-10-26'
+source: cr
+kind: contract
+summary: 'catalogue.Product gains validTo, the last moment its entitlements are valid (null: the same as onSaleTo); a
+  seasonEnd expiry anchor ends there, not when sales close.'
+decision:
+  what: 'ADAM CR-167 (CHG-R10ORD-026, its seasonEnd source): Product.validTo (date-time, nullable; null means the same as
+    onSaleTo) in contracts/spine/catalogue.yaml, settable beside onSaleTo in bulkUpdateCatalogueProducts'' changes (the
+    only write of onSaleTo); EntitlementTemplate.expiryAnchor''s description says seasonEnd ends at validTo, else
+    onSaleTo; access#issueOrderEntitlements says the same (contracts/spine/access.yaml). Siblings looked for: every
+    other onSaleTo reading (burst environments, ADR-0035, the waiting room, the endingSoon attention item, the guest
+    on-sale filter) is about sales, not validity, and stays.'
+  by: Chinmay
+  date: '2026-10-26'
+  quote: '"Yes, all six (Recommended)", then "actually get them build r10 thats fine"'
+why: 'The lead''s six decisions of 26 October 2026 on the r10 open questions (audit decisions-2026-10-26), item 3: lane C
+  read the product''s validity as onSaleTo, the only end date a product had (CHG-R10ORD-026 notes), so a season pass
+  sold until July and used until October would have expired in July.'
+keys_touched:
+  operations:
+  - issueOrderEntitlements
+  - bulkUpdateCatalogueProducts
+  schemas:
+  - Product
+  - EntitlementTemplate
+  tables:
+  - catalogue.product
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/access.yaml
+root_class: 'one field read for two meanings (sales close and validity end) because the second had no field'
+tickets:
+  started:
+  - '27701 (PLATFORM-SAGA-PAID, issueOrderEntitlements, Ready for QA): through CR-167''s comment; its text is not
+    rewritten.'
+  unstarted:
+  - '28382 and 32282 (issueOrderEntitlements), 28114 and 31667 (bulkUpdateCatalogueProducts): pick it up at the next
+    tag. Migration work: a child task of MIG-CATALOGUE for the migration owner.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-167
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+notes: 'Database change the generator writes: catalogue.product.valid_to (timestamptz, nullable), additive; no backfill
+  (null reads as onSaleTo).'
+status: open

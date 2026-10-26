@@ -197,3 +197,22 @@ changes:
     and columns read the ticket (getEntitlement); fields with no source are dropped and listed on the left-out list
     (LO-R10UI-003)'
   change: CHG-R10UI-017
+- screen: BO-101
+  field: 'navigation'
+  to: 084f8950e6b0275c
+  approval: 'ADAM CR-261 (raised from the r10 integration gate, check-plan-closure C-REACH, 26 October 2026; accepted 26
+    October 2026, option A by Chinmay: "Yes, all six (Recommended)", then "actually get them build r10 thats fine"):
+    since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the lead, 22 October
+    2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log. BO-101 links to
+    BO-1088 and BO-1144, as CHG-RONEP-007 linked the section''s other Block A screens'
+  change: CHG-R10OPN-004
+- screen: POS-006
+  field: 'state:offline'
+  to: ddeb979ad9f96bef
+  approval: 'ADAM CR-263 (raised from the r10 integration gate, check-screen-wiring S-OFFLINE-REFUSED, 26 October 2026;
+    accepted 26 October 2026, option A by Chinmay: "Yes, all six (Recommended)", then "actually get them build r10
+    thats fine"): since 22 October 2026 a developer may change approved UI when the change is logged in ADAM (the
+    lead, 22 October 2026: "let frontend change ui and log it in changes. dont worry about it"); this CR is that log.
+    The offline text says this till''s held orders can still be reprinted and the reprint queues, as reprintOrder''s
+    contract allows (x-ticvai-offline-capable, P04)'
+  change: CHG-R10OPN-006
