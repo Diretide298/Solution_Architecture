@@ -1,0 +1,37 @@
+id: CHG-R10INT-003
+date: '2026-10-26'
+source: audit
+kind: process
+summary: 'Three of the gate''s known-failure allowances are removed because r10 fixed what they allowed:
+  check-screen-wiring''s "exactly five new" S-OP-UNREACHED, check-plan-closure''s "exactly two new" C-REACH, and
+  check-package''s two build-readiness lines.'
+decision:
+  what: 'tools/refresh-safe-baseline.json loses (1) check-screen-wiring (the five reads on approved screens:
+    BO-291 and GST-048 named by CHG-R10GFP-006; BO-015, GST-059 and POS-004 removed by CHG-R10OPN-005, ADAM CR-262),
+    (2) check-plan-closure (BO-1088 and BO-1144, reachable in Block A through BO-101 since CHG-R10OPN-004, ADAM
+    CR-261) and (3) check-package''s two build-readiness-21-september.md lines (fixed by CHG-R10GFP-007). The file''s own
+    rule: "Remove an entry when its failure is fixed; never widen a pattern to let a new failure through." The
+    screen-wiring line also carried 14 findings on started tickets that the five-new pattern let through; they are
+    fixed at their source by the wiring lane, not allowed.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The lead, 26 October 2026: a fresh rebuild of r10 must pass the gate; never baseline, acknowledge or exempt to
+  pass. An allowance kept after its failure is fixed would let a new failure of the same shape through.'
+keys_touched:
+  files:
+  - tools/refresh-safe-baseline.json
+root_class: 'a count-only allowance (accept exactly N new) outlives the findings it was written for and hides others
+  on the same line'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-262
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/refresh-safe.sh
+status: open
+notes: 'Open for the lead: a count-only pattern ("N new") cannot tell which findings it allows. Naming the screen ids in
+  the check''s output would let an allowance name them instead.'
