@@ -1,0 +1,31 @@
+id: CHG-R10GFC-005
+date: '2026-10-26'
+source: audit
+kind: contract
+summary: 'access recordQueueRedemptionUse declares X-Consistency-Token on its 204, as every write of a Postgres table
+  does (api-conventions section 3).'
+decision:
+  what: 'contracts/spine/access.yaml recordQueueRedemptionUse: the 204 gains headers X-Consistency-Token
+    ($ref common.yaml ConsistencyToken). No body or behaviour changes.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-135604-1087), check-package rule 49 (R192): the
+  operation was added in r10 for ADAM CR-238 (CHG-R10ORD-007) and writes access.entitlement with no consistency token
+  on its 2xx.'
+keys_touched:
+  operations: [recordQueueRedemptionUse]
+  files:
+  - contracts/spine/access.yaml
+root_class: 'a new write operation without the header every write declares'
+tickets:
+  started: []
+  unstarted:
+  - 'recordQueueRedemptionUse: new in r10 and not ticketed yet on 22 October; its ticket carries it.'
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-238
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-package.py
+status: open
