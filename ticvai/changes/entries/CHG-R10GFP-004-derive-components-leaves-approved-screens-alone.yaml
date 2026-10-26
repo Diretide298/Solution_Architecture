@@ -1,0 +1,39 @@
+id: CHG-R10GFP-004
+date: '2026-10-26'
+source: audit
+kind: process
+summary: 'derive-components proposes no components to a client-approved screen, and makes a body region only for
+  components it adds. It had given approved GST-043 "Save my profile" and "Cancel" (from CR-186''s updateMyProfile,
+  which no decision gave a button), and an empty region to GST-018, GST-042, GST-051, GST-056 and GST-067.'
+decision:
+  what: 'tools/derive-components.py skips every screen in the approved snapshot (handoff/approved-ui.json, the one
+    check-approved-ui compares with): what it proposes is visible UI, and the approved UI changes only through a CR
+    logged in docs/active/approved-ui-changes.yaml. It no longer appends an empty contentBody (or an empty layout) to a
+    screen before counting; the region is made only when components go into it. The two buttons are not logged as an
+    approved change: ADAM CR-186''s decision is "GST-043 also calls marketing-crm#updateMyProfile (onAction, sending
+    only preferredLanguage) after the device copy is saved ... Add the operation to GST-043''s API list", an action on
+    the language choice, with no button. They were derived, never committed, so nothing in screens/ is reverted.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-135604-1087): check-approved-ui AU-FIELD, 11 new on
+  GST-018, GST-042, GST-043, GST-051, GST-056 and GST-067 (region "-" added; GST-043''s form gained primaryButton "Save
+  my profile" and secondaryButton "Cancel"). ADAM CR-186 (settled 25 October 2026) added updateMyProfile to GST-043,
+  which left it with one component and a write, the shape derive-components fills.'
+keys_touched:
+  screens: [GST-018, GST-042, GST-043, GST-051, GST-056, GST-067]
+  files:
+  - tools/derive-components.py
+root_class: 'a generator that writes visible UI onto client-approved screens, and a region added to every screen as a
+  side effect'
+tickets:
+  started: []
+  unstarted: ['27892 (GST-043), New: builds the language choice and the updateMyProfile call, no Save or Cancel button']
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-186
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open
+notes: 'Measured on the gate tree after the screen derive steps: check-approved-ui AU-FIELD 0 ("0 screens enriched").'
