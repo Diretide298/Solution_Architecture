@@ -1,0 +1,42 @@
+id: CHG-R10GFC-004
+date: '2026-10-26'
+source: audit
+kind: process
+summary: 'check-rls-scope-fit reads identity.principal''s write rule as the policy V0108 applied: the tenant root OR a
+  grant over the principal''s home scope. createPrincipal, updatePrincipal and resetPrincipalCredential at a venue
+  write principals homed in that venue, as decided; no contract or policy changes.'
+decision:
+  what: 'tools/check-rls-scope-fit.py classes(): a grant-holder-read write check that allows the tenant root OR an
+    in_scope() test is a scope write, not a tenant-root-only write; one that is the tenant root alone stays tenant.
+    The rule itself was already decided: Principal is x-ticvai-rls home-scope-write (R8 blocker IDENTITY-C37, the
+    lead''s option A, CHG-R8MIG-007: a venue manager creates and updates the principals homed in their venue), and
+    backend/tenant/V0108__after_r1_20261020.sql applied it (apply_grant_holder_read_rls with `(tenant_root_in_scope()
+    OR EXISTS (... in_scope(hs.path)))`). ADAM CR-189 (CHG-R10ID-001) evaluates USER_MANAGE at the scope acted on,
+    which is the same venue. tools/tests/test_gate2_fixc_r10.py holds it.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-135604-1087), check-rls-scope-fit RF-TENANT-ROOT on
+  started tickets #30804 and #30824: "createPrincipal (venue) writes identity.principal, which only the tenant root
+  writes". The check took any mention of platform.tenant_root_in_scope() in the write check for "the tenant root only".
+  The decision the finding asked for (a scope for the table, or the operations at tenant) was taken in r8
+  (CHG-R8MIG-007) and stands with CR-189.'
+keys_touched:
+  operations: [createPrincipal, updatePrincipal, resetPrincipalCredential]
+  tables: [identity.principal]
+  files:
+  - tools/check-rls-scope-fit.py
+  - tools/tests/test_gate2_fixc_r10.py
+root_class: 'a check that reads a policy predicate by a word in it rather than by what it allows'
+tickets:
+  started:
+  - '30804 (Ready for QA) and 30824 (In progress), Pranay Shinde: nothing changes for them; the policy they build on
+    already lets a venue''s USER_MANAGE write its own principals.'
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-189
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-rls-scope-fit.py
+status: open

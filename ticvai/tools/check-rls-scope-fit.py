@@ -139,10 +139,19 @@ def classes(pol: dict) -> dict:
     memo: dict = {}
 
     def write_of(arg: str) -> str:
+        # **The tenant root OR a grant over a scope is a scope write** (r10 gate 2, 26 October 2026, CHG-R10GFC-004).
+        # identity.principal's home-scope-write check (CHG-R8MIG-007, R8 blocker IDENTITY-C37, the lead's option A:
+        # a venue manager creates and updates the principals homed in their venue) is
+        # `(platform.tenant_root_in_scope() OR EXISTS (... platform.in_scope(hs.path)))`, and reading any mention of
+        # the tenant root as "the tenant root only" reported createPrincipal, updatePrincipal and
+        # resetPrincipalCredential at a venue as writes the policy refuses, which V0108 lets through.
+        rest = arg.replace("platform.tenant_root_in_scope()", "")
+        if "subject_in_scope" in rest:
+            return "subject"
+        if "in_scope(" in rest:
+            return "scope"
         if "tenant_root_in_scope" in arg:
             return "tenant"
-        if "subject_in_scope" in arg:
-            return "subject"
         return "scope"
 
     def cls(t: str, depth: int = 0):
