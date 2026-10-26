@@ -10,7 +10,8 @@ decision:
     shows its emptyFirstRun offer to make a plan; POS-004 opened on a past performance shows it and does not look up the
     next one. listProductCategories and listPerformances are still declared and reached on other screens (WEB-002,
     GST-002, CMS-101, BO-048, BO-115; WEB-006, GST-005, GST-007, BO-015 itself, BO-725). listMyVisitPlans is left with no
-    screen; it stays in the contract and is still built by 36219 and 36305 (see notes).'
+    screen; it stays in the contract, still built by 36219 and 36305, and says why it has none (x-ticvai-no-screen in
+    contracts/satellite/venue-map.yaml), so audit-screenless-operations does not count it as a screen not yet specified.'
   by: Chinmay
   date: '2026-10-26'
   quote: '"Yes, all six (Recommended)", then "actually get them build r10 thats fine"'
@@ -30,6 +31,7 @@ keys_touched:
   - screens/P08-venue-back-office.yaml
   - screens/P02-guest-mobile-app.yaml
   - screens/P04-point-of-sale.yaml
+  - contracts/satellite/venue-map.yaml
 root_class: 'a read declared for data the approved screen has no element to show'
 tickets:
   started: []
