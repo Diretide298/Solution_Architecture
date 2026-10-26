@@ -1,0 +1,54 @@
+id: CHG-R10GEN-006
+date: '2026-10-26'
+source: audit
+kind: process
+summary: 'The three r10 fixers become standing tools: tools/fix-read-routes.py, tools/fix-money-currency.py and
+  tools/fix-order-and-refusals.py (moved from tools/applied/, whose old names stay as thin wrappers because
+  CHG-R10GEN-001..005 cite them). Each check''s finding names the fixer to run, so whoever adds an operation runs
+  it; a second run writes nothing.'
+decision:
+  what: 'The lead, 26 October 2026: "the patterns we should update the build as well". A fix that needs a one-off
+    script each release is a fix the next release forgets. The fixers read the findings afresh on every run, so they
+    are re-runnable on any tree: fix-read-routes (XR-FACT, pattern e), fix-money-currency (MC-NO-CURRENCY, pattern
+    a), fix-order-and-refusals (LO-NULLABLE-KEY, LO-UNORDERED, SR-TERMINAL-UNANSWERED: patterns b and c). The
+    finding messages of check-cross-module-reads XR-FACT, check-money-currency, check-list-order and
+    check-state-refusals end with the fixer command (then derive-lineage --apply for a read route), and each check
+    notes the fix when it has findings; check-screen-value-sources says it has no mechanical fixer and what the fix
+    is. refresh.sh''s coverage block names the three fixers in _EXCLUDED: they write authored contracts, which a
+    refresh never does.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'r10 lane E round 2 (the coordinator''s brief of 26 October). On the merged r10 tree (1c2c2814) every fixer''s
+  dry run writes nothing: fix-read-routes 0 routes (193 findings already routed), fix-money-currency 0 routes (22
+  held for the lead), fix-order-and-refusals 0 sentences.'
+keys_touched:
+  files:
+  - tools/fix-read-routes.py
+  - tools/fix-money-currency.py
+  - tools/fix-order-and-refusals.py
+  - tools/applied/read-routes-r10.py
+  - tools/applied/money-currency-reads-r10.py
+  - tools/applied/order-and-refusals-r10.py
+  - tools/check-cross-module-reads.py
+  - tools/check-money-currency.py
+  - tools/check-list-order.py
+  - tools/check-state-refusals.py
+  - tools/check-screen-value-sources.py
+  - tools/refresh.sh
+  - tools/tests/test_read_routes_r10.py
+  - tools/tests/test_check_money_currency.py
+  - tools/tests/test_order_and_refusals_apply.py
+root_class: 'a one-off fixer: a rule fixed once by a dated script is drafted wrong again by the next change'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-186 to CR-240 (the r10 classes); P-30
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-money-currency.py
+status: open
+notes: 'The four checks and XR-FACT name their fixer in every finding. Tests: test_read_routes_r10,
+  test_check_money_currency and test_order_and_refusals_apply load the standing paths.'

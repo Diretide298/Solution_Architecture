@@ -1,0 +1,52 @@
+id: CHG-R10GEN-008
+date: '2026-10-26'
+source: audit
+kind: process
+summary: 'The seven rules r10 settled are stated once, in api-conventions section 8 (the package''s contract and
+  screen standard, copied to every project-bible and to ADAM''s starter docs), and the CR watcher knows each as a
+  class with a proposed default ruling (handoff/cr-classes.yaml), so a future request of the class is sorted and
+  drafted with no AI. Housekeeping: check-problem-types'' ceiling falls from 114 to 112, and ADR-0055 says ADR-0018 is
+  amended where it cites it.'
+decision:
+  what: 'The lead, 26 October 2026: "the patterns we should update the build as well". (a) Money has a currency
+    source; (b) a list states a total order, nulls last then id; (c) a refusal agrees with its state model; (d) a
+    screen value has a declared source; (e) another module''s fact is asked of its owner''s query; (f) a public guest
+    read of venue data takes GuestVenue and declares 400 venue-required (CR-198); (g) x-ticvai-permission is
+    evaluated per scope from Session.permissionsByScope (CR-189). Each row of api-conventions section 8 names its
+    check and its fixer. cr-classes.yaml: money-currency, state-model, screen-values and read-routes gain the r10
+    requests, words, checks and a default ruling; list-order, guest-venue and scope-authz are new classes. The
+    rulings are `proposed`; the lead makes one `active`. The ADR-0055 line now reads "ADR-0018 as amended 20
+    September for currency" (check-package''s superseded-citation rule).'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'r10 lane E round 2 (the coordinator''s brief of 26 October). A rule held only in a check and a CR''s decision
+  is learned by each developer from a failure; the standard is where an author reads it first (CR-6: the standard is
+  changed at its source and every copy in the same change). check-problem-types reported "lower CEILING to 112" on
+  the merged tree; check-package failed ADR-0055 for citing amended ADR-0018 without saying so.'
+keys_touched:
+  files:
+  - repos/ticvai-docs/setup/api-conventions.md
+  - repos/ticvai-ai/project-bible/setup/api-conventions.md
+  - repos/ticvai-backend/project-bible/setup/api-conventions.md
+  - repos/ticvai-contracts/project-bible/setup/api-conventions.md
+  - repos/ticvai-frontend/project-bible/setup/api-conventions.md
+  - repos/ticvai-infra/project-bible/setup/api-conventions.md
+  - ../viewer/mcp/setup/starters/docs/api-conventions.md
+  - handoff/cr-classes.yaml
+  - docs/adr/0055-a-modular-monolith-deployed-as-five-units.md
+  - tools/check-problem-types.py
+  - tools/tests/test_cr_classes_r10.py
+root_class: 'a rule known only to its check: the standard an author reads did not state it'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-186 to CR-240 (the r10 classes); P-30
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-starter-fit.py
+status: open
+notes: 'test_cr_classes_r10: the title and problem of each of 17 r10 requests, with every CR id taken out, are sorted
+  into their class by cr-watch.classify, and every r10 class carries its default ruling and its check.'

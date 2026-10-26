@@ -1,4 +1,4 @@
-"""Tests for tools/applied/read-routes-r10.py and the read rule it shares with check-cross-module-reads (CHG-R10GEN-001).
+"""Tests for tools/fix-read-routes.py and the read rule it shares with check-cross-module-reads (CHG-R10GEN-001).
 
     python -m pytest ticvai/tools/tests/test_read_routes_r10.py -q
 """
@@ -17,7 +17,7 @@ def _load(name, path):
     return mod
 
 
-rr = _load("rr10", TOOLS / "applied" / "read-routes-r10.py")
+rr = _load("rr10", TOOLS / "fix-read-routes.py")
 xr = _load("xr10", TOOLS / "check-cross-module-reads.py")
 
 CONTRACT = """openapi: 3.0.3

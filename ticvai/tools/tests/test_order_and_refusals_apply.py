@@ -1,4 +1,4 @@
-"""Tests for tools/applied/order-and-refusals-r10.py (CHG-R10GEN-004, CHG-R10GEN-005): the sentence it appends, in
+"""Tests for tools/fix-order-and-refusals.py (CHG-R10GEN-004, CHG-R10GEN-005): the sentence it appends, in
 every scalar style the contracts use, and only once.
 
     python -m pytest ticvai/tools/tests/test_order_and_refusals_apply.py -q
@@ -10,7 +10,7 @@ import pytest
 import yaml
 
 TOOLS = Path(__file__).resolve().parents[1]
-_spec = importlib.util.spec_from_file_location("oar", TOOLS / "applied" / "order-and-refusals-r10.py")
+_spec = importlib.util.spec_from_file_location("oar", TOOLS / "fix-order-and-refusals.py")
 oar = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(oar)
 

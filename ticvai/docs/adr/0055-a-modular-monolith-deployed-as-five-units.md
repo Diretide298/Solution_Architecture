@@ -23,7 +23,7 @@ security still scopes every row:
    `x-ticvai-consumes` as running in workers (XR-ROUTE).
 2. **`operations` composes Tenancy's venue and region settings queries** (`tenancy#venueSettingsRecords`,
    `tenancy#regionSettingsRecords`), as the workers host does: every F&B operation that answers Money reads the
-   venue's frozen trading currency and its scale this way (naming-and-style 5.1, ADR-0018), mergeTableVisits first
+   venue's frozen trading currency and its scale this way (naming-and-style 5.1, ADR-0018 as amended 20 September for currency), mergeTableVisits first
    (CR-234). Granted read XDR-004 in `docs/active/cross-deployable-writes.yaml`.
 3. **`access` composes Tenancy's workstation query and Catalogue's entitlement template query**
    (`tenancy#workstationRecords`, `catalogue#entitlementTemplateRecords`): getOfflinePackage reads the session's

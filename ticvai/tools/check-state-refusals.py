@@ -244,8 +244,12 @@ def main() -> int:
     guard = g.Guard("check-state-refusals", RULES)
     found = findings()
     for rule, key, msg in found:
-        guard.add(rule, key, msg)
+        guard.add(rule, key, f"{msg}. Fixer: python tools/fix-order-and-refusals.py --apply")
     guard.note(f"{len(load_models())} state model(s) read; {len(found)} disagreement(s)")
+    if found:
+        guard.note("the fix (CHG-R10GEN-006): python tools/fix-order-and-refusals.py --apply writes the default "
+                   "ruling (the 409s that leave states unanswered, refusing them too); a finding it cannot rule on it prints for the lead. A second run writes "
+                   "nothing.")
     return guard.finish()
 
 

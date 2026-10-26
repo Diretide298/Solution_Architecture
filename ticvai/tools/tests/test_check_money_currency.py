@@ -1,4 +1,4 @@
-"""Tests for tools/check-money-currency.py and tools/applied/money-currency-reads-r10.py (CHG-R10GEN-002; ADAM CR-197,
+"""Tests for tools/check-money-currency.py and tools/fix-money-currency.py (CHG-R10GEN-002; ADAM CR-197,
 CR-202, CR-217, CR-234, CR-235).
 
     python -m pytest ticvai/tools/tests/test_check_money_currency.py -q
@@ -23,7 +23,7 @@ def _load(name, path):
 
 
 mc = _load("mc", TOOLS / "check-money-currency.py")
-fx = _load("fx", TOOLS / "applied" / "money-currency-reads-r10.py")
+fx = _load("fx", TOOLS / "fix-money-currency.py")
 
 MONEY = {"$ref": "../shared/common.yaml#/components/schemas/Money"}
 BY = {

@@ -49,7 +49,7 @@ Rules:
 **The class release, 25 October 2026** (r10 lane E, CHG-R10GEN-001; PROCESS-LOG P-30). The 720 XR-FACT findings of r9
 were baselined on 18 October and acknowledged on started tickets until a class release that never ran, and about 13
 of the 48 CRs of 21-24 October were among them (listDepositBoxes' drawer limits, CR-218). With the read rule above
-and the dry run's NOT_READ, 198 remain, and tools/applied/read-routes-r10.py routes all but the two an Identity
+and the dry run's NOT_READ, 198 remain, and tools/fix-read-routes.py routes all but the two an Identity
 operation would ask above the foundation tier (getMembership's guest link, guestUaePassLogin's custom domain), which
 are the lead's.
 
@@ -726,7 +726,8 @@ def main() -> int:
     for o, reader, t, owner, how, phrase in facts:
         guard.add("XR-FACT", f"{o}:{t}",
                   f"{o} ({reader}) names {t} ({how}: {phrase!r}), which {owner} owns, and asks no query over it: add "
-                  f"an x-ticvai-read-via to {owner}'s query for {t} (ADR-0055 rule 2; CR-096)",
+                  f"an x-ticvai-read-via to {owner}'s query for {t} (ADR-0055 rule 2; CR-096). Fixer: python "
+                  "tools/fix-read-routes.py --apply, then python tools/derive-lineage.py --apply",
                   strict=(o, t) in MUST_FIX_FACTS)
     # XR-LINEAGE
     for o in sorted(set(ops) | {o for o, e in lin.items() if e.get("readVia")}):
