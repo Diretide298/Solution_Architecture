@@ -2323,6 +2323,8 @@ def main() -> int:
         for e in ex.get("epics") or []:
             task(e["key"], "", "Epic", e["subject"], e["detail"], 1, area=e.get("area", "backend"))
         for t_ in ex.get("tasks") or []:
+            # a database update task gains each forward migration newer than those it names (CHG-R10GFC-006)
+            t_ = ticket_done.db_update_task(t_, ROOT)
             # **A task for a later block is recorded, not ticketed** (1 October): the ADRs of that day name
             # build work for B1 (the waiting room, the admission rule evaluators), kept beside the Block A
             # tasks so it is not lost, and cut into tickets when that block is planned.
