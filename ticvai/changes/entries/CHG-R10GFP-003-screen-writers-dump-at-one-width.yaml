@@ -1,0 +1,37 @@
+id: CHG-R10GFP-003
+date: '2026-10-26'
+source: audit
+kind: process
+summary: 'Every refresh step that writes a screen file dumps it at width 100: derive-components and
+  link-screens-contracts wrote at 98, so a file they touched had its long notes rewrapped, and the next width-100
+  writer wrapped them back. The refresh chain was no fixed point on P02 (the targetApp note, "deliberately narrower
+  rather than different").'
+decision:
+  what: 'tools/derive-components.py and tools/link-screens-contracts.py write screens with yaml.safe_dump width 100,
+    the derivers'' form derive-screen-wiring and derive-state-views already hold every screen file to. No other screen
+    writer on the refresh dumps at another width (apply-p04-transitions, at 98, is an applied one-off).'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-135604-1087): check-regenerate-twice RT-CHAIN,
+  "screens/P02-guest-mobile-app.yaml: the chain changed it (derive-transitions-from-flows,
+  derive-carries-from-entrystate)". The gate''s refresh had written P02 through derive-components at width 98 (GST-043
+  gained components, CHG-R10GFP-004), and the chain rewrapped it at 100.'
+keys_touched:
+  files:
+  - tools/derive-components.py
+  - tools/link-screens-contracts.py
+root_class: 'two writers of one file in two layouts: a rebuild flips the bytes between them'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-186
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-regenerate-twice.py
+status: open
+notes: 'adam_cr: CR-186 is the r10 change whose GST-043 edit set derive-components writing P02; the defect is older.
+  Measured: check-regenerate-twice --chain on the gate tree after the screen steps passes ("the chain of 17 step(s)
+  left the files as it found them").'

@@ -631,10 +631,17 @@ def creates(pk: Package, s: dict, name: str) -> str | None:
     for x in apis(s):
         o = x["operationId"]
         po = pk.ops.get(o) or {}
-        if po.get("_method") != "post" or not MAKE_VERBS.match(o) or "{" + name + "}" in po.get("_path", ""):
+        if po.get("_method") != "post" or "{" + name + "}" in po.get("_path", ""):
             continue
         got = pk.response_props(o)
-        if stem in o.lower() or name in got or any(
+        # **A write that answers with the id makes it, whatever its verb** (r10 gate 2, CHG-R10GFP-002): WEB-024 and
+        # GST-066 poll getSubjectDataExport with the `requestId` exportSubjectData answered (ADAM CR-101), and
+        # "export" is no make verb, so the parameter was written required and P5 found no edge carrying it.
+        if name in got:
+            return o
+        if not MAKE_VERBS.match(o):
+            continue
+        if stem in o.lower() or any(
                 g.startswith("@") and g[1:].lower().endswith(stem) for g in got):
             return o
     return None

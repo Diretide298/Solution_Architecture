@@ -1,0 +1,42 @@
+id: CHG-R10GFP-006
+date: '2026-10-26'
+source: audit
+kind: spec
+summary: 'BO-291''s save form and GST-048''s add-to-cart form name the list reads that fill their pickers
+  (`reads`), so listTaxProfiles and listProductVariants are reached: two of the five reads the approved screens have
+  no element for.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml BO-291 formSetMembershipCommercialConfig: reads [listPriceLists,
+    listTaxProfiles], the pickers its body already names (basePricingProfile from the price lists, taxProfile from the
+    tax profiles; r8 GPS-C34). screens/P02-guest-mobile-app.yaml GST-048 formAddCartLine: reads [listProductVariants],
+    the variants the form lists when a suggestion carries no variantId (r8 ORDERS-MONEY-C40). The overlay `reads`
+    field is the CHG-R10UI-016 binding for a picker inside a form; check-approved-ui does not compare it, so no
+    approved UI changes. The other three (BO-015 listProductCategories, GST-059 listMyVisitPlans, POS-004
+    listPerformances) have no form or component to name them and wait for the lead.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-135604-1087): check-screen-wiring S-OP-UNREACHED, the
+  five reads the lead''s ruling of 20 October keeps visible until the client decides (CHG-R8INT-008). Two of them sit in
+  a form overlay, which since the r10 screens lane''s round 3 (CHG-R10UI-016, ADAM CR-222) can name its picker reads.'
+keys_touched:
+  screens: [BO-291, GST-048]
+  operations: [listTaxProfiles, listPriceLists, listProductVariants]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - screens/P02-guest-mobile-app.yaml
+root_class: 'a picker read inside a form, declared on the screen with nothing that reaches it'
+tickets:
+  started: []
+  unstarted: ['29883 (BO-291) and 28235 (GST-048), New: the forms'' pickers read listTaxProfiles and
+    listProductVariants']
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-222
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Measured: S-OP-UNREACHED 3 new (was 5). tools/refresh-safe-baseline.json pins this line at exactly "5 new", so
+  the integration judge reads the lower count as not matching: the lead re-pins it at 3 (tightening it is the
+  lead''s act, not this lane''s).'

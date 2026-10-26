@@ -3553,6 +3553,27 @@ def main() -> int:
     later_b = sp.LATER_BLOCKS
     budget = {b_: min(done_by[b_], run + rest * (i + 1) / len(later_b)) for i, b_ in enumerate(later_b)}
     cur = sp.BLOCKS.index("B")
+    # **A pushed app-module keeps the ticketed block it was pushed in** (r10 gate 2, 26 October 2026, CHG-R10GFP-001).
+    # The fill is a running sum against a third of the later work, so a module on the boundary flips when the work
+    # before it grows by a few points: at r10, Pricing & Promotions · Venue Management 3 of 8, ticketed task by task in
+    # Block B at r9 (27 New tickets in OpenProject), came out 3 points over B's 7,248 and fell to Block C, which is not
+    # ticketed, though no decision moved it (check-plan-closure C-UNTICKETED, CHG-RONEP-002). An app-module the last
+    # release bundle (op-release.json) pushed under a later block that is ticketed (team.json sprintPlan.ticketBlocks)
+    # is never placed after that block by the fill or by pass 2; the running sum still counts it, so what follows it is
+    # placed as before. Moving one out of a ticketed block is a plan change: a `departures` entry, decided by the lead.
+    kept_block = {}
+    try:
+        _bundle = json.loads((OUT / "op-release.json").read_text(encoding="utf-8"))
+        _pushed = set(_bundle.get("ids") or {})
+        if (OUT / "pms-map.json").exists():
+            _pushed |= {x for x in json.loads((OUT / "pms-map.json").read_text(encoding="utf-8")) if "#" not in x}
+        for t_ in _bundle.get("tickets") or []:
+            b_ = str(t_.get("parent") or "").removeprefix("BLOCK-")
+            if (t_.get("type") == "Feature" and t_.get("key") in am_info and t_["key"] in _pushed
+                    and b_ in sp.LATER_BLOCKS and b_ in settings["ticketBlocks"]):
+                kept_block[t_["key"]] = b_
+    except (OSError, ValueError):            # no bundle yet: nothing has been pushed, nothing is kept
+        kept_block = {}
     for k, a in sorted(am_info.items(), key=lambda x: x[1]["order"]):
         if a["block"] in sp.BLOCK_A_FAMILY:
             continue
@@ -3563,6 +3584,10 @@ def main() -> int:
         while cur < len(sp.BLOCKS) - 1 and run > budget[sp.BLOCKS[cur]] + 1e-6:
             cur += 1
         a["block"] = sp.BLOCKS[cur]
+        if k in kept_block and BRANK[kept_block[k]] < BRANK[a["block"]]:
+            print(f"  kept in Block {kept_block[k]}: {k}, pushed there by release {_bundle.get('release')}; the fill "
+                  f"would place it in Block {a['block']} (CHG-R10GFP-001)")
+            a["block"] = kept_block[k]
     # **Each block is complete and testable on its own.** What an app-module's tasks wait on to be finished -- the
     # back end a screen is wired to, the migration a service writes into, the migration a key points into, a task
     # of the same service -- must be in its block or an earlier one. Shared back end and migrations are pulled into
@@ -3868,7 +3893,9 @@ def main() -> int:
         moved = 0
         for b in sp.LATER_BLOCKS[:-1]:
             limit = sp.window_of(targets[b], tests["days"])[0]
-            late = {k for k, a in am_info.items() if a["block"] == b and fin.get(k, 0.0) > limit + 1e-6}
+            # a module pushed in a ticketed block stays in it (CHG-R10GFP-001): its block's end moves instead
+            late = {k for k, a in am_info.items() if a["block"] == b and fin.get(k, 0.0) > limit + 1e-6
+                    and kept_block.get(k) != b}
             if not late:
                 continue
             # the late app-modules move to the next block; the back end an app-module left in this block still

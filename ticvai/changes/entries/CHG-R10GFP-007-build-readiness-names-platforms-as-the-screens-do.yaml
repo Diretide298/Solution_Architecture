@@ -1,0 +1,33 @@
+id: CHG-R10GFP-007
+date: '2026-10-26'
+source: audit
+kind: spec
+summary: 'docs/reports/build-readiness-21-september.md names P11 as its screens file does (Accreditation Web) and no
+  longer writes the retired code P03: the report is hand-written and dated, and is its own source
+  (build-readiness-page.py only renders it).'
+decision:
+  what: 'Two phrases of the dated report: "P11 Accreditation is the other" becomes "P11 Accreditation Web is the
+    other", and the platform count "P01–P17, less the retired P03" becomes "P01–P17, less one retired code (the
+    kiosk, renumbered P05)". The figures and the argument are unchanged.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-135604-1087), check-package: "build-readiness-21-september.md:
+  writes ''P11 Accreditation is the other'' — its screens file declares ''Accreditation Web''" and "names platform code
+  P03, which no screen file defines", the two errors tools/refresh-safe-baseline.json has carried.'
+keys_touched:
+  files:
+  - docs/reports/build-readiness-21-september.md
+root_class: 'a dated narrative quoting a platform name and a code the package has since renamed and retired'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-153
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-package.py
+status: open
+notes: 'adam_cr: no CR traces to it; CR-153 (a platform made its own app) is the nearest r10 CR on platform names.
+  Measured: check-package shows neither error; its two baseline entries are left for the lead to remove.'

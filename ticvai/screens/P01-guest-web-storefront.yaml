@@ -2101,7 +2101,10 @@ screens:
     contract: seating
     purpose: 'Called on load when the screen is opened with `holdIds`: reads each of the guest''s own holds
       (seats and `expiresAt`), so the held seats show again and the countdown runs to the earliest expiry
-      (ADAM CR-187, 25 October 2026)'
+      (ADAM CR-187, 25 October 2026). Only under the guest session that placed the holds, signed in or
+      the anonymous guest session (ADAM CR-183, ADR-0045): a hold is read only by the session or subject
+      that made it with `createSeatHold`, so a visitor with no session has no `holdIds` and the screen
+      does not call it'
     trigger: onLoad
     provenance: ADAM CR-187 (option A), settled by Chinmay 25 October 2026
   - operationId: getPerformance

@@ -1,0 +1,56 @@
+id: CHG-R10GFP-001
+date: '2026-10-26'
+source: audit
+kind: process
+summary: 'The plan generator keeps an app-module the last release pushed under a ticketed later block (Block B) in
+  that block: r10''s growth had moved Pricing & Promotions · Venue Management 3 of 8 (27 tickets, all New, pushed in
+  Block B at r9) into Block C, which is not ticketed, though no decision moved it.'
+decision:
+  what: 'tools/build-service-docs.py, the block fill: an app-module that handoff/service-docs/op-release.json (the last
+    release bundle) has under BLOCK-B (any later block in team.json sprintPlan.ticketBlocks) and that OpenProject holds
+    (the bundle''s ids and pms-map.json) is never placed after that block, by the fill or by pass 2''s late moves; the
+    running sum still counts it, so the app-modules after it are placed as before. The r9 placement comes back:
+    AM-PRICING-PROMOTIONS-P08-3 and its 27 tasks in Block B, Block B 61 app-modules ending Sprint 6 (its target);
+    nothing else changes block against r9 (MIG-CONTROL-2 B to A, SVC-ORDER-ORDERS-21 C to A and APP-PARTNER-PTR-001
+    A to B are the r10 CRs'' own moves, all inside ticketed blocks). Moving a pushed app-module out of a ticketed block
+    stays possible, as a plan change with a `departures` reason the lead decides.'
+  by: Chinmay
+  date: '2026-10-26'
+why: 'The r10 integration gate of 26 October 2026 (run 20261026-135604-1087) failed check-plan-closure C-UNTICKETED on 32
+  artefacts (listAudienceDiscoveryTargeting, listBundleAvailabilityChannel ... ADM-190 to ADM-209): r9 built them in
+  Block B, the gate''s plan only in Block C. No r10 change moved them on purpose: git diff r9..HEAD on the plan inputs
+  (team.json, block-a-extra-tasks.json, sprint_plan.py) holds only the dead_letter builds of CHG-R10TEN-015/-023. The
+  fill is a running sum against a third of the later work (budget B 7,248 points); r10''s CRs added about 16 points to
+  the Block B modules before it (AM-IDENTITY-SECURITY-P10 +9 with P10 as its own app, ADAM CR-153; the subscription
+  and licensing modules +8; public API +1; identity P09-5 -2), so the module ended at 7,251, 3 points over, and
+  flipped.
+  The lead''s brief: undo an unintended move at the source.'
+keys_touched:
+  screens: [ADM-190, ADM-191, ADM-192, ADM-193, ADM-194, ADM-195, ADM-196, ADM-197, ADM-198, ADM-200, ADM-201, ADM-202,
+    ADM-203, ADM-204, ADM-205, ADM-206, ADM-207, ADM-208, ADM-209]
+  operations: [listAudienceDiscoveryTargeting, listAudiencePreviewReach, listBehavioralTransactionTargeting,
+    listBundleAvailabilityChannel, listBundleAvailabilityForecast, listBundleSellabilityDependency,
+    listCapacityPoolReservation, listContextLocationChannel, listCrmCustomerSegment, listDynamicComponentSubstitution,
+    listMembershipLoyaltyGuest, listPartnerPaymentEligibility, listPromotionPriorityHierarchy]
+  tickets: [AM-PRICING-PROMOTIONS-P08-3]
+  files:
+  - tools/build-service-docs.py
+root_class: 'a plan rule (blocks filled to a running budget) that moves pushed tickets between blocks when unrelated
+  work grows, with no decision and no departures reason'
+tickets:
+  started: []
+  unstarted: ['AM-PRICING-PROMOTIONS-P08-3 (#30009) and its 27 tasks, all New (status read 22 October): they stay in
+    Block B, as pushed; the C and D tasks after them move back by up to a sprint, as at r9']
+release_tag: r10
+decision_owner: Chinmay
+adam_cr: CR-153
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: 'adam_cr: no CR moved the module; CR-153 (P10 as its own app) is the largest single addition that tipped it.
+  Measured on the gate tree with this rule: check-plan-closure C-UNTICKETED 0 (was 32 new); against the gate''s plan
+  27 tasks go back to Block B, 466 C and 599 D tasks shift sprint or a New owner (the schedule after Block B), and
+  against r9 the only block moves left are the three named above. The rule reads the bundle the release committed; on a
+  tree with no bundle nothing is kept.'
