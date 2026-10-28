@@ -335,3 +335,30 @@ changes:
     and log it in changes. dont worry about it"); this CR is that log. The screen''s own button opens a form that collects
     the request body; an unlabelled derived button gets its label'
   change: CHG-R10WIR-004
+- screen: WEB-017
+  field: 'navigation'
+  to: 080893f2b191a792
+  approval: 'ADAM CR-290 (raised by Chitrangi Mestry on #33271, 28 October 2026; settled 29 October 2026 as done by Chinmay,
+    nothing back to build): the lead''s rule of 28 October 2026 that frontend developers change a screen''s design on
+    their own, with no change behind it, and log it in ADAM, after which the lead updates the wireframe, the screen''s
+    UI and its page info (written into the frontend starter in 28eb978d); this CR is that log. WEB-017 as built:
+    ticket cards, the All tickets link, a 72rem page, challenge cards and the dark membership band'
+  change: CHG-R11DES-001
+- screen: WEB-017
+  field: 'region:collection'
+  to: f1b53dceb0f3f1ce
+  approval: 'ADAM CR-290 (raised by Chitrangi Mestry on #33271, 28 October 2026; settled 29 October 2026 as done by Chinmay,
+    nothing back to build): the lead''s rule of 28 October 2026 that frontend developers change a screen''s design on
+    their own, with no change behind it, and log it in ADAM, after which the lead updates the wireframe, the screen''s
+    UI and its page info (written into the frontend starter in 28eb978d); this CR is that log. WEB-017 as built:
+    ticket cards, the All tickets link, a 72rem page, challenge cards and the dark membership band'
+  change: CHG-R11DES-001
+- screen: WEB-017
+  field: 'region:selection'
+  to: 4e5bbb17fa411c9b
+  approval: 'ADAM CR-290 (raised by Chitrangi Mestry on #33271, 28 October 2026; settled 29 October 2026 as done by Chinmay,
+    nothing back to build): the lead''s rule of 28 October 2026 that frontend developers change a screen''s design on
+    their own, with no change behind it, and log it in ADAM, after which the lead updates the wireframe, the screen''s
+    UI and its page info (written into the frontend starter in 28eb978d); this CR is that log. WEB-017 as built:
+    ticket cards, the All tickets link, a 72rem page, challenge cards and the dark membership band'
+  change: CHG-R11DES-001
