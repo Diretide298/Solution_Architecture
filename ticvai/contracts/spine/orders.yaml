@@ -5523,8 +5523,8 @@ paths:
 
         **The staff branch admits only a session with no guest subject** (ADAM CR-295, option A, decided 29 October
         2026; CHG-R11GST-001). The venue scope a guest request carries (CR-198) matched the scope branch for every
-        order at the venue; now `orders.sales_order`, `orders.order_line` and `orders.order_event` (and every table
-        that reads through them) show a guest its own rows by subject alone. Until the forward migration that carries
+        order at the venue; now `orders.sales_order` and `orders.order_line`, the order's lifecycle log and every table
+        that reads through them show a guest its own rows by subject alone. Until the forward migration that carries
         this is applied, a guest's order reads also filter by `subject_id` in the query, so no database with the old
         policy shows a guest another guest's order.
 
