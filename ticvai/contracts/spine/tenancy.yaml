@@ -1132,7 +1132,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ConfigurationProfile' }
+            schema: { $ref: '#/components/schemas/SetConfigurationProfileRequest' }
       responses:
         '200':
           description: Set — the draft replaced, or a new version stored after a published one
@@ -5272,6 +5272,45 @@ components:
             40 rows is forty.
         startedAt: { type: string, format: date-time, readOnly: true }
         completedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+
+    SetConfigurationProfileRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      description: '**What `setConfigurationProfile` is sent** (r11 gate, check-contract-shapes C-REQUEST-SERVER-FIELDS,
+        R079; started ticket #30825; CHG-R11FXC-001). The body was `ConfigurationProfile`, the stored row, which
+        requires `status`; on that schema `status` is the row''s lifecycle, and the deployment states in it are the
+        server''s. On input it is the caller''s choice between `draft` and `published`, so the request says so in a
+        schema of its own and the stored row keeps its own `required`. The fields are the stored row''s, by the same
+        names, and each lands in its column of `platform.configuration_profile` as `setConfigurationProfile` says.'
+      required: [name, venueKindScope, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Optional. The path's `profileId`; a body that sends a different value is `400` `validation`.
+        name: { type: string }
+        scopePath: { type: string }
+        venueKindScope:
+          type: array
+          description: Which workstation types the profile applies to, as `ConfigurationProfile.venueKindScope`.
+          items: { type: string }
+        settings:
+          type: object
+          additionalProperties: true
+        status:
+          type: string
+          enum: [draft, published, deploying, deployed, superseded, rolledBack]
+          description: >
+            **The caller's choice on input: `draft` or `published`**; sending `published` publishes this version.
+            The other four are the deployment's (`deployConfigurationProfile`) and a body carrying one is `400`
+            `validation`. They stay in the enum so a client built on r1, which sent the stored row, still sends a
+            valid body (check-contract-compat).
+        # The stored row's server-owned fields, kept readOnly (ignored on input) so a client built on r1, which sent
+        # the whole ConfigurationProfile, still sends a valid body (check-contract-compat), as
+        # DeployConfigurationProfileRequest keeps ProfileDeployment's.
+        version: { type: integer, readOnly: true }
+        deployedCount: { type: integer, readOnly: true }
+        publishedAt: { type: string, format: date-time, nullable: true, readOnly: true }
 
     DeployConfigurationProfileRequest:
       type: object

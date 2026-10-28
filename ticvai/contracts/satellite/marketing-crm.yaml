@@ -25329,7 +25329,11 @@ components:
           type: string
           format: date-time
     ConsentRecord:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by enrolFacePass, getConsentHistory, getGuestConsents, getGuestIntelligence and others
+      # MOD audit, CHG-MOD-007: read below the tenant by enrolFacePass, getConsentHistory, getGuestConsents,
+      # getGuestIntelligence and others. Written by venue staff and partners too (checkoutCart, enrolFacePass,
+      # submitForm: a desk or a partner records the guest's consent, recorded_by_principal_id), so any staff grant
+      # writes as well as reads, and the guest its own (r11 gate RF-TENANT-ROOT, #27745; CHG-R11FXC-003).
+      x-ticvai-rls: grant-holder-write
       x-ticvai-persistence: marketing.consent_record + marketing.consent_record_channel
       allOf:
       - $ref: '#/components/schemas/RecordConsentRequest'

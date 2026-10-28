@@ -783,8 +783,18 @@ $$;
 #     staff read and write through the parent, as the parent rule does, for a session with no guest subject (CR-295's
 #     rule), OR `platform.subject_in_scope(subject_id)` for read and write: marketing.guest_profile, the guest's own
 #     profile under the segment it was first captured in.
+#   * `x-ticvai-rls: grant-holder-write` (CHG-R11FXC-003; r11 gate, check-rls-scope-fit RF-TENANT-ROOT on started tickets
+#     #27745 and #32125, the choice CHG-MOD-007 left to the lead for "writes by venue staff to rows a guest owns"):
+#     a row a guest owns that belongs to no venue or scope (a consent record, a stored card token, a wallet) is read
+#     AND written by any staff grant (`platform.grant_holder()`: scope paths set, no guest subject), and the guest
+#     still reads and writes its own rows (`platform.subject_in_scope(subject_id)`, the tenant root included). The
+#     staff-grant write rule, not "write under the tenant root after the venue check": a venue cashier or desk records
+#     the guest's consent, saves its card and moves its wallet with the grant it holds, and the permission and the
+#     operation's own rules decide the rest, as they already do for the read. On a table with no subject_id (a row of
+#     a guest's wallet that names the wallet, `wallet.balance`) any staff grant reads and writes.
 RLS_MARKS = ("read-beneath", "grant-holder-read", "own-row", "home-scope-write", "subject-self", "own-or-home-scope",
-             "signed-in-read", "scope-or-subject", "any-grant-no-delete", "guest-owns", "guest-reads-own")
+             "signed-in-read", "scope-or-subject", "any-grant-no-delete", "guest-owns", "guest-reads-own",
+             "grant-holder-write")
 # The checks `guest-owns` and `guest-reads-own` build on, `{a}` standing for the row's alias (CHG-R9CR-003/004). The
 # scope rule is migration 225's per-statement predicate (apply_statement_scope_rls in our team's repository), the
 # guest's subject compared the same way, so neither calls a function per row.
@@ -819,8 +829,11 @@ TABLE_RLS = {
     "fnb.delivery_location_outlet": "grant-holder-read",
     "whitelabel.homepage_section": "grant-holder-read",
     # The balances closeFiscalPeriod (region) reads through Wallet's periodCloseChecks (CHG-FIN-012). Batch STO declares
-    # wallet_id, after which the table follows wallet.wallet (opened the same way) and this line is moot.
-    "wallet.balance": "grant-holder-read",
+    # wallet_id, after which the table follows wallet.wallet (opened the same way) and this line is moot. A subject's
+    # wallet is no parent the parent rule follows (it is owned by subject), so the line stands, and since r11 the
+    # venue's writers of a wallet (topUpWallet, transferWalletBalance, holdWalletFunds ...) write its balance too, as
+    # they write wallet.wallet (CHG-R11FXC-003).
+    "wallet.balance": "grant-holder-write",
 }
 
 RLS_SPLIT = """
@@ -901,6 +914,19 @@ BEGIN
     PERFORM platform.apply_split_rls(target,
         'platform.grant_holder() OR platform.subject_in_scope(subject_id)',
         'platform.subject_in_scope(subject_id)');
+END
+$$;
+
+-- `x-ticvai-rls: grant-holder-write` on a table owned by subject (CHG-R11FXC-003): any staff grant reads and writes,
+-- and the guest reads and writes its own rows (the tenant root included, through subject_in_scope).
+CREATE OR REPLACE FUNCTION platform.apply_grant_holder_subject_rls(target regclass)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    PERFORM platform.apply_split_rls(target,
+        'platform.grant_holder() OR platform.subject_in_scope(subject_id)',
+        'platform.grant_holder() OR platform.subject_in_scope(subject_id)');
 END
 $$;
 
@@ -3358,6 +3384,22 @@ def main() -> int:
             write = ("platform.own_row(" + ("{a}principal_id" if pc else "NULL::uuid") + ", "
                      + ("{a}subject_id" if sc else "NULL::uuid") + ")")
             base = "its own principal or guest"
+        elif mark == "grant-holder-write":
+            # **A guest's row that belongs to no scope, written by any staff grant** (CHG-R11FXC-003); see RLS_MARKS.
+            if base == "subject":
+                call = f"SELECT platform.apply_grant_holder_subject_rls('{tq(t)}'::regclass);"
+                write = "(platform.grant_holder() OR platform.subject_in_scope({a}subject_id))"
+                base = "any staff grant, or the guest it belongs to"
+            elif base == "tenant root":
+                write = "platform.grant_holder()"
+                call = (f"SELECT platform.apply_grant_holder_read_rls('{tq(t)}'::regclass, "
+                        f"{sql_literal(write)});")
+                base = "any staff grant"
+            else:
+                print(f"  ! {t}: x-ticvai-rls grant-holder-write is for a row that belongs to no scope (owned by subject, "
+                      f"or the tenant root's); its rows are owned by {base}, whose writers write at their scope. The "
+                      "base rule stands")
+                continue
         elif mark == "read-beneath" and base == "venue_id":
             # **Owned above, read below, for a venue_id table** (CHG-R8MIG-026; the storage-sat lane's request 7,
             # ORDERS-MONEY-C33 answer A): a row with no venue is the tenant's and is read at every venue; a venue's row

@@ -2243,13 +2243,28 @@ paths:
                 toSubjectId:
                   type: string
                   format: uuid
-                  description: The recipient guest. Resolves to their own wallet, as `getWallet` does.
+                  x-ticvai-persisted: false
+                  description: >-
+                    The recipient guest. Resolves to their own wallet, as `getWallet` does. **It names the recipient and
+                    is not stored itself**: the wallet it resolves to is what the transfer stores, as the `walletId` of
+                    the recipient's `transfer` transaction (CHG-R11FXC-004).
                 toWalletId:
                   type: string
                   format: uuid
-                  description: The receiving wallet, named outright. Required to reach a shared wallet.
+                  x-ticvai-stored-as: wallet.wallet_transaction.wallet_id
+                  description: >-
+                    The receiving wallet, named outright. Required to reach a shared wallet. Stored as the `walletId`
+                    of the recipient's `transfer` transaction, the credit the transfer writes beside the sender's debit
+                    in the same transaction (CHG-R11FXC-004).
                 amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-                message: { type: string, maxLength: 140, nullable: true }
+                message:
+                  type: string
+                  maxLength: 140
+                  nullable: true
+                  x-ticvai-stored-as: wallet.wallet_transaction.reason
+                  description: >-
+                    The sender's note, stored as the `reason` of both `transfer` transactions, so the sender's history
+                    and the recipient's show it (`WalletTransaction.reason`; CHG-R11FXC-004).
       responses:
         '200':
           headers:
@@ -6259,7 +6274,11 @@ components:
         scopePath:
           type: string
     Wallet:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by adjustGameCard, adjustWallet, authoriseStoredValue, closeWallet and others
+      # MOD audit, CHG-MOD-007: read below the tenant by adjustGameCard, adjustWallet, authoriseStoredValue, closeWallet
+      # and others. Written at a venue by staff (topUpWallet, adjustWallet, suspendWallet, closeWallet,
+      # transferWalletBalance ...), so any staff grant writes as well as reads, and the guest its own (r11 gate
+      # RF-TENANT-ROOT, #32125; CHG-R11FXC-003).
+      x-ticvai-rls: grant-holder-write
       # `credits[]` is not a column of `wallet.wallet`: each entry is a live lot in
       # `wallet.credit_lot`, so the lot table is named here as the child and a read of the wallet
       # reads both.
