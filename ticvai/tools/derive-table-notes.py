@@ -51,6 +51,16 @@ WHAT = {
         "is not, and a single `rows_processed` would hide which of the two happened. `error` "
         "holds the failure text, because **an archival job that fails silently is a table that "
         "grows until something else breaks.**"),
+    # ADAM CR-292, option A, decided 29 October 2026 (CHG-R11RUL-004): the table had no description and no writer.
+    "control.audit_record": (
+        "**The control plane's audit trail: one row per write to the control database**, written by the audit "
+        "interceptor's control variant inside the write's own transaction (ControlDbContext), as CR-179 has the "
+        "interceptor write `platform.audit_record` in the tenant database, which the control database does not "
+        "have. `operator_principal_id` is the Control Plane token's subject (null for a system job), `tenant_id` "
+        "the tenant the operation concerns (null for a platform-wide change), `action` the operation as "
+        "`AuditRecord.action`, `subject_ref` what it acted on, `details` the before and after where the operation "
+        "records them, and `occurred_at` when. Append-only; created by "
+        "backend/control/V0108__after_r1_20261020.sql."),
     "control.backup_run": (
         "**One backup, and whether anyone has proved it restores.** `restore_tested_at` is the "
         "column that matters: a backup nobody has restored from is a belief, not a backup, and "

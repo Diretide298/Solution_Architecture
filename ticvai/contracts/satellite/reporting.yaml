@@ -179,12 +179,12 @@ paths:
       - query: inventory#purchaseOrderRecords
         route: in-process
         for: 'its read of inventory.purchase_order, Inventory''s data (CHG-MOD-001)'
-      - query: inventory#supplierContractRecords
-        route: in-process
-        for: 'its read of inventory.supplier_contract, Inventory''s data (CHG-MOD-001)'
       - query: inventory#supplierRecords
         route: in-process
         for: 'its read of inventory.supplier, Inventory''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'each purchase order''s own venue''s time zone (RegionSettingsAtOrAbove the order''s scope_path), in the read''s transaction, for the venue-local dates from and to filter and for the on-time test (ADAM CR-297, option A; XDR-004; CHG-R11RUL-003)'
       summary: On-time, in-full, and what was rejected
       description: '15.3.3 and 15.3.17. **Receipts and rejections recorded what arrived and nothing scored
         it** — so a venue could see every delivery and could not tell a good supplier from a bad one.
@@ -200,6 +200,42 @@ paths:
 
         **Rejection reasons are separated from short deliveries.** One is a quality problem and the other
         is a supply problem, and a single fill-rate number hides which.
+
+        **How each figure is worked out, from what is already stored** (ADAM CR-274, option A, Chinmay, 28
+        October 2026; no migration; CHG-R11RUL-003):
+
+        - **The window.** `from` and `to` filter the purchase order''s `created_at`, as venue-local dates: each
+          purchase order is placed on its own venue''s calendar, its time zone read in process through
+          tenancy#regionSettingsRecords (RegionSettingsAtOrAbove the order''s `scope_path`) in the read''s
+          transaction (ADAM CR-297, option A, Chinmay, 29 October 2026; XDR-004). A caller above venue level can
+          see orders of venues in different zones, and each is judged on its own.
+
+        - **`ordersPlaced`** counts every purchase order raised in the window, cancelled ones included.
+
+        - **Matching.** A purchase order line matches its order''s goods receipt lines with the same `itemId`. It
+          is **in full** when its `received_quantity` is at least its `ordered_quantity`, and **on time** when the
+          last receipt that matched it (its `recorded_at`, else its `created_at`) is on or before the order''s
+          `expected_delivery`, on the venue''s calendar. A line whose order has no `expected_delivery` is never on
+          time and is not counted in `averageDaysLate`.
+
+        - **`onTimeInFullPercent`** is the share of lines both on time and in full; **`averageDaysLate`** is the
+          mean, over late lines only, of the days from the expected delivery to that last receipt.
+
+        - **`shortDeliveryPercent`** and **`rejectionPercent`** are shares of purchase order lines, not of
+          quantity.
+
+        - **`rejectionReasons`** counts the `supplierReturn` inventory movements by `reason`. rejectReceivedGoods
+          writes one per rejected receipt line, with `reason` the rejection reason''s enum value, `source_type`
+          `goodsReceiptLine` and `source_id` the receipt line''s id.
+
+        - **`priceVariancePercent`** = (sum of `unit_price` x `ordered_quantity` minus sum of `quoted_unit_price`
+          x `ordered_quantity`) / the quoted sum x 100, over the purchase order lines that have a quoted price.
+
+        - **Rounding and an empty window.** Percentages are rounded to two decimal places and `averageDaysLate`
+          to one. With no lines in the window, the percentages, `averageDaysLate` and `priceVariancePercent` are
+          left out, `ordersPlaced` is 0 and `rejectionReasons` is `{}`.
+
+        - Supplier contracts are not read: no figure uses one.
 
         '
       tags:
@@ -245,16 +281,17 @@ paths:
                     additionalProperties:
                       type: integer
                     description: 'Rejected receipt lines counted by rejection reason, keyed by the
-                      reason. **Sourced from the reason recorded against each rejected goods receipt
-                      line in `inventory`.** Pull audit 26 September: `inventory.goods_receipt_line`
-                      records only `rejected_quantity` and no reason, so until `inventory.yaml` carries
-                      a rejection reason per line this map has no source and is returned empty.
+                      reason. **Sourced from the `supplierReturn` inventory movement rejectReceivedGoods
+                      writes per rejected receipt line**, its `reason` the rejection reason''s enum value
+                      (ADAM CR-274, option A; CHG-R11RUL-003). `{}` when no line was rejected.
 
                       '
                   priceVariancePercent:
                     type: number
-                    description: 'Quoted against invoiced. **The number that finds a supplier quietly
-                      raising prices**, which no delivery record shows.
+                    description: 'Quoted against ordered: (sum of `unit_price` x `ordered_quantity` minus
+                      sum of `quoted_unit_price` x `ordered_quantity`) / the quoted sum x 100, over the
+                      purchase order lines with a quoted price (ADAM CR-274, option A). **The number that
+                      finds a supplier quietly raising prices**, which no delivery record shows.
 
                       '
         '429':
@@ -264,10 +301,10 @@ paths:
       operationId: listAlertRules
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: AlertRule.threshold, AlertRule.thresholdUpper (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AlertRule.threshold, AlertRule.thresholdUpper (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Thresholds being watched
       tags:
@@ -302,10 +339,10 @@ paths:
         route: service
         for: 'its read of identity.role, Identity''s data (CHG-MOD-001)'
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: AlertRule.threshold, AlertRule.thresholdUpper (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: AlertRule.threshold, AlertRule.thresholdUpper (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Watch a metric and tell somebody
       description: 'BL-152. **The metric comes from the closed set**, so a rule cannot watch something
@@ -387,10 +424,10 @@ paths:
         - "P16 ANL-009 AI Assistant & Action Center"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: Alert.observedValue, Alert.threshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Alert.observedValue, Alert.threshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: What is currently wrong
       description: '**The dashboard panel reads this.** Critical first, then unacknowledged, then by age
@@ -474,14 +511,11 @@ paths:
         - "P08 BO-141 Operational Alerts, AI Replenishment & Action Center"
         - "P16 ANL-009 AI Assistant & Action Center"
       x-ticvai-read-via:
-      - query: identity#principalRecords
-        route: service
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: Alert.observedValue, Alert.threshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Alert.observedValue, Alert.threshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Mark it seen
       description: 'CF-134. **Acknowledged, not dismissed** — the difference is that this records who
@@ -491,6 +525,13 @@ paths:
         with it.
 
         The optional `note` is kept on the alert as `acknowledgementNote` and returned with it.
+
+        **The acknowledger is the session''s principal** (ADAM CR-296, option A, Chinmay, 29 October 2026;
+        CHG-R11RUL-002): written as `acknowledged_by_principal_id` from the session, with `acknowledged_at` the
+        transaction''s time; nothing of Identity''s is read. The Money it answers (`observedValue` and `threshold`,
+        where the metric is money-valued) is in the currency of the venue the row''s `scope_path` names, read in
+        process through Tenancy''s queries (tenancy#scopeRecords, then tenancy#venueSettingsRecords), as the
+        operations host reads Tenancy''s settings for every operation it hosts (XDR-004).
 
         '
       tags:
@@ -902,7 +943,7 @@ paths:
         - "P16 ANL-009 AI Assistant & Action Center"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.reporting": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-permission-note: 'REPORT_VIEW_VENUE admits every report. **On the till (POS-008) a caller who holds REPORT_VIEW_OWN or REPORT_VIEW_WORKSTATION and not REPORT_VIEW_VENUE runs only the seeded till report `terminalDayView`, over the caller''s own sales (REPORT_VIEW_OWN) or this workstation''s (REPORT_VIEW_WORKSTATION)**; anything else is refused 403 for that caller (r8 walk fix, CHG-R8WFC-007: POS-008 promises a cashier''s and a terminal''s day, never the venue-wide report permission).'
       x-ticvai-api-scope: analytics.write
@@ -1532,7 +1573,7 @@ paths:
         - "P16 ANL-053 AI-Generated Dashboard Studio"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.reporting": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -1668,7 +1709,7 @@ paths:
         - "P16 ANL-029 Dashboard Access, Publishing & Versioning"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.reporting": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -2205,10 +2246,10 @@ paths:
         - "P16 ANL-063 KPI Targets, Thresholds & Scorecards"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: KpiTarget.amberAt, KpiTarget.redAt, KpiTarget.stretch, KpiTarget.target (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: KpiTarget.amberAt, KpiTarget.redAt, KpiTarget.stretch, KpiTarget.target (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Targets, thresholds and what red means
       description: 'BI boards 2.6 and 10.3. **A threshold is what turns a number into a status.** Without
@@ -2346,7 +2387,7 @@ paths:
         for: 'waitQuoteAccuracy: the waitlist parties told their table was ready in the period, against their quoted wait
           (fnb.waitlist_entry) (r8 re-walk, CHG-R8RW-005)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s businessDayCutoff, which closes the default period, its business day (platform.venue_settings)
           (r8 re-walk, CHG-R8RW-005)'
       x-ticvai-calls:
@@ -2489,7 +2530,7 @@ paths:
         route: in-process
         for: 'what its text calls "fnb.table_visit": fnb.table_visit, F&B''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -2623,10 +2664,10 @@ paths:
         route: service
         for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: BenchmarkRow.normalisedValue, BenchmarkRow.value (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: BenchmarkRow.normalisedValue, BenchmarkRow.value (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: One site against another, on a like-for-like basis
       description: 'BI boards 1.10, 7.9 and 10.4. **Comparison is only meaningful when the basis is
@@ -2790,10 +2831,10 @@ paths:
         - "P16 ANL-058 AI Recommendation & Next-Best-Action Center"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: AnalyticsAnomaly.expected, AnalyticsAnomaly.observed (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AnalyticsAnomaly.expected, AnalyticsAnomaly.observed (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Numbers that moved more than they should have
       description: 'BI boards 9.5 and 9.6. **Distinct from an alert rule, which fires on a threshold

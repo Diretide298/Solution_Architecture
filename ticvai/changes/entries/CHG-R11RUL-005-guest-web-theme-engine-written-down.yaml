@@ -1,0 +1,39 @@
+id: CHG-R11RUL-005
+date: '2026-10-29'
+source: cr
+kind: design-input
+summary: handoff/design-tokens/guest-web.yaml carries the theme engine CR-272 decided (every input the token rules read,
+  derived from the published Theme and FontConfig, and the prototype's colour functions), so the shell restyles every
+  token from a tenant's theme with no contract change.
+decision:
+  what: 'ADAM CR-272, option A (Chinmay, 28 October 2026). tools/derive-design-tokens.py writes themeEngine into
+    guest-web.yaml: dark from the background''s relative luminance (dark below 0.5); surf (and surface) the background
+    mixed 4% toward the ink, surf2 8%; fg is textColour (never derived); d 1 and flat false, the skin defaults; mix,
+    rgba, inkOn and onColor (with hex2rgb, relLum and ratio) copied from the prototype''s source, with what each does;
+    darkMode never used to render; under dir=rtl the Arabic pair from FontConfig maps to --font-h and --font-b.
+    guest-web''s appliedFrom says the same for textColour, darkMode and fonts. guest-app.yaml is unchanged (CR-280).'
+  by: Chinmay
+  date: '2026-10-28'
+why: 'ADAM CR-272 (Chitrangi Mestry, #36994 SETUP-SHELL-GUEST-WEB, blocking), the lead''s decision file decisions-2026-10-28.json:
+  the token rules read surface, surf, surf2, fg, dark, flat and d, which Theme does not carry, and called colour
+  functions the package never defined.'
+keys_touched:
+  files:
+  - tools/derive-design-tokens.py
+  - handoff/design-tokens/guest-web.yaml
+  tickets:
+  - SETUP-SHELL-GUEST-WEB (36994)
+root_class: 'a derived rule that reads inputs nothing defines'
+tickets:
+  started:
+  - '36994 (SETUP-SHELL-GUEST-WEB): through CR-272''s comment; the interim (only the direct tokens) ends.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-272
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-design-tokens.py::web_engine
+status: open
+notes: 'The functions are read from the prototype by the generator, so they cannot drift from it.'

@@ -1,0 +1,41 @@
+id: CHG-R11RUL-002
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: acknowledgeAlert no longer reads identity#principalRecords; the acknowledger is the session's principal, written
+  as acknowledged_by_principal_id, and its Money is in the venue's currency read in process.
+decision:
+  what: 'ADAM CR-296, option A (Chinmay, 29 October 2026): contracts/satellite/reporting.yaml acknowledgeAlert drops the
+    identity#principalRecords read, and its description says the acknowledger is the session''s principal, written as
+    acknowledged_by_principal_id, and that the Money it answers is in the currency of the venue the row''s scope_path
+    names, read in process (CHG-R11RUL-001). handoff/api-data-lineage-overrides.json drops acknowledgeAlert''s carried
+    identity.principal read (the carried count falls by one).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-296 (Sanket Keluskar, #33212), the lead''s decision file decisions-2026-10-29.json: the principalRecords read had
+  no stated use, since the acknowledger is the session''s principal.'
+keys_touched:
+  operations:
+  - acknowledgeAlert
+  tables:
+  - identity.principal
+  - reporting.alert
+  files:
+  - contracts/satellite/reporting.yaml
+  - handoff/api-data-lineage-overrides.json
+  - handoff/api-data-lineage.json
+root_class: 'a read carried from the hand-kept lineage with no use stated (CHG-R8GEN-001)'
+tickets:
+  started:
+  - '33212 (acknowledgeAlert): through CR-296''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-296
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-lineage.py
+status: open
+notes: 'The plan''s unreduced waits lose VM-REPORTING-REPORTING-1 -> MIG-IDENTITY with it (and -> VM-MIG-INVENTORY with
+  CHG-R11RUL-003); the follows links op-release.py writes are unchanged.'

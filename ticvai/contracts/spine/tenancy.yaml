@@ -218,7 +218,8 @@ x-ticvai-queries:
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
       another deployable through Tenancy's service route (serviceAuth), and in process by the operations host for
       the F&B menu operations, whose menus reach their venue only through `fnb.menu.outlet_id` (ADAM CR-260 as the
-      r10 package carries CR-234; docs/active/cross-deployable-writes.yaml XDR-004).
+      r10 package carries CR-234; docs/active/cross-deployable-writes.yaml XDR-004), and since 29 October 2026 for
+      every operation the operations host serves that asks it (ADAM CR-296, option A; CHG-R11RUL-001).
     served: [in-process, service]
   regionSettingsRecords:
     module: tenancy
@@ -239,7 +240,8 @@ x-ticvai-queries:
       process within commerce, through the C# query interface Tenancy implements, and asked from another
       deployable through Tenancy's service route (serviceAuth).
       It is asked in process by the operations host too (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008;
-      XDR-004), and by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
+      XDR-004), for every operation it serves that asks it since 29 October 2026 (ADAM CR-296, option A;
+      CHG-R11RUL-001), and by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
     served: [in-process, service]
   tenantRecords:
     module: tenancy
@@ -278,7 +280,8 @@ x-ticvai-queries:
       commerce, through the C# query interface Tenancy implements, and asked from another deployable through
       Tenancy's service route (serviceAuth).
       It is asked in process by the operations host too, which composes it for every F&B operation that answers Money
-      (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008; docs/active/cross-deployable-writes.yaml XDR-004), and
+      (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008; docs/active/cross-deployable-writes.yaml XDR-004) and,
+      since 29 October 2026, for every operation it serves that asks it (ADAM CR-296, option A; CHG-R11RUL-001), and
       by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
     served: [in-process, service]
   workstationRecords:
@@ -342,7 +345,10 @@ x-ticvai-queries:
       refuses or chooses on these rows states that rule in its own operation. A path is matched exactly, never as an
       ancestor or a descendant. It is asked in process within commerce, through the C# query interface Tenancy
       implements (Catalogue: a venue's path for a venue-scoped row, and a row's path back to its venue; Orders: a
-      venue's name), and asked from another deployable through Tenancy's service route (serviceAuth).
+      venue's name), and asked from another deployable through Tenancy's service route (serviceAuth). The
+      operations host asks it in process for every operation it serves that asks it (ADAM CR-296, option A, 29
+      October 2026; XDR-004; CHG-R11RUL-001): platform.scope is a kernel table every host's role may read (CR-002),
+      so no grant is added.
     served: [in-process, service]
   offlinePolicyRecords:
     module: tenancy
@@ -4241,6 +4247,13 @@ components:
         region grant reads the rows whose `orgUnitId` names a scope node at or beneath it. A row with no
         `orgUnitId` (a consumer, a job, the webhook) is the tenant root's alone. Appending is open to any grant,
         and correcting or removing a row to the tenant root only, as CR-005 settled.
+
+
+        **The control database's writes are audited by the same interceptor, into the control plane's own trail**
+        (ADAM CR-292, option A, Chinmay, 29 October 2026; CHG-R11RUL-004). The control database has no table of
+        this schema, so the interceptor's control variant runs on the control connection (ControlDbContext) and
+        writes a `ControlAuditRecord` in the write's own transaction instead; these rows are the tenant
+        database's only.
       required: [id, action, occurredAt]
       properties:
         id: { type: string, format: uuid, readOnly: true }
@@ -4512,11 +4525,22 @@ components:
       type: object
       x-ticvai-persistence: control.audit_record
       description: '**The control plane''s audit trail** (R8 blocker FOUNDATION-AI-C50, CHG-R8MIG-018). The control
-        database (ADR-0039) has no platform.audit_record and no scope tree, so an operation that runs on the control
-        connection (tenant, plan, subscription, cell, licence, webhook and API-client operations, `platform-ops` and
-        `subscription`) writes its audit row here, in the same transaction as its change: the tenant table''s fields
+        database (ADR-0039) has no platform.audit_record and no scope tree, so a write on the control connection
+        (tenant, plan, subscription, cell, licence, webhook and API-client operations, `platform-ops` and
+        `subscription`) leaves its audit row here, in the same transaction as its change: the tenant table''s fields
         less `scopePath`, with the tenant it concerns and the operator from the Control Plane token. Append-only, never
-        returned by an operation in r8 (the Platform Audit Log reads it when its read is planned).'
+        returned by an operation in r8 (the Platform Audit Log reads it when its read is planned).
+
+
+        **Written by the audit interceptor''s control variant, not by each operation** (ADAM CR-292, option A,
+        Chinmay, 29 October 2026; CHG-R11RUL-004), as CR-179 has the interceptor write `AuditRecord` for the tenant
+        database: every write through the control database''s context (ControlDbContext) gets one row, inside its
+        transaction. `operatorPrincipalId` is the Control Plane token''s subject (null for a system job);
+        `tenantId` comes from the operation; `action` is the operation, as `AuditRecord.action`; `subjectRef` and
+        `details` are as their fields describe; `occurredAt` is set. The table is in
+        backend/control/V0108__after_r1_20261020.sql and reaches the repository''s db/control with the control
+        database''s migration task, so no new migration; once that is applied, the stop-gap that leaves control
+        writes out of the interceptor is removed. Built with #27775.'
       required: [id, action, occurredAt]
       properties:
         id:

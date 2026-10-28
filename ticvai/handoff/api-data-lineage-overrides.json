@@ -61,13 +61,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "acknowledgeAlert": {
-   "reads": [
-    "identity.principal"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "acknowledgeAnnouncement": {
    "reads": [
     "workforce.announcement"
@@ -4571,8 +4564,7 @@
     "inventory.goods_receipt",
     "inventory.movement",
     "inventory.purchase_order",
-    "inventory.supplier",
-    "inventory.supplier_contract"
+    "inventory.supplier"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true

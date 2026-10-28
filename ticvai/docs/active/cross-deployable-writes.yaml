@@ -121,21 +121,54 @@ reads:
   reader: operations
   tables: [platform.venue_settings, platform.region_settings, platform.outlet]
   privileges: [SELECT]
-  queries: [tenancy#venueSettingsRecords, tenancy#regionSettingsRecords, tenancy#outletRecords]
-  operations: [listProductStartTimes, getFnbServiceChargePolicy, setFnbServiceChargePolicy, buildProductionPlan, releaseProductionPlan,
-    resolveBookingConflict, applyMenuActions, listCombos, createCombo, setComboSlots, attachModifierGroup,
-    list86Events, markOrderCollected, setServiceStage, transferOrderItems, publishMenu, rollbackMenu,
-    listMenuVersions, moveTableVisit, reassignServer, compItem, listProductionRuns, transferTableVisit, requestBill,
-    listTableReservations, createTableReservation, updateTableReservation, seatTableReservation, listBookableOutlets,
-    listMyTableReservations, getGuestMenu, getFnbDeliveryPolicy, setFnbDeliveryPolicy, listFulfilmentSlots,
-    createGuestFnbOrder, getGuestBill, listMenus, createMenu, getMenu, updateMenu, setMenuSections,
-    setItemAvailability, setMenuItemDailyCount, listModifierGroups, createModifierGroup, listFnbOrders,
-    createFnbOrder, acceptFnbOrder, cancelFnbOrder, getFnbOrder, amendFnbOrder, getTableMap, setTableLayout,
-    openTableVisit, getTableVisit, updateTableVisit, mergeTableVisits, getBill, splitBill, closeTableVisit,
-    clearTable, listRecipes, setRecipe, recordWaste, escalateCorrectiveAction, getWasteApprovalPolicy,
-    setWasteApprovalPolicy, createTableReservationForGuest]
+  queries: [tenancy#venueSettingsRecords, tenancy#regionSettingsRecords, tenancy#outletRecords,
+    tenancy#scopeRecords]
+  operations: [acceptFnbOrder, acknowledgeAlert, activateChallenge, addToWishlist, amendFnbOrder, applyMenuActions,
+    approveRequisition, assessRentalDamage, attachModifierGroup, authoriseGameplay, buildProductionPlan,
+    cancelFnbOrder, cancelRequisition, cancelStockCount, checkInResource, checkOutRental, checkOutResource,
+    claimLocationSession, claimTableSession, clearTable, cloneResource, closeTableVisit, compItem, createAsset,
+    createCampaign, createChallenge, createCombo, createDashboard, createDeliveryLocation, createFnbOrder,
+    createGoodsReceipt, createGuestFnbOrder, createMenu, createMerchandise, createModifierGroup, createRentalBooking,
+    createRentalPricingProfile, createRequisition, createResource, createResourceCost, createResourceHold,
+    createResourcePackage, createRetailExchange, createRetailReturn, createRetailSale, createStockMovement,
+    createTableReservation, createTableReservationForGuest, createVendorServiceRequest, escalateCorrectiveAction,
+    explainRentalPrice, extendRental, extendResourceHold, fireCourse, generateVisitPlan, getAnalyticsBenchmark,
+    getAsset, getBill, getCampaign, getCampaignPerformance, getCaseInvestigationResolution, getChallenge,
+    getCountVariance, getFnbDeliveryPolicy, getFnbOrder, getFnbServiceChargePolicy, getGameEligibility,
+    getGamePricing, getGameplaySyncStatus, getGameplayValidationRules, getGuestBill, getGuestMenu, getGuestProfile,
+    getKpiValues, getMapResourceAvailability, getMenu, getMyChallenges, getMyProfile, getNextTransportDeparture,
+    getOutletStock, getRentalBooking, getResource, getResourceCostAnalytics, getResourceHold, getRetailSale,
+    getReturnPolicy, getServiceSummary, getSupplierPerformance, getTableMap, getTableVisit, getTenantAppStatus,
+    getTransportDeparture, getTransportFareTable, getVisitPlan, getWasteApprovalPolicy, getWishlist, getWorkOrder,
+    joinQueue, joinRestaurantWaitlist, list86Events, listAlertRules, listAlerts, listAnalyticsAnomalies, listAssets,
+    listBookableOutlets, listCampaigns, listCaseResolutionClosure, listChallenges, listCombos,
+    listDeliveryCommunicationPlatform, listDiningOutlets, listFnbOrders, listFulfilmentSlots,
+    listGameplayTransactions, listMenuVersions, listMenus, listMerchandise, listModifierGroups, listMyFavouriteRoutes,
+    listMyTableReservations, listMyVisitPlans, listOverdueRentals, listProductStartTimes, listProductionRuns,
+    listProviderHealthUsage, listRecipes, listRentalBookings, listRentalPricingProfiles, listRequisitions,
+    listResourceCosts, listResourcePackages, listResources, listRetailReturns, listRetailSales, listSegmentMembers,
+    listStockCounts, listStockMovements, listStoreRules, listTableReservations, listTransportPassOffers,
+    listVendorServiceRequests, lookupAsset, lookupMerchandise, lookupRetailSale, markOrderCollected, mergeTableVisits,
+    moveTableVisit, openTableVisit, pauseCampaign, planProductionRun, postStockCount, publishMenu, publishVenueMap,
+    quoteRentalPrice, quoteTransportFare, reassignServer, recallKitchenTicket, recordWaste, recordWorkOrderParts,
+    recountStockCount, rejectRequisition, releaseProductionPlan, reportReaderQueue, requestBill,
+    requestRentalCommercialOverride, resolveBookingConflict, returnRental, returnRequisition, rollbackMenu, runReport,
+    saveFavouriteRoute, scheduleMenuPublish, searchGuests, searchTransportDepartures, seatTableReservation,
+    setAlertRule, setAssetStatus, setBillingEntity, setCaseInvestigationResolution, setCaseResolution, setComboSlots,
+    setDeliveryLocationOutletMapping, setFamilyHouseholdDependent, setFnbDeliveryPolicy, setFnbServiceChargePolicy,
+    setGamePricing, setGameplayValidationRules, setItemAvailability, setKitchenRoutingRules, setKpiTargets,
+    setMenuItemDailyCount, setMenuSections, setPrizeCost, setRecipe, setRefundCompensationService,
+    setRentalDepositPolicy, setRentalFeePolicy, setResourceLifecycleState, setReturnPolicy, setServiceStage,
+    setStoreRules, setTableLayout, setTransportFareTable, setVenuePoint, setWasteApprovalPolicy,
+    simulateGameplayAuthorisation, simulateRentalPricing, splitBill, startStockCount, stopCampaign,
+    submitOnboardingApplication, suggestResources, swapRentalEquipment, transferOrderItems, transferTableVisit,
+    unscheduleCampaign, updateAsset, updateCampaign, updateDashboard, updateGuestProfile, updateMenu,
+    updateMerchandise, updateMyProfile, updateRentalBooking, updateRentalPricingProfile, updateRequisitionLines,
+    updateResource, updateResourcePackage, updateTableReservation, updateTableVisit, updateVendorServiceRequest,
+    updateVisitPlan]
   added: '2026-10-25'
-  decision_ref: ADAM CR-234, option A, Chinmay, 25 October 2026
+  decision_ref: ADAM CR-234, option A, Chinmay, 25 October 2026; widened to every operations-host operation by ADAM
+    CR-296, option A, Chinmay, 29 October 2026
   why: 'F&B runs in operations and answers Money (a table visit''s runningTotal, an order''s amounts, a menu''s prices)
     whose currency and scale are the venue''s frozen trading currency, Tenancy''s data in commerce (naming-and-style
     5.1, ADR-0018). The service route between deployables is not built (CR-174, CR-196), so the build had no allowed
@@ -145,7 +178,17 @@ reads:
     platform.outlet and tenancy#outletRecords were added on 26 October 2026 (ADAM CR-260, which the lead answered as
     already decided and carried by r10): a menu reaches its venue only through fnb.menu.outlet_id, so getMenu,
     setMenuItemDailyCount and the other menu operations read the outlet''s venue in process too.
-    listProductStartTimes (resources, in operations) reads the venue''s stepMinutes the same way (ADAM CR-253).'
+    listProductStartTimes (resources, in operations) reads the venue''s stepMinutes the same way (ADAM CR-253).
+    **Widened to the operations host, 29 October 2026** (ADAM CR-296, option A, as a ruling for the whole class;
+    Chinmay: "Yes, all 141"; CHG-R11RUL-001): every operation the operations deployable hosts reads Tenancy''s
+    settings in process wherever it needs them, through Tenancy''s own query classes and never through its SQL:
+    tenancy#scopeRecords (platform.scope, which every host may read since CR-002, so no grant is added for it),
+    tenancy#venueSettingsRecords, tenancy#regionSettingsRecords and tenancy#outletRecords (the three tables above,
+    granted by V0116). SELECT only, row security unchanged, no migration. The 141 operations whose only reads
+    across deployables were these four, Reporting''s alert operations among them, and every other read of the four
+    by an operations-host operation moved from service to in-process (195 reads on 172 operations), so the list
+    above is every operations-host operation that asks one of the four. getSupplierPerformance reads
+    tenancy#regionSettingsRecords for each order''s time zone (ADAM CR-297, option A).'
 - id: XDR-005
   reader: commerce
   tables: [assets.media_asset]

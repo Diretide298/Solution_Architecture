@@ -1737,7 +1737,7 @@ paths:
         - "P13 CMS-102 Site Builder"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.OrgUnit.isActive": platform.scope, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - device

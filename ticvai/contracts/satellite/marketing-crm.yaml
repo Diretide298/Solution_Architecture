@@ -1887,10 +1887,10 @@ paths:
         route: service
         for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Define a challenge, mission or streak
       description: '22.6.1. **Gamification is not loyalty** — loyalty pays for spend, and a challenge
@@ -1934,10 +1934,10 @@ paths:
         - "P08 BO-825 Challenge Builder"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -1998,10 +1998,10 @@ paths:
         - "P08 BO-825 Challenge Builder"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -2042,10 +2042,10 @@ paths:
         - "P08 BO-825 Challenge Builder"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -2093,10 +2093,10 @@ paths:
         - "P01 WEB-017 My Account Dashboard"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
@@ -3167,7 +3167,7 @@ paths:
         - "P02 GST-043 Arabic / RTL Experience"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
@@ -3211,7 +3211,7 @@ paths:
         - "P02 GST-043 Arabic / RTL Experience"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'The caller''s own profile: one per signed-in guest, so there is no key in the path.'
@@ -4349,7 +4349,7 @@ paths:
         - "P08 BO-735 Guest Directory"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-reads:
       - table: marketing.consent_record
@@ -4452,7 +4452,7 @@ paths:
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
@@ -4490,7 +4490,7 @@ paths:
         - "P08 BO-735 Guest Directory"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -5917,7 +5917,7 @@ paths:
       operationId: listSegmentMembers
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -5961,7 +5961,7 @@ paths:
         - "P08 BO-766 Campaign Builder"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
@@ -6007,7 +6007,7 @@ paths:
         - "P08 BO-767 Audience & Offer Selection"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -6059,7 +6059,7 @@ paths:
         - "P08 BO-772 A/B & AI Optimization"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Campaign.budgetCap, Campaign.budgetSpent, CampaignPerformance.attributedRevenue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -6091,7 +6091,7 @@ paths:
         - "P08 BO-772 A/B & AI Optimization"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -6360,7 +6360,7 @@ paths:
       operationId: pauseCampaign
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -6421,7 +6421,7 @@ paths:
       operationId: unscheduleCampaign
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -6469,7 +6469,7 @@ paths:
       operationId: stopCampaign
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -6535,7 +6535,7 @@ paths:
         - "P08 BO-773 Attribution & Audit"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.marketing": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -8556,7 +8556,7 @@ paths:
         - "P08 BO-792 Deliverability & Analytics"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ProviderHealthUsageCostMonitoringView.cost, ProviderHealthUsageCostMonitoringView.costPerMessage, ProviderHealthUsageCostMonitoringView.costPerThousand (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
@@ -8685,7 +8685,7 @@ paths:
         route: service
         for: 'what its text calls "ai.suggestion": ai.suggestion, Ai''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiDeliveryOptimizationCommunicationPlatformDiagnostiView.estimatedMonthlySaving (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
@@ -11240,7 +11240,7 @@ paths:
         route: service
         for: 'what its text calls "ai.suggestion": ai.suggestion, Ai''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CaseInvestigationResolutionWorkspaceView.commercialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [caseId]
       x-ticvai-body-key-note: 'Keyed by the body''s `caseId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per case and linked record within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
@@ -11302,7 +11302,7 @@ paths:
         route: service
         for: 'what its text calls "ai.suggestion": ai.suggestion, Ai''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CaseInvestigationResolutionWorkspaceView.commercialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
@@ -11446,7 +11446,7 @@ paths:
         route: service
         for: 'what its text calls "orders.sales_order": orders.sales_order, Order''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RefundCompensationServiceExceptionWorkspaceInput.value (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
@@ -11675,7 +11675,7 @@ paths:
         route: service
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CaseResolutionClosureCustomerFeedbackView.financialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
@@ -11788,7 +11788,7 @@ paths:
         route: service
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CaseResolutionClosureCustomerFeedbackView.financialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff

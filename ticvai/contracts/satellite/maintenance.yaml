@@ -135,7 +135,7 @@ paths:
         - "P08 BO-903 Equipment & Asset Command Center"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience: [staff]
@@ -185,7 +185,7 @@ paths:
         - "P08 BO-069 Asset Register"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Register an asset
@@ -233,7 +233,7 @@ paths:
         - "P08 BO-508 Equipment Status & Condition Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -263,7 +263,7 @@ paths:
         - "P08 BO-506 Equipment / Asset Profile"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Amend an asset
@@ -324,7 +324,7 @@ paths:
         - "P08 BO-548 Equipment Scan & Validation"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -369,7 +369,7 @@ paths:
         - "P08 BO-582 Asset Retirement, Write-Off & Replacement Recommendation"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Take an asset out of service or return it
@@ -608,7 +608,7 @@ paths:
         - "P08 BO-577 Maintenance Work Order"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: WorkOrderDetail.cost, WorkOrderDetail.labourCost, WorkOrderDetail.partsCost, WorkOrderDetail.totalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -762,7 +762,7 @@ paths:
         route: in-process
         for: 'its read of inventory.stock_earmark, Inventory''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: WorkOrderDetail.cost, WorkOrderDetail.labourCost, WorkOrderDetail.partsCost, WorkOrderDetail.totalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Record parts consumed
@@ -1544,7 +1544,7 @@ paths:
         - "P08 BO-577 Maintenance Work Order"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: VendorServiceRequest.finalCost, VendorServiceRequest.quotedCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
@@ -1593,7 +1593,7 @@ paths:
         route: in-process
         for: 'its read of inventory.supplier, Inventory''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: VendorServiceRequest.finalCost, VendorServiceRequest.quotedCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-agreed: '29 September: M17-13 (MoM 17 September): external vendors engaged through vendor service requests'
@@ -1646,7 +1646,7 @@ paths:
         - "P08 BO-577 Maintenance Work Order"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: VendorServiceRequest.finalCost, VendorServiceRequest.quotedCost, body.finalCost, body.quotedCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-agreed: '29 September: M17-13 (MoM 17 September): external vendors engaged through vendor service requests'

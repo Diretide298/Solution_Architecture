@@ -636,7 +636,7 @@ paths:
         route: in-process
         for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the plan''s trading day, a business date closing at the venue''s businessDayCutoff (r10 read routes; CHG-R10GEN-001)'
       summary: Turn a forecast into a prep list
       description: 'Board 2M. **Demand forecast through recipes to quantities per item and per station.**
@@ -1125,7 +1125,7 @@ paths:
         - "P08 BO-045 Menu Management"
       x-ticvai-read-via:
       - query: tenancy#regionSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "RegionSettings.timeZone": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-config-scope: outlet
       summary: Publish it on a date, not now
@@ -2386,7 +2386,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'the target visit''s outlet (409 target-visit-not-open) (CHG-MOD-003)'
       x-ticvai-names-for-context: [orders.order_line]
       summary: Move items to another table's bill
@@ -2786,7 +2786,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: tenancy#regionSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "RegionSettings.timeZone": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-config-scope: outlet
       summary: Make the draft live, now or on a date
@@ -2997,7 +2997,7 @@ paths:
         - "P15 KIT-003 Order Firing & Course Management"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.Outlet.paymentTiming": platform.outlet, Tenancy''s data (CHG-R10GEN-001)'
       summary: Send a held course to the pass
       description: 'Board 3 of the client F&B pack. **`KitchenTicket.coursing` carried the policy — `holdAndFire`,
@@ -3251,7 +3251,7 @@ paths:
         - "P15 KIT-002 Kitchen Display System (KDS)"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.fnb": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       summary: Bring back a ticket that was bumped by mistake
       description: 'Board 3. **A bumped ticket disappears from the rail**, and a bump is a single tap
@@ -4104,7 +4104,7 @@ paths:
         route: in-process
         for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       summary: Plan a batch, for one outlet or several
       description: 'BL-129. **Orders consumed stock and nothing produced any**, so a central kitchen making
@@ -4326,7 +4326,7 @@ paths:
         - "P06 EMP-056 Walk-In & Waitlist Management"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
@@ -4512,7 +4512,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'the outlet at the asked time (409 outlet-full-at-time) (CHG-MOD-003)'
       - query: orders#depositRecords
         route: service
@@ -4773,7 +4773,7 @@ paths:
         - "P02 GST-029 Venue Info & Services"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - guest
@@ -5151,7 +5151,7 @@ paths:
         - "P02 GST-024 F&B – Browse & Order"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'which outlets are open to deliver to the location (409 location-not-served) (CHG-MOD-003)'
       x-ticvai-audience:
       - guest
@@ -5369,7 +5369,7 @@ paths:
       operationId: claimTableSession
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
       x-ticvai-audience:
@@ -5565,7 +5565,7 @@ paths:
         - "P02 GST-024 F&B – Browse & Order"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       - query: tenancy#regionSettingsRecords
         route: in-process
@@ -5650,7 +5650,7 @@ paths:
         route: in-process
         for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'the outlet''s admissionContext and whether it is taking orders (403 entry-ticket-required, 409 outlet-closed, 422 the outlet''s delivery policy) (CHG-MOD-003)'
       - query: orders#paymentRecords
         route: service
@@ -6690,7 +6690,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'whether the outlet is taking orders (409 outlet-not-accepting-orders) (CHG-MOD-003)'
       x-ticvai-audience:
       - staff
@@ -7418,7 +7418,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.Outlet.paymentTiming": platform.outlet, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -7520,7 +7520,7 @@ paths:
         route: service
         for: 'the payments taken against the bill (409 payments-short-of-bill) (CHG-MOD-003)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.Outlet.paymentTiming": platform.outlet, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -8157,7 +8157,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -8932,7 +8932,7 @@ paths:
         - "P08 BO-135 Order Routing & KDS/Printer Rules"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'the outlet the stations serve (422 unknown-station) (CHG-MOD-003)'
       x-ticvai-audience:
       - staff
@@ -9225,7 +9225,7 @@ paths:
         - "P08 BO-065 Venue Configuration"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -9306,7 +9306,7 @@ paths:
         - "P08 BO-065 Venue Configuration"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       - query: seating#seatRecords
         route: service

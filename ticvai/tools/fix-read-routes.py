@@ -80,8 +80,11 @@ def is_own(route: dict) -> bool:
     return bool(OWN_FOR.match(str((route or {}).get("for") or "")))
 
 
-def route_for(reader_deployable, owner_deployable) -> str:
-    return "in-process" if reader_deployable == owner_deployable else "service"
+def route_for(reader_deployable, owner_deployable, query=None) -> str:
+    """in-process within one deployable, or where the lead granted `query` in process to the reader's deployable
+    (docs/active/cross-deployable-writes.yaml `reads`; XDR-004 widened by ADAM CR-296, CHG-R11RUL-001); else service."""
+    import contract_shapes as CS
+    return CS.read_route(reader_deployable, owner_deployable, query)
 
 
 def records_name(table: str) -> str:
@@ -234,7 +237,7 @@ def plan_routes(findings, ctx: dict):
             new_q.setdefault(q, (sch[0], t, sch[1]))
         words = re.sub(r"\s+", " ", phrase.replace("`", "")).strip()
         label = LABEL.get(owner, owner[:-len("Service")])
-        plan.setdefault(op, []).append((q, route_for(dep_of.get(reader), dep_of.get(owner)),
+        plan.setdefault(op, []).append((q, route_for(dep_of.get(reader), dep_of.get(owner), q),
                                         f'what its text calls "{words}": {t}, {label}\'s data ({TAG})'))
         if how == "fact":
             facts.append(f"{op}: {t} ({phrase!r}) -> {q}")
@@ -269,7 +272,7 @@ def main() -> int:
             stem = q.split("#", 1)[0]
             owner = svc_of_contract.get(stem)
             reader = svc_of_contract.get(ops[op]["contract"])
-            plan.setdefault(op, []).append((q, route_for(dep_of.get(reader), dep_of.get(owner)), why))
+            plan.setdefault(op, []).append((q, route_for(dep_of.get(reader), dep_of.get(owner), q), why))
     # 1. the new per-table data reads, each in its owner's contract
     for key, (stem, t, sch) in sorted(new_q.items()):
         rel = contract_rel(stem)

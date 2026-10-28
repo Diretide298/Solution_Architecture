@@ -123,6 +123,30 @@ VENUE_REQUIRED_REF = "../shared/common.yaml#/components/responses/VenueRequired"
 VENUE_Q = "tenancy#venueSettingsRecords"
 REGION_Q = "tenancy#regionSettingsRecords"
 SETTINGS_DEPLOYABLE = "commerce"      # Tenancy's (handoff/service-decomposition.json)
+_GRANTED = None
+
+
+def granted_in_process(reader_deployable: str, query: str, root: Path = None) -> bool:
+    """Whether the lead granted `query` in process to `reader_deployable` across deployables: the `reads` of
+    docs/active/cross-deployable-writes.yaml (ADAM CR-196, CHG-R9CR-005), the same set check-cross-module-reads
+    XR-ROUTE allows. Since ADAM CR-296 (29 October 2026, CHG-R11RUL-001) the operations host reads Tenancy's four
+    settings queries in process for every operation it hosts (XDR-004), so a generator drafting one of those reads for
+    an operations-host operation writes `in-process`, not `service`, and the next draft needs no flip."""
+    global _GRANTED
+    if _GRANTED is None:
+        root = root or Path(__file__).resolve().parents[1]
+        p = root / "docs" / "active" / "cross-deployable-writes.yaml"
+        doc = (yaml.safe_load(p.read_text(encoding="utf-8")) or {}) if p.exists() else {}
+        _GRANTED = {(str(r.get("reader")), str(q)) for r in doc.get("reads") or [] for q in r.get("queries") or []}
+    return (str(reader_deployable), str(query)) in _GRANTED
+
+
+def read_route(reader_deployable: str, owner_deployable: str, query: str = None) -> str:
+    """in-process within one deployable or where the lead granted the read in process (granted_in_process), else
+    service (ADR-0055 rules 2 and 4 as amended)."""
+    if reader_deployable == owner_deployable or (query and granted_in_process(reader_deployable, query)):
+        return "in-process"
+    return "service"
 
 
 def order_sentence(props: dict, required) -> str:
@@ -198,14 +222,15 @@ def has_money(node, schemas: dict = None, seen=frozenset()) -> bool:
 def money_read_via(money: bool, scope: str, reader_deployable: str) -> list:
     """(a) naming-and-style 5.1, ADR-0018, CHG-R10GEN-002 (ADAM CR-234, CR-197, CR-217, CR-235, CR-202): the currency
     read a generated operation that answers or accepts common Money declares. A venue- or outlet-level operation asks
-    the venue's settings, a region-level one the region's; in process within commerce, service across. Above a region
-    nothing denominates by default, so nothing is written and check-money-currency asks the author."""
+    the venue's settings, a region-level one the region's; in process within commerce and from the operations host
+    (XDR-004, ADAM CR-296), service across otherwise. Above a region nothing denominates by default, so nothing is
+    written and check-money-currency asks the author."""
     if not money:
         return []
     q = {"venue": VENUE_Q, "outlet": VENUE_Q, "region": REGION_Q}.get(scope)
     if not q:
         return []
-    route = "in-process" if reader_deployable == SETTINGS_DEPLOYABLE else "service"
+    route = read_route(reader_deployable, SETTINGS_DEPLOYABLE, q)
     what = "region's" if q == REGION_Q else "venue's frozen"
     return [{"query": q, "route": route,
              "for": f"the {what} trading currency and scale for the Money it answers or accepts "

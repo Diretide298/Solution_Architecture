@@ -1,0 +1,58 @@
+id: CHG-R11RUL-003
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: getSupplierPerformance states how each figure is worked out from what is stored (CR-274) and the five readings
+  CR-297 confirmed, and reads each order's venue time zone through tenancy#regionSettingsRecords in process; it no
+  longer reads supplier contracts. rejectReceivedGoods writes one supplierReturn movement per rejected line.
+decision:
+  what: 'ADAM CR-274, option A (Chinmay, 28 October 2026, no migration) and CR-297, option A (Chinmay, 29 October 2026).
+    contracts/satellite/reporting.yaml getSupplierPerformance: x-ticvai-read-via gains tenancy#regionSettingsRecords
+    in-process (RegionSettingsAtOrAbove the order''s scope_path, in the read''s transaction; XDR-004) and drops
+    inventory#supplierContractRecords; its description states the window (from and to filter the purchase order''s
+    created_at as venue-local dates, each order on its own venue''s calendar), the matching (by itemId; in full when
+    received_quantity >= ordered_quantity; on time when the last receipt, recorded_at else created_at, is on or before
+    expected_delivery), averageDaysLate over late lines only, shortDeliveryPercent and rejectionPercent as shares of
+    lines, rejectionReasons from the supplierReturn movements by reason, priceVariancePercent''s formula, and readings
+    1-5 (cancelled orders counted; no expected_delivery is never on time and not in averageDaysLate; an empty window
+    leaves the percentages, averageDaysLate and priceVariancePercent out, with ordersPlaced 0 and rejectionReasons {};
+    two decimals and one; no supplier contract read). rejectionReasons and priceVariancePercent describe their source.
+    contracts/satellite/inventory.yaml rejectReceivedGoods: one supplierReturn movement per rejected receipt line
+    (reason the enum value, source_type goodsReceiptLine, source_id the line id).
+    handoff/api-data-lineage-overrides.json: inventory.supplier_contract leaves getSupplierPerformance''s carried reads.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-274 (Sanket Keluskar, #33214, blocking), the lead''s decision file decisions-2026-10-28.json, and CR-297 (Sanket
+  Keluskar, #33214), the lead''s decision file decisions-2026-10-29.json: rejectionReasons and priceVariancePercent had no stored
+  source, OTIF had no receipt-to-line match, date rule or denominators, and the venue-local dates needed a time-zone
+  read the operation did not declare.'
+keys_touched:
+  operations:
+  - getSupplierPerformance
+  - rejectReceivedGoods
+  tables:
+  - inventory.movement
+  - inventory.purchase_order
+  - inventory.supplier_contract
+  - platform.region_settings
+  files:
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/inventory.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - handoff/api-data-lineage-overrides.json
+  - handoff/api-data-lineage.json
+root_class: 'a figure an operation returns with no stated formula or source'
+tickets:
+  started:
+  - '33214 (getSupplierPerformance): through CR-274''s and CR-297''s comments; built as stated.'
+  unstarted:
+  - 'rejectReceivedGoods: its pointer body at the r11 tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-274, CR-297
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'The time-zone read is XR-ROUTE-checked against XDR-004, whose operations list names getSupplierPerformance.'

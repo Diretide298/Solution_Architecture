@@ -24,7 +24,12 @@ security still scopes every row:
 2. **`operations` composes Tenancy's venue and region settings queries** (`tenancy#venueSettingsRecords`,
    `tenancy#regionSettingsRecords`), as the workers host does: every F&B operation that answers Money reads the
    venue's frozen trading currency and its scale this way (naming-and-style 5.1, ADR-0018 as amended 20 September for currency), mergeTableVisits first
-   (CR-234). Granted read XDR-004 in `docs/active/cross-deployable-writes.yaml`.
+   (CR-234). Granted read XDR-004 in `docs/active/cross-deployable-writes.yaml`. **Widened on 29 October 2026 to
+   every operation the host serves** (ADAM CR-296, option A, a ruling for the whole class; CHG-R11RUL-001): the
+   operations host reads Tenancy's settings in process wherever an operation it hosts needs them, through Tenancy's
+   own query classes and never its SQL: `tenancy#scopeRecords` (platform.scope, a kernel read since CR-002),
+   `tenancy#venueSettingsRecords`, `tenancy#regionSettingsRecords` and `tenancy#outletRecords`. SELECT only, row
+   security unchanged, no migration (the grants exist).
 3. **`access` composes Tenancy's workstation query and Catalogue's entitlement template query**
    (`tenancy#workstationRecords`, `catalogue#entitlementTemplateRecords`): getOfflinePackage reads the session's
    access point and each entitlement's re-entry and admission rules this way, and so does every Access operation
