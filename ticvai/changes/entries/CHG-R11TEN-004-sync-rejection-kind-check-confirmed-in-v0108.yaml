@@ -1,0 +1,40 @@
+id: CHG-R11TEN-004
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'Confirmed, no new change: sync.rejection''s rejection_kind_chk is already dropped and re-added with
+  cashMovement, generated from SyncRejection.kind, in the package''s forward migration V0108 (20 October 2026); the
+  gap CR-276 found is the repository''s migrations, which never took that block.'
+decision:
+  what: 'ADAM CR-276, option A (Chinmay, 28 October 2026): a forward migration drops and re-adds rejection_kind_chk
+    with cashMovement, generated from the contract (CHG-R8SPN-021 stands). backend/tenant/V0108__after_r1_20261020.sql
+    already holds it (ALTER TABLE sync.rejection DROP CONSTRAINT IF EXISTS rejection_kind_chk, ADD ... NOT VALID,
+    VALIDATE), derived from contracts/spine/orders.yaml SyncRejection.kind, safe to run twice and changing no data;
+    tools/derive-ddl.py regenerates nothing new for it on this tree. This entry records CR-276 against that
+    migration so the CR settles with it.'
+  by: Chinmay
+  date: '2026-10-28'
+why: 'ADAM CR-276 (Deep Khanvilkar, #35807 recordSyncRejection): the repository''s CHECK still lists five kinds while
+  the contract has six since CHG-R8SPN-021. Settled by the lead on 28 October 2026.'
+keys_touched:
+  operations: [recordSyncRejection]
+  schemas: [SyncRejection]
+  tables: [sync.rejection]
+  files:
+  - backend/tenant/V0108__after_r1_20261020.sql
+root_class: 'a migration the package generated that the repository did not take'
+tickets:
+  started: []
+  unstarted:
+  - '35807 (recordSyncRejection): keep validating kind against the contract enum; the repository migration takes
+    V0108''s rejection_kind_chk block (the database task of that forward migration, CHG-R10GFC-006).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-276
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-migrations.py
+status: open
+notes: 'Nothing edited for CR-276. The package DDL baseline 010-sync.sql is frozen at r1 and keeps the five kinds;
+  V0108 is what moves a database to six.'

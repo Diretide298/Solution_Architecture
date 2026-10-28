@@ -5232,16 +5232,15 @@ paths:
         **Newest first**: ordered by `addedAt` descending, `id` as the tiebreak.
 
         **What Catalogue knows is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002;
-        ADR-0055 rule 4). Marketing runs in another deployable, so it never reads `catalogue.*`: it asks
-        Catalogue''s declared query `variantListingFacts(variantIds, channel, performanceIds)` through
-        Catalogue''s service route, once per read for every saved variant, with the guest''s channel (`web` or
-        `mobile`), and returns Catalogue''s current `productName`, `imageAssetRef`, `price` and
-        `performanceStartsAt`; `isAvailable` is false where Catalogue says the variant is not sellable
-        (`unavailableReason` is its `reason`) or the saved performance has started (`performancePassed`).
-        Nothing is written back: this read runs on a replica. **If Catalogue cannot be reached** the stored
-        values are returned as they were when each item was saved, rather than an error. Catalogue''s
-        published service operation for the query is not written yet (a follow-up, as for
-        `variantsSellableAt`, CHG-TEN-002).
+        asked in process since ADAM CR-270 and CR-273, option A, 28 October 2026, CHG-R11TEN-001). Marketing never
+        reads `catalogue.*` with its own SQL: it asks Catalogue''s declared query
+        `variantListingFacts(venueId, channel, variantIds, performanceIds)` in process, through Catalogue''s own
+        query class (the lead''s granted read, docs/active/cross-deployable-writes.yaml XDR-007), once per read for
+        every saved item, at the venue the guest acts at and with the guest''s channel (`web` or `mobile`), and
+        returns Catalogue''s current `productName`, `imageAssetRef`, `price` (its `listPrice`, with the venue''s
+        currency) and `performanceStartsAt`; `isAvailable` is false where Catalogue answers the item unavailable
+        (`unavailableReason` is its `unavailableReason`) or the saved performance has started
+        (`performancePassed`). Nothing is written back: this read runs on a replica.
 
         **Guests only** (ADR-0025): `bearerAuth` is not accepted; a staff token has no permission here
         (CHG-MKT-002, as the developer of ticket 30706 proposed).
@@ -5258,8 +5257,8 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       - query: catalogue#variantListingFacts
-        route: service
-        for: "items[] productName, imageAssetRef, price, performanceStartsAt, isAvailable, unavailableReason"
+        route: in-process
+        for: "items[] productName, imageAssetRef, price, performanceStartsAt, isAvailable, unavailableReason (ADAM CR-270, CR-273; XDR-007)"
       x-ticvai-permission: null
       x-ticvai-scope-level: subject
       x-ticvai-config-scope: subject
@@ -5301,18 +5300,19 @@ paths:
         `performanceId` is a third, date-less entry for the product generally.
 
         **Whether the variant may be sold is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM
-        CR-081; CHG-TEN-002; ADR-0055 rule 4). Marketing runs in another deployable, so it asks Catalogue''s
-        declared query `variantsSellableAt(venueId, [variantId], channel)` through Catalogue''s service route
-        with the guest''s channel (`web` or `mobile`) and never reads `catalogue.variant`. A variant Catalogue
-        does not know, or one not sellable at the venue on that channel, is the `404`. Catalogue''s published
-        service operation for the query is not written yet (a follow-up of CHG-TEN-002).
+        CR-081; CHG-TEN-002; asked in process since ADAM CR-270, option A, 28 October 2026, CHG-R11TEN-001).
+        Marketing asks Catalogue''s declared query `variantsSellableAt(venueId, [variantId], channel)` in process,
+        through Catalogue''s own query class (the lead''s granted read, docs/active/cross-deployable-writes.yaml
+        XDR-007), at the venue the guest acts at with the guest''s channel (`web` or `mobile`), and never reads
+        `catalogue.variant` with its own SQL. A variant Catalogue does not know is the `404` `unknown-variant`; one
+        not sellable at the venue on that channel is the `404` `variant-not-sellable`.
 
-        **What the saved row holds** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002). The same call
-        to Catalogue''s service route asks `variantListingFacts(variantIds, channel, performanceIds)` too, whose
-        `venueId` is the venue `variantsSellableAt` is asked about, and the row stores its `productName`,
-        `imageAssetRef`, `listPrice` (as `list_price`), `performanceStartsAt` and `isAvailable: true` as they are
-        at the save; `getWishlist` replaces them with Catalogue''s current answer on every read. A performance that
-        is not the variant''s product''s is the same `404` (`unknown-variant`).
+        **What the saved row holds** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002; the query as
+        CR-270 declared it). It asks `variantListingFacts(venueId, channel, [variantId], [performanceId])` too, at
+        the same venue, and the row stores its `productName`, `imageAssetRef`, `listPrice` (the amount only, as
+        `list_price`), `performanceStartsAt` and `isAvailable: true` as they are at the save; `getWishlist`
+        replaces them with Catalogue''s current answer on every read. A performance that is not the variant''s
+        product''s is answered `unknownVariant`, the same `404` (`unknown-variant`).
 
         **The idempotency is the database''s**: a unique index on (`subject_id`, `variant_id`, `performance_id`)
         with a null performance colliding too (`NULLS NOT DISTINCT`), so two saves racing under different
@@ -5331,11 +5331,11 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       - query: catalogue#variantsSellableAt
-        route: service
-        for: "the saved variantId (404 unknown-variant, variant-not-sellable)"
+        route: in-process
+        for: "the saved variantId (404 unknown-variant, variant-not-sellable) (ADAM CR-270; XDR-007)"
       - query: catalogue#variantListingFacts
-        route: service
-        for: "the stored productName, imageAssetRef, list_price, performanceStartsAt (404 unknown-variant)"
+        route: in-process
+        for: "the stored productName, imageAssetRef, list_price, performanceStartsAt (404 unknown-variant) (ADAM CR-270; XDR-007)"
       x-ticvai-permission: null
       x-ticvai-scope-level: subject
       x-ticvai-config-scope: subject

@@ -1,0 +1,34 @@
+id: CHG-R11TEN-008
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'setMenuItemDailyCount and setItemAvailability state the ETag of a row with no version column (a strong hash
+  of the MenuItem as answered, 412 on a different If-Match) and what count does: null clears both counts and leaves
+  availability; a count resets remainingCount; zero is soldOut with an fnb.sold_out_item row.'
+decision:
+  what: 'ADAM CR-294, option A (Chinmay, 29 October 2026), confirmed as built; no release asked.
+    contracts/satellite/fnb.yaml: the two operations'' text, and setMenuItemDailyCount''s x-ticvai-writes
+    fnb.sold_out_item, so the lineage lists the row its text names (check-parameter-columns P-NAMED-TABLE).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-294 (Sanket Keluskar, #32302 setMenuItemDailyCount): the ETag and count-null behaviour were read, not
+  stated. Settled by the lead on 29 October 2026.'
+keys_touched:
+  operations: [setMenuItemDailyCount, setItemAvailability]
+  tables: [fnb.menu_item, fnb.sold_out_item]
+  files:
+  - contracts/satellite/fnb.yaml
+root_class: 'a built behaviour the contract did not state'
+tickets:
+  started: []
+  unstarted:
+  - '32302 (setMenuItemDailyCount): built as the text now says, through CR-294''s comment.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-294
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'No schema change (option B, a version column, can follow without changing the wire).'

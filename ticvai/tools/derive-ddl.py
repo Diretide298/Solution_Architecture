@@ -2085,6 +2085,32 @@ def unique_key(col: str, col_type: dict, src_of: dict) -> str:
     return q(col)
 
 
+_PLAIN_INDEX = re.compile(r"^CREATE INDEX IF NOT EXISTS \S+ ON (\S+) \(([^()]*)\);$", re.M)
+_UNIQUE_INDEX = re.compile(r"^CREATE UNIQUE INDEX IF NOT EXISTS \S+ ON (\S+) \(([^()]*)\)( NULLS NOT DISTINCT)?;$", re.M)
+
+
+def without_redundant_indexes(lines: list) -> list:
+    """`idx_lines` less every plain index whose columns are exactly a unique index's on the same table.
+
+    **A unique index replaces the plain one on the same columns** (ADAM CR-278, option A, accepted 28 October 2026;
+    CHG-R11TEN-005, as CR-103 and CHG-R8MIG-004 decided for tenancy.device_assignment (device_id)). Postgres answers
+    every lookup and join the plain index served from the unique one, so the reference's own index
+    (`<table>_<column>_idx`) is not written beside a whole-column unique index (`<table>_<columns>_uniq`), and the next
+    forward migration drops it, guarded (ddl_forward, R8-MIG-001). A partial unique index (WHERE), one on `lower()` or
+    a plain index with a method or a predicate is not the same lookup and is kept."""
+    uniq = set()
+    for _s, line in lines:
+        for m in _UNIQUE_INDEX.finditer(line):
+            uniq.add((m.group(1), m.group(2).replace(" ", "")))
+    out = []
+    for s_, line in lines:
+        m = _PLAIN_INDEX.search(line)
+        if m and (m.group(1), m.group(2).replace(" ", "")) in uniq:
+            continue
+        out.append((s_, line))
+    return out
+
+
 # `table -> [columns]` from `x-ticvai-primary-key`, filled in `main` before any key is asked for.
 DECLARED_PK: dict = {}
 
@@ -3032,7 +3058,7 @@ def main() -> int:
             "",
         ] + mine) + "\n"
 
-        idx = sorted({line for s, line in idx_lines if area(s) == db})
+        idx = sorted({line for s, line in without_redundant_indexes(idx_lines) if area(s) == db})
         files[f"{db}/910-indexes.sql"] = "\n".join([
             f"-- Indexes in the {db} database: declared foreign keys, conventions and scope paths.",
             "-- **Derived by tools/derive-ddl.py. Do not hand-edit.**",

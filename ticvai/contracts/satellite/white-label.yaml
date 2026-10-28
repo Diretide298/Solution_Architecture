@@ -5743,7 +5743,7 @@ paths:
         required: false
         description: The venue the guest picked (WEB-001, GST-001). `bookingFlow` is then the tenant's settings
           with that venue's `venueOverrides` entry laid over field by field (rev 3 CFG-11); without it, the
-          tenant's own settings.
+          tenant's own settings. With it, `skinKey` names the venue's guest app skin (ADAM CR-280).
         schema:
           type: string
           format: uuid
@@ -10464,6 +10464,23 @@ components:
           - pill
           default: solid
           description: Button shape (decided 29 September, rev 3 CFG-3).
+        venueSkins:
+          type: array
+          default: []
+          description: '**The guest app skin each venue takes** (ADAM CR-280, option B, 28 October 2026; CHG-R11TEN-007):
+            one entry per venue, naming one of the approved app design''s skins (`handoff/design-tokens/guest-app.yaml`,
+            `skins.byVenueKind`). A venue with no entry has none set, and the guest app shell then uses the base skin
+            with `park`. `getPublishedTenantConfig` answers the asked venue''s entry as `skinKey`.'
+          items:
+            type: object
+            additionalProperties: false
+            required: [venueId, skinKey]
+            properties:
+              venueId:
+                type: string
+                format: uuid
+              skinKey:
+                $ref: '#/components/schemas/GuestAppSkinKey'
         componentColours:
           type: object
           description: '**Colours for single interactive elements (decided 17 September, M17-11).** Each is
@@ -12399,6 +12416,11 @@ components:
                   $ref: '#/components/schemas/KioskConfigFindingKind'
                 message:
                   type: string
+    GuestAppSkinKey:
+      type: string
+      enum: [park, water, stadium, theatre, dining, kids, museum, rooms, transport]
+      description: The guest app's skins per venue kind, as the approved Mobile App v4 design draws them
+        (`handoff/design-tokens/guest-app.yaml` `skins.byVenueKind`; ADAM CR-280, CHG-R11TEN-007).
     PublishedTenantConfig:
       x-ticvai-persistence: none — computed from the current ConfigVersion snapshot and the live status on whitelabel.tenant_config
       type: object
@@ -12490,6 +12512,21 @@ components:
           $ref: '#/components/schemas/Theme'
         fonts:
           $ref: '#/components/schemas/FontConfig'
+        skinKey:
+          allOf:
+          - $ref: '#/components/schemas/GuestAppSkinKey'
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**The asked venue''s guest app skin** (ADAM CR-280, option B, 28 October 2026, additive;
+            CHG-R11TEN-007): the published `theme.venueSkins` entry for `venueId`. Null without `venueId`, or where the
+            venue has no entry; the shell then uses the base skin with `park`. **How the shell applies it**: the skin
+            sets every token, then `theme` overrides `--br` (`primaryColour`), `--bg` (`backgroundColour`) and `--ink`
+            (`textColour`) where set; `textColour` is never derived (Theme requires it), and `theme.darkMode` is never
+            used to render. `fonts` replace the skin''s faces (`--fh`, `--fb`), with the Arabic pair
+            (`primaryArabic`, `secondaryArabic`) under `dir=rtl`. `--rk` scales the base radii (sm 6, md 10, lg 16,
+            in px) by `theme.cornerRadius / 10`.'
         header:
           $ref: '#/components/schemas/HeaderConfig'
         footer:

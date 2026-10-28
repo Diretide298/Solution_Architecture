@@ -1,0 +1,44 @@
+id: CHG-R11TEN-007
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'PublishedTenantConfig.skinKey (additive) names the asked venue''s guest app skin, from the new
+  Theme.venueSkins, with the decision''s rules for laying Theme and FontConfig over the skin; guest-app.yaml''s
+  appliedFrom states the same rules.'
+decision:
+  what: 'ADAM CR-280, option B with C meanwhile (Chinmay, 28 October 2026). contracts/satellite/white-label.yaml:
+    GuestAppSkinKey (the nine skins of guest-app.yaml skins.byVenueKind), Theme.venueSkins (one entry per venue,
+    written by setTheme, published with the theme), PublishedTenantConfig.skinKey (derived on read for venueId; null
+    without it or where unset, and the shell uses base plus park), and the venueId parameter''s text. The rules: the
+    skin sets every token, then Theme overrides --br, --bg and --ink where set; FontConfig''s faces replace the
+    skin''s, the Arabic pair under dir=rtl; --rk is cornerRadius / 10 on the base radii sm 6, md 10, lg 16;
+    textColour is never derived and darkMode never renders. tools/derive-design-tokens.py: the guest app''s appliedFrom
+    (APP_APPLIED_FROM) carries them; guest web''s is unchanged (CR-272). Derived: handoff/design-tokens/guest-app.yaml.'
+  by: Chinmay
+  date: '2026-10-28'
+why: 'ADAM CR-280 (#36991 SETUP-SHELL-GUEST-APP): no published field said which skin a venue takes, nor how Theme,
+  cornerRadius and the Arabic fonts combine with it. Settled by the lead on 28 October 2026.'
+keys_touched:
+  operations: [getPublishedTenantConfig, setTheme]
+  schemas: [PublishedTenantConfig, Theme, GuestAppSkinKey]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/derive-design-tokens.py
+  - handoff/design-tokens/guest-app.yaml
+root_class: 'a design mechanism with no published field behind it'
+tickets:
+  started: []
+  unstarted:
+  - '36991 (SETUP-SHELL-GUEST-APP): take the skin key as an input meanwhile (base plus park until set) and apply
+    Theme''s direct fields; read skinKey once the field is published (36992).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-280
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-design-tokens.py::APP_APPLIED_FROM
+status: open
+notes: 'The decision names the published field and not where a venue''s skin is kept; it is kept on the theme the
+  tenant publishes (Theme.venueSkins, inside whitelabel.tenant_config.theme, no column), the white-label module''s own
+  data, so no read crosses a module.'
