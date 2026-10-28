@@ -26,3 +26,12 @@ tickets:
   started: []
   unstarted: []
 release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-295
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::NO_GUEST
+status: open
+notes: 'Database: the forward migration re-applies identity.delegated_access''s policy (MIG-IDENTITY, the migration
+  owner). CHG-R11GST-001''s note left this table for the lead; CR-295''s decision covers every table of this shape.'
