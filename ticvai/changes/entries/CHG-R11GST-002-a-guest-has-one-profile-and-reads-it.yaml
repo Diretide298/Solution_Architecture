@@ -1,0 +1,51 @@
+id: CHG-R11GST-002
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'marketing.guest_profile is one row per subject (unique subject_id) that the guest reads and writes by its
+  subject, staff through its segment for a session with no guest subject; preferredChannel none is stored as null and
+  answered absent; getMyProfile and updateMyProfile answer 404 with no profile row; marketing.guest_preference is one
+  row per subject (unique subject_id, update else insert).'
+decision:
+  what: 'ADAM CR-291, option B with option A''s (2) to (5). (1) GuestProfile.subjectId x-ticvai-unique: tenant;
+    segment_id is the segment the profile was first captured in. (2) GuestProfileDetail x-ticvai-rls guest-owns:
+    derive-ddl now builds it on a table owned through its parent: (no guest subject AND the segment visible) OR
+    platform.subject_in_scope(subject_id), for read and write (CR-295''s rule). (3) none stored as null, preferredChannel
+    left out. (4) 404 not-found on getMyProfile and updateMyProfile. (5) GuestPreferences.subjectId x-ticvai-unique:
+    tenant; updateMyProfile updates the subject''s row, else inserts one (a new id, updated_at now). The light release
+    carries the forward migration, safe to run twice; where a subject already has two rows, Postgres refuses the unique
+    index naming the duplicated subject_id and the migration''s transaction rolls back.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-291 (Sanket Keluskar, #31167), accepted 29 October 2026 with option B and A''s (2)-(5) (decision record
+  decisions-2026-10-29.json, r10 settle batch): guest_profile had no unique subject, a policy that never admitted the
+  guest (apply_parent_rls through marketing.segment), no stored value for none, and no rule for a missing row.'
+keys_touched:
+  operations:
+  - getMyProfile
+  - updateMyProfile
+  schemas:
+  - GuestProfile
+  - GuestProfileDetail
+  - GuestPreferences
+  tables:
+  - marketing.guest_profile
+  - marketing.guest_preference
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/derive-ddl.py
+root_class: 'new: a guest''s own row the table''s policy never admits'
+tickets:
+  started:
+  - '31167 (updateMyProfile): through CR-291''s comment; its guest tests pass once the migration is applied.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-291
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::guest_parent
+status: open
+notes: 'Database: one forward migration adds guest_profile_subject_id_uniq and guest_preference_subject_id_uniq and
+  re-applies guest_profile''s policy (MIG-MARKETING, the migration owner).'

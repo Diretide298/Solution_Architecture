@@ -190,7 +190,7 @@ contracts:
     PUT: 22
     DELETE: 7
     PATCH: 6
-  guestCallable: 13
+  guestCallable: 12
   offlineCapable: 10
   events:
   - whitelabel-customDomainChanged

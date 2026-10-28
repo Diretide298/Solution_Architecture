@@ -40,7 +40,7 @@ actors:
   - P01
   - P02
   - P05
-  operations: 292
+  operations: 291
   note: Buys, arrives, is admitted, spends. **Never sees a staff surface** — `check-screens` refuses
     a guest screen declaring a staff permission.
 - actor: venue staff

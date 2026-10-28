@@ -372,9 +372,10 @@
    },
    "subjectId": {
     "x-ticvai-data-class": "behavioural",
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "format": "uuid",
-    "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"
+    "description": "Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n**One profile per guest** (ADAM CR-291, option B, decided 29 October 2026; CHG-R11GST-002): unique in the tenant, so `getMyProfile` and `updateMyProfile` read and write the one row of the session's subject. The profile's segment is the one it was first captured in.\n"
    },
    "displayName": {
     "x-ticvai-data-class": "personal",
@@ -398,7 +399,8 @@
    },
    "preferredChannel": {
     "x-ticvai-data-class": "personal",
-    "$ref": "#/components/schemas/MessageChannel"
+    "$ref": "#/components/schemas/MessageChannel",
+    "description": "Left out where the guest has no preferred channel: a guest who chose `none` in `updateMyProfile` is stored as null and answered without this field (ADAM CR-291, option B; CHG-R11GST-002).\n"
    },
    "guestLinkId": {
     "x-ticvai-data-class": "personal",
@@ -473,6 +475,7 @@
  },
  "GuestProfileDetail": {
   "x-ticvai-persistence": "marketing.guest_profile",
+  "x-ticvai-rls": "guest-owns",
   "allOf": [
    {
     "$ref": "#/components/schemas/GuestProfile"

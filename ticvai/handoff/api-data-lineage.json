@@ -33482,8 +33482,7 @@
    "postgres"
   ],
   "audience": [
-   "staff",
-   "guest"
+   "staff"
   ],
   "readColumns": {
    "whitelabel.content_page": [

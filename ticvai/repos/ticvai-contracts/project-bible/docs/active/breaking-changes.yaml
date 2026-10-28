@@ -1583,3 +1583,15 @@ changes:
     tag: r10
     producer-tickets: ['28375', '32269']
     consumer-tickets: ['30025', '30031', '30032']
+  - id: BC-493
+    contract: white-label
+    operation: listContentPages
+    change: "security changed"
+    reason: 'ADAM CR-287, option A (CHG-R11GST-005): listContentPages is the CMS staff read only, bearerAuth and
+      TENANT_CONFIGURE; guestAuth is removed and guests read listPublishedContentPages (GFIX-2, 2 October 2026). Every
+      guest screen''s binding of it was already removed in GFIX-2''s favour, and the staff callers (P08 BO-837, P13
+      CMS-007) are unchanged; dropping a security scheme is breaking by the compat rule.'
+    approved-by: 'Chinmay, 28 October 2026 (CR-287, option A: "build it with bearerAuth and TENANT_CONFIGURE, ... and treat guestAuth and the guest paragraph in its description as not there")'
+    tag: r11
+    producer-tickets: [SVC-WHITELABEL-CONTENT-3]
+    consumer-tickets: [APP-WL-CMS-007]

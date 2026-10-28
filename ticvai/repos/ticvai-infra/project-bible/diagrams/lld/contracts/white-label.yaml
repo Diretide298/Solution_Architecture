@@ -748,7 +748,6 @@ operations:
   permission: TENANT_CONFIGURE
   audience:
   - staff
-  - guest
   offline: true
   reads:
   - whitelabel.content_page

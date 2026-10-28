@@ -1,0 +1,41 @@
+id: CHG-R11GST-003
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'platform.audit_record''s description and the audit trail''s rule (AuditRecord, listAuditRecords) say a
+  transaction whose caller is a guest subject with no principal writes no audit row; staff and system writes are
+  audited as before.'
+decision:
+  what: 'ADAM CR-289, option A: platform.audit_record records what staff and the platform did; the guest''s own domain
+    rows (wishlist, guest device, cart, order) are its record. The INSERT policy stays as CR-005 made it and no column
+    is added. Description only: AuditRecord and listAuditRecords in tenancy.yaml, and the table''s note
+    (derive-table-notes WHAT).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-289 (Pranay Shinde, #27694 PLATFORM-AUDIT), settled done 29 October 2026 with option A (decision record
+  decisions-2026-10-29.json): the CR-179 wording (CHG-R10TEN-016) said every write, and a guest session''s audit INSERT
+  fails CR-005''s append policy, failing RemoveFromWishlist and RevokeGuestDevice with 42501.'
+keys_touched:
+  operations:
+  - listAuditRecords
+  schemas:
+  - AuditRecord
+  tables:
+  - platform.audit_record
+  files:
+  - contracts/spine/tenancy.yaml
+  - tools/derive-table-notes.py
+root_class: 'new: a description contradicting its ticket'
+tickets:
+  started:
+  - '27694 (PLATFORM-AUDIT): through CR-289''s comment; built as the ticket says.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-289
+triage: fix-forward
+prevention:
+  type: none
+  reason: A rule stated in prose (which callers the audit trail skips); no check can read whether a description covers
+    every kind of caller. Lead to approve.
+status: open

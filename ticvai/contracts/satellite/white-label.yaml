@@ -3295,18 +3295,12 @@ paths:
         - "P13 CMS-007 Page Builder"
       x-ticvai-audience:
       - staff
-      - guest
       x-ticvai-read-routing: replica
       summary: List custom content pages
-      description: '**A guest caller sees only what is live**: pages whose `status` is `published` and
-        `isEnabled` is true. For a guest `status` is ignored and `TENANT_CONFIGURE` is not needed — reading
-        a published page is not configuring it. A staff caller sees every page, and with no `status` gets
-        all three states.
-
-        **A guest screen reads `listPublishedContentPages`** (decided 2 October, GFIX-2), which needs no
-        session: help and accessibility pages are public.
-
-        
+      description: '**The CMS staff read** (ADAM CR-287, option A, decided 28 October 2026; CHG-R11GST-005): a
+        staff caller holding `TENANT_CONFIGURE` sees every page, and with no `status` gets all three states. A guest
+        session is refused as by any staff-only operation; guests read `listPublishedContentPages` (decided 2 October,
+        GFIX-2), which needs no session: help and accessibility pages are public.
 
         **Order.** Sorted by `sortOrder` ascending, then by `id`. Where `sortOrder` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
@@ -3321,12 +3315,11 @@ paths:
         '
       x-ticvai-conflict-policy: serverWins
       security:
-      - guestAuth: []
       - bearerAuth: []
       parameters:
       - name: status
         in: query
-        description: Staff only. Ignored for a guest caller.
+        description: Only pages in this state; with none, every state.
         schema:
           $ref: '#/components/schemas/ContentStatus'
       - name: categoryCode

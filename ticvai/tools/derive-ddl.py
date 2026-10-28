@@ -773,6 +773,16 @@ $$;
 #     `orders.order_event` through `orders.sales_order`). The scope-path rule is written in the per-statement shape of
 #     our team's repository migration 225 (`scope_path <@ ANY ((SELECT platform.current_scope_paths())::ltree[])`,
 #     evaluated once per statement on these hot tables), and the guest's subject the same way.
+#   * **The staff branch of both admits only a session with no guest subject** (CHG-R11GST-001; ADAM CR-295, option A,
+#     decided 29 October 2026). CR-198 gives a guest request a read-only scope of its venue's path, so a staff branch
+#     that tests the scope alone opened every order and cart at the venue to any guest there. The read check is
+#     `(NO_GUEST AND <the staff test>) OR <the guest branch>`: a guest reads these rows by subject alone, and the
+#     tables that follow them through the parent rule follow the narrower read. CR-198's venue scope still opens
+#     published venue data to a guest.
+#   * `guest-owns` on a table owned through its parent (CHG-R11GST-002; ADAM CR-291, option B, decided 29 October 2026):
+#     staff read and write through the parent, as the parent rule does, for a session with no guest subject (CR-295's
+#     rule), OR `platform.subject_in_scope(subject_id)` for read and write: marketing.guest_profile, the guest's own
+#     profile under the segment it was first captured in.
 RLS_MARKS = ("read-beneath", "grant-holder-read", "own-row", "home-scope-write", "subject-self", "own-or-home-scope",
              "signed-in-read", "scope-or-subject", "any-grant-no-delete", "guest-owns", "guest-reads-own")
 # The checks `guest-owns` and `guest-reads-own` build on, `{a}` standing for the row's alias (CHG-R9CR-003/004). The
@@ -781,6 +791,8 @@ RLS_MARKS = ("read-beneath", "grant-holder-read", "own-row", "home-scope-write",
 STATEMENT_SCOPE = ("{a}scope_path IS NOT NULL AND {a}scope_path <@ ANY ((SELECT platform.current_scope_paths())"
                    "::ltree[])")
 GUEST_SUBJECT = "{a}subject_id = (SELECT NULLIF(current_setting('ticvai.subject_id', true), '')::uuid)"
+# A session with no guest subject: the condition a staff branch beside a guest branch carries (CHG-R11GST-001, CR-295).
+NO_GUEST = "NULLIF(current_setting('ticvai.subject_id', true), '') IS NULL"
 
 # The check apply_split_rls gets for `any-grant-no-delete`: a scope path set, the WITH CHECK the append-only trail's
 # INSERT has (CHG-R6-002).
@@ -3211,6 +3223,7 @@ def main() -> int:
     split_mark: dict = {}     # table -> (its x-ticvai-rls mark, its base rule)
     split_write: dict = {}    # table -> its write check, `{a}` standing for the row's alias
     split_depth: dict = {}
+    guest_parent: set = set()   # parent-owned tables marked guest-owns (CHG-R11GST-002)
     parent_of = {p[0]: p for p in by_parent}
     for t in sorted(real):
         mark = (marks.get(t) or {}).get("rls") or TABLE_RLS.get(t)
@@ -3223,6 +3236,13 @@ def main() -> int:
             continue
         if area(t.split(".")[0]) != "tenant" or SCOPE_TABLE not in real:
             print(f"  ! {t}: x-ticvai-rls applies in the tenant database only; the base rule stands")
+            continue
+        if (mark == "guest-owns" and t in parent_of and t not in shared_scope and t not in APPEND_AUDIT
+                and t != SCOPE_TABLE):
+            if not any(c["column"] == "subject_id" for c in cols[t]):
+                print(f"  ! {t}: x-ticvai-rls guest-owns needs a subject_id; the base rule stands")
+                continue
+            guest_parent.add(t)   # its policy is written with its parent's, below (CHG-R11GST-002, CR-291)
             continue
         if t in shared_scope or t in parent_of or t in APPEND_AUDIT or t == SCOPE_TABLE:
             print(f"  ! {t}: x-ticvai-rls {mark} on a shared-scope, parent-owned or append-only table is not "
@@ -3261,7 +3281,8 @@ def main() -> int:
             else:
                 print(f"  ! {t}: x-ticvai-rls guest-owns needs a subject_id; the base rule stands")
                 continue
-            read = f"({staff}) OR ({guest})"
+            # the staff branch admits only a session with no guest subject (CHG-R11GST-001, CR-295)
+            read = f"({NO_GUEST} AND {staff}) OR ({guest})"
             write = staff if mark == "guest-reads-own" else read
             call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(read.format(a=''))}, "
                     f"{sql_literal(write.format(a=''))});")
@@ -3375,6 +3396,19 @@ def main() -> int:
         protected[t] = "parent"
     # A child of a split row follows it for reading only: its writes take the parent's write check, down the chain.
     for i, (t, col, par, key, *_rest) in enumerate(list(by_parent)):
+        if t in guest_parent:
+            # **Staff through the parent, the guest by its own subject** (CHG-R11GST-002; ADAM CR-291, option B, and
+            # CR-295's rule): read and written through the parent for a session with no guest subject, as the parent
+            # rule does, or by the guest the row names.
+            link = f"pr.{q(key)} = {tq(t)}.{q(col)}"
+            pw = f" AND ({split_write[par].format(a='pr')})" if par in split_write else ""
+            staff_rd = f"EXISTS (SELECT 1 FROM {tq(par)} pr WHERE {link})"
+            staff_wr = f"EXISTS (SELECT 1 FROM {tq(par)} pr WHERE {link}{pw})"
+            guest = "platform.subject_in_scope(subject_id)"
+            rd = f"({NO_GUEST} AND {staff_rd}) OR {guest}"
+            wr = f"({NO_GUEST} AND {staff_wr}) OR {guest}"
+            by_parent[i] = (t, col, par, key, split_write.get(par, "TRUE").format(a="parent_row"), rd, wr)
+            continue
         if par not in split_write:
             continue
         d = split_depth[par] + 1

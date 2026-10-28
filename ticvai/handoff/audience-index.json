@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-26",
+ "generated": "2026-10-29",
  "note": "Derived from `x-ticvai-audience` on every operation. **One field, eight values** \u2014 `x-ticvai-guest-callable` and `x-ticvai-auth` were two vocabularies answering the same question differently and were collapsed on 18 August (ADR-0025).",
  "field": "x-ticvai-audience",
  "values": [
@@ -536,7 +536,6 @@
     "listCases",
     "listCatalogueBundles",
     "listConsentPurposes",
-    "listContentPages",
     "listCreditMemos",
     "listCustomerBadges",
     "listCustomerMemberships",
@@ -1220,7 +1219,7 @@
     "whitelabel.tenant_config"
    ],
    "counts": {
-    "operations": 292,
+    "operations": 291,
     "screens": 144,
     "flows": 23,
     "contracts": 23,

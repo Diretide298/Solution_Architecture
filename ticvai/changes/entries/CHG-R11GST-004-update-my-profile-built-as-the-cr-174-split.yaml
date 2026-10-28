@@ -1,0 +1,37 @@
+id: CHG-R11GST-004
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'updateMyProfile says what is built now (email, phone, preferredChannel, dietary, accessibility for the
+  session''s own subject; Idempotency-Key replay; 200 GuestProfile) and that displayName or preferredLanguage is 400
+  validation until a follow-up ticket wires Identity''s updateGuestSubjectDetails; it answers 400.'
+decision:
+  what: 'ADAM CR-275, option B (the CR-174 split). r10 did not carry it: the text still said the operation calls
+    updateGuestSubjectDetails whenever displayName or preferredLanguage is sent. Now: Marketing does not write
+    guest_profile.display_name or preferred_language and answers them as stored; lifetimeValue stays out of this
+    guest answer (CR-141''s rule), and the venue settings read is not made here. The x-ticvai-calls and write-via to
+    Identity stay declared for the follow-up ticket.'
+  by: Chinmay
+  date: '2026-10-28'
+why: 'ADAM CR-275 (Sanket Keluskar, #31167), settled done 28 October 2026 with option B (decision record
+  decisions-2026-10-28.json): updateGuestSubjectDetails (SVC-IDENTITY-IDENTITY-12) and serviceAuth between
+  deployables are not built.'
+keys_touched:
+  operations:
+  - updateMyProfile
+  files:
+  - contracts/satellite/marketing-crm.yaml
+root_class: 'new: a description contradicting its ticket'
+tickets:
+  started:
+  - '31167 (updateMyProfile): through CR-275''s comment; built as the ticket says.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-275
+triage: fix-forward
+prevention:
+  type: none
+  reason: A rule stated in an operation's prose (which body fields answer 400 until a follow-up); no check can read
+    whether the prose follows a ticket split. Lead to approve.
+status: open

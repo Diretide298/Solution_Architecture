@@ -2071,10 +2071,7 @@ A `published` choice is unpublished first, or 409.
 
 **`GET /tenant-config/pages`**: List custom content pages
 
-**A guest caller sees only what is live**: pages whose `status` is `published` and `isEnabled` is true. For a guest `status` is ignored and `TENANT_CONFIGURE` is not needed — reading a published page is not configuring it. A staff caller sees every page, and with no `status` gets all three states.
-**A guest screen reads `listPublishedContentPages`** (decided 2 October, GFIX-2), which needs no session: help and accessibility pages are public.
-
-
+**The CMS staff read** (ADAM CR-287, option A, decided 28 October 2026; CHG-R11GST-005): a staff caller holding `TENANT_CONFIGURE` sees every page, and with no `status` gets all three states. A guest session is refused as by any staff-only operation; guests read `listPublishedContentPages` (decided 2 October, GFIX-2), which needs no session: help and accessibility pages are public.
 **Order.** Sorted by `sortOrder` ascending, then by `id`. Where `sortOrder` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)
 
 |  |  |
@@ -2095,7 +2092,7 @@ A `published` choice is unpublished first, or 409.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| status | query |  | ContentStatus: enum (draft, published, archived) | Staff only. |
+| status | query |  | ContentStatus: enum (draft, published, archived) | Only pages in this state; with none, every state. |
 | categoryCode | query |  | string | Only pages with this categoryCode. |
 | slug | query |  | string | Only the page with this slug — how a screen fetches one known page. |
 | pageSize | query |  | integer |  |
