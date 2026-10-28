@@ -7,7 +7,7 @@
 -- Every statement that needs a table is a guarded block (CHG-R9MIG-002): it does nothing where its table
 -- or a column it names is not there yet, so the file applies as one transaction, twice, on any database;
 -- the migration that creates such a table later copies the block. A table's policy change is one block.
--- 0 table(s), 1 column(s), 3 index(es), 9 other statement(s).
+-- 0 table(s), 1 column(s), 3 index(es), 10 other statement(s).
 
 DO $$ BEGIN IF to_regclass('platform.outlet') IS NOT NULL THEN
 ALTER TABLE platform.outlet ADD COLUMN IF NOT EXISTS order_number_prefix text CONSTRAINT outlet_order_number_prefix_chk CHECK (order_number_prefix IN ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z') AND char_length(order_number_prefix) <= 1);
@@ -41,10 +41,12 @@ DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'operations') AND 
 
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'operations') AND to_regclass('catalogue.performance') IS NOT NULL THEN GRANT SELECT ON catalogue.performance TO operations; END IF; END $$;
 
+DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'operations') AND to_regclass('catalogue.product_category') IS NOT NULL THEN GRANT SELECT ON catalogue.product_category TO operations; END IF; END $$;
+
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'operations') AND to_regclass('platform.workstation') IS NOT NULL THEN GRANT SELECT ON platform.workstation TO operations; END IF; END $$;
 
 INSERT INTO platform.schema_version (version, description, checksum)
-VALUES ('V0118', 'after r1 (9cec72d): 0 table(s), 1 column(s), 3 index(es), 9 other statement(s)', '21f20d3eec982180228e02b070b3b11ce275ade869d1284665bab52a04740b12')
+VALUES ('V0118', 'after r1 (9cec72d): 0 table(s), 1 column(s), 3 index(es), 10 other statement(s)', 'a28c97e3d278804326558a96c2ad80567952e9d469d72eb77869646bebc6affa')
 ON CONFLICT (version) DO NOTHING;
 
 -- ============================================================================
@@ -53,6 +55,7 @@ ON CONFLICT (version) DO NOTHING;
 -- Commented out so that applying this file never runs it: the rollback is run by removing the
 -- leading `-- `, and is tested in CI against a restored snapshot (backend/MIGRATIONS.md).
 -- REVOKE SELECT ON platform.workstation FROM operations;
+-- REVOKE SELECT ON catalogue.product_category FROM operations;
 -- REVOKE SELECT ON catalogue.performance FROM operations;
 -- REVOKE SELECT ON catalogue.price_list FROM operations;
 -- REVOKE SELECT ON catalogue.price_assignment FROM operations;

@@ -436,7 +436,8 @@ x-ticvai-queries:
       transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked in process within commerce, through the C# query interface Catalogue implements, and
-      asked from another deployable through Catalogue's service route (serviceAuth).
+      asked from another deployable through Catalogue's service route (serviceAuth). It is asked in process by the
+      operations host for createFnbOrder's productCategory routing match (ADAM CR-277; XDR-008).
     served: [in-process, service]
   productEligibilityRuleRecords:
     module: catalogue

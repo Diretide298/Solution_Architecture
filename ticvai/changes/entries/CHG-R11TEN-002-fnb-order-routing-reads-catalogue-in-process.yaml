@@ -7,10 +7,12 @@ summary: 'createFnbOrder reads the outlet (paymentTiming) and the menu item''s c
   item rule and MenuItem.stationId routes nothing; a line with redeemEntitlementId is 400 until service sign-in.'
 decision:
   what: 'ADAM CR-277, option A (Chinmay, 28 October 2026: grant the narrow read). docs/active/cross-deployable-writes.yaml:
-    XDR-008 (operations SELECT on catalogue.variant and catalogue.product, catalogue#variantRecords and
-    catalogue#productRecords). contracts/satellite/fnb.yaml createFnbOrder: tenancy#outletRecords moves from service
+    XDR-008 (operations SELECT on catalogue.variant, catalogue.product, catalogue.product_media and
+    catalogue.product_category; catalogue#variantRecords, catalogue#productRecords and catalogue#productCategoryRecords;
+    the last two tables added by the lead on 29 October 2026, because the productCategory match is on the category''s
+    code and productRecords reads the product''s media). contracts/satellite/fnb.yaml createFnbOrder: tenancy#outletRecords moves from service
     to in-process (XDR-004, which the operations-host rulings change widens to the order operations; that entry is
-    not edited here), catalogue#variantRecords and catalogue#productRecords in process, and the text states the
+    not edited here), catalogue#variantRecords, catalogue#productRecords and catalogue#productCategoryRecords in process, and the text states the
     routing order (item rule, then category rules, then the default station) and the 400 for redeemEntitlementId
     lines. MenuItem.stationId, KitchenRoutingRules and CreateFnbOrderLine.redeemEntitlementId say the same.
     contracts/spine/catalogue.yaml: the two queries'' rules name the granted read.'
@@ -22,7 +24,7 @@ why: 'ADAM CR-277 (Hrushikant Patkar, #27708): createFnbOrder had no allowed way
 keys_touched:
   operations: [createFnbOrder]
   schemas: [MenuItem, KitchenRoutingRules, CreateFnbOrderLine]
-  tables: [catalogue.variant, catalogue.product]
+  tables: [catalogue.variant, catalogue.product, catalogue.product_media, catalogue.product_category]
   files:
   - docs/active/cross-deployable-writes.yaml
   - contracts/satellite/fnb.yaml
@@ -44,7 +46,5 @@ prevention:
   type: check
   ref: tools/check-cross-module-reads.py
 status: open
-notes: 'The decision grants catalogue.variant and catalogue.product only. KitchenRoutingRules.categoryRules.matchValue
-  is "a catalogue product category code", and the code is on catalogue.product_category, which productRecords does
-  not answer and XDR-008 does not grant: the match is on Product.categoryId until the lead widens it. productRecords
-  also reads catalogue.product_media for Product.media[], which createFnbOrder does not ask for.'
+notes: 'The productCategory rule matches the category''s code (catalogue.product_category, through
+  productCategoryRecords).'

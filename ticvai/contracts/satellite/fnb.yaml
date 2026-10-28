@@ -6559,6 +6559,9 @@ paths:
       - query: catalogue#productRecords
         route: in-process
         for: 'the variant''s product''s category (Product.categoryId), matched by an outlet''s productCategory routing rules (ADAM CR-277 (2); XDR-008)'
+      - query: catalogue#productCategoryRecords
+        route: in-process
+        for: 'the product''s category''s code, which an outlet''s productCategory routing rule matches (ADAM CR-277 (2); XDR-008)'
       x-ticvai-calls:
       - access.validateAccess
       x-ticvai-note: >-
@@ -6600,9 +6603,10 @@ paths:
         **Which station a line goes to** (ADAM CR-277 (4); CHG-R11TEN-002). One kitchen ticket per station. A line
         goes to the station whose `KitchenStation.menuItemIds` lists its menu item (the item rule); a line no
         station lists goes by the outlet''s `KitchenRoutingRules.categoryRules`, the first match winning, then to
-        its `defaultStationId`. A `productCategory` rule matches the category of the item''s catalogue product
-        (`fnb.menu_item.product_variant_id`, then `catalogue#variantRecords` and `catalogue#productRecords` in
-        process, XDR-008). `MenuItem.stationId` (`fnb.menu_item.station_id`) is not used for routing.
+        its `defaultStationId`. A `productCategory` rule matches the code of the item''s catalogue product''s
+        category (`fnb.menu_item.product_variant_id`, then `catalogue#variantRecords`, `catalogue#productRecords` and
+        `catalogue#productCategoryRecords` in process, XDR-008). `MenuItem.stationId` (`fnb.menu_item.station_id`) is
+        not used for routing.
 
         **A line with `redeemEntitlementId` waits** (ADAM CR-277 (5)): its redemption calls access `validateAccess`
         on the access host, which waits for service sign-in between the apps (CR-241).

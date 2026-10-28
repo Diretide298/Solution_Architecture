@@ -196,18 +196,22 @@ reads:
     platform.venue_settings, whose inheritance reads the tenant''s own row of the same table and nothing else.'
 - id: XDR-008
   reader: operations
-  tables: [catalogue.variant, catalogue.product]
+  tables: [catalogue.variant, catalogue.product, catalogue.product_media, catalogue.product_category]
   privileges: [SELECT]
-  queries: [catalogue#variantRecords, catalogue#productRecords]
+  queries: [catalogue#variantRecords, catalogue#productRecords, catalogue#productCategoryRecords]
   operations: [createFnbOrder]
   added: '2026-10-28'
-  decision_ref: ADAM CR-277, option A, Chinmay, 28 October 2026 (the narrow read)
+  decision_ref: ADAM CR-277, option A, Chinmay, 28 October 2026 (the narrow read); catalogue.product_media and
+    catalogue.product_category added by the lead on 29 October 2026, as the reads touch them
   why: 'createFnbOrder (F&B, operations) routes each line to a kitchen station, and an outlet''s category rules
-    (KitchenRoutingRules.categoryRules, matchKind productCategory) match the product category of the menu item''s
-    catalogue variant (fnb.menu_item.product_variant_id, then catalogue.variant, then catalogue.product). Catalogue is
-    in commerce and the service route between deployables is not built (CR-174, CR-241). The operations host asks
-    Catalogue''s variantRecords and productRecords in process, through Catalogue''s own query classes, in the caller''s
-    transaction under the caller''s row-level security. The outlet read for paymentTiming is XDR-004''s.'
+    (KitchenRoutingRules.categoryRules, matchKind productCategory) match a catalogue product category code: the menu
+    item''s catalogue variant (fnb.menu_item.product_variant_id, catalogue#variantRecords), its product
+    (catalogue#productRecords, which reads catalogue.product_media for Product.media[] as well) and the product''s
+    category (Product.categoryId, catalogue#productCategoryRecords, whose code the rule matches). Catalogue is in
+    commerce and the service route between deployables is not built (CR-174, CR-241). The operations host asks the
+    three in process, through Catalogue''s own query classes, in the caller''s transaction under the caller''s
+    row-level security: SELECT only, on exactly the four tables they touch. The outlet read for paymentTiming is
+    XDR-004''s.'
 - id: XDR-009
   reader: operations
   tables: [platform.workstation]

@@ -16437,6 +16437,11 @@
   },
   "readVia": [
    {
+    "query": "catalogue#productCategoryRecords",
+    "route": "in-process",
+    "for": "the product's category's code, which an outlet's productCategory routing rule matches (ADAM CR-277 (2); XDR-008)"
+   },
+   {
     "query": "catalogue#productRecords",
     "route": "in-process",
     "for": "the variant's product's category (Product.categoryId), matched by an outlet's productCategory routing rules (ADAM CR-277 (2); XDR-008)"
@@ -16464,6 +16469,7 @@
   ],
   "readsInProcess": [
    "catalogue.product",
+   "catalogue.product_category",
    "catalogue.variant",
    "platform.outlet",
    "platform.venue_settings",

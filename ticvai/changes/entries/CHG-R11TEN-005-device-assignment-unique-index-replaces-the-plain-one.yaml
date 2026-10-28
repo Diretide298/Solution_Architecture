@@ -2,17 +2,18 @@ id: CHG-R11TEN-005
 date: '2026-10-29'
 source: cr
 kind: contract
-summary: 'tenancy.device_assignment''s unique index on device_id replaces its plain index: derive-ddl no longer writes
-  a plain index on exactly a whole-column unique index''s columns, so the forward migration drops
-  device_assignment_device_id_idx (and the five other such duplicates), guarded. DeviceAssignment.scopePath is the
-  device''s own platform.device.scope_path.'
+summary: 'tenancy.device_assignment''s unique index on device_id replaces its plain index: the forward migration drops
+  device_assignment_device_id_idx, guarded, and the five other plain indexes a unique index duplicates are listed in
+  handoff/migration-review.md for the lead, not dropped. DeviceAssignment.scopePath is the device''s own
+  platform.device.scope_path.'
 decision:
   what: 'ADAM CR-278, option A (Chinmay, 28 October 2026), as CR-103 and CHG-R8MIG-004 decided. The unique index
     device_assignment_device_id_uniq is already in V0108 (from x-ticvai-unique-together [[deviceId]]); the plain
-    index beside it was still generated. tools/derive-ddl.py without_redundant_indexes: a plain index whose columns
-    are exactly a whole-column unique index''s on the same table is not written (a partial or lower() unique index is
-    not the same lookup and keeps it), and ddl_forward''s R8-MIG-001 rule drops what is no longer generated, guarded,
-    with a rollback. contracts/spine/tenancy.yaml: setDeviceAssignment and DeviceAssignment.scopePath state the
+    index beside it was still generated. tools/derive-ddl.py without_redundant_indexes finds a plain index whose
+    columns are exactly a whole-column unique index''s on the same table (a partial or lower() unique index is not the
+    same lookup). On a table in UNIQUE_REPLACES_INDEX, which names only tenancy.device_assignment (CR-278), it is not
+    written and ddl_forward''s R8-MIG-001 rule drops it, guarded, with a rollback; every other one stays generated and
+    is a migration-review.md row, because a generated migration only adds (the lead, 29 October 2026). contracts/spine/tenancy.yaml: setDeviceAssignment and DeviceAssignment.scopePath state the
     upsert ON CONFLICT (device_id) and that scope_path is the device''s.'
   by: Chinmay
   date: '2026-10-28'
@@ -21,10 +22,10 @@ why: 'ADAM CR-278 (Deep Khanvilkar, #30793 setDeviceAssignment): the upsert need
 keys_touched:
   operations: [setDeviceAssignment]
   schemas: [DeviceAssignment]
-  tables: [tenancy.device_assignment, catalogue.group_package, catalogue.product_eligibility_rule,
-    catalogue.product_channel_text, games.reader_sync_status, seating.accessible]
+  tables: [tenancy.device_assignment]
   files:
   - tools/derive-ddl.py
+  - handoff/migration-review.md
   - contracts/spine/tenancy.yaml
 root_class: 'a generated index the decided unique key makes redundant'
 tickets:
@@ -39,7 +40,8 @@ prevention:
   type: generator-rule
   ref: tools/derive-ddl.py::without_redundant_indexes
 status: open
-notes: 'The same rule drops five other plain indexes a whole-column unique index already serves:
+notes: 'Listed for the lead in migration-review.md, not dropped: the five other plain indexes a whole-column unique
+  index already serves,
   catalogue.group_package_product_id_idx, catalogue.product_eligibility_rule_product_id_idx,
   catalogue.product_channel_text_product_id_idx, games.reader_sync_status_reader_id_idx and
   seating.accessible_seat_map_id_idx. Every database holds 0 assignments (CR-278).'

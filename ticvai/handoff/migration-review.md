@@ -4,7 +4,7 @@
 
 The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/check-migration-freeze.py`). `derive-ddl.py` writes additive changes (new tables, columns and indexes) as the next forward migration, `backend/<area>/V<nnnn>__*.sql`. **The changes below it does not write**, because each has a data question behind it: which rows survive a drop, what fills a new NOT NULL column, whether a rename is a rename. Write each as a forward migration by hand; once a forward migration carries it, it leaves this list.
 
-**177 change(s).**
+**182 change(s).**
 
 | Kind | Database | Object | Change | What a person does |
 |---|---|---|---|---|
@@ -185,3 +185,8 @@ The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/ch
 | statement dropped | tenant | `marketing.campaign, marketing.message_delivery` | `SELECT platform.apply_parent_rls('marketing.message_delivery'::regclass, 'campaign_id', 'marketing.campaign'::regclass, 'id')` | undo it by hand if intended |
 | statement dropped | tenant | `orders.payment, orders.payment_tip` | `SELECT platform.apply_parent_rls('orders.payment_tip'::regclass, 'payment_id', 'orders.payment'::regclass, 'id')` | undo it by hand if intended |
 | file changed | both | `990-cross-database-references.sql` | the generator would write it differently | not applied anywhere: bring the application rules it documents up to date by hand |
+| index duplicates a unique index | tenant | `catalogue.group_package_product_id_idx` | same columns as the unique index group_package_product_id_uniq, which serves every lookup | decide: DROP INDEX by hand (CONCURRENTLY on a live table), or add the table to tools/derive-ddl.py UNIQUE_REPLACES_INDEX with the decision so the next migration drops it |
+| index duplicates a unique index | tenant | `catalogue.product_channel_text_product_id_idx` | same columns as the unique index product_channel_text_product_id_uniq, which serves every lookup | decide: DROP INDEX by hand (CONCURRENTLY on a live table), or add the table to tools/derive-ddl.py UNIQUE_REPLACES_INDEX with the decision so the next migration drops it |
+| index duplicates a unique index | tenant | `catalogue.product_eligibility_rule_product_id_idx` | same columns as the unique index product_eligibility_rule_product_id_uniq, which serves every lookup | decide: DROP INDEX by hand (CONCURRENTLY on a live table), or add the table to tools/derive-ddl.py UNIQUE_REPLACES_INDEX with the decision so the next migration drops it |
+| index duplicates a unique index | tenant | `games.reader_sync_status_reader_id_idx` | same columns as the unique index reader_sync_status_reader_id_uniq, which serves every lookup | decide: DROP INDEX by hand (CONCURRENTLY on a live table), or add the table to tools/derive-ddl.py UNIQUE_REPLACES_INDEX with the decision so the next migration drops it |
+| index duplicates a unique index | tenant | `seating.accessible_seat_map_id_idx` | same columns as the unique index accessible_seat_map_id_uniq, which serves every lookup | decide: DROP INDEX by hand (CONCURRENTLY on a live table), or add the table to tools/derive-ddl.py UNIQUE_REPLACES_INDEX with the decision so the next migration drops it |
