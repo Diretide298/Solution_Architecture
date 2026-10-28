@@ -28,7 +28,6 @@
 | [IdentityService](IdentityService.md) | `identity.delegated_access`, `identity.principal`, `identity.role`, `identity.role_permission`, `identity.segregation_rule` |
 | [OrderService](OrderService.md) | `orders.pos_shift` |
 | [PlatformService](PlatformService.md) | `control.api_client` |
-| [VenueOpsService](VenueOpsService.md) | `assets.media_asset` |
 
 ## Operations in the first release
 
@@ -476,7 +475,7 @@ The delegate cannot exceed the delegator's own authority, and **cannot approve a
 
 **A release starts `draft`** and cannot be rolled out until `setDeviceFirmwareStatus` makes it `released` — registering an image and deciding the fleet may run it are two acts, and usually two people.
 
-The artefact is an uploaded asset (`artefactAssetId`); the device verifies `checksum` before it installs, so an image altered in transit is refused on the device rather than installed. `id`, `status`, `releasedAt`, `installedCount` and `scopePath` are the server's and ignored on input. A second release with the same `deviceKind` and `version` is `409`.
+The artefact is an uploaded asset (`artefactAssetId`), **stored as sent and not checked here** (ADAM CR-285 (1), 28 October 2026; CHG-R11TEN-006): the device verifies `checksum` before it installs, so an image altered in transit, or a wrong asset id, is refused on the device rather than installed. `version` is sent on create (CR-285 (3)); `id`, `status`, `releasedAt`, `installedCount` and `scopePath` are the server's and ignored on input. A second release with the same `deviceKind` and `version` is `409`: the insert meets the unique key on (`device_kind`, `version`) and its violation answers it (CR-285 (2)).
 
 |  |  |
 |---|---|
@@ -486,7 +485,7 @@ The artefact is an uploaded asset (`artefactAssetId`); the device verifies `chec
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `assets.media_asset`, `cache:idempotency`, `tenancy.device_firmware` |
+| Reads | `cache:idempotency`, `tenancy.device_firmware` |
 | Writes | `cache:idempotency`, `tenancy.device_firmware` |
 | Called by | ADM-587, BO-129 |
 | State model | Device firmware release ([states/device-firmware.yaml](../../../states/device-firmware.yaml)): created as `draft` |
@@ -503,11 +502,11 @@ The artefact is an uploaded asset (`artefactAssetId`); the device verifies `chec
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
 | deviceKind | string | yes |  |
-| version | string | yes | (read-only) |
+| version | string | yes | The release's version as its vendor names it, sent on create (ADAM CR-285 (3), 28 October 2026; CHG-R11TEN-006). |
 | vendor | string |  | Who built the image, as the device's driver names its maker. (nullable) |
 | checksumAlgorithm | enum (sha256, sha512) |  | (default sha256) |
 | releaseNotes | string |  | (nullable) |
-| artefactAssetId | string (uuid) |  | (nullable) |
+| artefactAssetId | string (uuid) |  | The uploaded image (an Assets media asset), stored unchecked (ADAM CR-285 (1), 28 October 2026; CHG-R11TEN-006). (nullable) |
 | checksum | string |  | (nullable) |
 | minimumPreviousVersion | string |  | Some updates cannot be applied from any starting point. (nullable) |
 | releasedAt | string (date-time) |  | Set when setDeviceFirmwareStatus first makes the release released. (read-only; nullable) |
@@ -522,11 +521,11 @@ The artefact is an uploaded asset (`artefactAssetId`); the device verifies `chec
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
 | deviceKind | string | yes |  |
-| version | string | yes | (read-only) |
+| version | string | yes | The release's version as its vendor names it, sent on create (ADAM CR-285 (3), 28 October 2026; CHG-R11TEN-006). |
 | vendor | string |  | Who built the image, as the device's driver names its maker. (nullable) |
 | checksumAlgorithm | enum (sha256, sha512) |  | (default sha256) |
 | releaseNotes | string |  | (nullable) |
-| artefactAssetId | string (uuid) |  | (nullable) |
+| artefactAssetId | string (uuid) |  | The uploaded image (an Assets media asset), stored unchecked (ADAM CR-285 (1), 28 October 2026; CHG-R11TEN-006). (nullable) |
 | checksum | string |  | (nullable) |
 | minimumPreviousVersion | string |  | Some updates cannot be applied from any starting point. (nullable) |
 | releasedAt | string (date-time) |  | Set when setDeviceFirmwareStatus first makes the release released. (read-only; nullable) |
@@ -553,7 +552,7 @@ The artefact is an uploaded asset (`artefactAssetId`); the device verifies `chec
 
 **PUT semantics** (pull audit R103). The target is the device in the path, which has one assignment. The first call creates it and later calls replace it whole, answered `200` either way; an omitted field is cleared to null. `deviceId` comes from the path, and `lastSeenLocation` (reported by the heartbeat), `assignedAt` and `scopePath` are server-owned; all four are `readOnly` and ignored on input.
 
-**One row per device, and its references checked** (ADAM CR-103, option 3, accepted 15 October 2026; CHG-R10TEN-007). The row is keyed by `device_id`, which is required and unique, so two first calls make one row. An `assignedWorkstationId` that is not a workstation of the tenant, an `ownerOrgUnitId` that is not a scope node, a `custodianPrincipalId` that is not a principal, or a `locationScopePath` outside the caller's scope is refused `422` `unknown-reference`, naming the field, and nothing is written.
+**One row per device, and its references checked** (ADAM CR-103, option 3, accepted 15 October 2026; CHG-R10TEN-007). The row is keyed by `device_id`, which is required and unique, so two first calls make one row: the write is an upsert `ON CONFLICT (device_id)` on the unique index `device_assignment_device_id_uniq`, which replaces the plain index on the column (ADAM CR-278, option A, 28 October 2026; CHG-R11TEN-005). The row's `scope_path` is the device's own `platform.device.scope_path`, so the assignment is seen and changed by whoever is in scope of the device. An `assignedWorkstationId` that is not a workstation of the tenant, an `ownerOrgUnitId` that is not a scope node, a `custodianPrincipalId` that is not a principal, or a `locationScopePath` outside the caller's scope is refused `422` `unknown-reference`, naming the field, and nothing is written.
 
 |  |  |
 |---|---|
@@ -588,7 +587,7 @@ The artefact is an uploaded asset (`artefactAssetId`); the device verifies `chec
 | acquiredAt | string (date) |  | A calendar date in the region's time zone. (nullable) |
 | warrantyExpiresAt | string (date) |  | A calendar date in the region's time zone. (nullable) |
 | assignedAt | string (date-time) |  | (read-only) |
-| scopePath | string |  | (read-only) |
+| scopePath | string |  | The device's own platform.device.scope_path, set by the server on every write (ADAM CR-278, option A, 28 October 2026; CHG-R11TEN-005), so whoever can change the device can change who holds it. (read-only) |
 
 **Response**: `DeviceAssignment`
 
@@ -604,7 +603,7 @@ The artefact is an uploaded asset (`artefactAssetId`); the device verifies `chec
 | acquiredAt | string (date) |  | A calendar date in the region's time zone. (nullable) |
 | warrantyExpiresAt | string (date) |  | A calendar date in the region's time zone. (nullable) |
 | assignedAt | string (date-time) |  | (read-only) |
-| scopePath | string |  | (read-only) |
+| scopePath | string |  | The device's own platform.device.scope_path, set by the server on every write (ADAM CR-278, option A, 28 October 2026; CHG-R11TEN-005), so whoever can change the device can change who holds it. (read-only) |
 
 **Responses**
 
@@ -656,11 +655,11 @@ The artefact is an uploaded asset (`artefactAssetId`); the device verifies `chec
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
 | deviceKind | string | yes |  |
-| version | string | yes | (read-only) |
+| version | string | yes | The release's version as its vendor names it, sent on create (ADAM CR-285 (3), 28 October 2026; CHG-R11TEN-006). |
 | vendor | string |  | Who built the image, as the device's driver names its maker. (nullable) |
 | checksumAlgorithm | enum (sha256, sha512) |  | (default sha256) |
 | releaseNotes | string |  | (nullable) |
-| artefactAssetId | string (uuid) |  | (nullable) |
+| artefactAssetId | string (uuid) |  | The uploaded image (an Assets media asset), stored unchecked (ADAM CR-285 (1), 28 October 2026; CHG-R11TEN-006). (nullable) |
 | checksum | string |  | (nullable) |
 | minimumPreviousVersion | string |  | Some updates cannot be applied from any starting point. (nullable) |
 | releasedAt | string (date-time) |  | Set when setDeviceFirmwareStatus first makes the release released. (read-only; nullable) |
@@ -721,7 +720,7 @@ The artefact is an uploaded asset (`artefactAssetId`); the device verifies `chec
 | acquiredAt | string (date) |  | A calendar date in the region's time zone. (nullable) |
 | warrantyExpiresAt | string (date) |  | A calendar date in the region's time zone. (nullable) |
 | assignedAt | string (date-time) |  | (read-only) |
-| scopePath | string |  | (read-only) |
+| scopePath | string |  | The device's own platform.device.scope_path, set by the server on every write (ADAM CR-278, option A, 28 October 2026; CHG-R11TEN-005), so whoever can change the device can change who holds it. (read-only) |
 
 **Responses**
 
@@ -2998,6 +2997,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | stockLocationId | string (uuid) |  | Where this outlet draws stock from. (nullable) |
 | costCenterId | string (uuid) |  | Revenue and cost attribution. (nullable) |
 | paymentTiming | object |  | Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004). (default sendFirst) |
+| orderNumberPrefix | enum (A, B, C, D, E, F, G, H, …) |  | The one letter this outlet's F&B order numbers start with (ADAM CR-293 (2), option A, 29 October 2026; CHG-R11TEN-003): one capital letter A to Z, or null for none. (max length 1; nullable) |
 | admissionContext | object |  | Inside the venue (needs an admission ticket) or standalone (no ticket) (DEC-070; CHG-CSP-004). (default insideVenue) |
 | producesForOutletIds | array of string (uuid) |  | One kitchen serving several outlets is a producing outlet (decided 2 October 2026, Chinmay, batch 6 set 5, BO-134: "Yes: via a producing outlet (one kitchen outlet produces for several)"; DEC-188; CH… (default []) |
 | saleBoardId | string (uuid) |  | The till layout every till in this outlet uses, unless a till overrides it (decided 2 October 2026, Chinmay, batch 6 set 4, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006). (nullable) |
@@ -3024,6 +3024,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | stockLocationId | string (uuid) |  | Where this outlet draws stock from. (nullable) |
 | costCenterId | string (uuid) |  | Revenue and cost attribution. (nullable) |
 | paymentTiming | object |  | Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004). (default sendFirst) |
+| orderNumberPrefix | enum (A, B, C, D, E, F, G, H, …) |  | The one letter this outlet's F&B order numbers start with (ADAM CR-293 (2), option A, 29 October 2026; CHG-R11TEN-003): one capital letter A to Z, or null for none. (max length 1; nullable) |
 | admissionContext | object |  | Inside the venue (needs an admission ticket) or standalone (no ticket) (DEC-070; CHG-CSP-004). (default insideVenue) |
 | producesForOutletIds | array of string (uuid) |  | One kitchen serving several outlets is a producing outlet (decided 2 October 2026, Chinmay, batch 6 set 5, BO-134: "Yes: via a producing outlet (one kitchen outlet produces for several)"; DEC-188; CH… (default []) |
 | saleBoardId | string (uuid) |  | The till layout every till in this outlet uses, unless a till overrides it (decided 2 October 2026, Chinmay, batch 6 set 4, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006). (nullable) |
@@ -3170,6 +3171,7 @@ A board `code` already used in the venue is `409 duplicate-code` (audit R108; CH
 | stockLocationId | string (uuid) |  | Where this outlet draws stock from. (nullable) |
 | costCenterId | string (uuid) |  | Revenue and cost attribution. (nullable) |
 | paymentTiming | object |  | Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004). (default sendFirst) |
+| orderNumberPrefix | enum (A, B, C, D, E, F, G, H, …) |  | The one letter this outlet's F&B order numbers start with (ADAM CR-293 (2), option A, 29 October 2026; CHG-R11TEN-003): one capital letter A to Z, or null for none. (max length 1; nullable) |
 | admissionContext | object |  | Inside the venue (needs an admission ticket) or standalone (no ticket) (DEC-070; CHG-CSP-004). (default insideVenue) |
 | producesForOutletIds | array of string (uuid) |  | One kitchen serving several outlets is a producing outlet (decided 2 October 2026, Chinmay, batch 6 set 5, BO-134: "Yes: via a producing outlet (one kitchen outlet produces for several)"; DEC-188; CH… (default []) |
 | saleBoardId | string (uuid) |  | The till layout every till in this outlet uses, unless a till overrides it (decided 2 October 2026, Chinmay, batch 6 set 4, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006). (nullable) |
@@ -3422,6 +3424,7 @@ The configured front ends a workstation may load. A board determines presentatio
 | departmentId | string (uuid) |  | (nullable) |
 | outletType | OutletType: enum (fineDining, casualDining, quickService, coffeeShop, barLounge, foodCourt, buffet, commissary, …) |  | How an F&B or retail outlet trades, which switches features on or off (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-729: "Add both fields: outlet type and department (DI-319)"; DEC-196; CHG-CS… |
 | paymentTiming | OutletPaymentTiming: enum (sendFirst, payFirst) |  | When an F&B order is paid, per outlet (decided 2 October 2026, Chinmay, batch 1, POS-021: "Two configurations: one takes the bill (payment) first, the other sends first and charges after"; DEC-064; C… |
+| orderNumberPrefix | enum (A, B, C, D, E, F, G, H, …) |  | The outlet's one-letter order-number prefix (Outlet.orderNumberPrefix; ADAM CR-293); null clears it. (max length 1; nullable) |
 | admissionContext | OutletAdmissionContext: enum (insideVenue, standalone) |  | Whether an outlet sits behind the admission gate (decided 2 October 2026, Chinmay, batch 1, WEB-036: "Inside the venue, a ticket is needed. |
 | producesForOutletIds | array of string (uuid) |  | Replaces the whole list of outlets this one produces for (CHG-CSP-005). |
 | saleBoardId | string (uuid) |  | (nullable) |
@@ -3448,6 +3451,7 @@ The configured front ends a workstation may load. A board determines presentatio
 | stockLocationId | string (uuid) |  | Where this outlet draws stock from. (nullable) |
 | costCenterId | string (uuid) |  | Revenue and cost attribution. (nullable) |
 | paymentTiming | object |  | Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004). (default sendFirst) |
+| orderNumberPrefix | enum (A, B, C, D, E, F, G, H, …) |  | The one letter this outlet's F&B order numbers start with (ADAM CR-293 (2), option A, 29 October 2026; CHG-R11TEN-003): one capital letter A to Z, or null for none. (max length 1; nullable) |
 | admissionContext | object |  | Inside the venue (needs an admission ticket) or standalone (no ticket) (DEC-070; CHG-CSP-004). (default insideVenue) |
 | producesForOutletIds | array of string (uuid) |  | One kitchen serving several outlets is a producing outlet (decided 2 October 2026, Chinmay, batch 6 set 5, BO-134: "Yes: via a producing outlet (one kitchen outlet produces for several)"; DEC-188; CH… (default []) |
 | saleBoardId | string (uuid) |  | The till layout every till in this outlet uses, unless a till overrides it (decided 2 October 2026, Chinmay, batch 6 set 4, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006). (nullable) |
@@ -3688,11 +3692,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | request_id | text | yes | The parent row. |
 | level | integer | yes | The level of the chain this approver decides at. |
 | principal_id | uuid | yes | The approver, a principal of the tenant. |
 | is_delegate | boolean | yes | True when the approver stands in for another through an ApprovalDelegation in force at routing. |
+| id | uuid | yes | Synthesised key. |
 
 ### `approvals.rule`
 
@@ -3853,6 +3857,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | stock_location_id | uuid | no | Where this outlet draws stock from. |
 | cost_center_id | uuid | no | Revenue and cost attribution. |
 | payment_timing | text | no | Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004). |
+| order_number_prefix | text | no | The one letter this outlet's F&B order numbers start with (ADAM CR-293 (2), option A, 29 October 2026; CHG-R11TEN-003): one capital letter A to Z, or null for none. |
 | admission_context | text | no | Inside the venue (needs an admission ticket) or standalone (no ticket) (DEC-070; CHG-CSP-004). |
 | produces_for_outlet_ids | text[] | no | One kitchen serving several outlets is a producing outlet (decided 2 October 2026, Chinmay, batch 6 set 5, BO-134: "Yes: via a producing outlet (one kitchen outlet produces for several)"; DEC-188; CH… |
 | sale_board_id | uuid | no | The till layout every till in this outlet uses, unless a till overrides it (decided 2 October 2026, Chinmay, batch 6 set 4, BO-109: "Per outlet, with a till override"; DEC-183; CHG-CSP-006). |
@@ -4021,7 +4026,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | acquired_at | date | no | A calendar date in the region's time zone. |
 | warranty_expires_at | date | no | A calendar date in the region's time zone. |
 | assigned_at | timestamptz | no |  |
-| scope_path | text | no |  |
+| scope_path | text | no | The device's own platform.device.scope_path, set by the server on every write (ADAM CR-278, option A, 28 October 2026; CHG-R11TEN-005), so whoever can change the device can change who holds it. |
 | id | uuid | yes | Synthesised key. |
 
 ### `tenancy.device_audit`
@@ -4046,11 +4051,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | uuid | yes |  |
 | device_kind | text | yes |  |
-| version | text | yes |  |
+| version | text | yes | The release's version as its vendor names it, sent on create (ADAM CR-285 (3), 28 October 2026; CHG-R11TEN-006). |
 | vendor | text | no | Who built the image, as the device's driver names its maker. |
 | checksum_algorithm | text | no |  |
 | release_notes | text | no |  |
-| artefact_asset_id | uuid | no |  |
+| artefact_asset_id | uuid | no | The uploaded image (an Assets media asset), stored unchecked (ADAM CR-285 (1), 28 October 2026; CHG-R11TEN-006). |
 | checksum | text | no |  |
 | minimum_previous_version | text | no | Some updates cannot be applied from any starting point. |
 | released_at | timestamptz | no | Set when setDeviceFirmwareStatus first makes the release released. |

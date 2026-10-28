@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `fnb` |
 | Schemas owned | `fnb` |
-| Operations in the slice | 78 of 138 |
+| Operations in the slice | 79 of 138 |
 | Scale | Write-heavy during service, idle between. Two peaks a day, sharply. |
 | If it is down | Down means the kitchen falls back to paper. Offline-capable by design. |
 
@@ -92,6 +92,7 @@
 | kitchen | [`setKitchenTicketStatus`](#setkitchenticketstatus) | PUT | `/kitchen/tickets/{ticketId}/status` | core | 1 | BO-020, BO-046, KIT-002, KIT-003, KIT-006, POS-022 … |
 | menu | [`createMenu`](#createmenu) | POST | `/menus` | setup | 1 | BO-045 |
 | menu | [`setItemAvailability`](#setitemavailability) | PUT | `/menu-items/{itemId}/availability` | core | 1 | BO-140, KIT-008, POS-021, POS-024 |
+| menu | [`setMenuItemDailyCount`](#setmenuitemdailycount) | PUT | `/menu-items/{itemId}/daily-count` | setup | 1 | BO-140 |
 | menu | [`setMenuSections`](#setmenusections) | PUT | `/menus/{menuId}/sections` | setup | 1 | BO-045, BO-109 |
 | menu | [`updateMenu`](#updatemenu) | PATCH | `/menus/{menuId}` | setup | 1 | BO-045 |
 | modifier | [`createModifierGroup`](#createmodifiergroup) | POST | `/modifier-groups` | setup | 1 | BO-045 |
@@ -171,7 +172,7 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 | visit.subjectId | string (uuid) |  | (nullable) |
 | visit.orders | array of FnbOrder | yes |  |
 | visit.orders[].id | string (uuid) | yes |  |
-| visit.orders[].orderNumber | string | yes |  |
+| visit.orders[].orderNumber | string | yes | Short and called out across a counter (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). |
 | visit.orders[].outletId | string (uuid) | yes |  |
 | visit.orders[].paymentTiming | object |  | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. (read-only) |
 | visit.orders[].sentToKitchenAt | string (date-time) |  | When the order's kitchen tickets were created. (read-only; nullable) |
@@ -423,7 +424,7 @@ Board 2E. **Attachment is separate from definition** because that is what makes 
 | remainingCount | integer |  | What is left of dailyCount ("6 left" on the till and the guest menu). (min 0; read-only; nullable) |
 | sortOrder | integer |  |  |
 | modifierGroupIds | array of string (uuid) |  |  |
-| stationId | string (uuid) |  | (nullable) |
+| stationId | string (uuid) |  | Not used for routing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). (nullable) |
 | menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | isStockTracked | boolean |  | True where a recipe exists. |
 | isAvailable | boolean | yes |  |
@@ -1752,7 +1753,7 @@ Board 3. **`recordOrderHandover` exists for a staff handover; a collection count
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| orderNumber | string | yes |  |
+| orderNumber | string | yes | Short and called out across a counter (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). |
 | outletId | string (uuid) | yes |  |
 | paymentTiming | object |  | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. (read-only) |
 | sentToKitchenAt | string (date-time) |  | When the order's kitchen tickets were created. (read-only; nullable) |
@@ -1994,7 +1995,7 @@ Board 2. **`updateMenu` existed, so a menu edited was a menu live** — no draft
 | sections[].items[].remainingCount | integer |  | What is left of dailyCount ("6 left" on the till and the guest menu). (min 0; read-only; nullable) |
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
-| sections[].items[].stationId | string (uuid) |  | (nullable) |
+| sections[].items[].stationId | string (uuid) |  | Not used for routing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). (nullable) |
 | sections[].items[].menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
@@ -2321,7 +2322,7 @@ Reversible. A party that asks for the bill and then orders another round is norm
 | subjectId | string (uuid) |  | (nullable) |
 | orders | array of FnbOrder | yes |  |
 | orders[].id | string (uuid) | yes |  |
-| orders[].orderNumber | string | yes |  |
+| orders[].orderNumber | string | yes | Short and called out across a counter (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). |
 | orders[].outletId | string (uuid) | yes |  |
 | orders[].paymentTiming | object |  | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. (read-only) |
 | orders[].sentToKitchenAt | string (date-time) |  | When the order's kitchen tickets were created. (read-only; nullable) |
@@ -2464,7 +2465,7 @@ Board 2. **The reason to version a menu at all.** A price published wrong at 11a
 | sections[].items[].remainingCount | integer |  | What is left of dailyCount ("6 left" on the till and the guest menu). (min 0; read-only; nullable) |
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
-| sections[].items[].stationId | string (uuid) |  | (nullable) |
+| sections[].items[].stationId | string (uuid) |  | Not used for routing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). (nullable) |
 | sections[].items[].menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
@@ -2971,7 +2972,7 @@ BL-125. **A shift change mid-service leaves a check with a server who has gone h
 | subjectId | string (uuid) |  | (nullable) |
 | orders | array of FnbOrder | yes |  |
 | orders[].id | string (uuid) | yes |  |
-| orders[].orderNumber | string | yes |  |
+| orders[].orderNumber | string | yes | Short and called out across a counter (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). |
 | orders[].outletId | string (uuid) | yes |  |
 | orders[].paymentTiming | object |  | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. (read-only) |
 | orders[].sentToKitchenAt | string (date-time) |  | When the order's kitchen tickets were created. (read-only; nullable) |
@@ -4489,7 +4490,7 @@ Called by P15 Kitchen Display, or the back-office and till views of the rail. St
 | sections[].items[].remainingCount | integer |  | What is left of dailyCount ("6 left" on the till and the guest menu). (min 0; read-only; nullable) |
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
-| sections[].items[].stationId | string (uuid) |  | (nullable) |
+| sections[].items[].stationId | string (uuid) |  | Not used for routing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). (nullable) |
 | sections[].items[].menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
@@ -4517,6 +4518,7 @@ Called by P15 Kitchen Display, or the back-office and till views of the rail. St
 
 The most-used endpoint in a live kitchen. A sold-out item must disappear from every terminal in the outlet immediately — this does not wait for a bundle publish.
 **Immediate, not on save** (decided 28 September, audit R110 (c)). The change is live on every terminal and guest menu of the outlet when this returns; there is no pending state behind a *Save changes* button.
+**Its ETag** (ADAM CR-294, option A, 29 October 2026; CHG-R11TEN-008). `fnb.menu_item` has no version column, so the ETag is a strong hash of the `MenuItem` as answered, sent on the `200` and compared on `If-Match`: one that differs is `412`, as on `setMenuItemDailyCount`.
 
 |  |  |
 |---|---|
@@ -4564,7 +4566,7 @@ The most-used endpoint in a live kitchen. A sold-out item must disappear from ev
 | remainingCount | integer |  | What is left of dailyCount ("6 left" on the till and the guest menu). (min 0; read-only; nullable) |
 | sortOrder | integer |  |  |
 | modifierGroupIds | array of string (uuid) |  |  |
-| stationId | string (uuid) |  | (nullable) |
+| stationId | string (uuid) |  | Not used for routing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). (nullable) |
 | menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | isStockTracked | boolean |  | True where a recipe exists. |
 | isAvailable | boolean | yes |  |
@@ -4581,6 +4583,78 @@ The most-used endpoint in a live kitchen. A sold-out item must disappear from ev
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 400 | BadRequest | Validation failed |
 | 200 |  | Updated |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setMenuItemDailyCount
+
+**`PUT /menu-items/{itemId}/daily-count`**: Set today's count for a dish
+
+**"6 left" on the till and the guest menu** (Chinmay, 2 October, workbook Q194; CHG-CSA-017). The kitchen sets how many portions it has for today; each sale takes one from `MenuItem.remainingCount`, and **at zero the item goes unavailable on every till and guest menu of the outlet immediately**, as `setItemAvailability` does, recorded as an `EightySixEvent` with `source` `dailyCount`. Raising the count above zero brings an item that was taken off by its count back on sale; an item taken off by hand stays off until somebody puts it back.
+**Not inventory `setDailyCount`**, which picks the items of a stock count. This is a service count for one menu item, reset at the venue day start. `count` null stops counting the item.
+**What a count does** (ADAM CR-294, option A, 29 October 2026, confirmed as built; CHG-R11TEN-008). Setting a count resets `remainingCount` to it; at zero the item goes unavailable with `unavailableReason` `soldOut` and an `fnb.sold_out_item` row (`source` `dailyCount`, `reason` `ranOut`). `count` null clears `daily_count` and `remaining_count` and leaves availability as it is: raising a count above zero is the one way back for an item its count took off.
+**Its ETag** (ADAM CR-294). `fnb.menu_item` has no version column, so the ETag is a strong hash of the `MenuItem` as answered, sent on the `200` and compared on `If-Match`: one that differs is `412`.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `fnb.sold_out_item` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `fnb.menu_item` |
+| Writes | `cache:idempotency`, `fnb.menu_item`, `fnb.sold_out_item` |
+| Called by | BO-140 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| itemId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| count | integer | yes | Portions for today. (min 0; nullable) |
+
+**Response**: `MenuItem`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| productVariantId | string (uuid) | yes | The catalogue variant this item links to, for reporting, stock and tax class only. |
+| name | string | yes |  |
+| description | string |  | (nullable) |
+| price | Money | yes | On the wire this is three fields; in the database it is one column. |
+| price.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
+| price.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
+| price.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
+| dailyCount | integer |  | How many portions the kitchen set for today (setMenuItemDailyCount; Chinmay, 2 October, workbook Q194; CHG-CSA-017). (min 0; read-only; nullable) |
+| remainingCount | integer |  | What is left of dailyCount ("6 left" on the till and the guest menu). (min 0; read-only; nullable) |
+| sortOrder | integer |  |  |
+| modifierGroupIds | array of string (uuid) |  |  |
+| stationId | string (uuid) |  | Not used for routing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). (nullable) |
+| menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
+| isStockTracked | boolean |  | True where a recipe exists. |
+| isAvailable | boolean | yes |  |
+| unavailableReason | string |  | (nullable) |
+| restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
+| preparationMinutes | integer |  | (nullable) |
+| allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| unavailableNote | string |  | The free text with an other unavailable reason (setItemAvailability); reviewed quarterly so the common ones become reasons (audit R222). (max length 500; read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
+| 400 | BadRequest | Validation failed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 200 |  | Set; the item with its dailyCount and remainingCount |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setMenuSections
@@ -4629,7 +4703,7 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | sections[].items[].remainingCount | integer |  | What is left of dailyCount ("6 left" on the till and the guest menu). (min 0; read-only; nullable) |
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
-| sections[].items[].stationId | string (uuid) |  | (nullable) |
+| sections[].items[].stationId | string (uuid) |  | Not used for routing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). (nullable) |
 | sections[].items[].menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
@@ -4668,7 +4742,7 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | sections[].items[].remainingCount | integer |  | What is left of dailyCount ("6 left" on the till and the guest menu). (min 0; read-only; nullable) |
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
-| sections[].items[].stationId | string (uuid) |  | (nullable) |
+| sections[].items[].stationId | string (uuid) |  | Not used for routing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). (nullable) |
 | sections[].items[].menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
@@ -4756,7 +4830,7 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | sections[].items[].remainingCount | integer |  | What is left of dailyCount ("6 left" on the till and the guest menu). (min 0; read-only; nullable) |
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
-| sections[].items[].stationId | string (uuid) |  | (nullable) |
+| sections[].items[].stationId | string (uuid) |  | Not used for routing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). (nullable) |
 | sections[].items[].menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
@@ -4863,7 +4937,11 @@ Groups carry selection constraints — minimum, maximum, required. A burger that
 **`POST /fnb-orders`**: Place an F&B order
 
 Quick service pays immediately; table service attaches to a visit and pays at close.
-**When it is paid is the outlet's choice** (Chinmay, 2 October, workbook Q64; refines audit R261 per outlet; CHG-CSA-010). The outlet's `tenancy.Outlet.paymentTiming` (common `OutletPaymentTiming`): `sendFirst`, the default, creates the kitchen tickets with the order and the till charges after (R261); `payFirst` creates the order with no kitchen tickets, and **they are created only when its payment is captured** (`FnbOrder.sentToKitchenAt` stays null until then). An unpaid order at a `payFirst` outlet never reaches the kitchen. The order carries the timing it was placed under (`FnbOrder.paymentTiming`).
+**When it is paid is the outlet's choice** (Chinmay, 2 October, workbook Q64; refines audit R261 per outlet; CHG-CSA-010). The outlet's `tenancy.Outlet.paymentTiming` (common `OutletPaymentTiming`): `sendFirst`, the default, creates the kitchen tickets with the order and the till charges after (R261); `payFirst` creates the order with no kitchen tickets, and **they are created only when its payment is captured** (`FnbOrder.sentToKitchenAt` stays null until then). An unpaid order at a `payFirst` outlet never reaches the kitchen. The order carries the timing it was placed under (`FnbOrder.paymentTiming`). The outlet is read in process with `tenancy#outletRecords` (ADAM CR-277 (1), option A, 28 October 2026; docs/active/cross-deployable-writes.yaml XDR-004).
+**A till at the outlet, or not** (ADAM CR-293 (1), option A, 29 October 2026; CHG-R11TEN-003). The caller's workstation is read in process with `tenancy#workstationRecords` (XDR-009). When its `outletId` equals the order's `outletId`, the order is a till's at the outlet: it is accepted and its kitchen tickets are created in this transaction (under the outlet's `paymentTiming`, above). Anything else waits for `acceptFnbOrder`: a workstation of another outlet, a workstation with no outlet, and a caller with no workstation.
+**The order number** (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). Per outlet, a counter that resets each business day in the venue's time zone (the day closes at the venue's `businessDayCutoff`, read with the venue's settings above), unique per outlet and business day. Its form is the outlet's one-letter `Outlet.orderNumberPrefix` (tenancy, A to Z), a hyphen and three digits (`A-042`), or the three digits alone (`042`) when the outlet has no prefix.
+**Which station a line goes to** (ADAM CR-277 (4); CHG-R11TEN-002). One kitchen ticket per station. A line goes to the station whose `KitchenStation.menuItemIds` lists its menu item (the item rule); a line no station lists goes by the outlet's `KitchenRoutingRules.categoryRules`, the first match winning, then to its `defaultStationId`. A `productCategory` rule matches the category of the item's catalogue product (`fnb.menu_item.product_variant_id`, then `catalogue#variantRecords` and `catalogue#productRecords` in process, XDR-008). `MenuItem.stationId` (`fnb.menu_item.station_id`) is not used for routing.
+**A line with `redeemEntitlementId` waits** (ADAM CR-277 (5)): its redemption calls access `validateAccess` on the access host, which waits for service sign-in between the apps (CR-241). Until that follow-up, a line carrying `redeemEntitlementId` is refused `400` (validation) and nothing is written.
 Offline behaviour depends on the items: an order containing only untracked items queues normally, while one containing a recipe-linked item is refused offline because stock depletes in real time.
 
 |  |  |
@@ -4910,7 +4988,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| orderNumber | string | yes |  |
+| orderNumber | string | yes | Short and called out across a counter (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). |
 | outletId | string (uuid) | yes |  |
 | paymentTiming | object |  | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. (read-only) |
 | sentToKitchenAt | string (date-time) |  | When the order's kitchen tickets were created. (read-only; nullable) |
@@ -5018,7 +5096,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| orderNumber | string | yes |  |
+| orderNumber | string | yes | Short and called out across a counter (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). |
 | outletId | string (uuid) | yes |  |
 | paymentTiming | object |  | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. (read-only) |
 | sentToKitchenAt | string (date-time) |  | When the order's kitchen tickets were created. (read-only; nullable) |
@@ -5132,7 +5210,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 |---|---|---|---|
 | items | array of FnbOrder | yes |  |
 | items[].id | string (uuid) | yes |  |
-| items[].orderNumber | string | yes |  |
+| items[].orderNumber | string | yes | Short and called out across a counter (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). |
 | items[].outletId | string (uuid) | yes |  |
 | items[].paymentTiming | object |  | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. (read-only) |
 | items[].sentToKitchenAt | string (date-time) |  | When the order's kitchen tickets were created. (read-only; nullable) |
@@ -5308,7 +5386,7 @@ May be automatic where the outlet is configured for it. The state still exists, 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| orderNumber | string | yes |  |
+| orderNumber | string | yes | Short and called out across a counter (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). |
 | outletId | string (uuid) | yes |  |
 | paymentTiming | object |  | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. (read-only) |
 | sentToKitchenAt | string (date-time) |  | When the order's kitchen tickets were created. (read-only; nullable) |
@@ -5429,7 +5507,7 @@ Before acceptance this is a refusal and needs no approval. **After acceptance th
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes |  |
-| orderNumber | string | yes |  |
+| orderNumber | string | yes | Short and called out across a counter (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). |
 | outletId | string (uuid) | yes |  |
 | paymentTiming | object |  | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. (read-only) |
 | sentToKitchenAt | string (date-time) |  | When the order's kitchen tickets were created. (read-only; nullable) |
@@ -5673,7 +5751,7 @@ The floor as the server sees it — free, seated, ordered, bill requested, needs
 | subjectId | string (uuid) |  | (nullable) |
 | orders | array of FnbOrder | yes |  |
 | orders[].id | string (uuid) | yes |  |
-| orders[].orderNumber | string | yes |  |
+| orders[].orderNumber | string | yes | Short and called out across a counter (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). |
 | orders[].outletId | string (uuid) | yes |  |
 | orders[].paymentTiming | object |  | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. (read-only) |
 | orders[].sentToKitchenAt | string (date-time) |  | When the order's kitchen tickets were created. (read-only; nullable) |
@@ -5800,7 +5878,7 @@ Covers is captured at seating because it drives split-by-covers at close.
 | subjectId | string (uuid) |  | (nullable) |
 | orders | array of FnbOrder | yes |  |
 | orders[].id | string (uuid) | yes |  |
-| orders[].orderNumber | string | yes |  |
+| orders[].orderNumber | string | yes | Short and called out across a counter (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). |
 | orders[].outletId | string (uuid) | yes |  |
 | orders[].paymentTiming | object |  | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. (read-only) |
 | orders[].sentToKitchenAt | string (date-time) |  | When the order's kitchen tickets were created. (read-only; nullable) |
@@ -6011,7 +6089,7 @@ Moving a party to another table is routine and must not lose the visit. The visi
 | subjectId | string (uuid) |  | (nullable) |
 | orders | array of FnbOrder | yes |  |
 | orders[].id | string (uuid) | yes |  |
-| orders[].orderNumber | string | yes |  |
+| orders[].orderNumber | string | yes | Short and called out across a counter (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). |
 | orders[].outletId | string (uuid) | yes |  |
 | orders[].paymentTiming | object |  | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. (read-only) |
 | orders[].sentToKitchenAt | string (date-time) |  | When the order's kitchen tickets were created. (read-only; nullable) |
@@ -6341,7 +6419,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | remaining_count | integer | no | What is left of dailyCount ("6 left" on the till and the guest menu). |
 | sort_order | integer | no |  |
 | modifier_group_ids | text[] | no |  |
-| station_id | uuid | no |  |
+| station_id | uuid | no | Not used for routing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). |
 | menu_section_id | uuid | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). |
 | is_stock_tracked | boolean | no | True where a recipe exists. |
 | is_available | boolean | yes |  |
@@ -6514,7 +6592,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| order_number | text | yes |  |
+| order_number | text | yes | Short and called out across a counter (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). |
 | outlet_id | uuid | yes |  |
 | payment_timing | text | no | The outlet's payment timing when the order was placed (CHG-CSA-010), kept as a snapshot. |
 | sent_to_kitchen_at | timestamptz | no | When the order's kitchen tickets were created. |
@@ -6705,7 +6783,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-60 operations, added to this service in later releases without changing any of the above.
+59 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -6713,7 +6791,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | general | `listCombos`, `listSubstitutionRules` |
 | guestOrdering | `claimTableSession` |
 | kitchen | `getKitchenRoutingRules`, `setKitchenRoutingRules`, `setKitchenStations` |
-| menu | `getMenu`, `listMenuSchedules`, `listMenuVersions`, `listMenus`, `setMenuItemDailyCount` |
+| menu | `getMenu`, `listMenuSchedules`, `listMenuVersions`, `listMenus` |
 | modifier | `listModifierGroups` |
 | order | `amendFnbOrder` |
 | outlet | `listOutletTemplates`, `setOutletTemplate` |
