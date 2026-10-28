@@ -92,7 +92,12 @@ def is_own(route: dict) -> bool:
     return bool(OWN_FOR.match(str((route or {}).get("for") or "")))
 
 
-def route_for(reader_deployable, owner_deployable) -> str:
+def route_for(reader_deployable, owner_deployable, query=None) -> str:
+    """rr's rule, and in process where the lead granted `query` to the reader's deployable (XDR-004 widened by
+    ADAM CR-296, CHG-R11RUL-001: the operations host reads Tenancy's settings in process)."""
+    import contract_shapes as CS
+    if query and CS.granted_in_process(reader_deployable, query):
+        return "in-process"
     return rr.route_for(reader_deployable, owner_deployable)
 
 
@@ -315,8 +320,7 @@ def main() -> int:
             held.setdefault(kind, []).append(f"{o} ({svc}): {', '.join(bare + computed)}")
             continue
         verb = "answers" if f["method"] == "get" else "accepts or answers"
-        route = route_for(dep_of.get(svc), tenancy_dep)
-        plan[o] = [(q, route, why(kind, q, verb, fields)) for q in qs]
+        plan[o] = [(q, route_for(dep_of.get(svc), tenancy_dep, q), why(kind, q, verb, fields)) for q in qs]
     # platform billing (CR-202): a stored currency on each control.* schema, or the billing entity's for a computed one
     n_cur = 0
     for o, f, fields, bare, computed in platform:

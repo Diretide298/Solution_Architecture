@@ -293,7 +293,7 @@ paths:
         - "P08 BO-116 Merchandising & Product Presentation"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestMerchandiseItem.price, MerchandiseItem.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -391,7 +391,7 @@ paths:
         - "P08 BO-048 Retail Products"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: MerchandiseItem.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Create a merchandise item
@@ -442,7 +442,7 @@ paths:
         - "P08 BO-116 Merchandising & Product Presentation"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: MerchandiseItem.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Amend a merchandise item
@@ -528,7 +528,7 @@ paths:
         route: service
         for: 'the price after any live promotion (ADAM CR-096)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PriceCheck.effectivePrice, PriceCheck.listPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -616,7 +616,7 @@ paths:
         - "P04 POS-005 Payment"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RetailSale.discount, RetailSale.discountAmount, RetailSale.grossAmount, RetailSale.lineTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
@@ -683,7 +683,7 @@ paths:
         route: service
         for: 'the discounts Orders applied to those lines, summed onto each sale line (r8 re-walk, CHG-R8RW-004)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RetailSale.discount, RetailSale.discountAmount, RetailSale.grossAmount, RetailSale.lineTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-reads:
       - table: retail.merchandise
@@ -775,7 +775,7 @@ paths:
         - "P04 POS-005 Payment"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RetailSale.discount, RetailSale.discountAmount, RetailSale.grossAmount, RetailSale.lineTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -807,7 +807,7 @@ paths:
         - "P08 BO-021 Order Search"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RetailSale.discount, RetailSale.discountAmount, RetailSale.grossAmount, RetailSale.lineTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -933,7 +933,7 @@ paths:
       operationId: listRetailReturns
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RetailReturn.refundAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
@@ -986,7 +986,7 @@ paths:
         route: in-process
         for: 'its read of inventory.kit_component, Inventory''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RetailReturn.refundAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Accept a return
@@ -1079,7 +1079,7 @@ paths:
       operationId: createRetailExchange
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CreateExchangeReplacementLine.overridePrice, RetailExchange.difference, RetailExchange.replacementValue, RetailExchange.returnedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       summary: Exchange one item for another
@@ -1132,7 +1132,7 @@ paths:
         - "P08 BO-143 Retail Global Settings & Controls"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ReturnPolicy.requiresApprovalAbove, ReturnPolicy.requiresSecondUserAbove, ReturnPolicy.selfAuthoriseLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -1162,7 +1162,7 @@ paths:
         - "P08 BO-143 Retail Global Settings & Controls"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ReturnPolicy.requiresApprovalAbove, ReturnPolicy.requiresSecondUserAbove, ReturnPolicy.selfAuthoriseLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: outlet   # CF-138: F&B and retail configure at outlet, decided 18 August
@@ -1213,7 +1213,7 @@ paths:
         - "P06 EMP-062 Store Stock & SKU Availability"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
@@ -1686,7 +1686,7 @@ paths:
         - "P08 BO-142 Store Rules, Controls & Permissions"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: StoreRule.thresholdAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -1729,7 +1729,7 @@ paths:
         - "P08 BO-142 Store Rules, Controls & Permissions"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StoreRule.thresholdAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff

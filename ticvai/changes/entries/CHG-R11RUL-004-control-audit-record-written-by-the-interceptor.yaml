@@ -1,0 +1,44 @@
+id: CHG-R11RUL-004
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: control.audit_record is written by the audit interceptor's control variant on every control-database write,
+  as platform.audit_record is for the tenant database; the table now has a description and a writer.
+decision:
+  what: 'ADAM CR-292, option A (Chinmay, 29 October 2026). contracts/spine/tenancy.yaml ControlAuditRecord: written by
+    the audit interceptor''s control variant (ControlDbContext) inside each write''s transaction; operator_principal_id
+    the Control Plane token''s subject (null for a system job), tenant_id from the operation, action the operation as
+    AuditRecord.action, subject_ref and details as the columns describe, occurred_at set; no new migration (the table is
+    in backend/control/V0108__after_r1_20261020.sql and reaches db/control with the control database''s task), and the
+    stop-gap that leaves control writes out is removed once that is applied; built with #27775. AuditRecord says the
+    control database''s writes go there. tools/derive-table-notes.py WHAT gives control.audit_record its note.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-292 (Narayan Gaonkar, #27775), the lead''s decision file decisions-2026-10-29.json: the interceptor of #27694
+  (CR-179) wrote platform.audit_record on ControlDbContext writes, which fail at commit (42P01), and control.audit_record
+  had no description and no writer, so control writes were left out as a stop-gap.'
+keys_touched:
+  tables:
+  - control.audit_record
+  - platform.audit_record
+  schemas:
+  - ControlAuditRecord
+  - AuditRecord
+  files:
+  - contracts/spine/tenancy.yaml
+  - tools/derive-table-notes.py
+  - handoff/schema-reference.json
+root_class: 'a table with no writer named'
+tickets:
+  started:
+  - '27775 (createTenant, suspendTenant, reactivateTenant) and 27694 (PLATFORM-AUDIT): through CR-292''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-292
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-table-notes.py::WHAT
+status: open
+notes: 'No migration: the decision says the table is already in V0108.'

@@ -1,0 +1,91 @@
+id: CHG-R11RUL-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: Every operation the operations deployable hosts reads Tenancy's settings in process (tenancy#scopeRecords,
+  venueSettingsRecords, regionSettingsRecords, outletRecords), never over the unbuilt service route; XDR-004 widens from
+  the F&B operations to all 232 operations-host operations that ask one of the four, and 195 reads on 172 operations
+  move from route service to in-process.
+decision:
+  what: 'ADAM CR-296, option A, as a ruling for the whole class (Chinmay, 29 October 2026: "Yes, all 141"). The operations
+    host reads tenancy#scopeRecords (platform.scope, kernel-readable since CR-002), tenancy#venueSettingsRecords,
+    tenancy#regionSettingsRecords and tenancy#outletRecords (platform.venue_settings, platform.region_settings,
+    platform.outlet, granted to operations by V0116) in process, through Tenancy''s own query classes, SELECT only, row
+    security unchanged, no migration. docs/active/cross-deployable-writes.yaml XDR-004: tenancy#scopeRecords joins its
+    queries (no table added: platform.scope is a kernel grant), its operations are every operations-host operation that
+    asks one of the four (232, from 68), and its decision_ref and why name CR-296. 14 contracts: each of the four
+    queries'' x-ticvai-read-via on an operations-host operation (handoff/service-decomposition.json) moved from service
+    to in-process: venueSettingsRecords 146, scopeRecords 24, outletRecords 21, regionSettingsRecords 4 (195 reads on
+    172 operations; 141 of them had no other read across deployables). Tenancy''s four query rules and ADR-0055''s
+    amendment of 25 October (item 2) say so. The generators draft the same route: tools/contract_shapes.py
+    read_route and granted_in_process (the reads of cross-deployable-writes.yaml, as XR-ROUTE reads them), used by
+    money_read_via, tools/fix-read-routes.py and tools/fix-money-currency.py.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-296 (Sanket Keluskar, #33212 acknowledgeAlert, blocking), the lead''s decision file decisions-2026-10-29.json:
+  acknowledgeAlert (Reporting, operations) answered Alert''s Money through reads declared route service, which nothing
+  builds (CR-174, CR-241, CR-281), and XDR-004 covered only F&B. The lead made option A the ruling for the class: the
+  141 operations-host operations whose only reads across deployables were these four, and every other such read with
+  them.'
+keys_touched:
+  operations:
+  - acknowledgeAlert
+  - listAlerts
+  - listAlertRules
+  - setAlertRule
+  - createFnbOrder
+  - submitOnboardingApplication
+  - setBillingEntity
+  - getTenantAppStatus
+  tables:
+  - platform.scope
+  - platform.venue_settings
+  - platform.region_settings
+  - platform.outlet
+  files:
+  - docs/active/cross-deployable-writes.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/games.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/maintenance.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/transport.yaml
+  - contracts/satellite/venue-map.yaml
+  - contracts/satellite/white-label.yaml
+  - docs/adr/0055-a-modular-monolith-deployed-as-five-units.md
+  - tools/contract_shapes.py
+  - tools/fix-read-routes.py
+  - tools/fix-money-currency.py
+  - tools/tests/test_generators_r10_patterns.py
+  - handoff/api-data-lineage.json
+  - handoff/cross-deployable-writes.md
+  other:
+  - 'XDR-004: the 232 operations are listed in docs/active/cross-deployable-writes.yaml'
+root_class: 'a read route chosen by deployable alone, blind to the reads the lead granted in process (XDR)'
+tickets:
+  started:
+  - '33212 (acknowledgeAlert): through CR-296''s comment; it is no longer blocked. Started tickets of the other
+    operations get the route at their next pull (CHG-ADM-001).'
+  unstarted:
+  - 'The other operations: through their pointer bodies at the r11 tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-296
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/contract_shapes.py::read_route
+status: open
+notes: 'check-cross-module-reads XR-ROUTE already fails an in-process read across deployables that no grant covers; the
+  gap was the generators, which chose in-process only within one deployable, so the next draft would have written
+  service again. Two operations that flipped write the control database (submitOnboardingApplication, setBillingEntity),
+  while platform.region_settings is in the tenant database: the ruling covers them as operations-host operations; the
+  lead may want to look. createFnbOrder''s outletRecords read (CR-277) moved here too, as one of the four on an
+  operations-host operation.'
