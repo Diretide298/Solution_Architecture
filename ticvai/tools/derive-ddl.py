@@ -2085,6 +2085,48 @@ def unique_key(col: str, col_type: dict, src_of: dict) -> str:
     return q(col)
 
 
+_PLAIN_INDEX = re.compile(r"^CREATE INDEX IF NOT EXISTS \S+ ON (\S+) \(([^()]*)\);$", re.M)
+_UNIQUE_INDEX = re.compile(r"^CREATE UNIQUE INDEX IF NOT EXISTS \S+ ON (\S+) \(([^()]*)\)( NULLS NOT DISTINCT)?;$", re.M)
+
+
+# **The tables whose plain index a decision replaced with the unique one** (ADAM CR-278, option A, 28 October 2026;
+# CHG-R11TEN-005). Only these lose the plain index in the generated DDL, so the next forward migration drops it. Every
+# other plain index a whole-column unique index duplicates stays generated and is listed for a person in
+# handoff/migration-review.md (REDUNDANT_INDEXES), because a generated migration only adds: a drop is a person's.
+UNIQUE_REPLACES_INDEX = {"tenancy.device_assignment": "ADAM CR-278, option A, 28 October 2026"}
+# (table, plain index, unique index) found by without_redundant_indexes and not decided, for migration-review.md.
+REDUNDANT_INDEXES: list = []
+
+
+def without_redundant_indexes(lines: list) -> list:
+    """`idx_lines` less the plain indexes a decision replaced with a unique index on the same columns.
+
+    **A unique index serves every lookup a plain index on the same columns does** (ADAM CR-278, option A, accepted
+    28 October 2026; CHG-R11TEN-005, as CR-103 and CHG-R8MIG-004 decided for tenancy.device_assignment (device_id)).
+    A plain index whose columns are exactly a whole-column unique index's on the same table is a duplicate. On a table
+    in UNIQUE_REPLACES_INDEX it is not written, and ddl_forward drops it, guarded (R8-MIG-001). Any other duplicate is
+    kept and recorded in REDUNDANT_INDEXES for handoff/migration-review.md, so the lead decides each drop. A partial
+    unique index (WHERE), one on `lower()` or a plain index with a method or a predicate is not the same lookup and is
+    no duplicate."""
+    uniq = {}
+    for _s, line in lines:
+        for m in _UNIQUE_INDEX.finditer(line):
+            uniq[(m.group(1), m.group(2).replace(" ", ""))] = re.search(r"INDEX IF NOT EXISTS (\S+)", m.group(0)).group(1)
+    out = []
+    for s_, line in lines:
+        m = _PLAIN_INDEX.search(line)
+        key = (m.group(1), m.group(2).replace(" ", "")) if m else None
+        if key and key in uniq:
+            if key[0] in UNIQUE_REPLACES_INDEX:
+                continue
+            found = (key[0], re.search(r"INDEX IF NOT EXISTS (\S+)", m.group(0)).group(1), uniq[key])
+            if found not in REDUNDANT_INDEXES:
+                REDUNDANT_INDEXES.append(found)
+        out.append((s_, line))
+    REDUNDANT_INDEXES.sort()
+    return out
+
+
 # `table -> [columns]` from `x-ticvai-primary-key`, filled in `main` before any key is asked for.
 DECLARED_PK: dict = {}
 
@@ -2300,6 +2342,13 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
         if was is not None and was.decode("utf-8").replace("\r\n", "\n") != files[name]:
             extra.append(("both", "file changed", name, "the generator would write it differently",
                           "not applied anywhere: bring the application rules it documents up to date by hand"))
+    # **A plain index a unique index duplicates waits for the lead** (ADAM CR-278, CHG-R11TEN-005): only the tables in
+    # UNIQUE_REPLACES_INDEX lose theirs; a generated migration adds, and a drop is a person's.
+    for t, plain, uq in REDUNDANT_INDEXES:
+        extra.append(("tenant" if area(t.split(".")[0]) == "tenant" else CONTROL, "index duplicates a unique index",
+                      f"{t.split('.')[0]}.{plain}", f"same columns as the unique index {uq}, which serves every lookup",
+                      "decide: DROP INDEX by hand (CONCURRENTLY on a live table), or add the table to "
+                      "tools/derive-ddl.py UNIQUE_REPLACES_INDEX with the decision so the next migration drops it"))
     # **Two keys to one parent wait for a decision** (CHG-MGN-001, ADAM CR-148, CR-149): listed, not resolved
     # alphabetically. Nothing to migrate until the package decides; the policy then reaches a forward migration.
     for t, (cols, par, took) in sorted(OWNER_UNDECIDED.items()):
@@ -3032,7 +3081,7 @@ def main() -> int:
             "",
         ] + mine) + "\n"
 
-        idx = sorted({line for s, line in idx_lines if area(s) == db})
+        idx = sorted({line for s, line in without_redundant_indexes(idx_lines) if area(s) == db})
         files[f"{db}/910-indexes.sql"] = "\n".join([
             f"-- Indexes in the {db} database: declared foreign keys, conventions and scope paths.",
             "-- **Derived by tools/derive-ddl.py. Do not hand-edit.**",

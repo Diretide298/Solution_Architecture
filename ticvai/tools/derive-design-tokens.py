@@ -60,6 +60,22 @@ APPLIED_FROM = {
     "direction": "dir=rtl on the root when the guest's language is Arabic; every token is direction-free",
 }
 
+# **How the app shell picks a skin and lays the tenant's theme over it** (ADAM CR-280, option B with C meanwhile,
+# Chinmay, 28 October 2026; CHG-R11TEN-007). The app's appliedFrom differs from the web's on the points the decision
+# settled for the app; guest web's rules are CR-272's.
+APP_APPLIED_FROM = dict(APPLIED_FROM, **{
+    "skinKey": "PublishedTenantConfig.skinKey (getPublishedTenantConfig with venueId): the venue's skin, one of "
+               "skins.byVenueKind; null or not yet published: the base skin with park (until the field arrives, the "
+               "shell takes the key as an input, base plus park until set)",
+    "order": "the skin sets every token; then theme.primaryColour, theme.backgroundColour and theme.textColour "
+             "override --br, --bg and --ink where set",
+    "theme.textColour": "--ink, where set; never derived (Theme requires it)",
+    "theme.darkMode": "never used to render (deprecated, CHG-CSA-035)",
+    "theme.cornerRadius": "--rk = cornerRadius / 10, the scale on the base radii sm 6, md 10, lg 16 (px)",
+    "fonts": "FontConfig's faces replace the skin's --fh and --fb: the Latin pair (primaryLatin, secondaryLatin), and "
+             "under dir=rtl the Arabic pair (primaryArabic, secondaryArabic)",
+})
+
 
 def read(rel: str) -> str:
     return (ROOT / rel).read_text(encoding="utf-8")
@@ -199,7 +215,7 @@ def web_tokens() -> dict:
 
 def app_tokens() -> dict:
     v4, v2 = read(APP_V4), read(APP_V2)
-    out = {"app": "guest-app", "repository": "ticvai-guest-app", "platforms": ["P02"], "appliedFrom": APPLIED_FROM,
+    out = {"app": "guest-app", "repository": "ticvai-guest-app", "platforms": ["P02"], "appliedFrom": APP_APPLIED_FROM,
            "sources": []}
     for rel, src, marker, rev in ((APP_V4, v4, 'data-lux="1"', "Mobile App v4, 30 September 2026 build"),
                                   (APP_V2, v2, '<div style="--bg:{{ t.bg }}', "Guest Booking Mobile v2, 28 September 2026 build")):

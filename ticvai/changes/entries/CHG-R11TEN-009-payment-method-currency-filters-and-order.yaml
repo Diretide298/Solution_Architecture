@@ -1,0 +1,37 @@
+id: CHG-R11TEN-009
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'listPaymentMethods and createPaymentMethod state whose currency a method''s amounts are in (the venue its
+  row''s scope_path names), that a row above a venue holds none (create 400, list absent), surcharge.fixed''s storage,
+  the venueId and channel filters, and the order (displayOrder, code, id).'
+decision:
+  what: 'ADAM CR-286, option A (Chinmay, 28 October 2026), confirmed as built; no release asked.
+    contracts/satellite/payments.yaml: listPaymentMethods asks tenancy#scopeRecords in process as createPaymentMethod
+    does, and its text gives the currency rule, the filters and the order (a null displayOrder sorts as its default
+    0, so the order is total); createPaymentMethod''s text and its 400, and the same 400 on
+    updatePaymentMethod, which takes the same body (check-business-rules BR-PAIR-REFUSAL).'
+  by: Chinmay
+  date: '2026-10-28'
+why: 'ADAM CR-286 (Deep Khanvilkar, #32116 listPaymentMethods): a tenant-level method names no venue, so "the
+  venue''s" currency had no source, and the filters and order were unstated. Settled by the lead on
+  28 October 2026.'
+keys_touched:
+  operations: [listPaymentMethods, createPaymentMethod, updatePaymentMethod]
+  tables: [payments.method]
+  files:
+  - contracts/satellite/payments.yaml
+root_class: 'Money with no currency source'
+tickets:
+  started: []
+  unstarted:
+  - '32116 (listPaymentMethods): built as the text now says, through CR-286''s comment.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-286
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-list-order.py
+status: open
+notes: 'Text and one read-via; no schema change.'

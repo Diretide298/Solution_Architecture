@@ -1,0 +1,51 @@
+id: CHG-R11TEN-003
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'createFnbOrder reads the caller''s workstation in process (tenancy#workstationRecords, granted as XDR-009):
+  a till at the order''s outlet is accepted at once, anything else waits for acceptFnbOrder. The order number is a
+  counter per outlet and business day, written as the outlet''s new one-letter Outlet.orderNumberPrefix, a hyphen and
+  three digits (A-042), or three digits alone.'
+decision:
+  what: 'ADAM CR-293, option A for both (Chinmay, 29 October 2026), with CR-277 (3) (28 October 2026).
+    docs/active/cross-deployable-writes.yaml: XDR-009 (operations SELECT on platform.workstation; the decision names it
+    as XDR-004 gaining the table, recorded as its own entry because XDR-004 is the rulings change''s to edit).
+    contracts/spine/tenancy.yaml: Outlet.orderNumberPrefix (optional, one letter A to Z, an enum so the column gets
+    the CHECK) and updateOutlet''s body field (createOutlet takes the Outlet schema); workstationRecords'' rule names
+    the granted read. contracts/satellite/fnb.yaml: createFnbOrder''s workstation read-via and its till and
+    order-number rules; FnbOrder.orderNumber points at them. Derived: platform.outlet.order_number_prefix text null
+    with outlet_order_number_prefix_chk in the forward migration, and the guarded GRANT.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-293 (Hrushikant Patkar, #27708): createFnbOrder could not tell a till at the outlet from one elsewhere
+  (platform.workstation is Tenancy''s, in commerce, and serviceAuth is not built, CR-241), and nothing stored the
+  one-letter prefix CR-277 (3) decided. Settled by the lead on 29 and 28 October 2026.'
+keys_touched:
+  operations: [createFnbOrder, createOutlet, updateOutlet]
+  schemas: [Outlet, FnbOrder]
+  tables: [platform.outlet, platform.workstation]
+  files:
+  - docs/active/cross-deployable-writes.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/fnb.yaml
+  - handoff/cross-deployable-writes.md
+  other:
+  - 'XDR-009 (granted read)'
+root_class: 'storage-route gap: a cross-deployable read on a route that is not built'
+tickets:
+  started: []
+  unstarted:
+  - '27708: build now against Tenancy''s in-process query classes; until the column is applied every outlet has no
+    prefix and order numbers are three digits.'
+  - 'The outlet tickets (createOutlet, updateOutlet, BO-044): the new optional field, through CR-293''s comment.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-293, CR-277
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'No routing-rule column: fnb.kitchen_routing_rule is not one row per outlet (the decision). The decision does
+  not ask for a unique index on the order number, so uniqueness per outlet and business day is the operation''s
+  rule only.'

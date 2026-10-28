@@ -221,7 +221,7 @@
  "deferredScreens": [],
  "counts": {
   "core": 517,
-  "setup": 268,
+  "setup": 269,
   "allOperations": 2854
  },
  "services": {
@@ -242,7 +242,7 @@
   },
   "FnbService": {
    "core": 57,
-   "setup": 21,
+   "setup": 22,
    "total": 138
   },
   "IdentityService": {
@@ -12202,6 +12202,21 @@
    ],
    "enables": []
   },
+  "setMenuItemDailyCount": {
+   "part": "setup",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PUT",
+   "path": "/menu-items/{itemId}/daily-count",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-140"
+   ],
+   "enables": [
+    "fnb.sold_out_item"
+   ]
+  },
   "setMenuSections": {
    "part": "setup",
    "service": "FnbService",
@@ -14607,7 +14622,6 @@
   "ai.training_run",
   "catalogue.demand_forecast",
   "catalogue.rate",
-  "fnb.sold_out_item",
   "identity.redirect_host",
   "identity.subject_holding",
   "inventory.serialised_item",

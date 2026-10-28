@@ -174,3 +174,56 @@ reads:
     routing (#27692, CR-161), served in-process as well as service. The grant is written into the control database''s
     forward migration, not the tenant''s (tools/derive-ddl.py). control.api_client has no row-level security, so the
     asker names the rows it may see (the client''s allowed_tenant_ids holds the caller''s tenant).'
+- id: XDR-007
+  reader: operations
+  tables: [catalogue.variant, catalogue.product, catalogue.product_media, catalogue.price, catalogue.price_assignment,
+    catalogue.price_list, catalogue.performance, platform.venue_settings]
+  privileges: [SELECT]
+  queries: [catalogue#variantsSellableAt, catalogue#variantListingFacts, tenancy#venueSettingsRecords]
+  operations: [addToWishlist, getWishlist]
+  added: '2026-10-28'
+  decision_ref: ADAM CR-270, option A, Chinmay, 28 October 2026 (the narrow read, as for CR-243 and CR-234); getWishlist
+    by ADAM CR-273, settled with CR-270 the same day
+  why: 'Marketing (operations) asks whether a saved variant is sellable (catalogue#variantsSellableAt, the 404) and what
+    its saved row shows (catalogue#variantListingFacts), and the currency of the Money it answers
+    (tenancy#venueSettingsRecords); Catalogue and Tenancy are in commerce. Catalogue published neither query over HTTP
+    and the service route between deployables is not built (CR-174, CR-241), so neither addToWishlist (#30705) nor
+    getWishlist (#30706) could be built. The operations host asks the three in process, through Catalogue''s and
+    Tenancy''s own query classes as the workers host does, never through Marketing SQL: a plain select on the same
+    tenant database under the caller''s own connection, so every table''s row-level security scopes it and FORCE RLS
+    stays on. SELECT only, on exactly the tables the three queries answer over: the variant, its product and the
+    product''s primary media, the price-list resolution (price, price_assignment, price_list), the performance, and
+    platform.venue_settings, whose inheritance reads the tenant''s own row of the same table and nothing else.'
+- id: XDR-008
+  reader: operations
+  tables: [catalogue.variant, catalogue.product, catalogue.product_media, catalogue.product_category]
+  privileges: [SELECT]
+  queries: [catalogue#variantRecords, catalogue#productRecords, catalogue#productCategoryRecords]
+  operations: [createFnbOrder]
+  added: '2026-10-28'
+  decision_ref: ADAM CR-277, option A, Chinmay, 28 October 2026 (the narrow read); catalogue.product_media and
+    catalogue.product_category added by the lead on 29 October 2026, as the reads touch them
+  why: 'createFnbOrder (F&B, operations) routes each line to a kitchen station, and an outlet''s category rules
+    (KitchenRoutingRules.categoryRules, matchKind productCategory) match a catalogue product category code: the menu
+    item''s catalogue variant (fnb.menu_item.product_variant_id, catalogue#variantRecords), its product
+    (catalogue#productRecords, which reads catalogue.product_media for Product.media[] as well) and the product''s
+    category (Product.categoryId, catalogue#productCategoryRecords, whose code the rule matches). Catalogue is in
+    commerce and the service route between deployables is not built (CR-174, CR-241). The operations host asks the
+    three in process, through Catalogue''s own query classes, in the caller''s transaction under the caller''s
+    row-level security: SELECT only, on exactly the four tables they touch. The outlet read for paymentTiming is
+    XDR-004''s.'
+- id: XDR-009
+  reader: operations
+  tables: [platform.workstation]
+  privileges: [SELECT]
+  queries: [tenancy#workstationRecords]
+  operations: [createFnbOrder]
+  added: '2026-10-29'
+  decision_ref: ADAM CR-293, option A, Chinmay, 29 October 2026
+  why: 'createFnbOrder accepts a till order at its outlet in the same transaction and creates its kitchen tickets there
+    (SD-046); an order from anywhere else waits for acceptFnbOrder. The till''s outlet is
+    platform.workstation.outlet_id, Tenancy''s data in commerce, and the service route between deployables is not built
+    (CR-241), so the build had no allowed way to tell a till at the outlet from one elsewhere. The operations host asks
+    tenancy#workstationRecords for the caller''s workstation in process, through Tenancy''s own query classes, under the
+    caller''s row-level security. The decision names it as XDR-004 gaining the table; it is recorded as its own entry
+    so the outlet and settings grant XDR-004 holds is not edited by two changes at once.'

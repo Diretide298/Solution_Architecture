@@ -26,7 +26,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 13 | `V0014__ai.sql` | MIG-AI | tenant | ai | 52 | 775 | assets, identity, pii, platform | Hrushikant Patkar | 8 |
 | 14 | `V0015__resources.sql` | MIG-RESOURCES | tenant | resources | 7 | 97 | identity, orders, pii, platform | Hrushikant Patkar | 5 |
 | 15 | `V0016__whitelabel.sql` | MIG-WHITELABEL | tenant | whitelabel | 31 | 298 | identity, platform, promotions | Hrushikant Patkar | 8 |
-| 16 | `V0017__platform.sql` | MIG-PLATFORM | tenant | platform | 19 | 244 | access, approvals, identity, inventory, ledger, pii | Hrushikant Patkar | 8 |
+| 16 | `V0017__platform.sql` | MIG-PLATFORM | tenant | platform | 19 | 245 | access, approvals, identity, inventory, ledger, pii | Hrushikant Patkar | 8 |
 | 17 | `V0018__workforce.sql` | MIG-WORKFORCE | tenant | workforce | 3 | 39 | access, identity, platform | Hrushikant Patkar | 2 |
 | 18 | `V0019__seating.sql` | MIG-SEATING | tenant | seating | 11 | 95 | assets, catalogue, identity, pii, platform | Hrushikant Patkar | 8 |
 | 19 | `V0020__maintenance.sql` | MIG-MAINTENANCE | tenant | maintenance | 6 | 150 | access, identity, inventory, platform | Hrushikant Patkar | 5 |
@@ -144,7 +144,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-REPORTING | `reporting.semantic_model` | 6 | none |  | 2 | 1 | used by the first release |
 | MIG-SYNC | `sync.rejection` | 11 | none |  | 1 | 1 | used by the first release |
 | MIG-ASSETS | `assets.asset_version` | 13 | scope_path |  | 1 | 2 | used by the first release |
-| MIG-ASSETS | `assets.media_asset` | 29 | venue_id |  | 15 | 4 | used by the first release |
+| MIG-ASSETS | `assets.media_asset` | 29 | venue_id |  | 14 | 4 | used by the first release |
 | MIG-ASSETS | `assets.media_collection` | 7 | venue_id |  | 4 | 1 | used by the first release |
 | MIG-ASSETS | `assets.media_collection_member` | 5 | through its owner |  | 3 | 3 | used by the first release |
 | MIG-ASSETS | `assets.media_fingerprint` | 7 | scope_path |  | 0 | 2 | used by the first release |
@@ -248,14 +248,14 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-PLATFORM | `platform.device` | 42 | none |  | 5 | 1 | used by the first release |
 | MIG-PLATFORM | `platform.idempotency_record` | 11 | scope_path |  | 0 | 6 | used by the first release |
 | MIG-PLATFORM | `platform.outbox` | 16 | scope_path | yes | 0 | 70 | used by the first release |
-| MIG-PLATFORM | `platform.outlet` | 16 | venue_id |  | 11 | 2 | used by the first release |
+| MIG-PLATFORM | `platform.outlet` | 17 | venue_id |  | 11 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.outlet_opening_hour` | 4 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.region_settings` | 20 | none |  | 8 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.sale_board` | 6 | venue_id |  | 4 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.sale_board_page` | 4 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.sale_board_tile` | 10 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.scope` | 8 | none |  | 11 | 2 | used by the first release |
-| MIG-PLATFORM | `platform.tenant` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by marketing.message_template |
+| MIG-PLATFORM | `platform.tenant` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by marketing.consent_purpose |
 | MIG-PLATFORM | `platform.venue_settings` | 34 | venue_id |  | 5 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.workstation` | 23 | scope_path |  | 7 | 1 | used by the first release |
 | MIG-PLATFORM | `sync.dsar_request` | 8 | none |  | 0 | 0 | built by MIG-PLATFORM as platform.dsar_request, before a declared move (CHG-TKT-013) |
@@ -367,14 +367,14 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-INVENTORY | `inventory.goods_receipt_line` | 11 | through its owner |  | 2 | 2 | used by the first release |
 | MIG-INVENTORY | `inventory.inventory_item` | 26 | venue_id |  | 6 | 3 | used by the first release |
 | MIG-INVENTORY | `inventory.kit_component` | 6 | scope_path |  | 3 | 1 | used by the first release |
-| MIG-INVENTORY | `inventory.location` | 7 | venue_id |  | 0 | 0 | referenced by inventory.stock_batch |
+| MIG-INVENTORY | `inventory.location` | 7 | venue_id |  | 0 | 0 | referenced by platform.outlet |
 | MIG-INVENTORY | `inventory.movement` | 17 | through its owner |  | 4 | 3 | used by the first release |
 | MIG-INVENTORY | `inventory.purchase_order` | 29 | scope_path |  | 0 | 0 | referenced by inventory.goods_receipt |
 | MIG-INVENTORY | `inventory.requisition` | 20 | venue_id |  | 0 | 0 | referenced by inventory.purchase_order |
 | MIG-INVENTORY | `inventory.serialised_item` | 9 | through its owner |  | 1 | 0 | used by the first release |
 | MIG-INVENTORY | `inventory.stock_batch` | 10 | none |  | 2 | 0 | used by the first release |
 | MIG-INVENTORY | `inventory.stock_earmark` | 10 | tenant root (one tenant per database; no tenant_id by design) |  | 1 | 1 | used by the first release |
-| MIG-INVENTORY | `inventory.supplier` | 17 | none |  | 0 | 0 | referenced by maintenance.asset |
+| MIG-INVENTORY | `inventory.supplier` | 17 | none |  | 0 | 0 | referenced by inventory.purchase_order |
 | MIG-PROMOTIONS | `promotions.allocation_component` | 9 | venue_id |  | 2 | 2 | used by the first release |
 | MIG-PROMOTIONS | `promotions.allocation_split` | 4 | through its owner |  | 0 | 1 | used by the first release |
 | MIG-PROMOTIONS | `promotions.bundle` | 21 | venue_id |  | 5 | 2 | used by the first release |
@@ -527,7 +527,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-FNB | `fnb.kitchen_ticket_line` | 14 | through its owner |  | 19 | 3 | used by the first release |
 | MIG-FNB | `fnb.location_session` | 10 | venue_id |  | 2 | 1 | used by the first release |
 | MIG-FNB | `fnb.menu` | 8 | none |  | 7 | 6 | used by the first release |
-| MIG-FNB | `fnb.menu_item` | 18 | through its owner |  | 14 | 6 | used by the first release |
+| MIG-FNB | `fnb.menu_item` | 18 | through its owner |  | 15 | 7 | used by the first release |
 | MIG-FNB | `fnb.menu_item_modifier` | 5 | through its owner |  | 2 | 1 | used by the first release |
 | MIG-FNB | `fnb.menu_schedule` | 9 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-FNB | `fnb.menu_section` | 5 | through its owner |  | 5 | 3 | used by the first release |
@@ -543,7 +543,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-FNB | `fnb.reservation_table` | 4 | none |  | 6 | 4 | used by the first release |
 | MIG-FNB | `fnb.service_order` | 17 | none |  | 17 | 9 | used by the first release |
 | MIG-FNB | `fnb.service_order_line` | 12 | through its owner |  | 12 | 1 | used by the first release |
-| MIG-FNB | `fnb.sold_out_item` | 10 | through its owner |  | 1 | 0 | used by the first release |
+| MIG-FNB | `fnb.sold_out_item` | 10 | through its owner |  | 1 | 1 | used by the first release |
 | MIG-FNB | `fnb.sub_bill` | 11 | through its owner |  | 1 | 1 | used by the first release |
 | MIG-FNB | `fnb.substitution_rule` | 10 | through its owner |  | 2 | 1 | used by the first release |
 | MIG-FNB | `fnb.table_combination` | 6 | scope_path |  | 2 | 1 | used by the first release |
@@ -597,7 +597,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 
 ## Forward migrations after the first release
 
-**192 forward migrations**, V1000 upwards in build order (the Venue Management waves, then each later app-module). V0100-V0999 are derive-ddl's frozen-mode files in `backend/<db>/`; a number is never reused, and a planned number is kept on the next refresh. The ticket's subject names the same file.
+**193 forward migrations**, V1000 upwards in build order (the Venue Management waves, then each later app-module). V0100-V0999 are derive-ddl's frozen-mode files in `backend/<db>/`; a number is never reused, and a planned number is kept on the next refresh. The ticket's subject names the same file.
 
 | Number | File | Task | Database | Schema | Tables | Which tables |
 |---|---|---|---|---|---|---|
@@ -628,7 +628,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1028 | `V1028__orders.sql` | MIG-ORDERS-6 | tenant | orders | 5 | orders.b2b_credit, orders.credit_override, orders.guest_credit_account, orders.invitation_allowance, orders.refund_calculation_policy |
 | 1030 | `V1030__payments.sql` | MIG-PAYMENTS-7 | tenant | payments | 5 | payments.currency_rule, payments.eligibility_rule, payments.failover_policy, payments.fee_rule, payments.provider_event |
 | 1032 | `V1032__ledger.sql` | MIG-LEDGER-2 | tenant | ledger | 2 | ledger.inter_entity_obligation, ledger.tax_exemption |
-| 1033 | `V1033__fnb.sql` | VM-MIG-FNB | tenant | fnb | 3 | fnb.kitchen_routing_rule, fnb.temperature_checkpoint, fnb.waste_approval_policy |
+| 1033 | `V1033__fnb.sql` | VM-MIG-FNB | tenant | fnb | 2 | fnb.kitchen_routing_rule, fnb.waste_approval_policy |
 | 1034 | `V1034__fnb.sql` | MIG-FNB-3 | tenant | fnb | 1 | fnb.reservation_policy |
 | 1035 | `V1035__fnb.sql` | MIG-FNB-4 | tenant | fnb | 3 | fnb.ingredient_substitute, fnb.prep_sheet_template, fnb.product_recommendation |
 | 1036 | `V1036__workforce.sql` | VM-MIG-WORKFORCE | tenant | workforce | 6 | workforce.announcement, workforce.announcement_receipt, workforce.employee, workforce.job_title, workforce.shift, workforce.work_assignment |
@@ -793,6 +793,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | 1251 | `V1251__access.sql` | MIG-ACCESS-10 | tenant | access | 10 | access.access_map, access.attraction_access, access.configuration_version, access.consumption_rule, access.gate_lane, access.group_admission_rule, access.hardware_deployment, access.journey_sequence_rule, access.offline_policy, access.operating_calendar_entry |
 | 1252 | `V1252__access.sql` | MIG-ACCESS-13 | tenant | access | 5 | access.fast_pass_profile, access.identity_lock, access.journey_profile, access.reason_code, access.security_investigation |
 | 1253 | `V1253__promotions.sql` | MIG-PROMOTIONS-10 | tenant | promotions | 4 | promotions.product_relationship, promotions.recommendation_experiment, promotions.recommendation_strategy, promotions.recommendation_suppression |
+| 1254 | `V1254__fnb.sql` | MIG-FNB-9 | tenant | fnb | 1 | fnb.temperature_checkpoint |
 
 ## Tables no migration creates
 

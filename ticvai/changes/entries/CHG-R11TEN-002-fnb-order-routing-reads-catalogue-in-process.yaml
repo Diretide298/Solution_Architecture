@@ -1,0 +1,50 @@
+id: CHG-R11TEN-002
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'createFnbOrder reads the outlet (paymentTiming) and the menu item''s catalogue variant and product (the
+  productCategory routing match) in process, the catalogue read granted as XDR-008; KitchenStation.menuItemIds is the
+  item rule and MenuItem.stationId routes nothing; a line with redeemEntitlementId is 400 until service sign-in.'
+decision:
+  what: 'ADAM CR-277, option A (Chinmay, 28 October 2026: grant the narrow read). docs/active/cross-deployable-writes.yaml:
+    XDR-008 (operations SELECT on catalogue.variant, catalogue.product, catalogue.product_media and
+    catalogue.product_category; catalogue#variantRecords, catalogue#productRecords and catalogue#productCategoryRecords;
+    the last two tables added by the lead on 29 October 2026, because the productCategory match is on the category''s
+    code and productRecords reads the product''s media). contracts/satellite/fnb.yaml createFnbOrder: tenancy#outletRecords moves from service
+    to in-process (XDR-004, which the operations-host rulings change widens to the order operations; that entry is
+    not edited here), catalogue#variantRecords, catalogue#productRecords and catalogue#productCategoryRecords in process, and the text states the
+    routing order (item rule, then category rules, then the default station) and the 400 for redeemEntitlementId
+    lines. MenuItem.stationId, KitchenRoutingRules and CreateFnbOrderLine.redeemEntitlementId say the same.
+    contracts/spine/catalogue.yaml: the two queries'' rules name the granted read.'
+  by: Chinmay
+  date: '2026-10-28'
+why: 'ADAM CR-277 (Hrushikant Patkar, #27708): createFnbOrder had no allowed way to read paymentTiming or a product
+  category across deployables, named two item-rule sources, and its redemption lines wait for serviceAuth (CR-241).
+  Settled by the lead on 28 October 2026. The order-number rule (CR-277 (3)) is CHG-R11TEN-003.'
+keys_touched:
+  operations: [createFnbOrder]
+  schemas: [MenuItem, KitchenRoutingRules, CreateFnbOrderLine]
+  tables: [catalogue.variant, catalogue.product, catalogue.product_media, catalogue.product_category]
+  files:
+  - docs/active/cross-deployable-writes.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/spine/catalogue.yaml
+  - handoff/cross-deployable-writes.md
+  other:
+  - 'XDR-008 (granted read)'
+root_class: 'storage-route gap: a cross-deployable read on a route that is not built'
+tickets:
+  started: []
+  unstarted:
+  - '27708 (POS sale reaches the kitchen): build now against Tenancy''s and Catalogue''s in-process query classes,
+    through CR-277''s comment.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-277
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'The productCategory rule matches the category''s code (catalogue.product_category, through
+  productCategoryRecords).'

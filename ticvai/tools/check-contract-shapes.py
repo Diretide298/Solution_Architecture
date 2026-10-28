@@ -341,6 +341,12 @@ def main() -> int:
                     bad.remove("id")  # an offline client mints the id it replays under (ADR-0056)
                 if "tenantId" in bad and op.get("x-ticvai-scope-level") == "platform":
                     bad.remove("tenantId")  # the platform console names the tenant it acts on
+                # A member of the schema's natural key (x-ticvai-unique-together, x-ticvai-unique) is the caller's to
+                # name, whatever its name: a firmware release's `version` is its vendor's and the 409 refuses a second
+                # one (ADAM CR-285 (3), 28 October 2026, CHG-R11TEN-006), not a row version the server moves.
+                natural = {k for grp in node.get("x-ticvai-unique-together") or [] for k in (grp or [])}
+                natural |= {k for k, v in props.items() if isinstance(v, dict) and v.get("x-ticvai-unique")}
+                bad = [p for p in bad if p not in natural]
                 if bad and persisted:
                     guard.add("C-REQUEST-SERVER-FIELDS", oid,
                               f"{oid}: request body requires server-owned {', '.join(bad)}")

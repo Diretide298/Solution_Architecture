@@ -10149,21 +10149,21 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | refund_id | uuid | yes | The parent row. |
 | order_line_id | uuid | yes |  |
 | refunded_amount | numeric(18,4) | yes |  |
 | applied_percentage | numeric | no | The time band of this line's own performance (ADAM CR-208). |
+| id | uuid | yes | Synthesised key. |
 
 ### `orders.refund_payment`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | refund_id | uuid | yes | The parent row. |
 | payment_id | uuid | yes |  |
 | refunded_amount | numeric(18,4) | yes | In the base currency, for the ledger. |
 | tender_amount | numeric(18,4) | no | In the payment's tender currency (Payment.tenderCurrency), at that currency's scale; null where the payment was in the base currency. |
+| id | uuid | yes | Synthesised key. |
 
 ### `orders.refund_policy`
 

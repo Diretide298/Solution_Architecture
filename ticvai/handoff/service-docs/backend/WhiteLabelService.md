@@ -3825,6 +3825,9 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | theme.cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
 | theme.surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
 | theme.buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
+| theme.venueSkins | array of object |  | The guest app skin each venue takes (ADAM CR-280, option B, 28 October 2026; CHG-R11TEN-007): one entry per venue, naming one of the approved app design's skins (handoff/design-tokens/guest-app.yaml,… (default []) |
+| theme.venueSkins[].venueId | string (uuid) | yes |  |
+| theme.venueSkins[].skinKey | GuestAppSkinKey: enum (park, water, stadium, theatre, dining, kids, museum, rooms, …) | yes | The guest app's skins per venue kind, as the approved Mobile App v4 design draws them (handoff/design-tokens/guest-app.yaml skins.byVenueKind; ADAM CR-280, CHG-R11TEN-007). |
 | theme.componentColours | object |  | Colours for single interactive elements (decided 17 September, M17-11). |
 | theme.componentColours.primaryCta | ThemeComponentColour |  |  |
 | theme.componentColours.payButton | ThemeComponentColour |  |  |
@@ -3839,6 +3842,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | fonts.secondaryArabic | string |  | Required whenever secondaryLatin is set and ar is among the tenant's languages (decided 28 September, audit R163). (nullable) |
 | fonts.customFontAssetRefs | array of string (uuid) |  | Uploaded font files, as MediaAsset ids. |
 | fonts.changeScope | object |  | Custom font files are buildTime; selecting a bundled face is runtime. (read-only) |
+| skinKey | object |  | The asked venue's guest app skin (ADAM CR-280, option B, 28 October 2026, additive; CHG-R11TEN-007): the published theme.venueSkins entry for venueId. (read-only; nullable) |
 | header | HeaderConfig |  |  |
 | header.layout | enum (logoLeft, logoCentre, logoWithMenu) | yes |  |
 | header.showLogo | boolean |  | (default True) |
@@ -4225,6 +4229,9 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | theme.cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
 | theme.surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
 | theme.buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
+| theme.venueSkins | array of object |  | The guest app skin each venue takes (ADAM CR-280, option B, 28 October 2026; CHG-R11TEN-007): one entry per venue, naming one of the approved app design's skins (handoff/design-tokens/guest-app.yaml,… (default []) |
+| theme.venueSkins[].venueId | string (uuid) | yes |  |
+| theme.venueSkins[].skinKey | GuestAppSkinKey: enum (park, water, stadium, theatre, dining, kids, museum, rooms, …) | yes | The guest app's skins per venue kind, as the approved Mobile App v4 design draws them (handoff/design-tokens/guest-app.yaml skins.byVenueKind; ADAM CR-280, CHG-R11TEN-007). |
 | theme.componentColours | object |  | Colours for single interactive elements (decided 17 September, M17-11). |
 | theme.componentColours.primaryCta | ThemeComponentColour |  |  |
 | theme.componentColours.payButton | ThemeComponentColour |  |  |
@@ -5220,6 +5227,9 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | theme.cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
 | theme.surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
 | theme.buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
+| theme.venueSkins | array of object |  | The guest app skin each venue takes (ADAM CR-280, option B, 28 October 2026; CHG-R11TEN-007): one entry per venue, naming one of the approved app design's skins (handoff/design-tokens/guest-app.yaml,… (default []) |
+| theme.venueSkins[].venueId | string (uuid) | yes |  |
+| theme.venueSkins[].skinKey | GuestAppSkinKey: enum (park, water, stadium, theatre, dining, kids, museum, rooms, …) | yes | The guest app's skins per venue kind, as the approved Mobile App v4 design draws them (handoff/design-tokens/guest-app.yaml skins.byVenueKind; ADAM CR-280, CHG-R11TEN-007). |
 | theme.componentColours | object |  | Colours for single interactive elements (decided 17 September, M17-11). |
 | theme.componentColours.primaryCta | ThemeComponentColour |  |  |
 | theme.componentColours.payButton | ThemeComponentColour |  |  |
@@ -5582,6 +5592,9 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 | cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
 | surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
 | buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
+| venueSkins | array of object |  | The guest app skin each venue takes (ADAM CR-280, option B, 28 October 2026; CHG-R11TEN-007): one entry per venue, naming one of the approved app design's skins (handoff/design-tokens/guest-app.yaml,… (default []) |
+| venueSkins[].venueId | string (uuid) | yes |  |
+| venueSkins[].skinKey | GuestAppSkinKey: enum (park, water, stadium, theatre, dining, kids, museum, rooms, …) | yes | The guest app's skins per venue kind, as the approved Mobile App v4 design draws them (handoff/design-tokens/guest-app.yaml skins.byVenueKind; ADAM CR-280, CHG-R11TEN-007). |
 | componentColours | object |  | Colours for single interactive elements (decided 17 September, M17-11). |
 | componentColours.primaryCta | ThemeComponentColour |  |  |
 | componentColours.primaryCta.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
@@ -5711,6 +5724,9 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
 | surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
 | buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
+| venueSkins | array of object |  | The guest app skin each venue takes (ADAM CR-280, option B, 28 October 2026; CHG-R11TEN-007): one entry per venue, naming one of the approved app design's skins (handoff/design-tokens/guest-app.yaml,… (default []) |
+| venueSkins[].venueId | string (uuid) | yes |  |
+| venueSkins[].skinKey | GuestAppSkinKey: enum (park, water, stadium, theatre, dining, kids, museum, rooms, …) | yes | The guest app's skins per venue kind, as the approved Mobile App v4 design draws them (handoff/design-tokens/guest-app.yaml skins.byVenueKind; ADAM CR-280, CHG-R11TEN-007). |
 | componentColours | object |  | Colours for single interactive elements (decided 17 September, M17-11). |
 | componentColours.primaryCta | ThemeComponentColour |  |  |
 | componentColours.primaryCta.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
@@ -5747,6 +5763,9 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | cornerRadius | integer |  | The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). (min 0; max 32) |
 | surfaceStyle | enum (glass, solid) |  | Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3). (default glass) |
 | buttonStyle | enum (solid, outline, pill) |  | Button shape (decided 29 September, rev 3 CFG-3). (default solid) |
+| venueSkins | array of object |  | The guest app skin each venue takes (ADAM CR-280, option B, 28 October 2026; CHG-R11TEN-007): one entry per venue, naming one of the approved app design's skins (handoff/design-tokens/guest-app.yaml,… (default []) |
+| venueSkins[].venueId | string (uuid) | yes |  |
+| venueSkins[].skinKey | GuestAppSkinKey: enum (park, water, stadium, theatre, dining, kids, museum, rooms, …) | yes | The guest app's skins per venue kind, as the approved Mobile App v4 design draws them (handoff/design-tokens/guest-app.yaml skins.byVenueKind; ADAM CR-280, CHG-R11TEN-007). |
 | componentColours | object |  | Colours for single interactive elements (decided 17 September, M17-11). |
 | componentColours.primaryCta | ThemeComponentColour |  |  |
 | componentColours.primaryCta.background | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |

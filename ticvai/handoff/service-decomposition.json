@@ -75,9 +75,9 @@
     "PlatformService": 4,
     "AccessService": 3,
     "CatalogueService": 2,
-    "VenueOpsService": 2,
     "MarketingService": 1,
-    "OrderService": 1
+    "OrderService": 1,
+    "VenueOpsService": 1
    },
    "writesOutside": {
     "MarketingService": 2,

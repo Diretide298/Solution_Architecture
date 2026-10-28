@@ -1894,13 +1894,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "createDeviceFirmware": {
-   "reads": [
-    "assets.media_asset"
-   ],
-   "reason": "artefactAssetId is an uploaded asset; unique on (deviceKind, version) within the tenant (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "createDonationCampaign": {
    "reads": [
     "ledger.account"

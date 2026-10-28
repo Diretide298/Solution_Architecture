@@ -1,0 +1,44 @@
+id: CHG-R11TEN-006
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'tenancy.device_firmware gets a unique key on (device_kind, version) whose violation answers
+  createDeviceFirmware''s 409; DeviceFirmware.version is writable on create; artefactAssetId is stored unchecked
+  (createDeviceFirmware no longer reads Assets).'
+decision:
+  what: 'Chinmay, 28 October 2026, on ADAM CR-285: (1) artefactAssetId stored unchecked, the device''s checksum check
+    is the guard and the cross-app read waits for service sign-in; (2) the unique key; (3) readOnly removed from
+    version. contracts/spine/tenancy.yaml: DeviceFirmware x-ticvai-unique-together [[deviceKind, version]], version
+    without readOnly, artefactAssetId''s description, createDeviceFirmware''s text, and its assets#mediaAssetRecords
+    service read-via removed. handoff/api-data-lineage-overrides.json: the carried assets.media_asset read of
+    createDeviceFirmware removed. Derived: device_firmware_device_kind_version_uniq in the forward migration (text
+    members on lower(), as common.yaml''s uniqueness rule). tools/check-contract-shapes.py C-REQUEST-SERVER-FIELDS:
+    a member of the schema''s natural key (x-ticvai-unique-together, x-ticvai-unique) is the caller''s to name, so a
+    release''s version is not read as the server''s row version.'
+  by: Chinmay
+  date: '2026-10-28'
+why: 'ADAM CR-285 (Deep Khanvilkar, #33878 createDeviceFirmware): its artefact read crossed deployables, its 409 had no
+  key, and version was readOnly yet required. Settled by the lead on 28 October 2026.'
+keys_touched:
+  operations: [createDeviceFirmware]
+  schemas: [DeviceFirmware]
+  tables: [tenancy.device_firmware]
+  files:
+  - contracts/spine/tenancy.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-contract-shapes.py
+root_class: 'a refusal with no key behind it'
+tickets:
+  started: []
+  unstarted:
+  - '33878 (createDeviceFirmware): build now to all three, through CR-285''s comment.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-285
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-lineage.py
+status: open
+notes: 'artefactAssetId stays a uuid column (ADR-0056, one id type) with its convention index; "unchecked" is that no
+  read verifies it.'

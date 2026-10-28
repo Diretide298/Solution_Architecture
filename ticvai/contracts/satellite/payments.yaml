@@ -464,10 +464,23 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PaymentMethod.fixed, PaymentMethod.maximumAmount, PaymentMethod.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue each row''s scope_path names, whose settings give the currency of its Money (ADAM CR-286; as createPaymentMethod)'
       summary: The methods this tenant can offer, and where
       description: 'Board 1.2. **A method is not a provider.** *Apple Pay* is a method; the acquirer
         behind it is a routing decision, and a venue that models them as one thing cannot change
         acquirer without re-configuring every till.
+
+        **Whose currency** (ADAM CR-286, option A, 28 October 2026, confirmed as built; CHG-R11TEN-009). A method''s
+        amounts (`minimumAmount`, `maximumAmount`, `surcharge.fixed`) are in the currency of the venue its row''s
+        `scope_path` names (`tenancy#scopeRecords`, then `tenancy#venueSettingsRecords`), as `createPaymentMethod`
+        writes them. A row above a venue holds no amounts, and the list answers them absent.
+
+        **The filters.** `venueId` matches a method whose `venueIds` contains it or is empty (all venues); `channel`
+        matches the same way on `channels`.
+
+        **Order.** Sorted by `displayOrder` (coalesce(`displayOrder`, 0), its default), then `code`, then `id`.
 
         '
       tags:
@@ -511,6 +524,13 @@ paths:
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PaymentMethod.fixed, PaymentMethod.maximumAmount, PaymentMethod.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Add a payment method to the catalogue
+      description: '**Whose currency** (ADAM CR-286, option A, 28 October 2026, confirmed as built; CHG-R11TEN-009).
+        A method''s amounts (`minimumAmount`, `maximumAmount`, `surcharge.fixed`) are in the currency of the venue its
+        row''s `scope_path` names (`tenancy#scopeRecords`, then `tenancy#venueSettingsRecords`). A row above a venue
+        holds no amounts: a create there that sends any of the three is refused `400`. `surcharge.fixed` is stored
+        in `payments.method.surcharge` as `{"amount": "<numeric>"}`, the amount only (ADR-0018).
+
+        '
       tags:
       - payments
       x-ticvai-permission: PAYMENT_CONFIGURE
@@ -536,6 +556,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentMethod'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
@@ -573,6 +595,10 @@ paths:
         ice cream is a decision, and it is made by restricting the method below a threshold rather than
         by removing it.
 
+        **A row above a venue holds no amounts** (ADAM CR-286, option A, 28 October 2026; CHG-R11TEN-009): as on
+        `createPaymentMethod`, the amounts are in the currency of the venue the row''s `scope_path` names, and a body
+        that sends `minimumAmount`, `maximumAmount` or `surcharge.fixed` for a row above a venue is refused `400`.
+
         '
       tags:
       - payments
@@ -593,6 +619,8 @@ paths:
       responses:
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '200':
           headers:
             X-Consistency-Token:

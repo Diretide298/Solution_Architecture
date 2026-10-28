@@ -1406,6 +1406,7 @@ fnb.menu_item,menu_section_id,fnb.menu_section,reference,declared,,yes
 fnb.menu_item,product_variant_id,catalogue.variant,reference,declared,yes,yes
 fnb.menu_item,station_id,fnb.kitchen_station,reference,declared,,
 fnb.menu_item,via attachModifierGroup,fnb.menu_item_modifier,ambient,lineage,,
+fnb.menu_item,via setMenuItemDailyCount,fnb.sold_out_item,ambient,lineage,,
 fnb.menu_item_modifier,group_id,fnb.modifier_group,reference,declared,,yes
 fnb.menu_item_modifier,item_id,fnb.menu_item,child,declared,,yes
 fnb.menu_schedule,created_by_principal_id,identity.principal,reference,convention,yes,
