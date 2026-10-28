@@ -130,8 +130,10 @@
             <select class="scope-select" id="tk-project" aria-label="Project"></select>
             <p class="tk-lede" id="tk-lede">…</p>
             <div class="tk-top-actions">
+              <!-- When the page last read OpenProject, in ink rather than a
+                   footnote: the numbers are only as true as this line. -->
               <p class="set-state tk-asof" id="tk-asof" role="status"></p>
-              <button id="tk-refresh" class="chip" type="button"
+              <button id="tk-refresh" class="chip tk-refresh" type="button"
                       title="Reads OpenProject again, now">Refresh</button>
             </div>
           </div>
@@ -155,6 +157,7 @@
             <button class="chip tk-clear" id="tk-scope-clear" type="button" hidden>Show everything</button>
             <p class="tk-scope-says" id="tk-scope-says" aria-live="polite"></p>
           </div>
+          <p class="tk-unit-says" id="tk-unit-says"></p>
         </div>
 
         <!-- ── this sprint ───────────────────────────────────────────────
@@ -193,7 +196,7 @@
             <p class="tk-note" id="tk-team-note"></p>
             <div class="tk-roster-head" aria-hidden="true">
               <span>Person</span><span id="tk-roster-head-bar">This sprint</span><span>Finished</span>
-              <span>Against pace</span><span>Open in the plan</span>
+              <span>Against pace</span><span>Open in the plan</span><span>Last moved</span>
             </div>
             <div class="tk-roster" id="tk-roster"></div>
             <ul class="tk-legend tk-roster-key" id="tk-roster-key"></ul>

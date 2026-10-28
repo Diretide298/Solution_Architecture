@@ -62,16 +62,22 @@ export function learnStatuses(statuses) {
   defaultStatus = new Set((statuses ?? []).filter((s) => s.isDefault).map((s) => s.name));
 }
 
-export const isClosed = (t) => closedByName.get(t.status) === true;
-export const isRejected = (t) => isClosed(t) && DROPPED.test(t.status || '');
+// A ticket may carry `stage`, one of the kinds below, when a page has worked
+// out what it is from something other than its own status: Tasks rolls a Task
+// up from its sub tasks (`rollUp`). Where it is set, it is what the ticket is,
+// and every question below answers from it. My work never sets it.
+export const isClosed = (t) => (t.stage ? t.stage === 'done' || t.stage === 'rejected'
+  : closedByName.get(t.status) === true);
+export const isRejected = (t) => (t.stage ? t.stage === 'rejected' : isClosed(t) && DROPPED.test(t.status || ''));
 export const isDone = (t) => isClosed(t) && !isRejected(t);
-export const isAwaiting = (t) => !isClosed(t) && AWAITING.test(t.status || '') && !BOUNCED.test(t.status || '');
+export const isAwaiting = (t) => (t.stage ? t.stage === 'qa'
+  : !isClosed(t) && AWAITING.test(t.status || '') && !BOUNCED.test(t.status || ''));
 export const isFinished = (t) => isDone(t) || isAwaiting(t);
 /** Still the developer's to do: open, and not waiting on QA. */
 export const isOpenWork = (t) => !isClosed(t) && !isAwaiting(t);
-export const isStalled = (t) => isOpenWork(t) && STALLED.test(t.status || '');
-export const isFresh = (t) => isOpenWork(t) && !isStalled(t)
-  && (defaultStatus.size ? defaultStatus.has(t.status) : FRESH.test(t.status || ''));
+export const isStalled = (t) => (t.stage ? t.stage === 'stalled' : isOpenWork(t) && STALLED.test(t.status || ''));
+export const isFresh = (t) => (t.stage ? t.stage === 'fresh' : isOpenWork(t) && !isStalled(t)
+  && (defaultStatus.size ? defaultStatus.has(t.status) : FRESH.test(t.status || '')));
 
 /** The five kinds a bar draws, in the order it draws them. */
 export const KINDS = [
@@ -83,6 +89,34 @@ export const KINDS = [
 ];
 export const kindOf = (t) => (isRejected(t) ? 'rejected' : isDone(t) ? 'done' : isAwaiting(t) ? 'qa'
   : isStalled(t) ? 'stalled' : isFresh(t) ? 'fresh' : 'going');
+
+/**
+ * What a Task is, from its sub tasks (29 October). TICVAI's developers move the
+ * sub tasks under a Task to Ready for QA and leave the Task itself at New, so a
+ * Task read by its own status says nobody has finished anything. The rule:
+ *
+ *   rejected sub tasks are left out, as they are everywhere else;
+ *   a Task closed or waiting for QA in its own right stays what it says;
+ *   otherwise it is finished when every sub task left is finished — closed if
+ *   every one is closed, waiting for QA if any still waits — and in progress
+ *   when it is still at its starting status and any sub task has started
+ *   (anything but not started); otherwise it is what its own status says.
+ *
+ * `null` when there is no sub task to roll up from (none, or all rejected):
+ * the Task is its own status. Otherwise the stage and the counts behind it.
+ */
+export function rollUp(task, subs) {
+  const live = (subs ?? []).filter((s) => !isRejected(s));
+  if (!live.length) return null;
+  const own = kindOf(task);
+  const finished = live.filter(isFinished).length;
+  const started = live.filter((s) => kindOf(s) !== 'fresh').length;
+  let stage = own;
+  if (own === 'done' || own === 'rejected' || own === 'qa') stage = own;
+  else if (finished === live.length) stage = live.every(isDone) ? 'done' : 'qa';
+  else if (own === 'fresh' && started) stage = 'going';
+  return { stage, own, of: live.length, finished, started };
+}
 
 /** When a ticket is due: its own date, or failing that its sprint's last day.
  *  TICVAI's tickets carry no dates of their own; the sprint is the deadline. */

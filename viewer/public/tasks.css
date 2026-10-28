@@ -50,9 +50,24 @@
 .tk-lede { margin: 0; font-size: 13px; color: var(--text-dim); }
 .tk-lede a { color: var(--accent-text); }
 .tk-top-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-.tk-asof { font-size: 12px; color: var(--text-faint); }
+/* When OpenProject was read. In ink, not faint: on 29 October the lead read
+   the page as out of step with OpenProject, and every count matched; what he
+   could not see was how old they were. */
+.tk-asof { font-size: 12.5px; color: var(--text); font-variant-numeric: tabular-nums; }
+/* Older than two of the service's five-minute reads: a Refresh is due. */
+.tk-asof.is-stale { color: var(--amber); font-weight: 600; }
 /* The last Refresh failed: still the held read on the page, said in red. */
 .tk-asof.is-failed { color: var(--red); }
+/* Refresh is the one control here that changes what the numbers are, so it
+   reads as a button rather than as one more chip. */
+.chip.tk-refresh {
+  padding: 5px 12px; font-size: 12px; font-weight: 600;
+  border-color: var(--accent); color: var(--accent-text); background: var(--accent-soft);
+}
+.chip.tk-refresh:disabled { cursor: progress; opacity: .75; }
+/* How a Task with sub tasks is counted: one line, under the filter. */
+.tk-unit-says { margin: 0; font-size: 12px; color: var(--text-dim); }
+.tk-unit-says:empty { display: none; }
 .tk-top .auth-error { margin: 0; }
 
 .tk-scope {
@@ -397,7 +412,7 @@ a.tk-badge:hover { background: var(--bg-hover); }
 /* ── who is doing what ── */
 .tk-roster-head, .tk-person {
   display: grid;
-  grid-template-columns: minmax(160px, 1.15fr) minmax(140px, 3fr) 92px 124px 104px;
+  grid-template-columns: minmax(160px, 1.15fr) minmax(140px, 3fr) 92px 124px 104px 82px;
   gap: 16px; align-items: center;
 }
 .tk-roster-head {
@@ -426,13 +441,21 @@ a.tk-badge:hover { background: var(--bg-hover); }
 .tk-person.is-chosen .tk-avatar { background: var(--accent); color: var(--ink-on-accent); border-color: var(--accent); }
 .tk-person-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tk-person-bar { min-width: 0; }
-.tk-person-done, .tk-person-pace, .tk-person-open {
+.tk-person-done, .tk-person-pace, .tk-person-open, .tk-person-moved {
   font-size: 12px; color: var(--text-dim); white-space: nowrap; text-align: right;
   font-variant-numeric: tabular-nums;
 }
 .tk-person-done strong, .tk-person-open strong { font-size: 14px; color: var(--text); }
 .tk-person-pace { display: inline-flex; align-items: center; justify-content: flex-end; gap: 6px; }
 .tk-person-pace.is-behind { color: var(--text); font-weight: 600; }
+/* When they last moved a ticket; `is-still` is nothing moved in five working
+   days with work still open, said like being behind pace. */
+.tk-person-moved { display: inline-flex; align-items: center; justify-content: flex-end; gap: 6px; }
+.tk-person-moved.is-still { color: var(--text); font-weight: 600; }
+.tk-moved-cell { white-space: nowrap; }
+.tk-moved-cell.is-still { color: var(--text); font-weight: 700; }
+.tk-moved-cell.is-still::before { content: '! '; color: var(--tk-late); }
+.tk-p-rank-item.is-still dd:not(.tk-p-rank-words) { color: var(--tk-late); }
 .tk-pace-glyph { color: var(--red); font-weight: 800; }
 .tk-pace-glyph.is-ok { color: var(--accent-text); }
 .tk-roster-key { margin-top: 12px; }
@@ -577,7 +600,7 @@ a.tk-gantt-label:hover { text-decoration: underline; color: var(--text); }
 /* ── narrower screens ──────────────────────────────────────────────── */
 @media (max-width: 1100px) {
   .tk-roster-head, .tk-person {
-    grid-template-columns: minmax(140px, 1.1fr) minmax(100px, 2.4fr) 84px 112px 92px;
+    grid-template-columns: minmax(140px, 1.1fr) minmax(100px, 2.4fr) 84px 112px 92px 76px;
     gap: 12px;
   }
   .tk-strip-grid { --lab: 170px; }
@@ -604,7 +627,7 @@ a.tk-gantt-label:hover { text-decoration: underline; color: var(--text); }
   .tk-roster-head { display: none; }
   .tk-person {
     grid-template-columns: minmax(0, 1fr) auto auto;
-    grid-template-areas: 'who done pace' 'bar bar open';
+    grid-template-areas: 'who done pace' 'bar bar open' 'moved moved moved';
     gap: 6px 12px; padding: 10px 6px;
     border-bottom: 1px solid var(--border); border-radius: 0;
   }
@@ -614,6 +637,8 @@ a.tk-gantt-label:hover { text-decoration: underline; color: var(--text); }
   .tk-person-done { grid-area: done; }
   .tk-person-pace { grid-area: pace; }
   .tk-person-open { grid-area: open; }
+  .tk-person-moved { grid-area: moved; justify-content: flex-start; }
+  .tk-person-moved:empty { display: none; }
 
   .tk-qa-row {
     grid-template-columns: 54px minmax(0, 1fr) auto;

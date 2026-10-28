@@ -37,6 +37,14 @@
  * "Finished" is closed plus waiting for QA. A ticket waiting for QA is never
  * late: its developer is done with it.
  *
+ * **Counted in tasks, a Task with sub tasks is what its sub tasks say** (29
+ * October). Developers move the sub tasks; the Task above them stays New. So
+ * a Task is finished when every sub task is (rejected ones left out), in
+ * progress once any has started, and its own status otherwise; one that is
+ * closed or waiting for QA in its own right stays so. `rollUp` in
+ * ticket-kinds.js has the rule, and the page says it in one line under the
+ * filter. Counted in tickets, nothing is rolled up: each sub task is a ticket.
+ *
  * **Pace is an even line through the sprint's working days.** A sprint of ten
  * working days with 2,000 tickets is on pace when 200 are finished at the end
  * of day one. Weekends do not count. It is a yardstick, not a plan: nobody
@@ -64,7 +72,7 @@ import { mountPanels } from '/panels.js';
 import {
   DAY, today, asDate, asDay, addDays, days, isWorkday,
   learnStatuses, isClosed, isRejected, isDone, isAwaiting, isFinished, isOpenWork, isStalled, isFresh,
-  KINDS, kindOf, dueOn, isLate, isDueSoon,
+  KINDS, kindOf, rollUp, dueOn, isLate, isDueSoon,
   buildSprints, sprintOf, datedSprints, currentSprint, nextSprint, clock, count, paceFor,
 } from '/ticket-kinds.js';
 
@@ -147,14 +155,50 @@ const inUnit = (t) => state.unit === 'tickets' || t.type === 'Task';
 /** The type filter applies to tickets; in tasks every row is a Task already. */
 const typeOk = (t) => state.unit === 'tasks' || !state.scope.type || (t.type || '') === state.scope.type;
 let unitMemo = { data: null, unit: '', list: [] };
-/** Every ticket in the current unit, kept until the data or the unit changes. */
+/** Every ticket in the current unit, kept until the data or the unit changes.
+ *  In tasks, a Task with sub tasks is the rolled-up copy `asTask` makes. */
 function counted() {
   const data = state.data;
   if (unitMemo.data !== data?.items || unitMemo.unit !== state.unit) {
-    unitMemo = { data: data?.items, unit: state.unit, list: (data?.items ?? []).filter(inUnit) };
+    const list = (data?.items ?? []).filter(inUnit);
+    unitMemo = { data: data?.items, unit: state.unit, list: state.unit === 'tasks' ? list.map(asTask) : list };
   }
   return unitMemo.list;
 }
+
+/**
+ * A Task as the tasks unit counts it: from its sub tasks where it has any
+ * (`rollUp` in ticket-kinds.js says the rule). Without this a developer who
+ * had moved nine sub tasks to Ready for QA read as 1 of 65 finished, because
+ * the Tasks above them were still New (29 October).
+ *
+ * A copy carrying `stage`, so the Tickets unit, which counts the sub tasks
+ * themselves, still sees the Task as OpenProject has it. Its last change is
+ * the newest of its own and its sub tasks' (the original is kept as
+ * `ownUpdatedAt` for the CSV), and when the sub tasks are what finished it,
+ * it was finished when the last of them was.
+ */
+function asTask(t) {
+  const subs = (tree.kids.get(String(t.key)) ?? []).filter((s) => s.type !== 'Task');
+  const r = rollUp(t, subs);
+  if (!r) return t;
+  const live = subs.filter((s) => !isRejected(s));
+  const fromSubs = r.stage !== r.own && (r.stage === 'done' || r.stage === 'qa');
+  return {
+    ...t,
+    stage: r.stage,
+    rolled: r,
+    ownUpdatedAt: t.updatedAt,
+    updatedAt: newest([t.updatedAt, ...live.map((s) => s.updatedAt)]),
+    finishedOn: fromSubs ? newest(live.map((s) => state.data.closes?.[s.key] ?? s.updatedAt)) : null,
+  };
+}
+
+/** The latest of some ISO moments, as it was given; null for none. */
+const newest = (moments) => moments.reduce((best, iso) => {
+  const d = asDate(iso);
+  return d && (!best || d > best.d) ? { d, iso } : best;
+}, null)?.iso ?? null;
 
 // ── days ────────────────────────────────────────────────────────────
 
@@ -186,8 +230,9 @@ const share = (part, whole) => {
 
 /** When it was finished: ADAM's own record where a close went through ADAM,
  *  otherwise OpenProject's last change — see the header. */
-const finishedAt = (t) => (isDone(t) ? asDate(state.data.closes?.[t.key] ?? t.updatedAt)
-  : isAwaiting(t) ? asDate(t.updatedAt) : null);
+const finishedAt = (t) => (!isFinished(t) ? null : t.finishedOn ? asDate(t.finishedOn)
+  : isDone(t) ? asDate(state.data.closes?.[t.key] ?? t.ownUpdatedAt ?? t.updatedAt)
+    : asDate(t.ownUpdatedAt ?? t.updatedAt));
 const who = (t) => t.assignee || 'Unassigned';
 
 /** The sprint the top of the page is about: the one chosen in the filter, or
@@ -263,10 +308,40 @@ function setUnit(unit) {
 // somebody else's Refresh is reading attaches this page to that read rather
 // than starting a second. While a read runs — whoever started it — the button
 // says "Refreshing…" and is down, and the held tickets stay on the page.
+//
+// **And it asks again by itself** (29 October). It used to ask once, on
+// arrival, so a page left open all afternoon showed the morning's read with
+// "4 hours ago" beside it, and a ticket somebody closed through ADAM never
+// appeared until somebody pressed Refresh. Now, while the page is in view, it
+// asks every two minutes, and at once when it comes back into view after
+// longer than that. Each ask is the held read, which costs the service
+// nothing; one past its five minutes starts the next read, as any ask does.
 
 let asking = 0;
 const ASK_REFRESHING_MS = 10_000;
 const ASK_READING_MS = 5_000;
+const ASK_IDLE_MS = 120_000;
+let lastAsked = 0;
+
+/** Ask the service again if the page is in view and has not asked lately. */
+function askIfDue() {
+  if (document.hidden || !state.data || state.read.refreshing || $('tasks').hidden) return;
+  if (performance.now() - lastAsked < ASK_IDLE_MS) return;
+  load();
+}
+
+/** What ADAM's own writes move in an answer, as one short string: a hash of
+ *  every ticket's fields the page counts by, and how many closes ADAM recorded.
+ *  A hash rather than the newest `updatedAt`, because a ticket dated ahead of
+ *  the clock would hide every later change behind it. */
+function writes(d) {
+  let h = 0x811c9dc5;
+  for (const t of d?.items ?? []) {
+    const s = `${t.key}|${t.status}|${t.updatedAt}|${t.assignee}|${t.version}|${t.parent}|${t.dueDate}`;
+    for (let i = 0; i < s.length; i += 1) h = Math.imul(h ^ s.charCodeAt(i), 16777619) >>> 0;
+  }
+  return `${h}|${Object.keys(d?.closes ?? {}).length}`;
+}
 
 /** The button, in step with whether a read is running. */
 function refreshButton(running, label = 'Refreshing…') {
@@ -277,6 +352,7 @@ function refreshButton(running, label = 'Refreshing…') {
 
 async function load({ refresh = false, answer = null } = {}) {
   clearTimeout(asking);
+  lastAsked = performance.now();
   $('tk-error').hidden = true;
   if (refresh) {
     refreshButton(true);
@@ -315,9 +391,12 @@ async function load({ refresh = false, answer = null } = {}) {
   }
   // Not redrawn when nothing changed: a page asking every ten seconds while a
   // read runs would otherwise rebuild every section, and lose the reader's
-  // place in a long list, to show the same tickets.
+  // place in a long list, to show the same tickets. A write made through ADAM
+  // is a change even with the same `asOf`: the service puts what OpenProject
+  // answered into the held read at once (`_overview_amend`) and records a
+  // close through the gate in `closes`, so either moves `writes`.
   if (!state.data || data.asOf !== state.data.asOf || data.total !== state.data.total
-      || !state.data.items) {
+      || !state.data.items || writes(data) !== writes(state.data)) {
     state.data = data;
     learnStatuses(data.statuses);
     buildSprints(data.versions, data.items);
@@ -363,6 +442,9 @@ const ago = (seconds) => (seconds < 60 ? 'under a minute ago'
   : seconds < 5400 ? `${plural(Math.round(seconds / 60), 'minute', 'minutes')} ago`
     : `${plural(Math.round(seconds / 3600), 'hour', 'hours')} ago`);
 
+/** Two of the service's five-minute reads: older than this is said in amber. */
+const STALE_SECONDS = 600;
+
 function drawAsOf() {
   const read = state.read;
   if (!read.asOf) return;
@@ -370,10 +452,14 @@ function drawAsOf() {
   const at = clockOf(read.asOf);
   const line = $('tk-asof');
   line.classList.toggle('is-failed', !read.refreshing && !!read.error);
-  line.title = read.error ?? '';
-  line.textContent = read.refreshing ? `Refreshing… (last read ${at})`
+  // Past two of the service's reads and not being refreshed: something is
+  // holding the read up, and the reader should know before acting on it.
+  line.classList.toggle('is-stale', !read.refreshing && !read.error && age > STALE_SECONDS);
+  line.title = read.error ?? 'When ADAM last read every ticket from OpenProject. '
+    + 'The page asks for a newer read every two minutes while it is open; Refresh reads OpenProject now.';
+  line.textContent = read.refreshing ? `Refreshing from OpenProject… (last read ${at})`
     : read.error ? `Could not refresh from OpenProject. Last good read at ${at}, ${ago(age)}.`
-      : `Read from OpenProject at ${at}, ${ago(age)}`;
+      : `OpenProject as of ${at}, ${ago(age)}`;
 }
 
 /**
@@ -420,13 +506,21 @@ function denied() {
 // under it (a feature), walked once per load. Visit-guarded: a parent chain is
 // another system's data, and a cycle must not hang the page.
 
-const tree = { byKey: new Map(), top: new Map(), second: new Map() };
+const tree = { byKey: new Map(), top: new Map(), second: new Map(), kids: new Map() };
 
 function buildTree() {
   const all = state.data.items ?? [];
   tree.byKey = new Map(all.map((t) => [String(t.key), t]));
   tree.top = new Map();
   tree.second = new Map();
+  // Each ticket's direct children, for a Task's sub tasks (`asTask`).
+  tree.kids = new Map();
+  for (const t of all) {
+    if (!t.parent) continue;
+    const key = String(t.parent);
+    if (!tree.kids.has(key)) tree.kids.set(key, []);
+    tree.kids.get(key).push(t);
+  }
   for (const t of all) {
     const chain = [t];
     const seen = new Set([t.key]);
@@ -517,6 +611,13 @@ function drawScope() {
   fillSelect($('tk-scope-type'), 'Every type', types.map(([n, c]) => [n, `${n} (${nu(c)})`]), state.scope.type);
   // In tasks every row is a Task, so the type filter has nothing to choose.
   $('tk-scope-type').closest('.tk-field').hidden = state.unit === 'tasks';
+  // How a Task with sub tasks is counted, in one line, wherever it is. Emptied
+  // rather than hidden in tickets, where nothing is rolled up.
+  const rolled = state.unit === 'tasks' ? all.filter((t) => t.rolled).length : 0;
+  $('tk-unit-says').textContent = state.unit !== 'tasks' ? ''
+    : `A task with sub tasks counts as finished when every sub task is closed or waiting for QA, `
+      + `and in progress once any has started; rejected sub tasks are left out. `
+      + `${num(rolled)} of ${nu(all.length)} have sub tasks.`;
   for (const b of document.querySelectorAll('[data-unit]')) {
     b.setAttribute('aria-pressed', b.dataset.unit === state.unit ? 'true' : 'false');
   }
@@ -867,9 +968,67 @@ function people(focus) {
     r.expected = k ? Math.round(r.c.live * k.frac) : 0;
     r.behind = r.expected - r.c.finished;
     r.gate = gateFor(r.name);
+    r.moved = movedOf(r.name, r.open);
   }
   return [...rows.values()].filter((r) => r.all.length || r.sprint.length);
 }
+
+// ── when somebody last moved a ticket ───────────────────────────────
+//
+// A person can be on pace by the count and still have stopped: nothing on the
+// page said when they last did anything (29 October). OpenProject 10's list
+// has no date a status changed, only `updatedAt`, a ticket's last change of
+// any kind. So "last moved" is the newest `updatedAt` among their tickets that
+// have left the status a new ticket starts in: every type, in either count,
+// because sub tasks are where developers move work. It is an approximation and
+// the page says so: a comment on a started ticket moves it too, so does QA
+// closing one, and a ticket moved back to New drops out. Somebody with open
+// work and nothing moved in five working days is flagged.
+
+const STILL_DAYS = 5;
+let movedMemo = { items: null, byName: new Map() };
+
+/** Working days after `at`'s day, up to and including today. */
+function workdaysSince(at) {
+  let n = 0;
+  for (let d = addDays(new Date(at.getFullYear(), at.getMonth(), at.getDate()), 1); d <= today(); d = addDays(d, 1)) {
+    if (isWorkday(d)) n += 1;
+  }
+  return n;
+}
+
+/** `{at, idle, still}` for a person: when they last moved a ticket, the
+ *  working days since, and whether that is a stall (`open` is what they hold). */
+function movedOf(name, open) {
+  const items = state.data?.items ?? [];
+  if (movedMemo.items !== items) {
+    const byName = new Map();
+    const now = new Date();
+    for (const t of items) {
+      // A change dated after now is a clock out of step, not a later move.
+      const changed = asDate(t.updatedAt);
+      const at = changed && changed > now ? now : changed;
+      if (!at || isFresh(t)) continue;
+      const key = who(t);
+      if (!byName.has(key) || at > byName.get(key)) byName.set(key, at);
+    }
+    movedMemo = { items, byName };
+  }
+  const at = movedMemo.byName.get(name) ?? null;
+  const idle = at ? workdaysSince(at) : null;
+  const still = name !== 'Unassigned' && open > 0 && (idle == null || idle >= STILL_DAYS);
+  return { at, idle, still };
+}
+
+/** "28 Oct", "today", or "never", for a row. */
+const movedLabel = (m) => (!m.at ? 'never'
+  : +today() === +new Date(m.at.getFullYear(), m.at.getMonth(), m.at.getDate()) ? 'today' : fmtShort(m.at));
+/** "no ticket moved in 6 working days", for a flag's words. */
+const stillWords = (m) => (m.at ? `no ticket moved in ${plural(m.idle, 'working day', 'working days')}`
+  : 'no ticket of theirs has left its starting status');
+const MOVED_NOTE = 'Last moved is the newest change to any of their tickets that has left its starting status: '
+  + 'OpenProject 10 gives no date a status changed, so a comment or a close by QA counts too. '
+  + `! marks open work with nothing moved in ${STILL_DAYS} working days.`;
 
 function sortPeople(rows) {
   const unassignedLast = (a, b) => (a.name === 'Unassigned') - (b.name === 'Unassigned');
@@ -895,8 +1054,8 @@ function drawRoster(focus) {
     ? `Each bar is one person's ${Ws()} in ${focus.name}, on one scale. `
       + (running ? 'The upright mark is where an even pace would have their finished part by the end of today. ' : '')
       + 'Open in the plan is everything still theirs across every sprint, as a number, so a big backlog does not drown the sprint. '
-      + 'Select a person to open everything about them.'
-    : 'No dated sprint to measure against. Select a person to open everything about them.';
+      + `${MOVED_NOTE} Select a person to open everything about them.`
+    : `No dated sprint to measure against. ${MOVED_NOTE} Select a person to open everything about them.`;
 
   const box = $('tk-roster');
   box.replaceChildren(...rows.map((r) => {
@@ -930,10 +1089,19 @@ function drawRoster(focus) {
     const open = el('span', 'tk-person-open');
     open.append(el('strong', null, num(r.open)), el('span', null, ` open ${Ws()}`));
 
-    row.append(ident, bar, done, pace, open);
+    const moved = el('span', `tk-person-moved${r.moved.still ? ' is-still' : ''}`);
+    if (r.name !== 'Unassigned') {
+      if (r.moved.still) moved.append(el('span', 'tk-pace-glyph', '!'));
+      moved.append(movedLabel(r.moved));
+      moved.title = r.moved.still ? stillWords(r.moved) : r.moved.at ? `Last moved a ticket ${fmtWhen(r.moved.at)}` : '';
+    }
+
+    row.append(ident, bar, done, pace, open, moved);
+    const lastMoved = r.name === 'Unassigned' ? ''
+      : ` Last moved a ticket ${r.moved.at ? fmtDay(r.moved.at) : 'never'}${r.moved.still ? `: ${stillWords(r.moved)}` : ''}.`;
     row.setAttribute('aria-label', `${r.name}. ${focus ? `${focus.name}: ${num(r.c.finished)} of ${num(r.c.live)} finished` : ''}`
       + `${running && r.c.live ? (r.behind > 0 ? `, ${num(r.behind)} behind an even pace` : ', on pace') : ''}`
-      + `. ${num(r.open)} open in the whole plan. Opens everything about ${r.name}.`);
+      + `. ${num(r.open)} open in the whole plan.${lastMoved} Opens everything about ${r.name}.`);
     row.onclick = () => openPerson(r.name);
     return row;
   }));
@@ -1436,8 +1604,15 @@ function drawPersonRank(name, focus) {
   if (me.finishedAll) {
     items.push(['Finished so far', nu(me.finishedAll), most((r) => r.finishedAll)]);
   }
-  box.replaceChildren(...items.map(([label, value, words]) => {
-    const wrap = el('div', 'tk-p-rank-item');
+  // When they last moved a ticket, beside how much they hold: the count can be
+  // on pace while the work has stopped. See "when somebody last moved a ticket".
+  const m = me.moved;
+  const since = m.still ? `${stillWords(m)}. `
+    : m.at ? (m.idle ? `${plural(m.idle, 'working day', 'working days')} ago. ` : 'Today. ') : '';
+  items.push(['Last moved a ticket', m.at ? fmtDay(m.at) : 'never',
+    `${since}The newest change to a ticket of theirs past its starting status; a comment counts too.`, m.still]);
+  box.replaceChildren(...items.map(([label, value, words, flagged]) => {
+    const wrap = el('div', `tk-p-rank-item${flagged ? ' is-still' : ''}`);
     wrap.append(el('dt', null, label), el('dd', null, value), el('dd', 'tk-p-rank-words', words));
     return wrap;
   }));
@@ -2163,7 +2338,8 @@ function drawPeopleTable(focus) {
     + 'because that is where a developer’s finished work waits. Against pace is how far their finished count is '
     + 'from an even pace through the sprint’s working days. Late is still the developer’s and past its due date '
     + `or its sprint’s end. Rejected ${Ws()} are closed too but counted apart, so they never read as work delivered. `
-    + 'The test gate counts tickets in either view: it is ten tickets closed through ADAM.';
+    + 'The test gate counts tickets in either view: it is ten tickets closed through ADAM. '
+    + MOVED_NOTE;
   const table = $('tk-people');
   // Every column that carries something. A column of zeros (nothing closed
   // yet, nothing on hold) is said once in the note below the table instead.
@@ -2183,7 +2359,8 @@ function drawPeopleTable(focus) {
   const kept = columns.filter(([, get, always]) => always || rows.some((r) => get(r)));
   const dropped = columns.filter((col) => !kept.includes(col)).map(([label]) => label.toLowerCase());
   const head = el('tr');
-  for (const [label, numeric] of [['Person', false], ...kept.map(([l]) => [l, true]), ['Test gate (tickets)', false]]) {
+  for (const [label, numeric] of [['Person', false], ...kept.map(([l]) => [l, true]), ['Last moved a ticket', false],
+    ['Test gate (tickets)', false]]) {
     const th = el('th', numeric ? 'is-num' : null, label);
     th.scope = 'col';
     head.append(th);
@@ -2202,6 +2379,8 @@ function drawPeopleTable(focus) {
       const v = get(r);
       tr.append(el('td', `is-num${label === 'Late' && v ? ' is-late' : ''}`, num(v)));
     }
+    tr.append(el('td', `tk-moved-cell${r.moved.still ? ' is-still' : ''}`, r.name === 'Unassigned' ? '—'
+      : `${r.moved.at ? fmtDay(r.moved.at) : 'never'}${r.moved.still ? `, ${stillWords(r.moved)}` : ''}`));
     tr.append(el('td', 'tk-gate-cell', r.gate ? `${r.gate.closed}/${r.gate.every} tickets, ${gateState(r.gate).text}` : '—'));
     body.append(tr);
   }
@@ -2242,7 +2421,10 @@ function drawStates(items) {
     return barRow(name, n, biggest, kind, words);
   }));
   if (!rows.length) box.append(el('p', 'tk-empty', `No ${Ws()} to count.`));
-  $('tk-states-count').textContent = `${rows.length} in use, counted in ${Ws()}`;
+  // A Task's own status here, even where its sub tasks count it as something
+  // else: this is OpenProject's column, not the page's verdict.
+  $('tk-states-count').textContent = `${rows.length} in use, counted in ${Ws()}`
+    + (state.unit === 'tasks' && items.some((t) => t.rolled) ? ', by their own status' : '');
 }
 
 /** One ticket as a row: number, subject, who, state, date. */
@@ -2265,7 +2447,16 @@ function badgeTone(t) {
   return isLate(t) ? 'bad' : 'open';
 }
 
-const stateBadge = (t) => el('span', `tk-badge tk-badge-${badgeTone(t)}`, t.status || '—');
+/** The status OpenProject shows, and for a Task its sub tasks have moved on
+ *  from it, how many of them are finished: "New, sub tasks 3/3". */
+function stateBadge(t) {
+  const r = t.rolled;
+  const moved = r && r.stage !== r.own;
+  const badge = el('span', `tk-badge tk-badge-${badgeTone(t)}`,
+    `${t.status || '—'}${moved ? `, sub tasks ${r.finished}/${r.of}` : ''}`);
+  if (moved) badge.title = `${t.status} in OpenProject; counted as ${KINDS.find((k) => k.id === r.stage)?.label.toLowerCase()} from its sub tasks`;
+  return badge;
+}
 
 /** A long list drawn a page at a time; the rest is a button away. */
 function paged(box, rows, draw1, size, empty, unit = null) {
@@ -2564,7 +2755,7 @@ function exportCsv() {
       'start', 'due', 'late', 'percentDone', 'created', 'lastChanged', 'artefacts', 'url'].join(','),
     ...rows.map((t) => [
       t.key, t.subject, t.type, t.status, isFinished(t) ? 'yes' : 'no', who(t), t.parentSubject, t.version,
-      t.startDate, t.dueDate, isLate(t) ? 'yes' : 'no', t.percentDone, t.createdAt, t.updatedAt,
+      t.startDate, t.dueDate, isLate(t) ? 'yes' : 'no', t.percentDone, t.createdAt, t.ownUpdatedAt ?? t.updatedAt,
       (t.touches ?? []).map((x) => `${x.kind}:${x.id}`).join(' '), t.url,
     ].map(esc).join(',')),
   ].join('\r\n');
@@ -2723,6 +2914,9 @@ function redrawBurn() {
   // The button is `load`'s to put back up, when the read is done.
   $('tk-refresh').onclick = () => load({ refresh: true });
   setInterval(drawAsOf, 30_000);
+  // Asking again by itself: see "reading".
+  setInterval(askIfDue, 30_000);
+  document.addEventListener('visibilitychange', askIfDue);
   $('tk-search').oninput = (e) => { state.filter.text = e.target.value; listLimit = LIST_PAGE; drawList(); };
   $('tk-status').onchange = (e) => { state.filter.status = e.target.value; listLimit = LIST_PAGE; drawList(); };
   $('tk-open-only').onchange = (e) => { state.filter.openOnly = e.target.checked; listLimit = LIST_PAGE; drawList(); };
