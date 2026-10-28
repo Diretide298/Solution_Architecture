@@ -5,13 +5,18 @@ kind: process
 summary: 'A refresh draws the diagrams from the screens it has just written: derive-diagrams runs after
   link-screens-contracts, the last step that writes the screens, flows or contracts it reads, instead of after
   derive-board-panel-map, before the ten screen steps. check-regenerate-twice --chain runs derive-diagrams last, so a
-  second regeneration that changes a diagram is RT-CHAIN and fails the gate.'
+  second regeneration that changes a diagram is RT-CHAIN and fails the gate. derive-diagrams also picks a schema''s largest
+  table from the tables sorted: it took the max over a set, so a tie went to whichever table the run''s string hashing put
+  first and MarketingService''s largestTable flipped between regenerations.'
 decision:
   what: 'PROCESS-LOG P-31, open item "Order fix": "run derive-diagrams after the screen derive steps in refresh.sh (or
     again after them). Then extend check-regenerate-twice''s chain to cover diagrams, so the whole refresh is a fixed
     point." tools/refresh.sh: the step moved below link-screens-contracts (nothing between reads diagrams/; derive-mirrors
     copies them at the end). tools/check-regenerate-twice.py: derive-diagrams added to the chain, last, with every file it
-    writes (diagrams/*.yaml, diagrams/hld/*.yaml, diagrams/lld/*/*.yaml).'
+    writes (diagrams/*.yaml, diagrams/hld/*.yaml, diagrams/lld/*/*.yaml). tools/derive-diagrams.py: largestTable from
+    sorted(real), found when two regenerations in a row changed diagrams/lld/services/MarketingService.yaml
+    (waiver_requirement to privacy_request, both of the most columns); proven with two runs under hash seeds 1 and 2,
+    all 283 diagram files identical.'
   by: Chinmay
   date: '2026-10-29'
 why: 'Finding: audit/ticvai/PROCESS-LOG.md P-31 (r10, 26 October 2026): derive-diagrams ran before
@@ -21,6 +26,8 @@ keys_touched:
   files:
   - tools/refresh.sh
   - tools/check-regenerate-twice.py
+  - tools/derive-diagrams.py
+  - diagrams/lld/services/MarketingService.yaml
 root_class: 'step order: a step that feeds an earlier one is read only at the next refresh'
 tickets:
   started: []
