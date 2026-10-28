@@ -19,7 +19,7 @@ decision:
     all 283 diagram files identical.'
   by: Chinmay
   date: '2026-10-29'
-why: 'Finding: audit/ticvai/PROCESS-LOG.md P-31 (r10, 26 October 2026): derive-diagrams ran before
+why: 'Finding: the process log entry P-31 (r10, 26 October 2026): derive-diagrams ran before
   derive-transitions-from-flows and derive-carries-from-entrystate, so after a full refresh the P01 and P02 diagrams were
   one step behind the screens and a second rebuild changed 4 lines (fixed by hand in cd306cce).'
 keys_touched:

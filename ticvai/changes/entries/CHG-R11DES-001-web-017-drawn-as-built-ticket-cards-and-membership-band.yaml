@@ -28,7 +28,7 @@ decision:
     overwritten.'
   by: Chinmay
   date: '2026-10-29'
-why: 'ADAM CR-290 (Chitrangi Mestry, #33271 WEB-017, 28 October 2026; settlement audit/ticvai/r10/decisions-2026-10-29.json):
+why: 'ADAM CR-290 (Chitrangi Mestry, #33271 WEB-017, 28 October 2026; settled done by the lead on 29 October 2026 in ADAM):
   the build differs from the frame and its prototype view (plain booking rows, no header link, plain challenge rows, a lighter
   membership band). The lead''s rule of 28 October 2026 (frontend starter, 28eb978d): a frontend developer changes a screen''s
   design on their own and logs it, and the lead updates the wireframe, the screen''s UI and its page info.'
