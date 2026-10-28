@@ -2689,12 +2689,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | domain_id | uuid | yes | The custom domain''s id in White-label. |
 | hostname | text | yes |  |
 | status | text | yes | The domain''s status as the last event applied gave it. |
 | uae_pass_redirect | text | no |  |
 | last_event_at | timestamptz | yes | The changedAt of the event last applied; an older redelivery changes nothing. |
+| id | uuid | yes | Synthesised key. |
 
 ### `identity.refresh_token`
 

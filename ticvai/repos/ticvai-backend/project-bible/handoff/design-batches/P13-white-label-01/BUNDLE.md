@@ -2070,7 +2070,7 @@ page:
 
 #### Permissions
 
-- `listContentPages` → `TENANT_CONFIGURE` (configure) · staff, guest
+- `listContentPages` → `TENANT_CONFIGURE` (configure) · staff
 - `createContentPage` → `TENANT_CONFIGURE` (configure) · staff
 - `updateContentPage` → `TENANT_CONFIGURE` (configure) · staff
 - `getHomepageLayout` → `TENANT_CONFIGURE` (configure) · staff

@@ -3175,6 +3175,11 @@ paths:
       description: '**The read `updateMyProfile` had none of**, so a guest correcting a phone number could
         not see the one on file first. The caller''s own profile, with their preferences.
 
+        **Which row** (ADAM CR-291, option B, decided 29 October 2026; CHG-R11GST-002): a guest has one profile,
+        the `marketing.guest_profile` row of the session''s subject (unique on `subject_id`), and at most one
+        `marketing.guest_preference` row. A guest with no profile row is answered `404 not-found`; with no
+        preference row, `preferences` is left out. A `preferredChannel` stored as null is left out of the profile.
+
         '
       tags:
       - marketing
@@ -3200,6 +3205,8 @@ paths:
                     $ref: '#/components/schemas/GuestProfile'
                   preferences:
                     $ref: '#/components/schemas/GuestPreferences'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
@@ -3232,9 +3239,25 @@ paths:
         language and channel preference. They may not set their own tags, lifetime value or loyalty tier.
 
         **The name and language are Identity''s.** `displayName` and `preferredLanguage` also live on the
-        guest''s `pii.subject`, which Identity owns in `commerce`; this calls identity
-        `updateGuestSubjectDetails` with the guest''s own subject and those two fields when either is sent
-        (ADR-0055 rule 4, CHG-XDW-005), and writes the rest of the profile itself.
+        guest''s `pii.subject`, which Identity owns in `commerce`; the call to identity
+        `updateGuestSubjectDetails` with the guest''s own subject and those two fields (ADR-0055 rule 4,
+        CHG-XDW-005) is wired by a follow-up ticket, once that operation and the service route between the
+        deployables exist.
+
+        **Built now** (ADAM CR-275, option B, the CR-174 split, decided 28 October 2026; CHG-R11GST-004): `email`,
+        `phone` and `preferredChannel` on `marketing.guest_profile`, `dietary` and `accessibility` on
+        `marketing.guest_preference`, for the session''s own subject only, with `Idempotency-Key` replay, answered
+        `200` with the `GuestProfile`. Until the follow-up wires the call, sending `displayName` or
+        `preferredLanguage` is `400 validation` naming the field. Marketing does not write
+        `guest_profile.display_name` or `preferred_language`; the answer returns them as stored. `lifetimeValue`
+        stays out of this guest answer (CR-141''s rule), so the answer carries no Money and the venue settings
+        read declared for it is not made here.
+
+        **Which rows** (ADAM CR-291, option B, decided 29 October 2026; CHG-R11GST-002): the guest''s one profile,
+        the `marketing.guest_profile` row of the session''s subject (unique on `subject_id`). With no profile row
+        the answer is `404 not-found` and nothing is written. `preferredChannel: none` is stored as null, and the
+        answer then leaves `preferredChannel` out. `dietary` and `accessibility` update the subject''s one
+        `marketing.guest_preference` row, else insert it (a new id, `updated_at` now); `subject_id` is unique there.
 
         '
       tags:
@@ -3279,6 +3302,10 @@ paths:
                   - whatsapp
                   - push
                   - none
+                  description: '`none` is stored as null on `marketing.guest_profile.preferred_channel`, and the
+                    answer then leaves `preferredChannel` out (ADAM CR-291, option B; CHG-R11GST-002).
+
+                    '
                 dietary:
                   x-ticvai-stored-as: marketing.guest_preference.dietary
                   type: array
@@ -3306,6 +3333,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestProfile'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/accruals:
@@ -24806,10 +24837,15 @@ components:
             '
         subjectId:
           x-ticvai-data-class: behavioural
+          x-ticvai-unique: tenant
           type: string
           format: uuid
           description: 'Opaque reference. Personal data lives in the separately erasable store, which
             is what makes erasure possible against an append-only ledger.
+
+            **One profile per guest** (ADAM CR-291, option B, decided 29 October 2026; CHG-R11GST-002): unique in
+            the tenant, so `getMyProfile` and `updateMyProfile` read and write the one row of the session''s
+            subject. The profile''s segment is the one it was first captured in.
 
             '
         displayName:
@@ -24831,6 +24867,11 @@ components:
         preferredChannel:
           x-ticvai-data-class: personal
           $ref: '#/components/schemas/MessageChannel'
+          description: 'Left out where the guest has no preferred channel: a guest who chose `none` in
+            `updateMyProfile` is stored as null and answered without this field (ADAM CR-291, option B;
+            CHG-R11GST-002).
+
+            '
         guestLinkId:
           x-ticvai-data-class: personal
           type: string
@@ -24907,6 +24948,9 @@ components:
           readOnly: true
     GuestProfileDetail:
       x-ticvai-persistence: marketing.guest_profile
+      # Staff through its segment, for a session with no guest subject, or the guest it names, reading and writing
+      # (ADAM CR-291, option B, and CR-295's rule, decided 29 October 2026; CHG-R11GST-002).
+      x-ticvai-rls: guest-owns
       allOf:
       - $ref: '#/components/schemas/GuestProfile'
       - type: object
@@ -25904,6 +25948,9 @@ components:
         are (the profile). One row per subject. `dietary` and `accessibility` are here rather than as
         tags because BL-134 gives them their own consent purpose and retention.
 
+        **One row per subject, held by a unique key** (ADAM CR-291, option B, decided 29 October 2026;
+        CHG-R11GST-002): a write updates the subject''s row, else inserts one.
+
         '
       properties:
         id:
@@ -25911,6 +25958,7 @@ components:
           format: uuid
           readOnly: true
         subjectId:
+          x-ticvai-unique: tenant
           type: string
           format: uuid
           readOnly: true

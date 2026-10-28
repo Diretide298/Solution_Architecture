@@ -1998,7 +1998,7 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 | items[].email | string |  | (nullable) |
 | items[].phone | string |  | (nullable) |
 | items[].preferredLanguage | string |  | (nullable) |
-| items[].preferredChannel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  |  |
+| items[].preferredChannel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  | Left out where the guest has no preferred channel: a guest who chose none in updateMyProfile is stored as null and answered without this field (ADAM CR-291, option B; CHG-R11GST-002). |
 | items[].guestLinkId | string |  | Present where the guest is linked across cells. (nullable) |
 | items[].tags | array of string |  |  |
 | items[].engagementScore | integer |  | 22.2.20 and 22.2.21. (min 0; max 100; nullable) |
@@ -3468,6 +3468,7 @@ Read from the primary, because a reply the guest has just sent must be in the th
 **`GET /guests/me/profile`**: A guest reading their own details
 
 **The read `updateMyProfile` had none of**, so a guest correcting a phone number could not see the one on file first. The caller's own profile, with their preferences.
+**Which row** (ADAM CR-291, option B, decided 29 October 2026; CHG-R11GST-002): a guest has one profile, the `marketing.guest_profile` row of the session's subject (unique on `subject_id`), and at most one `marketing.guest_preference` row. A guest with no profile row is answered `404 not-found`; with no preference row, `preferences` is left out. A `preferredChannel` stored as null is left out of the profile.
 
 |  |  |
 |---|---|
@@ -3494,7 +3495,7 @@ Read from the primary, because a reply the guest has just sent must be in the th
 | profile.email | string |  | (nullable) |
 | profile.phone | string |  | (nullable) |
 | profile.preferredLanguage | string |  | (nullable) |
-| profile.preferredChannel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  |  |
+| profile.preferredChannel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  | Left out where the guest has no preferred channel: a guest who chose none in updateMyProfile is stored as null and answered without this field (ADAM CR-291, option B; CHG-R11GST-002). |
 | profile.guestLinkId | string |  | Present where the guest is linked across cells. (nullable) |
 | profile.tags | array of string |  |  |
 | profile.engagementScore | integer |  | 22.2.20 and 22.2.21. (min 0; max 100; nullable) |
@@ -3523,6 +3524,7 @@ Read from the primary, because a reply the guest has just sent must be in the th
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Profile |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getSeoMetadata
@@ -4666,7 +4668,9 @@ Board 4G. **Table, drink, dietary needs, contact channel.** A guest who states a
 **`updateGuestProfile` is staff-only, and the three screens calling it are the staff app, the back office and the CMS** — so to correct a phone number a guest had to ask somebody.
 CF-96 fixed this class for 28 guest screens and the underlying pattern was never swept.
 **A narrower field set than the staff operation.** A guest may correct their name, contact details, language and channel preference. They may not set their own tags, lifetime value or loyalty tier.
-**The name and language are Identity's.** `displayName` and `preferredLanguage` also live on the guest's `pii.subject`, which Identity owns in `commerce`; this calls identity `updateGuestSubjectDetails` with the guest's own subject and those two fields when either is sent (ADR-0055 rule 4, CHG-XDW-005), and writes the rest of the profile itself.
+**The name and language are Identity's.** `displayName` and `preferredLanguage` also live on the guest's `pii.subject`, which Identity owns in `commerce`; the call to identity `updateGuestSubjectDetails` with the guest's own subject and those two fields (ADR-0055 rule 4, CHG-XDW-005) is wired by a follow-up ticket, once that operation and the service route between the deployables exist.
+**Built now** (ADAM CR-275, option B, the CR-174 split, decided 28 October 2026; CHG-R11GST-004): `email`, `phone` and `preferredChannel` on `marketing.guest_profile`, `dietary` and `accessibility` on `marketing.guest_preference`, for the session's own subject only, with `Idempotency-Key` replay, answered `200` with the `GuestProfile`. Until the follow-up wires the call, sending `displayName` or `preferredLanguage` is `400 validation` naming the field. Marketing does not write `guest_profile.display_name` or `preferred_language`; the answer returns them as stored. `lifetimeValue` stays out of this guest answer (CR-141's rule), so the answer carries no Money and the venue settings read declared for it is not made here.
+**Which rows** (ADAM CR-291, option B, decided 29 October 2026; CHG-R11GST-002): the guest's one profile, the `marketing.guest_profile` row of the session's subject (unique on `subject_id`). With no profile row the answer is `404 not-found` and nothing is written. `preferredChannel: none` is stored as null, and the answer then leaves `preferredChannel` out. `dietary` and `accessibility` update the subject's one `marketing.guest_preference` row, else insert it (a new id, `updated_at` now); `subject_id` is unique there.
 
 |  |  |
 |---|---|
@@ -4696,7 +4700,7 @@ CF-96 fixed this class for 28 guest screens and the underlying pattern was never
 | email | string (email) |  |  |
 | phone | string |  |  |
 | preferredLanguage | string |  |  |
-| preferredChannel | enum (email, sms, whatsapp, push, none) |  |  |
+| preferredChannel | enum (email, sms, whatsapp, push, none) |  | none is stored as null on marketing.guest_profile.preferred_channel, and the answer then leaves preferredChannel out (ADAM CR-291, option B; CHG-R11GST-002). |
 | dietary | array of string |  | Health-adjacent personal data, kept structured rather than as a tag (BL-134). |
 | accessibility | array of string |  | Same treatment, same reason. |
 
@@ -4710,7 +4714,7 @@ CF-96 fixed this class for 28 guest screens and the underlying pattern was never
 | email | string |  | (nullable) |
 | phone | string |  | (nullable) |
 | preferredLanguage | string |  | (nullable) |
-| preferredChannel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  |  |
+| preferredChannel | MessageChannel: enum (email, sms, whatsapp, push, inApp, post) |  | Left out where the guest has no preferred channel: a guest who chose none in updateMyProfile is stored as null and answered without this field (ADAM CR-291, option B; CHG-R11GST-002). |
 | guestLinkId | string |  | Present where the guest is linked across cells. (nullable) |
 | tags | array of string |  |  |
 | engagementScore | integer |  | 22.2.20 and 22.2.21. (min 0; max 100; nullable) |
@@ -4730,6 +4734,8 @@ CF-96 fixed this class for 28 guest screens and the underlying pattern was never
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 400 | BadRequest | Validation failed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### uploadGuestDocument
@@ -5631,7 +5637,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | email | text | no |  |
 | phone | text | no |  |
 | preferred_language | text | no |  |
-| preferred_channel | text | no |  |
+| preferred_channel | text | no | Left out where the guest has no preferred channel: a guest who chose none in updateMyProfile is stored as null and answered without this field (ADAM CR-291, option B; CHG-R11GST-002). |
 | guest_link_id | uuid | no | Present where the guest is linked across cells. |
 | tags | text[] | no |  |
 | engagement_score | integer | no | 22.2.20 and 22.2.21. |

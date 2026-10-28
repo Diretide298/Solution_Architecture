@@ -584,7 +584,9 @@ paths:
         **Whose cart it is, in the database** (ADAM CR-184, option A; CHG-R9CR-003): `orders.cart` is read and written
         by staff and partners by its venue, as before, and by a guest by its own subject (`subject_id` = the session''s
         `ticvai.subject_id`, `x-ticvai-rls: guest-owns`), so a signed-in guest needs no grant on the venue and never
-        sees another guest''s cart; `orders.cart_line` follows its cart.
+        sees another guest''s cart; `orders.cart_line` follows its cart. **The venue branch admits only a session
+        with no guest subject** (ADAM CR-295, option A, decided 29 October 2026; CHG-R11GST-001): the venue scope a
+        guest request carries (CR-198) never opens another guest''s cart; a guest reaches its carts by subject alone.
 
 
         **The new cart''s window and cap** (ADAM CR-184, option A; CHG-R9CR-003). A new cart holds no lease, so its
@@ -5518,6 +5520,13 @@ paths:
         another guest's order is simply not visible. `orders.order_line` is read by a guest through its order;
         `orders.payment`, `orders.order_line_discount` and `orders.order_line_eligibility` keep following their parent.
         A guest writes none of them through this rule.
+
+        **The staff branch admits only a session with no guest subject** (ADAM CR-295, option A, decided 29 October
+        2026; CHG-R11GST-001). The venue scope a guest request carries (CR-198) matched the scope branch for every
+        order at the venue; now `orders.sales_order` and `orders.order_line`, the order's lifecycle log and every table
+        that reads through them show a guest its own rows by subject alone. Until the forward migration that carries
+        this is applied, a guest's order reads also filter by `subject_id` in the query, so no database with the old
+        policy shows a guest another guest's order.
 
         **The order access token, checked** (CR-191, option A). Its claims, signing key and minting are on
         `Order.orderAccessToken`. getOrder verifies the signature, that `exp` is in the future, that `oid` is the path's
@@ -20123,7 +20132,7 @@ components:
       x-ticvai-persistence: orders.order_event
       # Staff by scope as before; a guest reads the events of its own order, through orders.sales_order, so
       # getOrderCalendarEvent counts its reschedules for the event's SEQUENCE (ADAM CR-199 and CR-191, option A;
-      # CHG-R9CR-006).
+      # CHG-R9CR-006). The staff branch admits only a session with no guest subject (CR-295; CHG-R11GST-001).
       x-ticvai-rls: guest-reads-own
       description: '**The order and reservation lifecycle log** (DM5, 29 September: data model for
         the agreed operations). Append-only: one row per state change or integration step, with
@@ -24130,7 +24139,8 @@ components:
       # `discounts` is the applied discounts, one row each in orders.order_line_discount (SD-008).
       x-ticvai-persistence: orders.order_line + orders.order_line_eligibility + orders.order_line_discount
       # Staff by venue as before; a guest reads the lines of its own order, through orders.sales_order (ADAM CR-191,
-      # option A; CHG-R9CR-004). The discount and eligibility rows keep following their line.
+      # option A; CHG-R9CR-004). The discount and eligibility rows keep following their line. The staff branch admits
+      # only a session with no guest subject (CR-295; CHG-R11GST-001).
       x-ticvai-rls: guest-reads-own
       x-ticvai-retired-columns:
       - promotion_id
@@ -24429,7 +24439,8 @@ components:
       type: object
       x-ticvai-persistence: orders.cart
       # Staff and partners by venue as before; a guest reads and writes its own carts by subject (ADAM CR-184,
-      # option A; CHG-R9CR-003). orders.cart_line follows the cart.
+      # option A; CHG-R9CR-003). orders.cart_line follows the cart. The venue branch admits only a session with no
+      # guest subject (CR-295; CHG-R11GST-001).
       x-ticvai-rls: guest-owns
       required:
       - id
@@ -24831,7 +24842,7 @@ components:
       x-ticvai-persistence: orders.sales_order + orders.order_line
       # Staff by scope as before, in migration 225's per-statement shape; a guest reads its own orders by subject
       # (ADAM CR-191, option A; CHG-R9CR-004). payment, order_line_discount and order_line_eligibility keep following
-      # their parent.
+      # their parent. The scope branch admits only a session with no guest subject (CR-295; CHG-R11GST-001).
       x-ticvai-rls: guest-reads-own
       type: object
       required:

@@ -681,7 +681,7 @@ routesTo: CMS-007
 #### Permissions
 
 - `createContentPage` → `TENANT_CONFIGURE` (configure) · staff
-- `listContentPages` → `TENANT_CONFIGURE` (configure) · staff, guest
+- `listContentPages` → `TENANT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 

@@ -172,18 +172,6 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `approvals` — 31 tables
-
-**Root: `approvals.request`**  ·  own 10 · reach 53 · out 5
-
-- **1 step from the root** — `accreditation_badge`, `approved_action_execution`, `decision`, `decision_record`, `escalation`, `external_dispatch`, `request_approver`, `signature`, `workflow_step_execution`, `workflow_version`
-- **2 steps from the root** — `automation_execution`, `workflow_definition`, `workflow_exception`, `workflow_instance`, `workflow_intervention`
-- **3 steps from the root** — `automation`, `workflow_trigger`
-
-- **Reaches the root through nothing** — `approver_availability`, `business_rule`, `control_policy`, `decision_table`, `decision_table_row`, `delegation`, `evidence_package`, `external_provider`, `matrix`, `retention_policy`, `rule`, `sla_policy`, `step_up_policy`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
 ## `promotions` — 31 tables
 
 **Root: `promotions.promotion`**  ·  own 5 · reach 9 · out 2
@@ -193,6 +181,18 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 - **1 step from the root** — `promotion_alert`, `promotion_audit`, `promotion_channel_publication`, `promotion_rule`, `promotion_variant`
 
 - **Reaches the root through nothing** — `allocation_component`, `allocation_split`, `bundle`, `bundle_capacity_policy`, `bundle_choice_group`, `bundle_choice_option`, `bundle_component`, `campaign`, `campaign_budget`, `code_assignment`, `coupon_campaign`, `coupon_code`, `coupon_code_batch`, `partner_bundle_product`, `product_relationship`, `promotion_conflict`, `promotion_evaluation_trace`, `recommendation_experiment`, `recommendation_outcome`, `recommendation_strategy`, `recommendation_suppression`, `stacking_rule`, `upsell_rule`, `voucher`, `voucher_batch`
+
+  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
+
+## `approvals` — 31 tables
+
+**Root: `approvals.request`**  ·  own 10 · reach 53 · out 5
+
+- **1 step from the root** — `accreditation_badge`, `approved_action_execution`, `decision`, `decision_record`, `escalation`, `external_dispatch`, `request_approver`, `signature`, `workflow_step_execution`, `workflow_version`
+- **2 steps from the root** — `automation_execution`, `workflow_definition`, `workflow_exception`, `workflow_instance`, `workflow_intervention`
+- **3 steps from the root** — `automation`, `workflow_trigger`
+
+- **Reaches the root through nothing** — `approver_availability`, `business_rule`, `control_policy`, `decision_table`, `decision_table_row`, `delegation`, `evidence_package`, `external_provider`, `matrix`, `retention_policy`, `rule`, `sla_policy`, `step_up_policy`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -241,6 +241,16 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
+## `inventory` — 23 tables
+
+**Root: `inventory.inventory_item`**  ·  own 13 · reach 20 · out 2
+
+- **1 step from the root** — `count_line`, `goods_receipt_line`, `kit_component`, `movement`, `purchase_order_line`, `quotation_line`, `requisition_line`, `serialised_item`, `stock_batch`, `stock_earmark`, `stock_level`, `transfer_line`
+
+- **Reaches the root through nothing** — `count`, `daily_count_list`, `goods_receipt`, `location`, `purchase_order`, `quotation`, `requisition`, `supplier`, `supplier_contract`, `transfer`
+
+  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
+
 ## `platform` — 23 tables
 
 **Root: `platform.scope`**  ·  own 12 · reach 213 · out 1
@@ -250,16 +260,6 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 - **3 steps from the root** — `sale_board_tile`
 
 - **Reaches the root through nothing** — `configuration_profile`, `connectivity_policy`, `dead_letter`, `denomination`, `idempotency_record`, `offline_policy`, `outbox`, `outbox_sequence`, `profile_deployment`, `schema_version`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
-## `inventory` — 23 tables
-
-**Root: `inventory.inventory_item`**  ·  own 13 · reach 20 · out 2
-
-- **1 step from the root** — `count_line`, `goods_receipt_line`, `kit_component`, `movement`, `purchase_order_line`, `quotation_line`, `requisition_line`, `serialised_item`, `stock_batch`, `stock_earmark`, `stock_level`, `transfer_line`
-
-- **Reaches the root through nothing** — `count`, `daily_count_list`, `goods_receipt`, `location`, `purchase_order`, `quotation`, `requisition`, `supplier`, `supplier_contract`, `transfer`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 

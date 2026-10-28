@@ -852,7 +852,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 
 **The anonymous session is Identity's** (ADAM CR-183, option A, decided 21 October 2026; CHG-R9CR-002). Called with no credential, createCart writes the cart and then asks Identity's in-process API `identity#openAnonymousGuestSession` with the cart's id and the body's `deviceId`, in the same transaction; Identity opens the session in its session registry, signs its token and returns `{ sessionId, token }`, and the token is `Cart.anonymousSessionToken`. Orders never writes Identity's session store and never holds its signing key. `claimCart` ends it through the same API (`identity#endAnonymousGuestSession`). **Without a credential, `deviceId` is required** (`400 validation` otherwise); with one it is ignored.
 
-**Whose cart it is, in the database** (ADAM CR-184, option A; CHG-R9CR-003): `orders.cart` is read and written by staff and partners by its venue, as before, and by a guest by its own subject (`subject_id` = the session's `ticvai.subject_id`, `x-ticvai-rls: guest-owns`), so a signed-in guest needs no grant on the venue and never sees another guest's cart; `orders.cart_line` follows its cart.
+**Whose cart it is, in the database** (ADAM CR-184, option A; CHG-R9CR-003): `orders.cart` is read and written by staff and partners by its venue, as before, and by a guest by its own subject (`subject_id` = the session's `ticvai.subject_id`, `x-ticvai-rls: guest-owns`), so a signed-in guest needs no grant on the venue and never sees another guest's cart; `orders.cart_line` follows its cart. **The venue branch admits only a session with no guest subject** (ADAM CR-295, option A, decided 29 October 2026; CHG-R11GST-001): the venue scope a guest request carries (CR-198) never opens another guest's cart; a guest reaches its carts by subject alone.
 
 **The new cart's window and cap** (ADAM CR-184, option A; CHG-R9CR-003). A new cart holds no lease, so its `expiresAt` is its own window: now plus `cartLeaseSeconds`, and its `maxExtensions` is `cartMaxExtensions`. Both are read with `tenancy#venueSettingsRecords`: the venue's row first, and where its value is null, the tenant's default, which is the tenant's own row of `platform.venue_settings` (the row with no venue that `setVenueSettingsDefaults` writes); where that is null too, the field's proposed default (900 seconds, 1 extension). `extensionsUsed` starts at 0.
 
@@ -2699,6 +2699,7 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for an order they placed; another guest's order is refused exactly as one that does not exist, never returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 **Or with the order's access token and no session** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C52, option A; CHG-R8SPN-025): the device that checked out, or a payer with no session, sends `X-Order-Access-Token` (`Order.orderAccessToken`, from `checkoutCart`) and reads this one order for 24 hours. With neither a session nor a valid token for this order the answer is `404`. For a signed-in guest a `404` is also what WEB-013 and WEB-012 show as their no-access state: the guest's own order lookup found nothing they may see (IDENTITY-C28); no permission is involved.
 **A guest's own order, in the database** (ADAM CR-191, option A, decided 21 October 2026; CHG-R9CR-004). `orders.sales_order` is read by staff by its scope path as before (the per-statement predicate of our repository's migration 225) and by a guest by its own subject (`subject_id` = the session's `ticvai.subject_id`; `x-ticvai-rls: guest-reads-own`), so a guest session needs no grant on the venue and another guest's order is simply not visible. `orders.order_line` is read by a guest through its order; `orders.payment`, `orders.order_line_discount` and `orders.order_line_eligibility` keep following their parent. A guest writes none of them through this rule.
+**The staff branch admits only a session with no guest subject** (ADAM CR-295, option A, decided 29 October 2026; CHG-R11GST-001). The venue scope a guest request carries (CR-198) matched the scope branch for every order at the venue; now `orders.sales_order` and `orders.order_line`, the order's lifecycle log and every table that reads through them show a guest its own rows by subject alone. Until the forward migration that carries this is applied, a guest's order reads also filter by `subject_id` in the query, so no database with the old policy shows a guest another guest's order.
 **The order access token, checked** (CR-191, option A). Its claims, signing key and minting are on `Order.orderAccessToken`. getOrder verifies the signature, that `exp` is in the future, that `oid` is the path's `orderId` and `tid` the routed tenant, and that `did` equals `X-Device-Id`; any failure is `404`. A verified token reads that one order (its lines, payments, discounts and eligibility rows) under the routed tenant's root grant, as the payment webhook does (ITenantRootGrant), and nothing else in the same transaction.
 
 |  |  |
@@ -10149,21 +10150,21 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | refund_id | uuid | yes | The parent row. |
 | order_line_id | uuid | yes |  |
 | refunded_amount | numeric(18,4) | yes |  |
 | applied_percentage | numeric | no | The time band of this line's own performance (ADAM CR-208). |
+| id | uuid | yes | Synthesised key. |
 
 ### `orders.refund_payment`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | refund_id | uuid | yes | The parent row. |
 | payment_id | uuid | yes |  |
 | refunded_amount | numeric(18,4) | yes | In the base currency, for the ledger. |
 | tender_amount | numeric(18,4) | no | In the payment's tender currency (Payment.tenderCurrency), at that currency's scale; null where the payment was in the base currency. |
+| id | uuid | yes | Synthesised key. |
 
 ### `orders.refund_policy`
 

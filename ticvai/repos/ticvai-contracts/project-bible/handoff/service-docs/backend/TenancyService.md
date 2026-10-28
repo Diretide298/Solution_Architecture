@@ -2176,7 +2176,7 @@ Board 1 of the client's POS design set. **The package held `lastHeartbeatAt` and
 
 **`GET /audit-records`**: Who did what, where, and when
 
-POS board 1 and 4, 24 August. **`platform.audit_record` existed and nothing read it** — every write leaves an audit row (the platform writes it in the write's transaction; ADAM CR-179) and no operation, screen or flow could show one. `BO-068 Audit Log` had zero operations declared.
+POS board 1 and 4, 24 August. **`platform.audit_record` existed and nothing read it** — every staff or system write leaves an audit row (the platform writes it in the write's transaction; ADAM CR-179; a guest's own write, with no principal, leaves none, CR-289) and no operation, screen or flow could show one. `BO-068 Audit Log` had zero operations declared.
 **A venue caller reads its own venue's trail** (ADAM CR-185, option B, decided 21 October 2026; CHG-R10TEN-006). The table's read policy is the tenant root, or a grant over the scope node a row's `orgUnitId` names: a venue manager holding `AUDIT_VIEW` sees the rows of the venue and the nodes beneath it, a region the rows of its venues, and head office every row. Rows with no `orgUnitId` (consumers, jobs, the webhook) stay the tenant root's. The policy does the narrowing, so the operation's code does not change; `orgUnitId` filters within what the caller may read.
 Found by mapping the POS pack: four separate frames wanted an audit view — station events, profile deployments, limit unlocks, override history — and **every one of them is this operation with a filter.**
 **Reading the audit log is itself audited.** `platform.audit_read` exists for that reason: a trail nobody can inspect is useless, and one anybody can inspect without trace is a different problem. Each call writes one `AuditRead` row (`target` `auditRecord`, the caller, the time, the filters and the number of rows returned; CHG-R8MIG-004), with the org unit the caller's session acts at (`orgUnitId`, CHG-R10TEN-019).
@@ -3688,11 +3688,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | request_id | text | yes | The parent row. |
 | level | integer | yes | The level of the chain this approver decides at. |
 | principal_id | uuid | yes | The approver, a principal of the tenant. |
 | is_delegate | boolean | yes | True when the approver stands in for another through an ApprovalDelegation in force at routing. |
+| id | uuid | yes | Synthesised key. |
 
 ### `approvals.rule`
 

@@ -687,7 +687,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": ""
+   "note": "Holds 5 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "catalogue.channel_envelope",
@@ -742,7 +742,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "**Redis, not Postgres.** `ActiveSession` and `Session` both declare `persistence: none — Redis session registry`, and ADR-0004 makes a session a token with a validity window rather than a row. The schema reference had it"
+   "note": "**The staff session record** (3 October 2026, CHG-R1S-008): one row per signed-in session of a principal, tenant-scoped and under row-level security. **The row is the record of record; Redis is the token cache in front o"
   },
   {
    "table": "ledger.fx_rate",
@@ -819,7 +819,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": ""
+   "note": "Holds 5 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "orders.refund_payment",
@@ -830,7 +830,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": ""
+   "note": "Holds 5 columns. **No description has been written for this table** — the name is the only thing saying what it is"
   },
   {
    "table": "payments.payment_attempt",
