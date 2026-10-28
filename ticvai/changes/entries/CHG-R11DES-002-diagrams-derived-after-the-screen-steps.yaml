@@ -1,0 +1,35 @@
+id: CHG-R11DES-002
+date: '2026-10-29'
+source: audit
+kind: process
+summary: 'A refresh draws the diagrams from the screens it has just written: derive-diagrams runs after
+  link-screens-contracts, the last step that writes the screens, flows or contracts it reads, instead of after
+  derive-board-panel-map, before the ten screen steps. check-regenerate-twice --chain runs derive-diagrams last, so a
+  second regeneration that changes a diagram is RT-CHAIN and fails the gate.'
+decision:
+  what: 'PROCESS-LOG P-31, open item "Order fix": "run derive-diagrams after the screen derive steps in refresh.sh (or
+    again after them). Then extend check-regenerate-twice''s chain to cover diagrams, so the whole refresh is a fixed
+    point." tools/refresh.sh: the step moved below link-screens-contracts (nothing between reads diagrams/; derive-mirrors
+    copies them at the end). tools/check-regenerate-twice.py: derive-diagrams added to the chain, last, with every file it
+    writes (diagrams/*.yaml, diagrams/hld/*.yaml, diagrams/lld/*/*.yaml).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: audit/ticvai/PROCESS-LOG.md P-31 (r10, 26 October 2026): derive-diagrams ran before
+  derive-transitions-from-flows and derive-carries-from-entrystate, so after a full refresh the P01 and P02 diagrams were
+  one step behind the screens and a second rebuild changed 4 lines (fixed by hand in cd306cce).'
+keys_touched:
+  files:
+  - tools/refresh.sh
+  - tools/check-regenerate-twice.py
+root_class: 'step order: a step that feeds an earlier one is read only at the next refresh'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: PROCESS-LOG P-31 (r10 integration gate), an order fix in the refresh'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-regenerate-twice.py
+status: open
