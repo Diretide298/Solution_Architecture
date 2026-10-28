@@ -7,7 +7,8 @@ summary: 'listContentPages is the CMS staff read only: bearerAuth and TENANT_CON
 decision:
   what: 'ADAM CR-287, option A. A guest session is refused as by any staff-only operation. Every guest screen''s binding
     of listContentPages is already marked removed in favour of listPublishedContentPages (P01 WEB-045, P02 GST-040 and
-    GST-057), so no screen changes. No grant is added; whitelabel.content_page''s read-beneath policy stays.'
+    GST-057), so no screen changes. No grant is added; whitelabel.content_page''s read-beneath policy stays. The
+    security change is breaking by the compat rule and is listed as BC-493 with the lead''s approval.'
   by: Chinmay
   date: '2026-10-28'
 why: 'ADAM CR-287 (Deep Khanvilkar, #31087), settled done 28 October 2026 with option A (decision record
@@ -18,6 +19,7 @@ keys_touched:
   - listContentPages
   files:
   - contracts/satellite/white-label.yaml
+  - docs/active/breaking-changes.yaml
 root_class: 'new: a guest read beside the guest operation that replaced it'
 tickets:
   started:
