@@ -1,0 +1,50 @@
+id: CHG-R11GST-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'On every table whose read policy has a guest branch beside a scope branch (orders.sales_order, orders.cart,
+  orders.order_line, orders.order_event, and the tables that read through them), the scope branch admits only a session
+  with no guest subject, so a guest request''s venue scope (CR-198) never shows another guest''s order or cart.'
+decision:
+  what: 'ADAM CR-295, option A: the read check is (NULLIF(current_setting(''ticvai.subject_id'', true), '''') IS NULL AND
+    <the scope test>) OR <the guest branch>. derive-ddl writes it for every table marked x-ticvai-rls guest-owns or
+    guest-reads-own (NO_GUEST); orders.cart''s write check is its read check, so the guest writes its own carts by
+    subject alone, and orders.cart_line follows. CR-198''s venue scope still opens published venue data to a guest.
+    The light release carries the forward migration (a policy re-apply, safe to run twice). Until it is applied, guest
+    order reads also filter by subject_id in the query (getOrder''s text).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-295 (Pranay Shinde, #30688), accepted 29 October 2026 with option A (decision record
+  decisions-2026-10-29.json, r10 settle batch): CR-191''s guest order policy (CHG-R9CR-004) beside CR-198''s guest
+  venue scope let a guest under Marina''s scope read another guest''s order (GetOrderCalendarEventTests on #30688''s
+  branch).'
+keys_touched:
+  operations:
+  - getOrder
+  - createCart
+  tables:
+  - orders.sales_order
+  - orders.cart
+  - orders.cart_line
+  - orders.order_line
+  - orders.order_event
+  files:
+  - tools/derive-ddl.py
+  - contracts/spine/orders.yaml
+root_class: 'new: a staff branch beside a guest branch that a guest''s own scope also matches'
+tickets:
+  started:
+  - '30688 (getOrderCalendarEvent and the guest order reads): through CR-295''s comment; its integration test passes
+    once the migration is applied.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-295
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::NO_GUEST
+status: open
+notes: 'Database: one forward migration re-applies the five policies (MIG-ORDERS, the migration owner). Not changed:
+  identity.delegated_access (x-ticvai-rls scope-or-subject) also has a scope branch beside a guest branch; CR-295''s
+  decision names the orders tables and guest_profile, so it is left for the lead.'

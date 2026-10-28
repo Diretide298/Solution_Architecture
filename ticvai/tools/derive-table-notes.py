@@ -66,6 +66,14 @@ WHAT = {
         "An ended session keeps `status`, `ended_at`, `ended_by_principal_id` and `end_reason` (R8 blocker "
         "IDENTITY-C46, CHG-R8MIG-015), and `ended_at` is null exactly while the session is `active` (ADAM CR-242), so a "
         "supervisor asking what happened to till 4 gets who ended it and why rather than an absence."),
+    # ADAM CR-289, option A, decided 29 October 2026 (CHG-R11GST-003): the note said "on every write", and a guest's
+    # write cannot pass the append policy and is not audited.
+    "platform.audit_record": (
+        "**Written by the platform on every staff or system write, not by any one operation** (ADR-0022 sits above "
+        "this; ADAM CR-179): one row in the write's own transaction, from every host. **A guest's own write is not "
+        "audited here** (ADAM CR-289): a transaction whose caller is a guest subject with no principal writes no row, "
+        "and the guest's domain rows (wishlist, guest device, cart, order) are its record. Appended by any connection "
+        "holding a grant; read by the tenant root, or by a grant over the row's org unit (CR-005, CR-185)."),
     # ADAM CR-182, option A, decided 21 October 2026 (CHG-R9CR-001): the table had no description.
     "platform.idempotency_record": (
         "**The durable record of one keyed write** (SD-024): the `Idempotency-Key` a client sent, the "

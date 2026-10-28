@@ -1,0 +1,34 @@
+id: CHG-R11GST-005
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'listContentPages is the CMS staff read only: bearerAuth and TENANT_CONFIGURE, with guestAuth, the guest
+  paragraph and the guest audience removed; guests read listPublishedContentPages (GFIX-2).'
+decision:
+  what: 'ADAM CR-287, option A. A guest session is refused as by any staff-only operation. Every guest screen''s binding
+    of listContentPages is already marked removed in favour of listPublishedContentPages (P01 WEB-045, P02 GST-040 and
+    GST-057), so no screen changes. No grant is added; whitelabel.content_page''s read-beneath policy stays.'
+  by: Chinmay
+  date: '2026-10-28'
+why: 'ADAM CR-287 (Deep Khanvilkar, #31087), settled done 28 October 2026 with option A (decision record
+  decisions-2026-10-28c.json): the guest half needed a grant nobody had decided, and GFIX-2 (2 October 2026) already
+  gave guests their own operation.'
+keys_touched:
+  operations:
+  - listContentPages
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'new: a guest read beside the guest operation that replaced it'
+tickets:
+  started:
+  - '31087 (listContentPages): through CR-287''s comment; built for staff only, as it is.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-287
+triage: fix-forward
+prevention:
+  type: none
+  reason: The guest operation that replaced a read is recorded only in screen gaps (GFIX-2); no rule says the old read
+    then loses guestAuth. Lead to approve.
+status: open
