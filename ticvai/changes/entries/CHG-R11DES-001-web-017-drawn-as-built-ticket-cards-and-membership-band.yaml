@@ -5,8 +5,9 @@ kind: spec
 summary: 'WEB-017 My Account Dashboard is drawn and specified as the guest-web build on #33271: the overview header''s All
   tickets link to My Tickets, upcoming bookings as ticket cards (date stub, venue and product, Shared pill, Date / Time /
   Guests, a tear-off stub with View ticket), a 72rem page, challenge cards (status pill, current of target, reward pill,
-  progress bar, hint and end date) and a dark membership band joined to a light perks panel by a curved gold edge. Same
-  operations, fields, bindings, errors and states.'
+  progress bar, hint and end date) and a dark membership band joined to a light perks panel by a curved gold edge. The
+  cards bind what the build reads from the responses already called: Entitlement venueName, productName, validFrom and
+  sharedWithSubjectIds, and ChallengeProgress current, target and completedAt. Same operations, contracts, errors and states.'
 decision:
   what: 'ADAM CR-290 (a design change, settled 29 October 2026 as done, release false, comment false): "WEB-017''s wireframe,
     screen UI and page info are updated to match the build on #33271: the overview''s All tickets link, upcoming bookings as
@@ -15,7 +16,9 @@ decision:
     the board''s format and the guest-web tokens (the prototype capture it held is replaced), with every state, the invitation
     overlay, the two-programme choice and the Arabic mirror. screens/P01 WEB-017: the Upcoming bookings tile is a card list
     with View ticket and All tickets controls, the Loyalty tile is the Membership rewards balance band, the challenge panel is
-    a card list (its columns, operations and bindings unchanged); the WEB-018 edge''s trigger is View ticket and a second edge,
+    a card list; the bookings cards bind Entitlement (venueName, productName, validFrom, sharedWithSubjectIds) and the
+    challenge cards add ChallengeProgress current, target and completedAt to their columns (the lead, 29 October 2026: bind
+    what her build reads, each field checked in its contract first; getWishlist kept; no operation or contract change); the WEB-018 edge''s trigger is View ticket and a second edge,
     All tickets, carries nothing; purpose, notes and wireframe.prototype (match partial: the look is the board frame since
     CR-290). docs/active/approved-ui-changes.yaml: WEB-017 navigation, region:collection and region:selection, logged as
     CR-290. tools/capture-plans/guest-web-v2.json: WEB-017 is not captured from the prototype, so the drawn frame is not
@@ -51,7 +54,6 @@ prevention:
   type: check
   ref: tools/check-approved-ui.py
 status: open
-notes: 'Visible change to an approved screen, logged in ADAM as CR-290 (approved-ui-changes.yaml). The build reads the ticket
-  cards'' fields (venueName, productName, validFrom, sharedWithSubjectIds) and the challenge cards'' progress (current, target,
-  completedAt) from the same responses; the record still binds no columns for the cards and lists only the Challenge columns,
-  as before: binding them is not a design change and is left to the lead.'
+notes: 'Visible change to an approved screen, logged in ADAM as CR-290 (approved-ui-changes.yaml). All seven bound fields
+  exist in the responses WEB-017 already calls: listMyEntitlements (a Page of access.yaml Entitlement) and getMyChallenges
+  (items of challenge and progress, marketing-crm.yaml ChallengeProgress).'
