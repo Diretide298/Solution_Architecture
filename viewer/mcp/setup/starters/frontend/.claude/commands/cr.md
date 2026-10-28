@@ -5,6 +5,14 @@ argument-hint: <what is wrong, in a few words>
 
 The package seems wrong: $ARGUMENTS
 
+**If this is a design change I made and confirmed** (only the look and the flow between screens: the same
+operations, fields, errors, permissions and data), it is a log, not a problem to settle. Follow "Changing the
+design is yours" in CLAUDE.md: `adam_draft_change` with `kind` screen, `target` the screen id, a title that
+starts "Design change:", what changed and why, the frame it now differs from and the commit, `contractImpact`
+none, `blocking` false, `when` now, the ticket, and the one option "Update the wireframe, the screen's UI and
+its page info to match". Show me the draft, run `adam_raise_change` after my yes, and then carry on with the
+ticket: no hold and no waiting. Otherwise:
+
 1. Find the artefact(s) involved with ADAM (`adam_contract`, `adam_table`, `adam_screen`,
    `adam_journey`, `adam_search`) and quote the passages that show the problem, with where each is.
 2. `adam_changes` for those artefacts. If an open or accepted request already covers it, show me

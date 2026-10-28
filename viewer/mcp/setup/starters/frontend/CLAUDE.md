@@ -199,6 +199,23 @@ and the client-approved prototype and views where there is one. To get a frame o
   README.md says one is a capture of the prototype view (then it is the same look as the frame). A wireframe,
   mock-up or screenshot from anywhere but ADAM is not the design.
 
+**Changing the design is yours** (Chinmay, 28 October 2026). You may change a screen's design on your own and
+carry on: layout, components, copy, imagery, spacing, colour, type, icons, motion, how each state looks, and the
+flow between your app's screens. Nobody needs to approve it first, as long as it changes **nothing behind the
+screen**: the same operations, sent the same request fields, reading the same response fields, with the same
+errors and permissions, and no table, event or data shape touched. Where README.md or a paragraph above says the
+approved UI is fixed or to match the frame exactly, that is where you start, not a limit on you.
+- **When the person confirms the change is final, log it** with `/cr` (`adam_draft_change`, then
+  `adam_raise_change` after their yes): `kind` screen, `target` the screen id, a title that starts
+  "Design change:", the `problem` saying what changed and why, `evidence` naming the frame it now differs from
+  and the commit, `contractImpact` none, `blocking` false, `when` now, the `ticket`, and the one option
+  "Update the wireframe, the screen's UI and its page info to match".
+- **Then move on.** Do not wait for it and do not put the ticket on hold. The request is a log for the lead,
+  who updates the wireframe, the screen's UI and UX, and its page info to match what you built; nothing comes
+  back for you to build.
+- **A change that needs anything behind the screen** (a new or different field, operation, error, permission
+  or data) is not a design change: raise it as "When the package is wrong" says and wait for the decision.
+
 This replaces the older rule that a wireframe is built from only when client-verified, with a placeholder
 layout otherwise: where an older paragraph of this file says that, this section wins.
 <!-- ADAM:end screen-look -->
