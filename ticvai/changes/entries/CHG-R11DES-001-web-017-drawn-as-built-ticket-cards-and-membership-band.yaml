@@ -17,7 +17,10 @@ decision:
     overlay, the two-programme choice and the Arabic mirror. screens/P01 WEB-017: the Upcoming bookings tile is a card list
     with View ticket and All tickets controls, the Loyalty tile is the Membership rewards balance band, the challenge panel is
     a card list; the bookings cards bind Entitlement (venueName, productName, validFrom, sharedWithSubjectIds) and the
-    challenge cards add ChallengeProgress current, target and completedAt to their columns (the lead, 29 October 2026: bind
+    challenge cards bind only what the card shows (name, kind, rewardKind, rewardValue, rewardAmount, endsAt and
+    ChallengeProgress current, target and completedAt; startsAt and the challenge''s status dropped, as the card draws
+    neither) and their provenance names CR-290 as the source of the card''s layout, a designed component and no longer a
+    contract-generated list (the lead, 29 October 2026: bind
     what her build reads, each field checked in its contract first; getWishlist kept; no operation or contract change); the WEB-018 edge''s trigger is View ticket and a second edge,
     All tickets, carries nothing; purpose, notes and wireframe.prototype (match partial: the look is the board frame since
     CR-290). docs/active/approved-ui-changes.yaml: WEB-017 navigation, region:collection and region:selection, logged as

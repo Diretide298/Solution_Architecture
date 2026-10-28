@@ -355,7 +355,7 @@ changes:
   change: CHG-R11DES-001
 - screen: WEB-017
   field: 'region:selection'
-  to: 2d7eff35bc1f412e
+  to: 782a7234c3b15951
   approval: 'ADAM CR-290 (raised by Chitrangi Mestry on #33271, 28 October 2026; settled 29 October 2026 as done by Chinmay,
     nothing back to build): the lead''s rule of 28 October 2026 that frontend developers change a screen''s design on
     their own, with no change behind it, and log it in ADAM, after which the lead updates the wireframe, the screen''s

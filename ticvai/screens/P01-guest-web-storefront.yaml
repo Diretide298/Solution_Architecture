@@ -4646,9 +4646,7 @@ screens:
         - Challenge.rewardKind
         - Challenge.rewardValue
         - Challenge.rewardAmount
-        - Challenge.startsAt
         - Challenge.endsAt
-        - Challenge.status
         - ChallengeProgress.current
         - ChallengeProgress.target
         - ChallengeProgress.completedAt
@@ -4660,9 +4658,12 @@ screens:
           panel. The progress is the response''s progress (ChallengeProgress): "{current} of {target}"
           and the bar from current and target, the pill completed when completedAt is set, not started
           when progress is null, in progress otherwise (bound 29 October 2026, the lead: bind what the
-          build reads).'
-        provenance: 'contract marketing-crm.yaml GET /guests/me/challenges; cards ADAM CR-290 (Chitrangi
-          Mestry, #33271, 28 October 2026)'
+          build reads). The columns are what the card shows and nothing else: startsAt and the challenge''s
+          own status are not drawn (the pill is the guest''s progress), so they are not bound (the lead,
+          29 October 2026).'
+        provenance: 'ADAM CR-290 (Chitrangi Mestry, #33271, 28 October 2026, a logged design change):
+          the card''s layout and the fields it shows are the developer''s design; the data is getMyChallenges,
+          contract marketing-crm.yaml GET /guests/me/challenges'
       - kind: detailPanel
         label: The wishlist
         bindsTo: Wishlist
