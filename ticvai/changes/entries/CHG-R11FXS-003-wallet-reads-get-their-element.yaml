@@ -1,0 +1,45 @@
+id: CHG-R11FXS-003
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'BO-416 Wallet Account & Balance View shows the wallet it is about (an "Account and balance" panel, getWallet
+  on load) and BO-1102 Funding Transaction Audit & Reconciliation shows the trail it audits ("The funding audit trail"
+  table, listWalletTransactions on load), each in the content region the approved screen left empty.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml. BO-416: contentBody (components: [] until now) holds a detailPanel
+    "Account and balance" bound to Wallet (balance, bonusBalance, credits, currency, status, expiresAt,
+    lastActivityAt), filled by getWallet, whose trigger moves from onAction to onLoad: the screen opens on the wallet
+    picked on BO-414. BO-1102: contentBody holds a dataTable "The funding audit trail" bound to WalletTransaction
+    (recordedAt, kind, amount, balanceAfter, orderId, reason, principalId), filled by listWalletTransactions, now
+    onLoad. Both reads are each screen''s purpose ("inspect all value held in an individual guest wallet"; "a
+    complete administrative record of every value entering a wallet"), so they get an element rather than leaving
+    (the r10 ruling for a read the screen does not show, CHG-R10WIR-002, does not fit). Logged in
+    docs/active/approved-ui-changes.yaml (region:- on each).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 integration gate of 29 October 2026 (run 20261029-020957-8105): check-screen-wiring S-OP-UNREACHED on
+  BO-416 getWallet and BO-1102 listWalletTransactions, built on by #32125 (In progress, Chitrangi Mestry). The lead''s
+  rule: fix every finding at its source (29 October 2026, "fix at the source").'
+keys_touched:
+  screens: [BO-416, BO-1102]
+  operations: [getWallet, listWalletTransactions]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'a load read declared onAction on an approved screen whose content region had no element for it'
+tickets:
+  started:
+  - '32125 (getWallet and listWalletTransactions, In progress, Chitrangi Mestry): the operations are unchanged; the
+    two screens now show them. Told through the lead''s comment; its text is not rewritten.'
+  unstarted:
+  - 'The two screens'' tickets pick the elements up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r11 integration gate of 29 October 2026 (run 20261029-020957-8105), the lead''s rule to fix every
+  gate finding at its source'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Visible change to approved screens, logged in approved-ui-changes.yaml with this entry. No database change.'

@@ -1,0 +1,45 @@
+id: CHG-R11FXS-002
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'BO-288 Membership Entitlement & Admission Benefit Builder gets a "Create entitlement template" button and the
+  form that collects what createEntitlementTemplate sends; the declaration it already had is now reached.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml BO-288: a secondaryButton "Create entitlement template" (operation
+    createEntitlementTemplate) at the end of its action bar, opening the overlay formCreateEntitlementTemplate
+    (modal; confirm "Create template" -> createEntitlementTemplate; dismiss Cancel), which collects code, name and
+    validityKind and sends the entitlement the screen''s fields define (entriesAllowed, validForDays, daysOfWeek,
+    validTimeWindows) with expiryNoticeDays for the pre-expiry notice. The api''s purpose says what it creates.
+    Removing the declaration instead was tried and refused: the screen''s approved emptyFirstRun text "carries the
+    create action" and createEntitlementTemplate is its only create (S-STATE-BOILERPLATE). Logged in
+    docs/active/approved-ui-changes.yaml (region:publish, overlay:formCreateEntitlementTemplate).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 integration gate of 29 October 2026 (run 20261029-020957-8105): check-screen-wiring S-OP-UNREACHED on
+  BO-288 createEntitlementTemplate, built on by #30944 (Ready for QA, Chinmay Patkar). The lead''s rule: fix every
+  finding at its source (29 October 2026, "fix at the source").'
+keys_touched:
+  screens: [BO-288]
+  operations: [createEntitlementTemplate]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'a declared write whose approved screen had no control or form for it'
+tickets:
+  started:
+  - '30944 (createEntitlementTemplate, Ready for QA, Chinmay Patkar): the operation is unchanged; BO-288 now calls
+    it. Told through the lead''s comment; its text is not rewritten.'
+  unstarted:
+  - 'BO-288''s screen ticket picks the form up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r11 integration gate of 29 October 2026 (run 20261029-020957-8105), the lead''s rule to fix every
+  gate finding at its source'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Visible change to an approved screen (a control and a form), logged in approved-ui-changes.yaml with this
+  entry. EntitlementTemplate.id is readOnly, so the form never asks for it (check-screen-patterns P1). No database
+  change.'

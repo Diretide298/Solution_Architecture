@@ -447,6 +447,8 @@ screens:
     - to: GST-050
       trigger: Resource Booking – Cabana
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
+      carries:
+      - productId
     - to: GST-051
       trigger: Plan Your Adventure – Start
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
@@ -10875,6 +10877,13 @@ screens:
     trigger: onAction
     invalidates:
     - listProducts
+  - operationId: listProductVariants
+    contract: catalogue
+    purpose: 'The types of the cabana the guest chose (its catalogue variants), read when the form opens:
+      the Type the form asks is the `variantId` addCartLine sends. No component of its own: the form''s
+      picker (r11 gate fix, CHG-R11FXS-005; as GST-048, CHG-R10GFP-006).'
+    trigger: onAction
+    provenance: r11 gate fix, 29 October 2026 (CHG-R11FXS-005)
   - operationId: listProducts
     contract: catalogue
     purpose: List products
@@ -10895,6 +10904,10 @@ screens:
     params:
     - name: cartId
       from: session
+    - name: productId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listProducts`.'
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded: []
   wireframe:
@@ -10929,6 +10942,8 @@ screens:
   overlays:
   - id: formAddCartLine
     component: modal
+    reads:
+    - listProductVariants
     trigger: Add to cart
     body: '**Type, date and guests**, then `addCartLine`; nothing else is asked.'
     bindsTo: AddCartLineRequest

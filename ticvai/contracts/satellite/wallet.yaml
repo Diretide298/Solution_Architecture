@@ -2179,7 +2179,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
-        - "P08 BO-1116 Parent–Child Stored Value Distribution"
         - "P08 BO-1121 Shared Wallet Transfers & Balance Reallocation"
       x-ticvai-read-via:
       - query: identity#subjectRecords
@@ -2412,7 +2411,6 @@ paths:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-011 Wallet Overview"
         - "P02 GST-071 Payment Methods"
-        - "P08 BO-1086 Wallet Ownership & Account Association"
         - "P08 BO-1100 Funding Reversal & Correction Management"
         - "P08 BO-1149 Administrative Balance Adjustment Studio"
         - "P08 BO-1150 Wallet Block, Freeze & Restriction Management"
@@ -2603,7 +2601,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-011 Wallet Overview"
-        - "P08 BO-1093 Funding Command Center"
         - "P08 BO-1102 Funding Transaction Audit & Reconciliation"
         - "P08 BO-1142 Wallet Transaction Simulator, Monitoring & Channel Audit"
         - "P08 BO-1143 Wallet Operations Command Center"

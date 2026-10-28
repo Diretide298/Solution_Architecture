@@ -1,0 +1,48 @@
+id: CHG-R11FXS-005
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'Three guest screens say where addCartLine''s variantId comes from, with no visible change: GST-050 and KSK-015
+  read the chosen product''s variants for their add-to-cart form (as GST-048), and KSK-005 takes the ticket types
+  chosen on KSK-004.'
+decision:
+  what: 'screens/P02 GST-050 (Resource Booking - Cabana): formAddCartLine reads [listProductVariants], declared
+    onAction: the "Type" the form asks is the chosen cabana''s variant. screens/P05 KSK-015 (Assistant):
+    formAddCartLine reads [listProductVariants], onAction, for an answer that names a product and not a variant.
+    Both as GST-048''s form (CHG-R10GFP-006). screens/P05 KSK-005 (Choose a performance): entry parameter variantId
+    from KSK-004, optional (the screen shows the times without it), the ticket types chosen there; the refresh''s
+    derive-carries now carries it on the KSK-004 edge. On the derive, derive-entrystate-params gives GST-050 and
+    KSK-015 an optional productId (for listProductVariants) and derive-carries carries productId into them.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 integration gate of 29 October 2026 (run 20261029-020957-8105): check-screen-wiring S-INPUT-SOURCE on
+  GST-050, KSK-005 and KSK-015 (addCartLine needs variantId), built on by #31749 and #31751 (Ready for QA, Chinmay
+  Patkar). The lead''s rule: fix every finding at its source (29 October 2026, "fix at the source").'
+keys_touched:
+  screens: [GST-050, KSK-015, KSK-005]
+  operations: [addCartLine, listProductVariants]
+  files:
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P05-guest-kiosk.yaml
+root_class: 'a guest action whose id the screen gets from a choice it did not name'
+tickets:
+  started:
+  - '31749 and 31751 (addCartLine, Ready for QA, Chinmay Patkar): the operation is unchanged; the three screens now
+    name where its variantId comes from. Told through the lead''s comment; their text is not rewritten.'
+  unstarted:
+  - 'The screens'' tickets pick the read and the parameter up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r11 integration gate of 29 October 2026 (run 20261029-020957-8105), the lead''s rule to fix every
+  gate finding at its source'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'No visible change (an overlay''s reads, apis and entry state are invisible to check-approved-ui). Ten more
+  S-INPUT-SOURCE findings on addCartLine (GST-026, GST-027, GST-070, GST-077, GST-078, KSK-017, WEB-033, WEB-041,
+  WEB-042, WEB-049) and GST-008''s S-BUTTON-FORM are left for the lead: their screens already take the variant from
+  what the contract designed for it (GuestMerchandiseItem.productVariantId, ParkingFacility.productVariantId,
+  PassOffer.variants[].variantId, PassengerType.catalogueVariantId, the reservation''s deposit.variantId, and each
+  "Ticket types" row''s stepper), which the rule does not read. No database change.'

@@ -362,3 +362,67 @@ changes:
     UI and its page info (written into the frontend starter in 28eb978d); this CR is that log. WEB-017 as built:
     ticket cards, the All tickets link, a 72rem page, challenge cards and the dark membership band'
   change: CHG-R11DES-001
+- screen: BO-288
+  field: 'overlay:formCreateEntitlementTemplate'
+  to: 8f375377b0456f5d
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The screen''s declared create gets its form.'
+  change: CHG-R11FXS-002
+- screen: BO-288
+  field: 'region:publish'
+  to: d905dbeb5db9ff7d
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The button that opens it.'
+  change: CHG-R11FXS-002
+- screen: BO-416
+  field: 'region:-'
+  to: 7ae5592bfede0ef0
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The empty content region shows the wallet the screen is about.'
+  change: CHG-R11FXS-003
+- screen: BO-1102
+  field: 'region:-'
+  to: bce9a0bffda4efd5
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The empty content region shows the trail the screen audits.'
+  change: CHG-R11FXS-003
+- screen: BO-1121
+  field: 'overlay:formTransferWalletBalance'
+  to: 44ca7a457ca24376
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The declared transfer gets its form.'
+  change: CHG-R11FXS-004
+- screen: BO-1121
+  field: 'region:fields'
+  to: 24d687da7124174c
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The button that opens it.'
+  change: CHG-R11FXS-004
+- screen: BO-281
+  field: 'overlay:formUpdateGroupBooking'
+  to: 7391db4512fea8e3
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The guest-count buttons open the form updateGroupBooking needs.'
+  change: CHG-R11FXS-004
+- screen: POS-021
+  field: 'state:offline'
+  to: 881360cf3b57b15d
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The offline text says the online-only write is disabled offline (4.4).'
+  change: CHG-R11FXS-006

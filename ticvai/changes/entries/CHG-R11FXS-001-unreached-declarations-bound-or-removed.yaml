@@ -1,0 +1,54 @@
+id: CHG-R11FXS-001
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'Nine back-office screens stop declaring an operation nothing on them reaches: five drop a declaration the
+  screen does not do (BO-1070, BO-1086, BO-1093, BO-1116, BO-272) and four name the operation on the element that
+  already does the job (BO-487, BO-1123, BO-454, BO-1143); nothing visible changes.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml, bindings and declarations only (invisible to check-approved-ui).
+    Removed: BO-1070 setConfigurationProfile (the screen clones a venue; profiles are written on BO-123 and BO-129);
+    BO-1086 getWallet (the shared wallet and its members come from listSharedWallets, which it keeps); BO-1093
+    listWalletTransactions (a form of funding selects with no list to show the transactions; it keeps
+    getWalletFundingRules); BO-1116 transferWalletBalance (the screen configures the parent and child model; moving
+    value is BO-1121''s, CHG-R11FXS-004); BO-272 updateGroupBooking (the screen converts a quote; numbers and leader
+    are changed on BO-281 and BO-026). Bound: BO-487 "The selected customer wallet balance" panel reads getWallet;
+    BO-1123 "Search Instrument" and "Check Balance" call getGiftCard, as its apisNote of 29 September already said;
+    BO-454 "Search card lifecycle" finds a card with getGameCard (purpose now says so, not "Cards in circulation");
+    BO-1143 "Every wallet operations" table is filled by listWalletTransactions, now onLoad (its one load read; the
+    component carried `operation: null`). BO-1121''s `invalidates` alias to the removed BO-1116 entry is written
+    out. Every removed operation stays declared and reached elsewhere: setConfigurationProfile on BO-123 and BO-129,
+    getWallet on BO-414, BO-416, BO-487 and more, listWalletTransactions on BO-1102, BO-1143, BO-414 and more,
+    transferWalletBalance on BO-1121, WEB-021 and GST-071, updateGroupBooking on BO-026 and BO-281.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 integration gate of 29 October 2026 (run 20261029-020957-8105): check-screen-wiring S-OP-UNREACHED,
+  built on by started tickets #30825 (setConfigurationProfile, Sanket Keluskar), #32125 (getWallet,
+  listWalletTransactions, transferWalletBalance, getGiftCard, getGameCard, Chitrangi Mestry) and #32269
+  (updateGroupBooking, Sanket Keluskar), failures since the ticket statuses were refreshed after r10. The lead''s
+  rule: fix every finding at its source (29 October 2026, "fix at the source"); the lead''s r10 ruling (CHG-R10WIR-002,
+  item 5) that a read the approved screen has no element for leaves it.'
+keys_touched:
+  screens: [BO-1070, BO-1086, BO-1093, BO-1116, BO-272, BO-487, BO-1123, BO-454, BO-1143, BO-1121]
+  operations: [setConfigurationProfile, getWallet, listWalletTransactions, transferWalletBalance, updateGroupBooking,
+    getGiftCard, getGameCard]
+  files:
+  - screens/P08-venue-back-office.yaml
+root_class: 'an operation declared on a screen whose element does not name it, or that the screen does not do'
+tickets:
+  started:
+  - '30825, 32125 and 32269: the operations are unchanged and still reached on other screens; the lead comments on
+    them. Their text is not rewritten.'
+  unstarted:
+  - 'The screens'' own tickets pick the declarations up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r11 integration gate of 29 October 2026 (run 20261029-020957-8105), the lead''s rule to fix every
+  gate finding at its source'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'No visible change (apis, `operation` and purposes are invisible to check-approved-ui). The x-ticvai-consumed-by
+  mirror follows from link-screens-contracts. No database change.'
