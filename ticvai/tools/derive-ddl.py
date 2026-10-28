@@ -756,6 +756,7 @@ $$;
 #     to. Staff read and write by `scope_path`, as the scope rule; a guest reads a row naming its subject in
 #     `subject_id`, `over_subject_id` or `granted_by_subject_id`, and writes one whose `over_subject_id` (else
 #     `subject_id`) is its own: the account holder grants and revokes. identity.delegated_access, guest to guest.
+#     Since ADAM CR-295 (29 October 2026) the staff scope test admits only a session with no guest subject.
 #   * `x-ticvai-rls: any-grant-no-delete` (CHG-R9MIG-001; ADAM CR-166 as the lead ruled it, 21 October 2026): any
 #     connection holding a grant (a scope path set) reads, inserts and updates a row, and no policy lets one be deleted.
 #     For a row that belongs to no scope (`x-ticvai-scope: none`): platform.outbox_sequence, the per-aggregate counter
@@ -3316,9 +3317,12 @@ def main() -> int:
                 print(f"  ! {t}: x-ticvai-rls scope-or-subject needs a scope_path and a subject column; the base rule "
                       "stands")
                 continue
-            read = " OR ".join(["platform.in_scope(scope_path)"]
+            # ADAM CR-295 (29 October 2026): the scope test admits a session with no guest subject only, so a guest
+            # whose request carries a venue scope (CR-198) reads and writes these rows by subject alone.
+            read = " OR ".join([f"({NO_GUEST} AND platform.in_scope(scope_path))"]
                                + [f"platform.own_row(NULL::uuid, {x})" for x in subs])
-            write = "(platform.in_scope({a}scope_path) OR platform.own_row(NULL::uuid, {a}" + holder + "))"
+            write = (f"(({NO_GUEST} AND platform.in_scope({{a}}scope_path)) OR platform.own_row(NULL::uuid, {{a}}"
+                     + holder + "))")
             call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(read)}, "
                     f"{sql_literal(write.format(a=''))});")
             base = "its scope, or the guest account it is about"

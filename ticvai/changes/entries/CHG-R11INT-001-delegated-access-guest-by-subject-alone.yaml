@@ -1,0 +1,28 @@
+id: CHG-R11INT-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'identity.delegated_access (x-ticvai-rls scope-or-subject) gets CR-295''s rule too: its staff scope test admits
+  only a session with no guest subject, so a guest whose request carries a venue scope reads and writes delegated access
+  by subject alone, like the order and cart tables.'
+decision:
+  what: 'ADAM CR-295, option A, applied as decided: "On every table whose read policy has a guest branch beside a scope
+    branch, the scope branch admits only a session with no guest subject". The guest lane applied it to the guest-owns
+    and guest-reads-own tables; scope-or-subject (identity.delegated_access, guest to guest) has the same shape and was
+    left out. derive-ddl now writes (NO_GUEST AND platform.in_scope(scope_path)) OR the subject branches for read, and
+    the same for write; the forward migration re-applies the policy (safe to run twice).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-295 (Pranay Shinde, #30688), accepted 29 October 2026 with option A; the guest lane''s report (r11)
+  named identity.delegated_access as the one remaining table with a scope branch beside a guest branch.'
+keys_touched:
+  operations: []
+  tables:
+  - identity.delegated_access
+  files:
+  - tools/derive-ddl.py
+root_class: 'same as CHG-R11GST-001: a staff branch beside a guest branch that a guest''s own scope also matches'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
