@@ -23,7 +23,7 @@ schemas:
   tables: 132
   stores:
   - postgres
-  largestTable: marketing.waiver_requirement
+  largestTable: marketing.privacy_request
 operationsByContract:
 - contract: marketing-crm
   count: 280
