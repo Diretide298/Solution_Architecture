@@ -1,0 +1,55 @@
+id: CHG-R11FXV-002
+date: '2026-10-29'
+source: audit
+kind: contract
+summary: 'identity.refresh_token is its owner''s own row (x-ticvai-rls own-row, as the MFA rows): the principal or the
+  guest it belongs to and the tenant root read and write it, so logout at a workstation revokes the caller''s own
+  token; updatePrincipal keeps revoking another principal''s tokens through identity.end_principal_sessions only.'
+decision:
+  what: 'The lead''s "Fix them, then ship" (r11 final gate, 29 October 2026). contracts/spine/identity.yaml
+    IdentityRefreshToken: x-ticvai-rls own-row (CHG-R8MIG-007''s rule for a credential that is its owner''s alone:
+    principal_id = ticvai.principal_id, or subject_id = ticvai.subject_id, or the tenant root), and its description
+    says who writes it; logout gets a description (it ends the caller''s own session and revokes the token it holds,
+    no other principal''s); updatePrincipal''s text says the table is own-row, not tenant-root. derive-ddl re-applies
+    the table''s policy in the forward migration (apply_own_row_rls, principal_id and subject_id, in a guarded block
+    with its rollback). Neither scope nor operation moves: logout stays at workstation and updatePrincipal at venue.
+    Under the old subject rule a staff token (subject_id null) was the tenant root''s alone, so logout revoked nothing.
+    Under own-row a venue or workstation caller reaches its own token and no other principal''s or guest''s, and no
+    other tenant''s (the tenant root is the tenant''s own); updatePrincipal''s revocation of another principal''s
+    tokens stays inside the SECURITY DEFINER identity.end_principal_sessions, which first checks the caller may update
+    that principal (ADAM CR-180 option A, CHG-R10ID-006). login, completeSsoAuthorization and refreshToken run at the
+    tenant and are unchanged; a guest''s token is still reached by its subject (guestLogout, CR-100).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: the r11 final gate, 29 October 2026, check-rls-scope-fit RF-TENANT-ROOT on started ticket #37052 (Ready
+  for QA, Pranay Shinde; the KERNEL-REDIS kernel ticket, linked through the operations it names): logout (workstation)
+  and updatePrincipal (venue) write identity.refresh_token, which only the tenant root wrote (apply_subject_rls).
+  CR-076, CHG-GEN-010, CR-180, CR-100, CHG-R8MIG-007.'
+keys_touched:
+  operations: [logout, updatePrincipal]
+  schemas: [IdentityRefreshToken]
+  tables: [identity.refresh_token]
+  tickets: ['37052']
+  files:
+  - contracts/spine/identity.yaml
+root_class: 'a tenant-root table written by staff below the tenant'
+tickets:
+  started:
+  - '37052 (Pranay Shinde): nothing to change in the build if logout revokes the token under the caller''s own
+    connection (ticvai.principal_id set by the session) and updatePrincipal revokes through
+    identity.end_principal_sessions; once the forward migration is applied, add a test that logout at a workstation
+    revokes the caller''s own refresh token and that the caller''s connection sees no other principal''s token. Its
+    text is not rewritten; the next pull shows the change.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-rls-scope-fit.py
+status: open
+notes: 'After the change, on a locally re-derived lineage and DDL (not committed): check-rls-scope-fit PASS (0 new; the
+  two RF-TENANT-ROOT entries on #37052 gone). Left open for the check: check-rls-scope-fit classes no own-row table
+  (apply_own_row_rls is not in its classes), so it neither passes nor fails an operation below tenant writing another
+  principal''s own-row rows; updatePrincipal is safe because of the definer function, not because the check saw it.'

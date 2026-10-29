@@ -2206,6 +2206,12 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       summary: Close the current session
+      description: 'Ends the caller''s own current session (`identity.session`, `ended_at`) and revokes the refresh
+        token it holds (`identity.refresh_token`, `revoked_at`, `revocation_reason`). **Its own rows only**: the
+        token row is its owner''s alone (`x-ticvai-rls: own-row`; r11 gate, 29 October 2026, CHG-R11FXV-002), so the
+        caller''s signed-in principal revokes its own token at the workstation and no other principal''s.
+
+        '
       responses:
         '204':
           headers:
@@ -2700,7 +2706,7 @@ paths:
 
         **Every session and refresh token, at every venue, through one function** (accepted 21 October 2026,
         Chinmay, ADAM CR-180 option A; CHG-R10ID-006). The caller acts at a venue, but `identity.refresh_token` is
-        tenant-root and `identity.session` venue-isolated, so ending them with the caller''s own row security
+        its owner''s alone (own-row; CHG-R11FXV-002) and `identity.session` venue-isolated, so ending them with the caller''s own row security
         would revoke no token and leave sessions at other venues live while answering 200. So the operation ends
         them by calling `identity.end_principal_sessions(principal_id, ended_by, reason)`, a SECURITY DEFINER
         function in the same transaction as the update: it first checks the caller may update that principal
@@ -6969,9 +6975,20 @@ paths:
 
 
         **The number is hashed on arrival and never returned**; only the last four characters are kept in clear,
-        in `pii.subject_document`, as they are for every document in the package. The scan is an uploaded media
-        asset and is deleted when the verification is decided, unless the policy keeps it
-        (`documentImageRetention`).
+        in `pii.subject_document`, as they are for every document in the package. The scan is the guest''s own
+        upload (`createGuestUpload`, `completeGuestUpload`, in assets) and is deleted when the verification is
+        decided, unless the policy keeps it (`documentImageRetention`).
+
+
+        **The uploads are checked against Identity''s projection, never against Assets'' table** (r11 gate, 29
+        October 2026; CHG-R11FXV-001; the lead''s r10 ruling on the ADR-0028 tiers, CHG-R10ID-018: Identity is
+        Foundation and reads nothing above it but a projection). `documentAssetId` must be, in
+        `identity.guest_upload_ref` (`assets#guestUploadsForIdentity`, fed by `assets.guestUploadChanged`), an
+        upload of the caller''s own subject with purpose `identityDocument` and status `uploaded`, and
+        `selfieAssetId`, when sent, the same with purpose `selfie`; otherwise `422 guest-upload-not-usable`, and
+        nothing is written. The row''s security is by subject, so another guest''s upload is not seen at all and
+        is refused the same way as an unknown id. An upload completed a moment ago may not have reached the
+        projection yet: the app retries a `422 guest-upload-not-usable` once, after a short wait, before showing it.
 
 
         Creates a `pending` verification. `409` while another is pending for this guest; `422` when the document
@@ -6984,6 +7001,18 @@ paths:
       x-ticvai-permission: null
       x-ticvai-audience:
       - guest
+      x-ticvai-reads:
+      - table: identity.guest_upload_ref
+        for: 'whether documentAssetId and selfieAssetId are the caller''s own uploaded files of their purpose,
+          Identity''s projection of assets.guest_upload (r11 gate, CHG-R11FXV-001; ADR-0028)'
+      - table: identity.guest_verification_policy
+        for: 'the tenant''s accepted document kinds, selfieRequired and documentImageRetention (was carried in the
+          lineage overrides, CHG-R8GEN-001; stated here, CHG-R11FXV-001)'
+      x-ticvai-read-via:
+      - query: assets#guestUploadsForIdentity
+        route: projection
+        for: 'whether documentAssetId and selfieAssetId are usable, from Identity''s projection
+          identity.guest_upload_ref (r11 gate, CHG-R11FXV-001; ADR-0028)'
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -7018,9 +7047,12 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          x-ticvai-problem-types: [identity-document-expired, document-kind-not-accepted, selfie-required]
+          x-ticvai-problem-types: [identity-document-expired, document-kind-not-accepted, selfie-required,
+            guest-upload-not-usable]
           description: The document has expired, or its kind is not accepted by the tenant's policy, or the policy
-            asks for a selfie and none was sent (`selfie-required`, CHG-R8MIG-027)
+            asks for a selfie and none was sent (`selfie-required`, CHG-R8MIG-027), or `documentAssetId` or
+            `selfieAssetId` is not the caller's own uploaded file of its purpose in Identity's projection
+            (`guest-upload-not-usable`, CHG-R11FXV-001)
           content:
             application/problem+json:
               schema:
@@ -9147,8 +9179,13 @@ components:
         expiry, rotation, and revocation. **A staff member''s or a guest''s** (accepted 15 October 2026, ADAM CR-100;
         CHG-R10ID-009): exactly one of `principalId` and `subjectId` is set, so a guest''s refresh token, which
         `refreshToken` serves and `guestLogout` and `endGuestDeviceSessions` revoke, has a store and is revoked the
-        same way as a staff one.'
+        same way as a staff one. **The row is its owner''s alone** (`x-ticvai-rls: own-row`, r11 gate, 29 October
+        2026; CHG-R11FXV-002), as the MFA rows are: read and written by the principal (`ticvai.principal_id`) or the
+        guest (`ticvai.subject_id`) it belongs to, and by the tenant root. `logout` revokes the caller''s own token
+        under it; the sign-ins and `refreshToken` run at the tenant; `updatePrincipal` revokes another principal''s
+        tokens only through `identity.end_principal_sessions` (CR-180), never with the caller''s grants.'
       x-ticvai-exactly-one-of: [[principalId, subjectId]]
+      x-ticvai-rls: own-row
       required:
       - hash
       - expiresAt
@@ -9833,6 +9870,41 @@ components:
           type: string
           enum: [ready, pending, notApplicable]
           nullable: true
+        lastEventAt:
+          type: string
+          format: date-time
+          description: The `changedAt` of the event last applied; an older redelivery changes nothing.
+    GuestUploadRef:
+      x-ticvai-persistence: identity.guest_upload_ref
+      x-ticvai-unique-together:
+      - [uploadId]
+      type: object
+      description: '**A guest''s identity uploads, as Identity knows them** (r11 gate, 29 October 2026; CHG-R11FXV-001;
+        the lead''s r10 ruling on the ADR-0028 tiers, CHG-R10ID-018). A projection of `assets.guest_upload`, so
+        `submitGuestIdentityDocument` checks `documentAssetId` and `selfieAssetId` without reading Assets'' table
+        (Identity is Foundation and reads nothing above it but a projection). **Never returned by any operation**;
+        Identity''s consumer of `assets.guestUploadChanged` writes it, as `identity.redirect_host` is written. The rule
+        is Assets'' (`assets#guestUploadsForIdentity`): an upload is usable while it is the subject''s own, of the
+        purpose asked, and `uploaded`. Row security is by subject: a guest sees only its own rows.'
+      required: [uploadId, subjectId, purpose, status, lastEventAt]
+      properties:
+        uploadId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The upload's id in Assets (`GuestUpload.uploadId`), the value a guest sends.
+        subjectId:
+          x-ticvai-references: pii.subject
+          type: string
+          format: uuid
+          description: The guest who uploaded it.
+        purpose:
+          type: string
+          enum: [identityDocument, selfie]
+        status:
+          type: string
+          enum: [uploaded, deleted]
+          description: The upload's status as the last event applied gave it.
         lastEventAt:
           type: string
           format: date-time

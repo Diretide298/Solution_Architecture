@@ -1,0 +1,65 @@
+id: CHG-R11FXV-001
+date: '2026-10-29'
+source: audit
+kind: contract
+summary: 'submitGuestIdentityDocument checks the uploads it is sent against identity.guest_upload_ref, Identity''s
+  projection of assets.guest_upload fed by the new assets.guestUploadChanged (assets#guestUploadsForIdentity, route
+  projection), instead of reading assets.media_asset raw; an unusable upload is 422 guest-upload-not-usable.'
+decision:
+  what: 'The lead''s "Fix them, then ship" (r11 final gate, 29 October 2026), applied the way the lead ruled the same
+    finding on linkGuestCheckout in r10 (CHG-R10ID-018: "fix it the ADR-0028 way, by a projection or an event, not
+    raw").
+    contracts/satellite/assets.yaml: query guestUploadsForIdentity (served projection; source assets.guest_upload,
+    table identity.guest_upload_ref, fed by assets.guestUploadChanged); completeGuestUpload x-ticvai-emits
+    assets.guestUploadChanged and says so. contracts/spine/identity.yaml: GuestUploadRef (identity.guest_upload_ref,
+    unique on uploadId, by subject, never returned); submitGuestIdentityDocument x-ticvai-read-via the query (route
+    projection), x-ticvai-reads identity.guest_upload_ref and identity.guest_verification_policy, its text (the scan
+    is the guest''s own upload, the projection check, the retry after a fresh upload) and 422 guest-upload-not-usable.
+    events/assets-guestUploadChanged.yaml (new; the identity consumer writes identity.guest_upload_ref).
+    handoff/api-data-lineage-overrides.json: the operation''s carried entry replaced by a reviewed one that keeps only
+    the pii.subject_document write (no contract schema persists that table, so no x-ticvai-writes can state it); the
+    assets.media_asset read is gone (a guest upload never reaches it: createGuestUpload keeps it apart from the media
+    library); carriedCeiling 1615 to 1614. Database: identity.guest_upload_ref (new), from the generator.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: the r11 final gate, 29 October 2026, check-cross-module-reads XR-UNCOVERED and XR-FOUNDATION on started
+  tickets #30906 and #30908 (Ready for QA, Narayan Gaonkar; #30912 In progress, the same operation):
+  submitGuestIdentityDocument (IdentityService, commerce, foundation) read assets.media_asset, which VenueOpsService
+  (operations) owns, raw. ADR-0028 (Identity reads nothing above it but a projection), ADR-0055 rule 4, CHG-R10ID-018,
+  CHG-R8MIG-027 (the guest uploads).'
+keys_touched:
+  operations: [submitGuestIdentityDocument, completeGuestUpload]
+  schemas: [GuestUploadRef]
+  tables: [identity.guest_upload_ref, assets.guest_upload, assets.media_asset]
+  tickets: ['30906', '30908', '30912']
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/assets.yaml
+  - events/assets-guestUploadChanged.yaml
+  - handoff/api-data-lineage-overrides.json
+root_class: 'existing: Identity (Foundation) reading a module above it other than through a projection'
+tickets:
+  started:
+  - '30906, 30908, 30912 (Narayan Gaonkar): drop any read of assets.media_asset or assets.guest_upload from
+    submitGuestIdentityDocument; check documentAssetId (purpose identityDocument) and selfieAssetId (purpose selfie)
+    against identity.guest_upload_ref under the guest''s own connection (subject row security), status uploaded, and
+    answer 422 guest-upload-not-usable otherwise, writing nothing; add the test for it. Their text is not rewritten;
+    the next pull shows the change.'
+  unstarted:
+  - 'Identity''s consumer of assets.guestUploadChanged (writes identity.guest_upload_ref, idempotent on uploadId +
+    changedAt, an older redelivery changes nothing) and completeGuestUpload''s outbox write need tasks (integration
+    files them); identity.guest_upload_ref is migration work for Hrushikant Patkar.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'After the change, on a locally re-derived lineage and DDL (not committed): check-cross-module-reads PASS (0 new;
+  the XR-UNCOVERED and XR-FOUNDATION entries on #30906 and #30908 gone). Left open: assets.guestUploadChanged is
+  written by completeGuestUpload only; the retention job that deletes an unused upload (24 hours, or the policy''s
+  documentImageRetention) is no operation, so the deleted status reaches the projection only once that job is modelled
+  and writes the event. A deleted upload has no file to review, so a verification submitted against it fails at the
+  reviewer, not silently.'
