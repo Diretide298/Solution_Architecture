@@ -30,7 +30,7 @@ And one rule per decision:
                    return or requestInformation; the composite operations declare 400, 403 exceedsDelegatorAuthority
                    and 409.
   BR-APPROVAL-VERSIONS (r11, ADAM CR-300, CHG-CR300-001) a matrix keeps one stable id across versions: its versions
-                   are approvals.matrix_version rows keyed (matrixId, version), each rule names its matrixVersion, and
+                   are approvals.matrix_version rows keyed (approvalMatrixId, version), each rule names its matrixVersion, and
                    ApprovalMatrix is unique on (kind, scopePath); setApprovalMatrix writes the version table.
   BR-BILLING-STATEMENT (r11, ADAM CR-303, CHG-CR303-001) a statement is a completed renewal row or the first period,
                    its charges the cycle's order, its guest customer_id, its dates in the venue's time zone; the id's v5
@@ -627,9 +627,9 @@ def main() -> int:
     # table of their own, each rule naming its version, and the two unique keys.
     mv = asch.get("ApprovalMatrixVersion") or {}
     need("BR-APPROVAL-VERSIONS", str(mv.get("x-ticvai-persistence") or "") == "approvals.matrix_version"
-         and (mv.get("x-ticvai-primary-key") or []) == ["matrixId", "version"]
-         and ((mv.get("properties") or {}).get("matrixId") or {}).get("x-ticvai-references") == "approvals.matrix",
-         "no approvals.matrix_version keyed (matrixId, version) and referencing approvals.matrix (ApprovalMatrixVersion)")
+         and (mv.get("x-ticvai-primary-key") or []) == ["approvalMatrixId", "version"]
+         and ((mv.get("properties") or {}).get("approvalMatrixId") or {}).get("x-ticvai-references") == "approvals.matrix",
+         "no approvals.matrix_version keyed (approvalMatrixId, version) and referencing approvals.matrix (ApprovalMatrixVersion)")
     need("BR-APPROVAL-VERSIONS", "matrixVersion" in (rule_s.get("properties") or {})
          and "matrixVersion" in (rule_s.get("required") or []),
          "ApprovalRule does not name its matrix version (a required matrixVersion, approvals.rule.matrix_version)")
