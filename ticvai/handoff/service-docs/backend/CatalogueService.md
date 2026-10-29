@@ -5851,7 +5851,7 @@ Where `name` is null the row sorts after the rows that have it (NULLS LAST), and
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.variant` |
 | Writes | - |
-| Called by | BO-007, BO-008, BO-012, BO-048, EMP-034, GST-008, GST-041, GST-048, GST-075, KSK-004, POS-002, POS-003, PTR-006, WEB-005, WEB-048 |
+| Called by | BO-007, BO-008, BO-012, BO-048, EMP-034, GST-008, GST-041, GST-048, GST-050, GST-075, KSK-004, KSK-015, POS-002, POS-003, PTR-006, WEB-005, WEB-048 |
 
 **Parameters**
 

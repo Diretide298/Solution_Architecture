@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 72 of 281 |
+| Operations in the slice | 74 of 281 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -50,6 +50,7 @@
 | consent | [`setDynamicFieldQuestion`](#setdynamicfieldquestion) | PUT | `/dynamic-field-question/{formId}/{key}` | setup | 1 |  |
 | consent | [`setTrackingTechnology`](#settrackingtechnology) | PUT | `/cookie-tracking-digital/{technologyId}` | setup | 1 | CMS-025 |
 | consent | [`updateConsentQuestion`](#updateconsentquestion) | PATCH | `/consent-questions/{questionId}` | core | 1 | CMS-018 |
+| consent | [`writeSubjectDataExportPart`](#writesubjectdataexportpart) | POST | `/subject-data-export-parts` | core | 1 |  |
 | feedback | [`submitReview`](#submitreview) | POST | `/reviews` | core | 1 | GST-035, WEB-026 |
 | guest | [`addToWishlist`](#addtowishlist) | POST | `/guests/{subjectId}/wishlist` | core | 1 | GST-020, WEB-009 |
 | guest | [`getWishlist`](#getwishlist) | GET | `/guests/{subjectId}/wishlist` | core | 1 | GST-020, WEB-009, WEB-017, WEB-024 |
@@ -99,6 +100,7 @@
 | marketing | [`submitForm`](#submitform) | POST | `/form-submissions` | core | 1 | GST-035, WEB-026 |
 | marketing | [`updateGuestPreferences`](#updateguestpreferences) | PUT | `/guests/{subjectId}/preferences` | core | 1 | BO-740, WEB-020 |
 | marketing | [`updateMyProfile`](#updatemyprofile) | PATCH | `/guests/me/profile` | core | 1 | GST-039, GST-043, WEB-011, WEB-020 |
+| marketing | [`uploadGuestDocument`](#uploadguestdocument) | POST | `/guest-documents` | setup | 1 |  |
 | message | [`createMessageTemplate`](#createmessagetemplate) | POST | `/message-templates` | setup | 1 | BO-785, BO-786, BO-787, SUP-007 |
 | message | [`listMyNotifications`](#listmynotifications) | GET | `/me/notifications` | core | 1 | GST-030, WEB-046 |
 | message | [`markMyNotificationsRead`](#markmynotificationsread) | POST | `/me/notifications/read` | core | 1 | GST-030, WEB-046 |
@@ -1542,6 +1544,61 @@ Each purpose names the channels it covers, whether it is required for service, a
 | 200 |  | Updated, at a new version where the question changed |
 | 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### writeSubjectDataExportPart
+
+**`POST /subject-data-export-parts`**: Write Marketing's part of a guest's data export
+
+**The `identity.privacyRequestRaised` consumer that writes Marketing's part of a guest's data export** (the lead, 29 October 2026, r11 gate; CHG-R11FXC-005). Identity is Foundation and reads nothing above it (ADR-0028), so `exportSubjectData` no longer reads Marketing's tables: Marketing, which owns them, writes its own part and Identity's export job assembles the parts. Modelled as an operation so it has lineage and a ticket.
+
+**What it writes.** For `requestType` `access` only (an erasure writes no part): every row of the guest (`subjectId`) in marketing.consent_record, marketing.guest_profile, marketing.form_submission and marketing.guest_document, the tables of Marketing's that `handoff/subject-data-register.json` lists, in the export's `format`, as one object in the tenant's private storage (never a public or CDN path; encrypted at rest under the tenant's keys, ADR-0063). **Another guest's rows are left out even where they share a form or a document**, as `exportSubjectData` says. Then it publishes `marketing.subjectDataPartWritten` with the object's key, in the same transaction as its inbox record. A guest with no Marketing rows still gets a part, with `rowCount` 0, so the export job never waits for a part that will not come.
+
+**When.** On the event, which `exportSubjectData` raises with the request: the part is the guest's Marketing data as of the request. It is not delivered until the export is approved; the export job deletes it with the export (7 days after `readyAt`, or when the request is rejected, withdrawn or expired).
+
+**Idempotent on `approvalRequestId`**: a redelivered event finds the part already written and returns it. Invoked by the event relay, never by a screen.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | append |
+| Reads | `cache:idempotency`, `marketing.consent_record`, `marketing.form_submission`, `marketing.guest_document`, `marketing.guest_profile` |
+| Writes | `cache:idempotency`, `platform.outbox` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| eventId | string | yes | The identity.privacyRequestRaised event id, for the consumer's inbox record. |
+| subjectId | string (uuid) | yes | The guest the export is about. |
+| approvalRequestId | string (uuid) | yes | The export's id, carried on to marketing.subjectDataPartWritten. |
+| requestType | string | yes | access writes a part; deletion writes none and answers rowCount 0 with no fileRef. |
+| format | enum (json, csv, pdf) |  | The export's format; json where the event carries none. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| approvalRequestId | string (uuid) | yes |  |
+| fileRef | string |  | The part's object key; null for a deletion request. (nullable) |
+| rowCount | integer | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The part, written now or already written. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -4737,6 +4794,67 @@ CF-96 fixed this class for 28 guest screens and the underlying pattern was never
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### uploadGuestDocument
+
+**`POST /guest-documents`**: Store a guest photo, ID or signed document
+
+BL-133. **Deliberately not `assets`.** A guest's passport scan is not a marketing asset — it has a different retention clock, a different access rule and a different reason to exist, and **one careless query against a shared store returns both.**
+`retainUntil` is required. **A guest document with no deletion date is a guest document kept forever.** It is the end of the document's purpose plus the retention period client counsel sets, which is still open (audit R149).
+
+|  |  |
+|---|---|
+| Permission | `GUEST_VIEW_PII` |
+| Scope level | venue |
+| Part of slice | setup, makes `marketing.guest_document` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Guest callable | True |
+| Reads | `cache:idempotency`, `marketing.consent_record`, `marketing.guest_document`, `pii.subject` |
+| Writes | `cache:idempotency`, `marketing.guest_document` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `GuestDocument`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| subjectId | string (uuid) | yes |  |
+| kind | enum (avatar, idDocument, visa, signedWaiver, medicalNote, accessibilityEvidence, photo, other) | yes |  |
+| storageRef | string | yes | The stored object's key in the guest-document store, which is deliberately not assets (BL-133). |
+| contentType | string |  |  |
+| consentPurposeId | string (uuid) |  |  |
+| retainUntil | string (date) | yes | Required, not optional. |
+| uploadedAt | string (date-time) |  | (read-only) |
+| uploadedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+
+**Response**: `GuestDocument`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| subjectId | string (uuid) | yes |  |
+| kind | enum (avatar, idDocument, visa, signedWaiver, medicalNote, accessibilityEvidence, photo, other) | yes |  |
+| storageRef | string | yes | The stored object's key in the guest-document store, which is deliberately not assets (BL-133). |
+| contentType | string |  |  |
+| consentPurposeId | string (uuid) |  |  |
+| retainUntil | string (date) | yes | Required, not optional. |
+| uploadedAt | string (date-time) |  | (read-only) |
+| uploadedByPrincipalId | string (uuid) |  | (read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Stored |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 
 ## Group: message
 
@@ -5539,6 +5657,20 @@ Every table this service owns that the slice reads or writes, with its columns a
 | revoked_at | timestamptz | no |  |
 | pending_session_end_installation_id | uuid | no | Set only by the server (a value a client sends is ignored) and never returned (R8 blocker IDENTITY-C23). |
 
+### `marketing.guest_document`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| subject_id | uuid | yes |  |
+| kind | text | yes |  |
+| storage_ref | text | yes | The stored object's key in the guest-document store, which is deliberately not assets (BL-133). |
+| content_type | text | no |  |
+| consent_purpose_id | uuid | no |  |
+| retain_until | date | yes | Required, not optional. |
+| uploaded_at | timestamptz | no |  |
+| uploaded_by_principal_id | uuid | no |  |
+
 ### `marketing.guest_preference`
 
 | Column | Type | Required | Notes |
@@ -5981,18 +6113,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-209 operations, added to this service in later releases without changing any of the above.
+207 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | campaign | `getCampaign`, `getCampaignPerformance`, `listCampaigns`, `pauseCampaign`, `testSendCampaign`, `unscheduleCampaign` |
 | case | `addCaseMessage`, `createCase`, `createCaseClassificationIntelligent`, `escalateCase`, `getCase`, `getCaseInvestigationResolution`, `listAgentWorkloadAvailability`, `listCaseCategories`, `listCaseResolutionClosure`, `listCases`, `listContact`, `listContactAutomation`, `listCustomerService`, `listCustomerServiceProfile`, `listEscalationCollaborationInternal`, `listEscalationCriticalCase`, `listIntelligentRoutingSkills`, `listQualityAgentEvaluation`, `listServiceQueues`, `listServiceRootCause`, `listSlaPolicyService`, `listUnifiedInteractionCommunication`, `reopenCase`, `setAgentServiceProfile`, `setCaseCategoryDefinition`, `setCaseInternalRequest`, `setCaseInvestigationResolution`, `setCaseResolution`, `setContactAutomation`, `setCustomerServiceCopilot`, `setIntelligentRoutingSkill`, `setOrderBookingTicket`, `setQualityEvaluation`, `setRefundCompensationService`, `setServiceQueueDefinition`, `updateCase` |
-| consent | `actOnWaiverRequirements`, `addSuppression`, `approvePrivacyTesting`, `approveWaiverTesting`, `getConsentHistory`, `getDeviceConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanFindings`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listPublishedTrackingTechnologies`, `listSiteWaiverException`, `listTrackingTechnologyCatalogue`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCheckoutConsents`, `recordCookieScan`, `recordDeviceConsent`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnologyCatalogueEntry`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation`, `writeSubjectDataExportPart` |
+| consent | `actOnWaiverRequirements`, `addSuppression`, `approvePrivacyTesting`, `approveWaiverTesting`, `getConsentHistory`, `getDeviceConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanFindings`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listPublishedTrackingTechnologies`, `listSiteWaiverException`, `listTrackingTechnologyCatalogue`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCheckoutConsents`, `recordCookieScan`, `recordDeviceConsent`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnologyCatalogueEntry`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
 | feedback | `listCustomerSatisfactionFeedback`, `listReviews`, `respondToReview` |
 | general | `getCustomerServiceCopilot` |
 | guest | `getGuestProfile`, `mergeGuestProfiles`, `updateGuestProfile` |
 | guests | `activateAudience`, `checkGuestCheckoutMatch`, `decideDuplicateCandidate`, `decideGuestCheckoutMatch`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestMatchPolicy`, `setGuestRelationships`, `setIdentityResolutionRules` |
 | loyalty | `adjustLoyaltyPoints`, `getLoyaltyRules`, `issueReward`, `listBadges`, `listLoyaltyCampaigns`, `listLoyaltyPointEntries`, `listRewardAssignments`, `setBadge`, `setLoyaltyCampaign` |
-| marketing | `accrueLoyaltyPoints`, `activateChallenge`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `endKioskAssist`, `getChallenge`, `getConversation`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `listChallenges`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageDispatches`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordPrivacyIncident`, `recordSaleOwnerAnswers`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `transferConversation`, `uploadGuestDocument` |
+| marketing | `accrueLoyaltyPoints`, `activateChallenge`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `endKioskAssist`, `getChallenge`, `getConversation`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `listChallenges`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageDispatches`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordPrivacyIncident`, `recordSaleOwnerAnswers`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `transferConversation` |
 | message | `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `notifyPerformanceHolders`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
 | segment | `listSegmentMembers`, `listSegments`, `previewSegment`, `previewSegmentDraft` |

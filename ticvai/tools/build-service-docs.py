@@ -2895,6 +2895,31 @@ def main() -> int:
                 waits_added.append(f"{asker_} ({o_}) waits on {', '.join(sorted(need_))} for {q_}")
     print(f"tasks waiting on the task that builds a query they ask: {len(waits_added)}"
           + (f" ({'; '.join(waits_added)})" if waits_added else ""))
+    # **An operation's task waits on the plan tasks named for it** (29 October 2026, CHG-R11PLN-001; ADAM CR-271, CR-281
+    # to CR-284): block-a-extra-tasks.json `operationWaits`, operation -> task keys, for work no screen, operation or
+    # query implies (the kernel's field encryption, service and device sign-in, Redis). The lead linked those tickets
+    # by hand in OpenProject on 29 October; this makes the plan order them, so the release links the tasks instead of
+    # leaving the order to hand-made links. The keys are hand-written tasks (this file's `tasks`): a generated key is
+    # provisional here until the key reconcile below. A wait that names an operation with no task or a key the plan
+    # does not have stops the build: an authored wait is never dropped quietly.
+    op_waits = dict(json.loads(EXTRA.read_text(encoding="utf-8")).get("operationWaits") or {}) \
+        if EXTRA.exists() else {}
+    op_waits_added, op_waits_bad = [], []
+    for o_, need_keys_ in sorted(op_waits.items()):
+        asker_ = task_of_op.get(o_)
+        if not asker_ or asker_ not in by_key:
+            op_waits_bad.append(f"{o_}: no task builds it")
+            continue
+        need_ = set(need_keys_) - {asker_}
+        op_waits_bad += [f"{o_}: {k_} is not a plan task" for k_ in sorted(need_) if k_ not in by_key]
+        need_ &= set(by_key)
+        if need_ - set(by_key[asker_]["dependsOn"].split()):
+            by_key[asker_]["dependsOn"] = " ".join(sorted(set(by_key[asker_]["dependsOn"].split()) | need_))
+        op_waits_added.append(f"{asker_} ({o_}) waits on {', '.join(sorted(need_))}")
+    if op_waits_bad:
+        raise SystemExit("block-a-extra-tasks.json operationWaits: " + "; ".join(op_waits_bad))
+    print(f"operations waiting on a named task (operationWaits): {len(op_waits_added)}"
+          + (f" ({'; '.join(op_waits_added)})" if op_waits_added else ""))
     # the screens, each waiting on the tasks that build its operations (soft: built against the mock server)
     for key, sid, k, kind, pts in later_items:
         if kind == "ticketed":
@@ -3993,6 +4018,12 @@ def main() -> int:
                                    {t_["key"] for t_ in tasks if t_["key"] not in work or not key_identity(t_["key"])},
                                    kmap, closed_keys())
     renamed = {k: v for k, v in stable.items() if k != v}
+    # an operationWaits key (CHG-R11PLN-001) names a pushed ticket; one the reconcile renames was a different task when
+    # the wait was wired above, so the wait would follow the wrong ticket
+    moved_waits_ = sorted({k_ for ks_ in op_waits.values() for k_ in ks_ if k_ in renamed})
+    if moved_waits_:
+        raise SystemExit("block-a-extra-tasks.json operationWaits names key(s) the plan renames at the reconcile: "
+                         + ", ".join(f"{k_} -> {renamed[k_]}" for k_ in moved_waits_))
     if renamed:
         def rk(k):
             return renamed.get(k, k)
