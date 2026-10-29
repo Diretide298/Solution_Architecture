@@ -1,0 +1,51 @@
+id: CHG-R11FXT-009
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'BO-129 Software, Configuration & Version Management shows firmware: a Firmware releases list
+  (listDeviceFirmware), a panel for the picked release (getDeviceFirmware), and a Register firmware release button
+  with its form (createDeviceFirmware).'
+decision:
+  what: 'screens/P08-venue-back-office.yaml BO-129, a design change: in the collection region a dataTable Firmware
+    releases bound to DeviceFirmware (deviceKind, version, vendor, status, installedCount), filled by
+    listDeviceFirmware on load; in the reads region a detailPanel The selected firmware release (version, status,
+    releasedAt, installedCount, minimumPreviousVersion, releaseNotes), read by getDeviceFirmware with the firmwareId of
+    the picked row (the screen''s optional firmwareId entry parameter already said the user picks one from
+    listDeviceFirmware); in the row actions a secondaryButton Register firmware release, bound to createDeviceFirmware,
+    which opens a new modal formCreateDeviceFirmware (required deviceKind, version; optional vendor, artefactAssetId,
+    checksum, checksumAlgorithm, minimumPreviousVersion, releaseNotes; the server''s readOnly fields not asked; a
+    duplicate device kind and version is a 409). createDeviceFirmware belongs here: the contract says a release is
+    registered before it is deployed, and this is the screen that manages firmware versions across the fleet (its
+    purpose). The four visible changes are logged in docs/active/approved-ui-changes.yaml. startDeviceFirmwareRollout,
+    rollbackDeviceFirmware and setDeviceFirmwareStatus stay declared and unreached (no started ticket builds on them).'
+  by: Chinmay
+  date: '2026-10-29'
+  quote: '"Add list + panel"'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T06:53Z): check-screen-wiring S-OP-UNREACHED
+  findings on BO-129 getDeviceFirmware and listDeviceFirmware, built on by started tickets #33879 and #33881 (In
+  progress, Deep Khanvilkar); left for the lead by cf4ac86b because the approved screen had no element for firmware.
+  The lead''s decision of 29 October 2026: "Add list + panel".'
+keys_touched:
+  screens: [BO-129]
+  operations: [listDeviceFirmware, getDeviceFirmware, createDeviceFirmware]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'an operation declared on a screen that has no element for it'
+tickets:
+  started:
+  - '33879 (getDeviceFirmware) and 33881 (listDeviceFirmware), In progress, Deep Khanvilkar: nothing to change; the
+    operations are unchanged and BO-129 now shows them (the list and the picked release). Told through the lead''s
+    comment; their text is not rewritten.'
+  unstarted:
+  - 'VM-BO-129 and APP-SETUP-BO-129-REST, and createDeviceFirmware''s ticket, pick the list, panel and form up at the
+    next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Visible design change to an approved screen, logged with this entry. No database change.'

@@ -433,7 +433,7 @@ changes:
     read 2026-10-29T06:53Z): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
     is generated and never acknowledged or baselined, the screen''s state text saying what its approved UI and its
     contract already do; and the lead''s rule of 22 October 2026 that a change to approved UI is made and logged ("let
-    frontend change ui and log it in changes. dont worry about it"). A web app keeps no offline store, so the offline text refuses the writes instead of queueing them (4.4).'
+    frontend change ui and log it in changes. dont worry about it"). The lead kept it on 29 October 2026 ("Keep all three"). A web app keeps no offline store, so the offline text refuses the writes instead of queueing them (4.4).'
   change: CHG-R11FXT-006
 - screen: BO-097
   field: 'state:error'
@@ -442,7 +442,7 @@ changes:
     read 2026-10-29T06:53Z): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
     is generated and never acknowledged or baselined, the screen''s state text saying what its approved UI and its
     contract already do; and the lead''s rule of 22 October 2026 that a change to approved UI is made and logged ("let
-    frontend change ui and log it in changes. dont worry about it"). The error text no longer says check-out and check-in work offline.'
+    frontend change ui and log it in changes. dont worry about it"). The lead kept it on 29 October 2026 ("Keep all three"). The error text no longer says check-out and check-in work offline.'
   change: CHG-R11FXT-006
 - screen: BO-602
   field: 'state:emptyNoAccess'
@@ -451,7 +451,7 @@ changes:
     read 2026-10-29T06:53Z): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
     is generated and never acknowledged or baselined, the screen''s state text saying what its approved UI and its
     contract already do; and the lead''s rule of 22 October 2026 that a change to approved UI is made and logged ("let
-    frontend change ui and log it in changes. dont worry about it"). The screen declares no operation now, so, like the back office''s other screens with none, it has no permission of its own and its no-access state says so.'
+    frontend change ui and log it in changes. dont worry about it"). The lead kept it on 29 October 2026 ("Keep all three"). The screen declares no operation now, so, like the back office''s other screens with none, it has no permission of its own and its no-access state says so.'
   change: CHG-R11FXT-004
 - screen: POS-016
   field: 'state:offline'
@@ -460,5 +460,53 @@ changes:
     read 2026-10-29T06:53Z): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
     is generated and never acknowledged or baselined, the screen''s state text saying what its approved UI and its
     contract already do; and the lead''s rule of 22 October 2026 that a change to approved UI is made and logged ("let
-    frontend change ui and log it in changes. dont worry about it"). The offline text says the online-only writes are disabled offline (4.4).'
+    frontend change ui and log it in changes. dont worry about it"). The lead kept it on 29 October 2026 ("Keep all three"). The offline text says the online-only writes are disabled offline (4.4).'
   change: CHG-R11FXT-007
+- screen: ADM-419
+  field: 'navigation'
+  to: b1f6f4f4bba99be6
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s decision of 29 October 2026, "Open ADM-420", and the lead''s rule of 22 October 2026
+    that a change to approved UI is made and logged ("let frontend change ui and log it in changes. dont worry about
+    it"). Create tenant opens ADM-420, whose form collects what createTenant sends.'
+  change: CHG-R11FXT-008
+- screen: ADM-419
+  field: 'state:emptyFirstRun'
+  to: 71a96bf1c92f85d8
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s decision of 29 October 2026, "Open ADM-420", and the lead''s rule of 22 October 2026
+    that a change to approved UI is made and logged ("let frontend change ui and log it in changes. dont worry about
+    it"). The empty state offers Create tenant, now that the create is made on ADM-420.'
+  change: CHG-R11FXT-008
+- screen: BO-129
+  field: 'region:collection'
+  to: 569dcf508fcccf70
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s decision of 29 October 2026, "Add list + panel", and the lead''s rule of 22 October 2026
+    that a change to approved UI is made and logged ("let frontend change ui and log it in changes. dont worry about
+    it"). A Firmware releases list (listDeviceFirmware).'
+  change: CHG-R11FXT-009
+- screen: BO-129
+  field: 'region:reads'
+  to: c711736ec7f36d84
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s decision of 29 October 2026, "Add list + panel", and the lead''s rule of 22 October 2026
+    that a change to approved UI is made and logged ("let frontend change ui and log it in changes. dont worry about
+    it"). The selected firmware release panel (getDeviceFirmware).'
+  change: CHG-R11FXT-009
+- screen: BO-129
+  field: 'region:rowActions'
+  to: 400489f271dab2d3
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s decision of 29 October 2026, "Add list + panel", and the lead''s rule of 22 October 2026
+    that a change to approved UI is made and logged ("let frontend change ui and log it in changes. dont worry about
+    it"). The Register firmware release button that opens its form.'
+  change: CHG-R11FXT-009
+- screen: BO-129
+  field: 'overlay:formCreateDeviceFirmware'
+  to: 2b323f2ccc00654e
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s decision of 29 October 2026, "Add list + panel", and the lead''s rule of 22 October 2026
+    that a change to approved UI is made and logged ("let frontend change ui and log it in changes. dont worry about
+    it"). The form createDeviceFirmware needs.'
+  change: CHG-R11FXT-009

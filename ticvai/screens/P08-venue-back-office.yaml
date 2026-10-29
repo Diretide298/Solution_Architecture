@@ -34274,6 +34274,20 @@ screens:
         - Workstation.currencyScale
         operation: listWorkstations
         provenance: contract tenancy.yaml GET /workstations
+      - kind: dataTable
+        label: Firmware releases
+        bindsTo: DeviceFirmware
+        columns:
+        - DeviceFirmware.deviceKind
+        - DeviceFirmware.version
+        - DeviceFirmware.vendor
+        - DeviceFirmware.status
+        - DeviceFirmware.installedCount
+        operation: listDeviceFirmware
+        notes: 'The fleet view: every firmware or software release, newest first, and how many devices
+          run it. Picking a row opens it in The selected firmware release (`getDeviceFirmware`). Added
+          29 October 2026 (the lead, "Add list + panel"; CHG-R11FXT-009).'
+        provenance: contract tenancy.yaml GET /device-firmware
       - kind: searchField
         label: Search software, configuration
         provenance: carried from the previous definition
@@ -34295,6 +34309,12 @@ screens:
         label: Deploy configuration profile
         operation: deployConfigurationProfile
         provenance: contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy
+      - kind: secondaryButton
+        label: Register firmware release
+        operation: createDeviceFirmware
+        notes: Opens the form that registers a release as `draft` (`createDeviceFirmware`). Added 29 October
+          2026 (the lead, "Add list + panel"; CHG-R11FXT-009).
+        provenance: contract tenancy.yaml POST /device-firmware
       - kind: publishGate
         label: What publishing changes
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
@@ -34309,6 +34329,21 @@ screens:
         notes: Shows `score`, `status`, `contributors` from `getWorkstationHealth`'s inline response.
           **The response has no named schema**, so this cannot bind until the contract names one.
         provenance: contract tenancy.yaml GET /workstations/{workstationId}/health
+      - kind: detailPanel
+        label: The selected firmware release
+        bindsTo: DeviceFirmware
+        columns:
+        - DeviceFirmware.version
+        - DeviceFirmware.status
+        - DeviceFirmware.releasedAt
+        - DeviceFirmware.installedCount
+        - DeviceFirmware.minimumPreviousVersion
+        - DeviceFirmware.releaseNotes
+        operation: getDeviceFirmware
+        notes: 'The release picked in Firmware releases, read by its id (`firmwareId`): its status, how
+          much of the fleet runs it, the version it must be applied from and its notes. Added 29 October
+          2026 (the lead, "Add list + panel"; CHG-R11FXT-009).'
+        provenance: contract tenancy.yaml GET /device-firmware/{firmwareId}
   states:
     loading: The software version list.
     error: Could not load. Names which read failed and leaves the software version untouched.
@@ -34460,6 +34495,32 @@ screens:
       - targetFilter
       - strategy
     provenance: contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy
+  - id: formCreateDeviceFirmware
+    component: modal
+    trigger: Register firmware release
+    body: '**Collects what `createDeviceFirmware` sends before it is called.** Required: `deviceKind`,
+      `version`. Optional: `vendor`, `artefactAssetId` (the vendor image, uploaded to Assets from the
+      form), `checksum`, `checksumAlgorithm`, `minimumPreviousVersion`, `releaseNotes`. A second release with
+      the same device kind and version is refused (409, duplicate-code) and says so. Dismissing sends nothing;
+      the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract):
+      `id`, `status` (a release starts `draft`), `releasedAt`, `installedCount`, `statusReason`, `scopePath`.'
+    bindsTo: DeviceFirmware
+    confirm:
+      label: Register release
+      operation: createDeviceFirmware
+    dismiss:
+      label: Cancel
+      discards:
+      - deviceKind
+      - version
+      - vendor
+      - artefactAssetId
+      - checksum
+      - checksumAlgorithm
+      - minimumPreviousVersion
+      - releaseNotes
+    provenance: contract tenancy.yaml POST /device-firmware; the lead, 29 October 2026 ("Add list + panel";
+      CHG-R11FXT-009)
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder
     "Software, Configuration & Version Management — from the client design board, 20 August".'
 - id: BO-130

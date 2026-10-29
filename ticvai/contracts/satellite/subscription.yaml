@@ -1295,7 +1295,6 @@ paths:
       operationId: createTenant
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
-        - "P09 ADM-419 Provisioning Command Center"
         - "P09 ADM-420 Tenant & Organization Provisioning"
       x-ticvai-audience:
       - staff

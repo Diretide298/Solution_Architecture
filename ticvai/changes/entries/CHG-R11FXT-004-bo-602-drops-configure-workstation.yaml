@@ -19,6 +19,7 @@ decision:
     contracts/spine/tenancy.yaml follows (link-screens-contracts).'
   by: Chinmay
   date: '2026-10-29'
+  quote: '"Keep all three" (the lead on the three visible text changes of this lane, 29 October 2026)'
 why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T06:53Z): check-screen-wiring S-OP-UNREACHED
   finding on BO-602 configureWorkstation, built on by started ticket #27789 (Ready for QA, Pranay Shinde). The lead''s
   rule: fix every finding at its source (29 October 2026); CHG-WIR-021; the same kind of fix as CHG-R11FXS-001 (a

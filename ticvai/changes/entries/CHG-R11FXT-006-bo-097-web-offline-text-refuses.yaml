@@ -16,6 +16,7 @@ decision:
     docs/active/approved-ui-changes.yaml.'
   by: Chinmay
   date: '2026-10-29'
+  quote: '"Keep all three" (the lead on the three visible text changes of this lane, 29 October 2026)'
 why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T06:53Z): check-screen-wiring S-OFFLINE-QUEUED
   finding on BO-097 relinquishStoredValue, built on by started ticket #32268 (In progress, Sanket Keluskar), and the
   same finding on its four other writes. The lead''s rule: fix every finding at its source (29 October 2026);

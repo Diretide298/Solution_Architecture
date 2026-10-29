@@ -12,8 +12,8 @@ decision:
     text bound to nothing, so nothing on it lists, opens or registers a release. The lead''s ruling of 26 October 2026
     (CHG-R10WIR-002, item 5): a read the approved screen has no element for leaves it; a CR brings it back. The
     x-ticvai-consumed-by mirror in contracts/spine/tenancy.yaml follows (link-screens-contracts). The three
-    operations stay declared on BO-129 Software, Configuration & Version Management, whose own unreached firmware
-    reads are left for the lead (they need a visible element).'
+    operations stay declared on BO-129 Software, Configuration & Version Management, which now shows them
+    (CHG-R11FXT-009).'
   by: Chinmay
   date: '2026-10-29'
 why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T06:53Z): check-screen-wiring S-OP-UNREACHED
