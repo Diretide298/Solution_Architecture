@@ -392,11 +392,23 @@ def main() -> int:
         collected = {((o.get("confirm") or {}).get("operation")) for o in overlays
                      if isinstance(o.get("confirm"), dict)}
         has_inputs = bool(kinds & INPUTS)
+        # A button may name the list whose rows collect its body (collectedBy, 29 October 2026): taken only when a
+        # list, card list or table of that label is on the screen and is filled by a read the screen declares.
+        reads = {a["operationId"] for a in apis
+                 if (facts.get(a["operationId"]) or {}).get("method") == "get" or a.get("trigger") == "onLoad"}
+        lists = {c.get("label") for c in comps
+                 if re.search(r"(?i)list|table|grid", str(c.get("kind"))) and c.get("operation") in reads}
         for c in comps:
             op_id = c.get("operation")
             f = ops.get(op_id) if op_id else None
+            by = c.get("collectedBy")
+            if by and by not in lists:
+                guard.add("S-BUTTON-FORM", f"{sid}:{op_id}",
+                          f"{sid}: button {c.get('label')!r} says {by!r} collects {op_id}'s body, but no list of "
+                          f"that label filled by a declared read is on the screen")
+                continue
             if f and "Button" in str(c.get("kind")) and f["method"] in WRITES \
-                    and required_body(f["op"]) and op_id not in collected and not has_inputs:
+                    and required_body(f["op"]) and op_id not in collected and not has_inputs and not by:
                 guard.add("S-BUTTON-FORM", f"{sid}:{op_id}",
                           f"{sid}: button {c.get('label')!r} calls {op_id}, which takes a body, and "
                           f"nothing on the screen collects it")

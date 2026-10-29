@@ -265,6 +265,15 @@ properties:
                             exist there either needs adding deliberately or is the wrong one.
                         label: { type: string }
                         bindsTo: { type: string }
+                        collectedBy:
+                          type: string
+                          description: >
+                            **A button whose write body is collected in a list's rows, not in a
+                            form** (29 October 2026, the lead, r11 gate): the label of the list,
+                            card list or table on the same screen whose rows carry the inputs
+                            (GST-008's ticket-type steppers feed Continue's addCartLine).
+                            check-screen-wiring S-BUTTON-FORM accepts it only when that component is
+                            on the screen and is filled by a read the screen declares.
                         permission:
                           type: string
                           description: >

@@ -2363,6 +2363,7 @@ screens:
       - kind: primaryButton
         label: Continue
         operation: addCartLine
+        collectedBy: Ticket types
         provenance: decided 29 September, rev 3 GAP-D3
   states:
     loading: The ticket types of the product, with prices.
