@@ -1,0 +1,33 @@
+id: CHG-R11INT-003
+date: '2026-10-29'
+source: audit
+kind: contract
+summary: 'reportBundleApplied says it has no wrong state (x-ticvai-no-wrong-state): every call appends one
+  catalogue.bundle_application row, and a workstation reporting a version that is no longer current is recorded, not
+  refused, because that drift is what the back office reads the reports for.'
+decision:
+  what: 'The lead, 29 October 2026 ("get fixing now"): fix the started-ticket findings. A 409 would hide a terminal
+    running a superseded or withdrawn bundle, so the contract states the report has no wrong state instead.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: r11 final gate (29 October 2026), check-contract-shapes C-ACTION-409 on reportBundleApplied, built on
+  by #27706 (Hrushikant Patkar, Ready for QA) once the gate read live ticket statuses.'
+keys_touched:
+  operations:
+  - reportBundleApplied
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'an append-only report shaped like an action on an item, with its no-wrong-state rule unstated'
+tickets:
+  started:
+  - '27706 (reportBundleApplied): nothing to change if every report is recorded; never answer 409 for a version
+    that is not current.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py::C-ACTION-409
+status: open
