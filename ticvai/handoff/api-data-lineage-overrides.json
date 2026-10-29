@@ -5254,13 +5254,6 @@
    "reason": "Rows are access.access_attribute (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "listAccessDecisions": {
-   "reads": [
-    "identity.authz_audit"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "listAccessExecutiveInsight": {
    "reads": [
     "access.access_point",

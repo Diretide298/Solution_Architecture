@@ -1,0 +1,45 @@
+id: CHG-R11FXD-003
+date: '2026-10-29'
+source: audit
+kind: contract
+summary: 'marketing.communication_policy_decision, a guest''s row with no venue or scope (the policy evaluation of one
+  message to that guest), is read and written by any staff or partner grant and by the guest its own:
+  x-ticvai-rls grant-holder-write on ConsentPreferenceCommunicationPolicyEnforcementView.'
+decision:
+  what: 'contracts/satellite/marketing-crm.yaml ConsentPreferenceCommunicationPolicyEnforcementView: x-ticvai-rls
+    grant-holder-write, the staff-grant write rule the lead confirmed for a guest-owned row with no scope in
+    CHG-R11FXC-003 (consent records, card tokens, wallets). derive-ddl re-applies the table''s policy in the forward
+    migration as apply_grant_holder_subject_rls: read and write `platform.grant_holder() OR
+    platform.subject_in_scope(subject_id)`. A guest session is no grant holder (platform.grant_holder() requires no
+    guest subject), so a guest still reads and writes only rows naming its own subject, and never another guest''s.
+    A scope column would hide the row from the other venues the guest is messaged from; running the send at tenant
+    would need a tenant grant for a partner''s booking confirmation.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: the r11 final gate, 29 October 2026, check-rls-scope-fit RF-TENANT-ROOT on started ticket #35910 (Ready for
+  QA, Hrushikant Patkar): listConsentPreferenceCommunication (venue, staff) reads and sendTransactionalMessage (venue,
+  partner; the dispatch worker behind it) writes marketing.communication_policy_decision, which only the tenant root
+  read and wrote (apply_subject_rls). CR-076, CHG-GEN-010, CHG-MOD-007, CHG-R11FXC-003.'
+keys_touched:
+  operations: [listConsentPreferenceCommunication, sendTransactionalMessage]
+  schemas: [ConsentPreferenceCommunicationPolicyEnforcementView]
+  tables: [marketing.communication_policy_decision]
+  tickets: ['35910']
+  files:
+  - contracts/satellite/marketing-crm.yaml
+root_class: 'a guest-owned row with no scope that staff below the tenant write'
+tickets:
+  started:
+  - '35910: nothing to change in the build; the read and the write pass the row policy once the forward migration is
+    applied.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::RLS_MARKS
+status: open
+notes: 'The table is append-only evidence by its description; grant-holder-write, like consent_record''s, also lets a
+  grant holder update or delete a row at the database. No operation does either.'

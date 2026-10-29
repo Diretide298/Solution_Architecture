@@ -1,0 +1,44 @@
+id: CHG-R11FXD-004
+date: '2026-10-29'
+source: audit
+kind: contract
+summary: 'acquireInventoryHold and checkoutCart say where three request fields are kept: ttlSeconds as the hold''s
+  expires_at, attendees as each order line''s holder_name, marketingConsents as marketing.consent_record rows.'
+decision:
+  what: 'contracts/spine/catalogue.yaml AcquireLeaseRequest.ttlSeconds: x-ticvai-stored-as
+    catalogue.inventory_reservation.expires_at (acquired_at + ttlSeconds, what the expiry sweeper reads).
+    contracts/spine/orders.yaml checkoutCart: attendees x-ticvai-stored-as orders.order_line.holder_name (each entry''s
+    holderName on the order line made from the cart line lineId names, as the description already said through
+    CreateOrderLine.holderName); marketingConsents x-ticvai-stored-as marketing.consent_record.purpose (each ticked
+    entry one consent_record row, purpose, decision granted, notice_version and the order id, its channel kept
+    with it by marketing, written from order.created by recordCheckoutConsents, the x-ticvai-write-via
+    checkoutCart already declares). No column added.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: the r11 final gate, 29 October 2026, check-request-fields-stored RF-ACTION-NOT-STORED on started tickets
+  #27706 (Ready for QA, Hrushikant Patkar: acquireInventoryHold.ttlSeconds) and #31893 and #31895 (Ready for QA, Chinmay
+  Patkar: checkoutCart.attendees and checkoutCart.marketingConsents), each with no column named for it; the
+  CHG-R11FXC-004 pattern.'
+keys_touched:
+  operations: [acquireInventoryHold, checkoutCart]
+  schemas: [AcquireLeaseRequest]
+  tables: [catalogue.inventory_reservation, orders.order_line, marketing.consent_record]
+  tickets: ['27706', '31893', '31895']
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/orders.yaml
+root_class: 'an act''s request field that says nowhere where it is kept'
+tickets:
+  started:
+  - '27706: nothing to change; expires_at is acquired_at plus ttlSeconds, as the build stores it.'
+  - '31893, 31895: nothing to change if the build writes each attendee''s holderName to its order line and carries the
+    ticked marketingConsents on order.created; the contract now names those columns.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-request-fields-stored.py
+status: open

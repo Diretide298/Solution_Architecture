@@ -4774,7 +4774,10 @@ paths:
                     the terms; one entry per channel and purpose the guest ticked. Bound to the new order and to the
                     verified contact (ADR-0045), recorded as consent records by marketing (`recordCheckoutConsents`, the
                     `order.created` consumer, source `checkout`), and attached to the profile when the contact matches one. Omitted or empty, no marketing consent is recorded: never inferred
-                    from the purchase.'
+                    from the purchase. **Kept as `marketing.consent_record` rows** (r11 gate, CHG-R11FXD-004): each ticked
+                    entry is one row (`purpose`, `decision` granted, `notice_version`, the order id), its channel kept with
+                    it by marketing, written from `order.created` by `recordCheckoutConsents`.'
+                  x-ticvai-stored-as: marketing.consent_record.purpose
                   x-ticvai-make-or-break: 'M18-15: whether a guest-checkout customer''s opt-in, given against a verified
                     contact without an account, is sufficient marketing consent under PDPL for the venue. No precedent
                     confirmed; the client decides.'
@@ -4806,7 +4809,9 @@ paths:
                 attendees:
                   type: array
                   description: The named holder for each cart line that needs one. Becomes
-                    `CreateOrderLine.holderName` on the order's matching line.
+                    `CreateOrderLine.holderName` on the order's matching line, kept as that line's
+                    `orders.order_line.holder_name`; `lineId` only picks the line (r11 gate, CHG-R11FXD-004).
+                  x-ticvai-stored-as: orders.order_line.holder_name
                   items:
                     type: object
                     required:
