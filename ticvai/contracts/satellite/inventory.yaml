@@ -2208,6 +2208,10 @@ paths:
       x-ticvai-permission: PROCUREMENT_REQUEST
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
+      x-ticvai-offline-refused-on: [EMP-070]
+      x-ticvai-offline-condition: Queued in the staff app's outbox where a screen offers it offline (EMP-063).
+        Inventory Exceptions (EMP-070) refuses the whole screen offline in its approved text, so it is not
+        raised there offline (CHG-R11FXT-005).
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey

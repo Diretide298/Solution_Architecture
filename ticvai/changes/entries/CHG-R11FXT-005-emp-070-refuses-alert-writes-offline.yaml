@@ -1,0 +1,46 @@
+id: CHG-R11FXT-005
+date: '2026-10-29'
+source: audit
+kind: contract
+summary: 'acknowledgeAlert and createRequisition are refused offline on EMP-070 (x-ticvai-offline-refused-on), whose
+  approved offline text refuses the whole screen; both stay offline-capable elsewhere and nothing visible changes.'
+decision:
+  what: 'contracts/satellite/reporting.yaml acknowledgeAlert and contracts/satellite/inventory.yaml createRequisition
+    gain `x-ticvai-offline-refused-on: [EMP-070]` with an `x-ticvai-offline-condition`, the CHG-OFL-001 mechanism for a
+    write the approved UI refuses offline on one screen. The contract side is the one that was wrong: CHG-OFL-004 (14
+    October) made acknowledgeAlert offline-capable to match an EMP-070 offline text that 5bd53a8e restored to the
+    client-approved one the same night ("Not available offline"), and the flag stayed. EMP-070 is acknowledgeAlert''s
+    only consumer on an offline app (BO-141 and ANL-009 are web), and the approved screen offers no alert list offline
+    to acknowledge from. ADR-0016 decides which database a read is served from, not whether an app works offline, so
+    it settles neither side; the approved text stands as client copy. Tonight''s CR-296 change to acknowledgeAlert
+    (CHG-R11RUL-002) touched only its reads. x-ticvai-offline-capable stays true on both, so their operation
+    descriptions (offline-capable: yes) and createRequisition''s queueing on EMP-063 are unchanged.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T06:53Z): check-screen-wiring S-OFFLINE-REFUSED
+  finding on EMP-070 acknowledgeAlert, built on by started ticket #33212 (Ready for QA, Sanket Keluskar), and the same
+  finding on createRequisition. The lead''s rule: fix every finding at its source (29 October 2026); CHG-OFL-001,
+  CHG-OFL-004, ADR-0016.'
+keys_touched:
+  screens: [EMP-070]
+  operations: [acknowledgeAlert, createRequisition]
+  files:
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/inventory.yaml
+root_class: 'an offline flag added to match screen text that was later restored to the approved copy'
+tickets:
+  started:
+  - '33212 (acknowledgeAlert, Ready for QA, Sanket Keluskar): nothing to change server-side; the operation stays
+    offline-capable with its Idempotency-Key. The staff app does not queue it on EMP-070, which is not available
+    offline. Told through the lead''s comment; its text is not rewritten.'
+  unstarted:
+  - 'createRequisition''s ticket and EMP-070''s screen ticket pick the refusal up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'No visible change. No database change.'

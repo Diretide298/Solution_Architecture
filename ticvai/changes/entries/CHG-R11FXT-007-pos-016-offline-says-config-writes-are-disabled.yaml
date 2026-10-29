@@ -1,0 +1,41 @@
+id: CHG-R11FXT-007
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'POS-016 Till Configuration''s offline text says Configure workstation and Assign peripheral to this till
+  are disabled offline, because configureWorkstation and setDeviceAssignment are not offline-capable (frontend-patterns
+  4.4).'
+decision:
+  what: 'screens/P04-point-of-sale.yaml POS-016 states.offline: the approved text is kept and one sentence is added:
+    "**Configure workstation and Assign peripheral to this till are disabled offline:** `configureWorkstation` and
+    `setDeviceAssignment` are not offline-capable, so their buttons say to reconnect." allocateDepositBox stays
+    offline-capable as before. Logged in docs/active/approved-ui-changes.yaml (state:offline). The same fix as
+    CHG-R11FXS-006 on POS-021.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T06:53Z): check-screen-wiring S-OFFLINE-QUEUED
+  finding on POS-016 configureWorkstation, built on by started ticket #27789 (Ready for QA, Pranay Shinde), and the
+  same finding on setDeviceAssignment. The lead''s rule: fix every finding at its source (29 October 2026);
+  CHG-R11FXS-006.'
+keys_touched:
+  screens: [POS-016]
+  operations: [configureWorkstation, setDeviceAssignment]
+  files:
+  - screens/P04-point-of-sale.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'an offline state that promises sync and does not name a write that is online-only'
+tickets:
+  started:
+  - '27789 (configureWorkstation, Ready for QA, Pranay Shinde): nothing to change server-side; the till disables
+    Configure workstation offline as 4.4 says. Told through the lead''s comment; its text is not rewritten.'
+  unstarted:
+  - 'POS-016''s screen ticket picks the copy up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Visible copy change to a client-verified screen, logged with this entry. No database change.'

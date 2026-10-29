@@ -541,6 +541,11 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
+      x-ticvai-offline-refused-on: [EMP-070]
+      x-ticvai-offline-condition: Inventory Exceptions (EMP-070), the one offline app's screen that offers it,
+        refuses the whole screen offline in its approved text, so no alert is acknowledged there offline and
+        the staff app queues none; the operation stays offline-capable for a screen that later shows its alerts
+        offline (CHG-R11FXT-005).
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey

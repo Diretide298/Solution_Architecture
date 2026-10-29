@@ -27111,7 +27111,8 @@ screens:
         provenance: contract orders.yaml POST /stored-value/authorisations/{authorisationId}/capture
   states:
     loading: The booking and its condition history
-    error: Could not load. **Check-out and check-in work offline** — the deposit hold reconciles on sync.
+    error: Could not load. Names which read failed and leaves the booking untouched; nothing is checked
+      out or in until it loads.
     emptyFirstRun: Nothing is out. **The list a poolside attendant checks at close** — anything still
       here at the end of the day is a conversation.
     emptyNoAccess: 'Shown when the caller lacks `RENTAL_VIEW`, which `getRentalBooking` requires to show
@@ -27119,8 +27120,10 @@ screens:
       and sends somebody to support with the wrong question. A caller who can see the screen but lacks
       what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `authoriseStoredValue`,
       `relinquishStoredValue`, `captureStoredValue`; `RESOURCE_BOOK` for `checkOutResource`, `checkInResource`.'
-    offline: Queued locally. The deposit is authorised on sync, and **the condition note taken now is
-      the only defence against a dispute later**.
+    offline: '**Not available offline.** The back office runs in a browser and keeps no offline store,
+      so check-out, check-in and the stored-value actions are disabled until the connection returns, each
+      saying so. **The condition note is the only defence against a dispute later**: it goes with the
+      check-out or check-in it belongs to, once the connection is back.'
   apis:
   - operationId: checkOutResource
     contract: resources
@@ -92766,7 +92769,6 @@ screens:
   module: Setup & Go-Live
   requiresModule: core
   wave: 3
-  permission: WORKSTATION_CONFIGURE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '7'
@@ -92805,6 +92807,14 @@ screens:
       call is `none`, a read. The name promises authoring and the contract offers none, so either the
       write operations are missing or this screen is a view of something another screen builds.'
     source: contract — the screen's declared operations
+  - operation: configureWorkstation
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXT-004): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its thirteen pack fields bind to no operation and it has no Save
+      or publish control. Workstation configuration is done where the device is registered (BO-036) or
+      at the till (POS-016), as decided on 2 October 2026 when BO-129 dropped it (CHG-WIR-021); configureWorkstation
+      stays declared and reached on both. A CR brings it back here with the control that sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -92855,16 +92865,11 @@ screens:
     error: Could not load. Names which read failed and leaves the pos payment access untouched.
     emptyFirstRun: No pos payment access configured yet. Carries the create action and says what the platform
       does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Not shown: nothing on this screen needs a permission of its own; the app''s sign-in
+      decides access.'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis:
-  - operationId: configureWorkstation
-    contract: tenancy
-    purpose: POS, payment and access setup
-    trigger: onAction
-    provenance: board reading, 19 September 2026
+  apis: []
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-602
@@ -162266,21 +162271,26 @@ screens:
       components:
       - kind: primaryButton
         label: Run Finance Validation
+        operation: getUnifiedReconciliation
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions
       - kind: secondaryButton
         label: Review Exceptions
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions
       - kind: secondaryButton
         label: Submit Close
+        operation: beginPeriodClose
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions
       - kind: secondaryButton
         label: Approve Close
+        operation: closeFiscalPeriod
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions
       - kind: secondaryButton
         label: Generate Liability Report
+        operation: getWalletLiability
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions
       - kind: secondaryButton
         label: Generate Reconciliation Report
+        operation: getWalletReconciliation
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions
       - kind: secondaryButton
         label: Export Audit
@@ -206138,6 +206148,23 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Payment_Payment_Orchestration.pdf, page 56
+  - operation: listDeviceFirmware
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXT-002): the approved screen has no element that shows firmware
+      (its content region is empty and its two buttons are pack text), and the lead''s ruling of 26 October
+      2026 (CHG-R10WIR-002, item 5) is that a read the approved screen has no element for leaves it. Firmware
+      releases are managed on BO-129; a CR brings them back here if this screen needs them.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
+  - operation: getDeviceFirmware
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXT-002), with listDeviceFirmware: nothing on the approved screen
+      opens a release.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
+  - operation: createDeviceFirmware
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXT-002), with listDeviceFirmware: nothing on the approved screen
+      registers a release; BO-129 declares it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -206172,21 +206199,6 @@ screens:
     purpose: Raise a repair
     trigger: onAction
     provenance: board reading, 19 September 2026
-  - operationId: listDeviceFirmware
-    contract: tenancy
-    purpose: Terminal firmware versions across the fleet
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getDeviceFirmware
-    contract: tenancy
-    purpose: Open a release
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: createDeviceFirmware
-    contract: tenancy
-    purpose: Register a terminal firmware release
-    trigger: onAction
-    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-587
@@ -206199,11 +206211,6 @@ screens:
     params:
     - name: deviceId
       from: session
-    - name: firmwareId
-      from: navigation
-      optional: true
-      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDeviceFirmware`
-        and the user picks one; an edge that holds one may still carry it to open on that record.'
 - id: ADM-588
   name: Terminal Simulator, Certification & AI Operations Advisor
   module: Commercial

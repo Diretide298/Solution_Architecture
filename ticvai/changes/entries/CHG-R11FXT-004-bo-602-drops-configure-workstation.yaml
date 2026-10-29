@@ -1,0 +1,50 @@
+id: CHG-R11FXT-004
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'BO-602 POS, Payment & Access Setup no longer declares configureWorkstation: nothing on the approved screen
+  calls it, and workstation configuration is done on BO-036 and POS-016; with no operation left, the screen has no
+  permission of its own and its no-access text says so.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml BO-602: the configureWorkstation api (a board reading of 19 September) is
+    removed and recorded as a removed gap. Its thirteen pack select fields bind to no operation and the approved
+    screen has no Save or publish control, so it never sends the PUT. The lead decided on 2 October 2026
+    (CHG-WIR-021, when BO-129 dropped the same operation) that workstation configuration is done where the device is
+    registered (BO-036) or at the till (POS-016); configureWorkstation stays declared and reached on both. With no
+    operation the screen permission WORKSTATION_CONFIGURE (taken from it) is removed, and state emptyNoAccess takes
+    the text the back office''s other screens without operations carry: "Not shown: nothing on this screen needs a
+    permission of its own; the app''s sign-in decides access." (check-screen-wiring S-STATE-BOILERPLATE and
+    check-screen-patterns P3 refuse a no-access text naming a permission no operation needs). Logged in
+    docs/active/approved-ui-changes.yaml (state:emptyNoAccess). The x-ticvai-consumed-by mirror in
+    contracts/spine/tenancy.yaml follows (link-screens-contracts).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T06:53Z): check-screen-wiring S-OP-UNREACHED
+  finding on BO-602 configureWorkstation, built on by started ticket #27789 (Ready for QA, Pranay Shinde). The lead''s
+  rule: fix every finding at its source (29 October 2026); CHG-WIR-021; the same kind of fix as CHG-R11FXS-001 (a
+  declaration the screen does not do is removed).'
+keys_touched:
+  screens: [BO-602]
+  operations: [configureWorkstation]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - contracts/spine/tenancy.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'an operation declared on a screen that does not do it'
+tickets:
+  started:
+  - '27789 (configureWorkstation, Ready for QA, Pranay Shinde): nothing to change in the operation; BO-602 no longer
+    consumes it, and it stays on BO-036 and POS-016. Told through the lead''s comment; its text is not rewritten.'
+  unstarted:
+  - 'BO-602''s screen ticket (wave 3) drops the declaration and the screen permission at the next tag; a CR brings
+    configureWorkstation back with the control that sends it if the setup guide is to save.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'One visible change, the no-access copy, logged with this entry. S-NO-READ on BO-602 goes with the PUT. No
+  database change.'

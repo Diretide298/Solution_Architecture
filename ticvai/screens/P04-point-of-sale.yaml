@@ -6808,7 +6808,9 @@ screens:
       sends somebody to support with the wrong question. A caller who can see the screen but lacks what
       an action needs sees that action disabled, naming its permission: `DEVICE_MANAGE` for `setDeviceAssignment`;
       `SHIFT_OPEN` for `allocateDepositBox`; `WORKSTATION_CONFIGURE` for `configureWorkstation`.'
-    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
+    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.
+      **Configure workstation and Assign peripheral to this till are disabled offline:** `configureWorkstation`
+      and `setDeviceAssignment` are not offline-capable, so their buttons say to reconnect.'
   apis:
   - operationId: allocateDepositBox
     contract: shift
