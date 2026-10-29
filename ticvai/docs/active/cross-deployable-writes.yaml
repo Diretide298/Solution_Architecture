@@ -322,3 +322,18 @@ reads:
     ruled for every operations-host operation that asks them (XDR-004, which already lists getTenantAppStatus), through
     Tenancy''s own query classes, SELECT only, row security unchanged; both tables are granted to operations by V0116,
     so no grant is new. Recorded as its own entry, as XDR-009 was, so XDR-004 is not edited by two changes at once.'
+- id: XDR-021
+  reader: operations
+  tables: [identity.sso_provider]
+  privileges: [SELECT]
+  queries: [identity#guestSignInProviders]
+  operations: [getPublishedTenantConfig]
+  added: '2026-10-29'
+  decision_ref: ADAM CR-327, part (1), Chinmay, 29 October 2026 ("Kind column on sso_provider")
+  why: 'white-label getPublishedTenantConfig (operations host) answers guestSignIn, the public client ids of the
+    tenant''s enabled guest sign-in providers, before anyone signs in, and the providers are identity.sso_provider
+    rows, Identity''s data in commerce. The service route between deployables is not built (CR-281; #37051). The
+    lead marked the guest rows (audience guest, guestProvider apple, google or uaePass) and chose a narrow Identity
+    query: the operations host asks identity#guestSignInProviders in process, through Identity''s own query class,
+    under the caller''s connection, so the table''s row-level security scopes it, and it answers provider and
+    display data only, never client_secret_ref. SELECT only, on the one table.'

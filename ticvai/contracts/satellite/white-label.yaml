@@ -5836,6 +5836,10 @@ paths:
       - query: assets#mediaAssetRecords
         route: in-process
         for: 'what its text calls "MediaAsset.url": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
+      - query: identity#guestSignInProviders
+        route: in-process
+        for: 'guestSignIn: the tenant''s enabled guest providers, provider and display data only (ADAM CR-327, part
+          (1)): identity.sso_provider, Identity''s data (XDR-021)'
       x-ticvai-audience:
       - anonymous
       - guest
@@ -5863,7 +5867,8 @@ paths:
         working draft) plus the live status `setMaintenanceMode` writes, and the banners and promo blocks active
         now, read live from `whitelabel.banner` and `whitelabel.promo_block` (ADAM CR-327, option A (2);
         CHG-CR327-001). `assetsBaseUrl` is the cell''s `Assets:PublicBaseUrl` setting, left out while empty, and
-        `paymentTokenisation` is left out until #37051 (option A (3), (4)). Left out, because a public and
+        `paymentTokenisation` is left out until #37051 (option A (3), (4)). `guestSignIn` lists the tenant''s
+        enabled guest providers through `identity#guestSignInProviders` (part (1): "Kind column on sso_provider"). Left out, because a public and
         cacheable response must not carry them: the draft markers (`isDraft`, `version`, the draft booking
         flows), notification branding (sender addresses), the enabled payment methods (checkout reads what
         the gateway offers), licensing, and every CMS status field `getTenantAppStatus` keeps for staff.
@@ -12761,7 +12766,9 @@ components:
           description: '**What the guest sign-in buttons need before anyone is signed in** (r8, IDENTITY-C21): the
             public client ids of the tenant''s enabled social and UAE PASS providers, derived on read from Identity''s
             provider rows (no stored column, nothing secret). A provider the tenant has not enabled is absent, and
-            its button is not drawn.'
+            its button is not drawn. **Read through `identity#guestSignInProviders`, in process** (ADAM CR-327, part
+            (1), Chinmay, 29 October 2026: "Kind column on sso_provider"; CHG-CR327-001; XDR-021): the tenant''s
+            active `identity.sso_provider` rows with `audience` `guest`, each under its `guestProvider` key.'
           properties:
             apple:
               type: object
