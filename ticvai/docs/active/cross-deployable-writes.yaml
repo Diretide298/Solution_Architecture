@@ -270,3 +270,39 @@ reads:
     tenancy#workstationRecords for the caller''s workstation in process, through Tenancy''s own query classes, under the
     caller''s row-level security. The decision names it as XDR-004 gaining the table; it is recorded as its own entry
     so the outlet and settings grant XDR-004 holds is not edited by two changes at once.'
+- id: XDR-010
+  reader: access
+  tables: [pii.subject]
+  privileges: [SELECT]
+  queries: [identity#subjectRecords]
+  operations: [listDeviceBindingSession]
+  added: '2026-10-29'
+  decision_ref: ADAM CR-302, option A, Chinmay, 29 October 2026
+  why: 'access listDeviceBindingSession (Access, access host, BO-167) answers each device binding''s user, and the
+    binding keeps only its holder''s subject_id; the name is pii.subject.display_name, Identity''s data in commerce. The
+    service route between deployables is not built (CR-281; the kernel''s service sign-in, #37051), no grant let the
+    access role read pii.subject, and the read is guest personal data. The lead chose the narrow in-process read already
+    chosen for the same gap (XDR-001, XDR-003, CR-296): the access host asks identity#subjectRecords through
+    Identity''s own query class, in the caller''s transaction under the caller''s own connection, so the table''s
+    row-level security scopes it, and reads one column, display_name, and nothing else of the subject. SELECT only.
+    Leaving user out until service sign-in (CR-302 option B) is the fallback if guest names should not cross into
+    Access; copying the name onto access.device_binding (option C) copies PII and was not chosen. No other Access
+    operation reads pii.subject in process under this entry.'
+- id: XDR-011
+  reader: operations
+  tables: [catalogue.product_media, catalogue.product]
+  privileges: [SELECT]
+  queries: [catalogue#productMediaRecords]
+  operations: [deleteMediaAsset]
+  added: '2026-10-29'
+  decision_ref: ADAM CR-309, option (b), Chinmay, 29 October 2026
+  why: 'assets deleteMediaAsset (Assets, operations host) refuses 409 in-use while a product lists the asset
+    (MediaUsage surface product), and a product''s media are catalogue.product_media rows, Catalogue''s data in
+    commerce. catalogue#productRecords was asked over the service route, which nothing builds (CR-174, CR-241,
+    CR-281), and cannot be asked which products list an asset without reading every product. Catalogue declares
+    catalogue#productMediaRecords (catalogue.product_media by asset id, the product_id per asset), and the
+    operations host asks it in process through Catalogue''s own query class, as CR-260 and XDR-004 serve Tenancy''s,
+    in the caller''s transaction under the caller''s row-level security. SELECT on exactly the two tables it touches:
+    catalogue.product_media and catalogue.product, whose policy product_media''s parent row security reads. Products
+    recording their use as assets.media_usage rows (CR-309 option (a)) is the cleaner long-term rule and changes
+    Catalogue''s product writers, which are other tickets.'

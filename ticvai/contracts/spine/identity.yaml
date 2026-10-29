@@ -224,6 +224,8 @@ x-ticvai-queries:
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Identity implements, and asked from another
       deployable through Identity's service route (serviceAuth).
+      It is asked in process by the access host for listDeviceBindingSession's holder name, display_name and no
+      other column (ADAM CR-302, option A, 29 October 2026; XDR-010; CHG-CR302-001).
     served: [in-process, service]
   subjectBiometricRecords:
     module: identity

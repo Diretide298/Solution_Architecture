@@ -1,0 +1,46 @@
+id: CHG-CR299-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'An alert above every venue (raised by a rule at a region or the tenant root) answers its Money in the currency
+  of the nearest venue at or above its scope_path, else the region''s (RegionSettingsAtOrAbove the path):
+  acknowledgeAlert and listAlerts read tenancy#regionSettingsRecords in process as well, and the money-currency fixer
+  draws that read for a row that may sit above every venue.'
+decision:
+  what: 'ADAM CR-299, option A (Chinmay, 29 October 2026: "All as recommended"): confirm as built, the nearest venue
+    at or above the path; above every venue, the region''s currency (regionSettingsRecords at or above the path), a read
+    CR-296 already allows (XDR-004). contracts/satellite/reporting.yaml: acknowledgeAlert and listAlerts gain the
+    x-ticvai-read-via tenancy#regionSettingsRecords (in-process) and their descriptions state the rule.
+    tools/fix-money-currency.py: queries_for adds tenancy#regionSettingsRecords for a scope-path row in
+    ABOVE_VENUE_ROWS (reporting.alert), with its test. No table or column changes.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-299 (Sanket Keluskar, #33212 acknowledgeAlert): CR-296 answered Alert''s Money "in the currency of the
+  venue the row''s scope_path names", and an alert raised at a region or the tenant root names no venue. MetricValue
+  says currency resolves from the scope, and a venue''s trading currency is its region''s frozen value (ADR-0018).'
+keys_touched:
+  operations: [acknowledgeAlert, listAlerts]
+  schemas: [Alert, MetricValue]
+  tables: [reporting.alert, platform.region_settings]
+  files:
+  - contracts/satellite/reporting.yaml
+  - tools/fix-money-currency.py
+  - tools/tests/test_check_money_currency.py
+root_class: 'a currency rule that assumed a scope_path always names a venue'
+tickets:
+  started:
+  - '33212 (acknowledgeAlert, Ready for QA): confirms what it built (nearest venue at or above, else the region''s
+    currency); nothing to change if the region fallback is in.'
+  unstarted:
+  - 'listAlerts (27811 and its screen tickets): the same rule, through their pointer bodies at the r11 tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-299
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/fix-money-currency.py::queries_for
+status: open
+notes: 'An alert at the tenant root has no region at or above its path either; the decision says nothing for it and
+  the package adds nothing. The alert-rule operations (listAlertRules, setAlertRule) are unchanged: an alert rule is
+  written at venue scope.'

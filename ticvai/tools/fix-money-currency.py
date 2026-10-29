@@ -14,7 +14,8 @@ tools/applied/read-routes-18-october.py writes a route:
   region   the row holds a region and no venue (`region_id`): tenancy#regionSettingsRecords, the same way;
   scope    the row keeps only its `scope_path`: routed through tenancy#scopeRecords (the venue of a scope path) and
            tenancy#venueSettingsRecords once Tenancy declares tenancy#scopeRecords (CR-217 and CR-235 option A);
-           until then it is printed for the lead;
+           until then it is printed for the lead; a row that may sit above every venue (an alert, ABOVE_VENUE_ROWS)
+           reads tenancy#regionSettingsRecords too, for the region's currency (ADAM CR-299, CHG-CR299-001);
   and each query's `served` gains the route its new askers take.
 
 Printed for the lead, grouped by kind, each with the default ruling this recommends:
@@ -146,13 +147,21 @@ def classify(f: dict, bare: list, computed: list, rows: list, cols_of: dict, by:
     return "no venue" if rows else "no row"
 
 
-def queries_for(kind: str, declared: set) -> list:
+# **A row whose scope_path may name a node above every venue** (ADAM CR-299, option A, Chinmay, 29 October 2026;
+# CHG-CR299-001). An alert raised by a rule at a region or the tenant root keeps that node's path and no venue, so
+# "the venue its row's scope_path names" has none for its Money. The nearest venue at or above the path gives the
+# currency; above every venue, the region's (RegionSettingsAtOrAbove the path, tenancy#regionSettingsRecords): a
+# venue's trading currency is its region's frozen value (ADR-0018), so the region is the same answer one level up.
+ABOVE_VENUE_ROWS = {"reporting.alert"}
+
+
+def queries_for(kind: str, declared: set, rows=()) -> list:
     if kind == "venue":
         return [VENUE_Q]
     if kind == "region":
         return [REGION_Q]
     if kind == "scope" and SCOPE_Q in declared:
-        return [SCOPE_Q, VENUE_Q]
+        return [SCOPE_Q, VENUE_Q] + ([REGION_Q] if set(rows or ()) & ABOVE_VENUE_ROWS else [])
     if kind in ("no venue", "no row"):     # the venue the operation acts at (the lead's default, 25 October)
         return [VENUE_Q]
     return []
@@ -162,6 +171,10 @@ def why(kind: str, query: str, verb: str, fields: list) -> str:
     shown = ", ".join(fields[:4]) + (f" and {len(fields) - 4} more" if len(fields) > 4 else "")
     if query == SCOPE_Q:
         what = "the venue its row's scope_path names, whose settings give the currency"
+    elif kind == "scope" and query == REGION_Q:
+        what = ("where no venue is at or above the row's scope_path (an alert raised at a region), the region's "
+                "trading currency and scale (currency_code, currency_scale), RegionSettingsAtOrAbove the path "
+                "(ADAM CR-299)")
     elif kind in ("no venue", "no row"):
         what = ("the venue the operation acts at (the caller's working venue): its frozen trading currency and scale "
                 "(currency_code, currency_scale)")
@@ -315,7 +328,7 @@ def main() -> int:
             rows += [t for t in (lin.get(o) or {}).get("reads") or []
                      if t in cols_of and owner_of_schema.get(t.split(".", 1)[0]) == svc]
         kind = classify(f, bare, computed, sorted(set(rows)), cols_of, by, declared)
-        qs = queries_for(kind, declared)
+        qs = queries_for(kind, declared, rows)
         if not qs:
             held.setdefault(kind, []).append(f"{o} ({svc}): {', '.join(bare + computed)}")
             continue

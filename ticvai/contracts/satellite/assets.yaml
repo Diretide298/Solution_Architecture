@@ -331,9 +331,9 @@ paths:
         - "P13 CMS-010 Media Library"
         - "P13 CMS-075 Duplicate & Near-Duplicate Management"
       x-ticvai-read-via:
-      - query: catalogue#productRecords
-        route: service
-        for: 'which products list the asset (409 in-use, MediaUsage surface product) (CHG-MOD-003)'
+      - query: catalogue#productMediaRecords
+        route: in-process
+        for: 'which products list the asset (catalogue.product_media.product_id by asset_id): 409 in-use, MediaUsage surface product, read in process (ADAM CR-309, option (b); XDR-011; CHG-CR309-001)'
       x-ticvai-audience: [staff]
       summary: Delete an asset
       description: >
@@ -351,7 +351,11 @@ paths:
         configuration sources, history imports and layout drafts; maintenance incident media and work-order
         attachments; seating sections; transport network imports; venue maps and their versions) record
         that use as a `media_usage` row when they take the asset, so Assets reads no other module's data
-        to answer. Any use is 409 `in-use`, naming it. **Otherwise the delete removes, in one transaction**, the asset's `media_collection_member`, `asset_version`, `rendition`
+        to answer for them. **A product listing the asset is Catalogue's** (ADAM CR-309, option (b), Chinmay, 29
+        October 2026; CHG-CR309-001): a product's media are `catalogue.product_media` rows, and the operations
+        host asks `catalogue#productMediaRecords` (the products whose media name the asset) in process, in the
+        caller's transaction under the caller's row security (XDR-011); each one found is a use with surface
+        `product`. Any use is 409 `in-use`, naming it. **Otherwise the delete removes, in one transaction**, the asset's `media_collection_member`, `asset_version`, `rendition`
         and `media_fingerprint` rows and clears `media_upload.asset_id`; the stored files of every version
         and their derivatives are removed from the asset store after the transaction commits.
       tags: [asset]
@@ -582,6 +586,13 @@ paths:
         writes one row per derivative it generates (its `preset`), `queued` then `ready` or `failed`, which
         `getMediaAsset` returns as `derivatives` and `listMediaRenditions` lists. `requestMediaRendition` adds a
         size or format beyond them; an uploaded asset has its derivatives without it.
+
+        **A second completion of the same upload** (ADAM CR-306, option (a), Chinmay, 29 October 2026;
+        CHG-CR306-001): once the upload has become an asset (`media_upload.asset_id` set), completing it again,
+        under a new `Idempotency-Key` (a retry after a lost response, a second tab), answers `201` with the asset
+        the upload already became, unchanged, and writes nothing; the body of the second call is ignored. One file
+        never becomes two assets. The upload row is read `FOR UPDATE`, so a concurrent second completion waits for
+        the first and then answers the same way.
       x-ticvai-writes:
       - table: assets.rendition
         for: 'the derivatives the processing job generates, one row per preset (CHG-R8RES-005)'

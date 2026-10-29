@@ -1,0 +1,50 @@
+id: CHG-CR305-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'listPerformances: a guest or visitor sees onSale and soldOut performances of an event listEvents shows a guest,
+  else 404; categoryId keeps an event''s performances when one of its products has that category (exact, declared join
+  product.event_id). listEvents: venueId and X-Venue-Id name one venue, and an unknown, differing or foreign venue is
+  400 unknown-venue.'
+decision:
+  what: 'ADAM CR-305, option A (Chinmay, 29 October 2026: "All as recommended"). contracts/spine/catalogue.yaml:
+    listPerformances G1 (guest statuses onSale and soldOut, only for an event listEvents shows a guest, else 404
+    not-found; staff every status; a 404 response declared), G2 (categoryId: at least one product with
+    catalogue.product.event_id = the event and category_id = categoryId, exact match, no descendants; "a product in
+    several categories" dropped; Product.eventId declared x-ticvai-references catalogue.event); listEvents G3 (either
+    names the venue; both and different, unknown from either, or a credentialed caller''s other venue: 400
+    unknown-venue), in the description, the venueId parameter and the 400.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-305 (Chinmay Patkar, #31124 listPerformances, #31123 listEvents): the guest rule named statuses Performance
+  does not have, categoryId had no product-to-performance link, and listEvents named the venue twice with no rule
+  between them.'
+keys_touched:
+  operations: [listPerformances, listEvents]
+  schemas: [Performance, Product]
+  tables: [catalogue.performance, catalogue.product, catalogue.event]
+  files:
+  - contracts/spine/catalogue.yaml
+root_class: 'a guest-visibility rule written against states and joins the tables do not have'
+tickets:
+  started:
+  - '31769 (FE GST-005 What''s On, Ready for QA): a guest gets only onSale and soldOut performances, and a 404 for an
+    event a guest cannot see; listEvents answers 400 unknown-venue (not 404) for an unknown X-Venue-Id. Check the
+    screen''s error state treats both as it treats an empty or failed read.'
+  - '31848 (FE WEB-007 Interactive Seat Selection, In progress): a guest gets only onSale and soldOut performances and
+    a 404 for an event a guest cannot see; nothing else changes.'
+  unstarted:
+  - '31123 (listEvents) and 31124 (listPerformances), New: build to option A through CR-305''s comment.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-305
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'G1 and G3 are rules in prose (which statuses a guest sees, which venue answer wins); no check can read whether
+    a description names states its schema has. G2''s join is now a declared key, which tools/derive-ddl.py writes.
+    Lead to approve.'
+status: open
+notes: 'Declaring Product.eventId makes derive-ddl write the same-venue key product (venue_id, event_id) ->
+  catalogue.event (venue_id, id), NOT VALID, in the next forward migration, and lists the unique (venue_id, id) on
+  catalogue.event in handoff/migration-review.md for a person to add (existing rows to validate).'
