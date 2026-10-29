@@ -1,0 +1,62 @@
+id: CHG-CR324-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'publishTenantConfig''s 201 path says what it writes and answers: pendingBuildTimeChanges against the
+  previously current snapshot, contentHash as the lowercase hex SHA-256 of the stored snapshot, a contentPublished
+  payload for config parts (tenantId the aggregate id), the draft''s next label N+1, the whole draft snapshotted,
+  409 config-validation-failed in ConfigValidationReport''s shape, a past scheduledFor refused 400, and only the
+  tenant''s own TENANT_PUBLISH holders publishing until identity.openPlatformStaffGrant exists.'
+decision:
+  what: 'ADAM CR-324, option A, A1 to A3 together (Chinmay, 29 October 2026: "As recommended, comment now", then
+    "Include those in today as well"). contracts/satellite/white-label.yaml: ConfigVersion.pendingBuildTimeChanges
+    compares the draft with the previously current version''s snapshot (nothing on a first publish), one entry per
+    changed buildTime part: area appIcons, splash, fonts (when customFontAssetRefs differ) and features (each buildTime
+    FeatureKey whose isEnabled differs), each for ios and android; ConfigVersion.contentHash is the lowercase hex
+    SHA-256 of the snapshot JSON as stored, the kiosk snapshot''s rule. publishTenantConfig: after publishing N the
+    draft''s tenant_config.version is the text of N+1 (TenantConfig.version says so too); the snapshot is the whole
+    draft, disabled flows included, and getPublishedBookingFlow uses only the enabled ones (its description says so);
+    the 409 is config-validation-failed and ConfigValidationProblem''s findings take ConfigValidationReport''s shape
+    (kind, severity, message, area, reference; every finding listed, only errors block); a new 400 validation refuses
+    a scheduledFor that is not in the future; until identity.openPlatformStaffGrant exists only the tenant''s
+    TENANT_PUBLISH holders publish. publishTenantConfig declares its read of whitelabel.config_version for the
+    comparison. events/whitelabel-contentPublished.yaml: the aggregate id is the tenantId; changedKinds adds brand,
+    appIcons, theme, fonts, navigation, homepage, footer, modules, features, languages and bookingFlows; changed means
+    it differs from the previously current version''s snapshot (on a first publish every part that is set); changedIds
+    are the ids of changed navigation items, homepage sections and booking flows; locales are the draft''s languages in
+    any changed LocalisedText.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-324 (Narayan Gaonkar, #30774 publishTenantConfig, blocking): the 201 path (publish-review policy off)
+  must write pendingBuildTimeChanges, contentHash and the contentPublished payload and answer the 409 and a scheduled
+  publish, and none of the eight was defined; each answer reuses what the package already states (the ChangeScope
+  flags, the kiosk hash, CR-154''s "previously current" comparison, ConfigValidationReport''s findings).'
+keys_touched:
+  operations: [publishTenantConfig, getPublishedBookingFlow]
+  schemas: [ConfigVersion, ConfigValidationProblem, TenantConfig]
+  tables: [whitelabel.config_version, whitelabel.tenant_config]
+  files:
+  - contracts/satellite/white-label.yaml
+  - events/whitelabel-contentPublished.yaml
+root_class: 'a write''s stored outputs and refusals named with no rule for what they hold'
+tickets:
+  started:
+  - '31848 (WEB-007), 31893 and 31895 (WEB-010), on getPublishedBookingFlow: a sentence of its description (disabled
+    flows are skipped, as they never resolved before); nothing to do.'
+  unstarted:
+  - '30774 (publishTenantConfig, On hold): builds A1 to A3 through CR-324''s comment; also declares the
+    whitelabel.config_version read it compares with.'
+  - '31033 (getPublishedBookingFlow, New): only enabled flows resolve from the snapshot.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-324
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'A field removed from the 409 findings (severity, reference), the new 400 or a response enum value taken back is
+  a breaking change the compat check fails until approved. The activation job of a scheduled publish (workers host,
+  R8 blocker IDENTITY-C63) has no ticket: A3 opens one, filed by the lead (plan files are not changed here). The 409
+  now names its problem type, so check-problem-types counts 109 unnamed error responses (its CEILING of 112 is left
+  for the integration to lower, as other lanes move it too).'

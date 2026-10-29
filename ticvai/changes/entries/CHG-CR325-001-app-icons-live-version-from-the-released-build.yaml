@@ -1,0 +1,46 @@
+id: CHG-CR325-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'AppIcons.liveVersion is the configVersion of the newest released app build, on either platform, and
+  requiresRebuild compares that version''s snapshot appIcons.sourceAssetRef with the draft''s (true when nothing is
+  released); getAppIcons and setAppIcons read whitelabel.app_build and whitelabel.config_version for it.'
+decision:
+  what: 'ADAM CR-325, option A (Chinmay, 29 October 2026: "As recommended, comment now", then "Include those in today as
+    well"). contracts/satellite/white-label.yaml AppIcons: liveVersion (now marked x-ticvai-derived onRead) is the
+    ConfigVersion.version of the newest whitelabel.app_build with status released (either platform), and its icon is
+    that version''s snapshot appIcons.sourceAssetRef; requiresRebuild is true when that differs from the draft''s
+    sourceAssetRef, and true when nothing is released (liveVersion null). getAppIcons and setAppIcons add
+    whitelabel.app_build and whitelabel.config_version to x-ticvai-reads; setAppIcons'' description points at the
+    rule. No schema change.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-325 (Deep Khanvilkar, #31038 getAppIcons, blocking): liveVersion and requiresRebuild were stored nowhere
+  and had no derivation, so building either operation meant inventing which build is shipped and where its icon is.'
+keys_touched:
+  operations: [getAppIcons, setAppIcons]
+  schemas: [AppIcons]
+  tables: [whitelabel.app_build, whitelabel.config_version]
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'a response field derived on read with no stated source'
+tickets:
+  started: []
+  unstarted:
+  - '31038 (getAppIcons, New) and 31040 (setAppIcons, New): as built through CR-325''s comment, with "newest" as the
+    latest requestedAt.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-325
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Disproportionate: the class is a derived response field whose prose names no source, and telling a stated
+    source from a missing one means reading prose. A check of "an onRead field naming a table its operations do not
+    read" was tried on 29 October: it finds 6 older gaps in other modules (createTenant, getEntitlement,
+    endOwnSession ...) that no lane may baseline, so it would block every lane until they are settled. Partly held:
+    setAppIcons now names both tables in its text, and check-lineage LN-TEXT warns if they leave its reads. Lead to
+    approve.'
+status: open
+notes: 'getTenantConfig and getPublishedTenantConfig also answer AppIcons (inside TenantConfig and
+  PublishedTenantConfig); CR-325 names only getAppIcons and setAppIcons, so their reads are unchanged here.'

@@ -1,0 +1,54 @@
+id: CHG-CR327-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'getPublishedTenantConfig reads banners and promo blocks live from whitelabel.banner and whitelabel.promo_block
+  (active now, at the tenant root or the picked venue), takes assetsBaseUrl from the per-cell setting
+  Assets:PublicBaseUrl (left out while empty) and leaves paymentTokenisation out until #37051. guestSignIn (part 1) is
+  held: Identity''s provider rows cannot say which one is Apple, Google or UAE PASS.'
+decision:
+  what: 'ADAM CR-327, option A (Chinmay, 29 October 2026: "As recommended, comment now", then "Include those in today as
+    well"), parts (2) to (4). contracts/satellite/white-label.yaml: PublishedTenantConfig.banners and .promoBlocks are
+    read live from whitelabel.banner and whitelabel.promo_block, state active at the time of the read, tenant root or
+    the picked venue, and getPublishedTenantConfig declares both tables in x-ticvai-reads; assetsBaseUrl is the
+    per-cell setting Assets:PublicBaseUrl, empty until the storage adapter is chosen, and the field is left out while
+    it is empty; paymentTokenisation stays out of the response until service sign-in (#37051, CR-281).
+    getPublishedTenantConfig''s description says all three. Part (1), identity#ssoProviderRecords for guestSignIn, is
+    not built here (see notes).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-327 (Hrushikant Patkar, #31052 getPublishedTenantConfig): four optional PublishedTenantConfig fields had
+  no source the operation may read; the published snapshot holds no banners or promo blocks, nothing defined
+  assetsBaseUrl, and paymentTokenisation''s service read waits on #37051.'
+keys_touched:
+  operations: [getPublishedTenantConfig]
+  schemas: [PublishedTenantConfig]
+  tables: [whitelabel.banner, whitelabel.promo_block]
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'a public read''s field with no source it may read'
+tickets:
+  started:
+  - '31052 (getPublishedTenantConfig, Ready for QA, Hrushikant Patkar): add banners and promoBlocks, read live from
+    whitelabel.banner and whitelabel.promo_block (state active now, tenant root or the picked venue), and assetsBaseUrl
+    from the cell setting Assets:PublicBaseUrl, left out while empty; guestSignIn and paymentTokenisation stay out.'
+  - '27889, 31062, 31064 (WEB-029), 31071 (GST-043), 31074 (GST-047), 32125 (WEB-021), on getPublishedTenantConfig: the
+    response gains banners, promoBlocks and assetsBaseUrl as the schema already listed them; nothing to do.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-327
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Rules in prose (where a public field''s value comes from); no check can tell a stated source from a missing
+    one. The live tables are declared reads, so check-lineage LN-TEXT warns if they leave the lineage. Lead to approve.'
+status: open
+notes: 'Part (1) held, not built: guestSignIn needs the public client ids of the tenant''s enabled Apple, Google and UAE
+  PASS providers, and Identity has no row that says which provider is which. identity.sso_provider (SsoProviderConfig)
+  is staff SSO, protocol oidc or saml2, with no provider kind (apple, google, uaePass) and no authorization URL, and
+  startSsoAuthorization says guests never use enterprise SSO, yet guestSocialLogin and guestUaePassLogin point at
+  identity.sso_provider.client_secret_ref. A query identity#ssoProviderRecords could be declared, but its rule could not
+  pick the three providers without a column the package does not have. The lead decides how Identity marks a guest
+  provider (a kind column on identity.sso_provider, or a guest provider table) before part (1) is built; then the read
+  is identity''s query in process for the operations host under a new XDR ruling.'

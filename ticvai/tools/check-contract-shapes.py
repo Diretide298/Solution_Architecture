@@ -48,6 +48,10 @@ same kind that nothing held:
                            left)", "is refused (422)", "refused with 404", and its responses declare no such status,
                            so the refusal has no problem type and QA cannot test it (ADAM CR-316, CHG-CR316-001:
                            setCodeDistributionManager's 409 was described and not declared)
+  C-FINDING-RULE           a validation's finding-kind enum (a schema named `*FindingKind`) whose description tables
+                           its kinds (`| kind | ... |`) without a `reported when` column, or a kind with no row or an
+                           empty `reported when` cell: a publish gate that blocks on a kind no rule defines
+                           (ADAM CR-320, CHG-CR320-001: 7 of ConfigFindingKind's 11 kinds had no rule)
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
@@ -100,12 +104,29 @@ RULES = {
                  "CHG-R10CRF-005)",
     "C-REFUSAL-UNDECLARED": "an operation's own text promises a refusal by status ('(409 when ...)', 'refused (422)') "
                             "that its responses do not declare (ADAM CR-316, CHG-CR316-001)",
+    "C-FINDING-RULE": "a finding-kind enum whose kind table gives a kind no 'reported when' rule (ADAM CR-320, "
+                      "CHG-CR320-001)",
 }
 # ADAM CR-316 (CHG-CR316-001): a refusal the operation's own text promises by status. Only the forms that say
 # this operation refuses: "(409 when|if|once|while ...)", "refused (409)", "refused with 409", "refused `409 ...`".
 # Statuses the shared responses carry for every operation (400 validation, 401, 403, 429) are not read.
 PROMISED_STATUS = re.compile(r"\(\s*`?(404|409|410|412|422)\b[^)]{0,40}?\b(?:when|if|once|while)\b"
                              r"|\brefused\s*(?:with\s*)?\(?`?(404|409|410|412|422)\b", re.I)
+
+
+def finding_rule_gaps(schema: dict) -> list:
+    """The kinds of a finding-kind enum that its description's kind table gives no rule (C-FINDING-RULE; ADAM CR-320,
+    CHG-CR320-001). The table is markdown, `| kind | severity | reported when |`, one row per kind. A description with
+    no `| kind |` table is not judged; a table without a `reported when` column leaves every kind without a rule."""
+    rows = [[c.strip() for c in ln.strip().strip("|").split("|")]
+            for ln in str(schema.get("description") or "").splitlines() if ln.strip().startswith("|")]
+    head = next((r for r in rows if r and r[0].lower() == "kind"), None)
+    if head is None:
+        return []
+    col = next((i for i, c in enumerate(head) if c.lower() == "reported when"), None)
+    rule = {r[0].strip("`"): (r[col] if col is not None and col < len(r) else "") for r in rows
+            if r and r is not head and not set(r[0]) <= set("-: ")}
+    return [v for v in schema.get("enum") or [] if not str(rule.get(str(v), "")).strip()]
 
 
 def promised_statuses(text: str) -> set:
@@ -471,6 +492,12 @@ def main() -> int:
                 and [p for p, v in sp.items() if p != "name" and LOCALISED.search(json.dumps(v, default=str))]:
             guard.add("C-NAME-LOCALISED", f"{stem}.{name}",
                       f"{stem}.{name}: localises other text (LocalisedText) but its name is one plain string")
+        # C-FINDING-RULE (ADAM CR-320, CHG-CR320-001): every kind a validation reports has its rule beside it.
+        if name.endswith("FindingKind") and s.get("enum"):
+            gaps = finding_rule_gaps(s)
+            if gaps:
+                guard.add("C-FINDING-RULE", f"{stem}.{name}",
+                          f"{stem}.{name}: its kind table gives no 'reported when' rule for {', '.join(map(str, gaps))}")
         enums = []
         walk_enums(s, f"{stem}.{name}", enums)
         siblings = set((s.get("properties") or {}).keys())

@@ -306,3 +306,19 @@ reads:
     catalogue.product_media and catalogue.product, whose policy product_media''s parent row security reads. Products
     recording their use as assets.media_usage rows (CR-309 option (a)) is the cleaner long-term rule and changes
     Catalogue''s product writers, which are other tickets.'
+- id: XDR-020
+  reader: operations
+  tables: [platform.venue_settings, platform.region_settings]
+  privileges: [SELECT]
+  queries: [tenancy#venueSettingsRecords, tenancy#regionSettingsRecords]
+  operations: [setMaintenanceMode]
+  added: '2026-10-29'
+  decision_ref: ADAM CR-338, city and openingHoursToday (a), Chinmay, 29 October 2026 ("As recommended"), under the
+    ruling of ADAM CR-296 (XDR-004)
+  why: 'white-label setMaintenanceMode (operations host) answers TenantAppStatus, as getTenantAppStatus does, and CR-338
+    gives each venue in it a city and today''s opening hours from the venue''s settings (platform.venue_settings, read
+    through tenancy#venueSettingsRecords) and today in the venue''s region time zone (platform.region_settings, through
+    tenancy#regionSettingsRecords), Tenancy''s data in commerce. The operations host asks both in process, as CR-296
+    ruled for every operations-host operation that asks them (XDR-004, which already lists getTenantAppStatus), through
+    Tenancy''s own query classes, SELECT only, row security unchanged; both tables are granted to operations by V0116,
+    so no grant is new. Recorded as its own entry, as XDR-009 was, so XDR-004 is not edited by two changes at once.'

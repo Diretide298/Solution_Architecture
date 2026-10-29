@@ -1,0 +1,61 @@
+id: CHG-CR320-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'validateTenantConfig gives every ConfigFindingKind its rule (a "reported when" column on the kind table) and
+  declares what the rules read: the draft''s own tables, catalogue#productRecords and tenancy#activeVenues
+  (bookingFlowMissing), assets#mediaAssetRecords (missingRequiredAsset) and subscription''s contract, add-on and plan
+  records (unlicensedModuleEnabled). publishTenantConfig, which runs the same validation, asks the same.'
+decision:
+  what: 'ADAM CR-320, option A, both parts (Chinmay, 29 October 2026: "As recommended, comment now", then "Include those
+    in today as well"). contracts/satellite/white-label.yaml: ConfigFindingKind''s table gains a "reported when"
+    column: bookingFlowMissing = an active venue with an active catalogue product of a ProductKind that no enabled
+    flow''s type serves; policyVersionMissing = terms or privacy (the footer''s required legal links) without a current
+    version; noVisibleNavigationItems = a saved guestApp navigation with no visible item (an unsaved one uses the
+    default tabs and passes); missingTranslation = the LocalisedText fields of the draft''s sections, nav labels,
+    content pages and policies, fallback = the default language present; missingRequiredAsset = brand.logoAssetRef or
+    appIcons.sourceAssetRef unset or not a ready asset; unlicensedModuleEnabled = an enabled module not in
+    LicencePosition.licensedModules; homepageReferencesMissingContent = a section whose contentPageId has no
+    content_page row. The four kinds the package already defined (navigationTargetsDisabledModule, contrastFailure,
+    arabicFontMissing, bookingFlowInvalid) point at their existing rule. validateTenantConfig declares x-ticvai-read-via
+    catalogue#productRecords (service), tenancy#activeVenues (service), assets#mediaAssetRecords and
+    subscription#contractRecords / licenceAddOnRecords / planRecords (in-process), as publishTenantConfig and
+    get/setModuleEnablement ask them, and x-ticvai-reads the draft tables the rules need (tenant_config,
+    navigation_config, navigation_item, module_enablement, homepage_layout, homepage_section, content_page, policy,
+    booking_flow, booking_flow_step). publishTenantConfig gains catalogue#productRecords, the three subscription reads
+    and whitelabel.policy, because it runs the same validation. tools/check-contract-shapes.py C-FINDING-RULE is new.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-320 (Narayan Gaonkar, #30778 validateTenantConfig, blocking): 7 of the 11 ConfigFindingKinds had no rule,
+  or no declared read to decide it, and the publish gate (errorCount above 0 blocks) depends on them, so a guess would
+  have decided what tenants can publish.'
+keys_touched:
+  operations: [validateTenantConfig, publishTenantConfig]
+  schemas: [ConfigFindingKind]
+  tables: [whitelabel.policy, whitelabel.navigation_item, whitelabel.module_enablement, whitelabel.homepage_section,
+    whitelabel.content_page]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-contract-shapes.py
+  - tools/tests/test_cr_forms_r11.py
+root_class: 'a validation finding kind with no rule, and no declared read, to decide it'
+tickets:
+  started: []
+  unstarted:
+  - '30778 (validateTenantConfig, On hold): builds the seven rules and the reads as CR-320''s comment says; the table
+    links it lacked (navigation_item, module_enablement, homepage_section, content_page, policy) are now the
+    operation''s declared reads.'
+  - '30774 (publishTenantConfig, On hold): runs the same rules, with the same reads (catalogue#productRecords, the
+    three subscription reads, whitelabel.policy).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-320
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py::C-FINDING-RULE
+status: open
+notes: 'C-FINDING-RULE fails a *FindingKind enum whose kind table gives a kind no "reported when" rule (it would have
+  failed all 11 of ConfigFindingKind before this change). The declared reads have no check of their own: removing
+  validateTenantConfig''s read-via was tried and check-cross-module-reads XR-FACT stays green, because the facts are
+  named on ConfigFindingKind rather than in the operation''s text.'
