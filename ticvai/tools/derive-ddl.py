@@ -1614,6 +1614,50 @@ def deployable_read_grants(db: str = "tenant") -> str:
             "-- these roles read.\n" + "\n".join(out) + "\n")
 
 
+def seed_rows_sql(db: str, cols: dict) -> str:
+    """The rows a table is seeded with, from its schema's `x-ticvai-seed-rows` (ADAM CR-330, option A, "All as
+    recommended", Chinmay, 29 October 2026; CHG-CR330-001).
+
+    **A rule the platform holds is a row, and nothing seeded it.** ApprovalKind said the platform rule for a tenant
+    subject was "seeded when the platform is provisioned", and no table held it and no migration wrote it, so every
+    suspendTenant and reactivateTenant would be refused 422. A schema now lists the rows its table starts with, by
+    contract property; each is written as one `INSERT ... ON CONFLICT DO NOTHING` after the table's keys, so the
+    statement can run twice and never overwrites a row an operator changed. The forward migration carries it with the
+    new table (ddl_forward writes a statement that names only new tables). Keyed by the table's primary or unique key:
+    a seeded table without one is refused here, since nothing would stop a second copy."""
+    out = []
+    for name, marks in sorted(SCHEMA_MARKS.items()):
+        rows = marks.get("x-ticvai-seed-rows")
+        if not rows:
+            continue
+        table = str(marks.get("x-ticvai-persistence") or "").strip()
+        if not re.match(r"^[a-z_]+\.[a-z_]+$", table) or area(table.split(".", 1)[0]) != db:
+            continue
+        by_prop = {str(c.get("source") or "").rsplit(".", 1)[-1]: c["column"] for c in cols.get(table, [])
+                   if str(c.get("source") or "").startswith(name + ".")}
+        if not (marks.get("x-ticvai-primary-key") or marks.get("x-ticvai-unique-together")):
+            print(f"  ! {name}: x-ticvai-seed-rows on {table}, which declares no primary or unique key; no seed written")
+            continue
+        for row in rows if isinstance(rows, list) else []:
+            names, values = [], []
+            for prop, val in (row or {}).items():
+                col = by_prop.get(str(prop))
+                if not col:
+                    print(f"  ! {name}: seed row names {prop!r}, which is no column of {table}; no seed written")
+                    names = []
+                    break
+                names.append(col)
+                values.append("NULL" if val is None else ("true" if val is True else "false" if val is False
+                              else str(val) if isinstance(val, (int, float)) else sql_literal(val)))
+            if names:
+                out.append(f"INSERT INTO {table} ({', '.join(names)}) VALUES ({', '.join(values)}) "
+                           "ON CONFLICT DO NOTHING;")
+    if not out:
+        return ""
+    return ("\n-- **Seed rows** (each schema's `x-ticvai-seed-rows`; ADAM CR-330, CHG-CR330-001). Run twice, they insert\n"
+            "-- nothing the second time, and they never overwrite a row already there.\n" + "\n".join(out) + "\n")
+
+
 # **Ending every session of a principal, whatever venue the caller acts at** (ADAM CR-180, option A, accepted 21 October
 # 2026; CHG-R10ID-006). updatePrincipal runs at venue scope, but identity.refresh_token is tenant-root and
 # identity.session venue-isolated, so a venue manager's revoke updated no token and only its own venue's sessions, and
@@ -3616,6 +3660,14 @@ def main() -> int:
         key = f"{grant_db}/920-row-level-security.sql"
         if grants and key in files:
             files[key] = files[key].rstrip("\n") + "\n" + grants
+
+    # ADAM CR-330 (CHG-CR330-001): the rows a schema says its table starts with, last in the database's files so its
+    # keys exist; the forward migration carries them with a new table.
+    for seed_db in ("tenant", CONTROL):
+        seeds = seed_rows_sql(seed_db, cols)
+        key = f"{seed_db}/920-row-level-security.sql"
+        if seeds and key in files:
+            files[key] = files[key].rstrip("\n") + "\n" + seeds
 
     # ADAM CR-180 (CHG-R10ID-006): the one function that ends a principal's sessions everywhere, written beside the
     # policies it works within; the forward migration carries it (CREATE OR REPLACE) to databases already built.

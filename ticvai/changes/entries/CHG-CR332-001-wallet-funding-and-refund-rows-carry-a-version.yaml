@@ -1,0 +1,53 @@
+id: CHG-CR332-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'wallet.funding_rule and wallet.refund_policy carry a version (integer NOT NULL DEFAULT 1), 1 on create and
+  bumped on every write; getWalletFundingRules, getWalletRefundPolicy and their PUTs send it as ETag, and the PUTs
+  refuse a stale If-Match 412, the rule CR-257 chose for group bookings.'
+decision:
+  what: '"As recommended, comment now", then "Include those in today as well" (Chinmay, 29 October 2026, about
+    19:20): ADAM CR-332, option A, built into r11. contracts/satellite/wallet.yaml: WalletFundingRules.version and
+    WalletRefundPolicy.version (integer, minimum 1, default 1, readOnly, required, so derive-ddl adds version integer
+    NOT NULL DEFAULT 1 to both tables in the next forward migration); getWalletFundingRules and getWalletRefundPolicy
+    name the version their ETag carries; setWalletFundingRules and setWalletRefundPolicy say the version is bumped on
+    every write, answer it as ETag on the 200, and refuse an If-Match that is not the current version 412 with nothing
+    changed. Builds on CR-310, CR-311 and CR-312''s changes to wallet.yaml, which it does not touch.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-332 (Pranay Shinde, ticket #30858 setWalletFundingRules): both PUTs (#30858, #30859) declare If-Match and
+  412, but funding_rule and refund_policy held no version, revision or updated-at, so the 412 could never happen and a
+  second editor silently overwrote the first.'
+keys_touched:
+  operations: [getWalletFundingRules, setWalletFundingRules, getWalletRefundPolicy, setWalletRefundPolicy]
+  schemas: [WalletFundingRules, WalletRefundPolicy]
+  tables: [wallet.funding_rule, wallet.refund_policy]
+  files:
+  - contracts/satellite/wallet.yaml
+  - tools/check-business-rules.py
+root_class: 'a PUT that declares If-Match and 412 over a row that holds no version to compare'
+tickets:
+  started:
+  - '30858 and 30859 (setWalletFundingRules, setWalletRefundPolicy; Ready for QA, Pranay Shinde): bump version on
+    every write, answer it as ETag, and refuse a stale If-Match 412 with nothing changed (they were built without
+    acting on If-Match).'
+  - '35656 and 30376 ([DB] wallet.funding_rule, [DB] wallet.refund_policy; Ready for QA, Hrushikant Patkar), under
+    27669 ([DB] Migration V0021__wallet.sql): apply the r11 forward migration''s version integer NOT NULL DEFAULT 1 on
+    both tables.'
+  unstarted:
+  - '32150 and 32151 (getWalletFundingRules, getWalletRefundPolicy) and 28323 ([BE] WalletService task holding them):
+    send the row''s version as ETag.'
+  - 30371 ([DB] wallet.funding_rules, On hold)
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-332
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-WALLET-ETAG-VERSION fails on the r10 contract (no version, an ETag that names nothing) and passes now. It
+  holds these two operations, not every serverWins PUT that declares If-Match: 94 other operations (orders 36, fnb 28,
+  payments 16, wallet 14) declare If-Match and 412 with no version on the schema they write or answer (setWalletTransferRules among them),
+  the same gap CR-332''s "one rule" names; a general check would fail on all of them, and a version on each is a
+  decision beyond this CR''s two tables, so it is reported to the lead rather than baselined.'

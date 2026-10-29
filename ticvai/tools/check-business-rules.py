@@ -96,6 +96,17 @@ And one rule per decision:
                    configuration_version row and answers the draft with version null; its 409 unpublished-changes
                    compares the area tables with the latest published snapshot as diffWalletConfigurationVersion does;
                    listWalletConfigurationVersions lists no restored draft.
+  BR-CREDIT-ACCOUNT-CURRENCY (r11, ADAM CR-322 option A, CHG-CR322-001) a B2B credit account stores the currency
+                   its limit is agreed in: B2bCreditAccount.currencyCode (required, readOnly; payments.credit_account.
+                   currency_code), set by createB2bCreditAccount from creditLimit.currency and never changed after, and
+                   neither credit-account operation resolves it from a venue.
+  BR-PLATFORM-APPROVAL-RULE (r11, ADAM CR-330 option A, CHG-CR330-001) the platform rule for a tenant subject is a
+                   control.platform_approval_rule row seeded by the control migration (x-ticvai-seed-rows:
+                   configurationChange, tenant, PLATFORM_TENANT_MANAGE, 2 approvals, active), and createApprovalRequest
+                   asks platform-ops#platformApprovalRuleFor over the service route.
+  BR-WALLET-ETAG-VERSION (r11, ADAM CR-332 option A, CHG-CR332-001) WalletFundingRules and WalletRefundPolicy carry a
+                   version (wallet.funding_rule.version, wallet.refund_policy.version); their GET and PUT send it as
+                   ETag, and the PUT refuses a stale If-Match 412, the rule CR-257 chose for group bookings.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -957,6 +968,54 @@ def main() -> int:
     need("BR-ROTA-CROSS-VENUE", any((e or {}).get("equal") == ["principalId"]
                                     and (e or {}).get("during") == ["startsAt", "endsAt"] for e in exc),
          "RotaAssignment declares no exclusion constraint over principalId and [startsAt, endsAt) (x-ticvai-exclude)")
+    # BR-CREDIT-ACCOUNT-CURRENCY, BR-PLATFORM-APPROVAL-RULE, BR-WALLET-ETAG-VERSION (r11, ADAM CR-322, CR-330, CR-332;
+    # the lead, 29 October 2026, "As recommended", "Include those in today as well"). Each fails on the r10 contract.
+    pdoc = load("contracts/satellite/payments.yaml")
+    bca = ((pdoc.get("components") or {}).get("schemas") or {}).get("B2bCreditAccount") or {}
+    bcur = (bca.get("properties") or {}).get("currencyCode") or {}
+    need("BR-CREDIT-ACCOUNT-CURRENCY", bcur.get("readOnly") is True and "currencyCode" in (bca.get("required") or []),
+         "B2bCreditAccount has no required, readOnly currencyCode, so payments.credit_account stores no currency and "
+         "a tenant-wide account's Money has none (CR-322)")
+    cdesc = " ".join(str(op("createB2bCreditAccount")[3].get("description") or "").split())
+    need("BR-CREDIT-ACCOUNT-CURRENCY", "creditLimit.currency" in cdesc and "never changed after" in cdesc,
+         "createB2bCreditAccount does not say it sets the account's currency from creditLimit.currency, never changed "
+         "after (CR-322)")
+    for oid in ("createB2bCreditAccount", "listB2bCreditAccounts"):
+        vias = [str(v.get("query")) for v in op(oid)[3].get("x-ticvai-read-via") or [] if isinstance(v, dict)]
+        need("BR-CREDIT-ACCOUNT-CURRENCY", not {"tenancy#scopeRecords", "tenancy#venueSettingsRecords"} & set(vias),
+             f"{oid} still resolves the account's currency from a venue (tenancy#scopeRecords/venueSettingsRecords); "
+             "it is the account's own currencyCode (CR-322)")
+    podoc = load("contracts/satellite/platform-ops.yaml")
+    par = ((podoc.get("components") or {}).get("schemas") or {}).get("PlatformApprovalRule") or {}
+    seed = [r for r in par.get("x-ticvai-seed-rows") or [] if isinstance(r, dict)]
+    need("BR-PLATFORM-APPROVAL-RULE", par.get("x-ticvai-persistence") == "control.platform_approval_rule" and any(
+         r.get("kind") == "configurationChange" and r.get("subjectType") == "tenant"
+         and r.get("approverPermission") == "PLATFORM_TENANT_MANAGE" and r.get("minimumApprovals") == 2
+         and r.get("isActive") is True for r in seed),
+         "no control.platform_approval_rule schema seeded with the platform rule (configurationChange, tenant, "
+         "PLATFORM_TENANT_MANAGE, 2 approvals, active), so suspend and reactivate are always 422 (CR-330)")
+    q = ((podoc.get("x-ticvai-queries") or {}).get("platformApprovalRuleFor") or {})
+    need("BR-PLATFORM-APPROVAL-RULE", q.get("table") == "control.platform_approval_rule" and "service" in (q.get("served") or []),
+         "platform-ops declares no platformApprovalRuleFor query over control.platform_approval_rule served over the "
+         "service route (CR-330)")
+    vias = {(str(v.get("query")), str(v.get("route"))) for v in op("createApprovalRequest")[3].get("x-ticvai-read-via") or []
+            if isinstance(v, dict)}
+    need("BR-PLATFORM-APPROVAL-RULE", ("platform-ops#platformApprovalRuleFor", "service") in vias,
+         "createApprovalRequest does not ask platform-ops#platformApprovalRuleFor over the service route for a request of "
+         "subject type tenant (CR-330)")
+    for get_id, put_id, sname in (("getWalletFundingRules", "setWalletFundingRules", "WalletFundingRules"),
+                                  ("getWalletRefundPolicy", "setWalletRefundPolicy", "WalletRefundPolicy")):
+        ver = ((wsch.get(sname) or {}).get("properties") or {}).get("version") or {}
+        need("BR-WALLET-ETAG-VERSION", ver.get("type") == "integer" and ver.get("readOnly") is True
+             and "version" in ((wsch.get(sname) or {}).get("required") or []),
+             f"{sname} has no required, readOnly integer version, so {put_id}'s If-Match has nothing to compare (CR-332)")
+        for oid in (get_id, put_id):
+            hdr = ((((op(oid)[3].get("responses") or {}).get("200") or {}).get("headers") or {}).get("ETag") or {})
+            need("BR-WALLET-ETAG-VERSION", "version" in str(hdr.get("description") or ""),
+                 f"{oid}'s 200 sends no ETag that is the row's version (CR-332)")
+        need("BR-WALLET-ETAG-VERSION", "412" in {str(k) for k in (op(put_id)[3].get("responses") or {})}
+             and "`412` and nothing changes" in " ".join(str(op(put_id)[3].get("description") or "").split()),
+             f"{put_id} does not say a stale If-Match is 412 and nothing changes (CR-332)")
 
     errors["BR-PARSE"].extend(PARSE_ERRORS)
     total = sum(len(v) for v in errors.values())
@@ -970,7 +1029,8 @@ def main() -> int:
              "BR-SCOPE-AUTHZ", "BR-SSO-ACTIVE", "BR-PERMISSION-FINDINGS", "BR-ENTITLEMENT-SHARE",
              "BR-PRESET-READONLY", "BR-END-SESSIONS", "BR-PLATFORM-TOKEN", "BR-GUEST-TOKENS", "BR-GUEST-VENUE",
              "BR-PLATFORM-INVOICE", "BR-WALLET-TOPUP-ONCE", "BR-WALLET-PUBLISH-CHECKS", "BR-WALLET-RESTORE-DRAFT",
-             "BR-PLANNER-QUESTIONS", "BR-ROTA-HOUR-LIMIT", "BR-ROTA-CROSS-VENUE"]
+             "BR-PLANNER-QUESTIONS", "BR-ROTA-HOUR-LIMIT", "BR-ROTA-CROSS-VENUE",
+             "BR-CREDIT-ACCOUNT-CURRENCY", "BR-PLATFORM-APPROVAL-RULE", "BR-WALLET-ETAG-VERSION"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

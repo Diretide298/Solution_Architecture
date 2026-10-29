@@ -858,7 +858,8 @@ paths:
         wallet type. `walletTypeId` picks the set; left out, the venue's set with no wallet type (the venue default) is
         returned. Before the first save it returns the defaults that set would get: no minimum, maximum or preset
         amounts, every channel and funding source allowed, no bonus rules, auto-reload and recurring funding off, no
-        approval threshold and no velocity limits. The `ETag` header carries the version the PUT takes as `If-Match`.
+        approval threshold and no velocity limits. The `ETag` header carries the version the PUT takes as `If-Match`:
+        the row's `version` (`wallet.funding_rule.version`; ADAM CR-332, the rule CR-257 chose for group bookings).
         A `walletTypeId` that names no wallet type of the tenant is 404 `wallet-type-not-found`.
       tags:
       - wallet
@@ -880,6 +881,7 @@ paths:
           description: The rules
           headers:
             ETag:
+              description: The rules' `version` (wallet.funding_rule.version), quoted (ADAM CR-332).
               schema:
                 type: string
           content:
@@ -923,6 +925,11 @@ paths:
         **Velocity limits are a fraud control, not a commercial one.** Ten top-ups of ninety-nine in an
         hour is a card being tested, and a daily cap expressed only in total value does not catch it.
 
+        **Its ETag is the row''s `version`** ("All as recommended": ADAM CR-332 option A, Chinmay, 29 October 2026,
+        the rule CR-257 chose for group bookings): `wallet.funding_rule.version` is 1 on create and bumped on every
+        write, and is sent as `ETag` on `getWalletFundingRules` and here; an `If-Match` that is not the current
+        version is `412` and nothing changes.
+
         '
       tags:
       - wallet
@@ -947,6 +954,10 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+            ETag:
+              description: The rules' new `version`, quoted (ADAM CR-332).
+              schema:
+                type: string
           description: Set
           content:
             application/json:
@@ -1546,7 +1557,8 @@ paths:
         **Added 4 October 2026 (CHG-FXC-010; BO-1146): `setWalletRefundPolicy` was a PUT nothing read.** Returns the policy
         at the venue, or the defaults it would get before the first save (`defaultDestination` the original payment method,
         `restoreToOriginalLots` true, `restoreOriginalExpiry` true, no bonus). The `ETag` header carries the version the PUT
-        takes as `If-Match`.
+        takes as `If-Match`: the row's `version` (`wallet.refund_policy.version`; ADAM CR-332, the rule CR-257 chose for
+        group bookings).
       tags:
       - wallet
       x-ticvai-permission: WALLET_VIEW
@@ -1561,6 +1573,7 @@ paths:
           description: The policy
           headers:
             ETag:
+              description: The policy's `version` (wallet.refund_policy.version), quoted (ADAM CR-332).
               schema:
                 type: string
           content:
@@ -1583,6 +1596,11 @@ paths:
         **Restoration is to the lot, not to the balance.** A purchase made from an expiring promotional
         lot and a gift card, refunded, has to put each part back where it came from — otherwise the
         guest either gains expiry they were never given or loses it.
+
+        **Its ETag is the row''s `version`** ("All as recommended": ADAM CR-332 option A, Chinmay, 29 October 2026,
+        the rule CR-257 chose for group bookings): `wallet.refund_policy.version` is 1 on create and bumped on every
+        write, and is sent as `ETag` on `getWalletRefundPolicy` and here; an `If-Match` that is not the current
+        version is `412` and nothing changes.
 
         '
       tags:
@@ -1608,6 +1626,10 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+            ETag:
+              description: The policy's new `version`, quoted (ADAM CR-332).
+              schema:
+                type: string
           description: Set
           content:
             application/json:
@@ -5303,6 +5325,8 @@ components:
       x-ticvai-unique-nulls: not-distinct
       description: 'Board 2, which is the 27 August minute one screen for one. One set per wallet type at a venue,
         and one venue default with no wallet type.'
+      required:
+      - version
       properties:
         walletTypeId:
           type: string
@@ -5421,6 +5445,15 @@ components:
               $ref: ../shared/common.yaml#/components/schemas/Money
         scopePath:
           type: string
+        version:
+          type: integer
+          minimum: 1
+          default: 1
+          readOnly: true
+          description: '**The row''s version, its ETag** ("All as recommended": ADAM CR-332 option A, Chinmay, 29
+            October 2026, the rule CR-257 chose for group bookings): 1 on create and bumped on every write;
+            `getWalletFundingRules` and `setWalletFundingRules` send it as `ETag`, and `setWalletFundingRules` checks
+            `If-Match` against it (`412` on a mismatch).'
     WalletAdjustment:
       type: object
       x-ticvai-persistence: wallet.adjustment
@@ -5787,6 +5820,8 @@ components:
       type: object
       x-ticvai-persistence: wallet.refund_policy
       description: 'Boards 7.4 and 7.5. **Restoration is to the lot, not to the balance.**'
+      required:
+      - version
       properties:
         defaultDestination:
           type: string
@@ -5840,6 +5875,15 @@ components:
                 - guestChoice
         scopePath:
           type: string
+        version:
+          type: integer
+          minimum: 1
+          default: 1
+          readOnly: true
+          description: '**The row''s version, its ETag** ("All as recommended": ADAM CR-332 option A, Chinmay, 29
+            October 2026, the rule CR-257 chose for group bookings): 1 on create and bumped on every write;
+            `getWalletRefundPolicy` and `setWalletRefundPolicy` send it as `ETag`, and `setWalletRefundPolicy` checks
+            `If-Match` against it (`412` on a mismatch).'
     WalletRestriction:
       type: object
       x-ticvai-persistence: wallet.restriction

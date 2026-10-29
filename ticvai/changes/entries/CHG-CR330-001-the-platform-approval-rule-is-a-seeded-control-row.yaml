@@ -1,0 +1,64 @@
+id: CHG-CR330-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'The platform approval rule for a tenant subject has storage: control.platform_approval_rule (kind, subject
+  type, approver permission, minimum approvals, active), seeded once by the control database''s migration with
+  configurationChange, tenant, PLATFORM_TENANT_MANAGE, 2, active; createApprovalRequest asks
+  platform-ops#platformApprovalRuleFor over the service route, so suspendTenant and reactivateTenant are routable.'
+decision:
+  what: '"As recommended, comment now", then "Include those in today as well" (Chinmay, 29 October 2026, about
+    19:20): ADAM CR-330, option A, built into r11. contracts/satellite/platform-ops.yaml: PlatformApprovalRule (new,
+    no operation returns it) persists to control.platform_approval_rule, keyed (kind, subjectType), with
+    x-ticvai-seed-rows; the query platformApprovalRuleFor (a rule question, served service).
+    contracts/spine/approvals.yaml: createApprovalRequest reads it (x-ticvai-read-via, route service, under service
+    sign-in between deployables, #37051) and says a tenant-subject request is routed by the rule it answers, found
+    false being the 422 no-approval-route; ApprovalKind says where the rule is held.
+    contracts/satellite/subscription.yaml: suspendTenant says the same. tools/derive-ddl.py gains the generator rule
+    x-ticvai-seed-rows (one INSERT ... ON CONFLICT DO NOTHING per row, after the table''s keys), so the next control
+    forward migration creates the table and seeds the row. The read crosses deployables (Tenancy in commerce asks
+    Platform in operations) on the service route, which check-cross-module-reads XR-ROUTE allows without a grant, so
+    no XDR entry is added: the XDR reads are in-process SELECT grants, and this decision keeps the rule off
+    commerce''s SQL and out of every tenant database.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-330 (Pranay Shinde, ticket #30848 createApprovalRequest, blocking): ApprovalKind said the platform rule
+  is held in the control plane and seeded when the platform is provisioned, but no control or tenant table held it,
+  nothing seeded it and createApprovalRequest declared no read of the control plane, so every suspendTenant and
+  reactivateTenant (#30759, #30758) would be refused 422.'
+keys_touched:
+  operations: [createApprovalRequest, suspendTenant]
+  schemas: [PlatformApprovalRule, ApprovalKind]
+  tables: [control.platform_approval_rule]
+  files:
+  - contracts/satellite/platform-ops.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/satellite/subscription.yaml
+  - tools/derive-ddl.py
+  - tools/check-business-rules.py
+root_class: 'a rule the contract says is held and seeded somewhere that no table holds and no migration writes'
+tickets:
+  started:
+  - '30848 (createApprovalRequest; On hold, Pranay Shinde): for subject type tenant, ask
+    platform-ops#platformApprovalRuleFor (kind, subjectType) over the service route and route by the rule it answers;
+    found false is 422 no-approval-route; the tenant''s approvals.matrix and approvals.rule are never read for it.'
+  - '30759 and 30758 (suspendTenant, reactivateTenant; On hold, Narayan Gaonkar): nothing new to build; their
+    createApprovalRequest call is routable once #30848 and the control migration are in.'
+  - '27647 ([DB] Migration V0002__control.sql; Ready for QA, Hrushikant Patkar), or the ticket the lead files for the
+    table: apply the r11 control forward migration, which creates control.platform_approval_rule and seeds its row.'
+  unstarted:
+  - 27813 ([BE] TenancyService task holding createApprovalRequest)
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-330
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-PLATFORM-APPROVAL-RULE fails on the r10 contract (no table, no seed, no read) and passes now; derive-ddl''s
+  seed_rows_sql is the generator rule that writes the seed (seen in this lane''s local regeneration of
+  backend/control/V0118). No [DB] ticket names control.platform_approval_rule: the generated MIGRATIONS.md lists it
+  under the tables no task names until one does, so the lead files one (as 37034 and 37035 were filed for CR-202).
+  Beyond the comment''s words: the rule is keyed (kind, subjectType), minimumApprovals counts approvals by different
+  holders with the raiser never one of them, and the query''s name and answer shape.'
