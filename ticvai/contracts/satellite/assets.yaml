@@ -367,6 +367,9 @@ paths:
       - query: catalogue#productMediaRecords
         route: in-process
         for: 'which products list the asset (catalogue.product_media.product_id by asset_id): 409 in-use, MediaUsage surface product, read in process (ADAM CR-309, option (b); XDR-011; CHG-CR309-001)'
+      x-ticvai-reads:
+      - table: assets.media_collection
+        for: 'the collections whose cover is the asset (cover_asset_id): 409 in-use, MediaUsage surface mediaCollectionCover (ADAM CR-326, option A; CHG-CR326-001)'
       x-ticvai-audience: [staff]
       summary: Delete an asset
       description: >
@@ -388,7 +391,11 @@ paths:
         October 2026; CHG-CR309-001): a product's media are `catalogue.product_media` rows, and the operations
         host asks `catalogue#productMediaRecords` (the products whose media name the asset) in process, in the
         caller's transaction under the caller's row security (XDR-011); each one found is a use with surface
-        `product`. Any use is 409 `in-use`, naming it. **Otherwise the delete removes, in one transaction**, the asset's `media_collection_member`, `asset_version`, `rendition`
+        `product`. **A collection's cover is named too** (ADAM CR-326, option A, Chinmay, 29 October 2026;
+        CHG-CR326-001): each `assets.media_collection` whose `cover_asset_id` is the asset is a use with surface
+        `mediaCollectionCover`, `referenceId` the collection's id and `label` its name, worked out from
+        `cover_asset_id` when the delete is asked, never stored as a `media_usage` row. Any use is 409 `in-use`,
+        naming it: `usage` is one list of every use, and `referenceCount` counts that list. **Otherwise the delete removes, in one transaction**, the asset's `media_collection_member`, `asset_version`, `rendition`
         and `media_fingerprint` rows and clears `media_upload.asset_id`; the stored files of every version
         and their derivatives are removed from the asset store after the transaction commits.
       tags: [asset]
@@ -406,7 +413,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
         '409':
           x-ticvai-problem-types: [in-use]
-          description: Asset is in use. Every reference is listed
+          description: Asset is in use. Every reference is listed, a collection cover included (`mediaCollectionCover`, ADAM CR-326)
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/MediaInUseProblem' }
@@ -424,6 +431,9 @@ paths:
       x-ticvai-consumed-by:
         - "P13 CMS-010 Media Library"
         - "P13 CMS-076 Asset Version Control & Revision History"
+      x-ticvai-reads:
+      - table: assets.asset_version
+        for: 'which of the asset''s uploads is its current file: the one whose key no version row names (ADAM CR-337, option A; CHG-CR337-001)'
       x-ticvai-audience: [staff]
       summary: Replace the file behind an asset
       description: >
@@ -440,6 +450,16 @@ paths:
         `ready`; a flagged file goes to `quarantined`. A replace is allowed from `ready` and `archived`; in
         any other status it is 409 `asset-not-replaceable`. No operation rolls a version back yet: only
         the retention is defined here.
+
+        **Where the replaced file's `storageKey` comes from** (ADAM CR-337, option A, Chinmay, 29 October 2026;
+        CHG-CR337-001). No column holds an asset's current file: the key follows from the upload, as `completeUpload`
+        finds the file. The upload a replace uses records `media_upload.asset_id` = the asset, as `completeUpload`'s
+        does, so an asset's current file is its upload whose key no `asset_version` row names, and the replace
+        writes that key as the replaced version's `storageKey`. **An upload already used:** a replace retried with
+        the upload that is already the asset's current file (a lost response, a new `Idempotency-Key`) answers `200`
+        with the asset unchanged and writes nothing, as `completeUpload` does for a second completion (ADAM CR-306);
+        an upload that became another asset, or an earlier file of this one, is 409 `upload-already-used`
+        (`refusedReason` `uploadAlreadyUsed`). One file is never two assets.
 
         **The fingerprint is recomputed with them**: the asset's one `assets.media_fingerprint` row
         is replaced by the processing job for the new file (decided 29 September, writers pass;
@@ -476,8 +496,9 @@ paths:
             document (`kindMismatch`) — or the transfer never finished (`transferIncomplete`),
             the upload ticket expired (`uploadExpired`), or the stored file is larger than the
             ticket allowed (`sizeExceeded`); or the asset is not `ready` or `archived`
-            (`assetNotReplaceable`, R8 blocker ORDERS-MONEY-C29)
-          x-ticvai-problem-types: [kind-mismatch, transfer-incomplete, upload-expired, size-exceeded, asset-not-replaceable]
+            (`assetNotReplaceable`, R8 blocker ORDERS-MONEY-C29); or the upload already became another asset, or
+            an earlier file of this one (`uploadAlreadyUsed`, ADAM CR-337)
+          x-ticvai-problem-types: [kind-mismatch, transfer-incomplete, upload-expired, size-exceeded, asset-not-replaceable, upload-already-used]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/UploadRefusedProblem' }
@@ -2387,7 +2408,10 @@ components:
         One place an asset is used. **`surface: product` is written by catalogue** for each item of
         `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and
         `isLive` is true while the product is listed to guests, which is what stops an asset in use on
-        a ticket card being archived from under it.
+        a ticket card being archived from under it. **`surface: mediaCollectionCover` is never a stored row**
+        (ADAM CR-326, option A; CHG-CR326-001): `deleteMediaAsset` works it out from
+        `assets.media_collection.cover_asset_id` to name a collection whose cover the asset is, with `referenceId`
+        the collection's id and `label` its name.
       required: [surface, referenceId]
       properties:
         extractedText:
@@ -2428,6 +2452,9 @@ components:
             - transportNetworkImport
             - venueMap
             - venueMapVersion
+            # r11 (ADAM CR-326, option A; CHG-CR326-001): a collection's cover, computed by deleteMediaAsset from
+            # media_collection.cover_asset_id, never written as a media_usage row.
+            - mediaCollectionCover
         referenceId: { type: string }
         label: { type: string }
         isLive:
@@ -2464,8 +2491,8 @@ components:
     UploadRefusedProblem:
       x-ticvai-persistence: "none — error shape"
       description: >
-        Why an upload could not become, or replace, an asset. `kindMismatch` is only ever
-        returned by `replaceMediaAsset`.
+        Why an upload could not become, or replace, an asset. `kindMismatch` and `uploadAlreadyUsed` (ADAM
+        CR-337) are only ever returned by `replaceMediaAsset`; a second completion is not refused (ADAM CR-306).
       allOf:
         - $ref: '../shared/common.yaml#/components/schemas/Problem'
         - type: object
@@ -2473,7 +2500,7 @@ components:
           properties:
             refusedReason:
               type: string
-              enum: [transferIncomplete, uploadExpired, sizeExceeded, kindMismatch, assetNotReplaceable]
+              enum: [transferIncomplete, uploadExpired, sizeExceeded, kindMismatch, assetNotReplaceable, uploadAlreadyUsed]
             uploadId: { type: string, format: uuid }
             expectedKind:
               allOf:

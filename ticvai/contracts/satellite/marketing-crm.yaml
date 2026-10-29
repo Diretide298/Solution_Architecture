@@ -4016,6 +4016,14 @@ paths:
         An agent who forgets to go offline is an agent conversations queue for. **Availability expires**
         rather than persisting through a closed laptop.
 
+        **When it expires** (ADAM CR-333, option C, Chinmay, 29 October 2026; CHG-CR333-001): every PUT sets
+        `expiresAt` to the earlier of the caller''s session expiry (`Session.expiresAt`, known from the caller''s
+        validated session as its scope is, never read from Identity''s tables) and a heartbeat lapse of 15 minutes
+        from now (a default, proposed, client to correct). Each PUT refreshes it, so the agent''s open console keeps
+        an agent available by sending its current availability again within the lapse; a closed laptop stops the
+        heartbeat, and the availability lapses. **Once `expiresAt` has passed the state reads as `offline`**,
+        whatever the row holds, for this operation''s answer and for every read that routes or counts agents by it.
+
         '
       tags:
       - marketing
@@ -26253,7 +26261,8 @@ components:
           nullable: true
           readOnly: true
           description: When this state lapses on its own — **availability expires** rather than persisting
-            through a closed laptop.
+            through a closed laptop. Set by every `setAgentAvailability` to the earlier of the session's expiry and
+            a 15-minute heartbeat lapse; once it has passed, `state` reads as `offline` (ADAM CR-333, option C).
         updatedAt:
           type: string
           format: date-time
