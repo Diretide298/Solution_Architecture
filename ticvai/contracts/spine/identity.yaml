@@ -1543,6 +1543,7 @@ paths:
                   type: string
                   format: uuid
                   description: The export the part belongs to; stored as the part's `exportId`.
+                  x-ticvai-stored-as: identity.subject_data_export_part.export_id
                 fileRef:
                   type: string
                   maxLength: 500

@@ -22,8 +22,8 @@ decision:
   by: Chinmay
   date: '2026-10-29T04:40'
 why: 'ADAM CR-271 and CR-283 (field encryption, ADR-0063), CR-281 (service sign-in), CR-282 (Redis) and CR-284 (device
-  sign-in): the lead''s decisions of 29 October 2026 made the four tickets under #27687 (audit/ticvai/r10/kernel-tickets.rb,
-  run in the OpenProject container) and linked each operation''s ticket to the kernel ticket it waits for by hand; at
+  sign-in): the lead''s decisions of 29 October 2026 made the four tickets under #27687 (#37050 to #37053, created in the OpenProject container;
+  their ids are in handoff/service-docs/pms-map.json) and linked each operation''s ticket to the kernel ticket it waits for by hand; at
   04:40 he made r11 a full release, whose links phase keeps only the order the plan has, so the plan records the
   tickets and their waits.'
 keys_touched:
@@ -35,7 +35,7 @@ keys_touched:
   operations: [registerGuestDevice, enrolMfaMethod, verifyMfaChallenge, verifyMfaEnrolment,
     recordStorefrontSessionEvents, endGuestDeviceSessions, recordConsentIdentifier, updateGuestSubjectDetails,
     requeueDeadLetter, listCellEndpoints, setAnalyticsProvider, setMaintenanceMode, startSsoAuthorization,
-    completeSsoAuthorization, recordDeviceHeartbeat]
+    completeSsoAuthorization, recordDeviceHeartbeat, getCurrentSession]
   files:
   - docs/active/block-a-extra-tasks.json
   - handoff/service-docs/pms-map.json
