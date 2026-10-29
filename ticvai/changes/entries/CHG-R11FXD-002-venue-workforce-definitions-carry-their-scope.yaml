@@ -7,7 +7,7 @@ summary: 'Job titles, leave types and shift patterns, which a venue configures (
   beneath it (x-ticvai-rls read-beneath): a venue writes its own and reads its own and those of the region and tenant
   above it. A leave balance follows its leave type.'
 decision:
-  what: 'contracts/satellite/workforce.yaml WorkforceJobTitle, WorkforceLeaveType and WorkforceShift: scopePath
+  what: 'The lead, 29 October 2026 (r11 gate): "Accept", over moving the writes to tenant level. contracts/satellite/workforce.yaml WorkforceJobTitle, WorkforceLeaveType and WorkforceShift: scopePath
     (readOnly, required, set by the server from the caller''s scope, never taken from a request) and x-ticvai-rls
     read-beneath, the write rule of the lead''s default ruling of 14 October 2026 (CHG-MOD-007: "a table written below
     tenant gets a scope") with the read ADR-0018 asks of configuration (nearest ancestor wins, venue the floor; rule 3

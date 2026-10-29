@@ -40,7 +40,7 @@ prevention:
   type: check
   ref: tools/check-rls-scope-fit.py
 status: open
-notes: 'Left for the lead: grant-holder-read lets any staff grant of the tenant read every employee row (contact details
+notes: 'The lead chose "Tenant-wide read" (29 October 2026, r11 gate), over a read only where a work assignment posts the employee. Was left for the lead: grant-holder-read lets any staff grant of the tenant read every employee row (contact details
   and date of birth included), as it already does for training records. If ADR-0011 position 6 ("no cross-venue data
   access unless explicitly permitted") is read to forbid that, the narrower rule is a new mark reading an employee
   where a workforce.work_assignment in the caller''s scope posts them; it would hide an employee with no posting yet
