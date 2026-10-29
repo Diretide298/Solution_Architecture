@@ -1,0 +1,36 @@
+id: CHG-R11INT-002
+date: '2026-10-29'
+source: audit
+kind: process
+summary: 'The release apply puts an On hold plan ticket back to New ("Back in the plan") only when a release deferred
+  it, which leaves it with no assignee. A ticket its developer put On hold and still holds (for example "Blocked by
+  CR-298") is listed and left alone: lifting that hold is the developer''s, once the change request is settled.
+  op-release.py refuses a bundle whose server script lacks the rule.'
+decision:
+  what: 'The release must not undo a developer''s hold. Telling the two apart by the assignee needs no new data: a
+    deferral clears the assignee and the sprint, a developer''s hold keeps both.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: r11 plan lane bundle (29 October 2026): the apply would have put #37053 (Pranay Shinde, On hold since
+  29 October behind ADAM CR-298, open and blocking) and #30708 (Deep Khanvilkar, On hold behind CR-271) back to New,
+  because the reopen took every On hold plan ticket for one a release had deferred.'
+keys_touched:
+  operations: []
+  screens: []
+  files:
+  - tools/op-release.rb
+  - tools/op-release.py
+  - tools/tests/test_op_release.py
+root_class: 'a release step that read every On hold ticket as one a release had deferred'
+tickets:
+  started:
+  - '37053, 30708: left On hold; their developers lift the hold.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 plan lane'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/op-release.py::HOLD_REQUIRED
+status: open
