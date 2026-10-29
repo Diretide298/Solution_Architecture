@@ -800,6 +800,72 @@
    ]
   },
   {
+   "key": "KERNEL-FIELD-ENC",
+   "epic": "PLATFORM",
+   "points": 5,
+   "pool": "backend",
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-10-29",
+   "subject": "Field encryption in the kernel: per-tenant data and blind-index keys behind one interface (ADR-0063 action 6)",
+   "detail": "ADR-0063 action 6 (ADAM CR-271, CR-283; the lead, 29 October 2026): one Application abstraction in the kernel that encrypts, decrypts and blind-indexes a value for the current tenant (ITenantContext), so no module calls Key Vault itself. Interface: Encrypt(plaintext) returns the stored string, Decrypt(stored) returns the plaintext, BlindIndex(value) returns 64 lowercase hex characters (HMAC-SHA-256); all three act for the current tenant only. Keys: per tenant, a data key (AES-256-GCM) and a blind-index key (HMAC-SHA-256), created when the tenant is provisioned (or on first use) and wrapped by the tenant's HSM-backed Key Vault key (ADR-0063 section 5, amended 14 October 2026); unwrapped keys live only in memory, cached per tenant, and are never logged or stored unwrapped. The stored form names the key version, enc:v<version>:<base64url(nonce | ciphertext | tag)>, so a value written under an older key still decrypts after rotation. Rotation: a new key version is used for new writes and older versions still decrypt; when the blind-index key rotates, a job re-hashes the stored indexes, and until it finishes a lookup tries both versions. One tenant's keys never decrypt or match another tenant's values. Key Vault unreachable with no cached key: the call fails with the shared 503 problem, never a fall back to plaintext or an unkeyed hash. TOTP secrets (CR-173) use the same per-tenant data key: ADR-0063's per-tenant key is the rule, and CR-173's per-cell key wording is superseded. Infrastructure (Hrushikant Patkar): the HSM-backed Key Vault per cell and the hosts' managed identity access to it. The operations that wait for it: registerGuestDevice (push token, CR-086), enrolMfaMethod, verifyMfaChallenge and verifyMfaEnrolment (CR-173), recordStorefrontSessionEvents (CR-107). Done when: round-trip tests pass; two tenants cannot decrypt or blind-index-match each other's values; a rotation test decrypts old values and re-hashes indexes; a blind index is stable within a tenant and different across tenants; no module outside the kernel references the Key Vault client.",
+   "builds": [
+    "adr ADR-0063"
+   ]
+  },
+  {
+   "key": "KERNEL-SERVICE-AUTH",
+   "epic": "PLATFORM",
+   "points": 8,
+   "pool": "backend",
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-10-29",
+   "subject": "Service sign-in between deployables inside a cell: workload identity, token validation, the caller's context (ADR-0073)",
+   "detail": "The serviceAuth scheme the contracts name (ADAM CR-281; the lead, 29 October 2026), so one deployable (commerce, access, operations, workers, ticvai-ai; ADR-0055) can call another's operation or service query inside a cell; nothing built it before (CR-174, CR-241, CR-281). 1. ADR-0073 first, for the lead's approval: how each deployable proves who it is (its own workload identity), mTLS between them inside the cell, and how the callee validates the call. 2. Validation: the callee accepts a call only with a valid token for itself (issuer the cell's identity, audience the callee deployable, not expired); anything else is 401 with the shared problem. 3. The caller's context: the caller sends the tenant, scope and subject of the request it acts for, and the callee sets ITenantContext from them only after the token is valid; a caller acting for no person (a job, a consumer) runs at the scope the route's contract names. 4. Client side: one shared kernel client that every x-ticvai-read-via query with route service, and every serviceAuth call, goes through, so no module builds its own. The operations that wait for it: endGuestDeviceSessions, recordConsentIdentifier, updateGuestSubjectDetails, requeueDeadLetter, listCellEndpoints, setAnalyticsProvider and setMaintenanceMode (CR-281), the follow-ups CR-174, CR-241, CR-275 and CR-277 left for after service sign-in, and the operations that read another deployable's data over the service route. Done when: in a test with two deployables, a valid call succeeds with the caller's tenant and scope in the callee's context; a missing, expired or wrong-audience token is 401; no shared SQL is used between them (ADR-0055 rule 4).",
+   "builds": [
+    "adr ADR-0055"
+   ]
+  },
+  {
+   "key": "KERNEL-REDIS",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-10-29",
+   "subject": "Redis in the kernel: the client, keyed state with expiry and take-once, and the rule when Redis is down",
+   "detail": "The Redis client and one small Application abstraction over it (ADAM CR-282; the lead, 29 October 2026). The contracts already keep SSO sign-in state (cache:sso-state:<state>), Identity's guest session registry (ADR-0004) and the session cache (cache:resolution) in Redis, and the repository had no client. Client: StackExchange.Redis, one connection multiplexer per host, registered in the kernel. Abstraction: Set(key, value, expiry), Get(key), TakeOnce(key) (atomic read-and-delete, GETDEL) and Delete(key); every key is prefixed with the tenant id, so tenants never share a key. Connection: one setting per cell; Hrushikant Patkar provisions Azure Managed Redis per cell and its access (managed identity, or a secret in Key Vault). Redis down: take-once state and the guest session registry fail closed with the shared 503 problem and Retry-After, with no in-process fallback, because single use must hold across replicas; the session cache falls back to the database read. KERNEL-TENANT-LIMITS keeps its own in-process fallback and uses this client (ADR-0064). The operations that wait for it: startSsoAuthorization, completeSsoAuthorization and endGuestDeviceSessions (with KERNEL-SERVICE-AUTH). Done when: TakeOnce succeeds once and only once under concurrent calls; expiry is honoured; two tenants' identical keys do not collide; stopping Redis gives 503 on SSO start and complete and still serves getCurrentSession from the database.",
+   "builds": [
+    "adr ADR-0004",
+    "adr ADR-0064"
+   ]
+  },
+  {
+   "key": "KERNEL-DEVICE-AUTH",
+   "epic": "PLATFORM",
+   "points": 5,
+   "pool": "backend",
+   "assignee": "Pranay Shinde",
+   "depends": [
+    "PLATFORM-KERNEL"
+   ],
+   "notBefore": "2026-10-29",
+   "subject": "Device sign-in (deviceAuth): validate the enrolled credential and act at the device's workstation",
+   "detail": "The deviceAuth scheme decided on 20 October 2026 (APPROVALS-TENANCY-C27 option A, CHG-R8SPN-030; ADAM CR-284, the lead, 29 October 2026): a device proves itself with the credential its enrolment issued (tenancy.device_credential), and acts at the scope of the workstation it is bound to; nothing built it before. Validation: the presented credential is checked against tenancy.device_credential, as that table and CHG-R8SPN-030 describe it: it must match, not be revoked and not be expired; otherwise the answer is 401 with the shared problem. Context: ITenantContext gets the device's tenant and the scope path of its bound workstation, with no principal; the device id is available to the operation. Revocation takes effect on the next call (no long-lived cache of a credential's validity). The operation that waits for it: recordDeviceHeartbeat. Done when: an enrolled device's call succeeds at its workstation's scope; an unknown, revoked or expired credential is 401; a device bound to one venue's workstation cannot act at another venue.",
+   "builds": [
+    "table tenancy.device_credential",
+    "adr ADR-0067"
+   ]
+  },
+  {
    "key": "OBS-TENANT-POOL",
    "epic": "PLATFORM",
    "points": 1,
@@ -1725,6 +1791,24 @@
  "readViaBuiltWithNote": "query (`<module>#<name>`, an x-ticvai-queries entry an operation's x-ticvai-read-via asks) -> the operations its module answers it from; tools/build-service-docs.py makes the asking operation's task wait on their tasks (CHG-TKT-014, ADAM CR-085: closeFiscalPeriod waits on Wallet's period-close query, built in Block A by the lead's decision 6 of 14 October 2026). A query with no entry adds no wait.",
  "readViaBuiltWith": {
   "wallet#periodCloseChecks": ["getWalletPreCloseChecks", "getWalletMovementSummary"]
+ },
+ "operationWaitsNote": "operation -> the hand-written plan tasks its task waits for: an operation whose ticket needs work that no screen, operation or query of the plan implies (a kernel scheme or client it runs on). tools/build-service-docs.py makes the task that builds the operation wait on each task named, so the release links the two tasks; a key must be a task of this file (a generated key, such as a migration's, is only settled at the key reconcile, and the build stops on one). Added 29 October 2026 (CHG-R11PLN-001; ADAM CR-271, CR-281 to CR-284): the lead made the four kernel tickets that day and linked each of these operations' tickets to the kernel tickets it waits for by hand in OpenProject; this is the plan's record of those waits.",
+ "operationWaits": {
+  "registerGuestDevice": ["KERNEL-FIELD-ENC"],
+  "enrolMfaMethod": ["KERNEL-FIELD-ENC"],
+  "verifyMfaChallenge": ["KERNEL-FIELD-ENC"],
+  "verifyMfaEnrolment": ["KERNEL-FIELD-ENC"],
+  "recordStorefrontSessionEvents": ["KERNEL-FIELD-ENC"],
+  "endGuestDeviceSessions": ["KERNEL-REDIS", "KERNEL-SERVICE-AUTH"],
+  "recordConsentIdentifier": ["KERNEL-SERVICE-AUTH"],
+  "updateGuestSubjectDetails": ["KERNEL-SERVICE-AUTH"],
+  "requeueDeadLetter": ["KERNEL-SERVICE-AUTH"],
+  "listCellEndpoints": ["KERNEL-SERVICE-AUTH"],
+  "setAnalyticsProvider": ["KERNEL-SERVICE-AUTH"],
+  "setMaintenanceMode": ["KERNEL-SERVICE-AUTH"],
+  "startSsoAuthorization": ["KERNEL-REDIS"],
+  "completeSsoAuthorization": ["KERNEL-REDIS"],
+  "recordDeviceHeartbeat": ["KERNEL-DEVICE-AUTH"]
  },
  "navHomes": {
   "BO-101": "a section home of Venue Management: lever A, Chinmay, 3 October (CHG-RONEP-007): the navigation closure pulls in app homes only, and the section homes link to their setup screens",

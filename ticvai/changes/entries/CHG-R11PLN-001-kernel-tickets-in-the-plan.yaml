@@ -1,0 +1,73 @@
+id: CHG-R11PLN-001
+date: '2026-10-29'
+source: cr
+kind: plan
+proposed: '2026-10-29T00:30'
+summary: The four kernel tickets the lead made in OpenProject on 29 October (field encryption, service sign-in, Redis,
+  device sign-in) are plan tasks of Foundation - Platform kernel, and the plan orders the waits behind the 17 follows
+  links he made by hand, so the full release keeps that order.
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: four PLATFORM tasks in KERNEL-TENANT-LIMITS''s shape, Pranay Shinde
+    building, each waiting on PLATFORM-KERNEL: KERNEL-FIELD-ENC (#37050, 5 points, ADR-0063 action 6),
+    KERNEL-SERVICE-AUTH (#37051, 8 points, ADR-0073 to be written first), KERNEL-REDIS (#37052, 3 points) and
+    KERNEL-DEVICE-AUTH (#37053, 5 points), their subjects and text from the tickets the lead made; their ids in
+    handoff/service-docs/pms-map.json (tools/op-created-merge.py). New `operationWaits` (operation -> the plan tasks
+    its task waits for), wired by tools/build-service-docs.py: registerGuestDevice, enrolMfaMethod,
+    verifyMfaChallenge, verifyMfaEnrolment and recordStorefrontSessionEvents wait on KERNEL-FIELD-ENC;
+    endGuestDeviceSessions, recordConsentIdentifier, updateGuestSubjectDetails, requeueDeadLetter, listCellEndpoints,
+    setAnalyticsProvider and setMaintenanceMode on KERNEL-SERVICE-AUTH; startSsoAuthorization,
+    completeSsoAuthorization and endGuestDeviceSessions on KERNEL-REDIS; recordDeviceHeartbeat on KERNEL-DEVICE-AUTH.
+    Each operation''s task follows the kernel task at the release. TEST-AM-FOUNDATION-PLATFORM (the module test) now
+    also follows the four kernel tasks, as it follows every task of its app-module.'
+  by: Chinmay
+  date: '2026-10-29T04:40'
+why: 'ADAM CR-271 and CR-283 (field encryption, ADR-0063), CR-281 (service sign-in), CR-282 (Redis) and CR-284 (device
+  sign-in): the lead''s decisions of 29 October 2026 made the four tickets under #27687 (audit/ticvai/r10/kernel-tickets.rb,
+  run in the OpenProject container) and linked each operation''s ticket to the kernel ticket it waits for by hand; at
+  04:40 he made r11 a full release, whose links phase keeps only the order the plan has, so the plan records the
+  tickets and their waits.'
+keys_touched:
+  tickets:
+  - KERNEL-FIELD-ENC (37050)
+  - KERNEL-SERVICE-AUTH (37051)
+  - KERNEL-REDIS (37052)
+  - KERNEL-DEVICE-AUTH (37053)
+  operations: [registerGuestDevice, enrolMfaMethod, verifyMfaChallenge, verifyMfaEnrolment,
+    recordStorefrontSessionEvents, endGuestDeviceSessions, recordConsentIdentifier, updateGuestSubjectDetails,
+    requeueDeadLetter, listCellEndpoints, setAnalyticsProvider, setMaintenanceMode, startSsoAuthorization,
+    completeSsoAuthorization, recordDeviceHeartbeat]
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - handoff/service-docs/pms-map.json
+  - tools/build-service-docs.py
+root_class: 'work the lead ticketed in OpenProject between releases that the plan did not have, so a full apply would
+  not keep its order'
+tickets:
+  started: []
+  unstarted:
+  - '37050'
+  - '37051'
+  - '37052'
+  - '37053 (On hold since 29 October: blocked by CR-298)'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-271, CR-281, CR-282, CR-283, CR-284
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-29'
+    quote: 'Waive for r11'
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'proposed is when the tickets were made (28 October 20:30 UTC, 29 October 00:30 in the UAE). The 17 hand-made
+  links all run from an operation''s sub-task, which the apply''s links phase never removes (it prunes only links
+  between two plan tasks, op-release.rb), so all 17 stay; the plan''s order is between the tasks that build those
+  operations and the kernel tasks. Not ordered by the plan, for the lead: #30831 (recordDeviceHeartbeat) follows
+  #28829, MIG-TENANCY-3, which creates tenancy.data_retention_setting only; tenancy.device_telemetry, which the
+  heartbeat writes, is created by MIG-TENANCY (#27652), which its task SVC-TENANCY-WORKSTATION-3 already follows, and
+  its r10 columns (CHG-R10TEN-007) come in V0116. The link stays (the apply does not touch it); the plan adds no wait
+  the package does not show. The "Not in ADAM yet" paragraph and the Unblocks line of the tickets are not carried:
+  the waits are links, and the pointer replaces the description on a New ticket.'
