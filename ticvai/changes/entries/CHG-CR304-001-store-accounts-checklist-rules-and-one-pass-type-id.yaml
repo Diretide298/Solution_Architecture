@@ -1,0 +1,53 @@
+id: CHG-CR304-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'setStoreAccounts: one Pass Type ID per tenant (one Apple account records one), every checklist item has its
+  done-rule and fixed English guidance, and a listing is checked against the working draft''s languages (the
+  published set''s without a draft). No migration.'
+decision:
+  what: '"All as recommended": ADAM CR-304, option A (Chinmay, 29 October 2026). contracts/satellite/white-label.yaml:
+    StoreAccount.passTypeIdentifier and passCertificateSecretRef one per tenant for all brands (one per brand needs a
+    later change with brand modelling); setStoreAccounts names the languages a listing is checked against and states
+    the one-per-tenant rule, and its 400 says which languages; StorePublishingChecklist states each item''s done-rule
+    (the three accounts; storeListing: a store recorded and every recorded listing with appName and description in
+    every tenant language and category, supportUrl and privacyPolicyUrl set; appIcons: the working draft''s
+    app_icons; publishedConfiguration: a current ConfigVersion) and guidance the fixed copy per item;
+    getStoreAccounts and setStoreAccounts declare x-ticvai-reads whitelabel.tenant_config and
+    whitelabel.config_version (getStoreAccounts'' carried override removed from
+    handoff/api-data-lineage-overrides.json). contracts/spine/orders.yaml issueWalletPass,
+    events/whitelabel-passCertificateExpiring.yaml and the CMS-104 overlay body (not visible UI) say one per tenant.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-304 (Chinmay Patkar, #31029 setStoreAccounts, blocking): the Pass Type ID was one per brand with no
+  brand on the row, three checklist items had no done-rule, guidance had no copy and the listing languages had no
+  source. Settled by the lead on 29 October 2026.'
+keys_touched:
+  operations: [setStoreAccounts, getStoreAccounts, issueWalletPass]
+  screens: [CMS-104]
+  schemas: [StoreAccount, StorePublishingChecklist]
+  tables: [whitelabel.store_account, whitelabel.tenant_config, whitelabel.config_version]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/orders.yaml
+  - events/whitelabel-passCertificateExpiring.yaml
+  - screens/P13-white-label-cms.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: 'a computed checklist whose items have no done-rule'
+tickets:
+  started: []
+  unstarted:
+  - '31029, 27877 (setStoreAccounts) and 31026, 27876 (getStoreAccounts): build to option A through CR-304''s comment;
+    the credential and certificate writes wait for the secret-store ticket.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-304
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'The Key Vault secret store CR-243 decided has no ticket; it is filed separately (a plan change), ordered
+  before #31029''s secret writes. Beyond the comment''s words: storeListing is not done while no store is recorded,
+  the guidance copy itself, and the checklist using the same language set as the 400.'

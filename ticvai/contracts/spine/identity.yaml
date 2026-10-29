@@ -8895,6 +8895,8 @@ components:
         customerId:
           type: string
           format: uuid
+          description: 'The guest who holds the agreement: its `pii.subject` id (ADAM CR-303, option A). Billing statements
+            (orders `listBillingStatements`, `getBillingStatement`) find a guest''s agreements by it.'
         entitlementTemplateId:
           x-ticvai-references: catalogue.entitlement_template
           type: string

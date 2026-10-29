@@ -1,0 +1,54 @@
+id: CHG-CR303-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'A billing statement is an agreement''s first period or one completed orders.membership_renewal row; its
+  charges are that cycle''s order; its dates are in the venue''s time zone; its guest is customer_membership.customer_id;
+  its id is a v5 UUID under a stated namespace and name, minted the same way by listBillingStatements and
+  getBillingStatement.'
+decision:
+  what: '"All as recommended": ADAM CR-303, option A (Chinmay, 29 October 2026). contracts/spine/orders.yaml
+    listBillingStatements: the cycles (the first period, start_at to the first expiry, which is the earliest completed
+    renewal''s previous_expiry_at, or expires_at while none has; then each renewal with status completed,
+    previous_expiry_at to new_expiry_at), the dates in the venue''s time zone (the venue of the cycle''s order, through
+    tenancy#regionSettingsRecords in process, same deployable), the charges (the renewal''s order_id, the agreement''s
+    source_order_id for the first period: its lines, payments and any payments.dunning_case), the guest (customer_id,
+    the guest''s subject id); x-ticvai-reads orders.membership_renewal and orders.order_line. BillingStatement.id: RFC
+    4122 v5 under namespace dca779d2-f1de-5904-bbfc-5c8dcf79383f, name <agreementId>|<periodStart>|<periodEnd>
+    (lower-case uuid, ISO dates), with a worked example; subjectId, periodStart and periodEnd described; its
+    persistence note names the tables. getBillingStatement: statementId (CHG-R11FXC-002) now mints by
+    BillingStatement.id''s rule over the same cycles, with the same reads. contracts/spine/identity.yaml
+    IdentityCustomerMembership.customerId: the guest''s pii.subject id. No column, no key, no migration: customer_id
+    gains no declared reference (that would add a foreign key).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-303 (Deep Khanvilkar, #30986 listBillingStatements, blocking): CR-099 computes a statement per billing
+  cycle with a v5 id, but nothing defined the cycle, its charges, the v5 namespace and name or the guest, so the two
+  operations built apart would mint different ids. Settled by the lead on 29 October 2026; agrees with CHG-R11FXC-002.'
+keys_touched:
+  operations: [listBillingStatements, getBillingStatement]
+  schemas: [BillingStatement, IdentityCustomerMembership]
+  tables: [orders.membership_renewal, orders.order_line, identity.customer_membership, platform.region_settings]
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: 'a computed resource whose id and contents depend on rules nobody wrote down'
+tickets:
+  started:
+  - '32100, 32102 ([FE] WEB-023 Membership Management; Ready for QA, Chinmay Patkar): nothing to change; the id stays
+    opaque and periodStart and periodEnd stay dates, now venue-local.'
+  unstarted:
+  - '30986, 27863 (listBillingStatements) and 31487, 28047 (getBillingStatement): build to option A through CR-303''s
+    comment, with one shared id function.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-303
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-BILLING-STATEMENT fails if the namespace, the name, the cycle rule or either operation''s use of
+  BillingStatement.id goes. Named beyond the comment''s words: which venue''s time zone (the cycle''s order''s), the
+  namespace value and a worked example.'
