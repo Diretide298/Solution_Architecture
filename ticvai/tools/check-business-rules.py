@@ -38,6 +38,15 @@ And one rule per decision:
   BR-STORE-CHECKLIST (r11, ADAM CR-304, CHG-CR304-001) every StorePublishingChecklist item has a done-rule and fixed
                    copy, setStoreAccounts names the languages a listing is checked against, and the Pass Type ID is
                    one per tenant.
+  BR-PLANNER-QUESTIONS (r11, ADAM CR-321, CHG-CR321-001) the planner's questions are a closed list a venue switches on,
+                   orders, relabels and makes required (venuemap.visit_planner_question, each key's default stated),
+                   VisitPlannerOptions answers them, setVisitPlannerQuestions writes them and keeps party and dates
+                   required, and generateVisitPlan refuses a missing required answer (422 planner-answer-missing).
+  BR-ROTA-HOUR-LIMIT (r11, ADAM CR-334, CHG-CR334-001) breachesWorkingHourLimit names the venue's rule (staffing_rules'
+                   day, rolling 7-day and rest limits), and both rota writes declare the read.
+  BR-ROTA-CROSS-VENUE (r11, ADAM CR-336, CHG-CR336-001) both rota writes ask the overlap and the role as yes/no queries
+                   answered under the tenant root grant (never delegatedAccessRecords under the caller's venue), and
+                   RotaAssignment's overlap rule is an exclusion constraint (x-ticvai-exclude).
   BR-PRIVACY-REQUEST (r10, ADAM CR-101, CHG-R10ID-016) a guest's privacy request records a subject, not a principal
                    (ApprovalRequest exactly one of requestedByPrincipalId and requestedBySubjectId); exportSubjectData
                    answers an erased subject 410 subject-erased and emits identity.privacyRequestRaised (as
@@ -849,6 +858,57 @@ def main() -> int:
     need("BR-WALLET-RESTORE-DRAFT", "drafts created by" not in lst,
          "listWalletConfigurationVersions still lists drafts created by the restore (CR-312: no draft row)")
 
+    # BR-PLANNER-QUESTIONS, BR-ROTA-HOUR-LIMIT, BR-ROTA-CROSS-VENUE (r11, ADAM CR-321, CR-334, CR-336; the lead, 29
+    # October 2026, "As recommended", then "Include those in today as well"). Each fails on the r10 contract.
+    vdoc = load("contracts/satellite/venue-map.yaml")
+    vsch = (vdoc.get("components") or {}).get("schemas") or {}
+    qkeys = (vsch.get("VisitPlannerQuestionKey") or {}).get("enum") or []
+    need("BR-PLANNER-QUESTIONS", set(qkeys) == {"party", "heights", "dates", "dayVenues", "pace", "interests",
+                                                 "retail", "cuisine"},
+         "VisitPlannerQuestionKey is not the closed list of the questions the rules planner understands (CR-321)")
+    vq = vsch.get("VisitPlannerQuestion") or {}
+    need("BR-PLANNER-QUESTIONS", str(vq.get("x-ticvai-persistence") or "") == "venuemap.visit_planner_question"
+         and {"isEnabled", "isRequired", "sortOrder", "label"} <= set(vq.get("properties") or {}),
+         "no venuemap.visit_planner_question with isEnabled, isRequired, sortOrder and label (VisitPlannerQuestion)")
+    for k in qkeys:
+        need("BR-PLANNER-QUESTIONS", f"| `{k}` |" in str(vq.get("description") or ""),
+             f"VisitPlannerQuestion states no default for {k}")
+    need("BR-PLANNER-QUESTIONS", "questions" in ((vsch.get("VisitPlannerOptions") or {}).get("required") or []),
+         "VisitPlannerOptions does not answer the venue's questions (questions), so the guest screens cannot read them")
+    need("BR-PLANNER-QUESTIONS", "planner-question-fixed" in problem_types(op("setVisitPlannerQuestions")[3])
+         and op("setVisitPlannerQuestions")[3].get("x-ticvai-permission") == "PRODUCT_CONFIGURE",
+         "no staff write of the planner questions refusing party and dates switched off (setVisitPlannerQuestions)")
+    gvp = op("generateVisitPlan")[3]
+    need("BR-PLANNER-QUESTIONS", "planner-answer-missing" in problem_types(gvp)
+         and "venuemap.visit_planner_question" in text(gvp.get("x-ticvai-reads") or []),
+         "generateVisitPlan does not check the venue's required questions (422 planner-answer-missing, x-ticvai-reads)")
+    wsch2 = (load("contracts/satellite/workforce.yaml").get("components") or {}).get("schemas") or {}
+    bwl = " ".join(str((((wsch2.get("RotaAssignment") or {}).get("properties") or {})
+                        .get("breachesWorkingHourLimit") or {}).get("description") or "").split())
+    for word in ("workforce.staffing_rules", "maximumHoursPerDay", "maximumHoursPerWeek", "minimumRestHours",
+                 "rolling"):
+        need("BR-ROTA-HOUR-LIMIT", word in bwl, f"RotaAssignment.breachesWorkingHourLimit does not name its rule ({word})")
+    for oid in ("createRotaAssignment", "updateRotaAssignment"):
+        o_ = op(oid)[3]
+        need("BR-ROTA-HOUR-LIMIT", "workforce.staffing_rules" in text(o_.get("x-ticvai-reads") or []),
+             f"{oid} does not declare its read of the venue's working-hour limits (x-ticvai-reads workforce.staffing_rules)")
+        rv = {str((r or {}).get("query")) for r in o_.get("x-ticvai-read-via") or []}
+        for qn in ("workforce#principalHasOverlappingAssignment", "identity#principalHoldsRoleAtVenue"):
+            need("BR-ROTA-CROSS-VENUE", qn in rv, f"{oid} does not ask {qn} (a yes or no beyond the caller's venue)")
+        need("BR-ROTA-CROSS-VENUE", "identity#delegatedAccessRecords" not in rv,
+             f"{oid} still reads identity.delegated_access under the caller's venue grant (delegatedAccessRecords)")
+    for f_, qn, field in (("contracts/satellite/workforce.yaml", "principalHasOverlappingAssignment", "overlaps"),
+                          ("contracts/spine/identity.yaml", "principalHoldsRoleAtVenue", "holds")):
+        qd = (load(f_).get("x-ticvai-queries") or {}).get(qn) or {}
+        rp = ((qd.get("returns") or {}).get("properties") or {})
+        need("BR-ROTA-CROSS-VENUE", list(rp) == [field] and (rp.get(field) or {}).get("type") == "boolean"
+             and "ITenantRootGrant" in str(qd.get("rule") or ""),
+             f"{qn} does not answer only a boolean ({field}) under the tenant root grant (CR-336)")
+    exc = (wsch2.get("RotaAssignment") or {}).get("x-ticvai-exclude") or []
+    need("BR-ROTA-CROSS-VENUE", any((e or {}).get("equal") == ["principalId"]
+                                    and (e or {}).get("during") == ["startsAt", "endsAt"] for e in exc),
+         "RotaAssignment declares no exclusion constraint over principalId and [startsAt, endsAt) (x-ticvai-exclude)")
+
     errors["BR-PARSE"].extend(PARSE_ERRORS)
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -859,7 +919,8 @@ def main() -> int:
              "BR-STORE-CHECKLIST", "BR-PRIVACY-REQUEST",
              "BR-SCOPE-AUTHZ", "BR-SSO-ACTIVE", "BR-PERMISSION-FINDINGS", "BR-ENTITLEMENT-SHARE",
              "BR-PRESET-READONLY", "BR-END-SESSIONS", "BR-PLATFORM-TOKEN", "BR-GUEST-TOKENS", "BR-GUEST-VENUE",
-             "BR-PLATFORM-INVOICE", "BR-WALLET-TOPUP-ONCE", "BR-WALLET-PUBLISH-CHECKS", "BR-WALLET-RESTORE-DRAFT"]
+             "BR-PLATFORM-INVOICE", "BR-WALLET-TOPUP-ONCE", "BR-WALLET-PUBLISH-CHECKS", "BR-WALLET-RESTORE-DRAFT",
+             "BR-PLANNER-QUESTIONS", "BR-ROTA-HOUR-LIMIT", "BR-ROTA-CROSS-VENUE"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

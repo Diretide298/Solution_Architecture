@@ -1789,6 +1789,14 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
             elif k not in old.stmts:
                 if add_fk(k, t, name):
                     continue
+                if " EXCLUDE USING " in norm(new.stmts[k]).upper():
+                    # **An exclusion constraint cannot be added NOT VALID** (x-ticvai-exclude, ADAM CR-336;
+                    # CHG-CR336-001): the rows that already break it are found and settled first, then it is added.
+                    review("constraint added", f"{t} {name}", f"`{new.stmts[k]}`",
+                           "existing rows may violate it, and an exclusion constraint has no NOT VALID: find the rows "
+                           "that break it (a self-join on the equal columns with overlapping ranges), settle them, "
+                           "then add it by hand")
+                    continue
                 review("constraint added", f"{t} {name}", f"`{new.stmts[k]}`",
                        "existing rows may violate it: validate, then add by hand (NOT VALID, then VALIDATE)")
             else:

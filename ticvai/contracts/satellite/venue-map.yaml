@@ -1574,6 +1574,11 @@ paths:
           from them; no new operation on the screen.
         - `fastTrackBundles`: the venue's published bundles that carry Fast Track, read from Promotions
           (`promotions#bundleRecords`), as id and name only.
+        - `questions` (ADAM CR-321, option A, decided 29 October 2026): the venue's question set-up, the rows
+          of `venuemap.visit_planner_question` with a default for every question the venue has not set, all
+          eight keys, ordered by `sortOrder` then the default order (`VisitPlannerQuestion`). GST-051 and
+          WEB-050 ask the enabled ones in that order, with the venue's labels, and hold the guest on a
+          required one; the venue changes them with `setVisitPlannerQuestions`.
 
         Published data only, whoever calls; a venue with no published map has an empty `interestTags`. Not a list
         operation: one venue's options, a handful of each (bounded below).
@@ -1582,7 +1587,7 @@ paths:
       x-ticvai-guest-callable: true
       x-ticvai-audience: [staff, guest]
       x-ticvai-agreed: 'R8 blocker GPS-C21, the lead''s answer B of 20 October 2026: venue-defined presets in a table; the guest read of the planner options (the surface lane''s request, applied at the r8 integration)'
-      x-ticvai-bounded: 'one venue''s presets (a dozen), its parks'' interest tags (12 per point, a closed list), cuisine and retail tags (8 per point) and its Fast Track bundles (a handful)'
+      x-ticvai-bounded: 'one venue''s presets (a dozen), its parks'' interest tags (12 per point, a closed list), cuisine and retail tags (8 per point), its Fast Track bundles (a handful) and its eight planner questions'
       x-ticvai-scope-level: venue
       x-ticvai-read-routing: replica
       x-ticvai-offline-capable: true
@@ -1694,6 +1699,71 @@ paths:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /venues/{venueId}/visit-planner-questions:
+    parameters:
+      - name: venueId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    put:
+      operationId: setVisitPlannerQuestions
+      x-ticvai-no-screen: 'No approved screen sets up the planner''s questions (ADAM CR-321, option A, decided 29 October
+        2026: the staff write is built, no screen is drawn for it, as the approved UI is fixed). It belongs with the
+        venue''s preset editor (setVisitPlanPreset, listVisitPlanPresets), which is not in Block A either; until a screen
+        is decided through a CR, a venue keeps the default questions.'
+      summary: Set which planner questions a venue asks, in what order, with what wording, and which are required
+      description: >
+        **A venue's question set-up for the visit planner** (ADAM CR-321, option A, decided 29 October 2026: a
+        closed list of questions the rules planner understands, switched on, ordered, relabelled and made
+        required per venue). **Whole replace**: the body is the venue's set-up as it should be, one entry per
+        question it changes (`VisitPlannerQuestionSet`); the rows of `venuemap.visit_planner_question` for the
+        venue are replaced by the entries sent, so a question left out goes back to its default
+        (`VisitPlannerQuestion`). Only the keys of `VisitPlannerQuestionKey` can be set (any other is 400), and
+        each at most once (400 `validation`). `party` and `dates` cannot be switched off or made optional: the
+        planner cannot lay out without them (422 `planner-question-fixed`). The answer is all eight questions as
+        the venue now has them, as `getVisitPlannerOptions` answers them. A change reaches `getVisitPlannerOptions`
+        and `generateVisitPlan` at once; a plan already made is not touched. Per venue, not per event or product.
+      tags: [visitPlan]
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-audience: [staff]
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/VisitPlannerQuestionSet' }
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The venue's eight questions as they now stand
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VisitPlannerQuestionSet' }
+        '400':
+          description: A question key named twice, or the body breaks the schema (`validation`).
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '422':
+          description: >
+            `party` or `dates` sent with `isEnabled` false or `isRequired` false (`planner-question-fixed`): the
+            planner cannot lay out a plan without the party and the dates. The problem names the question.
+          x-ticvai-problem-types: [planner-question-fixed]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /visit-plans:
     get:
       operationId: listMyVisitPlans
@@ -1785,6 +1855,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: VisitPlan.total, VisitPlanItem.pricePerGuest (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      x-ticvai-reads:
+      - table: venuemap.visit_planner_question
+        for: 'the venue''s question set-up, which answers the request must carry (isRequired), checked before anything is planned (ADAM CR-321, option A; CHG-CR321-001)'
       security:
       - guestAuth: []
       x-ticvai-agreed: '29 September: MOB-6 and the Block A re-plan (the Plan tab is Block A, rules planner first, AI planner agent on top; supersedes rev 3 GAP-C3 and audits R187, R209); shape follows createCart (guest-owned, permission null)'
@@ -1833,6 +1906,18 @@ paths:
         plans of GST-052 (the same rules with preset interests and pace). **The AI planner agent refines a plan; it does
         not make the first one** (ai `requestSuggestion` kind `itinerary`): when AI is off or
         fails, this answer is the plan.
+
+        **The venue's required questions are checked first** (ADAM CR-321, option A, decided 29 October
+        2026). The set-up of `venueId` (`venuemap.visit_planner_question`, defaults where the venue set
+        nothing; `VisitPlannerQuestion`) says which questions are required. A request that leaves out the
+        answer to an enabled, required question is refused 422 `planner-answer-missing`, naming the question,
+        and nothing is planned: `pace` not sent for `pace`; no `interestTags` for `interests`; no
+        `cuisineTags` for `cuisine`; no `retailTags` for `retail` when `interestTags` holds `shopping` (the
+        question is asked only then). `party` and `dates` are always required (the schema already holds
+        them). `heights` and `dayVenues` are held by the screens alone, as no request can show them
+        unanswered: a person may give an age instead of a height, and a date with no `dayVenues` entry is at
+        `venueId`. With `presetKey` (or `preset`) the ready-made plan supplies the interests and the pace, so
+        those two are not checked.
 
         **Owned by the guest session**, as a cart is: a signed-in guest's plan is theirs, an
         anonymous one is bound to the device session and claimed on sign-in. Nothing is held or
@@ -1886,13 +1971,16 @@ paths:
             problem names which, and for which date. For `no-suitable-plan` it carries `excludingAnswer`
             (`height`, `age`, `interests`, `cuisines` or `pace`) and `excludedBy`, the answer that removed the
             most candidates (for example the smallest child's height against every ride's minimum), so
-            WEB-050 and GST-052 can say which answer to change; the same plan is never shown empty.
+            WEB-050 and GST-052 can say which answer to change; the same plan is never shown empty. Or an
+            answer the venue's set-up requires is missing (`planner-answer-missing`; ADAM CR-321): the
+            problem carries `questionKey`, the `VisitPlannerQuestionKey` left unanswered.
           x-ticvai-problem-types:
             - venue-not-plannable
             - venue-closed-on-date
             - unknown-preset
             - venue-not-in-tenant
             - no-suitable-plan
+            - planner-answer-missing
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -2505,13 +2593,135 @@ components:
           type: string
           format: date-time
           readOnly: true
+    VisitPlannerQuestionKey:
+      type: string
+      enum: [party, heights, dates, dayVenues, pace, interests, retail, cuisine]
+      description: >
+        **The closed list of questions the rules planner understands** (ADAM CR-321, option A, decided 29 October
+        2026). Each key is one question of GST-051 and WEB-050 and the `VisitPlanRequest` field its answer fills:
+        `party` the adults and children (`party`), `heights` the children's heights or ages
+        (`party[].heightCm`, `party[].ageYears`), `dates` the days (`dates`), `dayVenues` the park each day, in a
+        multi-venue tenant only (`dayVenues`), `pace` how busy each day is (`pace`), `interests` what the party
+        likes (`interestTags`), `retail` the shops, asked when `shopping` is an interest (`retailTags`), and
+        `cuisine` lunch (`cuisineTags`). A venue cannot add a question outside this list: the planner could not
+        plan with its answer.
+    VisitPlannerQuestion:
+      type: object
+      x-ticvai-persistence: venuemap.visit_planner_question
+      # One row per question a venue has set up, keyed by the venue and the question (ADAM CR-321, option A;
+      # CHG-CR321-001). A key with no row takes its default (the table in the description), so no seeding is needed.
+      x-ticvai-primary-key: [scopePath, questionKey]
+      description: >
+        **How one venue asks one of the planner's questions** (ADAM CR-321, option A, decided 29 October 2026:
+        a closed list of questions the rules planner understands, switched on, ordered, relabelled and made
+        required per venue). **Per venue, not per event or product**: the planner plans a venue, and the
+        set-up of the plan's `venueId` (the venue the guest picked) is the one asked, in a multi-venue plan too.
+        A venue keeps a row only for a question it has changed; a question with no row takes its default:
+
+
+        | `questionKey` | `sortOrder` | default `label` | `isRequired` |
+
+        | --- | --- | --- | --- |
+
+        | `party` | 0 | Adults and children | true, always |
+
+        | `heights` | 1 | How tall are the children? | false |
+
+        | `dates` | 2 | Which days are you visiting? | true, always |
+
+        | `dayVenues` | 3 | Which park each day? | false |
+
+        | `pace` | 4 | How busy should each day be? | false |
+
+        | `interests` | 5 | What are you most interested in? | false |
+
+        | `retail` | 6 | Any shops you'd like to visit? | false |
+
+        | `cuisine` | 7 | What would you like for lunch? | false |
+
+
+        Every default question is on (`isEnabled` true). So a venue that sets nothing asks exactly the
+        questions the screen records draw. **`party` and `dates` stay on and required**: the planner cannot lay
+        out a plan without them, and `setVisitPlannerQuestions` refuses a body that switches either off or makes
+        it optional (422 `planner-question-fixed`). The screens keep their own conditions on top of the set-up:
+        `heights` is skipped when no children are coming, `dayVenues` is shown only in a multi-venue tenant, and
+        `retail` only when `shopping` is an interest.
+      required: [questionKey, isEnabled, isRequired, sortOrder, label]
+      properties:
+        questionKey: { $ref: '#/components/schemas/VisitPlannerQuestionKey' }
+        isEnabled:
+          type: boolean
+          default: true
+          description: Whether the guest is asked it. A question switched off is not shown; `generateVisitPlan` still plans with an answer a request carries for it.
+        isRequired:
+          type: boolean
+          default: false
+          description: Whether the guest must answer it before the plan is made. The screens hold the guest on the question until it is answered, and `generateVisitPlan` refuses a request that leaves a required answer out (422 `planner-answer-missing`).
+        sortOrder:
+          type: integer
+          minimum: 0
+          description: The order the screens ask the enabled questions in, lowest first; a tie keeps the default order.
+        label:
+          type: string
+          maxLength: 120
+          description: The question as the guest reads it, in the venue's default language. On a read, the venue's own wording where it set one, else the default above.
+        labelLocalised:
+          type: object
+          nullable: true
+          additionalProperties: { type: string, maxLength: 120 }
+          description: The label per locale; a read answers in the caller's locale where the row has one.
+        help:
+          type: string
+          maxLength: 300
+          nullable: true
+          description: A line under the question (for example why heights are asked); null shows none.
+        helpLocalised:
+          type: object
+          nullable: true
+          additionalProperties: { type: string, maxLength: 300 }
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The partition key** (ADR-0005): the venue the set-up belongs to.'
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the venue last changed the question; null for a question still at its default.
+    VisitPlannerQuestionSet:
+      type: object
+      x-ticvai-persistence: none — the venue's rows of venuemap.visit_planner_question
+      description: >
+        **A venue's whole question set-up** (`setVisitPlannerQuestions`; ADAM CR-321, option A). Sent, one entry
+        per question the venue changes, each key at most once; the set sent replaces the venue's rows, so a
+        question left out goes back to its default. Answered, all eight questions, each as the venue has it or
+        at its default, ordered by `sortOrder` then the default order.
+      required: [questions]
+      properties:
+        questions:
+          type: array
+          maxItems: 8
+          items: { $ref: '#/components/schemas/VisitPlannerQuestion' }
     VisitPlannerOptions:
       type: object
-      x-ticvai-persistence: none — assembled on read from venuemap.visit_plan_preset, the published points and Promotions' bundles
+      x-ticvai-persistence: none — assembled on read from venuemap.visit_plan_preset, venuemap.visit_planner_question, the published points and Promotions' bundles
       description: '**What the visit planner offers at one venue** (`getVisitPlannerOptions`; R8 blocker GPS-C21).'
-      required: [venueId, presets, interestTags, fastTrackBundles]
+      required: [venueId, presets, interestTags, fastTrackBundles, questions]
       properties:
         venueId: { type: string, format: uuid }
+        questions:
+          type: array
+          maxItems: 8
+          description: >
+            **The questions the planner asks at this venue, and how** (ADAM CR-321, option A, decided 29 October
+            2026): all eight `VisitPlannerQuestionKey` questions, each as the venue set it up
+            (`venuemap.visit_planner_question`) or at its default, ordered by `sortOrder` then the default order.
+            GST-051 and WEB-050 ask the ones with `isEnabled` true, in this order, with this `label` (in the
+            caller's locale where the venue gave one) and `help`, and hold the guest on a question with
+            `isRequired` true until it is answered. A venue that set nothing gets the questions the screen records
+            draw, in their order. Read on load with the rest of the options: no new guest call.
+          items: { $ref: '#/components/schemas/VisitPlannerQuestion' }
         presets:
           type: array
           maxItems: 50

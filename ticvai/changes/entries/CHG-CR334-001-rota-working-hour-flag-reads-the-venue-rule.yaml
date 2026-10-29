@@ -1,0 +1,51 @@
+id: CHG-CR334-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'RotaAssignment.breachesWorkingHourLimit names its rule: the venue''s workforce.staffing_rules limits (hours
+  per day, per rolling 7 days, minimum rest between shifts), measured over the person''s non-cancelled assignments at
+  that venue, this one included, and set at create and after a move; both rota writes declare the read.'
+decision:
+  what: '"As recommended", then "Include those in today as well" (Chinmay, 29 October 2026, about 19:20): ADAM CR-334,
+    option A. contracts/satellite/workforce.yaml: RotaAssignment.breachesWorkingHourLimit states the rule (a day in
+    the venue''s time zone over maximumHoursPerDay; any 7 consecutive days including the assignment over
+    maximumHoursPerWeek; less than minimumRestHours to the assignment just before or after; hours are endsAt minus
+    startsAt less breakMinutes; a null limit or no staffing rules is not checked; flagged, never refused; the flag is
+    the written assignment''s own); StaffingRules.maximumHoursPerDay, maximumHoursPerWeek (a rolling window) and
+    minimumRestHours describe themselves; createRotaAssignment and updateRotaAssignment declare x-ticvai-reads
+    workforce.staffing_rules, and update sets the flag again when the person, venue, times or break change.
+    tools/check-business-rules.py BR-ROTA-HOUR-LIMIT. No column added.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-334 (Pranay Shinde, #32338 createRotaAssignment, Ready for QA): breachesWorkingHourLimit was "flagged
+  at assignment" but neither the operation nor the schema named the limit, where it is configured or which
+  assignments count, so the build stored false and a rota breaching a statutory limit was never flagged. Settled by
+  the lead on 29 October 2026.'
+keys_touched:
+  operations: [createRotaAssignment, updateRotaAssignment]
+  schemas: [RotaAssignment, StaffingRules]
+  tables: [workforce.rota_assignment, workforce.staffing_rules]
+  files:
+  - contracts/satellite/workforce.yaml
+  - tools/check-business-rules.py
+root_class: 'a computed flag whose rule, source and counted rows nothing states'
+tickets:
+  started:
+  - '32338 (createRotaAssignment, Ready for QA, Pranay Shinde): read the venue''s workforce.staffing_rules row and set
+    breachesWorkingHourLimit by the rule on the field instead of storing false. Told through the lead''s comment; its
+    text is not rewritten.'
+  unstarted:
+  - '32340 and 28416 (updateRotaAssignment): set the flag again after a move, by the same rule.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-334
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ROTA-HOUR-LIMIT
+status: open
+notes: 'Beyond the comment''s words: the counted assignments are the person''s at that venue (what the caller''s
+  venue grant sees, the per-venue rule); hours worked at the tenant''s other venues are not counted. If they should
+  be, it is a yes/no question like CR-336''s, for the lead. Also stated: hours less breakMinutes, a calendar day in
+  the venue''s time zone, the rolling window, null limits unchecked, flag not refusal, other assignments'' flags not
+  recomputed. maximumConsecutiveDays, which option A does not name, is not checked.'

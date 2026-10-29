@@ -1,0 +1,70 @@
+id: CHG-CR336-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'createRotaAssignment and updateRotaAssignment ask the overlap and the required role as two yes/no rule
+  queries answered under the tenant root grant (workforce#principalHasOverlappingAssignment,
+  identity#principalHoldsRoleAtVenue), so a person''s shift at another venue and a role granted above the caller''s
+  scope are seen and nothing of another venue''s rota leaks; an exclusion constraint per person keeps the overlap
+  rule under races.'
+decision:
+  what: '"As recommended", then "Include those in today as well" (Chinmay, 29 October 2026, about 19:20): ADAM CR-336,
+    option B, with the exclusion constraint. contracts/satellite/workforce.yaml: x-ticvai-queries
+    principalHasOverlappingAssignment (principalId, startsAt, endsAt, exceptAssignmentId; returns overlaps only;
+    any venue, not cancelled, half-open times; one statement under ITenantRootGrant); createRotaAssignment and
+    updateRotaAssignment ask it and identity#principalHoldsRoleAtVenue in process instead of
+    identity#delegatedAccessRecords, and their 409s say any venue and at or above the venue; RotaAssignment
+    x-ticvai-exclude (principalId, [startsAt, endsAt), unless status cancelled), whose violation is the same 409.
+    contracts/spine/identity.yaml: x-ticvai-queries principalHoldsRoleAtVenue (principalId, roleId,
+    venueScopePath; returns holds only; a live ALLOW grant of the role at or above the venue). tools/derive-ddl.py:
+    x-ticvai-exclude becomes EXCLUDE USING gist (exclude_sql); tools/ddl_forward.py lists it for the migration owner
+    with the right advice (no NOT VALID); tools/check-ddl-conventions.py D-FWD-CARRIED holds it;
+    tools/check-business-rules.py BR-ROTA-CROSS-VENUE. updateRotaAssignment keeps create''s rules, as CR-315 made it.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-336 (Pranay Shinde, #32338 createRotaAssignment, Ready for QA): both checks read under the caller''s
+  grant, while workforce.rota_assignment has venue row security and identity.delegated_access scope row security, so
+  a person could be double-booked across two venues and a role granted at the tenant root was not found by a venue
+  caller (an integration test on the branch shows the role case). Settled by the lead on 29 October 2026; ADAM
+  CR-315 (CHG-CR315-001) had made the update reuse the create''s rules.'
+keys_touched:
+  operations: [createRotaAssignment, updateRotaAssignment]
+  schemas: [RotaAssignment]
+  tables: [workforce.rota_assignment, identity.delegated_access]
+  files:
+  - contracts/satellite/workforce.yaml
+  - contracts/spine/identity.yaml
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  - tools/check-ddl-conventions.py
+  - tools/check-business-rules.py
+  other:
+  - 'queries workforce#principalHasOverlappingAssignment, identity#principalHoldsRoleAtVenue'
+  - 'constraint rota_assignment_principal_id_overlap_excl'
+root_class: 'a rule check that must see beyond the caller''s scope, read under the caller''s row security'
+tickets:
+  started:
+  - '32338 (createRotaAssignment, Ready for QA, Pranay Shinde): ask the two queries (each one statement under
+    ITenantRootGrant, returning only the boolean) instead of reading rota_assignment and delegated_access under the
+    caller''s grant, and answer an exclusion violation (SQLSTATE 23P01) on rota_assignment_principal_id_overlap_excl
+    as 409 rota-assignment-overlap. Told through the lead''s comment; its text is not rewritten.'
+  - '30384 ([DB] workforce.rota_assignment, Ready for QA, Hrushikant Patkar) and 27670 ([DB] V0018 workforce, Ready
+    for QA): add the exclusion constraint once the overlapping rows are settled (handoff/migration-review.md row
+    "constraint added", no NOT VALID for an exclusion constraint); btree_gist is already installed.'
+  unstarted:
+  - '32340 and 28416 (updateRotaAssignment): the same two queries, with the assignment itself as exceptAssignmentId.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-336
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::exclude_sql
+status: open
+notes: 'Also held by tools/check-business-rules.py BR-ROTA-CROSS-VENUE (the queries, their boolean answers under the
+  tenant root grant, the constraint) and check-ddl-conventions D-FWD-CARRIED (the constraint reaches a migration or
+  a review row). Beyond the comment''s words: "not cancelled" is the overlap rule (as CR-334''s option counts
+  assignments); a range is half-open, so back-to-back shifts do not overlap; no role check when requiredRoleId is
+  null; a role grant counts when ALLOW, not revoked and within validFrom/validTo. Identity''s
+  principalHoldsRoleAtVenue is a new Identity query class with no ticket of its own: the lead decides whether
+  #32338 builds it or a ticket is filed. No XDR: both queries are in process within one deployable.'

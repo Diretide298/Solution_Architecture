@@ -84,6 +84,9 @@ IS_CONFIG = re.compile(
     # and the r8 integration (20 October 2026, GPS-C21, CHG-R8INT-020): a visit plan preset is a plan a venue sets up
     # once for guests to start from, the same shape as a guided choice; a guest's own plan is the record.
     r"VisitPlanPreset|"
+    # and r11 (29 October 2026, ADAM CR-321, CHG-CR321-001): a venue's planner questions are set up once and every
+    # guest's planner form resolves against them, as a preset is.
+    r"VisitPlannerQuestions|"
     # and for the VM close-out (29 September): which systems a wallet reconciles against is set up
     # once and read by every reconciliation run.
     r"ReconciliationSource|"

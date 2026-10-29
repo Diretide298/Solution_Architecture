@@ -1724,6 +1724,34 @@ def index_sql(schema: str, short: str, table: str, group: list) -> str:
             f"({', '.join(q(k) for k in group)});")
 
 
+RANGE_OF = {"timestamptz": "tstzrange", "timestamp": "tsrange", "date": "daterange"}
+
+
+def exclude_name(short: str, equal: list) -> str:
+    """The name of an `x-ticvai-exclude` constraint: `<table>_<equal columns>_overlap_excl` (CHG-CR336-001)."""
+    return obj_name(short, *equal, "overlap", suffix="excl")
+
+
+def exclude_sql(schema: str, short: str, table: str, equal: list, during: list, unless: dict, col_type: dict) -> str:
+    """`x-ticvai-exclude` (ADAM CR-336, option B; CHG-CR336-001): an exclusion constraint that no two rows with equal
+    `equal` columns hold overlapping half-open ranges `[during[0], during[1])`, among the rows `unless` does not name
+    (`{status: cancelled}`, or `{status: [a, b]}`). A row that ends when the next begins does not overlap: the
+    two-argument range constructor's bounds are `[)`, and it is written without the bounds literal, whose `)` would
+    unbalance the statement for the review's readers (check-ddl-conventions D-FWD-CUT). The range type follows the
+    columns' type (timestamptz -> tstzrange)."""
+    rng = RANGE_OF.get(col_type.get(during[0], "timestamptz"), "tstzrange")
+    preds = []
+    for k, v in sorted(unless.items()):
+        vals = v if isinstance(v, list) else [v]
+        preds.append(f"{q(k)} IS DISTINCT FROM {sql_literal(vals[0])}" if len(vals) == 1
+                     else f"({q(k)} IS NULL OR {q(k)} NOT IN ({', '.join(sql_literal(x) for x in vals)}))")
+    where = f" WHERE ({' AND '.join(preds)})" if preds else ""
+    return (f"-- no overlap (x-ticvai-exclude): {table} ({', '.join(equal)}) during [{during[0]}, {during[1]})\n"
+            f"ALTER TABLE {q(schema)}.{q(short)} ADD CONSTRAINT {exclude_name(short, equal)} EXCLUDE USING gist ("
+            + ", ".join(f"{q(k)} WITH =" for k in equal)
+            + f", {rng}({q(during[0])}, {q(during[1])}) WITH &&){where};")
+
+
 def unique_when_sql(schema: str, short: str, table: str, keycols: list, cond: dict, keys: list) -> str:
     """`x-ticvai-unique-when` (ADAM CR-154; CHG-CRA-004): a partial unique index. `keys` are the index's
     expressions (a text key as `lower(...)`); `cond` maps a column to the value that selects the rows, or to
@@ -2036,6 +2064,18 @@ def table_marks(cols: dict, tables) -> dict:
                  {(column_of(str(k)) or (str(k) if str(k) in names else f"?{k}")): v
                   for k, v in (u.get("when") or {}).items()})
                 for u in uw if isinstance(u, dict) and u.get("columns") and u.get("when")]
+        # **No two rows of one key overlap in time** (ADAM CR-336, option B, decided 29 October 2026; CHG-CR336-001):
+        # `x-ticvai-exclude: [{equal: [principalId], during: [startsAt, endsAt], unless: {status: cancelled}}]` on the
+        # schema is an exclusion constraint (EXCLUDE USING gist; btree_gist is in 001-extensions), so the rule holds
+        # when two writes race and across every row, whatever row security a reader runs under. See exclude_sql.
+        exm = marks.get("x-ticvai-exclude")
+        if isinstance(exm, list) and exm:
+            def _c(p):
+                return column_of(str(p)) or (str(p) if str(p) in names else f"?{p}")
+            entry["exclude"] = [
+                ([_c(p) for p in (e.get("equal") or [])], [_c(p) for p in (e.get("during") or [])],
+                 {_c(k): v for k, v in (e.get("unless") or {}).items()})
+                for e in exm if isinstance(e, dict) and len(e.get("during") or []) == 2]
         if len(entry) > 1:
             out[t] = entry
     return out
@@ -3042,6 +3082,18 @@ def main() -> int:
                     continue
                 idx_lines.append((schema, index_sql(schema, short, t, group)))
                 n_idx += 1
+
+            # `x-ticvai-exclude` (ADAM CR-336, option B; CHG-CR336-001): no two rows of one key overlap in time. A
+            # partitioned table's exclusion constraint must hold its partition key with `=`, so it is added.
+            for equal, during, unless in (marks.get(t) or {}).get("exclude") or []:
+                bad = [k[1:] for k in [*equal, *during, *unless] if k.startswith("?")]
+                if bad or not equal:
+                    no_unique.append(f"{t} (x-ticvai-exclude {equal} {during}): "
+                                     f"{', '.join(bad) or 'no equal column'} is not a column")
+                    continue
+                eq = list(equal) + ([part_col] if part_col and part_col not in equal else [])
+                idx_lines.append((schema, exclude_sql(schema, short, t, eq, during, unless, col_type)))
+                n_uniq += 1
 
             if not inline_pk and pk_cols:
                 body.append(f"    CONSTRAINT {obj_name(short, suffix='pkey')} PRIMARY KEY "

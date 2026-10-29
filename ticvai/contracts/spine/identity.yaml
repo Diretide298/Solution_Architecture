@@ -110,6 +110,32 @@ x-ticvai-queries:
       in its session registry, so its token is refused at its next request (the registry is read on every request).
       The guest''s own signed-in session is not touched.'
     served: [in-process]
+  # **Whether a person holds a role at or above a venue, as a yes or no** (ADAM CR-336, option B, decided 29 October
+  # 2026; CHG-CR336-001). createRotaAssignment and updateRotaAssignment read identity.delegated_access under the
+  # caller's venue grant, which hides a grant made above the caller's scope, so a role held at the tenant root was
+  # not found.
+  principalHoldsRoleAtVenue:
+    module: identity
+    table: identity.delegated_access
+    inputs:
+      principalId: {type: string, format: uuid, description: 'The person rostered (RotaAssignment.principalId).'}
+      roleId: {type: string, format: uuid, description: 'The role the position requires (RotaAssignment.requiredRoleId).'}
+      venueScopePath: {type: string, description: 'The scope path of the assignment''s venue (platform.scope.path of RotaAssignment.venueId), which the asker holds: the venue is within the caller''s own scope.'}
+    returns:
+      type: object
+      required: [holds]
+      properties:
+        holds: {type: boolean, description: 'True when the person holds the role at the venue or at a scope above it. Which grant, where it was made and by whom are never returned.'}
+    rule: >-
+      A rule question (ADAM CR-336, option B; Chinmay, 29 October 2026: "All as recommended"). True when an
+      identity.delegated_access row has principal_id = principalId and role_id = roleId, effect `ALLOW`, no
+      revoked_at, valid_from absent or not after now, valid_to absent or after now, and a scope_path at or above
+      the venue (scope_path @> venueScopePath). Identity answers it with one statement under the routed tenant's
+      root grant (ITenantRootGrant), so a grant made above the caller's scope is seen, and returns only `holds`;
+      the caller's own grant is in force again for every other statement of its transaction. It is asked in
+      process by createRotaAssignment and updateRotaAssignment, which refuse 409 person-lacks-required-role when
+      it is false.
+    served: [in-process]
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October). Rule questions keep queries of their own, above.
