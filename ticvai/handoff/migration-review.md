@@ -4,7 +4,7 @@
 
 The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/check-migration-freeze.py`). `derive-ddl.py` writes additive changes (new tables, columns and indexes) as the next forward migration, `backend/<area>/V<nnnn>__*.sql`. **The changes below it does not write**, because each has a data question behind it: which rows survive a drop, what fills a new NOT NULL column, whether a rename is a rename. Write each as a forward migration by hand; once a forward migration carries it, it leaves this list.
 
-**183 change(s).**
+**186 change(s).**
 
 | Kind | Database | Object | Change | What a person does |
 |---|---|---|---|---|
@@ -160,6 +160,9 @@ The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/ch
 | column retired | tenant | `wallet.fund_reservation.wallet_hold_id` | retired by the contract (x-ticvai-retired-columns): no code writes or reads it | drop it, the four-step drop: stop every read, drop hold_wallet_hold_id_idx, then ALTER TABLE wallet.fund_reservation DROP COLUMN wallet_hold_id in a later forward migration |
 | not null | tenant | `wallet.reconciliation_source.sources` | still nullable in the databases; the schema reference says NOT NULL | backfill, then ALTER COLUMN ... SET NOT NULL |
 | not null | tenant | `whitelabel.booking_flow_step.scope_path` | still nullable in the databases; the schema reference says NOT NULL, and row-level security reads it | in a forward migration, backfill first, then the NOT NULL: UPDATE whitelabel.booking_flow_step SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE scope_path IS NULL; ALTER TABLE whitelabel.booking_flow_step ALTER COLUMN scope_path SET NOT NULL |
+| not null | tenant | `workforce.job_title.scope_path` | added nullable; the schema reference says NOT NULL, and row-level security reads it | in the forward migration that adds it, backfill first, then the NOT NULL: UPDATE workforce.job_title SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE scope_path IS NULL; ALTER TABLE workforce.job_title ALTER COLUMN scope_path SET NOT NULL |
+| not null | tenant | `workforce.leave_type.scope_path` | added nullable; the schema reference says NOT NULL, and row-level security reads it | in the forward migration that adds it, backfill first, then the NOT NULL: UPDATE workforce.leave_type SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE scope_path IS NULL; ALTER TABLE workforce.leave_type ALTER COLUMN scope_path SET NOT NULL |
+| not null | tenant | `workforce.shift.scope_path` | added nullable; the schema reference says NOT NULL, and row-level security reads it | in the forward migration that adds it, backfill first, then the NOT NULL: UPDATE workforce.shift SET scope_path = (SELECT path FROM platform.scope WHERE level = 'tenant') WHERE scope_path IS NULL; ALTER TABLE workforce.shift ALTER COLUMN scope_path SET NOT NULL |
 | constraint added | tenant | `promotions.promotion promotion_venue_id_id_uniq` | `ALTER TABLE promotions.promotion ADD CONSTRAINT promotion_venue_id_id_uniq UNIQUE (venue_id, id)` | existing rows may violate it: validate, then add by hand (NOT VALID, then VALIDATE) |
 | constraint added | tenant | `transport.station station_venue_id_id_uniq` | `ALTER TABLE transport.station ADD CONSTRAINT station_venue_id_id_uniq UNIQUE (venue_id, id)` | existing rows may violate it: validate, then add by hand (NOT VALID, then VALIDATE) |
 | constraint added | tenant | `venuemap.map map_venue_id_id_uniq` | `ALTER TABLE venuemap.map ADD CONSTRAINT map_venue_id_id_uniq UNIQUE (venue_id, id)` | existing rows may violate it: validate, then add by hand (NOT VALID, then VALIDATE) |
