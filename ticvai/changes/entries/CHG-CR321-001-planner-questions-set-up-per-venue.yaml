@@ -1,0 +1,73 @@
+id: CHG-CR321-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'A venue sets up the visit planner''s questions from a closed list the rules planner understands (party,
+  heights, dates, dayVenues, pace, interests, retail, cuisine): switched on, ordered, relabelled and made required,
+  per venue. VisitPlannerOptions.questions answers them, one new table (venuemap.visit_planner_question) holds them,
+  one staff write (setVisitPlannerQuestions) sets them, and generateVisitPlan refuses a missing required answer.'
+decision:
+  what: '"As recommended, comment now", then "Include those in today as well" (Chinmay, 29 October 2026, about 19:20): ADAM CR-321,
+    option A. contracts/satellite/venue-map.yaml: VisitPlannerQuestionKey (the closed list of eight);
+    VisitPlannerQuestion (venuemap.visit_planner_question, keyed (scopePath, questionKey); isEnabled, isRequired,
+    sortOrder, label and help with their localised maps; a question with no row takes the default its description
+    tabulates, the questions and labels the screen records draw; party and dates always on and required);
+    VisitPlannerQuestionSet; VisitPlannerOptions.questions (required, all eight, by sortOrder); getVisitPlannerOptions
+    states it; setVisitPlannerQuestions (PUT /venues/{venueId}/visit-planner-questions, PRODUCT_CONFIGURE, venue,
+    whole replace, 400 validation, 422 planner-question-fixed; x-ticvai-no-screen); generateVisitPlan reads the
+    set-up (x-ticvai-reads) and refuses 422 planner-answer-missing for an enabled required pace, interests, cuisine
+    or retail answer left out (heights and dayVenues are held by the screens). screens/P01 WEB-050 and P02 GST-051:
+    the progress indicator binds VisitPlannerOptions.questions (getVisitPlannerOptions), invisible wiring and notes
+    only. tools/check-business-rules.py BR-PLANNER-QUESTIONS; tools/check-config-scope.py IS_CONFIG reaches
+    VisitPlannerQuestions, so the write''s venue scope is checked. derive-ddl writes the table into the next forward
+    migration.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-321 (Chinmay Patkar, #31855 WEB-050 Plan Your Visit, non-blocking): the planner''s questions and which
+  are required were fixed in the screen records, VisitPlannerOptions carried no question list, order, labels or
+  required flags, and no table held a set-up, so WEB-050 could not show a venue''s question set without inventing a
+  configuration shape. Settled by the lead on 29 October 2026.'
+keys_touched:
+  operations: [getVisitPlannerOptions, setVisitPlannerQuestions, generateVisitPlan]
+  schemas: [VisitPlannerQuestionKey, VisitPlannerQuestion, VisitPlannerQuestionSet, VisitPlannerOptions]
+  tables: [venuemap.visit_planner_question]
+  screens: [WEB-050, GST-051]
+  files:
+  - contracts/satellite/venue-map.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - tools/check-business-rules.py
+  - tools/check-config-scope.py
+root_class: 'a guest form whose questions are fixed in the screen records with no configuration behind them'
+tickets:
+  started:
+  - '31855 (WEB-050 Plan Your Visit: build with all states, Ready for QA, Chinmay Patkar): build the steps from
+    VisitPlannerOptions.questions (enabled ones, by sortOrder, the venue''s label and help, required ones hold the
+    guest), the record''s six steps being the default. Told through the lead''s comment; its text is not rewritten.'
+  - '31857 (WEB-050 tests, Ready for QA): add the set-up cases (a step switched off, reordered, relabelled, required).'
+  - '33038 (GST-051 Plan: build with all states, Ready for QA, Chitrangi Mestry): the same as WEB-050, from the same
+    field.'
+  unstarted:
+  - '31856 (WEB-050 connect), 33039 and 33040 (GST-051 connect and tests): read questions with the options already
+    read on load.'
+  - '36304 and 36219 (getVisitPlannerOptions): answer questions, defaults where the venue has no row.'
+  - '31753 and 28150 (generateVisitPlan): check the venue''s required answers first, 422 planner-answer-missing.'
+  - 'setVisitPlannerQuestions has no ticket, and the new table no migration task: the lead files them (plan files are
+    not touched in this lane).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-321
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PLANNER-QUESTIONS
+status: open
+notes: 'Beyond the comment''s words: the CR asked whether the set-up is per venue or per event or product, and the
+  comment does not answer it; the package says per venue (the planner plans a venue; option A''s "optionally per
+  event or product" is not built), and in a multi-venue plan the set-up of the plan''s venueId is asked. Also stated:
+  a question with no row takes its default (no seeding), a switched-off question''s answer is still used when sent,
+  a preset plan skips the interests and pace checks, the server checks pace, interests, cuisine and retail (heights
+  and dayVenues by the screens only), problem types planner-question-fixed and planner-answer-missing. No staff
+  screen is drawn (approved UI is fixed): the write belongs with the venue''s preset editor (setVisitPlanPreset,
+  listVisitPlanPresets), which no screen hosts and is not in Block A. With a set-up that asks fewer steps, the
+  progress label''s "n of 6" counts the steps asked: the label text is unchanged, its count follows the set-up.'

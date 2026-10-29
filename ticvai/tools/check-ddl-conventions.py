@@ -53,8 +53,9 @@ RULES = {
     "D-FWD-KEY-NULL": "the migration review relaxes a NOT NULL key the contract does not mark nullable (CHG-MGN-001, "
                       "CR-139)",
     "D-FWD-CUT": "a statement in the migration review cut short (CHG-MGN-001, CR-148)",
-    "D-FWD-CARRIED": "a unique-together index or required-when CHECK the contract declares that no baseline, forward "
-                     "migration or review row carries (CHG-MGN-001, CR-156)",
+    "D-FWD-CARRIED": "a unique-together index, required-when CHECK or exclusion constraint (x-ticvai-exclude, CR-336) "
+                     "the contract declares that no baseline, forward migration or review row carries (CHG-MGN-001, "
+                     "CR-156)",
     "D-FWD-RETIRED": "a column the contract retires left as 'a rename or a drop: decide' (CHG-MGN-001, CR-157)",
     "D-FWD-OWNER": "a table with two keys to one parent whose owner is not decided in derive-ddl ROW_OWNER "
                    "(CHG-MGN-001, CR-148 CR-149)",
@@ -873,6 +874,11 @@ def main() -> int:
         for rcol, cond in mk.get("required_when") or []:
             if not rcol.startswith("?") and not any(k.startswith("?") for k in cond):
                 derived[dd.obj_name(short, rcol, "when", suffix="chk")] = t
+        # An exclusion constraint the contract declares (`x-ticvai-exclude`; ADAM CR-336, CHG-CR336-001) reaches the
+        # databases the same way: a baseline, a forward migration or a review row for the migration owner.
+        for equal, during, unless in mk.get("exclude") or []:
+            if equal and not any(k.startswith("?") for k in [*equal, *during, *unless]):
+                derived[dd.exclude_name(short, equal)] = t
     nullable_keys = {(t, c.get("column")) for t, cs in ref_cols.items() for c in cs
                      if (props.get(str(c.get("source") or "")) or {}).get("nullable") is True}
     series = "\n".join(f.read_text(encoding="utf-8") for db in ("tenant", "control")
