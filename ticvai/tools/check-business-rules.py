@@ -56,6 +56,16 @@ And one rule per decision:
                    guest, a visitor or the public names its venue: a path {venueId}, a required venueId query
                    parameter or the shared GuestVenue header (X-Venue-Id); the rule is stated on guestAuth. Exempt:
                    reads addressed by their own token, and the waiting room's own store (GUEST_VENUE_EXEMPT).
+  BR-WALLET-TOPUP-ONCE (r11, ADAM CR-310, CHG-R11CR310-001) a top-up line is credited once: CreditLot.orderLineId
+                   carries x-ticvai-unique (derive-ddl writes credit_lot_order_line_id_uniq, partial), and topUpWallet's
+                   409 payment-already-used says a unique violation on that index is the refusal.
+  BR-WALLET-PUBLISH-CHECKS (r11, ADAM CR-311 option B, CHG-R11CR311-001) publishWalletConfiguration lists its
+                   validation checks, credit-type-without-accounting-mapping and consumption-policy-names-retired-type,
+                   both blocking, and WalletConfigurationVersion keeps (scopePath, version) unique.
+  BR-WALLET-RESTORE-DRAFT (r11, ADAM CR-312 option A, CHG-R11CR312-001) restoreWalletConfigurationVersion writes no
+                   configuration_version row and answers the draft with version null; its 409 unpublished-changes
+                   compares the area tables with the latest published snapshot as diffWalletConfigurationVersion does;
+                   listWalletConfigurationVersions lists no restored draft.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -732,6 +742,40 @@ def main() -> int:
         need("BR-GUEST-SELF-403", False, f"{len(self403)} guest self-scoped operations declare 403, above the ceiling "
              f"of {GUEST_SELF_403_CEILING}: answer another subject's record 404 ({', '.join(self403[:8])})")
 
+    # BR-WALLET-TOPUP-ONCE, BR-WALLET-PUBLISH-CHECKS, BR-WALLET-RESTORE-DRAFT (r11, ADAM CR-310, CR-311, CR-312; the
+    # lead, 29 October 2026, "All as recommended"). Each fails on the r10 contract and passes on the decision.
+    wdoc = load("contracts/satellite/wallet.yaml")
+    wsch = (wdoc.get("components") or {}).get("schemas") or {}
+    lot_line = ((wsch.get("CreditLot") or {}).get("properties") or {}).get("orderLineId") or {}
+    need("BR-WALLET-TOPUP-ONCE", lot_line.get("x-ticvai-unique") == "tenant",
+         "CreditLot.orderLineId carries no x-ticvai-unique: tenant, so no unique index stops two tills crediting one "
+         "top-up line (CR-310)")
+    top = op("topUpWallet")[3]
+    t409 = json.dumps(((top.get("responses") or {}).get("409") or {}), default=str)
+    need("BR-WALLET-TOPUP-ONCE", "payment-already-used" in t409 and "credit_lot_order_line_id_uniq" in t409,
+         "topUpWallet's 409 does not say a unique violation on credit_lot_order_line_id_uniq is payment-already-used")
+    pub = str(op("publishWalletConfiguration")[3].get("description") or "")
+    for code in ("credit-type-without-accounting-mapping", "consumption-policy-names-retired-type"):
+        need("BR-WALLET-PUBLISH-CHECKS", re.search(r"`" + code + r"` \(blocking\)", pub) is not None,
+             f"publishWalletConfiguration does not list the check `{code}` as blocking (CR-311)")
+    need("BR-WALLET-PUBLISH-CHECKS", "no warning" in " ".join(pub.split()),
+         "publishWalletConfiguration does not say this release has no warning checks (CR-311, option B)")
+    wcv = wsch.get("WalletConfigurationVersion") or {}
+    need("BR-WALLET-PUBLISH-CHECKS", ["scopePath", "version"] in (wcv.get("x-ticvai-unique-together") or []),
+         "WalletConfigurationVersion does not keep (scopePath, version) unique (CR-311)")
+    res = op("restoreWalletConfigurationVersion")[3]
+    rdesc = " ".join(str(res.get("description") or "").split())
+    need("BR-WALLET-RESTORE-DRAFT", "writes no `wallet.configuration_version` row" in rdesc,
+         "restoreWalletConfigurationVersion does not say it writes no configuration_version row (CR-312)")
+    r409 = " ".join(str(((res.get("responses") or {}).get("409") or {}).get("description") or "").split())
+    need("BR-WALLET-RESTORE-DRAFT", "latest published version" in r409 and "diffWalletConfigurationVersion" in r409,
+         "restore's 409 unpublished-changes does not compare with the latest published snapshot as the diff does")
+    need("BR-WALLET-RESTORE-DRAFT", ((wcv.get("properties") or {}).get("version") or {}).get("nullable") is True,
+         "WalletConfigurationVersion.version is not nullable, so restore's draft answer cannot carry version null")
+    lst = " ".join(str(op("listWalletConfigurationVersions")[3].get("description") or "").split())
+    need("BR-WALLET-RESTORE-DRAFT", "drafts created by" not in lst,
+         "listWalletConfigurationVersions still lists drafts created by the restore (CR-312: no draft row)")
+
     errors["BR-PARSE"].extend(PARSE_ERRORS)
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -741,7 +785,7 @@ def main() -> int:
              "BR-APPROVED-OUTCOME", "BR-APPROVAL-ENGINE", "BR-PRIVACY-REQUEST",
              "BR-SCOPE-AUTHZ", "BR-SSO-ACTIVE", "BR-PERMISSION-FINDINGS", "BR-ENTITLEMENT-SHARE",
              "BR-PRESET-READONLY", "BR-END-SESSIONS", "BR-PLATFORM-TOKEN", "BR-GUEST-TOKENS", "BR-GUEST-VENUE",
-             "BR-PLATFORM-INVOICE"]
+             "BR-PLATFORM-INVOICE", "BR-WALLET-TOPUP-ONCE", "BR-WALLET-PUBLISH-CHECKS", "BR-WALLET-RESTORE-DRAFT"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

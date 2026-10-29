@@ -1,0 +1,59 @@
+id: CHG-CR311-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'publishWalletConfiguration lists its validation checks for this release: credit-type-without-accounting-mapping
+  and consumption-policy-names-retired-type, both blocking, no warning checks yet; the (scope, version) unique key is
+  named.'
+decision:
+  what: '"All as recommended": ADAM CR-311, option "B now, growing to A" (Chinmay, 29 October 2026).
+    contracts/satellite/wallet.yaml publishWalletConfiguration states the two checks the contract already named as the
+    blocking set (credit-type-without-accounting-mapping: a credit type no accounting mapping entry names;
+    consumption-policy-names-retired-type: a consumption policy whose typeOrder names an inactive credit type), both
+    severity blocking, no warning checks yet, and that the list grows to option A (every check with its code, area,
+    severity and message) as an additive change. WalletConfigurationVersion.findings[].code points at that list. The
+    unique key option B adds "by migration as in A" is already in the package:
+    configuration_version_scope_path_version_uniq, from WalletConfigurationVersion''s x-ticvai-unique-together
+    (CHG-R8STO-001), in backend/tenant/V0108__after_r1_20261020.sql and on the MIG-WALLET ticket as Source DDL after r1;
+    the contract now names it. No migration is added here.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-311 (Pranay Shinde, ticket #30856, blocking): the 409 configuration-has-blocking-findings depended on
+  checks the contract never listed, so which publishes it refuses, and what the findings say, was undefined for the
+  screens (BO-1092, BO-1180) and QA.'
+keys_touched:
+  operations:
+  - publishWalletConfiguration
+  tables:
+  - wallet.configuration_version
+  - wallet.credit_type
+  - wallet.accounting_mapping
+  - wallet.consumption_policy
+  schemas:
+  - wallet.WalletConfigurationVersion
+  files:
+  - contracts/satellite/wallet.yaml
+  - tools/check-business-rules.py
+root_class: 'a refusal that depends on a rule set the contract names only by example (no codes, no severities)'
+tickets:
+  started:
+  - '30856 (publishWalletConfiguration; New in the 06:53 status read, being built by the CR''s raiser): validate exactly
+    the two blocking checks with those codes; no warnings.'
+  - '27669 and 30365 ([DB] wallet migration and [DB] wallet.configuration_version, Ready for QA, Hrushikant Patkar): per
+    CR-311''s evidence the repository has no unique key on wallet.configuration_version (scope_path, version); the
+    package''s V0108 has it (configuration_version_scope_path_version_uniq) and the ticket names V0108 as Source DDL
+    after r1.'
+  unstarted:
+  - 27816 ([BE] WalletService task holding publishWalletConfiguration)
+  - 29564, 34864, 34865, 34866 ([FE] BO-1173, shows publish findings; no screen change)
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-311
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Rule BR-WALLET-PUBLISH-CHECKS fails on the r10 contract (neither code listed as blocking, no statement that there
+  are no warning checks) and passes now; it also holds the (scopePath, version) unique-together. Growing to option A
+  is a later additive change, and the rule keeps the two codes blocking while it does.'

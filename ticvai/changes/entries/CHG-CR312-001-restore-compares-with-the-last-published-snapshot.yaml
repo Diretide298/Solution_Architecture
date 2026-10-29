@@ -1,0 +1,57 @@
+id: CHG-CR312-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'restoreWalletConfigurationVersion: unpublished changes means the area tables differ from the latest published
+  version''s snapshot (compared as diffWalletConfigurationVersion compares, no column); the restore writes no
+  configuration_version row and answers the draft with version and publishedAt null.'
+decision:
+  what: '"All as recommended": ADAM CR-312, option A, settled with CR-311 (Chinmay, 29 October 2026).
+    contracts/satellite/wallet.yaml restoreWalletConfigurationVersion: its 409 unpublished-changes is the area tables
+    differing from the snapshot of the latest published version at the scope, built as the snapshot document
+    diffWalletConfigurationVersion compares, with no new column; it writes no wallet.configuration_version row (a
+    version is a published one; publish assigns the number); its 200 WalletConfigurationVersion is the draft as a
+    response only, version null and publishedAt null, with the findings of publishWalletConfiguration''s validation on
+    the restored draft (CHG-CR311-001) beside its own warning findings. WalletConfigurationVersion.version is nullable
+    for that answer only. listWalletConfigurationVersions no longer says it lists drafts the restore created. No
+    migration.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-312 (Pranay Shinde, ticket #30857, blocking): nothing stored said whether the working draft had
+  unpublished changes, and the restore''s "new unpublished version" did not say whether it was a version row, which
+  would collide with publish''s highest-plus-one numbering.'
+keys_touched:
+  operations:
+  - restoreWalletConfigurationVersion
+  - listWalletConfigurationVersions
+  tables:
+  - wallet.configuration_version
+  - wallet.configuration_version_snapshot
+  schemas:
+  - wallet.WalletConfigurationVersion
+  files:
+  - contracts/satellite/wallet.yaml
+  - tools/check-business-rules.py
+root_class: 'a refusal and an answer that depend on state nothing stores or defines (a dirty draft, a draft version)'
+tickets:
+  started:
+  - '30857 (restoreWalletConfigurationVersion; New in the 06:53 status read, being built by the CR''s raiser): compare
+    the area tables with the latest published snapshot for the 409; write no version row; answer version and
+    publishedAt null with publish''s findings.'
+  unstarted:
+  - 27816 ([BE] WalletService task holding restoreWalletConfigurationVersion)
+  - 32133 (listWalletConfigurationVersions; lists published versions only)
+  - 32149 (diffWalletConfigurationVersion; its working-draft document is the one the restore compares)
+  - 28038, 28325, 31455, 31456, 31457, 32156, 32157, 32158 ([FE] BO-1162, On hold; no screen change)
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-312
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Rule BR-WALLET-RESTORE-DRAFT fails on the r10 contract (no "writes no configuration_version row", a 409 with no
+  comparison, version not nullable, the list naming restored drafts) and passes now. Option A says the draft answer is
+  "status unpublished"; WalletConfigurationVersion has no status field, so unpublished is publishedAt null, as the list
+  already used it, and no field is added.'

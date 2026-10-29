@@ -2120,7 +2120,21 @@ paths:
         `configuration-has-blocking-findings` with the findings and writes nothing; warnings do not stop it.
         **The version number** is the highest `version` at the scope plus one, under a database unique key on
         (scope, version), so two publishes at once cannot take the same number (the one that loses the race
-        is retried by the server).
+        is retried by the server). The key is `configuration_version_scope_path_version_uniq`, from
+        `WalletConfigurationVersion`''s `x-ticvai-unique-together` (ADAM CR-311).
+
+        **The validation checks** (ADAM CR-311, option B, decided 29 October 2026). This release validates the two
+        failures this operation was written for, both `severity: blocking`, and nothing else; there are no warning
+        checks yet. Each finding carries its `code`, its `severity` and a `message`:
+
+        - `credit-type-without-accounting-mapping` (blocking): a credit type (`wallet.credit_type`) that no entry
+        of the accounting mapping (`wallet.accounting_mapping`, `mappings[].creditTypeId`) names.
+
+        - `consumption-policy-names-retired-type` (blocking): a consumption policy (`wallet.consumption_policy`)
+        whose `typeOrder` names a credit type that is inactive (`isActive` false).
+
+        The list grows to every check, each with its code, the area it reads, its severity and its message, as an
+        additive change; until then validation produces no finding with any other code.
 
         '
       tags:
@@ -2529,7 +2543,10 @@ paths:
         food cannot become wallet credit, because only a top-up line's own amount is ever credited. A payment
         that is `declined` or `failed`, or not captured, is refused `402 payment-declined`. A line already
         credited is refused `409 payment-already-used`: the line's id is kept on the new credit lot
-        (`order_line_id`, one lot per line; `source_kind` `topUp`, `source_reference` the payment's id).
+        (`order_line_id`, one lot per line; `source_kind` `topUp`, `source_reference` the payment's id). **The unique
+        index `credit_lot_order_line_id_uniq` decides it** (ADAM CR-310, option A): a unique violation on that index
+        when the lot is inserted is `409 payment-already-used`, so two tills crediting one line at the same moment
+        cannot both succeed.
         `bonusAmount` is not paid for and is not compared. `tender` stays the receipt's label.
       tags: [wallet]
       x-ticvai-permission: WALLET_OPERATE
@@ -2599,7 +2616,8 @@ paths:
         '409':
           x-ticvai-problem-types: [payment-already-used]
           description: The body's `orderLineId` has already been credited (r8 walk fix, CHG-R8WFC-003; one lot per
-            line, CHG-R8RW-009)
+            line, CHG-R8RW-009), including a unique violation on `credit_lot_order_line_id_uniq` when two
+            credits of one line race (ADAM CR-310)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -3582,8 +3600,8 @@ paths:
         board 8 p.98 (Version comparison, Rollback); shape follows white-label listConfigVersions'
       summary: Wallet configuration versions, newest first
       description: 'Board 8, p.98. The list that version comparison and rollback pick from. Each entry is
-        what `publishWalletConfiguration` recorded, plus drafts created by
-        `restoreWalletConfigurationVersion` (`publishedAt` null).
+        what `publishWalletConfiguration` recorded. A draft `restoreWalletConfigurationVersion` puts back is not
+        a version and is not listed: it writes no `wallet.configuration_version` row (ADAM CR-312, option A).
 
         
 
@@ -3680,7 +3698,7 @@ paths:
         board 8 p.98 (Rollback); shape follows white-label restoreConfigVersion'
       summary: Put a previous wallet configuration back as the working draft
       description: 'Board 8, p.98. Copies the chosen version''s configuration into the working draft and
-        returns it as a new unpublished version with its validation findings. **It does not publish**:
+        returns that draft with its validation findings. **It does not publish**:
         restore, review with `diffWalletConfigurationVersion`, then `publishWalletConfiguration`, so a
         rollback is as deliberate as the change that caused it (same rule as `restoreConfigVersion`,
         audit R139). A credit type retired since that version is reported as a blocking finding rather
@@ -3694,6 +3712,17 @@ paths:
         deactivated (`is_active` false: wallet and credit types), never deleted**; in an area with no
         `is_active` they are left as they are and named in a `warning` finding, so nothing that other
         records point at disappears (R8 blocker APPROVALS-TENANCY-C32).
+
+        **Unpublished changes, and what the answer is** (ADAM CR-312, option A, decided 29 October 2026; settled
+        with CR-311). Before it writes, the restore compares the area tables with the snapshot of the latest
+        published version at the scope, building the same snapshot document `diffWalletConfigurationVersion`
+        compares; if any value differs, the working draft has unpublished changes and the answer is 409
+        `unpublished-changes`. No column records it: there is no dirty flag and no draft row. **The restore writes
+        no `wallet.configuration_version` row**: a version is a published one only, and its number is assigned by
+        `publishWalletConfiguration`. The 200''s `WalletConfigurationVersion` is the restored draft as a response
+        only: `version` null and `publishedAt` null (unpublished), with the findings of
+        `publishWalletConfiguration`''s validation run on the restored draft (its checks and codes, CR-311) beside the
+        warning findings named above.
 
         '
       tags:
@@ -3725,7 +3754,8 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Restored into the working draft, unpublished
+          description: 'Restored into the working draft, unpublished: the draft as a response only, `version` and
+            `publishedAt` null; no version row is written (ADAM CR-312)'
           content:
             application/json:
               schema:
@@ -3733,7 +3763,9 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: 'The working draft has unpublished changes that the restore would overwrite; publish or discard them first. Nothing changes.'
+          description: 'The working draft has unpublished changes that the restore would overwrite: the area
+            tables differ from the snapshot of the latest published version at the scope, compared as
+            `diffWalletConfigurationVersion` compares (ADAM CR-312). Publish or discard them first. Nothing changes.'
           x-ticvai-problem-types: [unpublished-changes]
           content:
             application/problem+json:
@@ -5181,8 +5213,11 @@ components:
           format: uuid
           nullable: true
           x-ticvai-references: orders.order_line
+          x-ticvai-unique: tenant
           description: 'The paid top-up line this lot credits (`source_kind` `topUp`; r8 gate, CHG-R8RW-009). One lot
-            per line, so a line is credited once. Null for every other source.'
+            per line, so a line is credited once. Null for every other source. **Kept by a unique index**
+            (`credit_lot_order_line_id_uniq`, partial: rows with a line only; ADAM CR-310, option A): the only guard
+            that holds when two tills credit one line at the same moment.'
         termsSnapshot:
           type: object
           additionalProperties: true
@@ -6191,6 +6226,9 @@ components:
       properties:
         version:
           type: integer
+          nullable: true
+          description: 'Every stored row has its number. Null only on `restoreWalletConfigurationVersion`''s answer,
+            the restored draft, which is not a version row (ADAM CR-312).'
         publishedAt:
           type: string
           format: date-time
@@ -6216,6 +6254,8 @@ components:
                 - warning
               code:
                 type: string
+                description: The check that found it. Validation's codes are listed on `publishWalletConfiguration`
+                  (ADAM CR-311).
               message:
                 type: string
         scopePath:

@@ -1,0 +1,53 @@
+id: CHG-CR310-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'wallet.credit_lot.order_line_id is unique (a partial unique index, rows with a line only), so a paid top-up
+  line is credited once; topUpWallet''s 409 payment-already-used is a unique violation on that index.'
+decision:
+  what: '"All as recommended": ADAM CR-310, option A (Chinmay, 29 October 2026). contracts/satellite/wallet.yaml
+    CreditLot.orderLineId carries x-ticvai-unique: tenant, which tools/derive-ddl.py writes as
+    credit_lot_order_line_id_uniq ON wallet.credit_lot (order_line_id) WHERE order_line_id IS NOT NULL in the next
+    forward migration; topUpWallet''s description and its 409 say a unique violation on that index is
+    payment-already-used. The two columns option A also names are already in the package''s forward migrations
+    (issued_credits in backend/tenant/V0108__after_r1_20261020.sql, order_line_id with its key and index in
+    backend/tenant/V0112__after_r1_20261021.sql, both on the MIG-WALLET ticket as Source DDL after r1), so no column
+    is added here.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-310 (Pranay Shinde, ticket #30860, blocking): topUpWallet refuses a line already credited, and nothing
+  in the DDL kept one lot per line, so two tills crediting the same line at the same moment would both succeed.'
+keys_touched:
+  operations:
+  - topUpWallet
+  tables:
+  - wallet.credit_lot
+  files:
+  - contracts/satellite/wallet.yaml
+  - tools/check-business-rules.py
+root_class: 'a uniqueness the contract states in prose only ("one lot per line"), with no x-ticvai-unique, so the DDL
+  has no unique index to keep it'
+tickets:
+  started:
+  - '30860 (topUpWallet; New in the 06:53 status read, being built by the CR''s raiser): insert the lot and map a unique
+    violation on credit_lot_order_line_id_uniq to 409 payment-already-used, as CR-310''s comment says.'
+  - '27669 and 30368 ([DB] wallet migration and [DB] wallet.credit_lot, Ready for QA, Hrushikant Patkar): the migration
+    adds the partial unique index credit_lot_order_line_id_uniq; and, per CR-310''s evidence, the repository''s
+    wallet.credit_lot still lacks issued_credits (V0108) and order_line_id with its key and index (V0112), which its
+    ticket already names as Source DDL after r1.'
+  unstarted:
+  - 27817 ([BE] WalletService task holding topUpWallet)
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-310
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Rule BR-WALLET-TOPUP-ONCE fails on the r10 contract (no x-ticvai-unique on CreditLot.orderLineId, a 409 that
+  names no index) and passes now; derive-ddl''s x-ticvai-unique rule writes the index into the next forward migration
+  (seen in this lane''s local regeneration: credit_lot_order_line_id_uniq, partial). A general rule over every
+  "already" 409 was tried and left out: it also finds access.scan_event.overrides_scan_id (approveManualOverrideSupervisor, "at most one override
+  row names any scan"), an append-only partitioned table whose unique key would have to include recorded_at, which is a
+  decision of its own, not this CR''s.'
