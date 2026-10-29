@@ -1,0 +1,47 @@
+id: CHG-CR316-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'setCodeDistributionManager: each PUT adds one assignment to the batch (one more promotions.code_assignment
+  row, quantity more codes assigned), never replacing an earlier one, and its refusal is declared: 409
+  not-enough-codes-in-batch, with remaining, the batch''s unassigned issued codes. A new contract-shapes rule fails an
+  operation whose own text promises a refusal by status that its responses do not declare.'
+decision:
+  what: '"All as recommended" (Chinmay, 29 October 2026): ADAM CR-316, option A. contracts/satellite/promotions.yaml
+    setCodeDistributionManager: x-ticvai-body-key-note corrected to the storage note (CHG-FXC-005), each PUT adds an
+    assignment, a retry with the same Idempotency-Key adds nothing; 409 declared with problem type
+    not-enough-codes-in-batch and member remaining. tools/check-contract-shapes.py: C-REFUSAL-UNDECLARED ("(409 when
+    ...)", "refused (422)", "refused with 404" in the operation''s own description or body-key note, with no such
+    response). The one other member it found, contracts/satellite/fnb.yaml setTableLayout ("refused with 409
+    tableHasOpenVisit", CHG-FXC-004), now declares that 409 as updateTable does (FnbProblem, refusedReason
+    tableHasOpenVisit, problem type table-has-open-visit).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-316 (Pranay Shinde, #31422 setCodeDistributionManager): the body-key note said a PUT replaces the record
+  whole while the storage note made each PUT one more assignment, and the 409 the storage note described was not
+  declared, so QA could not test it. Settled by the lead on 29 October 2026.'
+keys_touched:
+  operations: [setCodeDistributionManager, setTableLayout]
+  tables: [promotions.code_assignment]
+  files:
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/fnb.yaml
+  - tools/check-contract-shapes.py
+  - tools/tests/test_cr_forms_r11.py
+root_class: 'a refusal an operation''s text promises and its responses do not declare'
+tickets:
+  started: []
+  unstarted:
+  - '31422 (setCodeDistributionManager), 28025, 28080: through CR-316''s comment.'
+  - '31981 (setTableLayout, Deep Khanvilkar), 28251: the 409 its description already promised is now declared; build
+    it as updateTable''s.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-316
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'No database change. The setTableLayout 409 is not in CR-316''s decision: it is the new rule''s one other
+  finding, declared exactly as its own description and updateTable already state it.'

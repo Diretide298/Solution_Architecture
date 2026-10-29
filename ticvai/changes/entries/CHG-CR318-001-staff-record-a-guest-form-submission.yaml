@@ -1,0 +1,44 @@
+id: CHG-CR318-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'marketing.form_submission is written by any staff grant as well as by the guest for its own subject
+  (grant-holder-write), so a venue''s counter or kiosk records a guest''s waiver; submitForm declares 404
+  form-version-not-found for a form or version that does not exist or is not published, and answers 200 with the
+  existing submission, writing nothing, when a live acceptance already exists.'
+decision:
+  what: '"All as recommended" (Chinmay, 29 October 2026): ADAM CR-318, option A. contracts/satellite/marketing-crm.yaml:
+    FormSubmission x-ticvai-rls grant-holder-write (was grant-holder-read; the mark and helper CHG-R11FXC-003 added:
+    platform.grant_holder() OR platform.subject_in_scope(subject_id), read and write); submitForm states who may submit
+    and each outcome, and declares 200 (the existing submission) and 404 (form-version-not-found). Derived: the
+    table''s policy re-applied as apply_grant_holder_subject_rls in the forward migration.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-318 (Pranay Shinde, #31165 submitForm): the operation offers itself to venue staff, but the table''s write
+  rule admitted only the guest or the tenant root, and it declared no answer for an unknown or unpublished form version
+  nor for a returning participant with a live acceptance. Settled by the lead on 29 October 2026.'
+keys_touched:
+  operations: [submitForm]
+  schemas: [FormSubmission]
+  tables: [marketing.form_submission]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+root_class: 'a guest-owned row with no scope that staff below the tenant write'
+tickets:
+  started:
+  - '27677 and 30536 ([DB] marketing.form_submission, Ready for QA): apply the forward migration, which re-applies the
+    table''s policy as grant-holder-write; no column changes.'
+  unstarted:
+  - '31165 (submitForm), 27923: through CR-318''s comment.'
+  - 'recordSaleOwnerAnswers (36213), the other writer: its staff writes pass the new rule too.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-318
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-rls-scope-fit.py
+status: open
+notes: 'RF-TENANT-ROOT submitForm:marketing.form_submission:write is gone with this change; its baseline entry stays
+  until the next --update-baseline, which is not this lane''s to run, and until then a revert would be a known
+  finding rather than a new one.'

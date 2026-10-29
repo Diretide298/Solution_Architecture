@@ -7083,6 +7083,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableMap'
+        '409':
+          x-ticvai-problem-types: [table-has-open-visit]
+          description: 'A table the body removes, or whose capacity it lowers below the covers of the visit open on
+            it, has an open visit (CHG-FXC-004, as `updateTable`); nothing is applied. Declared as the description
+            already said (C-REFUSAL-UNDECLARED, CHG-CR316-001).'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - tableHasOpenVisit
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits:

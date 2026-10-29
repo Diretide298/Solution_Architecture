@@ -206,8 +206,11 @@ def check_banned_names(guard, tables: dict, ref_cols: dict, by: dict) -> None:
         if r["from"] in tables and r["from"] in ref_cols:
             guard.add("D-RENAME-APPLIED", r["from"] + ":old", f"{r['from']} is declared renamed to {r['to']} and "
                       "is still in the schema reference")
+    # A column renamed on a table that a later declared rename moved is read on the table it moved to: control.seo_metadata's
+    # no_index -> is_excluded_from_index (CHG-STO-009) on marketing.seo_metadata since ADAM CR-317 (CHG-CR317-001).
+    moved_to = {r["from"]: r["to"] for r in renames}
     for r in col_renames:
-        names = {c.get("column") for c in ref_cols.get(r["table"], [])}
+        names = {c.get("column") for c in ref_cols.get(moved_to.get(r["table"], r["table"]), [])}
         if r["to"] not in names or r["from"] in names:
             guard.add("D-RENAME-APPLIED", f"{r['table']}.{r['from']}",
                       f"{r['table']}.{r['from']} -> {r['to']} is declared and the schema reference has "
