@@ -67,6 +67,16 @@ And one rule per decision:
                    guest, a visitor or the public names its venue: a path {venueId}, a required venueId query
                    parameter or the shared GuestVenue header (X-Venue-Id); the rule is stated on guestAuth. Exempt:
                    reads addressed by their own token, and the waiting room's own store (GUEST_VENUE_EXEMPT).
+  BR-ANALYTICS-PROVIDER (r11, ADAM CR-323, CHG-CR323-001) one analytics provider row per venueId + provider is a
+                   unique key with nulls not distinct, its violation named in setAnalyticsProvider's 409; a PUT that
+                   leaves the write-only reportingCredentialRef out keeps the credential and an explicit null clears it.
+  BR-MEDIA-COVER-USE (r11, ADAM CR-326 option A, CHG-CR326-001) MediaUsage.surface can name a collection cover
+                   (mediaCollectionCover) and deleteMediaAsset reads assets.media_collection to list it with every use.
+  BR-AGENT-LAPSE   (r11, ADAM CR-333 option C, CHG-CR333-001) setAgentAvailability sets expiresAt to the earlier of the
+                   session's expiry and a heartbeat lapse each PUT refreshes, and a lapsed state reads as offline.
+  BR-MEDIA-REPLACE-UPLOAD (r11, ADAM CR-337 option A, CHG-CR337-001) replaceMediaAsset takes the replaced file's key
+                   from the asset's current upload (reading assets.asset_version), answers a retry with the current
+                   upload 200 unchanged, and refuses an upload already used 409 upload-already-used.
   BR-WALLET-TOPUP-ONCE (r11, ADAM CR-310, CHG-R11CR310-001) a top-up line is credited once: CreditLot.orderLineId
                    carries x-ticvai-unique (derive-ddl writes credit_lot_order_line_id_uniq, partial), and topUpWallet's
                    409 payment-already-used says a unique violation on that index is the refusal.
@@ -418,6 +428,45 @@ def main() -> int:
          "ai.yaml still defaults the spend ceiling to USD")
     need("BR-AI-CURRENCY", "billing currency" in text(op("setAiSpendCeiling")[3]),
          "setAiSpendCeiling does not default to the tenant's billing currency")
+
+    # BR-ANALYTICS-PROVIDER, BR-MEDIA-COVER-USE, BR-AGENT-LAPSE, BR-MEDIA-REPLACE-UPLOAD (r11, ADAM CR-323, CR-326,
+    # CR-333, CR-337; the lead, 29 October 2026, "As recommended"). Each fails on the r10 contract and passes on the
+    # decision.
+    _, _, _, sap, wl = op("setAnalyticsProvider")
+    sap_s = (((wl.get("components") or {}).get("schemas") or {}).get("StorefrontAnalyticsProvider") or {})
+    need("BR-ANALYTICS-PROVIDER", ["venueId", "provider"] in (sap_s.get("x-ticvai-unique-together") or [])
+         and str(sap_s.get("x-ticvai-unique-nulls") or "") == "not-distinct",
+         "StorefrontAnalyticsProvider is not unique on (venueId, provider) with nulls not distinct (CR-323 (1))")
+    sap_d = " ".join(str(sap.get("description") or "").split())
+    need("BR-ANALYTICS-PROVIDER", "leaves `reportingCredentialRef` out keeps" in sap_d and "explicit `null` clears" in sap_d,
+         "setAnalyticsProvider does not say a PUT leaving reportingCredentialRef out keeps it and null clears it "
+         "(CR-323 (2))")
+    need("BR-ANALYTICS-PROVIDER", "analytics_provider_venue_id_provider_uniq" in
+         json.dumps(((sap.get("responses") or {}).get("409") or {}), default=str),
+         "setAnalyticsProvider's 409 does not name the unique index analytics_provider_venue_id_provider_uniq (CR-323 (1))")
+    _, _, _, dma, adoc = op("deleteMediaAsset")
+    asch = (adoc.get("components") or {}).get("schemas") or {}
+    surf = set((((asch.get("MediaUsage") or {}).get("properties") or {}).get("surface") or {}).get("enum") or [])
+    need("BR-MEDIA-COVER-USE", "mediaCollectionCover" in surf,
+         "MediaUsage.surface cannot name a collection cover (mediaCollectionCover; CR-326)")
+    need("BR-MEDIA-COVER-USE", "assets.media_collection" in text(dma.get("x-ticvai-reads") or [])
+         and "mediaCollectionCover" in str(dma.get("description") or ""),
+         "deleteMediaAsset does not read assets.media_collection and name a cover as mediaCollectionCover (CR-326)")
+    saa = " ".join(str(op("setAgentAvailability")[3].get("description") or "").split())
+    need("BR-AGENT-LAPSE", "Session.expiresAt" in saa and "heartbeat lapse" in saa and "reads as `offline`" in saa,
+         "setAgentAvailability does not say expiresAt is the earlier of the session's expiry and a heartbeat lapse, "
+         "and that a lapsed state reads as offline (CR-333)")
+    rma = op("replaceMediaAsset")[3]
+    rma_d = " ".join(str(rma.get("description") or "").split())
+    refused = set(((props(adoc, {"$ref": "#/components/schemas/UploadRefusedProblem"}).get("refusedReason") or {})
+                   .get("enum") or []))
+    need("BR-MEDIA-REPLACE-UPLOAD", "uploadAlreadyUsed" in refused and "upload-already-used" in problem_types(rma),
+         "replaceMediaAsset does not refuse an upload already used (409 upload-already-used, refusedReason "
+         "uploadAlreadyUsed; CR-337)")
+    need("BR-MEDIA-REPLACE-UPLOAD", "assets.asset_version" in text(rma.get("x-ticvai-reads") or [])
+         and "answers `200` with the asset unchanged" in rma_d and "whose key no `asset_version` row names" in rma_d,
+         "replaceMediaAsset does not say where the replaced file's storageKey comes from, or that a retry with the "
+         "current upload answers 200 unchanged (CR-337)")
 
     # -------------------------------------------------------------- BR-QR
     cred = op("getEntitlementCredential")[3]
@@ -857,6 +906,7 @@ def main() -> int:
              "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS", "BR-GATE-CANCEL", "BR-APPROVAL-ROUTE", "BR-GUEST-SELF-403",
              "BR-APPROVED-OUTCOME", "BR-APPROVAL-ENGINE", "BR-APPROVAL-VERSIONS", "BR-BILLING-STATEMENT",
              "BR-STORE-CHECKLIST", "BR-PRIVACY-REQUEST",
+             "BR-ANALYTICS-PROVIDER", "BR-MEDIA-COVER-USE", "BR-AGENT-LAPSE", "BR-MEDIA-REPLACE-UPLOAD",
              "BR-SCOPE-AUTHZ", "BR-SSO-ACTIVE", "BR-PERMISSION-FINDINGS", "BR-ENTITLEMENT-SHARE",
              "BR-PRESET-READONLY", "BR-END-SESSIONS", "BR-PLATFORM-TOKEN", "BR-GUEST-TOKENS", "BR-GUEST-VENUE",
              "BR-PLATFORM-INVOICE", "BR-WALLET-TOPUP-ONCE", "BR-WALLET-PUBLISH-CHECKS", "BR-WALLET-RESTORE-DRAFT"]

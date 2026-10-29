@@ -5423,6 +5423,13 @@ paths:
         default; a venue's own row replaces it for that venue (ADR-0018, nearest wins). `measurementId`
         is what the page tag or app SDK reports to; it is public by nature, and the reporting credential is
         not: `reportingCredentialRef` names a secret in the platform vault, is write-only and is never returned.
+        **A PUT that leaves `reportingCredentialRef` out keeps the credential the row holds; an explicit `null`
+        clears it** (and `hasReportingCredential` then reads false); a value replaces it (ADAM CR-323 (2), Chinmay,
+        29 October 2026; CHG-CR323-001). Every other field is replaced as sent: a write-only secret cannot be read
+        back and resent by the CMS-016 form, so leaving it out cannot mean "clear". **The one row per `venueId` +
+        `provider` is the unique index `analytics_provider_venue_id_provider_uniq`** (`NULLS NOT DISTINCT`, in the
+        package's forward migration since r8): two creates of the same pair at once cannot both be stored, and the
+        second one's unique violation is 409 `analytics-provider-exists` too.
         **`measurementId` must match its provider's format**, else 422 `measurement-id-invalid` (formats
         proposed, client to confirm against each vendor): `googleAnalytics4` `^G-[A-Z0-9]{6,12}$`,
         `googleTagManager` `^GTM-[A-Z0-9]{4,8}$`, `metaPixel` `^[0-9]{10,20}$`; `adobeAnalytics`, `matomo` and
@@ -5468,7 +5475,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
           x-ticvai-problem-types: [analytics-provider-exists]
-          description: Another row already holds this `venueId` and `provider` (`analytics-provider-exists`). Nothing is written.
+          description: Another row already holds this `venueId` and `provider` (`analytics-provider-exists`), found by the check or by a unique violation on `analytics_provider_venue_id_provider_uniq`. Nothing is written.
           content:
             application/problem+json:
               schema:
@@ -7204,7 +7211,8 @@ components:
           maxLength: 200
           nullable: true
           writeOnly: true
-          description: The vault reference of the reporting credential. Accepted, never returned.
+          description: 'The vault reference of the reporting credential. Accepted, never returned. On
+            `setAnalyticsProvider`, left out keeps the credential held, `null` clears it (ADAM CR-323 (2)).'
         hasReportingCredential:
           type: boolean
           readOnly: true

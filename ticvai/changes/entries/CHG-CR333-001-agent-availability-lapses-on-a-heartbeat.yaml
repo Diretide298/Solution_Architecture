@@ -1,0 +1,48 @@
+id: CHG-CR333-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'setAgentAvailability sets expiresAt on every PUT to the earlier of the caller''s session expiry and a
+  15-minute heartbeat lapse; each PUT refreshes it, and once it has passed the state reads as offline for every reader.'
+decision:
+  what: 'ADAM CR-333, option C (Chinmay, 29 October 2026: "As recommended, comment now", then "Include those in today
+    as well"). contracts/satellite/marketing-crm.yaml setAgentAvailability: every PUT sets expiresAt to the earlier of
+    the caller''s session expiry (Session.expiresAt, from the caller''s validated session as its scope is, never read
+    from Identity''s tables) and now plus a 15-minute heartbeat lapse (a default, proposed, client to correct); each
+    PUT refreshes it, so the open console keeps an agent available by sending its availability again within the
+    lapse; once expiresAt has passed the state reads as offline, for the answer and for every read that routes or
+    counts agents by it. AgentAvailability.expiresAt says the same. No new setting or column.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-333 (Pranay Shinde, ticket #31163 setAgentAvailability): the contract said availability expires but named
+  no lapse, so expires_at was written null and an agent who closed the laptop stayed available.'
+keys_touched:
+  operations: [setAgentAvailability]
+  schemas: [AgentAvailability]
+  tables: [marketing.agent_availability]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-business-rules.py
+root_class: 'a time a row lapses at, promised with no rule for its value'
+tickets:
+  started:
+  - '31163 (setAgentAvailability, Ready for QA, Pranay Shinde): write expires_at = least(session expiry, now + 15
+    minutes) on every PUT, and answer state offline once it has passed.'
+  unstarted:
+  - '33563 (listAgentWorkloadAvailability), 33395 (claimConversation), 31013 (handoverToAgent), all New: read a row
+    whose expires_at has passed as offline.'
+  - '33556 (SUP-002 Agent Dashboard setup: connect to API, On hold): re-send the agent''s availability within the
+    15-minute lapse while the console is open.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-333
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Rule BR-AGENT-LAPSE fails on the r10 contract and passes now. The 15 minutes is option A''s example; the
+  decision names "a default lapse" without a number. The session expiry is Session.expiresAt (openedAt plus
+  PasswordPolicy.sessionMaxHours); Marketing takes it from the caller''s validated session (bearerAuth, the session
+  registry), not from identity.session, which has no expiry column. SUP-002''s screen wiring calls setAgentAvailability
+  on action only; the heartbeat is stated on the contract, and no screen was changed.'

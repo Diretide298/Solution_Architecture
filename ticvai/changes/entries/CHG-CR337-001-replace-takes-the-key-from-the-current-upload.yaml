@@ -1,0 +1,46 @@
+id: CHG-CR337-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'replaceMediaAsset: the upload a replace uses records asset_id = the asset, the asset''s current file is its
+  upload whose key no asset_version row names, and that key becomes the replaced version''s storageKey; a retry with
+  the current upload answers 200 unchanged, and an upload already used elsewhere is 409 upload-already-used.'
+decision:
+  what: 'ADAM CR-337, option A (Chinmay, 29 October 2026: "As recommended, comment now", then "Include those in today
+    as well"). contracts/satellite/assets.yaml replaceMediaAsset: declares x-ticvai-reads assets.asset_version; its
+    description says the key follows from the upload (no column added), the replace records media_upload.asset_id as
+    completeUpload does, the asset''s current file is its upload whose key no asset_version row names and the replace
+    writes that key as the replaced version''s storageKey; a retry with the upload that is already the current file
+    answers 200 with the asset unchanged and writes nothing (as CR-306); an upload that became another asset, or an
+    earlier file of this one, is 409 upload-already-used. UploadRefusedProblem.refusedReason gains uploadAlreadyUsed,
+    returned only by replaceMediaAsset.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-337 (Narayan Gaonkar, ticket #30907 replaceMediaAsset): the replace writes the replaced file''s
+  storageKey, but no column held an asset''s current file, and nothing said what a replace with an upload already used
+  answers; CR-306 settled the same question for completeUpload.'
+keys_touched:
+  operations: [replaceMediaAsset]
+  schemas: [UploadRefusedProblem]
+  tables: [assets.media_upload, assets.asset_version]
+  files:
+  - contracts/satellite/assets.yaml
+  - tools/check-business-rules.py
+root_class: 'a write that keeps a value it names no source for, and a reused input left unstated'
+tickets:
+  started:
+  - '30912 (completeUpload, In progress, Narayan Gaonkar): nothing to change; UploadRefusedProblem gains
+    uploadAlreadyUsed, which completeUpload never returns.'
+  unstarted:
+  - '30907 (replaceMediaAsset, New): as built (option A, CR-337''s comment).'
+  - '30920 and 34976 (CMS-010 and CMS-076: connect to API, New): a replace can answer 409 upload-already-used.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-337
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Rule BR-MEDIA-REPLACE-UPLOAD fails on the r10 contract and passes now. The new refusedReason is on an error
+  response, which tools/check-contract-compat.py does not compare, so no BC entry is needed.'

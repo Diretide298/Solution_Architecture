@@ -1,0 +1,50 @@
+id: CHG-CR326-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'deleteMediaAsset names a collection cover in its 409: MediaUsage.surface gains mediaCollectionCover, computed
+  from assets.media_collection.cover_asset_id (referenceId the collection id, label its name), never stored as a
+  media_usage row, so usage is one list of every use referenceCount counts.'
+decision:
+  what: 'ADAM CR-326, option A (Chinmay, 29 October 2026: "As recommended, comment now", then "Include those in today
+    as well"). contracts/satellite/assets.yaml: MediaUsage.surface gains mediaCollectionCover, and MediaUsage says it is
+    never a stored row; deleteMediaAsset declares x-ticvai-reads assets.media_collection and its description says each
+    collection whose cover_asset_id is the asset is a use with surface mediaCollectionCover, referenceId the
+    collection''s id and label its name, worked out when the delete is asked; usage is one list of every use and
+    referenceCount counts it; the 409 says a collection cover is listed.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-326 (Narayan Gaonkar, ticket #30905 deleteMediaAsset): the delete refuses an asset that is a collection''s
+  cover, "naming it", but MediaUsage.surface had no value for a cover, so the build counted it in referenceCount and
+  left it out of usage.'
+keys_touched:
+  operations: [deleteMediaAsset]
+  schemas: [MediaUsage, MediaInUseProblem]
+  tables: [assets.media_collection, assets.media_usage]
+  files:
+  - contracts/satellite/assets.yaml
+  - tools/check-business-rules.py
+root_class: 'a refusal that promises to name every use, with a use its closed list cannot name'
+tickets:
+  started:
+  - '30225 ([DB] assets.media_usage, Ready for QA, Hrushikant Patkar): the next forward migration widens
+    media_usage_surface_chk with mediaCollectionCover (derive-ddl carries the contract enum); no row is ever written
+    with it.'
+  unstarted:
+  - '30905 (deleteMediaAsset, On hold): build to option A, through CR-326''s comment.'
+  - '30920 and 34943 (CMS-010 and CMS-075: connect to API, New): a 409 in-use can list a mediaCollectionCover use (the
+    collection''s name in label).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-326
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Rule BR-MEDIA-COVER-USE fails on the r10 contract and passes now. tools/check-contract-compat.py reports the
+  value on getMediaAsset (MediaAssetDetail.usage[].surface gained enum value) and counts it approved by BC-396 (the r8
+  entry for MediaUsage.surface, change "gained enum value(s)"); no new BC entry was added, because a narrower one after
+  BC-396 would never be matched. getMediaAsset (30906, Ready for QA) reads media_usage rows, so it never returns the
+  new value; nothing to do there. updateMediaAsset''s archive refusal (MediaStatusRefusedProblem) is unchanged: the
+  decision names deleteMediaAsset only.'
