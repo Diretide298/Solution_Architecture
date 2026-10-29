@@ -80,9 +80,11 @@ notify_off() {
 # TICVAI's own mail filter (29 October 2026, PROCESS-LOG P-33): an interceptor in the container drops every mail of
 # project 153 and lets the other projects' through. With it in place, apply leaves the instance switch alone, so the
 # other projects keep their mail; without it, apply switches all mail off as before.
+# (r11 apply, 29 October 2026: `defined?` binds looser than `&&`, so the first version printed "expression" and the
+# apply switched all mail off; const_defined? is a plain method call. PROCESS-LOG P-33.)
 ticvai_filter_in() {
   docker exec "$CONTAINER" test -f /app/config/initializers/zz_ticvai_quiet_mail.rb || return 1
-  put_rb filter-get.rb 'puts(defined?(TicvaiQuietMail) && TicvaiQuietMail.identifier == "ticvai" ? "filter-on" : "filter-off")'
+  put_rb filter-get.rb 'ok = Object.const_defined?(:TicvaiQuietMail) && TicvaiQuietMail.identifier == "ticvai"; puts(ok ? "filter-on" : "filter-off")'
   [ "$(rails_line filter-get.rb)" = "filter-on" ]
 }
 
