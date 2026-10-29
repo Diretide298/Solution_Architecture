@@ -52,24 +52,6 @@ x-ticvai-queries:
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October).
-  seoMetadataRecords:
-    module: platform-ops
-    table: control.seo_metadata
-    inputs:
-      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.seo_metadata rows asked for, by id.'}
-      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
-    returns:
-      type: array
-      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
-      items: {type: object, description: 'A control.seo_metadata row: the columns handoff/schema-reference.json lists for it.'}
-    rule: >-
-      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Platform answers with its control.seo_metadata rows, as it stores them and as the caller's scope
-      lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
-      process within operations, through the C# query interface Platform implements.
-    served: [in-process]
   tenantDomainRecords:
     module: platform-ops
     table: control.tenant_domain

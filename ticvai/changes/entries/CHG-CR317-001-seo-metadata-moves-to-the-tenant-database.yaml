@@ -1,0 +1,60 @@
+id: CHG-CR317-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'SEO metadata moves from control.seo_metadata (Platform''s, in the shared control database) to
+  marketing.seo_metadata in the tenant database, owned by Marketing, same columns and scope row security:
+  setSeoMetadata writes it in the tenant''s own transaction and getSeoMetadata reads it, with no cross-module or
+  cross-database route; Platform''s seoMetadataRecords query, which nothing else asked, is removed.'
+decision:
+  what: '"All as recommended" (Chinmay, 29 October 2026): ADAM CR-317, option A. contracts/satellite/marketing-crm.yaml:
+    SeoMetadata x-ticvai-persistence marketing.seo_metadata; getSeoMetadata and setSeoMetadata lose the
+    platform-ops#seoMetadataRecords read-via and say where they read and write. contracts/satellite/platform-ops.yaml:
+    the seoMetadataRecords query removed (its only askers were these two; Platform reads no SEO metadata, so no
+    Marketing query is needed). tools/derive-schema-history.py RENAMES: control.seo_metadata to marketing.seo_metadata,
+    a move between databases as control.content_block''s (CHG-R8MIG-011). tools/resolution_cache.py: the moved table
+    stays in the tenant-config resolver. tools/check-ddl-conventions.py: D-RENAME-APPLIED reads a declared column
+    rename (no_index to is_excluded_from_index, CHG-STO-009) on the table a later rename moved it to. Derived: the
+    tenant forward migration creates marketing.seo_metadata with its scope_path index and apply_scope_rls; the control
+    side is a migration-review row (table dropped: copy each tenant''s rows across, then drop control.seo_metadata).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-317 (Pranay Shinde, #31164 setSeoMetadata): Marketing''s tenant-scoped write landed in Platform''s
+  control.seo_metadata, in the database every tenant shares, with no write route (ADR-0055 rule 4), outside the
+  tenant''s transaction and row security, for entities that live in the tenant database. Settled by the lead on 29
+  October 2026.'
+keys_touched:
+  operations: [setSeoMetadata, getSeoMetadata]
+  schemas: [SeoMetadata]
+  tables: [control.seo_metadata, marketing.seo_metadata]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/platform-ops.yaml
+  - tools/derive-schema-history.py
+  - tools/resolution_cache.py
+  - tools/check-ddl-conventions.py
+  other:
+  - 'query platform-ops#seoMetadataRecords (removed)'
+root_class: 'a tenant module''s data kept in another module''s table in the control database'
+tickets:
+  started:
+  - '27647 (V0002 control) and 30166 ([DB] control.seo_metadata), Ready for QA (Hrushikant Patkar): the table leaves
+    the control database; take the migration-review row (copy any rows to each tenant''s marketing.seo_metadata, then
+    drop control.seo_metadata).'
+  - '27677 ([DB] V0028 marketing, Ready for QA): apply the forward migration that creates marketing.seo_metadata.'
+  unstarted:
+  - '31164 (setSeoMetadata), 31011 (getSeoMetadata), 27871, 27923: through CR-317''s comment; Marketing''s own table on
+    the tenant connection, no Platform query.'
+  - 'The CMS-013 tickets (33383 to 33385): nothing changes on the wire.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-317
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open
+notes: 'D-RENAME-APPLIED fails if the contract names control.seo_metadata again while the move is declared. No check
+  holds the wider class (a module writing another module''s table in the same deployable with no x-ticvai-write-via):
+  the one other control-database member is createUrlRedirect (Marketing) writing control.url_redirect, also named by
+  SD-020 with seo_metadata; a check would fail on it until the lead decides it, and it is not in CR-317''s decision.'

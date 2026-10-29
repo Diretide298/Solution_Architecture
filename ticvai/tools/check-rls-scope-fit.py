@@ -321,6 +321,17 @@ def main() -> int:
                     guard.add("RF-OWNED-ABOVE", f"{o}:{t}", f"{o} ({level}) reads {t}, written only at tenant "
                               f"({', '.join(sorted(writers[t]))}), so its rows sit above the reader: x-ticvai-rls "
                               "read-beneath, or say why the reader sees none")
+                # **And written only at a brand** (ADAM CR-314, CHG-CR314-001): a brand's cookie banner, written at
+                # its brand's node (the corporate one at the tenant root), read by every venue of the brand. The rule
+                # read tenant writers only, so a table written at brand and read at venue passed. Only brand: a
+                # region- or venue-written table read by a workstation is a question of device scope this does not
+                # settle (27 such pairs on 29 October 2026, not judged here).
+                elif kind == "reads" and read == "scope" and t in has_path and writers.get(t) \
+                        and "brand" in writers[t] and writers[t] <= {"tenant", "brand", "platform"} \
+                        and level in LEVEL and LEVEL[level] > LEVEL["brand"]:
+                    guard.add("RF-OWNED-ABOVE", f"{o}:{t}", f"{o} ({level}) reads {t}, written only above it "
+                              f"({', '.join(sorted(writers[t]))}), so its rows sit above the reader: x-ticvai-rls "
+                              "read-beneath, or say why the reader sees none")
     for rule, key, msg, strict in (inherited_findings(lin, pol, cl, levelled)
                                    + device_findings(lin, cl, has_path, creators, fwd.SCOPE_FOLLOWS)
                                    + parent_across_findings(pol, dep_of_schema, helper_bodies(g.ROOT / "backend"))):

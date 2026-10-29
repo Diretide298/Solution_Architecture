@@ -1,0 +1,50 @@
+id: CHG-CR313-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'A waiver field''s options are stored whole: setDynamicFieldQuestion keeps each option''s value and label in
+  the new marketing.form_definition_field.option_labels (jsonb), so its 200 returns the field as sent, while options
+  (text[]) keeps the values for every existing reader; the validation members each fieldType accepts are listed, so
+  its 422 field-validation-invalid is defined.'
+decision:
+  what: '"All as recommended" (Chinmay, 29 October 2026): ADAM CR-313, option A, additive. contracts/satellite/
+    marketing-crm.yaml DynamicFieldsQuestionsConditionalLogicView.options: x-ticvai-persistence-column jsonb,
+    x-ticvai-column option_labels (an option was already typed {value: string, label: LocalisedText}); its values in
+    the same order still go to options. .validation: minimum and maximum a number field; dateFrom and dateTo a date
+    field; pattern and maxLength a shortText, longText, email, mobile or address field; a member on any other type is
+    422 field-validation-invalid. Derived: option_labels jsonb, nullable, in the forward migration.
+    tools/check-contract-storage.py: ST-TYPE-MISMATCH reads an array of records (items whose properties the contract
+    states) as incompatible with a scalar array column.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-313 (Pranay Shinde, #31160 setDynamicFieldQuestion): the body''s options are objects (value and label)
+  and the table stored options text[], so the labels a guest reads were lost on write and the 200 could not return
+  the field as sent; which validation members suit which fieldType was not stated, so the 422 was not testable.
+  Settled by the lead on 29 October 2026.'
+keys_touched:
+  operations: [setDynamicFieldQuestion]
+  schemas: [DynamicFieldsQuestionsConditionalLogicView]
+  tables: [marketing.form_definition_field]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-contract-storage.py
+  - tools/tests/test_cr_forms_r11.py
+root_class: 'an array of records stored in a scalar array column another schema typed'
+tickets:
+  started:
+  - '27677 and 30535 ([DB] marketing.form_definition_field, Ready for QA): apply the forward migration''s new nullable
+    column option_labels jsonb; nothing else changes on the table.'
+  unstarted:
+  - '31160 (setDynamicFieldQuestion), 27921: through CR-313''s comment; write option_labels and options together, and
+    refuse a validation member the fieldType does not take.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-313
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'The option member shape the CR reports as untyped was already typed in the contract (since 29 September) and in
+  the service docs; the gap was the column and the validation rule. ST-TYPE-MISMATCH with the new record rule finds
+  exactly this field when option_labels is taken away (tools/tests/test_cr_forms_r11.py).'

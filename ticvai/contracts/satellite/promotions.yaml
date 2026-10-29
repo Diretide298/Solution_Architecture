@@ -3852,7 +3852,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-164 Code Distribution & Assignment Manager"
       x-ticvai-body-key: [batchId]
-      x-ticvai-body-key-note: 'Keyed by the body''s `batchId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per code batch within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `batchId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
+      x-ticvai-body-key-note: 'Keyed by the body''s `batchId`, not a singleton (r8 walk fix, CHG-R8WFC-001): the code batch, within the caller''s venue, that this PUT assigns codes from. **Each PUT adds one assignment to the batch** (ADAM CR-316): one more `promotions.code_assignment` row and `quantity` more of the batch''s codes assigned, so a block can go to one channel and the next block to another; an earlier assignment is never replaced or un-assigned. A retry with the same `Idempotency-Key` adds nothing. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `batchId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.42; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (6 non-field properties removed; enums assigneeType; added batchId, partner)'
@@ -3868,8 +3868,9 @@ paths:
 
         **Where it is stored** (4 October 2026, CHG-FXC-005). The input becomes one `promotions.code_assignment` row
         (CouponCodeAssignment: channelsType, assigneeType, assigneeReference, batchId, quantity); `quantity` codes of the batch
-        that are `issued` and unassigned move to `assigned` with `assignmentId` set and `distributionStatus` `pending` (409
-        when the batch has fewer left). The view counts the batch's codes: `generated` all of them, `assigned` those with an
+        that are `issued` and unassigned move to `assigned` with `assignmentId` set and `distributionStatus` `pending`
+        (`409 not-enough-codes-in-batch` when the batch has fewer left, naming how many are left; nothing is written).
+        Every PUT adds an assignment this way (ADAM CR-316); none replaces an earlier one. The view counts the batch's codes: `generated` all of them, `assigned` those with an
         assignment, `sent`, `delivered`, `viewed` and `cancelled` by `distributionStatus`, `redeemed` and `expired` by
         `status`.
       tags:
@@ -3897,6 +3898,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CodeDistributionAssignmentManagerView'
+        '409':
+          x-ticvai-problem-types: [not-enough-codes-in-batch]
+          description: 'Refused, and nothing is written (ADAM CR-316). `not-enough-codes-in-batch`: the batch has fewer
+            `issued`, unassigned codes than `quantity`; `remaining` is how many it has left.'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Problem
+                - type: object
+                  required:
+                  - remaining
+                  properties:
+                    remaining:
+                      type: integer
+                      minimum: 0
+                      description: The batch's `issued` codes that no assignment holds yet.
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /redemption-code-lookup:

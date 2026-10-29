@@ -44,6 +44,10 @@ same kind that nothing held:
                            "there is no id in the path" (ADAM CR-245, CHG-R10CRF-005). The rule CR-245 decided: the
                            path id is the record's id, a create takes it, and a mismatch with the record the natural
                            key finds is 409 and changes nothing.
+  C-REFUSAL-UNDECLARED     an operation's own text promises a refusal by status, "(409 when the batch has fewer
+                           left)", "is refused (422)", "refused with 404", and its responses declare no such status,
+                           so the refusal has no problem type and QA cannot test it (ADAM CR-316, CHG-CR316-001:
+                           setCodeDistributionManager's 409 was described and not declared)
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
@@ -94,7 +98,19 @@ RULES = {
     "C-PUT-KEY": "a PUT keyed on a natural key whose path id carries the stock 'creates or replaces' text, a promised "
                  "409 <noun>-id-mismatch its 409 does not list, or 'no id in the path' beside a path id (ADAM CR-245, "
                  "CHG-R10CRF-005)",
+    "C-REFUSAL-UNDECLARED": "an operation's own text promises a refusal by status ('(409 when ...)', 'refused (422)') "
+                            "that its responses do not declare (ADAM CR-316, CHG-CR316-001)",
 }
+# ADAM CR-316 (CHG-CR316-001): a refusal the operation's own text promises by status. Only the forms that say
+# this operation refuses: "(409 when|if|once|while ...)", "refused (409)", "refused with 409", "refused `409 ...`".
+# Statuses the shared responses carry for every operation (400 validation, 401, 403, 429) are not read.
+PROMISED_STATUS = re.compile(r"\(\s*`?(404|409|410|412|422)\b[^)]{0,40}?\b(?:when|if|once|while)\b"
+                             r"|\brefused\s*(?:with\s*)?\(?`?(404|409|410|412|422)\b", re.I)
+
+
+def promised_statuses(text: str) -> set:
+    """The refusal statuses an operation's own description or body-key note promises (C-REFUSAL-UNDECLARED)."""
+    return {a or b for a, b in PROMISED_STATUS.findall(text or "")}
 # ADAM CR-245 (CHG-R10CRF-005): the text the 14 October shapes pass stamped on every PUT path id it added
 # (tools/applied/shp-contract-shapes-14-october/apply_noaddr.py), right only for a PUT keyed on that id.
 STOCK_ADDRESS = "Addresses the item this write creates or replaces"
@@ -394,6 +410,13 @@ def main() -> int:
                 if not r.get("x-ticvai-problem-types") and not (name.endswith("Problem") and name != "Problem"):
                     guard.add("C-ERROR-PROBLEM-TYPE", f"{oid}:{c}",
                               f"{oid}: {c} ({str(r.get('description') or '')[:40]}) names no problem type")
+        # C-REFUSAL-UNDECLARED (ADAM CR-316, CHG-CR316-001): a refusal promised in the text is a declared response.
+        promised = promised_statuses(" ".join(str(op.get(k) or "") for k in
+                                              ("description", "x-ticvai-body-key-note", "x-ticvai-singleton-note")))
+        for st in sorted(promised - codes):
+            guard.add("C-REFUSAL-UNDECLARED", f"{oid}:{st}",
+                      f"{oid}: its text promises a {st} refusal and its responses declare no {st}: declare it with "
+                      f"its problem type")
         last = f["path"].rstrip("/").rsplit("/", 1)[-1]
         if m == "post" and re.search(r"/\{[^}]+\}/[a-z][a-z-]*$", f["path"]) and "409" not in codes \
                 and not last.endswith("s") \

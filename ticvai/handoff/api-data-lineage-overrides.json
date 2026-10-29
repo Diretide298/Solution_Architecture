@@ -11386,8 +11386,7 @@
     "marketing.tracking_technology"
    ],
    "writes": [
-    "marketing.cookie_scan_run",
-    "marketing.tracking_technology"
+    "marketing.cookie_scan_run"
    ],
    "reason": "upserts detected rows / lastSeenAt; alert recipients from cookie_scan_policy (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
