@@ -1913,7 +1913,6 @@ paths:
     put:
       operationId: setBrandIdentity
       x-ticvai-consumed-by:
-        - "P08 BO-836 Design System & Components"
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-004 Logo & Assets"

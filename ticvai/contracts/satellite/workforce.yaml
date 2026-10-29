@@ -201,10 +201,7 @@ paths:
       operationId: createRotaAssignment
       x-ticvai-consumed-by:
         - "P08 BO-055 Rota & Scheduling"
-        - "P08 BO-712 Staff & Role Assignment Configuration"
         - "P08 BO-714 Event Shift & Roster Configuration"
-        - "P08 BO-884 Attraction & Operational Staffing Roster"
-        - "P08 BO-917 Event Staff & Personnel Allocation"
       x-ticvai-read-via:
       - query: identity#delegatedAccessRecords
         route: in-process

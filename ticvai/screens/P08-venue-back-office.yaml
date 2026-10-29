@@ -34500,10 +34500,11 @@ screens:
     trigger: Register firmware release
     body: '**Collects what `createDeviceFirmware` sends before it is called.** Required: `deviceKind`,
       `version`. Optional: `vendor`, `artefactAssetId` (the vendor image, uploaded to Assets from the
-      form), `checksum`, `checksumAlgorithm`, `minimumPreviousVersion`, `releaseNotes`. A second release with
-      the same device kind and version is refused (409, duplicate-code) and says so. Dismissing sends nothing;
-      the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract):
-      `id`, `status` (a release starts `draft`), `releasedAt`, `installedCount`, `statusReason`, `scopePath`.'
+      form), `checksum`, `checksumAlgorithm`, `minimumPreviousVersion`, `releaseNotes`. A second release
+      with the same device kind and version is refused (409, duplicate-code) and says so. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the
+      contract): `id`, `status` (a release starts `draft`), `releasedAt`, `installedCount`, `statusReason`,
+      `scopePath`.'
     bindsTo: DeviceFirmware
     confirm:
       label: Register release
@@ -72919,21 +72920,20 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Game_and_Ride_Module.pdf, page 26
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-006, the lead: "Remove + log text"): a board reading of 19 September
+      declared it, and nothing on the approved screen sends it: its only controls were the generated Save wallet
+      funding rules and Cancel, with no field to send. The funding rules are saved on BO-1094 Funding Method
+      Configuration and BO-1098, where setWalletFundingRules stays declared and reached. The generated Save and
+      Cancel buttons go with it; the screen keeps getWalletFundingRules and its rules panel. A CR brings the write
+      back here with the control and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
     - name: contentBody
       components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: setWalletFundingRules
-        label: Save wallet funding rules
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setWalletFundingRules
       - kind: detailPanel
         label: How a wallet may be topped up
         bindsTo: WalletFundingRules
@@ -72948,11 +72948,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Top-up rules
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -73021,21 +73016,20 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Game_and_Ride_Module.pdf, page 27
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-006, the lead: "Remove + log text"): a board reading of 19 September
+      declared it, and nothing on the approved screen sends it: its only controls were the generated Save wallet
+      funding rules and Cancel, with no field to send. The funding rules (bonusRules included) are saved on BO-1094
+      Funding Method Configuration and BO-1098, where setWalletFundingRules stays declared and reached. The
+      generated Save and Cancel buttons go with it; the screen keeps getWalletFundingRules and its rules panel. A CR
+      brings the write back here with the control and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
     - name: contentBody
       components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: setWalletFundingRules
-        label: Save wallet funding rules
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setWalletFundingRules
       - kind: detailPanel
         label: How a wallet may be topped up
         bindsTo: WalletFundingRules
@@ -73051,11 +73045,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Top-up bonus rules
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -104464,6 +104453,15 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 83
+  - operation: createRotaAssignment
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-008, the lead: "Remove + log text"): a board reading of 19 September
+      declared it, and nothing on the approved screen sends it: its Save button is the generated Save event resource
+      plan (setEventResourcePlan) and nothing rosters a person. A person is rostered on BO-055 Rota & Scheduling and
+      BO-714 Event Shift & Roster Configuration, where createRotaAssignment stays declared and reached. The screen
+      keeps setEventResourcePlan, getEventResourcePlan and the rota (listRotaAssignments). A CR brings the write
+      back here with the control and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -104492,7 +104490,8 @@ screens:
   states:
     loading: The staff role list.
     error: Could not load. Names which read failed and leaves the staff role untouched.
-    emptyFirstRun: No staff role yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyFirstRun: No staff role yet. The roles an event needs come from its resource plan; people are rostered
+      on Rota & Scheduling (BO-055), not here.
     emptyNoResults: The filter narrowed it and the staff role are still there. Names the active filter
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -104504,14 +104503,6 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id014
-  - operationId: createRotaAssignment
-    contract: workforce
-    purpose: Roster them
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates: &id017
-    - listRotaAssignments
-    - getStaffingCoverage
   - operationId: getEventResourcePlan
     contract: catalogue
     purpose: Everything an event needs, and whether it has been secured
@@ -107708,26 +107699,25 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 8
+  - operation: updateGuestPreferences
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-006, the lead: "Remove + log text"): a board reading of 19 September
+      declared it, and nothing on the approved screen sends it: its Save guest preferences and Cancel were
+      generated, with no preference field to send. A guest''s preferences are saved on WEB-020 (Save guest
+      preferences), where updateGuestPreferences stays declared and reached. The generated Save and Cancel buttons
+      go with it; the screen keeps the family links (getGuestRelationships, setGuestRelationships with its form) and
+      getGuestProfile. A CR brings the write back here with the control and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
     - name: contentBody
       components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: updateGuestPreferences
-        label: Save guest preferences
-        notes: The act the screen exists for.
       - kind: detailPanel
         derived: true
         impliedBy: getGuestProfile
         notes: One record, read-only.
         operation: getGuestProfile
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: updateGuestPreferences
       - kind: dataTable
         label: Family and guardians
         bindsTo: GuestRelationship
@@ -107751,13 +107741,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: updateGuestPreferences
-    contract: marketing-crm
-    purpose: Contact and service preferences
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getGuestConsents
   - operationId: getGuestProfile
     contract: marketing-crm
     purpose: Verified contacts
@@ -108546,6 +108529,15 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 12
+  - operation: setConsentPurposes
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-006, the lead: "Remove + log text"): a board reading of 19 September
+      declared it, and nothing on the approved screen sends it: its Save consent purposes and Cancel were generated,
+      and the purposes table is read-only. Consent purposes are configured on CMS-018 (Save consent purposes) and
+      CMS-023, where setConsentPurposes stays declared and reached. The generated Save and Cancel buttons go with
+      it; the screen keeps listConsentPurposes and the consent-form builder (listForms, createForm with its form). A
+      CR brings the write back here with the control and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -108557,16 +108549,6 @@ screens:
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
         operation: listConsentPurposes
-      - kind: primaryButton
-        derived: true
-        impliedBy: setConsentPurposes
-        label: Save consent purposes
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setConsentPurposes
       - kind: dataTable
         label: Consent forms
         bindsTo: FormDefinition
@@ -108597,11 +108579,6 @@ screens:
     contract: marketing-crm
     purpose: Purposes and lawful bases
     trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: setConsentPurposes
-    contract: marketing-crm
-    purpose: Configure them
-    trigger: onAction
     provenance: board reading, 19 September 2026
   - operationId: createForm
     contract: marketing-crm
@@ -119216,7 +119193,6 @@ screens:
   module: Engagement & Support
   requiresModule: marketing
   wave: 3
-  permission: TENANT_CONFIGURE
   notes: '**Merged into P13 CMS-005 Theme Editor, CMS-002 Brand Kit and CMS-006 Component Preview** (decided
     24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds
     the theme and the component set; the minute says to consolidate rather than build both. **One implementation,
@@ -119271,21 +119247,22 @@ screens:
     why: 'Spacing, shadow, breakpoint and transition tokens per brand are outside the agreed boundary
       (graphics, colours, fonts, tabs only; DI-223, DI-285): recorded as not built.'
     source: DI-223
+  - operation: setBrandIdentity
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-007, the lead: "Remove + log text"): a board reading of 19 September
+      declared it, and nothing on the approved screen sends it: its only controls were the generated Save brand
+      identity and Cancel, with no field to send. Brand identity is saved on CMS-002, CMS-004, CMS-104 and ADM-016,
+      where setBrandIdentity stays declared and reached. The generated Save and Cancel buttons go with it. With no
+      operation left the screen has no permission of its own and its no-access state says so. A CR brings the write
+      back here with the control and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
     - name: contentBody
-      components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: setBrandIdentity
-        label: Save brand identity
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setBrandIdentity
+      components: []
+      notes: 'Empty since 29 October 2026 (CHG-R11FXU-007): its only controls, a generated Save brand identity
+        and Cancel, went with setBrandIdentity; the pack gives the body nothing to draw. A CR fills it.'
   states:
     loading: The design system components list.
     error: Could not load. Names which read failed and leaves the design system components untouched.
@@ -119293,14 +119270,9 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the design system components are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: setBrandIdentity
-    contract: white-label
-    purpose: Design system and components
-    trigger: onAction
-    provenance: board reading, 19 September 2026
+    emptyNoAccess: 'Not shown: nothing on this screen needs a permission of its own; the app''s sign-in
+      decides access.'
+  apis: []
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-836
@@ -125323,6 +125295,15 @@ screens:
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-004): No read returns candidates for a rota position
       (skill, availability, suitability).'
     source: contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: createRotaAssignment
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-008, the lead: "Remove + log text"): a board reading of 19 September
+      declared it, and nothing on the approved screen sends it: its tables show the roster, coverage and check-ins
+      and nothing on it rosters a position. A person is rostered on BO-055 Rota & Scheduling and BO-714 Event Shift
+      & Roster Configuration, where createRotaAssignment stays declared and reached. The screen keeps
+      listRotaAssignments, getStaffingCoverage and listAttendance. A CR brings the write back here with the control
+      and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -125384,19 +125365,13 @@ screens:
   states:
     loading: The attraction operational staffing list.
     error: Could not load. Names which read failed and leaves the attraction operational staffing untouched.
-    emptyFirstRun: No attraction operational staffing yet. Carries the create action; distinct from a
-      filter that matched nothing.
+    emptyFirstRun: No attraction operational staffing yet. Positions are rostered on Rota & Scheduling (BO-055);
+      this screen shows the roster, its coverage and who has checked in.
     emptyNoResults: The filter narrowed it and the attraction operational staffing are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: createRotaAssignment
-    contract: workforce
-    purpose: Roster a position
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates: *id017
   - operationId: listRotaAssignments
     contract: workforce
     purpose: Who is rostered on each position
@@ -129717,7 +129692,6 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
-  permission: WORKFORCE_MANAGE
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '7'
@@ -129751,6 +129725,16 @@ screens:
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
     source: pack Resource_Management_Configuration_Reference.pdf, page 105 §Each candidate may display
+  - operation: createRotaAssignment
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-008, the lead: "Remove + log text"): a board reading of 19 September
+      declared it, and nothing on the approved screen sends it: its four role buttons (Event manager, Supervisor,
+      Security, Customer service) are pack text with no person or shift to send, and no read fills its staff table
+      (contract gap CHG-WIR-004). A person is rostered on BO-055 Rota & Scheduling and BO-714 Event Shift & Roster
+      Configuration, where createRotaAssignment stays declared and reached. With no operation left the screen has no
+      permission of its own and its no-access state says so; the role buttons stay, bound to nothing, as before. A
+      CR brings the write back here with the control and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -129811,21 +129795,13 @@ screens:
   states:
     loading: The event staff personnel list.
     error: Could not load. Names which read failed and leaves the event staff personnel untouched.
-    emptyFirstRun: No event staff personnel yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No event staff personnel yet. People are allocated to event roles on Event Shift & Roster
+      Configuration (BO-714), not here.
     emptyNoResults: The filter narrowed it and the event staff personnel are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: createRotaAssignment
-    contract: workforce
-    purpose: Staff allocation
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - listRotaAssignments
-    - getStaffingCoverage
+    emptyNoAccess: 'Not shown: nothing on this screen needs a permission of its own; the app''s sign-in
+      decides access.'
+  apis: []
   entryState:
     preloaded:
     - Name
@@ -151340,9 +151316,20 @@ screens:
     — it is settings, not a population
   purpose: Control the business rules governing individual wallet top-up transactions.
   purposeNote: Every wallet top-up is evaluated against the applicable funding rules before value is credited.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1096, BO-1097, BO-1098, BO-1099,
-    BO-1101, BO-417, BO-418; this screen is Top-Up Rule Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+  division: 'Shares `getWalletFundingRules` with BO-1096, BO-1097, BO-1098, BO-1099, BO-1101, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Top-Up Rule Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
     board 2.03, page 15): control the business rules governing individual wallet top-up transactions.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its pack select and text fields bind to no operation and it has
+      no Save or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding
+      Method Configuration (Save funding rules), where setWalletFundingRules stays declared and reached;
+      the lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps
+      getWalletFundingRules and its rules panel. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -151433,13 +151420,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Amounts, presets and bonus rules
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -151485,9 +151465,21 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Configure funding availability
     across; Configure) and no display directory — it is settings, not a population
   purpose: Determine where each funding method may be used.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1097, BO-1098, BO-1099,
-    BO-1101, BO-417, BO-418; this screen is Channel & Funding Source Mapping (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
-    board 2.04, page 16): determine where each funding method may be used.'
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1097, BO-1098, BO-1099, BO-1101, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Channel & Funding Source Mapping
+    (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.04, page 16): determine where each
+    funding method may be used.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its pack channel select fields bind to no operation and it has
+      no Save or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding
+      Method Configuration (Save funding rules), where setWalletFundingRules stays declared and reached;
+      the lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps
+      getWalletFundingRules and its rules panel. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -151581,13 +151573,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Channel and funding-source mapping
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -151637,11 +151622,22 @@ screens:
     threshold.
   purposeNote: Auto-reload occurs only after the configured threshold is reached and all consent, payment,
     security and funding-limit validations have passed.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1098, BO-1099,
-    BO-1101, BO-417, BO-418; this screen is Auto-Reload Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1098, BO-1099, BO-1101, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Auto-Reload Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
     board 2.05, page 17): configure automatic wallet replenishment when balances fall below predefined
     thresholds. The attached scope specifically requires automatic top-up when a wallet balance falls
     below a configurable threshold.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its only component is the read-only rules panel (getWalletFundingRules)
+      and it has no Save or publish control, so it never sends the PUT. The funding rules are saved on
+      BO-1094 Funding Method Configuration (Save funding rules), where setWalletFundingRules stays declared
+      and reached; the lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004.
+      The screen keeps getWalletFundingRules and its rules panel. A CR brings the write back here with
+      the control that sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -151717,13 +151713,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Auto-reload on a threshold
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -151772,11 +151761,12 @@ screens:
     specifically requires scheduled or recurring top-ups based on date, frequency, amount, payment method
     and customer authorization.
   purposeNote: and authorization requirements.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1099,
-    BO-1101, BO-417, BO-418; this screen is Recurring Funding Schedule (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
-    board 2.06, page 17): configure scheduled wallet funding independent of the wallet''s current balance.
-    The source specifically requires scheduled or recurring top-ups based on date, frequency, amount,
-    payment method and customer authorization.'
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1099, BO-1101, BO-417,
+    BO-418 (it and BO-1094, BO-417, BO-418 send `setWalletFundingRules`, CHG-R11FXU-002); this screen
+    is Recurring Funding Schedule (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.06, page
+    17): configure scheduled wallet funding independent of the wallet''s current balance. The source specifically
+    requires scheduled or recurring top-ups based on date, frequency, amount, payment method and customer
+    authorization.'
   layout:
     template: form
     regions:
@@ -151844,6 +151834,7 @@ screens:
       components:
       - kind: primaryButton
         label: Specific day of month
+        operation: setWalletFundingRules
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 17 §Support schedules such
           as
   states:
@@ -151911,9 +151902,21 @@ screens:
   purpose: Apply governance and approval controls to wallet funding operations.
   purposeNote: Funding transactions requiring approval cannot alter the wallet balance until all configured
     authorization requirements are satisfied.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098,
-    BO-1101, BO-417, BO-418; this screen is Funding Authorization & Approval Rules (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
-    board 2.07, page 18): apply governance and approval controls to wallet funding operations.'
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1101, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Funding Authorization & Approval
+    Rules (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.07, page 18): apply governance
+    and approval controls to wallet funding operations.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its pack select fields bind to no operation and it has no Save
+      or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding Method
+      Configuration (Save funding rules), where setWalletFundingRules stays declared and reached; the
+      lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps
+      getWalletFundingRules and its rules panel. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -152008,13 +152011,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Approval above a threshold
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -152210,11 +152206,22 @@ screens:
     configurable maximum balance, daily top-up limit, single-transaction limit and user- specific limits.
   purposeNote: Funding limits are evaluated in real time before wallet value is credited, with configurable
     actions for violations.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098,
-    BO-1099, BO-417, BO-418; this screen is Funding Limits & Velocity Controls (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
-    board 2.09, page 20): protect wallets against excessive or suspicious funding activity. The source
-    specifically requires configurable maximum balance, daily top-up limit, single-transaction limit and
-    user- specific limits.'
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1099, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Funding Limits & Velocity Controls
+    (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.09, page 20): protect wallets against
+    excessive or suspicious funding activity. The source specifically requires configurable maximum balance,
+    daily top-up limit, single-transaction limit and user- specific limits.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its pack limit fields bind to no operation and it has no Save or
+      publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding Method
+      Configuration (Save funding rules), where setWalletFundingRules stays declared and reached; the
+      lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps
+      getWalletFundingRules and its rules panel. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -152326,13 +152333,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Limits and velocity controls
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -158719,6 +158719,16 @@ screens:
     Example
   purposeNote: Refund processing correctly reconstructs or converts the value originally consumed without
     unintentionally changing its financial or promotional classification.
+  gaps:
+  - operation: setWalletRefundPolicy
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-003): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its six pack restore fields bind to no operation and it has no
+      Save control. The wallet refund policy is saved on BO-1146 (Save wallet refund policy), where setWalletRefundPolicy
+      stays declared and reached (CHG-R10WIR-002, item 5). The screen keeps getOrder, listOrderRefunds
+      and createRefund for the order it routes. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -158762,11 +158772,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletRefundPolicy
-    contract: wallet
-    purpose: Restoration to the original lots
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: createRefund
     contract: orders
     purpose: Issue the refund
@@ -208215,6 +208220,16 @@ screens:
       so either the write operations are missing or this screen is a view of something another screen
       builds.'
     source: contract — the screen's declared operations
+  - operation: listB2bCreditAccounts
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-004): the approved screen has no list, table or picker that
+      shows the accounts (its body is seven pack select fields for the facility being opened), and the
+      lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) is that a read the approved screen has
+      no element for leaves it. The accounts are listed and picked on ADM-603 (Customer/account) and ADM-608,
+      where listB2bCreditAccounts stays declared and reached. The edge to ADM-603 carries the accountId
+      createB2bCreditAccount returns; opened otherwise, ADM-603 picks the account itself. A CR brings
+      the read back here with the list that shows it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -208252,11 +208267,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: listB2bCreditAccounts
-    contract: payments
-    purpose: On-account customers
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   - operationId: createB2bCreditAccount
     contract: payments
     purpose: Open an account
@@ -209466,7 +209476,6 @@ screens:
   module: Commercial
   requiresModule: core
   wave: 3
-  permission: WALLET_CONFIGURE
   source:
     pack: Payment_Payment_Orchestration.pdf
     board: '6'
@@ -209524,6 +209533,16 @@ screens:
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the wallet refund policy (setWalletRefundPolicy
       has no get).'
     source: contracts/satellite/wallet.yaml#setWalletRefundPolicy | screens/P08-venue-back-office.yaml#ADM-612
+  - operation: setWalletRefundPolicy
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-007, the lead: "Remove + log text"): a board reading of 19 September
+      declared it, and nothing on the approved screen sends it: its one pack action, Manual allocation with
+      approval, collects nothing for the policy, and its Cancel was generated. The wallet refund policy is saved on
+      BO-1146 (Save wallet refund policy), where setWalletRefundPolicy stays declared and reached. The generated
+      Cancel goes with it; the pack action stays, bound to nothing, as before. With no operation left the screen has
+      no permission of its own and its no-access state says so. A CR brings the write back here with the control and
+      the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -209535,12 +209554,9 @@ screens:
         provenance: pack Payment_Payment_Orchestration.pdf, page 118 §Support configurable approaches
           such as
     - name: contentBody
-      components:
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setWalletRefundPolicy
+      components: []
+      notes: 'Empty since 29 October 2026 (CHG-R11FXU-007): its one control, a generated Cancel, went with
+        setWalletRefundPolicy; the pack gives the body nothing to draw. A CR fills it.'
   states:
     loading: The refund allocation original list.
     error: Could not load. Names which read failed and leaves the refund allocation original untouched.
@@ -209548,14 +209564,9 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the refund allocation original are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: setWalletRefundPolicy
-    contract: wallet
-    purpose: Refund to wallet or original tender
-    trigger: onAction
-    provenance: board reading, 19 September 2026
+    emptyNoAccess: 'Not shown: nothing on this screen needs a permission of its own; the app''s sign-in
+      decides access.'
+  apis: []
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-612

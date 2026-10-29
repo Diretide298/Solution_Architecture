@@ -1,0 +1,52 @@
+id: CHG-R11FXU-008
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'BO-712, BO-884 and BO-917 no longer declare createRotaAssignment, which nothing on them sends; their
+  first-run text says where people are rostered, and BO-917, left with no operation, has no permission of its own.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml. createRotaAssignment (a board reading of 19 September) is removed and
+    recorded as a removed gap on BO-712 Staff & Role Assignment Configuration (its Save is the generated Save event
+    resource plan; it keeps setEventResourcePlan, getEventResourcePlan and the rota), BO-884 Attraction & Operational
+    Staffing Roster (it keeps the roster, coverage and check-in reads) and BO-917 Event Staff & Personnel Allocation
+    (its four role buttons are pack text with no person or shift to send, and no read fills its staff table, contract
+    gap CHG-WIR-004; they stay, bound to nothing). emptyFirstRun no longer says the screen "carries the create
+    action": BO-712 and BO-884 point to Rota & Scheduling (BO-055), BO-917 to Event Shift & Roster Configuration
+    (BO-714). BO-917''s screen permission WORKFORCE_MANAGE, taken from the write, is dropped and its emptyNoAccess
+    takes the BO-602 text. createRotaAssignment stays declared and reached on BO-055 and BO-714. The four visible
+    changes are logged in docs/active/approved-ui-changes.yaml. The x-ticvai-consumed-by mirror in
+    contracts/satellite/workforce.yaml follows (link-screens-contracts).'
+  by: Chinmay
+  date: '2026-10-29'
+  quote: '"Remove + log text" (the lead on the held screen findings of the r11 final gate, 29 October 2026, after
+    "Fix them, then ship")'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T12:46Z, handoff/service-docs/adam-links.json):
+  check-screen-wiring S-OP-UNREACHED findings on BO-712, BO-884 and BO-917 createRotaAssignment, built on by started
+  ticket #32338 (Ready for QA, Pranay Shinde). With the write gone and the text unchanged, S-STATE-BOILERPLATE refuses
+  a first-run text promising a create action no operation does. The lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5); the BO-602 treatment
+  (CHG-R11FXT-004).'
+keys_touched:
+  screens: [BO-712, BO-884, BO-917]
+  operations: [createRotaAssignment]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - contracts/satellite/workforce.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'an operation declared on a screen that does not do it'
+tickets:
+  started:
+  - '32338 (createRotaAssignment, Ready for QA, Pranay Shinde): nothing to change in the operation; BO-712, BO-884
+    and BO-917 no longer consume it, and it stays on BO-055 and BO-714. Told through the lead''s comment; its text is
+    not rewritten.'
+  unstarted:
+  - 'The three screens'' tickets drop the declaration and take the state text (and, on BO-917, drop the screen
+    permission) at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-OP-UNREACHED
+status: open
+notes: 'Four visible changes (state text), logged. No database change.'

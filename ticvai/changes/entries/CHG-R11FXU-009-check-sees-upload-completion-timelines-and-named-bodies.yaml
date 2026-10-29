@@ -1,0 +1,59 @@
+id: CHG-R11FXU-009
+date: '2026-10-29'
+source: audit
+kind: process
+summary: 'check-screen-wiring learns three things: a fileUpload bound to createUpload reaches a declared
+  completeUpload; collectedBy takes a timeline; and S-BUTTON-FORM takes a body whose every required field is named in
+  inputSources and verified. GST-054 and GST-059 then name their bodies'' sources; nothing visible changes.'
+decision:
+  what: 'tools/check-screen-wiring.py, with self-tests: (1) upload_completes: when a screen declares completeUpload and
+    a fileUpload control on it is bound to createUpload, completeUpload counts as reached (S-OP-UNREACHED); a button
+    bound to createUpload reaches nothing more. (2) COLLECTS: collectedBy (S-BUTTON-FORM) accepts a timeline as well as
+    a list, card list, table or grid. (3) body_named: S-BUTTON-FORM takes a button whose write''s required body fields
+    are each named in the api''s inputSources from an operation on the screen whose 2xx response has that field (as
+    S-INPUT-SOURCE verifies an id''s source; the schema helpers it uses are now shared); a named source that is not
+    there is still a finding and says which field. Screens, invisible fields only: screens/P02-guest-mobile-app.yaml
+    GST-059 Re-order my day carries `collectedBy: Today` (the timeline filled by getVisitPlan) and its updateVisitPlan
+    api `inputSources: {baseVersion: getVisitPlan.version}`; GST-054''s updateVisitPlan api carries `inputSources:
+    {changes: requestSuggestion.value, baseVersion: getVisitPlan.version}` (Suggestion.value, VisitPlan.version), and
+    Apply this change says so in its notes. The rules stay narrow: the whole-run finding lists before and after differ
+    only by BO-1189 and BO-955 completeUpload and GST-054 and GST-059 updateVisitPlan; BO-798, ADM-016, CMS-002 and
+    CMS-004, which fit rule (1), held no completeUpload finding.'
+  by: Chinmay
+  date: '2026-10-29'
+  quote: '"Teach the check" (the lead on the held screen findings of the r11 final gate, 29 October 2026, after "Fix
+    them, then ship")'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T12:46Z, handoff/service-docs/adam-links.json):
+  check-screen-wiring S-OP-UNREACHED on BO-1189 and BO-955 completeUpload (#30912, In progress, Narayan Gaonkar) and
+  S-BUTTON-FORM on GST-054 and GST-059 updateVisitPlan (#31855, #31857, Ready for QA, Chinmay Patkar). Each screen
+  already did what the rule could not see: the upload control confirms its own transfer, Today''s rows are the order
+  Re-order my day sends, and Apply this change sends the planner''s proposal. The same kind of change as
+  CHG-R11FXS-008 (collectedBy and inputSources).'
+keys_touched:
+  screens: [BO-1189, BO-955, GST-054, GST-059]
+  operations: [completeUpload, createUpload, updateVisitPlan, getVisitPlan, requestSuggestion]
+  files:
+  - tools/check-screen-wiring.py
+  - screens/P02-guest-mobile-app.yaml
+root_class: 'a check that could not see an upload''s completion, a timeline''s rows or an earlier answer as what a
+  control sends'
+tickets:
+  started:
+  - '30912 (completeUpload, In progress, Narayan Gaonkar): nothing to change; on BO-1189 and BO-955 the file-upload
+    control calls createUpload and then completeUpload when the transfer ends, as its notes already said.'
+  - '31855 and 31857 (updateVisitPlan, Ready for QA, Chinmay Patkar): nothing to change; GST-059 Re-order my day sends
+    Today''s items in their new order (move changes) on getVisitPlan''s version, and GST-054 Apply this change sends
+    requestSuggestion''s value as changes on that version. Told through the lead''s comment; their text is not
+    rewritten.'
+  unstarted:
+  - 'GST-054''s and GST-059''s screen tickets pick the sources up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-BUTTON-FORM
+status: open
+notes: 'No visible change (collectedBy, inputSources and notes are invisible to check-approved-ui). No database
+  change.'

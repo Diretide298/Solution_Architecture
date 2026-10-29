@@ -1,0 +1,55 @@
+id: CHG-R11FXU-006
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'BO-417, BO-418, BO-740 and BO-747 no longer declare a write their generated Save button could never send
+  (setWalletFundingRules, updateGuestPreferences, setConsentPurposes); the generated Save and Cancel buttons go with it,
+  logged as visible changes.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml. Each write is removed and recorded as a removed gap, and the Save and
+    Cancel that derive-components proposed for it (derived, impliedBy the write, bound to nothing) are removed:
+    BO-417 Top-Up Configuration and BO-418 Top-Up Bonus Rule Configuration (setWalletFundingRules: Save wallet funding
+    rules, Cancel; no field on either screen; each keeps getWalletFundingRules and its panel); BO-740 Family & Guardians
+    (updateGuestPreferences: Save guest preferences, Cancel; no preference field; it keeps the family links,
+    getGuestRelationships and setGuestRelationships with its form, and getGuestProfile); BO-747 Consent Policy
+    Configuration (setConsentPurposes: Save consent purposes, Cancel; the purposes table is read-only; it keeps
+    listConsentPurposes and the consent-form builder, listForms and createForm with its form). Each write stays
+    declared and reached where it is really sent: setWalletFundingRules on BO-1094 and BO-1098, updateGuestPreferences
+    on WEB-020, setConsentPurposes on CMS-018 and CMS-023. The four region changes are logged in
+    docs/active/approved-ui-changes.yaml. The x-ticvai-consumed-by mirrors in contracts/satellite/wallet.yaml and
+    contracts/satellite/marketing-crm.yaml follow (link-screens-contracts).'
+  by: Chinmay
+  date: '2026-10-29'
+  quote: '"Remove + log text" (the lead on the held screen findings of the r11 final gate, 29 October 2026, after
+    "Fix them, then ship")'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T12:46Z, handoff/service-docs/adam-links.json):
+  check-screen-wiring S-OP-UNREACHED findings on BO-417 and BO-418 setWalletFundingRules (#30858, Ready for QA, Pranay
+  Shinde), BO-740 updateGuestPreferences (#31166, Ready for QA, Pranay Shinde) and BO-747 setConsentPurposes (#31158,
+  Ready for QA, Pranay Shinde). Binding the generated Save fails S-BUTTON-FORM (nothing collects the body), and
+  removing only the declaration would leave a Save that sends nothing. The lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5); the BO-602 treatment
+  (CHG-R11FXT-004).'
+keys_touched:
+  screens: [BO-417, BO-418, BO-740, BO-747]
+  operations: [setWalletFundingRules, updateGuestPreferences, setConsentPurposes]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'a generated control for a write the screen has no fields to send'
+tickets:
+  started:
+  - '30858 (setWalletFundingRules), 31166 (updateGuestPreferences), 31158 (setConsentPurposes), Ready for QA, Pranay
+    Shinde: nothing to change in the operations; BO-417, BO-418, BO-740 and BO-747 no longer consume them, and each
+    stays on the screens that send it. Told through the lead''s comment; their text is not rewritten.'
+  unstarted:
+  - 'The four screens'' own tickets drop the declaration and the generated Save and Cancel at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-OP-UNREACHED
+status: open
+notes: 'Four visible changes (one region each), logged. No database change.'

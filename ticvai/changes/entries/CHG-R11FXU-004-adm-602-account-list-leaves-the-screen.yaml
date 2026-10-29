@@ -1,0 +1,46 @@
+id: CHG-R11FXU-004
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'ADM-602 B2B Credit Account & Limit Manager no longer declares listB2bCreditAccounts: the approved screen
+  has no element that shows the accounts; ADM-603 and ADM-608 list and pick them. Nothing visible changes.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml ADM-602, a declaration only (invisible to check-approved-ui): the
+    listB2bCreditAccounts api (onLoad, a board reading of 19 September) is removed and recorded as a removed gap. The
+    approved screen''s body is seven pack select fields for the facility being opened (createB2bCreditAccount, which
+    it keeps); no list, table or picker shows the accounts. The lead''s ruling of 26 October 2026 (CHG-R10WIR-002,
+    item 5): a read the approved screen has no element for leaves it. listB2bCreditAccounts stays declared and
+    reached on ADM-603 (the Customer/account picker) and ADM-608. The edge to ADM-603 still carries accountId, which
+    createB2bCreditAccount returns (check-navigation N-CARRIES-HELD passes). The x-ticvai-consumed-by mirror in
+    contracts/satellite/payments.yaml follows (link-screens-contracts).'
+  by: Chinmay
+  date: '2026-10-29'
+  quote: '"Fix them, then ship" (the lead on the screen findings blocking the r11 final gate, 29 October 2026)'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T12:46Z, handoff/service-docs/adam-links.json):
+  check-screen-wiring S-OP-UNREACHED finding on ADM-602 listB2bCreditAccounts, built on by started tickets #36225 and
+  #36316 (Ready for QA, Hrushikant Patkar). The lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5); the same
+  kind of fix as CHG-R11FXT-002.'
+keys_touched:
+  screens: [ADM-602]
+  operations: [listB2bCreditAccounts, createB2bCreditAccount]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - contracts/satellite/payments.yaml
+root_class: 'an operation declared on a screen that has no element for it'
+tickets:
+  started:
+  - '36225 and 36316 (listB2bCreditAccounts, Ready for QA, Hrushikant Patkar): nothing to change in the operation;
+    ADM-602 no longer consumes it, and it stays on ADM-603 and ADM-608. Told through the lead''s comment; their text
+    is not rewritten.'
+  unstarted:
+  - 'ADM-602''s screen ticket drops the declaration at the next tag; the ADM-603 edge carries the id of the account
+    just opened.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-OP-UNREACHED
+status: open
+notes: 'No visible change (apis are invisible to check-approved-ui). No database change.'

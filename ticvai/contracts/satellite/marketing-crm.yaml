@@ -1325,7 +1325,6 @@ paths:
       operationId: updateGuestPreferences
       x-ticvai-consumed-by:
         - "P01 WEB-020 Profile & Preferences"
-        - "P08 BO-740 Family & Guardians"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -5233,7 +5232,6 @@ paths:
     put:
       operationId: setConsentPurposes
       x-ticvai-consumed-by:
-        - "P08 BO-747 Consent Policy Configuration"
         - "P13 CMS-018 Consent & Legal"
         - "P13 CMS-023 Consent Purpose & Consent Type Builder"
       x-ticvai-singleton: true

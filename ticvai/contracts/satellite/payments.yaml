@@ -1469,7 +1469,6 @@ paths:
     get:
       operationId: listB2bCreditAccounts
       x-ticvai-consumed-by:
-        - "P08 ADM-602 B2B Credit Account & Limit Manager"
         - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
         - "P08 ADM-608 Mixed Tender Simulator, Credit Exposure & AI Advisor"
       x-ticvai-read-via:

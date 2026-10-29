@@ -11780,7 +11780,9 @@ screens:
       - kind: primaryButton
         label: Apply this change
         operation: updateVisitPlan
-        notes: Saves the agent's proposal as a new plan version.
+        notes: Saves the agent's proposal as a new plan version. The body is the planner's proposal
+          (`changes` from requestSuggestion's value) on the plan's version (`baseVersion` from getVisitPlan)
+          (CHG-R11FXU-009).
         provenance: decided 29 September 2026, MOB-6
       - kind: secondaryButton
         label: Back to your plan
@@ -11822,6 +11824,9 @@ screens:
     purpose: 'Swap, remove, add or undo: each change is a new version, so undo goes back one'
     trigger: onAction
     provenance: decided 29 September 2026, MOB-6
+    inputSources:
+      changes: requestSuggestion.value
+      baseVersion: getVisitPlan.version
   - operationId: createAiConversation
     contract: ai
     purpose: Opened by the screen on the first message to the planner, not a control, and only when signed
@@ -12603,7 +12608,9 @@ screens:
       - kind: primaryButton
         label: Re-order my day
         operation: updateVisitPlan
-        notes: Saves the proposed order as a new plan version.
+        collectedBy: Today
+        notes: Saves the proposed order as a new plan version. The body is the items of Today (getVisitPlan's
+          rows) in their new order, `move` changes on the plan's version (CHG-R11FXU-009).
         provenance: decided 29 September 2026, MOB-6
       - kind: secondaryButton
         label: Swap
@@ -12637,6 +12644,8 @@ screens:
     purpose: 'Swap, remove, add or undo: each change is a new version, so undo goes back one'
     trigger: onAction
     provenance: decided 29 September 2026, MOB-6
+    inputSources:
+      baseVersion: getVisitPlan.version
   - operationId: listVisitPlanAlternatives
     contract: venue-map
     purpose: Swap candidates for one item that suit everyone in the party

@@ -1,0 +1,43 @@
+id: CHG-R11FXU-011
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'CMS-067 Advanced Search & Discovery shows what it finds: a Matching assets table filled by searchMedia,
+  narrowed by Asset Type, Venue and Collection; a logged design change.'
+decision:
+  what: 'screens/P13-white-label-cms.yaml CMS-067, a design change: its empty contentBody gets a dataTable Matching
+    assets bound to MediaAsset (title, kind, filename, status, createdAt), filled by searchMedia with cursor
+    pagination. The facet buttons Asset Type, Venue and Collection are bound to searchMedia (invisible) and send its
+    kind, venueId and collectionId; File Format and Owner have no search parameter and stay bound to nothing. The
+    region change is logged in docs/active/approved-ui-changes.yaml.'
+  by: Chinmay
+  date: '2026-10-29'
+  quote: '"Add a results table" (the lead on the held screen findings of the r11 final gate, 29 October 2026, after
+    "Fix them, then ship")'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T12:46Z, handoff/service-docs/adam-links.json):
+  check-screen-wiring S-OP-UNREACHED finding on CMS-067 searchMedia, built on by started ticket #30908 (Ready for QA,
+  Narayan Gaonkar). The screen is a search, and nothing on it showed what the search returns.'
+keys_touched:
+  screens: [CMS-067]
+  operations: [searchMedia]
+  schemas: [MediaAsset]
+  files:
+  - screens/P13-white-label-cms.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'a read declared on a screen with no element that shows it'
+tickets:
+  started:
+  - '30908 (searchMedia, Ready for QA, Narayan Gaonkar): nothing to change in the operation; CMS-067 shows its
+    results in Matching assets and sends kind, venueId and collectionId from the facets. Told through the lead''s
+    comment; its text is not rewritten.'
+  unstarted:
+  - 'CMS-067''s screen ticket builds the table and the three facets at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-OP-UNREACHED
+status: open
+notes: 'One visible change (the table), logged. No database change.'
