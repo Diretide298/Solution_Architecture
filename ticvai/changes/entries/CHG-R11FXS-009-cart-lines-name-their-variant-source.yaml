@@ -1,0 +1,46 @@
+id: CHG-R11FXS-009
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'Ten guest screens name where addCartLine''s variantId comes from (inputSources, CHG-R11FXS-008): the field the
+  contract designed for it, in the answer of an operation the screen already declares; nothing visible changes.'
+decision:
+  what: 'screens/P01, P02, P05, the addCartLine api entry gains `inputSources: {variantId: ...}`. The picked merchandise
+    card: listMerchandise.productVariantId (GST-026, KSK-017, WEB-033, WEB-042; GuestMerchandiseItem.productVariantId,
+    "which addCartLine takes as its variantId"). The picked car park: listParkingFacilities.productVariantId (GST-027,
+    WEB-041). The reservation''s deposit: createTableReservation.variantId (GST-070, answered with awaitingDeposit,
+    sent by "Pay the deposit"). The passenger type of a trip: getTransportFareTable.catalogueVariantId (GST-077,
+    WEB-049). The pass offer''s variant per passenger type: listTransportPassOffers.variantId (GST-078). A pass bought
+    on WEB-049 or GST-077 takes the pass offer''s variant; one source per id is named, the trip''s.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 integration gate of 29 October 2026 (run 20261029-020957-8105): check-screen-wiring S-INPUT-SOURCE on the
+  ten, built on by #31749 and #31751 (Ready for QA, Chinmay Patkar). The lead approved fixing the check (29 October 2026,
+  CHG-R11FXS-008); the screens now say what was already true.'
+keys_touched:
+  screens: [GST-026, GST-027, GST-070, GST-077, GST-078, KSK-017, WEB-033, WEB-041, WEB-042, WEB-049]
+  operations: [addCartLine, listMerchandise, listParkingFacilities, createTableReservation, getTransportFareTable,
+    listTransportPassOffers]
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P05-guest-kiosk.yaml
+root_class: 'a guest action whose id comes from a picked row or a write''s answer, which the screen did not name'
+tickets:
+  started:
+  - '31749 and 31751 (addCartLine, Ready for QA, Chinmay Patkar): the operation is unchanged; the screens name the
+    source the build already uses. Told through the lead''s comment; their text is not rewritten.'
+  unstarted:
+  - 'The screens'' tickets pick the metadata up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r11 integration gate of 29 October 2026 (run 20261029-020957-8105), the lead''s rule to fix every
+  gate finding at its source'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Invisible metadata (apis), so no approved-UI entry. S-INPUT-SOURCE after: 0 built on, 0 new. GST-008''s
+  S-BUTTON-FORM stays for the lead: the rule reads only overlays and top-level input components, and the body is
+  collected by each Ticket types row''s stepper. No database change.'

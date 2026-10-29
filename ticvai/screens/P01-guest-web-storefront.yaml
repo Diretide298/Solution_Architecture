@@ -8445,6 +8445,8 @@ screens:
     contract: orders
     purpose: Add the chosen item to the cart, for collection on the way out
     trigger: onAction
+    inputSources:
+      variantId: listMerchandise.productVariantId
     invalidates:
     - listMerchandise
   entryState:
@@ -9965,6 +9967,8 @@ screens:
     purpose: Put the car park's parking product in the cart; refused `soldOutForDay` when the car park
       is at capacity (decided 28 September, audit R166)
     trigger: onAction
+    inputSources:
+      variantId: listParkingFacilities.productVariantId
   - operationId: updateParkingEntitlement
     contract: access
     purpose: Change the plate, or revoke
@@ -10173,6 +10177,8 @@ screens:
     contract: orders
     purpose: Put the item in the cart, marked for collection on the way out (audit R236)
     trigger: onAction
+    inputSources:
+      variantId: listMerchandise.productVariantId
     invalidates:
     - listMerchandise
   - operationId: lookupShopAndDrop
@@ -11667,6 +11673,8 @@ screens:
     contract: orders
     purpose: Add the trip or pass to the basket (`attributes.transport`)
     trigger: onAction
+    inputSources:
+      variantId: getTransportFareTable.catalogueVariantId
   entryState:
     params:
     - name: cartId

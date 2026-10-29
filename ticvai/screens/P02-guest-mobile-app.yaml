@@ -6099,6 +6099,8 @@ screens:
     contract: orders
     purpose: Put the item in the cart, marked for collection on the way out (audit R236)
     trigger: onAction
+    inputSources:
+      variantId: listMerchandise.productVariantId
     invalidates:
     - listMerchandise
   - operationId: reserveMerchandise
@@ -6328,6 +6330,8 @@ screens:
     purpose: Put the car park's parking product in the cart; refused `soldOutForDay` when the car park
       is at capacity (decided 28 September, audit R166)
     trigger: onAction
+    inputSources:
+      variantId: listParkingFacilities.productVariantId
   - operationId: updateParkingEntitlement
     contract: access
     purpose: Change the plate, or revoke
@@ -14129,6 +14133,8 @@ screens:
     contract: orders
     purpose: Add the table deposit to the cart when the venue requires one
     trigger: onAction
+    inputSources:
+      variantId: createTableReservation.variantId
   - operationId: listMyTableReservations
     contract: fnb
     purpose: The guest's own table reservations and waitlist places (self-scoped)
@@ -15837,6 +15843,8 @@ screens:
     contract: orders
     purpose: Add the trip or pass to the basket (`attributes.transport`)
     trigger: onAction
+    inputSources:
+      variantId: getTransportFareTable.catalogueVariantId
   - operationId: saveFavouriteRoute
     contract: transport
     purpose: Save this route
@@ -16004,6 +16012,8 @@ screens:
     contract: orders
     purpose: Add the trip or pass to the basket (`attributes.transport`)
     trigger: onAction
+    inputSources:
+      variantId: listTransportPassOffers.variantId
   entryState:
     params:
     - name: cartId
