@@ -2637,6 +2637,16 @@
 {
 "key": "27645",
 "kind": "table",
+"id": "identity.sso_group_mapping",
+"url": "https://pms.softlabsgroup.in/work_packages/27645",
+"subject": "Foundation \u00b7 Database migrations",
+"status": "New",
+"type": "Feature",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27645",
+"kind": "table",
 "id": "identity.sso_provider",
 "url": "https://pms.softlabsgroup.in/work_packages/27645",
 "subject": "Foundation \u00b7 Database migrations",
@@ -5307,6 +5317,16 @@
 {
 "key": "27645",
 "kind": "table",
+"id": "venuemap.visit_planner_question",
+"url": "https://pms.softlabsgroup.in/work_packages/27645",
+"subject": "Foundation \u00b7 Database migrations",
+"status": "New",
+"type": "Feature",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27645",
+"kind": "table",
 "id": "wallet.accounting_mapping",
 "url": "https://pms.softlabsgroup.in/work_packages/27645",
 "subject": "Foundation \u00b7 Database migrations",
@@ -5777,6 +5797,16 @@
 {
 "key": "27645",
 "kind": "table",
+"id": "whitelabel.received_release",
+"url": "https://pms.softlabsgroup.in/work_packages/27645",
+"subject": "Foundation \u00b7 Database migrations",
+"status": "New",
+"type": "Feature",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27645",
+"kind": "table",
 "id": "whitelabel.site_package",
 "url": "https://pms.softlabsgroup.in/work_packages/27645",
 "subject": "Foundation \u00b7 Database migrations",
@@ -5847,7 +5877,27 @@
 {
 "key": "27645",
 "kind": "table",
+"id": "workforce.position_requirement",
+"url": "https://pms.softlabsgroup.in/work_packages/27645",
+"subject": "Foundation \u00b7 Database migrations",
+"status": "New",
+"type": "Feature",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27645",
+"kind": "table",
 "id": "workforce.rota_assignment",
+"url": "https://pms.softlabsgroup.in/work_packages/27645",
+"subject": "Foundation \u00b7 Database migrations",
+"status": "New",
+"type": "Feature",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27645",
+"kind": "table",
+"id": "workforce.staffing_rules",
 "url": "https://pms.softlabsgroup.in/work_packages/27645",
 "subject": "Foundation \u00b7 Database migrations",
 "status": "New",
@@ -5908,6 +5958,16 @@
 "key": "27646",
 "kind": "file",
 "id": "backend/tenant/V0116__after_r1_20261026.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/27646",
+"subject": "[DB] Migration V0001__baseline.sql: schemas, extensions, migration register, RLS helper functions and the monthly partition helpers (ADR-0056)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27646",
+"kind": "file",
+"id": "backend/tenant/V0118__after_r1_20261029.sql",
 "url": "https://pms.softlabsgroup.in/work_packages/27646",
 "subject": "[DB] Migration V0001__baseline.sql: schemas, extensions, migration register, RLS helper functions and the monthly partition helpers (ADR-0056)",
 "status": "Ready for QA",
@@ -6817,6 +6877,16 @@
 {
 "key": "27657",
 "kind": "table",
+"id": "identity.sso_group_mapping",
+"url": "https://pms.softlabsgroup.in/work_packages/27657",
+"subject": "[DB] Migration V0009__identity.sql: identity (18 tables)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27657",
+"kind": "table",
 "id": "identity.sso_provider",
 "url": "https://pms.softlabsgroup.in/work_packages/27657",
 "subject": "[DB] Migration V0009__identity.sql: identity (18 tables)",
@@ -7498,6 +7568,16 @@
 "key": "27663",
 "kind": "table",
 "id": "whitelabel.publish_review_policy",
+"url": "https://pms.softlabsgroup.in/work_packages/27663",
+"subject": "[DB] Migration V0016__whitelabel.sql: whitelabel (29 tables)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27663",
+"kind": "table",
+"id": "whitelabel.received_release",
 "url": "https://pms.softlabsgroup.in/work_packages/27663",
 "subject": "[DB] Migration V0016__whitelabel.sql: whitelabel (29 tables)",
 "status": "Ready for QA",
@@ -8927,7 +9007,27 @@
 {
 "key": "27670",
 "kind": "table",
+"id": "workforce.position_requirement",
+"url": "https://pms.softlabsgroup.in/work_packages/27670",
+"subject": "[DB] Migration V0018__workforce.sql: workforce (3 tables)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27670",
+"kind": "table",
 "id": "workforce.rota_assignment",
+"url": "https://pms.softlabsgroup.in/work_packages/27670",
+"subject": "[DB] Migration V0018__workforce.sql: workforce (3 tables)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27670",
+"kind": "table",
+"id": "workforce.staffing_rules",
 "url": "https://pms.softlabsgroup.in/work_packages/27670",
 "subject": "[DB] Migration V0018__workforce.sql: workforce (3 tables)",
 "status": "Ready for QA",
@@ -11665,6 +11765,16 @@
 "assignee": "Hrushikant Patkar"
 },
 {
+"key": "27681",
+"kind": "table",
+"id": "venuemap.visit_planner_question",
+"url": "https://pms.softlabsgroup.in/work_packages/27681",
+"subject": "[DB] Migration V0033__venuemap.sql: venuemap (8 tables)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
 "key": "27682",
 "kind": "table",
 "id": "retail.merchandise",
@@ -11858,6 +11968,16 @@
 "key": "27683",
 "kind": "table",
 "id": "identity.principal",
+"url": "https://pms.softlabsgroup.in/work_packages/27683",
+"subject": "[DB] Migration V0034__cross_schema_foreign_keys.sql (35 keys)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27683",
+"kind": "table",
+"id": "identity.sso_group_mapping",
 "url": "https://pms.softlabsgroup.in/work_packages/27683",
 "subject": "[DB] Migration V0034__cross_schema_foreign_keys.sql (35 keys)",
 "status": "Ready for QA",
@@ -14547,6 +14667,16 @@
 {
 "key": "27686",
 "kind": "table",
+"id": "identity.sso_group_mapping",
+"url": "https://pms.softlabsgroup.in/work_packages/27686",
+"subject": "[Test] Module test: Foundation \u00b7 Database migrations",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "27686",
+"kind": "table",
 "id": "identity.sso_provider",
 "url": "https://pms.softlabsgroup.in/work_packages/27686",
 "subject": "[Test] Module test: Foundation \u00b7 Database migrations",
@@ -17217,6 +17347,16 @@
 {
 "key": "27686",
 "kind": "table",
+"id": "venuemap.visit_planner_question",
+"url": "https://pms.softlabsgroup.in/work_packages/27686",
+"subject": "[Test] Module test: Foundation \u00b7 Database migrations",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "27686",
+"kind": "table",
 "id": "wallet.accounting_mapping",
 "url": "https://pms.softlabsgroup.in/work_packages/27686",
 "subject": "[Test] Module test: Foundation \u00b7 Database migrations",
@@ -17687,6 +17827,16 @@
 {
 "key": "27686",
 "kind": "table",
+"id": "whitelabel.received_release",
+"url": "https://pms.softlabsgroup.in/work_packages/27686",
+"subject": "[Test] Module test: Foundation \u00b7 Database migrations",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "27686",
+"kind": "table",
 "id": "whitelabel.site_package",
 "url": "https://pms.softlabsgroup.in/work_packages/27686",
 "subject": "[Test] Module test: Foundation \u00b7 Database migrations",
@@ -17757,7 +17907,27 @@
 {
 "key": "27686",
 "kind": "table",
+"id": "workforce.position_requirement",
+"url": "https://pms.softlabsgroup.in/work_packages/27686",
+"subject": "[Test] Module test: Foundation \u00b7 Database migrations",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "27686",
+"kind": "table",
 "id": "workforce.rota_assignment",
+"url": "https://pms.softlabsgroup.in/work_packages/27686",
+"subject": "[Test] Module test: Foundation \u00b7 Database migrations",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "27686",
+"kind": "table",
+"id": "workforce.staffing_rules",
 "url": "https://pms.softlabsgroup.in/work_packages/27686",
 "subject": "[Test] Module test: Foundation \u00b7 Database migrations",
 "status": "New",
@@ -21167,6 +21337,16 @@
 {
 "key": "27703",
 "kind": "table",
+"id": "whitelabel.config_version",
+"url": "https://pms.softlabsgroup.in/work_packages/27703",
+"subject": "[Test] Module test: Foundation \u00b7 Platform kernel",
+"status": "New",
+"type": "Task",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "27703",
+"kind": "table",
 "id": "whitelabel.content_page",
 "url": "https://pms.softlabsgroup.in/work_packages/27703",
 "subject": "[Test] Module test: Foundation \u00b7 Platform kernel",
@@ -21178,6 +21358,16 @@
 "key": "27703",
 "kind": "table",
 "id": "whitelabel.module_enablement",
+"url": "https://pms.softlabsgroup.in/work_packages/27703",
+"subject": "[Test] Module test: Foundation \u00b7 Platform kernel",
+"status": "New",
+"type": "Task",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "27703",
+"kind": "table",
+"id": "whitelabel.received_release",
 "url": "https://pms.softlabsgroup.in/work_packages/27703",
 "subject": "[Test] Module test: Foundation \u00b7 Platform kernel",
 "status": "New",
@@ -25707,7 +25897,7 @@
 {
 "key": "27728",
 "kind": "table",
-"id": "assets.media_asset",
+"id": "identity.guest_identity_verification",
 "url": "https://pms.softlabsgroup.in/work_packages/27728",
 "subject": "[BE] IdentityService: registerGuest, requestGuestOtp, submitGuestIdentityDocument, verifyGuestOtp",
 "status": "New",
@@ -25717,7 +25907,7 @@
 {
 "key": "27728",
 "kind": "table",
-"id": "identity.guest_identity_verification",
+"id": "identity.guest_upload_ref",
 "url": "https://pms.softlabsgroup.in/work_packages/27728",
 "subject": "[BE] IdentityService: registerGuest, requestGuestOtp, submitGuestIdentityDocument, verifyGuestOtp",
 "status": "New",
@@ -26528,6 +26718,16 @@
 "key": "27731",
 "kind": "operation",
 "id": "identity#guestSocialLogin",
+"url": "https://pms.softlabsgroup.in/work_packages/27731",
+"subject": "[BE] IdentityService: guestPasswordLogin, guestSocialLogin, guestUaePassLogin, linkGuestCheckout",
+"status": "New",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27731",
+"kind": "table",
+"id": "identity.sso_provider",
 "url": "https://pms.softlabsgroup.in/work_packages/27731",
 "subject": "[BE] IdentityService: guestPasswordLogin, guestSocialLogin, guestUaePassLogin, linkGuestCheckout",
 "status": "New",
@@ -28418,6 +28618,16 @@
 "key": "27740",
 "kind": "operation",
 "id": "identity#guestSocialLogin",
+"url": "https://pms.softlabsgroup.in/work_packages/27740",
+"subject": "[Test] Module test: Identity & Security \u00b7 Guest Web",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "27740",
+"kind": "table",
+"id": "identity.sso_provider",
 "url": "https://pms.softlabsgroup.in/work_packages/27740",
 "subject": "[Test] Module test: Identity & Security \u00b7 Guest Web",
 "status": "New",
@@ -31107,6 +31317,16 @@
 {
 "key": "27753",
 "kind": "table",
+"id": "identity.guest_upload_ref",
+"url": "https://pms.softlabsgroup.in/work_packages/27753",
+"subject": "[DB] Forward migration V1001__identity.sql: identity for Identity & Security \u00b7 Staff App (Block A) (2 tables)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27753",
+"kind": "table",
 "id": "identity.guest_verification_policy",
 "url": "https://pms.softlabsgroup.in/work_packages/27753",
 "subject": "[DB] Forward migration V1001__identity.sql: identity for Identity & Security \u00b7 Staff App (Block A) (2 tables)",
@@ -31118,16 +31338,6 @@
 "key": "27753",
 "kind": "table",
 "id": "identity.principal_external_identity",
-"url": "https://pms.softlabsgroup.in/work_packages/27753",
-"subject": "[DB] Forward migration V1001__identity.sql: identity for Identity & Security \u00b7 Staff App (Block A) (2 tables)",
-"status": "Ready for QA",
-"type": "Task",
-"assignee": "Hrushikant Patkar"
-},
-{
-"key": "27753",
-"kind": "table",
-"id": "identity.sso_group_mapping",
 "url": "https://pms.softlabsgroup.in/work_packages/27753",
 "subject": "[DB] Forward migration V1001__identity.sql: identity for Identity & Security \u00b7 Staff App (Block A) (2 tables)",
 "status": "Ready for QA",
@@ -31968,6 +32178,16 @@
 "key": "27759",
 "kind": "table",
 "id": "identity.guest_identity_verification",
+"url": "https://pms.softlabsgroup.in/work_packages/27759",
+"subject": "[Test] Module test: Identity & Security \u00b7 Staff App (Block A)",
+"status": "New",
+"type": "Task",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "27759",
+"kind": "table",
+"id": "identity.guest_upload_ref",
 "url": "https://pms.softlabsgroup.in/work_packages/27759",
 "subject": "[Test] Module test: Identity & Security \u00b7 Staff App (Block A)",
 "status": "New",
@@ -32998,6 +33218,16 @@
 "key": "27764",
 "kind": "screen",
 "id": "BO-053",
+"url": "https://pms.softlabsgroup.in/work_packages/27764",
+"subject": "[BE] IdentityService: createRole, listOwnPlatformStaffGrants, listPrincipals, listRoles",
+"status": "New",
+"type": "Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "27764",
+"kind": "screen",
+"id": "BO-873",
 "url": "https://pms.softlabsgroup.in/work_packages/27764",
 "subject": "[BE] IdentityService: createRole, listOwnPlatformStaffGrants, listPrincipals, listRoles",
 "status": "New",
@@ -34448,6 +34678,16 @@
 "key": "27770",
 "kind": "screen",
 "id": "BO-053",
+"url": "https://pms.softlabsgroup.in/work_packages/27770",
+"subject": "[Test] Module test: Identity & Security \u00b7 CMS 1 of 2",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "27770",
+"kind": "screen",
+"id": "BO-873",
 "url": "https://pms.softlabsgroup.in/work_packages/27770",
 "subject": "[Test] Module test: Identity & Security \u00b7 CMS 1 of 2",
 "status": "New",
@@ -36157,6 +36397,16 @@
 {
 "key": "27777",
 "kind": "table",
+"id": "whitelabel.config_version",
+"url": "https://pms.softlabsgroup.in/work_packages/27777",
+"subject": "[BE] WhiteLabelService: recordStorefrontSessionEvents, setAnalyticsProvider, setMaintenanceMode",
+"status": "New",
+"type": "Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "27777",
+"kind": "table",
 "id": "whitelabel.content_page",
 "url": "https://pms.softlabsgroup.in/work_packages/27777",
 "subject": "[BE] WhiteLabelService: recordStorefrontSessionEvents, setAnalyticsProvider, setMaintenanceMode",
@@ -36168,6 +36418,16 @@
 "key": "27777",
 "kind": "table",
 "id": "whitelabel.module_enablement",
+"url": "https://pms.softlabsgroup.in/work_packages/27777",
+"subject": "[BE] WhiteLabelService: recordStorefrontSessionEvents, setAnalyticsProvider, setMaintenanceMode",
+"status": "New",
+"type": "Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "27777",
+"kind": "table",
+"id": "whitelabel.received_release",
 "url": "https://pms.softlabsgroup.in/work_packages/27777",
 "subject": "[BE] WhiteLabelService: recordStorefrontSessionEvents, setAnalyticsProvider, setMaintenanceMode",
 "status": "New",
@@ -36617,6 +36877,16 @@
 {
 "key": "27779",
 "kind": "table",
+"id": "whitelabel.policy",
+"url": "https://pms.softlabsgroup.in/work_packages/27779",
+"subject": "[BE] WhiteLabelService: getSitePackage, getSiteSetupProgress, listConfigVersions, publishTenantConfig",
+"status": "New",
+"type": "Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "27779",
+"kind": "table",
 "id": "whitelabel.publish_review_policy",
 "url": "https://pms.softlabsgroup.in/work_packages/27779",
 "subject": "[BE] WhiteLabelService: getSitePackage, getSiteSetupProgress, listConfigVersions, publishTenantConfig",
@@ -36918,6 +37188,16 @@
 "key": "27780",
 "kind": "table",
 "id": "whitelabel.content_page",
+"url": "https://pms.softlabsgroup.in/work_packages/27780",
+"subject": "[BE] WhiteLabelService: restoreConfigVersion, setPublishReviewPolicy, setSiteSetupProgress, validateTenantConfig",
+"status": "New",
+"type": "Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "27780",
+"kind": "table",
+"id": "whitelabel.policy",
 "url": "https://pms.softlabsgroup.in/work_packages/27780",
 "subject": "[BE] WhiteLabelService: restoreConfigVersion, setPublishReviewPolicy, setSiteSetupProgress, validateTenantConfig",
 "status": "New",
@@ -44077,6 +44357,16 @@
 {
 "key": "27836",
 "kind": "table",
+"id": "assets.media_collection",
+"url": "https://pms.softlabsgroup.in/work_packages/27836",
+"subject": "[BE] VenueOpsService: deleteMediaAsset, getMediaAsset, replaceMediaAsset, searchMedia",
+"status": "New",
+"type": "Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "27836",
+"kind": "table",
 "id": "assets.media_usage",
 "url": "https://pms.softlabsgroup.in/work_packages/27836",
 "subject": "[BE] VenueOpsService: deleteMediaAsset, getMediaAsset, replaceMediaAsset, searchMedia",
@@ -44118,16 +44408,6 @@
 "key": "27836",
 "kind": "table",
 "id": "assets.asset_version",
-"url": "https://pms.softlabsgroup.in/work_packages/27836",
-"subject": "[BE] VenueOpsService: deleteMediaAsset, getMediaAsset, replaceMediaAsset, searchMedia",
-"status": "New",
-"type": "Task",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "27836",
-"kind": "table",
-"id": "assets.media_collection",
 "url": "https://pms.softlabsgroup.in/work_packages/27836",
 "subject": "[BE] VenueOpsService: deleteMediaAsset, getMediaAsset, replaceMediaAsset, searchMedia",
 "status": "New",
@@ -44258,16 +44538,6 @@
 "key": "27836",
 "kind": "screen",
 "id": "CMS-004",
-"url": "https://pms.softlabsgroup.in/work_packages/27836",
-"subject": "[BE] VenueOpsService: deleteMediaAsset, getMediaAsset, replaceMediaAsset, searchMedia",
-"status": "New",
-"type": "Task",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "27836",
-"kind": "screen",
-"id": "CMS-061",
 "url": "https://pms.softlabsgroup.in/work_packages/27836",
 "subject": "[BE] VenueOpsService: deleteMediaAsset, getMediaAsset, replaceMediaAsset, searchMedia",
 "status": "New",
@@ -45528,16 +45798,6 @@
 "key": "27843",
 "kind": "screen",
 "id": "BO-008",
-"url": "https://pms.softlabsgroup.in/work_packages/27843",
-"subject": "[Test] Module test: Digital Assets \u00b7 CMS 1 of 4",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "27843",
-"kind": "screen",
-"id": "CMS-061",
 "url": "https://pms.softlabsgroup.in/work_packages/27843",
 "subject": "[Test] Module test: Digital Assets \u00b7 CMS 1 of 4",
 "status": "New",
@@ -53277,6 +53537,26 @@
 {
 "key": "27880",
 "kind": "table",
+"id": "whitelabel.app_build",
+"url": "https://pms.softlabsgroup.in/work_packages/27880",
+"subject": "[BE] WhiteLabelService: getAppIcons, getBrandIdentity, setAppIcons, setBrandIdentity",
+"status": "New",
+"type": "Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "27880",
+"kind": "table",
+"id": "whitelabel.config_version",
+"url": "https://pms.softlabsgroup.in/work_packages/27880",
+"subject": "[BE] WhiteLabelService: getAppIcons, getBrandIdentity, setAppIcons, setBrandIdentity",
+"status": "New",
+"type": "Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "27880",
+"kind": "table",
 "id": "whitelabel.tenant_config",
 "url": "https://pms.softlabsgroup.in/work_packages/27880",
 "subject": "[BE] WhiteLabelService: getAppIcons, getBrandIdentity, setAppIcons, setBrandIdentity",
@@ -53358,16 +53638,6 @@
 "key": "27880",
 "kind": "operation",
 "id": "white-label#setBrandIdentity",
-"url": "https://pms.softlabsgroup.in/work_packages/27880",
-"subject": "[BE] WhiteLabelService: getAppIcons, getBrandIdentity, setAppIcons, setBrandIdentity",
-"status": "New",
-"type": "Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "27880",
-"kind": "screen",
-"id": "BO-836",
 "url": "https://pms.softlabsgroup.in/work_packages/27880",
 "subject": "[BE] WhiteLabelService: getAppIcons, getBrandIdentity, setAppIcons, setBrandIdentity",
 "status": "New",
@@ -53707,6 +53977,16 @@
 {
 "key": "27885",
 "kind": "table",
+"id": "whitelabel.banner",
+"url": "https://pms.softlabsgroup.in/work_packages/27885",
+"subject": "[BE] WhiteLabelService: getPublishedTenantConfig, getTenantAppStatus, getTenantConfig, listAnalyticsProviders",
+"status": "New",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27885",
+"kind": "table",
 "id": "whitelabel.config_version",
 "url": "https://pms.softlabsgroup.in/work_packages/27885",
 "subject": "[BE] WhiteLabelService: getPublishedTenantConfig, getTenantAppStatus, getTenantConfig, listAnalyticsProviders",
@@ -53778,6 +54058,16 @@
 "key": "27885",
 "kind": "table",
 "id": "whitelabel.navigation_item",
+"url": "https://pms.softlabsgroup.in/work_packages/27885",
+"subject": "[BE] WhiteLabelService: getPublishedTenantConfig, getTenantAppStatus, getTenantConfig, listAnalyticsProviders",
+"status": "New",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27885",
+"kind": "table",
+"id": "whitelabel.promo_block",
 "url": "https://pms.softlabsgroup.in/work_packages/27885",
 "subject": "[BE] WhiteLabelService: getPublishedTenantConfig, getTenantAppStatus, getTenantConfig, listAnalyticsProviders",
 "status": "New",
@@ -53898,6 +54188,16 @@
 "key": "27885",
 "kind": "table",
 "id": "whitelabel.module_enablement",
+"url": "https://pms.softlabsgroup.in/work_packages/27885",
+"subject": "[BE] WhiteLabelService: getPublishedTenantConfig, getTenantAppStatus, getTenantConfig, listAnalyticsProviders",
+"status": "New",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27885",
+"kind": "table",
+"id": "whitelabel.received_release",
 "url": "https://pms.softlabsgroup.in/work_packages/27885",
 "subject": "[BE] WhiteLabelService: getPublishedTenantConfig, getTenantAppStatus, getTenantConfig, listAnalyticsProviders",
 "status": "New",
@@ -62617,86 +62917,6 @@
 {
 "key": "27946",
 "kind": "operation",
-"id": "identity#listRoles",
-"url": "https://pms.softlabsgroup.in/work_packages/27946",
-"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Feature",
-"assignee": "Hrushikant Patkar"
-},
-{
-"key": "27946",
-"kind": "operation",
-"id": "identity#listPermissionFindings",
-"url": "https://pms.softlabsgroup.in/work_packages/27946",
-"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Feature",
-"assignee": "Hrushikant Patkar"
-},
-{
-"key": "27946",
-"kind": "operation",
-"id": "identity#suggestRoleAssignment",
-"url": "https://pms.softlabsgroup.in/work_packages/27946",
-"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Feature",
-"assignee": "Hrushikant Patkar"
-},
-{
-"key": "27946",
-"kind": "operation",
-"id": "identity#listAccessReviewCampaigns",
-"url": "https://pms.softlabsgroup.in/work_packages/27946",
-"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Feature",
-"assignee": "Hrushikant Patkar"
-},
-{
-"key": "27946",
-"kind": "operation",
-"id": "identity#listAccessReviewItems",
-"url": "https://pms.softlabsgroup.in/work_packages/27946",
-"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Feature",
-"assignee": "Hrushikant Patkar"
-},
-{
-"key": "27946",
-"kind": "operation",
-"id": "identity#updatePrincipal",
-"url": "https://pms.softlabsgroup.in/work_packages/27946",
-"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Feature",
-"assignee": "Hrushikant Patkar"
-},
-{
-"key": "27946",
-"kind": "operation",
-"id": "identity#resolvePermissions",
-"url": "https://pms.softlabsgroup.in/work_packages/27946",
-"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Feature",
-"assignee": "Hrushikant Patkar"
-},
-{
-"key": "27946",
-"kind": "operation",
-"id": "identity#listCapabilityTemplates",
-"url": "https://pms.softlabsgroup.in/work_packages/27946",
-"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Feature",
-"assignee": "Hrushikant Patkar"
-},
-{
-"key": "27946",
-"kind": "operation",
 "id": "identity#listSegregationRules",
 "url": "https://pms.softlabsgroup.in/work_packages/27946",
 "subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
@@ -62828,6 +63048,86 @@
 "key": "27946",
 "kind": "operation",
 "id": "tenancy#getDeviceFirmware",
+"url": "https://pms.softlabsgroup.in/work_packages/27946",
+"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
+"status": "New",
+"type": "Feature",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27946",
+"kind": "operation",
+"id": "identity#listRoles",
+"url": "https://pms.softlabsgroup.in/work_packages/27946",
+"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
+"status": "New",
+"type": "Feature",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27946",
+"kind": "operation",
+"id": "identity#listPermissionFindings",
+"url": "https://pms.softlabsgroup.in/work_packages/27946",
+"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
+"status": "New",
+"type": "Feature",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27946",
+"kind": "operation",
+"id": "identity#suggestRoleAssignment",
+"url": "https://pms.softlabsgroup.in/work_packages/27946",
+"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
+"status": "New",
+"type": "Feature",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27946",
+"kind": "operation",
+"id": "identity#listAccessReviewCampaigns",
+"url": "https://pms.softlabsgroup.in/work_packages/27946",
+"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
+"status": "New",
+"type": "Feature",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27946",
+"kind": "operation",
+"id": "identity#listAccessReviewItems",
+"url": "https://pms.softlabsgroup.in/work_packages/27946",
+"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
+"status": "New",
+"type": "Feature",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27946",
+"kind": "operation",
+"id": "identity#updatePrincipal",
+"url": "https://pms.softlabsgroup.in/work_packages/27946",
+"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
+"status": "New",
+"type": "Feature",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27946",
+"kind": "operation",
+"id": "identity#resolvePermissions",
+"url": "https://pms.softlabsgroup.in/work_packages/27946",
+"subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
+"status": "New",
+"type": "Feature",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "27946",
+"kind": "operation",
+"id": "identity#listCapabilityTemplates",
 "url": "https://pms.softlabsgroup.in/work_packages/27946",
 "subject": "Platform Foundation \u00b7 Venue Management (setup, the rest of the screens)",
 "status": "New",
@@ -63997,46 +64297,6 @@
 {
 "key": "27961",
 "kind": "operation",
-"id": "subscription#addLicenceAddOn",
-"url": "https://pms.softlabsgroup.in/work_packages/27961",
-"subject": "Platform Foundation \u00b7 TICVAI Console (setup)",
-"status": "New",
-"type": "Feature",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "27961",
-"kind": "operation",
-"id": "subscription#createTenant",
-"url": "https://pms.softlabsgroup.in/work_packages/27961",
-"subject": "Platform Foundation \u00b7 TICVAI Console (setup)",
-"status": "New",
-"type": "Feature",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "27961",
-"kind": "operation",
-"id": "subscription#terminateTenant",
-"url": "https://pms.softlabsgroup.in/work_packages/27961",
-"subject": "Platform Foundation \u00b7 TICVAI Console (setup)",
-"status": "New",
-"type": "Feature",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "27961",
-"kind": "operation",
-"id": "subscription#updateTenant",
-"url": "https://pms.softlabsgroup.in/work_packages/27961",
-"subject": "Platform Foundation \u00b7 TICVAI Console (setup)",
-"status": "New",
-"type": "Feature",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "27961",
-"kind": "operation",
 "id": "subscription#setSubscription",
 "url": "https://pms.softlabsgroup.in/work_packages/27961",
 "subject": "Platform Foundation \u00b7 TICVAI Console (setup)",
@@ -64068,6 +64328,56 @@
 "key": "27961",
 "kind": "operation",
 "id": "orders#setPaymentProvider",
+"url": "https://pms.softlabsgroup.in/work_packages/27961",
+"subject": "Platform Foundation \u00b7 TICVAI Console (setup)",
+"status": "New",
+"type": "Feature",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "27961",
+"kind": "operation",
+"id": "subscription#addLicenceAddOn",
+"url": "https://pms.softlabsgroup.in/work_packages/27961",
+"subject": "Platform Foundation \u00b7 TICVAI Console (setup)",
+"status": "New",
+"type": "Feature",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "27961",
+"kind": "operation",
+"id": "subscription#createTenant",
+"url": "https://pms.softlabsgroup.in/work_packages/27961",
+"subject": "Platform Foundation \u00b7 TICVAI Console (setup)",
+"status": "New",
+"type": "Feature",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "27961",
+"kind": "operation",
+"id": "identity#setSsoConfig",
+"url": "https://pms.softlabsgroup.in/work_packages/27961",
+"subject": "Platform Foundation \u00b7 TICVAI Console (setup)",
+"status": "New",
+"type": "Feature",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "27961",
+"kind": "operation",
+"id": "subscription#terminateTenant",
+"url": "https://pms.softlabsgroup.in/work_packages/27961",
+"subject": "Platform Foundation \u00b7 TICVAI Console (setup)",
+"status": "New",
+"type": "Feature",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "27961",
+"kind": "operation",
+"id": "subscription#updateTenant",
 "url": "https://pms.softlabsgroup.in/work_packages/27961",
 "subject": "Platform Foundation \u00b7 TICVAI Console (setup)",
 "status": "New",
@@ -64268,6 +64578,16 @@
 "key": "27964",
 "kind": "operation",
 "id": "subscription#createTenant",
+"url": "https://pms.softlabsgroup.in/work_packages/27964",
+"subject": "[FE] ADM-005 Tenant Directory (setup: 6 of its 17 operations)",
+"status": "On hold",
+"type": "Task",
+"assignee": ""
+},
+{
+"key": "27964",
+"kind": "operation",
+"id": "identity#setSsoConfig",
 "url": "https://pms.softlabsgroup.in/work_packages/27964",
 "subject": "[FE] ADM-005 Tenant Directory (setup: 6 of its 17 operations)",
 "status": "On hold",
@@ -64638,16 +64958,6 @@
 "key": "27968",
 "kind": "operation",
 "id": "subscription#removeLicenceAddOn",
-"url": "https://pms.softlabsgroup.in/work_packages/27968",
-"subject": "Platform Foundation \u00b7 TICVAI Console (setup, the rest of the screens)",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "27968",
-"kind": "operation",
-"id": "identity#setSsoConfig",
 "url": "https://pms.softlabsgroup.in/work_packages/27968",
 "subject": "Platform Foundation \u00b7 TICVAI Console (setup, the rest of the screens)",
 "status": "New",
@@ -86288,6 +86598,16 @@
 "key": "28150",
 "kind": "table",
 "id": "venuemap.point",
+"url": "https://pms.softlabsgroup.in/work_packages/28150",
+"subject": "[BE] VenueOpsService: bookVisitPlan, generateVisitPlan, getVisitPlan, listVisitPlanAlternatives",
+"status": "New",
+"type": "Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "28150",
+"kind": "table",
+"id": "venuemap.visit_planner_question",
 "url": "https://pms.softlabsgroup.in/work_packages/28150",
 "subject": "[BE] VenueOpsService: bookVisitPlan, generateVisitPlan, getVisitPlan, listVisitPlanAlternatives",
 "status": "New",
@@ -108096,16 +108416,6 @@
 },
 {
 "key": "28338",
-"kind": "screen",
-"id": "BO-836",
-"url": "https://pms.softlabsgroup.in/work_packages/28338",
-"subject": "[Test] Module test: White Label \u00b7 CMS",
-"status": "New",
-"type": "Task",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "28338",
 "kind": "operation",
 "id": "white-label#setHeader",
 "url": "https://pms.softlabsgroup.in/work_packages/28338",
@@ -113327,16 +113637,6 @@
 {
 "key": "28386",
 "kind": "operation",
-"id": "identity#setSsoConfig",
-"url": "https://pms.softlabsgroup.in/work_packages/28386",
-"subject": "[FE] ADM-005 Tenant Directory (the rest of the screen: 11 of its 17 operations)",
-"status": "On hold",
-"type": "Task",
-"assignee": ""
-},
-{
-"key": "28386",
-"kind": "operation",
 "id": "subscription#suspendTenant",
 "url": "https://pms.softlabsgroup.in/work_packages/28386",
 "subject": "[FE] ADM-005 Tenant Directory (the rest of the screen: 11 of its 17 operations)",
@@ -116767,6 +117067,16 @@
 {
 "key": "28415",
 "kind": "screen",
+"id": "BO-881",
+"url": "https://pms.softlabsgroup.in/work_packages/28415",
+"subject": "Venue Operations \u00b7 Venue Management (setup)",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "28415",
+"kind": "screen",
 "id": "BO-911",
 "url": "https://pms.softlabsgroup.in/work_packages/28415",
 "subject": "Venue Operations \u00b7 Venue Management (setup)",
@@ -116788,6 +117098,16 @@
 "key": "28415",
 "kind": "operation",
 "id": "workforce#updateRotaAssignment",
+"url": "https://pms.softlabsgroup.in/work_packages/28415",
+"subject": "Venue Operations \u00b7 Venue Management (setup)",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "28415",
+"kind": "operation",
+"id": "workforce#setStaffingRules",
 "url": "https://pms.softlabsgroup.in/work_packages/28415",
 "subject": "Venue Operations \u00b7 Venue Management (setup)",
 "status": "New",
@@ -117226,6 +117546,16 @@
 },
 {
 "key": "28416",
+"kind": "table",
+"id": "workforce.staffing_rules",
+"url": "https://pms.softlabsgroup.in/work_packages/28416",
+"subject": "[BE] TenancyService: createRotaAssignment, listRotaAssignments, updateRotaAssignment",
+"status": "New",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "28416",
 "kind": "screen",
 "id": "BO-055",
 "url": "https://pms.softlabsgroup.in/work_packages/28416",
@@ -117236,8 +117566,8 @@
 },
 {
 "key": "28416",
-"kind": "screen",
-"id": "BO-712",
+"kind": "operation",
+"id": "workforce#listRotaAssignments",
 "url": "https://pms.softlabsgroup.in/work_packages/28416",
 "subject": "[BE] TenancyService: createRotaAssignment, listRotaAssignments, updateRotaAssignment",
 "status": "New",
@@ -117246,8 +117576,8 @@
 },
 {
 "key": "28416",
-"kind": "operation",
-"id": "workforce#listRotaAssignments",
+"kind": "screen",
+"id": "BO-712",
 "url": "https://pms.softlabsgroup.in/work_packages/28416",
 "subject": "[BE] TenancyService: createRotaAssignment, listRotaAssignments, updateRotaAssignment",
 "status": "New",
@@ -118617,6 +118947,16 @@
 {
 "key": "28446",
 "kind": "screen",
+"id": "BO-881",
+"url": "https://pms.softlabsgroup.in/work_packages/28446",
+"subject": "[Test] Module test: Venue Operations \u00b7 Venue Management (setup)",
+"status": "New",
+"type": "Task",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "28446",
+"kind": "screen",
 "id": "BO-911",
 "url": "https://pms.softlabsgroup.in/work_packages/28446",
 "subject": "[Test] Module test: Venue Operations \u00b7 Venue Management (setup)",
@@ -119066,8 +119406,8 @@
 },
 {
 "key": "28446",
-"kind": "screen",
-"id": "BO-712",
+"kind": "table",
+"id": "workforce.staffing_rules",
 "url": "https://pms.softlabsgroup.in/work_packages/28446",
 "subject": "[Test] Module test: Venue Operations \u00b7 Venue Management (setup)",
 "status": "New",
@@ -119087,7 +119427,37 @@
 {
 "key": "28446",
 "kind": "screen",
+"id": "BO-712",
+"url": "https://pms.softlabsgroup.in/work_packages/28446",
+"subject": "[Test] Module test: Venue Operations \u00b7 Venue Management (setup)",
+"status": "New",
+"type": "Task",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "28446",
+"kind": "screen",
 "id": "POS-009",
+"url": "https://pms.softlabsgroup.in/work_packages/28446",
+"subject": "[Test] Module test: Venue Operations \u00b7 Venue Management (setup)",
+"status": "New",
+"type": "Task",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "28446",
+"kind": "operation",
+"id": "workforce#setStaffingRules",
+"url": "https://pms.softlabsgroup.in/work_packages/28446",
+"subject": "[Test] Module test: Venue Operations \u00b7 Venue Management (setup)",
+"status": "New",
+"type": "Task",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "28446",
+"kind": "table",
+"id": "workforce.position_requirement",
 "url": "https://pms.softlabsgroup.in/work_packages/28446",
 "subject": "[Test] Module test: Venue Operations \u00b7 Venue Management (setup)",
 "status": "New",
@@ -166966,6 +167336,16 @@
 },
 {
 "key": "28844",
+"kind": "screen",
+"id": "CMS-021",
+"url": "https://pms.softlabsgroup.in/work_packages/28844",
+"subject": "Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "28844",
 "kind": "operation",
 "id": "marketing-crm#setSeoMetadata",
 "url": "https://pms.softlabsgroup.in/work_packages/28844",
@@ -167068,6 +167448,16 @@
 "key": "28844",
 "kind": "operation",
 "id": "marketing-crm#listConsentAnswers",
+"url": "https://pms.softlabsgroup.in/work_packages/28844",
+"subject": "Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "28844",
+"kind": "operation",
+"id": "marketing-crm#listPrivacyConsent",
 "url": "https://pms.softlabsgroup.in/work_packages/28844",
 "subject": "Marketing & CRM \u00b7 CMS 1 of 4",
 "status": "New",
@@ -167218,6 +167608,126 @@
 "key": "28847",
 "kind": "screen",
 "id": "CMS-018",
+"url": "https://pms.softlabsgroup.in/work_packages/28847",
+"subject": "[Test] Module test: Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Task",
+"assignee": ""
+},
+{
+"key": "28847",
+"kind": "screen",
+"id": "CMS-021",
+"url": "https://pms.softlabsgroup.in/work_packages/28847",
+"subject": "[Test] Module test: Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Task",
+"assignee": ""
+},
+{
+"key": "28847",
+"kind": "operation",
+"id": "marketing-crm#listPrivacyConsent",
+"url": "https://pms.softlabsgroup.in/work_packages/28847",
+"subject": "[Test] Module test: Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Task",
+"assignee": ""
+},
+{
+"key": "28847",
+"kind": "service",
+"id": "MarketingService",
+"url": "https://pms.softlabsgroup.in/work_packages/28847",
+"subject": "[Test] Module test: Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Task",
+"assignee": ""
+},
+{
+"key": "28847",
+"kind": "table",
+"id": "marketing.communication_preference_type",
+"url": "https://pms.softlabsgroup.in/work_packages/28847",
+"subject": "[Test] Module test: Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Task",
+"assignee": ""
+},
+{
+"key": "28847",
+"kind": "table",
+"id": "marketing.consent_capture_point",
+"url": "https://pms.softlabsgroup.in/work_packages/28847",
+"subject": "[Test] Module test: Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Task",
+"assignee": ""
+},
+{
+"key": "28847",
+"kind": "table",
+"id": "marketing.consent_purpose",
+"url": "https://pms.softlabsgroup.in/work_packages/28847",
+"subject": "[Test] Module test: Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Task",
+"assignee": ""
+},
+{
+"key": "28847",
+"kind": "table",
+"id": "marketing.tracking_technology",
+"url": "https://pms.softlabsgroup.in/work_packages/28847",
+"subject": "[Test] Module test: Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Task",
+"assignee": ""
+},
+{
+"key": "28847",
+"kind": "table",
+"id": "marketing.duplicate_candidate",
+"url": "https://pms.softlabsgroup.in/work_packages/28847",
+"subject": "[Test] Module test: Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Task",
+"assignee": ""
+},
+{
+"key": "28847",
+"kind": "table",
+"id": "marketing.guest_attribute_model",
+"url": "https://pms.softlabsgroup.in/work_packages/28847",
+"subject": "[Test] Module test: Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Task",
+"assignee": ""
+},
+{
+"key": "28847",
+"kind": "table",
+"id": "marketing.identity_rules",
+"url": "https://pms.softlabsgroup.in/work_packages/28847",
+"subject": "[Test] Module test: Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Task",
+"assignee": ""
+},
+{
+"key": "28847",
+"kind": "table",
+"id": "marketing.privacy_exception",
+"url": "https://pms.softlabsgroup.in/work_packages/28847",
+"subject": "[Test] Module test: Marketing & CRM \u00b7 CMS 1 of 4",
+"status": "New",
+"type": "Task",
+"assignee": ""
+},
+{
+"key": "28847",
+"kind": "table",
+"id": "marketing.privacy_request",
 "url": "https://pms.softlabsgroup.in/work_packages/28847",
 "subject": "[Test] Module test: Marketing & CRM \u00b7 CMS 1 of 4",
 "status": "New",
@@ -176387,16 +176897,6 @@
 {
 "key": "28946",
 "kind": "table",
-"id": "workforce.staffing_rules",
-"url": "https://pms.softlabsgroup.in/work_packages/28946",
-"subject": "[DB] Forward migration V1162__workforce.sql: workforce for Resources & Capacity \u00b7 Venue Management 2 of 4 (4 tables)",
-"status": "Ready for QA",
-"type": "Task",
-"assignee": "Hrushikant Patkar"
-},
-{
-"key": "28946",
-"kind": "table",
 "id": "workforce.training_record",
 "url": "https://pms.softlabsgroup.in/work_packages/28946",
 "subject": "[DB] Forward migration V1162__workforce.sql: workforce for Resources & Capacity \u00b7 Venue Management 2 of 4 (4 tables)",
@@ -176448,16 +176948,6 @@
 "key": "28947",
 "kind": "table",
 "id": "workforce.open_shift",
-"url": "https://pms.softlabsgroup.in/work_packages/28947",
-"subject": "[DB] Forward migration V1164__workforce.sql: workforce for Workforce \u00b7 Venue Management 1 of 2 (9 tables)",
-"status": "Ready for QA",
-"type": "Task",
-"assignee": "Hrushikant Patkar"
-},
-{
-"key": "28947",
-"kind": "table",
-"id": "workforce.position_requirement",
 "url": "https://pms.softlabsgroup.in/work_packages/28947",
 "subject": "[DB] Forward migration V1164__workforce.sql: workforce for Workforce \u00b7 Venue Management 1 of 2 (9 tables)",
 "status": "Ready for QA",
@@ -178638,66 +179128,6 @@
 "key": "28968",
 "kind": "table",
 "id": "workforce.integration_source",
-"url": "https://pms.softlabsgroup.in/work_packages/28968",
-"subject": "[Test] Module test: AI & Intelligence \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Task",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "28968",
-"kind": "table",
-"id": "workforce.labour_budget",
-"url": "https://pms.softlabsgroup.in/work_packages/28968",
-"subject": "[Test] Module test: AI & Intelligence \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Task",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "28968",
-"kind": "table",
-"id": "workforce.leave_balance",
-"url": "https://pms.softlabsgroup.in/work_packages/28968",
-"subject": "[Test] Module test: AI & Intelligence \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Task",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "28968",
-"kind": "table",
-"id": "workforce.leave_request",
-"url": "https://pms.softlabsgroup.in/work_packages/28968",
-"subject": "[Test] Module test: AI & Intelligence \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Task",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "28968",
-"kind": "table",
-"id": "workforce.leave_type",
-"url": "https://pms.softlabsgroup.in/work_packages/28968",
-"subject": "[Test] Module test: AI & Intelligence \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Task",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "28968",
-"kind": "table",
-"id": "workforce.sync_conflict",
-"url": "https://pms.softlabsgroup.in/work_packages/28968",
-"subject": "[Test] Module test: AI & Intelligence \u00b7 Venue Management (setup, the rest of the screens)",
-"status": "New",
-"type": "Task",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "28968",
-"kind": "table",
-"id": "workforce.sync_run",
 "url": "https://pms.softlabsgroup.in/work_packages/28968",
 "subject": "[Test] Module test: AI & Intelligence \u00b7 Venue Management (setup, the rest of the screens)",
 "status": "New",
@@ -185428,6 +185858,16 @@
 "key": "29044",
 "kind": "screen",
 "id": "BO-053",
+"url": "https://pms.softlabsgroup.in/work_packages/29044",
+"subject": "[BE] TenancyService: listJobTitles, listWorkAssignments, setJobTitle, setWorkAssignment",
+"status": "New",
+"type": "Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "29044",
+"kind": "screen",
+"id": "BO-873",
 "url": "https://pms.softlabsgroup.in/work_packages/29044",
 "subject": "[BE] TenancyService: listJobTitles, listWorkAssignments, setJobTitle, setWorkAssignment",
 "status": "New",
@@ -192597,6 +193037,16 @@
 {
 "key": "29127",
 "kind": "screen",
+"id": "ADM-612",
+"url": "https://pms.softlabsgroup.in/work_packages/29127",
+"subject": "Tenancy & Venues \u00b7 Venue Management 2 of 3",
+"status": "New",
+"type": "Feature",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "29127",
+"kind": "screen",
 "id": "ADM-618",
 "url": "https://pms.softlabsgroup.in/work_packages/29127",
 "subject": "Tenancy & Venues \u00b7 Venue Management 2 of 3",
@@ -192697,26 +193147,6 @@
 {
 "key": "29127",
 "kind": "screen",
-"id": "BO-727",
-"url": "https://pms.softlabsgroup.in/work_packages/29127",
-"subject": "Tenancy & Venues \u00b7 Venue Management 2 of 3",
-"status": "New",
-"type": "Feature",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "29127",
-"kind": "screen",
-"id": "BO-731",
-"url": "https://pms.softlabsgroup.in/work_packages/29127",
-"subject": "Tenancy & Venues \u00b7 Venue Management 2 of 3",
-"status": "New",
-"type": "Feature",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "29127",
-"kind": "screen",
 "id": "BO-751",
 "url": "https://pms.softlabsgroup.in/work_packages/29127",
 "subject": "Tenancy & Venues \u00b7 Venue Management 2 of 3",
@@ -192767,6 +193197,16 @@
 {
 "key": "29127",
 "kind": "screen",
+"id": "BO-836",
+"url": "https://pms.softlabsgroup.in/work_packages/29127",
+"subject": "Tenancy & Venues \u00b7 Venue Management 2 of 3",
+"status": "New",
+"type": "Feature",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "29127",
+"kind": "screen",
 "id": "BO-838",
 "url": "https://pms.softlabsgroup.in/work_packages/29127",
 "subject": "Tenancy & Venues \u00b7 Venue Management 2 of 3",
@@ -192808,26 +193248,6 @@
 "key": "29127",
 "kind": "operation",
 "id": "tenancy#getDeviceTelemetry",
-"url": "https://pms.softlabsgroup.in/work_packages/29127",
-"subject": "Tenancy & Venues \u00b7 Venue Management 2 of 3",
-"status": "New",
-"type": "Feature",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "29127",
-"kind": "operation",
-"id": "tenancy#listOutlets",
-"url": "https://pms.softlabsgroup.in/work_packages/29127",
-"subject": "Tenancy & Venues \u00b7 Venue Management 2 of 3",
-"status": "New",
-"type": "Feature",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "29127",
-"kind": "operation",
-"id": "tenancy#updateOutlet",
 "url": "https://pms.softlabsgroup.in/work_packages/29127",
 "subject": "Tenancy & Venues \u00b7 Venue Management 2 of 3",
 "status": "New",
@@ -193637,6 +194057,16 @@
 {
 "key": "29157",
 "kind": "screen",
+"id": "ADM-612",
+"url": "https://pms.softlabsgroup.in/work_packages/29157",
+"subject": "[Test] Module test: Tenancy & Venues \u00b7 Venue Management 2 of 3",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "29157",
+"kind": "screen",
 "id": "ADM-618",
 "url": "https://pms.softlabsgroup.in/work_packages/29157",
 "subject": "[Test] Module test: Tenancy & Venues \u00b7 Venue Management 2 of 3",
@@ -193737,26 +194167,6 @@
 {
 "key": "29157",
 "kind": "screen",
-"id": "BO-727",
-"url": "https://pms.softlabsgroup.in/work_packages/29157",
-"subject": "[Test] Module test: Tenancy & Venues \u00b7 Venue Management 2 of 3",
-"status": "New",
-"type": "Task",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "29157",
-"kind": "screen",
-"id": "BO-731",
-"url": "https://pms.softlabsgroup.in/work_packages/29157",
-"subject": "[Test] Module test: Tenancy & Venues \u00b7 Venue Management 2 of 3",
-"status": "New",
-"type": "Task",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "29157",
-"kind": "screen",
 "id": "BO-751",
 "url": "https://pms.softlabsgroup.in/work_packages/29157",
 "subject": "[Test] Module test: Tenancy & Venues \u00b7 Venue Management 2 of 3",
@@ -193798,6 +194208,16 @@
 "key": "29157",
 "kind": "screen",
 "id": "BO-824",
+"url": "https://pms.softlabsgroup.in/work_packages/29157",
+"subject": "[Test] Module test: Tenancy & Venues \u00b7 Venue Management 2 of 3",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "29157",
+"kind": "screen",
+"id": "BO-836",
 "url": "https://pms.softlabsgroup.in/work_packages/29157",
 "subject": "[Test] Module test: Tenancy & Venues \u00b7 Venue Management 2 of 3",
 "status": "New",
@@ -194177,7 +194597,37 @@
 {
 "key": "29158",
 "kind": "screen",
+"id": "BO-727",
+"url": "https://pms.softlabsgroup.in/work_packages/29158",
+"subject": "Tenancy & Venues \u00b7 Venue Management 3 of 3",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "29158",
+"kind": "screen",
+"id": "BO-731",
+"url": "https://pms.softlabsgroup.in/work_packages/29158",
+"subject": "Tenancy & Venues \u00b7 Venue Management 3 of 3",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "29158",
+"kind": "screen",
 "id": "BO-732",
+"url": "https://pms.softlabsgroup.in/work_packages/29158",
+"subject": "Tenancy & Venues \u00b7 Venue Management 3 of 3",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "29158",
+"kind": "screen",
+"id": "BO-917",
 "url": "https://pms.softlabsgroup.in/work_packages/29158",
 "subject": "Tenancy & Venues \u00b7 Venue Management 3 of 3",
 "status": "New",
@@ -194228,6 +194678,16 @@
 "key": "29158",
 "kind": "operation",
 "id": "tenancy#listOutlets",
+"url": "https://pms.softlabsgroup.in/work_packages/29158",
+"subject": "Tenancy & Venues \u00b7 Venue Management 3 of 3",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "29158",
+"kind": "operation",
+"id": "tenancy#updateOutlet",
 "url": "https://pms.softlabsgroup.in/work_packages/29158",
 "subject": "Tenancy & Venues \u00b7 Venue Management 3 of 3",
 "status": "New",
@@ -194697,7 +195157,37 @@
 {
 "key": "29175",
 "kind": "screen",
+"id": "BO-727",
+"url": "https://pms.softlabsgroup.in/work_packages/29175",
+"subject": "[Test] Module test: Tenancy & Venues \u00b7 Venue Management 3 of 3",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "29175",
+"kind": "screen",
+"id": "BO-731",
+"url": "https://pms.softlabsgroup.in/work_packages/29175",
+"subject": "[Test] Module test: Tenancy & Venues \u00b7 Venue Management 3 of 3",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "29175",
+"kind": "screen",
 "id": "BO-732",
+"url": "https://pms.softlabsgroup.in/work_packages/29175",
+"subject": "[Test] Module test: Tenancy & Venues \u00b7 Venue Management 3 of 3",
+"status": "New",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "29175",
+"kind": "screen",
+"id": "BO-917",
 "url": "https://pms.softlabsgroup.in/work_packages/29175",
 "subject": "[Test] Module test: Tenancy & Venues \u00b7 Venue Management 3 of 3",
 "status": "New",
@@ -227027,16 +227517,6 @@
 {
 "key": "29607",
 "kind": "operation",
-"id": "assets#searchMedia",
-"url": "https://pms.softlabsgroup.in/work_packages/29607",
-"subject": "[FE] CMS-061 Digital Asset Management Command Center",
-"status": "New",
-"type": "Task",
-"assignee": "Pradnya Yeram"
-},
-{
-"key": "29607",
-"kind": "operation",
 "id": "assets#getMediaUsageAnalytics",
 "url": "https://pms.softlabsgroup.in/work_packages/29607",
 "subject": "[FE] CMS-061 Digital Asset Management Command Center",
@@ -228747,16 +229227,6 @@
 {
 "key": "29646",
 "kind": "screen",
-"id": "BO-836",
-"url": "https://pms.softlabsgroup.in/work_packages/29646",
-"subject": "White Label \u00b7 Venue Management",
-"status": "New",
-"type": "Feature",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "29646",
-"kind": "screen",
 "id": "BO-837",
 "url": "https://pms.softlabsgroup.in/work_packages/29646",
 "subject": "White Label \u00b7 Venue Management",
@@ -228798,16 +229268,6 @@
 "key": "29646",
 "kind": "operation",
 "id": "white-label#claimCustomDomain",
-"url": "https://pms.softlabsgroup.in/work_packages/29646",
-"subject": "White Label \u00b7 Venue Management",
-"status": "New",
-"type": "Feature",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "29646",
-"kind": "operation",
-"id": "white-label#setBrandIdentity",
 "url": "https://pms.softlabsgroup.in/work_packages/29646",
 "subject": "White Label \u00b7 Venue Management",
 "status": "New",
@@ -228965,16 +229425,6 @@
 "assignee": "Chinmay Patkar"
 },
 {
-"key": "29649",
-"kind": "operation",
-"id": "white-label#setBrandIdentity",
-"url": "https://pms.softlabsgroup.in/work_packages/29649",
-"subject": "[FE] BO-836 Design System & Components",
-"status": "New",
-"type": "Task",
-"assignee": "Chinmay Patkar"
-},
-{
 "key": "29650",
 "kind": "screen",
 "id": "BO-840",
@@ -229118,16 +229568,6 @@
 "key": "29655",
 "kind": "screen",
 "id": "BO-835",
-"url": "https://pms.softlabsgroup.in/work_packages/29655",
-"subject": "[Test] Module test: White Label \u00b7 Venue Management",
-"status": "New",
-"type": "Task",
-"assignee": ""
-},
-{
-"key": "29655",
-"kind": "screen",
-"id": "BO-836",
 "url": "https://pms.softlabsgroup.in/work_packages/29655",
 "subject": "[Test] Module test: White Label \u00b7 Venue Management",
 "status": "New",
@@ -241947,16 +242387,6 @@
 {
 "key": "29784",
 "kind": "operation",
-"id": "workforce#createRotaAssignment",
-"url": "https://pms.softlabsgroup.in/work_packages/29784",
-"subject": "Ticketing \u00b7 Venue Management 8 of 8",
-"status": "New",
-"type": "Feature",
-"assignee": "Pradnya Yeram"
-},
-{
-"key": "29784",
-"kind": "operation",
 "id": "workforce#listRotaAssignments",
 "url": "https://pms.softlabsgroup.in/work_packages/29784",
 "subject": "Ticketing \u00b7 Venue Management 8 of 8",
@@ -249015,56 +249445,6 @@
 "assignee": "Surendra Loke"
 },
 {
-"key": "29855",
-"kind": "operation",
-"id": "workforce#listJobTitles",
-"url": "https://pms.softlabsgroup.in/work_packages/29855",
-"subject": "[Test] Module test: Identity & Security \u00b7 Venue Management",
-"status": "New",
-"type": "Task",
-"assignee": "Surendra Loke"
-},
-{
-"key": "29855",
-"kind": "table",
-"id": "workforce.job_title",
-"url": "https://pms.softlabsgroup.in/work_packages/29855",
-"subject": "[Test] Module test: Identity & Security \u00b7 Venue Management",
-"status": "New",
-"type": "Task",
-"assignee": "Surendra Loke"
-},
-{
-"key": "29855",
-"kind": "operation",
-"id": "workforce#listWorkAssignments",
-"url": "https://pms.softlabsgroup.in/work_packages/29855",
-"subject": "[Test] Module test: Identity & Security \u00b7 Venue Management",
-"status": "New",
-"type": "Task",
-"assignee": "Surendra Loke"
-},
-{
-"key": "29855",
-"kind": "operation",
-"id": "workforce#setJobTitle",
-"url": "https://pms.softlabsgroup.in/work_packages/29855",
-"subject": "[Test] Module test: Identity & Security \u00b7 Venue Management",
-"status": "New",
-"type": "Task",
-"assignee": "Surendra Loke"
-},
-{
-"key": "29855",
-"kind": "operation",
-"id": "workforce#setWorkAssignment",
-"url": "https://pms.softlabsgroup.in/work_packages/29855",
-"subject": "[Test] Module test: Identity & Security \u00b7 Venue Management",
-"status": "New",
-"type": "Task",
-"assignee": "Surendra Loke"
-},
-{
 "key": "29856",
 "kind": "operation",
 "id": "subscription#listCreditLimitExposure",
@@ -254628,16 +255008,6 @@
 "key": "29921",
 "kind": "operation",
 "id": "catalogue#setEventResourcePlan",
-"url": "https://pms.softlabsgroup.in/work_packages/29921",
-"subject": "[FE] BO-712 Staff & Role Assignment Configuration",
-"status": "New",
-"type": "Task",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "29921",
-"kind": "operation",
-"id": "workforce#createRotaAssignment",
 "url": "https://pms.softlabsgroup.in/work_packages/29921",
 "subject": "[FE] BO-712 Staff & Role Assignment Configuration",
 "status": "New",
@@ -267557,16 +267927,6 @@
 {
 "key": "30029",
 "kind": "operation",
-"id": "wallet#setWalletRefundPolicy",
-"url": "https://pms.softlabsgroup.in/work_packages/30029",
-"subject": "Orders & Reservations \u00b7 Venue Management 5 of 8",
-"status": "New",
-"type": "Feature",
-"assignee": "Surendra Loke"
-},
-{
-"key": "30029",
-"kind": "operation",
 "id": "orders#createRefund",
 "url": "https://pms.softlabsgroup.in/work_packages/30029",
 "subject": "Orders & Reservations \u00b7 Venue Management 5 of 8",
@@ -270037,6 +270397,16 @@
 {
 "key": "30037",
 "kind": "operation",
+"id": "payments#createB2bCreditAccount",
+"url": "https://pms.softlabsgroup.in/work_packages/30037",
+"subject": "Payments \u00b7 Venue Management 3 of 3",
+"status": "New",
+"type": "Feature",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "30037",
+"kind": "operation",
 "id": "payments#setMixedTenderRules",
 "url": "https://pms.softlabsgroup.in/work_packages/30037",
 "subject": "Payments \u00b7 Venue Management 3 of 3",
@@ -270137,27 +270507,17 @@
 {
 "key": "30037",
 "kind": "operation",
-"id": "payments#listB2bCreditAccounts",
-"url": "https://pms.softlabsgroup.in/work_packages/30037",
-"subject": "Payments \u00b7 Venue Management 3 of 3",
-"status": "New",
-"type": "Feature",
-"assignee": "Chinmay Patkar"
-},
-{
-"key": "30037",
-"kind": "operation",
-"id": "payments#createB2bCreditAccount",
-"url": "https://pms.softlabsgroup.in/work_packages/30037",
-"subject": "Payments \u00b7 Venue Management 3 of 3",
-"status": "New",
-"type": "Feature",
-"assignee": "Chinmay Patkar"
-},
-{
-"key": "30037",
-"kind": "operation",
 "id": "payments#simulatePaymentConfiguration",
+"url": "https://pms.softlabsgroup.in/work_packages/30037",
+"subject": "Payments \u00b7 Venue Management 3 of 3",
+"status": "New",
+"type": "Feature",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "30037",
+"kind": "operation",
+"id": "payments#listB2bCreditAccounts",
 "url": "https://pms.softlabsgroup.in/work_packages/30037",
 "subject": "Payments \u00b7 Venue Management 3 of 3",
 "status": "New",
@@ -270273,16 +270633,6 @@
 "status": "New",
 "type": "Feature",
 "assignee": "Chinmay Patkar"
-},
-{
-"key": "30038",
-"kind": "screen",
-"id": "ADM-612",
-"url": "https://pms.softlabsgroup.in/work_packages/30038",
-"subject": "Wallet & Cashless \u00b7 Venue Management 1 of 7",
-"status": "New",
-"type": "Feature",
-"assignee": "Hrushikant Patkar"
 },
 {
 "key": "30038",
@@ -270447,16 +270797,6 @@
 {
 "key": "30038",
 "kind": "operation",
-"id": "wallet#setWalletRefundPolicy",
-"url": "https://pms.softlabsgroup.in/work_packages/30038",
-"subject": "Wallet & Cashless \u00b7 Venue Management 1 of 7",
-"status": "New",
-"type": "Feature",
-"assignee": "Hrushikant Patkar"
-},
-{
-"key": "30038",
-"kind": "operation",
 "id": "wallet#listWalletTypes",
 "url": "https://pms.softlabsgroup.in/work_packages/30038",
 "subject": "Wallet & Cashless \u00b7 Venue Management 1 of 7",
@@ -270548,16 +270888,6 @@
 "key": "30038",
 "kind": "operation",
 "id": "wallet#createCreditType",
-"url": "https://pms.softlabsgroup.in/work_packages/30038",
-"subject": "Wallet & Cashless \u00b7 Venue Management 1 of 7",
-"status": "New",
-"type": "Feature",
-"assignee": "Hrushikant Patkar"
-},
-{
-"key": "30038",
-"kind": "operation",
-"id": "wallet#setWalletFundingRules",
 "url": "https://pms.softlabsgroup.in/work_packages/30038",
 "subject": "Wallet & Cashless \u00b7 Venue Management 1 of 7",
 "status": "New",
@@ -271158,16 +271488,6 @@
 "key": "30040",
 "kind": "operation",
 "id": "wallet#getWalletBalance",
-"url": "https://pms.softlabsgroup.in/work_packages/30040",
-"subject": "Wallet & Cashless \u00b7 Venue Management 3 of 7",
-"status": "New",
-"type": "Feature",
-"assignee": "Chinmay Patkar"
-},
-{
-"key": "30040",
-"kind": "operation",
-"id": "wallet#setWalletFundingRules",
 "url": "https://pms.softlabsgroup.in/work_packages/30040",
 "subject": "Wallet & Cashless \u00b7 Venue Management 3 of 7",
 "status": "New",
@@ -283687,7 +284007,7 @@
 {
 "key": "30087",
 "kind": "screen",
-"id": "BO-873",
+"id": "BO-714",
 "url": "https://pms.softlabsgroup.in/work_packages/30087",
 "subject": "Workforce \u00b7 Venue Management 1 of 2",
 "status": "New",
@@ -283718,16 +284038,6 @@
 "key": "30087",
 "kind": "screen",
 "id": "BO-880",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30087",
-"kind": "screen",
-"id": "BO-881",
 "url": "https://pms.softlabsgroup.in/work_packages/30087",
 "subject": "Workforce \u00b7 Venue Management 1 of 2",
 "status": "New",
@@ -283827,7 +284137,17 @@
 {
 "key": "30087",
 "kind": "screen",
-"id": "BO-917",
+"id": "BO-936",
+"url": "https://pms.softlabsgroup.in/work_packages/30087",
+"subject": "Workforce \u00b7 Venue Management 1 of 2",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30087",
+"kind": "screen",
+"id": "BO-941",
 "url": "https://pms.softlabsgroup.in/work_packages/30087",
 "subject": "Workforce \u00b7 Venue Management 1 of 2",
 "status": "New",
@@ -283887,36 +284207,6 @@
 {
 "key": "30087",
 "kind": "operation",
-"id": "identity#listPrincipals",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30087",
-"kind": "operation",
-"id": "workforce#listWorkAssignments",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30087",
-"kind": "operation",
-"id": "workforce#listJobTitles",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30087",
-"kind": "operation",
 "id": "workforce#setStaffingRules",
 "url": "https://pms.softlabsgroup.in/work_packages/30087",
 "subject": "Workforce \u00b7 Venue Management 1 of 2",
@@ -283937,7 +284227,37 @@
 {
 "key": "30087",
 "kind": "operation",
-"id": "workforce#createRotaAssignment",
+"id": "workforce#listShiftTemplates",
+"url": "https://pms.softlabsgroup.in/work_packages/30087",
+"subject": "Workforce \u00b7 Venue Management 1 of 2",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30087",
+"kind": "operation",
+"id": "workforce#setShiftTemplate",
+"url": "https://pms.softlabsgroup.in/work_packages/30087",
+"subject": "Workforce \u00b7 Venue Management 1 of 2",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30087",
+"kind": "operation",
+"id": "workforce#listShiftPatterns",
+"url": "https://pms.softlabsgroup.in/work_packages/30087",
+"subject": "Workforce \u00b7 Venue Management 1 of 2",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30087",
+"kind": "operation",
+"id": "workforce#setShiftPattern",
 "url": "https://pms.softlabsgroup.in/work_packages/30087",
 "subject": "Workforce \u00b7 Venue Management 1 of 2",
 "status": "New",
@@ -283988,6 +284308,66 @@
 "key": "30087",
 "kind": "operation",
 "id": "workforce#listIntegrationSources",
+"url": "https://pms.softlabsgroup.in/work_packages/30087",
+"subject": "Workforce \u00b7 Venue Management 1 of 2",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30087",
+"kind": "operation",
+"id": "workforce#listLeaveRequests",
+"url": "https://pms.softlabsgroup.in/work_packages/30087",
+"subject": "Workforce \u00b7 Venue Management 1 of 2",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30087",
+"kind": "operation",
+"id": "workforce#requestLeave",
+"url": "https://pms.softlabsgroup.in/work_packages/30087",
+"subject": "Workforce \u00b7 Venue Management 1 of 2",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30087",
+"kind": "operation",
+"id": "workforce#listLeaveTypes",
+"url": "https://pms.softlabsgroup.in/work_packages/30087",
+"subject": "Workforce \u00b7 Venue Management 1 of 2",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30087",
+"kind": "operation",
+"id": "workforce#setLeaveType",
+"url": "https://pms.softlabsgroup.in/work_packages/30087",
+"subject": "Workforce \u00b7 Venue Management 1 of 2",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30087",
+"kind": "operation",
+"id": "workforce#listLeaveBalances",
+"url": "https://pms.softlabsgroup.in/work_packages/30087",
+"subject": "Workforce \u00b7 Venue Management 1 of 2",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30087",
+"kind": "operation",
+"id": "resources#createResourceBlock",
 "url": "https://pms.softlabsgroup.in/work_packages/30087",
 "subject": "Workforce \u00b7 Venue Management 1 of 2",
 "status": "New",
@@ -284097,97 +284477,7 @@
 {
 "key": "30087",
 "kind": "operation",
-"id": "workforce#listShiftTemplates",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30087",
-"kind": "operation",
-"id": "workforce#setShiftTemplate",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30087",
-"kind": "operation",
-"id": "workforce#listShiftPatterns",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30087",
-"kind": "operation",
-"id": "workforce#setShiftPattern",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30087",
-"kind": "operation",
-"id": "workforce#listLeaveRequests",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30087",
-"kind": "operation",
-"id": "workforce#requestLeave",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30087",
-"kind": "operation",
-"id": "workforce#listLeaveTypes",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30087",
-"kind": "operation",
-"id": "workforce#setLeaveType",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30087",
-"kind": "operation",
-"id": "workforce#listLeaveBalances",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30087",
-"kind": "operation",
-"id": "resources#createResourceBlock",
+"id": "workforce#getStaffingCoverage",
 "url": "https://pms.softlabsgroup.in/work_packages/30087",
 "subject": "Workforce \u00b7 Venue Management 1 of 2",
 "status": "New",
@@ -284206,103 +284496,13 @@
 },
 {
 "key": "30087",
-"kind": "operation",
-"id": "workforce#getStaffingCoverage",
-"url": "https://pms.softlabsgroup.in/work_packages/30087",
-"subject": "Workforce \u00b7 Venue Management 1 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30088",
-"kind": "screen",
-"id": "BO-714",
-"url": "https://pms.softlabsgroup.in/work_packages/30088",
-"subject": "Workforce \u00b7 Venue Management 2 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "30088",
-"kind": "screen",
-"id": "BO-936",
-"url": "https://pms.softlabsgroup.in/work_packages/30088",
-"subject": "Workforce \u00b7 Venue Management 2 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "30088",
-"kind": "screen",
-"id": "BO-941",
-"url": "https://pms.softlabsgroup.in/work_packages/30088",
-"subject": "Workforce \u00b7 Venue Management 2 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "30088",
-"kind": "operation",
-"id": "workforce#listAnnouncements",
-"url": "https://pms.softlabsgroup.in/work_packages/30088",
-"subject": "Workforce \u00b7 Venue Management 2 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "30088",
-"kind": "operation",
-"id": "workforce#recordAttendance",
-"url": "https://pms.softlabsgroup.in/work_packages/30088",
-"subject": "Workforce \u00b7 Venue Management 2 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "30088",
-"kind": "operation",
-"id": "workforce#setShiftTemplate",
-"url": "https://pms.softlabsgroup.in/work_packages/30088",
-"subject": "Workforce \u00b7 Venue Management 2 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "30088",
-"kind": "operation",
-"id": "workforce#getStaffingCoverage",
-"url": "https://pms.softlabsgroup.in/work_packages/30088",
-"subject": "Workforce \u00b7 Venue Management 2 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "30088",
-"kind": "operation",
-"id": "workforce#listRotaAssignments",
-"url": "https://pms.softlabsgroup.in/work_packages/30088",
-"subject": "Workforce \u00b7 Venue Management 2 of 2",
-"status": "New",
-"type": "Feature",
-"assignee": "Pallavi Sawant"
-},
-{
-"key": "30088",
 "kind": "operation",
 "id": "workforce#createRotaAssignment",
-"url": "https://pms.softlabsgroup.in/work_packages/30088",
-"subject": "Workforce \u00b7 Venue Management 2 of 2",
+"url": "https://pms.softlabsgroup.in/work_packages/30087",
+"subject": "Workforce \u00b7 Venue Management 1 of 2",
 "status": "New",
 "type": "Feature",
-"assignee": "Pallavi Sawant"
+"assignee": "Pranay Shinde"
 },
 {
 "key": "30089",
@@ -287136,6 +287336,16 @@
 },
 {
 "key": "30100",
+"kind": "screen",
+"id": "BO-749",
+"url": "https://pms.softlabsgroup.in/work_packages/30100",
+"subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
+"status": "New",
+"type": "Feature",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "30100",
 "kind": "operation",
 "id": "marketing-crm#listLostItems",
 "url": "https://pms.softlabsgroup.in/work_packages/30100",
@@ -287257,16 +287467,6 @@
 {
 "key": "30100",
 "kind": "operation",
-"id": "marketing-crm#setConsentPurposes",
-"url": "https://pms.softlabsgroup.in/work_packages/30100",
-"subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Chinmay Patkar"
-},
-{
-"key": "30100",
-"kind": "operation",
 "id": "marketing-crm#createForm",
 "url": "https://pms.softlabsgroup.in/work_packages/30100",
 "subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
@@ -287347,6 +287547,26 @@
 {
 "key": "30100",
 "kind": "operation",
+"id": "marketing-crm#listPrivacyCompliance",
+"url": "https://pms.softlabsgroup.in/work_packages/30100",
+"subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
+"status": "New",
+"type": "Feature",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "30100",
+"kind": "operation",
+"id": "marketing-crm#listDuplicateCandidates",
+"url": "https://pms.softlabsgroup.in/work_packages/30100",
+"subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
+"status": "New",
+"type": "Feature",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "30100",
+"kind": "operation",
 "id": "marketing-crm#getIdentityResolutionRules",
 "url": "https://pms.softlabsgroup.in/work_packages/30100",
 "subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
@@ -287387,16 +287607,6 @@
 {
 "key": "30100",
 "kind": "operation",
-"id": "marketing-crm#listDuplicateCandidates",
-"url": "https://pms.softlabsgroup.in/work_packages/30100",
-"subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Chinmay Patkar"
-},
-{
-"key": "30100",
-"kind": "operation",
 "id": "marketing-crm#decideDuplicateCandidate",
 "url": "https://pms.softlabsgroup.in/work_packages/30100",
 "subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
@@ -287417,7 +287627,17 @@
 {
 "key": "30100",
 "kind": "operation",
-"id": "marketing-crm#updateGuestPreferences",
+"id": "marketing-crm#setCommunicationPreferenceMarketing",
+"url": "https://pms.softlabsgroup.in/work_packages/30100",
+"subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
+"status": "New",
+"type": "Feature",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "30100",
+"kind": "operation",
+"id": "marketing-crm#getGuestConsents",
 "url": "https://pms.softlabsgroup.in/work_packages/30100",
 "subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
 "status": "New",
@@ -287428,16 +287648,6 @@
 "key": "30100",
 "kind": "operation",
 "id": "marketing-crm#getGuestProfile",
-"url": "https://pms.softlabsgroup.in/work_packages/30100",
-"subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Chinmay Patkar"
-},
-{
-"key": "30100",
-"kind": "operation",
-"id": "marketing-crm#getGuestTimeline",
 "url": "https://pms.softlabsgroup.in/work_packages/30100",
 "subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
 "status": "New",
@@ -287497,7 +287707,7 @@
 {
 "key": "30100",
 "kind": "operation",
-"id": "marketing-crm#listPrivacyCompliance",
+"id": "marketing-crm#getGuestTimeline",
 "url": "https://pms.softlabsgroup.in/work_packages/30100",
 "subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
 "status": "New",
@@ -287508,16 +287718,6 @@
 "key": "30100",
 "kind": "operation",
 "id": "marketing-crm#listCustomerServiceProfile",
-"url": "https://pms.softlabsgroup.in/work_packages/30100",
-"subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Chinmay Patkar"
-},
-{
-"key": "30100",
-"kind": "operation",
-"id": "marketing-crm#getGuestConsents",
 "url": "https://pms.softlabsgroup.in/work_packages/30100",
 "subject": "Marketing & CRM \u00b7 Venue Management 1 of 5",
 "status": "New",
@@ -287553,16 +287753,6 @@
 "status": "New",
 "type": "Feature",
 "assignee": "Chinmay Patkar"
-},
-{
-"key": "30101",
-"kind": "screen",
-"id": "BO-749",
-"url": "https://pms.softlabsgroup.in/work_packages/30101",
-"subject": "Marketing & CRM \u00b7 Venue Management 2 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
 },
 {
 "key": "30101",
@@ -287766,6 +287956,16 @@
 },
 {
 "key": "30101",
+"kind": "screen",
+"id": "BO-780",
+"url": "https://pms.softlabsgroup.in/work_packages/30101",
+"subject": "Marketing & CRM \u00b7 Venue Management 2 of 5",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30101",
 "kind": "operation",
 "id": "marketing-crm#createSegment",
 "url": "https://pms.softlabsgroup.in/work_packages/30101",
@@ -287868,26 +288068,6 @@
 "key": "30101",
 "kind": "operation",
 "id": "marketing-crm#listJourneys",
-"url": "https://pms.softlabsgroup.in/work_packages/30101",
-"subject": "Marketing & CRM \u00b7 Venue Management 2 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30101",
-"kind": "operation",
-"id": "marketing-crm#setCommunicationPreferenceMarketing",
-"url": "https://pms.softlabsgroup.in/work_packages/30101",
-"subject": "Marketing & CRM \u00b7 Venue Management 2 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30101",
-"kind": "operation",
-"id": "marketing-crm#getGuestConsents",
 "url": "https://pms.softlabsgroup.in/work_packages/30101",
 "subject": "Marketing & CRM \u00b7 Venue Management 2 of 5",
 "status": "New",
@@ -288043,16 +288223,6 @@
 "status": "New",
 "type": "Feature",
 "assignee": "Narayan Gaonkar"
-},
-{
-"key": "30102",
-"kind": "screen",
-"id": "BO-780",
-"url": "https://pms.softlabsgroup.in/work_packages/30102",
-"subject": "Marketing & CRM \u00b7 Venue Management 3 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
 },
 {
 "key": "30102",
@@ -288246,6 +288416,16 @@
 },
 {
 "key": "30102",
+"kind": "screen",
+"id": "BO-806",
+"url": "https://pms.softlabsgroup.in/work_packages/30102",
+"subject": "Marketing & CRM \u00b7 Venue Management 3 of 5",
+"status": "New",
+"type": "Feature",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "30102",
 "kind": "operation",
 "id": "marketing-crm#createMessageTemplate",
 "url": "https://pms.softlabsgroup.in/work_packages/30102",
@@ -288297,7 +288477,7 @@
 {
 "key": "30102",
 "kind": "operation",
-"id": "marketing-crm#listJourneys",
+"id": "marketing-crm#getJourneyPerformance",
 "url": "https://pms.softlabsgroup.in/work_packages/30102",
 "subject": "Marketing & CRM \u00b7 Venue Management 3 of 5",
 "status": "New",
@@ -288307,7 +288487,7 @@
 {
 "key": "30102",
 "kind": "operation",
-"id": "marketing-crm#getJourneyPerformance",
+"id": "marketing-crm#listJourneys",
 "url": "https://pms.softlabsgroup.in/work_packages/30102",
 "subject": "Marketing & CRM \u00b7 Venue Management 3 of 5",
 "status": "New",
@@ -288505,14 +288685,14 @@
 "assignee": "Pranay Shinde"
 },
 {
-"key": "30103",
-"kind": "screen",
-"id": "BO-806",
-"url": "https://pms.softlabsgroup.in/work_packages/30103",
-"subject": "Marketing & CRM \u00b7 Venue Management 4 of 5",
+"key": "30102",
+"kind": "operation",
+"id": "marketing-crm#createCase",
+"url": "https://pms.softlabsgroup.in/work_packages/30102",
+"subject": "Marketing & CRM \u00b7 Venue Management 3 of 5",
 "status": "New",
 "type": "Feature",
-"assignee": "Narayan Gaonkar"
+"assignee": "Pranay Shinde"
 },
 {
 "key": "30103",
@@ -288708,6 +288888,16 @@
 "key": "30103",
 "kind": "screen",
 "id": "BO-844",
+"url": "https://pms.softlabsgroup.in/work_packages/30103",
+"subject": "Marketing & CRM \u00b7 Venue Management 4 of 5",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30103",
+"kind": "screen",
+"id": "BO-845",
 "url": "https://pms.softlabsgroup.in/work_packages/30103",
 "subject": "Marketing & CRM \u00b7 Venue Management 4 of 5",
 "status": "New",
@@ -288917,7 +289107,17 @@
 {
 "key": "30103",
 "kind": "operation",
-"id": "marketing-crm#createCase",
+"id": "marketing-crm#listWaiverTemplateMaster",
+"url": "https://pms.softlabsgroup.in/work_packages/30103",
+"subject": "Marketing & CRM \u00b7 Venue Management 4 of 5",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30103",
+"kind": "operation",
+"id": "marketing-crm#setDigitalWaiverForm",
 "url": "https://pms.softlabsgroup.in/work_packages/30103",
 "subject": "Marketing & CRM \u00b7 Venue Management 4 of 5",
 "status": "New",
@@ -289067,16 +289267,6 @@
 {
 "key": "30104",
 "kind": "screen",
-"id": "BO-845",
-"url": "https://pms.softlabsgroup.in/work_packages/30104",
-"subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30104",
-"kind": "screen",
 "id": "BO-846",
 "url": "https://pms.softlabsgroup.in/work_packages/30104",
 "subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
@@ -289207,7 +289397,47 @@
 {
 "key": "30104",
 "kind": "operation",
+"id": "marketing-crm#listWaiverTemplateMaster",
+"url": "https://pms.softlabsgroup.in/work_packages/30104",
+"subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30104",
+"kind": "operation",
+"id": "marketing-crm#listWaiverTriggerEligibility",
+"url": "https://pms.softlabsgroup.in/work_packages/30104",
+"subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30104",
+"kind": "operation",
+"id": "marketing-crm#listVersioningEffectiveDate",
+"url": "https://pms.softlabsgroup.in/work_packages/30104",
+"subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30104",
+"kind": "operation",
 "id": "marketing-crm#setSignatorySignatureGuardian",
+"url": "https://pms.softlabsgroup.in/work_packages/30104",
+"subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30104",
+"kind": "operation",
+"id": "marketing-crm#listParticipantWaiverStatus",
 "url": "https://pms.softlabsgroup.in/work_packages/30104",
 "subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
 "status": "New",
@@ -289287,6 +289517,16 @@
 {
 "key": "30104",
 "kind": "operation",
+"id": "marketing-crm#listMinorGuardianGroup",
+"url": "https://pms.softlabsgroup.in/work_packages/30104",
+"subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30104",
+"kind": "operation",
 "id": "marketing-crm#setWaiverVerificationValidation",
 "url": "https://pms.softlabsgroup.in/work_packages/30104",
 "subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
@@ -289310,76 +289550,6 @@
 "id": "marketing-crm#listComplianceEvidenceWaiver",
 "url": "https://pms.softlabsgroup.in/work_packages/30104",
 "subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30104",
-"kind": "operation",
-"id": "marketing-crm#listWaiverTemplateMaster",
-"url": "https://pms.softlabsgroup.in/work_packages/30104",
-"subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30104",
-"kind": "operation",
-"id": "marketing-crm#setDigitalWaiverForm",
-"url": "https://pms.softlabsgroup.in/work_packages/30104",
-"subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30104",
-"kind": "operation",
-"id": "marketing-crm#listWaiverTriggerEligibility",
-"url": "https://pms.softlabsgroup.in/work_packages/30104",
-"subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30104",
-"kind": "operation",
-"id": "marketing-crm#listVersioningEffectiveDate",
-"url": "https://pms.softlabsgroup.in/work_packages/30104",
-"subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30104",
-"kind": "operation",
-"id": "marketing-crm#listParticipantWaiverStatus",
-"url": "https://pms.softlabsgroup.in/work_packages/30104",
-"subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30104",
-"kind": "operation",
-"id": "marketing-crm#listMinorGuardianGroup",
-"url": "https://pms.softlabsgroup.in/work_packages/30104",
-"subject": "Marketing & CRM \u00b7 Venue Management 5 of 5",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30105",
-"kind": "screen",
-"id": "CMS-021",
-"url": "https://pms.softlabsgroup.in/work_packages/30105",
-"subject": "Marketing & CRM \u00b7 CMS 2 of 4",
 "status": "New",
 "type": "Feature",
 "assignee": "Narayan Gaonkar"
@@ -289546,6 +289716,16 @@
 },
 {
 "key": "30105",
+"kind": "screen",
+"id": "CMS-041",
+"url": "https://pms.softlabsgroup.in/work_packages/30105",
+"subject": "Marketing & CRM \u00b7 CMS 2 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30105",
 "kind": "operation",
 "id": "marketing-crm#setConsentPurposes",
 "url": "https://pms.softlabsgroup.in/work_packages/30105",
@@ -289578,26 +289758,6 @@
 "key": "30105",
 "kind": "operation",
 "id": "marketing-crm#setConsentCapturePoint",
-"url": "https://pms.softlabsgroup.in/work_packages/30105",
-"subject": "Marketing & CRM \u00b7 CMS 2 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30105",
-"kind": "operation",
-"id": "marketing-crm#listPrivacyNoticePolicy",
-"url": "https://pms.softlabsgroup.in/work_packages/30105",
-"subject": "Marketing & CRM \u00b7 CMS 2 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30105",
-"kind": "operation",
-"id": "marketing-crm#setPrivacyNoticePolicyGovernance",
 "url": "https://pms.softlabsgroup.in/work_packages/30105",
 "subject": "Marketing & CRM \u00b7 CMS 2 of 4",
 "status": "New",
@@ -289647,7 +289807,27 @@
 {
 "key": "30105",
 "kind": "operation",
-"id": "marketing-crm#listPrivacyConsent",
+"id": "marketing-crm#listPrivacyCompliance",
+"url": "https://pms.softlabsgroup.in/work_packages/30105",
+"subject": "Marketing & CRM \u00b7 CMS 2 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30105",
+"kind": "operation",
+"id": "marketing-crm#listPrivacyEvidenceCompliance",
+"url": "https://pms.softlabsgroup.in/work_packages/30105",
+"subject": "Marketing & CRM \u00b7 CMS 2 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30105",
+"kind": "operation",
+"id": "marketing-crm#listWaiverConsent",
 "url": "https://pms.softlabsgroup.in/work_packages/30105",
 "subject": "Marketing & CRM \u00b7 CMS 2 of 4",
 "status": "New",
@@ -289668,6 +289848,26 @@
 "key": "30105",
 "kind": "operation",
 "id": "marketing-crm#setDataProcessingPurpose",
+"url": "https://pms.softlabsgroup.in/work_packages/30105",
+"subject": "Marketing & CRM \u00b7 CMS 2 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30105",
+"kind": "operation",
+"id": "marketing-crm#listPrivacyNoticePolicy",
+"url": "https://pms.softlabsgroup.in/work_packages/30105",
+"subject": "Marketing & CRM \u00b7 CMS 2 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30105",
+"kind": "operation",
+"id": "marketing-crm#setPrivacyNoticePolicyGovernance",
 "url": "https://pms.softlabsgroup.in/work_packages/30105",
 "subject": "Marketing & CRM \u00b7 CMS 2 of 4",
 "status": "New",
@@ -289763,36 +289963,6 @@
 "status": "New",
 "type": "Feature",
 "assignee": "Narayan Gaonkar"
-},
-{
-"key": "30105",
-"kind": "operation",
-"id": "marketing-crm#listPrivacyEvidenceCompliance",
-"url": "https://pms.softlabsgroup.in/work_packages/30105",
-"subject": "Marketing & CRM \u00b7 CMS 2 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30105",
-"kind": "operation",
-"id": "marketing-crm#listPrivacyCompliance",
-"url": "https://pms.softlabsgroup.in/work_packages/30105",
-"subject": "Marketing & CRM \u00b7 CMS 2 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30106",
-"kind": "screen",
-"id": "CMS-041",
-"url": "https://pms.softlabsgroup.in/work_packages/30106",
-"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Chitrangi Mestry"
 },
 {
 "key": "30106",
@@ -289956,8 +290126,38 @@
 },
 {
 "key": "30106",
+"kind": "screen",
+"id": "CMS-058",
+"url": "https://pms.softlabsgroup.in/work_packages/30106",
+"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "30106",
+"kind": "screen",
+"id": "CMS-059",
+"url": "https://pms.softlabsgroup.in/work_packages/30106",
+"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "30106",
+"kind": "screen",
+"id": "CMS-060",
+"url": "https://pms.softlabsgroup.in/work_packages/30106",
+"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "30106",
 "kind": "operation",
-"id": "marketing-crm#setDigitalWaiverForm",
+"id": "marketing-crm#listWaiverTemplateMaster",
 "url": "https://pms.softlabsgroup.in/work_packages/30106",
 "subject": "Marketing & CRM \u00b7 CMS 3 of 4",
 "status": "New",
@@ -289977,7 +290177,37 @@
 {
 "key": "30106",
 "kind": "operation",
+"id": "marketing-crm#setDigitalWaiverForm",
+"url": "https://pms.softlabsgroup.in/work_packages/30106",
+"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "30106",
+"kind": "operation",
 "id": "marketing-crm#listDynamicFieldQuestion",
+"url": "https://pms.softlabsgroup.in/work_packages/30106",
+"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "30106",
+"kind": "operation",
+"id": "marketing-crm#listWaiverTriggerEligibility",
+"url": "https://pms.softlabsgroup.in/work_packages/30106",
+"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "30106",
+"kind": "operation",
+"id": "marketing-crm#listVersioningEffectiveDate",
 "url": "https://pms.softlabsgroup.in/work_packages/30106",
 "subject": "Marketing & CRM \u00b7 CMS 3 of 4",
 "status": "New",
@@ -290017,6 +290247,26 @@
 {
 "key": "30106",
 "kind": "operation",
+"id": "marketing-crm#listWaiver",
+"url": "https://pms.softlabsgroup.in/work_packages/30106",
+"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "30106",
+"kind": "operation",
+"id": "marketing-crm#listParticipantWaiverStatus",
+"url": "https://pms.softlabsgroup.in/work_packages/30106",
+"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "30106",
+"kind": "operation",
 "id": "marketing-crm#listDigitalSigningCollection",
 "url": "https://pms.softlabsgroup.in/work_packages/30106",
 "subject": "Marketing & CRM \u00b7 CMS 3 of 4",
@@ -290047,57 +290297,7 @@
 {
 "key": "30106",
 "kind": "operation",
-"id": "marketing-crm#listWaiverTemplateMaster",
-"url": "https://pms.softlabsgroup.in/work_packages/30106",
-"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Chitrangi Mestry"
-},
-{
-"key": "30106",
-"kind": "operation",
-"id": "marketing-crm#listWaiverTriggerEligibility",
-"url": "https://pms.softlabsgroup.in/work_packages/30106",
-"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Chitrangi Mestry"
-},
-{
-"key": "30106",
-"kind": "operation",
-"id": "marketing-crm#listVersioningEffectiveDate",
-"url": "https://pms.softlabsgroup.in/work_packages/30106",
-"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Chitrangi Mestry"
-},
-{
-"key": "30106",
-"kind": "operation",
-"id": "marketing-crm#listWaiver",
-"url": "https://pms.softlabsgroup.in/work_packages/30106",
-"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Chitrangi Mestry"
-},
-{
-"key": "30106",
-"kind": "operation",
-"id": "marketing-crm#listParticipantWaiverStatus",
-"url": "https://pms.softlabsgroup.in/work_packages/30106",
-"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Chitrangi Mestry"
-},
-{
-"key": "30106",
-"kind": "operation",
-"id": "marketing-crm#listWaiverConsent",
+"id": "marketing-crm#listWaiverComplianceRisk",
 "url": "https://pms.softlabsgroup.in/work_packages/30106",
 "subject": "Marketing & CRM \u00b7 CMS 3 of 4",
 "status": "New",
@@ -290158,6 +290358,26 @@
 "key": "30106",
 "kind": "operation",
 "id": "marketing-crm#listSiteWaiverException",
+"url": "https://pms.softlabsgroup.in/work_packages/30106",
+"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "30106",
+"kind": "operation",
+"id": "marketing-crm#listComplianceEvidenceWaiver",
+"url": "https://pms.softlabsgroup.in/work_packages/30106",
+"subject": "Marketing & CRM \u00b7 CMS 3 of 4",
+"status": "New",
+"type": "Feature",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "30106",
+"kind": "operation",
+"id": "marketing-crm#listWaiverComplianceOperational",
 "url": "https://pms.softlabsgroup.in/work_packages/30106",
 "subject": "Marketing & CRM \u00b7 CMS 3 of 4",
 "status": "New",
@@ -290823,66 +291043,6 @@
 "status": "New",
 "type": "Feature",
 "assignee": "Surendra Loke"
-},
-{
-"key": "30110",
-"kind": "screen",
-"id": "CMS-058",
-"url": "https://pms.softlabsgroup.in/work_packages/30110",
-"subject": "Marketing & CRM \u00b7 CMS 4 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30110",
-"kind": "screen",
-"id": "CMS-059",
-"url": "https://pms.softlabsgroup.in/work_packages/30110",
-"subject": "Marketing & CRM \u00b7 CMS 4 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30110",
-"kind": "screen",
-"id": "CMS-060",
-"url": "https://pms.softlabsgroup.in/work_packages/30110",
-"subject": "Marketing & CRM \u00b7 CMS 4 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30110",
-"kind": "operation",
-"id": "marketing-crm#listComplianceEvidenceWaiver",
-"url": "https://pms.softlabsgroup.in/work_packages/30110",
-"subject": "Marketing & CRM \u00b7 CMS 4 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30110",
-"kind": "operation",
-"id": "marketing-crm#listWaiverComplianceOperational",
-"url": "https://pms.softlabsgroup.in/work_packages/30110",
-"subject": "Marketing & CRM \u00b7 CMS 4 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
-},
-{
-"key": "30110",
-"kind": "operation",
-"id": "marketing-crm#listWaiverComplianceRisk",
-"url": "https://pms.softlabsgroup.in/work_packages/30110",
-"subject": "Marketing & CRM \u00b7 CMS 4 of 4",
-"status": "New",
-"type": "Feature",
-"assignee": "Pranay Shinde"
 },
 {
 "key": "30111",
@@ -301497,7 +301657,7 @@
 {
 "key": "30660",
 "kind": "table",
-"id": "assets.media_asset",
+"id": "identity.guest_identity_verification",
 "url": "https://pms.softlabsgroup.in/work_packages/30660",
 "subject": "[BE] submitGuestIdentityDocument: POST /auth/guest/identity-verifications",
 "status": "New",
@@ -301507,7 +301667,7 @@
 {
 "key": "30660",
 "kind": "table",
-"id": "identity.guest_identity_verification",
+"id": "identity.guest_upload_ref",
 "url": "https://pms.softlabsgroup.in/work_packages/30660",
 "subject": "[BE] submitGuestIdentityDocument: POST /auth/guest/identity-verifications",
 "status": "New",
@@ -302637,6 +302797,16 @@
 {
 "key": "30669",
 "kind": "table",
+"id": "identity.sso_provider",
+"url": "https://pms.softlabsgroup.in/work_packages/30669",
+"subject": "[BE] guestSocialLogin: POST /auth/guest/social",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "30669",
+"kind": "table",
 "id": "pii.subject_contact",
 "url": "https://pms.softlabsgroup.in/work_packages/30669",
 "subject": "[BE] guestSocialLogin: POST /auth/guest/social",
@@ -302738,6 +302908,16 @@
 "key": "30670",
 "kind": "table",
 "id": "identity.redirect_host",
+"url": "https://pms.softlabsgroup.in/work_packages/30670",
+"subject": "[BE] guestUaePassLogin: POST /auth/guest/uae-pass",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "30670",
+"kind": "table",
+"id": "identity.sso_provider",
 "url": "https://pms.softlabsgroup.in/work_packages/30670",
 "subject": "[BE] guestUaePassLogin: POST /auth/guest/uae-pass",
 "status": "New",
@@ -309797,6 +309977,16 @@
 {
 "key": "30740",
 "kind": "screen",
+"id": "BO-873",
+"url": "https://pms.softlabsgroup.in/work_packages/30740",
+"subject": "[BE] listPrincipals: GET /principals",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "30740",
+"kind": "screen",
 "id": "CMS-019",
 "url": "https://pms.softlabsgroup.in/work_packages/30740",
 "subject": "[BE] listPrincipals: GET /principals",
@@ -312997,6 +313187,16 @@
 {
 "key": "30766",
 "kind": "table",
+"id": "whitelabel.config_version",
+"url": "https://pms.softlabsgroup.in/work_packages/30766",
+"subject": "[BE] setMaintenanceMode: PUT /tenant-config/status",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "30766",
+"kind": "table",
 "id": "whitelabel.content_page",
 "url": "https://pms.softlabsgroup.in/work_packages/30766",
 "subject": "[BE] setMaintenanceMode: PUT /tenant-config/status",
@@ -313008,6 +313208,16 @@
 "key": "30766",
 "kind": "table",
 "id": "whitelabel.module_enablement",
+"url": "https://pms.softlabsgroup.in/work_packages/30766",
+"subject": "[BE] setMaintenanceMode: PUT /tenant-config/status",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "30766",
+"kind": "table",
+"id": "whitelabel.received_release",
 "url": "https://pms.softlabsgroup.in/work_packages/30766",
 "subject": "[BE] setMaintenanceMode: PUT /tenant-config/status",
 "status": "New",
@@ -313637,6 +313847,16 @@
 {
 "key": "30774",
 "kind": "table",
+"id": "whitelabel.policy",
+"url": "https://pms.softlabsgroup.in/work_packages/30774",
+"subject": "[BE] publishTenantConfig: POST /tenant-config/publish",
+"status": "On hold",
+"type": "Sub Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30774",
+"kind": "table",
 "id": "whitelabel.publish_review_policy",
 "url": "https://pms.softlabsgroup.in/work_packages/30774",
 "subject": "[BE] publishTenantConfig: POST /tenant-config/publish",
@@ -314037,6 +314257,16 @@
 {
 "key": "30778",
 "kind": "table",
+"id": "whitelabel.homepage_layout",
+"url": "https://pms.softlabsgroup.in/work_packages/30778",
+"subject": "[BE] validateTenantConfig: POST /tenant-config/validate",
+"status": "On hold",
+"type": "Sub Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30778",
+"kind": "table",
 "id": "whitelabel.homepage_section",
 "url": "https://pms.softlabsgroup.in/work_packages/30778",
 "subject": "[BE] validateTenantConfig: POST /tenant-config/validate",
@@ -314068,6 +314298,16 @@
 "key": "30778",
 "kind": "table",
 "id": "whitelabel.navigation_item",
+"url": "https://pms.softlabsgroup.in/work_packages/30778",
+"subject": "[BE] validateTenantConfig: POST /tenant-config/validate",
+"status": "On hold",
+"type": "Sub Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30778",
+"kind": "table",
+"id": "whitelabel.policy",
 "url": "https://pms.softlabsgroup.in/work_packages/30778",
 "subject": "[BE] validateTenantConfig: POST /tenant-config/validate",
 "status": "On hold",
@@ -323297,6 +323537,16 @@
 {
 "key": "30905",
 "kind": "table",
+"id": "assets.media_collection",
+"url": "https://pms.softlabsgroup.in/work_packages/30905",
+"subject": "[BE] deleteMediaAsset: DELETE /media/{mediaId}",
+"status": "On hold",
+"type": "Sub Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30905",
+"kind": "table",
 "id": "assets.media_usage",
 "url": "https://pms.softlabsgroup.in/work_packages/30905",
 "subject": "[BE] deleteMediaAsset: DELETE /media/{mediaId}",
@@ -323457,6 +323707,16 @@
 {
 "key": "30907",
 "kind": "table",
+"id": "assets.asset_version",
+"url": "https://pms.softlabsgroup.in/work_packages/30907",
+"subject": "[BE] replaceMediaAsset: POST /media/{mediaId}/replace",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "30907",
+"kind": "table",
 "id": "assets.media_asset",
 "url": "https://pms.softlabsgroup.in/work_packages/30907",
 "subject": "[BE] replaceMediaAsset: POST /media/{mediaId}/replace",
@@ -323478,16 +323738,6 @@
 "key": "30907",
 "kind": "table",
 "id": "assets.media_usage",
-"url": "https://pms.softlabsgroup.in/work_packages/30907",
-"subject": "[BE] replaceMediaAsset: POST /media/{mediaId}/replace",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30907",
-"kind": "table",
-"id": "assets.asset_version",
 "url": "https://pms.softlabsgroup.in/work_packages/30907",
 "subject": "[BE] replaceMediaAsset: POST /media/{mediaId}/replace",
 "status": "New",
@@ -323608,16 +323858,6 @@
 "key": "30908",
 "kind": "screen",
 "id": "CMS-010",
-"url": "https://pms.softlabsgroup.in/work_packages/30908",
-"subject": "[BE] searchMedia: GET /media",
-"status": "Ready for QA",
-"type": "Sub Task",
-"assignee": "Narayan Gaonkar"
-},
-{
-"key": "30908",
-"kind": "screen",
-"id": "CMS-061",
 "url": "https://pms.softlabsgroup.in/work_packages/30908",
 "subject": "[BE] searchMedia: GET /media",
 "status": "Ready for QA",
@@ -333337,6 +333577,26 @@
 {
 "key": "31038",
 "kind": "table",
+"id": "whitelabel.app_build",
+"url": "https://pms.softlabsgroup.in/work_packages/31038",
+"subject": "[BE] getAppIcons: GET /tenant-config/app-icons",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "31038",
+"kind": "table",
+"id": "whitelabel.config_version",
+"url": "https://pms.softlabsgroup.in/work_packages/31038",
+"subject": "[BE] getAppIcons: GET /tenant-config/app-icons",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "31038",
+"kind": "table",
 "id": "whitelabel.tenant_config",
 "url": "https://pms.softlabsgroup.in/work_packages/31038",
 "subject": "[BE] getAppIcons: GET /tenant-config/app-icons",
@@ -333467,6 +333727,26 @@
 {
 "key": "31040",
 "kind": "table",
+"id": "whitelabel.app_build",
+"url": "https://pms.softlabsgroup.in/work_packages/31040",
+"subject": "[BE] setAppIcons: PUT /tenant-config/app-icons",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "31040",
+"kind": "table",
+"id": "whitelabel.config_version",
+"url": "https://pms.softlabsgroup.in/work_packages/31040",
+"subject": "[BE] setAppIcons: PUT /tenant-config/app-icons",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "31040",
+"kind": "table",
 "id": "whitelabel.tenant_config",
 "url": "https://pms.softlabsgroup.in/work_packages/31040",
 "subject": "[BE] setAppIcons: PUT /tenant-config/app-icons",
@@ -333528,16 +333808,6 @@
 "key": "31041",
 "kind": "screen",
 "id": "ADM-016",
-"url": "https://pms.softlabsgroup.in/work_packages/31041",
-"subject": "[BE] setBrandIdentity: PUT /tenant-config/brand",
-"status": "Ready for QA",
-"type": "Sub Task",
-"assignee": "Deep Khanvilkar"
-},
-{
-"key": "31041",
-"kind": "screen",
-"id": "BO-836",
 "url": "https://pms.softlabsgroup.in/work_packages/31041",
 "subject": "[BE] setBrandIdentity: PUT /tenant-config/brand",
 "status": "Ready for QA",
@@ -334097,6 +334367,16 @@
 {
 "key": "31052",
 "kind": "table",
+"id": "whitelabel.banner",
+"url": "https://pms.softlabsgroup.in/work_packages/31052",
+"subject": "[BE] getPublishedTenantConfig: GET /storefront/tenant-config",
+"status": "Ready for QA",
+"type": "Sub Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "31052",
+"kind": "table",
 "id": "whitelabel.config_version",
 "url": "https://pms.softlabsgroup.in/work_packages/31052",
 "subject": "[BE] getPublishedTenantConfig: GET /storefront/tenant-config",
@@ -334168,6 +334448,16 @@
 "key": "31052",
 "kind": "table",
 "id": "whitelabel.navigation_item",
+"url": "https://pms.softlabsgroup.in/work_packages/31052",
+"subject": "[BE] getPublishedTenantConfig: GET /storefront/tenant-config",
+"status": "Ready for QA",
+"type": "Sub Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "31052",
+"kind": "table",
+"id": "whitelabel.promo_block",
 "url": "https://pms.softlabsgroup.in/work_packages/31052",
 "subject": "[BE] getPublishedTenantConfig: GET /storefront/tenant-config",
 "status": "Ready for QA",
@@ -334308,6 +334598,16 @@
 "key": "31053",
 "kind": "table",
 "id": "whitelabel.module_enablement",
+"url": "https://pms.softlabsgroup.in/work_packages/31053",
+"subject": "[BE] getTenantAppStatus: GET /tenant-config/status",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "31053",
+"kind": "table",
+"id": "whitelabel.received_release",
 "url": "https://pms.softlabsgroup.in/work_packages/31053",
 "subject": "[BE] getTenantAppStatus: GET /tenant-config/status",
 "status": "New",
@@ -348297,6 +348597,16 @@
 {
 "key": "31266",
 "kind": "operation",
+"id": "identity#setSsoConfig",
+"url": "https://pms.softlabsgroup.in/work_packages/31266",
+"subject": "[FE] ADM-005 Tenant Directory (setup: 6 of its 17 operations): build with all states",
+"status": "On hold",
+"type": "Sub Task",
+"assignee": ""
+},
+{
+"key": "31266",
+"kind": "operation",
 "id": "subscription#terminateTenant",
 "url": "https://pms.softlabsgroup.in/work_packages/31266",
 "subject": "[FE] ADM-005 Tenant Directory (setup: 6 of its 17 operations): build with all states",
@@ -348347,6 +348657,16 @@
 {
 "key": "31267",
 "kind": "operation",
+"id": "identity#setSsoConfig",
+"url": "https://pms.softlabsgroup.in/work_packages/31267",
+"subject": "[FE] ADM-005 Tenant Directory (setup: 6 of its 17 operations): connect to API",
+"status": "On hold",
+"type": "Sub Task",
+"assignee": ""
+},
+{
+"key": "31267",
+"kind": "operation",
 "id": "subscription#terminateTenant",
 "url": "https://pms.softlabsgroup.in/work_packages/31267",
 "subject": "[FE] ADM-005 Tenant Directory (setup: 6 of its 17 operations): connect to API",
@@ -348388,6 +348708,16 @@
 "key": "31268",
 "kind": "operation",
 "id": "subscription#createTenant",
+"url": "https://pms.softlabsgroup.in/work_packages/31268",
+"subject": "[FE] ADM-005 Tenant Directory (setup: 6 of its 17 operations): tests",
+"status": "On hold",
+"type": "Sub Task",
+"assignee": ""
+},
+{
+"key": "31268",
+"kind": "operation",
+"id": "identity#setSsoConfig",
 "url": "https://pms.softlabsgroup.in/work_packages/31268",
 "subject": "[FE] ADM-005 Tenant Directory (setup: 6 of its 17 operations): tests",
 "status": "On hold",
@@ -371408,6 +371738,16 @@
 "key": "31753",
 "kind": "table",
 "id": "venuemap.visit_plan_item",
+"url": "https://pms.softlabsgroup.in/work_packages/31753",
+"subject": "[BE] generateVisitPlan: POST /visit-plans",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "31753",
+"kind": "table",
+"id": "venuemap.visit_planner_question",
 "url": "https://pms.softlabsgroup.in/work_packages/31753",
 "subject": "[BE] generateVisitPlan: POST /visit-plans",
 "status": "New",
@@ -403747,16 +404087,6 @@
 {
 "key": "32287",
 "kind": "operation",
-"id": "identity#setSsoConfig",
-"url": "https://pms.softlabsgroup.in/work_packages/32287",
-"subject": "[FE] ADM-005 Tenant Directory (the rest of the screen: 11 of its 17 operations): build with all states",
-"status": "On hold",
-"type": "Sub Task",
-"assignee": ""
-},
-{
-"key": "32287",
-"kind": "operation",
 "id": "subscription#suspendTenant",
 "url": "https://pms.softlabsgroup.in/work_packages/32287",
 "subject": "[FE] ADM-005 Tenant Directory (the rest of the screen: 11 of its 17 operations): build with all states",
@@ -403887,16 +404217,6 @@
 {
 "key": "32288",
 "kind": "operation",
-"id": "identity#setSsoConfig",
-"url": "https://pms.softlabsgroup.in/work_packages/32288",
-"subject": "[FE] ADM-005 Tenant Directory (the rest of the screen: 11 of its 17 operations): connect to API",
-"status": "On hold",
-"type": "Sub Task",
-"assignee": ""
-},
-{
-"key": "32288",
-"kind": "operation",
 "id": "subscription#suspendTenant",
 "url": "https://pms.softlabsgroup.in/work_packages/32288",
 "subject": "[FE] ADM-005 Tenant Directory (the rest of the screen: 11 of its 17 operations): connect to API",
@@ -404018,16 +404338,6 @@
 "key": "32289",
 "kind": "operation",
 "id": "subscription#removeLicenceAddOn",
-"url": "https://pms.softlabsgroup.in/work_packages/32289",
-"subject": "[FE] ADM-005 Tenant Directory (the rest of the screen: 11 of its 17 operations): tests",
-"status": "On hold",
-"type": "Sub Task",
-"assignee": ""
-},
-{
-"key": "32289",
-"kind": "operation",
-"id": "identity#setSsoConfig",
 "url": "https://pms.softlabsgroup.in/work_packages/32289",
 "subject": "[FE] ADM-005 Tenant Directory (the rest of the screen: 11 of its 17 operations): tests",
 "status": "On hold",
@@ -407046,8 +407356,8 @@
 },
 {
 "key": "32338",
-"kind": "screen",
-"id": "BO-055",
+"kind": "table",
+"id": "workforce.staffing_rules",
 "url": "https://pms.softlabsgroup.in/work_packages/32338",
 "subject": "[BE] createRotaAssignment: POST /rota-assignments",
 "status": "Ready for QA",
@@ -407057,7 +407367,7 @@
 {
 "key": "32338",
 "kind": "screen",
-"id": "BO-712",
+"id": "BO-055",
 "url": "https://pms.softlabsgroup.in/work_packages/32338",
 "subject": "[BE] createRotaAssignment: POST /rota-assignments",
 "status": "Ready for QA",
@@ -407158,6 +407468,16 @@
 "key": "32340",
 "kind": "table",
 "id": "workforce.rota_assignment",
+"url": "https://pms.softlabsgroup.in/work_packages/32340",
+"subject": "[BE] updateRotaAssignment: PATCH /rota-assignments/{assignmentId}",
+"status": "On hold",
+"type": "Sub Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "32340",
+"kind": "table",
+"id": "workforce.staffing_rules",
 "url": "https://pms.softlabsgroup.in/work_packages/32340",
 "subject": "[BE] updateRotaAssignment: PATCH /rota-assignments/{assignmentId}",
 "status": "On hold",
@@ -477055,6 +477375,16 @@
 "assignee": "Deep Khanvilkar"
 },
 {
+"key": "33750",
+"kind": "screen",
+"id": "BO-873",
+"url": "https://pms.softlabsgroup.in/work_packages/33750",
+"subject": "[BE] listJobTitles: GET /job-titles",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Deep Khanvilkar"
+},
+{
 "key": "33751",
 "kind": "operation",
 "id": "workforce#listWorkAssignments",
@@ -477088,6 +477418,16 @@
 "key": "33751",
 "kind": "screen",
 "id": "BO-053",
+"url": "https://pms.softlabsgroup.in/work_packages/33751",
+"subject": "[BE] listWorkAssignments: GET /work-assignments",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "33751",
+"kind": "screen",
+"id": "BO-873",
 "url": "https://pms.softlabsgroup.in/work_packages/33751",
 "subject": "[BE] listWorkAssignments: GET /work-assignments",
 "status": "New",
@@ -523057,16 +523397,6 @@
 {
 "key": "34957",
 "kind": "operation",
-"id": "assets#searchMedia",
-"url": "https://pms.softlabsgroup.in/work_packages/34957",
-"subject": "[FE] CMS-061 Digital Asset Management Command Center: build with all states",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Pradnya Yeram"
-},
-{
-"key": "34957",
-"kind": "operation",
 "id": "assets#getMediaUsageAnalytics",
 "url": "https://pms.softlabsgroup.in/work_packages/34957",
 "subject": "[FE] CMS-061 Digital Asset Management Command Center: build with all states",
@@ -523087,16 +523417,6 @@
 {
 "key": "34958",
 "kind": "operation",
-"id": "assets#searchMedia",
-"url": "https://pms.softlabsgroup.in/work_packages/34958",
-"subject": "[FE] CMS-061 Digital Asset Management Command Center: connect to API",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Pradnya Yeram"
-},
-{
-"key": "34958",
-"kind": "operation",
 "id": "assets#getMediaUsageAnalytics",
 "url": "https://pms.softlabsgroup.in/work_packages/34958",
 "subject": "[FE] CMS-061 Digital Asset Management Command Center: connect to API",
@@ -523108,16 +523428,6 @@
 "key": "34959",
 "kind": "screen",
 "id": "CMS-061",
-"url": "https://pms.softlabsgroup.in/work_packages/34959",
-"subject": "[FE] CMS-061 Digital Asset Management Command Center: tests",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Pradnya Yeram"
-},
-{
-"key": "34959",
-"kind": "operation",
-"id": "assets#searchMedia",
 "url": "https://pms.softlabsgroup.in/work_packages/34959",
 "subject": "[FE] CMS-061 Digital Asset Management Command Center: tests",
 "status": "New",
@@ -525465,16 +525775,6 @@
 "assignee": "Chinmay Patkar"
 },
 {
-"key": "35058",
-"kind": "operation",
-"id": "white-label#setBrandIdentity",
-"url": "https://pms.softlabsgroup.in/work_packages/35058",
-"subject": "[FE] BO-836 Design System & Components: build with all states",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Chinmay Patkar"
-},
-{
 "key": "35059",
 "kind": "screen",
 "id": "BO-836",
@@ -525485,29 +525785,9 @@
 "assignee": "Chinmay Patkar"
 },
 {
-"key": "35059",
-"kind": "operation",
-"id": "white-label#setBrandIdentity",
-"url": "https://pms.softlabsgroup.in/work_packages/35059",
-"subject": "[FE] BO-836 Design System & Components: connect to API",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Chinmay Patkar"
-},
-{
 "key": "35060",
 "kind": "screen",
 "id": "BO-836",
-"url": "https://pms.softlabsgroup.in/work_packages/35060",
-"subject": "[FE] BO-836 Design System & Components: tests",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Chinmay Patkar"
-},
-{
-"key": "35060",
-"kind": "operation",
-"id": "white-label#setBrandIdentity",
 "url": "https://pms.softlabsgroup.in/work_packages/35060",
 "subject": "[FE] BO-836 Design System & Components: tests",
 "status": "New",
@@ -546937,16 +547217,6 @@
 {
 "key": "35499",
 "kind": "operation",
-"id": "workforce#createRotaAssignment",
-"url": "https://pms.softlabsgroup.in/work_packages/35499",
-"subject": "[FE] BO-712 Staff & Role Assignment Configuration: build with all states",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "35499",
-"kind": "operation",
 "id": "catalogue#getEventResourcePlan",
 "url": "https://pms.softlabsgroup.in/work_packages/35499",
 "subject": "[FE] BO-712 Staff & Role Assignment Configuration: build with all states",
@@ -546987,16 +547257,6 @@
 {
 "key": "35500",
 "kind": "operation",
-"id": "workforce#createRotaAssignment",
-"url": "https://pms.softlabsgroup.in/work_packages/35500",
-"subject": "[FE] BO-712 Staff & Role Assignment Configuration: connect to API",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "35500",
-"kind": "operation",
 "id": "catalogue#getEventResourcePlan",
 "url": "https://pms.softlabsgroup.in/work_packages/35500",
 "subject": "[FE] BO-712 Staff & Role Assignment Configuration: connect to API",
@@ -547028,16 +547288,6 @@
 "key": "35501",
 "kind": "operation",
 "id": "catalogue#setEventResourcePlan",
-"url": "https://pms.softlabsgroup.in/work_packages/35501",
-"subject": "[FE] BO-712 Staff & Role Assignment Configuration: tests",
-"status": "New",
-"type": "Sub Task",
-"assignee": "Sanket Keluskar"
-},
-{
-"key": "35501",
-"kind": "operation",
-"id": "workforce#createRotaAssignment",
 "url": "https://pms.softlabsgroup.in/work_packages/35501",
 "subject": "[FE] BO-712 Staff & Role Assignment Configuration: tests",
 "status": "New",
@@ -570907,7 +571157,37 @@
 {
 "key": "36186",
 "kind": "file",
+"id": "backend/tenant/V0118__after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36186",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "36186",
+"kind": "file",
+"id": "backend/tenant/V0119__names_after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36186",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "36186",
+"kind": "file",
 "id": "backend/control/V0116__after_r1_20261026.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36186",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Chinmay Patkar"
+},
+{
+"key": "36186",
+"kind": "file",
+"id": "backend/control/V0118__after_r1_20261029.sql",
 "url": "https://pms.softlabsgroup.in/work_packages/36186",
 "subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
 "status": "Ready for QA",
@@ -571107,7 +571387,37 @@
 {
 "key": "36187",
 "kind": "file",
+"id": "backend/tenant/V0118__after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36187",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "New",
+"type": "Task",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "36187",
+"kind": "file",
+"id": "backend/tenant/V0119__names_after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36187",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "New",
+"type": "Task",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "36187",
+"kind": "file",
 "id": "backend/control/V0116__after_r1_20261026.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36187",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "New",
+"type": "Task",
+"assignee": "Chitrangi Mestry"
+},
+{
+"key": "36187",
+"kind": "file",
+"id": "backend/control/V0118__after_r1_20261029.sql",
 "url": "https://pms.softlabsgroup.in/work_packages/36187",
 "subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
 "status": "New",
@@ -571307,7 +571617,37 @@
 {
 "key": "36188",
 "kind": "file",
+"id": "backend/tenant/V0118__after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36188",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "36188",
+"kind": "file",
+"id": "backend/tenant/V0119__names_after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36188",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "36188",
+"kind": "file",
 "id": "backend/control/V0116__after_r1_20261026.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36188",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Deep Khanvilkar"
+},
+{
+"key": "36188",
+"kind": "file",
+"id": "backend/control/V0118__after_r1_20261029.sql",
 "url": "https://pms.softlabsgroup.in/work_packages/36188",
 "subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
 "status": "Ready for QA",
@@ -571507,7 +571847,37 @@
 {
 "key": "36189",
 "kind": "file",
+"id": "backend/tenant/V0118__after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36189",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "New",
+"type": "Task",
+"assignee": "Kalpita Mejari"
+},
+{
+"key": "36189",
+"kind": "file",
+"id": "backend/tenant/V0119__names_after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36189",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "New",
+"type": "Task",
+"assignee": "Kalpita Mejari"
+},
+{
+"key": "36189",
+"kind": "file",
 "id": "backend/control/V0116__after_r1_20261026.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36189",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "New",
+"type": "Task",
+"assignee": "Kalpita Mejari"
+},
+{
+"key": "36189",
+"kind": "file",
+"id": "backend/control/V0118__after_r1_20261029.sql",
 "url": "https://pms.softlabsgroup.in/work_packages/36189",
 "subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
 "status": "New",
@@ -571707,7 +572077,37 @@
 {
 "key": "36190",
 "kind": "file",
+"id": "backend/tenant/V0118__after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36190",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "36190",
+"kind": "file",
+"id": "backend/tenant/V0119__names_after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36190",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "36190",
+"kind": "file",
 "id": "backend/control/V0116__after_r1_20261026.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36190",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "36190",
+"kind": "file",
+"id": "backend/control/V0118__after_r1_20261029.sql",
 "url": "https://pms.softlabsgroup.in/work_packages/36190",
 "subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
 "status": "Ready for QA",
@@ -571907,7 +572307,37 @@
 {
 "key": "36191",
 "kind": "file",
+"id": "backend/tenant/V0118__after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36191",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "New",
+"type": "Task",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "36191",
+"kind": "file",
+"id": "backend/tenant/V0119__names_after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36191",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "New",
+"type": "Task",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "36191",
+"kind": "file",
 "id": "backend/control/V0116__after_r1_20261026.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36191",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "New",
+"type": "Task",
+"assignee": "Pallavi Sawant"
+},
+{
+"key": "36191",
+"kind": "file",
+"id": "backend/control/V0118__after_r1_20261029.sql",
 "url": "https://pms.softlabsgroup.in/work_packages/36191",
 "subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
 "status": "New",
@@ -572107,7 +572537,37 @@
 {
 "key": "36192",
 "kind": "file",
+"id": "backend/tenant/V0118__after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36192",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "New",
+"type": "Task",
+"assignee": "Pradnya Yeram"
+},
+{
+"key": "36192",
+"kind": "file",
+"id": "backend/tenant/V0119__names_after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36192",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "New",
+"type": "Task",
+"assignee": "Pradnya Yeram"
+},
+{
+"key": "36192",
+"kind": "file",
 "id": "backend/control/V0116__after_r1_20261026.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36192",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "New",
+"type": "Task",
+"assignee": "Pradnya Yeram"
+},
+{
+"key": "36192",
+"kind": "file",
+"id": "backend/control/V0118__after_r1_20261029.sql",
 "url": "https://pms.softlabsgroup.in/work_packages/36192",
 "subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
 "status": "New",
@@ -572307,7 +572767,37 @@
 {
 "key": "36193",
 "kind": "file",
+"id": "backend/tenant/V0118__after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36193",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "36193",
+"kind": "file",
+"id": "backend/tenant/V0119__names_after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36193",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "36193",
+"kind": "file",
 "id": "backend/control/V0116__after_r1_20261026.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36193",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "36193",
+"kind": "file",
+"id": "backend/control/V0118__after_r1_20261029.sql",
 "url": "https://pms.softlabsgroup.in/work_packages/36193",
 "subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
 "status": "Ready for QA",
@@ -572507,7 +572997,37 @@
 {
 "key": "36194",
 "kind": "file",
+"id": "backend/tenant/V0118__after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36194",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "36194",
+"kind": "file",
+"id": "backend/tenant/V0119__names_after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36194",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "36194",
+"kind": "file",
 "id": "backend/control/V0116__after_r1_20261026.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36194",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Sanket Keluskar"
+},
+{
+"key": "36194",
+"kind": "file",
+"id": "backend/control/V0118__after_r1_20261029.sql",
 "url": "https://pms.softlabsgroup.in/work_packages/36194",
 "subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
 "status": "Ready for QA",
@@ -572707,7 +573227,37 @@
 {
 "key": "36195",
 "kind": "file",
+"id": "backend/tenant/V0118__after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36195",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Surendra Loke"
+},
+{
+"key": "36195",
+"kind": "file",
+"id": "backend/tenant/V0119__names_after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36195",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Surendra Loke"
+},
+{
+"key": "36195",
+"kind": "file",
 "id": "backend/control/V0116__after_r1_20261026.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36195",
+"subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Surendra Loke"
+},
+{
+"key": "36195",
+"kind": "file",
+"id": "backend/control/V0118__after_r1_20261029.sql",
 "url": "https://pms.softlabsgroup.in/work_packages/36195",
 "subject": "[BE] r8: bring your local database to r8 (renamed tables, new columns)",
 "status": "Ready for QA",
@@ -572907,7 +573457,37 @@
 {
 "key": "36196",
 "kind": "file",
+"id": "backend/tenant/V0118__after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36196",
+"subject": "[BE] r8: apply r8 to the shared database",
+"status": "Closed",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "36196",
+"kind": "file",
+"id": "backend/tenant/V0119__names_after_r1_20261029.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36196",
+"subject": "[BE] r8: apply r8 to the shared database",
+"status": "Closed",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "36196",
+"kind": "file",
 "id": "backend/control/V0116__after_r1_20261026.sql",
+"url": "https://pms.softlabsgroup.in/work_packages/36196",
+"subject": "[BE] r8: apply r8 to the shared database",
+"status": "Closed",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "36196",
+"kind": "file",
+"id": "backend/control/V0118__after_r1_20261029.sql",
 "url": "https://pms.softlabsgroup.in/work_packages/36196",
 "subject": "[BE] r8: apply r8 to the shared database",
 "status": "Closed",
@@ -575426,6 +576006,16 @@
 },
 {
 "key": "36219",
+"kind": "table",
+"id": "venuemap.visit_planner_question",
+"url": "https://pms.softlabsgroup.in/work_packages/36219",
+"subject": "[BE] VenueOpsService: getVisitPlannerOptions, listMyVisitPlans, setVisitPlanPreset",
+"status": "New",
+"type": "Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "36219",
 "kind": "screen",
 "id": "GST-051",
 "url": "https://pms.softlabsgroup.in/work_packages/36219",
@@ -575898,6 +576488,16 @@
 "key": "36229",
 "kind": "table",
 "id": "assets.guest_upload",
+"url": "https://pms.softlabsgroup.in/work_packages/36229",
+"subject": "[BE] VenueOpsService: completeGuestUpload, createGuestUpload",
+"status": "New",
+"type": "Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "36229",
+"kind": "table",
+"id": "platform.outbox",
 "url": "https://pms.softlabsgroup.in/work_packages/36229",
 "subject": "[BE] VenueOpsService: completeGuestUpload, createGuestUpload",
 "status": "New",
@@ -578738,6 +579338,16 @@
 "key": "36304",
 "kind": "table",
 "id": "venuemap.visit_plan_preset",
+"url": "https://pms.softlabsgroup.in/work_packages/36304",
+"subject": "[BE] getVisitPlannerOptions: GET /venues/{venueId}/visit-planner-options",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Narayan Gaonkar"
+},
+{
+"key": "36304",
+"kind": "table",
+"id": "venuemap.visit_planner_question",
 "url": "https://pms.softlabsgroup.in/work_packages/36304",
 "subject": "[BE] getVisitPlannerOptions: GET /venues/{venueId}/visit-planner-options",
 "status": "New",
@@ -584588,6 +585198,16 @@
 "key": "36536",
 "kind": "table",
 "id": "assets.guest_upload",
+"url": "https://pms.softlabsgroup.in/work_packages/36536",
+"subject": "[BE] completeGuestUpload: POST /media/guest-uploads/{uploadId}/complete",
+"status": "New",
+"type": "Sub Task",
+"assignee": "Hrushikant Patkar"
+},
+{
+"key": "36536",
+"kind": "table",
+"id": "platform.outbox",
 "url": "https://pms.softlabsgroup.in/work_packages/36536",
 "subject": "[BE] completeGuestUpload: POST /media/guest-uploads/{uploadId}/complete",
 "status": "New",
@@ -598637,6 +599257,16 @@
 {
 "key": "37051",
 "kind": "table",
+"id": "whitelabel.config_version",
+"url": "https://pms.softlabsgroup.in/work_packages/37051",
+"subject": "[BE] Service sign-in between deployables inside a cell: workload identity, token validation, the caller's context (ADR-0073)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "37051",
+"kind": "table",
 "id": "whitelabel.content_page",
 "url": "https://pms.softlabsgroup.in/work_packages/37051",
 "subject": "[BE] Service sign-in between deployables inside a cell: workload identity, token validation, the caller's context (ADR-0073)",
@@ -598648,6 +599278,16 @@
 "key": "37051",
 "kind": "table",
 "id": "whitelabel.module_enablement",
+"url": "https://pms.softlabsgroup.in/work_packages/37051",
+"subject": "[BE] Service sign-in between deployables inside a cell: workload identity, token validation, the caller's context (ADR-0073)",
+"status": "Ready for QA",
+"type": "Task",
+"assignee": "Pranay Shinde"
+},
+{
+"key": "37051",
+"kind": "table",
+"id": "whitelabel.received_release",
 "url": "https://pms.softlabsgroup.in/work_packages/37051",
 "subject": "[BE] Service sign-in between deployables inside a cell: workload identity, token validation, the caller's context (ADR-0073)",
 "status": "Ready for QA",
