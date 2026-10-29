@@ -10619,6 +10619,7 @@ screens:
       - kind: fileUpload
         label: Browse Files
         operation: createUpload
+        bindsTo: MediaAsset.id
         notes: Picks the files and uploads each to the asset library (`createUpload` for a signed URL, then
           `completeUpload` when the transfer ends); analyseMediaAsset auto-tags what arrives.
         provenance: 'pack Digital Asset Management DAM.pdf, page 6 §Support; a fileUpload since 29 October 2026
