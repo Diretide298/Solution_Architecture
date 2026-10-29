@@ -31,10 +31,10 @@
 | giftCard | [`getGiftCard`](#getgiftcard) | GET | `/gift-cards/{cardCode}` | core | 1 | BO-1123, BO-1125, GST-071, WEB-021 |
 | retail | [`getWalletAutoReloadSetting`](#getwalletautoreloadsetting) | GET | `/wallets/{walletId}/auto-reload` | core | 1 | BO-416, GST-011 |
 | retail | [`setWalletAutoReloadSetting`](#setwalletautoreloadsetting) | PUT | `/wallets/{walletId}/auto-reload` | core | 1 | BO-416, GST-011 |
-| retail | [`transferWalletBalance`](#transferwalletbalance) | POST | `/wallets/{walletId}/transfer` | core | 1 | BO-1116, BO-1121, GST-071, WEB-021 |
+| retail | [`transferWalletBalance`](#transferwalletbalance) | POST | `/wallets/{walletId}/transfer` | core | 1 | BO-1121, GST-071, WEB-021 |
 | wallet | [`createCreditType`](#createcredittype) | POST | `/credit-types` | setup | 1 | BO-1088, BO-1104, BO-415 |
-| wallet | [`getWallet`](#getwallet) | GET | `/wallets/{subjectId}` | core | 1 | BO-1086, BO-1100, BO-1149, BO-1150, BO-414, BO-416 … |
-| wallet | [`listWalletTransactions`](#listwallettransactions) | GET | `/wallets/{subjectId}/transactions` | core | 1 | BO-1093, BO-1102, BO-1142, BO-1143, BO-1148, BO-414 … |
+| wallet | [`getWallet`](#getwallet) | GET | `/wallets/{subjectId}` | core | 1 | BO-1100, BO-1149, BO-1150, BO-414, BO-416, BO-422 … |
+| wallet | [`listWalletTransactions`](#listwallettransactions) | GET | `/wallets/{subjectId}/transactions` | core | 1 | BO-1102, BO-1142, BO-1143, BO-1148, BO-414, BO-423 … |
 | wallet | [`publishWalletConfiguration`](#publishwalletconfiguration) | POST | `/wallet-configuration/publish` | setup | 1 | BO-1092, BO-1112, BO-1132, BO-1162, BO-1173, BO-1180 … |
 | wallet | [`restoreWalletConfigurationVersion`](#restorewalletconfigurationversion) | POST | `/wallet-configuration/versions/{version}/restore` | setup | 1 | BO-1162 |
 | wallet | [`setWalletFundingRules`](#setwalletfundingrules) | PUT | `/wallet-funding-rules` | setup | 1 | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099 … |
@@ -378,7 +378,7 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 | Guest callable | True |
 | Reads | `cache:idempotency`, `pii.subject`, `wallet.balance`, `wallet.credit_lot`, `wallet.credit_type`, `wallet.transfer_rule`, `wallet.wallet`, `wallet.wallet_transaction` |
 | Writes | `cache:idempotency`, `wallet.balance`, `wallet.credit_lot`, `wallet.wallet`, `wallet.wallet_transaction` |
-| Called by | BO-1116, BO-1121, GST-071, WEB-021 |
+| Called by | BO-1121, GST-071, WEB-021 |
 
 **Parameters**
 
@@ -521,7 +521,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | Read routing | primary |
 | Reads | `wallet.credit_lot`, `wallet.wallet` |
 | Writes | - |
-| Called by | BO-1086, BO-1100, BO-1149, BO-1150, BO-414, BO-416, BO-422, BO-448, BO-487, BO-488, GST-011, GST-071, WEB-017, WEB-021 |
+| Called by | BO-1100, BO-1149, BO-1150, BO-414, BO-416, BO-422, BO-448, BO-487, BO-488, GST-011, GST-071, WEB-017, WEB-021 |
 
 **Parameters**
 
@@ -593,7 +593,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | Read routing | primary |
 | Reads | `wallet.wallet_transaction` |
 | Writes | - |
-| Called by | BO-1093, BO-1102, BO-1142, BO-1143, BO-1148, BO-414, BO-423, BO-453, BO-469, GST-011, WEB-021 |
+| Called by | BO-1102, BO-1142, BO-1143, BO-1148, BO-414, BO-423, BO-453, BO-469, GST-011, WEB-021 |
 
 **Parameters**
 

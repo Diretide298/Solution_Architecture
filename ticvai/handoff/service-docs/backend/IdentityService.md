@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 37 of 103 |
+| Operations in the slice | 38 of 103 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -51,6 +51,7 @@
 | identity | [`grantDelegation`](#grantdelegation) | POST | `/guests/{subjectId}/delegations` | core | 1 | GST-015 |
 | identity | [`listDelegations`](#listdelegations) | GET | `/guests/{subjectId}/delegations` | core | 1 | GST-015, GST-069, WEB-024 |
 | identity | [`login`](#login) | POST | `/auth/login` | core | 1 | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
+| identity | [`recordSubjectDataExportPart`](#recordsubjectdataexportpart) | POST | `/guest-data-export-parts` | core | 1 |  |
 | identity | [`refreshToken`](#refreshtoken) | POST | `/auth/refresh` | core | 1 | GST-042, WEB-016 |
 | identity | [`selectRole`](#selectrole) | POST | `/auth/select-role` | core | 1 | ADM-001, EMP-001, EMP-002, POS-000, POS-001, PTR-001 … |
 | identity | [`setPasswordPolicy`](#setpasswordpolicy) | PUT | `/password-policy` | setup | 1 | ADM-342, ADM-422 |
@@ -1787,6 +1788,61 @@ One sign-in for every staff and partner door. **A browser door sends no `worksta
 | 409 |  | An active session already exists for this principal on another device. |
 | 429 |  | The request budget is exceeded (rate-limited), or this principal's password or PIN is locked after too many wrong attempts (credential-locked, 14 October 2026, CHG-CRD-001; an unknown username is loc… |
 
+### recordSubjectDataExportPart
+
+**`POST /guest-data-export-parts`**: Record an owner's part of a guest's data export
+
+**Identity's `marketing.subjectDataPartWritten` consumer** (the lead, 29 October 2026, r11 gate; CHG-R11FXC-005). Records the part against its export (`SubjectDataExportPart`), keyed by the export and the owner. The export job (`exportSubjectData`) assembles the file once the request is approved, or needs no approval, and every owner's part is recorded: a job that started before Marketing's part arrived stays `running` and continues when it is recorded. A part for an export that is `rejected` or `expired` is recorded and its object deleted at once. Modelled as an operation so it has lineage and a ticket.
+
+**Idempotent on the export id and the owner**: a redelivered event finds the part recorded and returns it. Invoked by the event relay, never by a screen.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | append |
+| Reads | `cache:idempotency`, `identity.subject_data_export_part` |
+| Writes | `cache:idempotency`, `identity.subject_data_export_part` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| eventId | string | yes | The marketing.subjectDataPartWritten event id, for the consumer's inbox record. |
+| approvalRequestId | string (uuid) | yes | The export the part belongs to; stored as the part's exportId. |
+| fileRef | string | yes | (max length 500) |
+| tables | array of string |  |  |
+| rowCount | integer | yes | (min 0) |
+
+**Response**: `SubjectDataExportPart`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  | (read-only) |
+| exportId | string (uuid) | yes | The export the part belongs to (SubjectDataExport.requestId, the event's approvalRequestId). |
+| owner | string | yes | The module that wrote the part, marketing-crm today. (max length 40) |
+| fileRef | string | yes | The part's object key in the tenant's private storage. (max length 500) |
+| tables | array of string |  | The owner's tables the part holds rows of. |
+| rowCount | integer | yes | (min 0) |
+| writtenAt | string (date-time) | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The part, recorded now or already recorded. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### refreshToken
 
 **`POST /auth/refresh`**: Rotate the access token
@@ -2785,6 +2841,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 | requested_at | timestamptz | yes |  |
 | ready_at | timestamptz | no |  |
 
+### `identity.subject_data_export_part`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| export_id | uuid | yes | The export the part belongs to (SubjectDataExport.requestId, the event's approvalRequestId). |
+| owner | text | yes | The module that wrote the part, marketing-crm today. |
+| file_ref | text | yes | The part's object key in the tenant's private storage. |
+| tables | text[] | no | The owner's tables the part holds rows of. |
+| row_count | integer | yes |  |
+| written_at | timestamptz | yes |  |
+
 ### `identity.subject_holding`
 
 | Column | Type | Required | Notes |
@@ -2863,13 +2931,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-66 operations, added to this service in later releases without changing any of the above.
+65 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
 | guestAuth | `getMyIdentityVerification`, `submitGuestIdentityDocument` |
-| identity | `decideGuestIdentityVerification`, `endGuestDeviceSessions`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `getSessionVenue`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `listStepUpSupervisors`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `recordSubjectDataExportPart`, `setGuestVerificationPolicy`, `setSessionVenue`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
+| identity | `decideGuestIdentityVerification`, `endGuestDeviceSessions`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `getSessionVenue`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `listStepUpSupervisors`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `setGuestVerificationPolicy`, `setSessionVenue`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
 | mfa | `removeMfaMethod` |
 | prospectAuth | `startProspectSignup`, `verifyProspectSignupCode` |
 | session | `endOwnSession`, `listOwnSessions`, `revokeAllSessions` |

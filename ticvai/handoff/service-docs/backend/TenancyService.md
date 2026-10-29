@@ -58,7 +58,7 @@
 | scope | [`updateOrgUnit`](#updateorgunit) | PATCH | `/org-units/{orgUnitId}` | setup | 1 | BO-064, BO-145 |
 | tenancy | [`getWorkstationHealth`](#getworkstationhealth) | GET | `/workstations/{workstationId}/health` | core | 1 | BO-036, BO-128, BO-129, POS-001, POS-025 |
 | tenancy | [`listAuditRecords`](#listauditrecords) | GET | `/audit-records` | core | 1 | ADM-004, ANL-070, BO-035, BO-068, BO-1079, BO-1162 … |
-| tenancy | [`setConfigurationProfile`](#setconfigurationprofile) | PUT | `/configuration-profiles/{profileId}` | setup | 1 | BO-1070, BO-123, BO-129 |
+| tenancy | [`setConfigurationProfile`](#setconfigurationprofile) | PUT | `/configuration-profiles/{profileId}` | setup | 1 | BO-123, BO-129 |
 | tenancy | [`setVenueSettings`](#setvenuesettings) | PUT | `/venues/{venueId}/settings` | setup | 1 | BO-065, BO-1063, BO-136, BO-187, BO-600 |
 | tenancy | [`setVenueSettingsDefaults`](#setvenuesettingsdefaults) | PUT | `/venue-settings-defaults` | setup | 1 | ADM-019, ADM-426, BO-1062 |
 | workstation | [`configureWorkstation`](#configureworkstation) | PUT | `/workstations/{workstationId}` | core | 1 | BO-036, BO-602, POS-016 |
@@ -2265,7 +2265,7 @@ Board 1 of the client's POS set. **A profile is what a venue changes; a version 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `platform.configuration_profile` |
 | Writes | `cache:idempotency`, `cache:resolution`, `platform.configuration_profile` |
-| Called by | BO-1070, BO-123, BO-129 |
+| Called by | BO-123, BO-129 |
 | State model | ConfigurationProfile ([states/configuration-profile.yaml](../../../states/configuration-profile.yaml)): created as `draft`; moves `draft` -> `published` **(not settled: see the Gaps sheet)** |
 
 **Parameters**

@@ -220,8 +220,8 @@
  },
  "deferredScreens": [],
  "counts": {
-  "core": 517,
-  "setup": 268,
+  "core": 519,
+  "setup": 269,
   "allOperations": 2856
  },
  "services": {
@@ -246,7 +246,7 @@
    "total": 138
   },
   "IdentityService": {
-   "core": 32,
+   "core": 33,
    "setup": 5,
    "total": 103
   },
@@ -261,8 +261,8 @@
    "total": 72
   },
   "MarketingService": {
-   "core": 52,
-   "setup": 20,
+   "core": 53,
+   "setup": 21,
    "total": 281
   },
   "OrderService": {
@@ -5778,7 +5778,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-1086",
     "BO-1100",
     "BO-1149",
     "BO-1150",
@@ -8049,8 +8048,10 @@
     "GST-008",
     "GST-041",
     "GST-048",
+    "GST-050",
     "GST-075",
     "KSK-004",
+    "KSK-015",
     "POS-002",
     "POS-003",
     "PTR-006",
@@ -8803,7 +8804,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-1093",
     "BO-1102",
     "BO-1142",
     "BO-1143",
@@ -9935,6 +9935,19 @@
     "GST-001",
     "WEB-001"
    ],
+   "enables": []
+  },
+  "recordSubjectDataExportPart": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/guest-data-export-parts",
+   "perm": null,
+   "platforms": [
+    "SVC-IDENTITY-IDENTITY-1"
+   ],
+   "screens": [],
    "enables": []
   },
   "redeemLoyaltyPoints": {
@@ -11483,7 +11496,6 @@
    "perm": "TENANT_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-1070",
     "BO-123",
     "BO-129"
    ],
@@ -13414,7 +13426,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-1116",
     "BO-1121",
     "GST-071",
     "WEB-021"
@@ -14328,6 +14339,19 @@
    ],
    "enables": []
   },
+  "uploadGuestDocument": {
+   "part": "setup",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/guest-documents",
+   "perm": "GUEST_VIEW_PII",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "marketing.guest_document"
+   ]
+  },
   "validateBookingFlow": {
    "part": "core",
    "service": "WhiteLabelService",
@@ -14537,6 +14561,19 @@
    "enables": [
     "transport.timetable"
    ]
+  },
+  "writeSubjectDataExportPart": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/subject-data-export-parts",
+   "perm": null,
+   "platforms": [
+    "SVC-IDENTITY-IDENTITY-1"
+   ],
+   "screens": [],
+   "enables": []
   }
  },
  "fedElsewhere": {
