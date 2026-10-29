@@ -24,7 +24,8 @@ And one rule per decision:
                    approval-no-approver-available.
   BR-APPROVAL-ENGINE (r10, ADAM CR-102, CHG-R10ID-015) the engine's rules have storage: ApprovalRule.condition
                    defines its language (AND-joined comparisons) and the unreachableRule comparison; a rule's code is
-                   unique per matrix (x-ticvai-unique-together [matrix_id, code]); a matrix's version is required; the
+                   unique per rule set (x-ticvai-unique-together [matrix_id, matrixVersion, code], per version since
+                   CR-300, CHG-CR300-001); a matrix's version is required; the
                    approver chain is stored (ApprovalRequest.approvers, approvals.request_approver); a decision can be
                    return or requestInformation; the composite operations declare 400, 403 exceedsDelegatorAuthority
                    and 409.
@@ -592,8 +593,10 @@ def main() -> int:
     need("BR-APPROVAL-ENGINE", " AND " in cond and "notIn" in cond and "unreachableRule" in cond,
          "ApprovalRule.condition does not define the condition language (AND-joined clauses, operators) and the "
          "unreachableRule comparison")
-    need("BR-APPROVAL-ENGINE", ["matrix_id", "code"] in (rule_s.get("x-ticvai-unique-together") or []),
-         "ApprovalRule has no unique (matrix_id, code)")
+    # Per version since ADAM CR-300, option B (CHG-CR300-001): a version repeats its rules' codes, so CR-102's "no
+    # duplicate code within one rule set" is (matrix_id, matrix_version, code).
+    need("BR-APPROVAL-ENGINE", ["matrix_id", "matrixVersion", "code"] in (rule_s.get("x-ticvai-unique-together") or []),
+         "ApprovalRule has no unique (matrix_id, matrix_version, code)")
     need("BR-APPROVAL-ENGINE", "version" in ((asch.get("ApprovalMatrix") or {}).get("required") or []),
          "ApprovalMatrix.version is not required (a matrix version may be null)")
     req_s = asch.get("ApprovalRequest") or {}

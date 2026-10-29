@@ -5601,9 +5601,10 @@ components:
     ApprovalRule:
       type: object
       x-ticvai-persistence: approvals.rule
-      # A rule's code is unique within its matrix where it is set (ADAM CR-102, option 1; CHG-R10ID-015): a unique index
-      # on (matrix_id, code); rows with a null code do not collide.
-      x-ticvai-unique-together: [[matrix_id, code]]
+      # A rule's code is unique within one rule set where it is set (ADAM CR-102, option 1; CHG-R10ID-015): since ADAM
+      # CR-300, option B (CHG-CR300-001), a rule set is one version of its matrix and a new version repeats the codes of
+      # the one before, so the unique index is on (matrix_id, matrix_version, code); rows with a null code do not collide.
+      x-ticvai-unique-together: [[matrix_id, matrixVersion, code]]
       required:
       - order
       - approverRoleIds
