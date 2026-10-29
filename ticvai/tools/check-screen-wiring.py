@@ -45,6 +45,15 @@ view counts too** (CHG-R8INT-008): the guest web's Your orders, Transfer & resal
 whose rows the client approved, and the lead's ruling of 20 October 2026 is that no read a person sees is marked
 `background` to escape S-OP-UNREACHED.
 
+**Three things the rules now see** (29 October 2026, the r11 final gate; the lead: "Teach the check"). A `fileUpload`
+control bound to `createUpload` also reaches a declared `completeUpload`: the asset library's upload is two calls, and
+the control that starts the transfer confirms it when it ends (BO-1189, BO-955); a button bound to `createUpload`
+reaches nothing more. `collectedBy` (S-BUTTON-FORM) takes a `timeline` as well as a list, card list, table or grid
+(GST-059's Today). And S-BUTTON-FORM takes a body whose every required field is named in the api's `inputSources`
+from an operation on the screen whose 2xx response has that field, verified as S-INPUT-SOURCE verifies an id's source
+(GST-054's Apply this change: `changes` from `requestSuggestion.value`, `baseVersion` from `getVisitPlan.version`); a
+named source that is not there is still a finding, and says which field.
+
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
     python3 tools/check-screen-wiring.py [--all] [--update-baseline]
@@ -233,6 +242,35 @@ def self_test():
         bad.append(f"overlay_refs: a form's picker read is not reached: {overlay_refs(form)}")
     if overlay_refs({"id": "x", "confirm": {"label": "OK"}}) != set():
         bad.append("overlay_refs: an overlay with no operation reached something")
+    # a fileUpload on createUpload reaches a declared completeUpload; a button on createUpload does not ("Teach the check")
+    up = [{"kind": "fileUpload", "operation": "createUpload"}]
+    if upload_completes(up, {"createUpload", "completeUpload"}) != {"completeUpload"}:
+        bad.append("upload_completes: a fileUpload on createUpload does not reach the declared completeUpload")
+    if upload_completes(up, {"createUpload"}):
+        bad.append("upload_completes: reached a completeUpload the screen does not declare")
+    if upload_completes([{"kind": "secondaryButton", "operation": "createUpload"}], {"createUpload", "completeUpload"}):
+        bad.append("upload_completes: a button on createUpload reached completeUpload")
+    # collectedBy takes a timeline's rows, and still not a panel or a banner
+    for kind, ok in (("timeline", True), ("cardList", True), ("dataTable", True), ("detailPanel", False),
+                     ("banner", False)):
+        if bool(COLLECTS.search(kind)) != ok:
+            bad.append(f"COLLECTS: {kind} {'refused' if ok else 'accepted'}")
+    # a body named in inputSources: every required field from an operation on the screen whose answer has it
+    fops = {"updatePlan": {"required_body": {"baseVersion", "changes"}}, "getPlan": {}, "suggest": {}}
+    ans = {"getPlan": {"version", "days"}, "suggest": {"value", "kind"}}
+    both = {"operationId": "updatePlan", "inputSources": {"baseVersion": "getPlan.version", "changes": "suggest.value"}}
+    cases = [
+        ("both named and answered", both, {"updatePlan", "getPlan", "suggest"}, True),
+        ("one required field unnamed", {"operationId": "updatePlan", "inputSources": {"baseVersion": "getPlan.version"}},
+         {"updatePlan", "getPlan", "suggest"}, False),
+        ("source not on the screen", both, {"updatePlan", "getPlan"}, False),
+        ("source answers no such field", {"operationId": "updatePlan", "inputSources": {
+            "baseVersion": "getPlan.version", "changes": "suggest.changes"}}, {"updatePlan", "getPlan", "suggest"}, False),
+        ("no inputSources", {"operationId": "updatePlan"}, {"updatePlan", "getPlan", "suggest"}, False),
+    ]
+    for name, a, on, ok in cases:
+        if body_named(a, on, fops, None, ans)[0] != ok:
+            bad.append(f"body_named: {name}: expected {'taken' if ok else 'refused'}")
     return bad
 
 
@@ -365,6 +403,7 @@ def main() -> int:
             guard.add("S-DUP-REGION", f"{sid}:{n}", f"{sid}: region {n!r} appears {names.count(n)} times")
         # --- R273 unreached operations ---------------------------------------------------------
         refs = {c.get("operation") for c in comps if c.get("operation")}
+        refs |= upload_completes(comps, op_ids)
         for o in overlays:
             refs |= overlay_refs(o)
         for t in ((s.get("navigation") or {}).get("transitions") or []):
@@ -397,7 +436,8 @@ def main() -> int:
         reads = {a["operationId"] for a in apis
                  if (facts.get(a["operationId"]) or {}).get("method") == "get" or a.get("trigger") == "onLoad"}
         lists = {c.get("label") for c in comps
-                 if re.search(r"(?i)list|table|grid", str(c.get("kind"))) and c.get("operation") in reads}
+                 if COLLECTS.search(str(c.get("kind"))) and c.get("operation") in reads}
+        api_of = {a["operationId"]: a for a in apis}
         for c in comps:
             op_id = c.get("operation")
             f = ops.get(op_id) if op_id else None
@@ -409,6 +449,13 @@ def main() -> int:
                 continue
             if f and "Button" in str(c.get("kind")) and f["method"] in WRITES \
                     and required_body(f["op"]) and op_id not in collected and not has_inputs and not by:
+                taken, why = body_named(api_of.get(op_id) or {}, op_ids, ops, by_schema)
+                if taken:
+                    continue
+                if why:
+                    guard.add("S-BUTTON-FORM", f"{sid}:{op_id}",
+                              f"{sid}: button {c.get('label')!r} calls {op_id}, which takes a body, and {why}")
+                    continue
                 guard.add("S-BUTTON-FORM", f"{sid}:{op_id}",
                           f"{sid}: button {c.get('label')!r} calls {op_id}, which takes a body, and "
                           f"nothing on the screen collects it")
@@ -566,31 +613,107 @@ GUEST_SCREEN = re.compile(r"^(WEB|GST|KSK)-")
 SESSION_IDS = {"subjectId", "tenantId", "principalId", "venueId", "workstationId", "sessionId"}
 
 
+def schema_deref(node, stem, by_schema, depth=0):
+    """Follow `$ref`s to the schema they name, and the contract stem it lives in."""
+    while isinstance(node, dict) and "$ref" in node and depth < 8:
+        m = re.match(r"^(?:\.\./)?(?:[\w-]+/)?([\w-]+)\.yaml#/components/schemas/(\w+)$", str(node["$ref"]))
+        if m:
+            stem, node = m.group(1), by_schema.get((m.group(1), m.group(2))) or {}
+        else:
+            node = by_schema.get((stem, g.ref_name(str(node["$ref"])))) or {}
+        depth += 1
+    return node, stem
+
+
+def schema_walk(node, stem, by_schema, depth, fields, names):
+    """Every property name (`fields`) and schema name (`names`, lower case) under `node`, list rows included."""
+    if not isinstance(node, dict) or depth > 5:
+        return
+    if "$ref" in node:
+        names.add(g.ref_name(str(node["$ref"])).lower())
+        node, stem = schema_deref(node, stem, by_schema)
+    for k in ("allOf", "oneOf", "anyOf"):
+        for sub in node.get(k) or []:
+            schema_walk(sub, stem, by_schema, depth + 1, fields, names)
+    if isinstance(node.get("items"), dict):
+        schema_walk(node["items"], stem, by_schema, depth + 1, fields, names)
+    for p, ps in (node.get("properties") or {}).items():
+        fields.add(p)
+        schema_walk(ps, stem, by_schema, depth + 1, fields, names)
+
+
+def answer_fields(f: dict, by_schema) -> set:
+    """The fields an operation's 2xx responses carry, at any depth (a list's rows and what a write returns included)."""
+    out: set = set()
+    for code, r in (f["op"].get("responses") or {}).items():
+        if not str(code).startswith("2") or not isinstance(r, dict):
+            continue
+        for media in (r.get("content") or {}).values():
+            schema_walk((media or {}).get("schema") or {}, f["contract"], by_schema, 0, out, set())
+    return out
+
+
+def required_body_fields(f: dict, by_schema) -> set:
+    """The required top-level fields of an operation's JSON request body (allOf members included)."""
+    rb = ((f["op"].get("requestBody") or {}).get("content") or {}).get("application/json") or {}
+    body, bst = schema_deref(rb.get("schema") or {}, f["contract"], by_schema)
+    req = set((body or {}).get("required") or [])
+    for b in (body or {}).get("allOf") or []:
+        req |= set((schema_deref(b, bst, by_schema)[0] or {}).get("required") or [])
+    return req
+
+
+def body_named(a: dict, on_screen: set, ops: dict, by_schema, answers=None) -> tuple:
+    """Whether every required body field of the api `a` is named in its `inputSources` from an operation on the
+    screen whose 2xx response has that field, verified as S-INPUT-SOURCE verifies an id's source (S-BUTTON-FORM; the
+    lead, 29 October 2026, "Teach the check"): the body is what earlier calls on the screen answered, as GST-054's Apply
+    this change sends the planner's proposal (requestSuggestion.value) on the plan's version (getVisitPlan.version).
+    Returns (taken, why not); an api with no inputSources, or a body with no required field, is never taken this way
+    and gets the rule's usual finding. `answers` (operationId -> fields) stands in for the contracts in the self-tests."""
+    f = ops.get(a.get("operationId"))
+    named = a.get("inputSources") if isinstance(a.get("inputSources"), dict) else {}
+    if not f or not named:
+        return False, ""
+    req = f.get("required_body") if answers is not None else required_body_fields(f, by_schema)
+    if not req:
+        return False, ""
+    for n in sorted(req):
+        src = str(named.get(n) or "")
+        if not src:
+            return False, f"its required {n} has no inputSources entry"
+        op_name, _, field = src.partition(".")
+        if op_name not in on_screen or op_name not in ops:
+            return False, f"inputSources names {n} from {op_name}, which is not on the screen"
+        have = answers.get(op_name, set()) if answers is not None else answer_fields(ops[op_name], by_schema)
+        if field not in have:
+            return False, f"inputSources names {n} from {src}, and no 2xx response of {op_name} has {field}"
+    return True, ""
+
+
+def upload_completes(comps: list, op_ids: set) -> set:
+    """completeUpload, when the screen declares it and a fileUpload control is bound to createUpload (the lead, 29
+    October 2026, "Teach the check"): the asset library's upload is two calls, and the control that starts the
+    transfer (createUpload, a signed URL) confirms it when the transfer ends (completeUpload, the MediaAsset id), as
+    BO-1189's Network file and BO-955's View from this section say. Only that control kind and that pair; a button
+    bound to createUpload reaches nothing more."""
+    if "completeUpload" in op_ids and any(c.get("kind") == "fileUpload" and c.get("operation") == "createUpload"
+                                          for c in comps):
+        return {"completeUpload"}
+    return set()
+
+
+# The component kinds whose rows can collect a button's body (collectedBy): a list, card list, table or grid, and a
+# timeline (the lead, 29 October 2026, "Teach the check"): GST-059's Today is the day's items in time order, and
+# Re-order my day sends their new order.
+COLLECTS = re.compile(r"(?i)list|table|grid|timeline")
+
+
 def input_sources(guard, all_screens, ops, by_schema) -> None:
     def deref(node, stem, depth=0):
-        while isinstance(node, dict) and "$ref" in node and depth < 8:
-            m = re.match(r"^(?:\.\./)?(?:[\w-]+/)?([\w-]+)\.yaml#/components/schemas/(\w+)$", str(node["$ref"]))
-            if m:
-                stem, node = m.group(1), by_schema.get((m.group(1), m.group(2))) or {}
-            else:
-                node = by_schema.get((stem, g.ref_name(str(node["$ref"])))) or {}
-            depth += 1
-        return node, stem
+        return schema_deref(node, stem, by_schema, depth)
 
     def walk(node, stem, depth, fields, names):
-        if not isinstance(node, dict) or depth > 5:
-            return
-        if "$ref" in node:
-            names.add(g.ref_name(str(node["$ref"])).lower())
-            node, stem = deref(node, stem)
-        for k in ("allOf", "oneOf", "anyOf"):
-            for sub in node.get(k) or []:
-                walk(sub, stem, depth + 1, fields, names)
-        if isinstance(node.get("items"), dict):
-            walk(node["items"], stem, depth + 1, fields, names)
-        for p, ps in (node.get("properties") or {}).items():
-            fields.add(p)
-            walk(ps, stem, depth + 1, fields, names)
+        schema_walk(node, stem, by_schema, depth, fields, names)
 
     for plat, s in all_screens:
         sid = s.get("id", "")

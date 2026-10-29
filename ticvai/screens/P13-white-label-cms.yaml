@@ -10616,9 +10616,13 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
-      - kind: primaryButton
+      - kind: fileUpload
         label: Browse Files
-        provenance: pack Digital Asset Management DAM.pdf, page 6 §Support
+        operation: createUpload
+        notes: Picks the files and uploads each to the asset library (`createUpload` for a signed URL, then
+          `completeUpload` when the transfer ends); analyseMediaAsset auto-tags what arrives.
+        provenance: 'pack Digital Asset Management DAM.pdf, page 6 §Support; a fileUpload since 29 October 2026
+          (CHG-R11FXU-010; the lead: "Make it file upload")'
       - kind: secondaryButton
         label: Bulk Upload
         operation: completeUpload
@@ -11059,21 +11063,41 @@ screens:
       components:
       - kind: primaryButton
         label: Asset Type
+        operation: searchMedia
+        notes: Narrows Matching assets (searchMedia `kind`).
         provenance: pack Digital Asset Management DAM.pdf, page 12 §Support
       - kind: secondaryButton
         label: File Format
         provenance: pack Digital Asset Management DAM.pdf, page 12 §Support
       - kind: secondaryButton
         label: Venue
+        operation: searchMedia
+        notes: Narrows Matching assets (searchMedia `venueId`).
         provenance: pack Digital Asset Management DAM.pdf, page 12 §Support
       - kind: secondaryButton
         label: Collection
+        operation: searchMedia
+        notes: Narrows Matching assets (searchMedia `collectionId`).
         provenance: pack Digital Asset Management DAM.pdf, page 12 §Support
       - kind: secondaryButton
         label: Owner
         provenance: pack Digital Asset Management DAM.pdf, page 12 §Support
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        label: Matching assets
+        bindsTo: MediaAsset
+        columns:
+        - MediaAsset.title
+        - MediaAsset.kind
+        - MediaAsset.filename
+        - MediaAsset.status
+        - MediaAsset.createdAt
+        operation: searchMedia
+        notes: '**What the search finds**, narrowed by the facets above: Asset Type sends `kind`, Venue `venueId`,
+          Collection `collectionId`. Cursor pagination, never offset. File Format and Owner have no search
+          parameter yet and narrow nothing.'
+        provenance: 'design change 29 October 2026 (CHG-R11FXU-011; the lead: "Add a results table")'
   states:
     loading: The advanced search discovery list.
     error: Could not load. Names which read failed and leaves the advanced search discovery untouched.

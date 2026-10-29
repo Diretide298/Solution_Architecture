@@ -1,0 +1,42 @@
+id: CHG-R11FXU-010
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'CMS-063 Upload & Asset Ingestion Workspace: Browse Files is a file-upload control bound to createUpload,
+  the picker that collects the file it uploads; a logged design change.'
+decision:
+  what: 'screens/P13-white-label-cms.yaml CMS-063, a design change: the primaryButton Browse Files becomes a
+    fileUpload of the same label, bound to createUpload (the picked file gives filename, contentType and sizeBytes);
+    when the transfer ends it confirms it with completeUpload (CHG-R11FXU-009), and analyseMediaAsset auto-tags what
+    arrives. Bulk Upload (completeUpload) and Import from Approved Source stay as they were. The region change
+    (rowActions) is logged in docs/active/approved-ui-changes.yaml.'
+  by: Chinmay
+  date: '2026-10-29'
+  quote: '"Make it file upload" (the lead on the held screen findings of the r11 final gate, 29 October 2026, after
+    "Fix them, then ship")'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T12:46Z, handoff/service-docs/adam-links.json):
+  check-screen-wiring S-OP-UNREACHED finding on CMS-063 createUpload, built on by started ticket #30913 (In progress,
+  Narayan Gaonkar). A button bound to createUpload would fail S-BUTTON-FORM: its required body comes from the picked
+  file, and only a file-upload control picks one.'
+keys_touched:
+  screens: [CMS-063]
+  operations: [createUpload, completeUpload]
+  files:
+  - screens/P13-white-label-cms.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'an upload started from a button that picks no file'
+tickets:
+  started:
+  - '30913 (createUpload, In progress, Narayan Gaonkar): nothing to change in the operation; CMS-063 Browse Files now
+    calls it from a file picker. Told through the lead''s comment; its text is not rewritten.'
+  unstarted:
+  - 'CMS-063''s screen ticket builds Browse Files as a file-upload control at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-OP-UNREACHED
+status: open
+notes: 'One visible change (the control''s kind), logged. No database change.'

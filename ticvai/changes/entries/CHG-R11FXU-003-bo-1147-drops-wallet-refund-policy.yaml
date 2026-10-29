@@ -28,7 +28,7 @@ root_class: 'an operation declared on a screen that does not do it'
 tickets:
   started:
   - '30859 (setWalletRefundPolicy, Ready for QA, Pranay Shinde): nothing to change in the operation; BO-1147 no longer
-    consumes it, and it stays on BO-1146. ADM-612 still declares it (held for the lead). Told through the lead''s
+    consumes it, and it stays on BO-1146 (ADM-612 drops it too, CHG-R11FXU-007). Told through the lead''s
     comment; its text is not rewritten.'
   unstarted:
   - 'BO-1147''s screen ticket drops the declaration at the next tag.'

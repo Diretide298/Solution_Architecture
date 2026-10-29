@@ -32,7 +32,7 @@ root_class: 'an operation declared on a screen that has no element for it'
 tickets:
   started:
   - '30908 (searchMedia, Ready for QA, Narayan Gaonkar): nothing to change in the operation; CMS-061 no longer consumes
-    it, and it stays on CMS-010, CMS-062, CMS-073 and more. CMS-067 still declares it (held for the lead). Told through
+    it, and it stays on CMS-010, CMS-062, CMS-073 and more (CMS-067 now shows it, CHG-R11FXU-011). Told through
     the lead''s comment; its text is not rewritten.'
   unstarted:
   - 'CMS-061''s screen ticket drops the declaration and the three carried assetIds at the next tag.'
