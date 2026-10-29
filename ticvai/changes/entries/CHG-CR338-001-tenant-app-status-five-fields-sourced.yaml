@@ -1,0 +1,70 @@
+id: CHG-CR338-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'getTenantAppStatus''s five unsourced parts get a source: whatsNew from a tenant-side copy of the releases the
+  cell received (new whitelabel.received_release, written by the workers host), recentChanges from
+  whitelabel.config_version, each venue''s city and openingHoursToday from two new venue settings columns
+  (platform.venue_settings.city, opening_hours jsonb by weekday) read through venueSettingsRecords, and venues lists
+  the active venues on every read.'
+decision:
+  what: 'ADAM CR-338, the options it recommends (Chinmay, 29 October 2026: "As recommended, comment now", then "Include
+    those in today as well"): whatsNew (a) with the tenant-side copy, recentChanges (a), city and openingHoursToday
+    (a), venues (a). contracts/satellite/white-label.yaml: new ReceivedRelease (whitelabel.received_release: id,
+    releaseId, version, guestReleaseNotes, receivedAt, scopePath; one row per release, unique on scopePath and
+    releaseId), written by the workers host when the release''s rollout completes on the tenant''s database;
+    TenantAppStatus.whatsNew reads it, newest receivedAt first. recentChanges is derived from whitelabel.config_version
+    (area publish, description the note, principalId published_by_principal_id, at published_at), newest first, at
+    most 10. venues[].city and venues[].openingHoursToday come from VenueSettings.city and VenueSettings.openingHours
+    through tenancy#venueSettingsRecords, today in the venue''s region time zone (tenancy#regionSettingsRecords). The
+    venues sentence "and it is in the tenant''s current published ConfigVersion" is gone: the active venues are listed
+    on every read, as TenantConfig.venues does (still empty when nothing is published). getTenantAppStatus declares its
+    reads (received_release, config_version and its other own tables) and the two Tenancy reads in process (XDR-004
+    already lists it). setMaintenanceMode, which answers TenantAppStatus too, declares the same; its in-process Tenancy
+    reads are XDR-020. contracts/spine/tenancy.yaml: VenueSettings.city (text, at most 120) and
+    VenueSettings.openingHours (VenueOpeningHours, jsonb by weekday mon to sun, each VenueDayHours {opens, closes} or
+    null for closed). The columns and the table reach the database through the next forward migration (derive-ddl).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-338 (Hrushikant Patkar, #31053 getTenantAppStatus): five optional TenantAppStatus parts named a source
+  that did not exist (the control-plane release notes, a city and opening-hours column, a venue list in the snapshot)
+  or that the operation had no route to read (recentChanges).'
+keys_touched:
+  operations: [getTenantAppStatus, setMaintenanceMode, setVenueSettings, getVenueSettings, setVenueSettingsDefaults,
+    getVenueSettingsDefaults]
+  schemas: [TenantAppStatus, ReceivedRelease, VenueSettings, VenueOpeningHours, VenueDayHours]
+  tables: [whitelabel.received_release, platform.venue_settings, whitelabel.config_version]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/tenancy.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - handoff/api-data-lineage-overrides.json
+  other:
+  - 'XDR-020: setMaintenanceMode reads tenancy#venueSettingsRecords and regionSettingsRecords in process'
+root_class: 'a response field naming a source that does not exist or that its operation has no route to'
+tickets:
+  started:
+  - '30823 (getVenueSettings, Ready for QA, Pranay Shinde) and 31258 (getVenueSettingsDefaults, Ready for QA, Surendra
+    Loke): VenueSettings gains city and openingHours; return the two new columns.'
+  - '30342 (platform.venue_settings, Ready for QA, Hrushikant Patkar): the table gains city and opening_hours in the
+    next forward migration; migration work is a child task of the MIG ticket.'
+  - '31059 (WEB-028), 31855 and 31857 (WEB-050), 33038 (GST-051), 31065 and 31067 (WEB-045), 31068 (GST-040), 27889,
+    31062, 31064 (WEB-029), 31074 (GST-047), on getTenantAppStatus: venues[].city, openingHoursToday and whatsNew now
+    have values where they were left out; recentChanges is staff only; nothing to do.'
+  unstarted:
+  - '31053 (getTenantAppStatus, New): builds the five parts through CR-338''s comment.'
+  - '30766 (setMaintenanceMode, New): answers TenantAppStatus with the same sources.'
+  - '31205 (setVenueSettings, New): stores city and openingHours.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-338
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'XR-FACT fails an operation whose text names VenueSettings'' columns or RegionSettings.timeZone and asks no
+  Tenancy query: it caught setMaintenanceMode, which answers TenantAppStatus, on the first run of this change. The
+  writer of whitelabel.received_release (a workers-host step when a rollout completes on a tenant database) has no
+  ticket, and the new table and columns need a migration child task: both are for the lead to file. No screen
+  changes: the venue settings screens do not yet offer city or opening hours.'

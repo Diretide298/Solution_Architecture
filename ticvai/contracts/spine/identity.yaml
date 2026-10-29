@@ -307,6 +307,32 @@ x-ticvai-queries:
       transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
       own operation. It is asked in process within commerce, through the C# query interface Identity implements.
     served: [in-process]
+  guestSignInProviders:
+    module: identity
+    table: identity.sso_provider
+    inputs:
+      guestProviders: {type: array, items: {type: string, enum: [apple, google, uaePass]}, description: 'Only these guest providers; omitted, every guest provider of the tenant.'}
+    returns:
+      type: array
+      description: 'The tenant''s enabled guest providers, one per guestProvider: provider and display data only,
+        never a secret.'
+      items:
+        type: object
+        required: [guestProvider, clientId]
+        properties:
+          guestProvider: {type: string, enum: [apple, google, uaePass]}
+          clientId: {type: string}
+          displayName: {type: string}
+          iconAssetRef: {type: string, nullable: true}
+    rule: >-
+      A rule question (ADAM CR-327, part (1), Chinmay, 29 October 2026: "Kind column on sso_provider";
+      CHG-CR327-001). Identity answers with the identity.sso_provider rows of the caller's tenant whose audience is
+      guest and whose is_active is true (a null is_active counts as not active, as listSsoProviders reads it), each
+      as its guestProvider, client_id, display_name and icon_asset_ref. client_secret_ref, the metadata, the group
+      mappings and every staff row are never returned. It is asked in process by White-label's
+      getPublishedTenantConfig for guestSignIn, under the caller's connection and the table's row-level security
+      (XDR-021).
+    served: [in-process]
 paths:
   /internal/step-up/verify:
     post:
@@ -3660,6 +3686,9 @@ paths:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
       x-ticvai-reads:
+      - table: identity.sso_provider
+        for: 'the tenant''s guest provider row, audience guest and its guestProvider: client id and
+          client_secret_ref (ADAM CR-327, part (1))'
       - table: pii.subject_identity
         for: 'the provider and provider subject a returning guest is found by (R8 blocker IDENTITY-C54) (r8 gate,
           CHG-R8GT2-003; check-parameter-columns P-NAMED-TABLE)'
@@ -3679,7 +3708,9 @@ paths:
         and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant''s
         provider rows. The client secret and the audience checks stay here, server-side, in the provider row
         (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI
-        against the one registered (`DomainReadiness.uaePassRedirect`).
+        against the one registered (`DomainReadiness.uaePassRedirect`). **The provider row is the tenant''s
+        `identity.sso_provider` with `audience` `guest` and the matching `guestProvider`** (ADAM CR-327, part (1);
+        CHG-CR327-001).
 
         Where the provider''s verified email matches an existing account, the identities are
         linked rather than a duplicate created. Where it does not, a new account is created — an unverified
@@ -3754,6 +3785,9 @@ paths:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
       x-ticvai-reads:
+      - table: identity.sso_provider
+        for: 'the tenant''s guest provider row, audience guest and its guestProvider: client id and
+          client_secret_ref (ADAM CR-327, part (1))'
       - table: pii.subject_identity
         for: 'the UAE Pass user id a returning guest is found by (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003;
           check-parameter-columns P-NAMED-TABLE)'
@@ -3780,7 +3814,9 @@ paths:
         and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant''s
         provider rows. The client secret and the audience checks stay here, server-side, in the provider row
         (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI
-        against the one registered (`DomainReadiness.uaePassRedirect`).
+        against the one registered (`DomainReadiness.uaePassRedirect`). **The provider row is the tenant''s
+        `identity.sso_provider` with `audience` `guest` and the matching `guestProvider`** (ADAM CR-327, part (1);
+        CHG-CR327-001).
 
         OAuth authorisation-code exchange. Returns a verified identity, so an account created
         this way needs no further verification.
@@ -4188,7 +4224,8 @@ paths:
 
         **Active providers only, in a fixed order** (decided 25 October 2026, Chinmay, ADAM CR-190 option A;
         CHG-R10ID-002). Only providers whose `identity.sso_provider.is_active` is true are listed; a null
-        `is_active` (the column has no default) counts as not active. Ordered by `displayName` ascending, then
+        `is_active` (the column has no default) counts as not active, and only `audience` `staff` rows are listed
+        (ADAM CR-327, part (1); CHG-CR327-001): a guest provider is never an SSO button. Ordered by `displayName` ascending, then
         `id` ascending. A tenant with no active provider answers `[]`, and its sign-in doors show no SSO
         button. `SsoProvider` carries no `isActive`: the filter is the server''s, so a switched-off provider''s
         name never reaches an unauthenticated caller.'
@@ -4237,7 +4274,8 @@ paths:
         September, audit R167, first part; its second part, no guest MFA, was superseded on 29 September
         by rev 3 GAP-B1, which made guest two-step verification a per-venue option). A guest signs in with a one-time code, a password, Apple or Google, or
         UAE Pass, each returning a `GuestSession`; this flow maps groups to roles and returns a staff
-        session, which a guest surface cannot use.
+        session, which a guest surface cannot use. **It serves `audience` `staff` providers only** (ADAM CR-327,
+        part (1); CHG-CR327-001): a `guest` row is never started here.
 
 
         **The pending sign-in is kept in Redis** (R8 blocker IDENTITY-C58, CHG-R8MIG-015): `cache:sso-state:<state>`
@@ -11363,6 +11401,20 @@ components:
           default: false
         isActive:
           type: boolean
+        audience:
+          type: string
+          enum: [staff, guest]
+          default: staff
+          description: '**Who signs in through this provider** (ADAM CR-327, part (1), Chinmay, 29 October 2026: "Kind column on sso_provider"; CHG-CR327-001). `staff`, the
+            default, is enterprise SSO for staff and partners (`listSsoProviders`, `startSsoAuthorization`); `guest`
+            is a guest sign-in provider, named by `guestProvider`, used only by `guestSocialLogin` and
+            `guestUaePassLogin` and listed to guests by White-label''s `getPublishedTenantConfig.guestSignIn`.'
+        guestProvider:
+          type: string
+          enum: [apple, google, uaePass]
+          nullable: true
+          description: 'Which guest provider a `guest` row is (ADAM CR-327, part (1); CHG-CR327-001); null for `staff`.
+            `guestSocialLogin` and `guestUaePassLogin` pick their row by `audience` `guest` and this.'
     MfaKind:
       type: string
       enum:

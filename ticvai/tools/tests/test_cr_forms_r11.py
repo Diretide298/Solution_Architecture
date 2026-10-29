@@ -1,9 +1,10 @@
-"""The two check rules ADAM CR-313 and CR-316 added (CHG-CR313-001, CHG-CR316-001).
+"""The check rules ADAM CR-313, CR-316 and CR-320 added (CHG-CR313-001, CHG-CR316-001, CHG-CR320-001).
 
     python -m pytest ticvai/tools/tests/test_cr_forms_r11.py -q
 
 C-REFUSAL-UNDECLARED (check-contract-shapes): an operation's own text that promises a refusal by status.
 ST-TYPE-MISMATCH (check-contract-storage): an array of records stored in a scalar array column.
+C-FINDING-RULE (check-contract-shapes): a finding kind its kind table gives no "reported when" rule.
 """
 import importlib.util
 from pathlib import Path
@@ -54,3 +55,31 @@ def test_scalar_and_unresolved_arrays_keep_their_rule():
     unresolved = {"type": "array", "items": {"$ref": "../shared/common.yaml#/components/schemas/SalesChannel"}}
     assert storage.kind(unresolved, by, "x") == "arr:obj"
     assert storage.compatible("arr:obj", "text[]")
+
+
+# C-FINDING-RULE (check-contract-shapes; ADAM CR-320, CHG-CR320-001): a finding kind with no rule beside it.
+_TABLE = ("Severity first.\n\n| kind | severity | reported when |\n|---|---|---|\n"
+          "| missingTranslation | warning | a LocalisedText field has no text in a language |\n"
+          "| bookingFlowMissing | error | an active venue has a product no enabled flow serves |\n")
+
+
+def test_every_kind_with_a_rule_passes():
+    assert shapes.finding_rule_gaps({"enum": ["missingTranslation", "bookingFlowMissing"],
+                                     "description": _TABLE}) == []
+
+
+def test_a_kind_without_a_row_or_an_empty_rule_is_a_gap():
+    s = {"enum": ["missingTranslation", "bookingFlowMissing", "noVisibleNavigationItems"], "description": _TABLE}
+    assert shapes.finding_rule_gaps(s) == ["noVisibleNavigationItems"]
+    s = {"enum": ["missingTranslation"], "description": "| kind | severity | reported when |\n|---|---|---|\n"
+                                                         "| missingTranslation | warning |  |\n"}
+    assert shapes.finding_rule_gaps(s) == ["missingTranslation"]
+
+
+def test_a_table_without_the_rule_column_leaves_every_kind_without_a_rule():
+    s = {"enum": ["a", "b"], "description": "| kind | severity |\n|---|---|\n| a | error |\n| b | error |\n"}
+    assert shapes.finding_rule_gaps(s) == ["a", "b"]
+
+
+def test_an_enum_with_no_kind_table_is_not_judged():
+    assert shapes.finding_rule_gaps({"enum": ["a"], "description": "The publish checks."}) == []

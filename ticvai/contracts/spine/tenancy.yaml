@@ -4298,6 +4298,36 @@ components:
             tenant's own staff. Every platform action in a tenant carries one, so the tenant can
             see all of them.
 
+    VenueOpeningHours:
+      type: object
+      x-ticvai-persistence: none — jsonb column of platform.venue_settings (opening_hours)
+      additionalProperties: false
+      description: >
+        **A venue's opening hours by weekday** (ADAM CR-338, city and openingHoursToday (a), 29 October 2026;
+        CHG-CR338-001): one entry per weekday, local `HH:MM` in the venue's region time zone. A day left out or null
+        is closed. `TenantAppStatus.venues[].openingHoursToday` is today's entry.
+      properties:
+        mon: { $ref: '#/components/schemas/VenueDayHours' }
+        tue: { $ref: '#/components/schemas/VenueDayHours' }
+        wed: { $ref: '#/components/schemas/VenueDayHours' }
+        thu: { $ref: '#/components/schemas/VenueDayHours' }
+        fri: { $ref: '#/components/schemas/VenueDayHours' }
+        sat: { $ref: '#/components/schemas/VenueDayHours' }
+        sun: { $ref: '#/components/schemas/VenueDayHours' }
+    VenueDayHours:
+      type: object
+      nullable: true
+      x-ticvai-persistence: none — inside VenueOpeningHours
+      description: One weekday's opening hours (ADAM CR-338); null is closed that day.
+      required: [opens, closes]
+      properties:
+        opens:
+          type: string
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+        closes:
+          type: string
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+
     OpeningHoursWindow:
       type: object
       description: >
@@ -6180,6 +6210,22 @@ components:
             CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the
             venue settings write and read by White-Label''s getTenantAppStatus through tenancy#venueSettingsRecords.
             Null means the tenant''s contact is shown.'
+        city:
+          type: string
+          maxLength: 120
+          nullable: true
+          description: '**The venue''s city, shown under its name in the guest venue list** (ADAM CR-338, city and
+            openingHoursToday (a), 29 October 2026; CHG-CR338-001): `platform.venue_settings.city`, written by the venue
+            settings write and read by White-Label''s getTenantAppStatus (`TenantAppStatus.venues[].city`) through
+            tenancy#venueSettingsRecords. Null when not set.'
+        openingHours:
+          allOf:
+          - $ref: '#/components/schemas/VenueOpeningHours'
+          nullable: true
+          description: '**The venue''s opening hours by weekday** (ADAM CR-338, city and openingHoursToday (a), 29 October
+            2026; CHG-CR338-001): `platform.venue_settings.opening_hours`, one jsonb column, written by the venue settings
+            write and read by White-Label''s getTenantAppStatus for `TenantAppStatus.venues[].openingHoursToday` through
+            tenancy#venueSettingsRecords. Null when not set.'
         id:
           type: string
           format: uuid

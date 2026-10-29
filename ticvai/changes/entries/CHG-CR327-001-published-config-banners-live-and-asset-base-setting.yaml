@@ -1,0 +1,73 @@
+id: CHG-CR327-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'getPublishedTenantConfig reads banners and promo blocks live from whitelabel.banner and whitelabel.promo_block
+  (active now, at the tenant root or the picked venue), takes assetsBaseUrl from the per-cell setting
+  Assets:PublicBaseUrl (left out while empty) and leaves paymentTokenisation out until #37051. guestSignIn (part 1):
+  identity.sso_provider gains audience (staff | guest) and guestProvider (apple | google | uaePass), and guestSignIn
+  lists the enabled guest providers through a new in-process Identity query, identity#guestSignInProviders (XDR-021).'
+decision:
+  what: 'ADAM CR-327, option A (Chinmay, 29 October 2026: "As recommended, comment now", then "Include those in today as
+    well"), parts (2) to (4). contracts/satellite/white-label.yaml: PublishedTenantConfig.banners and .promoBlocks are
+    read live from whitelabel.banner and whitelabel.promo_block, state active at the time of the read, tenant root or
+    the picked venue, and getPublishedTenantConfig declares both tables in x-ticvai-reads; assetsBaseUrl is the
+    per-cell setting Assets:PublicBaseUrl, empty until the storage adapter is chosen, and the field is left out while
+    it is empty; paymentTokenisation stays out of the response until service sign-in (#37051, CR-281).
+    getPublishedTenantConfig''s description says all three. Part (1), after the lead''s ruling on the gap this lane
+    reported (Chinmay, 29 October 2026: "Kind column on sso_provider"): contracts/spine/identity.yaml
+    SsoProviderConfig (identity.sso_provider) gains audience (staff | guest, default staff) and guestProvider (apple |
+    google | uaePass, null for staff), declared so derive-ddl adds the columns; guestSocialLogin and guestUaePassLogin
+    keep their client_secret_ref reference and pick their row by audience guest and guestProvider (both declare the
+    read); listSsoProviders and startSsoAuthorization serve audience staff rows only, so "guests never use enterprise
+    SSO" stays true; the new query identity#guestSignInProviders (served in-process) answers the tenant''s active guest
+    rows as guestProvider, clientId, displayName and iconAssetRef, never a secret; getPublishedTenantConfig asks it in
+    process for guestSignIn, recorded as XDR-021 in docs/active/cross-deployable-writes.yaml.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-327 (Hrushikant Patkar, #31052 getPublishedTenantConfig): four optional PublishedTenantConfig fields had
+  no source the operation may read; the published snapshot holds no banners or promo blocks, nothing defined
+  assetsBaseUrl, and paymentTokenisation''s service read waits on #37051.'
+keys_touched:
+  operations: [getPublishedTenantConfig, guestSocialLogin, guestUaePassLogin, listSsoProviders, startSsoAuthorization,
+    getSsoConfig, setSsoConfig]
+  schemas: [PublishedTenantConfig, SsoProviderConfig]
+  tables: [whitelabel.banner, whitelabel.promo_block, identity.sso_provider]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/identity.yaml
+  - docs/active/cross-deployable-writes.yaml
+  other:
+  - 'XDR-021: getPublishedTenantConfig reads identity#guestSignInProviders in process'
+root_class: 'a public read''s field with no source it may read'
+tickets:
+  started:
+  - '31052 (getPublishedTenantConfig, Ready for QA, Hrushikant Patkar): add banners and promoBlocks, read live from
+    whitelabel.banner and whitelabel.promo_block (state active now, tenant root or the picked venue), and assetsBaseUrl
+    from the cell setting Assets:PublicBaseUrl, left out while empty; guestSignIn and paymentTokenisation stay out.'
+  - '27889, 31062, 31064 (WEB-029), 31071 (GST-043), 31074 (GST-047), 32125 (WEB-021), on getPublishedTenantConfig: the
+    response gains banners, promoBlocks and assetsBaseUrl as the schema already listed them; nothing to do.'
+  - '31052 also: guestSignIn now has its source, identity#guestSignInProviders asked in process (XDR-021).'
+  - '30730 (listSsoProviders, Ready for QA, Deep Khanvilkar): list only audience staff rows.'
+  - '35778 (identity.sso_provider, Ready for QA, Hrushikant Patkar): the table gains audience and guest_provider in the
+    next forward migration; migration work is a child task of the MIG ticket.'
+  - '30696 (WEB-016), 30702 (GST-042), 30790 (PTR-001), 37052 (Redis kernel): nothing to do.'
+  unstarted:
+  - '30669 (guestSocialLogin) and 30670 (guestUaePassLogin), New: pick the provider row by audience guest and
+    guestProvider.'
+  - '30731 (startSsoAuthorization, New): audience staff rows only. 31275 and 31276 (getSsoConfig, setSsoConfig, New):
+    read and write audience and guestProvider.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-327
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Rules in prose (where a public field''s value comes from); no check can tell a stated source from a missing
+    one. The live tables are declared reads, so check-lineage LN-TEXT warns if they leave the lineage. Lead to approve.'
+status: open
+notes: 'Part (1) was first held: identity.sso_provider had no column saying which row is Apple, Google or UAE PASS,
+  and startSsoAuthorization says guests never use enterprise SSO. The lead chose a kind column on the same table
+  ("Kind column on sso_provider"). Open: guestSignIn.uaePass.authorizationUrl has no column on identity.sso_provider
+  (only metadata_url and issuer), so guestSignInProviders does not return it; and SsoProviderConfig.groupMappings
+  (minItems 1) still binds a guest row written through setSsoConfig. Both are for the lead.'

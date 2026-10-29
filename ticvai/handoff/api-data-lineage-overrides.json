@@ -4594,16 +4594,6 @@
    "reason": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "getTenantAppStatus": {
-   "reads": [
-    "whitelabel.config_version",
-    "whitelabel.content_page",
-    "whitelabel.module_enablement",
-    "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause IDENTITY-C47 (CHG-R8GEN-009): activeModuleCount and licensedModuleCount from whitelabel.module_enablement, activePageCount from whitelabel.content_page (own tables)",
-   "carried": true
-  },
   "getTenantConfig": {
    "reads": [
     "whitelabel.config_version"
@@ -16677,15 +16667,7 @@
   },
   "validateTenantConfig": {
    "reads": [
-    "whitelabel.booking_flow",
-    "whitelabel.booking_flow_step",
-    "whitelabel.content_page",
-    "whitelabel.homepage_section",
-    "whitelabel.module_enablement",
-    "whitelabel.navigation_config",
-    "whitelabel.navigation_item",
-    "whitelabel.publish_review_policy",
-    "whitelabel.tenant_config"
+    "whitelabel.publish_review_policy"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
