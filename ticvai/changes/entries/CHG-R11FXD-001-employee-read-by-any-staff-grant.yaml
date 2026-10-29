@@ -1,0 +1,47 @@
+id: CHG-R11FXD-001
+date: '2026-10-29'
+source: audit
+kind: contract
+summary: 'workforce.employee, the tenant-wide staff record the HRMS sync writes, is read by any staff grant (x-ticvai-rls
+  grant-holder-read on WorkforceEmployee), so the venue operations that read it find their people; writes keep the
+  tenant root''s rule (startSync, at tenant).'
+decision:
+  what: 'contracts/satellite/workforce.yaml WorkforceEmployee: x-ticvai-rls grant-holder-read, the read rule of the lead''s
+    default ruling of 14 October 2026 (CHG-MOD-007: "for reads open its SELECT (x-ticvai-rls)"), as TrainingRecord in the
+    same contract has had since then. derive-ddl re-applies the table''s policy in the forward migration
+    (apply_grant_holder_read_rls, write check the tenant root). No column, no operation moved: the six readers stay at
+    venue, and WORKFORCE_VIEW (or the operation''s own permission) still decides who may call them. The row has no
+    scope of its own (an employee is the tenant''s and may be posted at several venues), so no narrower SELECT exists
+    without a new rule.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: the r11 final gate, 29 October 2026, check-rls-scope-fit RF-TENANT-ROOT on started ticket #31219 (Ready for
+  QA, Hrushikant Patkar): getEmployee, listEmployees, listStaffConversations, validateWorkforceCompliance,
+  suggestRoleAssignment and createAccessReviewCampaign (venue) read workforce.employee, which only the tenant root read
+  (apply_tenant_rls); a venue''s staff directory read nobody. CR-076, CHG-GEN-010, CHG-MOD-007.'
+keys_touched:
+  operations: [getEmployee, listEmployees, listStaffConversations, validateWorkforceCompliance, suggestRoleAssignment,
+    createAccessReviewCampaign]
+  schemas: [WorkforceEmployee]
+  tables: [workforce.employee]
+  tickets: ['31219']
+  files:
+  - contracts/satellite/workforce.yaml
+root_class: 'a tenant-root table read by staff below the tenant'
+tickets:
+  started:
+  - '31219: nothing to change in the build; the reads it makes pass the row policy once the forward migration is applied.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-rls-scope-fit.py
+status: open
+notes: 'The lead chose "Tenant-wide read" (29 October 2026, r11 gate), over a read only where a work assignment posts the employee. Was left for the lead: grant-holder-read lets any staff grant of the tenant read every employee row (contact details
+  and date of birth included), as it already does for training records. If ADR-0011 position 6 ("no cross-venue data
+  access unless explicitly permitted") is read to forbid that, the narrower rule is a new mark reading an employee
+  where a workforce.work_assignment in the caller''s scope posts them; it would hide an employee with no posting yet
+  from the venue that is to post them (setWorkAssignment).'

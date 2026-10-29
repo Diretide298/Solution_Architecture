@@ -1,0 +1,38 @@
+id: CHG-R11FXD-005
+date: '2026-10-29'
+source: audit
+kind: contract
+summary: 'listAccessDecisions reads identity.access_decision, the decisions it returns, and not identity.authz_audit:
+  the carried lineage override that added the audit trail is removed, and the trail stays the tenant root''s to read.'
+decision:
+  what: 'handoff/api-data-lineage-overrides.json: the listAccessDecisions entry (reads identity.authz_audit, "hand-kept in
+    the lineage before r8; no contract fact states it yet", carried by CHG-R8GEN-001) is removed. The operation answers
+    AccessDecision, persisted to identity.access_decision (scope_path, read at and beneath the caller''s scope), and
+    every field it returns is there; identity.authz_audit holds only an id and two principal ids and gives the
+    response nothing. Its read stays the tenant root''s alone, as CHG-R6-002 and CHG-R6-014 decided for the append-only
+    trails; opening it would need an org-unit column it does not have (audit-read-beneath, CHG-R10TEN-006).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: the r11 final gate, 29 October 2026, check-rls-scope-fit RF-TENANT-ROOT on started ticket #31228 (Ready for
+  QA, Hrushikant Patkar): listAccessDecisions (venue) reads identity.authz_audit, which only the tenant root reads
+  (apply_append_audit_rls). CR-076, CHG-R6-014, CHG-R8GEN-001.'
+keys_touched:
+  operations: [listAccessDecisions]
+  tables: [identity.authz_audit, identity.access_decision]
+  tickets: ['31228']
+  files:
+  - handoff/api-data-lineage-overrides.json
+root_class: 'a carried lineage read no contract fact states'
+tickets:
+  started:
+  - '31228: read identity.access_decision only. If the build reads identity.authz_audit, drop that read: below the
+    tenant it returns no rows, and nothing in the response comes from it.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-rls-scope-fit.py
+status: open

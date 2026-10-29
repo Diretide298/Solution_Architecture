@@ -28056,6 +28056,10 @@ components:
           format: date-time
           readOnly: true
     ConsentPreferenceCommunicationPolicyEnforcementView:
+      # r11 gate RF-TENANT-ROOT (#35910; CHG-R11FXD-003): a guest's row with no venue or scope, read at a venue by
+      # listConsentPreferenceCommunication and written behind sendTransactionalMessage (venue, partner), so any staff
+      # grant reads and writes, and the guest its own (CHG-R11FXC-003's rule).
+      x-ticvai-rls: grant-holder-write
       type: object
       x-ticvai-persistence: marketing.communication_policy_decision
       description: >

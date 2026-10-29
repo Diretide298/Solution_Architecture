@@ -26254,10 +26254,16 @@ components:
           minimum: 30
           maximum: 3600
           default: 900
+          x-ticvai-stored-as: catalogue.inventory_reservation.expires_at
           description: 'Short TTLs limit stranding when a terminal dies; long TTLs survive longer outages.
             The venue''s default balances the two: **15 minutes (900 seconds), from the venue setting
             `cartLeaseSeconds`** with a tenant default (decided 28 September, audit R169; proposed,
             client to correct under audit R094).
+
+
+            **Kept as the hold''s `expiresAt`** (`catalogue.inventory_reservation.expires_at` = `acquired_at` +
+            `ttlSeconds`, the time the expiry sweeper reads); the seconds themselves are not a column (r11 gate,
+            CHG-R11FXD-004).
 
             '
     InventoryHoldHolderKind:

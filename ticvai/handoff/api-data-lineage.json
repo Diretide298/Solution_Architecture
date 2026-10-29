@@ -78527,8 +78527,7 @@
   "verb": "GET",
   "path": "/access-decisions/audit",
   "reads": [
-   "identity.access_decision",
-   "identity.authz_audit"
+   "identity.access_decision"
   ],
   "writes": [],
   "routing": "replica",
@@ -88310,6 +88309,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "tenant_id",
     "updated_at"
    ],
@@ -88483,6 +88483,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "tenant_id",
     "updated_at"
    ]
@@ -88555,6 +88556,7 @@
     "is_paid",
     "name",
     "requires_approval",
+    "scope_path",
     "tenant_id"
    ]
   }
@@ -88834,6 +88836,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "tenant_id",
     "updated_at"
    ]
@@ -88874,6 +88877,7 @@
     "is_paid",
     "name",
     "requires_approval",
+    "scope_path",
     "tenant_id"
    ]
   }
@@ -88998,6 +89002,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "start_time",
     "tenant_id"
    ]
@@ -89039,6 +89044,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "start_time",
     "tenant_id"
    ]

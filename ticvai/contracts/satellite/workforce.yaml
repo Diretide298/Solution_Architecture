@@ -2944,6 +2944,10 @@ components:
           type: string
           nullable: true
     WorkforceEmployee:
+      # r11 gate RF-TENANT-ROOT (#31219; CHG-R11FXD-001): read below the tenant by getEmployee, listEmployees, listStaffConversations,
+      # validateWorkforceCompliance, suggestRoleAssignment and createAccessReviewCampaign, so any staff grant
+      # reads; writes keep the tenant root's rule (startSync, the HRMS sync, writes it at tenant).
+      x-ticvai-rls: grant-holder-read
       type: object
       x-ticvai-persistence: workforce.employee
       description: '**Taken from the backend workbook, 20 September.** Stores the main employee/staff master record.'
@@ -3055,6 +3059,9 @@ components:
           type: string
           format: date-time
     WorkforceJobTitle:
+      # r11 gate RF-TENANT-ROOT (#31220; CHG-R11FXD-002): setJobTitle (venue, x-ticvai-config-scope venue) writes it, so the
+      # row carries the scope that wrote it, and a venue reads its own and the ones above it (getEmployee, listJobTitles).
+      x-ticvai-rls: read-beneath
       type: object
       x-ticvai-persistence: workforce.job_title
       description: '**Taken from the backend workbook, 20 September.** Stores job/designation definitions such as Cashier, Manager, Chef or Technician.'
@@ -3064,7 +3071,15 @@ components:
       - name
       - isActive
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant
+            that configured it), set by the server from the caller''s scope and never taken from a request. Row-level
+            security reads it: a venue writes its own job titles and reads its own and those of the region and tenant above
+            it (ADR-0018, venue is the configuration floor; r11 gate, CHG-R11FXD-002).'
         id:
           type: string
           format: uuid
@@ -3094,6 +3109,9 @@ components:
           format: date-time
           nullable: true
     WorkforceLeaveBalance:
+      # r11 gate RF-TENANT-ROOT (#33591; CHG-R11FXD-002): read below the tenant by getEmployee and listLeaveBalances. No
+      # mark of its own: it follows its leave type (typeId) through the parent rule, so a balance is read wherever its
+      # leave type is (a venue reads the balances of its own leave types and of those above it).
       type: object
       x-ticvai-persistence: workforce.leave_balance
       description: '**Taken from the backend workbook, 20 September.** Stores leave entitlement, used amount and remaining balance per employee/period.'
@@ -3132,6 +3150,9 @@ components:
           type: string
           format: date-time
     WorkforceLeaveType:
+      # r11 gate RF-TENANT-ROOT (#33593; CHG-R11FXD-002): setLeaveType (venue, x-ticvai-config-scope venue) writes it, so the
+      # row carries the scope that wrote it, and a venue reads its own and the ones above it (listLeaveTypes).
+      x-ticvai-rls: read-beneath
       type: object
       x-ticvai-persistence: workforce.leave_type
       description: '**Taken from the backend workbook, 20 September.** Defines leave categories and basic leave behavior.'
@@ -3143,7 +3164,15 @@ components:
       - requiresApproval
       - isActive
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant
+            that configured it), set by the server from the caller''s scope and never taken from a request. Row-level
+            security reads it: a venue writes its own leave types and reads its own and those of the region and tenant above
+            it (ADR-0018, venue is the configuration floor; r11 gate, CHG-R11FXD-002).'
         id:
           type: string
           format: uuid
@@ -3169,6 +3198,9 @@ components:
           type: string
           format: date-time
     WorkforceShift:
+      # r11 gate RF-TENANT-ROOT (#31221; CHG-R11FXD-002): setShiftPattern (venue, x-ticvai-config-scope venue) writes it, so the
+      # row carries the scope that wrote it, and a venue reads its own and the ones above it (listShiftPatterns, suggestWorkOrderAssignee).
+      x-ticvai-rls: read-beneath
       type: object
       x-ticvai-persistence: workforce.shift
       description: '**Taken from the backend workbook, 20 September.** Defines reusable shifts such as Morning, Evening or Night.'
@@ -3181,7 +3213,15 @@ components:
       - breakMinutes
       - crossesMidnight
       - isActive
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant
+            that configured it), set by the server from the caller''s scope and never taken from a request. Row-level
+            security reads it: a venue writes its own shift patterns and reads its own and those of the region and tenant above
+            it (ADR-0018, venue is the configuration floor; r11 gate, CHG-R11FXD-002).'
         id:
           type: string
           format: uuid
