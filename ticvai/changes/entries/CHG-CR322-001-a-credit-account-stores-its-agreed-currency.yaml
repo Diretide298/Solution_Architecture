@@ -1,0 +1,63 @@
+id: CHG-CR322-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'A B2B credit account stores the currency its limit was agreed in: B2bCreditAccount.currencyCode
+  (payments.credit_account.currency_code, ISO 4217), set by createB2bCreditAccount from creditLimit.currency and never
+  changed after; every Money of the account is in it, and neither credit-account operation resolves a currency from a
+  venue any more.'
+decision:
+  what: '"As recommended, comment now", then "Include those in today as well" (Chinmay, 29 October 2026, about
+    19:20): ADAM CR-322, option A, built into r11. contracts/satellite/payments.yaml: B2bCreditAccount gains
+    currencyCode (required, readOnly, ^[A-Z]{3}$; derive-schema makes it payments.credit_account.currency_code, and
+    derive-ddl adds it in the next forward migration, nullable with a migration-review row for its NOT NULL);
+    createB2bCreditAccount says the currency is set from creditLimit.currency and never changed after, that every
+    Money of the account (creditLimit, outstandingInvoiced, outstandingUnbilled, availableCredit) is in it, and that a
+    body without creditLimit is refused 400; listB2bCreditAccounts says the same of what it answers; both operations
+    lose their tenancy#scopeRecords and tenancy#venueSettingsRecords reads (CHG-R10GEN-002), which served only this
+    currency. tools/check-package.py rule 33 lists payments.credit_account among the tables that store a currency,
+    with its reason. The wire is otherwise unchanged.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-322 (Hrushikant Patkar, ticket #36225 listB2bCreditAccounts): the four Money fields of a credit account
+  took their currency from the venue its scope_path names, and an on-account customer is tenant-wide, at the tenant
+  root or a brand, where no venue or region sits above it (CR-299''s rule gives nothing there), so the account''s Money
+  could not be answered.'
+keys_touched:
+  operations: [createB2bCreditAccount, listB2bCreditAccounts]
+  schemas: [B2bCreditAccount]
+  tables: [payments.credit_account]
+  files:
+  - contracts/satellite/payments.yaml
+  - tools/check-package.py
+  - tools/check-business-rules.py
+root_class: 'Money whose currency is resolved from a scope that, for a tenant-wide record, has no venue or region above
+  it'
+tickets:
+  started:
+  - '36225 and 36316 (listB2bCreditAccounts; Ready for QA, Hrushikant Patkar): answer creditLimit, outstandingInvoiced,
+    outstandingUnbilled and availableCredit in the account''s currency_code, and add currencyCode to each row; CR-299''s
+    interim rule and its tenancy scope and venue-settings reads go.'
+  - '28303 ([DB] Forward migration V1071__payments.sql, the migration that creates payments.credit_account; Ready for
+    QA, Hrushikant Patkar): apply the r11 forward migration''s currency_code column; a row already there is backfilled
+    with the currency its limit was agreed in before SET NOT NULL (migration-review.md).'
+  unstarted:
+  - '30037 (createB2bCreditAccount): build to option A through CR-322''s comment: store creditLimit.currency as
+    currency_code, never change it, refuse a body without creditLimit 400.'
+  - 32113 ([DB] payments.credit_account)
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-322
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-CREDIT-ACCOUNT-CURRENCY fails on the r10 contract (no currencyCode, both operations reading the venue''s
+  settings) and passes now; check-money-currency keeps the class (Money whose table stores no currency must read one),
+  and check-package rule 33 now admits the stored column. Beyond the comment''s words: currencyCode is answered on the
+  wire (a stored column is a contract property here), and a create without creditLimit is 400. Not done here:
+  naming-and-style 5.1''s list of the tables that store a currency lives only in the setup starter and the six
+  repos/* project-bible copies (repo-local, not synced from docs/), which this lane does not commit; and
+  B2bPaymentTerms.creditLimit (payments.payment_terms, the same account''s terms) still resolves from the venue and has
+  the same gap at tenant level.'

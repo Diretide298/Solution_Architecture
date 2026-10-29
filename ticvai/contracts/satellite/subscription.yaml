@@ -1477,7 +1477,8 @@ paths:
         **The platform approves, never the tenant** (lead''s ruling on lane H review 3 N-1, 20 October 2026;
         CHG-R8SPN-015). A platform suspension of a tenant is decided by the platform. Approvals routes the request
         (kind `configurationChange`, subject type `tenant`) by the **platform rule**: a rule held in the control plane
-        and seeded when the platform is provisioned, whose approvers are holders of `PLATFORM_TENANT_MANAGE`, with four
+        (Platform''s platform approval rule, seeded once by the control database''s migration and asked by approvals
+        over the service route; ADAM CR-330 option A, 29 October 2026), whose approvers are holders of `PLATFORM_TENANT_MANAGE`, with four
         eyes (the operator who raised the request can never decide it). A tenant''s own approval rules never match
         subject type `tenant`, even a rule that names no subject types (as approvals says where it defines them).
         **No route, no request**: where no active rule matches, `createApprovalRequest` refuses `422
