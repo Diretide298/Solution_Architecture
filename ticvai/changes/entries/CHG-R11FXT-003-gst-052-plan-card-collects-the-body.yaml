@@ -1,0 +1,42 @@
+id: CHG-R11FXT-003
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'GST-052 Suggested Itineraries: Use this plan names Ready-made plans as what collects its body
+  (collectedBy) and the preset''s presetKey as coming from getVisitPlannerOptions (inputSources); nothing visible
+  changes.'
+decision:
+  what: 'screens/P02-guest-mobile-app.yaml GST-052, invisible fields only: the Use this plan button carries
+    `collectedBy: Ready-made plans` (the card list filled by getVisitPlannerOptions, a declared read) and the
+    generateVisitPlan api carries `inputSources: {presetKey: getVisitPlannerOptions.presetKey}` (a VisitPlanPreset
+    row''s field). The body is what the screen''s purpose already said: the picked preset''s presetKey with the party
+    and dates carried from GST-051, or today and one adult on a cold entry. The schema features are the ones added by
+    CHG-R11FXS-008 tonight.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T06:53Z): check-screen-wiring S-BUTTON-FORM
+  finding on GST-052 (Use this plan calls generateVisitPlan, which takes a body, and nothing collects it), built on by
+  started ticket #33038 (Ready for QA, Chitrangi Mestry). The lead''s rule: fix every finding at its source (29
+  October 2026); CHG-R11FXS-008.'
+keys_touched:
+  screens: [GST-052]
+  operations: [generateVisitPlan, getVisitPlannerOptions]
+  files:
+  - screens/P02-guest-mobile-app.yaml
+root_class: 'a button whose write body is collected in a list''s rows, not in a form'
+tickets:
+  started:
+  - '33038 (generateVisitPlan, Ready for QA, Chitrangi Mestry): nothing to change; the request is the picked preset''s
+    presetKey with the party and dates the screen holds, as before. Told through the lead''s comment; its text is not
+    rewritten.'
+  unstarted:
+  - 'GST-052''s screen ticket picks the source up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'No visible change (collectedBy and inputSources are invisible to check-approved-ui). No database change.'

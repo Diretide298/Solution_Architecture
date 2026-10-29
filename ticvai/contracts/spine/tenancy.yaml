@@ -2002,7 +2002,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
         - "P08 BO-036 Device Registry"
-        - "P08 BO-602 POS, Payment & Access Setup"
       # Named to say custody is a different fact from binding; this PUT neither reads nor writes it (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
       x-ticvai-names-for-context: [tenancy.device_assignment]
       x-ticvai-audience: [staff]
@@ -3110,7 +3109,6 @@ paths:
     get:
       operationId: listDeviceFirmware
       x-ticvai-consumed-by:
-        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
         - "P08 BO-129 Software, Configuration & Version Management"
       summary: Firmware and software versions, and what is running where
       description: '16.6.30 and 16.6.32. **The fleet view, which is the only useful one.** *Which version
@@ -3148,7 +3146,6 @@ paths:
     post:
       operationId: createDeviceFirmware
       x-ticvai-consumed-by:
-        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
         - "P08 BO-129 Software, Configuration & Version Management"
       x-ticvai-agreed: '29 September: re-trace 16.6.30 and 16.6.33 (nothing wrote the table the rollout
         references); our build plan; shape follows startDeviceFirmwareRollout'
@@ -3219,7 +3216,6 @@ paths:
     get:
       operationId: getDeviceFirmware
       x-ticvai-consumed-by:
-        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
         - "P08 BO-129 Software, Configuration & Version Management"
       x-ticvai-agreed: '29 September: re-trace 16.6.30 (release read beside the new write); our build
         plan; shape follows getDevice'

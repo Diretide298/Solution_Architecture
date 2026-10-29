@@ -11296,7 +11296,9 @@ screens:
       - kind: primaryButton
         label: Use this plan
         operation: generateVisitPlan
-        notes: Opens Your Plan (GST-053).
+        collectedBy: Ready-made plans
+        notes: Opens Your Plan (GST-053). The body is the picked card of Ready-made plans (its `presetKey`)
+          with the party and dates the screen holds (CHG-R11FXT-003).
         provenance: decided 29 September 2026, MOB-6
   states:
     loading: The plan builds in place; the inputs stay on screen.
@@ -11325,6 +11327,8 @@ screens:
       one adult, proposed, client to confirm. The guest changes either on GST-051 (Make my own) before
       using a plan.'
     trigger: onAction
+    inputSources:
+      presetKey: getVisitPlannerOptions.presetKey
     provenance: decided 29 September 2026, MOB-6
   entryState:
     params:

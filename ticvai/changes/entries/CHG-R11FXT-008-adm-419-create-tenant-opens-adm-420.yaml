@@ -1,0 +1,52 @@
+id: CHG-R11FXT-008
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'ADM-419 Provisioning Command Center: the approved Create tenant button opens ADM-420, whose Create tenant
+  form collects code, name and billingEmail and calls createTenant; ADM-419 no longer declares createTenant.'
+decision:
+  what: 'screens/P09-platform-admin-console.yaml. ADM-419: a transition to ADM-420 with trigger Create tenant
+    (control primaryButton#createTenant) is added; the createTenant api is removed and recorded as a removed gap; the
+    button and Cancel notes say what they do; emptyFirstRun says it offers Create tenant, which opens the form on
+    ADM-420 (it said it carries the create action, which S-STATE-BOILERPLATE refuses on a screen with no create).
+    The screen held tenantId and regionId only from createTenant''s answer, and its edges carry them to the
+    provisioning steps (check-navigation N-CARRIES-HELD), so it now arrives holding them: optional entry parameters
+    tenantId and regionId, carried back from ADM-420 on its Back to Provisioning Command Center edge (ADM-420 holds
+    both from listTenants and createTenant); derive-carries-from-entrystate adds tenantId to ADM-427''s back edge.
+    ADM-420: checked that it declares createTenant, has a Create tenant button bound to it and a formCreateTenant
+    modal that confirms it; the modal''s generated body now lists the request (required code, name, billingEmail;
+    optional billingAddress, accountManagerPrincipalId, planId), with bindsTo CreateTenantRequest and its discards,
+    as ADM-005''s form has (invisible to check-approved-ui). The two visible changes on ADM-419 (navigation,
+    state:emptyFirstRun) are logged in docs/active/approved-ui-changes.yaml. The x-ticvai-consumed-by mirror in
+    contracts/satellite/subscription.yaml follows (link-screens-contracts).'
+  by: Chinmay
+  date: '2026-10-29'
+  quote: '"Open ADM-420"'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T06:53Z): check-screen-wiring S-OP-UNREACHED
+  finding on ADM-419 createTenant, built on by started ticket #30756 (Ready for QA, Narayan Gaonkar); left for the lead
+  by CHG-R11FXT-001 to CHG-R11FXT-007 (cf4ac86b) because nothing on ADM-419 collects the body. The lead''s decision of
+  29 October 2026: "Open ADM-420".'
+keys_touched:
+  screens: [ADM-419, ADM-420, ADM-427]
+  operations: [createTenant]
+  files:
+  - screens/P09-platform-admin-console.yaml
+  - contracts/satellite/subscription.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'an operation declared on a screen that has no form for it'
+tickets:
+  started:
+  - '30756 (createTenant, Ready for QA, Narayan Gaonkar): nothing to change; the operation is unchanged, and ADM-420
+    (and ADM-005) is the screen that calls it. ADM-419''s Create tenant opens ADM-420. Told through the lead''s comment;
+    its text is not rewritten.'
+  unstarted:
+  - 'ADM-419''s and ADM-420''s screen tickets pick the edge and the entry parameters up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Visible changes to ADM-419''s navigation and empty state, logged with this entry. No database change.'

@@ -1,0 +1,42 @@
+id: CHG-R11FXT-001
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'BO-1172 Finance Validation, Reporting & Audit Center: five of its approved buttons name the operation its
+  apisNote of 29 September already gave them (Submit Close calls beginPeriodClose); nothing visible changes.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml BO-1172, bindings only (invisible to check-approved-ui): Run Finance
+    Validation -> getUnifiedReconciliation, Submit Close -> beginPeriodClose, Approve Close -> closeFiscalPeriod,
+    Generate Liability Report -> getWalletLiability, Generate Reconciliation Report -> getWalletReconciliation, the
+    mapping the screen''s apisNote recorded at the VM close-out of 29 September and no component carried. The period
+    a close acts on is the selected row of the "Every finance validation reporting" table (listFiscalPeriods), or the
+    optional periodId an edge carries. beginPeriodClose takes no body and closeFiscalPeriod''s body is optional, so no
+    form is needed.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T06:53Z): check-screen-wiring S-OP-UNREACHED
+  finding on BO-1172 beginPeriodClose, built on by started ticket #32324 (In progress, Deep Khanvilkar). The lead''s
+  rule: fix every finding at its source (29 October 2026); the same kind of fix as CHG-R11FXS-001 (BO-1123, named on
+  the element its apisNote already gave).'
+keys_touched:
+  screens: [BO-1172]
+  operations: [beginPeriodClose, closeFiscalPeriod, getUnifiedReconciliation, getWalletLiability,
+    getWalletReconciliation]
+  files:
+  - screens/P08-venue-back-office.yaml
+root_class: 'an operation declared on a screen whose element does not name it'
+tickets:
+  started:
+  - '32324 (beginPeriodClose, In progress, Deep Khanvilkar): nothing to change; the operation is unchanged and BO-1172''s
+    Submit Close calls it on the selected fiscal period. Told through the lead''s comment; its text is not rewritten.'
+  unstarted:
+  - 'BO-1172''s screen ticket picks the bindings up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'No visible change. No database change. S-OP-UNREACHED loses all five of BO-1172''s findings.'

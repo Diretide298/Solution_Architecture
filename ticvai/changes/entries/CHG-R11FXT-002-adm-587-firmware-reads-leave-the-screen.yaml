@@ -1,0 +1,44 @@
+id: CHG-R11FXT-002
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'ADM-587 Terminal Health, Maintenance & Incident Center no longer declares listDeviceFirmware,
+  getDeviceFirmware or createDeviceFirmware: the approved screen has no element for firmware; BO-129 keeps them.
+  Nothing visible changes.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml ADM-587: the three firmware apis added at the build of 29 September are
+    removed, with the optional firmwareId entry parameter only they used, and each is recorded as a removed gap. The
+    approved screen''s content region is empty and its two buttons (Device replacement, Certification update) are pack
+    text bound to nothing, so nothing on it lists, opens or registers a release. The lead''s ruling of 26 October 2026
+    (CHG-R10WIR-002, item 5): a read the approved screen has no element for leaves it; a CR brings it back. The
+    x-ticvai-consumed-by mirror in contracts/spine/tenancy.yaml follows (link-screens-contracts). The three
+    operations stay declared on BO-129 Software, Configuration & Version Management, which now shows them
+    (CHG-R11FXT-009).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T06:53Z): check-screen-wiring S-OP-UNREACHED
+  findings on ADM-587 getDeviceFirmware and listDeviceFirmware, built on by started tickets #33879 and #33881 (In
+  progress, Deep Khanvilkar). The lead''s rule: fix every finding at its source (29 October 2026); CHG-R10WIR-002 item 5.'
+keys_touched:
+  screens: [ADM-587]
+  operations: [listDeviceFirmware, getDeviceFirmware, createDeviceFirmware]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - contracts/spine/tenancy.yaml
+root_class: 'an operation declared on a screen that has no element for it'
+tickets:
+  started:
+  - '33879 (getDeviceFirmware) and 33881 (listDeviceFirmware), In progress, Deep Khanvilkar: nothing to change in the
+    operations; ADM-587 no longer consumes them, and BO-129 is now their only screen. Told through the lead''s comment;
+    their text is not rewritten.'
+  unstarted:
+  - 'ADM-587''s screen ticket drops the firmware declarations at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'No visible change (apis and entry state are invisible to check-approved-ui). No database change.'

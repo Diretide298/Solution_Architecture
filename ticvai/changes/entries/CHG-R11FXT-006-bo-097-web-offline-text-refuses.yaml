@@ -1,0 +1,46 @@
+id: CHG-R11FXT-006
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'BO-097 Check Out & Check In, a back-office web screen, no longer promises to queue offline: its offline
+  text says the writes are disabled until the connection returns, and its error text no longer says check-out and
+  check-in work offline.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml BO-097 states.offline: "**Not available offline.** The back office runs in
+    a browser and keeps no offline store, so check-out, check-in and the stored-value actions are disabled until the
+    connection returns, each saying so. **The condition note is the only defence against a dispute later**: it goes
+    with the check-out or check-in it belongs to, once the connection is back." states.error: "Could not load. Names
+    which read failed and leaves the booking untouched; nothing is checked out or in until it loads." (it said
+    check-out and check-in work offline). P08 is a web app with no offline store (frontend-patterns 4.4), and
+    authoriseStoredValue, relinquishStoredValue and captureStoredValue are not offline-capable at all. Both logged in
+    docs/active/approved-ui-changes.yaml.'
+  by: Chinmay
+  date: '2026-10-29'
+  quote: '"Keep all three" (the lead on the three visible text changes of this lane, 29 October 2026)'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T06:53Z): check-screen-wiring S-OFFLINE-QUEUED
+  finding on BO-097 relinquishStoredValue, built on by started ticket #32268 (In progress, Sanket Keluskar), and the
+  same finding on its four other writes. The lead''s rule: fix every finding at its source (29 October 2026);
+  CHG-SWP-004.'
+keys_touched:
+  screens: [BO-097]
+  operations: [relinquishStoredValue, authoriseStoredValue, captureStoredValue, checkOutResource, checkInResource]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'an offline state written for an offline app on a web screen'
+tickets:
+  started:
+  - '32268 (relinquishStoredValue, In progress, Sanket Keluskar): nothing to change server-side (the operation was never
+    offline-capable); on BO-097 Release stored value is disabled offline, not queued. Told through the lead''s comment;
+    its text is not rewritten.'
+  unstarted:
+  - 'BO-097''s screen ticket picks the copy up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Two visible copy changes to an approved screen, logged with this entry. No database change.'
