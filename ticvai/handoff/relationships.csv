@@ -1644,6 +1644,7 @@ identity.sso_group_mapping,via setSsoConfig,identity.sso_provider,ambient,lineag
 identity.sso_provider,client_id,control.api_client,reference,convention,yes,
 identity.sso_provider,default_home_scope_id,platform.scope,reference,declared,yes,
 identity.subject_data_export,subject_id,pii.subject,reference,declared,yes,yes
+identity.subject_data_export_part,export_id,identity.subject_data_export,child,declared,,yes
 identity.subject_holding,order_line_id,orders.order_line,reference,convention,yes,
 identity.subject_holding,subject_id,pii.subject,reference,declared,yes,
 inventory.count,journal_entry_id,ledger.journal_entry,reference,declared,yes,

@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 37 of 102 |
+| Operations in the slice | 37 of 103 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -19,7 +19,6 @@
 
 | Service | Tables it reads |
 |---|---|
-| [MarketingService](MarketingService.md) | `marketing.consent_record`, `marketing.form_submission`, `marketing.guest_document`, `marketing.guest_profile` |
 | [TenancyService](TenancyService.md) | `platform.scope`, `platform.workstation` |
 
 ## Operations in the first release
@@ -1257,7 +1256,9 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 
 **The statutory clock** (CR-101). The call emits `identity.privacyRequestRaised`, which Marketing turns into a privacy case in its queue (request type `access`), so the request sits in the privacy queue and its `dueAt` (the jurisdiction's configured response period) applies. **The jurisdiction is the country of the venue the request is raised at** (the request's venue, CR-198; the lead, 25 October 2026, r10 round 3), carried on the event, and **the case carries the request id** (`approvalRequestId`), so the queue and the request are one. **The statutory period itself is the client's to give** (`setPrivacyRequestTypes` `deadlines[].responseDays`); until it is configured the queue shows no deadline, and `estimatedCompletionAt` stays null.
 
-**Which tables it reads** (CR-101). The table set comes from the derived subject-data marker, not from a list kept by hand: a table holds a guest's data when its declared storage has a `subject_id` column, and `handoff/subject-data-register.json` (derived each refresh by `tools/derive-subject-data-register.py`, r8 cause IDENTITY-C65, CHG-R8GEN-015) lists every such table under the module that owns it, so a new table joins the export by its own column. Identity reads its own tables directly; every other owner answers through its `subjectDataRecords(subjectId)` query, which this operation asks in turn as each owner declares it. Until an owner has declared it, the export assembles that owner's data from what the lineage lists for this operation today.
+**Which tables it reads** (CR-101). The table set comes from the derived subject-data marker, not from a list kept by hand: a table holds a guest's data when its declared storage has a `subject_id` column, and `handoff/subject-data-register.json` (derived each refresh by `tools/derive-subject-data-register.py`, r8 cause IDENTITY-C65, CHG-R8GEN-015) lists every such table under the module that owns it, so a new table joins the export by its own column. Identity reads its own tables directly; every owner above Identity writes its own part of the export, as Marketing does (below; CHG-R11FXC-005).
+
+**Marketing adds its part; Identity assembles the parts** (the lead, 29 October 2026, r11 gate; CHG-R11FXC-005). Identity is Foundation and reads nothing above it (ADR-0028), so the export reads no Marketing table: on the `identity.privacyRequestRaised` this call emits, Marketing writes the guest's consent records, guest profile, form submissions and guest documents as its own part (`writeSubjectDataExportPart`) and says so by `marketing.subjectDataPartWritten`, which `recordSubjectDataExportPart` records as a `SubjectDataExportPart`. The job assembles the file from Identity's own tables, its projections and the recorded parts, and runs once every owner's part is recorded; it deletes the parts' objects with the export.
 
 **An erased guest** (CR-101). A subject whose `pii.subject` row is tombstoned (`is_erased` true) is answered `410 subject-erased` and nothing is raised: there is nothing left to export, and the tombstone is the record that the erasure was done.
 
@@ -1270,7 +1271,7 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `identity.subject_holding`, `marketing.consent_record`, `marketing.form_submission`, `marketing.guest_document`, `marketing.guest_profile`, `pii.subject` |
+| Reads | `cache:idempotency`, `identity.subject_holding`, `pii.subject` |
 | Writes | `approvals.request`, `cache:idempotency`, `identity.subject_data_export`, `platform.outbox` |
 | Called by | GST-066, WEB-024 |
 
@@ -2862,13 +2863,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-65 operations, added to this service in later releases without changing any of the above.
+66 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
 | guestAuth | `getMyIdentityVerification`, `submitGuestIdentityDocument` |
-| identity | `decideGuestIdentityVerification`, `endGuestDeviceSessions`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `getSessionVenue`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `listStepUpSupervisors`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `setGuestVerificationPolicy`, `setSessionVenue`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
+| identity | `decideGuestIdentityVerification`, `endGuestDeviceSessions`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `getSessionVenue`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `listStepUpSupervisors`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `recordSubjectDataExportPart`, `setGuestVerificationPolicy`, `setSessionVenue`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
 | mfa | `removeMfaMethod` |
 | prospectAuth | `startProspectSignup`, `verifyProspectSignupCode` |
 | session | `endOwnSession`, `listOwnSessions`, `revokeAllSessions` |

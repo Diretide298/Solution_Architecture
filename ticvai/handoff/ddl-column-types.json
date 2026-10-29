@@ -8250,6 +8250,15 @@
    "status": "text",
    "subject_id": "uuid"
   },
+  "identity.subject_data_export_part": {
+   "export_id": "uuid",
+   "file_ref": "text",
+   "id": "uuid",
+   "owner": "text",
+   "row_count": "integer",
+   "tables": "text[]",
+   "written_at": "timestamptz"
+  },
   "identity.subject_holding": {
    "holding_id": "uuid",
    "holding_kind": "text",
@@ -17712,6 +17721,7 @@
   "identity.sso_group_mapping": {"columns": [["id", true], ["external_group", true], ["role_id", true], ["scope_path", true], ["provider_id", false], ["scope_id", false]], "primaryKey": ["id"], "keys": ["foreign key (provider_id) -> identity.sso_provider(id)", "foreign key (role_id) -> identity.role(id)", "foreign key (scope_id) -> platform.scope(id)"], "policy": "apply_scope_rls"},
   "identity.sso_provider": {"columns": [["icon_asset_ref", false], ["scope_path", true], ["id", true], ["display_name", true], ["protocol", true], ["metadata_url", false], ["issuer", false], ["client_id", false], ["client_secret_ref", false], ["is_auto_provision_principals", false], ["username_claim", false], ["display_name_claim", false], ["groups_claim", false], ["default_home_scope_id", false], ["allowed_redirect_uris", false], ["is_enforced", false], ["is_active", false]], "primaryKey": ["id"], "keys": ["foreign key (default_home_scope_id) -> platform.scope(id)"], "policy": "apply_scope_rls"},
   "identity.subject_data_export": {"columns": [["id", true], ["subject_id", true], ["format", true], ["status", true], ["file_ref", false], ["file_size_bytes", false], ["failure_reason", false], ["requested_at", true], ["ready_at", false]], "primaryKey": ["id"], "keys": ["foreign key (subject_id) -> pii.subject(id)"], "policy": "apply_subject_rls"},
+  "identity.subject_data_export_part": {"columns": [["id", true], ["export_id", true], ["owner", true], ["file_ref", true], ["tables", false], ["row_count", true], ["written_at", true]], "primaryKey": ["id"], "keys": ["foreign key (export_id) -> identity.subject_data_export(id)", "unique (export_id, lower(owner))"], "policy": "apply_tenant_rls"},
   "identity.subject_holding": {"columns": [["subject_id", false], ["holding_kind", true], ["holding_id", true], ["order_id", false], ["order_line_id", false], ["order_number", false], ["verified_contact_ref", false], ["status", true], ["valid_to", false], ["last_event_at", false], ["updated_at", true], ["id", true]], "primaryKey": ["id"], "keys": ["foreign key (subject_id) -> pii.subject(id)", "unique (lower(holding_kind), holding_id)"], "policy": "apply_subject_rls"},
   "inventory.count": {"columns": [["id", true], ["location_id", true], ["location_name", false], ["kind", true], ["status", true], ["is_blind", true], ["line_count", true], ["counted_count", true], ["variance_line_count", false], ["variance_value", false], ["started_by_principal_id", false], ["posted_by_principal_id", false], ["journal_entry_id", false], ["started_at", true], ["closed_at", false], ["posted_at", false], ["recount_reason", false], ["recount_signed_by_principal_id", false], ["cancel_reason", false]], "primaryKey": ["id"], "keys": ["foreign key (journal_entry_id) -> ledger.journal_entry(id)", "foreign key (location_id) -> inventory.location(id)", "foreign key (posted_by_principal_id) -> identity.principal(id)", "foreign key (started_by_principal_id) -> identity.principal(id)"], "policy": "apply_parent_rls"},
   "inventory.count_line": {"columns": [["id", true], ["count_id", true], ["item_id", true], ["location_id", false], ["batch_id", false], ["counted_quantity", true], ["theoretical_quantity", false], ["uom", false], ["variance", false], ["variance_percent", false], ["status", false], ["counted_by_principal_id", false], ["counted_at", false], ["note", false]], "primaryKey": ["id"], "keys": ["foreign key (count_id) -> inventory.count(id)", "foreign key (item_id) -> inventory.inventory_item(id)"], "policy": "apply_parent_rls"},

@@ -46055,10 +46055,6 @@
   "reads": [
    "cache:idempotency",
    "identity.subject_holding",
-   "marketing.consent_record",
-   "marketing.form_submission",
-   "marketing.guest_document",
-   "marketing.guest_profile",
    "pii.subject"
   ],
   "writes": [
@@ -141463,5 +141459,72 @@
    "postgres",
    "redis"
   ]
+ },
+ "writeSubjectDataExportPart": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/subject-data-export-parts",
+  "reads": [
+   "cache:idempotency",
+   "marketing.consent_record",
+   "marketing.form_submission",
+   "marketing.guest_document",
+   "marketing.guest_profile"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Write Marketing's part of a guest's data export",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "recordSubjectDataExportPart": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/guest-data-export-parts",
+  "reads": [
+   "cache:idempotency",
+   "identity.subject_data_export_part"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "identity.subject_data_export_part"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Record an owner's part of a guest's data export",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "identity.subject_data_export_part": [
+    "export_id",
+    "file_ref",
+    "id",
+    "owner",
+    "row_count",
+    "tables",
+    "written_at"
+   ]
+  }
  }
 }

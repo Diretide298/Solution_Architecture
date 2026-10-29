@@ -7,10 +7,24 @@
 -- Every statement that needs a table is a guarded block (CHG-R9MIG-002): it does nothing where its table
 -- or a column it names is not there yet, so the file applies as one transaction, twice, on any database;
 -- the migration that creates such a table later copies the block. A table's policy change is one block.
--- 0 table(s), 1 column(s), 5 index(es), 11 other statement(s), 10 row-level security polic(ies) re-applied.
+-- 1 table(s), 1 column(s), 7 index(es), 13 other statement(s), 10 row-level security polic(ies) re-applied.
+
+CREATE TABLE IF NOT EXISTS identity.subject_data_export_part (
+    id                                uuid PRIMARY KEY NOT NULL,
+    export_id                         uuid NOT NULL,
+    owner                             text NOT NULL CONSTRAINT subject_data_export_part_owner_chk CHECK (char_length(owner) <= 40),
+    file_ref                          text NOT NULL CONSTRAINT subject_data_export_part_file_ref_chk CHECK (char_length(file_ref) <= 500),
+    tables                            text[],
+    row_count                         integer NOT NULL,
+    written_at                        timestamptz NOT NULL
+);
 
 DO $$ BEGIN IF to_regclass('platform.outlet') IS NOT NULL THEN
 ALTER TABLE platform.outlet ADD COLUMN IF NOT EXISTS order_number_prefix text CONSTRAINT outlet_order_number_prefix_chk CHECK (order_number_prefix IN ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z') AND char_length(order_number_prefix) <= 1);
+END IF; END $$;
+
+DO $$ BEGIN IF to_regclass('identity.subject_data_export_part') IS NOT NULL AND to_regclass('identity.subject_data_export') IS NOT NULL AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'identity' AND table_name = 'subject_data_export_part' AND column_name = 'export_id') AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'subject_data_export_part_export_id_fkey' AND conrelid = to_regclass('identity.subject_data_export_part')) THEN
+ALTER TABLE identity.subject_data_export_part ADD CONSTRAINT subject_data_export_part_export_id_fkey FOREIGN KEY (export_id) REFERENCES identity.subject_data_export(id);
 END IF; END $$;
 
 DO $$ BEGIN IF to_regclass('ai.proposed_action') IS NOT NULL AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'ai' AND table_name = 'proposed_action' AND column_name = 'map_id') THEN
@@ -21,12 +35,20 @@ DO $$ BEGIN IF to_regclass('marketing.privacy_request') IS NOT NULL AND EXISTS (
 CREATE INDEX IF NOT EXISTS privacy_request_approval_request_id_idx ON marketing.privacy_request (approval_request_id);
 END IF; END $$;
 
+DO $$ BEGIN IF to_regclass('identity.subject_data_export_part') IS NOT NULL AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'identity' AND table_name = 'subject_data_export_part' AND column_name = 'export_id') THEN
+CREATE INDEX IF NOT EXISTS subject_data_export_part_export_id_idx ON identity.subject_data_export_part (export_id);
+END IF; END $$;
+
 DO $$ BEGIN IF to_regclass('marketing.guest_preference') IS NOT NULL AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'marketing' AND table_name = 'guest_preference' AND column_name = 'subject_id') THEN
 CREATE UNIQUE INDEX IF NOT EXISTS guest_preference_subject_id_uniq ON marketing.guest_preference (subject_id) WHERE subject_id IS NOT NULL;
 END IF; END $$;
 
 DO $$ BEGIN IF to_regclass('marketing.guest_profile') IS NOT NULL AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'marketing' AND table_name = 'guest_profile' AND column_name = 'subject_id') THEN
 CREATE UNIQUE INDEX IF NOT EXISTS guest_profile_subject_id_uniq ON marketing.guest_profile (subject_id);
+END IF; END $$;
+
+DO $$ BEGIN IF to_regclass('identity.subject_data_export_part') IS NOT NULL AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'identity' AND table_name = 'subject_data_export_part' AND column_name = 'export_id') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'identity' AND table_name = 'subject_data_export_part' AND column_name = 'owner') THEN
+CREATE UNIQUE INDEX IF NOT EXISTS subject_data_export_part_export_id_owner_uniq ON identity.subject_data_export_part (export_id, lower(owner));
 END IF; END $$;
 
 DO $$ BEGIN IF to_regclass('tenancy.device_firmware') IS NOT NULL AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'tenancy' AND table_name = 'device_firmware' AND column_name = 'device_kind') AND EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'tenancy' AND table_name = 'device_firmware' AND column_name = 'version') THEN
@@ -94,6 +116,10 @@ PERFORM platform.drop_rls_policies('orders.cart_line'::regclass);
 PERFORM platform.apply_parent_split_rls('orders.cart_line'::regclass, 'cart_id', 'orders.cart'::regclass, 'id', '((NULLIF(current_setting(''ticvai.subject_id'', true), '''') IS NULL AND platform.venue_in_scope(parent_row.venue_id)) OR (parent_row.subject_id = (SELECT NULLIF(current_setting(''ticvai.subject_id'', true), '''')::uuid)))');
 END IF; END $$;
 
+DO $$ BEGIN IF to_regclass('identity.subject_data_export_part') IS NOT NULL THEN
+PERFORM platform.apply_tenant_rls('identity.subject_data_export_part'::regclass);
+END IF; END $$;
+
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'operations') AND EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'catalogue') THEN GRANT USAGE ON SCHEMA catalogue TO operations; END IF; END $$;
 
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'operations') AND to_regclass('catalogue.variant') IS NOT NULL THEN GRANT SELECT ON catalogue.variant TO operations; END IF; END $$;
@@ -115,7 +141,7 @@ DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'operations') AND 
 DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'operations') AND to_regclass('platform.workstation') IS NOT NULL THEN GRANT SELECT ON platform.workstation TO operations; END IF; END $$;
 
 INSERT INTO platform.schema_version (version, description, checksum)
-VALUES ('V0118', 'after r1 (9cec72d): 0 table(s), 1 column(s), 5 index(es), 11 other statement(s), 10 row-level security polic(ies) re-applied', 'f50945e5511341708cce312d5608be05df1701dc2d73d5f3e52b88b186a9c2ae')
+VALUES ('V0118', 'after r1 (9cec72d): 1 table(s), 1 column(s), 7 index(es), 13 other statement(s), 10 row-level security polic(ies) re-applied', '4cf0f7842c51db502d4275a510337f669e8b86ddc442fbbbe8a0bc91501b621e')
 ON CONFLICT (version) DO NOTHING;
 
 -- ============================================================================
@@ -144,9 +170,12 @@ ON CONFLICT (version) DO NOTHING;
 -- SELECT platform.drop_rls_policies('orders.cart'::regclass); SELECT platform.apply_venue_rls('orders.cart'::regclass); SELECT platform.apply_split_rls('orders.cart'::regclass, '(platform.venue_in_scope(venue_id)) OR (subject_id = (SELECT NULLIF(current_setting(''ticvai.subject_id'', true), '''')::uuid))', '(platform.venue_in_scope(venue_id)) OR (subject_id = (SELECT NULLIF(current_setting(''ticvai.subject_id'', true), '''')::uuid))');
 -- SELECT platform.drop_rls_policies('marketing.consent_record'::regclass); SELECT platform.apply_subject_rls('marketing.consent_record'::regclass); SELECT platform.apply_grant_holder_subject_read_rls('marketing.consent_record'::regclass);
 -- DROP INDEX IF EXISTS tenancy.device_firmware_device_kind_version_uniq;
+-- DROP INDEX IF EXISTS identity.subject_data_export_part_export_id_owner_uniq;
 -- DROP INDEX IF EXISTS marketing.guest_profile_subject_id_uniq;
 -- DROP INDEX IF EXISTS marketing.guest_preference_subject_id_uniq;
+-- DROP INDEX IF EXISTS identity.subject_data_export_part_export_id_idx;
 -- DROP INDEX IF EXISTS marketing.privacy_request_approval_request_id_idx;
 -- DROP INDEX IF EXISTS ai.proposed_action_map_id_idx;
 -- ALTER TABLE platform.outlet DROP COLUMN IF EXISTS order_number_prefix;
+-- DROP TABLE IF EXISTS identity.subject_data_export_part;
 -- DELETE FROM platform.schema_version WHERE version = 'V0118';
