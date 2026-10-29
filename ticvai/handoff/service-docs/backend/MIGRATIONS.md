@@ -4,7 +4,7 @@
 
 Each migration only references tables created by the ones above it. Keys that would point forward are added by the last migration.
 
-**Where a migration is written.** Write this migration yourself, in our repository: the package's numbered SQL files (backend/tenant and backend/control: 000-930 and the V01nn after-r1 files) are the reference you copy from, never run as they are. Copying functions or tables out of them, such as the helpers at the top of 920 and 930, is expected; 'Do not hand-edit' is about the package's own files. The baseline file named in the subject is one you write in our repository; the package keeps no baseline file of its own. It creates the helper functions every later migration calls, copied as they are from the top of 920-row-level-security.sql: platform.current_scope_paths, platform.in_scope, platform.rls_policy_name, platform.apply_scope_rls, platform.apply_shared_scope_rls, platform.venue_in_scope, platform.apply_venue_rls, platform.apply_parent_rls, platform.tenant_root_in_scope, platform.subject_in_scope, platform.apply_tenant_rls, platform.apply_subject_rls; from the top of 930-partitioning.sql: platform.uuidv7_floor, platform.ensure_month_partition, platform.ensure_month_partitions; from backend/tenant/V0102__after_r1_20261013.sql (created by no other file): platform.apply_append_audit_rls; from backend/tenant/V0104__after_r1_20261015.sql (created by no other file): platform.drop_rls_policies, platform.grant_holder, platform.above_scope, platform.apply_split_rls, platform.apply_read_beneath_rls, platform.apply_grant_holder_read_rls, platform.apply_grant_holder_subject_read_rls, platform.apply_parent_split_rls; from backend/tenant/V0105__after_r1_20261018.sql (created by no other file): platform.visible_parent_ids, platform.visible_parent_ids_setup, platform.apply_parent_across_rls, platform.apply_parent_split_across_rls; from backend/tenant/V0108__after_r1_20261020.sql (created by no other file): platform.own_row, platform.apply_own_row_rls, platform.signed_in; from backend/tenant/V0116__after_r1_20261026.sql (created by no other file): platform.apply_append_audit_read_rls, identity.end_principal_sessions (the row-level security of each schema migration calls the platform.apply_* functions, so they come first). Start the file with `SET check_function_bodies = off;`: the SQL-language helpers read platform.scope, which the platform migration creates later, and PostgreSQL checks a function's body against the tables that exist when it is created unless that setting is off (the body is checked when the function first runs instead).
+**Where a migration is written.** Write this migration yourself, in our repository: the package's numbered SQL files (backend/tenant and backend/control: 000-930 and the V01nn after-r1 files) are the reference you copy from, never run as they are. Copying functions or tables out of them, such as the helpers at the top of 920 and 930, is expected; 'Do not hand-edit' is about the package's own files. The baseline file named in the subject is one you write in our repository; the package keeps no baseline file of its own. It creates the helper functions every later migration calls, copied as they are from the top of 920-row-level-security.sql: platform.current_scope_paths, platform.in_scope, platform.rls_policy_name, platform.apply_scope_rls, platform.apply_shared_scope_rls, platform.venue_in_scope, platform.apply_venue_rls, platform.apply_parent_rls, platform.tenant_root_in_scope, platform.subject_in_scope, platform.apply_tenant_rls, platform.apply_subject_rls; from the top of 930-partitioning.sql: platform.uuidv7_floor, platform.ensure_month_partition, platform.ensure_month_partitions; from backend/tenant/V0102__after_r1_20261013.sql (created by no other file): platform.apply_append_audit_rls; from backend/tenant/V0104__after_r1_20261015.sql (created by no other file): platform.drop_rls_policies, platform.grant_holder, platform.above_scope, platform.apply_split_rls, platform.apply_read_beneath_rls, platform.apply_grant_holder_read_rls, platform.apply_grant_holder_subject_read_rls, platform.apply_parent_split_rls; from backend/tenant/V0105__after_r1_20261018.sql (created by no other file): platform.visible_parent_ids, platform.visible_parent_ids_setup, platform.apply_parent_across_rls, platform.apply_parent_split_across_rls; from backend/tenant/V0108__after_r1_20261020.sql (created by no other file): platform.own_row, platform.apply_own_row_rls, platform.signed_in; from backend/tenant/V0116__after_r1_20261026.sql (created by no other file): platform.apply_append_audit_read_rls, identity.end_principal_sessions; from backend/tenant/V0118__after_r1_20261029.sql (created by no other file): platform.apply_grant_holder_subject_rls (the row-level security of each schema migration calls the platform.apply_* functions, so they come first). Start the file with `SET check_function_bodies = off;`: the SQL-language helpers read platform.scope, which the platform migration creates later, and PostgreSQL checks a function's body against the tables that exist when it is created unless that setting is off (the body is checked when the function first runs instead).
 
 ## Order
 
@@ -255,7 +255,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-PLATFORM | `platform.sale_board_page` | 4 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.sale_board_tile` | 10 | through its owner |  | 3 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.scope` | 8 | none |  | 11 | 2 | used by the first release |
-| MIG-PLATFORM | `platform.tenant` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by marketing.consent_purpose |
+| MIG-PLATFORM | `platform.tenant` | 2 | tenant root (one tenant per database; no tenant_id by design) |  | 0 | 0 | referenced by marketing.message_template |
 | MIG-PLATFORM | `platform.venue_settings` | 34 | venue_id |  | 5 | 2 | used by the first release |
 | MIG-PLATFORM | `platform.workstation` | 23 | scope_path |  | 7 | 1 | used by the first release |
 | MIG-PLATFORM | `sync.dsar_request` | 8 | none |  | 0 | 0 | built by MIG-PLATFORM as platform.dsar_request, before a declared move (CHG-TKT-013) |
@@ -345,8 +345,8 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-CATALOGUE | `catalogue.sales_channel` | 46 | none |  | 8 | 3 | used by the first release |
 | MIG-CATALOGUE | `catalogue.variant` | 10 | through its owner |  | 16 | 4 | used by the first release |
 | MIG-CATALOGUE | `catalogue.waitlist_entry` | 11 | through its owner |  | 2 | 2 | used by the first release |
-| MIG-LEDGER | `ledger.account` | 15 | none |  | 0 | 0 | referenced by ledger.tax_code |
-| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by ledger.posting |
+| MIG-LEDGER | `ledger.account` | 15 | none |  | 0 | 0 | referenced by inventory.supplier |
+| MIG-LEDGER | `ledger.cost_center` | 6 | venue_id |  | 0 | 0 | referenced by orders.invitation |
 | MIG-LEDGER | `ledger.credit_memo` | 30 | scope_path |  | 5 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.credit_memo_line` | 10 | through its owner |  | 3 | 1 | used by the first release |
 | MIG-LEDGER | `ledger.einvoice_transmission` | 17 | scope_path |  | 3 | 1 | used by the first release |
@@ -367,7 +367,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-INVENTORY | `inventory.goods_receipt_line` | 11 | through its owner |  | 2 | 2 | used by the first release |
 | MIG-INVENTORY | `inventory.inventory_item` | 26 | venue_id |  | 6 | 3 | used by the first release |
 | MIG-INVENTORY | `inventory.kit_component` | 6 | scope_path |  | 3 | 1 | used by the first release |
-| MIG-INVENTORY | `inventory.location` | 7 | venue_id |  | 0 | 0 | referenced by platform.outlet |
+| MIG-INVENTORY | `inventory.location` | 7 | venue_id |  | 0 | 0 | referenced by inventory.stock_batch |
 | MIG-INVENTORY | `inventory.movement` | 17 | through its owner |  | 4 | 3 | used by the first release |
 | MIG-INVENTORY | `inventory.purchase_order` | 29 | scope_path |  | 0 | 0 | referenced by inventory.goods_receipt |
 | MIG-INVENTORY | `inventory.requisition` | 20 | venue_id |  | 0 | 0 | referenced by inventory.purchase_order |
@@ -485,7 +485,7 @@ Each migration only references tables created by the ones above it. Keys that wo
 | MIG-MARKETING | `marketing.guest_device` | 16 | subject |  | 3 | 2 | used by the first release |
 | MIG-MARKETING | `marketing.guest_document` | 9 | none |  | 2 | 1 | used by the first release |
 | MIG-MARKETING | `marketing.guest_preference` | 7 | none |  | 2 | 2 | used by the first release |
-| MIG-MARKETING | `marketing.guest_profile` | 23 | through its owner |  | 9 | 3 | used by the first release |
+| MIG-MARKETING | `marketing.guest_profile` | 23 | none |  | 9 | 3 | used by the first release |
 | MIG-MARKETING | `marketing.invitation` | 19 | scope_path |  | 1 | 1 | used by the first release |
 | MIG-MARKETING | `marketing.invitation_campaign` | 11 | scope_path |  | 2 | 1 | used by the first release |
 | MIG-MARKETING | `marketing.journey` | 9 | scope_path |  | 0 | 0 | referenced by marketing.attribution_touch |

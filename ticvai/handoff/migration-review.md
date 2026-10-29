@@ -4,7 +4,7 @@
 
 The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/check-migration-freeze.py`). `derive-ddl.py` writes additive changes (new tables, columns and indexes) as the next forward migration, `backend/<area>/V<nnnn>__*.sql`. **The changes below it does not write**, because each has a data question behind it: which rows survive a drop, what fills a new NOT NULL column, whether a rename is a rename. Write each as a forward migration by hand; once a forward migration carries it, it leaves this list.
 
-**182 change(s).**
+**183 change(s).**
 
 | Kind | Database | Object | Change | What a person does |
 |---|---|---|---|---|
@@ -189,4 +189,5 @@ The baseline migrations under `backend/` are frozen at `r1 (9cec72d)` (`tools/ch
 | index duplicates a unique index | tenant | `catalogue.product_channel_text_product_id_idx` | same columns as the unique index product_channel_text_product_id_uniq, which serves every lookup | decide: DROP INDEX by hand (CONCURRENTLY on a live table), or add the table to tools/derive-ddl.py UNIQUE_REPLACES_INDEX with the decision so the next migration drops it |
 | index duplicates a unique index | tenant | `catalogue.product_eligibility_rule_product_id_idx` | same columns as the unique index product_eligibility_rule_product_id_uniq, which serves every lookup | decide: DROP INDEX by hand (CONCURRENTLY on a live table), or add the table to tools/derive-ddl.py UNIQUE_REPLACES_INDEX with the decision so the next migration drops it |
 | index duplicates a unique index | tenant | `games.reader_sync_status_reader_id_idx` | same columns as the unique index reader_sync_status_reader_id_uniq, which serves every lookup | decide: DROP INDEX by hand (CONCURRENTLY on a live table), or add the table to tools/derive-ddl.py UNIQUE_REPLACES_INDEX with the decision so the next migration drops it |
+| index duplicates a unique index | tenant | `marketing.guest_profile_subject_id_idx` | same columns as the unique index guest_profile_subject_id_uniq, which serves every lookup | decide: DROP INDEX by hand (CONCURRENTLY on a live table), or add the table to tools/derive-ddl.py UNIQUE_REPLACES_INDEX with the decision so the next migration drops it |
 | index duplicates a unique index | tenant | `seating.accessible_seat_map_id_idx` | same columns as the unique index accessible_seat_map_id_uniq, which serves every lookup | decide: DROP INDEX by hand (CONCURRENTLY on a live table), or add the table to tools/derive-ddl.py UNIQUE_REPLACES_INDEX with the decision so the next migration drops it |

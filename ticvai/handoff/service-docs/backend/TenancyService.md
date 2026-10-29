@@ -2275,17 +2275,17 @@ Board 1 of the client's POS set. **A profile is what a venue changes; a version 
 | profileId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
-**Request body**: `ConfigurationProfile`
+**Request body**: `SetConfigurationProfileRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes | (read-only) |
+| id | string (uuid) |  | Optional. |
 | name | string | yes |  |
 | scopePath | string |  |  |
-| venueKindScope | array of string | yes | Which workstation types it applies to. |
-| version | integer | yes | Immutable once deployed anywhere. (read-only) |
+| venueKindScope | array of string | yes | Which workstation types the profile applies to, as ConfigurationProfile.venueKindScope. |
 | settings | object |  |  |
-| status | enum (draft, published, deploying, deployed, superseded, rolledBack) | yes | On input only draft or published; sending published publishes this version. |
+| status | enum (draft, published, deploying, deployed, superseded, rolledBack) | yes | The caller's choice on input: draft or published; sending published publishes this version. |
+| version | integer |  | (read-only) |
 | deployedCount | integer |  | (read-only) |
 | publishedAt | string (date-time) |  | (read-only; nullable) |
 

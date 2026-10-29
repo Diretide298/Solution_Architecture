@@ -562,8 +562,8 @@
    "readsFrom": {
     "AccessService": 2,
     "AiService": 2,
-    "IdentityService": 2,
     "FnbService": 1,
+    "IdentityService": 1,
     "InventoryService": 1,
     "LedgerService": 1,
     "MarketingService": 1,
