@@ -10264,8 +10264,6 @@ screens:
     - to: CMS-063
       trigger: Upload & Asset Ingestion Workspace
       provenance: structural — pack board 1 wiring, 11 September 2026
-      carries:
-      - assetId
     - to: CMS-064
       trigger: Folder, Collection & Workspace Management
       provenance: structural — pack board 1 wiring, 11 September 2026
@@ -10275,16 +10273,12 @@ screens:
     - to: CMS-066
       trigger: Tags, Keywords & Classification
       provenance: structural — pack board 1 wiring, 11 September 2026
-      carries:
-      - assetId
     - to: CMS-067
       trigger: Advanced Search & Discovery
       provenance: structural — pack board 1 wiring, 11 September 2026
     - to: CMS-068
       trigger: Digital Asset 360° Profile
       provenance: structural — pack board 1 wiring, 11 September 2026
-      carries:
-      - assetId
     - to: CMS-069
       trigger: Bulk Asset Management Workspace
       provenance: structural — pack board 1 wiring, 11 September 2026
@@ -10308,6 +10302,16 @@ screens:
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
     source: pack Digital Asset Management DAM.pdf, page 3 §Display
+  - operation: searchMedia
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-005): the approved screen has no list, table or chart that
+      shows the assets themselves (its eight tiles are getMediaUsageAnalytics counts and its three buttons
+      are pack text), and the lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) is that a read
+      the approved screen has no element for leaves it. The assets are searched and listed on CMS-010,
+      CMS-062 and CMS-073, where searchMedia stays declared and reached. The edges to CMS-063, CMS-066
+      and CMS-068 no longer carry an assetId: this screen holds none, and all three take it as optional.
+      A CR brings the read back here with the element that shows it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -10368,11 +10372,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: searchMedia
-    contract: assets
-    purpose: The estate, counted and charted
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   - operationId: getMediaUsageAnalytics
     contract: assets
     purpose: Storage, uploads and library health
@@ -16233,8 +16232,9 @@ screens:
       links, screenshots). Refused `400` for an Apple account without a D-U-N-S number. **Apple Wallet**
       (Apple entry, optional): `passTypeIdentifier` and the Pass Type ID certificate (`passCertificateSecretRef`,
       a .p12 and its password uploaded once to Key Vault) from the client''s own Apple Developer account,
-      one per tenant for all its brands (ADAM CR-304); the server reads its expiry (`passCertificateExpiresAt`) and refuses `400` a certificate
-      for another Pass Type ID or team (Chinmay, 12 October 2026; CHG-R6-033). Dismissing sends nothing.'
+      one per tenant for all its brands (ADAM CR-304); the server reads its expiry (`passCertificateExpiresAt`)
+      and refuses `400` a certificate for another Pass Type ID or team (Chinmay, 12 October 2026; CHG-R6-033).
+      Dismissing sends nothing.'
     bindsTo: StoreAccount
     confirm:
       label: Save

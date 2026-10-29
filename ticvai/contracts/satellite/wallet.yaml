@@ -899,12 +899,7 @@ paths:
       operationId: setWalletFundingRules
       x-ticvai-consumed-by:
         - "P08 BO-1094 Funding Method Configuration"
-        - "P08 BO-1095 Top-Up Rule Configuration"
-        - "P08 BO-1096 Channel & Funding Source Mapping"
-        - "P08 BO-1097 Auto-Reload Configuration"
         - "P08 BO-1098 Recurring Funding Schedule"
-        - "P08 BO-1099 Funding Authorization & Approval Rules"
-        - "P08 BO-1101 Funding Limits & Velocity Controls"
         - "P08 BO-417 Top-Up Configuration"
         - "P08 BO-418 Top-Up Bonus Rule Configuration"
       x-ticvai-read-via:
@@ -1581,7 +1576,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-612 Refund Allocation & Original Tender Manager"
         - "P08 BO-1146 Refund-to-Wallet Policy Configuration"
-        - "P08 BO-1147 Refund Routing & Credit Restoration Engine"
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins

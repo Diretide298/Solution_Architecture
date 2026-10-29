@@ -34500,10 +34500,11 @@ screens:
     trigger: Register firmware release
     body: '**Collects what `createDeviceFirmware` sends before it is called.** Required: `deviceKind`,
       `version`. Optional: `vendor`, `artefactAssetId` (the vendor image, uploaded to Assets from the
-      form), `checksum`, `checksumAlgorithm`, `minimumPreviousVersion`, `releaseNotes`. A second release with
-      the same device kind and version is refused (409, duplicate-code) and says so. Dismissing sends nothing;
-      the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract):
-      `id`, `status` (a release starts `draft`), `releasedAt`, `installedCount`, `statusReason`, `scopePath`.'
+      form), `checksum`, `checksumAlgorithm`, `minimumPreviousVersion`, `releaseNotes`. A second release
+      with the same device kind and version is refused (409, duplicate-code) and says so. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the
+      contract): `id`, `status` (a release starts `draft`), `releasedAt`, `installedCount`, `statusReason`,
+      `scopePath`.'
     bindsTo: DeviceFirmware
     confirm:
       label: Register release
@@ -151340,9 +151341,20 @@ screens:
     — it is settings, not a population
   purpose: Control the business rules governing individual wallet top-up transactions.
   purposeNote: Every wallet top-up is evaluated against the applicable funding rules before value is credited.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1096, BO-1097, BO-1098, BO-1099,
-    BO-1101, BO-417, BO-418; this screen is Top-Up Rule Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+  division: 'Shares `getWalletFundingRules` with BO-1096, BO-1097, BO-1098, BO-1099, BO-1101, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Top-Up Rule Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
     board 2.03, page 15): control the business rules governing individual wallet top-up transactions.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its pack select and text fields bind to no operation and it has
+      no Save or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding
+      Method Configuration (Save funding rules), where setWalletFundingRules stays declared and reached;
+      the lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps
+      getWalletFundingRules and its rules panel. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -151433,13 +151445,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Amounts, presets and bonus rules
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -151485,9 +151490,21 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Configure funding availability
     across; Configure) and no display directory — it is settings, not a population
   purpose: Determine where each funding method may be used.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1097, BO-1098, BO-1099,
-    BO-1101, BO-417, BO-418; this screen is Channel & Funding Source Mapping (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
-    board 2.04, page 16): determine where each funding method may be used.'
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1097, BO-1098, BO-1099, BO-1101, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Channel & Funding Source Mapping
+    (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.04, page 16): determine where each
+    funding method may be used.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its pack channel select fields bind to no operation and it has
+      no Save or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding
+      Method Configuration (Save funding rules), where setWalletFundingRules stays declared and reached;
+      the lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps
+      getWalletFundingRules and its rules panel. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -151581,13 +151598,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Channel and funding-source mapping
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -151637,11 +151647,22 @@ screens:
     threshold.
   purposeNote: Auto-reload occurs only after the configured threshold is reached and all consent, payment,
     security and funding-limit validations have passed.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1098, BO-1099,
-    BO-1101, BO-417, BO-418; this screen is Auto-Reload Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1098, BO-1099, BO-1101, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Auto-Reload Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
     board 2.05, page 17): configure automatic wallet replenishment when balances fall below predefined
     thresholds. The attached scope specifically requires automatic top-up when a wallet balance falls
     below a configurable threshold.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its only component is the read-only rules panel (getWalletFundingRules)
+      and it has no Save or publish control, so it never sends the PUT. The funding rules are saved on
+      BO-1094 Funding Method Configuration (Save funding rules), where setWalletFundingRules stays declared
+      and reached; the lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004.
+      The screen keeps getWalletFundingRules and its rules panel. A CR brings the write back here with
+      the control that sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -151717,13 +151738,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Auto-reload on a threshold
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -151772,11 +151786,12 @@ screens:
     specifically requires scheduled or recurring top-ups based on date, frequency, amount, payment method
     and customer authorization.
   purposeNote: and authorization requirements.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1099,
-    BO-1101, BO-417, BO-418; this screen is Recurring Funding Schedule (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
-    board 2.06, page 17): configure scheduled wallet funding independent of the wallet''s current balance.
-    The source specifically requires scheduled or recurring top-ups based on date, frequency, amount,
-    payment method and customer authorization.'
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1099, BO-1101, BO-417,
+    BO-418 (it and BO-1094, BO-417, BO-418 send `setWalletFundingRules`, CHG-R11FXU-002); this screen
+    is Recurring Funding Schedule (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.06, page
+    17): configure scheduled wallet funding independent of the wallet''s current balance. The source specifically
+    requires scheduled or recurring top-ups based on date, frequency, amount, payment method and customer
+    authorization.'
   layout:
     template: form
     regions:
@@ -151844,6 +151859,7 @@ screens:
       components:
       - kind: primaryButton
         label: Specific day of month
+        operation: setWalletFundingRules
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 17 §Support schedules such
           as
   states:
@@ -151911,9 +151927,21 @@ screens:
   purpose: Apply governance and approval controls to wallet funding operations.
   purposeNote: Funding transactions requiring approval cannot alter the wallet balance until all configured
     authorization requirements are satisfied.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098,
-    BO-1101, BO-417, BO-418; this screen is Funding Authorization & Approval Rules (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
-    board 2.07, page 18): apply governance and approval controls to wallet funding operations.'
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1101, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Funding Authorization & Approval
+    Rules (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.07, page 18): apply governance
+    and approval controls to wallet funding operations.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its pack select fields bind to no operation and it has no Save
+      or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding Method
+      Configuration (Save funding rules), where setWalletFundingRules stays declared and reached; the
+      lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps
+      getWalletFundingRules and its rules panel. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -152008,13 +152036,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Approval above a threshold
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -152210,11 +152231,22 @@ screens:
     configurable maximum balance, daily top-up limit, single-transaction limit and user- specific limits.
   purposeNote: Funding limits are evaluated in real time before wallet value is credited, with configurable
     actions for violations.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098,
-    BO-1099, BO-417, BO-418; this screen is Funding Limits & Velocity Controls (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
-    board 2.09, page 20): protect wallets against excessive or suspicious funding activity. The source
-    specifically requires configurable maximum balance, daily top-up limit, single-transaction limit and
-    user- specific limits.'
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1099, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Funding Limits & Velocity Controls
+    (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.09, page 20): protect wallets against
+    excessive or suspicious funding activity. The source specifically requires configurable maximum balance,
+    daily top-up limit, single-transaction limit and user- specific limits.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its pack limit fields bind to no operation and it has no Save or
+      publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding Method
+      Configuration (Save funding rules), where setWalletFundingRules stays declared and reached; the
+      lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps
+      getWalletFundingRules and its rules panel. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -152326,13 +152358,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Limits and velocity controls
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -158719,6 +158744,16 @@ screens:
     Example
   purposeNote: Refund processing correctly reconstructs or converts the value originally consumed without
     unintentionally changing its financial or promotional classification.
+  gaps:
+  - operation: setWalletRefundPolicy
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-003): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its six pack restore fields bind to no operation and it has no
+      Save control. The wallet refund policy is saved on BO-1146 (Save wallet refund policy), where setWalletRefundPolicy
+      stays declared and reached (CHG-R10WIR-002, item 5). The screen keeps getOrder, listOrderRefunds
+      and createRefund for the order it routes. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -158762,11 +158797,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletRefundPolicy
-    contract: wallet
-    purpose: Restoration to the original lots
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: createRefund
     contract: orders
     purpose: Issue the refund
@@ -208215,6 +208245,16 @@ screens:
       so either the write operations are missing or this screen is a view of something another screen
       builds.'
     source: contract — the screen's declared operations
+  - operation: listB2bCreditAccounts
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-004): the approved screen has no list, table or picker that
+      shows the accounts (its body is seven pack select fields for the facility being opened), and the
+      lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) is that a read the approved screen has
+      no element for leaves it. The accounts are listed and picked on ADM-603 (Customer/account) and ADM-608,
+      where listB2bCreditAccounts stays declared and reached. The edge to ADM-603 carries the accountId
+      createB2bCreditAccount returns; opened otherwise, ADM-603 picks the account itself. A CR brings
+      the read back here with the list that shows it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -208252,11 +208292,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: listB2bCreditAccounts
-    contract: payments
-    purpose: On-account customers
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   - operationId: createB2bCreditAccount
     contract: payments
     purpose: Open an account

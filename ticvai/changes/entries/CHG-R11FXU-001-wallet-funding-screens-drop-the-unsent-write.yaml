@@ -1,0 +1,50 @@
+id: CHG-R11FXU-001
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'BO-1095, BO-1096, BO-1097, BO-1099 and BO-1101 no longer declare setWalletFundingRules: nothing on the
+  five approved screens sends it, and the funding rules are saved on BO-1094; each keeps getWalletFundingRules and its
+  rules panel. Nothing visible changes.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml, declarations only (invisible to check-approved-ui): the
+    setWalletFundingRules api (a board reading of 19 September) is removed from BO-1095 Top-Up Rule Configuration,
+    BO-1096 Channel & Funding Source Mapping, BO-1097 Auto-Reload Configuration, BO-1099 Funding Authorization &
+    Approval Rules and BO-1101 Funding Limits & Velocity Controls, and recorded on each as a removed gap. Their pack
+    select and text fields bind to no operation and none has a Save or publish control, so none ever sends the PUT
+    (the same case as BO-602, CHG-R11FXT-004). setWalletFundingRules stays declared and reached on BO-1094 Funding
+    Method Configuration (Save funding rules) and on BO-1098 (CHG-R11FXU-002). Each screen''s division now says it
+    shares getWalletFundingRules, and that BO-1094 saves the rules. The x-ticvai-consumed-by mirror in
+    contracts/satellite/wallet.yaml follows (link-screens-contracts).'
+  by: Chinmay
+  date: '2026-10-29'
+  quote: '"Fix them, then ship" (the lead on the screen findings blocking the r11 final gate, 29 October 2026)'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T12:46Z, handoff/service-docs/adam-links.json):
+  check-screen-wiring S-OP-UNREACHED findings on BO-1095, BO-1096, BO-1097, BO-1099 and BO-1101 setWalletFundingRules,
+  built on by started ticket #30858 (Ready for QA, Pranay Shinde). The lead''s ruling of 26 October 2026
+  (CHG-R10WIR-002, item 5); the same kind of fix as CHG-R11FXS-001 and CHG-R11FXT-004 (a declaration the screen does
+  not do is removed).'
+keys_touched:
+  screens: [BO-1095, BO-1096, BO-1097, BO-1099, BO-1101]
+  operations: [setWalletFundingRules]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - contracts/satellite/wallet.yaml
+root_class: 'an operation declared on a screen that does not do it'
+tickets:
+  started:
+  - '30858 (setWalletFundingRules, Ready for QA, Pranay Shinde): nothing to change in the operation; BO-1095, BO-1096,
+    BO-1097, BO-1099 and BO-1101 no longer consume it, and it stays on BO-1094 (Save funding rules) and BO-1098
+    (Specific day of month). Told through the lead''s comment; its text is not rewritten.'
+  unstarted:
+  - 'The five screens'' own tickets drop the declaration at the next tag; a CR brings the write back to any of them
+    with the Save control that sends it.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-OP-UNREACHED
+status: open
+notes: 'No visible change (apis, division and gaps are invisible to check-approved-ui). The screens still save nothing:
+  their fields stay the pack''s, unbound, as before. No database change.'

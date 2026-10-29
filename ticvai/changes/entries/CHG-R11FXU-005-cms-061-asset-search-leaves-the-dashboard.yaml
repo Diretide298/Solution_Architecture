@@ -1,0 +1,47 @@
+id: CHG-R11FXU-005
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'CMS-061 Digital Asset Management Command Center no longer declares searchMedia: its tiles are
+  getMediaUsageAnalytics counts and nothing on it shows the assets; its three edges stop carrying an assetId it does not
+  hold. Nothing visible changes.'
+decision:
+  what: 'screens/P13-white-label-cms.yaml CMS-061, invisible fields only: the searchMedia api (onLoad, "The estate,
+    counted and charted", a board reading of 19 September) is removed and recorded as a removed gap. The approved
+    screen''s eight metric tiles are filled by getMediaUsageAnalytics, which it keeps, and its three buttons (Upload
+    Assets, Browse Library, Create Collection) are pack text bound to nothing; no list, table or chart shows assets.
+    The lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5): a read the approved screen has no element for
+    leaves it. searchMedia stays declared and reached on CMS-010, CMS-062, CMS-073 and more. With it gone the screen
+    holds no assetId, so the structural edges to CMS-063, CMS-066 and CMS-068 no longer carry one (carried ids are
+    invisible; all three take assetId as optional), which check-navigation N-CARRIES-HELD requires. The
+    x-ticvai-consumed-by mirror in contracts/satellite/assets.yaml follows (link-screens-contracts).'
+  by: Chinmay
+  date: '2026-10-29'
+  quote: '"Fix them, then ship" (the lead on the screen findings blocking the r11 final gate, 29 October 2026)'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T12:46Z, handoff/service-docs/adam-links.json):
+  check-screen-wiring S-OP-UNREACHED finding on CMS-061 searchMedia, built on by started ticket #30908 (Ready for QA,
+  Narayan Gaonkar). The lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5); the same kind of fix as
+  CHG-R11FXT-002.'
+keys_touched:
+  screens: [CMS-061]
+  operations: [searchMedia, getMediaUsageAnalytics]
+  files:
+  - screens/P13-white-label-cms.yaml
+  - contracts/satellite/assets.yaml
+root_class: 'an operation declared on a screen that has no element for it'
+tickets:
+  started:
+  - '30908 (searchMedia, Ready for QA, Narayan Gaonkar): nothing to change in the operation; CMS-061 no longer consumes
+    it, and it stays on CMS-010, CMS-062, CMS-073 and more. CMS-067 still declares it (held for the lead). Told through
+    the lead''s comment; its text is not rewritten.'
+  unstarted:
+  - 'CMS-061''s screen ticket drops the declaration and the three carried assetIds at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-OP-UNREACHED
+status: open
+notes: 'No visible change (apis, gaps and carried ids are invisible to check-approved-ui). No database change.'

@@ -1,0 +1,43 @@
+id: CHG-R11FXU-003
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'BO-1147 Refund Routing & Credit Restoration Engine no longer declares setWalletRefundPolicy: nothing on the
+  approved screen sends it, and the policy is saved on BO-1146; the screen keeps its order, refunds and createRefund.
+  Nothing visible changes.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml BO-1147, a declaration only (invisible to check-approved-ui): the
+    setWalletRefundPolicy api (a board reading of 19 September) is removed and recorded as a removed gap. Its six pack
+    restore fields bind to no operation and it has no Save control, so it never sends the PUT. setWalletRefundPolicy
+    stays declared and reached on BO-1146 Refund-to-Wallet Policy Configuration (Save wallet refund policy). The
+    x-ticvai-consumed-by mirror in contracts/satellite/wallet.yaml follows (link-screens-contracts).'
+  by: Chinmay
+  date: '2026-10-29'
+  quote: '"Fix them, then ship" (the lead on the screen findings blocking the r11 final gate, 29 October 2026)'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T12:46Z, handoff/service-docs/adam-links.json):
+  check-screen-wiring S-OP-UNREACHED finding on BO-1147 setWalletRefundPolicy, built on by started ticket #30859
+  (Ready for QA, Pranay Shinde). The lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5); the same kind of fix
+  as CHG-R11FXT-004.'
+keys_touched:
+  screens: [BO-1147]
+  operations: [setWalletRefundPolicy]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - contracts/satellite/wallet.yaml
+root_class: 'an operation declared on a screen that does not do it'
+tickets:
+  started:
+  - '30859 (setWalletRefundPolicy, Ready for QA, Pranay Shinde): nothing to change in the operation; BO-1147 no longer
+    consumes it, and it stays on BO-1146. ADM-612 still declares it (held for the lead). Told through the lead''s
+    comment; its text is not rewritten.'
+  unstarted:
+  - 'BO-1147''s screen ticket drops the declaration at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-OP-UNREACHED
+status: open
+notes: 'No visible change. No database change.'

@@ -1,0 +1,43 @@
+id: CHG-R11FXU-002
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'BO-1098 Recurring Funding Schedule: its approved Specific day of month button names setWalletFundingRules,
+  the operation its apisNote of 29 September already gave it (recurringFunding.dayOfMonth); nothing visible changes.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml BO-1098, a binding only (invisible to check-approved-ui): the primaryButton
+    Specific day of month carries `operation: setWalletFundingRules`. The screen''s apisNote recorded at the VM
+    close-out of 29 September that "Specific day of month are choices sent by `setWalletFundingRules`
+    (recurringFunding.dayOfMonth)", and no component carried it. The PUT replaces the venue''s one rules object, so
+    the request is the rules getWalletFundingRules returned with recurringFunding changed (cadence monthly,
+    dayOfMonth), sent with If-Match on that version, as on BO-1094. The screen''s seventeen select fields are its
+    inputs, so S-BUTTON-FORM has nothing to report. Its division now says which screens send the write.'
+  by: Chinmay
+  date: '2026-10-29'
+  quote: '"Fix them, then ship" (the lead on the screen findings blocking the r11 final gate, 29 October 2026)'
+why: 'The r11 final gate, 29 October 2026 (ticket statuses read 2026-10-29T12:46Z, handoff/service-docs/adam-links.json):
+  check-screen-wiring S-OP-UNREACHED finding on BO-1098 setWalletFundingRules, built on by started ticket #30858
+  (Ready for QA, Pranay Shinde). The same kind of fix as CHG-R11FXT-001 (an approved button names the operation its
+  apisNote already gave it).'
+keys_touched:
+  screens: [BO-1098]
+  operations: [setWalletFundingRules, getWalletFundingRules]
+  files:
+  - screens/P08-venue-back-office.yaml
+root_class: 'an operation declared on a screen whose element does not name it'
+tickets:
+  started:
+  - '30858 (setWalletFundingRules, Ready for QA, Pranay Shinde): nothing to change; the operation is unchanged and
+    BO-1098''s Specific day of month sends the whole rules object with recurringFunding set. Told through the lead''s
+    comment; its text is not rewritten.'
+  unstarted:
+  - 'BO-1098''s screen ticket picks the binding up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-OP-UNREACHED
+status: open
+notes: 'No visible change. No database change.'
