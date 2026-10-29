@@ -9844,7 +9844,7 @@ paths:
       x-ticvai-consumed-by:
         - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
       x-ticvai-body-key: [changeSetId]
-      x-ticvai-body-key-note: 'Keyed by the body''s `changeSetId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per privacy change set within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `changeSetId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
+      x-ticvai-body-key-note: 'Keyed by the body''s `changeSetId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per privacy change set within the caller''s brand (brand level since ADAM CR-314); a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `changeSetId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.16-18 (17.1.10); approval runs through the approvals engine (configurable workflow, no hard-coded job titles)'
@@ -9867,10 +9867,19 @@ paths:
 
         **Publishing a cookie banner design sets its `noticeVersion`**, which is null while it is a draft
         (ADAM CR-314, 29 October 2026).
+
+
+        **At the owner's level** (the lead's ruling on ADAM CR-314, 29 October 2026: "Scan + approval at
+        owner level"): this runs at brand level, as `setCookieBannerDesign` does, so publishing writes the
+        brand's `marketing.cookie_banner_design` row (its `status` and the `noticeVersion` it sets) with a
+        grant at that brand or above.
+      x-ticvai-writes:
+      - table: marketing.cookie_banner_design
+        for: 'publishing a cookie banner design: the version''s status and the noticeVersion it sets, at the brand''s node (ADAM CR-314 ruling, 29 October 2026)'
       tags:
         - consent
       x-ticvai-permission: GUEST_MANAGE
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: brand
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
@@ -19093,6 +19102,16 @@ paths:
         category is not `strictlyNecessary` is a pre-consent violation**: it is flagged on the finding, counted in
         `CookieScanRun.preConsentViolationCount` and raises the administrator alert whether or not the technology is
         new. That is what proves nothing loads before consent (2.6.58).
+
+
+        **The registry write is the tenant's** (the lead's ruling on ADAM CR-314, 29 October 2026: "Scan +
+        approval at owner level"). A venue-level staff caller may start or submit a scan; matching a finding to
+        `marketing.tracking_technology` (moving `lastSeenAt`, adding a `detected` row) is a service write
+        at tenant level: it runs at the tenant root, so the registry row stays the tenant's, as
+        `setTrackingTechnology` writes it.
+      x-ticvai-writes:
+      - table: marketing.tracking_technology
+        for: 'a finding matched to the registry (lastSeenAt) or added as detected: a service write at tenant level, at the tenant root (ADAM CR-314 ruling, 29 October 2026)'
       tags:
       - consent
       x-ticvai-permission: GUEST_MANAGE

@@ -5,13 +5,21 @@ kind: contract
 summary: 'A cookie banner design is written at its brand''s node (the corporate design at the tenant root) and the
   tracking technology registry at the tenant root; both tables read beneath, so every venue''s staff and storefront
   read their brand''s banner and the tenant''s registry, and writes need a grant at that node or above. A draft''s
-  noticeVersion is null until approvePrivacyTesting publishes it.'
+  noticeVersion is null until approvePrivacyTesting publishes it. By the lead''s ruling on the follow-up ("Scan +
+  approval at owner level"), approvePrivacyTesting runs at brand level and declares its write of the banner, and
+  recordCookieScan''s registry write is a service write at the tenant root.'
 decision:
   what: '"All as recommended" (Chinmay, 29 October 2026): ADAM CR-314, option C, one decision for both operations.
     contracts/satellite/marketing-crm.yaml: setCookieBannerDesign x-ticvai-scope-level brand, setTrackingTechnology
     x-ticvai-scope-level tenant, each saying the node its row is written at; CookieBannerPreferenceCenterDesignerView
     and CookieTrackingDigitalTechnologyRegistryView x-ticvai-rls read-beneath; noticeVersion nullable, null on a draft,
-    and approvePrivacyTesting says publishing a banner sets it. Derived: both tables'' policies re-applied as
+    and approvePrivacyTesting says publishing a banner sets it. The lead''s ruling on this lane''s stop (Chinmay, 29
+    October 2026: "Scan + approval at owner level"): approvePrivacyTesting x-ticvai-scope-level brand, like
+    setCookieBannerDesign, with x-ticvai-writes marketing.cookie_banner_design (the status and the noticeVersion it
+    sets on publishing); recordCookieScan stays venue-level for the staff caller who starts or submits a scan, and its
+    write of marketing.tracking_technology (lastSeenAt, a detected row) is a service write at tenant level, at the
+    tenant root, declared as x-ticvai-writes (its carried lineage override for that write removed,
+    handoff/api-data-lineage-overrides.json). Derived: both tables'' policies re-applied as
     apply_read_beneath_rls in the forward migration. tools/check-rls-scope-fit.py: RF-OWNED-ABOVE also reads a table
     written only at brand (or brand and tenant) and read below the brand.'
   by: Chinmay
@@ -20,11 +28,12 @@ why: 'ADAM CR-314 (Pranay Shinde, #31159 setCookieBannerDesign and #31161 setTra
   writes keyed above a venue, so the node a row is written at was undefined and the upsert keys could not hold; nor
   was it said when a draft''s noticeVersion is set. Settled by the lead on 29 October 2026.'
 keys_touched:
-  operations: [setCookieBannerDesign, setTrackingTechnology, approvePrivacyTesting]
+  operations: [setCookieBannerDesign, setTrackingTechnology, approvePrivacyTesting, recordCookieScan]
   schemas: [CookieBannerPreferenceCenterDesignerView, CookieTrackingDigitalTechnologyRegistryView]
   tables: [marketing.cookie_banner_design, marketing.tracking_technology]
   files:
   - contracts/satellite/marketing-crm.yaml
+  - handoff/api-data-lineage-overrides.json
   - tools/check-rls-scope-fit.py
 root_class: 'a write keyed above its scope level, with no node stated for the row'
 tickets:
@@ -33,6 +42,10 @@ tickets:
     apply the forward migration, which re-applies both tables'' policies as read-beneath; no column changes.'
   unstarted:
   - '31159 (setCookieBannerDesign), 31161 (setTrackingTechnology), 27921: through CR-314''s comment.'
+  - '33543 (recordCookieScan), 28923, 28927: the registry write runs at the tenant root (the ruling), through a
+    follow-up comment on CR-314.'
+  - '30105 (approvePrivacyTesting''s feature): brand level, and publishing writes the banner''s status and
+    noticeVersion, through a follow-up comment on CR-314.'
   - 'The readers (getCookieConsentRuntime 30694, listCookieBannerPreference 33545, listCookieTrackingDigital 33541 and
     the others): nothing to change; read-beneath shows them the brand''s and tenant''s rows.'
 release_tag: pending
@@ -44,9 +57,8 @@ prevention:
   ref: tools/check-rls-scope-fit.py
 status: open
 notes: 'Verified 29 October 2026: with the two read-beneath marks taken out, RF-OWNED-ABOVE fails on
-  listCookieBannerPreference reading marketing.cookie_banner_design. The registry is not caught the same way, because
-  recordCookieScan (venue) also writes marketing.tracking_technology. Left for the lead, not changed (the decision names
-  two operations): recordCookieScan is venue-level and matches findings to the registry, moving lastSeenAt and adding
-  detected rows, so under option C a venue-only caller can neither update a tenant-root registry row nor add one there;
-  and approvePrivacyTesting (venue) publishes a brand''s banner, which its lineage does not show as a write of
-  marketing.cookie_banner_design at all.'
+  listCookieBannerPreference reading marketing.cookie_banner_design. The registry is not caught the same way: its
+  lineage still lists recordCookieScan (venue) as a writer, because the scan''s level is the caller''s and the
+  tenant-root service write is stated on the operation (x-ticvai-writes, description), which no check reads. This
+  lane stopped on recordCookieScan and approvePrivacyTesting (the decision named two operations); the lead ruled
+  both the same day ("Scan + approval at owner level"), and both are built to that ruling here.'
