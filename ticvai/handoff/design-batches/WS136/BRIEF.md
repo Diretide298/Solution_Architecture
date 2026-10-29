@@ -1,6 +1,6 @@
 # WS136 — Marketing CRM Configuration Reference v1.0 board 2
 
-**10 screens · 25 operations · 29 schemas · 8 permissions**
+**10 screens · 24 operations · 29 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-744` | Data Governance Center | D | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-745` | Identity Resolution Rules | D | 2 | 3 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-746` | Duplicate Review & Merge | D | 0 | 18 | 6 | 0 | 4 | 2 | — | notStarted (—) |
-| `BO-747` | Consent Policy Configuration | D | 25 | 31 | 6 | 76 | 1 | 4 | — | notStarted (—) |
+| `BO-747` | Consent Policy Configuration | D | 25 | 31 | 6 | 75 | 1 | 4 | — | notStarted (—) |
 | `BO-748` | Consent Capture & Versions | D | 0 | 7 | 6 | 10 | 0 | 4 | — | notStarted (—) |
 | `BO-749` | Guest Preference Center | D | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-750` | Data Subject Requests | D | 17 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -116,7 +116,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-744, BO-746, BO-748, BO-749, BO-751, BO-752, BO-753 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-744, BO-746, BO-747, BO-748, BO-749, BO-751, BO-752, BO-753 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

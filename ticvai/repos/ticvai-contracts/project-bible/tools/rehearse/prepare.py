@@ -208,13 +208,20 @@ def snapshot(token, project, out, pms=PMS) -> int:
     def get(path, params=None):
         url = f"{pms}/api/v3/{path}" + ("?" + urllib.parse.urlencode(params) if params else "")
         req = urllib.request.Request(url, method="GET", headers={"Authorization": auth, "User-Agent": "curl/8.0"})
-        with urllib.request.urlopen(req, timeout=600) as r:
-            return json.load(r)
+        for attempt in range(4):
+            try:
+                with urllib.request.urlopen(req, timeout=600) as r:
+                    return json.load(r)
+            except urllib.error.HTTPError as e:
+                # the proxy gives up after 100 seconds (524) or while OpenProject restarts (502); a read is safe to repeat
+                if e.code not in (502, 503, 524) or attempt == 3:
+                    raise
+                time.sleep(30 * (attempt + 1))
 
     flt = json.dumps([{"status": {"operator": "*", "values": []}}])
     wps, off = [], 1
     while True:
-        d = get(f"projects/{project}/work_packages", {"pageSize": 1000, "offset": off, "filters": flt})
+        d = get(f"projects/{project}/work_packages", {"pageSize": 200, "offset": off, "filters": flt})
         els = d["_embedded"]["elements"]
         wps += els
         if len(wps) >= d["total"] or not els:

@@ -11797,11 +11797,12 @@ screens:
         bindsTo: VisitPlannerOptions.questions
         operation: getVisitPlannerOptions
         notes: 'Who, heights (skipped with no children), days (up to 3), pace (packed, balanced or relaxed;
-          DI-1098), interests, lunch. **The steps are the venue''s question set-up** (ADAM CR-321, option A, 29
-          October 2026): `VisitPlannerOptions.questions`, read on load with the other options, gives the questions
-          with `isEnabled` true in `sortOrder`, each with its `label` and `help`, and a question with `isRequired`
-          true holds the guest until it is answered. With no set-up, the defaults are the questions and labels
-          drawn here, so the screen is as approved; `n` counts the steps the set-up asks.'
+          DI-1098), interests, lunch. **The steps are the venue''s question set-up** (ADAM CR-321, option
+          A, 29 October 2026): `VisitPlannerOptions.questions`, read on load with the other options, gives
+          the questions with `isEnabled` true in `sortOrder`, each with its `label` and `help`, and a
+          question with `isRequired` true holds the guest until it is answered. With no set-up, the defaults
+          are the questions and labels drawn here, so the screen is as approved; `n` counts the steps
+          the set-up asks.'
         provenance: decided 29 September 2026, MOB-6; Visit Planner prototype
     - name: fields
       slot: fields

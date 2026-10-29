@@ -275,39 +275,6 @@
    }
   }
  },
- "CatalogueState": {
-  "x-ticvai-persistence": "none — computed from catalogue.bundle_application, the workstation's latest applied report (CHG-R8MIG-015)",
-  "type": "object",
-  "description": "The workstation's local catalogue position. A terminal beyond `staleAfter` must refuse to trade rather than transact against stale prices. **Read from Catalogue** (R8 blocker FOUNDATION-AI-C44, CHG-R8MIG-015): the workstation's latest `applied` row in `catalogue.bundle_application` (catalogue#bundleApplicationRecords) gives `appliedBundleVersion` and `appliedAt`, that bundle's `catalogue.published_bundle.stale_after` gives `staleAfter`, and the venue's newest published bundle, when newer, is `pendingBundleVersion`.\n",
-  "required": [
-   "appliedBundleVersion",
-   "appliedAt",
-   "staleAfter",
-   "isStale"
-  ],
-  "properties": {
-   "appliedBundleVersion": {
-    "type": "string"
-   },
-   "appliedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "staleAfter": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Beyond this the terminal refuses to trade."
-   },
-   "isStale": {
-    "type": "boolean"
-   },
-   "pendingBundleVersion": {
-    "type": "string",
-    "nullable": true,
-    "description": "Published but not yet applied."
-   }
-  }
- },
  "Channel": {
   "type": "string",
   "enum": [
@@ -483,156 +450,6 @@
    "issuedEntitlementsUnaffected": {
     "type": "integer",
     "description": "Valid issued tickets/entitlements that remain valid whatever the channel change (pack p.10 Important Rule)"
-   }
-  }
- },
- "ConfigureWorkstationRequest": {
-  "type": "object",
-  "required": [
-   "name"
-  ],
-  "properties": {
-   "cashierInputMode": {
-    "type": "string",
-    "enum": [
-     "keyboard",
-     "touch",
-     "scanner",
-     "hybrid"
-    ],
-    "default": "hybrid",
-    "description": "BL-061. **A till operator who touch-types is slower on a touchscreen and a new starter is faster.** The mode is per workstation because the operator is. Stored as `Workstation.cashierInputMode` (ADAM CR-082; CHG-TEN-003); left out, it is `hybrid` (PUT replaces).\n"
-   },
-   "guestDisplayContent": {
-    "type": "array",
-    "default": [
-     "lineItems"
-    ],
-    "description": "**What the guest-facing screen shows while a sale is in progress.** Line items always; the rest is the venue's choice — and **a second screen showing nothing is a second screen the guest ignores when it does show something that matters.** Stored as `Workstation.guestDisplayContent` (ADAM CR-082; CHG-TEN-003); left out, it is `[lineItems]`.\n",
-    "items": {
-     "type": "string",
-     "enum": [
-      "lineItems",
-      "total",
-      "loyaltyBalance",
-      "promotions",
-      "branding",
-      "upsell",
-      "queuePosition"
-     ]
-    }
-   },
-   "loadedMediaStockId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "deprecated": true,
-    "x-ticvai-persisted": false,
-    "description": "**Deprecated: not stored until BL-095** (the media stock record, on the printer device, waits on the BOCA stock answer; ADAM CR-082, CHG-TEN-003). Ignored on input. BL-095. **Neither which stock a printer is loaded with nor how much is left.** A till that runs out of wristbands mid-queue is an outage nobody predicted. The stock belongs to the printer (`DeviceBinding`, `platform.device`), not to the till, which is where BL-095 will put it.\n"
-   },
-   "mediaStockRemaining": {
-    "type": "integer",
-    "nullable": true,
-    "readOnly": true,
-    "deprecated": true,
-    "x-ticvai-persisted": false,
-    "description": "**Deprecated: not stored until BL-095** (the media stock record, on the printer device, waits on the BOCA stock answer; ADAM CR-082, CHG-TEN-003). A read-only field on a request is never returned, so it was never readable. Decremented on issue, once BL-095 stores it on the printer.\n"
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "saleBoardId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**This till's own layout, overriding its outlet's** (DEC-183; CHG-CSP-006). Optional since 2 October 2026: absent or null, the till uses `Outlet.saleBoardId`.\n"
-   },
-   "outletId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The outlet this till stands in (CHG-CSP-006)."
-   },
-   "cashDrawerLimit": {
-    "oneOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "nullable": true,
-    "description": "This till's drawer limit; null inherits `VenueSettings.cashDrawerLimit` (DEC-179; CHG-CSP-016)."
-   },
-   "departmentId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "accessPointId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "devices": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/DeviceBinding"
-    }
-   },
-   "deploymentProfile": {
-    "$ref": "#/components/schemas/DeploymentProfile"
-   },
-   "edgeNodeId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "isActive": {
-    "type": "boolean",
-    "default": true
-   }
-  }
- },
- "DeploymentProfile": {
-  "type": "string",
-  "description": "How this workstation obtains catalogue and inventory (ADR-0013).\n- `terminalLocal` — own SQLite, leases direct from the cell. Small venues, 4G sites - `venueEdge` — own SQLite, distributed via the venue edge node which holds the\n  venue lease and sub-leases to terminals. Mid and large venues, stadium gates\n- `thin` — no local catalogue, server reads. Non-transactional surfaces only\n",
-  "enum": [
-   "terminalLocal",
-   "venueEdge",
-   "thin"
-  ]
- },
- "DeviceBinding": {
-  "x-ticvai-persistence": "platform.device",
-  "type": "object",
-  "description": "A device as its workstation is configured with it. **Binding a device here moves its row to the workstation's scope**: `platform.device.scope_path` becomes the workstation's path, so the device's own session, scoped to that workstation, can write its heartbeat (ADAM CR-095, CHG-RSF-001).\n\n**A registered device linked to the workstation** (ADAM CR-155, option A, 18 October 2026; CHG-CRA-004). `deviceId` names an existing `platform.device` (registered by `registerDevice`); in `configureWorkstation` it is what links the device (`platform.device.workstation_id`, `isRequired`). `kind`, `driver` and `identifier` are the device's own record, returned on `Workstation.devices`; a request's values for them are not written.",
-  "required": [
-   "kind",
-   "driver"
-  ],
-  "properties": {
-   "deviceId": {
-    "type": "string",
-    "format": "uuid",
-    "x-ticvai-column": "id",
-    "description": "**The registered device** (CR-155): the `platform.device` row's own id. Every item `configureWorkstation` is sent names one; an item without one, or naming no registered device of this tenant, is `422 unknown-device`."
-   },
-   "kind": {
-    "$ref": "#/components/schemas/DeviceKind"
-   },
-   "driver": {
-    "type": "string",
-    "description": "Driver identifier. Adding a vendor is a driver plus configuration, never a core change — every venue arrives with hardware not previously seen.\n"
-   },
-   "identifier": {
-    "type": "string",
-    "description": "Serial",
-    "port or network address.": null
-   },
-   "isRequired": {
-    "type": "boolean",
-    "default": false,
-    "description": "When true, the workstation refuses to open a shift if the device is absent.\n"
    }
   }
  },
@@ -1078,15 +895,6 @@
    }
   }
  },
- "SaleBoardKind": {
-  "type": "string",
-  "enum": [
-   "ticketing",
-   "fnb",
-   "retail",
-   "mixed"
-  ]
- },
  "SetPriceRequest": {
   "type": "object",
   "required": [
@@ -1107,6 +915,35 @@
    }
   }
  },
+ "VenueOpeningHours": {
+  "type": "object",
+  "x-ticvai-persistence": "none — jsonb column of platform.venue_settings (opening_hours)",
+  "additionalProperties": false,
+  "description": "**A venue's opening hours by weekday** (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): one entry per weekday, local `HH:MM` in the venue's region time zone. A day left out or null is closed. `TenantAppStatus.venues[].openingHoursToday` is today's entry.\n",
+  "properties": {
+   "mon": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "tue": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "wed": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "thu": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "fri": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "sat": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "sun": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   }
+  }
+ },
  "VenueSettings": {
   "x-ticvai-retired-columns": [
    "org_unit_id"
@@ -1123,6 +960,21 @@
     ],
     "nullable": true,
     "description": "**How a guest reaches this venue** (R8 blocker WHITE-C16, the storage-sat lane's request 5; CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the venue settings write and read by White-Label's getTenantAppStatus through tenancy#venueSettingsRecords. Null means the tenant's contact is shown."
+   },
+   "city": {
+    "type": "string",
+    "maxLength": 120,
+    "nullable": true,
+    "description": "**The venue's city, shown under its name in the guest venue list** (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): `platform.venue_settings.city`, written by the venue settings write and read by White-Label's getTenantAppStatus (`TenantAppStatus.venues[].city`) through tenancy#venueSettingsRecords. Null when not set."
+   },
+   "openingHours": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/VenueOpeningHours"
+     }
+    ],
+    "nullable": true,
+    "description": "**The venue's opening hours by weekday** (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): `platform.venue_settings.opening_hours`, one jsonb column, written by the venue settings write and read by White-Label's getTenantAppStatus for `TenantAppStatus.venues[].openingHoursToday` through tenancy#venueSettingsRecords. Null when not set."
    },
    "id": {
     "type": "string",
@@ -1776,200 +1628,6 @@
       }
      }
     }
-   }
-  }
- },
- "Workstation": {
-  "x-ticvai-retired-columns": [
-   "org_unit_id"
-  ],
-  "x-ticvai-persistence": "platform.workstation",
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "name",
-   "venueId",
-   "regionId",
-   "scopePath",
-   "saleBoard",
-   "currency",
-   "currencyScale",
-   "timeZone"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string",
-    "maxLength": 64
-   },
-   "name": {
-    "type": "string",
-    "maxLength": 200
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "regionId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "departmentId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "outletId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "**The outlet this till stands in** (CHG-CSP-006). Its board is the till's board unless the till overrides it. Null on a workstation that belongs to no outlet (a ticket office counter set up before outlets), which must then carry its own board.\n"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "saleBoard": {
-    "type": "object",
-    "x-ticvai-column-nullable": true,
-    "description": "Determines which front end loads. Bound to the workstation, not the role — the F&B terminal opens the F&B board. What the operator may then DO within it is governed by their permissions.\n**The effective board** since 2 October 2026 (DEC-183; CHG-CSP-006): the till's own when it overrides the outlet, otherwise the outlet's (`saleBoardSource`).\n**Resolved on read, never copied** (decided 20 October 2026, Chinmay, R8 blocker cause APPROVALS-TENANCY-C39, option A; CHG-R8SPN-013). `platform.workstation.sale_board` holds only this till's own override and is null when `saleBoardSource` is `outlet`. `getWorkstation`, `listWorkstations` and `configureWorkstation`'s answer build `saleBoard` from the override when there is one, otherwise from the outlet's `platform.outlet.sale_board_id` and that `platform.sale_board` row (its id, kind and name). So `updateOutlet` and `updateSaleBoard` change what every inheriting till shows with no write to `platform.workstation`, and no stored copy can go stale.\n",
-    "required": [
-     "id",
-     "kind"
-    ],
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "kind": {
-      "$ref": "#/components/schemas/SaleBoardKind"
-     },
-     "name": {
-      "type": "string"
-     }
-    }
-   },
-   "saleBoardSource": {
-    "type": "string",
-    "enum": [
-     "outlet",
-     "workstation"
-    ],
-    "readOnly": true,
-    "description": "**Where `saleBoard` came from** (decided 2 October 2026, Chinmay, BO-109: \"Per outlet, with a till override\"; DEC-183; CHG-CSP-006): `outlet` when the till uses its outlet's layout, `workstation` when this till overrides it. BO-109 shows which tills differ from their outlet.\n"
-   },
-   "cashDrawerLimit": {
-    "x-ticvai-column": "deposit_box_limit_amount",
-    "oneOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "nullable": true,
-    "description": "**This till's drawer limit, overriding the venue's** (`VenueSettings.cashDrawerLimit`; DEC-179; CHG-CSP-016). Null inherits the venue's. Above it the till warns and offers a cash lift.\n"
-   },
-   "cashierInputMode": {
-    "type": "string",
-    "enum": [
-     "keyboard",
-     "touch",
-     "scanner",
-     "hybrid"
-    ],
-    "default": "hybrid",
-    "description": "BL-061. **How the cashier at this till enters a sale**, as `configureWorkstation` set it. Stored on the workstation and returned here since 14 October 2026 (ADAM CR-082; CHG-TEN-003): until then the request took it and nothing kept it.\n"
-   },
-   "guestDisplayContent": {
-    "type": "array",
-    "default": [
-     "lineItems"
-    ],
-    "description": "BL-061. **What the guest-facing screen shows while a sale is in progress**, as `configureWorkstation` set it. Stored on the workstation and returned here since 14 October 2026 (ADAM CR-082; CHG-TEN-003).\n",
-    "items": {
-     "type": "string",
-     "enum": [
-      "lineItems",
-      "total",
-      "loyaltyBalance",
-      "promotions",
-      "branding",
-      "upsell",
-      "queuePosition"
-     ]
-    }
-   },
-   "accessPointId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Inherited from the workstation, never selected by the operator. Null where the workstation is not at an access point.\n"
-   },
-   "devices": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/DeviceBinding"
-    }
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$",
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"
-   },
-   "currencyScale": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 4,
-    "x-ticvai-persisted": false,
-    "description": "**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"
-   },
-   "timeZone": {
-    "type": "string"
-   },
-   "deploymentProfile": {
-    "$ref": "#/components/schemas/DeploymentProfile"
-   },
-   "edgeNodeId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Present when `deploymentProfile` is `venueEdge`."
-   },
-   "healthScore": {
-    "type": "integer",
-    "nullable": true,
-    "minimum": 0,
-    "maximum": 100,
-    "readOnly": true,
-    "description": "Board 1 of the client's POS set. **A number a manager can sort by** — the package held `lastHeartbeatAt` and a heartbeat timestamp is not a score.\nThe client's board shows 1,248 workstations at 96% healthy, and **the value of that figure is that it ranks**: a fleet dashboard exists so somebody can open the worst one first.\n**Derived from its devices, its heartbeat age, its firmware currency and its error rate.** Read-only, because a workstation that could set its own score would.\n**The formula, proposed, client to correct (audit R096 (2)):** score = 40% device online share (the share of its devices reporting online) + 25% heartbeat freshness (100 at one minute old or less, 0 at 15 minutes or more, linear between) + 20% firmware and profile currency (100 on the latest, 50 one version behind, 0 older) + 15% error rate (100 at 0 errors an hour, 0 at 10 or more, linear between), rounded to a whole number. **Below 80 is a warning and below 60 a failure.** The exact rules (whose heartbeat, which firmware is the latest, what profile currency compares, the error term until the heartbeat series lands, a workstation with no devices, the bands and the contributors) are `getWorkstationHealth`'s, the one place the score is defined (ADAM CR-244, 26 October 2026).\n"
-   },
-   "configurationProfileId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "x-ticvai-references": "platform.configuration_profile",
-    "x-ticvai-references-version": "configurationProfileVersion",
-    "description": "Which profile this workstation runs, and at which version. **The client's board shows a fleet split four ways — 72% latest, 18.8% one behind, 6.1% outdated** — and the package had a firmware version field and no profile.\n**A profile is what a venue changes; a version is what it deploys.** Conflating them means a venue cannot say *roll the ticketing counters back and leave the kiosks*.\n"
-   },
-   "configurationProfileVersion": {
-    "type": "integer",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The version of `configurationProfileId` this workstation runs, written when a deployment reaches it; null with no profile (R8 blocker APPROVALS-TENANCY-C08, CHG-R8MIG-019)."
-   },
-   "catalogueState": {
-    "$ref": "#/components/schemas/CatalogueState"
-   },
-   "offlineCapable": {
-    "type": "boolean",
-    "description": "Derived from `deploymentProfile`. False only for `thin`. Under local-first, catalogue READS are always local on transactional surfaces; this flag governs whether WRITES can be queued.\n"
-   },
-   "isActive": {
-    "type": "boolean"
    }
   }
  }

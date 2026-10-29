@@ -491,9 +491,12 @@ def op10_problems():
 # assignment that follows. The server script cannot be run here, so its source is held to these lines, as OP10_FORBIDDEN
 # holds it to what OpenProject 10 can run; tools/tests/test_op_release.py proves a reopen without the guard is caught.
 HOLD_REQUIRED = [
-    (re.compile(r"^\s*reopen\s*=\s*tickets\b.*status_hold.*&&\s*!held_keys\.include\?\(t\[\"key\"\]\)"),
+    (re.compile(r"^\s*on_hold\s*=\s*tickets\b.*status_hold.*&&\s*!held_keys\.include\?\(t\[\"key\"\]\)"),
      "the reopen of On hold plan tickets (\"Back in the plan\") does not leave out the held ones "
      "(&& !held_keys.include?(t[\"key\"])): the push would undo the lead's hold"),
+    (re.compile(r"^\s*reopen,\s*dev_held\s*=\s*on_hold\.partition\s*\{.*assigned_to_id\.nil\?"),
+     "the reopen does not leave a developer's own hold alone (only a ticket with no assignee, as a deferral leaves "
+     "it, goes back to New): the push would undo a hold such as \"Blocked by CR-298\" (r11, 29 October 2026)"),
     (re.compile(r"^\s*held_keys\s*=.*\[\"hold\"\]"), "held_keys is not built from the bundle tickets' `hold`"),
     (re.compile(r"^\s*next if held_keys\.include\?\(t\[\"key\"\]\)"),
      "the assignment (and the descriptions) do not skip held tickets: a held ticket would be given a person and a sprint"),

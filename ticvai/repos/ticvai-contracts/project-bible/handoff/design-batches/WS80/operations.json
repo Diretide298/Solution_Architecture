@@ -252,30 +252,6 @@
   "requestBody": "WalletAutoReloadSetting",
   "responds": "WalletAutoReloadSetting"
  },
- "setWalletFundingRules": {
-  "method": "PUT",
-  "path": "/wallet-funding-rules",
-  "contract": "wallet",
-  "summary": "Amounts, channels, bonuses, limits and velocity",
-  "permission": "WALLET_CONFIGURE",
-  "offlineCapable": null,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "WalletFundingRules",
-  "responds": "WalletFundingRules"
- },
  "settleWalletAtExit": {
   "method": "POST",
   "path": "/wallets/{walletId}/exit-settlement",

@@ -567,25 +567,6 @@
   "requestBody": "CommunicationPreferenceMarketingPermissionConfiguratInput",
   "responds": "CommunicationPreferenceMarketingPermissionConfiguratView"
  },
- "setConsentPurposes": {
-  "method": "PUT",
-  "path": "/consent-purposes",
-  "contract": "marketing-crm",
-  "summary": "Configure consent purposes",
-  "permission": "GUEST_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ConsentPurposeConfig"
- },
  "setDataDiscoveryAccess": {
   "method": "PUT",
   "path": "/data-discovery-access",

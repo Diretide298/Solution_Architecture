@@ -74,7 +74,8 @@ python3 tools/derive-schema-roots.py
 python3 tools/derive-write-decisions.py
 python3 tools/derive-frontend.py
 python3 tools/derive-board-panel-map.py
-python3 tools/derive-diagrams.py
+# derive-diagrams moved below link-screens-contracts (P-31): it reads the screens, flows and contracts the steps between
+# here and there still write.
 # **Before the workbook, because the workbook asks it what changed.** What was "new" used to
 # be a set literal typed on 14 August — still blue five weeks later while the schema went from
 # 378 tables to 556, so 178 arrived and none was marked. This records when each table was first
@@ -194,6 +195,15 @@ python3 tools/derive-subject-data-register.py
 # it, and also means a stale register fails the package for a screen that is perfectly fine.
 python3 tools/derive-id-register.py --apply
 python3 tools/link-screens-contracts.py
+# **The diagrams, after the last step that writes what they draw** (P-31, 29 October 2026, CHG-R11DES-002). derive-diagrams
+# reads screens/P*.yaml, flows/, contracts/, states/, events/, docs/adr/ and the lineage, schema reference and service
+# decomposition. It ran after derive-board-panel-map, before derive-board-flows, derive-transitions-from-flows,
+# label-launcher-edges, derive-entrystate-params, derive-carries-from-entrystate, derive-components,
+# derive-screen-wiring, derive-board-anchors, derive-state-views and link-screens-contracts had written the screens
+# and contracts, so every refresh drew the previous run's screens: on r10 a second rebuild changed P01 and P02 by four
+# lines, fixed by hand in cd306cce. Nothing between there and here reads diagrams/ (only derive-mirrors, at the end).
+# check-regenerate-twice --chain runs it last, so a diagram a second regeneration would change fails the gate.
+python3 tools/derive-diagrams.py
 # **Both of these were hand-written documents until 19 September, and both had drifted by a
 # factor of three.** `api-list.md` claimed 581 operations against 1,974 and carried a
 # published/specified status key that stopped meaning anything once the contracts became the

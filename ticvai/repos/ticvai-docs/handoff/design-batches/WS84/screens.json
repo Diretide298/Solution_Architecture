@@ -118,6 +118,7 @@
       {
        "kind": "searchField",
        "label": "Search card lifecycle",
+       "operation": "getGameCard",
        "provenance": "pack Game_and_Ride_Module.pdf, page 64 §Filters"
       },
       {
@@ -195,7 +196,7 @@
    {
     "operationId": "getGameCard",
     "contract": "games",
-    "purpose": "Cards in circulation",
+    "purpose": "Find a card by its code and show its balances and status",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
    }

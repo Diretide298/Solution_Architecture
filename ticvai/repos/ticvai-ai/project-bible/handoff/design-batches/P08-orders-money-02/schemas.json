@@ -2825,6 +2825,40 @@
     "default": "sendFirst",
     "description": "Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004)."
    },
+   "orderNumberPrefix": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 1,
+    "enum": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E",
+     "F",
+     "G",
+     "H",
+     "I",
+     "J",
+     "K",
+     "L",
+     "M",
+     "N",
+     "O",
+     "P",
+     "Q",
+     "R",
+     "S",
+     "T",
+     "U",
+     "V",
+     "W",
+     "X",
+     "Y",
+     "Z"
+    ],
+    "description": "**The one letter this outlet's F&B order numbers start with** (ADAM CR-293 (2), option A, 29 October 2026; CHG-R11TEN-003): one capital letter A to Z, or null for none. `createFnbOrder` numbers an outlet's orders `A-042` (the prefix, a hyphen and three digits from the outlet's daily counter, CR-277 (3)), or `042` where the outlet has no prefix. Written by `createOutlet` and `updateOutlet`, returned by `tenancy#outletRecords`, which `createFnbOrder` reads in process (XDR-004).\n"
+   },
    "admissionContext": {
     "allOf": [
      {
@@ -3464,6 +3498,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
+    "x-ticvai-references": "catalogue.event",
     "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
    },
    "createdAt": {
@@ -5479,6 +5514,35 @@
    }
   }
  },
+ "VenueOpeningHours": {
+  "type": "object",
+  "x-ticvai-persistence": "none — jsonb column of platform.venue_settings (opening_hours)",
+  "additionalProperties": false,
+  "description": "**A venue's opening hours by weekday** (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): one entry per weekday, local `HH:MM` in the venue's region time zone. A day left out or null is closed. `TenantAppStatus.venues[].openingHoursToday` is today's entry.\n",
+  "properties": {
+   "mon": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "tue": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "wed": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "thu": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "fri": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "sat": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "sun": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   }
+  }
+ },
  "VenueSettings": {
   "x-ticvai-retired-columns": [
    "org_unit_id"
@@ -5495,6 +5559,21 @@
     ],
     "nullable": true,
     "description": "**How a guest reaches this venue** (R8 blocker WHITE-C16, the storage-sat lane's request 5; CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the venue settings write and read by White-Label's getTenantAppStatus through tenancy#venueSettingsRecords. Null means the tenant's contact is shown."
+   },
+   "city": {
+    "type": "string",
+    "maxLength": 120,
+    "nullable": true,
+    "description": "**The venue's city, shown under its name in the guest venue list** (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): `platform.venue_settings.city`, written by the venue settings write and read by White-Label's getTenantAppStatus (`TenantAppStatus.venues[].city`) through tenancy#venueSettingsRecords. Null when not set."
+   },
+   "openingHours": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/VenueOpeningHours"
+     }
+    ],
+    "nullable": true,
+    "description": "**The venue's opening hours by weekday** (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): `platform.venue_settings.opening_hours`, one jsonb column, written by the venue settings write and read by White-Label's getTenantAppStatus for `TenantAppStatus.venues[].openingHoursToday` through tenancy#venueSettingsRecords. Null when not set."
    },
    "id": {
     "type": "string",

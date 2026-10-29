@@ -852,7 +852,7 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.funding_rule
-  columns: 13
+  columns: 14
   store: postgres
   parent: wallet.wallet_type
   writtenBy:
@@ -887,7 +887,7 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.refund_policy
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -1045,7 +1045,6 @@ screens:
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-005 Payment
 - P08:ADM-604 Stored Value, Gift Card & Voucher Tender Controls
-- P08:ADM-612 Refund Allocation & Original Tender Manager
 - P08:BO-1083 Wallet Command Center
 - P08:BO-1084 Wallet Type Library
 - P08:BO-1085 Wallet Creation & Provisioning Rules
@@ -1109,7 +1108,6 @@ screens:
 - P08:BO-1144 Peer-to-Peer Transfer Configuration
 - P08:BO-1145 Transfer Eligibility, Limits & Approval Rules
 - P08:BO-1146 Refund-to-Wallet Policy Configuration
-- P08:BO-1147 Refund Routing & Credit Restoration Engine
 - P08:BO-1148 Reversal & Transaction Correction Management
 - P08:BO-1149 Administrative Balance Adjustment Studio
 - P08:BO-1150 Wallet Block, Freeze & Restriction Management

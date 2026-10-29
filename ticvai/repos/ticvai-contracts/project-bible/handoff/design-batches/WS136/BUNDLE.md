@@ -1,6 +1,6 @@
 # WS136 — Marketing CRM Configuration Reference v1.0 board 2
 
-**10 screens · 25 operations · 29 schemas · 8 permissions**
+**10 screens · 24 operations · 29 schemas · 8 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-744` | Data Governance Center | D | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-745` | Identity Resolution Rules | D | 2 | 3 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-746` | Duplicate Review & Merge | D | 0 | 18 | 6 | 0 | 4 | 2 | — | notStarted (—) |
-| `BO-747` | Consent Policy Configuration | D | 25 | 31 | 6 | 76 | 1 | 4 | — | notStarted (—) |
+| `BO-747` | Consent Policy Configuration | D | 25 | 31 | 6 | 75 | 1 | 4 | — | notStarted (—) |
 | `BO-748` | Consent Capture & Versions | D | 0 | 7 | 6 | 10 | 0 | 4 | — | notStarted (—) |
 | `BO-749` | Guest Preference Center | D | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-750` | Data Subject Requests | D | 17 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -116,7 +116,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**BO-744, BO-746, BO-748, BO-749, BO-751, BO-752, BO-753 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**BO-744, BO-746, BO-747, BO-748, BO-749, BO-751, BO-752, BO-753 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -621,14 +621,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
 | Block | Block D · task VM-BO-747 |
-| Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW`, `MARKETING_MANAGE`, `MARKETING_VIEW` (2 configure, 2 read); in the flows as venue manager |
+| Who uses it | venue staff holding `GUEST_VIEW`, `MARKETING_MANAGE`, `MARKETING_VIEW` (2 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/engagement-support/consent-policy-configuration-bo-747` |
 
-**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
+**Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built. Removed 29 October 2026 (CHG-R11FXU-006, the lead: "Remove + log text"): a board reading of 19 September declared it, and nothing on the approved screen sends it: its Save consent purposes and Cancel …
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The legal and operational rules of consent: purposes, marketing categories, channels (email, SMS, WhatsApp, push, post), lawful basis, age and guardian requirements, capture channels, expiry, renewal and enforcement. Guests who have not opted in must not receive promotional communications.
 
@@ -730,8 +730,6 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save consent purposes (primary button) | navigation or local | — | — | — | — |
-| Cancel (secondary button) | navigation or local | — | — | — | — |
 | New consent form (primary button) | `createForm` POST `/forms` | FormDefinition | FormDefinition | — | opens modal first |
 
 **Data it reads**: `listConsentPurposes` (onLoad, Purposes and lawful bases); `listForms` (onLoad, The venue's consent forms)
@@ -774,7 +772,6 @@ purposes:
 #### Permissions
 
 - `listConsentPurposes` → `GUEST_VIEW` (read) · staff, guest
-- `setConsentPurposes` → `GUEST_MANAGE` (configure) · staff
 - `createForm` → `MARKETING_MANAGE` (configure) · staff
 - `listForms` → `MARKETING_VIEW` (read) · staff
 
@@ -784,11 +781,10 @@ Screen guard: `GUEST_VIEW`
 
 #### Requirements it meets
 
-76 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+75 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 22.13.7 | Consent Expiration Management | Marketing & CRM | CONTRACTED | `setConsentPurposes` |
 | 2.1.13 | The system should provide the ability to capture configurable survey data. e.g. nationality, residency, guest type (individual, group, ...) in the POS and self-service kiosks. The survey should be … | Ticketing Sales | CONTRACTED | data `FormDefinition` |
 | 2.5.3 | The system should collect demographic data about guests and transfer to Guest 360 (CRM) through API integration. The data to be collected should be configurable. | Ticketing Sales | CONTRACTED | data `FormDefinition` |
 | 2.7.22 | It is expected to have the Reseller collecting the Guest information to be filled in online in order for FE to retrieve them. | Ticketing Sales | CONTRACTED | data `FormDefinition` |
@@ -800,7 +796,8 @@ Screen guard: `GUEST_VIEW`
 | 2.12.9 | The system should allow the selection of the data entry personnel for the required parameters. I.e. which field should be entered by the venue (client) user and which fields should be completed by … | Ticketing Sales | CONTRACTED | data `FormDefinition` |
 | 2.12.10 | The system should provide the ability to capture configurable survey data from the guests. The survey can be configured to appear in the different points of the purchase journey. | Ticketing Sales | CONTRACTED | data `FormDefinition` |
 | 2.12.20 | Annual Pass Products 1) Customers must first fill in personal information via the annual pass registration page or can go to the ticket counter onsite to purchase Annual Pass Ticket 2) At the … | Ticketing Sales | CONTRACTED | data `FormDefinition` |
-| … 64 more | | | | `traceability.json` |
+| 2.12.31 | On the order, it must be possible to register: • The customer • the PLU, • the visit date, • the number of guests, • guest information (name, email, phone, address) which is configurable by the … | Ticketing Sales | CONTRACTED | data `FormDefinition` |
+| … 63 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -830,9 +827,9 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every input above is drawn (25), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-747?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Save consent purposes, Cancel, New consent form.
+- [ ] Every action is wired with its success and its failure: New consent form.
 - [ ] Every transition is wired: `BO-744`.
-- [ ] Every gated control is gated: `GUEST_MANAGE`, `GUEST_VIEW`, `MARKETING_MANAGE`, `MARKETING_VIEW`.
+- [ ] Every gated control is gated: `GUEST_VIEW`, `MARKETING_MANAGE`, `MARKETING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1885,7 +1882,6 @@ Method, path, parameters, request and response for every operation these screens
 "recordPrivacyIncident": {"method":"POST","path":"/privacy-incidents","contract":"marketing-crm","summary":"Log a personal-data breach and start the clock","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PrivacyIncident","responds":"PrivacyIncident"},
 "runDataRetention": {"method":"POST","path":"/retention-runs","contract":"marketing-crm","summary":"Preview or execute a retention pass","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"RetentionRunResult"},
 "setCommunicationPreferenceMarketing": {"method":"PUT","path":"/communication-preference-marketing","contract":"marketing-crm","summary":"Communication Preference & Marketing Permission Configuration","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CommunicationPreferenceMarketingPermissionConfiguratInput","responds":"CommunicationPreferenceMarketingPermissionConfiguratView"},
-"setConsentPurposes": {"method":"PUT","path":"/consent-purposes","contract":"marketing-crm","summary":"Configure consent purposes","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ConsentPurposeConfig"},
 "setDataDiscoveryAccess": {"method":"PUT","path":"/data-discovery-access","contract":"marketing-crm","summary":"Data Discovery, Access, Export & Correction Workspace","permission":"GUEST_VIEW_PII","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"DataDiscoveryAccessExportCorrectionWorkspaceInput","responds":"DataDiscoveryAccessExportCorrectionWorkspaceView"},
 "setDataRetentionSetting": {"method":"PUT","path":"/data-retention-settings/{dataClass}","contract":"tenancy","summary":"Set how long the tenant keeps one class of data","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"TenantDataRetentionSetting","responds":"TenantDataRetentionSetting"},
 "setGuestMatchPolicy": {"method":"PUT","path":"/guest-match-policy","contract":"marketing-crm","summary":"Set how returning guests are recognised","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"GuestMatchPolicy","responds":"GuestMatchPolicy"},

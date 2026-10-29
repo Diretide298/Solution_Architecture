@@ -176,7 +176,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `WEB-016` | Login / Register | A | 36 | 6 | 6 | 15 | 11 | 0 | guest | review (client-verified) |
-| `WEB-017` | My Account Dashboard | A | 3 | 78 | 6 | 56 | 1 | 0 | guest | review (client-verified) |
+| `WEB-017` | My Account Dashboard | A | 3 | 63 | 6 | 58 | 1 | 0 | guest | review (client-verified) |
 | `WEB-018` | My Tickets | A | 11 | 38 | 6 | 8 | 8 | 0 | guest | review (client-verified) |
 | `WEB-019` | Order History | A | 15 | 74 | 6 | 16 | 2 | 0 | guest | review (client-verified) |
 | `WEB-020` | Profile & Preferences | A | 17 | 48 | 6 | 14 | 0 | 0 | guest | review (client-verified) |

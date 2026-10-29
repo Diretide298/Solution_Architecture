@@ -66,7 +66,7 @@
 | `KSK-012` | Booking found | Sell | 2 | 1 | yes |
 | `KSK-013` | Call staff | Sell | 2 | 3 | yes |
 | `KSK-014` | Out of service | Sell | 2 | 2 | yes |
-| `KSK-015` | Assistant | AI | 1 | 6 | yes |
+| `KSK-015` | Assistant | AI | 1 | 7 | yes |
 | `KSK-016` | Order Food | Sell | 2 | 2 | yes |
 | `KSK-017` | Shop | Sell | 2 | 4 | yes |
 

@@ -119,7 +119,7 @@
 | `GST-047` | Maintenance / Upgrade Page | System States | 1 | 2 | yes |
 | `GST-048` | Upsell / Cross-Sell | Booking & Selection | 1 | 5 | yes |
 | `GST-049` | Interactive Seat Selection | Booking & Selection | 1 | 6 | yes |
-| `GST-050` | Resource Booking – Cabana | Booking & Selection | 1 | 4 | yes |
+| `GST-050` | Resource Booking – Cabana | Booking & Selection | 1 | 5 | yes |
 | `GST-051` | Plan | Engagement & Support | 1 | 4 | yes |
 | `GST-052` | Suggested Itineraries | Engagement & Support | 1 | 2 | yes |
 | `GST-053` | Your Plan | Engagement & Support | 1 | 5 | yes |

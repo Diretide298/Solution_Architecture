@@ -2193,14 +2193,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Tenants</b><span>184</span></div><div class="kpi"><b>Cells</b><span>3</span></div><div class="kpi"><b>Incidents</b><span>2</span></div><div class="kpi"><b>Releases</b><span>11</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Create tenant</b><div class="chip cta">Create tenant</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>Provisioning progress</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Create tenant</b><div class="chip cta">Create tenant</div><span class="why">Opens ADM-420 on its Create tenant form, which calls `createTenant` (the lead, 29 October 2026, &quot;Open ADM-420&quot;; CHG-R11FXT-008). This screen submits nothing its</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">Leaves the screen for the Platform Dashboard (ADM-002); nothing is sent.</span></div><div class="panel"><b>Provisioning progress</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createTenant · listCellJobs</div>
+          <div><b>OPERATIONS</b> &middot; listCellJobs</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; cellId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; cellId&larr;navigation, tenantId&larr;navigation, regionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Back to Platform Dashboard</i><br><a href="#adm-420">ADM-420</a>  &mdash; <i>Tenant &amp; Organization Provisioning</i> <span class="car">tenantId</span><br><a href="#adm-421">ADM-421</a>  &mdash; <i>Venue &amp; Operational Structure Creation</i> <span class="car">tenantId</span><br><a href="#adm-422">ADM-422</a>  &mdash; <i>Administrator &amp; Security Initialization</i><br><a href="#adm-423">ADM-423</a>  &mdash; <i>License &amp; Entitlement Activation</i><br><a href="#adm-424">ADM-424</a>  &mdash; <i>Module Activation &amp; Dependency Validation</i> <span class="car">tenantId</span><br><a href="#adm-425">ADM-425</a>  &mdash; <i>Venue Template Application</i> <span class="car">tenantId</span><br><a href="#adm-426">ADM-426</a>  &mdash; <i>Initial Configuration &amp; Regional Defaults</i> <span class="car">regionId · tenantId</span><br><a href="#adm-427">ADM-427</a>  &mdash; <i>Provisioning Validation &amp; Exception Manageme</i></div>
           
           
@@ -2231,9 +2231,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; createOrgUnit · createTenant · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#adm-419">ADM-419</a>  &mdash; <i>Back to Provisioning Command Center</i> <span class="car">cellId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-419">ADM-419</a>  &mdash; <i>Back to Provisioning Command Center</i> <span class="car">cellId · tenantId · regionId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateTenant &middot; <i>Create tenant</i> &middot; <b>Create tenant</b> &middot; Cancel</div><div class="ov"><b>modal</b> formOpenPlatformStaffGrant &middot; <i>Open access grant</i> &middot; <b>Open access grant</b> &middot; Cancel <span class="dis">discards permissions · reason · ticketRef · expiresAt</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateTenant &middot; <i>Create tenant</i> &middot; <b>Create tenant</b> &middot; Cancel <span class="dis">discards code · name · billingEmail · billingAddress · accountManagerPrincipalId · planId</span></div><div class="ov"><b>modal</b> formOpenPlatformStaffGrant &middot; <i>Open access grant</i> &middot; <b>Open access grant</b> &middot; Cancel <span class="dis">discards permissions · reason · ticketRef · expiresAt</span></div></div>
         </div>
       </div>
       <div id="adm-421" class="scr" data-ws="WS103">
@@ -2441,7 +2441,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getGoLiveReadiness</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#adm-419">ADM-419</a>  &mdash; <i>Back to Provisioning Command Center</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-419">ADM-419</a>  &mdash; <i>Back to Provisioning Command Center</i> <span class="car">tenantId</span></div>
           
           
         </div>

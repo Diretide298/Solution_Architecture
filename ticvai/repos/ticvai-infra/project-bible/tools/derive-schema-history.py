@@ -88,6 +88,12 @@ RENAMES = [
     # rows across and drops control.content_block.
     # CHG-R8MIG-018 (R8 blocker APPROVALS-TENANCY-C10, the lead's answer A): a cell's endpoints are a control-plane fact,
     # moved to the control database as CR-150 moved the plan catalogue.
+    # CHG-CR317-001 (ADAM CR-317, option A, decided 29 October 2026): SEO metadata is a tenant's own configuration
+    # about entities in its own database, written at tenant scope by Marketing. A move between databases the way
+    # control.content_block went: the tenant forward migration creates marketing.seo_metadata, and the control review
+    # row copies each tenant's rows across and drops control.seo_metadata.
+    {"from": "control.seo_metadata", "to": "marketing.seo_metadata", "on": "2026-10-29",
+     "why": "CR-317: a tenant's own SEO configuration about entities in its own database, written by Marketing in the tenant's transaction; it sat in the shared control database, Platform's, with no write route"},
     {"from": "platform.cell_endpoint", "to": "control.cell_endpoint", "on": "2026-10-20",
      "why": "APPROVALS-TENANCY-C10: about a cell, not inside a tenant; the control plane writes it at provisioning"},
     {"from": "control.content_block", "to": "whitelabel.content_block", "on": "2026-10-20",

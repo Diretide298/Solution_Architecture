@@ -169,7 +169,8 @@
    },
    "scopePath": {
     "type": "string",
-    "readOnly": true
+    "readOnly": true,
+    "description": "The device's own `platform.device.scope_path`, set by the server on every write (ADAM CR-278, option A, 28 October 2026; CHG-R11TEN-005), so whoever can change the device can change who holds it. Never the `locationScopePath` or the assigned workstation's path."
    }
   }
  },
@@ -237,94 +238,6 @@
       "nullable": true
      }
     }
-   }
-  }
- },
- "DeviceFirmware": {
-  "type": "object",
-  "x-ticvai-persistence": "tenancy.device_firmware",
-  "x-ticvai-rls": "read-beneath",
-  "description": "16.6.30 and 16.6.32. **A release, and how much of the fleet is on it.** Written by `createDeviceFirmware` and moved through its life by `setDeviceFirmwareStatus` (29 September, build pass); `startDeviceFirmwareRollout` deploys only a `released` one.\n",
-  "required": [
-   "deviceKind",
-   "version"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "deviceKind": {
-    "type": "string"
-   },
-   "version": {
-    "readOnly": true,
-    "type": "string"
-   },
-   "vendor": {
-    "type": "string",
-    "nullable": true,
-    "description": "Who built the image, as the device's driver names its maker."
-   },
-   "checksumAlgorithm": {
-    "type": "string",
-    "enum": [
-     "sha256",
-     "sha512"
-    ],
-    "default": "sha256"
-   },
-   "releaseNotes": {
-    "type": "string",
-    "nullable": true
-   },
-   "artefactAssetId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "checksum": {
-    "type": "string",
-    "nullable": true
-   },
-   "minimumPreviousVersion": {
-    "type": "string",
-    "nullable": true,
-    "description": "**Some updates cannot be applied from any starting point.** Naming the floor is how a two-step upgrade stays possible instead of bricking the devices that skipped one.\n"
-   },
-   "releasedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true,
-    "description": "Set when `setDeviceFirmwareStatus` first makes the release `released`."
-   },
-   "installedCount": {
-    "type": "integer",
-    "readOnly": true
-   },
-   "status": {
-    "type": "string",
-    "readOnly": true,
-    "default": "draft",
-    "enum": [
-     "draft",
-     "released",
-     "deprecated",
-     "withdrawn"
-    ]
-   },
-   "statusReason": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The `reason` given when the release was deprecated or withdrawn."
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "The tenant the release belongs to. Releases are tenant-wide; rollouts narrow them."
    }
   }
  },

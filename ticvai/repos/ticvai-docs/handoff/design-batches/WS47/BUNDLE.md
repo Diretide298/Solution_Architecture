@@ -1166,7 +1166,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Distribute (primary button) | `setCodeDistributionManager` PUT `/code-distribution-manager` | CodeDistributionAssignmentManagerInput | CodeDistributionAssignmentManagerView | — | — |
+| Distribute (primary button) | `setCodeDistributionManager` PUT `/code-distribution-manager` | CodeDistributionAssignmentManagerInput | CodeDistributionAssignmentManagerView | 409 Refused, and nothing is written (ADAM CR-316). `not-enough-codes-in-batch`: the batch has fewer `issued`, unassigned codes than `quantity`; `remaining` is how … | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1188,6 +1188,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the code distribution are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRICE_VIEW`, which `listCouponCodes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `setCodeDistributionManager`. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Refused, and nothing is written (ADAM CR-316). `not-enough-codes-in-batch`: the batch has fewer `issued`, unassigned codes than `quantity`; `remaining` is how … |
 
 #### Sample data for the mock-up
 
@@ -1236,7 +1237,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (12), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (54 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-164?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Distribute.

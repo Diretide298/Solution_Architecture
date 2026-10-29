@@ -110,6 +110,32 @@ x-ticvai-queries:
       in its session registry, so its token is refused at its next request (the registry is read on every request).
       The guest''s own signed-in session is not touched.'
     served: [in-process]
+  # **Whether a person holds a role at or above a venue, as a yes or no** (ADAM CR-336, option B, decided 29 October
+  # 2026; CHG-CR336-001). createRotaAssignment and updateRotaAssignment read identity.delegated_access under the
+  # caller's venue grant, which hides a grant made above the caller's scope, so a role held at the tenant root was
+  # not found.
+  principalHoldsRoleAtVenue:
+    module: identity
+    table: identity.delegated_access
+    inputs:
+      principalId: {type: string, format: uuid, description: 'The person rostered (RotaAssignment.principalId).'}
+      roleId: {type: string, format: uuid, description: 'The role the position requires (RotaAssignment.requiredRoleId).'}
+      venueScopePath: {type: string, description: 'The scope path of the assignment''s venue (platform.scope.path of RotaAssignment.venueId), which the asker holds: the venue is within the caller''s own scope.'}
+    returns:
+      type: object
+      required: [holds]
+      properties:
+        holds: {type: boolean, description: 'True when the person holds the role at the venue or at a scope above it. Which grant, where it was made and by whom are never returned.'}
+    rule: >-
+      A rule question (ADAM CR-336, option B; Chinmay, 29 October 2026: "All as recommended"). True when an
+      identity.delegated_access row has principal_id = principalId and role_id = roleId, effect `ALLOW`, no
+      revoked_at, valid_from absent or not after now, valid_to absent or after now, and a scope_path at or above
+      the venue (scope_path @> venueScopePath). Identity answers it with one statement under the routed tenant's
+      root grant (ITenantRootGrant), so a grant made above the caller's scope is seen, and returns only `holds`;
+      the caller's own grant is in force again for every other statement of its transaction. It is asked in
+      process by createRotaAssignment and updateRotaAssignment, which refuse 409 person-lacks-required-role when
+      it is false.
+    served: [in-process]
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October). Rule questions keep queries of their own, above.
@@ -224,6 +250,8 @@ x-ticvai-queries:
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Identity implements, and asked from another
       deployable through Identity's service route (serviceAuth).
+      It is asked in process by the access host for listDeviceBindingSession's holder name, display_name and no
+      other column (ADAM CR-302, option A, 29 October 2026; XDR-010; CHG-CR302-001).
     served: [in-process, service]
   subjectBiometricRecords:
     module: identity
@@ -278,6 +306,33 @@ x-ticvai-queries:
       caller's scope lets it see them (the table's row-level security, under the caller's connection and
       transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
       own operation. It is asked in process within commerce, through the C# query interface Identity implements.
+    served: [in-process]
+  guestSignInProviders:
+    module: identity
+    table: identity.sso_provider
+    inputs:
+      guestProviders: {type: array, items: {type: string, enum: [apple, google, uaePass]}, description: 'Only these guest providers; omitted, every guest provider of the tenant.'}
+    returns:
+      type: array
+      description: 'The tenant''s enabled guest providers, one per guestProvider: provider and display data only,
+        never a secret.'
+      items:
+        type: object
+        required: [guestProvider, clientId]
+        properties:
+          guestProvider: {type: string, enum: [apple, google, uaePass]}
+          clientId: {type: string}
+          displayName: {type: string}
+          iconAssetRef: {type: string, nullable: true}
+          authorizationUrl: {type: string, format: uri, nullable: true}
+    rule: >-
+      A rule question (ADAM CR-327, part (1), Chinmay, 29 October 2026: "Kind column on sso_provider";
+      CHG-CR327-001). Identity answers with the identity.sso_provider rows of the caller's tenant whose audience is
+      guest and whose is_active is true (a null is_active counts as not active, as listSsoProviders reads it), each
+      as its guestProvider, client_id, display_name, icon_asset_ref and authorization_url. client_secret_ref, the metadata, the group
+      mappings and every staff row are never returned. It is asked in process by White-label's
+      getPublishedTenantConfig for guestSignIn, under the caller's connection and the table's row-level security
+      (XDR-021).
     served: [in-process]
 paths:
   /internal/step-up/verify:
@@ -1380,10 +1435,17 @@ paths:
         kept by hand: a table holds a guest''s data when its declared storage has a `subject_id` column, and
         `handoff/subject-data-register.json` (derived each refresh by `tools/derive-subject-data-register.py`, r8 cause
         IDENTITY-C65, CHG-R8GEN-015) lists every such table under the module that owns it, so a new table joins the
-        export by its own column. Identity reads its own tables directly; every other owner answers through its
-        `subjectDataRecords(subjectId)` query, which this operation asks in turn as each owner declares it. Until an
-        owner has declared it, the export assembles that owner''s data from what the lineage lists for this operation
-        today.
+        export by its own column. Identity reads its own tables directly; every owner above Identity writes its own part of the export, as Marketing does
+        (below; CHG-R11FXC-005).
+
+
+        **Marketing adds its part; Identity assembles the parts** (the lead, 29 October 2026, r11 gate; CHG-R11FXC-005).
+        Identity is Foundation and reads nothing above it (ADR-0028), so the export reads no Marketing table: on the
+        `identity.privacyRequestRaised` this call emits, Marketing writes the guest''s consent records, guest profile,
+        form submissions and guest documents as its own part (`writeSubjectDataExportPart`) and says so by
+        `marketing.subjectDataPartWritten`, which `recordSubjectDataExportPart` records as a `SubjectDataExportPart`.
+        The job assembles the file from Identity''s own tables, its projections and the recorded parts, and runs once
+        every owner''s part is recorded; it deletes the parts'' objects with the export.
 
 
         **An erased guest** (CR-101). A subject whose `pii.subject` row is tombstoned (`is_erased` true) is answered
@@ -1483,6 +1545,79 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /guest-data-export-parts:
+    post:
+      operationId: recordSubjectDataExportPart
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-agreed: '29 October 2026: the lead, r11 gate (check-cross-module-reads on exportSubjectData, started
+        ticket #27745): Marketing adds its part, Identity assembles the parts (CHG-R11FXC-005)'
+      summary: Record an owner's part of a guest's data export
+      description: '**Identity''s `marketing.subjectDataPartWritten` consumer** (the lead, 29 October 2026, r11 gate;
+        CHG-R11FXC-005). Records the part against its export (`SubjectDataExportPart`), keyed by the export and the
+        owner. The export job (`exportSubjectData`) assembles the file once the request is approved, or needs no
+        approval, and every owner''s part is recorded: a job that started before Marketing''s part arrived stays
+        `running` and continues when it is recorded. A part for an export that is `rejected` or `expired` is recorded
+        and its object deleted at once. Modelled as an operation so it has lineage and a ticket.
+
+
+        **Idempotent on the export id and the owner**: a redelivered event finds the part recorded and returns it.
+        Invoked by the event relay, never by a screen.'
+      tags:
+      - identity
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      x-ticvai-consumes:
+      - marketing.subjectDataPartWritten
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              x-ticvai-persistence: none — request only
+              required:
+              - eventId
+              - approvalRequestId
+              - fileRef
+              - rowCount
+              properties:
+                eventId:
+                  type: string
+                  description: The `marketing.subjectDataPartWritten` event id, for the consumer's inbox record.
+                approvalRequestId:
+                  type: string
+                  format: uuid
+                  description: The export the part belongs to; stored as the part's `exportId`.
+                  x-ticvai-stored-as: identity.subject_data_export_part.export_id
+                fileRef:
+                  type: string
+                  maxLength: 500
+                tables:
+                  type: array
+                  items: { type: string }
+                rowCount:
+                  type: integer
+                  minimum: 0
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The part, recorded now or already recorded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubjectDataExportPart'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/data-export/{requestId}:
@@ -2124,6 +2259,12 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       summary: Close the current session
+      description: 'Ends the caller''s own current session (`identity.session`, `ended_at`) and revokes the refresh
+        token it holds (`identity.refresh_token`, `revoked_at`, `revocation_reason`). **Its own rows only**: the
+        token row is its owner''s alone (`x-ticvai-rls: own-row`; r11 gate, 29 October 2026, CHG-R11FXV-002), so the
+        caller''s signed-in principal revokes its own token at the workstation and no other principal''s.
+
+        '
       responses:
         '204':
           headers:
@@ -2618,7 +2759,7 @@ paths:
 
         **Every session and refresh token, at every venue, through one function** (accepted 21 October 2026,
         Chinmay, ADAM CR-180 option A; CHG-R10ID-006). The caller acts at a venue, but `identity.refresh_token` is
-        tenant-root and `identity.session` venue-isolated, so ending them with the caller''s own row security
+        its owner''s alone (own-row; CHG-R11FXV-002) and `identity.session` venue-isolated, so ending them with the caller''s own row security
         would revoke no token and leave sessions at other venues live while answering 200. So the operation ends
         them by calling `identity.end_principal_sessions(principal_id, ended_by, reason)`, a SECURITY DEFINER
         function in the same transaction as the update: it first checks the caller may update that principal
@@ -3546,6 +3687,9 @@ paths:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
       x-ticvai-reads:
+      - table: identity.sso_provider
+        for: 'the tenant''s guest provider row, audience guest and its guestProvider: client id and
+          client_secret_ref (ADAM CR-327, part (1))'
       - table: pii.subject_identity
         for: 'the provider and provider subject a returning guest is found by (R8 blocker IDENTITY-C54) (r8 gate,
           CHG-R8GT2-003; check-parameter-columns P-NAMED-TABLE)'
@@ -3565,7 +3709,9 @@ paths:
         and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant''s
         provider rows. The client secret and the audience checks stay here, server-side, in the provider row
         (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI
-        against the one registered (`DomainReadiness.uaePassRedirect`).
+        against the one registered (`DomainReadiness.uaePassRedirect`). **The provider row is the tenant''s
+        `identity.sso_provider` with `audience` `guest` and the matching `guestProvider`** (ADAM CR-327, part (1);
+        CHG-CR327-001).
 
         Where the provider''s verified email matches an existing account, the identities are
         linked rather than a duplicate created. Where it does not, a new account is created — an unverified
@@ -3640,6 +3786,9 @@ paths:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
       x-ticvai-reads:
+      - table: identity.sso_provider
+        for: 'the tenant''s guest provider row, audience guest and its guestProvider: client id and
+          client_secret_ref (ADAM CR-327, part (1))'
       - table: pii.subject_identity
         for: 'the UAE Pass user id a returning guest is found by (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003;
           check-parameter-columns P-NAMED-TABLE)'
@@ -3666,7 +3815,9 @@ paths:
         and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant''s
         provider rows. The client secret and the audience checks stay here, server-side, in the provider row
         (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI
-        against the one registered (`DomainReadiness.uaePassRedirect`).
+        against the one registered (`DomainReadiness.uaePassRedirect`). **The provider row is the tenant''s
+        `identity.sso_provider` with `audience` `guest` and the matching `guestProvider`** (ADAM CR-327, part (1);
+        CHG-CR327-001).
 
         OAuth authorisation-code exchange. Returns a verified identity, so an account created
         this way needs no further verification.
@@ -4074,7 +4225,8 @@ paths:
 
         **Active providers only, in a fixed order** (decided 25 October 2026, Chinmay, ADAM CR-190 option A;
         CHG-R10ID-002). Only providers whose `identity.sso_provider.is_active` is true are listed; a null
-        `is_active` (the column has no default) counts as not active. Ordered by `displayName` ascending, then
+        `is_active` (the column has no default) counts as not active, and only `audience` `staff` rows are listed
+        (ADAM CR-327, part (1); CHG-CR327-001): a guest provider is never an SSO button. Ordered by `displayName` ascending, then
         `id` ascending. A tenant with no active provider answers `[]`, and its sign-in doors show no SSO
         button. `SsoProvider` carries no `isActive`: the filter is the server''s, so a switched-off provider''s
         name never reaches an unauthenticated caller.'
@@ -4123,7 +4275,8 @@ paths:
         September, audit R167, first part; its second part, no guest MFA, was superseded on 29 September
         by rev 3 GAP-B1, which made guest two-step verification a per-venue option). A guest signs in with a one-time code, a password, Apple or Google, or
         UAE Pass, each returning a `GuestSession`; this flow maps groups to roles and returns a staff
-        session, which a guest surface cannot use.
+        session, which a guest surface cannot use. **It serves `audience` `staff` providers only** (ADAM CR-327,
+        part (1); CHG-CR327-001): a `guest` row is never started here.
 
 
         **The pending sign-in is kept in Redis** (R8 blocker IDENTITY-C58, CHG-R8MIG-015): `cache:sso-state:<state>`
@@ -6887,9 +7040,20 @@ paths:
 
 
         **The number is hashed on arrival and never returned**; only the last four characters are kept in clear,
-        in `pii.subject_document`, as they are for every document in the package. The scan is an uploaded media
-        asset and is deleted when the verification is decided, unless the policy keeps it
-        (`documentImageRetention`).
+        in `pii.subject_document`, as they are for every document in the package. The scan is the guest''s own
+        upload (`createGuestUpload`, `completeGuestUpload`, in assets) and is deleted when the verification is
+        decided, unless the policy keeps it (`documentImageRetention`).
+
+
+        **The uploads are checked against Identity''s projection, never against Assets'' table** (r11 gate, 29
+        October 2026; CHG-R11FXV-001; the lead''s r10 ruling on the ADR-0028 tiers, CHG-R10ID-018: Identity is
+        Foundation and reads nothing above it but a projection). `documentAssetId` must be, in
+        `identity.guest_upload_ref` (`assets#guestUploadsForIdentity`, fed by `assets.guestUploadChanged`), an
+        upload of the caller''s own subject with purpose `identityDocument` and status `uploaded`, and
+        `selfieAssetId`, when sent, the same with purpose `selfie`; otherwise `422 guest-upload-not-usable`, and
+        nothing is written. The row''s security is by subject, so another guest''s upload is not seen at all and
+        is refused the same way as an unknown id. An upload completed a moment ago may not have reached the
+        projection yet: the app retries a `422 guest-upload-not-usable` once, after a short wait, before showing it.
 
 
         Creates a `pending` verification. `409` while another is pending for this guest; `422` when the document
@@ -6902,6 +7066,18 @@ paths:
       x-ticvai-permission: null
       x-ticvai-audience:
       - guest
+      x-ticvai-reads:
+      - table: identity.guest_upload_ref
+        for: 'whether documentAssetId and selfieAssetId are the caller''s own uploaded files of their purpose,
+          Identity''s projection of assets.guest_upload (r11 gate, CHG-R11FXV-001; ADR-0028)'
+      - table: identity.guest_verification_policy
+        for: 'the tenant''s accepted document kinds, selfieRequired and documentImageRetention (was carried in the
+          lineage overrides, CHG-R8GEN-001; stated here, CHG-R11FXV-001)'
+      x-ticvai-read-via:
+      - query: assets#guestUploadsForIdentity
+        route: projection
+        for: 'whether documentAssetId and selfieAssetId are usable, from Identity''s projection
+          identity.guest_upload_ref (r11 gate, CHG-R11FXV-001; ADR-0028)'
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6936,9 +7112,12 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          x-ticvai-problem-types: [identity-document-expired, document-kind-not-accepted, selfie-required]
+          x-ticvai-problem-types: [identity-document-expired, document-kind-not-accepted, selfie-required,
+            guest-upload-not-usable]
           description: The document has expired, or its kind is not accepted by the tenant's policy, or the policy
-            asks for a selfie and none was sent (`selfie-required`, CHG-R8MIG-027)
+            asks for a selfie and none was sent (`selfie-required`, CHG-R8MIG-027), or `documentAssetId` or
+            `selfieAssetId` is not the caller's own uploaded file of its purpose in Identity's projection
+            (`guest-upload-not-usable`, CHG-R11FXV-001)
           content:
             application/problem+json:
               schema:
@@ -8815,6 +8994,8 @@ components:
         customerId:
           type: string
           format: uuid
+          description: 'The guest who holds the agreement: its `pii.subject` id (ADAM CR-303, option A). Billing statements
+            (orders `listBillingStatements`, `getBillingStatement`) find a guest''s agreements by it.'
         entitlementTemplateId:
           x-ticvai-references: catalogue.entitlement_template
           type: string
@@ -9063,8 +9244,13 @@ components:
         expiry, rotation, and revocation. **A staff member''s or a guest''s** (accepted 15 October 2026, ADAM CR-100;
         CHG-R10ID-009): exactly one of `principalId` and `subjectId` is set, so a guest''s refresh token, which
         `refreshToken` serves and `guestLogout` and `endGuestDeviceSessions` revoke, has a store and is revoked the
-        same way as a staff one.'
+        same way as a staff one. **The row is its owner''s alone** (`x-ticvai-rls: own-row`, r11 gate, 29 October
+        2026; CHG-R11FXV-002), as the MFA rows are: read and written by the principal (`ticvai.principal_id`) or the
+        guest (`ticvai.subject_id`) it belongs to, and by the tenant root. `logout` revokes the caller''s own token
+        under it; the sign-ins and `refreshToken` run at the tenant; `updatePrincipal` revokes another principal''s
+        tokens only through `identity.end_principal_sessions` (CR-180), never with the caller''s grants.'
       x-ticvai-exactly-one-of: [[principalId, subjectId]]
+      x-ticvai-rls: own-row
       required:
       - hash
       - expiresAt
@@ -9682,6 +9868,45 @@ components:
           type: string
           nullable: true
           description: Why the job failed, with `failed`; null otherwise.
+    SubjectDataExportPart:
+      x-ticvai-persistence: identity.subject_data_export_part
+      x-ticvai-unique-together:
+      - [exportId, owner]
+      type: object
+      description: '**One owner''s part of a guest data export, as Identity records it** (the lead, 29 October 2026, r11
+        gate; CHG-R11FXC-005). An owner above Identity writes its own part of the export to the tenant''s private storage
+        and says so by event (Marketing: `marketing.subjectDataPartWritten`); `recordSubjectDataExportPart` records it
+        here, and the export job assembles the file from Identity''s own data and these parts, reading no owner''s
+        table (ADR-0028). The job deletes each part''s object with the export.'
+      required: [exportId, owner, fileRef, rowCount, writtenAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        exportId:
+          type: string
+          format: uuid
+          x-ticvai-references: identity.subject_data_export
+          description: The export the part belongs to (`SubjectDataExport.requestId`, the event's `approvalRequestId`).
+        owner:
+          type: string
+          maxLength: 40
+          description: The module that wrote the part, `marketing-crm` today.
+        fileRef:
+          type: string
+          maxLength: 500
+          description: The part's object key in the tenant's private storage. Server only.
+        tables:
+          type: array
+          items: { type: string }
+          description: The owner's tables the part holds rows of.
+        rowCount:
+          type: integer
+          minimum: 0
+        writtenAt:
+          type: string
+          format: date-time
     RedirectHost:
       x-ticvai-persistence: identity.redirect_host
       x-ticvai-unique-together:
@@ -9710,6 +9935,41 @@ components:
           type: string
           enum: [ready, pending, notApplicable]
           nullable: true
+        lastEventAt:
+          type: string
+          format: date-time
+          description: The `changedAt` of the event last applied; an older redelivery changes nothing.
+    GuestUploadRef:
+      x-ticvai-persistence: identity.guest_upload_ref
+      x-ticvai-unique-together:
+      - [uploadId]
+      type: object
+      description: '**A guest''s identity uploads, as Identity knows them** (r11 gate, 29 October 2026; CHG-R11FXV-001;
+        the lead''s r10 ruling on the ADR-0028 tiers, CHG-R10ID-018). A projection of `assets.guest_upload`, so
+        `submitGuestIdentityDocument` checks `documentAssetId` and `selfieAssetId` without reading Assets'' table
+        (Identity is Foundation and reads nothing above it but a projection). **Never returned by any operation**;
+        Identity''s consumer of `assets.guestUploadChanged` writes it, as `identity.redirect_host` is written. The rule
+        is Assets'' (`assets#guestUploadsForIdentity`): an upload is usable while it is the subject''s own, of the
+        purpose asked, and `uploaded`. Row security is by subject: a guest sees only its own rows.'
+      required: [uploadId, subjectId, purpose, status, lastEventAt]
+      properties:
+        uploadId:
+          type: string
+          format: uuid
+          x-ticvai-references: none
+          description: The upload's id in Assets (`GuestUpload.uploadId`), the value a guest sends.
+        subjectId:
+          x-ticvai-references: pii.subject
+          type: string
+          format: uuid
+          description: The guest who uploaded it.
+        purpose:
+          type: string
+          enum: [identityDocument, selfie]
+        status:
+          type: string
+          enum: [uploaded, deleted]
+          description: The upload's status as the last event applied gave it.
         lastEventAt:
           type: string
           format: date-time
@@ -11096,9 +11356,10 @@ components:
           description: Key vault reference. The secret itself is never returned.
         groupMappings:
           type: array
-          minItems: 1
           description: '**A group with no mapping grants nothing.** No default role, ever — otherwise
-            the identity provider becomes a way to mint access nobody configured.
+            the identity provider becomes a way to mint access nobody configured. **At least one for an `audience`
+            `staff` row; none for a `guest` row** (r11, CHG-CR327-002): a guest provider grants no staff role, so
+            `setSsoConfig` refuses `400` `validation` a staff row with no mapping and a guest row with any.
 
             '
           items:
@@ -11142,6 +11403,31 @@ components:
           default: false
         isActive:
           type: boolean
+        audience:
+          type: string
+          enum: [staff, guest]
+          default: staff
+          description: '**Who signs in through this provider** (ADAM CR-327, part (1), Chinmay, 29 October 2026: "Kind column on sso_provider"; CHG-CR327-001). `staff`, the
+            default, is enterprise SSO for staff and partners (`listSsoProviders`, `startSsoAuthorization`); `guest`
+            is a guest sign-in provider, named by `guestProvider`, used only by `guestSocialLogin` and
+            `guestUaePassLogin` and listed to guests by White-label''s `getPublishedTenantConfig.guestSignIn`.'
+        guestProvider:
+          type: string
+          enum: [apple, google, uaePass]
+          nullable: true
+          description: 'Which guest provider a `guest` row is (ADAM CR-327, part (1); CHG-CR327-001); null for `staff`.
+            `guestSocialLogin` and `guestUaePassLogin` pick their row by `audience` `guest` and this.'
+        authorizationUrl:
+          type: string
+          format: uri
+          maxLength: 2000
+          nullable: true
+          description: '**Where a guest app sends the guest to sign in** (r11, CHG-CR327-002; the lead, 29 October 2026:
+            "Get those 2 gaps sorted as well"): the provider''s authorization endpoint for this tenant''s client.
+            Required for a `guest` `uaePass` row (`setSsoConfig` refuses `400` `validation` one without it), optional
+            for `apple` and `google`, null for `staff` (a staff start is built by `startSsoAuthorization`). Stored, not
+            read from `metadataUrl` at sign-in, so the published config, a public cacheable read, never calls out to
+            the provider.'
     MfaKind:
       type: string
       enum:

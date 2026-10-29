@@ -89,7 +89,8 @@
    },
    "scopePath": {
     "type": "string",
-    "readOnly": true
+    "readOnly": true,
+    "description": "The device's own `platform.device.scope_path`, set by the server on every write (ADAM CR-278, option A, 28 October 2026; CHG-R11TEN-005), so whoever can change the device can change who holds it. Never the `locationScopePath` or the assigned workstation's path."
    }
   }
  },
@@ -345,6 +346,40 @@
     ],
     "default": "sendFirst",
     "description": "Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004)."
+   },
+   "orderNumberPrefix": {
+    "type": "string",
+    "nullable": true,
+    "maxLength": 1,
+    "enum": [
+     "A",
+     "B",
+     "C",
+     "D",
+     "E",
+     "F",
+     "G",
+     "H",
+     "I",
+     "J",
+     "K",
+     "L",
+     "M",
+     "N",
+     "O",
+     "P",
+     "Q",
+     "R",
+     "S",
+     "T",
+     "U",
+     "V",
+     "W",
+     "X",
+     "Y",
+     "Z"
+    ],
+    "description": "**The one letter this outlet's F&B order numbers start with** (ADAM CR-293 (2), option A, 29 October 2026; CHG-R11TEN-003): one capital letter A to Z, or null for none. `createFnbOrder` numbers an outlet's orders `A-042` (the prefix, a hyphen and three digits from the outlet's daily counter, CR-277 (3)), or `042` where the outlet has no prefix. Written by `createOutlet` and `updateOutlet`, returned by `tenancy#outletRecords`, which `createFnbOrder` reads in process (XDR-004).\n"
    },
    "admissionContext": {
     "allOf": [

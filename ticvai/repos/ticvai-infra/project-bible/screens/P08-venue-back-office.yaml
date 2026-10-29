@@ -27111,7 +27111,8 @@ screens:
         provenance: contract orders.yaml POST /stored-value/authorisations/{authorisationId}/capture
   states:
     loading: The booking and its condition history
-    error: Could not load. **Check-out and check-in work offline** — the deposit hold reconciles on sync.
+    error: Could not load. Names which read failed and leaves the booking untouched; nothing is checked
+      out or in until it loads.
     emptyFirstRun: Nothing is out. **The list a poolside attendant checks at close** — anything still
       here at the end of the day is a conversation.
     emptyNoAccess: 'Shown when the caller lacks `RENTAL_VIEW`, which `getRentalBooking` requires to show
@@ -27119,8 +27120,10 @@ screens:
       and sends somebody to support with the wrong question. A caller who can see the screen but lacks
       what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `authoriseStoredValue`,
       `relinquishStoredValue`, `captureStoredValue`; `RESOURCE_BOOK` for `checkOutResource`, `checkInResource`.'
-    offline: Queued locally. The deposit is authorised on sync, and **the condition note taken now is
-      the only defence against a dispute later**.
+    offline: '**Not available offline.** The back office runs in a browser and keeps no offline store,
+      so check-out, check-in and the stored-value actions are disabled until the connection returns, each
+      saying so. **The condition note is the only defence against a dispute later**: it goes with the
+      check-out or check-in it belongs to, once the connection is back.'
   apis:
   - operationId: checkOutResource
     contract: resources
@@ -34170,7 +34173,7 @@ screens:
   name: Software, Configuration & Version Management
   module: Venue Operations
   requiresModule: core
-  wave: 2
+  wave: 1
   permission: SCOPE_VIEW
   implementation:
     app: venue-management-web
@@ -34271,6 +34274,20 @@ screens:
         - Workstation.currencyScale
         operation: listWorkstations
         provenance: contract tenancy.yaml GET /workstations
+      - kind: dataTable
+        label: Firmware releases
+        bindsTo: DeviceFirmware
+        columns:
+        - DeviceFirmware.deviceKind
+        - DeviceFirmware.version
+        - DeviceFirmware.vendor
+        - DeviceFirmware.status
+        - DeviceFirmware.installedCount
+        operation: listDeviceFirmware
+        notes: 'The fleet view: every firmware or software release, newest first, and how many devices
+          run it. Picking a row opens it in The selected firmware release (`getDeviceFirmware`). Added
+          29 October 2026 (the lead, "Add list + panel"; CHG-R11FXT-009).'
+        provenance: contract tenancy.yaml GET /device-firmware
       - kind: searchField
         label: Search software, configuration
         provenance: carried from the previous definition
@@ -34292,6 +34309,12 @@ screens:
         label: Deploy configuration profile
         operation: deployConfigurationProfile
         provenance: contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy
+      - kind: secondaryButton
+        label: Register firmware release
+        operation: createDeviceFirmware
+        notes: Opens the form that registers a release as `draft` (`createDeviceFirmware`). Added 29 October
+          2026 (the lead, "Add list + panel"; CHG-R11FXT-009).
+        provenance: contract tenancy.yaml POST /device-firmware
       - kind: publishGate
         label: What publishing changes
         notes: '**Names what goes live, where, and from when.** A publish with no stated consequence is
@@ -34306,6 +34329,21 @@ screens:
         notes: Shows `score`, `status`, `contributors` from `getWorkstationHealth`'s inline response.
           **The response has no named schema**, so this cannot bind until the contract names one.
         provenance: contract tenancy.yaml GET /workstations/{workstationId}/health
+      - kind: detailPanel
+        label: The selected firmware release
+        bindsTo: DeviceFirmware
+        columns:
+        - DeviceFirmware.version
+        - DeviceFirmware.status
+        - DeviceFirmware.releasedAt
+        - DeviceFirmware.installedCount
+        - DeviceFirmware.minimumPreviousVersion
+        - DeviceFirmware.releaseNotes
+        operation: getDeviceFirmware
+        notes: 'The release picked in Firmware releases, read by its id (`firmwareId`): its status, how
+          much of the fleet runs it, the version it must be applied from and its notes. Added 29 October
+          2026 (the lead, "Add list + panel"; CHG-R11FXT-009).'
+        provenance: contract tenancy.yaml GET /device-firmware/{firmwareId}
   states:
     loading: The software version list.
     error: Could not load. Names which read failed and leaves the software version untouched.
@@ -34457,6 +34495,33 @@ screens:
       - targetFilter
       - strategy
     provenance: contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy
+  - id: formCreateDeviceFirmware
+    component: modal
+    trigger: Register firmware release
+    body: '**Collects what `createDeviceFirmware` sends before it is called.** Required: `deviceKind`,
+      `version`. Optional: `vendor`, `artefactAssetId` (the vendor image, uploaded to Assets from the
+      form), `checksum`, `checksumAlgorithm`, `minimumPreviousVersion`, `releaseNotes`. A second release
+      with the same device kind and version is refused (409, duplicate-code) and says so. Dismissing sends
+      nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the
+      contract): `id`, `status` (a release starts `draft`), `releasedAt`, `installedCount`, `statusReason`,
+      `scopePath`.'
+    bindsTo: DeviceFirmware
+    confirm:
+      label: Register release
+      operation: createDeviceFirmware
+    dismiss:
+      label: Cancel
+      discards:
+      - deviceKind
+      - version
+      - vendor
+      - artefactAssetId
+      - checksum
+      - checksumAlgorithm
+      - minimumPreviousVersion
+      - releaseNotes
+    provenance: contract tenancy.yaml POST /device-firmware; the lead, 29 October 2026 ("Add list + panel";
+      CHG-R11FXT-009)
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder
     "Software, Configuration & Version Management — from the client design board, 20 August".'
 - id: BO-130
@@ -53542,13 +53607,6 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listQuoteBookingConversion
-  - operationId: updateGroupBooking
-    contract: orders
-    purpose: Confirm numbers or the leader on the converted booking
-    trigger: onAction
-    provenance: decided 29 September, VM close-out (venue management and configuration)
-    invalidates:
-    - listQuoteBookingConversion
   entryState:
     preloaded: []
     params:
@@ -54746,9 +54804,11 @@ screens:
       components:
       - kind: primaryButton
         label: Increase Guest Count
+        operation: updateGroupBooking
         provenance: pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support
       - kind: secondaryButton
         label: Reduce Guest Count
+        operation: updateGroupBooking
         provenance: pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support
       - kind: secondaryButton
         label: Date Change
@@ -54770,6 +54830,25 @@ screens:
         provenance: pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support
     - name: contentBody
       components: []
+  overlays:
+  - id: formUpdateGroupBooking
+    component: modal
+    trigger: Increase Guest Count, Reduce Guest Count
+    body: '**Collects what `updateGroupBooking` sends before it is called:** the group''s new size, `expectedSize`
+      before the numbers are confirmed or `confirmedSize` once they are. The booking''s version goes with
+      it (If-Match), so a change made meanwhile is refused and shown, not overwritten. Dismissing sends
+      nothing; the group is unchanged.'
+    bindsTo: UpdateGroupBookingRequest
+    confirm:
+      label: Save guest count
+      operation: updateGroupBooking
+    dismiss:
+      label: Cancel
+      discards:
+      - expectedSize
+      - confirmedSize
+    provenance: contract orders.yaml PATCH /group-bookings/{groupBookingId}; r11 gate fix, 29 October
+      2026 (CHG-R11FXS-004)
   states:
     loading: The group amendments cancellation list.
     error: Could not load. Names which read failed and leaves the group amendments cancellation untouched.
@@ -55887,6 +55966,33 @@ screens:
       - kind: secondaryButton
         label: Rental Benefit
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support
+      - kind: secondaryButton
+        label: Create entitlement template
+        operation: createEntitlementTemplate
+        notes: Opens the form that creates the entitlement template the fields above define (r11 gate
+          fix, CHG-R11FXS-002).
+        provenance: contract catalogue.yaml POST /entitlement-templates; r11 gate fix, 29 October 2026
+  overlays:
+  - id: formCreateEntitlementTemplate
+    component: modal
+    trigger: Create entitlement template
+    body: '**Collects what `createEntitlementTemplate` sends before it is called.** Required: `code`,
+      `name` and `validityKind`; the server gives the template its identity. The entitlement the fields
+      above define goes with it: `entriesAllowed` (Number of Visits), `validForDays` (Period), `daysOfWeek`
+      (Days), `validTimeWindows` (Times, Timeslots), and `expiryNoticeDays` for the pre-expiry notice.
+      Dismissing sends nothing; no template is created.'
+    bindsTo: EntitlementTemplate
+    confirm:
+      label: Create template
+      operation: createEntitlementTemplate
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - name
+      - validityKind
+      - expiryNoticeDays
+    provenance: contract catalogue.yaml POST /entitlement-templates; r11 gate fix, 29 October 2026 (CHG-R11FXS-002)
   states:
     loading: The membership entitlement admission configuration as saved.
     error: Could not load. Names which read failed and leaves the membership entitlement admission untouched.
@@ -55915,9 +56021,10 @@ screens:
     trigger: onLoad
   - operationId: createEntitlementTemplate
     contract: catalogue
-    purpose: Set expiryNoticeDays on a pass template (pre-expiry notice)
+    purpose: Create the entitlement template the screen's fields define, with expiryNoticeDays for the
+      pre-expiry notice
     trigger: onAction
-    provenance: build, 29 September 2026
+    provenance: build, 29 September 2026; reached by Create entitlement template, r11 gate fix (CHG-R11FXS-002)
   wireframe:
     status: notStarted
     provenance: generated
@@ -72664,7 +72771,22 @@ screens:
         provenance: pack Game_and_Ride_Module.pdf, page 25 §Actions
         operation: suspendWallet
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        label: Account and balance
+        bindsTo: Wallet
+        columns:
+        - Wallet.balance
+        - Wallet.bonusBalance
+        - Wallet.credits
+        - Wallet.currency
+        - Wallet.status
+        - Wallet.expiresAt
+        - Wallet.lastActivityAt
+        operation: getWallet
+        notes: The guest's wallet as the screen opens on it, every kind of value it holds (r11 gate fix,
+          CHG-R11FXS-003).
+        provenance: contract wallet.yaml GET /wallets/{subjectId}; r11 gate fix, 29 October 2026
   states:
     loading: The wallet account balance list.
     error: Could not load. Names which read failed and leaves the wallet account balance untouched.
@@ -72678,7 +72800,7 @@ screens:
   - operationId: getWallet
     contract: wallet
     purpose: Account and balance
-    trigger: onAction
+    trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: listCreditLots
     contract: wallet
@@ -72798,21 +72920,20 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Game_and_Ride_Module.pdf, page 26
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-006, the lead: "Remove + log text"): a board reading of
+      19 September declared it, and nothing on the approved screen sends it: its only controls were the
+      generated Save wallet funding rules and Cancel, with no field to send. The funding rules are saved
+      on BO-1094 Funding Method Configuration and BO-1098, where setWalletFundingRules stays declared
+      and reached. The generated Save and Cancel buttons go with it; the screen keeps getWalletFundingRules
+      and its rules panel. A CR brings the write back here with the control and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
     - name: contentBody
       components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: setWalletFundingRules
-        label: Save wallet funding rules
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setWalletFundingRules
       - kind: detailPanel
         label: How a wallet may be topped up
         bindsTo: WalletFundingRules
@@ -72827,11 +72948,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Top-up rules
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -72900,21 +73016,20 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Game_and_Ride_Module.pdf, page 27
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-006, the lead: "Remove + log text"): a board reading of
+      19 September declared it, and nothing on the approved screen sends it: its only controls were the
+      generated Save wallet funding rules and Cancel, with no field to send. The funding rules (bonusRules
+      included) are saved on BO-1094 Funding Method Configuration and BO-1098, where setWalletFundingRules
+      stays declared and reached. The generated Save and Cancel buttons go with it; the screen keeps getWalletFundingRules
+      and its rules panel. A CR brings the write back here with the control and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
     - name: contentBody
       components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: setWalletFundingRules
-        label: Save wallet funding rules
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setWalletFundingRules
       - kind: detailPanel
         label: How a wallet may be topped up
         bindsTo: WalletFundingRules
@@ -72930,11 +73045,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Top-up bonus rules
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -76784,6 +76894,7 @@ screens:
       components:
       - kind: searchField
         label: Search card lifecycle
+        operation: getGameCard
         provenance: pack Game_and_Ride_Module.pdf, page 64 §Filters
       - kind: multiSelect
         label: Filter by
@@ -76836,7 +76947,7 @@ screens:
   apis:
   - operationId: getGameCard
     contract: games
-    purpose: Cards in circulation
+    purpose: Find a card by its code and show its balances and status
     trigger: onAction
     provenance: board reading, 19 September 2026
   entryState:
@@ -80475,6 +80586,7 @@ screens:
       - kind: detailPanel
         label: The selected customer wallet balance
         bindsTo: null
+        operation: getWallet
         columns:
         - Card Status
         - Card Expiry
@@ -85235,7 +85347,7 @@ screens:
     purpose: Grace, late fee and extension pricing
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id019
+    invalidates: &id018
     - listRentalPricingProfiles
   wireframe:
     status: notStarted
@@ -92707,7 +92819,6 @@ screens:
   module: Setup & Go-Live
   requiresModule: core
   wave: 3
-  permission: WORKSTATION_CONFIGURE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '7'
@@ -92746,6 +92857,14 @@ screens:
       call is `none`, a read. The name promises authoring and the contract offers none, so either the
       write operations are missing or this screen is a view of something another screen builds.'
     source: contract — the screen's declared operations
+  - operation: configureWorkstation
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXT-004): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its thirteen pack fields bind to no operation and it has no Save
+      or publish control. Workstation configuration is done where the device is registered (BO-036) or
+      at the till (POS-016), as decided on 2 October 2026 when BO-129 dropped it (CHG-WIR-021); configureWorkstation
+      stays declared and reached on both. A CR brings it back here with the control that sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -92796,16 +92915,11 @@ screens:
     error: Could not load. Names which read failed and leaves the pos payment access untouched.
     emptyFirstRun: No pos payment access configured yet. Carries the create action and says what the platform
       does in the meantime.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
+    emptyNoAccess: 'Not shown: nothing on this screen needs a permission of its own; the app''s sign-in
+      decides access.'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
-  apis:
-  - operationId: configureWorkstation
-    contract: tenancy
-    purpose: POS, payment and access setup
-    trigger: onAction
-    provenance: board reading, 19 September 2026
+  apis: []
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-602
@@ -104339,6 +104453,16 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 83
+  - operation: createRotaAssignment
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-008, the lead: "Remove + log text"): a board reading of
+      19 September declared it, and nothing on the approved screen sends it: its Save button is the generated
+      Save event resource plan (setEventResourcePlan) and nothing rosters a person. A person is rostered
+      on BO-055 Rota & Scheduling and BO-714 Event Shift & Roster Configuration, where createRotaAssignment
+      stays declared and reached. The screen keeps setEventResourcePlan, getEventResourcePlan and the
+      rota (listRotaAssignments). A CR brings the write back here with the control and the fields that
+      send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -104367,7 +104491,8 @@ screens:
   states:
     loading: The staff role list.
     error: Could not load. Names which read failed and leaves the staff role untouched.
-    emptyFirstRun: No staff role yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyFirstRun: No staff role yet. The roles an event needs come from its resource plan; people are
+      rostered on Rota & Scheduling (BO-055), not here.
     emptyNoResults: The filter narrowed it and the staff role are still there. Names the active filter
       and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
@@ -104379,14 +104504,6 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id014
-  - operationId: createRotaAssignment
-    contract: workforce
-    purpose: Roster them
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates: &id017
-    - listRotaAssignments
-    - getStaffingCoverage
   - operationId: getEventResourcePlan
     contract: catalogue
     purpose: Everything an event needs, and whether it has been secured
@@ -107583,26 +107700,26 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 8
+  - operation: updateGuestPreferences
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-006, the lead: "Remove + log text"): a board reading of
+      19 September declared it, and nothing on the approved screen sends it: its Save guest preferences
+      and Cancel were generated, with no preference field to send. A guest''s preferences are saved on
+      WEB-020 (Save guest preferences), where updateGuestPreferences stays declared and reached. The generated
+      Save and Cancel buttons go with it; the screen keeps the family links (getGuestRelationships, setGuestRelationships
+      with its form) and getGuestProfile. A CR brings the write back here with the control and the fields
+      that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
     - name: contentBody
       components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: updateGuestPreferences
-        label: Save guest preferences
-        notes: The act the screen exists for.
       - kind: detailPanel
         derived: true
         impliedBy: getGuestProfile
         notes: One record, read-only.
         operation: getGuestProfile
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: updateGuestPreferences
       - kind: dataTable
         label: Family and guardians
         bindsTo: GuestRelationship
@@ -107626,13 +107743,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: updateGuestPreferences
-    contract: marketing-crm
-    purpose: Contact and service preferences
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getGuestConsents
   - operationId: getGuestProfile
     contract: marketing-crm
     purpose: Verified contacts
@@ -108421,6 +108531,16 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 12
+  - operation: setConsentPurposes
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-006, the lead: "Remove + log text"): a board reading of
+      19 September declared it, and nothing on the approved screen sends it: its Save consent purposes
+      and Cancel were generated, and the purposes table is read-only. Consent purposes are configured
+      on CMS-018 (Save consent purposes) and CMS-023, where setConsentPurposes stays declared and reached.
+      The generated Save and Cancel buttons go with it; the screen keeps listConsentPurposes and the consent-form
+      builder (listForms, createForm with its form). A CR brings the write back here with the control
+      and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -108432,16 +108552,6 @@ screens:
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
         operation: listConsentPurposes
-      - kind: primaryButton
-        derived: true
-        impliedBy: setConsentPurposes
-        label: Save consent purposes
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setConsentPurposes
       - kind: dataTable
         label: Consent forms
         bindsTo: FormDefinition
@@ -108472,11 +108582,6 @@ screens:
     contract: marketing-crm
     purpose: Purposes and lawful bases
     trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: setConsentPurposes
-    contract: marketing-crm
-    purpose: Configure them
-    trigger: onAction
     provenance: board reading, 19 September 2026
   - operationId: createForm
     contract: marketing-crm
@@ -119091,7 +119196,6 @@ screens:
   module: Engagement & Support
   requiresModule: marketing
   wave: 3
-  permission: TENANT_CONFIGURE
   notes: '**Merged into P13 CMS-005 Theme Editor, CMS-002 Brand Kit and CMS-006 Component Preview** (decided
     24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds
     the theme and the component set; the minute says to consolidate rather than build both. **One implementation,
@@ -119146,21 +119250,24 @@ screens:
     why: 'Spacing, shadow, breakpoint and transition tokens per brand are outside the agreed boundary
       (graphics, colours, fonts, tabs only; DI-223, DI-285): recorded as not built.'
     source: DI-223
+  - operation: setBrandIdentity
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-007, the lead: "Remove + log text"): a board reading of
+      19 September declared it, and nothing on the approved screen sends it: its only controls were the
+      generated Save brand identity and Cancel, with no field to send. Brand identity is saved on CMS-002,
+      CMS-004, CMS-104 and ADM-016, where setBrandIdentity stays declared and reached. The generated Save
+      and Cancel buttons go with it. With no operation left the screen has no permission of its own and
+      its no-access state says so. A CR brings the write back here with the control and the fields that
+      send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
     - name: contentBody
-      components:
-      - kind: primaryButton
-        derived: true
-        impliedBy: setBrandIdentity
-        label: Save brand identity
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setBrandIdentity
+      components: []
+      notes: 'Empty since 29 October 2026 (CHG-R11FXU-007): its only controls, a generated Save brand
+        identity and Cancel, went with setBrandIdentity; the pack gives the body nothing to draw. A CR
+        fills it.'
   states:
     loading: The design system components list.
     error: Could not load. Names which read failed and leaves the design system components untouched.
@@ -119168,14 +119275,9 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the design system components are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: setBrandIdentity
-    contract: white-label
-    purpose: Design system and components
-    trigger: onAction
-    provenance: board reading, 19 September 2026
+    emptyNoAccess: 'Not shown: nothing on this screen needs a permission of its own; the app''s sign-in
+      decides access.'
+  apis: []
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-836
@@ -123513,7 +123615,7 @@ screens:
     purpose: Fill each requirement
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id018
+    invalidates: &id017
     - getResourceCalendar
     - listResourceBookings
   entryState:
@@ -125198,6 +125300,15 @@ screens:
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-004): No read returns candidates for a rota position
       (skill, availability, suitability).'
     source: contracts/satellite/workforce.yaml#createRotaAssignment
+  - operation: createRotaAssignment
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-008, the lead: "Remove + log text"): a board reading of
+      19 September declared it, and nothing on the approved screen sends it: its tables show the roster,
+      coverage and check-ins and nothing on it rosters a position. A person is rostered on BO-055 Rota
+      & Scheduling and BO-714 Event Shift & Roster Configuration, where createRotaAssignment stays declared
+      and reached. The screen keeps listRotaAssignments, getStaffingCoverage and listAttendance. A CR
+      brings the write back here with the control and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -125259,19 +125370,13 @@ screens:
   states:
     loading: The attraction operational staffing list.
     error: Could not load. Names which read failed and leaves the attraction operational staffing untouched.
-    emptyFirstRun: No attraction operational staffing yet. Carries the create action; distinct from a
-      filter that matched nothing.
+    emptyFirstRun: No attraction operational staffing yet. Positions are rostered on Rota & Scheduling
+      (BO-055); this screen shows the roster, its coverage and who has checked in.
     emptyNoResults: The filter narrowed it and the attraction operational staffing are still there. Names
       the active filter and offers to clear it.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: createRotaAssignment
-    contract: workforce
-    purpose: Roster a position
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates: *id017
   - operationId: listRotaAssignments
     contract: workforce
     purpose: Who is rostered on each position
@@ -127220,7 +127325,7 @@ screens:
     purpose: Assign at the counter
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id018
+    invalidates: *id017
   - operationId: suggestResources
     contract: resources
     purpose: What is free and suitable
@@ -127435,7 +127540,7 @@ screens:
     purpose: Change the strategy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id020
+    invalidates: &id019
     - getResourceAllocationPolicy
   wireframe:
     status: notStarted
@@ -128504,7 +128609,7 @@ screens:
     purpose: Grace period and late fees
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id019
+    invalidates: *id018
   entryState:
     preloaded:
     - Required
@@ -129592,7 +129697,6 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
-  permission: WORKFORCE_MANAGE
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '7'
@@ -129626,6 +129730,17 @@ screens:
       columns can be bound. The columns are the pack''s own labels and are carried as text until the response
       shape exists.'
     source: pack Resource_Management_Configuration_Reference.pdf, page 105 §Each candidate may display
+  - operation: createRotaAssignment
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-008, the lead: "Remove + log text"): a board reading of
+      19 September declared it, and nothing on the approved screen sends it: its four role buttons (Event
+      manager, Supervisor, Security, Customer service) are pack text with no person or shift to send,
+      and no read fills its staff table (contract gap CHG-WIR-004). A person is rostered on BO-055 Rota
+      & Scheduling and BO-714 Event Shift & Roster Configuration, where createRotaAssignment stays declared
+      and reached. With no operation left the screen has no permission of its own and its no-access state
+      says so; the role buttons stay, bound to nothing, as before. A CR brings the write back here with
+      the control and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -129686,21 +129801,13 @@ screens:
   states:
     loading: The event staff personnel list.
     error: Could not load. Names which read failed and leaves the event staff personnel untouched.
-    emptyFirstRun: No event staff personnel yet. Carries the create action; distinct from a filter that
-      matched nothing.
+    emptyFirstRun: No event staff personnel yet. People are allocated to event roles on Event Shift &
+      Roster Configuration (BO-714), not here.
     emptyNoResults: The filter narrowed it and the event staff personnel are still there. Names the active
       filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: createRotaAssignment
-    contract: workforce
-    purpose: Staff allocation
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - listRotaAssignments
-    - getStaffingCoverage
+    emptyNoAccess: 'Not shown: nothing on this screen needs a permission of its own; the app''s sign-in
+      decides access.'
+  apis: []
   entryState:
     preloaded:
     - Name
@@ -133584,7 +133691,7 @@ screens:
     purpose: Change it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id020
+    invalidates: *id019
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-948
@@ -134738,7 +134845,7 @@ screens:
     contract: seating
     purpose: Standing areas
     trigger: onAction
-    invalidates: &id021
+    invalidates: &id020
     - getSeatMap
   - operationId: getSeatMap
     contract: seating
@@ -134853,7 +134960,7 @@ screens:
     contract: seating
     purpose: Suites and boxes
     trigger: onAction
-    invalidates: *id021
+    invalidates: *id020
   - operationId: getSeatMap
     contract: seating
     purpose: Read a seat map with its structure
@@ -134955,7 +135062,7 @@ screens:
     contract: seating
     purpose: Stage and focal point
     trigger: onAction
-    invalidates: *id021
+    invalidates: *id020
   - operationId: proposeSeatMapChanges
     contract: ai
     purpose: Propose categories, numbering, a stage variant or consistency findings for this map
@@ -135072,7 +135179,7 @@ screens:
     contract: seating
     purpose: Entrances, exits and aisles
     trigger: onAction
-    invalidates: *id021
+    invalidates: *id020
   - operationId: getSeatMap
     contract: seating
     purpose: Read a seat map with its structure
@@ -135184,7 +135291,7 @@ screens:
     contract: seating
     purpose: Amenities and obstructions
     trigger: onAction
-    invalidates: *id021
+    invalidates: *id020
   - operationId: getSeatMap
     contract: seating
     purpose: Read a seat map with its structure
@@ -136492,7 +136599,7 @@ screens:
     contract: seating
     purpose: Publish
     trigger: onAction
-    invalidates: &id022
+    invalidates: &id021
     - listSeatMaps
     - getSeatMap
   - operationId: getImportJob
@@ -137696,7 +137803,7 @@ screens:
     contract: seating
     purpose: Publish or roll back
     trigger: onAction
-    invalidates: *id022
+    invalidates: *id021
   - operationId: proposeSeatMapChanges
     contract: ai
     purpose: Propose categories, numbering, a stage variant or consistency findings for this map
@@ -140325,7 +140432,7 @@ screens:
     purpose: Define one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id024
+    invalidates: &id023
     - listSeatHoldTypes
   wireframe:
     status: notStarted
@@ -140554,7 +140661,7 @@ screens:
     purpose: Which rule applies where
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id023
+    invalidates: &id022
     - listSeatHoldTypes
   - operationId: listSeatHoldTypes
     contract: seating
@@ -140670,7 +140777,7 @@ screens:
     purpose: Expiration rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id023
+    invalidates: *id022
   - operationId: listSeatHoldTypes
     contract: seating
     purpose: The kinds of hold a venue places, and who may release them
@@ -141128,7 +141235,7 @@ screens:
     purpose: Priority between kinds
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id024
+    invalidates: *id023
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1011
@@ -141511,7 +141618,7 @@ screens:
     purpose: Kill a seat, with a reason
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id025
+    invalidates: &id024
     - getSeatRules
     - getSeatInventory
   - operationId: getSeatRules
@@ -141625,7 +141732,7 @@ screens:
     purpose: Buffer seats around a sale
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id025
+    invalidates: *id024
   - operationId: getSeatRules
     contract: seating
     purpose: Kill, buffer, companion and accessibility rules
@@ -141735,7 +141842,7 @@ screens:
     purpose: Companion pairing
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id025
+    invalidates: *id024
   - operationId: getSeatRules
     contract: seating
     purpose: Kill, buffer, companion and accessibility rules
@@ -142050,7 +142157,7 @@ screens:
     purpose: Routes to each space
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id026
+    invalidates: &id025
     - getAccessibleSeating
     - validateSeatCompliance
   - operationId: getAccessibleSeating
@@ -142164,7 +142271,7 @@ screens:
     purpose: Who may buy them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id026
+    invalidates: *id025
   - operationId: getAccessibleSeating
     contract: seating
     purpose: Accessible seats, their routes and who may buy them
@@ -142274,7 +142381,7 @@ screens:
     purpose: Flexible spacing and density
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id025
+    invalidates: *id024
   - operationId: getSeatRules
     contract: seating
     purpose: Kill, buffer, companion and accessibility rules
@@ -143761,7 +143868,7 @@ screens:
     purpose: What "best seat" means here
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id027
+    invalidates: &id026
     - getSeatRecommendationRules
   - operationId: getSeatRecommendationRules
     contract: seating
@@ -143873,7 +143980,7 @@ screens:
     purpose: Best value weighting
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id027
+    invalidates: *id026
   - operationId: getSeatRecommendationRules
     contract: seating
     purpose: What "best" means at this venue
@@ -143983,7 +144090,7 @@ screens:
     purpose: Closest to stage
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id027
+    invalidates: *id026
   - operationId: getSeatRecommendationRules
     contract: seating
     purpose: What "best" means at this venue
@@ -144093,7 +144200,7 @@ screens:
     purpose: Family together
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id027
+    invalidates: *id026
   - operationId: getSeatRecommendationRules
     contract: seating
     purpose: What "best" means at this venue
@@ -144547,7 +144654,7 @@ screens:
     purpose: Scoring and governance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id027
+    invalidates: *id026
   - operationId: getSeatRecommendationRules
     contract: seating
     purpose: What "best" means at this venue
@@ -148070,11 +148177,6 @@ screens:
     purpose: Clone a map into a new venue
     trigger: onAction
     provenance: board reading, 19 September 2026
-  - operationId: setConfigurationProfile
-    contract: tenancy
-    purpose: Inherited settings
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getSeatMap
     contract: seating
     purpose: Read a seat map with its structure
@@ -149871,7 +149973,7 @@ screens:
     purpose: Change them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id028
+    invalidates: &id027
     - listWalletTypes
   - operationId: listWalletTypes
     contract: wallet
@@ -149982,11 +150084,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: getWallet
-    contract: wallet
-    purpose: The wallet and its owner
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: updateWalletType
     contract: wallet
     purpose: Ownership and association rules
@@ -150139,7 +150236,7 @@ screens:
     purpose: Currency and monetary limits
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id028
+    invalidates: *id027
   - operationId: listWalletTypes
     contract: wallet
     purpose: The kinds of wallet that may exist — who owns one
@@ -150434,7 +150531,7 @@ screens:
     purpose: Which features this wallet type has
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id028
+    invalidates: *id027
   - operationId: listWalletTypes
     contract: wallet
     purpose: The kinds of wallet that may exist — who owns one
@@ -150547,7 +150644,7 @@ screens:
     purpose: Lifecycle states and transitions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id028
+    invalidates: *id027
   - operationId: listWalletTypes
     contract: wallet
     purpose: The kinds of wallet that may exist — who owns one
@@ -150675,13 +150772,13 @@ screens:
     purpose: Numbering and identity
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id028
+    invalidates: *id027
   - operationId: linkWalletCredential
     contract: wallet
     purpose: Digital credentials
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id033
+    invalidates: &id031
     - getWallet
   - operationId: listWalletTypes
     contract: wallet
@@ -151048,11 +151145,6 @@ screens:
     purpose: Funding rules in force
     trigger: onLoad
     provenance: board reading, 19 September 2026
-  - operationId: listWalletTransactions
-    contract: wallet
-    purpose: Recent funding
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1093
@@ -151230,9 +151322,20 @@ screens:
     — it is settings, not a population
   purpose: Control the business rules governing individual wallet top-up transactions.
   purposeNote: Every wallet top-up is evaluated against the applicable funding rules before value is credited.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1096, BO-1097, BO-1098, BO-1099,
-    BO-1101, BO-417, BO-418; this screen is Top-Up Rule Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+  division: 'Shares `getWalletFundingRules` with BO-1096, BO-1097, BO-1098, BO-1099, BO-1101, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Top-Up Rule Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
     board 2.03, page 15): control the business rules governing individual wallet top-up transactions.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its pack select and text fields bind to no operation and it has
+      no Save or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding
+      Method Configuration (Save funding rules), where setWalletFundingRules stays declared and reached;
+      the lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps
+      getWalletFundingRules and its rules panel. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -151323,13 +151426,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Amounts, presets and bonus rules
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -151375,9 +151471,21 @@ screens:
   patternReason: the pack gives this screen a configuration directory (§Configure funding availability
     across; Configure) and no display directory — it is settings, not a population
   purpose: Determine where each funding method may be used.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1097, BO-1098, BO-1099,
-    BO-1101, BO-417, BO-418; this screen is Channel & Funding Source Mapping (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
-    board 2.04, page 16): determine where each funding method may be used.'
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1097, BO-1098, BO-1099, BO-1101, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Channel & Funding Source Mapping
+    (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.04, page 16): determine where each
+    funding method may be used.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its pack channel select fields bind to no operation and it has
+      no Save or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding
+      Method Configuration (Save funding rules), where setWalletFundingRules stays declared and reached;
+      the lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps
+      getWalletFundingRules and its rules panel. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -151471,13 +151579,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Channel and funding-source mapping
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -151527,11 +151628,22 @@ screens:
     threshold.
   purposeNote: Auto-reload occurs only after the configured threshold is reached and all consent, payment,
     security and funding-limit validations have passed.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1098, BO-1099,
-    BO-1101, BO-417, BO-418; this screen is Auto-Reload Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1098, BO-1099, BO-1101, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Auto-Reload Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
     board 2.05, page 17): configure automatic wallet replenishment when balances fall below predefined
     thresholds. The attached scope specifically requires automatic top-up when a wallet balance falls
     below a configurable threshold.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its only component is the read-only rules panel (getWalletFundingRules)
+      and it has no Save or publish control, so it never sends the PUT. The funding rules are saved on
+      BO-1094 Funding Method Configuration (Save funding rules), where setWalletFundingRules stays declared
+      and reached; the lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004.
+      The screen keeps getWalletFundingRules and its rules panel. A CR brings the write back here with
+      the control that sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -151607,13 +151719,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Auto-reload on a threshold
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -151662,11 +151767,12 @@ screens:
     specifically requires scheduled or recurring top-ups based on date, frequency, amount, payment method
     and customer authorization.
   purposeNote: and authorization requirements.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1099,
-    BO-1101, BO-417, BO-418; this screen is Recurring Funding Schedule (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
-    board 2.06, page 17): configure scheduled wallet funding independent of the wallet''s current balance.
-    The source specifically requires scheduled or recurring top-ups based on date, frequency, amount,
-    payment method and customer authorization.'
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1099, BO-1101, BO-417,
+    BO-418 (it and BO-1094, BO-417, BO-418 send `setWalletFundingRules`, CHG-R11FXU-002); this screen
+    is Recurring Funding Schedule (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.06, page
+    17): configure scheduled wallet funding independent of the wallet''s current balance. The source specifically
+    requires scheduled or recurring top-ups based on date, frequency, amount, payment method and customer
+    authorization.'
   layout:
     template: form
     regions:
@@ -151734,6 +151840,7 @@ screens:
       components:
       - kind: primaryButton
         label: Specific day of month
+        operation: setWalletFundingRules
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 17 §Support schedules such
           as
   states:
@@ -151801,9 +151908,21 @@ screens:
   purpose: Apply governance and approval controls to wallet funding operations.
   purposeNote: Funding transactions requiring approval cannot alter the wallet balance until all configured
     authorization requirements are satisfied.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098,
-    BO-1101, BO-417, BO-418; this screen is Funding Authorization & Approval Rules (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
-    board 2.07, page 18): apply governance and approval controls to wallet funding operations.'
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1101, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Funding Authorization & Approval
+    Rules (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.07, page 18): apply governance
+    and approval controls to wallet funding operations.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its pack select fields bind to no operation and it has no Save
+      or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding Method
+      Configuration (Save funding rules), where setWalletFundingRules stays declared and reached; the
+      lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps
+      getWalletFundingRules and its rules panel. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -151898,13 +152017,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Approval above a threshold
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -152035,7 +152147,7 @@ screens:
     purpose: Reverse or correct a top-up
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id034
+    invalidates: &id032
     - listWalletTransactions
     - listCreditLots
   - operationId: adjustWallet
@@ -152100,11 +152212,22 @@ screens:
     configurable maximum balance, daily top-up limit, single-transaction limit and user- specific limits.
   purposeNote: Funding limits are evaluated in real time before wallet value is credited, with configurable
     actions for violations.
-  division: 'Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098,
-    BO-1099, BO-417, BO-418; this screen is Funding Limits & Velocity Controls (pack Wallet_Configuration_Backend_Structure_v1.0.pdf,
-    board 2.09, page 20): protect wallets against excessive or suspicious funding activity. The source
-    specifically requires configurable maximum balance, daily top-up limit, single-transaction limit and
-    user- specific limits.'
+  division: 'Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1099, BO-417,
+    BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Funding Limits & Velocity Controls
+    (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.09, page 20): protect wallets against
+    excessive or suspicious funding activity. The source specifically requires configurable maximum balance,
+    daily top-up limit, single-transaction limit and user- specific limits.'
+  gaps:
+  - operation: setWalletFundingRules
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its pack limit fields bind to no operation and it has no Save or
+      publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding Method
+      Configuration (Save funding rules), where setWalletFundingRules stays declared and reached; the
+      lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps
+      getWalletFundingRules and its rules panel. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -152216,13 +152339,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletFundingRules
-    contract: wallet
-    purpose: Limits and velocity controls
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getWalletFundingRules
   - operationId: getWalletFundingRules
     contract: wallet
     purpose: How a wallet may be topped up
@@ -152319,7 +152435,23 @@ screens:
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 21 §Allow administrators
           to identify
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        label: The funding audit trail
+        bindsTo: WalletTransaction
+        columns:
+        - WalletTransaction.recordedAt
+        - WalletTransaction.kind
+        - WalletTransaction.amount
+        - WalletTransaction.balanceAfter
+        - WalletTransaction.orderId
+        - WalletTransaction.reason
+        - WalletTransaction.principalId
+        operation: listWalletTransactions
+        notes: Every movement on the wallet, the record the exception buttons above are checked against
+          (r11 gate fix, CHG-R11FXS-003).
+        provenance: contract wallet.yaml GET /wallets/{subjectId}/transactions; r11 gate fix, 29 October
+          2026
   states:
     loading: The funding transaction audit list.
     error: Could not load. Names which read failed and leaves the funding transaction audit untouched.
@@ -152333,7 +152465,7 @@ screens:
   - operationId: listWalletTransactions
     contract: wallet
     purpose: The funding audit trail
-    trigger: onAction
+    trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: getWalletReconciliation
     contract: wallet
@@ -152690,7 +152822,7 @@ screens:
     purpose: Change one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id029
+    invalidates: &id028
     - listCreditTypes
   - operationId: listCreditTypes
     contract: wallet
@@ -152816,7 +152948,7 @@ screens:
     purpose: How this credit is issued
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates: *id028
   - operationId: listCreditTypes
     contract: wallet
     purpose: The kinds of value that may sit in a wallet
@@ -153165,7 +153297,7 @@ screens:
     purpose: Expiry and validity
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id029
+    invalidates: *id028
   - operationId: listCreditTypes
     contract: wallet
     purpose: The kinds of value that may sit in a wallet
@@ -154070,7 +154202,7 @@ screens:
     purpose: Household members and roles
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id030
+    invalidates: &id029
     - listSharedWallets
   - operationId: listSharedWallets
     contract: wallet
@@ -154198,15 +154330,7 @@ screens:
     purpose: Parent and child distribution
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id030
-  - operationId: transferWalletBalance
-    contract: wallet
-    purpose: Move value between them
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates: &id031
-    - getWallet
-    - listWalletTransactions
+    invalidates: *id029
   - operationId: listSharedWallets
     contract: wallet
     purpose: Family, household and corporate structures
@@ -154335,7 +154459,7 @@ screens:
     purpose: Allowance and budget
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id030
+    invalidates: *id029
   - operationId: listSharedWallets
     contract: wallet
     purpose: Family, household and corporate structures
@@ -154489,7 +154613,7 @@ screens:
     purpose: Spending controls per member
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id030
+    invalidates: *id029
   - operationId: listSharedWallets
     contract: wallet
     purpose: Family, household and corporate structures
@@ -154725,7 +154849,7 @@ screens:
     purpose: Corporate budget and policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id030
+    invalidates: *id029
   - operationId: setApprovalMatrix
     contract: approvals
     purpose: Set how corporate wallet spend is approved (levels, mode, thresholds)
@@ -154838,6 +154962,32 @@ screens:
         bindsTo: WalletBalance
         operation: getWalletBalance
         provenance: contract wallet.yaml GET /wallets/{walletId}/balance; wiring fix, 2 October 2026
+      - kind: primaryButton
+        label: Transfer balance
+        operation: transferWalletBalance
+        notes: Opens the form that moves value from this wallet to another in the structure (r11 gate
+          fix, CHG-R11FXS-004).
+        provenance: contract wallet.yaml POST /wallets/{walletId}/transfer; r11 gate fix, 29 October 2026
+  overlays:
+  - id: formTransferWalletBalance
+    component: modal
+    trigger: Transfer balance
+    body: '**Collects what `transferWalletBalance` sends before it is called.** Required: `amount` (cash
+      credit only) and the receiving wallet, `toWalletId`, named outright: the only way to reach a parent,
+      child, department or corporate wallet of the structure. Optional: `message`. The wallet the screen
+      is on is the sender. A `409` (insufficient cash credit, a suspended or closed wallet, or transfer
+      rules that forbid it) stays in the dialog and says which. Dismissing sends nothing; no value moves.'
+    confirm:
+      label: Transfer
+      operation: transferWalletBalance
+    dismiss:
+      label: Cancel
+      discards:
+      - toWalletId
+      - amount
+      - message
+    provenance: contract wallet.yaml POST /wallets/{walletId}/transfer; r11 gate fix, 29 October 2026
+      (CHG-R11FXS-004)
   states:
     loading: The shared wallet transfers configuration as saved.
     error: Could not load. Names which read failed and leaves the shared wallet transfers untouched.
@@ -154853,7 +155003,9 @@ screens:
     purpose: Reallocate balance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id031
+    invalidates:
+    - getWallet
+    - listWalletTransactions
   - operationId: getWalletBalance
     contract: wallet
     purpose: A wallet's balance
@@ -155123,6 +155275,7 @@ screens:
         - Operational Alerts
         notes: 'The pack groups this record''s detail under its own headings: “Highlight”.'
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Display
+        operation: getWalletLiability
     - name: actionBar
       slot: rowActions
       components:
@@ -155140,9 +155293,11 @@ screens:
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions
       - kind: secondaryButton
         label: Search Instrument
+        operation: getGiftCard
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions
       - kind: secondaryButton
         label: Check Balance
+        operation: getGiftCard
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions
       - kind: secondaryButton
         label: Investigate Redemption
@@ -156856,7 +157011,7 @@ screens:
     purpose: Channel configuration
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id032
+    invalidates: &id030
     - getWalletFundingRules
   wireframe:
     status: notStarted
@@ -156973,7 +157128,7 @@ screens:
     purpose: Payment and redemption policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id030
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1135
@@ -157117,7 +157272,7 @@ screens:
     purpose: Credential kinds accepted
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id030
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1136
@@ -157263,7 +157418,7 @@ screens:
     purpose: Bind a wearable to a wallet
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id033
+    invalidates: *id031
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1137
@@ -157368,7 +157523,7 @@ screens:
     purpose: NFC, RFID and QR rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id030
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1138
@@ -157486,7 +157641,7 @@ screens:
     purpose: Authentication and PIN policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id030
   - operationId: setWalletAuthenticationPolicy
     contract: wallet
     purpose: Save authentication policy
@@ -157622,7 +157777,7 @@ screens:
     purpose: Offline and degraded mode
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id030
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1140
@@ -158010,7 +158165,7 @@ screens:
         - Correction
         - Administrative Operation
         bindsTo: null
-        operation: null
+        operation: listWalletTransactions
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 75 §Display
     - name: contextPanel
       slot: selection
@@ -158062,7 +158217,7 @@ screens:
   - operationId: listWalletTransactions
     contract: wallet
     purpose: Recent activity
-    trigger: onAction
+    trigger: onLoad
     provenance: board reading, 19 September 2026
   entryState:
     preloaded:
@@ -158570,6 +158725,16 @@ screens:
     Example
   purposeNote: Refund processing correctly reconstructs or converts the value originally consumed without
     unintentionally changing its financial or promotional classification.
+  gaps:
+  - operation: setWalletRefundPolicy
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-003): a board reading of 19 September declared it, and nothing
+      on the approved screen calls it: its six pack restore fields bind to no operation and it has no
+      Save control. The wallet refund policy is saved on BO-1146 (Save wallet refund policy), where setWalletRefundPolicy
+      stays declared and reached (CHG-R10WIR-002, item 5). The screen keeps getOrder, listOrderRefunds
+      and createRefund for the order it routes. A CR brings the write back here with the control that
+      sends it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -158613,11 +158778,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: setWalletRefundPolicy
-    contract: wallet
-    purpose: Restoration to the original lots
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: createRefund
     contract: orders
     purpose: Issue the refund
@@ -158742,7 +158902,7 @@ screens:
     purpose: Reverse a transaction
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id034
+    invalidates: *id032
   - operationId: listWalletTransactions
     contract: wallet
     purpose: Wallet transaction history
@@ -161138,7 +161298,7 @@ screens:
     purpose: Credit types to ledger accounts
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id035
+    invalidates: &id033
     - getWalletLiability
   wireframe:
     status: notStarted
@@ -161812,7 +161972,7 @@ screens:
     purpose: Breakage recognition policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id035
+    invalidates: *id033
   entryState:
     preloaded:
     - Original value → AED 500
@@ -162183,21 +162343,26 @@ screens:
       components:
       - kind: primaryButton
         label: Run Finance Validation
+        operation: getUnifiedReconciliation
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions
       - kind: secondaryButton
         label: Review Exceptions
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions
       - kind: secondaryButton
         label: Submit Close
+        operation: beginPeriodClose
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions
       - kind: secondaryButton
         label: Approve Close
+        operation: closeFiscalPeriod
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions
       - kind: secondaryButton
         label: Generate Liability Report
+        operation: getWalletLiability
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions
       - kind: secondaryButton
         label: Generate Reconciliation Report
+        operation: getWalletReconciliation
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions
       - kind: secondaryButton
         label: Export Audit
@@ -162830,7 +162995,7 @@ screens:
     purpose: Integration profile
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id030
   - operationId: setWalletIntegrationMapping
     contract: wallet
     purpose: Save mapping
@@ -205343,7 +205508,7 @@ screens:
     purpose: Its payment configuration
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id036
+    invalidates: &id034
     - listPaymentTerminals
   wireframe:
     status: notStarted
@@ -205981,7 +206146,7 @@ screens:
     purpose: Store-and-forward limits
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id036
+    invalidates: *id034
   entryState:
     preloaded:
     - Terminal
@@ -206055,6 +206220,23 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Payment_Payment_Orchestration.pdf, page 56
+  - operation: listDeviceFirmware
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXT-002): the approved screen has no element that shows firmware
+      (its content region is empty and its two buttons are pack text), and the lead''s ruling of 26 October
+      2026 (CHG-R10WIR-002, item 5) is that a read the approved screen has no element for leaves it. Firmware
+      releases are managed on BO-129; a CR brings them back here if this screen needs them.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
+  - operation: getDeviceFirmware
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXT-002), with listDeviceFirmware: nothing on the approved screen
+      opens a release.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
+  - operation: createDeviceFirmware
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXT-002), with listDeviceFirmware: nothing on the approved screen
+      registers a release; BO-129 declares it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -206089,21 +206271,6 @@ screens:
     purpose: Raise a repair
     trigger: onAction
     provenance: board reading, 19 September 2026
-  - operationId: listDeviceFirmware
-    contract: tenancy
-    purpose: Terminal firmware versions across the fleet
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getDeviceFirmware
-    contract: tenancy
-    purpose: Open a release
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: createDeviceFirmware
-    contract: tenancy
-    purpose: Register a terminal firmware release
-    trigger: onAction
-    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-587
@@ -206116,11 +206283,6 @@ screens:
     params:
     - name: deviceId
       from: session
-    - name: firmwareId
-      from: navigation
-      optional: true
-      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDeviceFirmware`
-        and the user picks one; an edge that holds one may still carry it to open on that record.'
 - id: ADM-588
   name: Terminal Simulator, Certification & AI Operations Advisor
   module: Commercial
@@ -207859,7 +208021,7 @@ screens:
     purpose: Which combinations are allowed
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id037
+    invalidates: &id035
     - getMixedTenderRules
   - operationId: getMixedTenderRules
     contract: payments
@@ -208064,6 +208226,16 @@ screens:
       so either the write operations are missing or this screen is a view of something another screen
       builds.'
     source: contract — the screen's declared operations
+  - operation: listB2bCreditAccounts
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-004): the approved screen has no list, table or picker that
+      shows the accounts (its body is seven pack select fields for the facility being opened), and the
+      lead''s ruling of 26 October 2026 (CHG-R10WIR-002, item 5) is that a read the approved screen has
+      no element for leaves it. The accounts are listed and picked on ADM-603 (Customer/account) and ADM-608,
+      where listB2bCreditAccounts stays declared and reached. The edge to ADM-603 carries the accountId
+      createB2bCreditAccount returns; opened otherwise, ADM-603 picks the account itself. A CR brings
+      the read back here with the list that shows it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: form
     regions:
@@ -208101,11 +208273,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: listB2bCreditAccounts
-    contract: payments
-    purpose: On-account customers
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   - operationId: createB2bCreditAccount
     contract: payments
     purpose: Open an account
@@ -208509,7 +208676,7 @@ screens:
     purpose: Sequence and restrictions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id037
+    invalidates: *id035
   - operationId: getMixedTenderRules
     contract: payments
     purpose: Which tenders may be combined, and in what order
@@ -209315,7 +209482,6 @@ screens:
   module: Commercial
   requiresModule: core
   wave: 3
-  permission: WALLET_CONFIGURE
   source:
     pack: Payment_Payment_Orchestration.pdf
     board: '6'
@@ -209373,6 +209539,16 @@ screens:
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No read of the wallet refund policy (setWalletRefundPolicy
       has no get).'
     source: contracts/satellite/wallet.yaml#setWalletRefundPolicy | screens/P08-venue-back-office.yaml#ADM-612
+  - operation: setWalletRefundPolicy
+    removed: true
+    why: 'Removed 29 October 2026 (CHG-R11FXU-007, the lead: "Remove + log text"): a board reading of
+      19 September declared it, and nothing on the approved screen sends it: its one pack action, Manual
+      allocation with approval, collects nothing for the policy, and its Cancel was generated. The wallet
+      refund policy is saved on BO-1146 (Save wallet refund policy), where setWalletRefundPolicy stays
+      declared and reached. The generated Cancel goes with it; the pack action stays, bound to nothing,
+      as before. With no operation left the screen has no permission of its own and its no-access state
+      says so. A CR brings the write back here with the control and the fields that send it.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -209384,12 +209560,9 @@ screens:
         provenance: pack Payment_Payment_Orchestration.pdf, page 118 §Support configurable approaches
           such as
     - name: contentBody
-      components:
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: setWalletRefundPolicy
+      components: []
+      notes: 'Empty since 29 October 2026 (CHG-R11FXU-007): its one control, a generated Cancel, went
+        with setWalletRefundPolicy; the pack gives the body nothing to draw. A CR fills it.'
   states:
     loading: The refund allocation original list.
     error: Could not load. Names which read failed and leaves the refund allocation original untouched.
@@ -209397,14 +209570,9 @@ screens:
       that matched nothing.
     emptyNoResults: The filter narrowed it and the refund allocation original are still there. Names the
       active filter and offers to clear it.
-    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
-      data* and sends somebody to support with the wrong question.
-  apis:
-  - operationId: setWalletRefundPolicy
-    contract: wallet
-    purpose: Refund to wallet or original tender
-    trigger: onAction
-    provenance: board reading, 19 September 2026
+    emptyNoAccess: 'Not shown: nothing on this screen needs a permission of its own; the app''s sign-in
+      decides access.'
+  apis: []
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-612
@@ -213175,7 +213343,7 @@ screens:
     purpose: Declare them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id038
+    invalidates: &id036
     - listProductRelationships
   wireframe:
     status: notStarted
@@ -214135,7 +214303,7 @@ screens:
     purpose: Order it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id038
+    invalidates: *id036
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-650
@@ -215335,7 +215503,7 @@ screens:
     purpose: Build the relationships
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id039
+    invalidates: &id037
     - listProductRelationships
   - operationId: listProductRelationships
     contract: promotions
@@ -215641,7 +215809,7 @@ screens:
     purpose: Across categories
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id039
+    invalidates: *id037
   - operationId: listProductRelationships
     contract: promotions
     purpose: The product relationships already declared
@@ -215743,7 +215911,7 @@ screens:
     purpose: Across attractions and partners
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id039
+    invalidates: *id037
   - operationId: listProductRelationships
     contract: promotions
     purpose: The product relationships already declared
@@ -221248,7 +221416,7 @@ screens:
     purpose: Create the workflow
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id040
+    invalidates: &id038
     - listWorkflow
   wireframe:
     status: notStarted
@@ -221330,7 +221498,7 @@ screens:
     purpose: Stages and approvers
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id040
+    invalidates: *id038
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-322
@@ -221554,7 +221722,7 @@ screens:
     purpose: Sequence and parallel routing
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id040
+    invalidates: *id038
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-324
@@ -221644,7 +221812,7 @@ screens:
     purpose: What happens on each outcome
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id043
+    invalidates: &id041
     - listCrossModuleOrchestration
   wireframe:
     status: notStarted
@@ -221823,7 +221991,7 @@ screens:
     purpose: Publish
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id040
+    invalidates: *id038
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-327
@@ -222156,7 +222324,7 @@ screens:
     purpose: Authority by role and value
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id041
+    invalidates: &id039
     - listApprovalMatrices
   wireframe:
     status: notStarted
@@ -222251,7 +222419,7 @@ screens:
     purpose: Route up the hierarchy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id041
+    invalidates: *id039
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-331
@@ -222336,7 +222504,7 @@ screens:
     purpose: By department
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id041
+    invalidates: *id039
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-332
@@ -222431,7 +222599,7 @@ screens:
     purpose: By venue and tenant
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id041
+    invalidates: *id039
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-333
@@ -222526,7 +222694,7 @@ screens:
     purpose: By value threshold
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id041
+    invalidates: *id039
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-334
@@ -222620,7 +222788,7 @@ screens:
     purpose: By risk and condition
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id041
+    invalidates: *id039
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-335
@@ -222714,7 +222882,7 @@ screens:
     purpose: Approver groups and decision policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id042
+    invalidates: &id040
     - listApprovalControlPolicies
   wireframe:
     status: notStarted
@@ -223254,7 +223422,7 @@ screens:
     purpose: Four-eyes and dual control
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id042
+    invalidates: *id040
   - operationId: listApprovalControlPolicies
     contract: approvals
     purpose: What is already required
@@ -224526,7 +224694,7 @@ screens:
     purpose: Workflow events
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id043
+    invalidates: *id041
   - operationId: listWebhookEventTypes
     contract: public-api
     purpose: Workflow events published through the event framework (publisher=approvals)
@@ -224873,7 +225041,7 @@ screens:
     purpose: Map external data onto a request
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id043
+    invalidates: *id041
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-355

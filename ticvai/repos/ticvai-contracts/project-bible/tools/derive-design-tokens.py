@@ -60,6 +60,22 @@ APPLIED_FROM = {
     "direction": "dir=rtl on the root when the guest's language is Arabic; every token is direction-free",
 }
 
+# **How the app shell picks a skin and lays the tenant's theme over it** (ADAM CR-280, option B with C meanwhile,
+# Chinmay, 28 October 2026; CHG-R11TEN-007). The app's appliedFrom differs from the web's on the points the decision
+# settled for the app; guest web's rules are CR-272's.
+APP_APPLIED_FROM = dict(APPLIED_FROM, **{
+    "skinKey": "PublishedTenantConfig.skinKey (getPublishedTenantConfig with venueId): the venue's skin, one of "
+               "skins.byVenueKind; null or not yet published: the base skin with park (until the field arrives, the "
+               "shell takes the key as an input, base plus park until set)",
+    "order": "the skin sets every token; then theme.primaryColour, theme.backgroundColour and theme.textColour "
+             "override --br, --bg and --ink where set",
+    "theme.textColour": "--ink, where set; never derived (Theme requires it)",
+    "theme.darkMode": "never used to render (deprecated, CHG-CSA-035)",
+    "theme.cornerRadius": "--rk = cornerRadius / 10, the scale on the base radii sm 6, md 10, lg 16 (px)",
+    "fonts": "FontConfig's faces replace the skin's --fh and --fb: the Latin pair (primaryLatin, secondaryLatin), and "
+             "under dir=rtl the Arabic pair (primaryArabic, secondaryArabic)",
+})
+
 
 def read(rel: str) -> str:
     return (ROOT / rel).read_text(encoding="utf-8")
@@ -170,6 +186,73 @@ def line_of(src: str, needle: str) -> int:
     return src.count("\n", 0, i) + 1 if i >= 0 else 0
 
 
+# **The guest web theme engine** (ADAM CR-272, option A, Chinmay, 28 October 2026; CHG-R11RUL-005). The token rules
+# read inputs the published Theme does not carry (surface, surf, surf2, fg, dark, flat, the density d) and call colour
+# functions the package never wrote down, so the shell could apply only the tokens Theme carries directly (option C,
+# meanwhile). The decision: the engine follows the prototype's theme() rules with no contract change; these are the
+# inputs it derives from Theme and FontConfig, and the functions are copied from the prototype below, so they behave
+# exactly as the prototype's do. guest-app is CR-280's and keeps APPLIED_FROM.
+WEB_APPLIED_FROM = dict(APPLIED_FROM, **{
+    "theme.textColour": "fg, the ink every ink, line and surface rule mixes toward (--ink, --ink-2, --ink-3, "
+                        "--line, --surface); Theme requires it, so it is never derived",
+    "theme.darkMode": "never used to render (the contract deprecates it); dark is derived from theme.backgroundColour "
+                      "(themeEngine.inputs.dark)",
+    "fonts": "FontConfig's faces: primaryLatin -> --font-h, secondaryLatin (else primaryLatin) -> --font-b; under "
+             "dir=rtl the Arabic pair, primaryArabic -> --font-h and secondaryArabic (else primaryArabic) -> --font-b",
+})
+WEB_INPUTS = {
+    "brand": "theme.primaryColour",
+    "brand2": "theme.secondaryColour, else brand",
+    "accent": "theme.accentColour",
+    "bg": "theme.backgroundColour",
+    "fg": "theme.textColour (Theme requires it; never derived)",
+    "dark": "relLum(bg) < 0.5: dark is derived from the background's relative luminance (dark below 0.5); "
+            "theme.darkMode is never used to render",
+    "surface": "surf: the opaque surface the prototype's palette carries and Theme does not (--surface-op, and "
+               "`surface` in every rule)",
+    "surf": "mix(bg, fg, 0.04): the background mixed 4% toward the ink",
+    "surf2": "mix(bg, fg, 0.08): the background mixed 8% toward the ink",
+    "d": "1: the density the skin defaults fix (Standard: --sp2 16px, --sp3 24px, --sp4 36px, the token defaults)",
+    "flat": "false: the skin default has no solid bars (--card-bw 1.5px, the token default)",
+    "glass": "theme.surfaceStyle is Glass (Glass when it is not set), as data-glass on the root",
+    "r": "theme.cornerRadius, else 10",
+    "btn": "theme.buttonStyle, else Solid",
+    "fp": "[the heading face, the body face] from FontConfig (appliedFrom.fonts), the Arabic pair under dir=rtl",
+}
+WEB_FUNCTIONS = ("hex2rgb", "relLum", "ratio", "mix", "rgba", "inkOn", "onColor")
+WEB_FUNCTION_SAYS = {
+    "mix": "sRGB mix by weight: each channel a + (b - a) x t, rounded, as #rrggbb",
+    "rgba": "the colour's channels with alpha a, as rgba(r,g,b,a)",
+    "inkOn": "a readable ink of colour h on a ground: moves h 10% at a time toward #141416 (on a ground of relative "
+             "luminance above 0.34) or #ffffff until its WCAG contrast ratio against the ground reaches the target "
+             "(4.5 by default), at most 16 steps",
+    "onColor": "the readable text on a colour: #141416 or #ffffff, whichever has the higher WCAG contrast against it",
+    "hex2rgb": "#rgb or #rrggbb to [r, g, b] (0 where a pair does not parse)",
+    "relLum": "WCAG relative luminance of a colour",
+    "ratio": "WCAG contrast ratio of two colours, (lighter + 0.05) / (darker + 0.05)",
+}
+
+
+def web_engine(src: str) -> dict:
+    """themeEngine: how every derived input of the token rules is worked out from Theme and FontConfig, and the colour
+    functions as the prototype writes them (ADAM CR-272, option A; CHG-R11RUL-005)."""
+    funcs = {}
+    for name in WEB_FUNCTIONS:
+        m = re.search(r"^\s{2}(" + re.escape(name) + r"\([^)]*\))\s*\{", src, re.M)
+        funcs[name] = {"signature": m.group(1) if m else name + "()", "says": WEB_FUNCTION_SAYS[name],
+                       "body": " ".join(method_body(src, name).split()),
+                       "line": src.count("\n", 0, m.start()) + 1 if m else 0}
+    return {
+        "decision": "ADAM CR-272, option A (Chinmay, 28 October 2026): the theme engine follows the prototype's theme() "
+                    "rules, with no contract change. The shell evaluates every token's rule (`tokens`, below) with these inputs and "
+                    "these functions; no token keeps its default once a tenant's Theme is applied.",
+        "inputs": WEB_INPUTS,
+        "functions": funcs,
+        "direction": "under dir=rtl the Arabic pair from FontConfig maps to --font-h and --font-b; every other token is "
+                     "direction-free",
+    }
+
+
 def web_tokens() -> dict:
     src = read(WEB)
     uses, falls = var_uses(src)
@@ -185,21 +268,25 @@ def web_tokens() -> dict:
         "app": "guest-web", "repository": "ticvai-guest-web", "platforms": ["P01"],
         "source": {"file": WEB, "rev": "rev 3, 30 September 2026 build", "theme": f"theme() at line {line_of(src, '  theme() {')}",
                    "apply": f"apply() at line {line_of(src, '  apply() {')}: every variable set on document.documentElement"},
-        "appliedFrom": APPLIED_FROM,
+        "appliedFrom": WEB_APPLIED_FROM,
         "fonts": {"pairs": pairs, "default": "Archivo / IBM Plex Sans",
                   "headingFallback": default_of(falls, "--font-h"), "bodyFallback": default_of(falls, "--font-b")},
+        "themeEngine": web_engine(src),
         "tokens": dict(sorted(tokens.items())),
         "palettes": palette_table(src, pal_lo - 40 if pal_lo > 40 else 1, pal_lo + 8),
         "notes": ["A variable's `default` is what the markup falls back to before the theme is applied (the prototype's "
                   "own default venue): build the shell so it is never seen, by applying the tenant's theme first.",
-                  "Colours are mixed by the rules (`mix`, `rgba`, `inkOn`, `onColor` in the prototype); the shell "
-                  "implements the same functions, so a tenant's two or three colours give every variable."],
+                  "Colours are mixed by the rules with the functions in themeEngine.functions, copied from the "
+                  "prototype; the shell implements them exactly so, and derives the rules' other inputs as "
+                  "themeEngine.inputs says (ADAM CR-272), so a tenant's Theme gives every variable.",
+                  "The named palettes below are the prototype's presets: their surface and dark are the prototype's "
+                  "own, and a tenant's Theme derives both instead (themeEngine.inputs)."],
     }
 
 
 def app_tokens() -> dict:
     v4, v2 = read(APP_V4), read(APP_V2)
-    out = {"app": "guest-app", "repository": "ticvai-guest-app", "platforms": ["P02"], "appliedFrom": APPLIED_FROM,
+    out = {"app": "guest-app", "repository": "ticvai-guest-app", "platforms": ["P02"], "appliedFrom": APP_APPLIED_FROM,
            "sources": []}
     for rel, src, marker, rev in ((APP_V4, v4, 'data-lux="1"', "Mobile App v4, 30 September 2026 build"),
                                   (APP_V2, v2, '<div style="--bg:{{ t.bg }}', "Guest Booking Mobile v2, 28 September 2026 build")):

@@ -47,7 +47,7 @@ servicesCalled:
 - service: MarketingService
   operationCalls: 62
 - service: CatalogueService
-  operationCalls: 58
+  operationCalls: 59
 - service: VenueOpsService
   operationCalls: 55
 - service: IdentityService
@@ -1678,6 +1678,7 @@ screens:
   - addCartLine
   - createCart
   - getAvailability
+  - listProductVariants
   - listProducts
   states:
   - emptyFirstRun
@@ -1689,6 +1690,7 @@ screens:
   offlineState: true
   entryParams:
   - cartId<-session
+  - productId<-navigation
   goesTo:
   - GST-001
   - GST-002

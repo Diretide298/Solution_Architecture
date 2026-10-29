@@ -1937,6 +1937,7 @@
       {
        "kind": "primaryButton",
        "label": "Run Finance Validation",
+       "operation": "getUnifiedReconciliation",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions"
       },
       {
@@ -1947,21 +1948,25 @@
       {
        "kind": "secondaryButton",
        "label": "Submit Close",
+       "operation": "beginPeriodClose",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions"
       },
       {
        "kind": "secondaryButton",
        "label": "Approve Close",
+       "operation": "closeFiscalPeriod",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions"
       },
       {
        "kind": "secondaryButton",
        "label": "Generate Liability Report",
+       "operation": "getWalletLiability",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions"
       },
       {
        "kind": "secondaryButton",
        "label": "Generate Reconciliation Report",
+       "operation": "getWalletReconciliation",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Actions"
       },
       {

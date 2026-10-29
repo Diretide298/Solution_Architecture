@@ -1,0 +1,43 @@
+# marketing.subjectDataPartWritten v1 — published by marketing
+# Added 29 October 2026 (the lead, r11 gate; CHG-R11FXC-005): a guest's data export is assembled from parts, and
+# Marketing writes its own part (the guest's consent records, guest profile, form submissions and guest documents)
+# when Identity raises the request, so Identity, which reads nothing above it (ADR-0028), reads no Marketing table.
+
+name: marketing.subjectDataPartWritten
+version: 1
+publisher: marketing
+description: Marketing wrote its part of a guest's data export to the tenant's private object storage.
+aggregate: subject
+emittedWhen: writeSubjectDataExportPart wrote Marketing's part for an identity.privacyRequestRaised of requestType access
+emittedBy:
+- marketing-crm.writeSubjectDataExportPart
+payload:
+- field: subjectId
+  type: uuid
+  notes: The guest the export is about (pii.subject)
+- field: approvalRequestId
+  type: uuid
+  notes: The export's id, as identity.privacyRequestRaised carried it (identity.subject_data_export.id)
+- field: fileRef
+  type: string
+  notes: The object key of Marketing's part in the tenant's private storage; never a public or CDN path
+- field: tables
+  type: array
+  notes: The Marketing tables the part holds rows of, each named even when it holds none of the guest's rows
+- field: rowCount
+  type: integer
+  notes: The guest's rows in the part, across its tables
+- field: writtenAt
+  type: timestamp
+consumers:
+- context: identity
+  purpose: 'Record the part against the export (identity.subject_data_export_part); the export job assembles the file
+    once every owner''s part is recorded and the request is approved (or needs no approval)'
+  operation: identity.recordSubjectDataExportPart
+  writes:
+  - identity.subject_data_export_part
+  idempotencyKey: approvalRequestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication
+notes: No state model emits this.

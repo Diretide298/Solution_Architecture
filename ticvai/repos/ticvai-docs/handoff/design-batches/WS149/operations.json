@@ -18,25 +18,6 @@
   "requestBody": "KioskAssignment",
   "responds": "KioskAssignment"
  },
- "createDeviceFirmware": {
-  "method": "POST",
-  "path": "/device-firmware",
-  "contract": "tenancy",
-  "summary": "Register a firmware or software release before it is deployed",
-  "permission": "DEVICE_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "DeviceFirmware",
-  "responds": "DeviceFirmware"
- },
  "createWorkOrder": {
   "method": "POST",
   "path": "/work-orders",
@@ -75,19 +56,6 @@
   "requestBody": "DeviceEnrolment",
   "responds": "RegisteredDevice"
  },
- "getDeviceFirmware": {
-  "method": "GET",
-  "path": "/device-firmware/{firmwareId}",
-  "contract": "tenancy",
-  "summary": "Read one firmware release, and how much of the fleet is on it",
-  "permission": "DEVICE_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "DeviceFirmware"
- },
  "getDeviceTelemetry": {
   "method": "GET",
   "path": "/devices/{deviceId}/telemetry",
@@ -116,30 +84,6 @@
   ],
   "requestBody": null,
   "responds": "DeviceTelemetryPoint"
- },
- "listDeviceFirmware": {
-  "method": "GET",
-  "path": "/device-firmware",
-  "contract": "tenancy",
-  "summary": "Firmware and software versions, and what is running where",
-  "permission": "DEVICE_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "deviceKind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "version",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "DeviceFirmware"
  },
  "listKioskAssignments": {
   "method": "GET",

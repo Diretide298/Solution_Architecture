@@ -360,7 +360,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Who uses it | venue staff holding `ORDER_CREATE`, `RENTAL_VIEW`, `RESOURCE_BOOK`, `RESOURCE_VIEW` (2 operate, 2 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`checkOutResource`, `checkInResource`, `authoriseStoredValue`) and no read of a population — it is settings, not a list |
-| Offline | Queued locally. The deposit is authorised on sync, and **the condition note taken now is the only defence against a dispute later**. |
+| Offline | **Not available offline.** The back office runs in a browser and keeps no offline store, so check-out, check-in and the stored-value actions are disabled until the connection returns, each saying so. **The condition note is the only defence against a dispute later**: it goes with the check-out or … |
 | Opens with | `authorisationId` (deepLink), `bookingId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/resources/check-out` |
 
@@ -514,10 +514,10 @@ Errors to draw in the form: 409 Insufficient balance after existing holds. The r
 | State | What it shows |
 |---|---|
 | Loading (`?state=loading`) | The booking and its condition history |
-| Error (`?state=error`) | Could not load. **Check-out and check-in work offline** — the deposit hold reconciles on sync. |
+| Error (`?state=error`) | Could not load. Names which read failed and leaves the booking untouched; nothing is checked out or in until it loads. |
 | Empty, first run (`?state=emptyFirstRun`) | Nothing is out. **The list a poolside attendant checks at close** — anything still here at the end of the day is a conversation. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `RENTAL_VIEW`, which `getRentalBooking` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `authoriseStoredValue`, `relinquishStoredValue`, `captureStoredValue`; `RESOURCE_BOOK` for `checkOutResource` … |
-| Offline (`?state=offline`) | Queued locally. The deposit is authorised on sync, and **the condition note taken now is the only defence against a dispute later**. |
+| Offline (`?state=offline`) | **Not available offline.** The back office runs in a browser and keeps no offline store, so check-out, check-in and the stored-value actions are disabled until the connection returns, each saying so. **The condition note is the only defence against a dispute later**: it goes with the check-out or check-in it belongs to, once the connection is back. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient balance after existing holds. The reason says which — the balance itself is too low (`insufficientBalance`), or enough is there but other holds … (StoredValueProblem); 409 Nothing is held to release — the hold is already `captured`, `released` or `expired` (`authorisationNotHeld`). (StoredValueProblem); 409 The hold is no longer live — `captured`, `released` or `expired` … |
 
 #### Edge cases to draw

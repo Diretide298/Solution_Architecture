@@ -1,5 +1,5 @@
 id: LLD-WhiteLabelService
-title: WhiteLabelService — 110 operations, 36 tables
+title: WhiteLabelService — 110 operations, 37 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
@@ -17,7 +17,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: whitelabel
-  tables: 36
+  tables: 37
   stores:
   - postgres
   largestTable: whitelabel.tenant_config
@@ -191,7 +191,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 1
+    reads: 3
     writes: 0
   - operation: getBookingFlow
     verb: GET
@@ -335,7 +335,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: true
-    reads: 10
+    reads: 12
     writes: 0
   - operation: getSitePackage
     verb: GET
@@ -375,7 +375,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: true
-    reads: 4
+    reads: 5
     writes: 0
   - operation: getTenantConfig
     verb: GET
@@ -599,7 +599,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_PUBLISH
     offline: false
-    reads: 15
+    reads: 16
     writes: 5
   - operation: recordStorefrontSessionEvents
     verb: POST
@@ -663,7 +663,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 4
     writes: 2
   - operation: setBookingFlowConfig
     verb: PUT
@@ -751,7 +751,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 4
+    reads: 6
     writes: 2
   - operation: setModuleEnablement
     verb: PUT
@@ -807,7 +807,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 4
     writes: 2
   - operation: setTheme
     verb: PUT
@@ -895,7 +895,7 @@ operationsByContract:
     scope: tenant
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 10
+    reads: 12
     writes: 1
   - operation: verifyCustomDomain
     verb: POST
@@ -1433,6 +1433,12 @@ tables:
   writtenBy:
   - white-label
   foreignWriters: null
+- table: whitelabel.received_release
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: whitelabel.site_package
   columns: 10
   store: postgres
@@ -1569,7 +1575,6 @@ screens:
 - P08:BO-748 Consent Capture & Versions
 - P08:BO-834 Digital Experience Center
 - P08:BO-835 Site, Brand & Domain Setup
-- P08:BO-836 Design System & Components
 - P08:BO-837 Page & Landing Builder
 - P08:BO-839 Dynamic Product Pages
 - P08:BO-840 Mobile App CMS

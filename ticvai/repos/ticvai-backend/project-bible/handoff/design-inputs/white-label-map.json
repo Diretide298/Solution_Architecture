@@ -716,6 +716,102 @@
    "venueOverride": false
   },
   {
+   "id": "theme.venueSkins",
+   "part": "theme",
+   "partLabel": "Theme: colours, shape, surfaces",
+   "path": "venueSkins",
+   "label": "Venue skins",
+   "control": "repeatable rows",
+   "mask": "",
+   "required": false,
+   "default": "—",
+   "allowed": "—",
+   "help": "The guest app skin each venue takes (ADAM CR-280, option B, 28 October 2026; CHG-R11TEN-007): one entry per venue, naming one of the approved app design's skins (`handoff/design-tokens/guest-app.yaml` …",
+   "effect": "",
+   "configuredOn": [
+    {
+     "screen": "CMS-005",
+     "name": "Theme Editor",
+     "op": "setTheme"
+    },
+    {
+     "screen": "ADM-016",
+     "name": "White-Label Branding Management",
+     "op": "setTheme"
+    }
+   ],
+   "reach": "shell",
+   "reachesText": "every guest screen (web, app and kiosk)",
+   "specific": [],
+   "channel": "",
+   "change": "on publish (CMS-014): web at once, the app on its next launch",
+   "venueOverride": false
+  },
+  {
+   "id": "theme.venueSkins[].venueId",
+   "part": "theme",
+   "partLabel": "Theme: colours, shape, surfaces",
+   "path": "venueSkins[].venueId",
+   "label": "Venue skins: venue",
+   "control": "picker: choose a venue",
+   "mask": "shows names, sends the id",
+   "required": true,
+   "default": "—",
+   "allowed": "shows names, sends the id",
+   "help": "",
+   "effect": "",
+   "configuredOn": [
+    {
+     "screen": "CMS-005",
+     "name": "Theme Editor",
+     "op": "setTheme"
+    },
+    {
+     "screen": "ADM-016",
+     "name": "White-Label Branding Management",
+     "op": "setTheme"
+    }
+   ],
+   "reach": "shell",
+   "reachesText": "every guest screen (web, app and kiosk)",
+   "specific": [],
+   "channel": "",
+   "change": "on publish (CMS-014): web at once, the app on its next launch",
+   "venueOverride": false
+  },
+  {
+   "id": "theme.venueSkins[].skinKey",
+   "part": "theme",
+   "partLabel": "Theme: colours, shape, surfaces",
+   "path": "venueSkins[].skinKey",
+   "label": "Venue skins: skin key",
+   "control": "select",
+   "mask": "",
+   "required": true,
+   "default": "—",
+   "allowed": "Park · Water · Stadium · Theatre · Dining · Kids · Museum · Rooms · Transport",
+   "help": "The guest app's skins per venue kind, as the approved Mobile App v4 design draws them (`handoff/design-tokens/guest-app.yaml` `skins.byVenueKind`; ADAM CR-280, CHG-R11TEN-007).",
+   "effect": "",
+   "configuredOn": [
+    {
+     "screen": "CMS-005",
+     "name": "Theme Editor",
+     "op": "setTheme"
+    },
+    {
+     "screen": "ADM-016",
+     "name": "White-Label Branding Management",
+     "op": "setTheme"
+    }
+   ],
+   "reach": "shell",
+   "reachesText": "every guest screen (web, app and kiosk)",
+   "specific": [],
+   "channel": "",
+   "change": "on publish (CMS-014): web at once, the app on its next launch",
+   "venueOverride": false
+  },
+  {
    "id": "theme.componentColours",
    "part": "theme",
    "partLabel": "Theme: colours, shape, surfaces",
@@ -10594,7 +10690,7 @@
    "required": false,
    "default": "—",
    "allowed": "pattern `^pass\\.[A-Za-z0-9.-]+$`; Apple entry only; a Google entry sending it is refused with 400.",
-   "help": "The Apple Wallet Pass Type ID (`pass.<reverse-domain>`), registered in the client's own Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033).",
+   "help": "The Apple Wallet Pass Type ID (`pass.<reverse-domain>`), registered in the client's own Apple Developer account (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033), one per tenant (ADAM CR-304 …",
    "effect": "",
    "configuredOn": [
     {
@@ -11090,6 +11186,9 @@
     "theme.cornerRadius",
     "theme.surfaceStyle",
     "theme.buttonStyle",
+    "theme.venueSkins",
+    "theme.venueSkins[].venueId",
+    "theme.venueSkins[].skinKey",
     "theme.componentColours",
     "theme.componentColours.primaryCta",
     "theme.componentColours.primaryCta.background",
@@ -13777,6 +13876,9 @@
    "theme.cornerRadius",
    "theme.surfaceStyle",
    "theme.buttonStyle",
+   "theme.venueSkins",
+   "theme.venueSkins[].venueId",
+   "theme.venueSkins[].skinKey",
    "theme.componentColours",
    "theme.componentColours.primaryCta",
    "theme.componentColours.primaryCta.background",
@@ -13807,6 +13909,9 @@
    "theme.cornerRadius",
    "theme.surfaceStyle",
    "theme.buttonStyle",
+   "theme.venueSkins",
+   "theme.venueSkins[].venueId",
+   "theme.venueSkins[].skinKey",
    "theme.componentColours",
    "theme.componentColours.primaryCta",
    "theme.componentColours.primaryCta.background",
@@ -14174,6 +14279,7 @@
   "theme.cornerRadius",
   "theme.surfaceStyle",
   "theme.buttonStyle",
+  "theme.venueSkins",
   "theme.componentColours",
   "fonts.primaryLatin",
   "fonts.primaryArabic",
@@ -14230,7 +14336,7 @@
   },
   {
    "label": "Theme",
-   "count": 27,
+   "count": 30,
    "screens": [
     "CMS-005",
     "ADM-016"

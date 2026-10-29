@@ -1641,16 +1641,6 @@
     "invalidates": [
      "listQuoteBookingConversion"
     ]
-   },
-   {
-    "operationId": "updateGroupBooking",
-    "contract": "orders",
-    "purpose": "Confirm numbers or the leader on the converted booking",
-    "trigger": "onAction",
-    "provenance": "decided 29 September, VM close-out (venue management and configuration)",
-    "invalidates": [
-     "listQuoteBookingConversion"
-    ]
    }
   ],
   "entryState": {

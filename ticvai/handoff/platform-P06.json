@@ -15,7 +15,7 @@
   "contracts": 19,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 157
+  "operationsWithNoScreen": 158
  },
  "waves": {
   "wave1": 30,
@@ -118,19 +118,19 @@
    "operations": 5
   },
   {
-   "contract": "tenancy",
-   "operations": 2
-  },
-  {
    "contract": "venue-map",
    "operations": 2
   },
   {
-   "contract": "approvals",
-   "operations": 1
+   "contract": "tenancy",
+   "operations": 2
   },
   {
    "contract": "payments",
+   "operations": 1
+  },
+  {
+   "contract": "approvals",
    "operations": 1
   }
  ],
@@ -1925,6 +1925,12 @@
     "contract": "venue-map",
     "verb": "PUT",
     "summary": "Add or replace one of a venue's ready-made day plans"
+   },
+   {
+    "operation": "setVisitPlannerQuestions",
+    "contract": "venue-map",
+    "verb": "PUT",
+    "summary": "Set which planner questions a venue asks, in what order, with what wording, and which are "
    },
    {
     "operation": "broadcastToGuests",

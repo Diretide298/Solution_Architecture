@@ -240,7 +240,7 @@ Worked from `tools/screen-ledger.py`, which is new and is the accounting nothing
 
 Wired **BO-067**, **PTR-019**, **SUP-006**, **CMS-013**, **CMS-017** to operations that already
 existed in the contracts. `CMS-013` closes a `check-package` warning from the other end —
-`control.seo_metadata` was *written by `setSeoMetadata` and read by nothing*.
+`marketing.seo_metadata` (then in the control database) was *written by `setSeoMetadata` and read by nothing*.
 
 Two judgements: **`setApiQuota` is not on PTR-019** (declared `staff`, and that is a partner
 surface), and **PTR-019 moved `requiresModule` from `partner` to `developerApi`** after the drift
@@ -685,7 +685,7 @@ contract owns, read out of `backend/*/0*.sql`:
 **A name match would have said the opposite.** Fuzzy-matching screen titles against table names
 claimed 77 of the 153 already had a home — it paired `setMinorGuardianAge` with
 `marketing.privacy_incident` on a score of 100, and `setDataDiscoveryAccess` with
-`control.seo_metadata`. The fields disagree with the names, and a table is made of fields.
+`marketing.seo_metadata` (then in the control database). The fields disagree with the names, and a table is made of fields.
 
 So **the pack is not a data model**: it specifies screens, and what those screens configure is
 vocabulary this package does not store today. **13 of the 153** come closest to specifying a

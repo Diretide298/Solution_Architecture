@@ -9,12 +9,12 @@
 | Contracts | 19 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 157 |
+| Operations with no screen | 158 |
 | Waves | wave1 30 · wave2 35 · wave3 31 |
 
 ## Gaps
 
-### 157 operations with no screen here
+### 158 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
-| … | | | 117 more |
+| … | | | 118 more |
 
 ### 3 modules split across waves
 

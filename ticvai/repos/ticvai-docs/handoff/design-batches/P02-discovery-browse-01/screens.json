@@ -429,7 +429,10 @@
     {
      "to": "GST-050",
      "trigger": "Resource Booking – Cabana",
-     "provenance": "structural — GST-001 is P02's home screen and its exits are its launcher"
+     "provenance": "structural — GST-001 is P02's home screen and its exits are its launcher",
+     "carries": [
+      "productId"
+     ]
     },
     {
      "to": "GST-051",

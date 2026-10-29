@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 38 of 103 |
+| Operations in the slice | 39 of 103 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -63,6 +63,7 @@
 | mfa | [`verifyMfaChallenge`](#verifymfachallenge) | POST | `/auth/mfa/challenge/{challengeId}/verify` | core | 1 | ADM-001, ADM-018, ADM-247, ADM-699, ADM-700, BO-053 … |
 | mfa | [`verifyMfaEnrolment`](#verifymfaenrolment) | POST | `/auth/mfa/methods/{methodId}` | core | 1 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 |
 | session | [`listActiveSessions`](#listactivesessions) | GET | `/auth/sessions` | core | 1 | BO-053, POS-000 |
+| sso | [`setSsoConfig`](#setssoconfig) | PUT | `/tenants/sso-config` | setup | 1 | ADM-005 |
 
 ## Group: administration
 
@@ -448,7 +449,7 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 
 Deactivation invalidates any live session immediately. **A change to `validTo`, to `primaryRoleId` or to the principal's permissions ends every live session of the principal at once** (decided 28 September, audit R126 (1)): the person signs in again and is resolved afresh. A change to `displayName` alone ends nothing.
 
-**Every session and refresh token, at every venue, through one function** (accepted 21 October 2026, Chinmay, ADAM CR-180 option A; CHG-R10ID-006). The caller acts at a venue, but `identity.refresh_token` is tenant-root and `identity.session` venue-isolated, so ending them with the caller's own row security would revoke no token and leave sessions at other venues live while answering 200. So the operation ends them by calling `identity.end_principal_sessions(principal_id, ended_by, reason)`, a SECURITY DEFINER function in the same transaction as the update: it first checks the caller may update that principal (the principal's own write rule: the tenant root, or a grant over its home scope), then sets every `active` session of the principal `terminated` with `ended_at`, `ended_by_principal_id` and `end_reason`, and revokes every live refresh token (`revoked_at`, `revocation_reason`), whatever the venue. No grant or policy is widened. A refusal by the function fails the whole update. Any other operation that must end all of a principal's sessions calls the same function (`forceLogout` ends one session, at the caller's own venue, and does not need it).
+**Every session and refresh token, at every venue, through one function** (accepted 21 October 2026, Chinmay, ADAM CR-180 option A; CHG-R10ID-006). The caller acts at a venue, but `identity.refresh_token` is its owner's alone (own-row; CHG-R11FXV-002) and `identity.session` venue-isolated, so ending them with the caller's own row security would revoke no token and leave sessions at other venues live while answering 200. So the operation ends them by calling `identity.end_principal_sessions(principal_id, ended_by, reason)`, a SECURITY DEFINER function in the same transaction as the update: it first checks the caller may update that principal (the principal's own write rule: the tenant root, or a grant over its home scope), then sets every `active` session of the principal `terminated` with `ended_at`, `ended_by_principal_id` and `end_reason`, and revokes every live refresh token (`revoked_at`, `revocation_reason`), whatever the venue. No grant or policy is widened. A refusal by the function fails the whole update. Any other operation that must end all of a principal's sessions calls the same function (`forceLogout` ends one session, at the caller's own venue, and does not need it).
 
 **It never grants or removes a role** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C15, option A; CHG-R8SPN-024). A role held at a scope is a grant: `createDelegatedAccess` gives one (role, scope, validity) and `deleteDelegatedAccess` takes one away. CMS-019's Change access calls those two for the roles it adds and removes, and this operation only for the display name, active flag and validity.
 
@@ -791,7 +792,7 @@ An unverified account signs in and may browse and fill a cart; the checkout gate
 
 **`POST /auth/guest/social`**: Sign in with Apple or Google
 
-**Where the app gets what it needs to start this sign-in** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C21, option A; CHG-R8SPN-025): white-label's published tenant config, which the app shell loads before sign-in, carries a read-only `guestSignIn` block with the public values only (Apple and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant's provider rows. The client secret and the audience checks stay here, server-side, in the provider row (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI against the one registered (`DomainReadiness.uaePassRedirect`).
+**Where the app gets what it needs to start this sign-in** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C21, option A; CHG-R8SPN-025): white-label's published tenant config, which the app shell loads before sign-in, carries a read-only `guestSignIn` block with the public values only (Apple and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant's provider rows. The client secret and the audience checks stay here, server-side, in the provider row (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI against the one registered (`DomainReadiness.uaePassRedirect`). **The provider row is the tenant's `identity.sso_provider` with `audience` `guest` and the matching `guestProvider`** (ADAM CR-327, part (1); CHG-CR327-001).
 Where the provider's verified email matches an existing account, the identities are linked rather than a duplicate created. Where it does not, a new account is created — an unverified email from a provider is not proof of ownership.
 
 **The link is stored** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): one `pii.subject_identity` row (`SubjectIdentity`) per provider and provider subject (`sub`), unique on the pair, so a returning Apple user whose email is a private-relay address still resolves to the same account. A new account also writes the provider's email to `pii.subject_contact`.
@@ -804,7 +805,7 @@ Where the provider's verified email matches an existing account, the identities 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.mfa_method`, `pii.subject_contact`, `pii.subject_identity` |
+| Reads | `cache:idempotency`, `identity.mfa_method`, `identity.sso_provider`, `pii.subject_contact`, `pii.subject_identity` |
 | Writes | `cache:idempotency`, `identity.guest_session`, `pii.subject`, `pii.subject_identity`, `platform.outbox` |
 | Called by | GST-042, WEB-016 |
 
@@ -867,7 +868,7 @@ Where the provider's verified email matches an existing account, the identities 
 
 **`POST /auth/guest/uae-pass`**: Sign in with a national identity provider
 
-**Where the app gets what it needs to start this sign-in** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C21, option A; CHG-R8SPN-025): white-label's published tenant config, which the app shell loads before sign-in, carries a read-only `guestSignIn` block with the public values only (Apple and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant's provider rows. The client secret and the audience checks stay here, server-side, in the provider row (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI against the one registered (`DomainReadiness.uaePassRedirect`).
+**Where the app gets what it needs to start this sign-in** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C21, option A; CHG-R8SPN-025): white-label's published tenant config, which the app shell loads before sign-in, carries a read-only `guestSignIn` block with the public values only (Apple and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant's provider rows. The client secret and the audience checks stay here, server-side, in the provider row (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI against the one registered (`DomainReadiness.uaePassRedirect`). **The provider row is the tenant's `identity.sso_provider` with `audience` `guest` and the matching `guestProvider`** (ADAM CR-327, part (1); CHG-CR327-001).
 OAuth authorisation-code exchange. Returns a verified identity, so an account created this way needs no further verification.
 Government onboarding has lead time and should be started before it becomes the critical path.
 
@@ -883,7 +884,7 @@ Government onboarding has lead time and should be started before it becomes the 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.mfa_method`, `identity.redirect_host`, `pii.subject_contact`, `pii.subject_identity` |
+| Reads | `cache:idempotency`, `identity.mfa_method`, `identity.redirect_host`, `identity.sso_provider`, `pii.subject_contact`, `pii.subject_identity` |
 | Writes | `cache:idempotency`, `identity.guest_session`, `pii.subject`, `pii.subject_document`, `pii.subject_identity`, `platform.outbox` |
 | Called by | GST-042, WEB-016 |
 
@@ -2537,6 +2538,98 @@ Who is logged in, on which workstation, since when. There was previously no way 
 | 403 |  | The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is missing or failed, or workstationId is missing (supervisor-step-up-refused; CHG-RUL-015). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+
+## Group: sso
+
+### setSsoConfig
+
+**`PUT /tenants/sso-config`**: Configure an identity provider
+
+Per tenant. A tenant's Azure AD is theirs, not TICVAI's, and credentials are stored in the cell key vault rather than returned by this endpoint.
+
+|  |  |
+|---|---|
+| Permission | `USER_MANAGE` |
+| Scope level | tenant |
+| Part of slice | setup, makes `identity.sso_provider` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | tenant |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `identity.sso_group_mapping`, `identity.sso_provider` |
+| Writes | `cache:idempotency`, `identity.sso_group_mapping`, `identity.sso_provider` |
+| Called by | ADM-005 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `SsoProviderConfig`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| displayName | string | yes |  |
+| protocol | SsoProtocol: enum (oidc, saml2) | yes |  |
+| metadataUrl | string |  | (nullable) |
+| issuer | string |  | (nullable) |
+| clientId | string |  | (nullable) |
+| clientSecretRef | string |  | Key vault reference. (nullable) |
+| groupMappings | array of SsoGroupMapping | yes | A group with no mapping grants nothing. |
+| groupMappings[].id | string (uuid) |  | Added 20 August. (read-only) |
+| groupMappings[].externalGroup | string | yes |  |
+| groupMappings[].roleId | string (uuid) | yes |  |
+| groupMappings[].scopePath | string |  | Scope the mapped role is granted at. |
+| autoProvisionPrincipals | boolean |  | Create a principal on first successful sign-in. (default False) |
+| usernameClaim | string |  | The claim (OIDC) or attribute (SAML) a provisioned principal's username is taken from; null means preferred_username, else the email (R8 blocker IDENTITY-C57, CHG-R8MIG-015). (max length 100; nullable) |
+| displayNameClaim | string |  | The claim a provisioned principal's display name is taken from; null means name. (max length 100; nullable) |
+| groupsClaim | string |  | The claim that lists the user's groups, matched against groupMappings; null means groups. (max length 100; nullable) |
+| defaultHomeScopeId | string (uuid) |  | The home scope a provisioned principal gets when its mapped groups name none; null means the scope of the first mapped group. (nullable) |
+| allowedRedirectUris | array of string |  | The only redirect URIs a start may name (R8 blocker IDENTITY-C58, CHG-R8MIG-015): startSsoAuthorization refuses 400 a redirectUri not on this list. |
+| isEnforced | boolean |  | (default False) |
+| isActive | boolean |  |  |
+| audience | enum (staff, guest) |  | Who signs in through this provider (ADAM CR-327, part (1), Chinmay, 29 October 2026: "Kind column on sso_provider"; CHG-CR327-001). (default staff) |
+| guestProvider | enum (apple, google, uaePass) |  | Which guest provider a guest row is (ADAM CR-327, part (1); CHG-CR327-001); null for staff. (nullable) |
+| authorizationUrl | string (uri) |  | Where a guest app sends the guest to sign in (r11, CHG-CR327-002; the lead, 29 October 2026: "Get those 2 gaps sorted as well"): the provider's authorization endpoint for this tenant's client. (max length 2000; nullable) |
+
+**Response**: `SsoProviderConfig`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes | (read-only) |
+| displayName | string | yes |  |
+| protocol | SsoProtocol: enum (oidc, saml2) | yes |  |
+| metadataUrl | string |  | (nullable) |
+| issuer | string |  | (nullable) |
+| clientId | string |  | (nullable) |
+| clientSecretRef | string |  | Key vault reference. (nullable) |
+| groupMappings | array of SsoGroupMapping | yes | A group with no mapping grants nothing. |
+| groupMappings[].id | string (uuid) |  | Added 20 August. (read-only) |
+| groupMappings[].externalGroup | string | yes |  |
+| groupMappings[].roleId | string (uuid) | yes |  |
+| groupMappings[].scopePath | string |  | Scope the mapped role is granted at. |
+| autoProvisionPrincipals | boolean |  | Create a principal on first successful sign-in. (default False) |
+| usernameClaim | string |  | The claim (OIDC) or attribute (SAML) a provisioned principal's username is taken from; null means preferred_username, else the email (R8 blocker IDENTITY-C57, CHG-R8MIG-015). (max length 100; nullable) |
+| displayNameClaim | string |  | The claim a provisioned principal's display name is taken from; null means name. (max length 100; nullable) |
+| groupsClaim | string |  | The claim that lists the user's groups, matched against groupMappings; null means groups. (max length 100; nullable) |
+| defaultHomeScopeId | string (uuid) |  | The home scope a provisioned principal gets when its mapped groups name none; null means the scope of the first mapped group. (nullable) |
+| allowedRedirectUris | array of string |  | The only redirect URIs a start may name (R8 blocker IDENTITY-C58, CHG-R8MIG-015): startSsoAuthorization refuses 400 a redirectUri not on this list. |
+| isEnforced | boolean |  | (default False) |
+| isActive | boolean |  |  |
+| audience | enum (staff, guest) |  | Who signs in through this provider (ADAM CR-327, part (1), Chinmay, 29 October 2026: "Kind column on sso_provider"; CHG-CR327-001). (default staff) |
+| guestProvider | enum (apple, google, uaePass) |  | Which guest provider a guest row is (ADAM CR-327, part (1); CHG-CR327-001); null for staff. (nullable) |
+| authorizationUrl | string (uri) |  | Where a guest app sends the guest to sign in (r11, CHG-CR327-002; the lead, 29 October 2026: "Get those 2 gaps sorted as well"): the provider's authorization endpoint for this tenant's client. (max length 2000; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Configured |
+| 400 |  | Metadata unreachable, or no group mappings supplied |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ## Tables
 
 Every table this service owns that the slice reads or writes, with its columns as derived into `backend/tenant/*.sql`.
@@ -2827,6 +2920,42 @@ Every table this service owns that the slice reads or writes, with its columns a
 | working_venue_id | uuid | no | The session's working venue; null while a session that may choose has not chosen. |
 | id | uuid | yes | Synthesised key. |
 
+### `identity.sso_group_mapping`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes | Added 20 August. |
+| external_group | text | yes |  |
+| role_id | uuid | yes |  |
+| scope_path | text | no | Scope the mapped role is granted at. |
+| provider_id | uuid | no | Points at identity.sso_provider. |
+| scope_id | uuid | no | Points at platform.org_unit. |
+
+### `identity.sso_provider`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| icon_asset_ref | text | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+| id | uuid | yes |  |
+| display_name | text | yes |  |
+| protocol | text | yes |  |
+| metadata_url | text | no |  |
+| issuer | text | no |  |
+| client_id | text | no |  |
+| client_secret_ref | text | no | Key vault reference. |
+| is_auto_provision_principals | boolean | no | Create a principal on first successful sign-in. |
+| username_claim | text | no | The claim (OIDC) or attribute (SAML) a provisioned principal's username is taken from; null means preferred_username, else the email (R8 blocker IDENTITY-C57, CHG-R8MIG-015). |
+| display_name_claim | text | no | The claim a provisioned principal's display name is taken from; null means name. |
+| groups_claim | text | no | The claim that lists the user's groups, matched against groupMappings; null means groups. |
+| default_home_scope_id | uuid | no | The home scope a provisioned principal gets when its mapped groups name none; null means the scope of the first mapped group. |
+| allowed_redirect_uris | text[] | no | The only redirect URIs a start may name (R8 blocker IDENTITY-C58, CHG-R8MIG-015): startSsoAuthorization refuses 400 a redirectUri not on this list. |
+| is_enforced | boolean | no |  |
+| is_active | boolean | no |  |
+| audience | text | no | Who signs in through this provider (ADAM CR-327, part (1), Chinmay, 29 October 2026: "Kind column on sso_provider"; CHG-CR327-001). |
+| guest_provider | text | no | Which guest provider a guest row is (ADAM CR-327, part (1); CHG-CR327-001); null for staff. |
+| authorization_url | text | no | Where a guest app sends the guest to sign in (r11, CHG-CR327-002; the lead, 29 October 2026: "Get those 2 gaps sorted as well"): the provider's authorization endpoint for this tenant's client. |
+
 ### `identity.subject_data_export`
 
 | Column | Type | Required | Notes |
@@ -2931,7 +3060,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-65 operations, added to this service in later releases without changing any of the above.
+64 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -2941,4 +3070,4 @@ Every table this service owns that the slice reads or writes, with its columns a
 | mfa | `removeMfaMethod` |
 | prospectAuth | `startProspectSignup`, `verifyProspectSignupCode` |
 | session | `endOwnSession`, `listOwnSessions`, `revokeAllSessions` |
-| sso | `completeSsoAuthorization`, `getSsoConfig`, `listSsoProviders`, `setSsoConfig`, `startSsoAuthorization` |
+| sso | `completeSsoAuthorization`, `getSsoConfig`, `listSsoProviders`, `startSsoAuthorization` |

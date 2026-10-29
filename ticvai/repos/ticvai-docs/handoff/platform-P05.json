@@ -56,15 +56,15 @@
    "operations": 3
   },
   {
+   "contract": "ai",
+   "operations": 2
+  },
+  {
    "contract": "fnb",
    "operations": 2
   },
   {
    "contract": "marketing-crm",
-   "operations": 2
-  },
-  {
-   "contract": "ai",
    "operations": 2
   }
  ],
@@ -201,7 +201,7 @@
    "module": "AI",
    "wave": 1,
    "route": "/kiosk/assistant",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {

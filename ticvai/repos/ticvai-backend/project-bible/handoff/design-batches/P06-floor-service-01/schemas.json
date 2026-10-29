@@ -289,7 +289,7 @@
     "type": "string",
     "nullable": true,
     "x-ticvai-references": "access.entitlement",
-    "description": "**A meal combo redeemed at the till or by a scan** (29 September, MOB-4; applied 30 September). The entitlement a bundle's `fnbMenuItem` component issued (promotions `BundleComponent.componentKind: fnbMenuItem`, `menuItemId`, `redeemAtOutletIds`). The line is priced at zero against it, `menuItemId` must be the component's menu item and the outlet one of `redeemAtOutletIds` (or any outlet with the item on a live menu when that list is empty), and the entitlement is marked used in the same step through access `validateAccess` at the outlet. An entitlement already used, for another item or outlet, or not yet valid is refused 409 `entitlementNotRedeemable`; a till that is offline queues the redemption like any sale and the replay is refused the same way if it was used meanwhile."
+    "description": "**A meal combo redeemed at the till or by a scan** (29 September, MOB-4; applied 30 September). The entitlement a bundle's `fnbMenuItem` component issued (promotions `BundleComponent.componentKind: fnbMenuItem`, `menuItemId`, `redeemAtOutletIds`). The line is priced at zero against it, `menuItemId` must be the component's menu item and the outlet one of `redeemAtOutletIds` (or any outlet with the item on a live menu when that list is empty), and the entitlement is marked used in the same step through access `validateAccess` at the outlet. An entitlement already used, for another item or outlet, or not yet valid is refused 409 `entitlementNotRedeemable`; a till that is offline queues the redemption like any sale and the replay is refused the same way if it was used meanwhile.\n**Waits for service sign-in between the apps** (ADAM CR-277 (5), 28 October 2026; CHG-R11TEN-002): until that follow-up, `createFnbOrder` refuses a line carrying `redeemEntitlementId` with `400` (validation)."
    }
   }
  },
@@ -443,7 +443,8 @@
     "format": "uuid"
    },
    "orderNumber": {
-    "type": "string"
+    "type": "string",
+    "description": "**Short and called out across a counter** (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). Set once by `createFnbOrder`, which states the rule: the outlet's daily counter, written as the outlet's one-letter prefix, a hyphen and three digits (`A-042`), or the three digits alone (`042`)."
    },
    "outletId": {
     "type": "string",

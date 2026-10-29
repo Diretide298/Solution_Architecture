@@ -13,7 +13,8 @@ the decision and passes after it. Two rules are general, because the same gap ca
   BR-PAIR-REFUSAL  An update that takes the same request schema as a create declares every refusal (4xx) the
                    create declares: the same body passes the same rules (`updateDashboard` skipped the refresh
                    budget, CHG-RUL-008). Pairs found before 3 October and not named by a rule are exempt below,
-                   each with its reason.
+                   each with its reason. A partial-update request schema (`a partial update of <table>`) counts as
+                   the body of the create that persists to that table (ADAM CR-315, CHG-CR315-001).
 
 And one rule per decision:
 
@@ -23,10 +24,29 @@ And one rule per decision:
                    approval-no-approver-available.
   BR-APPROVAL-ENGINE (r10, ADAM CR-102, CHG-R10ID-015) the engine's rules have storage: ApprovalRule.condition
                    defines its language (AND-joined comparisons) and the unreachableRule comparison; a rule's code is
-                   unique per matrix (x-ticvai-unique-together [matrix_id, code]); a matrix's version is required; the
+                   unique per rule set (x-ticvai-unique-together [matrix_id, matrixVersion, code], per version since
+                   CR-300, CHG-CR300-001); a matrix's version is required; the
                    approver chain is stored (ApprovalRequest.approvers, approvals.request_approver); a decision can be
                    return or requestInformation; the composite operations declare 400, 403 exceedsDelegatorAuthority
                    and 409.
+  BR-APPROVAL-VERSIONS (r11, ADAM CR-300, CHG-CR300-001) a matrix keeps one stable id across versions: its versions
+                   are approvals.matrix_version rows keyed (approvalMatrixId, version), each rule names its matrixVersion, and
+                   ApprovalMatrix is unique on (kind, scopePath); setApprovalMatrix writes the version table.
+  BR-BILLING-STATEMENT (r11, ADAM CR-303, CHG-CR303-001) a statement is a completed renewal row or the first period,
+                   its charges the cycle's order, its guest customer_id, its dates in the venue's time zone; the id's v5
+                   namespace and name are stated on BillingStatement.id, which both statement operations use.
+  BR-STORE-CHECKLIST (r11, ADAM CR-304, CHG-CR304-001) every StorePublishingChecklist item has a done-rule and fixed
+                   copy, setStoreAccounts names the languages a listing is checked against, and the Pass Type ID is
+                   one per tenant.
+  BR-PLANNER-QUESTIONS (r11, ADAM CR-321, CHG-CR321-001) the planner's questions are a closed list a venue switches on,
+                   orders, relabels and makes required (venuemap.visit_planner_question, each key's default stated),
+                   VisitPlannerOptions answers them, setVisitPlannerQuestions writes them and keeps party and dates
+                   required, and generateVisitPlan refuses a missing required answer (422 planner-answer-missing).
+  BR-ROTA-HOUR-LIMIT (r11, ADAM CR-334, CHG-CR334-001) breachesWorkingHourLimit names the venue's rule (staffing_rules'
+                   day, rolling 7-day and rest limits), and both rota writes declare the read.
+  BR-ROTA-CROSS-VENUE (r11, ADAM CR-336, CHG-CR336-001) both rota writes ask the overlap and the role as yes/no queries
+                   answered under the tenant root grant (never delegatedAccessRecords under the caller's venue), and
+                   RotaAssignment's overlap rule is an exclusion constraint (x-ticvai-exclude).
   BR-PRIVACY-REQUEST (r10, ADAM CR-101, CHG-R10ID-016) a guest's privacy request records a subject, not a principal
                    (ApprovalRequest exactly one of requestedByPrincipalId and requestedBySubjectId); exportSubjectData
                    answers an erased subject 410 subject-erased and emits identity.privacyRequestRaised (as
@@ -56,6 +76,37 @@ And one rule per decision:
                    guest, a visitor or the public names its venue: a path {venueId}, a required venueId query
                    parameter or the shared GuestVenue header (X-Venue-Id); the rule is stated on guestAuth. Exempt:
                    reads addressed by their own token, and the waiting room's own store (GUEST_VENUE_EXEMPT).
+  BR-ANALYTICS-PROVIDER (r11, ADAM CR-323, CHG-CR323-001) one analytics provider row per venueId + provider is a
+                   unique key with nulls not distinct, its violation named in setAnalyticsProvider's 409; a PUT that
+                   leaves the write-only reportingCredentialRef out keeps the credential and an explicit null clears it.
+  BR-MEDIA-COVER-USE (r11, ADAM CR-326 option A, CHG-CR326-001) MediaUsage.surface can name a collection cover
+                   (mediaCollectionCover) and deleteMediaAsset reads assets.media_collection to list it with every use.
+  BR-AGENT-LAPSE   (r11, ADAM CR-333 option C, CHG-CR333-001) setAgentAvailability sets expiresAt to the earlier of the
+                   session's expiry and a heartbeat lapse each PUT refreshes, and a lapsed state reads as offline.
+  BR-MEDIA-REPLACE-UPLOAD (r11, ADAM CR-337 option A, CHG-CR337-001) replaceMediaAsset takes the replaced file's key
+                   from the asset's current upload (reading assets.asset_version), answers a retry with the current
+                   upload 200 unchanged, and refuses an upload already used 409 upload-already-used.
+  BR-WALLET-TOPUP-ONCE (r11, ADAM CR-310, CHG-R11CR310-001) a top-up line is credited once: CreditLot.orderLineId
+                   carries x-ticvai-unique (derive-ddl writes credit_lot_order_line_id_uniq, partial), and topUpWallet's
+                   409 payment-already-used says a unique violation on that index is the refusal.
+  BR-WALLET-PUBLISH-CHECKS (r11, ADAM CR-311 option B, CHG-R11CR311-001) publishWalletConfiguration lists its
+                   validation checks, credit-type-without-accounting-mapping and consumption-policy-names-retired-type,
+                   both blocking, and WalletConfigurationVersion keeps (scopePath, version) unique.
+  BR-WALLET-RESTORE-DRAFT (r11, ADAM CR-312 option A, CHG-R11CR312-001) restoreWalletConfigurationVersion writes no
+                   configuration_version row and answers the draft with version null; its 409 unpublished-changes
+                   compares the area tables with the latest published snapshot as diffWalletConfigurationVersion does;
+                   listWalletConfigurationVersions lists no restored draft.
+  BR-CREDIT-ACCOUNT-CURRENCY (r11, ADAM CR-322 option A, CHG-CR322-001) a B2B credit account stores the currency
+                   its limit is agreed in: B2bCreditAccount.currencyCode (required, readOnly; payments.credit_account.
+                   currency_code), set by createB2bCreditAccount from creditLimit.currency and never changed after, and
+                   neither credit-account operation resolves it from a venue.
+  BR-PLATFORM-APPROVAL-RULE (r11, ADAM CR-330 option A, CHG-CR330-001) the platform rule for a tenant subject is a
+                   control.platform_approval_rule row seeded by the control migration (x-ticvai-seed-rows:
+                   configurationChange, tenant, PLATFORM_TENANT_MANAGE, 2 approvals, active), and createApprovalRequest
+                   asks platform-ops#platformApprovalRuleFor over the service route.
+  BR-WALLET-ETAG-VERSION (r11, ADAM CR-332 option A, CHG-CR332-001) WalletFundingRules and WalletRefundPolicy carry a
+                   version (wallet.funding_rule.version, wallet.refund_policy.version); their GET and PUT send it as
+                   ETag, and the PUT refuses a stale If-Match 412, the rule CR-257 chose for group bookings.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -151,8 +202,6 @@ PAIR_EXEMPT = {
         "the staff create's 400/409 are about naming the guest, which an update does not do (not reviewed)",
     ("createReport", "updateReport"):
         "400 on create is the definition's validation; whether update shares it is open (not reviewed)",
-    ("createRotaAssignment", "updateRotaAssignment"):
-        "409 on create is a double booking; whether update re-checks it is open (not reviewed)",
     ("createTicketTemplate", "updateTicketTemplate"):
         "400 on create is the template's validation; whether update shares it is open (not reviewed)",
 }
@@ -257,10 +306,26 @@ def main() -> int:
         need("BR-STREAM", op(oid)[3].get("x-ticvai-streaming") == "sse", f"{oid} must stream ({why})")
 
     # -------------------------------------------------------------- BR-PAIR-REFUSAL (general)
+    # **A partial update is the create's body too** (ADAM CR-315, option A, 29 October 2026; CHG-CR315-001). Since the
+    # CR-089 pattern (CHG-SHP-008) an update may take its own `...Request` schema marked `x-ticvai-persistence: none —
+    # request only; a partial update of <table>`, so it no longer shared the create's `$ref` and the pair went unread:
+    # updateRotaAssignment ("Move or cancel") declared no 409 while createRotaAssignment refuses an overlap and a
+    # missing role. Such a schema is keyed here as the create's body that persists to the same table.
+    by_table = {}
+    for oid, (f, path, method, o, doc) in ops.items():
+        ref = body_schema(o).get("$ref")
+        if ref and method == "post" and oid.startswith("create"):
+            tbl = str(schema_of(doc, body_schema(o)).get("x-ticvai-persistence") or "").strip().strip('"')
+            if tbl and not tbl.startswith("none"):
+                by_table.setdefault((f.name, tbl), ref)
     by_schema = collections.defaultdict(list)
     for oid, (f, path, method, o, doc) in ops.items():
         ref = body_schema(o).get("$ref")
         if ref:
+            pers = str(schema_of(doc, body_schema(o)).get("x-ticvai-persistence") or "")
+            m_ = re.search(r"a partial update of ([a-z_]+\.[a-z_]+)", pers)
+            if m_ and (f.name, m_.group(1)) in by_table:
+                ref = by_table[(f.name, m_.group(1))]
             codes = {str(k) for k in (o.get("responses") or {}) if str(k)[0] == "4"} - {"401", "403", "404", "429"}
             by_schema[(f.name, ref)].append((oid, method, codes))
     for (fname, ref), members in sorted(by_schema.items()):
@@ -383,6 +448,45 @@ def main() -> int:
          "ai.yaml still defaults the spend ceiling to USD")
     need("BR-AI-CURRENCY", "billing currency" in text(op("setAiSpendCeiling")[3]),
          "setAiSpendCeiling does not default to the tenant's billing currency")
+
+    # BR-ANALYTICS-PROVIDER, BR-MEDIA-COVER-USE, BR-AGENT-LAPSE, BR-MEDIA-REPLACE-UPLOAD (r11, ADAM CR-323, CR-326,
+    # CR-333, CR-337; the lead, 29 October 2026, "As recommended"). Each fails on the r10 contract and passes on the
+    # decision.
+    _, _, _, sap, wl = op("setAnalyticsProvider")
+    sap_s = (((wl.get("components") or {}).get("schemas") or {}).get("StorefrontAnalyticsProvider") or {})
+    need("BR-ANALYTICS-PROVIDER", ["venueId", "provider"] in (sap_s.get("x-ticvai-unique-together") or [])
+         and str(sap_s.get("x-ticvai-unique-nulls") or "") == "not-distinct",
+         "StorefrontAnalyticsProvider is not unique on (venueId, provider) with nulls not distinct (CR-323 (1))")
+    sap_d = " ".join(str(sap.get("description") or "").split())
+    need("BR-ANALYTICS-PROVIDER", "leaves `reportingCredentialRef` out keeps" in sap_d and "explicit `null` clears" in sap_d,
+         "setAnalyticsProvider does not say a PUT leaving reportingCredentialRef out keeps it and null clears it "
+         "(CR-323 (2))")
+    need("BR-ANALYTICS-PROVIDER", "analytics_provider_venue_id_provider_uniq" in
+         json.dumps(((sap.get("responses") or {}).get("409") or {}), default=str),
+         "setAnalyticsProvider's 409 does not name the unique index analytics_provider_venue_id_provider_uniq (CR-323 (1))")
+    _, _, _, dma, adoc = op("deleteMediaAsset")
+    asch = (adoc.get("components") or {}).get("schemas") or {}
+    surf = set((((asch.get("MediaUsage") or {}).get("properties") or {}).get("surface") or {}).get("enum") or [])
+    need("BR-MEDIA-COVER-USE", "mediaCollectionCover" in surf,
+         "MediaUsage.surface cannot name a collection cover (mediaCollectionCover; CR-326)")
+    need("BR-MEDIA-COVER-USE", "assets.media_collection" in text(dma.get("x-ticvai-reads") or [])
+         and "mediaCollectionCover" in str(dma.get("description") or ""),
+         "deleteMediaAsset does not read assets.media_collection and name a cover as mediaCollectionCover (CR-326)")
+    saa = " ".join(str(op("setAgentAvailability")[3].get("description") or "").split())
+    need("BR-AGENT-LAPSE", "Session.expiresAt" in saa and "heartbeat lapse" in saa and "reads as `offline`" in saa,
+         "setAgentAvailability does not say expiresAt is the earlier of the session's expiry and a heartbeat lapse, "
+         "and that a lapsed state reads as offline (CR-333)")
+    rma = op("replaceMediaAsset")[3]
+    rma_d = " ".join(str(rma.get("description") or "").split())
+    refused = set(((props(adoc, {"$ref": "#/components/schemas/UploadRefusedProblem"}).get("refusedReason") or {})
+                   .get("enum") or []))
+    need("BR-MEDIA-REPLACE-UPLOAD", "uploadAlreadyUsed" in refused and "upload-already-used" in problem_types(rma),
+         "replaceMediaAsset does not refuse an upload already used (409 upload-already-used, refusedReason "
+         "uploadAlreadyUsed; CR-337)")
+    need("BR-MEDIA-REPLACE-UPLOAD", "assets.asset_version" in text(rma.get("x-ticvai-reads") or [])
+         and "answers `200` with the asset unchanged" in rma_d and "whose key no `asset_version` row names" in rma_d,
+         "replaceMediaAsset does not say where the replaced file's storageKey comes from, or that a retry with the "
+         "current upload answers 200 unchanged (CR-337)")
 
     # -------------------------------------------------------------- BR-QR
     cred = op("getEntitlementCredential")[3]
@@ -568,8 +672,10 @@ def main() -> int:
     need("BR-APPROVAL-ENGINE", " AND " in cond and "notIn" in cond and "unreachableRule" in cond,
          "ApprovalRule.condition does not define the condition language (AND-joined clauses, operators) and the "
          "unreachableRule comparison")
-    need("BR-APPROVAL-ENGINE", ["matrix_id", "code"] in (rule_s.get("x-ticvai-unique-together") or []),
-         "ApprovalRule has no unique (matrix_id, code)")
+    # Per version since ADAM CR-300, option B (CHG-CR300-001): a version repeats its rules' codes, so CR-102's "no
+    # duplicate code within one rule set" is (matrix_id, matrix_version, code).
+    need("BR-APPROVAL-ENGINE", ["matrix_id", "matrixVersion", "code"] in (rule_s.get("x-ticvai-unique-together") or []),
+         "ApprovalRule has no unique (matrix_id, matrix_version, code)")
     need("BR-APPROVAL-ENGINE", "version" in ((asch.get("ApprovalMatrix") or {}).get("required") or []),
          "ApprovalMatrix.version is not required (a matrix version may be null)")
     req_s = asch.get("ApprovalRequest") or {}
@@ -586,6 +692,52 @@ def main() -> int:
         r403 = text(((op(oid)[3].get("responses") or {}).get("403")) or {})
         need("BR-APPROVAL-ENGINE", "exceeds-delegator-authority" in r403,
              f"{oid} does not refuse exceedsDelegatorAuthority with 403")
+    # BR-APPROVAL-VERSIONS (ADAM CR-300, option B; CHG-CR300-001): one matrix row with a stable id, its versions in a
+    # table of their own, each rule naming its version, and the two unique keys.
+    mv = asch.get("ApprovalMatrixVersion") or {}
+    need("BR-APPROVAL-VERSIONS", str(mv.get("x-ticvai-persistence") or "") == "approvals.matrix_version"
+         and (mv.get("x-ticvai-primary-key") or []) == ["approvalMatrixId", "version"]
+         and ((mv.get("properties") or {}).get("approvalMatrixId") or {}).get("x-ticvai-references") == "approvals.matrix",
+         "no approvals.matrix_version keyed (approvalMatrixId, version) and referencing approvals.matrix (ApprovalMatrixVersion)")
+    need("BR-APPROVAL-VERSIONS", "matrixVersion" in (rule_s.get("properties") or {})
+         and "matrixVersion" in (rule_s.get("required") or []),
+         "ApprovalRule does not name its matrix version (a required matrixVersion, approvals.rule.matrix_version)")
+    need("BR-APPROVAL-VERSIONS", ["kind", "scopePath"] in ((asch.get("ApprovalMatrix") or {}).get("x-ticvai-unique-together")
+                                                          or []),
+         "ApprovalMatrix has no unique (kind, scopePath): two first saves can make two matrices for one kind and scope")
+    need("BR-APPROVAL-VERSIONS", "approvals.matrix_version" in text(op("setApprovalMatrix")[3].get("x-ticvai-writes") or []),
+         "setApprovalMatrix does not write approvals.matrix_version (x-ticvai-writes)")
+    # BR-BILLING-STATEMENT (ADAM CR-303, option A; CHG-CR303-001): the cycle, its charges, the v5 namespace and name,
+    # and the subject are stated, and both statement operations mint the id by the one rule.
+    odoc = op("listBillingStatements")[4]
+    bs_id = text((((((odoc.get("components") or {}).get("schemas") or {}).get("BillingStatement") or {})
+                   .get("properties") or {}).get("id")) or {})
+    need("BR-BILLING-STATEMENT", bool(re.search(r"namespace `[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`",
+                                                bs_id)) and "<agreementId>|<periodStart>|<periodEnd>" in bs_id,
+         "BillingStatement.id does not state its v5 namespace uuid and the name <agreementId>|<periodStart>|<periodEnd>")
+    lbs = text(op("listBillingStatements")[3])
+    for word in ("orders.membership_renewal", "completed", "source_order_id", "customer_id", "regionSettingsRecords"):
+        need("BR-BILLING-STATEMENT", word in lbs, f"listBillingStatements does not state the cycle rule ({word})")
+    for oid in ("listBillingStatements", "getBillingStatement"):
+        need("BR-BILLING-STATEMENT", "BillingStatement.id" in text(op(oid)[3]),
+             f"{oid} does not mint the statement id by BillingStatement.id's rule")
+    # BR-STORE-CHECKLIST (ADAM CR-304, option A; CHG-CR304-001): every checklist item has its done-rule and its copy,
+    # the listing languages are named, and the Pass Type ID is one per tenant.
+    wdoc = op("setStoreAccounts")[4]
+    wsch = ((wdoc.get("components") or {}).get("schemas") or {})
+    chk = wsch.get("StorePublishingChecklist") or {}
+    item_p = ((((chk.get("properties") or {}).get("items") or {}).get("items") or {}).get("properties") or {})
+    items_ = (item_p.get("item") or {}).get("enum") or []
+    rules_t = str(chk.get("description") or "")
+    copy_t = str((item_p.get("guidance") or {}).get("description") or "")
+    for it in items_:
+        need("BR-STORE-CHECKLIST", f"- `{it}`:" in rules_t, f"StorePublishingChecklist states no done-rule for {it}")
+        need("BR-STORE-CHECKLIST", f"`{it}`: \"" in copy_t, f"StorePublishingChecklist.guidance lists no copy for {it}")
+    need("BR-STORE-CHECKLIST", "is_draft" in text(op("setStoreAccounts")[3]),
+         "setStoreAccounts does not say which tenant languages a listing is checked against (the working draft's)")
+    ptid = text(((wsch.get("StoreAccount") or {}).get("properties") or {}).get("passTypeIdentifier") or {})
+    need("BR-STORE-CHECKLIST", "one per tenant" in ptid and "one per brand" not in ptid,
+         "StoreAccount.passTypeIdentifier is not one per tenant (CR-304)")
     # BR-PRIVACY-REQUEST (ADAM CR-101, CHG-R10ID-016): a guest's privacy request is recorded, clocked and readable.
     need("BR-PRIVACY-REQUEST", ["requestedByPrincipalId", "requestedBySubjectId"]
          in (req_s.get("x-ticvai-exactly-one-of") or []),
@@ -732,16 +884,164 @@ def main() -> int:
         need("BR-GUEST-SELF-403", False, f"{len(self403)} guest self-scoped operations declare 403, above the ceiling "
              f"of {GUEST_SELF_403_CEILING}: answer another subject's record 404 ({', '.join(self403[:8])})")
 
+    # BR-WALLET-TOPUP-ONCE, BR-WALLET-PUBLISH-CHECKS, BR-WALLET-RESTORE-DRAFT (r11, ADAM CR-310, CR-311, CR-312; the
+    # lead, 29 October 2026, "All as recommended"). Each fails on the r10 contract and passes on the decision.
+    wdoc = load("contracts/satellite/wallet.yaml")
+    wsch = (wdoc.get("components") or {}).get("schemas") or {}
+    lot_line = ((wsch.get("CreditLot") or {}).get("properties") or {}).get("orderLineId") or {}
+    need("BR-WALLET-TOPUP-ONCE", lot_line.get("x-ticvai-unique") == "tenant",
+         "CreditLot.orderLineId carries no x-ticvai-unique: tenant, so no unique index stops two tills crediting one "
+         "top-up line (CR-310)")
+    top = op("topUpWallet")[3]
+    t409 = json.dumps(((top.get("responses") or {}).get("409") or {}), default=str)
+    need("BR-WALLET-TOPUP-ONCE", "payment-already-used" in t409 and "credit_lot_order_line_id_uniq" in t409,
+         "topUpWallet's 409 does not say a unique violation on credit_lot_order_line_id_uniq is payment-already-used")
+    pub = str(op("publishWalletConfiguration")[3].get("description") or "")
+    for code in ("credit-type-without-accounting-mapping", "consumption-policy-names-retired-type"):
+        need("BR-WALLET-PUBLISH-CHECKS", re.search(r"`" + code + r"` \(blocking\)", pub) is not None,
+             f"publishWalletConfiguration does not list the check `{code}` as blocking (CR-311)")
+    need("BR-WALLET-PUBLISH-CHECKS", "no warning" in " ".join(pub.split()),
+         "publishWalletConfiguration does not say this release has no warning checks (CR-311, option B)")
+    wcv = wsch.get("WalletConfigurationVersion") or {}
+    need("BR-WALLET-PUBLISH-CHECKS", ["scopePath", "version"] in (wcv.get("x-ticvai-unique-together") or []),
+         "WalletConfigurationVersion does not keep (scopePath, version) unique (CR-311)")
+    res = op("restoreWalletConfigurationVersion")[3]
+    rdesc = " ".join(str(res.get("description") or "").split())
+    need("BR-WALLET-RESTORE-DRAFT", "writes no `wallet.configuration_version` row" in rdesc,
+         "restoreWalletConfigurationVersion does not say it writes no configuration_version row (CR-312)")
+    r409 = " ".join(str(((res.get("responses") or {}).get("409") or {}).get("description") or "").split())
+    need("BR-WALLET-RESTORE-DRAFT", "latest published version" in r409 and "diffWalletConfigurationVersion" in r409,
+         "restore's 409 unpublished-changes does not compare with the latest published snapshot as the diff does")
+    need("BR-WALLET-RESTORE-DRAFT", ((wcv.get("properties") or {}).get("version") or {}).get("nullable") is True,
+         "WalletConfigurationVersion.version is not nullable, so restore's draft answer cannot carry version null")
+    lst = " ".join(str(op("listWalletConfigurationVersions")[3].get("description") or "").split())
+    need("BR-WALLET-RESTORE-DRAFT", "drafts created by" not in lst,
+         "listWalletConfigurationVersions still lists drafts created by the restore (CR-312: no draft row)")
+
+    # BR-PLANNER-QUESTIONS, BR-ROTA-HOUR-LIMIT, BR-ROTA-CROSS-VENUE (r11, ADAM CR-321, CR-334, CR-336; the lead, 29
+    # October 2026, "As recommended", then "Include those in today as well"). Each fails on the r10 contract.
+    vdoc = load("contracts/satellite/venue-map.yaml")
+    vsch = (vdoc.get("components") or {}).get("schemas") or {}
+    qkeys = (vsch.get("VisitPlannerQuestionKey") or {}).get("enum") or []
+    need("BR-PLANNER-QUESTIONS", set(qkeys) == {"party", "heights", "dates", "dayVenues", "pace", "interests",
+                                                 "retail", "cuisine"},
+         "VisitPlannerQuestionKey is not the closed list of the questions the rules planner understands (CR-321)")
+    vq = vsch.get("VisitPlannerQuestion") or {}
+    need("BR-PLANNER-QUESTIONS", str(vq.get("x-ticvai-persistence") or "") == "venuemap.visit_planner_question"
+         and {"isEnabled", "isRequired", "sortOrder", "label"} <= set(vq.get("properties") or {}),
+         "no venuemap.visit_planner_question with isEnabled, isRequired, sortOrder and label (VisitPlannerQuestion)")
+    for k in qkeys:
+        need("BR-PLANNER-QUESTIONS", f"| `{k}` |" in str(vq.get("description") or ""),
+             f"VisitPlannerQuestion states no default for {k}")
+    need("BR-PLANNER-QUESTIONS", "questions" in ((vsch.get("VisitPlannerOptions") or {}).get("required") or []),
+         "VisitPlannerOptions does not answer the venue's questions (questions), so the guest screens cannot read them")
+    need("BR-PLANNER-QUESTIONS", "planner-question-fixed" in problem_types(op("setVisitPlannerQuestions")[3])
+         and op("setVisitPlannerQuestions")[3].get("x-ticvai-permission") == "PRODUCT_CONFIGURE",
+         "no staff write of the planner questions refusing party and dates switched off (setVisitPlannerQuestions)")
+    gvp = op("generateVisitPlan")[3]
+    need("BR-PLANNER-QUESTIONS", "planner-answer-missing" in problem_types(gvp)
+         and "venuemap.visit_planner_question" in text(gvp.get("x-ticvai-reads") or []),
+         "generateVisitPlan does not check the venue's required questions (422 planner-answer-missing, x-ticvai-reads)")
+    wsch2 = (load("contracts/satellite/workforce.yaml").get("components") or {}).get("schemas") or {}
+    bwl = " ".join(str((((wsch2.get("RotaAssignment") or {}).get("properties") or {})
+                        .get("breachesWorkingHourLimit") or {}).get("description") or "").split())
+    for word in ("workforce.staffing_rules", "maximumHoursPerDay", "maximumHoursPerWeek", "minimumRestHours",
+                 "rolling"):
+        need("BR-ROTA-HOUR-LIMIT", word in bwl, f"RotaAssignment.breachesWorkingHourLimit does not name its rule ({word})")
+    for oid in ("createRotaAssignment", "updateRotaAssignment"):
+        o_ = op(oid)[3]
+        need("BR-ROTA-HOUR-LIMIT", "workforce.staffing_rules" in text(o_.get("x-ticvai-reads") or []),
+             f"{oid} does not declare its read of the venue's working-hour limits (x-ticvai-reads workforce.staffing_rules)")
+        rv = {str((r or {}).get("query")) for r in o_.get("x-ticvai-read-via") or []}
+        for qn in ("workforce#principalHasOverlappingAssignment", "identity#principalHoldsRoleAtVenue"):
+            need("BR-ROTA-CROSS-VENUE", qn in rv, f"{oid} does not ask {qn} (a yes or no beyond the caller's venue)")
+        need("BR-ROTA-CROSS-VENUE", "identity#delegatedAccessRecords" not in rv,
+             f"{oid} still reads identity.delegated_access under the caller's venue grant (delegatedAccessRecords)")
+    for f_, qn, field in (("contracts/satellite/workforce.yaml", "principalHasOverlappingAssignment", "overlaps"),
+                          ("contracts/spine/identity.yaml", "principalHoldsRoleAtVenue", "holds")):
+        qd = (load(f_).get("x-ticvai-queries") or {}).get(qn) or {}
+        rp = ((qd.get("returns") or {}).get("properties") or {})
+        need("BR-ROTA-CROSS-VENUE", list(rp) == [field] and (rp.get(field) or {}).get("type") == "boolean"
+             and "ITenantRootGrant" in str(qd.get("rule") or ""),
+             f"{qn} does not answer only a boolean ({field}) under the tenant root grant (CR-336)")
+    exc = (wsch2.get("RotaAssignment") or {}).get("x-ticvai-exclude") or []
+    need("BR-ROTA-CROSS-VENUE", any((e or {}).get("equal") == ["principalId"]
+                                    and (e or {}).get("during") == ["startsAt", "endsAt"] for e in exc),
+         "RotaAssignment declares no exclusion constraint over principalId and [startsAt, endsAt) (x-ticvai-exclude)")
+    # BR-CREDIT-ACCOUNT-CURRENCY, BR-PLATFORM-APPROVAL-RULE, BR-WALLET-ETAG-VERSION (r11, ADAM CR-322, CR-330, CR-332;
+    # the lead, 29 October 2026, "As recommended", "Include those in today as well"). Each fails on the r10 contract.
+    pdoc = load("contracts/satellite/payments.yaml")
+    bca = ((pdoc.get("components") or {}).get("schemas") or {}).get("B2bCreditAccount") or {}
+    bcur = (bca.get("properties") or {}).get("currencyCode") or {}
+    need("BR-CREDIT-ACCOUNT-CURRENCY", bcur.get("readOnly") is True and "currencyCode" in (bca.get("required") or []),
+         "B2bCreditAccount has no required, readOnly currencyCode, so payments.credit_account stores no currency and "
+         "a tenant-wide account's Money has none (CR-322)")
+    cdesc = " ".join(str(op("createB2bCreditAccount")[3].get("description") or "").split())
+    need("BR-CREDIT-ACCOUNT-CURRENCY", "creditLimit.currency" in cdesc and "never changed after" in cdesc,
+         "createB2bCreditAccount does not say it sets the account's currency from creditLimit.currency, never changed "
+         "after (CR-322)")
+    for oid in ("createB2bCreditAccount", "listB2bCreditAccounts"):
+        vias = [str(v.get("query")) for v in op(oid)[3].get("x-ticvai-read-via") or [] if isinstance(v, dict)]
+        need("BR-CREDIT-ACCOUNT-CURRENCY", not {"tenancy#scopeRecords", "tenancy#venueSettingsRecords"} & set(vias),
+             f"{oid} still resolves the account's currency from a venue (tenancy#scopeRecords/venueSettingsRecords); "
+             "it is the account's own currencyCode (CR-322)")
+    podoc = load("contracts/satellite/platform-ops.yaml")
+    par = ((podoc.get("components") or {}).get("schemas") or {}).get("PlatformApprovalRule") or {}
+    seed = [r for r in par.get("x-ticvai-seed-rows") or [] if isinstance(r, dict)]
+    need("BR-PLATFORM-APPROVAL-RULE", par.get("x-ticvai-persistence") == "control.platform_approval_rule" and any(
+         r.get("kind") == "configurationChange" and r.get("subjectType") == "tenant"
+         and r.get("approverPermission") == "PLATFORM_TENANT_MANAGE" and r.get("minimumApprovals") == 2
+         and r.get("isActive") is True for r in seed),
+         "no control.platform_approval_rule schema seeded with the platform rule (configurationChange, tenant, "
+         "PLATFORM_TENANT_MANAGE, 2 approvals, active), so suspend and reactivate are always 422 (CR-330)")
+    q = ((podoc.get("x-ticvai-queries") or {}).get("platformApprovalRuleFor") or {})
+    need("BR-PLATFORM-APPROVAL-RULE", q.get("table") == "control.platform_approval_rule" and "service" in (q.get("served") or []),
+         "platform-ops declares no platformApprovalRuleFor query over control.platform_approval_rule served over the "
+         "service route (CR-330)")
+    vias = {(str(v.get("query")), str(v.get("route"))) for v in op("createApprovalRequest")[3].get("x-ticvai-read-via") or []
+            if isinstance(v, dict)}
+    need("BR-PLATFORM-APPROVAL-RULE", ("platform-ops#platformApprovalRuleFor", "service") in vias,
+         "createApprovalRequest does not ask platform-ops#platformApprovalRuleFor over the service route for a request of "
+         "subject type tenant (CR-330)")
+    for get_id, put_id, sname in (("getWalletFundingRules", "setWalletFundingRules", "WalletFundingRules"),
+                                  ("getWalletRefundPolicy", "setWalletRefundPolicy", "WalletRefundPolicy")):
+        ver = ((wsch.get(sname) or {}).get("properties") or {}).get("version") or {}
+        need("BR-WALLET-ETAG-VERSION", ver.get("type") == "integer" and ver.get("readOnly") is True
+             and "version" in ((wsch.get(sname) or {}).get("required") or []),
+             f"{sname} has no required, readOnly integer version, so {put_id}'s If-Match has nothing to compare (CR-332)")
+        for oid in (get_id, put_id):
+            hdr = ((((op(oid)[3].get("responses") or {}).get("200") or {}).get("headers") or {}).get("ETag") or {})
+            need("BR-WALLET-ETAG-VERSION", "version" in str(hdr.get("description") or ""),
+                 f"{oid}'s 200 sends no ETag that is the row's version (CR-332)")
+        need("BR-WALLET-ETAG-VERSION", "412" in {str(k) for k in (op(put_id)[3].get("responses") or {})}
+             and "`412` and nothing changes" in " ".join(str(op(put_id)[3].get("description") or "").split()),
+             f"{put_id} does not say a stale If-Match is 412 and nothing changes (CR-332)")
+
     errors["BR-PARSE"].extend(PARSE_ERRORS)
+    # BR-GUEST-SSO (r11, CHG-CR327-002; the lead, 29 October 2026: "Get those 2 gaps sorted as well"): a guest
+    # sign-in provider stores its authorization URL and carries no staff group mapping. Fails on CR-327's first cut.
+    isch = (load("contracts/spine/identity.yaml").get("components") or {}).get("schemas") or {}
+    spc = (isch.get("SsoProviderConfig") or {}).get("properties") or {}
+    need("BR-GUEST-SSO", (spc.get("authorizationUrl") or {}).get("format") == "uri"
+         and "uaePass" in str((spc.get("authorizationUrl") or {}).get("description") or ""),
+         "SsoProviderConfig stores no authorizationUrl for a guest uaePass row (CHG-CR327-002)")
+    gm = spc.get("groupMappings") or {}
+    need("BR-GUEST-SSO", "minItems" not in gm and "guest" in str(gm.get("description") or ""),
+         "SsoProviderConfig.groupMappings still requires a mapping on a guest row (CHG-CR327-002)")
+
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
              "BR-AI-CURRENCY", "BR-QR", "BR-NEW-OPS", "BR-GUEST-PII", "BR-HOST-ROUTING", "BR-CASH-RECEIPT",
              "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS", "BR-GATE-CANCEL", "BR-APPROVAL-ROUTE", "BR-GUEST-SELF-403",
-             "BR-APPROVED-OUTCOME", "BR-APPROVAL-ENGINE", "BR-PRIVACY-REQUEST",
+             "BR-APPROVED-OUTCOME", "BR-APPROVAL-ENGINE", "BR-APPROVAL-VERSIONS", "BR-BILLING-STATEMENT",
+             "BR-STORE-CHECKLIST", "BR-PRIVACY-REQUEST",
+             "BR-ANALYTICS-PROVIDER", "BR-MEDIA-COVER-USE", "BR-AGENT-LAPSE", "BR-MEDIA-REPLACE-UPLOAD",
              "BR-SCOPE-AUTHZ", "BR-SSO-ACTIVE", "BR-PERMISSION-FINDINGS", "BR-ENTITLEMENT-SHARE",
              "BR-PRESET-READONLY", "BR-END-SESSIONS", "BR-PLATFORM-TOKEN", "BR-GUEST-TOKENS", "BR-GUEST-VENUE",
-             "BR-PLATFORM-INVOICE"]
+             "BR-PLATFORM-INVOICE", "BR-WALLET-TOPUP-ONCE", "BR-WALLET-PUBLISH-CHECKS", "BR-WALLET-RESTORE-DRAFT",
+             "BR-PLANNER-QUESTIONS", "BR-ROTA-HOUR-LIMIT", "BR-ROTA-CROSS-VENUE",
+             "BR-CREDIT-ACCOUNT-CURRENCY", "BR-PLATFORM-APPROVAL-RULE", "BR-WALLET-ETAG-VERSION", "BR-GUEST-SSO"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

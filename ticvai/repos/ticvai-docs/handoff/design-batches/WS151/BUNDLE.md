@@ -571,7 +571,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | Block C · task VM-ADM-602 |
-| Who uses it | venue staff holding `CREDIT_MANAGE`, `PAYMENT_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `CREDIT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
@@ -580,7 +580,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
 
-**Known gaps.** **B2B Credit Account & Limit Manager\t95 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either …
+**Known gaps.** **B2B Credit Account & Limit Manager\t95 declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either … Removed 29 October 2026 (CHG-R11FXU-004): the approved screen has no list, table or picker that shows the accounts (its body is seven pack select fields for the facility being opened), and the lead's …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** On-account credit facilities for B2B customers: limits and exposure.
 
@@ -603,19 +603,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Payment terms | select field | — | — | — | — | — | — |
 | Approval level | select field | — | — | — | — | — | — |
 
-**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
-
-| Filter | Drawn as | Default | Allowed values, rules | Source |
-|---|---|---|---|---|
-| Over limit only | toggle | — | — | `listB2bCreditAccounts` ?overLimitOnly |
-
 #### Outputs: what the screen shows and produces
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
 - **exposure**: Limit, used, available, overdue. *(source: contracts/satellite/payments.yaml#listB2bCreditAccounts)*
-
-**Data it reads**: `listB2bCreditAccounts` (onLoad, On-account customers)
 
 **Where the user goes next**
 
@@ -632,6 +624,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
 #### Consistency with other screens
 
@@ -650,7 +643,6 @@ account:
 
 #### Permissions
 
-- `listB2bCreditAccounts` → `PAYMENT_VIEW` (read) · staff
 - `createB2bCreditAccount` → `CREDIT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -677,16 +669,15 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-602`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 6: Works in B2B Credit Account & Limit Manager\t95 → Manage payment credit facilities granted to authorized B2B customers, resellers, corporate clients or partners. This is not the general B2B customer profile. The B2B/CRM module remains authoritative …
-- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (7), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (400).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-602?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-599`, `ADM-603`.
-- [ ] Every gated control is gated: `CREDIT_MANAGE`, `PAYMENT_VIEW`.
+- [ ] Every gated control is gated: `CREDIT_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1521,7 +1512,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS91 Payment Payment Orchestration Board 5.dc.html#adm-608`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 5
 - Flow F260 *Payment Payment Orchestration board 5: Mixed Tender & Credit Command Center\t93*, step 18: Works in Mixed Tender Simulator, Credit Exposure & AI Advisor\t102 → Allow administrators to test complex tender combinations before activating rules.
-- ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
@@ -1653,7 +1643,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"B2bCreditAccount": {"type":"object","x-ticvai-persistence":"payments.credit_account","description":"Board 5.4. **Exposure includes unbilled bookings, not just unpaid invoices.**","required":["organisationId"],"properties":{"id":{"type":"string","format":"uuid"},"organisationId":{"type":"string","format":"uuid"},"accountCode":{"type":"string"},"creditLimit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"outstandingInvoiced":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"outstandingUnbilled":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"availableCredit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["active","onHold","suspended","closed"]},"overLimit":{"type":"boolean","readOnly":true},"scopePath":{"type":"string"}}},
+"B2bCreditAccount": {"type":"object","x-ticvai-persistence":"payments.credit_account","description":"Board 5.4. **Exposure includes unbilled bookings, not just unpaid invoices.**","required":["organisationId","currencyCode"],"properties":{"id":{"type":"string","format":"uuid"},"organisationId":{"type":"string","format":"uuid"},"accountCode":{"type":"string"},"creditLimit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"outstandingInvoiced":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"outstandingUnbilled":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"availableCredit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"currencyCode":{"type":"string","minLength":3,"maxLength":3,"pattern":"^[A-Z]{3}$","readOnly":true,"description":"**The ISO 4217 currency of every Money of the account** (\"All as recommended\": ADAM CR-322 option A, Chinmay, 29 October 2026): `creditLimit`, `outstandingInvoiced`, `outstandingUnbilled` and `availableCredit` are all in it. A credit limit is agreed with the customer in a currency, a contract term like a ledger account's or a partner agreement's currency, so the account stores it (naming-and-style 5.1: a table whose currency genuinely differs from its venue stores one). Set by `createB2bCreditAccount` from `creditLimit.currency` and never changed after; its scale comes from the kernel's ISO 4217 list (CR-192)."},"status":{"type":"string","enum":["active","onHold","suspended","closed"]},"overLimit":{"type":"boolean","readOnly":true},"scopePath":{"type":"string"}}},
 "B2bPaymentTerms": {"type":"object","x-ticvai-persistence":"payments.payment_terms","description":"Board 5.5. **What happens at the limit is the decision.**\n\n**ADM-603 in r8** (R8 blocker ORDERS-MONEY-C28, the lead's answer C of 20 October 2026). The approved layout is built with the labels these fields carry: Payment term (`paymentTermDays`), Billing cycle (`billingCycle`), Purchase order requirement (`purchaseOrderRequired`), Outstanding balance limit (`creditLimit`) and Approval requirement (`overrideApprovalRole`). Credit agreement, Currency, Invoice requirement and Transaction maximum have no field in r8 and are shown empty and read-only; proposed to the client (not built): Currency resolved from the region and shown read-only, Transaction maximum, Credit agreement and Invoice requirement as new fields. **The terms belong to the tenant**: a B2B credit account and its terms are tenant-level records, edited by tenant-level staff, as their row security already holds.","properties":{"accountId":{"type":"string","format":"uuid"},"creditLimit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"paymentTermDays":{"type":"integer","default":30},"billingCycle":{"type":"string","enum":["perBooking","weekly","fortnightly","monthly"]},"purchaseOrderRequired":{"type":"boolean","default":false},"depositPercent":{"type":"number","nullable":true,"description":"1 September: *\"partial payment/deposit is supported for bulk bookings such as schools and corporates — e.g. a 20–30% deposit upfront with the balance due on or before arrival.\"*\n"},"balanceDue":{"type":"string","enum":["onArrival","beforeArrival","onTerms"],"default":"beforeArrival"},"atLimit":{"type":"string","enum":["refuse","warn","allowWithOverride"],"default":"allowWithOverride"},"overrideApprovalRole":{"type":"string","nullable":true},"scopePath":{"type":"string"}}},
 "CreditConsumptionPolicy": {"type":"object","x-ticvai-persistence":"wallet.consumption_policy","description":"Boards 3.5 and 3.7. **There is no neutral default**, which is why this is configuration.\n","properties":{"strategy":{"type":"string","enum":["expiringFirst","typePriority","nonRefundableFirst","manual"],"default":"expiringFirst","description":"**`expiringFirst` is the default because it is the one that does not quietly profit from the guest forgetting.**\n"},"typeOrder":{"type":"array","items":{"type":"string","format":"uuid"}},"withinTypeOrder":{"type":"string","enum":["fefo","fifo","lifo"],"default":"fefo"},"allowSplitTender":{"type":"boolean","default":true},"allowGuestChoice":{"type":"boolean","default":false,"description":"**Whether a guest may override the order at the till.** Rarely enabled, and the venues that want it want it badly.\n"},"scopePath":{"type":"string"}}},
 "DeclineClass": {"type":"string","description":"BL-100. **Whether a failed charge may be tried again at all**, and the distinction is a merchant-account risk rather than a courtesy.\n`soft` — insufficient funds, a temporary hold, an issuer timeout. **Worth another attempt on another day**, and the whole reason a dunning schedule exists.\n`hard` — closed account, stolen card, do-not-honour, invalid number. **Never retried.** A hard decline put on a timetable is how a merchant ID gets flagged by the scheme, and the venue finds out when its acquirer calls.\n`unknown` — the provider gave no usable code. **Treated as `hard`**, because guessing `soft` optimises for one more attempt and risks the thing that cannot be undone.\n","enum":["soft","hard","unknown"]},

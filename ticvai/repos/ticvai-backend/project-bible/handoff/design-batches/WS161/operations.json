@@ -99,25 +99,6 @@
   "requestBody": "ResourcePackage",
   "responds": "ResourcePackage"
  },
- "createRotaAssignment": {
-  "method": "POST",
-  "path": "/rota-assignments",
-  "contract": "workforce",
-  "summary": "Put someone on the rota",
-  "permission": "WORKFORCE_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RotaAssignment",
-  "responds": "RotaAssignment"
- },
  "estimateEventResourceCost": {
   "method": "GET",
   "path": "/events/{eventId}/resource-cost",

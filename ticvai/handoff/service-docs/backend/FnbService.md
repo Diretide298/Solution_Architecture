@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `fnb` |
 | Schemas owned | `fnb` |
-| Operations in the slice | 79 of 138 |
+| Operations in the slice | 80 of 138 |
 | Scale | Write-heavy during service, idle between. Two peaks a day, sharply. |
 | If it is down | Down means the kitchen falls back to paper. Offline-capable by design. |
 
@@ -89,6 +89,7 @@
 | kitchen | [`listKitchenStations`](#listkitchenstations) | GET | `/kitchen/stations` | core | 1 | BO-134, KIT-001, KIT-005 |
 | kitchen | [`listKitchenTickets`](#listkitchentickets) | GET | `/kitchen/tickets` | core | 1 | BO-020, BO-046, KIT-001, KIT-002, KIT-003, KIT-004 … |
 | kitchen | [`prioritiseKitchenTicket`](#prioritisekitchenticket) | POST | `/kitchen/tickets/{ticketId}/prioritise` | core | 1 | BO-020, BO-046, KIT-003 |
+| kitchen | [`setKitchenRoutingRules`](#setkitchenroutingrules) | PUT | `/outlets/{outletId}/kitchen-routing` | setup | 1 | BO-135 |
 | kitchen | [`setKitchenTicketStatus`](#setkitchenticketstatus) | PUT | `/kitchen/tickets/{ticketId}/status` | core | 1 | BO-020, BO-046, KIT-002, KIT-003, KIT-006, POS-022 … |
 | menu | [`createMenu`](#createmenu) | POST | `/menus` | setup | 1 | BO-045 |
 | menu | [`setItemAvailability`](#setitemavailability) | PUT | `/menu-items/{itemId}/availability` | core | 1 | BO-140, KIT-008, POS-021, POS-024 |
@@ -4343,6 +4344,73 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 | 409 |  | The ticket is already ready (kitchen-ticket-already-ready), or served or cancelled (kitchen-ticket-closed); only a ticket still being made can move up the queue. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### setKitchenRoutingRules
+
+**`PUT /outlets/{outletId}/kitchen-routing`**: Set an outlet's category rules, default station and fallback station
+
+**Item routing, then category rules, then the default station** (Chinmay, 2 October, workbook Q189 and Q190; DI-323, client-requested; CHG-CSA-015). When an order is sent, each line goes to:
+1. the station whose `menuItemIds` names the item (item routing, `setKitchenStations`);
+2. otherwise the first `categoryRules` entry matching the item's menu section or product category;
+3. otherwise the outlet's `defaultStationId`. **An item is never refused at Send to kitchen for want of a station.**
+If the station a line routes to is inactive or every display assigned to it is down, its ticket goes to `fallbackStationId` instead (DI-323: the fallback display). Every station named must belong to this outlet, or to the producing outlet that serves it (`KitchenStation.servesOutletIds`); otherwise `422`.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `fnb.kitchen_routing_rule` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | outlet |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `fnb.kitchen_routing_rule` |
+| Writes | `cache:idempotency`, `fnb.kitchen_routing_rule` |
+| Called by | BO-135 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| outletId | path | yes | string (uuid) |  |
+| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `KitchenRoutingRules`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| outletId | string (uuid) |  | The outlet in the path. (read-only) |
+| categoryRules | array of object |  | Tried in order; the first match wins. |
+| categoryRules[].matchKind | enum (menuSection, productCategory) | yes |  |
+| categoryRules[].matchValue | string | yes | A MenuSection.code, or a catalogue product category code. |
+| categoryRules[].stationId | string (uuid) | yes |  |
+| defaultStationId | string (uuid) | yes | Where a line that matches no item rule and no category rule goes (workbook Q190). |
+| fallbackStationId | string (uuid) |  | Where a ticket goes when the station it routed to is inactive or every display assigned to it is down (DI-323). (nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Response**: `KitchenRoutingRules`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| outletId | string (uuid) |  | The outlet in the path. (read-only) |
+| categoryRules | array of object |  | Tried in order; the first match wins. |
+| categoryRules[].matchKind | enum (menuSection, productCategory) | yes |  |
+| categoryRules[].matchValue | string | yes | A MenuSection.code, or a catalogue product category code. |
+| categoryRules[].stationId | string (uuid) | yes |  |
+| defaultStationId | string (uuid) | yes | Where a line that matches no item rule and no category rule goes (workbook Q190). |
+| fallbackStationId | string (uuid) |  | Where a ticket goes when the station it routed to is inactive or every display assigned to it is down (DI-323). (nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
+| 400 | BadRequest | Validation failed |
+| 422 |  | A station named is not this outlet's and does not serve it (unknown-station). |
+| 200 |  | Saved |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### setKitchenTicketStatus
 
 **`PUT /kitchen/tickets/{ticketId}/status`**: Advance a kitchen ticket
@@ -4941,6 +5009,7 @@ Quick service pays immediately; table service attaches to a visit and pays at cl
 **A till at the outlet, or not** (ADAM CR-293 (1), option A, 29 October 2026; CHG-R11TEN-003). The caller's workstation is read in process with `tenancy#workstationRecords` (XDR-009). When its `outletId` equals the order's `outletId`, the order is a till's at the outlet: it is accepted and its kitchen tickets are created in this transaction (under the outlet's `paymentTiming`, above). Anything else waits for `acceptFnbOrder`: a workstation of another outlet, a workstation with no outlet, and a caller with no workstation.
 **The order number** (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). Per outlet, a counter that resets each business day in the venue's time zone (the day closes at the venue's `businessDayCutoff`, read with the venue's settings above), unique per outlet and business day. Its form is the outlet's one-letter `Outlet.orderNumberPrefix` (tenancy, A to Z), a hyphen and three digits (`A-042`), or the three digits alone (`042`) when the outlet has no prefix.
 **Which station a line goes to** (ADAM CR-277 (4); CHG-R11TEN-002). One kitchen ticket per station. A line goes to the station whose `KitchenStation.menuItemIds` lists its menu item (the item rule); a line no station lists goes by the outlet's `KitchenRoutingRules.categoryRules`, the first match winning, then to its `defaultStationId`. A `productCategory` rule matches the code of the item's catalogue product's category (`fnb.menu_item.product_variant_id`, then `catalogue#variantRecords`, `catalogue#productRecords` and `catalogue#productCategoryRecords` in process, XDR-008). `MenuItem.stationId` (`fnb.menu_item.station_id`) is not used for routing.
+**An outlet with no routing rule takes no order** (ADAM CR-319 (3), option B, Chinmay, 29 October 2026; CHG-CR319-001). An outlet that sells food must have its `fnb.kitchen_routing_rule` row (`KitchenRoutingRules`, which holds its `defaultStationId`); with none, the order is refused `409` `outletNotAcceptingOrders` and nothing is written, so the misconfiguration shows at the till rather than as an order no kitchen sees.
 **A line with `redeemEntitlementId` waits** (ADAM CR-277 (5)): its redemption calls access `validateAccess` on the access host, which waits for service sign-in between the apps (CR-241). Until that follow-up, a line carrying `redeemEntitlementId` is refused `400` (validation) and nothing is written.
 Offline behaviour depends on the items: an order containing only untracked items queues normally, while one containing a recipe-linked item is refused offline because stock depletes in real time.
 
@@ -4952,7 +5021,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
-| Reads | `cache:idempotency`, `fnb.kitchen_station`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.menu_item`, `fnb.service_order`, `fnb.service_order_line` |
+| Reads | `cache:idempotency`, `fnb.kitchen_routing_rule`, `fnb.kitchen_station`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.menu_item`, `fnb.service_order`, `fnb.service_order_line` |
 | Writes | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.service_order`, `fnb.service_order_line`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | EMP-058, EMP-059, POS-012, POS-022 |
 | State model | F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): created as `ordered`<br/>Table ([states/table.yaml](../../../states/table.yaml)): moves `seated` -> `ordered` |
@@ -4962,6 +5031,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| X-Offline-Replay | header |  | enum (true) | This call replays a write the client queued while it was offline (ADAM CR-319 (1), option A, Chinmay, 29 October 2026; CHG-CR319-001). |
 
 **Request body**: `CreateFnbOrderRequest`
 
@@ -5065,7 +5135,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 |---|---|---|
 | 201 |  | Created. |
 | 400 | BadRequest | Validation failed |
-| 409 |  | An item is unavailable, modifier constraints are unmet, a tracked item was ordered offline, or a line's redeemEntitlementId cannot be redeemed here (entitlementNotRedeemable: used, another item or ou… |
+| 409 |  | An item is unavailable, modifier constraints are unmet, a tracked item was ordered offline, a line's redeemEntitlementId cannot be redeemed here (entitlementNotRedeemable: used, another item or outle… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getFnbOrder
@@ -6037,6 +6107,7 @@ covers, is refused with 409 `tableHasOpenVisit` (an `FnbProblem` reason), read f
 |---|---|---|
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Applied |
+| 409 |  | A table the body removes, or whose capacity it lowers below the covers of the visit open on it, has an open visit (CHG-FXC-004, as updateTable); nothing is applied. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateTableVisit
@@ -6313,6 +6384,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 | raised_at | timestamptz | yes |  |
 | raised_by_principal_id | uuid | no |  |
 | note | text | no |  |
+
+### `fnb.kitchen_routing_rule`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| outlet_id | uuid | no | The outlet in the path. |
+| category_rules | jsonb | no | Tried in order; the first match wins. |
+| default_station_id | uuid | yes | Where a line that matches no item rule and no category rule goes (workbook Q190). |
+| fallback_station_id | uuid | no | Where a ticket goes when the station it routed to is inactive or every display assigned to it is down (DI-323). |
+| scope_path | text | no | The partition key (ADR-0005). |
+| id | uuid | yes | Synthesised key. |
 
 ### `fnb.kitchen_sla`
 
@@ -6783,14 +6865,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-59 operations, added to this service in later releases without changing any of the above.
+58 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | fnb | `applyMenuActions`, `closeCorrectiveAction`, `compItem`, `completeProductionRun`, `createCombo`, `createTable`, `enterCountLine`, `getAllergenVerification`, `getFnbReservationPolicy`, `getFnbServiceChargePolicy`, `getProductionRun`, `listCorrectiveActions`, `listFnbRecommendations`, `listIngredientSubstitutes`, `listProductionPlans`, `listProductionRuns`, `listTemperatureCheckpoints`, `moveTableVisit`, `notifyWaitlistParty`, `planProductionRun`, `quoteWaitTime`, `reassignServer`, `recordCorrectiveAction`, `requestRecount`, `resolveBookingConflict`, `sendBookingConfirmation`, `sendOrderNotification`, `setComboSlots`, `setFnbReservationPolicy`, `setFnbServiceChargePolicy`, `setIngredientSubstitutes`, `setSectionLayout`, `setServiceStage`, `setTemperatureCheckpoint`, `transferOrderItems`, `updateTable`, `verifyAllergens` |
 | general | `listCombos`, `listSubstitutionRules` |
 | guestOrdering | `claimTableSession` |
-| kitchen | `getKitchenRoutingRules`, `setKitchenRoutingRules`, `setKitchenStations` |
+| kitchen | `getKitchenRoutingRules`, `setKitchenStations` |
 | menu | `getMenu`, `listMenuSchedules`, `listMenuVersions`, `listMenus` |
 | modifier | `listModifierGroups` |
 | order | `amendFnbOrder` |

@@ -1212,10 +1212,6 @@ paths:
   /approval-matrices/{matrixId}:
     put:
       operationId: setApprovalMatrix
-      x-ticvai-writes:
-      - table: approvals.matrix_version
-        for: 'one row per version it stores, version 1 on create and the previous version plus one after; a stored
-          version row is never edited (ADAM CR-300, option B)'
       x-ticvai-consumed-by:
         - "P08 ADM-243 Roles, Authority, Delegation & Approval Limits"
         - "P08 ADM-330 Approval Authority Matrix"
@@ -1231,6 +1227,10 @@ paths:
         - "P08 BO-639 Reviewer Assignment & Delegation"
         - "P08 BO-863 Resource Lifecycle, Governance & Audit"
         - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
+      x-ticvai-writes:
+      - table: approvals.matrix_version
+        for: 'one row per version it stores, version 1 on create and the previous version plus one after; a stored
+          version row is never edited (ADAM CR-300, option B)'
       x-ticvai-audience:
       - staff
       summary: Configure what requires approval

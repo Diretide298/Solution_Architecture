@@ -53,8 +53,9 @@ RULES = {
     "D-FWD-KEY-NULL": "the migration review relaxes a NOT NULL key the contract does not mark nullable (CHG-MGN-001, "
                       "CR-139)",
     "D-FWD-CUT": "a statement in the migration review cut short (CHG-MGN-001, CR-148)",
-    "D-FWD-CARRIED": "a unique-together index or required-when CHECK the contract declares that no baseline, forward "
-                     "migration or review row carries (CHG-MGN-001, CR-156)",
+    "D-FWD-CARRIED": "a unique-together index, required-when CHECK or exclusion constraint (x-ticvai-exclude, CR-336) "
+                     "the contract declares that no baseline, forward migration or review row carries (CHG-MGN-001, "
+                     "CR-156)",
     "D-FWD-RETIRED": "a column the contract retires left as 'a rename or a drop: decide' (CHG-MGN-001, CR-157)",
     "D-FWD-OWNER": "a table with two keys to one parent whose owner is not decided in derive-ddl ROW_OWNER "
                    "(CHG-MGN-001, CR-148 CR-149)",
@@ -206,8 +207,11 @@ def check_banned_names(guard, tables: dict, ref_cols: dict, by: dict) -> None:
         if r["from"] in tables and r["from"] in ref_cols:
             guard.add("D-RENAME-APPLIED", r["from"] + ":old", f"{r['from']} is declared renamed to {r['to']} and "
                       "is still in the schema reference")
+    # A column renamed on a table that a later declared rename moved is read on the table it moved to: control.seo_metadata's
+    # no_index -> is_excluded_from_index (CHG-STO-009) on marketing.seo_metadata since ADAM CR-317 (CHG-CR317-001).
+    moved_to = {r["from"]: r["to"] for r in renames}
     for r in col_renames:
-        names = {c.get("column") for c in ref_cols.get(r["table"], [])}
+        names = {c.get("column") for c in ref_cols.get(moved_to.get(r["table"], r["table"]), [])}
         if r["to"] not in names or r["from"] in names:
             guard.add("D-RENAME-APPLIED", f"{r['table']}.{r['from']}",
                       f"{r['table']}.{r['from']} -> {r['to']} is declared and the schema reference has "
@@ -870,6 +874,11 @@ def main() -> int:
         for rcol, cond in mk.get("required_when") or []:
             if not rcol.startswith("?") and not any(k.startswith("?") for k in cond):
                 derived[dd.obj_name(short, rcol, "when", suffix="chk")] = t
+        # An exclusion constraint the contract declares (`x-ticvai-exclude`; ADAM CR-336, CHG-CR336-001) reaches the
+        # databases the same way: a baseline, a forward migration or a review row for the migration owner.
+        for equal, during, unless in mk.get("exclude") or []:
+            if equal and not any(k.startswith("?") for k in [*equal, *during, *unless]):
+                derived[dd.exclude_name(short, equal)] = t
     nullable_keys = {(t, c.get("column")) for t, cs in ref_cols.items() for c in cs
                      if (props.get(str(c.get("source") or "")) or {}).get("nullable") is True}
     series = "\n".join(f.read_text(encoding="utf-8") for db in ("tenant", "control")

@@ -396,29 +396,5 @@
   ],
   "requestBody": "GroupQuotationBuilderProposalGenerationInput",
   "responds": "GroupQuotationBuilderProposalGenerationView"
- },
- "updateGroupBooking": {
-  "method": "PATCH",
-  "path": "/group-bookings/{groupBookingId}",
-  "contract": "orders",
-  "summary": "Confirm numbers, change the leader or cancel a group",
-  "permission": "ORDER_MODIFY",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "UpdateGroupBookingRequest",
-  "responds": "GroupBooking"
  }
 }

@@ -374,6 +374,16 @@ def test_a_held_ticket_is_never_reopened_by_the_server_script():
     assert any("do not skip held tickets" in p for p in rel.hold_problems(unskipped))
 
 
+def test_a_developers_own_hold_is_never_reopened_by_the_server_script():
+    """Only a ticket a release deferred (no assignee left) goes back to New; one its developer put On hold, still
+    assigned (e.g. "Blocked by CR-298" on #37053, 29 October 2026), is listed and left alone."""
+    rb = (TOOLS / "op-release.rb").read_text(encoding="utf-8")
+    assert rel.hold_problems(rb) == []
+    every_hold = rb.replace("on_hold.partition { |_, id| wps[id].assigned_to_id.nil? }", "[on_hold, []]")
+    assert every_hold != rb
+    assert any("developer's own hold" in p for p in rel.hold_problems(every_hold))
+
+
 @pytest.mark.skipif(not (ROOT / "docs" / "active" / "held-tasks.yaml").exists(), reason="no held-tasks.yaml")
 def test_the_real_holds_are_planned_tasks_and_well_formed():
     held, problems = rel.load_held()

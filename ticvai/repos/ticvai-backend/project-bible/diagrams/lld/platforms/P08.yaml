@@ -61,15 +61,15 @@ servicesCalled:
 - service: VenueOpsService
   operationCalls: 532
 - service: TenancyService
-  operationCalls: 498
+  operationCalls: 490
 - service: OrderService
-  operationCalls: 425
+  operationCalls: 423
 - service: AccessService
   operationCalls: 298
 - service: MarketingService
-  operationCalls: 237
+  operationCalls: 235
 - service: WalletService
-  operationCalls: 224
+  operationCalls: 212
 - service: AiService
   operationCalls: 119
 - service: PlatformService
@@ -85,7 +85,7 @@ servicesCalled:
 - service: IdentityService
   operationCalls: 66
 - service: WhiteLabelService
-  operationCalls: 24
+  operationCalls: 23
 - service: RetailService
   operationCalls: 17
 coverage:
@@ -4379,7 +4379,7 @@ screens:
   name: Software, Configuration & Version Management
   module: Venue Operations
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createDeviceFirmware
@@ -7892,7 +7892,6 @@ screens:
   operations:
   - createGroupBooking
   - listQuoteBookingConversion
-  - updateGroupBooking
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11381,7 +11380,6 @@ screens:
   density: compact
   operations:
   - getWalletFundingRules
-  - setWalletFundingRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -11404,7 +11402,6 @@ screens:
   density: compact
   operations:
   - getWalletFundingRules
-  - setWalletFundingRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -15777,8 +15774,7 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations:
-  - configureWorkstation
+  operations: []
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -18424,7 +18420,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - createRotaAssignment
   - getEventResourcePlan
   - listRotaAssignments
   - setEventResourcePlan
@@ -19141,7 +19136,6 @@ screens:
   - getGuestProfile
   - getGuestRelationships
   - setGuestRelationships
-  - updateGuestPreferences
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -19320,7 +19314,6 @@ screens:
   - createForm
   - listConsentPurposes
   - listForms
-  - setConsentPurposes
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -21512,8 +21505,7 @@ screens:
   requiresModule: marketing
   wave: 3
   density: compact
-  operations:
-  - setBrandIdentity
+  operations: []
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -22717,7 +22709,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - createRotaAssignment
   - getStaffingCoverage
   - listAttendance
   - listRotaAssignments
@@ -23522,8 +23513,7 @@ screens:
   requiresModule: resources
   wave: 3
   density: compact
-  operations:
-  - createRotaAssignment
+  operations: []
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -27270,7 +27260,6 @@ screens:
   - cloneSeatMap
   - getSeatMap
   - listConfigurationProfiles
-  - setConfigurationProfile
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -27658,7 +27647,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - getWallet
   - listSharedWallets
   - setSharedWalletMembers
   - updateWalletType
@@ -27832,7 +27820,6 @@ screens:
   density: compact
   operations:
   - getWalletFundingRules
-  - listWalletTransactions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -27889,7 +27876,6 @@ screens:
   density: compact
   operations:
   - getWalletFundingRules
-  - setWalletFundingRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -27912,7 +27898,6 @@ screens:
   density: compact
   operations:
   - getWalletFundingRules
-  - setWalletFundingRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -27935,7 +27920,6 @@ screens:
   density: compact
   operations:
   - getWalletFundingRules
-  - setWalletFundingRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -27981,7 +27965,6 @@ screens:
   density: compact
   operations:
   - getWalletFundingRules
-  - setWalletFundingRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -28029,7 +28012,6 @@ screens:
   density: compact
   operations:
   - getWalletFundingRules
-  - setWalletFundingRules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -28403,7 +28385,6 @@ screens:
   - getWalletBalance
   - listSharedWallets
   - setSharedWalletMembers
-  - transferWalletBalance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -29157,7 +29138,6 @@ screens:
   - createRefund
   - getOrder
   - listOrderRefunds
-  - setWalletRefundPolicy
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -37330,11 +37310,8 @@ screens:
   wave: 3
   density: compact
   operations:
-  - createDeviceFirmware
   - createWorkOrder
-  - getDeviceFirmware
   - getDeviceTelemetry
-  - listDeviceFirmware
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -37344,7 +37321,6 @@ screens:
   offlineState: false
   entryParams:
   - deviceId<-session
-  - firmwareId<-navigation
   goesTo:
   - ADM-579
   boardFrames: null
@@ -37705,7 +37681,6 @@ screens:
   density: compact
   operations:
   - createB2bCreditAccount
-  - listB2bCreditAccounts
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -37952,8 +37927,7 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations:
-  - setWalletRefundPolicy
+  operations: []
   states:
   - emptyFirstRun
   - emptyNoAccess

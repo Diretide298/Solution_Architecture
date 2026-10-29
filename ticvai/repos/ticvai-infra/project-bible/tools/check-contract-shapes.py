@@ -44,6 +44,14 @@ same kind that nothing held:
                            "there is no id in the path" (ADAM CR-245, CHG-R10CRF-005). The rule CR-245 decided: the
                            path id is the record's id, a create takes it, and a mismatch with the record the natural
                            key finds is 409 and changes nothing.
+  C-REFUSAL-UNDECLARED     an operation's own text promises a refusal by status, "(409 when the batch has fewer
+                           left)", "is refused (422)", "refused with 404", and its responses declare no such status,
+                           so the refusal has no problem type and QA cannot test it (ADAM CR-316, CHG-CR316-001:
+                           setCodeDistributionManager's 409 was described and not declared)
+  C-FINDING-RULE           a validation's finding-kind enum (a schema named `*FindingKind`) whose description tables
+                           its kinds (`| kind | ... |`) without a `reported when` column, or a kind with no row or an
+                           empty `reported when` cell: a publish gate that blocks on a kind no rule defines
+                           (ADAM CR-320, CHG-CR320-001: 7 of ConfigFindingKind's 11 kinds had no rule)
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
@@ -94,7 +102,36 @@ RULES = {
     "C-PUT-KEY": "a PUT keyed on a natural key whose path id carries the stock 'creates or replaces' text, a promised "
                  "409 <noun>-id-mismatch its 409 does not list, or 'no id in the path' beside a path id (ADAM CR-245, "
                  "CHG-R10CRF-005)",
+    "C-REFUSAL-UNDECLARED": "an operation's own text promises a refusal by status ('(409 when ...)', 'refused (422)') "
+                            "that its responses do not declare (ADAM CR-316, CHG-CR316-001)",
+    "C-FINDING-RULE": "a finding-kind enum whose kind table gives a kind no 'reported when' rule (ADAM CR-320, "
+                      "CHG-CR320-001)",
 }
+# ADAM CR-316 (CHG-CR316-001): a refusal the operation's own text promises by status. Only the forms that say
+# this operation refuses: "(409 when|if|once|while ...)", "refused (409)", "refused with 409", "refused `409 ...`".
+# Statuses the shared responses carry for every operation (400 validation, 401, 403, 429) are not read.
+PROMISED_STATUS = re.compile(r"\(\s*`?(404|409|410|412|422)\b[^)]{0,40}?\b(?:when|if|once|while)\b"
+                             r"|\brefused\s*(?:with\s*)?\(?`?(404|409|410|412|422)\b", re.I)
+
+
+def finding_rule_gaps(schema: dict) -> list:
+    """The kinds of a finding-kind enum that its description's kind table gives no rule (C-FINDING-RULE; ADAM CR-320,
+    CHG-CR320-001). The table is markdown, `| kind | severity | reported when |`, one row per kind. A description with
+    no `| kind |` table is not judged; a table without a `reported when` column leaves every kind without a rule."""
+    rows = [[c.strip() for c in ln.strip().strip("|").split("|")]
+            for ln in str(schema.get("description") or "").splitlines() if ln.strip().startswith("|")]
+    head = next((r for r in rows if r and r[0].lower() == "kind"), None)
+    if head is None:
+        return []
+    col = next((i for i, c in enumerate(head) if c.lower() == "reported when"), None)
+    rule = {r[0].strip("`"): (r[col] if col is not None and col < len(r) else "") for r in rows
+            if r and r is not head and not set(r[0]) <= set("-: ")}
+    return [v for v in schema.get("enum") or [] if not str(rule.get(str(v), "")).strip()]
+
+
+def promised_statuses(text: str) -> set:
+    """The refusal statuses an operation's own description or body-key note promises (C-REFUSAL-UNDECLARED)."""
+    return {a or b for a, b in PROMISED_STATUS.findall(text or "")}
 # ADAM CR-245 (CHG-R10CRF-005): the text the 14 October shapes pass stamped on every PUT path id it added
 # (tools/applied/shp-contract-shapes-14-october/apply_noaddr.py), right only for a PUT keyed on that id.
 STOCK_ADDRESS = "Addresses the item this write creates or replaces"
@@ -341,6 +378,12 @@ def main() -> int:
                     bad.remove("id")  # an offline client mints the id it replays under (ADR-0056)
                 if "tenantId" in bad and op.get("x-ticvai-scope-level") == "platform":
                     bad.remove("tenantId")  # the platform console names the tenant it acts on
+                # A member of the schema's natural key (x-ticvai-unique-together, x-ticvai-unique) is the caller's to
+                # name, whatever its name: a firmware release's `version` is its vendor's and the 409 refuses a second
+                # one (ADAM CR-285 (3), 28 October 2026, CHG-R11TEN-006), not a row version the server moves.
+                natural = {k for grp in node.get("x-ticvai-unique-together") or [] for k in (grp or [])}
+                natural |= {k for k, v in props.items() if isinstance(v, dict) and v.get("x-ticvai-unique")}
+                bad = [p for p in bad if p not in natural]
                 if bad and persisted:
                     guard.add("C-REQUEST-SERVER-FIELDS", oid,
                               f"{oid}: request body requires server-owned {', '.join(bad)}")
@@ -388,6 +431,13 @@ def main() -> int:
                 if not r.get("x-ticvai-problem-types") and not (name.endswith("Problem") and name != "Problem"):
                     guard.add("C-ERROR-PROBLEM-TYPE", f"{oid}:{c}",
                               f"{oid}: {c} ({str(r.get('description') or '')[:40]}) names no problem type")
+        # C-REFUSAL-UNDECLARED (ADAM CR-316, CHG-CR316-001): a refusal promised in the text is a declared response.
+        promised = promised_statuses(" ".join(str(op.get(k) or "") for k in
+                                              ("description", "x-ticvai-body-key-note", "x-ticvai-singleton-note")))
+        for st in sorted(promised - codes):
+            guard.add("C-REFUSAL-UNDECLARED", f"{oid}:{st}",
+                      f"{oid}: its text promises a {st} refusal and its responses declare no {st}: declare it with "
+                      f"its problem type")
         last = f["path"].rstrip("/").rsplit("/", 1)[-1]
         if m == "post" and re.search(r"/\{[^}]+\}/[a-z][a-z-]*$", f["path"]) and "409" not in codes \
                 and not last.endswith("s") \
@@ -442,6 +492,12 @@ def main() -> int:
                 and [p for p, v in sp.items() if p != "name" and LOCALISED.search(json.dumps(v, default=str))]:
             guard.add("C-NAME-LOCALISED", f"{stem}.{name}",
                       f"{stem}.{name}: localises other text (LocalisedText) but its name is one plain string")
+        # C-FINDING-RULE (ADAM CR-320, CHG-CR320-001): every kind a validation reports has its rule beside it.
+        if name.endswith("FindingKind") and s.get("enum"):
+            gaps = finding_rule_gaps(s)
+            if gaps:
+                guard.add("C-FINDING-RULE", f"{stem}.{name}",
+                          f"{stem}.{name}: its kind table gives no 'reported when' rule for {', '.join(map(str, gaps))}")
         enums = []
         walk_enums(s, f"{stem}.{name}", enums)
         siblings = set((s.get("properties") or {}).keys())

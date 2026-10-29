@@ -192,7 +192,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the event catalogue are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 No `venueId` from a caller with no venue (`venue-required`), or one that is not a venue of the tenant (`unknown-venue`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 No `venueId` or `X-Venue-Id` from a caller with no venue (`venue-required`); or a venue, from either, that is not a venue of the tenant, a `venueId` and … |
 
 #### Sample data for the mock-up
 

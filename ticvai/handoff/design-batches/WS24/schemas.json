@@ -892,6 +892,7 @@
   ]
  },
  "ConsentPreferenceCommunicationPolicyEnforcementView": {
+  "x-ticvai-rls": "grant-holder-write",
   "type": "object",
   "x-ticvai-persistence": "marketing.communication_policy_decision",
   "description": "One policy evaluation of one communication, with the inputs as they stood when it was evaluated. Append-only evidence; retained per the tenant's retention policy (ADR-0047). **Job note:** written by the dispatch worker behind `sendTransactionalMessage` and campaign sends (`launchCampaign`) as it evaluates each message, never by an operation of its own (decided 29 September, writers pass; DM6).\n",

@@ -7215,8 +7215,8 @@ paths:
         - "P08 BO-167 Device Binding & Session Security"
       x-ticvai-read-via:
       - query: identity#subjectRecords
-        route: service
-        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'DeviceBindingSessionSecurityView.user: the display_name of each binding''s holder (access.device_binding.subject_id -> pii.subject), Identity''s data, and nothing else of the subject, read in process under the caller''s row security (ADAM CR-302, option A; XDR-010; CHG-CR302-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.33 [Device Change], [Show], [Response];
@@ -7243,7 +7243,17 @@ paths:
 
         **The screen''s actions are behaviour, not fields:** Deactivate binding (no operation yet).
 
-        
+
+        **Where each part comes from** (ADAM CR-302, option A, Chinmay, 29 October 2026; CHG-CR302-001). Rows
+        are `access.device_binding` rows, and a deactivated binding (`deactivated_at` set) is left out of the
+        list. `user` is the holder''s `pii.subject.display_name` (the binding''s `subject_id`), Identity''s data:
+        the access host asks `identity#subjectRecords` in process, the narrow read across deployables the lead
+        granted for it (XDR-010), in the caller''s transaction under the caller''s own row security, and reads that
+        one column of the subject and nothing else. `credential` is the binding''s entitlement''s media code
+        (`access.entitlement.media_code`), the key the list is sorted by. The summary is the `deviceBinding`
+        credential policy (`access.credential_policy`, kind `deviceBinding`) of the caller''s venue
+        (`credential_policy.venue_id`), else the tenant-level one (`venue_id` null).
+
 
         **Order.** Sorted by `credential` ascending, then by `bindingId`.'
       tags:
@@ -33142,10 +33152,11 @@ components:
       properties:
         user:
           type: string
-          description: User
+          description: 'User: the binding holder''s `pii.subject.display_name`, read in process from Identity
+            (ADAM CR-302, option A; XDR-010).'
         credential:
           type: string
-          description: Credential
+          description: 'Credential: the binding''s entitlement''s `access.entitlement.media_code` (ADAM CR-302).'
         deviceId:
           type: string
           description: Device ID

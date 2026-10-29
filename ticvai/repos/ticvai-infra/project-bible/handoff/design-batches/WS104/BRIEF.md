@@ -1,6 +1,6 @@
 # WS104 — Subscription Licensing AI Self Service board 7
 
-**10 screens · 10 operations · 19 schemas · 7 permissions**
+**10 screens · 9 operations · 14 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 7 permissions apply here:
-  `AI_USE, PLATFORM_TENANT_MANAGE, PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, TENANT_CONFIGURE, WORKSTATION_CONFIGURE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 6 permissions apply here:
+  `AI_USE, PLATFORM_TENANT_MANAGE, PRICE_CONFIGURE, PRICE_VIEW, PRODUCT_CONFIGURE, TENANT_CONFIGURE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -188,7 +188,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-599` | Manual Configuration Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-600` | Venue, Calendar & Operational Setup | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-601` | Product, Pricing & Sales Channel Setup | B | 16 | 8 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `BO-602` | POS, Payment & Access Setup | B | 13 | 0 | 6 | 10 | 0 | 0 | — | notStarted (—) |
+| `BO-602` | POS, Payment & Access Setup | B | 13 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-603` | Configuration Health & AI Review | B | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-604` | Setup Completion & Handoff to Go-Live | B | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 

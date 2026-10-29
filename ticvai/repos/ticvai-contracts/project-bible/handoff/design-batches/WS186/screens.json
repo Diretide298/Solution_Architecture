@@ -900,13 +900,6 @@
   },
   "apis": [
    {
-    "operationId": "getWallet",
-    "contract": "wallet",
-    "purpose": "The wallet and its owner",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "updateWalletType",
     "contract": "wallet",
     "purpose": "Ownership and association rules",

@@ -1267,7 +1267,10 @@
     "operationId": "addCartLine",
     "contract": "orders",
     "purpose": "Put the car park's parking product in the cart; refused `soldOutForDay` when the car park is at capacity (decided 28 September, audit R166)",
-    "trigger": "onAction"
+    "trigger": "onAction",
+    "inputSources": {
+     "variantId": "listParkingFacilities.productVariantId"
+    }
    },
    {
     "operationId": "updateParkingEntitlement",
@@ -2217,7 +2220,10 @@
     "operationId": "addCartLine",
     "contract": "orders",
     "purpose": "Add the table deposit to the cart when the venue requires one",
-    "trigger": "onAction"
+    "trigger": "onAction",
+    "inputSources": {
+     "variantId": "createTableReservation.variantId"
+    }
    },
    {
     "operationId": "listMyTableReservations",

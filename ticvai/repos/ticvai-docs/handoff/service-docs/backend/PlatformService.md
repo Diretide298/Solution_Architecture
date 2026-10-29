@@ -42,7 +42,7 @@ Nothing outside itself.
 | subscription | [`listModuleCatalogue`](#listmodulecatalogue) | GET | `/module-catalogue` | core | 1 | ADM-386, ADM-401, ADM-402, ADM-403, ADM-404, ADM-423 … |
 | subscription | [`setModuleListing`](#setmodulelisting) | PUT | `/module-catalogue/{moduleCode}` | setup | 1 |  |
 | subscription | [`setSubscription`](#setsubscription) | PUT | `/tenants/{tenantId}/subscription` | setup | 1 | ADM-008, ADM-410, ADM-417 |
-| tenant | [`createTenant`](#createtenant) | POST | `/tenants` | setup | 1 | ADM-005, ADM-419, ADM-420 |
+| tenant | [`createTenant`](#createtenant) | POST | `/tenants` | setup | 1 | ADM-005, ADM-420 |
 | tenant | [`listTenants`](#listtenants) | GET | `/tenants` | core | 1 | ADM-002, ADM-004, ADM-005, ADM-006, ADM-007, ADM-008 … |
 | tenant | [`terminateTenant`](#terminatetenant) | POST | `/tenants/{tenantId}/terminate` | setup | 1 | ADM-005 |
 | tenant | [`updateTenant`](#updatetenant) | PATCH | `/tenants/{tenantId}` | setup | 1 | ADM-005, ADM-006 |
@@ -1261,7 +1261,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant` |
 | Writes | `cache:idempotency`, `control.tenant` |
-| Called by | ADM-005, ADM-419, ADM-420 |
+| Called by | ADM-005, ADM-420 |
 | State model | Tenant ([states/tenant.yaml](../../../states/tenant.yaml)): created as `onboarding` |
 
 **Parameters**

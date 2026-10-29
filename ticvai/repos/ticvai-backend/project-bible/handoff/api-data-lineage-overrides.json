@@ -1,6 +1,6 @@
 {
  "about": "What the contracts cannot state about an operation's tables, one entry per operation, each with its reason. tools/derive-lineage.py adds `reads`/`writes` to what the contract derives and takes `notReads`/`notWrites` away. Authored by hand: nothing in the refresh writes it. An entry marked `carried` was copied from the hand-kept lineage when it became derived (20 October 2026, CHG-R8GEN-001); their number may only fall (carriedCeiling, check-lineage LN-OVERRIDE). To change an operation's tables, change its contract (a persisted schema, x-ticvai-read-via, x-ticvai-write-via, x-ticvai-config-change-log); add an override only for what no contract fact can say, with a reason, and without `carried`.",
- "carriedCeiling": 1615,
+ "carriedCeiling": 1614,
  "operations": {
   "abandonCart": {
    "reads": [
@@ -57,13 +57,6 @@
    "reads": [
     "marketing.loyalty_programme",
     "orders.sales_order"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
-  "acknowledgeAlert": {
-   "reads": [
-    "identity.principal"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
@@ -1894,13 +1887,6 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
-  "createDeviceFirmware": {
-   "reads": [
-    "assets.media_asset"
-   ],
-   "reason": "artefactAssetId is an uploaded asset; unique on (deviceKind, version) within the tenant (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "createDonationCampaign": {
    "reads": [
     "ledger.account"
@@ -3228,16 +3214,12 @@
   "exportSubjectData": {
    "reads": [
     "identity.subject_holding",
-    "marketing.consent_record",
-    "marketing.form_submission",
-    "marketing.guest_document",
-    "marketing.guest_profile",
     "pii.subject"
    ],
    "writes": [
     "approvals.request"
    ],
-   "reason": "14 October 2026 (ADAM CR-084, CHG-GDL-002): the orders and entitlements it lists come from Identity's projection identity.subject_holding, not access.entitlement or orders.sales_order (ADR-0028); requestId is the approvals.request raised through createApprovalRequest; cross-region createDsarRequest, which writes platform.dsar_request, is called only when guestLinkId is set (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "29 October 2026 (the lead, r11 gate; CHG-R11FXC-005): Marketing writes its own part of the export (marketing.subjectDataPartWritten) and the export job assembles the parts, so the export reads no marketing table. 14 October 2026 (ADAM CR-084, CHG-GDL-002): the orders and entitlements it lists come from Identity's projection identity.subject_holding, not access.entitlement or orders.sales_order (ADR-0028); requestId is the approvals.request raised through createApprovalRequest; cross-region createDsarRequest, which writes platform.dsar_request, is called only when guestLinkId is set (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "extendCart": {
@@ -4550,14 +4532,6 @@
    "reason": "4 October 2026 (CHG-FXC-004): derived from movements (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "getStoreAccounts": {
-   "reads": [
-    "whitelabel.config_version",
-    "whitelabel.tenant_config"
-   ],
-   "reason": "Checklist computed. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "getStorefrontInsights": {
    "reads": [
     "whitelabel.analytics_provider"
@@ -4578,8 +4552,7 @@
     "inventory.goods_receipt",
     "inventory.movement",
     "inventory.purchase_order",
-    "inventory.supplier",
-    "inventory.supplier_contract"
+    "inventory.supplier"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
@@ -4619,16 +4592,6 @@
     "control.cell_tenant"
    ],
    "reason": "18 October 2026: CHG-CRA-003: the plan catalogue and the records about a tenant moved from subscription to the control database (ADAM CR-150, CR-097) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "getTenantAppStatus": {
-   "reads": [
-    "whitelabel.config_version",
-    "whitelabel.content_page",
-    "whitelabel.module_enablement",
-    "whitelabel.tenant_config"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); r8 cause IDENTITY-C47 (CHG-R8GEN-009): activeModuleCount and licensedModuleCount from whitelabel.module_enablement, activePageCount from whitelabel.content_page (own tables)",
    "carried": true
   },
   "getTenantConfig": {
@@ -5271,13 +5234,6 @@
     "access.access_attribute"
    ],
    "reason": "Rows are access.access_attribute (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "listAccessDecisions": {
-   "reads": [
-    "identity.authz_audit"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
   "listAccessExecutiveInsight": {
@@ -11420,8 +11376,7 @@
     "marketing.tracking_technology"
    ],
    "writes": [
-    "marketing.cookie_scan_run",
-    "marketing.tracking_technology"
+    "marketing.cookie_scan_run"
    ],
    "reason": "upserts detected rows / lastSeenAt; alert recipients from cookie_scan_policy (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -15825,15 +15780,10 @@
    "carried": true
   },
   "submitGuestIdentityDocument": {
-   "reads": [
-    "assets.media_asset",
-    "identity.guest_verification_policy"
-   ],
    "writes": [
     "pii.subject_document"
    ],
-   "reason": "Number hashed into pii.subject_document.number_hash with number_last4; scan is the uploaded media asset (document_asset_ref) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
+   "reason": "r11 gate, CHG-R11FXV-001: the document row, its number hashed into number_hash with number_last4 kept; no contract schema persists pii.subject_document, so no x-ticvai-writes can state it. Reviewed: the carried entry's assets.media_asset read is gone (the uploads are checked against identity.guest_upload_ref, assets#guestUploadsForIdentity) and identity.guest_verification_policy is stated in the contract."
   },
   "submitIntegrationListing": {
    "reads": [
@@ -16717,15 +16667,7 @@
   },
   "validateTenantConfig": {
    "reads": [
-    "whitelabel.booking_flow",
-    "whitelabel.booking_flow_step",
-    "whitelabel.content_page",
-    "whitelabel.homepage_section",
-    "whitelabel.module_enablement",
-    "whitelabel.navigation_config",
-    "whitelabel.navigation_item",
-    "whitelabel.publish_review_policy",
-    "whitelabel.tenant_config"
+    "whitelabel.publish_review_policy"
    ],
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true

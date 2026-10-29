@@ -476,6 +476,7 @@ Receipt increments stock and creates the accrual the invoice will later match ag
 Quality failure, damage, wrong item, expiry too near. Reverses the stock increment and creates a supplier return.
 **Rejected by receipt line, not by item** (decided 28 September, audit R171): a receipt can hold one item on several batch or expiry lines, and each line names the one it rejects by `lineId`.
 **`other` needs a `note`** (decided 28 September, audit R222); the notes are reviewed quarterly to add the real reasons they reveal.
+**One supplier return movement per rejected line** (ADAM CR-274, option A, Chinmay, 28 October 2026; CHG-R11RUL-003): each rejected receipt line writes one `supplierReturn` inventory movement, its `reason` the request's `reason` enum value, `source_type` `goodsReceiptLine` and `source_id` the receipt line's id. getSupplierPerformance counts these movements by reason for `rejectionReasons`.
 
 |  |  |
 |---|---|

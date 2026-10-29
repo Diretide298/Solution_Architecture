@@ -96,13 +96,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-061` | Digital Asset Management Command Center | B | 0 | 72 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `CMS-061` | Digital Asset Management Command Center | B | 0 | 72 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-062` | Central Digital Asset Library | B | 3 | 18 | 6 | 9 | 1 | 0 | — | notStarted (—) |
-| `CMS-063` | Upload & Asset Ingestion Workspace | B | 17 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `CMS-063` | Upload & Asset Ingestion Workspace | B | 18 | 0 | 6 | 4 | 1 | 0 | — | notStarted (—) |
 | `CMS-064` | Folder, Collection & Workspace Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `CMS-065` | Metadata & Taxonomy Management | B | 18 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-066` | Tags, Keywords & Classification | B | 4 | 0 | 6 | 8 | 1 | 0 | — | notStarted (—) |
-| `CMS-067` | Advanced Search & Discovery | B | 0 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `CMS-067` | Advanced Search & Discovery | B | 0 | 5 | 6 | 7 | 1 | 0 | — | notStarted (—) |
 | `CMS-068` | Digital Asset 360° Profile | B | 0 | 36 | 6 | 1 | 2 | 0 | — | notStarted (—) |
 | `CMS-069` | Bulk Asset Management Workspace | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-070` | Asset Activity, Recent Assets & Library Health | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | nothing: it opens on its own |
 | Route | `/media-library/digital-asset-management-command-center-cms-061` |
 
-**Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Upload Assets, Browse Library, Create Collection. Each needs an operation, or needs removing from the … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
+**Known gaps.** **The pack names 3 actions on this screen and the screen declares 0 operations.** Unserved: Upload Assets, Browse Library, Create Collection. Each needs an operation, or needs removing from the … **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape … Removed 29 October 2026 (CHG-R11FXU-005): the approved screen has no list, table or chart that shows the assets themselves (its eight tiles are getMediaUsageAnalytics counts and its three buttons are …
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** The DAM board's hub for the tenant's content team: how many assets by type, uploads, updates, downloads, shares and what was recently used, scoped to the tenant and the venues in the person's scope.
 
@@ -149,12 +149,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Kind | select | — | Image · Video · Audio · Document · Vector · Font · Archive · Model3d; glb`) venue model, at most 40 MB. | `searchMedia` ?kind |
-| Tag | text field | — | — | `searchMedia` ?tag |
-| Collection | picker: choose a collection | — | — | `searchMedia` ?collectionId |
-| Search | text field | — | — | `searchMedia` ?search |
-| Unused only | toggle | off | — | `searchMedia` ?unusedOnly |
-| Rights expiring within days | number field (days) | — | — | `searchMedia` ?rightsExpiringWithinDays |
 | From | date and time picker | — | — | `getMediaUsageAnalytics` ?from |
 | To | date and time picker | — | — | `getMediaUsageAnalytics` ?to |
 | Group by | radio group | — | Asset type · Category · Venue · Owner · Channel | `getMediaUsageAnalytics` ?groupBy |
@@ -285,18 +279,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Browse Library (secondary button) | navigation or local | — | — | — | — |
 | Create Collection (secondary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `searchMedia` (onLoad, The estate, counted and charted); `getMediaUsageAnalytics` (onLoad, Storage, uploads and library health)
+**Data it reads**: `getMediaUsageAnalytics` (onLoad, Storage, uploads and library health)
 
 **Where the user goes next**
 
 - → `CMS-001` Tenant Workspace: *Back to Tenant Workspace*
 - → `CMS-062` Central Digital Asset Library: *Central Digital Asset Library*
-- → `CMS-063` Upload & Asset Ingestion Workspace: *Upload & Asset Ingestion Workspace*; carries `assetId`
+- → `CMS-063` Upload & Asset Ingestion Workspace: *Upload & Asset Ingestion Workspace*
 - → `CMS-064` Folder, Collection & Workspace Management: *Folder, Collection & Workspace Management*
 - → `CMS-065` Metadata & Taxonomy Management: *Metadata & Taxonomy Management*
-- → `CMS-066` Tags, Keywords & Classification: *Tags, Keywords & Classification*; carries `assetId`
+- → `CMS-066` Tags, Keywords & Classification: *Tags, Keywords & Classification*
 - → `CMS-067` Advanced Search & Discovery: *Advanced Search & Discovery*
-- → `CMS-068` Digital Asset 360° Profile: *Digital Asset 360° Profile*; carries `assetId`
+- → `CMS-068` Digital Asset 360° Profile: *Digital Asset 360° Profile*
 - → `CMS-069` Bulk Asset Management Workspace: *Bulk Asset Management Workspace*
 - → `CMS-070` Asset Activity, Recent Assets & Library Health: *Asset Activity, Recent Assets & Library Health*
 
@@ -349,7 +343,6 @@ Every digital asset:
 
 #### Permissions
 
-- `searchMedia` → `ASSET_LIBRARY_VIEW` (read) · staff
 - `getMediaUsageAnalytics` → `ASSET_LIBRARY_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -358,15 +351,7 @@ Screen guard: `ASSET_LIBRARY_VIEW`
 
 #### Requirements it meets
 
-5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 22.1.9 | Campaign Asset Library | Marketing & CRM | CONTRACTED | `searchMedia` |
-| 22.10.25 | Media Library | Marketing & CRM | CONTRACTED | `searchMedia` |
-| 23.1.1 | System shall provide a centralized repository for storing and managing digital assets including images, videos, documents, PDFs, marketing materials, brand assets, audio files, templates, and … | Digital Asset Management | CONTRACTED | `searchMedia` |
-| 23.1.5 | System shall support searching assets using keywords, metadata, tags, categories, and filters. | Digital Asset Management | CONTRACTED | `searchMedia` |
-| 23.1.15 | System shall expose DAM functionality through APIs and support integration with CMS, CRM, marketing platforms, mobile applications, and third-party systems. | Digital Asset Management | CONTRACTED | `searchMedia` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -399,7 +384,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (72 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-061?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Upload Assets, Browse Library, Create Collection.
@@ -632,6 +617,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Browse Files | picker: choose an id | optional | — | — | shows names, sends the id | Picks the files and uploads each to the asset library (`createUpload` for a signed URL, then `completeUpload` when the transfer ends); analyseMediaAsset auto-tags what arrives. | `MediaAsset.id` |
+
 **Sent by *Bulk Upload*** (`completeUpload`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
@@ -664,7 +655,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Browse Files (primary button) | navigation or local | — | — | — | — |
 | Bulk Upload (secondary button) | `completeUpload` POST `/media/uploads/{uploadId}/complete` | inline | MediaAsset | 409 The transfer never finished (`transferIncomplete`), the upload ticket expired (`uploadExpired`), or the stored file is larger than the ticket allowed … (UploadRefusedProblem) | — |
 | Import from Approved Source (secondary button) | navigation or local | — | — | — | — |
 
@@ -716,12 +706,14 @@ Screen guard: `ASSET_LIBRARY_MANAGE`
 
 #### Requirements it meets
 
-2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 23.1.4 | Authorized users shall upload assets individually or in bulk through web interfaces and APIs. | Digital Asset Management | CONTRACTED | `createUpload` |
 | 23.1.7 | AI shall automatically generate tags, keywords, and classifications for uploaded assets. | Digital Asset Management | CONTRACTED | `analyseMediaAsset` |
+| 23.1.3 | System shall support configurable metadata including asset type, owner, department, campaign, venue, event, creation date, expiry date, and usage rights. | Digital Asset Management | CONTRACTED | data `MediaAsset` |
+| 23.1.10 | System shall support secure sharing of assets across departments, venues, tenants, and external partners. | Digital Asset Management | CONTRACTED | data `MediaAsset` |
 
 #### Client meeting inputs
 
@@ -745,10 +737,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (400, 409).
+- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-063?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Browse Files, Bulk Upload, Import from Approved Source.
+- [ ] Every action is wired with its success and its failure: Bulk Upload, Import from Approved Source.
 - [ ] Every transition is wired: `CMS-061`.
 - [ ] Every gated control is gated: `ASSET_LIBRARY_MANAGE`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1223,14 +1215,26 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Matching assets** (data table, from `searchMedia`): **What the search finds**, narrowed by the facets above: Asset Type sends `kind`, Venue `venueId`, Collection `collectionId`. Cursor pagination, never offset. File Format and Owner have no search parameter yet and narrow nothing.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Title | in the reader's language | — |
+| Kind | chip: Image, Video, Audio, Document, Vector, Font… | `model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 … |
+| Filename | text | — |
+| Status | chip: Processing, Ready, Quarantined, Failed, Archived | — |
+| Created at | 1 Oct 2026, 14:30 | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Asset Type (primary button) | navigation or local | — | — | — | — |
+| Asset Type (primary button) | `searchMedia` GET `/media` | — | MediaAsset (paged) | 403 Authenticated but not permitted at the requested scope | — |
 | File Format (secondary button) | navigation or local | — | — | — | — |
-| Venue (secondary button) | navigation or local | — | — | — | — |
-| Collection (secondary button) | navigation or local | — | — | — | — |
+| Venue (secondary button) | `searchMedia` GET `/media` | — | MediaAsset (paged) | 403 Authenticated but not permitted at the requested scope | — |
+| Collection (secondary button) | `searchMedia` GET `/media` | — | MediaAsset (paged) | 403 Authenticated but not permitted at the requested scope | — |
 | Owner (secondary button) | navigation or local | — | — | — | — |
 
 **Data it reads**: `searchMedia` (onLoad, Advanced search)
@@ -1282,7 +1286,7 @@ Screen guard: `ASSET_LIBRARY_VIEW`
 
 #### Requirements it meets
 
-5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1291,6 +1295,8 @@ Screen guard: `ASSET_LIBRARY_VIEW`
 | 23.1.1 | System shall provide a centralized repository for storing and managing digital assets including images, videos, documents, PDFs, marketing materials, brand assets, audio files, templates, and … | Digital Asset Management | CONTRACTED | `searchMedia` |
 | 23.1.5 | System shall support searching assets using keywords, metadata, tags, categories, and filters. | Digital Asset Management | CONTRACTED | `searchMedia` |
 | 23.1.15 | System shall expose DAM functionality through APIs and support integration with CMS, CRM, marketing platforms, mobile applications, and third-party systems. | Digital Asset Management | CONTRACTED | `searchMedia` |
+| 23.1.3 | System shall support configurable metadata including asset type, owner, department, campaign, venue, event, creation date, expiry date, and usage rights. | Digital Asset Management | CONTRACTED | data `MediaAsset` |
+| 23.1.10 | System shall support secure sharing of assets across departments, venues, tenants, and external partners. | Digital Asset Management | CONTRACTED | data `MediaAsset` |
 
 #### Client meeting inputs
 
@@ -1314,7 +1320,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-067?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Asset Type, File Format, Venue, Collection, Owner.
 - [ ] Every transition is wired: `CMS-061`.
@@ -1899,7 +1905,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "MediaStatus": {"type":"string","enum":["processing","ready","quarantined","failed","archived"]},
 "MediaTag": {"type":"object","x-ticvai-persistence":"assets.tag","description":"Board 2.2. **A tag carries its origin and confidence**, so machine labels can be filtered without being deleted.\n","required":["value"],"properties":{"value":{"type":"string"},"vocabulary":{"type":"string","nullable":true},"source":{"type":"string","enum":["human","autoTag","import","inherited"],"default":"human"},"confidence":{"type":"number","nullable":true},"accepted":{"type":"boolean","default":true,"description":"A proposed auto-tag below the promotion threshold sits here as false."},"addedBy":{"type":"string","format":"uuid","nullable":true},"addedAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string"}}},
 "MediaTaxonomy": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"assets.taxonomy","description":"Boards 1.5 and 1.6. **Metadata fields are per asset type**, because an image has dimensions and a contract has an expiry.\n","properties":{"categories":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"parentCategoryId":{"type":"string","format":"uuid","nullable":true},"applicableAssetTypes":{"type":"array","items":{"type":"string"}}}}},"fields":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"dataType":{"type":"string"},"applicableAssetTypes":{"type":"array","items":{"type":"string"}},"mandatory":{"type":"boolean"},"allowedValues":{"type":"array","items":{"type":"string"}}}}},"keywordVocabularies":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"terms":{"type":"array","items":{"type":"string"}},"closed":{"type":"boolean","default":false,"description":"**A closed vocabulary refuses terms not in the list.** Open vocabularies are how a library ends up with `logo`, `logos`, `Logo` and `brand-logo`.\n"}}}},"scopePath":{"type":"string"}}},
-"MediaUsage": {"x-ticvai-persistence":"assets.media_usage","type":"object","description":"One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it.\n","required":["surface","referenceId"],"properties":{"extractedText":{"type":"string","description":"**Not written; read `MediaAsset.extractedText`** (R8 blocker ORDERS-MONEY-C19). Text pulled out of an uploaded document belongs to the asset, not to one place it is used, and nothing could query it here. Kept on the wire for clients built before; always absent.\n"},"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"surface":{"type":"string","enum":["tenantBranding","homepageBanner","promoBlock","contentPage","product","event","menuItem","merchandise","workOrder","incident","inspection","campaign","aiConfigSource","aiHistoryImport","aiLayoutDraft","workOrderAttachment","seatingSection","transportNetworkImport","venueMap","venueMapVersion"]},"referenceId":{"type":"string"},"label":{"type":"string"},"isLive":{"type":"boolean","description":"True where the referencing surface is published to guests."}}},
+"MediaUsage": {"x-ticvai-persistence":"assets.media_usage","type":"object","description":"One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it. **`surface: mediaCollectionCover` is never a stored row** (ADAM CR-326, option A; CHG-CR326-001): `deleteMediaAsset` works it out from `assets.media_collection.cover_asset_id` to name a collection whose cover the asset is, with `referenceId` the collection's id and `label` its name.\n","required":["surface","referenceId"],"properties":{"extractedText":{"type":"string","description":"**Not written; read `MediaAsset.extractedText`** (R8 blocker ORDERS-MONEY-C19). Text pulled out of an uploaded document belongs to the asset, not to one place it is used, and nothing could query it here. Kept on the wire for clients built before; always absent.\n"},"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"surface":{"type":"string","enum":["tenantBranding","homepageBanner","promoBlock","contentPage","product","event","menuItem","merchandise","workOrder","incident","inspection","campaign","aiConfigSource","aiHistoryImport","aiLayoutDraft","workOrderAttachment","seatingSection","transportNetworkImport","venueMap","venueMapVersion","mediaCollectionCover"]},"referenceId":{"type":"string"},"label":{"type":"string"},"isLive":{"type":"boolean","description":"True where the referencing surface is published to guests."}}},
 "MediaUsageRow": {"type":"object","description":"Boards 1.10 and 4.9. **Assets never used is the number that justifies the library.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"assetCount":{"type":"integer"},"storageBytes":{"type":"integer"},"downloads":{"type":"integer"},"views":{"type":"integer"},"shares":{"type":"integer"},"neverUsedCount":{"type":"integer"},"unclassifiedCount":{"type":"integer"}}},
 "OrgUnit": {"x-ticvai-persistence":"platform.scope","type":"object","required":["id","level","path","code","name","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"level":{"$ref":"#/components/schemas/tenancy::ScopeLevel"},"parentId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"platform.scope"},"path":{"type":"string","description":"Materialised ltree path, e.g. `t_ref.b_alpha.r_north.v_alpha1`.","pattern":"^[a-z0-9_]+(\\.[a-z0-9_]+)*$"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"isActive":{"type":"boolean","description":"False causes every permission query at or beneath this node to resolve to DENY.\n"},"childCount":{"type":"integer","minimum":0}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},

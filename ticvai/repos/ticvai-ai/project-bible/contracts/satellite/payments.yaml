@@ -464,10 +464,23 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PaymentMethod.fixed, PaymentMethod.maximumAmount, PaymentMethod.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the venue each row''s scope_path names, whose settings give the currency of its Money (ADAM CR-286; as createPaymentMethod)'
       summary: The methods this tenant can offer, and where
       description: 'Board 1.2. **A method is not a provider.** *Apple Pay* is a method; the acquirer
         behind it is a routing decision, and a venue that models them as one thing cannot change
         acquirer without re-configuring every till.
+
+        **Whose currency** (ADAM CR-286, option A, 28 October 2026, confirmed as built; CHG-R11TEN-009). A method''s
+        amounts (`minimumAmount`, `maximumAmount`, `surcharge.fixed`) are in the currency of the venue its row''s
+        `scope_path` names (`tenancy#scopeRecords`, then `tenancy#venueSettingsRecords`), as `createPaymentMethod`
+        writes them. A row above a venue holds no amounts, and the list answers them absent.
+
+        **The filters.** `venueId` matches a method whose `venueIds` contains it or is empty (all venues); `channel`
+        matches the same way on `channels`.
+
+        **Order.** Sorted by `displayOrder` (coalesce(`displayOrder`, 0), its default), then `code`, then `id`.
 
         '
       tags:
@@ -511,6 +524,13 @@ paths:
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PaymentMethod.fixed, PaymentMethod.maximumAmount, PaymentMethod.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Add a payment method to the catalogue
+      description: '**Whose currency** (ADAM CR-286, option A, 28 October 2026, confirmed as built; CHG-R11TEN-009).
+        A method''s amounts (`minimumAmount`, `maximumAmount`, `surcharge.fixed`) are in the currency of the venue its
+        row''s `scope_path` names (`tenancy#scopeRecords`, then `tenancy#venueSettingsRecords`). A row above a venue
+        holds no amounts: a create there that sends any of the three is refused `400`. `surcharge.fixed` is stored
+        in `payments.method.surcharge` as `{"amount": "<numeric>"}`, the amount only (ADR-0018).
+
+        '
       tags:
       - payments
       x-ticvai-permission: PAYMENT_CONFIGURE
@@ -536,6 +556,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentMethod'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
@@ -573,6 +595,10 @@ paths:
         ice cream is a decision, and it is made by restricting the method below a threshold rather than
         by removing it.
 
+        **A row above a venue holds no amounts** (ADAM CR-286, option A, 28 October 2026; CHG-R11TEN-009): as on
+        `createPaymentMethod`, the amounts are in the currency of the venue the row''s `scope_path` names, and a body
+        that sends `minimumAmount`, `maximumAmount` or `surcharge.fixed` for a row above a venue is refused `400`.
+
         '
       tags:
       - payments
@@ -593,6 +619,8 @@ paths:
       responses:
         '412':
           $ref: '../shared/common.yaml#/components/responses/PreconditionFailed'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '200':
           headers:
             X-Consistency-Token:
@@ -1441,16 +1469,8 @@ paths:
     get:
       operationId: listB2bCreditAccounts
       x-ticvai-consumed-by:
-        - "P08 ADM-602 B2B Credit Account & Limit Manager"
         - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
         - "P08 ADM-608 Mixed Tender Simulator, Credit Exposure & AI Advisor"
-      x-ticvai-read-via:
-      - query: tenancy#scopeRecords
-        route: in-process
-        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: B2bCreditAccount.availableCredit, B2bCreditAccount.creditLimit, B2bCreditAccount.outstandingInvoiced, B2bCreditAccount.outstandingUnbilled (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: B2bCreditAccount.availableCredit, B2bCreditAccount.creditLimit, B2bCreditAccount.outstandingInvoiced, B2bCreditAccount.outstandingUnbilled (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: On-account customers, their limits and their exposure
       description: 'Boards 5.4 and 5.5. **`CREDIT_MANAGE` and `CREDIT_OVERRIDE` existed as permissions
         and the account they govern did not.** A school booking on account, a tour operator with thirty
@@ -1460,6 +1480,10 @@ paths:
         **Exposure includes unbilled bookings, not just unpaid invoices.** A tour operator with no
         outstanding invoices and eighty thousand of bookings next month is not within their limit; they
         have simply not been billed yet.
+
+        **Every Money of an account is in the account''s own currency** ("All as recommended": ADAM CR-322 option A,
+        Chinmay, 29 October 2026): `currencyCode` (`payments.credit_account.currency_code`), the currency the limit
+        was agreed in, not a venue''s or a region''s, since an on-account customer is tenant-wide.
 
          **Order.** Sorted by `id` descending (a UUIDv7, so newest first). (r10 default ruling, CHG-R10GEN-004)'
       tags:
@@ -1489,15 +1513,15 @@ paths:
       operationId: createB2bCreditAccount
       x-ticvai-consumed-by:
         - "P08 ADM-602 B2B Credit Account & Limit Manager"
-      x-ticvai-read-via:
-      - query: tenancy#scopeRecords
-        route: in-process
-        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: B2bCreditAccount.availableCredit, B2bCreditAccount.creditLimit, B2bCreditAccount.outstandingInvoiced, B2bCreditAccount.outstandingUnbilled (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: B2bCreditAccount.availableCredit, B2bCreditAccount.creditLimit, B2bCreditAccount.outstandingInvoiced, B2bCreditAccount.outstandingUnbilled (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-conflict-policy: serverWins
       summary: Open an on-account relationship
+      description: '**The account keeps the currency its limit is agreed in** ("All as recommended": ADAM CR-322
+        option A, Chinmay, 29 October 2026). A credit limit is a contract term agreed with the customer in a
+        currency, so the account stores it: `currencyCode` (`payments.credit_account.currency_code`, ISO 4217, its
+        scale from the kernel''s ISO 4217 list as CR-192 set) is set here from `creditLimit.currency` and never
+        changed after, and every Money of the account (`creditLimit`, `outstandingInvoiced`, `outstandingUnbilled`,
+        `availableCredit`) is in it. It is not resolved from a venue or a region: an account at the tenant root or a
+        brand has neither above it. A body without `creditLimit` names no currency to store and is refused `400`.'
       tags:
       - payments
       x-ticvai-permission: CREDIT_MANAGE
@@ -1513,6 +1537,8 @@ paths:
             schema:
               $ref: '#/components/schemas/B2bCreditAccount'
       responses:
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '201':
           headers:
             X-Consistency-Token:
@@ -4274,6 +4300,7 @@ components:
       description: 'Board 5.4. **Exposure includes unbilled bookings, not just unpaid invoices.**'
       required:
       - organisationId
+      - currencyCode
       properties:
         id:
           type: string
@@ -4291,6 +4318,18 @@ components:
           $ref: ../shared/common.yaml#/components/schemas/Money
         availableCredit:
           $ref: ../shared/common.yaml#/components/schemas/Money
+        currencyCode:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z]{3}$'
+          readOnly: true
+          description: '**The ISO 4217 currency of every Money of the account** ("All as recommended": ADAM CR-322
+            option A, Chinmay, 29 October 2026): `creditLimit`, `outstandingInvoiced`, `outstandingUnbilled` and
+            `availableCredit` are all in it. A credit limit is agreed with the customer in a currency, a contract term
+            like a ledger account''s or a partner agreement''s currency, so the account stores it (naming-and-style 5.1:
+            a table whose currency genuinely differs from its venue stores one). Set by `createB2bCreditAccount` from
+            `creditLimit.currency` and never changed after; its scale comes from the kernel''s ISO 4217 list (CR-192).'
         status:
           type: string
           enum:

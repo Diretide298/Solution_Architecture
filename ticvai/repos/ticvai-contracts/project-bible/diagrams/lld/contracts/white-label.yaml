@@ -317,6 +317,8 @@ operations:
   - staff
   offline: false
   reads:
+  - whitelabel.app_build
+  - whitelabel.config_version
   - whitelabel.tenant_config
   writes: []
 - operation: getBookingFlow
@@ -551,6 +553,7 @@ operations:
   offline: true
   reads:
   - whitelabel.analytics_provider
+  - whitelabel.banner
   - whitelabel.config_version
   - whitelabel.footer_config
   - whitelabel.footer_config_column
@@ -559,6 +562,7 @@ operations:
   - whitelabel.homepage_section
   - whitelabel.navigation_config
   - whitelabel.navigation_item
+  - whitelabel.promo_block
   - whitelabel.tenant_config
   writes: []
 - operation: getSitePackage
@@ -624,6 +628,7 @@ operations:
   - whitelabel.config_version
   - whitelabel.content_page
   - whitelabel.module_enablement
+  - whitelabel.received_release
   - whitelabel.tenant_config
   writes: []
 - operation: getTenantConfig
@@ -633,7 +638,6 @@ operations:
   permission: TENANT_CONFIGURE
   audience:
   - staff
-  - guest
   offline: false
   reads:
   - whitelabel.booking_flow
@@ -998,6 +1002,7 @@ operations:
   - whitelabel.module_enablement
   - whitelabel.navigation_config
   - whitelabel.navigation_item
+  - whitelabel.policy
   - whitelabel.publish_review_policy
   - whitelabel.tenant_config
   writes:
@@ -1143,6 +1148,8 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - whitelabel.app_build
+  - whitelabel.config_version
   - whitelabel.tenant_config
   writes:
   - cache:idempotency
@@ -1314,8 +1321,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - whitelabel.config_version
   - whitelabel.content_page
   - whitelabel.module_enablement
+  - whitelabel.received_release
   - whitelabel.tenant_config
   writes:
   - cache:idempotency
@@ -1426,7 +1435,9 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - whitelabel.config_version
   - whitelabel.store_account
+  - whitelabel.tenant_config
   writes:
   - cache:idempotency
   - whitelabel.store_account
@@ -1597,10 +1608,12 @@ operations:
   - whitelabel.booking_flow
   - whitelabel.booking_flow_step
   - whitelabel.content_page
+  - whitelabel.homepage_layout
   - whitelabel.homepage_section
   - whitelabel.module_enablement
   - whitelabel.navigation_config
   - whitelabel.navigation_item
+  - whitelabel.policy
   - whitelabel.publish_review_policy
   - whitelabel.tenant_config
   writes:

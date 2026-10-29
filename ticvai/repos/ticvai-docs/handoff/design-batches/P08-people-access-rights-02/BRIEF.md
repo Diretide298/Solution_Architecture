@@ -1,6 +1,6 @@
 # P08-people-access-rights-02 — P08 · People & Access Rights (2 of 2)
 
-**2 screens · 4 operations · 6 schemas · 4 permissions**
+**2 screens · 4 operations · 7 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

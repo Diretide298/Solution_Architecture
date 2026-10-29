@@ -2915,6 +2915,7 @@
     "kind",
     "name",
     "name_translations",
+    "order_number_prefix",
     "outlet_type",
     "payment_timing",
     "produces_for_outlet_ids",
@@ -2973,6 +2974,7 @@
     "kind",
     "name",
     "name_translations",
+    "order_number_prefix",
     "outlet_type",
     "payment_timing",
     "produces_for_outlet_ids",
@@ -3031,6 +3033,7 @@
     "kind",
     "name",
     "name_translations",
+    "order_number_prefix",
     "outlet_type",
     "payment_timing",
     "produces_for_outlet_ids",
@@ -10202,6 +10205,7 @@
   "reads": [
    "cache:idempotency",
    "identity.mfa_method",
+   "identity.sso_provider",
    "pii.subject_contact",
    "pii.subject_identity"
   ],
@@ -10263,6 +10267,7 @@
    "cache:idempotency",
    "identity.mfa_method",
    "identity.redirect_host",
+   "identity.sso_provider",
    "pii.subject_contact",
    "pii.subject_identity"
   ],
@@ -10656,12 +10661,15 @@
    ],
    "identity.sso_provider": [
     "allowed_redirect_uris",
+    "audience",
+    "authorization_url",
     "client_id",
     "client_secret_ref",
     "default_home_scope_id",
     "display_name",
     "display_name_claim",
     "groups_claim",
+    "guest_provider",
     "id",
     "is_active",
     "is_auto_provision_principals",
@@ -10711,12 +10719,15 @@
    ],
    "identity.sso_provider": [
     "allowed_redirect_uris",
+    "audience",
+    "authorization_url",
     "client_id",
     "client_secret_ref",
     "default_home_scope_id",
     "display_name",
     "display_name_claim",
     "groups_claim",
+    "guest_provider",
     "id",
     "is_active",
     "is_auto_provision_principals",
@@ -15255,9 +15266,12 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of platform.outlet, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.outlet"
   ]
  },
  "getGuestMenu": {
@@ -15389,9 +15403,12 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "which outlets are open to deliver to the location (409 location-not-served) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "platform.outlet"
   ]
  },
  "recordOrderHandover": {
@@ -15476,9 +15493,12 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of platform.outlet, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.outlet"
   ]
  },
  "createGuestFnbOrder": {
@@ -15529,7 +15549,7 @@
    },
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the outlet's admissionContext and whether it is taking orders (403 entry-ticket-required, 409 outlet-closed, 422 the outlet's delivery policy) (CHG-MOD-003)"
    },
    {
@@ -15540,6 +15560,7 @@
   ],
   "readsInProcess": [
    "inventory.movement",
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -16332,6 +16353,7 @@
   "path": "/fnb-orders",
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_routing_rule",
    "fnb.kitchen_station",
    "fnb.kitchen_ticket",
    "fnb.kitchen_ticket_line",
@@ -16434,18 +16456,43 @@
   },
   "readVia": [
    {
+    "query": "catalogue#productCategoryRecords",
+    "route": "in-process",
+    "for": "the product's category's code, which an outlet's productCategory routing rule matches (ADAM CR-277 (2); XDR-008)"
+   },
+   {
+    "query": "catalogue#productRecords",
+    "route": "in-process",
+    "for": "the variant's product's category (Product.categoryId), matched by an outlet's productCategory routing rules (ADAM CR-277 (2); XDR-008)"
+   },
+   {
+    "query": "catalogue#variantRecords",
+    "route": "in-process",
+    "for": "each line's menu item's catalogue variant (fnb.menu_item.product_variant_id), for its productId: the productCategory routing match (ADAM CR-277 (2); XDR-008)"
+   },
+   {
     "query": "tenancy#outletRecords",
-    "route": "service",
-    "for": "the outlet an entitlement may be redeemed at (409 entitlement-not-redeemable) (CHG-MOD-003)"
+    "route": "in-process",
+    "for": "the order's outlet: its paymentTiming (ADAM CR-277 (1)) and its orderNumberPrefix (ADAM CR-293 (2)), in process (XDR-004); the outlet an entitlement may be redeemed at waits with the redeemEntitlementId lines (CHG-MOD-003)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the currency and scale of the Money it answers: the venue's frozen trading currency, from platform.venue_settings, Tenancy's data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)"
+   },
+   {
+    "query": "tenancy#workstationRecords",
+    "route": "in-process",
+    "for": "the caller's workstation's outletId: a till at the order's outlet is accepted now, anything else waits for acceptFnbOrder (ADAM CR-293 (1); XDR-009)"
    }
   ],
   "readsInProcess": [
-   "platform.venue_settings"
+   "catalogue.product",
+   "catalogue.product_category",
+   "catalogue.variant",
+   "platform.outlet",
+   "platform.venue_settings",
+   "platform.workstation"
   ]
  },
  "acceptFnbOrder": {
@@ -16553,7 +16600,7 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "whether the outlet is taking orders (409 outlet-not-accepting-orders) (CHG-MOD-003)"
    },
    {
@@ -16563,6 +16610,7 @@
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -17593,7 +17641,7 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"tenancy.Outlet.paymentTiming\": platform.outlet, Tenancy's data (CHG-R10GEN-001)"
    },
    {
@@ -17603,6 +17651,7 @@
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -17733,7 +17782,7 @@
    },
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"tenancy.Outlet.paymentTiming\": platform.outlet, Tenancy's data (CHG-R10GEN-001)"
    },
    {
@@ -17743,6 +17792,7 @@
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -18220,7 +18270,7 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of platform.outlet, Tenancy's data (CHG-MOD-001)"
    },
    {
@@ -18230,6 +18280,7 @@
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -19907,9 +19958,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: StockMovement.totalCost, StockMovement.unitCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "createStockMovement": {
@@ -19962,9 +20016,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StockMovement.totalCost, StockMovement.unitCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listStockCounts": {
@@ -20015,9 +20072,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: StockCount.varianceValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "startStockCount": {
@@ -20074,9 +20134,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StockCount.varianceValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "submitCountLines": {
@@ -20131,9 +20194,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.inventory\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "cancelStockCount": {
@@ -20189,9 +20255,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StockCount.varianceValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "recountStockCount": {
@@ -20229,7 +20298,7 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StockCount.varianceValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
@@ -20255,7 +20324,10 @@
     "variance_line_count",
     "variance_value"
    ]
-  }
+  },
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "postStockCount": {
   "contract": "inventory",
@@ -20312,9 +20384,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.inventory\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listStockTransfers": {
@@ -20613,9 +20688,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "createRequisition": {
@@ -20688,9 +20766,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getSuggestedRequisitions": {
@@ -20785,9 +20866,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "returnRequisition": {
@@ -20859,9 +20943,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "cancelRequisition": {
@@ -20933,9 +21020,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "approveRequisition": {
@@ -21007,9 +21097,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listSuppliers": {
@@ -21832,9 +21925,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.inventory\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "rejectReceivedGoods": {
@@ -21941,9 +22037,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestMerchandiseItem.price, MerchandiseItem.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "createMerchandise": {
@@ -21997,9 +22096,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: MerchandiseItem.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "updateMerchandise": {
@@ -22053,9 +22155,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: MerchandiseItem.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "lookupMerchandise": {
@@ -22088,7 +22193,7 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PriceCheck.effectivePrice, PriceCheck.listPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
@@ -22096,6 +22201,9 @@
     "route": "service",
     "for": "the caller's workstation and its outlet (400 outlet-required, 404) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listRetailSales": {
@@ -22159,9 +22267,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RetailSale.discount, RetailSale.discountAmount, RetailSale.grossAmount, RetailSale.lineTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "createRetailSale": {
@@ -22255,13 +22366,14 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RetailSale.discount, RetailSale.discountAmount, RetailSale.grossAmount, RetailSale.lineTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
   "readsInProcess": [
    "inventory.kit_component",
-   "inventory.movement"
+   "inventory.movement",
+   "platform.venue_settings"
   ]
  },
  "getRetailSale": {
@@ -22325,9 +22437,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RetailSale.discount, RetailSale.discountAmount, RetailSale.grossAmount, RetailSale.lineTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "lookupRetailSale": {
@@ -22391,9 +22506,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RetailSale.discount, RetailSale.discountAmount, RetailSale.grossAmount, RetailSale.lineTotal and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "reprintReceipt": {
@@ -22478,9 +22596,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RetailReturn.refundAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "createRetailReturn": {
@@ -22555,12 +22676,13 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RetailReturn.refundAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
   "readsInProcess": [
-   "inventory.kit_component"
+   "inventory.kit_component",
+   "platform.venue_settings"
   ]
  },
  "createRetailExchange": {
@@ -22604,9 +22726,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CreateExchangeReplacementLine.overridePrice, RetailExchange.difference, RetailExchange.replacementValue, RetailExchange.returnedValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getReturnPolicy": {
@@ -22661,9 +22786,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ReturnPolicy.requiresApprovalAbove, ReturnPolicy.requiresSecondUserAbove, ReturnPolicy.selfAuthoriseLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setReturnPolicy": {
@@ -22720,9 +22848,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ReturnPolicy.requiresApprovalAbove, ReturnPolicy.requiresSecondUserAbove, ReturnPolicy.selfAuthoriseLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getWallet": {
@@ -23123,9 +23254,12 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of platform.outlet, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.outlet"
   ]
  },
  "createShopAndDrop": {
@@ -23474,9 +23608,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "createAsset": {
@@ -23543,9 +23680,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getAsset": {
@@ -23664,9 +23804,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "updateAsset": {
@@ -23733,9 +23876,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "lookupAsset": {
@@ -23854,9 +24000,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setAssetStatus": {
@@ -23923,9 +24072,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Asset.accumulatedDepreciation, Asset.acquisitionCost, Asset.disposalProceeds, Asset.residualValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getAssetHistory": {
@@ -24163,9 +24315,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: WorkOrderDetail.cost, WorkOrderDetail.labourCost, WorkOrderDetail.partsCost, WorkOrderDetail.totalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "updateWorkOrder": {
@@ -24396,12 +24551,13 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: WorkOrderDetail.cost, WorkOrderDetail.labourCost, WorkOrderDetail.partsCost, WorkOrderDetail.totalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
   "readsInProcess": [
-   "inventory.stock_earmark"
+   "inventory.stock_earmark",
+   "platform.venue_settings"
   ]
  },
  "cancelWorkOrder": {
@@ -25453,6 +25609,7 @@
   "path": "/media/{mediaId}",
   "reads": [
    "assets.media_asset",
+   "assets.media_collection",
    "assets.media_usage",
    "cache:idempotency"
   ],
@@ -25477,10 +25634,13 @@
   ],
   "readVia": [
    {
-    "query": "catalogue#productRecords",
-    "route": "service",
-    "for": "which products list the asset (409 in-use, MediaUsage surface product) (CHG-MOD-003)"
+    "query": "catalogue#productMediaRecords",
+    "route": "in-process",
+    "for": "which products list the asset (catalogue.product_media.product_id by asset_id): 409 in-use, MediaUsage surface product, read in process (ADAM CR-309, option (b); XDR-011; CHG-CR309-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product_media"
   ]
  },
  "replaceMediaAsset": {
@@ -25488,6 +25648,7 @@
   "verb": "POST",
   "path": "/media/{mediaId}/replace",
   "reads": [
+   "assets.asset_version",
    "assets.media_asset",
    "assets.media_upload",
    "assets.media_usage",
@@ -26198,9 +26359,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.reporting\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listReportExecutions": {
@@ -26701,9 +26865,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.reporting\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getDashboard": {
@@ -26808,9 +26975,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.reporting\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "askReportingQuestion": {
@@ -31291,12 +31461,13 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.queue\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
   ],
   "readsInProcess": [
-   "marketing.loyalty_position"
+   "marketing.loyalty_position",
+   "platform.venue_settings"
   ]
  },
  "getWaitingGuest": {
@@ -32441,8 +32612,7 @@
    "redis"
   ],
   "audience": [
-   "staff",
-   "guest"
+   "staff"
   ],
   "note": "bookingFlows onRead.",
   "readColumns": {
@@ -32583,6 +32753,7 @@
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.module_enablement",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -32603,10 +32774,25 @@
   ],
   "readVia": [
    {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "the venue's region time zone, which day is today for openingHoursToday (ADAM CR-338): platform.region_settings, Tenancy's data (XDR-004)"
+   },
+   {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"tenancy.OrgUnit.isActive\": platform.scope, Tenancy's data (CHG-R10GEN-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "each venue's contact, city and openingHours for venues[] (ADAM CR-338, city and openingHoursToday (a)): platform.venue_settings, Tenancy's data (XDR-004)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "setMaintenanceMode": {
@@ -32615,8 +32801,10 @@
   "path": "/tenant-config/status",
   "reads": [
    "cache:idempotency",
+   "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.module_enablement",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -32642,7 +32830,21 @@
     "query": "tenancy#activeVenues",
     "route": "service",
     "for": "TenantAppStatus.venues: only the active venues are listed (ADAM CR-096)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "the TenantAppStatus it answers: the venue's region time zone for openingHoursToday (ADAM CR-338): platform.region_settings, Tenancy's data (XDR-020)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the TenantAppStatus it answers: each venue's contact, city and openingHours (ADAM CR-338): platform.venue_settings, Tenancy's data (XDR-020)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "getBrandIdentity": {
@@ -32715,6 +32917,8 @@
   "verb": "GET",
   "path": "/tenant-config/app-icons",
   "reads": [
+   "whitelabel.app_build",
+   "whitelabel.config_version",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -32738,6 +32942,8 @@
   "path": "/tenant-config/app-icons",
   "reads": [
    "cache:idempotency",
+   "whitelabel.app_build",
+   "whitelabel.config_version",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -34084,10 +34290,12 @@
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.content_page",
+   "whitelabel.homepage_layout",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.policy",
    "whitelabel.publish_review_policy",
    "whitelabel.tenant_config"
   ],
@@ -34108,7 +34316,45 @@
   "audience": [
    "staff"
   ],
-  "pure": "a validation: reports what it finds, stores nothing"
+  "pure": "a validation: reports what it finds, stores nothing",
+  "readVia": [
+   {
+    "query": "assets#mediaAssetRecords",
+    "route": "in-process",
+    "for": "whether brand.logoAssetRef and appIcons.sourceAssetRef are ready assets, for missingRequiredAsset (ADAM CR-320): assets.media_asset, VenueOps's data"
+   },
+   {
+    "query": "catalogue#productRecords",
+    "route": "service",
+    "for": "each active catalogue product's ProductKind at an active venue, for bookingFlowMissing (ADAM CR-320), as the booking-flow operations read catalogue.product, Catalogue's data"
+   },
+   {
+    "query": "subscription#contractRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for unlicensedModuleEnabled (ADAM CR-320), as getModuleEnablement reads control.contract, Platform's data"
+   },
+   {
+    "query": "subscription#licenceAddOnRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for unlicensedModuleEnabled (ADAM CR-320), as getModuleEnablement reads control.licence_add_on, Platform's data"
+   },
+   {
+    "query": "subscription#planRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for unlicensedModuleEnabled (ADAM CR-320), as getModuleEnablement reads control.plan, Platform's data"
+   },
+   {
+    "query": "tenancy#activeVenues",
+    "route": "service",
+    "for": "the active venues bookingFlowMissing is checked at (ADAM CR-320), as publishTenantConfig asks it: platform.scope, Tenancy's data"
+   }
+  ],
+  "readsInProcess": [
+   "assets.media_asset",
+   "control.contract",
+   "control.licence_add_on",
+   "control.plan"
+  ]
  },
  "publishTenantConfig": {
   "contract": "white-label",
@@ -34128,6 +34374,7 @@
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.policy",
    "whitelabel.publish_review_policy",
    "whitelabel.tenant_config"
   ],
@@ -34180,6 +34427,11 @@
     "for": "what its text calls \"MediaAsset\": assets.media_asset, VenueOps's data (CHG-R10GEN-001)"
    },
    {
+    "query": "catalogue#productRecords",
+    "route": "service",
+    "for": "the validation it runs, as validateTenantConfig asks it: each active product's ProductKind, for bookingFlowMissing (ADAM CR-320)"
+   },
+   {
     "query": "marketing-crm#guestMatchPolicyRecords",
     "route": "in-process",
     "for": "what its text calls \"GuestMatchPolicy.matchBy\": marketing.guest_match_policy, Marketing's data (CHG-R10GEN-001)"
@@ -34188,6 +34440,21 @@
     "query": "orders#venueChargeCurrencies",
     "route": "service",
     "for": "what its text calls \"orders.PaymentProvider.supportedMethods\": payments.provider, Order's data (CHG-R10GEN-001)"
+   },
+   {
+    "query": "subscription#contractRecords",
+    "route": "in-process",
+    "for": "the validation it runs, as validateTenantConfig asks it: LicencePosition.licensedModules, for unlicensedModuleEnabled (ADAM CR-320)"
+   },
+   {
+    "query": "subscription#licenceAddOnRecords",
+    "route": "in-process",
+    "for": "the validation it runs, as validateTenantConfig asks it: LicencePosition.licensedModules, for unlicensedModuleEnabled (ADAM CR-320)"
+   },
+   {
+    "query": "subscription#planRecords",
+    "route": "in-process",
+    "for": "the validation it runs, as validateTenantConfig asks it: LicencePosition.licensedModules, for unlicensedModuleEnabled (ADAM CR-320)"
    },
    {
     "query": "tenancy#activeVenues",
@@ -34204,6 +34471,9 @@
   ],
   "readsInProcess": [
    "assets.media_asset",
+   "control.contract",
+   "control.licence_add_on",
+   "control.plan",
    "marketing.guest_match_policy"
   ]
  },
@@ -35014,6 +35284,11 @@
     "query": "identity#principalRecords",
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
+   },
+   {
+    "query": "platform-ops#platformApprovalRuleFor",
+    "route": "service",
+    "for": "the platform rule a request of subject type tenant is routed by: control.platform_approval_rule, Platform's data in the control database (ADAM CR-330 option A; service sign-in between deployables, #37051)"
    }
   ],
   "readsInProcess": [
@@ -35073,6 +35348,7 @@
     "levels",
     "match_attributes",
     "matrix_id",
+    "matrix_version",
     "max_amount",
     "min_amount",
     "min_percentage",
@@ -35674,6 +35950,7 @@
     "levels",
     "match_attributes",
     "matrix_id",
+    "matrix_version",
     "max_amount",
     "min_amount",
     "min_percentage",
@@ -35703,6 +35980,7 @@
   ],
   "writes": [
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency"
   ],
@@ -35747,6 +36025,7 @@
     "levels",
     "match_attributes",
     "matrix_id",
+    "matrix_version",
     "max_amount",
     "min_amount",
     "min_percentage",
@@ -36421,7 +36700,8 @@
    "identity.delegated_access",
    "identity.principal",
    "platform.workstation",
-   "workforce.rota_assignment"
+   "workforce.rota_assignment",
+   "workforce.staffing_rules"
   ],
   "writes": [
    "cache:idempotency",
@@ -36464,19 +36744,25 @@
   },
   "readVia": [
    {
-    "query": "identity#delegatedAccessRecords",
+    "query": "identity#principalHoldsRoleAtVenue",
     "route": "in-process",
-    "for": "its read of identity.delegated_access, Identity's data (CHG-MOD-001)"
+    "for": "whether the person holds the required role at the venue or above it, as a yes or no answered under the tenant root grant, so a role granted above the caller's scope is found (ADAM CR-336, option B; CHG-CR336-001): identity.delegated_access, Identity's data"
    },
    {
     "query": "identity#principalRecords",
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
+   },
+   {
+    "query": "workforce#principalHasOverlappingAssignment",
+    "route": "in-process",
+    "for": "whether the person already holds an overlapping assignment at any venue, as a yes or no answered under the tenant root grant, so no other venue's rota reaches the caller (ADAM CR-336, option B; CHG-CR336-001)"
    }
   ],
   "readsInProcess": [
    "identity.delegated_access",
-   "identity.principal"
+   "identity.principal",
+   "workforce.rota_assignment"
   ]
  },
  "updateRotaAssignment": {
@@ -36485,7 +36771,8 @@
   "path": "/rota-assignments/{assignmentId}",
   "reads": [
    "cache:idempotency",
-   "workforce.rota_assignment"
+   "workforce.rota_assignment",
+   "workforce.staffing_rules"
   ],
   "writes": [
    "cache:idempotency",
@@ -36525,7 +36812,29 @@
     "venue_id",
     "workstation_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "identity#principalHoldsRoleAtVenue",
+    "route": "in-process",
+    "for": "whether the person holds the required role at the venue or above it after a move, as a yes or no under the tenant root grant, as createRotaAssignment asks it (ADAM CR-315, CR-336 option B; CHG-CR336-001): identity.delegated_access, Identity's data"
+   },
+   {
+    "query": "identity#principalRecords",
+    "route": "in-process",
+    "for": "its read of identity.principal, Identity's data (CHG-MOD-001), as createRotaAssignment reads it (ADAM CR-315)"
+   },
+   {
+    "query": "workforce#principalHasOverlappingAssignment",
+    "route": "in-process",
+    "for": "whether the person holds another overlapping assignment at any venue after a move, this one left out (exceptAssignmentId), as createRotaAssignment asks it (ADAM CR-315, CR-336 option B; CHG-CR336-001)"
+   }
+  ],
+  "readsInProcess": [
+   "identity.delegated_access",
+   "identity.principal",
+   "workforce.rota_assignment"
+  ]
  },
  "requestShiftSwap": {
   "contract": "workforce",
@@ -38575,7 +38884,7 @@
    },
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the outlet at the asked time (409 outlet-full-at-time) (CHG-MOD-003)"
    },
    {
@@ -38585,6 +38894,7 @@
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -42421,9 +42731,12 @@
    },
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of platform.outlet, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.outlet"
   ]
  },
  "publishVenueMap": {
@@ -42496,9 +42809,12 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of platform.outlet, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.outlet"
   ]
  },
  "getVenueMapLive": {
@@ -42852,6 +43168,7 @@
     "cart_max_extensions",
     "catalogue",
     "charge_currencies",
+    "city",
     "contact",
     "currency_code",
     "currency_scale",
@@ -42863,6 +43180,7 @@
     "identity",
     "inventory",
     "marketing",
+    "opening_hours",
     "promotions",
     "queue",
     "quiet_hours",
@@ -42928,6 +43246,7 @@
     "cart_max_extensions",
     "catalogue",
     "charge_currencies",
+    "city",
     "contact",
     "currency_code",
     "currency_scale",
@@ -42939,6 +43258,7 @@
     "identity",
     "inventory",
     "marketing",
+    "opening_hours",
     "promotions",
     "queue",
     "quiet_hours",
@@ -43026,9 +43346,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "createResource": {
@@ -43087,9 +43410,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getResourceAvailability": {
@@ -43242,9 +43568,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: body.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "checkInResource": {
@@ -43306,9 +43635,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: body.captureAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setResourceQualifications": {
@@ -44336,14 +44668,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it answers: AlertRule.threshold, AlertRule.thresholdUpper (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AlertRule.threshold, AlertRule.thresholdUpper (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "setAlertRule": {
@@ -44398,14 +44734,18 @@
    },
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: AlertRule.threshold, AlertRule.thresholdUpper (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: AlertRule.threshold, AlertRule.thresholdUpper (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "listAlerts": {
@@ -44454,15 +44794,25 @@
   },
   "readVia": [
    {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "where no venue is at or above the row's scope_path (an alert raised at a region), the region's trading currency and scale (currency_code, currency_scale), RegionSettingsAtOrAbove the path (ADAM CR-299) for the Money it answers: Alert.observedValue, Alert.threshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
+   },
+   {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it answers: Alert.observedValue, Alert.threshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Alert.observedValue, Alert.threshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "acknowledgeAlert": {
@@ -44471,7 +44821,6 @@
   "path": "/alerts/{alertId}/acknowledge",
   "reads": [
    "cache:idempotency",
-   "identity.principal",
    "reporting.alert"
   ],
   "writes": [
@@ -44516,20 +44865,25 @@
   },
   "readVia": [
    {
-    "query": "identity#principalRecords",
-    "route": "service",
-    "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "where no venue is at or above the row's scope_path (an alert raised at a region), the region's trading currency and scale (currency_code, currency_scale), RegionSettingsAtOrAbove the path (ADAM CR-299) for the Money it accepts or answers: Alert.observedValue, Alert.threshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: Alert.observedValue, Alert.threshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Alert.observedValue, Alert.threshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings",
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "planProductionRun": {
@@ -44586,12 +44940,13 @@
    },
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of platform.outlet, Tenancy's data (CHG-MOD-001)"
    }
   ],
   "readsInProcess": [
-   "inventory.movement"
+   "inventory.movement",
+   "platform.outlet"
   ]
  },
  "completeProductionRun": {
@@ -44821,9 +45176,12 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of platform.outlet, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.outlet"
   ]
  },
  "recordWriteOff": {
@@ -45444,9 +45802,12 @@
   "readVia": [
    {
     "query": "tenancy#regionSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"RegionSettings\": platform.region_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "listVenueTypeTemplates": {
@@ -45859,10 +46220,6 @@
   "reads": [
    "cache:idempotency",
    "identity.subject_holding",
-   "marketing.consent_record",
-   "marketing.form_submission",
-   "marketing.guest_document",
-   "marketing.guest_profile",
    "pii.subject"
   ],
   "writes": [
@@ -47534,8 +47891,7 @@
    "inventory.goods_receipt",
    "inventory.movement",
    "inventory.purchase_order",
-   "inventory.supplier",
-   "inventory.supplier_contract"
+   "inventory.supplier"
   ],
   "writes": [],
   "routing": "analytical",
@@ -47568,14 +47924,14 @@
     "for": "its read of inventory.purchase_order, Inventory's data (CHG-MOD-001)"
    },
    {
-    "query": "inventory#supplierContractRecords",
-    "route": "in-process",
-    "for": "its read of inventory.supplier_contract, Inventory's data (CHG-MOD-001)"
-   },
-   {
     "query": "inventory#supplierRecords",
     "route": "in-process",
     "for": "its read of inventory.supplier, Inventory's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "each purchase order's own venue's time zone (RegionSettingsAtOrAbove the order's scope_path), in the read's transaction, for the venue-local dates from and to filter and for the on-time test (ADAM CR-297, option A; XDR-004; CHG-R11RUL-003)"
    }
   ],
   "readsInProcess": [
@@ -47583,7 +47939,7 @@
    "inventory.movement",
    "inventory.purchase_order",
    "inventory.supplier",
-   "inventory.supplier_contract"
+   "platform.region_settings"
   ]
  },
  "listMyEntitlements": {
@@ -49272,9 +49628,12 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"tenancy.Outlet.paymentTiming\": platform.outlet, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.outlet"
   ]
  },
  "holdCourse": {
@@ -49472,9 +49831,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.fnb\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setCourseRules": {
@@ -49769,7 +50131,7 @@
    },
    {
     "query": "tenancy#regionSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"RegionSettings.timeZone\": platform.region_settings, Tenancy's data (CHG-R10GEN-001)"
    },
    {
@@ -49780,6 +50142,7 @@
   ],
   "readsInProcess": [
    "platform.outlet",
+   "platform.region_settings",
    "platform.venue_settings"
   ]
  },
@@ -50254,7 +50617,7 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the target visit's outlet (409 target-visit-not-open) (CHG-MOD-003)"
    },
    {
@@ -50264,6 +50627,7 @@
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.venue_settings"
   ]
  },
@@ -51165,9 +51529,12 @@
   "readVia": [
    {
     "query": "tenancy#regionSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"RegionSettings.timeZone\": platform.region_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "applyMenuActions": {
@@ -51375,9 +51742,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setDailyCount": {
@@ -51861,12 +52231,13 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the plan's trading day, a business date closing at the venue's businessDayCutoff (r10 read routes; CHG-R10GEN-001)"
    }
   ],
   "readsInProcess": [
-   "platform.region_settings"
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "releaseProductionPlan": {
@@ -53696,9 +54067,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: StoreRule.thresholdAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listTrainingRecords": {
@@ -53856,9 +54230,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StoreRule.thresholdAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setWafPolicy": {
@@ -54604,6 +54981,7 @@
   ],
   "writes": [
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency"
   ],
@@ -59284,8 +59662,8 @@
   "readVia": [
    {
     "query": "identity#subjectRecords",
-    "route": "service",
-    "for": "its read of pii.subject, Identity's data (CHG-MOD-001)"
+    "route": "in-process",
+    "for": "DeviceBindingSessionSecurityView.user: the display_name of each binding's holder (access.device_binding.subject_id -> pii.subject), Identity's data, and nothing else of the subject, read in process under the caller's row security (ADAM CR-302, option A; XDR-010; CHG-CR302-001)"
    }
   ]
  },
@@ -70166,14 +70544,18 @@
    },
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: FamilyHouseholdDependentMembershipConfigurationInput.memberChangeFee, FamilyHouseholdDependentMembershipConfigurationView.memberChangeFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: FamilyHouseholdDependentMembershipConfigurationInput.memberChangeFee, FamilyHouseholdDependentMembershipConfigurationView.memberChangeFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "setFeeApplicabilityCharging": {
@@ -73682,9 +74064,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalDamageAssessment.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "assignRentalEquipment": {
@@ -73779,14 +74164,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: GameplayAuthorisation.amount, GameplayAuthorisation.remainingBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GameplayAuthorisation.amount, GameplayAuthorisation.remainingBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "bulkUpdateMediaAssets": {
@@ -73939,9 +74328,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "claimOpenShift": {
@@ -74090,9 +74482,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "concludeRecommendationExperiment": {
@@ -74365,6 +74760,7 @@
     "account_code",
     "available_credit",
     "credit_limit",
+    "currency_code",
     "id",
     "is_over_limit",
     "organisation_id",
@@ -74373,23 +74769,7 @@
     "scope_path",
     "status"
    ]
-  },
-  "readVia": [
-   {
-    "query": "tenancy#scopeRecords",
-    "route": "in-process",
-    "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: B2bCreditAccount.availableCredit, B2bCreditAccount.creditLimit, B2bCreditAccount.outstandingInvoiced, B2bCreditAccount.outstandingUnbilled (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   },
-   {
-    "query": "tenancy#venueSettingsRecords",
-    "route": "in-process",
-    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: B2bCreditAccount.availableCredit, B2bCreditAccount.creditLimit, B2bCreditAccount.outstandingInvoiced, B2bCreditAccount.outstandingUnbilled (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   }
-  ],
-  "readsInProcess": [
-   "platform.scope",
-   "platform.venue_settings"
-  ]
+  }
  },
  "createBadgePrintJob": {
   "contract": "accreditation",
@@ -75019,9 +75399,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "createRentalCategory": {
@@ -75124,9 +75507,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalPricingProfile.additionalIncrementPrice, RentalPricingProfile.basePrice, RentalPricingProfile.minimumCharge, RentalPricingProfile.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "createRentalProduct": {
@@ -75411,14 +75797,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: ResourcePackage.internalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ResourcePackage.internalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "createResourceType": {
@@ -76038,9 +76428,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalPriceExplanation.amountAfter, RentalPriceExplanation.amountBefore, RentalQuote.addOnAmount, RentalQuote.depositAmount and 4 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "extendRental": {
@@ -76108,9 +76501,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "findSimilarMediaAssets": {
@@ -76347,14 +76743,18 @@
    },
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it answers: BenchmarkRow.normalisedValue, BenchmarkRow.value (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: BenchmarkRow.normalisedValue, BenchmarkRow.value (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "getAnalyticsUsage": {
@@ -76651,9 +77051,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GameEligibility.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getGamePricing": {
@@ -76686,9 +77089,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GamePriceResolution.effectivePrice, GamePriceResolution.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getGameplaySyncStatus": {
@@ -76721,9 +77127,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ReaderSyncStatus.pendingValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getGameplayValidationRules": {
@@ -76763,14 +77172,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it answers: GameplayValidationRules.offlineMaximumValue, GameplayValidationRules.refuseBelowBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GameplayValidationRules.offlineMaximumValue, GameplayValidationRules.refuseBelowBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "getGoLiveReadiness": {
@@ -76926,7 +77339,7 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's businessDayCutoff, which closes the default period, its business day (platform.venue_settings) (r8 re-walk, CHG-R8RW-005)"
    }
   ],
@@ -76934,7 +77347,8 @@
    "fnb.table_reservation",
    "fnb.table_visit",
    "fnb.waitlist_entry",
-   "marketing.loyalty_position"
+   "marketing.loyalty_position",
+   "platform.venue_settings"
   ]
  },
  "getLabourCost": {
@@ -77377,9 +77791,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getRentalProduct": {
@@ -77477,9 +77894,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getResourceAllocationPolicy": {
@@ -77994,6 +78414,7 @@
     "recurring_funding",
     "scope_path",
     "velocity_limits",
+    "version",
     "wallet_type_id"
    ]
   },
@@ -78258,8 +78679,7 @@
   "verb": "GET",
   "path": "/access-decisions/audit",
   "reads": [
-   "identity.access_decision",
-   "identity.authz_audit"
+   "identity.access_decision"
   ],
   "writes": [],
   "routing": "replica",
@@ -78801,14 +79221,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it answers: AnalyticsAnomaly.expected, AnalyticsAnomaly.observed (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AnalyticsAnomaly.expected, AnalyticsAnomaly.observed (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "listAnalyticsPipelines": {
@@ -78956,6 +79380,7 @@
     "account_code",
     "available_credit",
     "credit_limit",
+    "currency_code",
     "id",
     "is_over_limit",
     "organisation_id",
@@ -78964,23 +79389,7 @@
     "scope_path",
     "status"
    ]
-  },
-  "readVia": [
-   {
-    "query": "tenancy#scopeRecords",
-    "route": "in-process",
-    "for": "the venue its row's scope_path names, whose settings give the currency for the Money it answers: B2bCreditAccount.availableCredit, B2bCreditAccount.creditLimit, B2bCreditAccount.outstandingInvoiced, B2bCreditAccount.outstandingUnbilled (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   },
-   {
-    "query": "tenancy#venueSettingsRecords",
-    "route": "in-process",
-    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: B2bCreditAccount.availableCredit, B2bCreditAccount.creditLimit, B2bCreditAccount.outstandingInvoiced, B2bCreditAccount.outstandingUnbilled (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   }
-  ],
-  "readsInProcess": [
-   "platform.scope",
-   "platform.venue_settings"
-  ]
+  }
  },
  "listBadgePrintJobs": {
   "contract": "accreditation",
@@ -79391,9 +79800,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GameplayTransaction.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listGroupSeatRequests": {
@@ -79871,9 +80283,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listPaymentMethods": {
@@ -79919,12 +80334,18 @@
   },
   "readVia": [
    {
+    "query": "tenancy#scopeRecords",
+    "route": "in-process",
+    "for": "the venue each row's scope_path names, whose settings give the currency of its Money (ADAM CR-286; as createPaymentMethod)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PaymentMethod.fixed, PaymentMethod.maximumAmount, PaymentMethod.minimumAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
   "readsInProcess": [
+   "platform.scope",
    "platform.venue_settings"
   ]
  },
@@ -80323,9 +80744,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listRentalCategories": {
@@ -80420,9 +80844,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: RentalPricingProfile.additionalIncrementPrice, RentalPricingProfile.basePrice, RentalPricingProfile.minimumCharge, RentalPricingProfile.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listRentalProducts": {
@@ -80766,14 +81193,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it answers: ResourcePackage.internalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ResourcePackage.internalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "listResourceTypes": {
@@ -81418,9 +81849,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalQuote.addOnAmount, RentalQuote.depositAmount, RentalQuote.discountAmount, RentalQuote.rentalAmount and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "raiseWalletDispute": {
@@ -81996,9 +82430,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalOverride.adjustedAmount, RentalOverride.originalAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "rescheduleEvent": {
@@ -82094,9 +82531,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalDamageAssessment.amount, RentalSettlement.balanceDue, RentalSettlement.damageFee, RentalSettlement.depositCaptured and 4 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "reverseWalletFunding": {
@@ -83542,9 +83982,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GamePricing.price, GamePricing.pricePerPlayer, GamePricing.retryPrice, GamePricing.standardPrice and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setGameplayValidationRules": {
@@ -83588,14 +84031,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: GameplayValidationRules.offlineMaximumValue, GameplayValidationRules.refuseBelowBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GameplayValidationRules.offlineMaximumValue, GameplayValidationRules.refuseBelowBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "setGiftCardProduct": {
@@ -83805,14 +84252,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: KpiTarget.amberAt, KpiTarget.redAt, KpiTarget.stretch, KpiTarget.target (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: KpiTarget.amberAt, KpiTarget.redAt, KpiTarget.stretch, KpiTarget.target (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "setLicenceEnforcementPolicy": {
@@ -84555,9 +85006,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PrizeCost.directPayPrice, PrizeCost.unitCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setProductRelationships": {
@@ -84931,9 +85385,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalDepositPolicy.fixedAmount, RentalDepositPolicy.maximumAmount, RentalDepositPolicy.minimumAmount, RentalDepositPolicy.supervisorApprovalThreshold (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setRentalDurationRules": {
@@ -85025,9 +85482,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalFeePolicy.amount, RentalFeePolicy.damageFeeApprovalAbove, RentalFeePolicy.damageFeeMaximum, RentalFeePolicy.extensionPricePerIncrement and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setRentalInventoryModel": {
@@ -85337,9 +85797,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setResourceSchedule": {
@@ -86022,6 +86485,7 @@
     "recurring_funding",
     "scope_path",
     "velocity_limits",
+    "version",
     "wallet_type_id"
    ]
   },
@@ -86075,6 +86539,7 @@
     "restores_original_expiry",
     "restores_to_original_lots",
     "scope_path",
+    "version",
     "wallet_refund_bonus_percent",
     "wallet_refund_credit_type_id"
    ]
@@ -86471,14 +86936,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: GameplayAuthorisation.amount, GameplayAuthorisation.remainingBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GameplayAuthorisation.amount, GameplayAuthorisation.remainingBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "simulatePaymentConfiguration": {
@@ -86646,9 +87115,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalQuote.addOnAmount, RentalQuote.depositAmount, RentalQuote.discountAmount, RentalQuote.rentalAmount and 2 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "startDeviceFirmwareRollout": {
@@ -86832,9 +87304,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "swapRentalEquipment": {
@@ -86901,9 +87376,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "testPaymentProviderConnection": {
@@ -87287,9 +87765,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalBooking.accruedLateFee (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "updateRentalPricingProfile": {
@@ -87348,9 +87829,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RentalPricingProfile.additionalIncrementPrice, RentalPricingProfile.basePrice, RentalPricingProfile.minimumCharge, RentalPricingProfile.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "updateRentalProduct": {
@@ -87456,9 +87940,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Resource.depositAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "updateResourceBooking": {
@@ -87617,14 +88104,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: ResourcePackage.internalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ResourcePackage.internalCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "updateResourceType": {
@@ -87957,6 +88448,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "tenant_id",
     "updated_at"
    ],
@@ -88130,6 +88622,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "tenant_id",
     "updated_at"
    ]
@@ -88202,6 +88695,7 @@
     "is_paid",
     "name",
     "requires_approval",
+    "scope_path",
     "tenant_id"
    ]
   }
@@ -88481,6 +88975,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "tenant_id",
     "updated_at"
    ]
@@ -88521,6 +89016,7 @@
     "is_paid",
     "name",
     "requires_approval",
+    "scope_path",
     "tenant_id"
    ]
   }
@@ -88645,6 +89141,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "start_time",
     "tenant_id"
    ]
@@ -88686,6 +89183,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "start_time",
     "tenant_id"
    ]
@@ -90710,6 +91208,8 @@
   "path": "/billing-statements/{statementId}",
   "reads": [
    "ledger.tax_invoice_line",
+   "orders.membership_renewal",
+   "orders.order_line",
    "orders.payment",
    "orders.sales_order",
    "payments.dunning_case"
@@ -90732,11 +91232,25 @@
   ],
   "lineageNote": "tax, discount and taxInvoiceId per line; format=pdf renders to object storage and returns pdfUrl",
   "readColumns": {
+   "orders.membership_renewal": [
+    "id",
+    "order_id"
+   ],
+   "orders.order_line": [
+    "id",
+    "sales_order_id"
+   ],
    "orders.payment": [
-    "id"
+    "id",
+    "order_id"
+   ],
+   "orders.sales_order": [
+    "id",
+    "subject_id"
    ],
    "payments.dunning_case": [
     "id",
+    "order_id",
     "subject_id"
    ]
   },
@@ -90745,10 +91259,22 @@
     "query": "finance#taxInvoiceLineRecords",
     "route": "in-process",
     "for": "its read of ledger.tax_invoice_line, Ledger's data (CHG-MOD-001)"
+   },
+   {
+    "query": "identity#customerMembershipRecords",
+    "route": "in-process",
+    "for": "the membership agreements whose billing cycles it recomputes the statement ids of, to find the one `statementId` names, identity.customer_membership, Identity's data (ADAM CR-099; CHG-R11FXC-002); same deployable (commerce)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "the time zone the cycle's dates are in: the region settings at or above the scope_path of the cycle's order (RegionSettingsAtOrAbove), in the read's transaction (ADAM CR-303, option A); same deployable (commerce)"
    }
   ],
   "readsInProcess": [
-   "ledger.tax_invoice_line"
+   "identity.customer_membership",
+   "ledger.tax_invoice_line",
+   "platform.region_settings"
   ]
  },
  "getDunningPolicy": {
@@ -90790,6 +91316,8 @@
   "verb": "GET",
   "path": "/billing-statements",
   "reads": [
+   "orders.membership_renewal",
+   "orders.order_line",
    "orders.payment",
    "orders.sales_order",
    "payments.dunning_case"
@@ -90811,11 +91339,25 @@
    "redis"
   ],
   "readColumns": {
+   "orders.membership_renewal": [
+    "id",
+    "order_id"
+   ],
+   "orders.order_line": [
+    "id",
+    "sales_order_id"
+   ],
    "orders.payment": [
-    "id"
+    "id",
+    "order_id"
+   ],
+   "orders.sales_order": [
+    "id",
+    "subject_id"
    ],
    "payments.dunning_case": [
     "id",
+    "order_id",
     "subject_id"
    ]
   },
@@ -90824,10 +91366,16 @@
     "query": "identity#customerMembershipRecords",
     "route": "in-process",
     "for": "the membership agreements whose billing cycles the statements are, identity.customer_membership, Identity's data (ADAM CR-099); same deployable (commerce)"
+   },
+   {
+    "query": "tenancy#regionSettingsRecords",
+    "route": "in-process",
+    "for": "the time zone the cycle's dates are in: the region settings at or above the scope_path of the cycle's order (RegionSettingsAtOrAbove), in the read's transaction (ADAM CR-303, option A); same deployable (commerce)"
    }
   ],
   "readsInProcess": [
-   "identity.customer_membership"
+   "identity.customer_membership",
+   "platform.region_settings"
   ]
  },
  "listDunningCases": {
@@ -92503,7 +93051,7 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of platform.outlet, Tenancy's data (CHG-MOD-001)"
    },
    {
@@ -92513,6 +93061,7 @@
    }
   ],
   "readsInProcess": [
+   "platform.outlet",
    "platform.region_settings"
   ]
  },
@@ -93387,6 +93936,7 @@
     "kind",
     "name",
     "name_translations",
+    "order_number_prefix",
     "outlet_type",
     "payment_timing",
     "produces_for_outlet_ids",
@@ -94184,6 +94734,7 @@
     "cart_max_extensions",
     "catalogue",
     "charge_currencies",
+    "city",
     "contact",
     "currency_code",
     "currency_scale",
@@ -94195,6 +94746,7 @@
     "identity",
     "inventory",
     "marketing",
+    "opening_hours",
     "promotions",
     "queue",
     "quiet_hours",
@@ -94546,6 +95098,7 @@
     "cart_max_extensions",
     "catalogue",
     "charge_currencies",
+    "city",
     "contact",
     "currency_code",
     "currency_scale",
@@ -94557,6 +95110,7 @@
     "identity",
     "inventory",
     "marketing",
+    "opening_hours",
     "promotions",
     "queue",
     "quiet_hours",
@@ -95265,14 +95819,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: ResourceHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ResourceHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "createTransportPassType": {
@@ -95792,9 +96350,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.seating\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getCredentialIssuanceRetryPolicy": {
@@ -95866,9 +96427,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: MapResourceAvailability.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getNextTransportDeparture": {
@@ -95917,9 +96481,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DepartureOffer.fare, DepartureOffer.partyTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getPublishedGuidedChoice": {
@@ -96016,9 +96583,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ResourceCostAnalytics.costPerBookedHour, ResourceCostAnalytics.operatingCost, ResourceCostAnalytics.replacementCost, ResourceCostAnalytics.revenue and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getResourceHold": {
@@ -96066,14 +96636,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it answers: ResourceHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ResourceHold.totalPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "getTransportFareTable": {
@@ -96129,9 +96703,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SetFareTableRequest.baseFare, SetFareTableRequest.fare, SetFareTableRequest.perStopFare (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getTransportNetworkImport": {
@@ -96523,9 +97100,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: FavouriteRoute.adultFare (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listOutletTemplates": {
@@ -96679,9 +97259,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PassOffer.price, PassOffer.saving (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listTransportPassTypes": {
@@ -97318,9 +97901,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: FareQuote.adultFare, FareQuote.lineTotal, FareQuote.saving, FareQuote.total and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "raiseResourceRequest": {
@@ -97815,9 +98401,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: FavouriteRoute.adultFare (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "searchTransportDepartures": {
@@ -97866,9 +98455,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DepartureOffer.fare, DepartureOffer.partyTotal, body.adultFare (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setAccessAttributeCatalog": {
@@ -98940,9 +99532,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: SetFareTableRequest.baseFare, SetFareTableRequest.fare, SetFareTableRequest.perStopFare (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setTransportRouteStatus": {
@@ -101013,9 +101608,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ResourceCostEntry.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "decideCatalogueAiFinding": {
@@ -101792,9 +102390,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ResourceCostEntry.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listSiteNormalisationBases": {
@@ -102463,9 +103064,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ReaderOfflineQueue.pendingValue, body.pendingValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "requestPricingRollback": {
@@ -107102,9 +107706,12 @@
    },
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of platform.outlet, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.outlet"
   ]
  },
  "createDeviceFirmware": {
@@ -107112,7 +107719,6 @@
   "verb": "POST",
   "path": "/device-firmware",
   "reads": [
-   "assets.media_asset",
    "cache:idempotency",
    "tenancy.device_firmware"
   ],
@@ -107152,14 +107758,7 @@
     "vendor",
     "version"
    ]
-  },
-  "readVia": [
-   {
-    "query": "assets#mediaAssetRecords",
-    "route": "service",
-    "for": "its read of assets.media_asset, VenueOps's data (CHG-MOD-001)"
-   }
-  ]
+  }
  },
  "createForecastScenario": {
   "contract": "ai",
@@ -114836,9 +115435,12 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "its read of platform.outlet, Tenancy's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.outlet"
   ]
  },
  "setDeviceFirmwareStatus": {
@@ -115626,9 +116228,9 @@
   "verb": "POST",
   "path": "/auth/guest/identity-verifications",
   "reads": [
-   "assets.media_asset",
    "cache:idempotency",
    "identity.guest_identity_verification",
+   "identity.guest_upload_ref",
    "identity.guest_verification_policy"
   ],
   "writes": [
@@ -115668,7 +116270,14 @@
     "subject_id",
     "submitted_at"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "assets#guestUploadsForIdentity",
+    "route": "projection",
+    "for": "whether documentAssetId and selfieAssetId are usable, from Identity's projection identity.guest_upload_ref (r11 gate, CHG-R11FXV-001; ADR-0028)"
+   }
+  ]
  },
  "suggestGuidedChoice": {
   "contract": "ai",
@@ -116501,12 +117110,13 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: VendorServiceRequest.finalCost, VendorServiceRequest.quotedCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
   "readsInProcess": [
-   "inventory.supplier"
+   "inventory.supplier",
+   "platform.venue_settings"
   ]
  },
  "decideProductionAccess": {
@@ -116615,7 +117225,8 @@
    "venuemap.path",
    "venuemap.point",
    "venuemap.visit_plan",
-   "venuemap.visit_plan_item"
+   "venuemap.visit_plan_item",
+   "venuemap.visit_planner_question"
   ],
   "writes": [
    "cache:idempotency",
@@ -116705,9 +117316,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: VisitPlan.total, VisitPlanItem.pricePerGuest (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getAiVenueSettings": {
@@ -117113,14 +117727,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"active venues\": platform.scope, Tenancy's data (CHG-R10GEN-001)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: VisitPlan.total, VisitPlanItem.pricePerGuest (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "getWorkOrderPriorityPolicy": {
@@ -117772,9 +118390,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: VendorServiceRequest.finalCost, VendorServiceRequest.quotedCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listVenueHistoryImports": {
@@ -118422,7 +119043,9 @@
   "path": "/tenant-config/store-accounts",
   "reads": [
    "cache:idempotency",
-   "whitelabel.store_account"
+   "whitelabel.config_version",
+   "whitelabel.store_account",
+   "whitelabel.tenant_config"
   ],
   "writes": [
    "cache:idempotency",
@@ -118713,9 +119336,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: VendorServiceRequest.finalCost, VendorServiceRequest.quotedCost, body.finalCost, body.quotedCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "updateVisitPlan": {
@@ -118810,9 +119436,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: VisitPlan.total, VisitPlanItem.pricePerGuest (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "validateBookingFlow": {
@@ -119321,6 +119950,7 @@
   "path": "/storefront/tenant-config",
   "reads": [
    "whitelabel.analytics_provider",
+   "whitelabel.banner",
    "whitelabel.config_version",
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
@@ -119329,6 +119959,7 @@
    "whitelabel.homepage_section",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.promo_block",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -119349,6 +119980,15 @@
    "redis"
   ],
   "readColumns": {
+   "whitelabel.banner": [
+    "id",
+    "link_target",
+    "placement",
+    "sort_order",
+    "subtitle",
+    "tenant_config_id",
+    "title"
+   ],
    "whitelabel.footer_config": [
     "copyright_text",
     "id",
@@ -119400,6 +120040,13 @@
     "sort_order",
     "target"
    ],
+   "whitelabel.promo_block": [
+    "description",
+    "id",
+    "link_target",
+    "sort_order",
+    "title"
+   ],
    "whitelabel.tenant_config": [
     "accessibility",
     "app_icons",
@@ -119432,13 +120079,19 @@
     "for": "what its text calls \"MediaAsset.url\": assets.media_asset, VenueOps's data (CHG-R10GEN-001)"
    },
    {
+    "query": "identity#guestSignInProviders",
+    "route": "in-process",
+    "for": "guestSignIn: the tenant's enabled guest providers, provider and display data only (ADAM CR-327, part (1)): identity.sso_provider, Identity's data (XDR-021)"
+   },
+   {
     "query": "payments#providerConnectionRecords",
     "route": "service",
     "for": "its read of payments.provider_connection, for `paymentTokenisation`, through the service route: White-label runs in operations, Payments in commerce (lineage request, r8; CHG-R8INT-005)"
    }
   ],
   "readsInProcess": [
-   "assets.media_asset"
+   "assets.media_asset",
+   "identity.sso_provider"
   ]
  },
  "listPublishedContentPages": {
@@ -120693,12 +121346,13 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
   ],
   "readsInProcess": [
-   "fnb.table_visit"
+   "fnb.table_visit",
+   "platform.venue_settings"
   ]
  },
  "getShiftCountLines": {
@@ -121703,9 +122357,12 @@
   "readVia": [
    {
     "query": "tenancy#regionSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"RegionSettings\": platform.region_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.region_settings"
   ]
  },
  "setEntitlementTemplateBlackoutDates": {
@@ -121907,9 +122564,12 @@
   "readVia": [
    {
     "query": "tenancy#outletRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the outlet the stations serve (422 unknown-station) (CHG-MOD-003)"
    }
+  ],
+  "readsInProcess": [
+   "platform.outlet"
   ]
  },
  "setMenuItemDailyCount": {
@@ -121922,7 +122582,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "fnb.menu_item"
+   "fnb.menu_item",
+   "fnb.sold_out_item"
   ],
   "routing": null,
   "scope": "venue",
@@ -123037,9 +123698,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DepartureOffer.fare, DepartureOffer.partyTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getVirtualTicketIdentity": {
@@ -123424,6 +124088,7 @@
     "restores_original_expiry",
     "restores_to_original_lots",
     "scope_path",
+    "version",
     "wallet_refund_bonus_percent",
     "wallet_refund_credit_type_id"
    ]
@@ -125453,9 +126118,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: VisitPlan.total (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listOwnGroupBookings": {
@@ -125840,7 +126508,8 @@
   "verb": "GET",
   "path": "/venues/{venueId}/visit-planner-options",
   "reads": [
-   "venuemap.visit_plan_preset"
+   "venuemap.visit_plan_preset",
+   "venuemap.visit_planner_question"
   ],
   "writes": [],
   "routing": "replica",
@@ -125878,6 +126547,18 @@
     "name_localised",
     "pace",
     "preset_key",
+    "scope_path",
+    "sort_order",
+    "updated_at"
+   ],
+   "venuemap.visit_planner_question": [
+    "help",
+    "help_localised",
+    "is_enabled",
+    "is_required",
+    "label",
+    "label_localised",
+    "question_key",
     "scope_path",
     "sort_order",
     "updated_at"
@@ -127955,12 +128636,12 @@
    },
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
@@ -127981,7 +128662,11 @@
     "starts_at",
     "status"
    ]
-  }
+  },
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
+  ]
  },
  "listChallenges": {
   "contract": "marketing-crm",
@@ -128025,14 +128710,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "getChallenge": {
@@ -128077,14 +128766,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "activateChallenge": {
@@ -128134,14 +128827,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "getMyChallenges": {
@@ -128200,14 +128897,18 @@
   "readVia": [
    {
     "query": "tenancy#scopeRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue its row's scope_path names, whose settings give the currency for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope",
+   "platform.venue_settings"
   ]
  },
  "getSeoMetadata": {
@@ -128215,7 +128916,7 @@
   "verb": "GET",
   "path": "/seo-metadata",
   "reads": [
-   "control.seo_metadata"
+   "marketing.seo_metadata"
   ],
   "writes": [],
   "routing": "replica",
@@ -128231,15 +128932,8 @@
   "stores": [
    "postgres"
   ],
-  "readVia": [
-   {
-    "query": "platform-ops#seoMetadataRecords",
-    "route": "in-process",
-    "for": "its read of control.seo_metadata, Platform's data (CHG-MOD-001)"
-   }
-  ],
   "readColumns": {
-   "control.seo_metadata": [
+   "marketing.seo_metadata": [
     "canonical_url",
     "entity_id",
     "entity_kind",
@@ -128256,10 +128950,7 @@
     "slug",
     "title"
    ]
-  },
-  "readsInProcess": [
-   "control.seo_metadata"
-  ]
+  }
  },
  "setSeoMetadata": {
   "contract": "marketing-crm",
@@ -128268,12 +128959,12 @@
   "reads": [
    "cache:idempotency",
    "catalogue.product",
-   "control.seo_metadata"
+   "marketing.seo_metadata"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "control.seo_metadata"
+   "marketing.seo_metadata"
   ],
   "routing": null,
   "scope": "tenant",
@@ -128293,11 +128984,6 @@
     "query": "catalogue#productRecords",
     "route": "service",
     "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
-   },
-   {
-    "query": "platform-ops#seoMetadataRecords",
-    "route": "in-process",
-    "for": "its read of control.seo_metadata, Platform's data (CHG-MOD-001)"
    }
   ],
   "cache": {
@@ -128311,7 +128997,7 @@
    "affects": "every scope in the tenant: the bump is one counter per resolver, so the scope written, its ancestors and every descendant that inherits from it re-resolve on their next read"
   },
   "readColumns": {
-   "control.seo_metadata": [
+   "marketing.seo_metadata": [
     "canonical_url",
     "entity_id",
     "entity_kind",
@@ -128328,10 +129014,7 @@
     "slug",
     "title"
    ]
-  },
-  "readsInProcess": [
-   "control.seo_metadata"
-  ]
+  }
  },
  "createUrlRedirect": {
   "contract": "marketing-crm",
@@ -129199,9 +129882,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "updateMyProfile": {
@@ -129262,9 +129948,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "accrueLoyaltyPoints": {
@@ -130132,9 +130821,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getGuestProfile": {
@@ -130176,7 +130868,7 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
@@ -130230,7 +130922,10 @@
     "subject_id",
     "value"
    ]
-  }
+  },
+  "readsInProcess": [
+   "platform.venue_settings"
+  ]
  },
  "updateGuestProfile": {
   "contract": "marketing-crm",
@@ -130302,9 +130997,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "mergeGuestProfiles": {
@@ -130732,8 +131430,8 @@
   "readVia": [
    {
     "query": "catalogue#variantListingFacts",
-    "route": "service",
-    "for": "items[] productName, imageAssetRef, price, performanceStartsAt, isAvailable, unavailableReason"
+    "route": "in-process",
+    "for": "items[] productName, imageAssetRef, price, performanceStartsAt, isAvailable, unavailableReason (ADAM CR-270, CR-273; XDR-007)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
@@ -130797,13 +131495,13 @@
   "readVia": [
    {
     "query": "catalogue#variantListingFacts",
-    "route": "service",
-    "for": "the stored productName, imageAssetRef, list_price, performanceStartsAt (404 unknown-variant)"
+    "route": "in-process",
+    "for": "the stored productName, imageAssetRef, list_price, performanceStartsAt (404 unknown-variant) (ADAM CR-270; XDR-007)"
    },
    {
     "query": "catalogue#variantsSellableAt",
-    "route": "service",
-    "for": "the saved variantId (404 unknown-variant, variant-not-sellable)"
+    "route": "in-process",
+    "for": "the saved variantId (404 unknown-variant, variant-not-sellable) (ADAM CR-270; XDR-007)"
    },
    {
     "query": "tenancy#venueSettingsRecords",
@@ -131194,9 +131892,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listCampaigns": {
@@ -131270,9 +131971,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "createCampaign": {
@@ -131353,9 +132057,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getCampaign": {
@@ -131430,9 +132137,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Campaign.budgetCap, Campaign.budgetSpent, CampaignPerformance.attributedRevenue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "updateCampaign": {
@@ -131513,9 +132223,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "testSendCampaign": {
@@ -131649,9 +132362,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "unscheduleCampaign": {
@@ -131729,9 +132445,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "stopCampaign": {
@@ -131810,9 +132529,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getCampaignPerformance": {
@@ -131849,9 +132571,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "what its text calls \"VenueSettings.marketing\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listMessageTemplates": {
@@ -133385,9 +134110,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ProviderHealthUsageCostMonitoringView.cost, ProviderHealthUsageCostMonitoringView.costPerMessage, ProviderHealthUsageCostMonitoringView.costPerThousand (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listDeliveryCommunicationPlatform": {
@@ -133425,9 +134153,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiDeliveryOptimizationCommunicationPlatformDiagnostiView.estimatedMonthlySaving (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listPrivacyConsent": {
@@ -133684,7 +134415,7 @@
    "marketing.tracking_technology"
   ],
   "routing": "primary",
-  "scope": "venue",
+  "scope": "tenant",
   "perm": "GUEST_MANAGE",
   "offline": false,
   "summary": "Add, classify or retire a tracking technology",
@@ -133784,7 +134515,7 @@
    "marketing.cookie_banner_design"
   ],
   "routing": "primary",
-  "scope": "venue",
+  "scope": "brand",
   "perm": "GUEST_MANAGE",
   "offline": false,
   "summary": "Save a cookie banner design as a new version",
@@ -134024,10 +134755,11 @@
   ],
   "writes": [
    "cache:idempotency",
+   "marketing.cookie_banner_design",
    "marketing.privacy_change_set"
   ],
   "routing": "primary",
-  "scope": "venue",
+  "scope": "brand",
   "perm": "GUEST_MANAGE",
   "offline": false,
   "summary": "Privacy Configuration Testing, Approval & Publication",
@@ -135046,9 +135778,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CaseInvestigationResolutionWorkspaceView.commercialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getCaseInvestigationResolution": {
@@ -135093,9 +135828,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CaseInvestigationResolutionWorkspaceView.commercialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setOrderBookingTicket": {
@@ -135241,9 +135979,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RefundCompensationServiceExceptionWorkspaceInput.value (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listEscalationCollaborationInternal": {
@@ -135383,9 +136124,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CaseResolutionClosureCustomerFeedbackView.financialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setCaseResolution": {
@@ -135439,9 +136183,12 @@
    },
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
+    "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CaseResolutionClosureCustomerFeedbackView.financialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getCustomerServiceCopilot": {
@@ -136373,7 +137120,7 @@
     "key",
     "label",
     "maps_to",
-    "options",
+    "option_labels",
     "requirement",
     "scope_path",
     "sort_order",
@@ -136429,7 +137176,7 @@
     "key",
     "label",
     "maps_to",
-    "options",
+    "option_labels",
     "requirement",
     "scope_path",
     "sort_order",
@@ -140495,7 +141242,8 @@
   ],
   "writes": [
    "assets.guest_upload",
-   "cache:idempotency"
+   "cache:idempotency",
+   "platform.outbox"
   ],
   "routing": null,
   "scope": "tenant",
@@ -140936,5 +141684,113 @@
    "postgres",
    "redis"
   ]
+ },
+ "writeSubjectDataExportPart": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/subject-data-export-parts",
+  "reads": [
+   "cache:idempotency",
+   "marketing.consent_record",
+   "marketing.form_submission",
+   "marketing.guest_document",
+   "marketing.guest_profile"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "platform.outbox"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Write Marketing's part of a guest's data export",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "recordSubjectDataExportPart": {
+  "contract": "identity",
+  "verb": "POST",
+  "path": "/guest-data-export-parts",
+  "reads": [
+   "cache:idempotency",
+   "identity.subject_data_export_part"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "identity.subject_data_export_part"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Record an owner's part of a guest's data export",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "identity.subject_data_export_part": [
+    "export_id",
+    "file_ref",
+    "id",
+    "owner",
+    "row_count",
+    "tables",
+    "written_at"
+   ]
+  }
+ },
+ "setVisitPlannerQuestions": {
+  "contract": "venue-map",
+  "verb": "PUT",
+  "path": "/venues/{venueId}/visit-planner-questions",
+  "reads": [
+   "cache:idempotency",
+   "venuemap.visit_planner_question"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "venuemap.visit_planner_question"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": "PRODUCT_CONFIGURE",
+  "offline": false,
+  "summary": "Set which planner questions a venue asks, in what order, with what wording, and which are required",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "venuemap.visit_planner_question": [
+    "help",
+    "help_localised",
+    "is_enabled",
+    "is_required",
+    "label",
+    "label_localised",
+    "question_key",
+    "scope_path",
+    "sort_order",
+    "updated_at"
+   ]
+  }
  }
 }

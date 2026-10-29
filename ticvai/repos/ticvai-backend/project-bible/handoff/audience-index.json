@@ -111,7 +111,7 @@
   }
  },
  "totals": {
-  "operations": 2854,
+  "operations": 2857,
   "screens": 2453,
   "flows": 291
  },
@@ -235,6 +235,7 @@
     "platform.outbox",
     "platform.scope",
     "whitelabel.analytics_provider",
+    "whitelabel.banner",
     "whitelabel.config_version",
     "whitelabel.footer_config",
     "whitelabel.footer_config_column",
@@ -248,6 +249,7 @@
     "whitelabel.kiosk_config_version",
     "whitelabel.navigation_config",
     "whitelabel.navigation_item",
+    "whitelabel.promo_block",
     "whitelabel.tenant_config"
    ],
    "counts": {
@@ -255,7 +257,7 @@
     "screens": 0,
     "flows": 14,
     "contracts": 7,
-    "tables": 72
+    "tables": 74
    }
   },
   "device": {
@@ -351,6 +353,7 @@
     "wallet.wallet",
     "wallet.wallet_transaction",
     "whitelabel.analytics_provider",
+    "whitelabel.banner",
     "whitelabel.config_version",
     "whitelabel.content_page",
     "whitelabel.footer_config",
@@ -366,6 +369,8 @@
     "whitelabel.module_enablement",
     "whitelabel.navigation_config",
     "whitelabel.navigation_item",
+    "whitelabel.promo_block",
+    "whitelabel.received_release",
     "whitelabel.tenant_config"
    ],
    "counts": {
@@ -373,7 +378,7 @@
     "screens": 0,
     "flows": 13,
     "contracts": 6,
-    "tables": 58
+    "tables": 61
    }
   },
   "guest": {
@@ -494,7 +499,6 @@
     "getTaxDocumentRendition",
     "getTaxInvoice",
     "getTenantAppStatus",
-    "getTenantConfig",
     "getTransportDeparture",
     "getTransportFareTable",
     "getTransportRoute",
@@ -988,6 +992,7 @@
     "identity.delegated_access",
     "identity.guest_identity_verification",
     "identity.guest_session",
+    "identity.guest_upload_ref",
     "identity.guest_verification_policy",
     "identity.mfa_challenge",
     "identity.mfa_method",
@@ -1069,6 +1074,7 @@
     "orders.fraud_rule",
     "orders.group_booking",
     "orders.invitation",
+    "orders.membership_renewal",
     "orders.order_event",
     "orders.order_line",
     "orders.order_line_discount",
@@ -1179,6 +1185,7 @@
     "venuemap.visit_plan",
     "venuemap.visit_plan_item",
     "venuemap.visit_plan_preset",
+    "venuemap.visit_planner_question",
     "wallet.auto_reload_setting",
     "wallet.balance",
     "wallet.credit_lot",
@@ -1193,13 +1200,13 @@
     "wallet.wallet",
     "wallet.wallet_transaction",
     "whitelabel.analytics_provider",
+    "whitelabel.banner",
     "whitelabel.booking_flow",
     "whitelabel.booking_flow_step",
     "whitelabel.config_version",
     "whitelabel.content_page",
     "whitelabel.faq_category",
     "whitelabel.faq_entry",
-    "whitelabel.feature_toggle",
     "whitelabel.footer_config",
     "whitelabel.footer_config_column",
     "whitelabel.footer_config_social_link",
@@ -1216,14 +1223,16 @@
     "whitelabel.module_enablement",
     "whitelabel.navigation_config",
     "whitelabel.navigation_item",
+    "whitelabel.promo_block",
+    "whitelabel.received_release",
     "whitelabel.tenant_config"
    ],
    "counts": {
-    "operations": 291,
+    "operations": 290,
     "screens": 144,
     "flows": 23,
     "contracts": 23,
-    "tables": 345
+    "tables": 350
    }
   },
   "partner": {
@@ -1814,6 +1823,7 @@
     "recordEInvoiceTransmissionStatus",
     "recordQueueRedemptionUse",
     "recordSaleOwnerAnswers",
+    "recordSubjectDataExportPart",
     "recordSyncRejection",
     "recordSyncRejectionResolution",
     "recordTouchPoint",
@@ -1836,7 +1846,8 @@
     "simulateRecommendationDecision",
     "transmitEInvoices",
     "updateGuestSubjectDetails",
-    "verifySupervisorStepUp"
+    "verifySupervisorStepUp",
+    "writeSubjectDataExportPart"
    ],
    "screens": [],
    "flows": [
@@ -1911,6 +1922,7 @@
     "identity.principal",
     "identity.principal_credential",
     "identity.role_permission",
+    "identity.subject_data_export_part",
     "ledger.account",
     "ledger.account_mapping",
     "ledger.credit_memo",
@@ -1938,6 +1950,7 @@
     "marketing.customer_badge",
     "marketing.form_submission",
     "marketing.form_submission_sale_link",
+    "marketing.guest_document",
     "marketing.guest_match_policy",
     "marketing.guest_profile",
     "marketing.journey",
@@ -2002,11 +2015,11 @@
     "whitelabel.guided_choice_question"
    ],
    "counts": {
-    "operations": 66,
+    "operations": 68,
     "screens": 0,
     "flows": 5,
     "contracts": 18,
-    "tables": 133
+    "tables": 135
    }
   },
   "staff": {
@@ -4435,6 +4448,7 @@
     "setVirtualTicketCredential",
     "setVirtualTicketIdentity",
     "setVisitPlanPreset",
+    "setVisitPlannerQuestions",
     "setVisualAccessRule",
     "setVisualBusinessRule",
     "setVisualDynamicPolicy",
@@ -5242,7 +5256,6 @@
     "ADM-608",
     "ADM-609",
     "ADM-610",
-    "ADM-612",
     "ADM-613",
     "ADM-614",
     "ADM-615",
@@ -6170,7 +6183,6 @@
     "BO-598",
     "BO-600",
     "BO-601",
-    "BO-602",
     "BO-603",
     "BO-604",
     "BO-605",
@@ -6390,7 +6402,6 @@
     "BO-833",
     "BO-834",
     "BO-835",
-    "BO-836",
     "BO-837",
     "BO-839",
     "BO-840",
@@ -6469,7 +6480,6 @@
     "BO-914",
     "BO-915",
     "BO-916",
-    "BO-917",
     "BO-918",
     "BO-919",
     "BO-920",
@@ -7198,6 +7208,7 @@
     "approvals.external_dispatch",
     "approvals.external_provider",
     "approvals.matrix",
+    "approvals.matrix_version",
     "approvals.request",
     "approvals.request_approver",
     "approvals.retention_policy",
@@ -7403,7 +7414,6 @@
     "control.rollout_tenant",
     "control.sandbox",
     "control.scaling_policy",
-    "control.seo_metadata",
     "control.support_notice",
     "control.tenant",
     "control.tenant_migration",
@@ -7501,7 +7511,6 @@
     "identity.access_review_item",
     "identity.authorisation_policy",
     "identity.authorisation_policy_version",
-    "identity.authz_audit",
     "identity.benefit_usage",
     "identity.capability_template",
     "identity.customer_membership",
@@ -7704,6 +7713,7 @@
     "marketing.segment",
     "marketing.segment_criterion",
     "marketing.sender_identity",
+    "marketing.seo_metadata",
     "marketing.service_copilot_config",
     "marketing.service_queue",
     "marketing.sla_policy",
@@ -8052,6 +8062,7 @@
     "venuemap.visit_plan",
     "venuemap.visit_plan_item",
     "venuemap.visit_plan_preset",
+    "venuemap.visit_planner_question",
     "wallet.accounting_mapping",
     "wallet.adjustment",
     "wallet.authentication_policy",
@@ -8115,6 +8126,7 @@
     "whitelabel.policy",
     "whitelabel.promo_block",
     "whitelabel.publish_review_policy",
+    "whitelabel.received_release",
     "whitelabel.site_package",
     "whitelabel.site_setup_progress",
     "whitelabel.store_account",
@@ -8150,11 +8162,11 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 2645,
-    "screens": 2168,
+    "operations": 2646,
+    "screens": 2164,
     "flows": 138,
     "contracts": 33,
-    "tables": 1134
+    "tables": 1136
    }
   }
  }

@@ -49,7 +49,10 @@
     {
      "to": "KSK-015",
      "trigger": "Opens Assistant",
-     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+     "carries": [
+      "productId"
+     ]
     },
     {
      "to": "CMS-105",
@@ -507,14 +510,20 @@
    "fromFlows": true,
    "transitions": [
     {
-     "to": "KSK-005",
-     "trigger": "Chooses a session",
-     "provenance": "flow F07 step 4→5"
-    },
-    {
      "to": "KSK-015",
      "trigger": "Assistant",
-     "provenance": "derived — KSK-015 declares entryState.params cartId, conversationId, messageId and KSK-004 holds none of them. The edge carries nothing: conversationId, messageId, cartId only pre-select (deep link or optional), and KSK-015 opens on its own"
+     "carries": [
+      "productId"
+     ],
+     "provenance": "derived — KSK-015 declares entryState.params cartId, conversationId, messageId, productId and KSK-004 holds productId, so an edge into it carries them"
+    },
+    {
+     "to": "KSK-005",
+     "trigger": "Chooses a session",
+     "provenance": "flow F07 step 4→5",
+     "carries": [
+      "variantId"
+     ]
     }
    ]
   },
@@ -731,6 +740,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `addCartLine` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+    },
+    {
+     "name": "variantId",
+     "from": "KSK-004",
+     "optional": true,
+     "notes": "The ticket types the guest chose on KSK-004 (its Tickets rows, read with `listProductVariants`), with their quantities, kept by the kiosk through the sale: the screen loads without them (the times and their room), and a tap on a time adds them for that time with `addCartLine` (r11 gate fix, CHG-R11FXS-005)."
     }
    ]
   },

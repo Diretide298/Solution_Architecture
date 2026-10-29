@@ -39,8 +39,8 @@ consumers:
   isCritical: true
 retention: 30 days after publication
 notes: '**Added 12 October 2026 (CHG-R6-033).** Chinmay, 12 October: the client owns the Apple Wallet pass
-  certificate. The Pass Type ID certificate sits in the client''s Apple Developer account, one per brand for white
-  label; the platform stores it in Key Vault (`StoreAccount.passCertificateSecretRef`) and warns 30 days before it
+  certificate. The Pass Type ID certificate sits in the client''s Apple Developer account, one per tenant for all
+  its brands (ADAM CR-304, option A, 29 October 2026; one per brand needs brand modelling later); the platform stores it in Key Vault (`StoreAccount.passCertificateSecretRef`) and warns 30 days before it
   expires, to the tenant admin and to our operations. A pass certificate lasts about a year, so without this the
   failure surfaces a year after launch as passes that will not issue or update (the Vivaticket comparison of 6
   October filed it as a launch defect).

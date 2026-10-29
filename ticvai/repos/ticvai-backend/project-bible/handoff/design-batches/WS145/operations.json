@@ -196,25 +196,6 @@
   "requestBody": null,
   "responds": "ConfigVersion"
  },
- "setBrandIdentity": {
-  "method": "PUT",
-  "path": "/tenant-config/brand",
-  "contract": "white-label",
-  "summary": "Set logo, favicon and splash",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "BrandIdentity",
-  "responds": "BrandIdentity"
- },
  "setHomepageLayout": {
   "method": "PUT",
   "path": "/tenant-config/homepage",

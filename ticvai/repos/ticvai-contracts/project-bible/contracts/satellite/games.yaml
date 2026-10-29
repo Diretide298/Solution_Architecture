@@ -1168,10 +1168,10 @@ paths:
         - "P08 BO-425 Gameplay Validation Rule Configuration"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: GameplayValidationRules.offlineMaximumValue, GameplayValidationRules.refuseBelowBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GameplayValidationRules.offlineMaximumValue, GameplayValidationRules.refuseBelowBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: What a tap is checked against, and in what order
       tags:
@@ -1197,10 +1197,10 @@ paths:
         - "P08 BO-426 Deduction Priority & Funding Source Rules"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: GameplayValidationRules.offlineMaximumValue, GameplayValidationRules.refuseBelowBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GameplayValidationRules.offlineMaximumValue, GameplayValidationRules.refuseBelowBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
@@ -1246,10 +1246,10 @@ paths:
       operationId: authoriseGameplay
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: GameplayAuthorisation.amount, GameplayAuthorisation.remainingBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GameplayAuthorisation.amount, GameplayAuthorisation.remainingBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Decide a tap, now
       description: 'Board 4.9. **Under a second, or the queue notices.** Card valid, not expired, not
@@ -1300,10 +1300,10 @@ paths:
         - "P08 BO-467 Tap Validation & Decision Trace"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: GameplayAuthorisation.amount, GameplayAuthorisation.remainingBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GameplayAuthorisation.amount, GameplayAuthorisation.remainingBalance (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: What would happen if this card tapped this reader
       description: 'Board 4.10. **The configuration is five layers deep and fails silently.** An
@@ -1345,7 +1345,7 @@ paths:
         - "P08 BO-442 Effective Pricing & Reader Price Preview"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GamePriceResolution.effectivePrice, GamePriceResolution.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: The effective price at a reader, and why
       description: 'Boards 5.9 and 5.8. **Standard, group, peak, VIP, retry and calendar exceptions all
@@ -1402,7 +1402,7 @@ paths:
         - "P08 BO-452 Direct-Pay / Crane & Prize Machine Configuration"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GamePricing.price, GamePricing.pricePerPlayer, GamePricing.retryPrice, GamePricing.standardPrice and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [gameId]
       x-ticvai-body-key-note: 'Keyed by the body''s `gameId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per game within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `gameId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
@@ -1503,7 +1503,7 @@ paths:
         - "P08 BO-451 Prize Inventory Integration"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: PrizeCost.directPayPrice, PrizeCost.unitCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: What a prize costs in tickets, and what it costs the venue
       description: 'Boards 6.7 and 6.8. **Two numbers, and only one of them is on the shelf.** The
@@ -1674,7 +1674,7 @@ paths:
         - "P08 BO-492 Customer Game & Wallet Transaction History"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GameplayTransaction.amount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Taps, decisions and what they cost
       description: 'Boards 8.2, 8.4 and 8.5. **Every tap, accepted or refused, with the reason and the
@@ -1727,7 +1727,7 @@ paths:
         - "P08 BO-473 Operational Analytics & Reconciliation Dashboard"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ReaderSyncStatus.pendingValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: What readers took offline and have not sent
       description: 'Board 8.8. **The gaming equivalent of store-and-forward, and the same risk.** Plays
@@ -1763,7 +1763,7 @@ paths:
         - "P08 BO-490 Game & Ride Eligibility / “What Can I Play?”"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GameEligibility.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
@@ -2129,7 +2129,7 @@ paths:
       operationId: reportReaderQueue
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: ReaderOfflineQueue.pendingValue, body.pendingValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - device

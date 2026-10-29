@@ -18,13 +18,19 @@ payload:
   type: string
 - field: changedKinds
   type: array
-  notes: page, faq, policy, banner, promoBlock — only what actually changed
+  notes: 'page, faq, policy, banner, promoBlock, and for a config publish brand, appIcons, theme, fonts, navigation,
+    homepage, footer, modules, features, languages and bookingFlows (ADAM CR-324, A2; CHG-CR324-001) — only what
+    actually changed. **Changed** means it differs from the previously current version''s snapshot; on a first
+    publish, every part that is set'
 - field: changedIds
   type: array
-  notes: So indexing is incremental. **Republishing a whole config to change one FAQ would reindex everything**
+  notes: 'So indexing is incremental. **Republishing a whole config to change one FAQ would reindex everything**.
+    The ids of the changed items that have one: navigation items, homepage sections and booking flows (ADAM CR-324,
+    A2)'
 - field: locales
   type: array
-  notes: Which languages changed. A translation added is new content to retrieve
+  notes: 'Which languages changed. A translation added is new content to retrieve. The draft''s languages that
+    appear in any changed LocalisedText (ADAM CR-324, A2)'
 - field: publishedAt
   type: timestamp
 consumers:
@@ -48,4 +54,8 @@ consumers:
 retention: 30 days after publication
 notes: '**Carries what changed, not that something did.** A publish event with no change list forces
   a full reindex on every save, and a tenant editing a homepage over a week would rebuild the knowledge
-  base daily.'
+  base daily.
+
+
+  **The aggregate id is the tenantId** (the envelope''s `aggregateId`; ADAM CR-324, A2; CHG-CR324-001): one
+  tenantConfig per tenant, so events about the same tenant''s configuration are ordered.'

@@ -1002,6 +1002,11 @@ def main() -> int:
         # and its credit note are fixed in the billing currency copied at generation.
         "control.plan", "control.contract", "control.licence_add_on", "control.capacity_pack",
         "control.module_listing", "control.licensing_model", "control.invoice", "control.credit_note",
+        # **A B2B credit account is denominated in the currency its limit was agreed in** (ADAM CR-322, option A,
+        # "All as recommended", Chinmay, 29 October 2026; CHG-CR322-001). An on-account customer is tenant-wide, at
+        # the tenant root or a brand, where no venue or region sits above it to resolve a currency from; the limit is a
+        # contract term like ledger.account's or control.partner_agreement's currency.
+        "payments.credit_account",
     }
     _schema = ROOT / "handoff" / "schema-reference.json"
     if _schema.exists():

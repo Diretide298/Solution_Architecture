@@ -31,13 +31,13 @@
 | giftCard | [`getGiftCard`](#getgiftcard) | GET | `/gift-cards/{cardCode}` | core | 1 | BO-1123, BO-1125, GST-071, WEB-021 |
 | retail | [`getWalletAutoReloadSetting`](#getwalletautoreloadsetting) | GET | `/wallets/{walletId}/auto-reload` | core | 1 | BO-416, GST-011 |
 | retail | [`setWalletAutoReloadSetting`](#setwalletautoreloadsetting) | PUT | `/wallets/{walletId}/auto-reload` | core | 1 | BO-416, GST-011 |
-| retail | [`transferWalletBalance`](#transferwalletbalance) | POST | `/wallets/{walletId}/transfer` | core | 1 | BO-1116, BO-1121, GST-071, WEB-021 |
+| retail | [`transferWalletBalance`](#transferwalletbalance) | POST | `/wallets/{walletId}/transfer` | core | 1 | BO-1121, GST-071, WEB-021 |
 | wallet | [`createCreditType`](#createcredittype) | POST | `/credit-types` | setup | 1 | BO-1088, BO-1104, BO-415 |
-| wallet | [`getWallet`](#getwallet) | GET | `/wallets/{subjectId}` | core | 1 | BO-1086, BO-1100, BO-1149, BO-1150, BO-414, BO-416 … |
-| wallet | [`listWalletTransactions`](#listwallettransactions) | GET | `/wallets/{subjectId}/transactions` | core | 1 | BO-1093, BO-1102, BO-1142, BO-1143, BO-1148, BO-414 … |
+| wallet | [`getWallet`](#getwallet) | GET | `/wallets/{subjectId}` | core | 1 | BO-1100, BO-1149, BO-1150, BO-414, BO-416, BO-422 … |
+| wallet | [`listWalletTransactions`](#listwallettransactions) | GET | `/wallets/{subjectId}/transactions` | core | 1 | BO-1102, BO-1142, BO-1143, BO-1148, BO-414, BO-423 … |
 | wallet | [`publishWalletConfiguration`](#publishwalletconfiguration) | POST | `/wallet-configuration/publish` | setup | 1 | BO-1092, BO-1112, BO-1132, BO-1162, BO-1173, BO-1180 … |
 | wallet | [`restoreWalletConfigurationVersion`](#restorewalletconfigurationversion) | POST | `/wallet-configuration/versions/{version}/restore` | setup | 1 | BO-1162 |
-| wallet | [`setWalletFundingRules`](#setwalletfundingrules) | PUT | `/wallet-funding-rules` | setup | 1 | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099 … |
+| wallet | [`setWalletFundingRules`](#setwalletfundingrules) | PUT | `/wallet-funding-rules` | setup | 1 | BO-1094, BO-1098 |
 | wallet | [`setWalletTransferRules`](#setwallettransferrules) | PUT | `/wallet-transfer-rules` | setup | 1 | BO-1144, BO-1145 |
 | wallet | [`topUpWallet`](#topupwallet) | POST | `/wallets/{subjectId}/top-ups` | core | 1 | BO-488, POS-005 |
 | wallet | [`updateCreditType`](#updatecredittype) | PUT | `/credit-types/{creditTypeId}` | setup | 1 | BO-1088, BO-1104, BO-1105, BO-1108, BO-420 |
@@ -378,7 +378,7 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 | Guest callable | True |
 | Reads | `cache:idempotency`, `pii.subject`, `wallet.balance`, `wallet.credit_lot`, `wallet.credit_type`, `wallet.transfer_rule`, `wallet.wallet`, `wallet.wallet_transaction` |
 | Writes | `cache:idempotency`, `wallet.balance`, `wallet.credit_lot`, `wallet.wallet`, `wallet.wallet_transaction` |
-| Called by | BO-1116, BO-1121, GST-071, WEB-021 |
+| Called by | BO-1121, GST-071, WEB-021 |
 
 **Parameters**
 
@@ -397,7 +397,7 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| message | string |  | (max length 140; nullable) |
+| message | string |  | The sender's note, stored as the reason of both transfer transactions, so the sender's history and the recipient's show it (WalletTransaction.reason; CHG-R11FXC-004). (max length 140; nullable) |
 
 **Response**: `WalletTransaction`
 
@@ -521,7 +521,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | Read routing | primary |
 | Reads | `wallet.credit_lot`, `wallet.wallet` |
 | Writes | - |
-| Called by | BO-1086, BO-1100, BO-1149, BO-1150, BO-414, BO-416, BO-422, BO-448, BO-487, BO-488, GST-011, GST-071, WEB-017, WEB-021 |
+| Called by | BO-1100, BO-1149, BO-1150, BO-414, BO-416, BO-422, BO-448, BO-487, BO-488, GST-011, GST-071, WEB-017, WEB-021 |
 
 **Parameters**
 
@@ -593,7 +593,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | Read routing | primary |
 | Reads | `wallet.wallet_transaction` |
 | Writes | - |
-| Called by | BO-1093, BO-1102, BO-1142, BO-1143, BO-1148, BO-414, BO-423, BO-453, BO-469, GST-011, WEB-021 |
+| Called by | BO-1102, BO-1142, BO-1143, BO-1148, BO-414, BO-423, BO-453, BO-469, GST-011, WEB-021 |
 
 **Parameters**
 
@@ -643,7 +643,11 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 
 Boards 1.10, 10.8 and 10.9. **Ten boards of configuration that interact**, and the failure mode is a credit type with no accounting mapping or a consumption policy naming a type that was retired. Validation names those before they reach a till.
 Published as a version, so a change can be rolled back and so `getApprovalRecord` can say what was in force. **`mode: publish` writes `wallet.configuration_version` and one `wallet.configuration_version_snapshot` row per configuration area**, read from the area tables at that moment; validation alone writes neither (decided 29 September, writers pass; DM6).
-**Publishing with a blocking finding is refused** (R8 blocker APPROVALS-TENANCY-C32): `mode: publish` validates first, and when any finding has `severity: blocking` it answers 409 `configuration-has-blocking-findings` with the findings and writes nothing; warnings do not stop it. **The version number** is the highest `version` at the scope plus one, under a database unique key on (scope, version), so two publishes at once cannot take the same number (the one that loses the race is retried by the server).
+**Publishing with a blocking finding is refused** (R8 blocker APPROVALS-TENANCY-C32): `mode: publish` validates first, and when any finding has `severity: blocking` it answers 409 `configuration-has-blocking-findings` with the findings and writes nothing; warnings do not stop it. **The version number** is the highest `version` at the scope plus one, under a database unique key on (scope, version), so two publishes at once cannot take the same number (the one that loses the race is retried by the server). The key is `configuration_version_scope_path_version_uniq`, from `WalletConfigurationVersion`'s `x-ticvai-unique-together` (ADAM CR-311).
+**The validation checks** (ADAM CR-311, option B, decided 29 October 2026). This release validates the two failures this operation was written for, both `severity: blocking`, and nothing else; there are no warning checks yet. Each finding carries its `code`, its `severity` and a `message`:
+- `credit-type-without-accounting-mapping` (blocking): a credit type (`wallet.credit_type`) that no entry of the accounting mapping (`wallet.accounting_mapping`, `mappings[].creditTypeId`) names.
+- `consumption-policy-names-retired-type` (blocking): a consumption policy (`wallet.consumption_policy`) whose `typeOrder` names a credit type that is inactive (`isActive` false).
+The list grows to every check, each with its code, the area it reads, its severity and its message, as an additive change; until then validation produces no finding with any other code.
 
 |  |  |
 |---|---|
@@ -675,13 +679,13 @@ Published as a version, so a change can be rolled back and so `getApprovalRecord
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| version | integer |  |  |
+| version | integer |  | Every stored row has its number. (nullable) |
 | publishedAt | string (date-time) |  | (nullable) |
 | publishedBy | string (uuid) |  | (nullable) |
 | note | string |  | (nullable) |
 | findings | array of object |  |  |
 | findings[].severity | enum (blocking, warning) |  |  |
-| findings[].code | string |  |  |
+| findings[].code | string |  | The check that found it. |
 | findings[].message | string |  |  |
 | scopePath | string |  |  |
 
@@ -697,8 +701,9 @@ Published as a version, so a change can be rolled back and so `getApprovalRecord
 
 **`POST /wallet-configuration/versions/{version}/restore`**: Put a previous wallet configuration back as the working draft
 
-Board 8, p.98. Copies the chosen version's configuration into the working draft and returns it as a new unpublished version with its validation findings. **It does not publish**: restore, review with `diffWalletConfigurationVersion`, then `publishWalletConfiguration`, so a rollback is as deliberate as the change that caused it (same rule as `restoreConfigVersion`, audit R139). A credit type retired since that version is reported as a blocking finding rather than silently revived.
+Board 8, p.98. Copies the chosen version's configuration into the working draft and returns that draft with its validation findings. **It does not publish**: restore, review with `diffWalletConfigurationVersion`, then `publishWalletConfiguration`, so a rollback is as deliberate as the change that caused it (same rule as `restoreConfigVersion`, audit R139). A credit type retired since that version is reported as a blocking finding rather than silently revived.
 **It reads the version's `wallet.configuration_version_snapshot` rows and writes their values back into the area tables** (wallet types, credit types, funding, consumption, transfer, refund, channel, risk, authentication, accounting, integration and reconciliation), which are the working draft (decided 29 September, writers pass; DM6). **Rows the snapshot holds are upserted by their id; rows of an area that the snapshot does not hold (created after that version) are deactivated (`is_active` false: wallet and credit types), never deleted**; in an area with no `is_active` they are left as they are and named in a `warning` finding, so nothing that other records point at disappears (R8 blocker APPROVALS-TENANCY-C32).
+**Unpublished changes, and what the answer is** (ADAM CR-312, option A, decided 29 October 2026; settled with CR-311). Before it writes, the restore compares the area tables with the snapshot of the latest published version at the scope, building the same snapshot document `diffWalletConfigurationVersion` compares; if any value differs, the working draft has unpublished changes and the answer is 409 `unpublished-changes`. No column records it: there is no dirty flag and no draft row. **The restore writes no `wallet.configuration_version` row**: a version is a published one only, and its number is assigned by `publishWalletConfiguration`. The 200's `WalletConfigurationVersion` is the restored draft as a response only: `version` null and `publishedAt` null (unpublished), with the findings of `publishWalletConfiguration`'s validation run on the restored draft (its checks and codes, CR-311) beside the warning findings named above.
 
 |  |  |
 |---|---|
@@ -730,13 +735,13 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| version | integer |  |  |
+| version | integer |  | Every stored row has its number. (nullable) |
 | publishedAt | string (date-time) |  | (nullable) |
 | publishedBy | string (uuid) |  | (nullable) |
 | note | string |  | (nullable) |
 | findings | array of object |  |  |
 | findings[].severity | enum (blocking, warning) |  |  |
-| findings[].code | string |  |  |
+| findings[].code | string |  | The check that found it. |
 | findings[].message | string |  |  |
 | scopePath | string |  |  |
 
@@ -744,9 +749,9 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Restored into the working draft, unpublished |
+| 200 |  | Restored into the working draft, unpublished: the draft as a response only, version and publishedAt null; no version row is written (ADAM CR-312) |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 409 |  | The working draft has unpublished changes that the restore would overwrite; publish or discard them first. |
+| 409 |  | The working draft has unpublished changes that the restore would overwrite: the area tables differ from the snapshot of the latest published version at the scope, compared as diffWalletConfigurationV… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setWalletFundingRules
@@ -756,6 +761,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 **Board 2 is the 27 August minute, one screen for one**, and the matrix agrees on four of them: auto-reload on threshold (4.3.28), calendar-based recurring funding (4.3.29, *"distinct from auto-reload"*), minimum and maximum amounts with velocity controls (4.3.30) and the funding audit trail (4.3.35).
 **Auto-reload and recurring funding are genuinely different** and the minute says so. One fires when the balance drops; the other fires on a date. A venue that models the second as the first cannot give a parent a weekly allowance.
 **Velocity limits are a fraud control, not a commercial one.** Ten top-ups of ninety-nine in an hour is a card being tested, and a daily cap expressed only in total value does not catch it.
+**Its ETag is the row's `version`** ("All as recommended": ADAM CR-332 option A, Chinmay, 29 October 2026, the rule CR-257 chose for group bookings): `wallet.funding_rule.version` is 1 on create and bumped on every write, and is sent as `ETag` on `getWalletFundingRules` and here; an `If-Match` that is not the current version is `412` and nothing changes.
 
 |  |  |
 |---|---|
@@ -768,7 +774,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `wallet.funding_rule` |
 | Writes | `cache:idempotency`, `wallet.funding_rule` |
-| Called by | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099, BO-1101, BO-417, BO-418 |
+| Called by | BO-1094, BO-1098 |
 
 **Parameters**
 
@@ -845,6 +851,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 | velocityLimits.maxAmountPerMonth.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | velocityLimits.maxAmountPerMonth.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | scopePath | string |  |  |
+| version | integer | yes | The row's version, its ETag ("All as recommended": ADAM CR-332 option A, Chinmay, 29 October 2026, the rule CR-257 chose for group bookings): 1 on create and bumped on every write; getWalletFundingRu… (min 1; default 1; read-only) |
 
 **Response**: `WalletFundingRules`
 
@@ -914,6 +921,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 | velocityLimits.maxAmountPerMonth.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | velocityLimits.maxAmountPerMonth.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | scopePath | string |  |  |
+| version | integer | yes | The row's version, its ETag ("All as recommended": ADAM CR-332 option A, Chinmay, 29 October 2026, the rule CR-257 chose for group bookings): 1 on create and bumped on every write; getWalletFundingRu… (min 1; default 1; read-only) |
 
 **Responses**
 
@@ -1008,7 +1016,7 @@ Boards 7.2 and 7.3. **Peer-to-peer transfer is a money-transmission question bef
 
 Creates a liability, not revenue. Recognition happens when the value is spent, or as breakage if the wallet expires.
 **Sold as a line of a sale, credited once the sale is paid** (r8 walk fix, CHG-R8WFC-003; r8 re-walk, CHG-R8RW-001; r8 gate, CHG-R8RW-009). The till adds a top-up to the current sale, as the client-approved till does ("Add top-up to sale ... loads on payment"); the guest app does the same on its own order. That is one Orders line for the venue's catalogue product of kind `walletTopUp`, priced at `amount`, on an order naming the guest; it may share the order with anything else. When the order is paid (`createPayment`, and `capturePayment` where the provider authorises first), the till or app calls this once per top-up line, with the line's id as `orderLineId` and a captured payment of that order as `paymentId`. Wallet reads the payment, the order, the line and the line's product in process (`x-ticvai-read-via` above).
-**Only a paid top-up line becomes wallet credit, once.** The payment must be `captured` and of the line's order; the order must be for this wallet's subject (`subjectId`) and paid in full; the line must be a `walletTopUp` product line with `quantity` 1 and a `grossAmount` equal to `amount`. Anything else is refused `422 payment-not-for-top-up` and nothing is credited: a payment for tickets, goods or food cannot become wallet credit, because only a top-up line's own amount is ever credited. A payment that is `declined` or `failed`, or not captured, is refused `402 payment-declined`. A line already credited is refused `409 payment-already-used`: the line's id is kept on the new credit lot (`order_line_id`, one lot per line; `source_kind` `topUp`, `source_reference` the payment's id). `bonusAmount` is not paid for and is not compared. `tender` stays the receipt's label.
+**Only a paid top-up line becomes wallet credit, once.** The payment must be `captured` and of the line's order; the order must be for this wallet's subject (`subjectId`) and paid in full; the line must be a `walletTopUp` product line with `quantity` 1 and a `grossAmount` equal to `amount`. Anything else is refused `422 payment-not-for-top-up` and nothing is credited: a payment for tickets, goods or food cannot become wallet credit, because only a top-up line's own amount is ever credited. A payment that is `declined` or `failed`, or not captured, is refused `402 payment-declined`. A line already credited is refused `409 payment-already-used`: the line's id is kept on the new credit lot (`order_line_id`, one lot per line; `source_kind` `topUp`, `source_reference` the payment's id). **The unique index `credit_lot_order_line_id_uniq` decides it** (ADAM CR-310, option A): a unique violation on that index when the lot is inserted is `409 payment-already-used`, so two tills crediting one line at the same moment cannot both succeed. `bonusAmount` is not paid for and is not compared. `tender` stays the receipt's label.
 
 |  |  |
 |---|---|
@@ -1093,7 +1101,7 @@ Creates a liability, not revenue. Recognition happens when the value is spent, o
 | 201 |  | Topped up |
 | 402 |  | Payment declined, failed or not captured (the body's paymentId) |
 | 422 |  | The body's orderLineId and paymentId are not a paid top-up: the payment is not of the line's order, the order is for another subject or not paid in full, or the line is not a walletTopUp line of quan… |
-| 409 |  | The body's orderLineId has already been credited (r8 walk fix, CHG-R8WFC-003; one lot per line, CHG-R8RW-009) |
+| 409 |  | The body's orderLineId has already been credited (r8 walk fix, CHG-R8WFC-003; one lot per line, CHG-R8RW-009), including a unique violation on credit_lot_order_line_id_uniq when two credits of one li… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateCreditType
@@ -1242,7 +1250,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| version | integer | no |  |
+| version | integer | no | Every stored row has its number. |
 | published_at | timestamptz | no |  |
 | published_by | uuid | no |  |
 | note | text | no |  |
@@ -1328,6 +1336,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | approval_above_amount | numeric(18,4) | no |  |
 | velocity_limits | jsonb | no | A fraud control, not a commercial one. |
 | scope_path | text | no |  |
+| version | integer | yes | The row's version, its ETag ("All as recommended": ADAM CR-332 option A, Chinmay, 29 October 2026, the rule CR-257 chose for group bookings): 1 on create and bumped on every write; getWalletFundingRu… |
 | id | uuid | yes | Synthesised key. |
 
 ### `wallet.gift_card`
@@ -1379,6 +1388,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | wallet_refund_bonus_percent | numeric | no | An incentive to take the refund as credit rather than to a card. |
 | destinations_by_source | jsonb | no | A destination per refund source (contract gap CHG-WIR-027, BO-1146; CHG-CSA-045). |
 | scope_path | text | no |  |
+| version | integer | yes | The row's version, its ETag ("All as recommended": ADAM CR-332 option A, Chinmay, 29 October 2026, the rule CR-257 chose for group bookings): 1 on create and bumped on every write; getWalletRefundPol… |
 | id | uuid | yes | Synthesised key. |
 
 ### `wallet.risk_rule_set`

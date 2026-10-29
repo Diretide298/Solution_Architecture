@@ -44,7 +44,7 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | brand | [`getAppIcons`](#getappicons) | GET | `/tenant-config/app-icons` | core | 1 | ADM-016, CMS-004 |
 | brand | [`getBrandIdentity`](#getbrandidentity) | GET | `/tenant-config/brand` | core | 1 | ADM-016, CMS-002, CMS-004, CMS-006, CMS-104 |
 | brand | [`setAppIcons`](#setappicons) | PUT | `/tenant-config/app-icons` | core | 1 | ADM-016, CMS-004 |
-| brand | [`setBrandIdentity`](#setbrandidentity) | PUT | `/tenant-config/brand` | core | 1 | ADM-016, BO-836, CMS-002, CMS-004, CMS-104 |
+| brand | [`setBrandIdentity`](#setbrandidentity) | PUT | `/tenant-config/brand` | core | 1 | ADM-016, CMS-002, CMS-004, CMS-104 |
 | branding | [`getBookingFlowConfig`](#getbookingflowconfig) | GET | `/tenant-config/booking-flow` | core | 1 | CMS-006, CMS-016 |
 | branding | [`setBookingFlowConfig`](#setbookingflowconfig) | PUT | `/tenant-config/booking-flow` | core | 1 | CMS-016 |
 | content | [`createBanner`](#createbanner) | POST | `/tenant-config/banners` | core | 1 | CMS-008 |
@@ -180,7 +180,7 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 
 **`GET /tenant-config/store-accounts`**: The client's store accounts and the publishing checklist
 
-The Apple and Google accounts the client has recorded, and the checklist CMS-104 shows: Apple D-U-N-S number, Apple Developer account, Google Play developer account, store listing, app icons and a published configuration. Secrets are never returned: a stored credential shows as `hasApiCredential`.
+The Apple and Google accounts the client has recorded, and the checklist CMS-104 shows: Apple D-U-N-S number, Apple Developer account, Google Play developer account, store listing, app icons and a published configuration. Secrets are never returned: a stored credential shows as `hasApiCredential`. When each item is done, and what it says to do next, is `StorePublishingChecklist` (ADAM CR-304, option A).
 
 |  |  |
 |---|---|
@@ -208,7 +208,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | accounts[].appIdentifier | string | yes | The bundle id (Apple) or application id (Google) the app is signed with. (max length 155; pattern ^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$) |
 | accounts[].apiCredentialSecretRef | string |  | App Store Connect API key or Play service-account key. (nullable) |
 | accounts[].hasApiCredential | boolean |  | (read-only) |
-| accounts[].passTypeIdentifier | string |  | The Apple Wallet Pass Type ID (pass.<reverse-domain>), registered in the client's own Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033). (pattern ^pass\.[A-Za-z0-9.-]+$; nullable) |
+| accounts[].passTypeIdentifier | string |  | The Apple Wallet Pass Type ID (pass.<reverse-domain>), registered in the client's own Apple Developer account (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033), one per tenant (… (pattern ^pass\.[A-Za-z0-9.-]+$; nullable) |
 | accounts[].passCertificateSecretRef | string |  | The Pass Type ID certificate, from the client's Apple Developer account. (nullable) |
 | accounts[].passCertificatePassword | string (password) |  | The password of the .p12 sent in passCertificateSecretRef. (nullable) |
 | accounts[].hasPassCertificate | boolean |  | (read-only) |
@@ -228,7 +228,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | items[].item | enum (appleDunsNumber, appleDeveloperAccount, googlePlayDeveloperAccount, storeListing, appIcons, publishedConfiguration) | yes |  |
 | items[].done | boolean | yes |  |
 | items[].clientOwned | boolean |  | True for the three accounts, which only the client can open. |
-| items[].guidance | string |  | What to do next, in the operator's language. |
+| items[].guidance | string |  | What to do next: fixed English copy, one text per item (ADAM CR-304, option A), sent while the item is not done and absent once it is. |
 
 **Responses**
 
@@ -367,6 +367,10 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 
 **The client's accounts, never TICVAI's (decided 24 September, M24-08).** One entry per store; the body replaces both. A fact about the client rather than configuration a guest resolves against, and not part of the published draft: it takes effect at once and carries no config scope. An Apple entry without a nine-digit `dunsNumber`, a store given twice, or a listing text missing a tenant language, is refused with 400. A credential is kept in the secret store and only its reference is stored here.
 
+**The tenant languages a listing is checked against** (ADAM CR-304, option A, Chinmay, 29 October 2026): the working draft's `languages` (the `whitelabel.tenant_config` row with `is_draft`), or, where there is no draft, the published set's (the current `ConfigVersion`). Store accounts are outside the draft and take effect at once, so a listing is checked against the languages the tenant is editing towards.
+
+**One Apple account per tenant, so one Pass Type ID per tenant** (ADAM CR-304, option A). The body is a tenant singleton with one entry per store, and the Apple entry records one Apple Developer account (one team), so its `passTypeIdentifier` and certificate sign the Apple passes of every brand the tenant has. A tenant whose brands each need their own Pass Type ID needs a later change, with brand modelling.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -375,7 +379,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `whitelabel.store_account` |
+| Reads | `cache:idempotency`, `whitelabel.config_version`, `whitelabel.store_account`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency`, `whitelabel.store_account` |
 | Called by | CMS-104 |
 
@@ -398,7 +402,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | accounts[].appIdentifier | string | yes | The bundle id (Apple) or application id (Google) the app is signed with. (max length 155; pattern ^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$) |
 | accounts[].apiCredentialSecretRef | string |  | App Store Connect API key or Play service-account key. (nullable) |
 | accounts[].hasApiCredential | boolean |  | (read-only) |
-| accounts[].passTypeIdentifier | string |  | The Apple Wallet Pass Type ID (pass.<reverse-domain>), registered in the client's own Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033). (pattern ^pass\.[A-Za-z0-9.-]+$; nullable) |
+| accounts[].passTypeIdentifier | string |  | The Apple Wallet Pass Type ID (pass.<reverse-domain>), registered in the client's own Apple Developer account (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033), one per tenant (… (pattern ^pass\.[A-Za-z0-9.-]+$; nullable) |
 | accounts[].passCertificateSecretRef | string |  | The Pass Type ID certificate, from the client's Apple Developer account. (nullable) |
 | accounts[].passCertificatePassword | string (password) |  | The password of the .p12 sent in passCertificateSecretRef. (nullable) |
 | accounts[].hasPassCertificate | boolean |  | (read-only) |
@@ -428,7 +432,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | accounts[].appIdentifier | string | yes | The bundle id (Apple) or application id (Google) the app is signed with. (max length 155; pattern ^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$) |
 | accounts[].apiCredentialSecretRef | string |  | App Store Connect API key or Play service-account key. (nullable) |
 | accounts[].hasApiCredential | boolean |  | (read-only) |
-| accounts[].passTypeIdentifier | string |  | The Apple Wallet Pass Type ID (pass.<reverse-domain>), registered in the client's own Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033). (pattern ^pass\.[A-Za-z0-9.-]+$; nullable) |
+| accounts[].passTypeIdentifier | string |  | The Apple Wallet Pass Type ID (pass.<reverse-domain>), registered in the client's own Apple Developer account (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033), one per tenant (… (pattern ^pass\.[A-Za-z0-9.-]+$; nullable) |
 | accounts[].passCertificateSecretRef | string |  | The Pass Type ID certificate, from the client's Apple Developer account. (nullable) |
 | accounts[].passCertificatePassword | string (password) |  | The password of the .p12 sent in passCertificateSecretRef. (nullable) |
 | accounts[].hasPassCertificate | boolean |  | (read-only) |
@@ -448,14 +452,14 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | items[].item | enum (appleDunsNumber, appleDeveloperAccount, googlePlayDeveloperAccount, storeListing, appIcons, publishedConfiguration) | yes |  |
 | items[].done | boolean | yes |  |
 | items[].clientOwned | boolean |  | True for the three accounts, which only the client can open. |
-| items[].guidance | string |  | What to do next, in the operator's language. |
+| items[].guidance | string |  | What to do next: fixed English copy, one text per item (ADAM CR-304, option A), sent while the item is not done and absent once it is. |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Saved; the checklist as it now stands |
-| 400 |  | An Apple account without a nine-digit D-U-N-S number, a store given twice, or a listing text missing a tenant language |
+| 400 |  | An Apple account without a nine-digit D-U-N-S number, a store given twice, or a listing text missing a tenant language (the working draft's languages, else the published set's; ADAM CR-304) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -656,7 +660,7 @@ Removed from the working draft; guests keep the published copy until the next pu
 
 **`GET /venues/{venueId}/booking-flow`**: The published booking flow a product or category books through
 
-**What the guest booking screens read to order their steps (decided 29 September, W12).** Public and cacheable, like the rest of the published app; reads the current `ConfigVersion`, never the draft. Resolved in this order: the product's own `bookingFlowId` (catalogue), then its category's, then the venue's default flow for the type serving the product's kind. With `flowTypeKey` alone, the venue's default for that type. Returns only the enabled steps, in order, with their settings and the flow-level settings; `name` is left out of this view. 404 when nothing resolves, and the guest screens use the type's default order.
+**What the guest booking screens read to order their steps (decided 29 September, W12).** Public and cacheable, like the rest of the published app; reads the current `ConfigVersion`, never the draft. Resolved in this order: the product's own `bookingFlowId` (catalogue), then its category's, then the venue's default flow for the type serving the product's kind. With `flowTypeKey` alone, the venue's default for that type. Only enabled flows resolve: the snapshot holds the disabled ones too, and they are skipped (ADAM CR-324, A3; CHG-CR324-001). Returns only the enabled steps, in order, with their settings and the flow-level settings; `name` is left out of this view. 404 when nothing resolves, and the guest screens use the type's default order.
 
 |  |  |
 |---|---|
@@ -945,7 +949,8 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 
 **`POST /booking-flows/{bookingFlowId}/validate`**: Check a flow against its type
 
-**Says whether a flow can be published, and why not (decided 29 September, W12).** With no body it checks the saved flow; with `steps` it checks that order without saving it, so the builder can mark a drag that breaks a constraint before it is dropped. A required step turned off, a step out of its allowed order, a conditional step whose condition can never hold, a step the type does not have and a step given twice are each a problem. Writes nothing.
+**Says whether a flow can be published, and why not (decided 29 September, W12).** With no body it checks the saved flow; with `steps` it checks that order without saving it, so the builder can mark a drag that breaks a constraint before it is dropped. A required step turned off, a step out of its allowed order, a step the type does not have and a step given twice are each a problem. Writes nothing.
+**Five kinds, and none for a condition** (ADAM CR-308, option A, Chinmay, 29 October 2026; CHG-CR308-001). A conditional step decides only at booking time whether a guest meets its condition (the type's `commonConditions` and step conditions: a second active venue, a published `GuidedChoice`, a product in the cart that asks), and that can change after the flow is saved, so a flow is never invalid for a condition that may hold later and no problem is reported for one. **A required step missing from the `steps` a caller sends** is `requiredStepDisabled` for that step, as a required step turned off is (a saved flow holds every step of its type, so only a caller's list can leave one out).
 
 |  |  |
 |---|---|
@@ -986,7 +991,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 |---|---|---|---|
 | valid | boolean | yes |  |
 | problems | array of object | yes |  |
-| problems[].kind | enum (requiredStepDisabled, orderConstraintBroken, conditionNeverHolds, stepNotInType, duplicateStep, unknownStepSetting) | yes |  |
+| problems[].kind | enum (requiredStepDisabled, orderConstraintBroken, stepNotInType, duplicateStep, unknownStepSetting) | yes |  |
 | problems[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
 | problems[].otherStepKey | object |  | For orderConstraintBroken, the step it must come before or after. (nullable) |
 | problems[].message | string | yes |  |
@@ -1015,7 +1020,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `whitelabel.tenant_config` |
+| Reads | `whitelabel.app_build`, `whitelabel.config_version`, `whitelabel.tenant_config` |
 | Writes | - |
 | Called by | ADM-016, CMS-004 |
 
@@ -1030,7 +1035,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 | derived[].assetRef | string (uuid) |  |  |
 | changeScope | object | yes | Always buildTime — icons are baked into the binary. (read-only) |
 | liveVersion | string |  | Icon currently shipped. (read-only; nullable) |
-| requiresRebuild | boolean |  | True while the draft's source differs from the icon in liveVersion. (read-only) |
+| requiresRebuild | boolean |  | True while the draft's source differs from the icon in liveVersion, that is when the released version's snapshot appIcons.sourceAssetRef differs from the draft's sourceAssetRef; true when nothing is… (read-only) |
 
 **Responses**
 
@@ -1086,7 +1091,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 
 **`PUT /tenant-config/app-icons`**: Set app icons
 
-**Build-time.** Icons are baked into the binary, so a change here does not reach guests until the next store release. The response says whether a rebuild is needed (`requiresRebuild`) and which icon is currently live (`liveVersion`), so nobody expects an icon change to appear tomorrow. The sizes generated for each platform are listed in `derived`.
+**Build-time.** Icons are baked into the binary, so a change here does not reach guests until the next store release. The response says whether a rebuild is needed (`requiresRebuild`) and which icon is currently live (`liveVersion`), so nobody expects an icon change to appear tomorrow. Both are read as `AppIcons` says, from `whitelabel.app_build` and `whitelabel.config_version` (ADAM CR-325, option A; CHG-CR325-001). The sizes generated for each platform are listed in `derived`.
 Source is a single 1024×1024 PNG without transparency; derived sizes are generated.
 **Asked of Assets, answered pending** (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012). The transparency check reads the source's `MediaAsset.hasTransparency`, which Assets records from the image's alpha channel when the upload completes; `true` is `400` `icon-has-transparency`. This call stores the source and returns every derived size in `derived` in the same shape, each entry pending: `platform` and `size` set, `assetRef` absent. The renditions are asked of Assets after the write (`requestMediaRendition`, one per size) by the white-label jobs component, which fills each `assetRef` when Assets has made it; this call does not wait for them. Nothing on screen changes shape. Kept so by the lead (r10 question 27, 25 October 2026; CHG-R10TEN-022): `requestMediaRendition` is built in Block B, and this Block A operation does not call it.
 **Generated: the iOS and Android store sets, plus web favicons (decided 28 September, audit R163).** iOS: 1024 (App Store), 180, 167, 152, 120, 87, 80, 76, 60, 58, 40, 29 and 20 px. Android: 512 (Play Store), 432 adaptive foreground, 192, 144, 96, 72 and 48 px. Web: 16, 32 and 48 px favicons, the 180 px Apple touch icon, and 192 and 512 px manifest icons. The web icons are runtime and reach guests with the publish; the store sets need a release.
@@ -1099,7 +1104,7 @@ Source is a single 1024×1024 PNG without transparency; derived sizes are genera
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `whitelabel.tenant_config` |
+| Reads | `cache:idempotency`, `whitelabel.app_build`, `whitelabel.config_version`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency`, `whitelabel.tenant_config` |
 | Called by | ADM-016, CMS-004 |
 
@@ -1126,7 +1131,7 @@ Source is a single 1024×1024 PNG without transparency; derived sizes are genera
 | derived[].assetRef | string (uuid) |  |  |
 | changeScope | object | yes | Always buildTime — icons are baked into the binary. (read-only) |
 | liveVersion | string |  | Icon currently shipped. (read-only; nullable) |
-| requiresRebuild | boolean |  | True while the draft's source differs from the icon in liveVersion. (read-only) |
+| requiresRebuild | boolean |  | True while the draft's source differs from the icon in liveVersion, that is when the released version's snapshot appIcons.sourceAssetRef differs from the draft's sourceAssetRef; true when nothing is… (read-only) |
 
 **Responses**
 
@@ -1154,7 +1159,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency`, `whitelabel.tenant_config` |
-| Called by | ADM-016, BO-836, CMS-002, CMS-004, CMS-104 |
+| Called by | ADM-016, CMS-002, CMS-004, CMS-104 |
 
 **Parameters**
 
@@ -3737,11 +3742,11 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 
 **`GET /storefront/tenant-config`**: The published guest-facing configuration, before anyone signs in
 
-**What a first-time visitor's storefront renders in** (decided 2 October by Chinmay, GFIX-1). `getTenantConfig` needs a guest or a staff session, so a visitor with neither could not load the tenant's brand, theme, fonts, header, footer or navigation, and the home page (WEB-001, GST-001), the maintenance and sold-out pages (WEB-029, GST-047) and the kiosk (KSK-002) had nothing to style themselves with. This is that read with no session at all.
+**What a first-time visitor's storefront renders in** (decided 2 October by Chinmay, GFIX-1). `getTenantConfig` needs a guest or a staff session, so a visitor with neither could not load the tenant's brand, theme, fonts, header, footer or navigation, and the home page (WEB-001, GST-001), the maintenance and sold-out pages (WEB-029, GST-047) and the kiosk (KSK-002) had nothing to style themselves with. This is that read with no session at all. **A signed-in guest reads this too**: `getTenantConfig` is staff only (ADAM CR-307, option C, 29 October 2026; CHG-CR307-001).
 
 **The tenant comes from the host, never from the caller.** The request carries no tenant: the edge resolves the host it arrived on to a tenant with `tenancy.resolveTenantHost` (SD-021), which is the tenant's verified custom domain or its platform subdomain. The platform subdomain is the tenant slug the guest app and kiosk builds are configured with, so all three shells call the same path. An unknown host is `404` and never falls through to a default tenant.
 
-**Published, non-sensitive fields only.** Read from the current published `ConfigVersion` (never the working draft) plus the live status `setMaintenanceMode` writes. Left out, because a public and cacheable response must not carry them: the draft markers (`isDraft`, `version`, the draft booking flows), notification branding (sender addresses), the enabled payment methods (checkout reads what the gateway offers), licensing, and every CMS status field `getTenantAppStatus` keeps for staff. A module the tenant has not enabled is not listed, so a guest never learns what was not bought.
+**Published, non-sensitive fields only.** Read from the current published `ConfigVersion` (never the working draft) plus the live status `setMaintenanceMode` writes, and the banners and promo blocks active now, read live from `whitelabel.banner` and `whitelabel.promo_block` (ADAM CR-327, option A (2); CHG-CR327-001). `assetsBaseUrl` is the cell's `Assets:PublicBaseUrl` setting, left out while empty, and `paymentTokenisation` is left out until #37051 (option A (3), (4)). `guestSignIn` lists the tenant's enabled guest providers through `identity#guestSignInProviders` (part (1): "Kind column on sso_provider"). Left out, because a public and cacheable response must not carry them: the draft markers (`isDraft`, `version`, the draft booking flows), notification branding (sender addresses), the enabled payment methods (checkout reads what the gateway offers), licensing, and every CMS status field `getTenantAppStatus` keeps for staff. A module the tenant has not enabled is not listed, so a guest never learns what was not bought.
 
 **Cacheable.** With no session the answer is the same for every visitor of a host and venue and is cached at the edge, invalidated by `publishTenantConfig` and `setMaintenanceMode`; `publishedVersion` lets a client keep its copy when nothing changed. A signed-in guest gets the same answer.
 
@@ -3755,7 +3760,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Offline note | 2 October: servable from a local cache. |
-| Reads | `whitelabel.analytics_provider`, `whitelabel.config_version`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_layout`, `whitelabel.homepage_section`, `whitelabel.navigation_config`, `whitelabel.navigation_item`, `whitelabel.tenant_config` |
+| Reads | `whitelabel.analytics_provider`, `whitelabel.banner`, `whitelabel.config_version`, `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_layout`, `whitelabel.homepage_section`, `whitelabel.navigation_config`, `whitelabel.navigation_item`, `whitelabel.promo_block`, `whitelabel.tenant_config` |
 | Writes | - |
 | Called by | GST-001, GST-043, GST-047, GST-071, KSK-002, WEB-001, WEB-021, WEB-029 |
 
@@ -3778,7 +3783,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | guestSignIn.google | object |  |  |
 | guestSignIn.google.clientId | string |  |  |
 | guestSignIn.uaePass | object |  |  |
-| guestSignIn.uaePass.authorizationUrl | string (uri) |  |  |
+| guestSignIn.uaePass.authorizationUrl | string (uri) |  | The guest uaePass row's identity.sso_provider.authorization_url, through identity#guestSignInProviders (CHG-CR327-002). |
 | guestSignIn.uaePass.clientId | string |  |  |
 | brand | BrandIdentity |  | Every *AssetRef here is a MediaAsset id from the assets library (createUpload then completeUpload). |
 | brand.logoAssetRef | string (uuid) | yes | The primary logo. |
@@ -3808,7 +3813,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | appIcons.derived[].assetRef | string (uuid) |  |  |
 | appIcons.changeScope | object | yes | Always buildTime — icons are baked into the binary. (read-only) |
 | appIcons.liveVersion | string |  | Icon currently shipped. (read-only; nullable) |
-| appIcons.requiresRebuild | boolean |  | True while the draft's source differs from the icon in liveVersion. (read-only) |
+| appIcons.requiresRebuild | boolean |  | True while the draft's source differs from the icon in liveVersion, that is when the released version's snapshot appIcons.sourceAssetRef differs from the draft's sourceAssetRef; true when nothing is… (read-only) |
 | theme | Theme |  |  |
 | theme.primaryColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
 | theme.secondaryColour | string | yes | (pattern ^#[0-9A-Fa-f]{6}$) |
@@ -3890,7 +3895,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | homepage.sections[].maxItems | integer |  | How many cards the section shows, the venue's choice (Chinmay, 2 October, workbook Q152: every customisation option of the approved wireframe, including the card count per section; CHG-CSA-040). (nullable) |
 | homepage.sections[].scrollAnimation | enum (rise, scale, slide, blur, none) |  | How the section enters as the guest scrolls (Chinmay, 2 October, workbook Q153: "must be there"; DI-1088; CHG-CSA-040). (default rise) |
 | homepage.sections[].heroStyle | enum (carousel, video, poster, split, None) |  | For heroBanner only (decided 29 September, MOB-3). (nullable) |
-| banners | array of PublishedBanner |  | The hero and other banners a guest sees now (r8 walk of ticket 28335): the banners in the published version whose state is active at the time of the read, by sortOrder. (read-only) |
+| banners | array of PublishedBanner |  | The hero and other banners a guest sees now (r8 walk of ticket 28335): the banners whose state is active at the time of the read, by sortOrder. (read-only) |
 | banners[].id | string (uuid) | yes |  |
 | banners[].placement | enum (homepageHero, homepageBlock, explore, checkout) |  |  |
 | banners[].title | LocalisedText |  | Keyed by ISO 639-1 code. |
@@ -3906,7 +3911,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | banners[].linkTarget.date | string (date) |  | Used when kind is bookingFlow, the date the flow opens on. (nullable) |
 | banners[].linkTarget.url | string |  |  |
 | banners[].sortOrder | integer |  |  |
-| promoBlocks | array of PublishedPromoBlock |  | The promo blocks in the published version that are active at the time of the read, by sortOrder, with the same rule as banners. (read-only) |
+| promoBlocks | array of PublishedPromoBlock |  | The promo blocks that are active at the time of the read, by sortOrder, with the same rule as banners. (read-only) |
 | promoBlocks[].id | string (uuid) | yes |  |
 | promoBlocks[].title | LocalisedText |  | Keyed by ISO 639-1 code. |
 | promoBlocks[].description | LocalisedText |  | Keyed by ISO 639-1 code. |
@@ -4022,6 +4027,7 @@ Also the endpoint the guest app calls to discover a maintenance window, which is
 **Per tenant, except each venue's contact** (R8 blocker WHITE-C16, the lead's answer of 20 October 2026). Maintenance, `availability` and the homepage layout are one per tenant in r8: a closure (a weather closure, a private event) set for the site shows at every venue the guest may pick, which is a known simplification, and the screens call it "the site", not "the venue". `contact` is the tenant's head-office contact. **The picked venue's own address, phone and email** are `venues[].contact`, which WEB-028 heads its page with; where a venue has none, the app shows `contact`.
 **And the tenant's venues, for the guest's venue picker (decided 28 September, audit R267)**: the guest picks a venue on first open of WEB-001 or GST-001, the choice is remembered on the device and changeable, and on a visit day the app suggests the venue on the guest's ticket. `venues` lists the tenant's active venues so that picker has a source without a session.
 **And what is new, for guests (decided 29 September, rev 3 GAP-B2)**: `whatsNew` is the public, localised release notes the guest Help screen reads (WEB-025, WEB-045, GST-040), newest first, at most 10, filled from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received, skipping releases with none. It names no person. `recentChanges` stays staff only.
+**Where the five parts come from** (ADAM CR-338, 29 October 2026; CHG-CR338-001): `whatsNew` from the tenant-side copy `whitelabel.received_release` (whatsNew (a)); `recentChanges` from `whitelabel.config_version` (recentChanges (a)); each venue's `city` and `openingHoursToday` from its `VenueSettings.city` and `VenueSettings.openingHours`, read through `tenancy#venueSettingsRecords` (city and openingHoursToday (a)); and `venues` lists the active venues on every read (venues (a)). The rules are on `TenantAppStatus` and `ReceivedRelease`.
 
 |  |  |
 |---|---|
@@ -4032,7 +4038,7 @@ Also the endpoint the guest app calls to discover a maintenance window, which is
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `whitelabel.config_version`, `whitelabel.content_page`, `whitelabel.module_enablement`, `whitelabel.tenant_config` |
+| Reads | `whitelabel.config_version`, `whitelabel.content_page`, `whitelabel.module_enablement`, `whitelabel.received_release`, `whitelabel.tenant_config` |
 | Writes | - |
 | Called by | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014, WEB-001, WEB-025, WEB-028, WEB-029, WEB-045, WEB-050 |
 
@@ -4084,7 +4090,7 @@ Also the endpoint the guest app calls to discover a maintenance window, which is
 | whatsNew[].version | string | yes | The release version. |
 | whatsNew[].publishedAt | string (date-time) | yes | When the release reached the tenant's cell. |
 | whatsNew[].notes | LocalisedText | yes | Keyed by ISO 639-1 code. |
-| recentChanges | array of object |  | Staff only. |
+| recentChanges | array of object |  | Staff only. (max items 10) |
 | recentChanges[].area | string |  |  |
 | recentChanges[].description | string |  |  |
 | recentChanges[].principalId | string (uuid) |  |  |
@@ -4102,8 +4108,8 @@ Also the endpoint the guest app calls to discover a maintenance window, which is
 
 **`GET /tenant-config`**: Full working configuration
 
-Everything the builder edits. **A staff caller gets the working draft**, or with `version` the snapshot of that published version. **A guest caller always gets the current published version**: `version` is ignored and `TENANT_CONFIGURE` is not needed, because reading the published app is not configuring it. The dashboard's status view (published state, module and page counts, recent changes) is `getTenantAppStatus`, not this.
-**A visitor with no session reads `getPublishedTenantConfig`** (decided 2 October, GFIX-1): the published, non-sensitive part of this, resolved from the host and cacheable, so a storefront renders in the tenant's brand before anyone signs in.
+Everything the builder edits. **A staff caller gets the working draft**, or with `version` the snapshot of that published version. The dashboard's status view (published state, module and page counts, recent changes) is `getTenantAppStatus`, not this.
+**Staff only; a guest reads `getPublishedTenantConfig`** (ADAM CR-307, option C, Chinmay, 29 October 2026; CHG-CR307-001). A guest, like a visitor with no session (decided 2 October, GFIX-1), reads the published, non-sensitive part of this, resolved from the host and cacheable, so a storefront renders in the tenant's brand before anyone signs in. The full configuration is not answered to a guest: it holds what the published one deliberately leaves out (sender addresses, licensing, module counts).
 
 |  |  |
 |---|---|
@@ -4152,7 +4158,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | appIcons.derived[].assetRef | string (uuid) |  |  |
 | appIcons.changeScope | object | yes | Always buildTime — icons are baked into the binary. (read-only) |
 | appIcons.liveVersion | string |  | Icon currently shipped. (read-only; nullable) |
-| appIcons.requiresRebuild | boolean |  | True while the draft's source differs from the icon in liveVersion. (read-only) |
+| appIcons.requiresRebuild | boolean |  | True while the draft's source differs from the icon in liveVersion, that is when the released version's snapshot appIcons.sourceAssetRef differs from the draft's sourceAssetRef; true when nothing is… (read-only) |
 | bookingFlow | BookingFlowConfig |  | Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11). |
 | bookingFlow.preset | enum (auto, ticketBox, playCentre, venueSite, marketplace, singleEvent, season, custom) |  | L1 Ticket box … L6 Season. (default auto) |
 | bookingFlow.stepIndicator | enum (bar, numbered, dots, segmented, breadcrumb, pills, ticks, none) |  | (default bar) |
@@ -4361,7 +4367,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 |---|---|---|
 | 200 |  | Configuration |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 404 |  | version names no published version (not-found), or the tenant has no working draft yet — for a guest, nothing has been published yet (not-configured). |
+| 404 |  | version names no published version (not-found), or the tenant has no working draft yet (not-configured). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listAnalyticsProviders
@@ -4485,7 +4491,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 
 **`PUT /tenant-config/analytics-providers/{analyticsProviderId}`**: Connect the storefront and app to an analytics platform
 
-**One row per `venueId` + `provider`** (22.10.29; a database unique key, a null `venueId` counting as one value). The path id is the row's identity: a PUT to an existing id replaces that row; a PUT to a new id creates it, unless another row already holds the same `venueId` and `provider`, which is 409 `analytics-provider-exists` (PUT to that row's id instead). A null `venueId` is the tenant-wide default; a venue's own row replaces it for that venue (ADR-0018, nearest wins). `measurementId` is what the page tag or app SDK reports to; it is public by nature, and the reporting credential is not: `reportingCredentialRef` names a secret in the platform vault, is write-only and is never returned. **`measurementId` must match its provider's format**, else 422 `measurement-id-invalid` (formats proposed, client to confirm against each vendor): `googleAnalytics4` `^G-[A-Z0-9]{6,12}$`, `googleTagManager` `^GTM-[A-Z0-9]{4,8}$`, `metaPixel` `^[0-9]{10,20}$`; `adobeAnalytics`, `matomo` and `other` are checked for length only (1 to 100 characters).
+**One row per `venueId` + `provider`** (22.10.29; a database unique key, a null `venueId` counting as one value). The path id is the row's identity: a PUT to an existing id replaces that row; a PUT to a new id creates it, unless another row already holds the same `venueId` and `provider`, which is 409 `analytics-provider-exists` (PUT to that row's id instead). A null `venueId` is the tenant-wide default; a venue's own row replaces it for that venue (ADR-0018, nearest wins). `measurementId` is what the page tag or app SDK reports to; it is public by nature, and the reporting credential is not: `reportingCredentialRef` names a secret in the platform vault, is write-only and is never returned. **A PUT that leaves `reportingCredentialRef` out keeps the credential the row holds; an explicit `null` clears it** (and `hasReportingCredential` then reads false); a value replaces it (ADAM CR-323 (2), Chinmay, 29 October 2026; CHG-CR323-001). Every other field is replaced as sent: a write-only secret cannot be read back and resent by the CMS-016 form, so leaving it out cannot mean "clear". **The one row per `venueId` + `provider` is the unique index `analytics_provider_venue_id_provider_uniq`** (`NULLS NOT DISTINCT`, in the package's forward migration since r8): two creates of the same pair at once cannot both be stored, and the second one's unique violation is 409 `analytics-provider-exists` too. **`measurementId` must match its provider's format**, else 422 `measurement-id-invalid` (formats proposed, client to confirm against each vendor): `googleAnalytics4` `^G-[A-Z0-9]{6,12}$`, `googleTagManager` `^GTM-[A-Z0-9]{4,8}$`, `metaPixel` `^[0-9]{10,20}$`; `adobeAnalytics`, `matomo` and `other` are checked for length only (1 to 100 characters).
 **Every provider waits on a consent category** (`consentCategory`, `analytics` unless set): it is not loaded, and no hit is sent, until the visitor's decision grants that category. `strictlyNecessary` is not offered: no analytics platform is necessary for the site to work. Takes effect with `publishTenantConfig`, like the rest of the storefront configuration.
 
 |  |  |
@@ -4551,7 +4557,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | 200 |  | Saved |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 409 |  | Another row already holds this venueId and provider (analytics-provider-exists). |
+| 409 |  | Another row already holds this venueId and provider (analytics-provider-exists), found by the check or by a unique violation on analytics_provider_venue_id_provider_uniq. |
 | 422 |  | A measurementId that does not match the provider's format, or a venueId not among the tenant's active venues |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -4571,7 +4577,7 @@ Renders the branded maintenance screen with an expected-back time. Tenant-brande
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `whitelabel.content_page`, `whitelabel.module_enablement`, `whitelabel.tenant_config` |
+| Reads | `cache:idempotency`, `whitelabel.config_version`, `whitelabel.content_page`, `whitelabel.module_enablement`, `whitelabel.received_release`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency`, `whitelabel.tenant_config` |
 | Called by | CMS-001 |
 
@@ -4651,7 +4657,7 @@ Renders the branded maintenance screen with an expected-back time. Tenant-brande
 | whatsNew[].version | string | yes | The release version. |
 | whatsNew[].publishedAt | string (date-time) | yes | When the release reached the tenant's cell. |
 | whatsNew[].notes | LocalisedText | yes | Keyed by ISO 639-1 code. |
-| recentChanges | array of object |  | Staff only. |
+| recentChanges | array of object |  | Staff only. (max items 10) |
 | recentChanges[].area | string |  |  |
 | recentChanges[].description | string |  |  |
 | recentChanges[].principalId | string (uuid) |  |  |
@@ -5000,9 +5006,9 @@ The builder's checklist (decided 29 September, W12 and M24-05): the preset picke
 | items[].scheduledFor | string (date-time) |  | (nullable) |
 | items[].activationFailedAt | string (date-time) |  | When the scheduled activation of this version failed its validation again; null when it has not failed (R8 blocker IDENTITY-C63). (read-only; nullable) |
 | items[].activationFailure | string |  | Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63). (max length 2000; read-only; nullable) |
-| items[].contentHash | string |  |  |
+| items[].contentHash | string |  | The lowercase hex SHA-256 of the snapshot JSON as stored, the same rule as the kiosk snapshot's hash (ADAM CR-324, A1; CHG-CR324-001). |
 | items[].pendingBuildTimeChanges | array of object |  | Changes in this version that will not reach guests until the next store release. |
-| items[].pendingBuildTimeChanges[].area | string |  |  |
+| items[].pendingBuildTimeChanges[].area | string |  | appIcons, splash, fonts or features (ADAM CR-324, A1). |
 | items[].pendingBuildTimeChanges[].description | string |  |  |
 | items[].pendingBuildTimeChanges[].platforms | array of enum (ios, android, web) |  |  |
 | items[].snapshot | object |  | What this version contained. (read-only) |
@@ -5023,11 +5029,12 @@ The builder's checklist (decided 29 September, W12 and M24-05): the preset picke
 
 Validates, snapshots, versions and activates atomically: the draft is copied into the new version's `snapshot`, and that version becomes the one guests read. Guests receive the new configuration on next launch — no store release, because runtime configuration is deliberately separated from build-time.
 The response names any build-time change in the draft that will **not** reach guests until the next release. A tenant who changed their app icon and published should be told plainly that the icon has not shipped.
-**Booking flows are published here (decided 29 September, W12).** Each venue's enabled flows are copied into the snapshot with the rest of the draft; `getPublishedBookingFlow` reads them from the current version. An invalid enabled flow fails validation (409, `bookingFlowInvalid`).
+**Booking flows are published here (decided 29 September, W12).** Each venue's flows are copied into the snapshot with the rest of the draft, disabled flows included, because the snapshot is the whole draft (ADAM CR-324, A3); `getPublishedBookingFlow` reads them from the current version and uses only the enabled ones. An invalid enabled flow fails validation (409, `bookingFlowInvalid`).
 **Simulate, then a single publish by the permission holder; review only if the venue switches it on** (Chinmay, 2 October, workbook Q156; CHG-CSA-042). The simulate step is `createPreview`. With the tenant's publish-review policy off (the default), a `TENANT_PUBLISH` holder publishes in one step (201). With it on (`setPublishReviewPolicy`), the version is validated and snapshotted and an approval request is raised; the response is 202 with `reviewStatus` `pending`, and the version becomes current when a reviewer (never the author, where the policy says so) approves it.
-**Platform staff publish a hosted tenant's site** (Chinmay, 2 October, workbook Q144; R098; CHG-CSA-038) only under a platform-staff grant naming `TENANT_PUBLISH`, with step-up. A self-hosted tenant publishes first and then exports a site package (`exportSitePackage`, which needs a published version); both actions are always offered on CMS-014 and there is no hosting flag (r8 walk of ticket 27906; lead decision of 20 October 2026).
-**The server names the version** (ADAM CR-154, 18 October 2026; CHG-CRA-004). In the publish transaction it takes the next integer for the tenant (`1`, `2`, ...), as kiosk versions are numbered; that is the version's `version`, and the draft's `tenant_config.version` becomes the next label. `config_version` is unique on (`scope_path`, `version`) and has one current row per tenant (a partial unique index on `scope_path` where `is_current`), so a racing publish fails on the index and is retried with the next label.
+**Platform staff publish a hosted tenant's site** (Chinmay, 2 October, workbook Q144; R098; CHG-CSA-038) only under a platform-staff grant naming `TENANT_PUBLISH`, with step-up. **Until `identity.openPlatformStaffGrant` exists, only the tenant's own `TENANT_PUBLISH` holders publish** (ADAM CR-324, A3). A self-hosted tenant publishes first and then exports a site package (`exportSitePackage`, which needs a published version); both actions are always offered on CMS-014 and there is no hosting flag (r8 walk of ticket 27906; lead decision of 20 October 2026).
+**The server names the version** (ADAM CR-154, 18 October 2026; CHG-CRA-004). In the publish transaction it takes the next integer for the tenant (`1`, `2`, ...), as kiosk versions are numbered; that is the version's `version`, and the draft's `tenant_config.version` becomes the next label: after publishing `N` it is the text of `N+1` (after `3`, the draft is `4`; ADAM CR-324, A3). `config_version` is unique on (`scope_path`, `version`) and has one current row per tenant (a partial unique index on `scope_path` where `is_current`), so a racing publish fails on the index and is retried with the next label.
 **The review path** (CR-154; CHG-CRA-004). The tenant's publish-review policy decides: off, the version is current at once (201) and `whitelabel.contentPublished` goes out in the same transaction; on, this calls approvals' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, subject `whiteLabelPublication`, `subjectId` the `config_version` id), records its `approvalRequestId` and answers 202 with `reviewStatus` `pending`. White-label's consumer of `approval.granted` makes the version current (`reviewStatus` `approved`) and then emits `contentPublished`; its consumer of `approval.rejected` sets `reviewStatus` `rejected` and the version never becomes current. A scheduled publish emits it when the job makes the version current. **The event goes out when a version becomes current, never before.**
+**What the 201 writes and answers** (ADAM CR-324, option A, A1 to A3, 29 October 2026; CHG-CR324-001). `pendingBuildTimeChanges` and `contentHash` follow the rules on `ConfigVersion`; the `contentPublished` payload follows `events/whitelabel-contentPublished.yaml`. **Refused:** a validation with any `error` finding is 409 `config-validation-failed`, whose findings take `ConfigValidationReport`'s shape: every finding is listed, warnings too, and only errors block. A `scheduledFor` that is not in the future is 400 `validation` on `scheduledFor`, and nothing is snapshotted.
 
 |  |  |
 |---|---|
@@ -5038,7 +5045,7 @@ The response names any build-time change in the draft that will **not** reach gu
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `whitelabel.analytics_provider`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.config_version`, `whitelabel.content_page`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.homepage_layout`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_config`, `whitelabel.navigation_item`, `whitelabel.publish_review_policy`, `whitelabel.tenant_config` |
+| Reads | `cache:idempotency`, `whitelabel.analytics_provider`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.config_version`, `whitelabel.content_page`, `whitelabel.feature_toggle`, `whitelabel.footer_config`, `whitelabel.homepage_layout`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_config`, `whitelabel.navigation_item`, `whitelabel.policy`, `whitelabel.publish_review_policy`, `whitelabel.tenant_config` |
 | Writes | `approvals.request`, `cache:idempotency`, `platform.outbox`, `whitelabel.config_version`, `whitelabel.content_page` |
 | Called by | ADM-016, BO-843, CMS-014, CMS-103 |
 | State model | White-label content ([states/content.yaml](../../../states/content.yaml)): moves `draft` -> `published`, `archived` -> `published` |
@@ -5071,9 +5078,9 @@ The response names any build-time change in the draft that will **not** reach gu
 | scheduledFor | string (date-time) |  | (nullable) |
 | activationFailedAt | string (date-time) |  | When the scheduled activation of this version failed its validation again; null when it has not failed (R8 blocker IDENTITY-C63). (read-only; nullable) |
 | activationFailure | string |  | Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63). (max length 2000; read-only; nullable) |
-| contentHash | string |  |  |
+| contentHash | string |  | The lowercase hex SHA-256 of the snapshot JSON as stored, the same rule as the kiosk snapshot's hash (ADAM CR-324, A1; CHG-CR324-001). |
 | pendingBuildTimeChanges | array of object |  | Changes in this version that will not reach guests until the next store release. |
-| pendingBuildTimeChanges[].area | string |  |  |
+| pendingBuildTimeChanges[].area | string |  | appIcons, splash, fonts or features (ADAM CR-324, A1). |
 | pendingBuildTimeChanges[].description | string |  |  |
 | pendingBuildTimeChanges[].platforms | array of enum (ios, android, web) |  |  |
 | snapshot | object |  | What this version contained. (read-only) |
@@ -5085,7 +5092,8 @@ The response names any build-time change in the draft that will **not** reach gu
 |---|---|---|
 | 201 |  | Published |
 | 202 |  | Submitted for review; the venue's publish-review policy is on (CHG-CSA-042). |
-| 409 |  | Validation failed. |
+| 400 |  | scheduledFor is not in the future (validation, naming scheduledFor; ADAM CR-324, A3). |
+| 409 |  | Validation failed (config-validation-failed; ADAM CR-324, A3). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### restoreConfigVersion
@@ -5150,7 +5158,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | appIcons.derived[].assetRef | string (uuid) |  |  |
 | appIcons.changeScope | object | yes | Always buildTime — icons are baked into the binary. (read-only) |
 | appIcons.liveVersion | string |  | Icon currently shipped. (read-only; nullable) |
-| appIcons.requiresRebuild | boolean |  | True while the draft's source differs from the icon in liveVersion. (read-only) |
+| appIcons.requiresRebuild | boolean |  | True while the draft's source differs from the icon in liveVersion, that is when the released version's snapshot appIcons.sourceAssetRef differs from the draft's sourceAssetRef; true when nothing is… (read-only) |
 | bookingFlow | BookingFlowConfig |  | Set per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11). |
 | bookingFlow.preset | enum (auto, ticketBox, playCentre, venueSite, marketplace, singleEvent, season, custom) |  | L1 Ticket box … L6 Season. (default auto) |
 | bookingFlow.stepIndicator | enum (bar, numbered, dots, segmented, breadcrumb, pills, ticks, none) |  | (default bar) |
@@ -5477,6 +5485,7 @@ Records the preset and which steps are done, skipped or in progress, so the buil
 
 Run before publishing. Reports missing translations, navigation pointing at disabled modules, unset required assets, contrast failures, and policies without a current version.
 **And the booking flows (decided 29 September, W12):** an enabled flow that fails `validateBookingFlow` is `bookingFlowInvalid`; a venue with bookable products and no flow serving their kind is `bookingFlowMissing`.
+**What each kind checks** (ADAM CR-320, option A, both parts, 29 October 2026; CHG-CR320-001): the rule of every kind is on `ConfigFindingKind`, and `publishTenantConfig` runs the same rules. To decide them this reads the draft's own tables (`x-ticvai-reads`) and asks, as `publishTenantConfig` and `getModuleEnablement` / `setModuleEnablement` ask them: `catalogue#productRecords` and `tenancy#activeVenues` (`bookingFlowMissing`), `assets#mediaAssetRecords` (`missingRequiredAsset`), and `subscription#contractRecords`, `subscription#licenceAddOnRecords` and `subscription#planRecords`, which give the tenant's `LicencePosition.licensedModules` (`unlicensedModuleEnabled`).
 
 |  |  |
 |---|---|
@@ -5486,7 +5495,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.content_page`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_config`, `whitelabel.navigation_item`, `whitelabel.publish_review_policy`, `whitelabel.tenant_config` |
+| Reads | `cache:idempotency`, `whitelabel.booking_flow`, `whitelabel.booking_flow_step`, `whitelabel.content_page`, `whitelabel.homepage_layout`, `whitelabel.homepage_section`, `whitelabel.module_enablement`, `whitelabel.navigation_config`, `whitelabel.navigation_item`, `whitelabel.policy`, `whitelabel.publish_review_policy`, `whitelabel.tenant_config` |
 | Writes | `cache:idempotency` |
 | Called by | CMS-012, CMS-014, CMS-102 |
 
@@ -6642,7 +6651,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scheduled_for | timestamptz | no |  |
 | activation_failed_at | timestamptz | no | When the scheduled activation of this version failed its validation again; null when it has not failed (R8 blocker IDENTITY-C63). |
 | activation_failure | text | no | Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63). |
-| content_hash | text | no |  |
+| content_hash | text | no | The lowercase hex SHA-256 of the snapshot JSON as stored, the same rule as the kiosk snapshot's hash (ADAM CR-324, A1; CHG-CR324-001). |
 | pending_build_time_changes | jsonb | no | Changes in this version that will not reach guests until the next store release. |
 | snapshot | jsonb | no | What this version contained. |
 | scope_path | text | no | The partition key (ADR-0005). |
@@ -6908,6 +6917,17 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no | The partition key (ADR-0005). |
 | id | uuid | yes | Synthesised key. |
 
+### `whitelabel.received_release`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| release_id | uuid | yes | The release received (platform-ops.Release.id). |
+| version | text | yes | The release version (platform-ops.Release.version). |
+| guest_release_notes | jsonb | no | The release's guestReleaseNotes as received; null where the release has none, and then whatsNew skips it. |
+| received_at | timestamptz | yes | When the tenant's database took the release. |
+| scope_path | text | no | The partition key (ADR-0005). |
+
 ### `whitelabel.site_package`
 
 | Column | Type | Required | Notes |
@@ -6947,7 +6967,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | app_identifier | text | yes | The bundle id (Apple) or application id (Google) the app is signed with. |
 | api_credential_secret_ref | text | no | App Store Connect API key or Play service-account key. |
 | has_api_credential | boolean | no |  |
-| pass_type_identifier | text | no | The Apple Wallet Pass Type ID (pass.<reverse-domain>), registered in the client's own Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033). |
+| pass_type_identifier | text | no | The Apple Wallet Pass Type ID (pass.<reverse-domain>), registered in the client's own Apple Developer account (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033), one per tenant (… |
 | pass_certificate_secret_ref | text | no | The Pass Type ID certificate, from the client's Apple Developer account. |
 | has_pass_certificate | boolean | no |  |
 | pass_certificate_expires_at | timestamptz | no | When the pass certificate expires, read from the certificate when it is stored (CHG-R6-033). |

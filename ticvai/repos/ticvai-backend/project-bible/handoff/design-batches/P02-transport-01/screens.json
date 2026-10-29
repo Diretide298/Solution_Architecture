@@ -416,7 +416,10 @@
     "operationId": "addCartLine",
     "contract": "orders",
     "purpose": "Add the trip or pass to the basket (`attributes.transport`)",
-    "trigger": "onAction"
+    "trigger": "onAction",
+    "inputSources": {
+     "variantId": "getTransportFareTable.catalogueVariantId"
+    }
    },
    {
     "operationId": "saveFavouriteRoute",
@@ -641,7 +644,10 @@
     "operationId": "addCartLine",
     "contract": "orders",
     "purpose": "Add the trip or pass to the basket (`attributes.transport`)",
-    "trigger": "onAction"
+    "trigger": "onAction",
+    "inputSources": {
+     "variantId": "listTransportPassOffers.variantId"
+    }
    }
   ],
   "entryState": {

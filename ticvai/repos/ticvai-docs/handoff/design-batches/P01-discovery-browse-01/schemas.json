@@ -93,13 +93,14 @@
     "type": "string",
     "nullable": true,
     "readOnly": true,
-    "description": "Icon currently shipped. Differs from the draft until the next release."
+    "x-ticvai-derived": "onRead",
+    "description": "Icon currently shipped. Differs from the draft until the next release. **Where it comes from** (ADAM CR-325, option A, 29 October 2026; CHG-CR325-001): the `ConfigVersion.version` (`configVersion`) of the newest `whitelabel.app_build` (latest `requestedAt`) with `status` `released`, on either platform; its icon is that version's `snapshot` `appIcons.sourceAssetRef` (`whitelabel.config_version`). Null while no build is released."
    },
    "requiresRebuild": {
     "type": "boolean",
     "readOnly": true,
     "x-ticvai-derived": "onRead",
-    "description": "True while the draft's source differs from the icon in `liveVersion`."
+    "description": "True while the draft's source differs from the icon in `liveVersion`, that is when the released version's `snapshot` `appIcons.sourceAssetRef` differs from the draft's `sourceAssetRef`; true when nothing is released (`liveVersion` null) (ADAM CR-325, option A; CHG-CR325-001)."
    }
   }
  },
@@ -433,6 +434,7 @@
   ]
  },
  "CookieBannerPreferenceCenterDesignerView": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "marketing.cookie_banner_design",
   "description": "One version of a cookie banner and preference-centre design (pack 17.1.6).",
@@ -616,7 +618,8 @@
    "noticeVersion": {
     "type": "string",
     "readOnly": true,
-    "description": "Moves with the cookie policy (white-label `setPolicy`, kind `cookie`)."
+    "nullable": true,
+    "description": "Moves with the cookie policy (white-label `setPolicy`, kind `cookie`). **Null on a draft**; `approvePrivacyTesting` sets it when it publishes the version (ADAM CR-314)."
    },
    "version": {
     "type": "integer",
@@ -1343,6 +1346,21 @@
     }
    }
   }
+ },
+ "GuestAppSkinKey": {
+  "type": "string",
+  "enum": [
+   "park",
+   "water",
+   "stadium",
+   "theatre",
+   "dining",
+   "kids",
+   "museum",
+   "rooms",
+   "transport"
+  ],
+  "description": "The guest app's skins per venue kind, as the approved Mobile App v4 design draws them (`handoff/design-tokens/guest-app.yaml` `skins.byVenueKind`; ADAM CR-280, CHG-R11TEN-007)."
  },
  "GuestListing": {
   "type": "string",
@@ -2548,6 +2566,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
+    "x-ticvai-references": "catalogue.event",
     "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
    },
    "createdAt": {
@@ -3079,7 +3098,7 @@
     "type": "object",
     "readOnly": true,
     "additionalProperties": false,
-    "description": "**What the guest sign-in buttons need before anyone is signed in** (r8, IDENTITY-C21): the public client ids of the tenant's enabled social and UAE PASS providers, derived on read from Identity's provider rows (no stored column, nothing secret). A provider the tenant has not enabled is absent, and its button is not drawn.",
+    "description": "**What the guest sign-in buttons need before anyone is signed in** (r8, IDENTITY-C21): the public client ids of the tenant's enabled social and UAE PASS providers, derived on read from Identity's provider rows (no stored column, nothing secret). A provider the tenant has not enabled is absent, and its button is not drawn. **Read through `identity#guestSignInProviders`, in process** (ADAM CR-327, part (1), Chinmay, 29 October 2026: \"Kind column on sso_provider\"; CHG-CR327-001; XDR-021): the tenant's active `identity.sso_provider` rows with `audience` `guest`, each under its `guestProvider` key.",
     "properties": {
      "apple": {
       "type": "object",
@@ -3105,7 +3124,8 @@
       "properties": {
        "authorizationUrl": {
         "type": "string",
-        "format": "uri"
+        "format": "uri",
+        "description": "The guest uaePass row's identity.sso_provider.authorization_url, through identity#guestSignInProviders (CHG-CR327-002)."
        },
        "clientId": {
         "type": "string"
@@ -3123,7 +3143,7 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "x-ticvai-derived": "onRead",
-    "description": "**How any guest screen turns an asset id into a picture** (r8 walk of ticket 28156; lead decision of 20 October 2026, option A). The address of a published asset is `assetsBaseUrl` + `/` + the asset id + `/` + a rendition name, for example `{assetsBaseUrl}/{assetId}/card.webp`. The renditions are `thumb`, `card`, `hero` and `original`. Every media object in every guest response carries an asset id and nothing else, so no screen makes a media call per tile. Only public assets referenced by a published version are served at it. `brandUrls` and the banner addresses below are this rule worked out for you."
+    "description": "**How any guest screen turns an asset id into a picture** (r8 walk of ticket 28156; lead decision of 20 October 2026, option A). The address of a published asset is `assetsBaseUrl` + `/` + the asset id + `/` + a rendition name, for example `{assetsBaseUrl}/{assetId}/card.webp`. The renditions are `thumb`, `card`, `hero` and `original`. Every media object in every guest response carries an asset id and nothing else, so no screen makes a media call per tile. Only public assets referenced by a published version are served at it. `brandUrls` and the banner addresses below are this rule worked out for you.\n\n**Where it comes from** (ADAM CR-327, option A (3), 29 October 2026; CHG-CR327-001): a per-cell setting (`Assets:PublicBaseUrl`), empty until the storage adapter is chosen; the field is left out of the response while it is empty."
    },
    "brandUrls": {
     "type": "object",
@@ -3171,6 +3191,18 @@
    "fonts": {
     "$ref": "#/components/schemas/FontConfig"
    },
+   "skinKey": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/GuestAppSkinKey"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "x-ticvai-derived": "onRead",
+    "description": "**The asked venue's guest app skin** (ADAM CR-280, option B, 28 October 2026, additive; CHG-R11TEN-007): the published `theme.venueSkins` entry for `venueId`. Null without `venueId`, or where the venue has no entry; the shell then uses the base skin with `park`. **How the shell applies it**: the skin sets every token, then `theme` overrides `--br` (`primaryColour`), `--bg` (`backgroundColour`) and `--ink` (`textColour`) where set; `textColour` is never derived (Theme requires it), and `theme.darkMode` is never used to render. `fonts` replace the skin's faces (`--fh`, `--fb`), with the Arabic pair (`primaryArabic`, `secondaryArabic`) under `dir=rtl`. `--rk` scales the base radii (sm 6, md 10, lg 16, in px) by `theme.cornerRadius / 10`."
+   },
    "header": {
     "$ref": "#/components/schemas/HeaderConfig"
    },
@@ -3188,7 +3220,7 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "x-ticvai-derived": "onRead",
-    "description": "**The hero and other banners a guest sees now** (r8 walk of ticket 28335): the banners in the published version whose state is `active` at the time of the read, by `sortOrder`. Draft, scheduled and expired banners are never returned. `imageUrl` is the resolved address of `imageAssetRef`. Staff read all banners with `listBanners`, which is unchanged.",
+    "description": "**The hero and other banners a guest sees now** (r8 walk of ticket 28335): the banners whose state is `active` at the time of the read, by `sortOrder`. Draft, scheduled and expired banners are never returned. `imageUrl` is the resolved address of `imageAssetRef`. Staff read all banners with `listBanners`, which is unchanged. **Read live from `whitelabel.banner`** (ADAM CR-327, option A (2), 29 October 2026; CHG-CR327-001), not from the published version's snapshot: the rows whose state is `active` now, at the tenant root or at the picked venue (`venueId`), so a scheduled banner going live needs no republish.",
     "items": {
      "$ref": "#/components/schemas/PublishedBanner"
     }
@@ -3198,7 +3230,7 @@
     "readOnly": true,
     "x-ticvai-persisted": false,
     "x-ticvai-derived": "onRead",
-    "description": "The promo blocks in the published version that are `active` at the time of the read, by `sortOrder`, with the same rule as `banners`.",
+    "description": "The promo blocks that are `active` at the time of the read, by `sortOrder`, with the same rule as `banners`. **Read live from `whitelabel.promo_block`** (ADAM CR-327, option A (2); CHG-CR327-001), at the tenant root or at the picked venue (`venueId`).",
     "items": {
      "$ref": "#/components/schemas/PublishedPromoBlock"
     }
@@ -3275,7 +3307,7 @@
    "paymentTokenisation": {
     "type": "object",
     "nullable": true,
-    "description": "**The provider the guest app tokenises cards with** (4 October 2026, CHG-FXC-010; GST-071): the `providerId` `storePaymentToken` requires, its kind and the publishable key the client SDK needs. Never a secret. Null where no provider with tokenisation is connected.",
+    "description": "**The provider the guest app tokenises cards with** (4 October 2026, CHG-FXC-010; GST-071): the `providerId` `storePaymentToken` requires, its kind and the publishable key the client SDK needs. Never a secret. Null where no provider with tokenisation is connected. **Left out of the response until service sign-in between deployables is built** (#37051, CR-281; ADAM CR-327, option A (4), 29 October 2026; CHG-CR327-001): its read, payments#providerConnectionRecords, takes the service route, and a null would say wrongly that no provider is connected.",
     "required": [
      "providerId",
      "providerKind"
@@ -3399,7 +3431,7 @@
     "type": "array",
     "maxItems": 200,
     "x-ticvai-derived": "onRead",
-    "description": "**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **Published only**: a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published `ConfigVersion`; a venue added or reactivated since the last publish appears after the next publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.\n",
+    "description": "**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **The active venues, on every read** (ADAM CR-338, venues (a), 29 October 2026; CHG-CR338-001): a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`), as `TenantConfig.venues` lists them, so `getTenantConfig` and this agree. Ordered by `name`. Empty when nothing is published.\n",
     "items": {
      "type": "object",
      "required": [
@@ -3430,12 +3462,12 @@
        "type": "string",
        "maxLength": 120,
        "nullable": true,
-       "description": "Shown under the name so two venues with similar names can be told apart."
+       "description": "Shown under the name so two venues with similar names can be told apart. The venue's `VenueSettings.city` (`platform.venue_settings.city`), read through `venueSettingsRecords` (ADAM CR-338, city and openingHoursToday (a); CHG-CR338-001). Null when it is not set."
       },
       "openingHoursToday": {
        "type": "object",
        "nullable": true,
-       "description": "Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set.",
+       "description": "Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set. Today's weekday entry of `VenueSettings.openingHours` (`platform.venue_settings.opening_hours`, jsonb by weekday), read through `venueSettingsRecords`; today is the date in the venue's region time zone (`RegionSettings.timeZone`, `regionSettingsRecords`) (ADAM CR-338, city and openingHoursToday (a); CHG-CR338-001).",
        "properties": {
         "opens": {
          "type": "string",
@@ -3454,7 +3486,7 @@
     "type": "array",
     "maxItems": 10,
     "x-ticvai-derived": "onRead",
-    "description": "**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session.\n",
+    "description": "**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session. **Read from the tenant-side copy** (ADAM CR-338, whatsNew (a), 29 October 2026; CHG-CR338-001): `whitelabel.received_release` (`ReceivedRelease`), in the tenant's own database, so a public, cacheable read never crosses to the control plane; newest `receivedAt` first.\n",
     "items": {
      "type": "object",
      "required": [
@@ -3480,7 +3512,9 @@
    },
    "recentChanges": {
     "type": "array",
-    "description": "Staff only. Names the principal behind each change, so it never reaches a public response.",
+    "maxItems": 10,
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. Names the principal behind each change, so it never reaches a public response. **Derived from `whitelabel.config_version`** (ADAM CR-338, recentChanges (a), 29 October 2026; CHG-CR338-001): one item per version, `area` `publish`, `description` the version's `note`, `principalId` its `published_by_principal_id`, `at` its `published_at`; newest first, at most 10. No new storage.",
     "items": {
      "type": "object",
      "properties": {
@@ -3621,6 +3655,28 @@
     ],
     "default": "solid",
     "description": "Button shape (decided 29 September, rev 3 CFG-3)."
+   },
+   "venueSkins": {
+    "type": "array",
+    "default": [],
+    "description": "**The guest app skin each venue takes** (ADAM CR-280, option B, 28 October 2026; CHG-R11TEN-007): one entry per venue, naming one of the approved app design's skins (`handoff/design-tokens/guest-app.yaml`, `skins.byVenueKind`). A venue with no entry has none set, and the guest app shell then uses the base skin with `park`. `getPublishedTenantConfig` answers the asked venue's entry as `skinKey`.",
+    "items": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "venueId",
+      "skinKey"
+     ],
+     "properties": {
+      "venueId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "skinKey": {
+       "$ref": "#/components/schemas/GuestAppSkinKey"
+      }
+     }
+    }
    },
    "componentColours": {
     "type": "object",
@@ -4609,18 +4665,27 @@
  },
  "VisitPlannerOptions": {
   "type": "object",
-  "x-ticvai-persistence": "none — assembled on read from venuemap.visit_plan_preset, the published points and Promotions' bundles",
+  "x-ticvai-persistence": "none — assembled on read from venuemap.visit_plan_preset, venuemap.visit_planner_question, the published points and Promotions' bundles",
   "description": "**What the visit planner offers at one venue** (`getVisitPlannerOptions`; R8 blocker GPS-C21).",
   "required": [
    "venueId",
    "presets",
    "interestTags",
-   "fastTrackBundles"
+   "fastTrackBundles",
+   "questions"
   ],
   "properties": {
    "venueId": {
     "type": "string",
     "format": "uuid"
+   },
+   "questions": {
+    "type": "array",
+    "maxItems": 8,
+    "description": "**The questions the planner asks at this venue, and how** (ADAM CR-321, option A, decided 29 October 2026): all eight `VisitPlannerQuestionKey` questions, each as the venue set it up (`venuemap.visit_planner_question`) or at its default, ordered by `sortOrder` then the default order. GST-051 and WEB-050 ask the ones with `isEnabled` true, in this order, with this `label` (in the caller's locale where the venue gave one) and `help`, and hold the guest on a question with `isRequired` true until it is answered. A venue that set nothing gets the questions the screen records draw, in their order. Read on load with the rest of the options: no new guest call.\n",
+    "items": {
+     "$ref": "#/components/schemas/VisitPlannerQuestion"
+    }
    },
    "presets": {
     "type": "array",
@@ -4732,6 +4797,82 @@
       }
      }
     }
+   }
+  }
+ },
+ "VisitPlannerQuestion": {
+  "type": "object",
+  "x-ticvai-persistence": "venuemap.visit_planner_question",
+  "x-ticvai-primary-key": [
+   "scopePath",
+   "questionKey"
+  ],
+  "description": "**How one venue asks one of the planner's questions** (ADAM CR-321, option A, decided 29 October 2026: a closed list of questions the rules planner understands, switched on, ordered, relabelled and made required per venue). **Per venue, not per event or product**: the planner plans a venue, and the set-up of the plan's `venueId` (the venue the guest picked) is the one asked, in a multi-venue plan too. A venue keeps a row only for a question it has changed; a question with no row takes its default:\n\n| `questionKey` | `sortOrder` | default `label` | `isRequired` |\n| --- | --- | --- | --- |\n| `party` | 0 | Adults and children | true, always |\n| `heights` | 1 | How tall are the children? | false |\n| `dates` | 2 | Which days are you visiting? | true, always |\n| `dayVenues` | 3 | Which park each day? | false |\n| `pace` | 4 | How busy should each day be? | false |\n| `interests` | 5 | What are you most interested in? | false |\n| `retail` | 6 | Any shops you'd like to visit? | false |\n| `cuisine` | 7 | What would you like for lunch? | false |\n\nEvery default question is on (`isEnabled` true). So a venue that sets nothing asks exactly the questions the screen records draw. **`party` and `dates` stay on and required**: the planner cannot lay out a plan without them, and `setVisitPlannerQuestions` refuses a body that switches either off or makes it optional (422 `planner-question-fixed`). The screens keep their own conditions on top of the set-up: `heights` is skipped when no children are coming, `dayVenues` is shown only in a multi-venue tenant, and `retail` only when `shopping` is an interest.\n",
+  "required": [
+   "questionKey",
+   "isEnabled",
+   "isRequired",
+   "sortOrder",
+   "label"
+  ],
+  "properties": {
+   "questionKey": {
+    "$ref": "#/components/schemas/VisitPlannerQuestionKey"
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "Whether the guest is asked it. A question switched off is not shown; `generateVisitPlan` still plans with an answer a request carries for it."
+   },
+   "isRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "Whether the guest must answer it before the plan is made. The screens hold the guest on the question until it is answered, and `generateVisitPlan` refuses a request that leaves a required answer out (422 `planner-answer-missing`)."
+   },
+   "sortOrder": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "The order the screens ask the enabled questions in, lowest first; a tie keeps the default order."
+   },
+   "label": {
+    "type": "string",
+    "maxLength": 120,
+    "description": "The question as the guest reads it, in the venue's default language. On a read, the venue's own wording where it set one, else the default above."
+   },
+   "labelLocalised": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 120
+    },
+    "description": "The label per locale; a read answers in the caller's locale where the row has one."
+   },
+   "help": {
+    "type": "string",
+    "maxLength": 300,
+    "nullable": true,
+    "description": "A line under the question (for example why heights are asked); null shows none."
+   },
+   "helpLocalised": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 300
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005): the venue the set-up belongs to."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the venue last changed the question; null for a question still at its default."
    }
   }
  },

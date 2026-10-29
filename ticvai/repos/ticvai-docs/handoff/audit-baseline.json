@@ -285,18 +285,10 @@
     "guestUaePassLogin:whitelabel.custom_domain"
    ],
    "XR-FOUNDATION": [
-    "exportSubjectData:marketing.consent_record",
-    "exportSubjectData:marketing.form_submission",
-    "exportSubjectData:marketing.guest_document",
-    "exportSubjectData:marketing.guest_profile",
     "linkGuestCheckout:orders.sales_order",
     "submitGuestIdentityDocument:assets.media_asset"
    ],
    "XR-UNCOVERED": [
-    "exportSubjectData:marketing.consent_record",
-    "exportSubjectData:marketing.form_submission",
-    "exportSubjectData:marketing.guest_document",
-    "exportSubjectData:marketing.guest_profile",
     "linkGuestCheckout:orders.sales_order",
     "submitGuestIdentityDocument:assets.media_asset"
    ]
@@ -320,40 +312,6 @@
     "why": "CR-096: the read routes class reaches these operations in the next class release",
     "on": "2026-10-18"
    },
-   "XR-FOUNDATION|exportSubjectData:marketing.consent_record": {
-    "tickets": [
-     27677,
-     30526,
-     30711
-    ],
-    "why": "CR-096: the read routes class reaches these operations in the next class release",
-    "on": "2026-10-20"
-   },
-   "XR-FOUNDATION|exportSubjectData:marketing.form_submission": {
-    "tickets": [
-     27677,
-     30536
-    ],
-    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
-    "on": "2026-10-18"
-   },
-   "XR-FOUNDATION|exportSubjectData:marketing.guest_document": {
-    "tickets": [
-     27677,
-     30538
-    ],
-    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
-    "on": "2026-10-18"
-   },
-   "XR-FOUNDATION|exportSubjectData:marketing.guest_profile": {
-    "tickets": [
-     27677,
-     30540,
-     30711
-    ],
-    "why": "CR-096: the read routes class reaches these operations in the next class release",
-    "on": "2026-10-20"
-   },
    "XR-FOUNDATION|linkGuestCheckout:orders.sales_order": {
     "tickets": [
      27675,
@@ -374,40 +332,6 @@
     ],
     "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
     "on": "2026-10-18"
-   },
-   "XR-UNCOVERED|exportSubjectData:marketing.consent_record": {
-    "tickets": [
-     27677,
-     30526,
-     30711
-    ],
-    "why": "CR-096: the read routes class reaches these operations in the next class release",
-    "on": "2026-10-20"
-   },
-   "XR-UNCOVERED|exportSubjectData:marketing.form_submission": {
-    "tickets": [
-     27677,
-     30536
-    ],
-    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
-    "on": "2026-10-18"
-   },
-   "XR-UNCOVERED|exportSubjectData:marketing.guest_document": {
-    "tickets": [
-     27677,
-     30538
-    ],
-    "why": "CR-096: the read routes class fix adds the read routes (fix/read-routes)",
-    "on": "2026-10-18"
-   },
-   "XR-UNCOVERED|exportSubjectData:marketing.guest_profile": {
-    "tickets": [
-     27677,
-     30540,
-     30711
-    ],
-    "why": "CR-096: the read routes class reaches these operations in the next class release",
-    "on": "2026-10-20"
    },
    "XR-UNCOVERED|linkGuestCheckout:orders.sales_order": {
     "tickets": [

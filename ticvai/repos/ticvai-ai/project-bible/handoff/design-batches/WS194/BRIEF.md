@@ -145,7 +145,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1169` | Breakage & Revenue Recognition Policy | C | 0 | 6 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1170` | Wallet Financial Period & Closing Controls | C | 18 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1171` | Wallet Analytics & Management Reporting | C | 0 | 34 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1172` | Finance Validation, Reporting & Audit Center | C | 0 | 10 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-1172` | Finance Validation, Reporting & Audit Center | C | 1 | 10 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

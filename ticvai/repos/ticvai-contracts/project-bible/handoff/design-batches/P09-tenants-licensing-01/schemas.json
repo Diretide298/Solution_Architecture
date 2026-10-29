@@ -1635,8 +1635,7 @@
    },
    "groupMappings": {
     "type": "array",
-    "minItems": 1,
-    "description": "**A group with no mapping grants nothing.** No default role, ever — otherwise the identity provider becomes a way to mint access nobody configured.\n",
+    "description": "**A group with no mapping grants nothing.** No default role, ever — otherwise the identity provider becomes a way to mint access nobody configured. **At least one for an `audience` `staff` row; none for a `guest` row** (r11, CHG-CR327-002): a guest provider grants no staff role, so `setSsoConfig` refuses `400` `validation` a staff row with no mapping and a guest row with any.\n",
     "items": {
      "$ref": "#/components/schemas/SsoGroupMapping"
     }
@@ -1685,6 +1684,32 @@
    },
    "isActive": {
     "type": "boolean"
+   },
+   "audience": {
+    "type": "string",
+    "enum": [
+     "staff",
+     "guest"
+    ],
+    "default": "staff",
+    "description": "**Who signs in through this provider** (ADAM CR-327, part (1), Chinmay, 29 October 2026: \"Kind column on sso_provider\"; CHG-CR327-001). `staff`, the default, is enterprise SSO for staff and partners (`listSsoProviders`, `startSsoAuthorization`); `guest` is a guest sign-in provider, named by `guestProvider`, used only by `guestSocialLogin` and `guestUaePassLogin` and listed to guests by White-label's `getPublishedTenantConfig.guestSignIn`."
+   },
+   "guestProvider": {
+    "type": "string",
+    "enum": [
+     "apple",
+     "google",
+     "uaePass"
+    ],
+    "nullable": true,
+    "description": "Which guest provider a `guest` row is (ADAM CR-327, part (1); CHG-CR327-001); null for `staff`. `guestSocialLogin` and `guestUaePassLogin` pick their row by `audience` `guest` and this."
+   },
+   "authorizationUrl": {
+    "type": "string",
+    "format": "uri",
+    "maxLength": 2000,
+    "nullable": true,
+    "description": "**Where a guest app sends the guest to sign in** (r11, CHG-CR327-002; the lead, 29 October 2026: \"Get those 2 gaps sorted as well\"): the provider's authorization endpoint for this tenant's client. Required for a `guest` `uaePass` row (`setSsoConfig` refuses `400` `validation` one without it), optional for `apple` and `google`, null for `staff` (a staff start is built by `startSsoAuthorization`). Stored, not read from `metadataUrl` at sign-in, so the published config, a public cacheable read, never calls out to the provider."
    }
   }
  },

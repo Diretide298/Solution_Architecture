@@ -53,6 +53,7 @@ operations:
   writes:
   - assets.guest_upload
   - cache:idempotency
+  - platform.outbox
 - operation: completeUpload
   verb: POST
   path: /media/uploads/{uploadId}/complete
@@ -141,6 +142,7 @@ operations:
   offline: false
   reads:
   - assets.media_asset
+  - assets.media_collection
   - assets.media_usage
   - cache:idempotency
   writes:
@@ -283,6 +285,7 @@ operations:
   - staff
   offline: false
   reads:
+  - assets.asset_version
   - assets.media_asset
   - assets.media_upload
   - assets.media_usage

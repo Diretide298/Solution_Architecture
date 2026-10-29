@@ -1693,7 +1693,7 @@
   }
  },
  "FormSubmission": {
-  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-rls": "grant-holder-write",
   "type": "object",
   "x-ticvai-persistence": "marketing.form_submission",
   "description": "**The acceptance record, and it is evidence.** Bound to the exact version accepted, with who accepted it and when.\n",
@@ -3401,6 +3401,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
+    "x-ticvai-references": "catalogue.event",
     "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
    },
    "createdAt": {
@@ -4216,7 +4217,7 @@
     "type": "array",
     "maxItems": 200,
     "x-ticvai-derived": "onRead",
-    "description": "**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **Published only**: a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published `ConfigVersion`; a venue added or reactivated since the last publish appears after the next publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.\n",
+    "description": "**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **The active venues, on every read** (ADAM CR-338, venues (a), 29 October 2026; CHG-CR338-001): a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`), as `TenantConfig.venues` lists them, so `getTenantConfig` and this agree. Ordered by `name`. Empty when nothing is published.\n",
     "items": {
      "type": "object",
      "required": [
@@ -4247,12 +4248,12 @@
        "type": "string",
        "maxLength": 120,
        "nullable": true,
-       "description": "Shown under the name so two venues with similar names can be told apart."
+       "description": "Shown under the name so two venues with similar names can be told apart. The venue's `VenueSettings.city` (`platform.venue_settings.city`), read through `venueSettingsRecords` (ADAM CR-338, city and openingHoursToday (a); CHG-CR338-001). Null when it is not set."
       },
       "openingHoursToday": {
        "type": "object",
        "nullable": true,
-       "description": "Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set.",
+       "description": "Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set. Today's weekday entry of `VenueSettings.openingHours` (`platform.venue_settings.opening_hours`, jsonb by weekday), read through `venueSettingsRecords`; today is the date in the venue's region time zone (`RegionSettings.timeZone`, `regionSettingsRecords`) (ADAM CR-338, city and openingHoursToday (a); CHG-CR338-001).",
        "properties": {
         "opens": {
          "type": "string",
@@ -4271,7 +4272,7 @@
     "type": "array",
     "maxItems": 10,
     "x-ticvai-derived": "onRead",
-    "description": "**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session.\n",
+    "description": "**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session. **Read from the tenant-side copy** (ADAM CR-338, whatsNew (a), 29 October 2026; CHG-CR338-001): `whitelabel.received_release` (`ReceivedRelease`), in the tenant's own database, so a public, cacheable read never crosses to the control plane; newest `receivedAt` first.\n",
     "items": {
      "type": "object",
      "required": [
@@ -4297,7 +4298,9 @@
    },
    "recentChanges": {
     "type": "array",
-    "description": "Staff only. Names the principal behind each change, so it never reaches a public response.",
+    "maxItems": 10,
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. Names the principal behind each change, so it never reaches a public response. **Derived from `whitelabel.config_version`** (ADAM CR-338, recentChanges (a), 29 October 2026; CHG-CR338-001): one item per version, `area` `publish`, `description` the version's `note`, `principalId` its `published_by_principal_id`, `at` its `published_at`; newest first, at most 10. No new storage.",
     "items": {
      "type": "object",
      "properties": {
@@ -5272,18 +5275,27 @@
  },
  "VisitPlannerOptions": {
   "type": "object",
-  "x-ticvai-persistence": "none — assembled on read from venuemap.visit_plan_preset, the published points and Promotions' bundles",
+  "x-ticvai-persistence": "none — assembled on read from venuemap.visit_plan_preset, venuemap.visit_planner_question, the published points and Promotions' bundles",
   "description": "**What the visit planner offers at one venue** (`getVisitPlannerOptions`; R8 blocker GPS-C21).",
   "required": [
    "venueId",
    "presets",
    "interestTags",
-   "fastTrackBundles"
+   "fastTrackBundles",
+   "questions"
   ],
   "properties": {
    "venueId": {
     "type": "string",
     "format": "uuid"
+   },
+   "questions": {
+    "type": "array",
+    "maxItems": 8,
+    "description": "**The questions the planner asks at this venue, and how** (ADAM CR-321, option A, decided 29 October 2026): all eight `VisitPlannerQuestionKey` questions, each as the venue set it up (`venuemap.visit_planner_question`) or at its default, ordered by `sortOrder` then the default order. GST-051 and WEB-050 ask the ones with `isEnabled` true, in this order, with this `label` (in the caller's locale where the venue gave one) and `help`, and hold the guest on a question with `isRequired` true until it is answered. A venue that set nothing gets the questions the screen records draw, in their order. Read on load with the rest of the options: no new guest call.\n",
+    "items": {
+     "$ref": "#/components/schemas/VisitPlannerQuestion"
+    }
    },
    "presets": {
     "type": "array",
@@ -5395,6 +5407,82 @@
       }
      }
     }
+   }
+  }
+ },
+ "VisitPlannerQuestion": {
+  "type": "object",
+  "x-ticvai-persistence": "venuemap.visit_planner_question",
+  "x-ticvai-primary-key": [
+   "scopePath",
+   "questionKey"
+  ],
+  "description": "**How one venue asks one of the planner's questions** (ADAM CR-321, option A, decided 29 October 2026: a closed list of questions the rules planner understands, switched on, ordered, relabelled and made required per venue). **Per venue, not per event or product**: the planner plans a venue, and the set-up of the plan's `venueId` (the venue the guest picked) is the one asked, in a multi-venue plan too. A venue keeps a row only for a question it has changed; a question with no row takes its default:\n\n| `questionKey` | `sortOrder` | default `label` | `isRequired` |\n| --- | --- | --- | --- |\n| `party` | 0 | Adults and children | true, always |\n| `heights` | 1 | How tall are the children? | false |\n| `dates` | 2 | Which days are you visiting? | true, always |\n| `dayVenues` | 3 | Which park each day? | false |\n| `pace` | 4 | How busy should each day be? | false |\n| `interests` | 5 | What are you most interested in? | false |\n| `retail` | 6 | Any shops you'd like to visit? | false |\n| `cuisine` | 7 | What would you like for lunch? | false |\n\nEvery default question is on (`isEnabled` true). So a venue that sets nothing asks exactly the questions the screen records draw. **`party` and `dates` stay on and required**: the planner cannot lay out a plan without them, and `setVisitPlannerQuestions` refuses a body that switches either off or makes it optional (422 `planner-question-fixed`). The screens keep their own conditions on top of the set-up: `heights` is skipped when no children are coming, `dayVenues` is shown only in a multi-venue tenant, and `retail` only when `shopping` is an interest.\n",
+  "required": [
+   "questionKey",
+   "isEnabled",
+   "isRequired",
+   "sortOrder",
+   "label"
+  ],
+  "properties": {
+   "questionKey": {
+    "$ref": "#/components/schemas/VisitPlannerQuestionKey"
+   },
+   "isEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "Whether the guest is asked it. A question switched off is not shown; `generateVisitPlan` still plans with an answer a request carries for it."
+   },
+   "isRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "Whether the guest must answer it before the plan is made. The screens hold the guest on the question until it is answered, and `generateVisitPlan` refuses a request that leaves a required answer out (422 `planner-answer-missing`)."
+   },
+   "sortOrder": {
+    "type": "integer",
+    "minimum": 0,
+    "description": "The order the screens ask the enabled questions in, lowest first; a tie keeps the default order."
+   },
+   "label": {
+    "type": "string",
+    "maxLength": 120,
+    "description": "The question as the guest reads it, in the venue's default language. On a read, the venue's own wording where it set one, else the default above."
+   },
+   "labelLocalised": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 120
+    },
+    "description": "The label per locale; a read answers in the caller's locale where the row has one."
+   },
+   "help": {
+    "type": "string",
+    "maxLength": 300,
+    "nullable": true,
+    "description": "A line under the question (for example why heights are asked); null shows none."
+   },
+   "helpLocalised": {
+    "type": "object",
+    "nullable": true,
+    "additionalProperties": {
+     "type": "string",
+     "maxLength": 300
+    }
+   },
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The partition key** (ADR-0005): the venue the set-up belongs to."
+   },
+   "updatedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the venue last changed the question; null for a question still at its default."
    }
   }
  },

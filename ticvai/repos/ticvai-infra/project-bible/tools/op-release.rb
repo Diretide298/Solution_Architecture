@@ -402,9 +402,13 @@ if rel_run?("assign")
   # to New, with one comment, so it is assigned and versioned like any New ticket below.
   reopen_marker = B["reopen_marker"] || "Back in the plan"
   # A ticket the lead holds is never reopened (CHG-R8DEC-004; op-release.py hold_problems() refuses a bundle without this).
-  reopen = tickets.map { |t| [t, all_ids[t["key"]]] }.select { |t, id| id && wps[id] && wps[id].status_id == status_hold.id && !held_keys.include?(t["key"]) }
-  rel_say "On hold tickets the plan has again (back to New): #{reopen.size}"
-  rel_list(reopen.map { |t, id| "reopen ##{id} #{t['key']}" })
+  # Only a ticket a release deferred comes back: a deferral leaves it with no assignee. A developer's own hold (the
+  # ticket keeps its assignee, e.g. "Blocked by CR-298") is the developer's to lift, so it is listed and left alone
+  # (r11, 29 October 2026: #37053, held by Pranay Shinde behind an open blocking change request).
+  on_hold = tickets.map { |t| [t, all_ids[t["key"]]] }.select { |t, id| id && wps[id] && wps[id].status_id == status_hold.id && !held_keys.include?(t["key"]) }
+  reopen, dev_held = on_hold.partition { |_, id| wps[id].assigned_to_id.nil? }
+  rel_say "On hold tickets the plan has again (back to New): #{reopen.size}; on hold by their developer (left): #{dev_held.size}"
+  rel_list(reopen.map { |t, id| "reopen ##{id} #{t['key']}" } + dev_held.map { |t, id| "left   ##{id} #{t['key']} (on hold by its developer)" })
   if APPLY && reopen.any?
     rel_quietly do
       WorkPackage.transaction do

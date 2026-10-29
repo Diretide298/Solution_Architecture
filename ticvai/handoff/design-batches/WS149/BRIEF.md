@@ -1,6 +1,6 @@
 # WS149 — Payment Payment Orchestration board 3
 
-**10 screens · 16 operations · 36 schemas · 7 permissions**
+**10 screens · 13 operations · 35 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -138,7 +138,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-584` | Payment Server & Terminal Connectivity Manager | B | 0 | 8 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-585` | Card-Present Transaction Monitor & Operations | C | 2 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-586` | Degraded, Offline & Store-and-Forward Manager | C | 0 | 14 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-587` | Terminal Health, Maintenance & Incident Center | B | 0 | 0 | 6 | 14 | 0 | 2 | — | notStarted (—) |
+| `ADM-587` | Terminal Health, Maintenance & Incident Center | B | 0 | 0 | 6 | 11 | 0 | 2 | — | notStarted (—) |
 | `ADM-588` | Terminal Simulator, Certification & AI Operations Advisor | C | 16 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

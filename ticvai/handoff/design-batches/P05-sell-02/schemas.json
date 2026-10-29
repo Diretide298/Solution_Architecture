@@ -3110,7 +3110,7 @@
     "type": "array",
     "maxItems": 200,
     "x-ticvai-derived": "onRead",
-    "description": "**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **Published only**: a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published `ConfigVersion`; a venue added or reactivated since the last publish appears after the next publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.\n",
+    "description": "**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **The active venues, on every read** (ADAM CR-338, venues (a), 29 October 2026; CHG-CR338-001): a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`), as `TenantConfig.venues` lists them, so `getTenantConfig` and this agree. Ordered by `name`. Empty when nothing is published.\n",
     "items": {
      "type": "object",
      "required": [
@@ -3141,12 +3141,12 @@
        "type": "string",
        "maxLength": 120,
        "nullable": true,
-       "description": "Shown under the name so two venues with similar names can be told apart."
+       "description": "Shown under the name so two venues with similar names can be told apart. The venue's `VenueSettings.city` (`platform.venue_settings.city`), read through `venueSettingsRecords` (ADAM CR-338, city and openingHoursToday (a); CHG-CR338-001). Null when it is not set."
       },
       "openingHoursToday": {
        "type": "object",
        "nullable": true,
-       "description": "Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set.",
+       "description": "Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set. Today's weekday entry of `VenueSettings.openingHours` (`platform.venue_settings.opening_hours`, jsonb by weekday), read through `venueSettingsRecords`; today is the date in the venue's region time zone (`RegionSettings.timeZone`, `regionSettingsRecords`) (ADAM CR-338, city and openingHoursToday (a); CHG-CR338-001).",
        "properties": {
         "opens": {
          "type": "string",
@@ -3165,7 +3165,7 @@
     "type": "array",
     "maxItems": 10,
     "x-ticvai-derived": "onRead",
-    "description": "**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session.\n",
+    "description": "**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session. **Read from the tenant-side copy** (ADAM CR-338, whatsNew (a), 29 October 2026; CHG-CR338-001): `whitelabel.received_release` (`ReceivedRelease`), in the tenant's own database, so a public, cacheable read never crosses to the control plane; newest `receivedAt` first.\n",
     "items": {
      "type": "object",
      "required": [
@@ -3191,7 +3191,9 @@
    },
    "recentChanges": {
     "type": "array",
-    "description": "Staff only. Names the principal behind each change, so it never reaches a public response.",
+    "maxItems": 10,
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. Names the principal behind each change, so it never reaches a public response. **Derived from `whitelabel.config_version`** (ADAM CR-338, recentChanges (a), 29 October 2026; CHG-CR338-001): one item per version, `area` `publish`, `description` the version's `note`, `principalId` its `published_by_principal_id`, `at` its `published_at`; newest first, at most 10. No new storage.",
     "items": {
      "type": "object",
      "properties": {

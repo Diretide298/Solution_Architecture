@@ -32,7 +32,7 @@ operationsByContract:
     scope: venue
     permission: REPORT_VIEW_VENUE
     offline: true
-    reads: 3
+    reads: 2
     writes: 2
   - operation: askReportingQuestion
     verb: POST
@@ -224,7 +224,7 @@ operationsByContract:
     scope: venue
     permission: REPORT_VIEW_VENUE
     offline: false
-    reads: 5
+    reads: 4
     writes: 0
   - operation: listAlertRules
     verb: GET
@@ -672,9 +672,9 @@ readsFrom:
   operations: 2
 - service: AiService
   operations: 2
-- service: IdentityService
-  operations: 2
 - service: FnbService
+  operations: 1
+- service: IdentityService
   operations: 1
 - service: InventoryService
   operations: 1

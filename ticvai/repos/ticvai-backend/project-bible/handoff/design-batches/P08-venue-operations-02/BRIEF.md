@@ -1,6 +1,6 @@
 # P08-venue-operations-02 — P08 · Venue Operations (2 of 2)
 
-**5 screens · 21 operations · 30 schemas · 11 permissions**
+**5 screens · 21 operations · 31 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -160,7 +160,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-129` | Software, Configuration & Version Management | A | 15 | 12 | 6 | 5 | 4 | 0 | — | notStarted (generated) |
+| `BO-129` | Software, Configuration & Version Management | A | 24 | 23 | 6 | 5 | 4 | 0 | — | notStarted (generated) |
 | `BO-130` | Offline Policy & Rules Configuration | A | 13 | 19 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
 | `BO-131` | Connectivity & Auto-Switch Settings | B | 12 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
 | `BO-132` | Offline Transaction Monitor & Sync Queue | C | 43 | 13 | 6 | 2 | 2 | 6 | — | notStarted (generated) |

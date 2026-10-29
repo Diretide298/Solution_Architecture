@@ -843,6 +843,8 @@ operations:
   offline: false
   reads:
   - ledger.tax_invoice_line
+  - orders.membership_renewal
+  - orders.order_line
   - orders.payment
   - orders.sales_order
   - payments.dunning_case
@@ -1224,6 +1226,8 @@ operations:
   - staff
   offline: false
   reads:
+  - orders.membership_renewal
+  - orders.order_line
   - orders.payment
   - orders.sales_order
   - payments.dunning_case

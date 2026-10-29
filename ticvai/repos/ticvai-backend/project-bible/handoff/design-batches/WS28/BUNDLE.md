@@ -113,7 +113,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-278` | Group Ticket, Seat & Entitlement Allocation | C | 8 | 16 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-279` | Group Ticket Fulfillment & Distribution | C | 3 | 16 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-280` | Group Arrival, Check-In & Admission Operations | C | 6 | 20 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-281` | Group Amendments, Cancellation & Refund Operations | C | 0 | 0 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
+| `BO-281` | Group Amendments, Cancellation & Refund Operations | C | 15 | 0 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
 | `BO-282` | Group Booking Reconciliation, Closure & Performance | C | 0 | 12 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-283` | Group Sales Analytics & AI Intelligence Center | C | 2 | 28 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
@@ -1218,7 +1218,29 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Form: Increase Guest Count, Reduce Guest Count** (modal, opened by *Increase Guest Count, Reduce Guest Count*; *Save guest count* calls `updateGroupBooking`, *Cancel* sends nothing)
+
+**Collects what `updateGroupBooking` sends before it is called:** the group's new size, `expectedSize` before the numbers are confirmed or `confirmedSize` once they are. The booking's version goes with it (If-Match), so a change made meanwhile is refused and shown, not overwritten. Dismissing sends nothing; the group is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Package product `packageProductId` | text field | optional | — | — | — | The school-trip format or party package. | `updateGroupBooking` body |
+| Year group `yearGroup` | text field | optional | — | max length 40 | — | — | `updateGroupBooking` body |
+| Access and dietary needs `accessAndDietaryNeeds` | text area | optional | — | max length 1000 | — | — | `updateGroupBooking` body |
+| Celebrant name `celebrantName` | text field | optional | — | max length 120 | — | The birthday child. | `updateGroupBooking` body |
+| Celebrant turning age `celebrantTurningAge` | stepper or slider | optional | — | min 1; max 18 | — | — | `updateGroupBooking` body |
+| Allergies and requests `allergiesAndRequests` | text area | optional | — | max length 1000 | — | — | `updateGroupBooking` body |
+| Final headcount due by `finalHeadcountDueBy` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateGroupBooking` body |
+| Leader subject `leaderSubjectId` | picker: choose a leader subject | optional | — | — | shows names, sends the id | — | `updateGroupBooking` body |
+| Organisation name `organisationName` | text field | optional | — | max length 200 | — | — | `updateGroupBooking` body |
+| Expected size `expectedSize` | number field | optional | — | min 2 | — | — | `updateGroupBooking` body |
+| Confirmed size `confirmedSize` | number field | optional | — | min 0 | — | — | `updateGroupBooking` body |
+| Minimum size `minimumSize` | number field | optional | — | min 1 | — | — | `updateGroupBooking` body |
+| Attendee capture required `attendeeCaptureRequired` | toggle | optional | — | — | — | — | `updateGroupBooking` body |
+| Attendee capture due by `attendeeCaptureDueBy` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateGroupBooking` body |
+| Status `status` | segmented control | optional | — | Confirmed · Complete · Cancelled | — | `namesPending` is set by the timer, never by a PATCH: sending it is `400` on `status` (ADAM CR-257). | `updateGroupBooking` body |
+
+Errors to draw in the form: 400 Validation failed (`validation`), with `errors[]` naming the field. Includes `status` `namesPending`, which only the timer sets (ADAM CR-257).; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The status change goes backwards (`statusBackwards`), the group is already cancelled or complete (`groupClosed`), or the move is one the state model does not … (GroupBookingProblem); 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry.
 
 #### Outputs: what the screen shows and produces
 
@@ -1226,8 +1248,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Increase Guest Count (primary button) | navigation or local | — | — | — | — |
-| Reduce Guest Count (secondary button) | navigation or local | — | — | — | — |
+| Increase Guest Count (primary button) | `updateGroupBooking` PATCH `/group-bookings/{groupBookingId}` | UpdateGroupBookingRequest | GroupBooking | 400 Validation failed (`validation`), with `errors[]` naming the field. Includes `status` `namesPending`, which only the timer sets (ADAM CR-257).; 403 Authenticated but not permitted at the requested scope; 404 The … | opens modal first |
+| Reduce Guest Count (secondary button) | `updateGroupBooking` PATCH `/group-bookings/{groupBookingId}` | UpdateGroupBookingRequest | GroupBooking | 400 Validation failed (`validation`), with `errors[]` naming the field. Includes `status` `namesPending`, which only the timer sets (ADAM CR-257).; 403 Authenticated but not permitted at the requested scope; 404 The … | opens modal first |
 | Date Change (secondary button) | navigation or local | — | — | — | — |
 | Time Change (secondary button) | navigation or local | — | — | — | — |
 | Product Change (secondary button) | navigation or local | — | — | — | — |
@@ -1319,7 +1341,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404, 409, 412).
+- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (400, 403, 404, 409, 412).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-281?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Increase Guest Count, Reduce Guest Count, Date Change, Time Change, Product Change, Package Change, Seat Change, Catering Change.

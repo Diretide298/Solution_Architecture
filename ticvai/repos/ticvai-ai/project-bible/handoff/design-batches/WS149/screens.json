@@ -1554,6 +1554,24 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Payment_Payment_Orchestration.pdf, page 56"
+   },
+   {
+    "operation": "listDeviceFirmware",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXT-002): the approved screen has no element that shows firmware (its content region is empty and its two buttons are pack text), and the lead's ruling of 26 October 2026 (CHG-R10WIR-002, item 5) is that a read the approved screen has no element for leaves it. Firmware releases are managed on BO-129; a CR brings them back here if this screen needs them.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
+   },
+   {
+    "operation": "getDeviceFirmware",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXT-002), with listDeviceFirmware: nothing on the approved screen opens a release.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
+   },
+   {
+    "operation": "createDeviceFirmware",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXT-002), with listDeviceFirmware: nothing on the approved screen registers a release; BO-129 declares it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
    }
   ],
   "layout": {
@@ -1602,27 +1620,6 @@
     "purpose": "Raise a repair",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "listDeviceFirmware",
-    "contract": "tenancy",
-    "purpose": "Terminal firmware versions across the fleet",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getDeviceFirmware",
-    "contract": "tenancy",
-    "purpose": "Open a release",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "createDeviceFirmware",
-    "contract": "tenancy",
-    "purpose": "Register a terminal firmware release",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1636,12 +1633,6 @@
     {
      "name": "deviceId",
      "from": "session"
-    },
-    {
-     "name": "firmwareId",
-     "from": "navigation",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDeviceFirmware` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

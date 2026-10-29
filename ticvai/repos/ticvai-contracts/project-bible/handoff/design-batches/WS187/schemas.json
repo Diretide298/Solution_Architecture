@@ -48,7 +48,7 @@
   }
  },
  "Wallet": {
-  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-rls": "grant-holder-write",
   "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
   "type": "object",
   "required": [
@@ -248,6 +248,9 @@
   ],
   "x-ticvai-unique-nulls": "not-distinct",
   "description": "Board 2, which is the 27 August minute one screen for one. One set per wallet type at a venue, and one venue default with no wallet type.",
+  "required": [
+   "version"
+  ],
   "properties": {
    "walletTypeId": {
     "type": "string",
@@ -397,6 +400,13 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "readOnly": true,
+    "description": "**The row's version, its ETag** (\"All as recommended\": ADAM CR-332 option A, Chinmay, 29 October 2026, the rule CR-257 chose for group bookings): 1 on create and bumped on every write; `getWalletFundingRules` and `setWalletFundingRules` send it as `ETag`, and `setWalletFundingRules` checks `If-Match` against it (`412` on a mismatch)."
    }
   }
  },

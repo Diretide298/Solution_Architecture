@@ -52,24 +52,6 @@ x-ticvai-queries:
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October).
-  seoMetadataRecords:
-    module: platform-ops
-    table: control.seo_metadata
-    inputs:
-      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.seo_metadata rows asked for, by id.'}
-      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
-    returns:
-      type: array
-      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
-      items: {type: object, description: 'A control.seo_metadata row: the columns handoff/schema-reference.json lists for it.'}
-    rule: >-
-      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Platform answers with its control.seo_metadata rows, as it stores them and as the caller's scope
-      lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
-      process within operations, through the C# query interface Platform implements.
-    served: [in-process]
   tenantDomainRecords:
     module: platform-ops
     table: control.tenant_domain
@@ -124,6 +106,28 @@ x-ticvai-queries:
       claimCustomDomain refuses the claim when it is true. It is asked in process within operations, through the C#
       query interface Platform implements.
     served: [in-process]
+  platformApprovalRuleFor:
+    module: platform-ops
+    table: control.platform_approval_rule
+    inputs:
+      kind: {type: string, description: 'The approval request''s kind (approvals ApprovalKind), configurationChange.'}
+      subjectType: {type: string, description: 'The approval request''s subject type, tenant.'}
+    returns:
+      type: object
+      required: [found]
+      properties:
+        found: {type: boolean, description: 'True when an active platform rule matches the kind and subject type.'}
+        approverPermission: {type: string, description: 'The permission every approver holds (PLATFORM_TENANT_MANAGE).'}
+        minimumApprovals: {type: integer, description: 'How many approvals by different holders the request needs.'}
+    rule: >-
+      A rule question ("All as recommended": ADAM CR-330 option A, Chinmay, 29 October 2026). True when the
+      control.platform_approval_rule row of the asked kind and subject type is active, with its approver permission
+      and minimum approvals; false when there is none or it is inactive, and approvals refuses 422 no-approval-route.
+      The table is the platform's, in the control database, with no tenant in it, so Platform answers on its control
+      connection. Asked from another deployable through Platform's service route, under service sign-in between
+      deployables (ADR-0073, #37051): approvals' createApprovalRequest (Tenancy, commerce) asks it for a request of
+      subject type tenant.
+    served: [service]
 paths:
   /rollouts/{rolloutId}/cells/{cellId}/skip:
     parameters:
@@ -2127,6 +2131,57 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
+    PlatformApprovalRule:
+      type: object
+      x-ticvai-persistence: control.platform_approval_rule
+      # One rule per kind and subject type, keyed by them; the platform's tenant rule is its only row (ADAM CR-330).
+      x-ticvai-primary-key: [kind, subjectType]
+      x-ticvai-seed-rows:
+      - {kind: configurationChange, subjectType: tenant, approverPermission: PLATFORM_TENANT_MANAGE, minimumApprovals: 2,
+         isActive: true}
+      description: '**The platform''s own approval rule for a tenant subject** ("All as recommended": ADAM CR-330
+        option A, Chinmay, 29 October 2026). A platform suspension or reactivation of a tenant (`suspendTenant`,
+        `reactivateTenant`: approvals'' kind `configurationChange`, subject type `tenant`) is decided by the
+        platform, never by the tenant''s own approvers, so its rule is not a tenant''s `approvals.rule`: it lives
+        here, in the control database, out of every tenant''s reach. One row, seeded once by the control
+        database''s migration (`x-ticvai-seed-rows`, which tools/derive-ddl.py writes): approvers hold
+        `PLATFORM_TENANT_MANAGE`, two approvals, four eyes (the operator who raised the request is never one of
+        them), active. No operation returns or edits it; approvals'' `createApprovalRequest` reads it through
+        `platform-ops#platformApprovalRuleFor` over the service route (service sign-in between deployables, ADR-0073,
+        #37051).'
+      required:
+      - kind
+      - subjectType
+      - approverPermission
+      - minimumApprovals
+      - isActive
+      properties:
+        kind:
+          type: string
+          enum:
+          - configurationChange
+          description: The approvals `ApprovalKind` the rule routes.
+        subjectType:
+          type: string
+          enum:
+          - tenant
+          description: The `CreateApprovalRequest.subjectType` the rule routes; a tenant's own rules never match it.
+        approverPermission:
+          type: string
+          enum:
+          - PLATFORM_TENANT_MANAGE
+          description: The platform permission every approver holds, read from the operator's platform token.
+        minimumApprovals:
+          type: integer
+          minimum: 1
+          default: 2
+          description: How many approvals by different holders the request needs; the operator who raised it is
+            never one of them.
+        isActive:
+          type: boolean
+          default: true
+          description: The seeded rule is active; with no active row `createApprovalRequest` refuses `422
+            no-approval-route`.
     OutboxRelay:
       type: object
       x-ticvai-persistence: control.outbox_relay

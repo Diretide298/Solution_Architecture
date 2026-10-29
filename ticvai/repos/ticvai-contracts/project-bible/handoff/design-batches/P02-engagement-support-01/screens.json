@@ -1646,7 +1646,9 @@
       {
        "kind": "progressIndicator",
        "label": "Plan your visit · n of 6",
-       "notes": "Six questions; Heights is skipped when no children are coming.",
+       "bindsTo": "VisitPlannerOptions.questions",
+       "operation": "getVisitPlannerOptions",
+       "notes": "Six questions; Heights is skipped when no children are coming. **The steps are the venue's question set-up** (ADAM CR-321, option A, 29 October 2026): `VisitPlannerOptions.questions`, read on load with the other options, gives the questions with `isEnabled` true in `sortOrder`, each with its `label` and `help`, and a question with `isRequired` true holds the guest until it is answered. With no set-up, the defaults are the questions and labels drawn here, so the screen is as approved; `n` counts the steps the set-up asks.",
        "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
@@ -1931,7 +1933,8 @@
        "kind": "primaryButton",
        "label": "Use this plan",
        "operation": "generateVisitPlan",
-       "notes": "Opens Your Plan (GST-053).",
+       "collectedBy": "Ready-made plans",
+       "notes": "Opens Your Plan (GST-053). The body is the picked card of Ready-made plans (its `presetKey`) with the party and dates the screen holds (CHG-R11FXT-003).",
        "provenance": "decided 29 September 2026, MOB-6"
       }
      ]
@@ -1959,6 +1962,9 @@
     "contract": "venue-map",
     "purpose": "Build a rules plan from the preset's inputs (`presetKey`) with the party and dates this screen holds (r8, GPS-C14): the ones carried from GST-051 when the guest answered the questions there; on the cold entry from GST-001, `dates` is today (the venue's business date) and `party` one adult, proposed, client to confirm. The guest changes either on GST-051 (Make my own) before using a plan.",
     "trigger": "onAction",
+    "inputSources": {
+     "presetKey": "getVisitPlannerOptions.presetKey"
+    },
     "provenance": "decided 29 September 2026, MOB-6"
    }
   ],
@@ -2485,7 +2491,7 @@
        "kind": "primaryButton",
        "label": "Apply this change",
        "operation": "updateVisitPlan",
-       "notes": "Saves the agent's proposal as a new plan version.",
+       "notes": "Saves the agent's proposal as a new plan version. The body is the planner's proposal (`changes` from requestSuggestion's value) on the plan's version (`baseVersion` from getVisitPlan) (CHG-R11FXU-009).",
        "provenance": "decided 29 September 2026, MOB-6"
       },
       {
@@ -2535,7 +2541,11 @@
     "contract": "venue-map",
     "purpose": "Swap, remove, add or undo: each change is a new version, so undo goes back one",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026, MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6",
+    "inputSources": {
+     "changes": "requestSuggestion.value",
+     "baseVersion": "getVisitPlan.version"
+    }
    },
    {
     "operationId": "createAiConversation",

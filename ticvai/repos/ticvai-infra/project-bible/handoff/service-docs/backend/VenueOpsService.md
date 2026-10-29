@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental`, `transport` |
 | Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental`, `transport` |
-| Operations in the slice | 80 of 298 |
+| Operations in the slice | 81 of 299 |
 | Scale | Low and steady. Queue readings are the only frequent write. |
 | If it is down | Down degrades venue operations. Selling and admitting continue. |
 
@@ -32,7 +32,7 @@
 | asset | [`deleteMediaAsset`](#deletemediaasset) | DELETE | `/media/{mediaId}` | core | 1 | CMS-010, CMS-075 |
 | asset | [`getMediaAsset`](#getmediaasset) | GET | `/media/{mediaId}` | core | 1 | CMS-010, CMS-068, CMS-082 |
 | asset | [`replaceMediaAsset`](#replacemediaasset) | POST | `/media/{mediaId}/replace` | core | 1 | CMS-010, CMS-076 |
-| asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 1 | ADM-016, BO-008, BO-094, CMS-004, CMS-010, CMS-061 … |
+| asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 1 | ADM-016, BO-008, BO-094, CMS-004, CMS-010, CMS-062 … |
 | asset | [`updateMediaAsset`](#updatemediaasset) | PATCH | `/media/{mediaId}` | core | 1 | CMS-010, CMS-075 |
 | card | [`getGameCard`](#getgamecard) | GET | `/game-cards/{cardCode}` | core | 1 | BO-454, BO-455, BO-457, BO-462, BO-486, GST-011 … |
 | card | [`issueGameCard`](#issuegamecard) | POST | `/game-cards` | core | 1 | POS-002 |
@@ -107,6 +107,7 @@
 | visitPlan | [`getVisitPlannerOptions`](#getvisitplanneroptions) | GET | `/venues/{venueId}/visit-planner-options` | core | 1 | GST-051, GST-052, WEB-050 |
 | visitPlan | [`listVisitPlanAlternatives`](#listvisitplanalternatives) | GET | `/visit-plans/{planId}/items/{itemId}/alternatives` | core | 1 | GST-053, GST-059, WEB-050 |
 | visitPlan | [`setVisitPlanPreset`](#setvisitplanpreset) | PUT | `/venues/{venueId}/visit-plan-presets/{presetKey}` | setup | 1 |  |
+| visitPlan | [`setVisitPlannerQuestions`](#setvisitplannerquestions) | PUT | `/venues/{venueId}/visit-planner-questions` | setup | 1 |  |
 | visitPlan | [`updateVisitPlan`](#updatevisitplan) | PUT | `/visit-plans/{planId}` | core | 1 | GST-053, GST-054, GST-059, WEB-050 |
 | waitTime | [`getWaitTimes`](#getwaittimes) | GET | `/queues/wait-times` | core | 1 | BO-001, BO-002, BO-004, BO-005, EMP-031, EMP-032 … |
 
@@ -119,7 +120,7 @@
 **Refused while the asset is referenced.** The response names every reference so the holder can be cleared first — deleting the image on a live homepage should not be one keystroke away.
 **Deletion is the only end of an asset's life (decided 28 September, audit STATE-MEDIA).** It removes the row rather than moving the asset to a state; `archived` and `quarantined` are both reversible through `updateMediaAsset`.
 
-**In use means** (R8 blocker ORDERS-MONEY-C29) any `assets.media_usage` row for the asset, or the asset being a media collection's cover. The other modules that keep an asset's id (AI's configuration sources, history imports and layout drafts; maintenance incident media and work-order attachments; seating sections; transport network imports; venue maps and their versions) record that use as a `media_usage` row when they take the asset, so Assets reads no other module's data to answer. Any use is 409 `in-use`, naming it. **Otherwise the delete removes, in one transaction**, the asset's `media_collection_member`, `asset_version`, `rendition` and `media_fingerprint` rows and clears `media_upload.asset_id`; the stored files of every version and their derivatives are removed from the asset store after the transaction commits.
+**In use means** (R8 blocker ORDERS-MONEY-C29) any `assets.media_usage` row for the asset, or the asset being a media collection's cover. The other modules that keep an asset's id (AI's configuration sources, history imports and layout drafts; maintenance incident media and work-order attachments; seating sections; transport network imports; venue maps and their versions) record that use as a `media_usage` row when they take the asset, so Assets reads no other module's data to answer for them. **A product listing the asset is Catalogue's** (ADAM CR-309, option (b), Chinmay, 29 October 2026; CHG-CR309-001): a product's media are `catalogue.product_media` rows, and the operations host asks `catalogue#productMediaRecords` (the products whose media name the asset) in process, in the caller's transaction under the caller's row security (XDR-011); each one found is a use with surface `product`. **A collection's cover is named too** (ADAM CR-326, option A, Chinmay, 29 October 2026; CHG-CR326-001): each `assets.media_collection` whose `cover_asset_id` is the asset is a use with surface `mediaCollectionCover`, `referenceId` the collection's id and `label` its name, worked out from `cover_asset_id` when the delete is asked, never stored as a `media_usage` row. Any use is 409 `in-use`, naming it: `usage` is one list of every use, and `referenceCount` counts that list. **Otherwise the delete removes, in one transaction**, the asset's `media_collection_member`, `asset_version`, `rendition` and `media_fingerprint` rows and clears `media_upload.asset_id`; the stored files of every version and their derivatives are removed from the asset store after the transaction commits.
 
 |  |  |
 |---|---|
@@ -129,7 +130,7 @@
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `assets.media_asset`, `assets.media_usage`, `cache:idempotency` |
+| Reads | `assets.media_asset`, `assets.media_collection`, `assets.media_usage`, `cache:idempotency` |
 | Writes | `assets.media_asset`, `assets.media_usage`, `cache:idempotency` |
 | Called by | CMS-010, CMS-075 |
 
@@ -255,6 +256,7 @@ Returns every generated size and every place the asset is referenced. Usage is w
 The reference is stable, so every surface using it updates at once. This is how a brand refresh happens without editing thirty screens.
 Derivatives regenerate. The previous version is retained for rollback.
 **Where the previous file is kept** (R8 blocker ORDERS-MONEY-C29): the replace writes one `assets.asset_version` row for the file it replaces (its `storageKey`, `contentType`, `fileName`, `sizeBytes`, `checksum`) with `isCurrent` false, and the new file becomes the current version; the first replace of an asset also writes version 1 for the original, since `completeUpload` writes none. The asset passes through `processing` (derivatives regenerating, scanned again) back to `ready`; a flagged file goes to `quarantined`. A replace is allowed from `ready` and `archived`; in any other status it is 409 `asset-not-replaceable`. No operation rolls a version back yet: only the retention is defined here.
+**Where the replaced file's `storageKey` comes from** (ADAM CR-337, option A, Chinmay, 29 October 2026; CHG-CR337-001). No column holds an asset's current file: the key follows from the upload, as `completeUpload` finds the file. The upload a replace uses records `media_upload.asset_id` = the asset, as `completeUpload`'s does, so an asset's current file is its upload whose key no `asset_version` row names, and the replace writes that key as the replaced version's `storageKey`. **An upload already used:** a replace retried with the upload that is already the asset's current file (a lost response, a new `Idempotency-Key`) answers `200` with the asset unchanged and writes nothing, as `completeUpload` does for a second completion (ADAM CR-306); an upload that became another asset, or an earlier file of this one, is 409 `upload-already-used` (`refusedReason` `uploadAlreadyUsed`). One file is never two assets.
 **The fingerprint is recomputed with them**: the asset's one `assets.media_fingerprint` row is replaced by the processing job for the new file (decided 29 September, writers pass; DM4), so similarity and duplicate checks compare what is actually served.
 
 |  |  |
@@ -265,7 +267,7 @@ Derivatives regenerate. The previous version is retained for rollback.
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `assets.media_asset`, `assets.media_upload`, `assets.media_usage`, `cache:idempotency` |
+| Reads | `assets.asset_version`, `assets.media_asset`, `assets.media_upload`, `assets.media_usage`, `cache:idempotency` |
 | Writes | `assets.asset_version`, `assets.media_asset`, `assets.media_fingerprint`, `assets.media_upload`, `cache:idempotency` |
 | Called by | CMS-010, CMS-076 |
 | State model | Media asset ([states/media.yaml](../../../states/media.yaml)): moves `ready` -> `processing`, `archived` -> `processing` |
@@ -361,7 +363,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 | Read routing | replica |
 | Reads | `assets.media_asset`, `assets.media_collection_member` |
 | Writes | - |
-| Called by | ADM-016, BO-008, BO-094, CMS-004, CMS-010, CMS-061, CMS-062, CMS-067, CMS-073 |
+| Called by | ADM-016, BO-008, BO-094, CMS-004, CMS-010, CMS-062, CMS-067, CMS-073 |
 
 **Parameters**
 
@@ -4358,6 +4360,7 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 **Scanning and derivatives run after this call returns** (`states/media.yaml`). The 201 carries the asset in `processing`; the job moves it to `ready`, `quarantined` or `failed`. A failed scan is therefore an asset in `quarantined`, not a refusal here — a client reads `status` rather than assuming the file is servable.
 **The same job writes the asset's `assets.media_fingerprint` row** (perceptual hash and embedding, stamped with the model version) once the file passes scanning, so `findSimilarMediaAssets` sees a new asset without anyone asking for it (decided 29 September, writers pass; DM4). A quarantined file gets no fingerprint.
 **The derivatives are the asset's `assets.rendition` rows** (r8 gate residue, CHG-R8RES-005): the job writes one row per derivative it generates (its `preset`), `queued` then `ready` or `failed`, which `getMediaAsset` returns as `derivatives` and `listMediaRenditions` lists. `requestMediaRendition` adds a size or format beyond them; an uploaded asset has its derivatives without it.
+**A second completion of the same upload** (ADAM CR-306, option (a), Chinmay, 29 October 2026; CHG-CR306-001): once the upload has become an asset (`media_upload.asset_id` set), completing it again, under a new `Idempotency-Key` (a retry after a lost response, a second tab), answers `201` with the asset the upload already became, unchanged, and writes nothing; the body of the second call is ignored. One file never becomes two assets. The upload row is read `FOR UPDATE`, so a concurrent second completion waits for the first and then answers the same way.
 
 |  |  |
 |---|---|
@@ -5525,6 +5528,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 **Each day is planned from its own venue, never from the tenant as a whole** (30 September client meeting, MoM 4.7, Allam's requirement). In a multi-venue tenant the guest may put each date at a different venue (`dayVenues`; a date not listed is at `venueId`). Every candidate for a day comes from **that day's venue's own published map**: its rides and attractions, its dining points (restaurant, cafe, food kiosk) and its retail points (shop, retail kiosk), and the performances dated at that venue. A preference is matched against the amenities of that venue only: when one park has the only Indian restaurant, a party that asked for `indian` gets it on that park's day and nowhere else, and a day at a park without one says so (`unmatchedPreferences`) rather than placing a restaurant the guest cannot walk to.
 **Rules, in order, per day.** (1) Candidates: the day venue's published map points that are destinations and have a `typicalDurationMinutes`, and the performances dated that day at that venue. **Retail is a candidate as F&B is** (30 September, MoM 4.7; until then only dining points were venue-linked): a `shop`, or a `kiosk` carrying `retailTags`, is placed as a `shop` stop. (2) Eligibility: a ride whose product's `catalogue.ProductEligibilityRule` excludes anyone in the party by height or age is dropped, and the reason is kept on the plan (`excluded`); a `mustIncludePointIds` point that is at none of the plan's venues is kept there with `notAtVenue`. (3) Scoring: interest tags matched, then the venue's featured order. (4) Layout: from opening time, the next item is the best-scoring one reachable by walking time over the published graph (`venuemap.path`), with the typical wait for that hour and its duration; a meal is placed at a dining point of the day's venue whose `cuisineTags` match, around 12:30 and 19:00, and where no dining point of that venue matches, at its best other dining point, with the unmatched cuisine recorded; a retail stop is placed when the party chose `shopping` or a `retailTags` value, at a retail point of the day's venue that matches, late in the day or on the way to the exit; `relaxed` leaves a 30-minute gap after every two items and stops by 18:00, `packed` fills to closing, and `balanced` (DI-1098, agreed 30 September; r8 walk of tickets 28701 and 28200) sits between them: a 15-minute gap after every two items, filling to 85% of the venue's opening hours. **The balanced numbers are the planner owner's proposal, to be confirmed by the lead.** (5) Add-ons: where the expected wait on a planned ride exceeds 30 minutes and the venue sells a Fast Track for it, the add-on is suggested on that item, never added.
 **The same inputs give the same plan**, so the guest can trust that a regenerate changes only what they changed. `presetKey` (or the older `preset`) gives the ready-made day plans of GST-052 (the same rules with preset interests and pace). **The AI planner agent refines a plan; it does not make the first one** (ai `requestSuggestion` kind `itinerary`): when AI is off or fails, this answer is the plan.
+**The venue's required questions are checked first** (ADAM CR-321, option A, decided 29 October 2026). The set-up of `venueId` (`venuemap.visit_planner_question`, defaults where the venue set nothing; `VisitPlannerQuestion`) says which questions are required. A request that leaves out the answer to an enabled, required question is refused 422 `planner-answer-missing`, naming the question, and nothing is planned: `pace` not sent for `pace`; no `interestTags` for `interests`; no `cuisineTags` for `cuisine`; no `retailTags` for `retail` when `interestTags` holds `shopping` (the question is asked only then). `party` and `dates` are always required (the schema already holds them). `heights` and `dayVenues` are held by the screens alone, as no request can show them unanswered: a person may give an age instead of a height, and a date with no `dayVenues` entry is at `venueId`. With `presetKey` (or `preset`) the ready-made plan supplies the interests and the pace, so those two are not checked.
 **Owned by the guest session**, as a cart is: a signed-in guest's plan is theirs, an anonymous one is bound to the device session and claimed on sign-in. Nothing is held or sold here; `bookVisitPlan` turns the plan into cart lines.
 **Signed out, a guest builds and changes; signed in, they save, share and book** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-003). This operation, `getVisitPlan`, `updateVisitPlan` and `listVisitPlanAlternatives` accept the anonymous guest session a device holds before sign-in (the `guestAuth` token `orders.createCart` uses), so the Plan tab works without an account. The plan is kept against that device session (`VisitPlan.sessionRef`) and is not saved to any account: it lapses with the session. **When the guest signs in on that device, every draft plan of the session moves to the account** (`subjectId` set, `sessionRef` cleared, `ownership` becomes `account`), in the same step as the cart is claimed, with no call from the client and with its versions intact. Booking (`bookVisitPlan`) needs a signed-in guest; sharing a plan is a signed-in act as well (no share operation is contracted yet).
 
@@ -5537,7 +5541,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
-| Reads | `cache:idempotency`, `catalogue.performance`, `catalogue.product`, `catalogue.product_eligibility_rule`, `catalogue.variant`, `queue.reading`, `venuemap.map`, `venuemap.path`, `venuemap.point`, `venuemap.visit_plan`, `venuemap.visit_plan_item` |
+| Reads | `cache:idempotency`, `catalogue.performance`, `catalogue.product`, `catalogue.product_eligibility_rule`, `catalogue.variant`, `queue.reading`, `venuemap.map`, `venuemap.path`, `venuemap.point`, `venuemap.visit_plan`, `venuemap.visit_plan_item`, `venuemap.visit_planner_question` |
 | Writes | `cache:idempotency`, `venuemap.visit_plan`, `venuemap.visit_plan_item` |
 | Called by | GST-051, GST-052, WEB-050 |
 
@@ -5799,6 +5803,11 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
   from them; no new operation on the screen.
 - `fastTrackBundles`: the venue's published bundles that carry Fast Track, read from Promotions
   (`promotions#bundleRecords`), as id and name only.
+- `questions` (ADAM CR-321, option A, decided 29 October 2026): the venue's question set-up, the rows
+  of `venuemap.visit_planner_question` with a default for every question the venue has not set, all
+  eight keys, ordered by `sortOrder` then the default order (`VisitPlannerQuestion`). GST-051 and
+  WEB-050 ask the enabled ones in that order, with the venue's labels, and hold the guest on a
+  required one; the venue changes them with `setVisitPlannerQuestions`.
 
 Published data only, whoever calls; a venue with no published map has an empty `interestTags`. Not a list operation: one venue's options, a handful of each (bounded below).
 
@@ -5812,7 +5821,7 @@ Published data only, whoever calls; a venue with no published map has an empty `
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `venuemap.visit_plan_preset` |
+| Reads | `venuemap.visit_plan_preset`, `venuemap.visit_planner_question` |
 | Writes | - |
 | Called by | GST-051, GST-052, WEB-050 |
 
@@ -5827,6 +5836,17 @@ Published data only, whoever calls; a venue with no published map has an empty `
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | venueId | string (uuid) | yes |  |
+| questions | array of VisitPlannerQuestion | yes | The questions the planner asks at this venue, and how (ADAM CR-321, option A, decided 29 October 2026): all eight VisitPlannerQuestionKey questions, each as the venue set it up (venuemap.visit_planne… (max items 8) |
+| questions[].questionKey | VisitPlannerQuestionKey: enum (party, heights, dates, dayVenues, pace, interests, retail, cuisine) | yes | The closed list of questions the rules planner understands (ADAM CR-321, option A, decided 29 October 2026). |
+| questions[].isEnabled | boolean | yes | Whether the guest is asked it. (default True) |
+| questions[].isRequired | boolean | yes | Whether the guest must answer it before the plan is made. (default False) |
+| questions[].sortOrder | integer | yes | The order the screens ask the enabled questions in, lowest first; a tie keeps the default order. (min 0) |
+| questions[].label | string | yes | The question as the guest reads it, in the venue's default language. (max length 120) |
+| questions[].labelLocalised | object |  | The label per locale; a read answers in the caller's locale where the row has one. (nullable) |
+| questions[].help | string |  | A line under the question (for example why heights are asked); null shows none. (max length 300; nullable) |
+| questions[].helpLocalised | object |  | (nullable) |
+| questions[].scopePath | string |  | The partition key (ADR-0005): the venue the set-up belongs to. (read-only) |
+| questions[].updatedAt | string (date-time) |  | When the venue last changed the question; null for a question still at its default. (read-only; nullable) |
 | presets | array of VisitPlanPreset | yes | (max items 50) |
 | presets[].id | string (uuid) | yes | (read-only) |
 | presets[].presetKey | string | yes | The key generateVisitPlan.presetKey names. (max length 64; pattern ^[a-z][a-zA-Z0-9]*$) |
@@ -5998,6 +6018,74 @@ Where `walkMinutes` is null the row sorts after the rows that have it (NULLS LAS
 |---|---|---|
 | 200 |  | The preset as stored |
 | 422 |  | A must-include point that is not a point of the venue's published maps |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### setVisitPlannerQuestions
+
+**`PUT /venues/{venueId}/visit-planner-questions`**: Set which planner questions a venue asks, in what order, with what wording, and which are required
+
+**A venue's question set-up for the visit planner** (ADAM CR-321, option A, decided 29 October 2026: a closed list of questions the rules planner understands, switched on, ordered, relabelled and made required per venue). **Whole replace**: the body is the venue's set-up as it should be, one entry per question it changes (`VisitPlannerQuestionSet`); the rows of `venuemap.visit_planner_question` for the venue are replaced by the entries sent, so a question left out goes back to its default (`VisitPlannerQuestion`). Only the keys of `VisitPlannerQuestionKey` can be set (any other is 400), and each at most once (400 `validation`). `party` and `dates` cannot be switched off or made optional: the planner cannot lay out without them (422 `planner-question-fixed`). The answer is all eight questions as the venue now has them, as `getVisitPlannerOptions` answers them. A change reaches `getVisitPlannerOptions` and `generateVisitPlan` at once; a plan already made is not touched. Per venue, not per event or product.
+
+|  |  |
+|---|---|
+| Permission | `PRODUCT_CONFIGURE` |
+| Scope level | venue |
+| Part of slice | setup, makes `venuemap.visit_planner_question` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Conflict policy | serverWins |
+| Reads | `cache:idempotency`, `venuemap.visit_planner_question` |
+| Writes | `cache:idempotency`, `venuemap.visit_planner_question` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `VisitPlannerQuestionSet`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| questions | array of VisitPlannerQuestion | yes | (max items 8) |
+| questions[].questionKey | VisitPlannerQuestionKey: enum (party, heights, dates, dayVenues, pace, interests, retail, cuisine) | yes | The closed list of questions the rules planner understands (ADAM CR-321, option A, decided 29 October 2026). |
+| questions[].isEnabled | boolean | yes | Whether the guest is asked it. (default True) |
+| questions[].isRequired | boolean | yes | Whether the guest must answer it before the plan is made. (default False) |
+| questions[].sortOrder | integer | yes | The order the screens ask the enabled questions in, lowest first; a tie keeps the default order. (min 0) |
+| questions[].label | string | yes | The question as the guest reads it, in the venue's default language. (max length 120) |
+| questions[].labelLocalised | object |  | The label per locale; a read answers in the caller's locale where the row has one. (nullable) |
+| questions[].help | string |  | A line under the question (for example why heights are asked); null shows none. (max length 300; nullable) |
+| questions[].helpLocalised | object |  | (nullable) |
+| questions[].scopePath | string |  | The partition key (ADR-0005): the venue the set-up belongs to. (read-only) |
+| questions[].updatedAt | string (date-time) |  | When the venue last changed the question; null for a question still at its default. (read-only; nullable) |
+
+**Response**: `VisitPlannerQuestionSet`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| questions | array of VisitPlannerQuestion | yes | (max items 8) |
+| questions[].questionKey | VisitPlannerQuestionKey: enum (party, heights, dates, dayVenues, pace, interests, retail, cuisine) | yes | The closed list of questions the rules planner understands (ADAM CR-321, option A, decided 29 October 2026). |
+| questions[].isEnabled | boolean | yes | Whether the guest is asked it. (default True) |
+| questions[].isRequired | boolean | yes | Whether the guest must answer it before the plan is made. (default False) |
+| questions[].sortOrder | integer | yes | The order the screens ask the enabled questions in, lowest first; a tie keeps the default order. (min 0) |
+| questions[].label | string | yes | The question as the guest reads it, in the venue's default language. (max length 120) |
+| questions[].labelLocalised | object |  | The label per locale; a read answers in the caller's locale where the row has one. (nullable) |
+| questions[].help | string |  | A line under the question (for example why heights are asked); null shows none. (max length 300; nullable) |
+| questions[].helpLocalised | object |  | (nullable) |
+| questions[].scopePath | string |  | The partition key (ADR-0005): the venue the set-up belongs to. (read-only) |
+| questions[].updatedAt | string (date-time) |  | When the venue last changed the question; null for a question still at its default. (read-only; nullable) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The venue's eight questions as they now stand |
+| 400 |  | A question key named twice, or the body breaks the schema (validation). |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | party or dates sent with isEnabled false or isRequired false (planner-question-fixed): the planner cannot lay out a plan without the party and the dates. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateVisitPlan
@@ -7044,6 +7132,21 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sort_order | integer | yes | The order GST-052 lists the presets in. |
 | scope_path | text | yes | The partition key (ADR-0005): the venue the preset belongs to. |
 | updated_at | timestamptz | no |  |
+
+### `venuemap.visit_planner_question`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| question_key | text | yes |  |
+| is_enabled | boolean | yes | Whether the guest is asked it. |
+| is_required | boolean | yes | Whether the guest must answer it before the plan is made. |
+| sort_order | integer | yes | The order the screens ask the enabled questions in, lowest first; a tie keeps the default order. |
+| label | text | yes | The question as the guest reads it, in the venue's default language. |
+| label_localised | jsonb | no | The label per locale; a read answers in the caller's locale where the row has one. |
+| help | text | no | A line under the question (for example why heights are asked); null shows none. |
+| help_localised | jsonb | no |  |
+| scope_path | text | yes | The partition key (ADR-0005): the venue the set-up belongs to. |
+| updated_at | timestamptz | no | When the venue last changed the question; null for a question still at its default. |
 
 ## Not in the first release
 

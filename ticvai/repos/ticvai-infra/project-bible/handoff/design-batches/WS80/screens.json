@@ -531,7 +531,25 @@
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "Account and balance",
+       "bindsTo": "Wallet",
+       "columns": [
+        "Wallet.balance",
+        "Wallet.bonusBalance",
+        "Wallet.credits",
+        "Wallet.currency",
+        "Wallet.status",
+        "Wallet.expiresAt",
+        "Wallet.lastActivityAt"
+       ],
+       "operation": "getWallet",
+       "notes": "The guest's wallet as the screen opens on it, every kind of value it holds (r11 gate fix, CHG-R11FXS-003).",
+       "provenance": "contract wallet.yaml GET /wallets/{subjectId}; r11 gate fix, 29 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -547,7 +565,7 @@
     "operationId": "getWallet",
     "contract": "wallet",
     "purpose": "Account and balance",
-    "trigger": "onAction",
+    "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
    },
    {
@@ -704,6 +722,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 26"
+   },
+   {
+    "operation": "setWalletFundingRules",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXU-006, the lead: \"Remove + log text\"): a board reading of 19 September declared it, and nothing on the approved screen sends it: its only controls were the generated Save wallet funding rules and Cancel, with no field to send. The funding rules are saved on BO-1094 Funding Method Configuration and BO-1098, where setWalletFundingRules stays declared and reached. The generated Save and Cancel buttons go with it; the screen keeps getWalletFundingRules and its rules panel. A CR brings the write back here with the control and the fields that send it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
    }
   ],
   "layout": {
@@ -712,20 +736,6 @@
     {
      "name": "contentBody",
      "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setWalletFundingRules",
-       "label": "Save wallet funding rules",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setWalletFundingRules"
-      },
       {
        "kind": "detailPanel",
        "label": "How a wallet may be topped up",
@@ -745,13 +755,6 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "setWalletFundingRules",
-    "contract": "wallet",
-    "purpose": "Top-up rules",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "getWalletFundingRules",
     "contract": "wallet",
@@ -842,6 +845,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Game_and_Ride_Module.pdf, page 27"
+   },
+   {
+    "operation": "setWalletFundingRules",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXU-006, the lead: \"Remove + log text\"): a board reading of 19 September declared it, and nothing on the approved screen sends it: its only controls were the generated Save wallet funding rules and Cancel, with no field to send. The funding rules (bonusRules included) are saved on BO-1094 Funding Method Configuration and BO-1098, where setWalletFundingRules stays declared and reached. The generated Save and Cancel buttons go with it; the screen keeps getWalletFundingRules and its rules panel. A CR brings the write back here with the control and the fields that send it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
    }
   ],
   "layout": {
@@ -850,20 +859,6 @@
     {
      "name": "contentBody",
      "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setWalletFundingRules",
-       "label": "Save wallet funding rules",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setWalletFundingRules"
-      },
       {
        "kind": "detailPanel",
        "label": "How a wallet may be topped up",
@@ -883,13 +878,6 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "setWalletFundingRules",
-    "contract": "wallet",
-    "purpose": "Top-up bonus rules",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "getWalletFundingRules",
     "contract": "wallet",

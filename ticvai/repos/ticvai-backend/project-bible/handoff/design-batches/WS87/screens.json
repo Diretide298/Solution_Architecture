@@ -797,6 +797,7 @@
        "kind": "detailPanel",
        "label": "The selected customer wallet balance",
        "bindsTo": null,
+       "operation": "getWallet",
        "columns": [
         "Card Status",
         "Card Expiry",

@@ -295,6 +295,10 @@ paths:
       - query: ai#approvalRequestScoreRecords
         route: service
         for: 'what its text calls "ai.AiApprovalRequestScore.signals": ai.approval_request_score, Ai''s data (CHG-R10GEN-001)'
+      - query: platform-ops#platformApprovalRuleFor
+        route: service
+        for: 'the platform rule a request of subject type tenant is routed by: control.platform_approval_rule, Platform''s
+          data in the control database (ADAM CR-330 option A; service sign-in between deployables, #37051)'
       x-ticvai-audience:
       - staff
       summary: Raise a request
@@ -327,6 +331,14 @@ paths:
         never approved automatically and never left `pending` with nobody to ask. The calling operation passes the
         refusal on to its own caller (`suspendTenant`, `reactivateTenant`). A rule that matches but whose roles have
         no holder is a different case (`rerouteOnNoApprover`, `noApproverAvailable`).
+
+        **The platform rule is read from the control plane** ("All as recommended": ADAM CR-330 option A, Chinmay, 29
+        October 2026). For subject type `tenant` the rule is `control.platform_approval_rule`, Platform''s table in
+        the control database, seeded once by the control database''s migration (approvers holding
+        `PLATFORM_TENANT_MANAGE`, two approvals, active). This asks `platform-ops#platformApprovalRuleFor` with the
+        request''s kind and subject type over the service route, under service sign-in between deployables (#37051),
+        and routes the request by the rule it answers; `found` false is the `422` above. A tenant''s own
+        `approvals.matrix` and `approvals.rule` are never read for it.
 
         '
       tags:
@@ -367,7 +379,8 @@ paths:
         '422':
           description: 'No approval route (`no-approval-route`; CHG-R8SPN-015): the request is not a draft and no
             active rule matches its kind and subject type at its `scopePath` (for subject type `tenant`, no active
-            platform rule). Nothing is written; the calling operation passes this refusal on.'
+            platform rule: `platform-ops#platformApprovalRuleFor` answers `found` false; ADAM CR-330). Nothing is
+            written; the calling operation passes this refusal on.'
           x-ticvai-problem-types: [no-approval-route]
           content:
             application/problem+json:
@@ -1214,6 +1227,10 @@ paths:
         - "P08 BO-639 Reviewer Assignment & Delegation"
         - "P08 BO-863 Resource Lifecycle, Governance & Audit"
         - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
+      x-ticvai-writes:
+      - table: approvals.matrix_version
+        for: 'one row per version it stores, version 1 on create and the previous version plus one after; a stored
+          version row is never edited (ADAM CR-300, option B)'
       x-ticvai-audience:
       - staff
       summary: Configure what requires approval
@@ -1254,6 +1271,17 @@ paths:
         body is not in the new version. Rule `id`s are read-only and ignored on input — each version
         carries its own rule rows. The previous version is kept, never edited, because requests in
         flight still point at it.
+
+
+        **How the versions are stored** (ADAM CR-300, option B, Chinmay, 29 October 2026). One
+        `approvals.matrix` row per (`kind`, scope node), keyed by the stable `matrixId` CR-245 gives it, so
+        every version keeps that one id. Each version is one `approvals.matrix_version` row (`ApprovalMatrixVersion`:
+        `matrix_id`, `version`, `is_active`, `created_at`), and each rule row names its version
+        (`approvals.rule.matrix_version`). A new version inserts its `matrix_version` row and its rule rows and
+        moves the matrix row''s `version` and `is_active` to it; the earlier version''s `matrix_version` row and
+        rule rows are never touched. Unique (`matrix_id`, `version`) stops two versions with one number, and unique
+        (`kind`, `scope_path`) on `approvals.matrix` stops two first saves at once from creating two matrices for
+        one kind and scope (the second insert fails and nothing it sent is stored).
 
         '
       tags:
@@ -1872,6 +1900,9 @@ paths:
   /matrix-multi-level:
     put:
       operationId: approveMatrixMultiLevel
+      x-ticvai-writes:
+      - table: approvals.matrix_version
+        for: 'the new version of the matrix the rule goes into, as setApprovalMatrix stores one (ADAM CR-300, option B)'
       x-ticvai-body-key: [code]
       x-ticvai-body-key-note: 'Keyed by the body''s `code`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per approval matrix code within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
@@ -5514,7 +5545,7 @@ components:
         **Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.
 
         **Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:
-        - **A platform suspension or reactivation of a tenant** (`configurationChange`, subject `tenant`, `subjectContract` `subscription`; ADAM CR-172; lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015): decided by the platform, never by the tenant''s own approvers. It is routed only by the **platform rule**, held in the control plane and seeded when the platform is provisioned, whose approvers hold `PLATFORM_TENANT_MANAGE`, with four eyes (the operator who raised it cannot decide it). It is not off by default like the review steps below: the platform rule always exists, and without it `createApprovalRequest` refuses `422 no-approval-route`.
+        - **A platform suspension or reactivation of a tenant** (`configurationChange`, subject `tenant`, `subjectContract` `subscription`; ADAM CR-172; lead''s ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015): decided by the platform, never by the tenant''s own approvers. It is routed only by the **platform rule**, held in the control plane (Platform's platform approval rule, seeded once by the control database's migration and asked by `createApprovalRequest` over the service route; ADAM CR-330 option A, 29 October 2026), whose approvers hold `PLATFORM_TENANT_MANAGE`, with four eyes (the operator who raised it cannot decide it). It is not off by default like the review steps below: the platform rule always exists, and without it `createApprovalRequest` refuses `422 no-approval-route`.
         - **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.
 
         **A sales channel going live** (ADAM CR-211, option A, decided 25 October 2026; CHG-R10CAT-003).
@@ -5583,14 +5614,24 @@ components:
     ApprovalRule:
       type: object
       x-ticvai-persistence: approvals.rule
-      # A rule's code is unique within its matrix where it is set (ADAM CR-102, option 1; CHG-R10ID-015): a unique index
-      # on (matrix_id, code); rows with a null code do not collide.
-      x-ticvai-unique-together: [[matrix_id, code]]
+      # A rule's code is unique within one rule set where it is set (ADAM CR-102, option 1; CHG-R10ID-015): since ADAM
+      # CR-300, option B (CHG-CR300-001), a rule set is one version of its matrix and a new version repeats the codes of
+      # the one before, so the unique index is on (matrix_id, matrix_version, code); rows with a null code do not collide.
+      x-ticvai-unique-together: [[matrix_id, matrixVersion, code]]
       required:
       - order
       - approverRoleIds
       - mode
+      - matrixVersion
       properties:
+        matrixVersion:
+          type: integer
+          readOnly: true
+          description: '**The version of its matrix this rule belongs to** (ADAM CR-300, option B): with the rule''s
+            `matrix_id`, it names one `approvals.matrix_version` row. Set by the server to the version the save
+            stores; not sent, and ignored on input. A version''s rule set is the rules with its `matrix_id` and this
+            `matrixVersion`, which is how a decision is checked against exactly the version a request names
+            (`ApprovalRequest.matrixVersion`).'
         id:
           type: string
           format: uuid
@@ -5822,7 +5863,9 @@ components:
       x-ticvai-persistence: approvals.matrix
       x-ticvai-rls: read-beneath   # ADAM CR-095, CHG-RSF-001: a matrix set at the tenant or a region governs every venue beneath it, so a venue reads the matrices it inherits (approvals.rule follows its matrix for reading) and still writes only its own
       # One matrix per kind, scope and version, as the contract promises (R8 blocker APPROVALS-TENANCY-C02, CHG-R8MIG-009).
-      x-ticvai-unique-together: [[kind, scopePath, version]]
+      # One matrix row per kind and scope, keyed by its stable id, whose versions are approvals.matrix_version rows (ADAM
+      # CR-300, option B): unique (kind, scope_path). It implies the first, which stays as it is.
+      x-ticvai-unique-together: [[kind, scopePath, version], [kind, scopePath]]
       description: '**Which matrix routes a request, and which version of it** (ADAM CR-102, option 1, accepted 15 October
         2026; CHG-R10ID-015). Matrices resolve up the scope tree as configuration does (ADR-0018: nearest ancestor
         wins): for the request''s `kind` at its `scopePath`, the matrix of the nearest node, the venue''s, else the
@@ -5863,6 +5906,11 @@ components:
 
             **(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a
             request''s `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).
+            **Stored as** (ADAM CR-300, option B): the matrix row keeps the version in force (the highest) in
+            `version` and that version''s `isActive` in `is_active`; every version, the earlier ones included, is
+            an `approvals.matrix_version` row (`ApprovalMatrixVersion`) unique on (`approval_matrix_id`, `version`), and its
+            rules are the `approvals.rule` rows with that `matrix_version`. The matrix row itself is unique on
+            (`kind`, `scope_path`).
             **Never null** (ADAM CR-102, CHG-R10ID-015): the server sets it, 1 for a new matrix and the previous
             version plus one after; it is not sent and is ignored on input.
 
@@ -5873,6 +5921,40 @@ components:
             $ref: '#/components/schemas/ApprovalRule'
         isActive:
           type: boolean
+    ApprovalMatrixVersion:
+      type: object
+      x-ticvai-persistence: approvals.matrix_version
+      # Keyed (approval_matrix_id, version): two versions of one matrix cannot share a number (ADAM CR-300, option B).
+      x-ticvai-primary-key: [approvalMatrixId, version]
+      description: '**One version of an approval matrix** (ADAM CR-300, option B, Chinmay, 29 October 2026). The
+        matrix keeps one stable id across its versions (CR-245), so its versions are rows here, one per version,
+        each with its own rule rows (`approvals.rule` with this `matrix_id` and `matrix_version`).
+        `setApprovalMatrix` (and `approveMatrixMultiLevel`, through the same versioning) inserts the row of each
+        version it stores and never edits one, because requests in flight still name it
+        (`ApprovalRequest.approvalMatrixId` and `matrixVersion`). No operation returns this schema: a read answers
+        `ApprovalMatrix`, whose `version` and `isActive` are the version in force.'
+      required:
+      - approvalMatrixId
+      - version
+      - isActive
+      - createdAt
+      properties:
+        approvalMatrixId:
+          type: string
+          format: uuid
+          x-ticvai-references: approvals.matrix
+          description: The matrix this is a version of (`approvals.matrix.id`, the stable `matrixId`).
+        version:
+          type: integer
+          description: 1 for a new matrix, then the previous version plus one; with `matrixId`, the key.
+        isActive:
+          type: boolean
+          description: Whether this version was saved active (`ApprovalMatrix.isActive`). When the version in force
+            is inactive, the node sets no matrix of that kind and the next ancestor's applies.
+        createdAt:
+          type: string
+          format: date-time
+          description: When the version was stored.
     ApprovalRequirement:
       type: object
       x-ticvai-persistence: none — computed

@@ -914,6 +914,9 @@
     "contract": "orders",
     "purpose": "Add the chosen item to the kiosk basket",
     "trigger": "onAction",
+    "inputSources": {
+     "variantId": "listMerchandise.productVariantId"
+    },
     "invalidates": [
      "listMerchandise"
     ]

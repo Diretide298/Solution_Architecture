@@ -11,15 +11,15 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1663,
-  "operations": 1895,
+  "operations": 1892,
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
-  "operationsWithNoScreen": 211
+  "operationsWithNoScreen": 212
  },
  "waves": {
-  "wave1": 143,
-  "wave2": 58,
+  "wave1": 144,
+  "wave2": 57,
   "wave3": 1462
  },
  "modules": [
@@ -191,7 +191,7 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 142
+   "operations": 140
   },
   {
    "contract": "promotions",
@@ -202,11 +202,11 @@
    "operations": 77
   },
   {
-   "contract": "wallet",
+   "contract": "finance",
    "operations": 62
   },
   {
-   "contract": "finance",
+   "contract": "wallet",
    "operations": 62
   },
   {
@@ -246,7 +246,7 @@
    "operations": 44
   },
   {
-   "contract": "maintenance",
+   "contract": "identity",
    "operations": 41
   },
   {
@@ -254,7 +254,7 @@
    "operations": 41
   },
   {
-   "contract": "identity",
+   "contract": "maintenance",
    "operations": 41
   },
   {
@@ -275,7 +275,7 @@
   },
   {
    "contract": "white-label",
-   "operations": 19
+   "operations": 18
   },
   {
    "contract": "shift",
@@ -3513,7 +3513,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/terminal-health-maintenance-incident-center-t57-adm-587",
-   "operations": 5,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -3648,7 +3648,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/b2b-credit-account-limit-manager-t95-adm-602",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -3738,7 +3738,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/refund-allocation-original-tender-manager-t119-adm-612",
-   "operations": 1,
+   "operations": 0,
    "drawn": true
   },
   {
@@ -6105,7 +6105,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/setup-clone-inheritance-bo-1070",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -6258,7 +6258,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/wallet-ownership-account-association-bo-1086",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -6330,7 +6330,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/funding-command-center-bo-1093",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6348,7 +6348,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/top-up-rule-configuration-bo-1095",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6357,7 +6357,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/channel-funding-source-mapping-bo-1096",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6366,7 +6366,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/auto-reload-configuration-bo-1097",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6384,7 +6384,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/funding-authorization-approval-rules-bo-1099",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6411,7 +6411,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/funding-limits-velocity-controls-bo-1101",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -6555,7 +6555,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/parent-child-stored-value-distribution-bo-1116",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -6861,7 +6861,7 @@
    "module": "Orders & Money",
    "wave": 3,
    "route": "/orders-money/refund-routing-credit-restoration-engine-bo-1147",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -7390,7 +7390,7 @@
    "id": "BO-129",
    "name": "Software, Configuration & Version Management",
    "module": "Venue Operations",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-operations/software-configuration-version-management",
    "operations": 10,
    "drawn": true
@@ -8679,7 +8679,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/quote-to-booking-conversion-confirmation-bo-272",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -9975,7 +9975,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/top-up-configuration-bo-417",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -9984,7 +9984,7 @@
    "module": "Games & Rides",
    "wave": 3,
    "route": "/games-rides/top-up-bonus-rule-configuration-bo-418",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -11631,7 +11631,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/pos-payment-access-setup-bo-602",
-   "operations": 1,
+   "operations": 0,
    "drawn": true
   },
   {
@@ -12612,7 +12612,7 @@
    "module": "Sell",
    "wave": 3,
    "route": "/sell/staff-role-assignment-configuration-bo-712",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -12864,7 +12864,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/family-guardians-bo-740",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -12927,7 +12927,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/consent-policy-configuration-bo-747",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -13728,7 +13728,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/design-system-components-bo-836",
-   "operations": 1,
+   "operations": 0,
    "drawn": true
   },
   {
@@ -14160,7 +14160,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/attraction-operational-staffing-roster-bo-884",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -14457,7 +14457,7 @@
    "module": "Rentals",
    "wave": 3,
    "route": "/rentals/event-staff-personnel-allocation-bo-917",
-   "operations": 1,
+   "operations": 0,
    "drawn": true
   },
   {
@@ -16460,6 +16460,12 @@
     "contract": "venue-map",
     "verb": "PUT",
     "summary": "Add or replace one of a venue's ready-made day plans"
+   },
+   {
+    "operation": "setVisitPlannerQuestions",
+    "contract": "venue-map",
+    "verb": "PUT",
+    "summary": "Set which planner questions a venue asks, in what order, with what wording, and which are "
    },
    {
     "operation": "adjustGameCard",

@@ -297,6 +297,7 @@ operations:
   offline: true
   reads:
   - cache:idempotency
+  - fnb.kitchen_routing_rule
   - fnb.kitchen_station
   - fnb.kitchen_ticket
   - fnb.kitchen_ticket_line
@@ -1733,6 +1734,7 @@ operations:
   writes:
   - cache:idempotency
   - fnb.menu_item
+  - fnb.sold_out_item
 - operation: setMenuSections
   verb: PUT
   path: /menus/{menuId}/sections

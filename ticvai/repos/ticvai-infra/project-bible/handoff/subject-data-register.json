@@ -71,6 +71,7 @@
     "identity.guest_credential",
     "identity.guest_identity_verification",
     "identity.guest_session",
+    "identity.guest_upload_ref",
     "identity.mfa_challenge",
     "identity.mfa_method",
     "identity.mfa_recovery_code",

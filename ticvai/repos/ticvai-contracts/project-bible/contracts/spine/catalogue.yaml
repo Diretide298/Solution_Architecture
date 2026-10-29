@@ -117,72 +117,76 @@ x-ticvai-queries:
       Product.channels; the owner to confirm. This is not Product.isSellable, which also needs a published
       bundle: a till board is how a new product reaches its first bundle, so a board save must not need one.
       publishBundle applies isSellable when the bundle is cut and leaves out a tile whose product fails it.
+      It is asked in process by the operations host for Marketing's addToWishlist and getWishlist (ADAM CR-270,
+      option A, 28 October 2026; docs/active/cross-deployable-writes.yaml XDR-007).
     served: [in-process, service]
-  # **What a guest's saved item shows** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002). Marketing's
-  # wishlist (operations deployable) shows a variant's name, picture, price and performance start and whether it can
-  # still be bought; all of it is Catalogue's, and ADR-0055 rule 4 lets Marketing ask only through Catalogue's
-  # published contract. Asked at the save (addToWishlist stores the answer) and at every read (getWishlist returns the
-  # current answer). The price resolution is the lead's proposal, the Catalogue owner to confirm.
+  # **What a guest's saved item shows** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002; declared as
+  # ADAM CR-270's specification gives it, option A, 28 October 2026, CHG-R11TEN-001). Marketing's wishlist (operations
+  # deployable) shows a variant's name, picture, price and performance start and whether it can still be bought; all of
+  # it is Catalogue's. Asked at the save (addToWishlist stores the answer) and at every read (getWishlist returns the
+  # current answer), in process through Catalogue's own query class (docs/active/cross-deployable-writes.yaml XDR-007).
   variantListingFacts:
     module: catalogue
     decision_owner: Chinmay
-    notes: Catalogue owner to confirm the listPrice resolution (the guest listing's own, below). Asked by Marketing's
-      addToWishlist and getWishlist (CHG-MKT-002).
+    notes: Declared by the lead's decision on ADAM CR-270 (28 October 2026); asked by Marketing's addToWishlist and
+      getWishlist (CR-270, CR-273), in process from the operations host under XDR-007.
     inputs:
-      variantIds: { type: array, maxItems: 200, items: { type: string, format: uuid } }
-      channel: { $ref: '#/components/schemas/Channel' }
+      venueId: { type: string, format: uuid, description: The venue the guest acts at; sellability is asked at it. }
+      channel:
+        type: string
+        enum: [web, mobile]
+        description: The guest's channel (Channel's web or mobile).
+      variantIds: { type: array, minItems: 1, maxItems: 200, items: { type: string, format: uuid } }
       performanceIds:
         type: array
-        description: The saved performances, if any; each answered in `performances`.
-        items: { type: string, format: uuid }
+        maxItems: 200
+        description: One per asked variant, in the same order; null where the saved item names no performance.
+        items: { type: string, format: uuid, nullable: true }
     returns:
-      type: object
-      properties:
-        variants:
-          type: array
-          description: One entry per asked variant, in the order asked.
-          items:
-            type: object
-            required: [variantId, known]
-            properties:
-              variantId: { type: string, format: uuid }
-              known: { type: boolean, description: False when Catalogue has no such variant; nothing else is set. }
-              venueId: { type: string, format: uuid, description: The product's venue (Product.venueId). }
-              productName: { type: string, description: The product's name in the guest's language, as the guest listing shows it. }
-              imageAssetRef:
-                type: string
-                nullable: true
-                description: The product's primary media (ProductMedia.isPrimary), as the guest listing's primaryMedia; null when it has none.
-              listPrice:
-                $ref: ../shared/common.yaml#/components/schemas/Money
-                nullable: true
-                description: The price the guest listing shows for this variant on the channel now, in the venue's currency; null when no price list prices it.
-              sellable: { type: boolean, description: variantsSellableAt's answer for the variant at its own venue on the channel. }
-              reason:
-                type: string
-                nullable: true
-                enum: [retired, otherVenue, notApproved, notOnChannel, offSale]
-                description: variantsSellableAt's reason; null when sellable.
-        performances:
-          type: array
-          items:
-            type: object
-            required: [performanceId, known]
-            properties:
-              performanceId: { type: string, format: uuid }
-              known: { type: boolean }
-              productId: { type: string, format: uuid }
-              startsAt: { type: string, format: date-time }
-              isCancelled: { type: boolean }
+      type: array
+      description: One entry per asked variant (with its performance), in the order asked.
+      items:
+        type: object
+        required: [variantId, isAvailable]
+        properties:
+          variantId: { type: string, format: uuid }
+          performanceId: { type: string, format: uuid, nullable: true, description: The performance asked with it; null when none was. }
+          productName: { type: string, description: 'The product''s name in the guest''s language, as the guest listing shows it.' }
+          imageAssetRef:
+            type: string
+            nullable: true
+            description: The product's primary media (ProductMedia.isPrimary), as the guest listing's primaryMedia; null when it has none.
+          listPrice:
+            type: string
+            pattern: ^-?\d+(\.\d{1,4})?$
+            nullable: true
+            description: The amount only, numeric(18,4) as a decimal string (ADR-0018), of the price the guest listing
+              shows for this variant at the venue on the channel now; null when no price list prices it. The asker
+              puts the venue's currency and scale on it (tenancy#venueSettingsRecords).
+          performanceStartsAt: { type: string, format: date-time, nullable: true, description: The asked performance's start; null when none was asked. }
+          isAvailable: { type: boolean, description: True when the variant is known and sellable at the venue on the channel. }
+          unavailableReason:
+            type: string
+            nullable: true
+            enum: [unknownVariant, retired, otherVenue, notApproved, notOnChannel, offSale]
+            description: Null when isAvailable. unknownVariant is a variant Catalogue does not know, or a performance
+              that is not the variant's product's (the asker's unknown-variant); every other value is
+              variantsSellableAt's reason (the asker's variant-not-sellable).
+    reads: [catalogue.variant, catalogue.product, catalogue.product_media, catalogue.price, catalogue.price_assignment,
+      catalogue.price_list, catalogue.performance]
     rule: >
-      Proposed by the lead on 14 October 2026 (ADAM CR-087), the Catalogue owner to confirm. For each variant: the
-      product's name and primary media as the guest listing (searchCatalogue) shows them; listPrice is the price the
-      same listing shows for that variant on the asked channel at this moment (the same price-list resolution as its
-      fromPrice, for the one variant), in the venue's currency; sellable and reason are variantsSellableAt's for the
-      variant at its product's own venue. For each performance: its start, whether it is cancelled, and its product,
-      so the asker can tell a performance that is not the variant's product's. Read-only, no side effects, and safe to
-      cache for a short time on the asker's side.
-    served: [service]
+      The lead's decision on ADAM CR-270, option A (28 October 2026), declaring CR-087's query as CR-270's
+      specification gives it. For each asked variant, with the performance asked beside it: the product's name and
+      primary media as the guest listing (searchCatalogue) shows them; listPrice, the amount only, is the price the
+      same listing shows for that variant at the venue on the asked channel at this moment (the same price-list
+      resolution as its fromPrice, for the one variant); performanceStartsAt is the asked performance's start.
+      isAvailable is variantsSellableAt's sellable for the variant at venueId on the channel, and unavailableReason
+      its reason. A variant Catalogue does not know, or a performance that is not the variant's product's, is
+      unknownVariant: the asker answers it as the 404 unknown-variant, and any other reason as the 404
+      variant-not-sellable, where it refuses (addToWishlist); a read that keeps the item (getWishlist) shows it
+      unavailable instead. Read-only, no side effects, under the caller's row-level security. It is asked in process
+      by the operations host for Marketing's wishlist (XDR-007), and in process within commerce.
+    served: [in-process, service]
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October). Rule questions keep queries of their own, above.
@@ -381,8 +385,38 @@ x-ticvai-queries:
       process within commerce, through the C# query interface Catalogue implements, and asked from another
       deployable through Catalogue's service route (serviceAuth).
       It is asked in process by the workers host for the consumers it runs, issueOrderEntitlements among them (ADAM
-      CR-167; ADR-0055, amended 25 October 2026).
+      CR-167; ADR-0055, amended 25 October 2026). It is asked in process by the operations host for
+      createFnbOrder's productCategory routing match (ADAM CR-277, option A, 28 October 2026; XDR-008).
     served: [in-process, service]
+  # **Which products list an asset** (ADAM CR-309, option (b), Chinmay, 29 October 2026; CHG-CR309-001). Assets'
+  # deleteMediaAsset (operations host) refuses 409 in-use while a product lists the asset, and productRecords answers
+  # by product id or product column only, never by the asset a product's media row names.
+  productMediaRecords:
+    module: catalogue
+    table: catalogue.product_media
+    # product_media's row security is its parent's (catalogue.product), read under that table's own policy.
+    reads: [catalogue.product]
+    inputs:
+      assetIds: {type: array, minItems: 1, items: {type: string, format: uuid}, description: 'The assets asked about (catalogue.product_media.asset_id).'}
+    returns:
+      type: array
+      description: 'One entry per catalogue.product_media row that names an asked asset and the caller''s scope lets
+        it see; an asset no visible product lists is absent.'
+      items:
+        type: object
+        required: [assetId, productId]
+        properties:
+          assetId: {type: string, format: uuid, description: 'catalogue.product_media.asset_id, one of those asked.'}
+          productId: {type: string, format: uuid, description: 'catalogue.product_media.product_id, the product that lists it.'}
+    rule: >-
+      A data read, not a rule question (CHG-MOD-001). Catalogue answers with the product_id of each of its
+      catalogue.product_media rows whose asset_id is asked, as the caller's scope lets it see them (the row-level
+      security product_media takes from catalogue.product, under the caller's connection and transaction). It
+      decides nothing: the asker states what a listing means for it. It is asked in process by the operations host
+      for Assets' deleteMediaAsset, the products that list the asset (409 in-use, MediaUsage surface product), through
+      the C# query interface Catalogue implements, as CR-260 serves Tenancy's (ADAM CR-309, option (b), 29 October
+      2026; docs/active/cross-deployable-writes.yaml XDR-011).
+    served: [in-process]
   bundleApplicationRecords:
     module: catalogue
     table: catalogue.bundle_application
@@ -431,7 +465,8 @@ x-ticvai-queries:
       transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked in process within commerce, through the C# query interface Catalogue implements, and
-      asked from another deployable through Catalogue's service route (serviceAuth).
+      asked from another deployable through Catalogue's service route (serviceAuth). It is asked in process by the
+      operations host for createFnbOrder's productCategory routing match (ADAM CR-277; XDR-008).
     served: [in-process, service]
   productEligibilityRuleRecords:
     module: catalogue
@@ -490,7 +525,8 @@ x-ticvai-queries:
       process within commerce, through the C# query interface Catalogue implements, and asked from another
       deployable through Catalogue's service route (serviceAuth).
       It is asked in process by the workers host for the consumers it runs, issueOrderEntitlements among them (ADAM
-      CR-167; ADR-0055, amended 25 October 2026).
+      CR-167; ADR-0055, amended 25 October 2026). It is asked in process by the operations host for
+      createFnbOrder's productCategory routing match (ADAM CR-277, option A, 28 October 2026; XDR-008).
     served: [in-process, service]
   variantDimensionRecords:
     module: catalogue
@@ -3167,10 +3203,12 @@ paths:
         - "P02 GST-008 Tickets & Add-ons"
         - "P02 GST-041 Checkout Entry"
         - "P02 GST-048 Upsell / Cross-Sell"
+        - "P02 GST-050 Resource Booking – Cabana"
         - "P02 GST-075 Book a Space by the Hour"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-003 Sell — Timed Entry"
         - "P05 KSK-004 Choose tickets"
+        - "P05 KSK-015 Assistant"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
@@ -3595,7 +3633,14 @@ paths:
 
 
         **Order.** Sorted by `name` ascending, then by `id`. **Statuses.** For staff every `lifecycleState`; for a
-        guest only `onSale` and `live`, as above.'
+        guest only `onSale` and `live`, as above.
+
+
+        **`venueId` and `X-Venue-Id` name the same thing** (ADAM CR-305 G3, option A, Chinmay, 29 October 2026;
+        CHG-CR305-001). Either names the venue; both sent and different is `400 unknown-venue`. An unknown
+        venue, from either, is `400 unknown-venue` (not the header''s usual `404`), and so is a caller with a
+        credential naming a venue other than the one they act at, so the answer says nothing about which other
+        venues exist.'
       security:
       - bearerAuth: []
       - guestAuth: []
@@ -3620,7 +3665,8 @@ paths:
         description: '**Whose venue to read, for a caller with no venue** (as `listProductCategories`; GPS-C30). A guest
           with a credential, or staff, act at a venue already and may leave it out; a visitor with no credential
           **must send it** (missing: `400 venue-required`; not a venue of the tenant: `400 unknown-venue`). With a
-          credential it must be the venue the caller acts at.'
+          credential it must be the venue the caller acts at (another venue: `400 unknown-venue`). `X-Venue-Id` names
+          it as well; both sent and different is `400 unknown-venue` (ADAM CR-305 G3).'
         schema:
           type: string
           format: uuid
@@ -3629,8 +3675,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '400':
-          description: 'No `venueId` from a caller with no venue (`venue-required`), or one that is not a venue of the tenant
-            (`unknown-venue`).'
+          description: 'No `venueId` or `X-Venue-Id` from a caller with no venue (`venue-required`); or a venue, from either,
+            that is not a venue of the tenant, a `venueId` and `X-Venue-Id` that differ, or a credentialed caller''s venue
+            other than the one they act at (`unknown-venue`; ADAM CR-305 G3).'
           x-ticvai-problem-types: [venue-required, unknown-venue]
           content:
             application/problem+json:
@@ -3733,13 +3780,16 @@ paths:
       summary: List performances of an event
       description: >
         **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
-        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published performances,
-        and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found.
-        `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`). What that means (ADAM CR-305 G1, option A, Chinmay,
+        29 October 2026; CHG-CR305-001): a guest or a visitor sees a performance whose `status` is `onSale` or
+        `soldOut`, and only when its event is one `listEvents` shows a guest (`onSale` or `live`, and
+        `isActive`); for any other event the path's event answers `404 not-found`. `PRODUCT_VIEW` is what a staff
+        caller must hold, and staff see every `status` (ADR-0025).
 
         **Order.** Soonest first, by `startsAt` ascending, then by `id`.
 
-        **Statuses.** Every `status` is returned, ended ones included (`cancelled`); a screen that shows only live rows filters on `status` itself.
+        **Statuses.** For staff every `status` is returned, ended ones included (`cancelled`); a screen that shows
+        only live rows filters on `status` itself. For a guest or a visitor only `onSale` and `soldOut`, as above.
       tags:
       - event
       x-ticvai-permission: PRODUCT_VIEW
@@ -3768,9 +3818,13 @@ paths:
           format: date-time
       - name: categoryId
         in: query
-        description: 'Only performances of products in this product category (a product in several
-          categories matches each), the calendar''s category filter (17 September minutes M17-03, added 30
-          September). With `from` and `to` it is what the day, week and month calendar views ask for.'
+        description: 'Only performances of an event with a product in this product category, the calendar''s
+          category filter (17 September minutes M17-03, added 30 September). With `from` and `to` it is what the
+          day, week and month calendar views ask for. **How it matches** (ADAM CR-305 G2, option A, Chinmay, 29
+          October 2026; CHG-CR305-001): a performance has no product of its own, so the event''s performances
+          are kept when at least one of its products (`catalogue.product.event_id` = the event, Catalogue''s own
+          declared join) has `category_id` = `categoryId`, an exact match with no descendant categories; otherwise
+          none of them are.'
         schema:
           type: string
           format: uuid
@@ -3790,6 +3844,8 @@ paths:
       responses:
         '400':
           $ref: ../shared/common.yaml#/components/responses/VenueRequired
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '200':
           description: Performances, by `startsAt` ascending with `id` as the tiebreak — the order a
             date-and-performance picker shows them in, and the key the cursor pages on.
@@ -4520,6 +4576,9 @@ paths:
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
+      x-ticvai-no-wrong-state: 'a report, not a change of state: every call appends one bundle_application row, and a
+        workstation reporting a version that is no longer current (superseded or withdrawn) is the drift the back office
+        must see, so it is recorded, never refused with 409 (r11 gate, 29 October 2026; CHG-R11INT-003)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -24637,6 +24696,7 @@ components:
           type: string
           format: uuid
           nullable: true
+          x-ticvai-references: catalogue.event
           description: '**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a
             product page finds its event and the event''s performances (`Performance.eventId`) give it dates. Null for a product
             not tied to an event (merchandise, a pass, a membership).'
@@ -26242,10 +26302,16 @@ components:
           minimum: 30
           maximum: 3600
           default: 900
+          x-ticvai-stored-as: catalogue.inventory_reservation.expires_at
           description: 'Short TTLs limit stranding when a terminal dies; long TTLs survive longer outages.
             The venue''s default balances the two: **15 minutes (900 seconds), from the venue setting
             `cartLeaseSeconds`** with a tenant default (decided 28 September, audit R169; proposed,
             client to correct under audit R094).
+
+
+            **Kept as the hold''s `expiresAt`** (`catalogue.inventory_reservation.expires_at` = `acquired_at` +
+            `ttlSeconds`, the time the expiry sweeper reads); the seconds themselves are not a column (r11 gate,
+            CHG-R11FXD-004).
 
             '
     InventoryHoldHolderKind:

@@ -49,7 +49,6 @@ operations:
   - staff
   offline: false
   reads:
-  - assets.media_asset
   - cache:idempotency
   - tenancy.device_firmware
   writes:

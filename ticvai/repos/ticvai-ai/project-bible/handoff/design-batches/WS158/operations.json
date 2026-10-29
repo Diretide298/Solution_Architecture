@@ -18,25 +18,6 @@
   "requestBody": null,
   "responds": "AttendanceRecord"
  },
- "createRotaAssignment": {
-  "method": "POST",
-  "path": "/rota-assignments",
-  "contract": "workforce",
-  "summary": "Put someone on the rota",
-  "permission": "WORKFORCE_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RotaAssignment",
-  "responds": "RotaAssignment"
- },
  "getLabourCost": {
   "method": "GET",
   "path": "/labour-cost",

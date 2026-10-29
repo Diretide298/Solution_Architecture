@@ -414,7 +414,6 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
-  "permission": "TENANT_CONFIGURE",
   "notes": "**Merged into P13 CMS-005 Theme Editor, CMS-002 Brand Kit and CMS-006 Component Preview** (decided 24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds the theme and the component set; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
@@ -463,6 +462,12 @@
     "operation": null,
     "why": "Spacing, shadow, breakpoint and transition tokens per brand are outside the agreed boundary (graphics, colours, fonts, tabs only; DI-223, DI-285): recorded as not built.",
     "source": "DI-223"
+   },
+   {
+    "operation": "setBrandIdentity",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXU-007, the lead: \"Remove + log text\"): a board reading of 19 September declared it, and nothing on the approved screen sends it: its only controls were the generated Save brand identity and Cancel, with no field to send. Brand identity is saved on CMS-002, CMS-004, CMS-104 and ADM-016, where setBrandIdentity stays declared and reached. The generated Save and Cancel buttons go with it. With no operation left the screen has no permission of its own and its no-access state says so. A CR brings the write back here with the control and the fields that send it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
    }
   ],
   "layout": {
@@ -470,22 +475,8 @@
    "regions": [
     {
      "name": "contentBody",
-     "components": [
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setBrandIdentity",
-       "label": "Save brand identity",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setBrandIdentity"
-      }
-     ]
+     "components": [],
+     "notes": "Empty since 29 October 2026 (CHG-R11FXU-007): its only controls, a generated Save brand identity and Cancel, went with setBrandIdentity; the pack gives the body nothing to draw. A CR fills it."
     }
    ]
   },
@@ -494,17 +485,9 @@
    "error": "Could not load. Names which read failed and leaves the design system components untouched.",
    "emptyFirstRun": "No design system components yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the design system components are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "setBrandIdentity",
-    "contract": "white-label",
-    "purpose": "Design system and components",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-836",

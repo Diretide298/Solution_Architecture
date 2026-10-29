@@ -41,6 +41,7 @@ operations:
   - cache:idempotency
   writes:
   - approvals.matrix
+  - approvals.matrix_version
   - approvals.rule
   - cache:idempotency
 - operation: approveRoleAuthorityDelegation
@@ -774,6 +775,7 @@ operations:
   - cache:idempotency
   writes:
   - approvals.matrix
+  - approvals.matrix_version
   - approvals.rule
   - cache:idempotency
 - operation: setApprovalRetentionPolicy

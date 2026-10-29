@@ -186,7 +186,7 @@
         "Administrative Operation"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listWalletTransactions",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 75 §Display"
       }
      ]
@@ -250,7 +250,7 @@
     "operationId": "listWalletTransactions",
     "contract": "wallet",
     "purpose": "Recent activity",
-    "trigger": "onAction",
+    "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
    }
   ],
@@ -965,6 +965,14 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Determine exactly where returned value goes when the original transaction consumed multiple wallet credits. This is important because a simple “+AED 200 to Cash Credit” can corrupt wallet economics. Example",
   "purposeNote": "Refund processing correctly reconstructs or converts the value originally consumed without unintentionally changing its financial or promotional classification.",
+  "gaps": [
+   {
+    "operation": "setWalletRefundPolicy",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXU-003): a board reading of 19 September declared it, and nothing on the approved screen calls it: its six pack restore fields bind to no operation and it has no Save control. The wallet refund policy is saved on BO-1146 (Save wallet refund policy), where setWalletRefundPolicy stays declared and reached (CHG-R10WIR-002, item 5). The screen keeps getOrder, listOrderRefunds and createRefund for the order it routes. A CR brings the write back here with the control that sends it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1027,13 +1035,6 @@
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
-   {
-    "operationId": "setWalletRefundPolicy",
-    "contract": "wallet",
-    "purpose": "Restoration to the original lots",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "createRefund",
     "contract": "orders",

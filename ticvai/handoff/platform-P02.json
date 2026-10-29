@@ -183,11 +183,11 @@
    "operations": 7
   },
   {
-   "contract": "wallet",
+   "contract": "resources",
    "operations": 6
   },
   {
-   "contract": "resources",
+   "contract": "wallet",
    "operations": 6
   },
   {
@@ -667,7 +667,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/general/resource-booking-cabana",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {

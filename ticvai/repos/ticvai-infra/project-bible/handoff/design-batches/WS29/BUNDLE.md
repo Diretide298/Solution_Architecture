@@ -134,7 +134,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-285` | Membership Product & Tier Builder | B | 48 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-286` | Membership Eligibility & Qualification Rule Builder | B | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-287` | Validity, Activation & Expiry Configuration | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-288` | Membership Entitlement & Admission Benefit Builder | B | 14 | 0 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
+| `BO-288` | Membership Entitlement & Admission Benefit Builder | B | 59 | 0 | 5 | 45 | 0 | 0 | — | notStarted (generated) |
 | `BO-289` | Membership Usage, Visit & Consumption Rules | B | 19 | 20 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
 | `BO-290` | Family, Household & Dependent Membership Configuration | B | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-291` | Membership Commercial, Pricing & Channel Association | A | 35 | 0 | 5 | 4 | 0 | 0 | — | notStarted (generated) |
@@ -1097,6 +1097,60 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Per Membership Year | select field | — | — | — | — | — | — |
 | Lifetime of Membership | select field | — | — | — | — | — | — |
 
+**Form: Create entitlement template** (modal, opened by *Create entitlement template*; *Create template* calls `createEntitlementTemplate`, *Cancel* sends nothing)
+
+**Collects what `createEntitlementTemplate` sends before it is called.** Required: `code`, `name` and `validityKind`; the server gives the template its identity. The entitlement the fields above define goes with it: `entriesAllowed` (Number of Visits), `validForDays` (Period), `daysOfWeek` (Days), `validTimeWindows` (Times, Timeslots), and `expiryNoticeDays` for the pre-expiry notice. Dismissing sends nothing; no template is created.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Description `description` | text area | optional | — | — | — | Validity, re-entry and transfer rules in prose. "Can I leave and come back" is answered from here, and a name cannot answer it. | `createEntitlementTemplate` body |
+| Code `code` | text field | required | — | max length 64 | — | — | `createEntitlementTemplate` body |
+| Name `name` | text field | required | — | max length 200 | — | — | `createEntitlementTemplate` body |
+| Validity kind `validityKind` | select | required | — | Single use · Dated · Date range · Rolling · Unlimited · Count limited | — | — | `createEntitlementTemplate` body |
+| Valid from offset days `validFromOffsetDays` | number field (days) | optional | — | — | — | — | `createEntitlementTemplate` body |
+| Valid for days `validForDays` | number field (days) | optional | — | — | — | — | `createEntitlementTemplate` body |
+| Days of week `daysOfWeek` | multi-select chips | optional | — | Mon · Tue · Wed · Thu · Fri · Sat · Sun | — | 1.1.7 and 1.1.82. A camp ticket admits on Tuesdays and Thursdays for six weeks, and `validityKind` had six values with no day pattern among them. | `createEntitlementTemplate` body |
+| Expiry anchor `expiryAnchor` | select | optional | — | Offset days · End of month · End of quarter · End of year · Fixed date · Season end; A pass bought on the 20th and expiring on the 31st cannot be expressed by an offset in days. | — | 1.1.90 to 1.1.92. A pass bought on the 20th and expiring on the 31st cannot be expressed by an offset in days. | `createEntitlementTemplate` body |
+| Expiry date `expiryDate` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | Where `expiryAnchor` is `fixedDate`. Every pass expires the same day regardless of purchase. | `createEntitlementTemplate` body |
+| Expiry notice days `expiryNoticeDays` | number field (days) | optional | — | min 1; max 180 | — | How many days before `validTo` access raises `entitlement.expiringSoon` for an entitlement of this template still `issued` or `partiallyConsumed` (29 September, build pass, group … | `createEntitlementTemplate` body |
+| Carries stored value `carriesStoredValue` | toggle | optional | off | — | — | BL-033. A ticket that is also a wallet — a resort pass with 200 dirhams of spend on it, deducted at a gate or a till. | `createEntitlementTemplate` body |
+| Included value `includedValue` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `createEntitlementTemplate` body |
+| Valid time windows `validTimeWindows` | repeatable rows | optional | — | — | — | BL-036, 1.1.81 and 1.1.83. A time-window entitlement needed a performance to express — valid 09:00 to 13:00 on any day was a thing you built by creating performances. | `createEntitlementTemplate` body |
+| From `validTimeWindows[].from` | text field | optional | — | — | — | — | `createEntitlementTemplate` body |
+| To `validTimeWindows[].to` | text field | optional | — | — | — | — | `createEntitlementTemplate` body |
+| Days of week `validTimeWindows[].daysOfWeek` | list of values (chips) | optional | — | — | — | — | `createEntitlementTemplate` body |
+| Blackout dates `blackoutDates` | list of values (chips) | optional | — | — | — | Calendar exceptions on the entitlement. An annual pass excluding public holidays is the normal case and had nowhere to live. | `createEntitlementTemplate` body |
+| Fast track tier `fastTrackTier` | radio group | optional | — | None · Priority · Express · Unlimited | — | 19.2.20, BL-015. Fast track existed nowhere in the package — not an enum value, not a description, not a screen. | `createEntitlementTemplate` body |
+| Entries allowed `entriesAllowed` | number field | optional | — | — | — | Null means unlimited. The Fast Pass consumption counter lives here. | `createEntitlementTemplate` body |
+| Transport restriction `transportRestriction` | group | optional | — | — | — | The journey a transport pass is good for (decided 29 September, rev 3 REV3-21). Set on the template `transport.createTransportPassType` creates, from the station pair the guest … | `createEntitlementTemplate` body |
+| From station `transportRestriction.fromStationId` | picker: choose a from station | required | — | — | shows names, sends the id | A `transport.Station`. | `createEntitlementTemplate` body |
+| To station `transportRestriction.toStationId` | picker: choose a to station | required | — | — | shows names, sends the id | — | `createEntitlementTemplate` body |
+| Both directions `transportRestriction.bothDirections` | toggle | optional | on | — | — | Valid from either station to the other, as the prototype sells it. | `createEntitlementTemplate` body |
+| Routes `transportRestriction.routeIds` | multi-picker: choose routes | optional | — | — | — | The routes it may be used on. Empty means any active route serving both stations. | `createEntitlementTemplate` body |
+| Reentry allowed `reentryAllowed` | toggle | optional | off | — | — | — | `createEntitlementTemplate` body |
+| Purchase eligibility `purchaseEligibility` | group | optional | — | — | — | 1.1.38, 1.1.121, 1.1.125, 1.1.126. `admissionRulesId` governs where an entitlement admits, not who may buy it, and `promotions.evaluatePromotions` gates a discount rather than a … | `createEntitlementTemplate` body |
+| Min age years `purchaseEligibility.minAgeYears` | number field | optional | — | — | — | — | `createEntitlementTemplate` body |
+| Max age years `purchaseEligibility.maxAgeYears` | number field | optional | — | — | — | — | `createEntitlementTemplate` body |
+| Min height cm `purchaseEligibility.minHeightCm` | number field | optional | — | — | — | Height gates a ride and can gate a sale. A ticket sold to somebody who cannot ride it is a refund at the gate. | `createEntitlementTemplate` body |
+| Residency required `purchaseEligibility.residencyRequired` | toggle | optional | off | — | — | — | `createEntitlementTemplate` body |
+| Nationalities `purchaseEligibility.nationalities` | list of values (chips) | optional | — | — | — | — | `createEntitlementTemplate` body |
+| Min loyalty tier `purchaseEligibility.minLoyaltyTier` | text field | optional | — | — | — | — | `createEntitlementTemplate` body |
+| Requires verification `purchaseEligibility.requiresVerification` | toggle | optional | off | — | — | Whether the claim is checked or taken on trust. A resident rate sold unverified and refused at the gate is worse than one that could not be bought. | `createEntitlementTemplate` body |
+| Person type `personType` | select | optional | — | Adult · Child · Infant · Senior · Student · Resident · Staff | — | 2.11.7. Adult, child and senior existed only as `ProductVariant.axisValues` — a variant axis rather than an attribute of the holder. | `createEntitlementTemplate` body |
+| Admission rules `admissionRulesId` | picker: choose an admission rules | optional | — | — | shows names, sends the id | — | `createEntitlementTemplate` body |
+| Is transferable `isTransferable` | toggle | optional | on | — | — | — | `createEntitlementTemplate` body |
+| Can share media `canShareMedia` | toggle | optional | on | — | — | Whether this entitlement may be appended to media a guest already holds (CF-58). | `createEntitlementTemplate` body |
+| Can claim shop and drop `canClaimShopAndDrop` | toggle | optional | off | — | — | Whether this entitlement may be scanned to claim goods left under 4.4.7. False for a single-entry ticket that is surrendered at the gate — a claim token the guest no longer holds … | `createEntitlementTemplate` body |
+| Is name bound `isNameBound` | toggle | optional | off | — | — | True requires a holder name at sale. Most entitlements carry none — identity and entitlement are separate concerns. | `createEntitlementTemplate` body |
+| Auto renew default `autoRenewDefault` | toggle | optional | off | — | — | Taken from their `membership_plan`, 20 September — the "take those" half of the TAKE BODY verdict. | `createEntitlementTemplate` body |
+| Renewal term days `renewalTermDays` | number field (days) | optional | — | — | — | What a renewal extends the membership by. `orders.membership_renewal` records `previousExpiryAt` and `newExpiryAt` and the number between them lived nowhere. | `createEntitlementTemplate` body |
+| Renewal grace days `renewalGraceDays` | number field (days) | optional | 0 | — | — | How long after expiry a membership can still be renewed rather than rejoined. `membership_renewal.failureReason` implies a window and there was none, so a failed card on the … | `createEntitlementTemplate` body |
+| Renewal variant `renewalVariantId` | picker: choose a renewal variant | optional | — | — | shows names, sends the id | What a renewal sells, which is usually not what joining sold. A first-year price and a renewal price are different products, and pointing both at one variant makes a loyalty … | `createEntitlementTemplate` body |
+| Crosses cells `crossesCells` | toggle | optional | off | — | — | True propagates a redemption right to other cells on issue (ADR-0010). | `createEntitlementTemplate` body |
+| Is active `isActive` | toggle | optional | — | — | — | — | `createEntitlementTemplate` body |
+
+Errors to draw in the form: 400 `includedValue` is in another currency or scale than the working venue's (`venue-currency-mismatch`, `venue-scale-mismatch`).; 403 The session has no working venue, so the template has no venue to be written under (`working-venue-required`); or the caller lacks PRODUCT_CONFIGURE at the …; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …
+
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
 - **benefits**: A list per tier, each benefit with type, value and unit (10% off F&B, 4 guest passes a year), linked to an entitlement template where it grants entry; the plan's benefit set is replaced whole. *(source: contracts/spine/catalogue.yaml#setMembershipBenefit / contracts/spine/catalogue.yaml#setPlanBenefits)*
@@ -1115,6 +1169,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | F&B Benefit (secondary button) | navigation or local | — | — | — | — |
 | Retail Benefit (secondary button) | navigation or local | — | — | — | — |
 | Rental Benefit (secondary button) | navigation or local | — | — | — | — |
+| Create entitlement template (secondary button) | `createEntitlementTemplate` POST `/entitlement-templates` | EntitlementTemplate | EntitlementTemplate | 400 `includedValue` is in another currency or scale than the working venue's (`venue-currency-mismatch`, `venue-scale-mismatch`).; 403 The session has no working venue, so the template has no venue to be written under … | opens modal first |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1170,7 +1225,7 @@ Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
-25 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+45 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -1186,7 +1241,7 @@ Screen guard: `PRODUCT_VIEW`
 | 1.1.9 | The system should allow the validity period for a ticket to be configurable. For open-dated tickets, the validity period is intended to define the mandatory date by which the ticket must be used. For … | Ticketing Catalogue | CONTRACTED | `createEntitlementTemplate` |
 | 1.1.11 | The system should allow the number of entitled access per ticket to be configurable (N entries to Y access areas). Some tickets will allow only access once per attraction while some tickets will … | Ticketing Catalogue | CONTRACTED | `createEntitlementTemplate` |
 | 1.1.16 | System shall allow administrators to create reusable ticket templates containing pricing, validity, capacity, access rights, add-ons, restrictions and approval workflows. | Ticketing Catalogue | CONTRACTED | `createEntitlementTemplate` |
-| … 13 more | | | | `traceability.json` |
+| … 33 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -1209,10 +1264,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (400, 403, 409).
+- [ ] Every input above is drawn (59), with its required mark, default, format and its error state (400, 403, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-288?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Attraction Access, Event Access, Zone Access, Priority Entry, Guest Tickets, F&B Benefit, Retail Benefit, Rental Benefit.
+- [ ] Every action is wired with its success and its failure: Attraction Access, Event Access, Zone Access, Priority Entry, Guest Tickets, F&B Benefit, Retail Benefit, Rental Benefit, Create entitlement template.
 - [ ] Every transition is wired: `BO-284`.
 - [ ] Every gated control is gated: `MEMBERSHIP_MANAGE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The module and platform inputs below are applied.

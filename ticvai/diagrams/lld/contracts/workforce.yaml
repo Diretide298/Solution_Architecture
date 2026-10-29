@@ -80,6 +80,7 @@ operations:
   - identity.principal
   - platform.workstation
   - workforce.rota_assignment
+  - workforce.staffing_rules
   writes:
   - cache:idempotency
   - workforce.rota_assignment
@@ -650,6 +651,7 @@ operations:
   reads:
   - cache:idempotency
   - workforce.rota_assignment
+  - workforce.staffing_rules
   writes:
   - cache:idempotency
   - workforce.rota_assignment

@@ -671,7 +671,7 @@
  "MediaUsage": {
   "x-ticvai-persistence": "assets.media_usage",
   "type": "object",
-  "description": "One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it.\n",
+  "description": "One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it. **`surface: mediaCollectionCover` is never a stored row** (ADAM CR-326, option A; CHG-CR326-001): `deleteMediaAsset` works it out from `assets.media_collection.cover_asset_id` to name a collection whose cover the asset is, with `referenceId` the collection's id and `label` its name.\n",
   "required": [
    "surface",
    "referenceId"
@@ -709,7 +709,8 @@
      "seatingSection",
      "transportNetworkImport",
      "venueMap",
-     "venueMapVersion"
+     "venueMapVersion",
+     "mediaCollectionCover"
     ]
    },
    "referenceId": {

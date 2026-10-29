@@ -1474,11 +1474,13 @@
       {
        "kind": "primaryButton",
        "label": "Increase Guest Count",
+       "operation": "updateGroupBooking",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support"
       },
       {
        "kind": "secondaryButton",
        "label": "Reduce Guest Count",
+       "operation": "updateGroupBooking",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support"
       },
       {
@@ -1519,6 +1521,27 @@
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formUpdateGroupBooking",
+    "component": "modal",
+    "trigger": "Increase Guest Count, Reduce Guest Count",
+    "body": "**Collects what `updateGroupBooking` sends before it is called:** the group's new size, `expectedSize` before the numbers are confirmed or `confirmedSize` once they are. The booking's version goes with it (If-Match), so a change made meanwhile is refused and shown, not overwritten. Dismissing sends nothing; the group is unchanged.",
+    "bindsTo": "UpdateGroupBookingRequest",
+    "confirm": {
+     "label": "Save guest count",
+     "operation": "updateGroupBooking"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "expectedSize",
+      "confirmedSize"
+     ]
+    },
+    "provenance": "contract orders.yaml PATCH /group-bookings/{groupBookingId}; r11 gate fix, 29 October 2026 (CHG-R11FXS-004)"
+   }
+  ],
   "states": {
    "loading": "The group amendments cancellation list.",
    "error": "Could not load. Names which read failed and leaves the group amendments cancellation untouched.",

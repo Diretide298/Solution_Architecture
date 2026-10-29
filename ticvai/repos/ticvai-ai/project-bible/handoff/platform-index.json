@@ -74,7 +74,7 @@
    "contracts": 19,
    "modules": 4,
    "undrawn": 0,
-   "operationsWithNoScreen": 157
+   "operationsWithNoScreen": 158
   },
   "waves": {
    "wave1": 30,
@@ -104,15 +104,15 @@
   "operator": "venue",
   "counts": {
    "screens": 1663,
-   "operations": 1895,
+   "operations": 1892,
    "contracts": 31,
    "modules": 19,
    "undrawn": 0,
-   "operationsWithNoScreen": 211
+   "operationsWithNoScreen": 212
   },
   "waves": {
-   "wave1": 143,
-   "wave2": 58,
+   "wave1": 144,
+   "wave2": 57,
    "wave3": 1462
   }
  },

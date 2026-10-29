@@ -159,7 +159,7 @@ operationsByContract:
     scope: workstation
     permission: ORDER_CREATE
     offline: true
-    reads: 7
+    reads: 8
     writes: 7
   - operation: createGuestFnbOrder
     verb: POST
@@ -960,7 +960,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: setMenuSections
     verb: PUT
     path: /menus/{menuId}/sections
@@ -1870,7 +1870,8 @@ tables:
   columns: 10
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - fnb
   foreignWriters: null
 - table: fnb.sub_bill
   columns: 11

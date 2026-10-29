@@ -3200,8 +3200,9 @@ Outbound sending runs through the CRM/marketing communication services, not a se
 
 **Where it is stored** (4 October 2026, CHG-FXC-005). The input becomes one `promotions.code_assignment` row
 (CouponCodeAssignment: channelsType, assigneeType, assigneeReference, batchId, quantity); `quantity` codes of the batch
-that are `issued` and unassigned move to `assigned` with `assignmentId` set and `distributionStatus` `pending` (409
-when the batch has fewer left). The view counts the batch's codes: `generated` all of them, `assigned` those with an
+that are `issued` and unassigned move to `assigned` with `assignmentId` set and `distributionStatus` `pending`
+(`409 not-enough-codes-in-batch` when the batch has fewer left, naming how many are left; nothing is written).
+Every PUT adds an assignment this way (ADAM CR-316); none replaces an earlier one. The view counts the batch's codes: `generated` all of them, `assigned` those with an
 assignment, `sent`, `delivered`, `viewed` and `cancelled` by `distributionStatus`, `redeemed` and `expired` by
 `status`.
 
@@ -3256,6 +3257,7 @@ assignment, `sent`, `delivered`, `viewed` and `cancelled` by `distributionStatus
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Code Distribution & Assignment Manager |
+| 409 |  | Refused, and nothing is written (ADAM CR-316). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setDemandOccupancyAvailability
@@ -4458,6 +4460,8 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 
 **Order.** Sorted by `name` ascending, then by `id`. **Statuses.** For staff every `lifecycleState`; for a guest only `onSale` and `live`, as above.
 
+**`venueId` and `X-Venue-Id` name the same thing** (ADAM CR-305 G3, option A, Chinmay, 29 October 2026; CHG-CR305-001). Either names the venue; both sent and different is `400 unknown-venue`. An unknown venue, from either, is `400 unknown-venue` (not the header's usual `404`), and so is a caller with a credential naming a venue other than the one they act at, so the answer says nothing about which other venues exist.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
@@ -4506,7 +4510,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 400 |  | No venueId from a caller with no venue (venue-required), or one that is not a venue of the tenant (unknown-venue). |
+| 400 |  | No venueId or X-Venue-Id from a caller with no venue (venue-required); or a venue, from either, that is not a venue of the tenant, a venueId and X-Venue-Id that differ, or a credentialed caller's ven… |
 | 200 |  | Events |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -4514,9 +4518,9 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 
 **`GET /events/{eventId}/performances`**: List performances of an event
 
-**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published performances, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`). What that means (ADAM CR-305 G1, option A, Chinmay, 29 October 2026; CHG-CR305-001): a guest or a visitor sees a performance whose `status` is `onSale` or `soldOut`, and only when its event is one `listEvents` shows a guest (`onSale` or `live`, and `isActive`); for any other event the path's event answers `404 not-found`. `PRODUCT_VIEW` is what a staff caller must hold, and staff see every `status` (ADR-0025).
 **Order.** Soonest first, by `startsAt` ascending, then by `id`.
-**Statuses.** Every `status` is returned, ended ones included (`cancelled`); a screen that shows only live rows filters on `status` itself.
+**Statuses.** For staff every `status` is returned, ended ones included (`cancelled`); a screen that shows only live rows filters on `status` itself. For a guest or a visitor only `onSale` and `soldOut`, as above.
 
 |  |  |
 |---|---|
@@ -4540,7 +4544,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | eventId | path | yes | string (uuid) |  |
 | from | query |  | string (date-time) | Only performances whose startsAt is at or after this instant. |
 | to | query |  | string (date-time) | Only performances whose startsAt is before this instant. |
-| categoryId | query |  | string (uuid) | Only performances of products in this product category (a product in several categories matches each), the calendar's category filter (17 September minutes M17-03, added 30 September). |
+| categoryId | query |  | string (uuid) | Only performances of an event with a product in this product category, the calendar's category filter (17 September minutes M17-03, added 30 September). |
 | language | query |  | string | Only performances given in this language, e.g. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
@@ -4571,6 +4575,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | Code | Shape | Meaning |
 |---|---|---|
 | 400 | VenueRequired | A public guest read of venue data named no venue (venue-required; ADAM CR-198, CHG-R10ID-022): send X-Venue-Id. |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 200 |  | Performances, by startsAt ascending with id as the tiebreak — the order a date-and-performance picker shows them in, and the key the cursor pages on. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -5851,7 +5856,7 @@ Where `name` is null the row sorts after the rows that have it (NULLS LAST), and
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.variant` |
 | Writes | - |
-| Called by | BO-007, BO-008, BO-012, BO-048, EMP-034, GST-008, GST-041, GST-048, GST-075, KSK-004, POS-002, POS-003, PTR-006, WEB-005, WEB-048 |
+| Called by | BO-007, BO-008, BO-012, BO-048, EMP-034, GST-008, GST-041, GST-048, GST-050, GST-075, KSK-004, KSK-015, POS-002, POS-003, PTR-006, WEB-005, WEB-048 |
 
 **Parameters**
 

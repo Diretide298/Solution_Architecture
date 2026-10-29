@@ -20,6 +20,11 @@ transitions:
   operation: createRotaAssignment
   trigger: operation
   guard: Visible to the person rostered. **Until published it is a plan, not a commitment**
+- from: planned
+  to: published
+  operation: updateRotaAssignment
+  trigger: operation
+  guard: Published by a PATCH of its status (ADAM CR-315). Visible to the person rostered from then on
 - from: published
   to: confirmed
   operation: updateRotaAssignment

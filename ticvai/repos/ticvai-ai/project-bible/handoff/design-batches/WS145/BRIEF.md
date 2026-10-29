@@ -1,6 +1,6 @@
 # WS145 — Marketing CRM Configuration Reference v1.0 board 11
 
-**10 screens · 11 operations · 30 schemas · 4 permissions**
+**10 screens · 10 operations · 29 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-834` | Digital Experience Center | B | 1 | 26 | 6 | 6 | 1 | 0 | — | notStarted (—) |
 | `BO-835` | Site, Brand & Domain Setup | B | 0 | 0 | 6 | 0 | 3 | 6 | — | notStarted (—) |
-| `BO-836` | Design System & Components | B | 0 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
+| `BO-836` | Design System & Components | B | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-837` | Page & Landing Builder | B | 0 | 13 | 6 | 3 | 4 | 0 | — | notStarted (—) |
 | `BO-838` | Content, Media & Forms | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-839` | Dynamic Product Pages | B | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |

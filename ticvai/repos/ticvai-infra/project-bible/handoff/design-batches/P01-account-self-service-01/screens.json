@@ -545,12 +545,18 @@
     },
     {
      "to": "WEB-018",
-     "trigger": "My Tickets",
+     "trigger": "View ticket",
      "carries": [
       "entitlementId",
       "orderId"
      ],
      "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId and WEB-017 holds entitlementId, orderId, so an edge into it carries them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "All tickets",
+     "carries": [],
+     "provenance": "ADAM CR-290, a design change logged by Chitrangi Mestry on #33271, 28 October 2026: the overview header's All tickets link opens My Tickets on the whole list, so it carries no ticket."
     },
     {
      "to": "WEB-019",
@@ -562,14 +568,14 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.\n\n**The loyalty tile's programmeId comes from listLoyaltyProgrammes (4 October 2026)** (CHG-FXS-003)\n\n**The loyalty programme is picked from listLoyaltyProgrammes when there are several** (CHG-FXS-003)\n\nBuild note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text above reads.** A guest holds no permission, so the state never names one (the text above still names staff permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs says so without saying whose. The corrected wording waits for the client's approval of the visible text (pending entry GPS-C09).",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack recognised that before the package did.\n\n**The loyalty tile's programmeId comes from listLoyaltyProgrammes (4 October 2026)** (CHG-FXS-003)\n\n**The loyalty programme is picked from listLoyaltyProgrammes when there are several** (CHG-FXS-003)\n\nBuild note (r8 second round, GPS-C09): **build the no-access state as GFIX-4 says, not as the state text above reads.** A guest holds no permission, so the state never names one (the text above still names staff permissions); signed out, the guest is offered sign-in and brought back here; a record that is not theirs says so without saying whose. The corrected wording waits for the client's approval of the visible text (pending entry GPS-C09).\n\n**Design change, logged (ADAM CR-290, raised by Chitrangi Mestry on #33271, 28 October 2026; the lead's rule of 28 October that frontend developers change a screen's design on their own and log it).** The guest-web build changes the look and nothing behind it; the frame `wireframes/P01 Guest Web.dc.html#web-017` draws it and is the look to build to. (1) The overview header has an **All tickets** link on its end side (an arrow after it, mirrored in Arabic) that opens My Tickets (WEB-018) on the whole list, in place of an All tickets row action. (2) **Upcoming bookings** (up to three, soonest first) are compact ticket cards: a brand date stub (day, month, year), the venue and product name, a *Shared* pill on a shared ticket, a dashed rule, a Date / Time / Guests line, and a perforated tear-off stub with **View ticket**, which opens WEB-018 with the entitlement and its order. (3) The page container is 72rem wide (it was 57.5rem). (4) **Challenges** are cards: an icon circle, the name, a status pill (completed, in progress, not started), \"{current} of {target}\", a reward pill (points, credit or badge), a progress bar with its percentage, and a hint (\"{n} more to unlock the reward\", \"Get started to earn the reward\") with the end date. (5) The **membership band** is a dark ink panel: crowns and the tier kicker, the points balance large with the label *Membership rewards balance*, \"Progress to {tier}\" with a percentage and a glowing brand bar, the to-next text, and the pending and expiring lines. It joins a light perks panel through a curved gold edge; the panel lists two perks with icon circles, *Member pricing* (applied automatically at checkout) and *Saved cards and guests* (prefill the booking flow). Every colour is a theme token (ink, brand, tint, surface) and the page mirrors in Arabic. The operations, fields, errors and states are the ones above; the prototype view's account navigation, greeting and signed-out card are unchanged.",
   "density": "compact",
   "boardFrames": [
    "Dashboards Board.dc.html#web-017"
   ],
   "pattern": "listDetail",
   "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
-  "purpose": "Everything I have with this venue at a glance: bookings, wallet, loyalty, challenges and invitations, each opening its own pane.",
+  "purpose": "Everything I have with this venue at a glance: my membership and its rewards balance, my next bookings as tickets, my challenges, wallet, orders and invitations, each opening its own pane.",
   "layout": {
    "template": "split",
    "regions": [
@@ -578,11 +584,30 @@
      "slot": "collection",
      "components": [
       {
-       "kind": "metricTile",
+       "kind": "cardList",
        "label": "Upcoming bookings",
+       "bindsTo": "Entitlement",
+       "columns": [
+        "Entitlement.venueName",
+        "Entitlement.productName",
+        "Entitlement.validFrom",
+        "Entitlement.sharedWithSubjectIds"
+       ],
        "operation": "listMyEntitlements",
-       "notes": "Next visits; opens WEB-018.",
-       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction)"
+       "notes": "Up to three ticket cards, soonest first: a brand date stub (day, month, year), the venue and product name, a Shared pill on a shared ticket, a dashed rule, a Date / Time / Guests line, and a perforated tear-off stub with View ticket. Was a tile of next visits (ADAM CR-290, 28 October 2026). The venue and product name are venueName and productName, the date stub and Date / Time validFrom, the Shared pill a non-empty sharedWithSubjectIds; Guests counts the cards' entitlements of one order line (bound 29 October 2026, the lead: bind what the build reads).",
+       "provenance": "corrected 2 October 2026 (CHG-SGU-017, design-notes correction); ticket cards ADAM CR-290 (Chitrangi Mestry, #33271, 28 October 2026)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "View ticket",
+       "notes": "On each ticket card's tear-off stub; opens WEB-018 with the entitlement and its order.",
+       "provenance": "ADAM CR-290 (Chitrangi Mestry, #33271, 28 October 2026)"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "All tickets",
+       "notes": "A text link with an arrow on the end side of the overview header (mirrored in Arabic); opens WEB-018 on the whole list, in place of an All tickets row action.",
+       "provenance": "ADAM CR-290 (Chitrangi Mestry, #33271, 28 October 2026)"
       },
       {
        "kind": "metricTile",
@@ -601,10 +626,10 @@
       },
       {
        "kind": "metricTile",
-       "label": "Loyalty",
+       "label": "Membership rewards balance",
        "operation": "getLoyaltyPosition",
-       "notes": "The guest's position in the programme from listLoyaltyProgrammes (the first active one).",
-       "provenance": "contract marketing-crm.yaml LoyaltyPosition (defined 4 October 2026, CHG-FXS-003)",
+       "notes": "The guest's position in the programme from listLoyaltyProgrammes (the first active one), drawn as the membership band (ADAM CR-290, 28 October 2026): a dark ink panel with crowns and the tier kicker, the points balance large over the label Membership rewards balance, \"Progress to {tier}\" with a percentage and a glowing brand bar, the to-next text, and the pending and expiring lines. A curved gold edge joins it to a light perks panel: Member pricing (applied automatically at checkout) and Saved cards and guests (prefill the booking flow), each with an icon circle.",
+       "provenance": "contract marketing-crm.yaml LoyaltyPosition (defined 4 October 2026, CHG-FXS-003); the band ADAM CR-290 (Chitrangi Mestry, #33271, 28 October 2026)",
        "bindsTo": "LoyaltyPosition"
       },
       {
@@ -622,8 +647,8 @@
      "slot": "selection",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "The challenge",
+       "kind": "cardList",
+       "label": "Challenges",
        "bindsTo": "Challenge",
        "columns": [
         "Challenge.name",
@@ -631,12 +656,14 @@
         "Challenge.rewardKind",
         "Challenge.rewardValue",
         "Challenge.rewardAmount",
-        "Challenge.startsAt",
         "Challenge.endsAt",
-        "Challenge.status"
+        "ChallengeProgress.current",
+        "ChallengeProgress.target",
+        "ChallengeProgress.completedAt"
        ],
        "operation": "getMyChallenges",
-       "provenance": "contract marketing-crm.yaml GET /guests/me/challenges"
+       "notes": "One card per challenge (ADAM CR-290, 28 October 2026): an icon circle by kind, the name, a status pill (completed, in progress, not started), \"{current} of {target}\", a reward pill (points, credit or badge), a progress bar with its percentage, and a hint (\"{n} more to unlock the reward\", \"Get started to earn the reward\") with the end date. Was one challenge's detail panel. The progress is the response's progress (ChallengeProgress): \"{current} of {target}\" and the bar from current and target, the pill completed when completedAt is set, not started when progress is null, in progress otherwise (bound 29 October 2026, the lead: bind what the build reads). The columns are what the card shows and nothing else: startsAt and the challenge's own status are not drawn (the pill is the guest's progress), so they are not bound (the lead, 29 October 2026).",
+       "provenance": "ADAM CR-290 (Chitrangi Mestry, #33271, 28 October 2026, a logged design change): the card's layout and the fields it shows are the developer's design; the data is getMyChallenges, contract marketing-crm.yaml GET /guests/me/challenges"
       },
       {
        "kind": "detailPanel",
@@ -773,9 +800,9 @@
     "file": "sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html",
     "rev": "rev 3 (pointer moved to the 30 September build, CHG-R1S-015)",
     "verified": "2026-09-28",
-    "match": "exact",
+    "match": "partial",
     "view": "Sign in → avatar menu → 'Account overview'",
-    "differences": "Prototype makes the account a single page with section panes; most YAML account screens (019–024, 026, 027, 030, 031, 034) are panes of it. Groups & invitations (respondToInvitation, getMyChallenges, referral code) sits here. Signed-out state 'Sign in to see your account' is drawn."
+    "differences": "Prototype makes the account a single page with section panes; most YAML account screens (019–024, 026, 027, 030, 031, 034) are panes of it. Groups & invitations (respondToInvitation, getMyChallenges, referral code) sits here. Signed-out state 'Sign in to see your account' is drawn. **Since 28 October 2026 the look is the frame on the board, not this view** (ADAM CR-290, a design change logged by Chitrangi Mestry on #33271): the view still shows the greeting, the account navigation and the signed-out card; the frame draws the build's ticket cards, All tickets link, 72rem page, challenge cards and dark membership band, where this view draws plain booking rows, no header link, plain challenge rows and a lighter band."
    },
    "derivedFrom": "wireframes/reference/Dashboards Board.dc.html",
    "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing.",

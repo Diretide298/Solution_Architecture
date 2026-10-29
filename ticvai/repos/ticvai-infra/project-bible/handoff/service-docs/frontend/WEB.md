@@ -1035,7 +1035,7 @@
 
 ## WEB-017 My Account Dashboard
 
-**Everything I have with this venue at a glance: bookings, wallet, loyalty, challenges and invitations, each opening its own pane.**
+**Everything I have with this venue at a glance: my membership and its rewards balance, my next bookings as tickets, my challenges, wallet, orders and invitations, each opening its own pane.**
 
 |  |  |
 |---|---|
@@ -1048,7 +1048,7 @@
 | Suggested location | `src/routes/account-and-self-service/MyAccountDashboard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Layout pattern | listDetail (structure only, not the look) |
 
-**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Sign in → avatar menu → 'Account overview'. Wireframe frame `wireframes/P01 Guest Web.dc.html#web-017`, which adam_pull writes into the ticket folder as `wireframe-web-017.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
+**Design (client-approved, build identical).** Prototype `sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html` (rev 3 (pointer moved to the 30 September build, CHG-R1S-015)), view: Sign in → avatar menu → 'Account overview' (it shows part of this screen: build the rest from the screen spec in the same look). Wireframe frame `wireframes/P01 Guest Web.dc.html#web-017`, which adam_pull writes into the ticket folder as `wireframe-web-017.html`. Build it to look identical to that view (layout, spacing, type and colour), with the app shell's tokens (`handoff/design-tokens/guest-web.yaml`). Each state's look: loading: the turnstile loader (the prototype, lines 4950-4962, the block marked "TURNSTILE LOADER" (and flash() at 6984-6994, which opens it for 820 ms)); error: the status card of WEB-029 (Error / Sold out / Maintenance) (`wireframes/P01 Guest Web.dc.html#web-029`, pulled as `wireframe-web-029.html`); emptyFirstRun: the dashed empty card (the prototype, lines 3228-3235 (My tickets, "{{ tickets.emptyText }}") and 4640-4644 (Wishlist, "Nothing saved.")); emptyNoResults: the "Nothing matched" card (the prototype, lines 3084-3090 (Listing and search, "Nothing matched {{ list.filterText }}")); emptyNoAccess: the "Sign in to see your account" card (the prototype, lines 3314-3322 (My account, signed out)); offline: the offline banner and the paused actions (`wireframes/states/P01 Guest Web states.dc.html#web-state-offline`, pulled as `wireframe-web-state-offline.html`) [drawn by the package from the approved design, r9; not yet seen by the client]. The screen's layout block (template, regions, pattern) and any frame generated from the YAML under wireframes/incoming/ are structure only, not the look.
 
 **Done when** the visual check passes for every state (screenshots side by side with the prototype view, or the state's pattern, per state at 1440×900 and 390×844, LTR and RTL; attach them to the Ready-for-QA comment).
 
@@ -1088,7 +1088,8 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | WEB-016 | Login / Register | challengeId, subjectId |  |
-| WEB-018 | My Tickets | entitlementId, orderId |  |
+| WEB-018 | View ticket | entitlementId, orderId |  |
+| WEB-018 | All tickets |  |  |
 | WEB-019 | Order History | orderId |  |
 
 ## WEB-018 My Tickets

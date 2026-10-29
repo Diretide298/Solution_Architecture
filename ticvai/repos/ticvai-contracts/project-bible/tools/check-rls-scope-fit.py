@@ -183,6 +183,10 @@ def classes(pol: dict) -> dict:
         elif helper == "apply_grant_holder_subject_read_rls":
             # a subject-owned table opened to staff grants, still read by its own guest (CHG-MOD-007)
             r = ("any", "subject")
+        elif helper == "apply_grant_holder_subject_rls":
+            # a guest's row that belongs to no scope, read and written by any staff grant and by its own guest
+            # (x-ticvai-rls grant-holder-write, CHG-R11FXC-003)
+            r = ("any", "any")
         elif helper in PARENT_HELPERS:
             p = parent_of(args)
             pc = cls(p, depth + 1) if p else None
@@ -315,6 +319,17 @@ def main() -> int:
                 if kind == "reads" and read == "scope" and t in has_path and writers.get(t) \
                         and writers[t] <= {"tenant", "platform"}:
                     guard.add("RF-OWNED-ABOVE", f"{o}:{t}", f"{o} ({level}) reads {t}, written only at tenant "
+                              f"({', '.join(sorted(writers[t]))}), so its rows sit above the reader: x-ticvai-rls "
+                              "read-beneath, or say why the reader sees none")
+                # **And written only at a brand** (ADAM CR-314, CHG-CR314-001): a brand's cookie banner, written at
+                # its brand's node (the corporate one at the tenant root), read by every venue of the brand. The rule
+                # read tenant writers only, so a table written at brand and read at venue passed. Only brand: a
+                # region- or venue-written table read by a workstation is a question of device scope this does not
+                # settle (27 such pairs on 29 October 2026, not judged here).
+                elif kind == "reads" and read == "scope" and t in has_path and writers.get(t) \
+                        and "brand" in writers[t] and writers[t] <= {"tenant", "brand", "platform"} \
+                        and level in LEVEL and LEVEL[level] > LEVEL["brand"]:
+                    guard.add("RF-OWNED-ABOVE", f"{o}:{t}", f"{o} ({level}) reads {t}, written only above it "
                               f"({', '.join(sorted(writers[t]))}), so its rows sit above the reader: x-ticvai-rls "
                               "read-beneath, or say why the reader sees none")
     for rule, key, msg, strict in (inherited_findings(lin, pol, cl, levelled)

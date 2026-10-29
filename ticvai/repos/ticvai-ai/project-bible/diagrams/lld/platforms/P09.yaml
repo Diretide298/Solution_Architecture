@@ -23,7 +23,7 @@ modulesUsed:
   screens: 211
 servicesCalled:
 - service: PlatformService
-  operationCalls: 371
+  operationCalls: 370
 - service: IdentityService
   operationCalls: 264
 - service: AiService
@@ -2609,7 +2609,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - createTenant
   - listCellJobs
   states:
   - emptyFirstRun
@@ -2620,6 +2619,8 @@ screens:
   offlineState: false
   entryParams:
   - cellId<-navigation
+  - tenantId<-navigation
+  - regionId<-navigation
   goesTo:
   - ADM-002
   - ADM-420

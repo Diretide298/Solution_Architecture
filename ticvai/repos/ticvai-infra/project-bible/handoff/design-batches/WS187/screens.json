@@ -264,13 +264,6 @@
     "purpose": "Funding rules in force",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "listWalletTransactions",
-    "contract": "wallet",
-    "purpose": "Recent funding",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
    }
   ],
   "wireframe": {
@@ -536,7 +529,15 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Control the business rules governing individual wallet top-up transactions.",
   "purposeNote": "Every wallet top-up is evaluated against the applicable funding rules before value is credited.",
-  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1096, BO-1097, BO-1098, BO-1099, BO-1101, BO-417, BO-418; this screen is Top-Up Rule Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.03, page 15): control the business rules governing individual wallet top-up transactions.",
+  "division": "Shares `getWalletFundingRules` with BO-1096, BO-1097, BO-1098, BO-1099, BO-1101, BO-417, BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Top-Up Rule Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.03, page 15): control the business rules governing individual wallet top-up transactions.",
+  "gaps": [
+   {
+    "operation": "setWalletFundingRules",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing on the approved screen calls it: its pack select and text fields bind to no operation and it has no Save or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding Method Configuration (Save funding rules), where setWalletFundingRules stays declared and reached; the lead's ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps getWalletFundingRules and its rules panel. A CR brings the write back here with the control that sends it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -679,16 +680,6 @@
   },
   "apis": [
    {
-    "operationId": "setWalletFundingRules",
-    "contract": "wallet",
-    "purpose": "Amounts, presets and bonus rules",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getWalletFundingRules"
-    ]
-   },
-   {
     "operationId": "getWalletFundingRules",
     "contract": "wallet",
     "purpose": "How a wallet may be topped up",
@@ -765,7 +756,15 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure funding availability across; Configure) and no display directory — it is settings, not a population",
   "purpose": "Determine where each funding method may be used.",
-  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1097, BO-1098, BO-1099, BO-1101, BO-417, BO-418; this screen is Channel & Funding Source Mapping (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.04, page 16): determine where each funding method may be used.",
+  "division": "Shares `getWalletFundingRules` with BO-1095, BO-1097, BO-1098, BO-1099, BO-1101, BO-417, BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Channel & Funding Source Mapping (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.04, page 16): determine where each funding method may be used.",
+  "gaps": [
+   {
+    "operation": "setWalletFundingRules",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing on the approved screen calls it: its pack channel select fields bind to no operation and it has no Save or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding Method Configuration (Save funding rules), where setWalletFundingRules stays declared and reached; the lead's ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps getWalletFundingRules and its rules panel. A CR brings the write back here with the control that sends it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -893,16 +892,6 @@
   },
   "apis": [
    {
-    "operationId": "setWalletFundingRules",
-    "contract": "wallet",
-    "purpose": "Channel and funding-source mapping",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getWalletFundingRules"
-    ]
-   },
-   {
     "operationId": "getWalletFundingRules",
     "contract": "wallet",
     "purpose": "How a wallet may be topped up",
@@ -980,7 +969,15 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure automatic wallet replenishment when balances fall below predefined thresholds. The attached scope specifically requires automatic top-up when a wallet balance falls below a configurable threshold.",
   "purposeNote": "Auto-reload occurs only after the configured threshold is reached and all consent, payment, security and funding-limit validations have passed.",
-  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1098, BO-1099, BO-1101, BO-417, BO-418; this screen is Auto-Reload Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.05, page 17): configure automatic wallet replenishment when balances fall below predefined thresholds. The attached scope specifically requires automatic top-up when a wallet balance falls below a configurable threshold.",
+  "division": "Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1098, BO-1099, BO-1101, BO-417, BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Auto-Reload Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.05, page 17): configure automatic wallet replenishment when balances fall below predefined thresholds. The attached scope specifically requires automatic top-up when a wallet balance falls below a configurable threshold.",
+  "gaps": [
+   {
+    "operation": "setWalletFundingRules",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing on the approved screen calls it: its only component is the read-only rules panel (getWalletFundingRules) and it has no Save or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding Method Configuration (Save funding rules), where setWalletFundingRules stays declared and reached; the lead's ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps getWalletFundingRules and its rules panel. A CR brings the write back here with the control that sends it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1098,16 +1095,6 @@
   },
   "apis": [
    {
-    "operationId": "setWalletFundingRules",
-    "contract": "wallet",
-    "purpose": "Auto-reload on a threshold",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getWalletFundingRules"
-    ]
-   },
-   {
     "operationId": "getWalletFundingRules",
     "contract": "wallet",
     "purpose": "How a wallet may be topped up",
@@ -1185,7 +1172,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure scheduled wallet funding independent of the wallet's current balance. The source specifically requires scheduled or recurring top-ups based on date, frequency, amount, payment method and customer authorization.",
   "purposeNote": "and authorization requirements.",
-  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1099, BO-1101, BO-417, BO-418; this screen is Recurring Funding Schedule (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.06, page 17): configure scheduled wallet funding independent of the wallet's current balance. The source specifically requires scheduled or recurring top-ups based on date, frequency, amount, payment method and customer authorization.",
+  "division": "Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1099, BO-1101, BO-417, BO-418 (it and BO-1094, BO-417, BO-418 send `setWalletFundingRules`, CHG-R11FXU-002); this screen is Recurring Funding Schedule (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.06, page 17): configure scheduled wallet funding independent of the wallet's current balance. The source specifically requires scheduled or recurring top-ups based on date, frequency, amount, payment method and customer authorization.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1294,6 +1281,7 @@
       {
        "kind": "primaryButton",
        "label": "Specific day of month",
+       "operation": "setWalletFundingRules",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 17 §Support schedules such as"
       }
      ]
@@ -1396,7 +1384,15 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure approval based on; Configure) and no display directory — it is settings, not a population",
   "purpose": "Apply governance and approval controls to wallet funding operations.",
   "purposeNote": "Funding transactions requiring approval cannot alter the wallet balance until all configured authorization requirements are satisfied.",
-  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1101, BO-417, BO-418; this screen is Funding Authorization & Approval Rules (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.07, page 18): apply governance and approval controls to wallet funding operations.",
+  "division": "Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1101, BO-417, BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Funding Authorization & Approval Rules (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.07, page 18): apply governance and approval controls to wallet funding operations.",
+  "gaps": [
+   {
+    "operation": "setWalletFundingRules",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing on the approved screen calls it: its pack select fields bind to no operation and it has no Save or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding Method Configuration (Save funding rules), where setWalletFundingRules stays declared and reached; the lead's ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps getWalletFundingRules and its rules panel. A CR brings the write back here with the control that sends it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -1528,16 +1524,6 @@
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
   "apis": [
-   {
-    "operationId": "setWalletFundingRules",
-    "contract": "wallet",
-    "purpose": "Approval above a threshold",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getWalletFundingRules"
-    ]
-   },
    {
     "operationId": "getWalletFundingRules",
     "contract": "wallet",
@@ -1840,7 +1826,15 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Protect wallets against excessive or suspicious funding activity. The source specifically requires configurable maximum balance, daily top-up limit, single-transaction limit and user- specific limits.",
   "purposeNote": "Funding limits are evaluated in real time before wallet value is credited, with configurable actions for violations.",
-  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1099, BO-417, BO-418; this screen is Funding Limits & Velocity Controls (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.09, page 20): protect wallets against excessive or suspicious funding activity. The source specifically requires configurable maximum balance, daily top-up limit, single-transaction limit and user- specific limits.",
+  "division": "Shares `getWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1099, BO-417, BO-418 (BO-1094 saves the rules, CHG-R11FXU-001); this screen is Funding Limits & Velocity Controls (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.09, page 20): protect wallets against excessive or suspicious funding activity. The source specifically requires configurable maximum balance, daily top-up limit, single-transaction limit and user- specific limits.",
+  "gaps": [
+   {
+    "operation": "setWalletFundingRules",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing on the approved screen calls it: its pack limit fields bind to no operation and it has no Save or publish control, so it never sends the PUT. The funding rules are saved on BO-1094 Funding Method Configuration (Save funding rules), where setWalletFundingRules stays declared and reached; the lead's ruling of 26 October 2026 (CHG-R10WIR-002, item 5) and CHG-R11FXT-004. The screen keeps getWalletFundingRules and its rules panel. A CR brings the write back here with the control that sends it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
+   }
+  ],
   "layout": {
    "template": "form",
    "regions": [
@@ -2018,16 +2012,6 @@
   },
   "apis": [
    {
-    "operationId": "setWalletFundingRules",
-    "contract": "wallet",
-    "purpose": "Limits and velocity controls",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getWalletFundingRules"
-    ]
-   },
-   {
     "operationId": "getWalletFundingRules",
     "contract": "wallet",
     "purpose": "How a wallet may be topped up",
@@ -2156,7 +2140,25 @@
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "The funding audit trail",
+       "bindsTo": "WalletTransaction",
+       "columns": [
+        "WalletTransaction.recordedAt",
+        "WalletTransaction.kind",
+        "WalletTransaction.amount",
+        "WalletTransaction.balanceAfter",
+        "WalletTransaction.orderId",
+        "WalletTransaction.reason",
+        "WalletTransaction.principalId"
+       ],
+       "operation": "listWalletTransactions",
+       "notes": "Every movement on the wallet, the record the exception buttons above are checked against (r11 gate fix, CHG-R11FXS-003).",
+       "provenance": "contract wallet.yaml GET /wallets/{subjectId}/transactions; r11 gate fix, 29 October 2026"
+      }
+     ]
     }
    ]
   },
@@ -2172,7 +2174,7 @@
     "operationId": "listWalletTransactions",
     "contract": "wallet",
     "purpose": "The funding audit trail",
-    "trigger": "onAction",
+    "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
    },
    {

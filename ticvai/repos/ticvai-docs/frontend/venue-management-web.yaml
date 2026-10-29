@@ -80,8 +80,8 @@ deployment:
   releaseCadence: weekly
 screenCount: 1838
 byWave:
-  wave1: 173
-  wave2: 58
+  wave1: 174
+  wave2: 57
   wave3: 1607
 screens:
 - id: BO-001
@@ -1106,7 +1106,7 @@ screens:
   route: /venue-operations/software-configuration-version-management
   repo: ticvai-venue-management
   path: src/routes/ops/SoftwareConfigurationVersionManagementList.tsx
-  wave: 2
+  wave: 1
   status: notStarted
 - id: BO-130
   name: Offline Policy & Rules Configuration

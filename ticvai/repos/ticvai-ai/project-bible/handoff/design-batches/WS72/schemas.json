@@ -264,6 +264,9 @@
     "description": "`conditional` needs `conditions`; `autoPopulated` and `readOnly` need `mapsTo`."
    },
    "options": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-column": "option_labels",
     "type": "array",
     "items": {
      "type": "object",
@@ -280,11 +283,12 @@
       }
      }
     },
-    "description": "The allowed values of a select, dropdown or multi-select field."
+    "description": "The allowed values of a select, dropdown or multi-select field, each with the label a guest reads. **Stored whole** (ADAM CR-313, option A, additive): the options as sent, value and label, in `marketing.form_definition_field.option_labels` (jsonb), so the 200 returns the field exactly as sent; their values, in the same order, still go to `options` (text[]), which every existing reader of a field's options reads."
    },
    "validation": {
     "type": "object",
     "nullable": true,
+    "description": "**Which members each `fieldType` accepts** (ADAM CR-313, option A): `minimum` and `maximum` a `number` field; `dateFrom` and `dateTo` a `date` field; `pattern` and `maxLength` a `shortText`, `longText`, `email`, `mobile` or `address` field. A member on any other type is validation that contradicts the type: `422 field-validation-invalid`.",
     "properties": {
      "minimum": {
       "type": "number",

@@ -1,10 +1,10 @@
 id: LLD-MarketingService
-title: MarketingService — 280 operations, 132 tables
+title: MarketingService — 281 operations, 133 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**280 operations and 132 tables — the biggest thing in the package, and probably two services
+why: '**281 operations and 133 tables — the biggest thing in the package, and probably two services
   eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly
   and written rarely; a campaign send is a burst of millions of rows nobody reads again.
 
@@ -13,20 +13,20 @@ why: '**280 operations and 132 tables — the biggest thing in the package, and 
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 280
+  operations: 281
   inAFlow: 103
   percent: 37%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: marketing
-  tables: 132
+  tables: 133
   stores:
   - postgres
   largestTable: marketing.privacy_request
 operationsByContract:
 - contract: marketing-crm
-  count: 280
+  count: 281
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -111,11 +111,11 @@ operationsByContract:
   - operation: approvePrivacyTesting
     verb: PUT
     path: /privacy-testing
-    scope: venue
+    scope: brand
     permission: GUEST_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: approveWaiverTesting
     verb: PUT
     path: /waiver-testing
@@ -1791,7 +1791,7 @@ operationsByContract:
   - operation: setCookieBannerDesign
     verb: PUT
     path: /cookie-banner-preference/{bannerDesignId}
-    scope: venue
+    scope: brand
     permission: GUEST_MANAGE
     offline: false
     reads: 2
@@ -2087,7 +2087,7 @@ operationsByContract:
   - operation: setTrackingTechnology
     verb: PUT
     path: /cookie-tracking-digital/{technologyId}
-    scope: venue
+    scope: tenant
     permission: GUEST_MANAGE
     offline: false
     reads: 2
@@ -2268,6 +2268,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 2
+  - operation: writeSubjectDataExportPart
+    verb: POST
+    path: /subject-data-export-parts
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 5
+    writes: 2
 tables:
 - store: cache:idempotency
   kind: cache
@@ -2426,6 +2434,7 @@ tables:
   - updateMessageTemplate
   - updateMyProfile
   - uploadGuestDocument
+  - writeSubjectDataExportPart
   readBy:
   - accrueLoyaltyPoints
   - actOnWaiverRequirements
@@ -2572,6 +2581,7 @@ tables:
   - updateMessageTemplate
   - updateMyProfile
   - uploadGuestDocument
+  - writeSubjectDataExportPart
   keys:
     createUrlRedirect:
       role: evicts
@@ -2988,7 +2998,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.form_definition_field
-  columns: 24
+  columns: 25
   store: postgres
   parent: marketing.form_definition
   writtenBy:
@@ -3424,6 +3434,13 @@ tables:
   writtenBy:
   - marketing-crm
   foreignWriters: null
+- table: marketing.seo_metadata
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - marketing-crm
+  foreignWriters: null
 - table: marketing.service_copilot_config
   columns: 12
   store: postgres
@@ -3586,17 +3603,17 @@ readsFrom:
   operations: 11
 - service: AccessService
   operations: 4
-- service: PlatformService
-  operations: 3
 - service: TenancyService
   operations: 3
 - service: VenueOpsService
   operations: 2
+- service: PlatformService
+  operations: 1
 - service: WhiteLabelService
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 5
+  operations: 6
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -3616,6 +3633,9 @@ writesOutside:
     tables:
     - platform.idempotency_record
   - operation: recordDeviceConsent
+    tables:
+    - platform.outbox
+  - operation: writeSubjectDataExportPart
     tables:
     - platform.outbox
 - service: IdentityService
@@ -3653,7 +3673,7 @@ writesOutside:
     tables:
     - orders.stored_value_authorisation
 - service: PlatformService
-  operations: 2
+  operations: 1
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -3663,9 +3683,6 @@ writesOutside:
   - operation: createUrlRedirect
     tables:
     - control.url_redirect
-  - operation: setSeoMetadata
-    tables:
-    - control.seo_metadata
 screens:
 - P01:WEB-001 Home / Landing
 - P01:WEB-006 Date & Performance Selection

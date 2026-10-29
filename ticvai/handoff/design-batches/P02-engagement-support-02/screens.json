@@ -83,7 +83,8 @@
        "kind": "primaryButton",
        "label": "Re-order my day",
        "operation": "updateVisitPlan",
-       "notes": "Saves the proposed order as a new plan version.",
+       "collectedBy": "Today",
+       "notes": "Saves the proposed order as a new plan version. The body is the items of Today (getVisitPlan's rows) in their new order, `move` changes on the plan's version (CHG-R11FXU-009).",
        "provenance": "decided 29 September 2026, MOB-6"
       },
       {
@@ -124,7 +125,10 @@
     "contract": "venue-map",
     "purpose": "Swap, remove, add or undo: each change is a new version, so undo goes back one",
     "trigger": "onAction",
-    "provenance": "decided 29 September 2026, MOB-6"
+    "provenance": "decided 29 September 2026, MOB-6",
+    "inputSources": {
+     "baseVersion": "getVisitPlan.version"
+    }
    },
    {
     "operationId": "listVisitPlanAlternatives",

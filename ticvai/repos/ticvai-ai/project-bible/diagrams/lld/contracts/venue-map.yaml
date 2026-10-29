@@ -1,5 +1,5 @@
 id: LLD-venue-map
-title: venue-map — 26 operations
+title: venue-map — 27 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -99,6 +99,7 @@ operations:
   - venuemap.point
   - venuemap.visit_plan
   - venuemap.visit_plan_item
+  - venuemap.visit_planner_question
   writes:
   - cache:idempotency
   - venuemap.visit_plan
@@ -193,6 +194,7 @@ operations:
   offline: true
   reads:
   - venuemap.visit_plan_preset
+  - venuemap.visit_planner_question
   writes: []
 - operation: importVenueGeometry
   verb: POST
@@ -377,6 +379,20 @@ operations:
   writes:
   - cache:idempotency
   - venuemap.visit_plan_preset
+- operation: setVisitPlannerQuestions
+  verb: PUT
+  path: /venues/{venueId}/visit-planner-questions
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - venuemap.visit_planner_question
+  writes:
+  - cache:idempotency
+  - venuemap.visit_planner_question
 - operation: updateVisitPlan
   verb: PUT
   path: /visit-plans/{planId}

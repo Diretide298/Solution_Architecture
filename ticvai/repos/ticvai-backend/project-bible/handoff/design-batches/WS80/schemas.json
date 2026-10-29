@@ -126,7 +126,8 @@
     "format": "uuid",
     "nullable": true,
     "x-ticvai-references": "orders.order_line",
-    "description": "The paid top-up line this lot credits (`source_kind` `topUp`; r8 gate, CHG-R8RW-009). One lot per line, so a line is credited once. Null for every other source."
+    "x-ticvai-unique": "tenant",
+    "description": "The paid top-up line this lot credits (`source_kind` `topUp`; r8 gate, CHG-R8RW-009). One lot per line, so a line is credited once. Null for every other source. **Kept by a unique index** (`credit_lot_order_line_id_uniq`, partial: rows with a line only; ADAM CR-310, option A): the only guard that holds when two tills credit one line at the same moment."
    },
    "termsSnapshot": {
     "type": "object",
@@ -385,7 +386,7 @@
   }
  },
  "Wallet": {
-  "x-ticvai-rls": "grant-holder-read",
+  "x-ticvai-rls": "grant-holder-write",
   "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
   "type": "object",
   "required": [
@@ -702,6 +703,9 @@
   ],
   "x-ticvai-unique-nulls": "not-distinct",
   "description": "Board 2, which is the 27 August minute one screen for one. One set per wallet type at a venue, and one venue default with no wallet type.",
+  "required": [
+   "version"
+  ],
   "properties": {
    "walletTypeId": {
     "type": "string",
@@ -851,6 +855,13 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "version": {
+    "type": "integer",
+    "minimum": 1,
+    "default": 1,
+    "readOnly": true,
+    "description": "**The row's version, its ETag** (\"All as recommended\": ADAM CR-332 option A, Chinmay, 29 October 2026, the rule CR-257 chose for group bookings): 1 on create and bumped on every write; `getWalletFundingRules` and `setWalletFundingRules` send it as `ETag`, and `setWalletFundingRules` checks `If-Match` against it (`412` on a mismatch)."
    }
   }
  },

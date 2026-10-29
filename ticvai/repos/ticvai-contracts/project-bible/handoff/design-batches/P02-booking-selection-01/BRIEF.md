@@ -148,7 +148,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `GST-008` | Tickets & Add-ons | A | 27 | 66 | 6 | 30 | 25 | 0 | guest | notStarted (client-verified) |
 | `GST-048` | Upsell / Cross-Sell | A | 27 | 10 | 5 | 57 | 9 | 0 | guest | approved (client-verified) |
 | `GST-049` | Interactive Seat Selection | A | 8 | 39 | 5 | 29 | 21 | 6 | guest | notStarted (client-verified) |
-| `GST-050` | Resource Booking – Cabana | A | 27 | 18 | 6 | 25 | 4 | 6 | guest | approved (client-verified) |
+| `GST-050` | Resource Booking – Cabana | A | 27 | 18 | 6 | 34 | 4 | 6 | guest | approved (client-verified) |
 | `GST-056` | Bundle Package | A | 27 | 4 | 6 | 4 | 4 | 0 | guest | approved (client-verified) |
 | `GST-058` | Resource Availability (Cabana) | A | 3 | 20 | 6 | 0 | 4 | 0 | guest | approved (client-verified) |
 | `GST-072` | Share & Group Booking | A | 15 | 14 | 6 | 8 | 8 | 6 | guest | notStarted (client-verified) |

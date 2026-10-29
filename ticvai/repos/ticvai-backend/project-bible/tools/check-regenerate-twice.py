@@ -35,6 +35,11 @@ its own output's inputs: one more run that changes anything is the second run ch
 On a branch that was not refreshed, use the default (twice): the first run's changes are only noted. `--skip-slow`
 leaves out the steps in SLOW (none since link-screens-contracts went from eleven minutes to 34 seconds, CHG-R8GEN-016).
 
+**The diagrams are in the chain** (P-31, CHG-R11DES-002). derive-diagrams writes no authored input, but it draws the
+screens, flows and contracts the steps above write, and it ran before them in refresh.sh, so each refresh drew the
+previous run's screens (r10, fixed by hand in cd306cce). It is the last step here, as in refresh.sh: a diagram the
+chain changes is RT-CHAIN, which is a second regeneration changing a diagram.
+
 It writes into the package while it runs, so run-checks.py runs it alone (SERIAL) and it never runs beside a refresh.
 """
 import argparse
@@ -50,6 +55,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # The refresh steps that write into authored inputs, in refresh.sh order, with the files each may write. Kept beside
 # the list in the generators report (item 1); a step added to refresh.sh that writes into contracts/, screens/,
 # flows/, states/, events/, roles*.yaml or the lineage belongs here.
+# Every file derive-diagrams writes (the README, the HLD and the four LLD sets).
+DIAGRAMS = ["diagrams/*.yaml", "diagrams/hld/*.yaml", "diagrams/lld/*/*.yaml"]
+
 WRITE_BACK = [
     ("derive-lineage", ["--apply"], ["handoff/api-data-lineage.json"]),
     ("derive-read-columns", ["--apply"], ["handoff/api-data-lineage.json"]),
@@ -69,6 +77,11 @@ WRITE_BACK = [
     ("derive-app-roles", [], ["roles-by-app.yaml"]),
     ("derive-id-register", ["--apply"], ["screens/_id-register.yaml"]),
     ("link-screens-contracts", [], ["screens/P*.yaml", "contracts/*/*.yaml"]),
+    # Not a write-back: the diagrams are derived. They are drawn from everything above (the screens, flows, contracts and
+    # lineage), so they run last here as in refresh.sh, and --chain fails on a diagram a second regeneration changes
+    # (P-31, CHG-R11DES-002: derive-diagrams ran before the screen steps, so every refresh drew the previous run's
+    # screens; r10's second rebuild changed P01 and P02, fixed by hand in cd306cce).
+    ("derive-diagrams", [], DIAGRAMS),
 ]
 
 

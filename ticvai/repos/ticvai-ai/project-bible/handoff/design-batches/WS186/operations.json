@@ -37,25 +37,6 @@
   "requestBody": "WalletType",
   "responds": "WalletType"
  },
- "getWallet": {
-  "method": "GET",
-  "path": "/wallets/{subjectId}",
-  "contract": "wallet",
-  "summary": "Read a guest wallet",
-  "permission": "WALLET_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Wallet"
- },
  "getWalletLiability": {
   "method": "GET",
   "path": "/wallet-liability",

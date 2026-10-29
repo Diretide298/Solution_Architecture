@@ -15,7 +15,6 @@ operations:
   offline: true
   reads:
   - cache:idempotency
-  - identity.principal
   - reporting.alert
   writes:
   - cache:idempotency
@@ -370,7 +369,6 @@ operations:
   - inventory.movement
   - inventory.purchase_order
   - inventory.supplier
-  - inventory.supplier_contract
   writes: []
 - operation: listAlertRules
   verb: GET

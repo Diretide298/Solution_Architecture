@@ -1146,11 +1146,41 @@
        "kind": "secondaryButton",
        "label": "Rental Benefit",
        "provenance": "pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create entitlement template",
+       "operation": "createEntitlementTemplate",
+       "notes": "Opens the form that creates the entitlement template the fields above define (r11 gate fix, CHG-R11FXS-002).",
+       "provenance": "contract catalogue.yaml POST /entitlement-templates; r11 gate fix, 29 October 2026"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formCreateEntitlementTemplate",
+    "component": "modal",
+    "trigger": "Create entitlement template",
+    "body": "**Collects what `createEntitlementTemplate` sends before it is called.** Required: `code`, `name` and `validityKind`; the server gives the template its identity. The entitlement the fields above define goes with it: `entriesAllowed` (Number of Visits), `validForDays` (Period), `daysOfWeek` (Days), `validTimeWindows` (Times, Timeslots), and `expiryNoticeDays` for the pre-expiry notice. Dismissing sends nothing; no template is created.",
+    "bindsTo": "EntitlementTemplate",
+    "confirm": {
+     "label": "Create template",
+     "operation": "createEntitlementTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "validityKind",
+      "expiryNoticeDays"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /entitlement-templates; r11 gate fix, 29 October 2026 (CHG-R11FXS-002)"
+   }
+  ],
   "states": {
    "loading": "The membership entitlement admission configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the membership entitlement admission untouched.",
@@ -1187,9 +1217,9 @@
    {
     "operationId": "createEntitlementTemplate",
     "contract": "catalogue",
-    "purpose": "Set expiryNoticeDays on a pass template (pre-expiry notice)",
+    "purpose": "Create the entitlement template the screen's fields define, with expiryNoticeDays for the pre-expiry notice",
     "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
+    "provenance": "build, 29 September 2026; reached by Create entitlement template, r11 gate fix (CHG-R11FXS-002)"
    }
   ],
   "wireframe": {

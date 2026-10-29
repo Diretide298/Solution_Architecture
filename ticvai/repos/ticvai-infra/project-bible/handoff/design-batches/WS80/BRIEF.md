@@ -1,6 +1,6 @@
 # WS80 — Game and Ride board 3
 
-**10 screens · 17 operations · 13 schemas · 5 permissions**
+**10 screens · 16 operations · 13 schemas · 5 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-414` | Wallet & Credit Management Dashboard | C | 2 | 21 | 6 | 30 | 1 | 6 | — | notStarted (—) |
 | `BO-415` | Wallet & Credit Type Configuration | C | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-416` | Wallet Account & Balance View | C | 0 | 0 | 6 | 18 | 1 | 6 | — | notStarted (—) |
+| `BO-416` | Wallet Account & Balance View | C | 0 | 7 | 6 | 29 | 1 | 6 | — | notStarted (—) |
 | `BO-417` | Top-Up Configuration | C | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-418` | Top-Up Bonus Rule Configuration | C | 0 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-419` | Bonus Usage Restrictions | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |

@@ -391,7 +391,7 @@ paths:
         - "P08 BO-078 Requisitions"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Change what an outlet is asking for, before it is approved
       description: 'Board 5F, 24 August. **`getSuggestedRequisitions` drafts from reorder points and nothing
@@ -1229,7 +1229,7 @@ paths:
         - "P08 BO-512 Inventory Adjustment & Exception Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: StockMovement.totalCost, StockMovement.unitCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -1300,7 +1300,7 @@ paths:
         - "P08 BO-512 Inventory Adjustment & Exception Management"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StockMovement.totalCost, StockMovement.unitCost (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -1371,7 +1371,7 @@ paths:
         - "P08 BO-079 Stock Count"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: StockCount.varianceValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Newest first, by `startedAt` descending, then by `id`.'
       x-ticvai-audience:
@@ -1419,7 +1419,7 @@ paths:
         - "P08 BO-079 Stock Count"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StockCount.varianceValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -1620,7 +1620,7 @@ paths:
         - "P16 ANL-006 Inventory & Waste Intelligence"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.inventory": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -1678,7 +1678,7 @@ paths:
         - "P08 BO-079 Stock Count"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StockCount.varianceValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -1759,7 +1759,7 @@ paths:
         route: service
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); the operations deployable may not read identity.*: Identity''s serviceAuth operation verifySupervisorStepUp (ADR-0055 rule 4)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: StockCount.varianceValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-step-up-reason: Sends a submitted count back, discarding its variance; a supervisor signs it in place (audit R144).
       x-ticvai-scope-level: venue
@@ -1824,7 +1824,7 @@ paths:
         - "P08 BO-079 Stock Count"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.inventory": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -2140,7 +2140,7 @@ paths:
         - "P08 BO-078 Requisitions"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
@@ -2194,7 +2194,7 @@ paths:
         - "P08 BO-141 Operational Alerts, AI Replenishment & Action Center"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -2208,6 +2208,10 @@ paths:
       x-ticvai-permission: PROCUREMENT_REQUEST
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
+      x-ticvai-offline-refused-on: [EMP-070]
+      x-ticvai-offline-condition: Queued in the staff app's outbox where a screen offers it offline (EMP-063).
+        Inventory Exceptions (EMP-070) refuses the whole screen offline in its approved text, so it is not
+        raised there offline (CHG-R11FXT-005).
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -2286,7 +2290,7 @@ paths:
       operationId: rejectRequisition
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       deprecated: true
       x-ticvai-superseded-by: 'approveRequisition'
@@ -2354,7 +2358,7 @@ paths:
       operationId: returnRequisition
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       deprecated: true
       x-ticvai-superseded-by: 'approveRequisition'
@@ -2422,7 +2426,7 @@ paths:
         - "P08 BO-078 Requisitions"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -2483,7 +2487,7 @@ paths:
         - "P08 BO-078 Requisitions"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Requisition.estimatedCost, Requisition.estimatedTotal (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -3201,7 +3205,7 @@ paths:
         - "P08 BO-052 Goods Receipt"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.inventory": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -3274,6 +3278,11 @@ paths:
 
         **`other` needs a `note`** (decided 28 September, audit R222); the notes are reviewed quarterly to
         add the real reasons they reveal.
+
+        **One supplier return movement per rejected line** (ADAM CR-274, option A, Chinmay, 28 October 2026;
+        CHG-R11RUL-003): each rejected receipt line writes one `supplierReturn` inventory movement, its `reason`
+        the request''s `reason` enum value, `source_type` `goodsReceiptLine` and `source_id` the receipt line''s
+        id. getSupplierPerformance counts these movements by reason for `rejectionReasons`.
 
         '
       tags:

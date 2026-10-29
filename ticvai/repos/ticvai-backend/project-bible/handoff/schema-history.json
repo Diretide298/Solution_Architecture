@@ -1251,9 +1251,22 @@
   "identity.subject_data_export": "2026-10-26",
   "orders.refund_line": "2026-10-26",
   "orders.refund_payment": "2026-10-26",
-  "whitelabel.ui_string_pack": "2026-10-26"
+  "whitelabel.ui_string_pack": "2026-10-26",
+  "approvals.matrix_version": "2026-10-29",
+  "control.platform_approval_rule": "2026-10-29",
+  "identity.guest_upload_ref": "2026-10-29",
+  "identity.subject_data_export_part": "2026-10-29",
+  "marketing.seo_metadata": "2026-10-29",
+  "venuemap.visit_planner_question": "2026-10-29",
+  "whitelabel.received_release": "2026-10-29"
  },
  "renames": [
+  {
+   "from": "control.seo_metadata",
+   "to": "marketing.seo_metadata",
+   "on": "2026-10-29",
+   "why": "CR-317: a tenant's own SEO configuration about entities in its own database, written by Marketing in the tenant's transaction; it sat in the shared control database, Platform's, with no write route"
+  },
   {
    "from": "platform.cell_endpoint",
    "to": "control.cell_endpoint",

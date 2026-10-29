@@ -183,7 +183,8 @@
         "Operational Alerts"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Highlight”.",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Display"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Display",
+       "operation": "getWalletLiability"
       }
      ]
     },
@@ -214,11 +215,13 @@
       {
        "kind": "secondaryButton",
        "label": "Search Instrument",
+       "operation": "getGiftCard",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions"
       },
       {
        "kind": "secondaryButton",
        "label": "Check Balance",
+       "operation": "getGiftCard",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions"
       },
       {

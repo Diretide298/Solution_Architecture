@@ -164,6 +164,9 @@
     "contract": "orders",
     "purpose": "Put the item in the cart, marked for collection on the way out (audit R236)",
     "trigger": "onAction",
+    "inputSources": {
+     "variantId": "listMerchandise.productVariantId"
+    },
     "invalidates": [
      "listMerchandise"
     ]

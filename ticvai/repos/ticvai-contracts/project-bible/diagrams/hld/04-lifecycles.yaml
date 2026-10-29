@@ -7,7 +7,7 @@ sourceFiles:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 209 state models and 105 events
+title: 209 state models and 107 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -2693,7 +2693,7 @@ stateModels:
   owner: workforce
   service: TenancyService
   states: null
-  transitions: 11
+  transitions: 12
   initial:
   - planned
   terminal:
@@ -2704,7 +2704,7 @@ stateModels:
   - createRotaAssignment
   - requestShiftSwap
   - updateRotaAssignment
-  guarded: 11
+  guarded: 12
   ref: diagrams/lld/lifecycles/rota-assignment.yaml
 - entity: Sales channel
   contract: catalogue
@@ -3468,6 +3468,8 @@ events:
   description: The requester took an approval request back before anyone decided it.
 - event: assets-documentIndexed
   description: Text was extracted from an uploaded document and is ready to embed.
+- event: assets-guestUploadChanged
+  description: A guest's identity-document or selfie upload was completed, or deleted.
 - event: biometric-enrolmentChanged
   description: A Face Pass or Face Tag enrolment was made, re-enrolled after review, or removed.
 - event: cart-abandoned
@@ -3557,6 +3559,8 @@ events:
   description: Work on an asset is finished and awaiting verification.
 - event: marketing-caseClosed
   description: A service case was resolved and closed.
+- event: marketing-subjectDataPartWritten
+  description: Marketing wrote its part of a guest's data export to the tenant's private object storage.
 - event: order-cancelled
   description: An order was voided before any money was captured — the whole order, with its reason
     and who did it.

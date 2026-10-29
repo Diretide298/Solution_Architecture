@@ -4409,7 +4409,7 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `ledger.tax_invoice_line`, `orders.payment`, `orders.sales_order`, `payments.dunning_case` |
+| Reads | `ledger.tax_invoice_line`, `orders.membership_renewal`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `payments.dunning_case` |
 | Writes | - |
 | Called by | GST-015, WEB-023 |
 
@@ -4417,7 +4417,7 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| statementId | path | yes | string (uuid) |  |
+| statementId | path | yes | string (uuid) | The id listBillingStatements answered for the statement: a name-based UUID (v5) of agreementId, periodStart and periodEnd (ADAM CR-099), minted under the namespace and from the name BillingStatement.… |
 | format | query |  | enum (json, pdf) | 2.14.23. |
 | language | query |  | string |  |
 
@@ -4427,9 +4427,9 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 |---|---|---|---|
 | id | string (uuid) | yes | A name-based UUID (v5) of agreementId, periodStart and periodEnd, so the same statement has the same id on every read (ADAM CR-099). |
 | agreementId | string (uuid) | yes | The membership agreement this statement is one billing cycle of (identity.customer_membership.id; ADAM CR-099). |
-| subjectId | string (uuid) |  | (read-only) |
-| periodStart | string (date) | yes |  |
-| periodEnd | string (date) | yes |  |
+| subjectId | string (uuid) |  | The guest, the agreement's customer_id, which is the guest's subject id (ADAM CR-303). (read-only) |
+| periodStart | string (date) | yes | The cycle's start as a date in the venue's time zone (listBillingStatements, ADAM CR-303). |
+| periodEnd | string (date) | yes | The cycle's end as a date in the venue's time zone (listBillingStatements, ADAM CR-303). |
 | lines | array of BillingStatementLine |  |  |
 | lines[].occurredAt | string (date-time) | yes |  |
 | lines[].kind | enum (charge, refund, failedAttempt, adjustment) | yes |  |
@@ -4473,6 +4473,7 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Statement |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getGroupBooking
@@ -4716,7 +4717,7 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF is that it updates — a changed gate, a cancelled performance, a time that moved.
 **A pass that cannot be pushed to is a screenshot with better rounding.**
 
-**An Apple pass is signed with the brand's own Pass Type ID certificate** (Chinmay, 12 October 2026: the client owns it, one per brand; CHG-R6-033), read from Key Vault through white-label `StoreAccount.passCertificateSecretRef`, never a TICVAI certificate. Its expiry is `StoreAccount.passCertificateExpiresAt`, warned 30 days ahead by `whitelabel.passCertificateExpiring`.
+**An Apple pass is signed with the client's own Pass Type ID certificate** (Chinmay, 12 October 2026: the client owns it; CHG-R6-033), one per tenant for all its brands (ADAM CR-304, option A), read from Key Vault through white-label `StoreAccount.passCertificateSecretRef`, never a TICVAI certificate. Its expiry is `StoreAccount.passCertificateExpiresAt`, warned 30 days ahead by `whitelabel.passCertificateExpiring`.
 
 |  |  |
 |---|---|
@@ -4777,6 +4778,8 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 
 **What a statement is** (ADAM CR-099): one billing cycle of a membership agreement (`identity.customer_membership`, read through `identity#customerMembershipRecords`), named by `agreementId`. Its `id` is derived from the agreement and the period, a name-based UUID (v5) of `agreementId`, `periodStart` and `periodEnd`, so `getBillingStatement` finds the same statement again.
 
+**The cycles, their charges and the guest** (ADAM CR-303, option A, Chinmay, 29 October 2026). An agreement's statements are its first period and one per `orders.membership_renewal` row of it with `status` `completed`. The first period runs from the agreement's `start_at` to its first expiry (the `previous_expiry_at` of its earliest completed renewal, or its `expires_at` while none has completed); a renewal's period runs from its `previous_expiry_at` to its `new_expiry_at`. `periodStart` and `periodEnd` are those instants as dates in the venue's time zone (the venue of the cycle's order, its region settings read through `tenancy#regionSettingsRecords`). A cycle's charges are its order: the renewal row's `order_id`, and for the first period the agreement's `source_order_id`. The lines, `total`, `taxTotal` and `discountTotal` are worked out from that order's lines and payments, with any `payments.dunning_case` on that order as its failed attempts. The guest is the agreement's `customer_id`, which is the guest's subject id (the id `subjectId` names): a guest reads the agreements whose `customer_id` is its own subject, a staff `subjectId` is matched against `customer_id`, and `BillingStatement.subjectId` is it. The `id` is minted as `BillingStatement.id` states (namespace and name), the one rule `getBillingStatement` uses too.
+
 **Order.** Most recent period first: `periodStart` descending, then `id` (one order; ADAM CR-099).
 
 |  |  |
@@ -4788,7 +4791,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `orders.payment`, `orders.sales_order`, `payments.dunning_case` |
+| Reads | `orders.membership_renewal`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `payments.dunning_case` |
 | Writes | - |
 | Called by | GST-015, WEB-023 |
 
@@ -4809,9 +4812,9 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items | array of BillingStatement | yes |  |
 | items[].id | string (uuid) | yes | A name-based UUID (v5) of agreementId, periodStart and periodEnd, so the same statement has the same id on every read (ADAM CR-099). |
 | items[].agreementId | string (uuid) | yes | The membership agreement this statement is one billing cycle of (identity.customer_membership.id; ADAM CR-099). |
-| items[].subjectId | string (uuid) |  | (read-only) |
-| items[].periodStart | string (date) | yes |  |
-| items[].periodEnd | string (date) | yes |  |
+| items[].subjectId | string (uuid) |  | The guest, the agreement's customer_id, which is the guest's subject id (ADAM CR-303). (read-only) |
+| items[].periodStart | string (date) | yes | The cycle's start as a date in the venue's time zone (listBillingStatements, ADAM CR-303). |
+| items[].periodEnd | string (date) | yes | The cycle's end as a date in the venue's time zone (listBillingStatements, ADAM CR-303). |
 | items[].lines | array of BillingStatementLine |  |  |
 | items[].lines[].occurredAt | string (date-time) | yes |  |
 | items[].lines[].kind | enum (charge, refund, failedAttempt, adjustment) | yes |  |
@@ -5684,9 +5687,9 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | providerId | string (uuid) | yes |  |
-| providerToken | string (password) | yes |  |
+| providerToken | string (password) | yes | The provider's reference to the credential it tokenised, stored field-encrypted as the token row's token (PaymentToken.token, write-only, never returned; CHG-R11FXC-004). |
 | consentPurposeId | string (uuid) | yes |  |
-| setDefault | boolean |  | (default False) |
+| setDefault | boolean |  | True makes the new token the guest's default (PaymentToken.isDefault, the row's is_default), and clears is_default on the guest's other tokens in the same transaction; false stores it with is_default… (default False) |
 
 **Response**: `PaymentToken`
 
@@ -9910,6 +9913,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no | The partition key (ADR-0005). |
 | created_at | timestamptz | yes |  |
 | updated_at | timestamptz | no |  |
+
+### `orders.membership_renewal`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| customer_membership_id | uuid | yes | The membership in the path. |
+| entitlement_template_id | uuid | yes |  |
+| order_id | uuid | no | The order the renewal charged through. |
+| type | text | yes |  |
+| status | text | yes |  |
+| previous_expiry_at | timestamptz | no |  |
+| new_expiry_at | timestamptz | no | Computed from the entitlement template's term and grace period. |
+| attempted_at | timestamptz | yes |  |
+| completed_at | timestamptz | no |  |
+| failure_reason | text | no |  |
 
 ### `orders.no_sale_event`
 

@@ -99,7 +99,16 @@ ALSO = ["evaluateAiGovernance", "getAiUsage", "getAiPolicy", "proposeGuidedChoic
 # (labelled with it in `platforms`, as ALSO is labelled AI). listAuditRecords (20 October 2026, r8 cause
 # FOUNDATION-AI-C21, the lead: "take the recommendation", CHG-R8GEN-007): PLATFORM-AUDIT's done-when says a support user
 # can read what the interceptor wrote, and it is the only operation that reads platform.audit_record (BO-068, ADM-004).
-ALSO_FOR = {"listAuditRecords": "PLATFORM-AUDIT"}
+# writeSubjectDataExportPart and recordSubjectDataExportPart (29 October 2026, CHG-R11FXC-005, the lead: "Marketing adds
+# its part"): exportSubjectData (GST-066, WEB-024; SVC-IDENTITY-IDENTITY-1) assembles a guest's export from the parts
+# its owners write and runs once every owner's part is recorded, so its done-when needs Marketing's part written
+# (marketing-crm, the consumer of identity.privacyRequestRaised) and Identity's record of it
+# (identity.subject_data_export_part). Both are event consumers that no screen calls; without them the first release
+# exports nothing of Marketing's and its MIG-MARKETING lost marketing.guest_document (check-ddl-conventions
+# D-MIG-TABLES, r11 gate).
+ALSO_FOR = {"listAuditRecords": "PLATFORM-AUDIT",
+            "writeSubjectDataExportPart": "SVC-IDENTITY-IDENTITY-1",
+            "recordSubjectDataExportPart": "SVC-IDENTITY-IDENTITY-1"}
 
 
 # **Placed in a later block by the lead** (Chinmay, 12 October 2026, N32: the client's feedback of 6 October,

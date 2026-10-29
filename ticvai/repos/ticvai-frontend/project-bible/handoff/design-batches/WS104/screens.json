@@ -1107,7 +1107,6 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
-  "permission": "WORKSTATION_CONFIGURE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "7",
@@ -1146,6 +1145,12 @@
     "operation": null,
     "why": "**POS, Payment & Access Setup declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write operations are missing or this screen is a view of something another screen builds.",
     "source": "contract — the screen's declared operations"
+   },
+   {
+    "operation": "configureWorkstation",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXT-004): a board reading of 19 September declared it, and nothing on the approved screen calls it: its thirteen pack fields bind to no operation and it has no Save or publish control. Workstation configuration is done where the device is registered (BO-036) or at the till (POS-016), as decided on 2 October 2026 when BO-129 dropped it (CHG-WIR-021); configureWorkstation stays declared and reached on both. A CR brings it back here with the control that sends it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
    }
   ],
   "layout": {
@@ -1228,18 +1233,10 @@
    "loading": "The pos payment access configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the pos payment access untouched.",
    "emptyFirstRun": "No pos payment access configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist"
   },
-  "apis": [
-   {
-    "operationId": "configureWorkstation",
-    "contract": "tenancy",
-    "purpose": "POS, payment and access setup",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   }
-  ],
+  "apis": [],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P08 Venue Management.dc.html#bo-602",

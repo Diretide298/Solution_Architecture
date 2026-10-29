@@ -113,7 +113,13 @@ def kind(ps: dict, by: dict, stem: str) -> str:
         t = next((x for x in t if x != "null"), None)
     if t == "array":
         it = ps.get("items") if isinstance(ps.get("items"), dict) else {}
-        return "arr:" + kind(it, by, stem)
+        inner = kind(it, by, stem)
+        # `rec`: items whose properties this contract states (inline, or a local $ref it resolves), so a record and
+        # not a value; a $ref this file cannot resolve stays `obj`, as before (CHG-CR313-001)
+        tgt = by.get((stem, g.ref_name(it["$ref"]))) or {} if "$ref" in it else it
+        if inner == "obj" and isinstance(tgt, dict) and tgt.get("properties"):
+            inner = "rec"
+        return "arr:" + inner
     return {"boolean": "bool", "integer": "int", "number": "num", "string": "str"}.get(t or "", "obj")
 
 
@@ -124,6 +130,11 @@ def compatible(k: str, coltype: str) -> bool:
     if k.startswith("arr:"):
         if not ct.endswith("[]"):
             return False
+        # **An array of records is not a scalar array** (ADAM CR-313, CHG-CR313-001): the options of a select field
+        # (`{value, label}`) shared `form_definition_field.options text[]` with FormField's string options, and passed,
+        # because an object was "compatible" with any scalar; the labels had nowhere to go.
+        if k[4:] == "rec":
+            return ct[:-2].startswith("json")
         return compatible(k[4:], ct[:-2])
     if ct.endswith("[]"):
         return False

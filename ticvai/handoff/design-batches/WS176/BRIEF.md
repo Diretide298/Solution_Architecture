@@ -1,6 +1,6 @@
 # WS176 — Seat Management Venue Mapping Reference v1.0 board 12
 
-**10 screens · 33 operations · 31 schemas · 12 permissions**
+**10 screens · 32 operations · 32 schemas · 12 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -158,8 +158,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1061` | Platform Command Center | C | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-1062` | Tenant & Brand Context | A | 91 | 11 | 6 | 28 | 0 | 6 | — | notStarted (—) |
-| `BO-1063` | Venue-Specific Configuration | B | 93 | 0 | 6 | 17 | 0 | 0 | — | notStarted (—) |
+| `BO-1062` | Tenant & Brand Context | A | 114 | 11 | 6 | 28 | 0 | 6 | — | notStarted (—) |
+| `BO-1063` | Venue-Specific Configuration | B | 116 | 0 | 6 | 17 | 0 | 0 | — | notStarted (—) |
 | `BO-1064` | Naming, Numbering & Localization | C | 0 | 20 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 | `BO-1065` | Currency, Timezone & Channels | A | 47 | 17 | 6 | 0 | 0 | 4 | — | notStarted (—) |
 | `BO-1066` | Roles, Permissions & Masking | B | 91 | 16 | 6 | 15 | 1 | 5 | — | notStarted (—) |

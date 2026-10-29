@@ -140,7 +140,7 @@
 | `CMS-058` | Compliance Evidence, Audit & Waiver Repository | Policy | 3 | 1 | yes |
 | `CMS-059` | Waiver Analytics, Compliance & Operational Insights | Policy | 3 | 1 | yes |
 | `CMS-060` | AI Waiver Compliance & Risk Intelligence Center | Policy | 3 | 1 | yes |
-| `CMS-061` | Digital Asset Management Command Center | Media Library | 3 | 2 | yes |
+| `CMS-061` | Digital Asset Management Command Center | Media Library | 3 | 1 | yes |
 | `CMS-062` | Central Digital Asset Library | Media Library | 3 | 2 | yes |
 | `CMS-063` | Upload & Asset Ingestion Workspace | Media Library | 3 | 3 | yes |
 | `CMS-064` | Folder, Collection & Workspace Management | Media Library | 3 | 2 | yes |

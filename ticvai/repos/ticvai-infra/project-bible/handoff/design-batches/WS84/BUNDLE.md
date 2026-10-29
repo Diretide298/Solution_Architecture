@@ -158,7 +158,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Search card lifecycle | search field | — | — | — | — | — | — |
+| Search card lifecycle | search field | — | — | — | — | — | `getGameCard` |
 | Filter by | multi select | — | — | — | — | The pack filters this screen by venue, status, expiry period, last activity, last recharge, customer/card — which are present is a decision the pack already made. | — |
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)

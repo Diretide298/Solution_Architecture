@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 1663 |
-| Operations | 1895 |
+| Operations | 1892 |
 | Contracts | 31 |
 | Modules | 19 |
 | Undrawn | 0 |
-| Operations with no screen | 211 |
-| Waves | wave1 143 · wave2 58 · wave3 1462 |
+| Operations with no screen | 212 |
+| Waves | wave1 144 · wave2 57 · wave3 1462 |
 
 ## Gaps
 
-### 211 operations with no screen here
+### 212 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
 | `listMembershipBenefits` | catalogue | GET | Benefits a plan can grant |
 | `listMembershipProgrammes` | catalogue | GET | Membership schemes, the level above a plan |
-| … | | | 171 more |
+| … | | | 172 more |
 
 ### 14 modules split across waves
 
@@ -465,7 +465,7 @@
 | `ADM-584` | Payment Server & Terminal Connectivity Manager | Commercial | 3 | 1 | yes |
 | `ADM-585` | Card-Present Transaction Monitor & Operations | Commercial | 3 | 1 | yes |
 | `ADM-586` | Degraded, Offline & Store-and-Forward Manager | Commercial | 3 | 2 | yes |
-| `ADM-587` | Terminal Health, Maintenance & Incident Center | Commercial | 3 | 5 | yes |
+| `ADM-587` | Terminal Health, Maintenance & Incident Center | Commercial | 3 | 2 | yes |
 | `ADM-588` | Terminal Simulator, Certification & AI Operations Advisor | Commercial | 3 | 3 | yes |
 | `ADM-589` | Digital Payments Command Center | Commercial | 3 | 1 | yes |
 | `ADM-590` | Digital & Alternative Payment Method Manager | Commercial | 3 | 2 | yes |
@@ -480,7 +480,7 @@
 | `ADM-599` | Mixed Tender & Credit Command Center | Commercial | 3 | 1 | yes |
 | `ADM-600` | Mixed Tender Rule & Combination Builder | Commercial | 3 | 2 | yes |
 | `ADM-601` | Split Payment & Tender Allocation Manager | Commercial | 3 | 3 | yes |
-| `ADM-602` | B2B Credit Account & Limit Manager | Commercial | 3 | 2 | yes |
+| `ADM-602` | B2B Credit Account & Limit Manager | Commercial | 3 | 1 | yes |
 | `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | Commercial | 1 | 5 | yes |
 | `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls | Commercial | 3 | 2 | yes |
 | `ADM-605` | Advanced Payment Eligibility, Sequence & Restriction Rules | Commercial | 3 | 2 | yes |
@@ -490,7 +490,7 @@
 | `ADM-609` | Refund & Payment Adjustment Command Center | Commercial | 3 | 1 | yes |
 | `ADM-610` | Refund Request & Eligibility Workspace | Commercial | 3 | 2 | yes |
 | `ADM-611` | Refund Policy & Rule Configuration | Commercial | 3 | 0 | yes |
-| `ADM-612` | Refund Allocation & Original Tender Manager | Commercial | 3 | 1 | yes |
+| `ADM-612` | Refund Allocation & Original Tender Manager | Commercial | 3 | 0 | yes |
 | `ADM-613` | Void, Reversal & Cancellation Manager | Commercial | 3 | 2 | yes |
 | `ADM-614` | Refund Approval & Exception Workflow | Commercial | 3 | 3 | yes |
 | `ADM-615` | Refund Processing, Provider Status & Recovery Center | Commercial | 3 | 1 | yes |
@@ -753,7 +753,7 @@
 | `BO-1068` | Lifecycle & Environment Promotion | Access & Venue | 3 | 2 | yes |
 | `BO-1069` | Platform Health & Observability | Access & Venue | 3 | 0 | yes |
 | `BO-107` | Guests & Marketing | Guests & Marketing | 1 | 4 | yes |
-| `BO-1070` | Setup, Clone & Inheritance | Access & Venue | 3 | 4 | yes |
+| `BO-1070` | Setup, Clone & Inheritance | Access & Venue | 3 | 3 | yes |
 | `BO-1071` | Integration Command Center | Access & Venue | 3 | 1 | yes |
 | `BO-1072` | Seat Management APIs | Access & Venue | 3 | 0 | yes |
 | `BO-1073` | API Access & OAuth | Access & Venue | 3 | 3 | yes |
@@ -770,7 +770,7 @@
 | `BO-1083` | Wallet Command Center | Orders & Money | 3 | 2 | yes |
 | `BO-1084` | Wallet Type Library | Orders & Money | 3 | 2 | yes |
 | `BO-1085` | Wallet Creation & Provisioning Rules | Orders & Money | 3 | 3 | yes |
-| `BO-1086` | Wallet Ownership & Account Association | Orders & Money | 3 | 4 | yes |
+| `BO-1086` | Wallet Ownership & Account Association | Orders & Money | 3 | 3 | yes |
 | `BO-1087` | Wallet Currency & Monetary Configuration | Orders & Money | 3 | 2 | yes |
 | `BO-1088` | Credit & Balance Type Configuration | Orders & Money | 1 | 3 | yes |
 | `BO-1089` | Wallet Feature Profile | Orders & Money | 3 | 2 | yes |
@@ -778,16 +778,16 @@
 | `BO-1090` | Wallet Lifecycle Configuration | Orders & Money | 3 | 2 | yes |
 | `BO-1091` | Wallet Numbering, Identity & Digital Credentials | Orders & Money | 3 | 3 | yes |
 | `BO-1092` | Wallet Configuration Preview, Validation & Publication | Orders & Money | 3 | 2 | yes |
-| `BO-1093` | Funding Command Center | Orders & Money | 3 | 2 | yes |
+| `BO-1093` | Funding Command Center | Orders & Money | 3 | 1 | yes |
 | `BO-1094` | Funding Method Configuration | Orders & Money | 1 | 3 | yes |
-| `BO-1095` | Top-Up Rule Configuration | Orders & Money | 3 | 2 | yes |
-| `BO-1096` | Channel & Funding Source Mapping | Orders & Money | 3 | 2 | yes |
-| `BO-1097` | Auto-Reload Configuration | Orders & Money | 3 | 2 | yes |
+| `BO-1095` | Top-Up Rule Configuration | Orders & Money | 3 | 1 | yes |
+| `BO-1096` | Channel & Funding Source Mapping | Orders & Money | 3 | 1 | yes |
+| `BO-1097` | Auto-Reload Configuration | Orders & Money | 3 | 1 | yes |
 | `BO-1098` | Recurring Funding Schedule | Orders & Money | 3 | 2 | yes |
-| `BO-1099` | Funding Authorization & Approval Rules | Orders & Money | 3 | 2 | yes |
+| `BO-1099` | Funding Authorization & Approval Rules | Orders & Money | 3 | 1 | yes |
 | `BO-110` | Recipe & BOM Management | Sell | 2 | 0 | yes |
 | `BO-1100` | Funding Reversal & Correction Management | Orders & Money | 3 | 3 | yes |
-| `BO-1101` | Funding Limits & Velocity Controls | Orders & Money | 3 | 2 | yes |
+| `BO-1101` | Funding Limits & Velocity Controls | Orders & Money | 3 | 1 | yes |
 | `BO-1102` | Funding Transaction Audit & Reconciliation | Orders & Money | 3 | 2 | yes |
 | `BO-1103` | Stored Value & Credit Command Center | Orders & Money | 3 | 2 | yes |
 | `BO-1104` | Credit Type Definition Studio | Orders & Money | 3 | 3 | yes |
@@ -803,7 +803,7 @@
 | `BO-1113` | Shared Wallet Command Center | Orders & Money | 3 | 3 | yes |
 | `BO-1114` | Shared Wallet Model Configuration | Orders & Money | 3 | 2 | yes |
 | `BO-1115` | Family & Household Structure Configuration | Orders & Money | 3 | 2 | yes |
-| `BO-1116` | Parent–Child Stored Value Distribution | Orders & Money | 3 | 4 | yes |
+| `BO-1116` | Parent–Child Stored Value Distribution | Orders & Money | 3 | 3 | yes |
 | `BO-1117` | Allowance & Budget Allocation Engine | Orders & Money | 3 | 2 | yes |
 | `BO-1118` | Member Spending Controls & Permissions | Orders & Money | 3 | 2 | yes |
 | `BO-1119` | Corporate Wallet & Organizational Hierarchy | Orders & Money | 3 | 2 | yes |
@@ -837,7 +837,7 @@
 | `BO-1144` | Peer-to-Peer Transfer Configuration | Orders & Money | 1 | 3 | yes |
 | `BO-1145` | Transfer Eligibility, Limits & Approval Rules | Orders & Money | 3 | 1 | yes |
 | `BO-1146` | Refund-to-Wallet Policy Configuration | Orders & Money | 1 | 4 | yes |
-| `BO-1147` | Refund Routing & Credit Restoration Engine | Orders & Money | 3 | 4 | yes |
+| `BO-1147` | Refund Routing & Credit Restoration Engine | Orders & Money | 3 | 3 | yes |
 | `BO-1148` | Reversal & Transaction Correction Management | Orders & Money | 3 | 2 | yes |
 | `BO-1149` | Administrative Balance Adjustment Studio | Orders & Money | 3 | 4 | yes |
 | `BO-115` | Category, Brand & Merchandise Hierarchy | Sell | 2 | 3 | yes |
@@ -896,7 +896,7 @@
 | `BO-125` | Product & Category Button Configuration | Sell | 2 | 2 | yes |
 | `BO-126` | Deployment, Preview & Audit | Sell | 2 | 5 | yes |
 | `BO-128` | Live Workstation Health Monitor | Venue Operations | 2 | 2 | yes |
-| `BO-129` | Software, Configuration & Version Management | Venue Operations | 2 | 10 | yes |
+| `BO-129` | Software, Configuration & Version Management | Venue Operations | 1 | 10 | yes |
 | `BO-130` | Offline Policy & Rules Configuration | Venue Operations | 1 | 4 | yes |
 | `BO-131` | Connectivity & Auto-Switch Settings | Venue Operations | 2 | 1 | yes |
 | `BO-132` | Offline Transaction Monitor & Sync Queue | Venue Operations | 2 | 2 | yes |
@@ -1039,7 +1039,7 @@
 | `BO-269` | Group Quotation Builder & Proposal Generation | Sell | 3 | 1 | yes |
 | `BO-270` | Quote Revision, Negotiation & Version Management | Sell | 3 | 1 | yes |
 | `BO-271` | Group Discount, Exception & Approval Workflow | Sell | 3 | 1 | yes |
-| `BO-272` | Quote-to-Booking Conversion & Confirmation | Sell | 3 | 3 | yes |
+| `BO-272` | Quote-to-Booking Conversion & Confirmation | Sell | 3 | 2 | yes |
 | `BO-273` | Group Booking 360° & Handover Workspace | Sell | 3 | 2 | yes |
 | `BO-274` | Group Booking Operations Command Center | Sell | 3 | 2 | yes |
 | `BO-275` | Group Operational Planning & Task Workspace | Sell | 3 | 1 | yes |
@@ -1183,8 +1183,8 @@
 | `BO-414` | Wallet & Credit Management Dashboard | Games & Rides | 3 | 2 | yes |
 | `BO-415` | Wallet & Credit Type Configuration | Games & Rides | 3 | 2 | yes |
 | `BO-416` | Wallet Account & Balance View | Games & Rides | 3 | 8 | yes |
-| `BO-417` | Top-Up Configuration | Games & Rides | 3 | 2 | yes |
-| `BO-418` | Top-Up Bonus Rule Configuration | Games & Rides | 3 | 2 | yes |
+| `BO-417` | Top-Up Configuration | Games & Rides | 3 | 1 | yes |
+| `BO-418` | Top-Up Bonus Rule Configuration | Games & Rides | 3 | 1 | yes |
 | `BO-419` | Bonus Usage Restrictions | Games & Rides | 3 | 1 | yes |
 | `BO-420` | Bonus Validity & Expiry Configuration | Games & Rides | 3 | 2 | yes |
 | `BO-421` | Free Game & Ride Credit Management | Games & Rides | 3 | 2 | yes |
@@ -1367,7 +1367,7 @@
 | `BO-599` | Manual Configuration Center | Setup & Go-Live | 3 | 0 | yes |
 | `BO-600` | Venue, Calendar & Operational Setup | Setup & Go-Live | 3 | 1 | yes |
 | `BO-601` | Product, Pricing & Sales Channel Setup | Setup & Go-Live | 3 | 3 | yes |
-| `BO-602` | POS, Payment & Access Setup | Setup & Go-Live | 3 | 1 | yes |
+| `BO-602` | POS, Payment & Access Setup | Setup & Go-Live | 3 | 0 | yes |
 | `BO-603` | Configuration Health & AI Review | Setup & Go-Live | 3 | 2 | yes |
 | `BO-604` | Setup Completion & Handoff to Go-Live | Setup & Go-Live | 3 | 1 | yes |
 | `BO-605` | Go-Live Readiness Command Center | Setup & Go-Live | 3 | 1 | yes |
@@ -1476,7 +1476,7 @@
 | `BO-709` | Event Admission & Entry Policy Configuration | Sell | 3 | 2 | yes |
 | `BO-710` | Event Resource Command Center | Sell | 3 | 1 | yes |
 | `BO-711` | Event Resource Requirement Configuration | Sell | 3 | 2 | yes |
-| `BO-712` | Staff & Role Assignment Configuration | Sell | 3 | 4 | yes |
+| `BO-712` | Staff & Role Assignment Configuration | Sell | 3 | 3 | yes |
 | `BO-713` | Contractor & External Workforce Configuration | Sell | 3 | 2 | yes |
 | `BO-714` | Event Shift & Roster Configuration | Sell | 3 | 4 | yes |
 | `BO-715` | Resource Location & Deployment Configuration | Sell | 3 | 2 | yes |
@@ -1504,14 +1504,14 @@
 | `BO-737` | Customer 360 Profile | Engagement & Support | 3 | 6 | yes |
 | `BO-738` | Activity Timeline | Engagement & Support | 3 | 3 | yes |
 | `BO-739` | Contact & Preferences | Engagement & Support | 3 | 3 | yes |
-| `BO-740` | Family & Guardians | Engagement & Support | 3 | 4 | yes |
+| `BO-740` | Family & Guardians | Engagement & Support | 3 | 3 | yes |
 | `BO-741` | Corporate & Groups | Engagement & Support | 3 | 2 | yes |
 | `BO-742` | Commerce & Documents | Engagement & Support | 3 | 1 | yes |
 | `BO-743` | AI Guest Intelligence | Engagement & Support | 3 | 1 | yes |
 | `BO-744` | Data Governance Center | Engagement & Support | 3 | 2 | yes |
 | `BO-745` | Identity Resolution Rules | Engagement & Support | 3 | 4 | yes |
 | `BO-746` | Duplicate Review & Merge | Engagement & Support | 3 | 3 | yes |
-| `BO-747` | Consent Policy Configuration | Engagement & Support | 3 | 4 | yes |
+| `BO-747` | Consent Policy Configuration | Engagement & Support | 3 | 3 | yes |
 | `BO-748` | Consent Capture & Versions | Engagement & Support | 3 | 2 | yes |
 | `BO-749` | Guest Preference Center | Engagement & Support | 3 | 2 | yes |
 | `BO-750` | Data Subject Requests | Engagement & Support | 3 | 3 | yes |
@@ -1600,7 +1600,7 @@
 | `BO-833` | Gamification Analytics & Audit | Engagement & Support | 3 | 3 | yes |
 | `BO-834` | Digital Experience Center | Engagement & Support | 3 | 2 | yes |
 | `BO-835` | Site, Brand & Domain Setup | Engagement & Support | 3 | 1 | yes |
-| `BO-836` | Design System & Components | Engagement & Support | 3 | 1 | yes |
+| `BO-836` | Design System & Components | Engagement & Support | 3 | 0 | yes |
 | `BO-837` | Page & Landing Builder | Engagement & Support | 3 | 2 | yes |
 | `BO-838` | Content, Media & Forms | Engagement & Support | 3 | 0 | yes |
 | `BO-839` | Dynamic Product Pages | Engagement & Support | 3 | 1 | yes |
@@ -1648,7 +1648,7 @@
 | `BO-881` | Overtime & Working-Hour Rules | Rentals | 3 | 1 | yes |
 | `BO-882` | Workforce Integration & Synchronization Center | Rentals | 3 | 8 | yes |
 | `BO-883` | Workforce Roster Command Center | Rentals | 3 | 2 | yes |
-| `BO-884` | Attraction & Operational Staffing Roster | Rentals | 3 | 4 | yes |
+| `BO-884` | Attraction & Operational Staffing Roster | Rentals | 3 | 3 | yes |
 | `BO-885` | Minimum Staffing & Coverage Rule Configuration | Rentals | 3 | 1 | yes |
 | `BO-886` | Staffing Gap & Coverage Control Center | Rentals | 3 | 3 | yes |
 | `BO-887` | Shift Marketplace & Workforce Requests | Rentals | 3 | 2 | yes |
@@ -1681,7 +1681,7 @@
 | `BO-914` | Event Resource Requirement Builder | Rentals | 3 | 2 | yes |
 | `BO-915` | Venue & Space Allocation | Rentals | 3 | 2 | yes |
 | `BO-916` | Equipment & Asset Allocation | Rentals | 3 | 1 | yes |
-| `BO-917` | Event Staff & Personnel Allocation | Rentals | 3 | 1 | yes |
+| `BO-917` | Event Staff & Personnel Allocation | Rentals | 3 | 0 | yes |
 | `BO-918` | Event Resource Template Library | Rentals | 3 | 3 | yes |
 | `BO-919` | AI Event Resource Forecasting | Rentals | 1 | 4 | yes |
 | `BO-920` | Event Resource Cost Estimator | Rentals | 3 | 2 | yes |

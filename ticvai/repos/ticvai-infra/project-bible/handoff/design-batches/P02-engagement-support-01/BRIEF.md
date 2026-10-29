@@ -1,6 +1,6 @@
 # P02-engagement-support-01 — P02 · Engagement & Support (1 of 2)
 
-**10 screens · 35 operations · 83 schemas · 4 permissions**
+**10 screens · 35 operations · 84 schemas · 4 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -209,7 +209,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `GST-033` | AI Concierge – Contextual Help | A | 7 | 24 | 5 | 20 | 0 | 0 | guest | approved (client-verified) |
 | `GST-035` | Feedback & Ratings | A | 28 | 20 | 4 | 82 | 2 | 0 | guest | notStarted (client-verified) |
 | `GST-040` | Help & Support | A | 8 | 31 | 6 | 0 | 3 | 0 | guest | notStarted (client-verified) |
-| `GST-051` | Plan | A | 26 | 0 | 7 | 3 | 8 | 1 | guest | notStarted (client-verified) |
+| `GST-051` | Plan | A | 26 | 20 | 7 | 3 | 8 | 1 | guest | notStarted (client-verified) |
 | `GST-052` | Suggested Itineraries | A | 17 | 40 | 6 | 0 | 2 | 1 | guest | approved (client-verified) |
 | `GST-053` | Your Plan | A | 16 | 91 | 7 | 4 | 8 | 1 | guest | notStarted (client-verified) |
 | `GST-054` | AI Planner | A | 10 | 71 | 7 | 29 | 4 | 1 | guest | notStarted (client-verified) |

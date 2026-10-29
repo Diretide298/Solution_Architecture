@@ -376,25 +376,6 @@
   "requestBody": null,
   "responds": "GuestRelationship"
  },
- "updateGuestPreferences": {
-  "method": "PUT",
-  "path": "/guests/{subjectId}/preferences",
-  "contract": "marketing-crm",
-  "summary": "The things a regular should not have to say twice",
-  "permission": "GUEST_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "GuestPreferences",
-  "responds": "GuestPreferences"
- },
  "updateGuestProfile": {
   "method": "PATCH",
   "path": "/guests/{subjectId}",

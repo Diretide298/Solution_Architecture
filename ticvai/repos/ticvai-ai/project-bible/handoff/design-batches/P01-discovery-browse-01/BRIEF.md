@@ -1,6 +1,6 @@
 # P01-discovery-browse-01 — P01 · Discovery & Browse
 
-**5 screens · 21 operations · 60 schemas · 3 permissions**
+**5 screens · 21 operations · 62 schemas · 3 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `WEB-002` | Event & Attraction Listing | A | 3 | 87 | 6 | 22 | 10 | 0 | guest | review (client-verified) |
 | `WEB-003` | Search Results | A | 2 | 20 | 6 | 15 | 0 | 0 | guest | review (client-verified) |
 | `WEB-004` | Attraction Details | A | 1 | 81 | 8 | 24 | 17 | 0 | guest | review (client-verified) |
-| `WEB-050` | Plan Your Visit | A | 40 | 60 | 7 | 3 | 7 | 1 | guest | review (client-verified) |
+| `WEB-050` | Plan Your Visit | A | 40 | 80 | 7 | 3 | 7 | 1 | guest | review (client-verified) |
 
 ## Design inputs from the client meetings
 

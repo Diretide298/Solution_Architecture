@@ -90,7 +90,8 @@
     "format": "uuid",
     "nullable": true,
     "x-ticvai-references": "orders.order_line",
-    "description": "The paid top-up line this lot credits (`source_kind` `topUp`; r8 gate, CHG-R8RW-009). One lot per line, so a line is credited once. Null for every other source."
+    "x-ticvai-unique": "tenant",
+    "description": "The paid top-up line this lot credits (`source_kind` `topUp`; r8 gate, CHG-R8RW-009). One lot per line, so a line is credited once. Null for every other source. **Kept by a unique index** (`credit_lot_order_line_id_uniq`, partial: rows with a line only; ADAM CR-310, option A): the only guard that holds when two tills credit one line at the same moment."
    },
    "termsSnapshot": {
     "type": "object",
@@ -405,7 +406,9 @@
   "description": "Boards 1.10 and 10.8. **Ten boards of configuration that interact.** `version` is the highest at the scope plus one; (scope, version) is unique.",
   "properties": {
    "version": {
-    "type": "integer"
+    "type": "integer",
+    "nullable": true,
+    "description": "Every stored row has its number. Null only on `restoreWalletConfigurationVersion`'s answer, the restored draft, which is not a version row (ADAM CR-312)."
    },
    "publishedAt": {
     "type": "string",
@@ -436,7 +439,8 @@
        ]
       },
       "code": {
-       "type": "string"
+       "type": "string",
+       "description": "The check that found it. Validation's codes are listed on `publishWalletConfiguration` (ADAM CR-311)."
       },
       "message": {
        "type": "string"

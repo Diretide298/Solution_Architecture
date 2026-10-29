@@ -4273,28 +4273,6 @@
    "status": "pending"
   },
   {
-   "id": "WS135",
-   "kind": "workshop",
-   "label": "Marketing CRM Configuration Reference v1.0 board 1",
-   "platform": "P08",
-   "screens": [
-    "BO-734",
-    "BO-735",
-    "BO-736",
-    "BO-737",
-    "BO-738",
-    "BO-739",
-    "BO-740",
-    "BO-741",
-    "BO-742",
-    "BO-743"
-   ],
-   "drawable": 4,
-   "thin": 6,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
    "id": "WS142",
    "kind": "workshop",
    "label": "Marketing CRM Configuration Reference v1.0 board 8",
@@ -4708,21 +4686,21 @@
    "status": "pending"
   },
   {
-   "id": "WS136",
+   "id": "WS135",
    "kind": "workshop",
-   "label": "Marketing CRM Configuration Reference v1.0 board 2",
+   "label": "Marketing CRM Configuration Reference v1.0 board 1",
    "platform": "P08",
    "screens": [
-    "BO-744",
-    "BO-745",
-    "BO-746",
-    "BO-747",
-    "BO-748",
-    "BO-749",
-    "BO-750",
-    "BO-751",
-    "BO-752",
-    "BO-753"
+    "BO-734",
+    "BO-735",
+    "BO-736",
+    "BO-737",
+    "BO-738",
+    "BO-739",
+    "BO-740",
+    "BO-741",
+    "BO-742",
+    "BO-743"
    ],
    "drawable": 3,
    "thin": 7,
@@ -5030,6 +5008,28 @@
     "BO-653"
    ],
    "drawable": 1,
+   "thin": 8,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "WS136",
+   "kind": "workshop",
+   "label": "Marketing CRM Configuration Reference v1.0 board 2",
+   "platform": "P08",
+   "screens": [
+    "BO-744",
+    "BO-745",
+    "BO-746",
+    "BO-747",
+    "BO-748",
+    "BO-749",
+    "BO-750",
+    "BO-751",
+    "BO-752",
+    "BO-753"
+   ],
+   "drawable": 2,
    "thin": 8,
    "frames": 0,
    "status": "pending"

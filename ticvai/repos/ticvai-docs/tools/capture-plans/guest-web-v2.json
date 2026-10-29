@@ -95,7 +95,7 @@
 
   {"id": "WEB-016", "name": "Login / Register", "view": "Header profile icon (signed out), or automatically when leaving Add-ons / at payment", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
 
-  {"id": "WEB-017", "name": "My Account Dashboard", "view": "Sign in → avatar menu → 'Account overview'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+  {"id": "WEB-017", "name": "My Account Dashboard", "view": "Sign in → avatar menu → 'Account overview'", "steps": [], "expect": [], "pending": "not captured: since ADAM CR-290 (28 October 2026) the frame wireframes/frames/web-017.html draws the guest-web build on #33271, not this view; a capture would overwrite it"},
 
   {"id": "WEB-018", "name": "My Tickets", "view": "Header 'My tickets' → a ticket → 'Manage' (ticket sheet)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
 

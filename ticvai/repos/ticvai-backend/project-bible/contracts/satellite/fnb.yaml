@@ -636,7 +636,7 @@ paths:
         route: in-process
         for: 'what its text calls "Region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the plan''s trading day, a business date closing at the venue''s businessDayCutoff (r10 read routes; CHG-R10GEN-001)'
       summary: Turn a forecast into a prep list
       description: 'Board 2M. **Demand forecast through recipes to quantities per item and per station.**
@@ -1125,7 +1125,7 @@ paths:
         - "P08 BO-045 Menu Management"
       x-ticvai-read-via:
       - query: tenancy#regionSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "RegionSettings.timeZone": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-config-scope: outlet
       summary: Publish it on a date, not now
@@ -2386,7 +2386,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'the target visit''s outlet (409 target-visit-not-open) (CHG-MOD-003)'
       x-ticvai-names-for-context: [orders.order_line]
       summary: Move items to another table's bill
@@ -2786,7 +2786,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: tenancy#regionSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "RegionSettings.timeZone": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-config-scope: outlet
       summary: Make the draft live, now or on a date
@@ -2997,7 +2997,7 @@ paths:
         - "P15 KIT-003 Order Firing & Course Management"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.Outlet.paymentTiming": platform.outlet, Tenancy''s data (CHG-R10GEN-001)'
       summary: Send a held course to the pass
       description: 'Board 3 of the client F&B pack. **`KitchenTicket.coursing` carried the policy — `holdAndFire`,
@@ -3251,7 +3251,7 @@ paths:
         - "P15 KIT-002 Kitchen Display System (KDS)"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.fnb": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       summary: Bring back a ticket that was bumped by mistake
       description: 'Board 3. **A bumped ticket disappears from the rail**, and a bump is a single tap
@@ -4104,7 +4104,7 @@ paths:
         route: in-process
         for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       summary: Plan a batch, for one outlet or several
       description: 'BL-129. **Orders consumed stock and nothing produced any**, so a central kitchen making
@@ -4326,7 +4326,7 @@ paths:
         - "P06 EMP-056 Walk-In & Waitlist Management"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
@@ -4512,7 +4512,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'the outlet at the asked time (409 outlet-full-at-time) (CHG-MOD-003)'
       - query: orders#depositRecords
         route: service
@@ -4773,7 +4773,7 @@ paths:
         - "P02 GST-029 Venue Info & Services"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - guest
@@ -5151,7 +5151,7 @@ paths:
         - "P02 GST-024 F&B – Browse & Order"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'which outlets are open to deliver to the location (409 location-not-served) (CHG-MOD-003)'
       x-ticvai-audience:
       - guest
@@ -5369,7 +5369,7 @@ paths:
       operationId: claimTableSession
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
       x-ticvai-audience:
@@ -5565,7 +5565,7 @@ paths:
         - "P02 GST-024 F&B – Browse & Order"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       - query: tenancy#regionSettingsRecords
         route: in-process
@@ -5650,7 +5650,7 @@ paths:
         route: in-process
         for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'the outlet''s admissionContext and whether it is taking orders (403 entry-ticket-required, 409 outlet-closed, 422 the outlet''s delivery policy) (CHG-MOD-003)'
       - query: orders#paymentRecords
         route: service
@@ -6198,6 +6198,10 @@ paths:
         terminal and guest menu of the outlet when this returns; there is no pending state behind a
         *Save changes* button.
 
+        **Its ETag** (ADAM CR-294, option A, 29 October 2026; CHG-R11TEN-008). `fnb.menu_item` has no version column,
+        so the ETag is a strong hash of the `MenuItem` as answered, sent on the `200` and compared on `If-Match`: one
+        that differs is `412`, as on `setMenuItemDailyCount`.
+
         '
       tags:
       - menu
@@ -6287,6 +6291,9 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
+      x-ticvai-writes:
+      - table: fnb.sold_out_item
+        for: 'the row a count reaching zero records (source dailyCount, reason ranOut; ADAM CR-294, CHG-R11TEN-008)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q194 (BO-140, FNB-2H "Count set"): daily counts with automatic
@@ -6301,6 +6308,15 @@ paths:
 
         **Not inventory `setDailyCount`**, which picks the items of a stock count. This is a service count for
         one menu item, reset at the venue day start. `count` null stops counting the item.
+
+        **What a count does** (ADAM CR-294, option A, 29 October 2026, confirmed as built; CHG-R11TEN-008). Setting a
+        count resets `remainingCount` to it; at zero the item goes unavailable with `unavailableReason` `soldOut` and
+        an `fnb.sold_out_item` row (`source` `dailyCount`, `reason` `ranOut`). `count` null clears `daily_count` and
+        `remaining_count` and leaves availability as it is: raising a count above zero is the one way back for an
+        item its count took off.
+
+        **Its ETag** (ADAM CR-294). `fnb.menu_item` has no version column, so the ETag is a strong hash of the
+        `MenuItem` as answered, sent on the `200` and compared on `If-Match`: one that differs is `412`.
 
         '
       tags:
@@ -6532,8 +6548,23 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: tenancy#outletRecords
-        route: service
-        for: 'the outlet an entitlement may be redeemed at (409 entitlement-not-redeemable) (CHG-MOD-003)'
+        route: in-process
+        for: 'the order''s outlet: its paymentTiming (ADAM CR-277 (1)) and its orderNumberPrefix (ADAM CR-293 (2)), in process (XDR-004); the outlet an entitlement may be redeemed at waits with the redeemEntitlementId lines (CHG-MOD-003)'
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the caller''s workstation''s outletId: a till at the order''s outlet is accepted now, anything else waits for acceptFnbOrder (ADAM CR-293 (1); XDR-009)'
+      - query: catalogue#variantRecords
+        route: in-process
+        for: 'each line''s menu item''s catalogue variant (fnb.menu_item.product_variant_id), for its productId: the productCategory routing match (ADAM CR-277 (2); XDR-008)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'the variant''s product''s category (Product.categoryId), matched by an outlet''s productCategory routing rules (ADAM CR-277 (2); XDR-008)'
+      - query: catalogue#productCategoryRecords
+        route: in-process
+        for: 'the product''s category''s code, which an outlet''s productCategory routing rule matches (ADAM CR-277 (2); XDR-008)'
+      x-ticvai-reads:
+      - table: fnb.kitchen_routing_rule
+        for: 'the outlet''s routing rule (category rules and default station), and its absence: 409 outletNotAcceptingOrders (ADAM CR-319 (3); CHG-CR319-001)'
       x-ticvai-calls:
       - access.validateAccess
       x-ticvai-note: >-
@@ -6557,6 +6588,39 @@ paths:
         `payFirst` creates the order with no kitchen tickets, and **they are created only when its payment is
         captured** (`FnbOrder.sentToKitchenAt` stays null until then). An unpaid order at a `payFirst` outlet
         never reaches the kitchen. The order carries the timing it was placed under (`FnbOrder.paymentTiming`).
+        The outlet is read in process with `tenancy#outletRecords` (ADAM CR-277 (1), option A, 28 October 2026;
+        docs/active/cross-deployable-writes.yaml XDR-004).
+
+        **A till at the outlet, or not** (ADAM CR-293 (1), option A, 29 October 2026; CHG-R11TEN-003). The caller''s
+        workstation is read in process with `tenancy#workstationRecords` (XDR-009). When its `outletId` equals the
+        order''s `outletId`, the order is a till''s at the outlet: it is accepted and its kitchen tickets are created
+        in this transaction (under the outlet''s `paymentTiming`, above). Anything else waits for `acceptFnbOrder`:
+        a workstation of another outlet, a workstation with no outlet, and a caller with no workstation.
+
+        **The order number** (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003). Per outlet, a counter that resets
+        each business day in the venue''s time zone (the day closes at the venue''s `businessDayCutoff`, read with the
+        venue''s settings above), unique per outlet and business day. Its form is the outlet''s
+        one-letter `Outlet.orderNumberPrefix` (tenancy, A to Z), a hyphen and three digits (`A-042`), or the three
+        digits alone (`042`) when the outlet has no prefix.
+
+        **Which station a line goes to** (ADAM CR-277 (4); CHG-R11TEN-002). One kitchen ticket per station. A line
+        goes to the station whose `KitchenStation.menuItemIds` lists its menu item (the item rule); a line no
+        station lists goes by the outlet''s `KitchenRoutingRules.categoryRules`, the first match winning, then to
+        its `defaultStationId`. A `productCategory` rule matches the code of the item''s catalogue product''s
+        category (`fnb.menu_item.product_variant_id`, then `catalogue#variantRecords`, `catalogue#productRecords` and
+        `catalogue#productCategoryRecords` in process, XDR-008). `MenuItem.stationId` (`fnb.menu_item.station_id`) is
+        not used for routing.
+
+        **An outlet with no routing rule takes no order** (ADAM CR-319 (3), option B, Chinmay, 29 October 2026;
+        CHG-CR319-001). An outlet that sells food must have its `fnb.kitchen_routing_rule` row
+        (`KitchenRoutingRules`, which holds its `defaultStationId`); with none, the order is refused `409`
+        `outletNotAcceptingOrders` and nothing is written, so the misconfiguration shows at the till rather than as
+        an order no kitchen sees.
+
+        **A line with `redeemEntitlementId` waits** (ADAM CR-277 (5)): its redemption calls access `validateAccess`
+        on the access host, which waits for service sign-in between the apps (CR-241).
+        Until that follow-up, a line carrying `redeemEntitlementId` is refused `400` (validation) and nothing is
+        written.
 
         Offline behaviour depends on the items: an order containing only untracked items queues normally,
         while one containing a recipe-linked item is refused offline because stock depletes in real time.
@@ -6570,6 +6634,7 @@ paths:
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/OfflineReplay
       requestBody:
         required: true
         content:
@@ -6591,15 +6656,17 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          x-ticvai-problem-types: [item-unavailable, modifier-constraint-unmet, tracked-item-offline, entitlement-not-redeemable]
+          x-ticvai-problem-types: [item-unavailable, modifier-constraint-unmet, tracked-item-offline, entitlement-not-redeemable, outlet-not-accepting-orders]
           description: 'An item is unavailable, modifier constraints are unmet, a tracked item was
-            ordered offline, or a line''s `redeemEntitlementId` cannot be redeemed here
-            (`entitlementNotRedeemable`: used, another item or outlet, not yet valid; MOB-4). One reason per
-            cause.
+            ordered offline, a line''s `redeemEntitlementId` cannot be redeemed here
+            (`entitlementNotRedeemable`: used, another item or outlet, not yet valid; MOB-4), or the outlet has
+            no kitchen routing rule (`outletNotAcceptingOrders`; ADAM CR-319 (3)). One reason per cause.
 
             **`trackedItemOffline` is stock that ran out while the terminal was offline** (proposed, client
             to correct (audit R125 (11))): an order queued offline with a recipe-linked item is replayed, and
-            the stock it needs was used up meanwhile.
+            the stock it needs was used up meanwhile. **The till marks the replay** (ADAM CR-319 (1), option A, Chinmay, 29 October 2026;
+            CHG-CR319-001): with `X-Offline-Replay: true`, a stock-tracked item that is unavailable is
+            `trackedItemOffline`; without it, `itemUnavailable`.
 
             '
           content:
@@ -6615,6 +6682,7 @@ paths:
                       - modifierConstraintUnmet
                       - trackedItemOffline
                       - entitlementNotRedeemable
+                      - outletNotAcceptingOrders
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-orders/{orderId}/accept:
@@ -6635,7 +6703,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'whether the outlet is taking orders (409 outlet-not-accepting-orders) (CHG-MOD-003)'
       x-ticvai-audience:
       - staff
@@ -7028,6 +7096,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableMap'
+        '409':
+          x-ticvai-problem-types: [table-has-open-visit]
+          description: 'A table the body removes, or whose capacity it lowers below the covers of the visit open on
+            it, has an open visit (CHG-FXC-004, as `updateTable`); nothing is applied. Declared as the description
+            already said (C-REFUSAL-UNDECLARED, CHG-CR316-001).'
+          content:
+            application/problem+json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/FnbProblem'
+                - type: object
+                  properties:
+                    refusedReason:
+                      enum:
+                      - tableHasOpenVisit
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /table-visits:
@@ -7363,7 +7446,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.Outlet.paymentTiming": platform.outlet, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -7465,7 +7548,7 @@ paths:
         route: service
         for: 'the payments taken against the bill (409 payments-short-of-bill) (CHG-MOD-003)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.Outlet.paymentTiming": platform.outlet, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -8102,7 +8185,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -8877,7 +8960,7 @@ paths:
         - "P08 BO-135 Order Routing & KDS/Printer Rules"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'the outlet the stations serve (422 unknown-station) (CHG-MOD-003)'
       x-ticvai-audience:
       - staff
@@ -9170,7 +9253,7 @@ paths:
         - "P08 BO-065 Venue Configuration"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -9251,7 +9334,7 @@ paths:
         - "P08 BO-065 Venue Configuration"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
-        route: service
+        route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       - query: seating#seatRecords
         route: service
@@ -12080,6 +12163,8 @@ components:
           type: string
           format: uuid
           nullable: true
+          description: Not used for routing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). The item rule is
+            `KitchenStation.menuItemIds`; `createFnbOrder` routes by it and the outlet's `KitchenRoutingRules`.
         menuSectionId:
           x-ticvai-references: fnb.menu_section
           type: string
@@ -12261,7 +12346,10 @@ components:
             entitlement is marked used in the same step through access `validateAccess` at the outlet. An
             entitlement already used, for another item or outlet, or not yet valid is refused 409
             `entitlementNotRedeemable`; a till that is offline queues the redemption like any sale and the
-            replay is refused the same way if it was used meanwhile.'
+            replay is refused the same way if it was used meanwhile.
+
+            **Waits for service sign-in between the apps** (ADAM CR-277 (5), 28 October 2026; CHG-R11TEN-002): until
+            that follow-up, `createFnbOrder` refuses a line carrying `redeemEntitlementId` with `400` (validation).'
     CreateFnbOrderRequest:
       x-ticvai-persistence: none — request only
       type: object
@@ -12317,6 +12405,9 @@ components:
           format: uuid
         orderNumber:
           type: string
+          description: '**Short and called out across a counter** (ADAM CR-277 (3) and CR-293 (2); CHG-R11TEN-003).
+            Set once by `createFnbOrder`, which states the rule: the outlet''s daily counter, written as the outlet''s
+            one-letter prefix, a hyphen and three digits (`A-042`), or the three digits alone (`042`).'
         outletId:
           type: string
           format: uuid
@@ -13027,7 +13118,10 @@ components:
       x-ticvai-persistence: fnb.kitchen_routing_rule
       description: '**Where a line goes when its item names no station** (Chinmay, 2 October, workbook Q189 and Q190;
         DI-323; CHG-CSA-015). Item rules are `KitchenStation.menuItemIds`; these are the category rules, the
-        default station and the fallback station of one outlet. One row per outlet.
+        default station and the fallback station of one outlet. One row per outlet. `MenuItem.stationId` is not
+        an item rule and routes nothing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). An outlet with no row
+        has no default station, and `createFnbOrder` refuses its orders `409 outletNotAcceptingOrders` (ADAM CR-319
+        (3), option B, 29 October 2026; CHG-CR319-001).
 
         '
       required:

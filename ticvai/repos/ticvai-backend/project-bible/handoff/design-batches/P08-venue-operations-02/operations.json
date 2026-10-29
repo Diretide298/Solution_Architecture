@@ -413,7 +413,7 @@
     "required": null
    }
   ],
-  "requestBody": "ConfigurationProfile",
+  "requestBody": "SetConfigurationProfileRequest",
   "responds": "ConfigurationProfile"
  },
  "setConnectivityThresholds": {

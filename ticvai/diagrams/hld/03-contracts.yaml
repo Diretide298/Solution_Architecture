@@ -17,12 +17,12 @@ tiers:
 contracts:
 - contract: marketing-crm
   tier: satellite
-  operations: 280
+  operations: 281
   holds: null
   service: MarketingService
   verbs:
     GET: 134
-    POST: 77
+    POST: 78
     PUT: 60
     PATCH: 7
     DELETE: 2
@@ -190,18 +190,18 @@ contracts:
     PUT: 22
     DELETE: 7
     PATCH: 6
-  guestCallable: 12
+  guestCallable: 11
   offlineCapable: 10
   events:
   - whitelabel-customDomainChanged
   ref: diagrams/lld/contracts/white-label.yaml
 - contract: identity
   tier: spine
-  operations: 102
+  operations: 103
   holds: null
   service: IdentityService
   verbs:
-    POST: 45
+    POST: 46
     GET: 42
     PUT: 8
     DELETE: 4
@@ -503,6 +503,7 @@ contracts:
   offlineCapable: 1
   events:
   - assets-documentIndexed
+  - assets-guestUploadChanged
   ref: diagrams/lld/contracts/assets.yaml
 - contract: shift
   tier: spine
@@ -521,13 +522,13 @@ contracts:
   ref: diagrams/lld/contracts/shift.yaml
 - contract: venue-map
   tier: satellite
-  operations: 26
+  operations: 27
   holds: null
   service: VenueOpsService
   verbs:
     GET: 12
     POST: 12
-    PUT: 2
+    PUT: 3
   guestCallable: 10
   offlineCapable: 6
   events: null

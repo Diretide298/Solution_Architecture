@@ -438,17 +438,17 @@ screens:
     inferred: true
     fromFlows: true
     transitions:
-    - to: KSK-005
-      trigger: Chooses a session
-      provenance: flow F07 step 4→5
-      carries:
-      - variantId
     - to: KSK-015
       trigger: Assistant
       carries:
       - productId
       provenance: derived — KSK-015 declares entryState.params cartId, conversationId, messageId, productId
         and KSK-004 holds productId, so an edge into it carries them
+    - to: KSK-005
+      trigger: Chooses a session
+      provenance: flow F07 step 4→5
+      carries:
+      - variantId
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
 

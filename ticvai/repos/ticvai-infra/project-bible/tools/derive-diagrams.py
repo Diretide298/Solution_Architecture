@@ -1005,9 +1005,12 @@ def main() -> int:
                 "tables": len([t for t in real if t.split(".")[0] == s]),
                 "stores": sorted({(schema.get("store") or {}).get(t, "postgres")
                                   for t in real if t.split(".")[0] == s}),
+                # **Sorted, so a tie has one answer** (P-31, CHG-R11DES-002): `real` is a set, and `max` over it kept
+                # whichever tied table the run's string hashing put first, so marketing's largest table flipped
+                # between waiver_requirement and privacy_request from one regeneration to the next.
                 "largestTable": max(
                     ((t, len((schema.get("cols") or {}).get(t) or []))
-                     for t in real if t.split(".")[0] == s),
+                     for t in sorted(real) if t.split(".")[0] == s),
                     key=lambda x: x[1], default=("—", 0))[0],
             } for s in v["schemas"]],
             "operationsByContract": [

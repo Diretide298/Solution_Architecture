@@ -218,7 +218,8 @@ x-ticvai-queries:
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
       another deployable through Tenancy's service route (serviceAuth), and in process by the operations host for
       the F&B menu operations, whose menus reach their venue only through `fnb.menu.outlet_id` (ADAM CR-260 as the
-      r10 package carries CR-234; docs/active/cross-deployable-writes.yaml XDR-004).
+      r10 package carries CR-234; docs/active/cross-deployable-writes.yaml XDR-004), and since 29 October 2026 for
+      every operation the operations host serves that asks it (ADAM CR-296, option A; CHG-R11RUL-001).
     served: [in-process, service]
   regionSettingsRecords:
     module: tenancy
@@ -239,7 +240,8 @@ x-ticvai-queries:
       process within commerce, through the C# query interface Tenancy implements, and asked from another
       deployable through Tenancy's service route (serviceAuth).
       It is asked in process by the operations host too (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008;
-      XDR-004), and by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
+      XDR-004), for every operation it serves that asks it since 29 October 2026 (ADAM CR-296, option A;
+      CHG-R11RUL-001), and by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
     served: [in-process, service]
   tenantRecords:
     module: tenancy
@@ -278,7 +280,8 @@ x-ticvai-queries:
       commerce, through the C# query interface Tenancy implements, and asked from another deployable through
       Tenancy's service route (serviceAuth).
       It is asked in process by the operations host too, which composes it for every F&B operation that answers Money
-      (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008; docs/active/cross-deployable-writes.yaml XDR-004), and
+      (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008; docs/active/cross-deployable-writes.yaml XDR-004) and,
+      since 29 October 2026, for every operation it serves that asks it (ADAM CR-296, option A; CHG-R11RUL-001), and
       by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
     served: [in-process, service]
   workstationRecords:
@@ -300,8 +303,9 @@ x-ticvai-queries:
       process within commerce, through the C# query interface Tenancy implements, and asked from another
       deployable through Tenancy's service route (serviceAuth).
       It is asked in process by the access host too, for the session's access point (ADAM CR-240, option A, 25 October
-      2026; CHG-R10ORD-009; XDR-003), and by the workers host for the consumers it runs (ADR-0055, amended 25 October
-      2026).
+      2026; CHG-R10ORD-009; XDR-003), by the operations host for createFnbOrder, whose till at the order's outlet is
+      accepted at once (ADAM CR-293 (1), option A, 29 October 2026; XDR-009), and by the workers host for the
+      consumers it runs (ADR-0055, amended 25 October 2026).
     served: [in-process, service]
   dataRetentionSettingRecords:
     module: tenancy
@@ -341,7 +345,10 @@ x-ticvai-queries:
       refuses or chooses on these rows states that rule in its own operation. A path is matched exactly, never as an
       ancestor or a descendant. It is asked in process within commerce, through the C# query interface Tenancy
       implements (Catalogue: a venue's path for a venue-scoped row, and a row's path back to its venue; Orders: a
-      venue's name), and asked from another deployable through Tenancy's service route (serviceAuth).
+      venue's name), and asked from another deployable through Tenancy's service route (serviceAuth). The
+      operations host asks it in process for every operation it serves that asks it (ADAM CR-296, option A, 29
+      October 2026; XDR-004; CHG-R11RUL-001): platform.scope is a kernel table every host's role may read (CR-002),
+      so no grant is added.
     served: [in-process, service]
   offlinePolicyRecords:
     module: tenancy
@@ -1083,7 +1090,6 @@ paths:
     put:
       operationId: setConfigurationProfile
       x-ticvai-consumed-by:
-        - "P08 BO-1070 Setup, Clone & Inheritance"
         - "P08 BO-123 POS Profile Management"
         - "P08 BO-129 Software, Configuration & Version Management"
       summary: What a class of workstation is configured to be
@@ -1125,7 +1131,7 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ConfigurationProfile' }
+            schema: { $ref: '#/components/schemas/SetConfigurationProfileRequest' }
       responses:
         '200':
           description: Set — the draft replaced, or a new version stored after a published one
@@ -1996,7 +2002,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
         - "P08 BO-036 Device Registry"
-        - "P08 BO-602 POS, Payment & Access Setup"
       # Named to say custody is a different fact from binding; this PUT neither reads nor writes it (r8 integration, CHG-R8INT-014; check-parameter-columns P-NAMED-TABLE).
       x-ticvai-names-for-context: [tenancy.device_assignment]
       x-ticvai-audience: [staff]
@@ -2265,6 +2270,12 @@ paths:
                 departmentId: { type: string, format: uuid, nullable: true }
                 outletType: { $ref: '#/components/schemas/OutletType' }
                 paymentTiming: { $ref: '#/components/schemas/OutletPaymentTiming' }
+                orderNumberPrefix:
+                  type: string
+                  nullable: true
+                  maxLength: 1
+                  enum: [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z]
+                  description: The outlet's one-letter order-number prefix (`Outlet.orderNumberPrefix`; ADAM CR-293); null clears it.
                 admissionContext: { $ref: '#/components/schemas/OutletAdmissionContext' }
                 producesForOutletIds:
                   type: array
@@ -2991,7 +3002,10 @@ paths:
 
         **One row per device, and its references checked** (ADAM CR-103, option 3, accepted 15 October 2026;
         CHG-R10TEN-007). The row is keyed by `device_id`, which is required and unique, so two first calls make one
-        row. An `assignedWorkstationId` that is not a workstation of the tenant, an `ownerOrgUnitId` that is not a
+        row: the write is an upsert `ON CONFLICT (device_id)` on the unique index `device_assignment_device_id_uniq`,
+        which replaces the plain index on the column (ADAM CR-278, option A, 28 October 2026; CHG-R11TEN-005). The
+        row''s `scope_path` is the device''s own `platform.device.scope_path`, so the assignment is seen and changed
+        by whoever is in scope of the device. An `assignedWorkstationId` that is not a workstation of the tenant, an `ownerOrgUnitId` that is not a
         scope node, a `custodianPrincipalId` that is not a principal, or a `locationScopePath` outside the
         caller''s scope is refused `422` `unknown-reference`, naming the field, and nothing is written.
 
@@ -3095,7 +3109,6 @@ paths:
     get:
       operationId: listDeviceFirmware
       x-ticvai-consumed-by:
-        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
         - "P08 BO-129 Software, Configuration & Version Management"
       summary: Firmware and software versions, and what is running where
       description: '16.6.30 and 16.6.32. **The fleet view, which is the only useful one.** *Which version
@@ -3133,12 +3146,7 @@ paths:
     post:
       operationId: createDeviceFirmware
       x-ticvai-consumed-by:
-        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
         - "P08 BO-129 Software, Configuration & Version Management"
-      x-ticvai-read-via:
-      - query: assets#mediaAssetRecords
-        route: service
-        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-agreed: '29 September: re-trace 16.6.30 and 16.6.33 (nothing wrote the table the rollout
         references); our build plan; shape follows startDeviceFirmwareRollout'
       summary: Register a firmware or software release before it is deployed
@@ -3152,10 +3160,12 @@ paths:
         two people.
 
 
-        The artefact is an uploaded asset (`artefactAssetId`); the device verifies `checksum` before it
-        installs, so an image altered in transit is refused on the device rather than installed. `id`,
-        `status`, `releasedAt`, `installedCount` and `scopePath` are the server''s and ignored on input.
-        A second release with the same `deviceKind` and `version` is `409`.
+        The artefact is an uploaded asset (`artefactAssetId`), **stored as sent and not checked here** (ADAM
+        CR-285 (1), 28 October 2026; CHG-R11TEN-006): the device verifies `checksum` before it installs, so an
+        image altered in transit, or a wrong asset id, is refused on the device rather than installed. `version`
+        is sent on create (CR-285 (3)); `id`, `status`, `releasedAt`, `installedCount` and `scopePath` are the
+        server''s and ignored on input. A second release with the same `deviceKind` and `version` is `409`: the
+        insert meets the unique key on (`device_kind`, `version`) and its violation answers it (CR-285 (2)).
 
         '
       tags:
@@ -3206,7 +3216,6 @@ paths:
     get:
       operationId: getDeviceFirmware
       x-ticvai-consumed-by:
-        - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
         - "P08 BO-129 Software, Configuration & Version Management"
       x-ticvai-agreed: '29 September: re-trace 16.6.30 (release read beside the new write); our build
         plan; shape follows getDevice'
@@ -4241,6 +4250,13 @@ components:
         region grant reads the rows whose `orgUnitId` names a scope node at or beneath it. A row with no
         `orgUnitId` (a consumer, a job, the webhook) is the tenant root's alone. Appending is open to any grant,
         and correcting or removing a row to the tenant root only, as CR-005 settled.
+
+
+        **The control database's writes are audited by the same interceptor, into the control plane's own trail**
+        (ADAM CR-292, option A, Chinmay, 29 October 2026; CHG-R11RUL-004). The control database has no table of
+        this schema, so the interceptor's control variant runs on the control connection (ControlDbContext) and
+        writes a `ControlAuditRecord` in the write's own transaction instead; these rows are the tenant
+        database's only.
       required: [id, action, occurredAt]
       properties:
         id: { type: string, format: uuid, readOnly: true }
@@ -4281,6 +4297,36 @@ components:
             (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the
             tenant's own staff. Every platform action in a tenant carries one, so the tenant can
             see all of them.
+
+    VenueOpeningHours:
+      type: object
+      x-ticvai-persistence: none — jsonb column of platform.venue_settings (opening_hours)
+      additionalProperties: false
+      description: >
+        **A venue's opening hours by weekday** (ADAM CR-338, city and openingHoursToday (a), 29 October 2026;
+        CHG-CR338-001): one entry per weekday, local `HH:MM` in the venue's region time zone. A day left out or null
+        is closed. `TenantAppStatus.venues[].openingHoursToday` is today's entry.
+      properties:
+        mon: { $ref: '#/components/schemas/VenueDayHours' }
+        tue: { $ref: '#/components/schemas/VenueDayHours' }
+        wed: { $ref: '#/components/schemas/VenueDayHours' }
+        thu: { $ref: '#/components/schemas/VenueDayHours' }
+        fri: { $ref: '#/components/schemas/VenueDayHours' }
+        sat: { $ref: '#/components/schemas/VenueDayHours' }
+        sun: { $ref: '#/components/schemas/VenueDayHours' }
+    VenueDayHours:
+      type: object
+      nullable: true
+      x-ticvai-persistence: none — inside VenueOpeningHours
+      description: One weekday's opening hours (ADAM CR-338); null is closed that day.
+      required: [opens, closes]
+      properties:
+        opens:
+          type: string
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
+        closes:
+          type: string
+          pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'
 
     OpeningHoursWindow:
       type: object
@@ -4512,11 +4558,22 @@ components:
       type: object
       x-ticvai-persistence: control.audit_record
       description: '**The control plane''s audit trail** (R8 blocker FOUNDATION-AI-C50, CHG-R8MIG-018). The control
-        database (ADR-0039) has no platform.audit_record and no scope tree, so an operation that runs on the control
-        connection (tenant, plan, subscription, cell, licence, webhook and API-client operations, `platform-ops` and
-        `subscription`) writes its audit row here, in the same transaction as its change: the tenant table''s fields
+        database (ADR-0039) has no platform.audit_record and no scope tree, so a write on the control connection
+        (tenant, plan, subscription, cell, licence, webhook and API-client operations, `platform-ops` and
+        `subscription`) leaves its audit row here, in the same transaction as its change: the tenant table''s fields
         less `scopePath`, with the tenant it concerns and the operator from the Control Plane token. Append-only, never
-        returned by an operation in r8 (the Platform Audit Log reads it when its read is planned).'
+        returned by an operation in r8 (the Platform Audit Log reads it when its read is planned).
+
+
+        **Written by the audit interceptor''s control variant, not by each operation** (ADAM CR-292, option A,
+        Chinmay, 29 October 2026; CHG-R11RUL-004), as CR-179 has the interceptor write `AuditRecord` for the tenant
+        database: every write through the control database''s context (ControlDbContext) gets one row, inside its
+        transaction. `operatorPrincipalId` is the Control Plane token''s subject (null for a system job);
+        `tenantId` comes from the operation; `action` is the operation, as `AuditRecord.action`; `subjectRef` and
+        `details` are as their fields describe; `occurredAt` is set. The table is in
+        backend/control/V0108__after_r1_20261020.sql and reaches the repository''s db/control with the control
+        database''s migration task, so no new migration; once that is applied, the stop-gap that leaves control
+        writes out of the interceptor is removed. Built with #27775.'
       required: [id, action, occurredAt]
       properties:
         id:
@@ -4711,6 +4768,9 @@ components:
         scopePath:
           type: string
           readOnly: true
+          description: The device's own `platform.device.scope_path`, set by the server on every write (ADAM CR-278,
+            option A, 28 October 2026; CHG-R11TEN-005), so whoever can change the device can change who holds it.
+            Never the `locationScopePath` or the assigned workstation's path.
     DeviceTelemetryPoint:
       type: object
       x-ticvai-persistence: tenancy.device_telemetry
@@ -4770,6 +4830,9 @@ components:
       type: object
       x-ticvai-persistence: tenancy.device_firmware
       x-ticvai-rls: read-beneath   # r10 gate 3, CHG-R10INT-002: read below the tenant by getWorkstationHealth (ADAM CR-244)
+      # **One release per device kind and version** (ADAM CR-285 (2), 28 October 2026; CHG-R11TEN-006): the insert's
+      # unique violation answers createDeviceFirmware's 409.
+      x-ticvai-unique-together: [[deviceKind, version]]
       description: '16.6.30 and 16.6.32. **A release, and how much of the fleet is on it.** Written by
         `createDeviceFirmware` and moved through its life by `setDeviceFirmwareStatus` (29 September,
         build pass); `startDeviceFirmwareRollout` deploys only a `released` one.
@@ -4786,8 +4849,9 @@ components:
         deviceKind:
           type: string
         version:
-          readOnly: true
           type: string
+          description: The release's version as its vendor names it, sent on create (ADAM CR-285 (3), 28 October 2026;
+            CHG-R11TEN-006). One release per `deviceKind` and `version`.
         vendor:
           type: string
           nullable: true
@@ -4805,6 +4869,10 @@ components:
           type: string
           format: uuid
           nullable: true
+          description: The uploaded image (an Assets media asset), **stored unchecked** (ADAM CR-285 (1), 28 October
+            2026; CHG-R11TEN-006). `createDeviceFirmware` does not read Assets to verify it; the device verifies the
+            image's `checksum` before it installs, which is the real guard. The cross-app read waits for service
+            sign-in between the apps and is not needed to ship.
         checksum:
           type: string
           nullable: true
@@ -5230,6 +5298,45 @@ components:
         startedAt: { type: string, format: date-time, readOnly: true }
         completedAt: { type: string, format: date-time, nullable: true, readOnly: true }
 
+    SetConfigurationProfileRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      description: '**What `setConfigurationProfile` is sent** (r11 gate, check-contract-shapes C-REQUEST-SERVER-FIELDS,
+        R079; started ticket #30825; CHG-R11FXC-001). The body was `ConfigurationProfile`, the stored row, which
+        requires `status`; on that schema `status` is the row''s lifecycle, and the deployment states in it are the
+        server''s. On input it is the caller''s choice between `draft` and `published`, so the request says so in a
+        schema of its own and the stored row keeps its own `required`. The fields are the stored row''s, by the same
+        names, and each lands in its column of `platform.configuration_profile` as `setConfigurationProfile` says.'
+      required: [name, venueKindScope, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Optional. The path's `profileId`; a body that sends a different value is `400` `validation`.
+        name: { type: string }
+        scopePath: { type: string }
+        venueKindScope:
+          type: array
+          description: Which workstation types the profile applies to, as `ConfigurationProfile.venueKindScope`.
+          items: { type: string }
+        settings:
+          type: object
+          additionalProperties: true
+        status:
+          type: string
+          enum: [draft, published, deploying, deployed, superseded, rolledBack]
+          description: >
+            **The caller's choice on input: `draft` or `published`**; sending `published` publishes this version.
+            The other four are the deployment's (`deployConfigurationProfile`) and a body carrying one is `400`
+            `validation`. They stay in the enum so a client built on r1, which sent the stored row, still sends a
+            valid body (check-contract-compat).
+        # The stored row's server-owned fields, kept readOnly (ignored on input) so a client built on r1, which sent
+        # the whole ConfigurationProfile, still sends a valid body (check-contract-compat), as
+        # DeployConfigurationProfileRequest keeps ProfileDeployment's.
+        version: { type: integer, readOnly: true }
+        deployedCount: { type: integer, readOnly: true }
+        publishedAt: { type: string, format: date-time, nullable: true, readOnly: true }
+
     DeployConfigurationProfileRequest:
       type: object
       x-ticvai-persistence: none — request only
@@ -5448,6 +5555,17 @@ components:
             - $ref: '#/components/schemas/OutletPaymentTiming'
           default: sendFirst
           description: Pay first, or send to the kitchen first then pay (DEC-064; CHG-CSP-004).
+        orderNumberPrefix:
+          type: string
+          nullable: true
+          maxLength: 1
+          enum: [A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z]
+          description: >
+            **The one letter this outlet's F&B order numbers start with** (ADAM CR-293 (2), option A, 29 October
+            2026; CHG-R11TEN-003): one capital letter A to Z, or null for none. `createFnbOrder` numbers an
+            outlet's orders `A-042` (the prefix, a hyphen and three digits from the outlet's daily counter,
+            CR-277 (3)), or `042` where the outlet has no prefix. Written by `createOutlet` and `updateOutlet`,
+            returned by `tenancy#outletRecords`, which `createFnbOrder` reads in process (XDR-004).
         admissionContext:
           allOf:
             - $ref: '#/components/schemas/OutletAdmissionContext'
@@ -6092,6 +6210,22 @@ components:
             CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the
             venue settings write and read by White-Label''s getTenantAppStatus through tenancy#venueSettingsRecords.
             Null means the tenant''s contact is shown.'
+        city:
+          type: string
+          maxLength: 120
+          nullable: true
+          description: '**The venue''s city, shown under its name in the guest venue list** (ADAM CR-338, city and
+            openingHoursToday (a), 29 October 2026; CHG-CR338-001): `platform.venue_settings.city`, written by the venue
+            settings write and read by White-Label''s getTenantAppStatus (`TenantAppStatus.venues[].city`) through
+            tenancy#venueSettingsRecords. Null when not set.'
+        openingHours:
+          allOf:
+          - $ref: '#/components/schemas/VenueOpeningHours'
+          nullable: true
+          description: '**The venue''s opening hours by weekday** (ADAM CR-338, city and openingHoursToday (a), 29 October
+            2026; CHG-CR338-001): `platform.venue_settings.opening_hours`, one jsonb column, written by the venue settings
+            write and read by White-Label''s getTenantAppStatus for `TenantAppStatus.venues[].openingHoursToday` through
+            tenancy#venueSettingsRecords. Null when not set.'
         id:
           type: string
           format: uuid

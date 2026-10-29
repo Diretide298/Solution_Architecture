@@ -475,6 +475,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
+    "x-ticvai-references": "catalogue.event",
     "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
    },
    "createdAt": {
@@ -1468,15 +1469,18 @@
    },
    "maximumHoursPerDay": {
     "type": "integer",
-    "nullable": true
+    "nullable": true,
+    "description": "The most hours a person may be rostered on one calendar day in the venue's time zone. Read at assignment for `RotaAssignment.breachesWorkingHourLimit` (ADAM CR-334, option A); null is no limit."
    },
    "maximumHoursPerWeek": {
     "type": "integer",
-    "nullable": true
+    "nullable": true,
+    "description": "The most hours a person may be rostered in any 7 consecutive days, a rolling window rather than a calendar week. Read at assignment for `RotaAssignment.breachesWorkingHourLimit` (ADAM CR-334, option A); null is no limit."
    },
    "minimumRestHours": {
     "type": "integer",
-    "nullable": true
+    "nullable": true,
+    "description": "The fewest hours between the end of one of a person's assignments and the start of the next. Read at assignment for `RotaAssignment.breachesWorkingHourLimit` (ADAM CR-334, option A); null is no limit."
    },
    "maximumConsecutiveDays": {
     "type": "integer",
@@ -1582,6 +1586,7 @@
   }
  },
  "WorkforceEmployee": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "workforce.employee",
   "description": "**Taken from the backend workbook, 20 September.** Stores the main employee/staff master record.",
@@ -1891,6 +1896,7 @@
   }
  },
  "WorkforceJobTitle": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "workforce.job_title",
   "description": "**Taken from the backend workbook, 20 September.** Stores job/designation definitions such as Cashier, Manager, Chef or Technician.",
@@ -1899,9 +1905,15 @@
    "code",
    "name",
    "isActive",
-   "createdAt"
+   "createdAt",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it: a venue writes its own job titles and reads its own and those of the region and tenant above it (ADR-0018, venue is the configuration floor; r11 gate, CHG-R11FXD-002)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -1991,6 +2003,7 @@
   }
  },
  "WorkforceLeaveType": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "workforce.leave_type",
   "description": "**Taken from the backend workbook, 20 September.** Defines leave categories and basic leave behavior.",
@@ -2001,9 +2014,15 @@
    "isPaid",
    "requiresApproval",
    "isActive",
-   "createdAt"
+   "createdAt",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it: a venue writes its own leave types and reads its own and those of the region and tenant above it (ADR-0018, venue is the configuration floor; r11 gate, CHG-R11FXD-002)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -2039,6 +2058,7 @@
   }
  },
  "WorkforceShift": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "workforce.shift",
   "description": "**Taken from the backend workbook, 20 September.** Defines reusable shifts such as Morning, Evening or Night.",
@@ -2050,9 +2070,15 @@
    "endTime",
    "breakMinutes",
    "crossesMidnight",
-   "isActive"
+   "isActive",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it: a venue writes its own shift patterns and reads its own and those of the region and tenant above it (ADR-0018, venue is the configuration floor; r11 gate, CHG-R11FXD-002)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"

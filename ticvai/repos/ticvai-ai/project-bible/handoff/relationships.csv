@@ -636,9 +636,12 @@ approvals.evidence_package,asset_id,maintenance.asset,reference,convention,yes,
 approvals.external_dispatch,provider_id,approvals.external_provider,reference,declared,,yes
 approvals.external_dispatch,request_id,approvals.request,reference,declared,,yes
 approvals.external_provider,api_client_id,control.api_client,reference,convention,yes,
+approvals.matrix,via approveMatrixMultiLevel,approvals.matrix_version,ambient,lineage,,
 approvals.matrix,via approveMatrixMultiLevel,approvals.rule,ambient,lineage,,
+approvals.matrix,via setApprovalMatrix,approvals.matrix_version,ambient,lineage,,
 approvals.matrix,via setApprovalMatrix,approvals.rule,ambient,lineage,,
 approvals.matrix,via setPublishReviewPolicy,whitelabel.publish_review_policy,ambient,lineage,yes,
+approvals.matrix_version,approval_matrix_id,approvals.matrix,child,declared,,yes
 approvals.request,approval_matrix_id,approvals.matrix,reference,declared,,
 approvals.request,assigned_to_principal_id,identity.principal,reference,convention,yes,
 approvals.request,requested_by_principal_id,identity.principal,reference,declared,yes,
@@ -723,6 +726,7 @@ assets.asset_version,via replaceMediaAsset,assets.media_fingerprint,ambient,line
 assets.asset_version,via replaceMediaAsset,assets.media_upload,ambient,lineage,,
 assets.audit,via bulkUpdateMediaAssets,assets.media_asset,ambient,lineage,,
 assets.audit,via bulkUpdateMediaAssets,assets.tag,ambient,lineage,,
+assets.guest_upload,via completeGuestUpload,platform.outbox,ambient,lineage,yes,
 assets.guest_upload,via createGuestUpload,assets.media_upload,ambient,lineage,,
 assets.media_asset,released_by_principal_id,identity.principal,reference,declared,yes,
 assets.media_asset,uploaded_by_principal_id,identity.principal,reference,declared,yes,
@@ -1019,7 +1023,7 @@ catalogue.product,booking_flow_id,whitelabel.booking_flow,reference,convention,y
 catalogue.product,category_id,catalogue.product_category,reference,convention,,
 catalogue.product,created_by_principal_id,identity.principal,reference,convention,yes,
 catalogue.product,entitlement_template_id,catalogue.entitlement_template,reference,declared,,
-catalogue.product,event_id,catalogue.event,reference,convention,,
+catalogue.product,event_id,catalogue.event,reference,declared,,
 catalogue.product,legal_entity_id,ledger.legal_entity,reference,convention,yes,
 catalogue.product,location_id,inventory.location,reference,convention,yes,
 catalogue.product,product_owner_principal_id,identity.principal,reference,convention,yes,
@@ -1406,6 +1410,7 @@ fnb.menu_item,menu_section_id,fnb.menu_section,reference,declared,,yes
 fnb.menu_item,product_variant_id,catalogue.variant,reference,declared,yes,yes
 fnb.menu_item,station_id,fnb.kitchen_station,reference,declared,,
 fnb.menu_item,via attachModifierGroup,fnb.menu_item_modifier,ambient,lineage,,
+fnb.menu_item,via setMenuItemDailyCount,fnb.sold_out_item,ambient,lineage,,
 fnb.menu_item_modifier,group_id,fnb.modifier_group,reference,declared,,yes
 fnb.menu_item_modifier,item_id,fnb.menu_item,child,declared,,yes
 fnb.menu_schedule,created_by_principal_id,identity.principal,reference,convention,yes,
@@ -1579,6 +1584,7 @@ identity.guest_session,via revokeGuestDevice,marketing.guest_device,ambient,line
 identity.guest_session,via verifyGuestOtp,identity.otp_challenge,ambient,lineage,,
 identity.guest_session,via verifyGuestOtp,pii.subject_contact,ambient,lineage,yes,
 identity.guest_session,via verifyGuestOtp,platform.outbox,ambient,lineage,yes,
+identity.guest_upload_ref,subject_id,pii.subject,reference,declared,yes,yes
 identity.membership_history,approval_request_id,approvals.request,reference,convention,yes,
 identity.membership_history,changed_by_principal_id,identity.principal,reference,convention,,
 identity.membership_history,customer_membership_id,identity.customer_membership,reference,declared,,yes
@@ -1643,6 +1649,7 @@ identity.sso_group_mapping,via setSsoConfig,identity.sso_provider,ambient,lineag
 identity.sso_provider,client_id,control.api_client,reference,convention,yes,
 identity.sso_provider,default_home_scope_id,platform.scope,reference,declared,yes,
 identity.subject_data_export,subject_id,pii.subject,reference,declared,yes,yes
+identity.subject_data_export_part,export_id,identity.subject_data_export,child,declared,,yes
 identity.subject_holding,order_line_id,orders.order_line,reference,convention,yes,
 identity.subject_holding,subject_id,pii.subject,reference,declared,yes,
 inventory.count,journal_entry_id,ledger.journal_entry,reference,declared,yes,
@@ -2023,6 +2030,7 @@ marketing.conversation_message,sender_principal_id,identity.principal,reference,
 marketing.conversation_message_attachment,asset_id,maintenance.asset,reference,convention,yes,
 marketing.conversation_message_attachment,conversation_message_id,marketing.conversation_message,child,declared,,yes
 marketing.cookie_banner_design,logo_asset_id,assets.media_asset,reference,convention,yes,
+marketing.cookie_banner_design,via approvePrivacyTesting,marketing.privacy_change_set,ambient,lineage,,
 marketing.cookie_scan_finding,scan_run_id,marketing.cookie_scan_run,reference,declared,,yes
 marketing.cookie_scan_finding,via recordCookieScan,marketing.cookie_scan_run,ambient,lineage,,
 marketing.cookie_scan_finding,via recordCookieScan,marketing.tracking_technology,ambient,lineage,,
@@ -3232,6 +3240,7 @@ whitelabel.navigation_config,via setNavigation,whitelabel.navigation_item,ambien
 whitelabel.navigation_item,navigation_config_id,whitelabel.navigation_config,reference,declared,,yes
 whitelabel.policy,published_by_principal_id,identity.principal,reference,declared,yes,
 whitelabel.promo_block,promotion_id,promotions.promotion,reference,declared,yes,
+whitelabel.received_release,release_id,ai.release,reference,convention,yes,
 whitelabel.site_package,platform_staff_grant_id,identity.platform_staff_grant,reference,convention,yes,
 whitelabel.site_package,requested_by_principal_id,identity.principal,reference,convention,yes,
 whitelabel.store_account,developer_account_id,control.developer_account,reference,convention,yes,

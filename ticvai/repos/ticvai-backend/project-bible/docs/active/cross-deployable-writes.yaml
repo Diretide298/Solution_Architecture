@@ -121,21 +121,54 @@ reads:
   reader: operations
   tables: [platform.venue_settings, platform.region_settings, platform.outlet]
   privileges: [SELECT]
-  queries: [tenancy#venueSettingsRecords, tenancy#regionSettingsRecords, tenancy#outletRecords]
-  operations: [listProductStartTimes, getFnbServiceChargePolicy, setFnbServiceChargePolicy, buildProductionPlan, releaseProductionPlan,
-    resolveBookingConflict, applyMenuActions, listCombos, createCombo, setComboSlots, attachModifierGroup,
-    list86Events, markOrderCollected, setServiceStage, transferOrderItems, publishMenu, rollbackMenu,
-    listMenuVersions, moveTableVisit, reassignServer, compItem, listProductionRuns, transferTableVisit, requestBill,
-    listTableReservations, createTableReservation, updateTableReservation, seatTableReservation, listBookableOutlets,
-    listMyTableReservations, getGuestMenu, getFnbDeliveryPolicy, setFnbDeliveryPolicy, listFulfilmentSlots,
-    createGuestFnbOrder, getGuestBill, listMenus, createMenu, getMenu, updateMenu, setMenuSections,
-    setItemAvailability, setMenuItemDailyCount, listModifierGroups, createModifierGroup, listFnbOrders,
-    createFnbOrder, acceptFnbOrder, cancelFnbOrder, getFnbOrder, amendFnbOrder, getTableMap, setTableLayout,
-    openTableVisit, getTableVisit, updateTableVisit, mergeTableVisits, getBill, splitBill, closeTableVisit,
-    clearTable, listRecipes, setRecipe, recordWaste, escalateCorrectiveAction, getWasteApprovalPolicy,
-    setWasteApprovalPolicy, createTableReservationForGuest]
+  queries: [tenancy#venueSettingsRecords, tenancy#regionSettingsRecords, tenancy#outletRecords,
+    tenancy#scopeRecords]
+  operations: [acceptFnbOrder, acknowledgeAlert, activateChallenge, addToWishlist, amendFnbOrder, applyMenuActions,
+    approveRequisition, assessRentalDamage, attachModifierGroup, authoriseGameplay, buildProductionPlan,
+    cancelFnbOrder, cancelRequisition, cancelStockCount, checkInResource, checkOutRental, checkOutResource,
+    claimLocationSession, claimTableSession, clearTable, cloneResource, closeTableVisit, compItem, createAsset,
+    createCampaign, createChallenge, createCombo, createDashboard, createDeliveryLocation, createFnbOrder,
+    createGoodsReceipt, createGuestFnbOrder, createMenu, createMerchandise, createModifierGroup, createRentalBooking,
+    createRentalPricingProfile, createRequisition, createResource, createResourceCost, createResourceHold,
+    createResourcePackage, createRetailExchange, createRetailReturn, createRetailSale, createStockMovement,
+    createTableReservation, createTableReservationForGuest, createVendorServiceRequest, escalateCorrectiveAction,
+    explainRentalPrice, extendRental, extendResourceHold, fireCourse, generateVisitPlan, getAnalyticsBenchmark,
+    getAsset, getBill, getCampaign, getCampaignPerformance, getCaseInvestigationResolution, getChallenge,
+    getCountVariance, getFnbDeliveryPolicy, getFnbOrder, getFnbServiceChargePolicy, getGameEligibility,
+    getGamePricing, getGameplaySyncStatus, getGameplayValidationRules, getGuestBill, getGuestMenu, getGuestProfile,
+    getKpiValues, getMapResourceAvailability, getMenu, getMyChallenges, getMyProfile, getNextTransportDeparture,
+    getOutletStock, getRentalBooking, getResource, getResourceCostAnalytics, getResourceHold, getRetailSale,
+    getReturnPolicy, getServiceSummary, getSupplierPerformance, getTableMap, getTableVisit, getTenantAppStatus,
+    getTransportDeparture, getTransportFareTable, getVisitPlan, getWasteApprovalPolicy, getWishlist, getWorkOrder,
+    joinQueue, joinRestaurantWaitlist, list86Events, listAlertRules, listAlerts, listAnalyticsAnomalies, listAssets,
+    listBookableOutlets, listCampaigns, listCaseResolutionClosure, listChallenges, listCombos,
+    listDeliveryCommunicationPlatform, listDiningOutlets, listFnbOrders, listFulfilmentSlots,
+    listGameplayTransactions, listMenuVersions, listMenus, listMerchandise, listModifierGroups, listMyFavouriteRoutes,
+    listMyTableReservations, listMyVisitPlans, listOverdueRentals, listProductStartTimes, listProductionRuns,
+    listProviderHealthUsage, listRecipes, listRentalBookings, listRentalPricingProfiles, listRequisitions,
+    listResourceCosts, listResourcePackages, listResources, listRetailReturns, listRetailSales, listSegmentMembers,
+    listStockCounts, listStockMovements, listStoreRules, listTableReservations, listTransportPassOffers,
+    listVendorServiceRequests, lookupAsset, lookupMerchandise, lookupRetailSale, markOrderCollected, mergeTableVisits,
+    moveTableVisit, openTableVisit, pauseCampaign, planProductionRun, postStockCount, publishMenu, publishVenueMap,
+    quoteRentalPrice, quoteTransportFare, reassignServer, recallKitchenTicket, recordWaste, recordWorkOrderParts,
+    recountStockCount, rejectRequisition, releaseProductionPlan, reportReaderQueue, requestBill,
+    requestRentalCommercialOverride, resolveBookingConflict, returnRental, returnRequisition, rollbackMenu, runReport,
+    saveFavouriteRoute, scheduleMenuPublish, searchGuests, searchTransportDepartures, seatTableReservation,
+    setAlertRule, setAssetStatus, setBillingEntity, setCaseInvestigationResolution, setCaseResolution, setComboSlots,
+    setDeliveryLocationOutletMapping, setFamilyHouseholdDependent, setFnbDeliveryPolicy, setFnbServiceChargePolicy,
+    setGamePricing, setGameplayValidationRules, setItemAvailability, setKitchenRoutingRules, setKpiTargets,
+    setMenuItemDailyCount, setMenuSections, setPrizeCost, setRecipe, setRefundCompensationService,
+    setRentalDepositPolicy, setRentalFeePolicy, setResourceLifecycleState, setReturnPolicy, setServiceStage,
+    setStoreRules, setTableLayout, setTransportFareTable, setVenuePoint, setWasteApprovalPolicy,
+    simulateGameplayAuthorisation, simulateRentalPricing, splitBill, startStockCount, stopCampaign,
+    submitOnboardingApplication, suggestResources, swapRentalEquipment, transferOrderItems, transferTableVisit,
+    unscheduleCampaign, updateAsset, updateCampaign, updateDashboard, updateGuestProfile, updateMenu,
+    updateMerchandise, updateMyProfile, updateRentalBooking, updateRentalPricingProfile, updateRequisitionLines,
+    updateResource, updateResourcePackage, updateTableReservation, updateTableVisit, updateVendorServiceRequest,
+    updateVisitPlan]
   added: '2026-10-25'
-  decision_ref: ADAM CR-234, option A, Chinmay, 25 October 2026
+  decision_ref: ADAM CR-234, option A, Chinmay, 25 October 2026; widened to every operations-host operation by ADAM
+    CR-296, option A, Chinmay, 29 October 2026
   why: 'F&B runs in operations and answers Money (a table visit''s runningTotal, an order''s amounts, a menu''s prices)
     whose currency and scale are the venue''s frozen trading currency, Tenancy''s data in commerce (naming-and-style
     5.1, ADR-0018). The service route between deployables is not built (CR-174, CR-196), so the build had no allowed
@@ -145,7 +178,17 @@ reads:
     platform.outlet and tenancy#outletRecords were added on 26 October 2026 (ADAM CR-260, which the lead answered as
     already decided and carried by r10): a menu reaches its venue only through fnb.menu.outlet_id, so getMenu,
     setMenuItemDailyCount and the other menu operations read the outlet''s venue in process too.
-    listProductStartTimes (resources, in operations) reads the venue''s stepMinutes the same way (ADAM CR-253).'
+    listProductStartTimes (resources, in operations) reads the venue''s stepMinutes the same way (ADAM CR-253).
+    **Widened to the operations host, 29 October 2026** (ADAM CR-296, option A, as a ruling for the whole class;
+    Chinmay: "Yes, all 141"; CHG-R11RUL-001): every operation the operations deployable hosts reads Tenancy''s
+    settings in process wherever it needs them, through Tenancy''s own query classes and never through its SQL:
+    tenancy#scopeRecords (platform.scope, which every host may read since CR-002, so no grant is added for it),
+    tenancy#venueSettingsRecords, tenancy#regionSettingsRecords and tenancy#outletRecords (the three tables above,
+    granted by V0116). SELECT only, row security unchanged, no migration. The 141 operations whose only reads
+    across deployables were these four, Reporting''s alert operations among them, and every other read of the four
+    by an operations-host operation moved from service to in-process (195 reads on 172 operations), so the list
+    above is every operations-host operation that asks one of the four. getSupplierPerformance reads
+    tenancy#regionSettingsRecords for each order''s time zone (ADAM CR-297, option A).'
 - id: XDR-005
   reader: commerce
   tables: [assets.media_asset]
@@ -174,3 +217,123 @@ reads:
     routing (#27692, CR-161), served in-process as well as service. The grant is written into the control database''s
     forward migration, not the tenant''s (tools/derive-ddl.py). control.api_client has no row-level security, so the
     asker names the rows it may see (the client''s allowed_tenant_ids holds the caller''s tenant).'
+- id: XDR-007
+  reader: operations
+  tables: [catalogue.variant, catalogue.product, catalogue.product_media, catalogue.price, catalogue.price_assignment,
+    catalogue.price_list, catalogue.performance, platform.venue_settings]
+  privileges: [SELECT]
+  queries: [catalogue#variantsSellableAt, catalogue#variantListingFacts, tenancy#venueSettingsRecords]
+  operations: [addToWishlist, getWishlist]
+  added: '2026-10-28'
+  decision_ref: ADAM CR-270, option A, Chinmay, 28 October 2026 (the narrow read, as for CR-243 and CR-234); getWishlist
+    by ADAM CR-273, settled with CR-270 the same day
+  why: 'Marketing (operations) asks whether a saved variant is sellable (catalogue#variantsSellableAt, the 404) and what
+    its saved row shows (catalogue#variantListingFacts), and the currency of the Money it answers
+    (tenancy#venueSettingsRecords); Catalogue and Tenancy are in commerce. Catalogue published neither query over HTTP
+    and the service route between deployables is not built (CR-174, CR-241), so neither addToWishlist (#30705) nor
+    getWishlist (#30706) could be built. The operations host asks the three in process, through Catalogue''s and
+    Tenancy''s own query classes as the workers host does, never through Marketing SQL: a plain select on the same
+    tenant database under the caller''s own connection, so every table''s row-level security scopes it and FORCE RLS
+    stays on. SELECT only, on exactly the tables the three queries answer over: the variant, its product and the
+    product''s primary media, the price-list resolution (price, price_assignment, price_list), the performance, and
+    platform.venue_settings, whose inheritance reads the tenant''s own row of the same table and nothing else.'
+- id: XDR-008
+  reader: operations
+  tables: [catalogue.variant, catalogue.product, catalogue.product_media, catalogue.product_category]
+  privileges: [SELECT]
+  queries: [catalogue#variantRecords, catalogue#productRecords, catalogue#productCategoryRecords]
+  operations: [createFnbOrder]
+  added: '2026-10-28'
+  decision_ref: ADAM CR-277, option A, Chinmay, 28 October 2026 (the narrow read); catalogue.product_media and
+    catalogue.product_category added by the lead on 29 October 2026, as the reads touch them
+  why: 'createFnbOrder (F&B, operations) routes each line to a kitchen station, and an outlet''s category rules
+    (KitchenRoutingRules.categoryRules, matchKind productCategory) match a catalogue product category code: the menu
+    item''s catalogue variant (fnb.menu_item.product_variant_id, catalogue#variantRecords), its product
+    (catalogue#productRecords, which reads catalogue.product_media for Product.media[] as well) and the product''s
+    category (Product.categoryId, catalogue#productCategoryRecords, whose code the rule matches). Catalogue is in
+    commerce and the service route between deployables is not built (CR-174, CR-241). The operations host asks the
+    three in process, through Catalogue''s own query classes, in the caller''s transaction under the caller''s
+    row-level security: SELECT only, on exactly the four tables they touch. The outlet read for paymentTiming is
+    XDR-004''s.'
+- id: XDR-009
+  reader: operations
+  tables: [platform.workstation]
+  privileges: [SELECT]
+  queries: [tenancy#workstationRecords]
+  operations: [createFnbOrder]
+  added: '2026-10-29'
+  decision_ref: ADAM CR-293, option A, Chinmay, 29 October 2026
+  why: 'createFnbOrder accepts a till order at its outlet in the same transaction and creates its kitchen tickets there
+    (SD-046); an order from anywhere else waits for acceptFnbOrder. The till''s outlet is
+    platform.workstation.outlet_id, Tenancy''s data in commerce, and the service route between deployables is not built
+    (CR-241), so the build had no allowed way to tell a till at the outlet from one elsewhere. The operations host asks
+    tenancy#workstationRecords for the caller''s workstation in process, through Tenancy''s own query classes, under the
+    caller''s row-level security. The decision names it as XDR-004 gaining the table; it is recorded as its own entry
+    so the outlet and settings grant XDR-004 holds is not edited by two changes at once.'
+- id: XDR-010
+  reader: access
+  tables: [pii.subject]
+  privileges: [SELECT]
+  queries: [identity#subjectRecords]
+  operations: [listDeviceBindingSession]
+  added: '2026-10-29'
+  decision_ref: ADAM CR-302, option A, Chinmay, 29 October 2026
+  why: 'access listDeviceBindingSession (Access, access host, BO-167) answers each device binding''s user, and the
+    binding keeps only its holder''s subject_id; the name is pii.subject.display_name, Identity''s data in commerce. The
+    service route between deployables is not built (CR-281; the kernel''s service sign-in, #37051), no grant let the
+    access role read pii.subject, and the read is guest personal data. The lead chose the narrow in-process read already
+    chosen for the same gap (XDR-001, XDR-003, CR-296): the access host asks identity#subjectRecords through
+    Identity''s own query class, in the caller''s transaction under the caller''s own connection, so the table''s
+    row-level security scopes it, and reads one column, display_name, and nothing else of the subject. SELECT only.
+    Leaving user out until service sign-in (CR-302 option B) is the fallback if guest names should not cross into
+    Access; copying the name onto access.device_binding (option C) copies PII and was not chosen. No other Access
+    operation reads pii.subject in process under this entry.'
+- id: XDR-011
+  reader: operations
+  tables: [catalogue.product_media, catalogue.product]
+  privileges: [SELECT]
+  queries: [catalogue#productMediaRecords]
+  operations: [deleteMediaAsset]
+  added: '2026-10-29'
+  decision_ref: ADAM CR-309, option (b), Chinmay, 29 October 2026
+  why: 'assets deleteMediaAsset (Assets, operations host) refuses 409 in-use while a product lists the asset
+    (MediaUsage surface product), and a product''s media are catalogue.product_media rows, Catalogue''s data in
+    commerce. catalogue#productRecords was asked over the service route, which nothing builds (CR-174, CR-241,
+    CR-281), and cannot be asked which products list an asset without reading every product. Catalogue declares
+    catalogue#productMediaRecords (catalogue.product_media by asset id, the product_id per asset), and the
+    operations host asks it in process through Catalogue''s own query class, as CR-260 and XDR-004 serve Tenancy''s,
+    in the caller''s transaction under the caller''s row-level security. SELECT on exactly the two tables it touches:
+    catalogue.product_media and catalogue.product, whose policy product_media''s parent row security reads. Products
+    recording their use as assets.media_usage rows (CR-309 option (a)) is the cleaner long-term rule and changes
+    Catalogue''s product writers, which are other tickets.'
+- id: XDR-020
+  reader: operations
+  tables: [platform.venue_settings, platform.region_settings]
+  privileges: [SELECT]
+  queries: [tenancy#venueSettingsRecords, tenancy#regionSettingsRecords]
+  operations: [setMaintenanceMode]
+  added: '2026-10-29'
+  decision_ref: ADAM CR-338, city and openingHoursToday (a), Chinmay, 29 October 2026 ("As recommended"), under the
+    ruling of ADAM CR-296 (XDR-004)
+  why: 'white-label setMaintenanceMode (operations host) answers TenantAppStatus, as getTenantAppStatus does, and CR-338
+    gives each venue in it a city and today''s opening hours from the venue''s settings (platform.venue_settings, read
+    through tenancy#venueSettingsRecords) and today in the venue''s region time zone (platform.region_settings, through
+    tenancy#regionSettingsRecords), Tenancy''s data in commerce. The operations host asks both in process, as CR-296
+    ruled for every operations-host operation that asks them (XDR-004, which already lists getTenantAppStatus), through
+    Tenancy''s own query classes, SELECT only, row security unchanged; both tables are granted to operations by V0116,
+    so no grant is new. Recorded as its own entry, as XDR-009 was, so XDR-004 is not edited by two changes at once.'
+- id: XDR-021
+  reader: operations
+  tables: [identity.sso_provider]
+  privileges: [SELECT]
+  queries: [identity#guestSignInProviders]
+  operations: [getPublishedTenantConfig]
+  added: '2026-10-29'
+  decision_ref: ADAM CR-327, part (1), Chinmay, 29 October 2026 ("Kind column on sso_provider")
+  why: 'white-label getPublishedTenantConfig (operations host) answers guestSignIn, the public client ids of the
+    tenant''s enabled guest sign-in providers, before anyone signs in, and the providers are identity.sso_provider
+    rows, Identity''s data in commerce. The service route between deployables is not built (CR-281; #37051). The
+    lead marked the guest rows (audience guest, guestProvider apple, google or uaePass) and chose a narrow Identity
+    query: the operations host asks identity#guestSignInProviders in process, through Identity''s own query class,
+    under the caller''s connection, so the table''s row-level security scopes it, and it answers provider and
+    display data only, never client_secret_ref. SELECT only, on the one table.'

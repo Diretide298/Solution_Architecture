@@ -335,3 +335,304 @@ changes:
     and log it in changes. dont worry about it"); this CR is that log. The screen''s own button opens a form that collects
     the request body; an unlabelled derived button gets its label'
   change: CHG-R10WIR-004
+- screen: WEB-017
+  field: 'navigation'
+  to: 080893f2b191a792
+  approval: 'ADAM CR-290 (raised by Chitrangi Mestry on #33271, 28 October 2026; settled 29 October 2026 as done by Chinmay,
+    nothing back to build): the lead''s rule of 28 October 2026 that frontend developers change a screen''s design on
+    their own, with no change behind it, and log it in ADAM, after which the lead updates the wireframe, the screen''s
+    UI and its page info (written into the frontend starter in 28eb978d); this CR is that log. WEB-017 as built:
+    ticket cards, the All tickets link, a 72rem page, challenge cards and the dark membership band'
+  change: CHG-R11DES-001
+- screen: WEB-017
+  field: 'region:collection'
+  to: c66eed8d6420288e
+  approval: 'ADAM CR-290 (raised by Chitrangi Mestry on #33271, 28 October 2026; settled 29 October 2026 as done by Chinmay,
+    nothing back to build): the lead''s rule of 28 October 2026 that frontend developers change a screen''s design on
+    their own, with no change behind it, and log it in ADAM, after which the lead updates the wireframe, the screen''s
+    UI and its page info (written into the frontend starter in 28eb978d); this CR is that log. WEB-017 as built:
+    ticket cards, the All tickets link, a 72rem page, challenge cards and the dark membership band'
+  change: CHG-R11DES-001
+- screen: WEB-017
+  field: 'region:selection'
+  to: 782a7234c3b15951
+  approval: 'ADAM CR-290 (raised by Chitrangi Mestry on #33271, 28 October 2026; settled 29 October 2026 as done by Chinmay,
+    nothing back to build): the lead''s rule of 28 October 2026 that frontend developers change a screen''s design on
+    their own, with no change behind it, and log it in ADAM, after which the lead updates the wireframe, the screen''s
+    UI and its page info (written into the frontend starter in 28eb978d); this CR is that log. WEB-017 as built:
+    ticket cards, the All tickets link, a 72rem page, challenge cards and the dark membership band'
+  change: CHG-R11DES-001
+- screen: BO-288
+  field: 'overlay:formCreateEntitlementTemplate'
+  to: 8f375377b0456f5d
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The screen''s declared create gets its form.'
+  change: CHG-R11FXS-002
+- screen: BO-288
+  field: 'region:publish'
+  to: d905dbeb5db9ff7d
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The button that opens it.'
+  change: CHG-R11FXS-002
+- screen: BO-416
+  field: 'region:-'
+  to: 7ae5592bfede0ef0
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The empty content region shows the wallet the screen is about.'
+  change: CHG-R11FXS-003
+- screen: BO-1102
+  field: 'region:-'
+  to: bce9a0bffda4efd5
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The empty content region shows the trail the screen audits.'
+  change: CHG-R11FXS-003
+- screen: BO-1121
+  field: 'overlay:formTransferWalletBalance'
+  to: 44ca7a457ca24376
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The declared transfer gets its form.'
+  change: CHG-R11FXS-004
+- screen: BO-1121
+  field: 'region:fields'
+  to: 24d687da7124174c
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The button that opens it.'
+  change: CHG-R11FXS-004
+- screen: BO-281
+  field: 'overlay:formUpdateGroupBooking'
+  to: 7391db4512fea8e3
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The guest-count buttons open the form updateGroupBooking needs.'
+  change: CHG-R11FXS-004
+- screen: POS-021
+  field: 'state:offline'
+  to: 881360cf3b57b15d
+  approval: 'The r11 integration gate fix of 29 October 2026 (run 20261029-020957-8105, check-screen-wiring findings built on
+    by started tickets): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined; and the lead''s rule of 22 October 2026 that a change to approved
+    UI is made and logged ("let frontend change ui and log it in changes. dont worry about it"). The offline text says the online-only write is disabled offline (4.4).'
+  change: CHG-R11FXS-006
+- screen: BO-097
+  field: 'state:offline'
+  to: 74e5892bc8c5a12b
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined, the screen''s state text saying what its approved UI and its
+    contract already do; and the lead''s rule of 22 October 2026 that a change to approved UI is made and logged ("let
+    frontend change ui and log it in changes. dont worry about it"). The lead kept it on 29 October 2026 ("Keep all three"). A web app keeps no offline store, so the offline text refuses the writes instead of queueing them (4.4).'
+  change: CHG-R11FXT-006
+- screen: BO-097
+  field: 'state:error'
+  to: 0c69a170d6294681
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined, the screen''s state text saying what its approved UI and its
+    contract already do; and the lead''s rule of 22 October 2026 that a change to approved UI is made and logged ("let
+    frontend change ui and log it in changes. dont worry about it"). The lead kept it on 29 October 2026 ("Keep all three"). The error text no longer says check-out and check-in work offline.'
+  change: CHG-R11FXT-006
+- screen: BO-602
+  field: 'state:emptyNoAccess'
+  to: d06a7c401154711c
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined, the screen''s state text saying what its approved UI and its
+    contract already do; and the lead''s rule of 22 October 2026 that a change to approved UI is made and logged ("let
+    frontend change ui and log it in changes. dont worry about it"). The lead kept it on 29 October 2026 ("Keep all three"). The screen declares no operation now, so, like the back office''s other screens with none, it has no permission of its own and its no-access state says so.'
+  change: CHG-R11FXT-004
+- screen: POS-016
+  field: 'state:offline'
+  to: fc149a7eb6dd73a1
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s rule of 29 October 2026, "fix at the source", every gate finding fixed where it
+    is generated and never acknowledged or baselined, the screen''s state text saying what its approved UI and its
+    contract already do; and the lead''s rule of 22 October 2026 that a change to approved UI is made and logged ("let
+    frontend change ui and log it in changes. dont worry about it"). The lead kept it on 29 October 2026 ("Keep all three"). The offline text says the online-only writes are disabled offline (4.4).'
+  change: CHG-R11FXT-007
+- screen: ADM-419
+  field: 'navigation'
+  to: b1f6f4f4bba99be6
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s decision of 29 October 2026, "Open ADM-420", and the lead''s rule of 22 October 2026
+    that a change to approved UI is made and logged ("let frontend change ui and log it in changes. dont worry about
+    it"). Create tenant opens ADM-420, whose form collects what createTenant sends.'
+  change: CHG-R11FXT-008
+- screen: ADM-419
+  field: 'state:emptyFirstRun'
+  to: 71a96bf1c92f85d8
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s decision of 29 October 2026, "Open ADM-420", and the lead''s rule of 22 October 2026
+    that a change to approved UI is made and logged ("let frontend change ui and log it in changes. dont worry about
+    it"). The empty state offers Create tenant, now that the create is made on ADM-420.'
+  change: CHG-R11FXT-008
+- screen: BO-129
+  field: 'region:collection'
+  to: 569dcf508fcccf70
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s decision of 29 October 2026, "Add list + panel", and the lead''s rule of 22 October 2026
+    that a change to approved UI is made and logged ("let frontend change ui and log it in changes. dont worry about
+    it"). A Firmware releases list (listDeviceFirmware).'
+  change: CHG-R11FXT-009
+- screen: BO-129
+  field: 'region:reads'
+  to: c711736ec7f36d84
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s decision of 29 October 2026, "Add list + panel", and the lead''s rule of 22 October 2026
+    that a change to approved UI is made and logged ("let frontend change ui and log it in changes. dont worry about
+    it"). The selected firmware release panel (getDeviceFirmware).'
+  change: CHG-R11FXT-009
+- screen: BO-129
+  field: 'region:rowActions'
+  to: 400489f271dab2d3
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s decision of 29 October 2026, "Add list + panel", and the lead''s rule of 22 October 2026
+    that a change to approved UI is made and logged ("let frontend change ui and log it in changes. dont worry about
+    it"). The Register firmware release button that opens its form.'
+  change: CHG-R11FXT-009
+- screen: BO-129
+  field: 'overlay:formCreateDeviceFirmware'
+  to: 2b323f2ccc00654e
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started, statuses
+    read 2026-10-29T06:53Z): the lead''s decision of 29 October 2026, "Add list + panel", and the lead''s rule of 22 October 2026
+    that a change to approved UI is made and logged ("let frontend change ui and log it in changes. dont worry about
+    it"). The form createDeviceFirmware needs.'
+  change: CHG-R11FXT-009
+- screen: ADM-612
+  field: 'region:-'
+  to: d29a0939bcb51176
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Remove + log text", and the lead''s rule
+    of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in changes.
+    dont worry about it"). The generated Cancel goes with setWalletRefundPolicy, which nothing on the screen sends; the
+    pack action stays.'
+  change: CHG-R11FXU-007
+- screen: ADM-612
+  field: 'state:emptyNoAccess'
+  to: d06a7c401154711c
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Remove + log text", and the lead''s rule
+    of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in changes.
+    dont worry about it"). The screen declares no operation now, so, like BO-602, it has no permission of its own and
+    its no-access state says so.'
+  change: CHG-R11FXU-007
+- screen: BO-417
+  field: 'region:-'
+  to: bbf29c23e88d52ea
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Remove + log text", and the lead''s rule
+    of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in changes.
+    dont worry about it"). The generated Save wallet funding rules and Cancel go with setWalletFundingRules: no field on
+    the screen to send.'
+  change: CHG-R11FXU-006
+- screen: BO-418
+  field: 'region:-'
+  to: bbf29c23e88d52ea
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Remove + log text", and the lead''s rule
+    of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in changes.
+    dont worry about it"). The generated Save wallet funding rules and Cancel go with setWalletFundingRules: no field on
+    the screen to send.'
+  change: CHG-R11FXU-006
+- screen: BO-712
+  field: 'state:emptyFirstRun'
+  to: 96f4b18f10bdb26e
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Remove + log text", and the lead''s rule
+    of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in changes.
+    dont worry about it"). The screen no longer rosters anyone (createRotaAssignment left it), so its first-run text
+    says where people are rostered.'
+  change: CHG-R11FXU-008
+- screen: BO-740
+  field: 'region:-'
+  to: bb4f79e9b5268331
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Remove + log text", and the lead''s rule
+    of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in changes.
+    dont worry about it"). The generated Save guest preferences and Cancel go with updateGuestPreferences: no preference
+    field to send; Save links stays.'
+  change: CHG-R11FXU-006
+- screen: BO-747
+  field: 'region:-'
+  to: 7b4202a6ab3fa204
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Remove + log text", and the lead''s rule
+    of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in changes.
+    dont worry about it"). The generated Save consent purposes and Cancel go with setConsentPurposes: the purposes table
+    is read-only; New consent form stays.'
+  change: CHG-R11FXU-006
+- screen: BO-836
+  field: 'region:-'
+  to: d29a0939bcb51176
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Remove + log text", and the lead''s rule
+    of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in changes.
+    dont worry about it"). The generated Save brand identity and Cancel go with setBrandIdentity: no field on the screen
+    to send.'
+  change: CHG-R11FXU-007
+- screen: BO-836
+  field: 'state:emptyNoAccess'
+  to: d06a7c401154711c
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Remove + log text", and the lead''s rule
+    of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in changes.
+    dont worry about it"). The screen declares no operation now, so, like BO-602, it has no permission of its own and
+    its no-access state says so.'
+  change: CHG-R11FXU-007
+- screen: BO-884
+  field: 'state:emptyFirstRun'
+  to: ebf8a3774e6f0023
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Remove + log text", and the lead''s rule
+    of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in changes.
+    dont worry about it"). The screen no longer rosters anyone (createRotaAssignment left it), so its first-run text
+    says where positions are rostered.'
+  change: CHG-R11FXU-008
+- screen: BO-917
+  field: 'state:emptyFirstRun'
+  to: c655076227d214ba
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Remove + log text", and the lead''s rule
+    of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in changes.
+    dont worry about it"). The screen no longer rosters anyone (createRotaAssignment left it), so its first-run text
+    says where people are allocated.'
+  change: CHG-R11FXU-008
+- screen: BO-917
+  field: 'state:emptyNoAccess'
+  to: d06a7c401154711c
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Remove + log text", and the lead''s rule
+    of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in changes.
+    dont worry about it"). The screen declares no operation now, so, like BO-602, it has no permission of its own and
+    its no-access state says so.'
+  change: CHG-R11FXU-008
+- screen: CMS-063
+  field: 'region:rowActions'
+  to: c27eb748099d8895
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Make it file upload", and the lead''s
+    rule of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in
+    changes. dont worry about it"). Browse Files becomes a file-upload control bound to createUpload, the picker that
+    collects the file it uploads.'
+  change: CHG-R11FXU-010
+- screen: CMS-067
+  field: 'region:-'
+  to: c68a8e01f22288fc
+  approval: 'The r11 final gate fix of 29 October 2026 (check-screen-wiring findings on tickets developers have started,
+    statuses read 2026-10-29T12:46Z): the lead''s decision of 29 October 2026, "Add a results table", and the lead''s
+    rule of 22 October 2026 that a change to approved UI is made and logged ("let frontend change ui and log it in
+    changes. dont worry about it"). Matching assets, filled by searchMedia and narrowed by Asset Type, Venue and
+    Collection.'
+  change: CHG-R11FXU-011

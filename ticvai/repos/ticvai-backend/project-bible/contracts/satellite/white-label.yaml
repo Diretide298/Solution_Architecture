@@ -1662,18 +1662,17 @@ paths:
         for: 'the venues whose overrides it returns: platform.scope, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
-      - guest
       x-ticvai-read-routing: replica
       summary: Full working configuration
       description: 'Everything the builder edits. **A staff caller gets the working draft**, or with
-        `version` the snapshot of that published version. **A guest caller always gets the current published
-        version**: `version` is ignored and `TENANT_CONFIGURE` is not needed, because reading the published
-        app is not configuring it. The dashboard''s status view (published state, module and page counts,
-        recent changes) is `getTenantAppStatus`, not this.
+        `version` the snapshot of that published version. The dashboard''s status view (published state, module
+        and page counts, recent changes) is `getTenantAppStatus`, not this.
 
-        **A visitor with no session reads `getPublishedTenantConfig`** (decided 2 October, GFIX-1): the
-        published, non-sensitive part of this, resolved from the host and cacheable, so a storefront renders
-        in the tenant''s brand before anyone signs in.
+        **Staff only; a guest reads `getPublishedTenantConfig`** (ADAM CR-307, option C, Chinmay, 29 October 2026;
+        CHG-CR307-001). A guest, like a visitor with no session (decided 2 October, GFIX-1), reads the
+        published, non-sensitive part of this, resolved from the host and cacheable, so a storefront renders in
+        the tenant''s brand before anyone signs in. The full configuration is not answered to a guest: it holds
+        what the published one deliberately leaves out (sender addresses, licensing, module counts).
 
         '
       tags:
@@ -1683,12 +1682,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       security:
-      - guestAuth: []
       - bearerAuth: []
       parameters:
       - name: version
         in: query
-        description: Read a published version's snapshot instead of the working draft. Staff only.
+        description: Read a published version's snapshot instead of the working draft.
         schema:
           type: string
       responses:
@@ -1702,7 +1700,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           description: '`version` names no published version (`not-found`), or the tenant has no working
-            draft yet — for a guest, nothing has been published yet (`not-configured`).
+            draft yet (`not-configured`).
 
             '
           x-ticvai-problem-types:
@@ -1735,10 +1733,29 @@ paths:
         - "P13 CMS-001 Tenant Workspace"
         - "P13 CMS-014 Publishing Workflow"
         - "P13 CMS-102 Site Builder"
+      x-ticvai-reads:
+      - table: whitelabel.received_release
+        for: 'the releases the tenant''s cell has received, for whatsNew (ADAM CR-338, whatsNew (a))'
+      - table: whitelabel.config_version
+        for: 'the published versions, for publishedVersion and recentChanges (ADAM CR-338, recentChanges (a))'
+      - table: whitelabel.tenant_config
+        for: 'the draft and the live maintenance state'
+      - table: whitelabel.content_page
+        for: 'activePageCount'
+      - table: whitelabel.module_enablement
+        for: 'activeModuleCount and licensedModuleCount'
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.OrgUnit.isActive": platform.scope, Tenancy''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'each venue''s contact, city and openingHours for venues[] (ADAM CR-338, city and openingHoursToday (a)):
+          platform.venue_settings, Tenancy''s data (XDR-004)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the venue''s region time zone, which day is today for openingHoursToday (ADAM CR-338):
+          platform.region_settings, Tenancy''s data (XDR-004)'
       x-ticvai-audience:
       - device
       - guest
@@ -1776,6 +1793,13 @@ paths:
         most 10, filled from `platform-ops.Release.guestReleaseNotes` of the releases the tenant''s cell
         has received, skipping releases with none. It names no person. `recentChanges` stays staff only.
 
+        **Where the five parts come from** (ADAM CR-338, 29 October 2026; CHG-CR338-001): `whatsNew` from the
+        tenant-side copy `whitelabel.received_release` (whatsNew (a)); `recentChanges` from
+        `whitelabel.config_version` (recentChanges (a)); each venue''s `city` and `openingHoursToday` from its
+        `VenueSettings.city` and `VenueSettings.openingHours`, read through `tenancy#venueSettingsRecords` (city and
+        openingHoursToday (a)); and `venues` lists the active venues on every read (venues (a)). The rules are on
+        `TenantAppStatus` and `ReceivedRelease`.
+
         '
       tags:
       - overview
@@ -1812,10 +1836,22 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: whitelabel.tenant_config
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: whitelabel.received_release
+        for: 'the TenantAppStatus it answers: whatsNew, from the tenant-side copy (ADAM CR-338, whatsNew (a))'
+      - table: whitelabel.config_version
+        for: 'the TenantAppStatus it answers: recentChanges (ADAM CR-338, recentChanges (a))'
       x-ticvai-read-via:
       - query: tenancy#activeVenues
         route: service
         for: 'TenantAppStatus.venues: only the active venues are listed (ADAM CR-096)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the TenantAppStatus it answers: each venue''s contact, city and openingHours (ADAM CR-338):
+          platform.venue_settings, Tenancy''s data (XDR-020)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the TenantAppStatus it answers: the venue''s region time zone for openingHoursToday (ADAM CR-338):
+          platform.region_settings, Tenancy''s data (XDR-020)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
@@ -1915,7 +1951,6 @@ paths:
     put:
       operationId: setBrandIdentity
       x-ticvai-consumed-by:
-        - "P08 BO-836 Design System & Components"
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-004 Logo & Assets"
@@ -2008,6 +2043,11 @@ paths:
       x-ticvai-reads:
       - table: whitelabel.tenant_config
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: whitelabel.app_build
+        for: 'the newest released build, whose configVersion is AppIcons.liveVersion (ADAM CR-325, option A)'
+      - table: whitelabel.config_version
+        for: 'that version''s snapshot appIcons.sourceAssetRef, compared with the draft''s for requiresRebuild (ADAM
+          CR-325, option A)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2040,6 +2080,11 @@ paths:
       x-ticvai-reads:
       - table: whitelabel.tenant_config
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: whitelabel.app_build
+        for: 'the newest released build, whose configVersion is AppIcons.liveVersion (ADAM CR-325, option A)'
+      - table: whitelabel.config_version
+        for: 'that version''s snapshot appIcons.sourceAssetRef, compared with the draft''s for requiresRebuild (ADAM
+          CR-325, option A)'
       x-ticvai-read-via:
       - query: assets#mediaAssetRecords
         route: in-process
@@ -2052,6 +2097,8 @@ paths:
       description: '**Build-time.** Icons are baked into the binary, so a change here does not reach guests
         until the next store release. The response says whether a rebuild is needed (`requiresRebuild`)
         and which icon is currently live (`liveVersion`), so nobody expects an icon change to appear tomorrow.
+        Both are read as `AppIcons` says, from `whitelabel.app_build` and `whitelabel.config_version` (ADAM
+        CR-325, option A; CHG-CR325-001).
         The sizes generated for each platform are listed in `derived`.
 
         Source is a single 1024×1024 PNG without transparency; derived sizes are generated.
@@ -4206,6 +4253,55 @@ paths:
         - "P13 CMS-012 RTL Preview"
         - "P13 CMS-014 Publishing Workflow"
         - "P13 CMS-102 Site Builder"
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'the draft: brand, app icons, theme, fonts, languages and the live parts the rules read (ADAM CR-320)'
+      - table: whitelabel.navigation_config
+        for: 'whether a guestApp navigation has been saved (noVisibleNavigationItems; ADAM CR-320)'
+      - table: whitelabel.navigation_item
+        for: 'the items'' targets, visibility and labels (navigationTargetsDisabledModule, noVisibleNavigationItems,
+          missingTranslation; ADAM CR-320)'
+      - table: whitelabel.module_enablement
+        for: 'which modules are enabled (navigationTargetsDisabledModule, unlicensedModuleEnabled; ADAM CR-320)'
+      - table: whitelabel.homepage_layout
+        for: 'the homepage the sections belong to (ADAM CR-320)'
+      - table: whitelabel.homepage_section
+        for: 'each section''s contentPageId and LocalisedText (homepageReferencesMissingContent, missingTranslation;
+          ADAM CR-320)'
+      - table: whitelabel.content_page
+        for: 'whether a section''s contentPageId has a row, and the pages'' LocalisedText (ADAM CR-320)'
+      - table: whitelabel.policy
+        for: 'the current version of terms and privacy, and the policies'' LocalisedText (policyVersionMissing,
+          missingTranslation; ADAM CR-320)'
+      - table: whitelabel.booking_flow
+        for: 'the enabled flows and their types (bookingFlowInvalid, bookingFlowMissing; W12)'
+      - table: whitelabel.booking_flow_step
+        for: 'the steps validateBookingFlow checks (bookingFlowInvalid; W12)'
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'each active catalogue product''s ProductKind at an active venue, for bookingFlowMissing (ADAM CR-320), as
+          the booking-flow operations read catalogue.product, Catalogue''s data'
+      - query: tenancy#activeVenues
+        route: service
+        for: 'the active venues bookingFlowMissing is checked at (ADAM CR-320), as publishTenantConfig asks it:
+          platform.scope, Tenancy''s data'
+      - query: assets#mediaAssetRecords
+        route: in-process
+        for: 'whether brand.logoAssetRef and appIcons.sourceAssetRef are ready assets, for missingRequiredAsset (ADAM
+          CR-320): assets.media_asset, VenueOps''s data'
+      - query: subscription#contractRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for unlicensedModuleEnabled (ADAM CR-320), as
+          getModuleEnablement reads control.contract, Platform''s data'
+      - query: subscription#licenceAddOnRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for unlicensedModuleEnabled (ADAM CR-320), as
+          getModuleEnablement reads control.licence_add_on, Platform''s data'
+      - query: subscription#planRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for unlicensedModuleEnabled (ADAM CR-320), as
+          getModuleEnablement reads control.plan, Platform''s data'
       x-ticvai-audience:
       - staff
       summary: Validate the working draft
@@ -4214,6 +4310,14 @@ paths:
 
         **And the booking flows (decided 29 September, W12):** an enabled flow that fails `validateBookingFlow`
         is `bookingFlowInvalid`; a venue with bookable products and no flow serving their kind is `bookingFlowMissing`.
+
+        **What each kind checks** (ADAM CR-320, option A, both parts, 29 October 2026; CHG-CR320-001): the rule of
+        every kind is on `ConfigFindingKind`, and `publishTenantConfig` runs the same rules. To decide them this reads
+        the draft''s own tables (`x-ticvai-reads`) and asks, as `publishTenantConfig` and `getModuleEnablement` /
+        `setModuleEnablement` ask them: `catalogue#productRecords` and `tenancy#activeVenues` (`bookingFlowMissing`),
+        `assets#mediaAssetRecords` (`missingRequiredAsset`), and `subscription#contractRecords`,
+        `subscription#licenceAddOnRecords` and `subscription#planRecords`, which give the tenant''s
+        `LicencePosition.licensedModules` (`unlicensedModuleEnabled`).
 
         '
       tags:
@@ -4257,6 +4361,29 @@ paths:
       - query: orders#venueChargeCurrencies
         route: service
         for: 'what its text calls "orders.PaymentProvider.supportedMethods": payments.provider, Order''s data (CHG-R10GEN-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'the validation it runs, as validateTenantConfig asks it: each active product''s ProductKind, for
+          bookingFlowMissing (ADAM CR-320)'
+      - query: subscription#contractRecords
+        route: in-process
+        for: 'the validation it runs, as validateTenantConfig asks it: LicencePosition.licensedModules, for
+          unlicensedModuleEnabled (ADAM CR-320)'
+      - query: subscription#licenceAddOnRecords
+        route: in-process
+        for: 'the validation it runs, as validateTenantConfig asks it: LicencePosition.licensedModules, for
+          unlicensedModuleEnabled (ADAM CR-320)'
+      - query: subscription#planRecords
+        route: in-process
+        for: 'the validation it runs, as validateTenantConfig asks it: LicencePosition.licensedModules, for
+          unlicensedModuleEnabled (ADAM CR-320)'
+      x-ticvai-reads:
+      - table: whitelabel.policy
+        for: 'the validation it runs, as validateTenantConfig reads it: the current version of terms and privacy, for
+          policyVersionMissing (ADAM CR-320)'
+      - table: whitelabel.config_version
+        for: 'the previously current version''s snapshot, compared with the draft for pendingBuildTimeChanges and the
+          contentPublished change list (ADAM CR-324, A1 and A2)'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -4273,9 +4400,10 @@ paths:
         next release. A tenant who changed their app icon and published should be told plainly that the
         icon has not shipped.
 
-        **Booking flows are published here (decided 29 September, W12).** Each venue''s enabled flows are copied
-        into the snapshot with the rest of the draft; `getPublishedBookingFlow` reads them from the current
-        version. An invalid enabled flow fails validation (409, `bookingFlowInvalid`).
+        **Booking flows are published here (decided 29 September, W12).** Each venue''s flows are copied into the
+        snapshot with the rest of the draft, disabled flows included, because the snapshot is the whole draft (ADAM
+        CR-324, A3); `getPublishedBookingFlow` reads them from the current version and uses only the enabled ones. An
+        invalid enabled flow fails validation (409, `bookingFlowInvalid`).
 
         **Simulate, then a single publish by the permission holder; review only if the venue switches it on**
         (Chinmay, 2 October, workbook Q156; CHG-CSA-042). The simulate step is `createPreview`. With the tenant''s
@@ -4285,13 +4413,15 @@ paths:
         author, where the policy says so) approves it.
 
         **Platform staff publish a hosted tenant''s site** (Chinmay, 2 October, workbook Q144; R098; CHG-CSA-038)
-        only under a platform-staff grant naming `TENANT_PUBLISH`, with step-up. A self-hosted tenant publishes first and then
+        only under a platform-staff grant naming `TENANT_PUBLISH`, with step-up. **Until `identity.openPlatformStaffGrant`
+        exists, only the tenant''s own `TENANT_PUBLISH` holders publish** (ADAM CR-324, A3). A self-hosted tenant publishes first and then
         exports a site package (`exportSitePackage`, which needs a published version); both actions are always
         offered on CMS-014 and there is no hosting flag (r8 walk of ticket 27906; lead decision of 20 October 2026).
 
         **The server names the version** (ADAM CR-154, 18 October 2026; CHG-CRA-004). In the publish transaction it
         takes the next integer for the tenant (`1`, `2`, ...), as kiosk versions are numbered; that is the
-        version''s `version`, and the draft''s `tenant_config.version` becomes the next label. `config_version` is
+        version''s `version`, and the draft''s `tenant_config.version` becomes the next label: after publishing `N`
+        it is the text of `N+1` (after `3`, the draft is `4`; ADAM CR-324, A3). `config_version` is
         unique on (`scope_path`, `version`) and has one current row per tenant (a partial unique index on
         `scope_path` where `is_current`), so a racing publish fails on the index and is retried with the next label.
 
@@ -4303,6 +4433,13 @@ paths:
         (`reviewStatus` `approved`) and then emits `contentPublished`; its consumer of `approval.rejected` sets
         `reviewStatus` `rejected` and the version never becomes current. A scheduled publish emits it when the job
         makes the version current. **The event goes out when a version becomes current, never before.**
+
+        **What the 201 writes and answers** (ADAM CR-324, option A, A1 to A3, 29 October 2026; CHG-CR324-001).
+        `pendingBuildTimeChanges` and `contentHash` follow the rules on `ConfigVersion`; the `contentPublished`
+        payload follows `events/whitelabel-contentPublished.yaml`. **Refused:** a validation with any `error` finding
+        is 409 `config-validation-failed`, whose findings take `ConfigValidationReport`''s shape: every finding is
+        listed, warnings too, and only errors block. A `scheduledFor` that is not in the future is 400 `validation` on
+        `scheduledFor`, and nothing is snapshotted.
 
         '
       tags:
@@ -4339,7 +4476,8 @@ paths:
                     versions whose `scheduledFor` has passed and that are not current and not failed,
                     validates each again and makes it current, which is when `contentPublished` is emitted
                     (CR-154); a version that fails validation keeps `isCurrent` false and records the
-                    failure.
+                    failure. A time that is not in the future is refused 400 `validation` on `scheduledFor`
+                    (ADAM CR-324, A3).
       responses:
         '201':
           headers:
@@ -4357,8 +4495,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConfigVersion'
+        '400':
+          description: '`scheduledFor` is not in the future (`validation`, naming `scheduledFor`; ADAM CR-324, A3).
+            Nothing is validated or snapshotted.'
+          x-ticvai-problem-types:
+          - validation
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          description: Validation failed. Every finding is listed
+          description: Validation failed (`config-validation-failed`; ADAM CR-324, A3). Every finding is listed, in
+            `ConfigValidationReport`'s shape, warnings too; only an `error` blocks.
+          x-ticvai-problem-types:
+          - config-validation-failed
           content:
             application/problem+json:
               schema:
@@ -5426,6 +5576,13 @@ paths:
         default; a venue's own row replaces it for that venue (ADR-0018, nearest wins). `measurementId`
         is what the page tag or app SDK reports to; it is public by nature, and the reporting credential is
         not: `reportingCredentialRef` names a secret in the platform vault, is write-only and is never returned.
+        **A PUT that leaves `reportingCredentialRef` out keeps the credential the row holds; an explicit `null`
+        clears it** (and `hasReportingCredential` then reads false); a value replaces it (ADAM CR-323 (2), Chinmay,
+        29 October 2026; CHG-CR323-001). Every other field is replaced as sent: a write-only secret cannot be read
+        back and resent by the CMS-016 form, so leaving it out cannot mean "clear". **The one row per `venueId` +
+        `provider` is the unique index `analytics_provider_venue_id_provider_uniq`** (`NULLS NOT DISTINCT`, in the
+        package's forward migration since r8): two creates of the same pair at once cannot both be stored, and the
+        second one's unique violation is 409 `analytics-provider-exists` too.
         **`measurementId` must match its provider's format**, else 422 `measurement-id-invalid` (formats
         proposed, client to confirm against each vendor): `googleAnalytics4` `^G-[A-Z0-9]{6,12}$`,
         `googleTagManager` `^GTM-[A-Z0-9]{4,8}$`, `metaPixel` `^[0-9]{10,20}$`; `adobeAnalytics`, `matomo` and
@@ -5471,7 +5628,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
           x-ticvai-problem-types: [analytics-provider-exists]
-          description: Another row already holds this `venueId` and `provider` (`analytics-provider-exists`). Nothing is written.
+          description: Another row already holds this `venueId` and `provider` (`analytics-provider-exists`), found by the check or by a unique violation on `analytics_provider_venue_id_provider_uniq`. Nothing is written.
           content:
             application/problem+json:
               schema:
@@ -5674,6 +5831,11 @@ paths:
         - "P02 GST-047 Maintenance / Upgrade Page"
         - "P02 GST-071 Payment Methods"
         - "P05 KSK-002 Language Select"
+      x-ticvai-reads:
+      - table: whitelabel.banner
+        for: 'the banners active now, read live for banners (ADAM CR-327, option A (2))'
+      - table: whitelabel.promo_block
+        for: 'the promo blocks active now, read live for promoBlocks (ADAM CR-327, option A (2))'
       x-ticvai-read-via:
       - query: payments#providerConnectionRecords
         route: service
@@ -5681,6 +5843,10 @@ paths:
       - query: assets#mediaAssetRecords
         route: in-process
         for: 'what its text calls "MediaAsset.url": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
+      - query: identity#guestSignInProviders
+        route: in-process
+        for: 'guestSignIn: the tenant''s enabled guest providers, provider and display data only (ADAM CR-327, part
+          (1)): identity.sso_provider, Identity''s data (XDR-021)'
       x-ticvai-audience:
       - anonymous
       - guest
@@ -5693,7 +5859,8 @@ paths:
         `getTenantConfig` needs a guest or a staff session, so a visitor with neither could not load the
         tenant''s brand, theme, fonts, header, footer or navigation, and the home page (WEB-001, GST-001), the
         maintenance and sold-out pages (WEB-029, GST-047) and the kiosk (KSK-002) had nothing to style
-        themselves with. This is that read with no session at all.
+        themselves with. This is that read with no session at all. **A signed-in guest reads this too**:
+        `getTenantConfig` is staff only (ADAM CR-307, option C, 29 October 2026; CHG-CR307-001).
 
 
         **The tenant comes from the host, never from the caller.** The request carries no tenant: the edge
@@ -5704,7 +5871,11 @@ paths:
 
 
         **Published, non-sensitive fields only.** Read from the current published `ConfigVersion` (never the
-        working draft) plus the live status `setMaintenanceMode` writes. Left out, because a public and
+        working draft) plus the live status `setMaintenanceMode` writes, and the banners and promo blocks active
+        now, read live from `whitelabel.banner` and `whitelabel.promo_block` (ADAM CR-327, option A (2);
+        CHG-CR327-001). `assetsBaseUrl` is the cell''s `Assets:PublicBaseUrl` setting, left out while empty, and
+        `paymentTokenisation` is left out until #37051 (option A (3), (4)). `guestSignIn` lists the tenant''s
+        enabled guest providers through `identity#guestSignInProviders` (part (1): "Kind column on sso_provider"). Left out, because a public and
         cacheable response must not carry them: the draft markers (`isDraft`, `version`, the draft booking
         flows), notification branding (sender addresses), the enabled payment methods (checkout reads what
         the gateway offers), licensing, and every CMS status field `getTenantAppStatus` keeps for staff.
@@ -5736,7 +5907,7 @@ paths:
         required: false
         description: The venue the guest picked (WEB-001, GST-001). `bookingFlow` is then the tenant's settings
           with that venue's `venueOverrides` entry laid over field by field (rev 3 CFG-11); without it, the
-          tenant's own settings.
+          tenant's own settings. With it, `skinKey` names the venue's guest app skin (ADAM CR-280).
         schema:
           type: string
           format: uuid
@@ -6184,7 +6355,8 @@ paths:
         Public and cacheable, like the rest of the published app; reads the current `ConfigVersion`, never
         the draft. Resolved in this order: the product''s own `bookingFlowId` (catalogue), then its category''s,
         then the venue''s default flow for the type serving the product''s kind. With `flowTypeKey` alone,
-        the venue''s default for that type. Returns only the enabled steps, in order, with their settings and
+        the venue''s default for that type. Only enabled flows resolve: the snapshot holds the disabled ones too, and
+        they are skipped (ADAM CR-324, A3; CHG-CR324-001). Returns only the enabled steps, in order, with their settings and
         the flow-level settings; `name` is left out of this view. 404 when nothing resolves, and the guest
         screens use the type''s default order.
 
@@ -6523,8 +6695,16 @@ paths:
       description: '**Says whether a flow can be published, and why not (decided 29 September, W12).** With
         no body it checks the saved flow; with `steps` it checks that order without saving it, so the builder
         can mark a drag that breaks a constraint before it is dropped. A required step turned off, a step out
-        of its allowed order, a conditional step whose condition can never hold, a step the type does not
-        have and a step given twice are each a problem. Writes nothing.
+        of its allowed order, a step the type does not have and a step given twice are each a problem. Writes
+        nothing.
+
+        **Five kinds, and none for a condition** (ADAM CR-308, option A, Chinmay, 29 October 2026;
+        CHG-CR308-001). A conditional step decides only at booking time whether a guest meets its condition
+        (the type''s `commonConditions` and step conditions: a second active venue, a published `GuidedChoice`, a
+        product in the cart that asks), and that can change after the flow is saved, so a flow is never invalid
+        for a condition that may hold later and no problem is reported for one. **A required step missing from
+        the `steps` a caller sends** is `requiredStepDisabled` for that step, as a required step turned off is (a
+        saved flow holds every step of its type, so only a caller''s list can leave one out).
 
         '
       tags:
@@ -6650,6 +6830,13 @@ paths:
       operationId: getStoreAccounts
       x-ticvai-consumed-by:
         - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'the checklist and the listing languages: the working draft''s languages and app_icons (the published
+          set''s languages where there is no draft) (ADAM CR-304, option A)'
+      - table: whitelabel.config_version
+        for: 'the checklist''s publishedConfiguration item: whether a current ConfigVersion exists, and the published
+          languages where there is no draft (ADAM CR-304, option A)'
       x-ticvai-agreed: '29 September: M24-08 (impact.json names it getStorePublishingChecklist; the read half
         of setStoreAccounts); shape follows getBrandIdentity'
       x-ticvai-audience:
@@ -6659,6 +6846,7 @@ paths:
       description: 'The Apple and Google accounts the client has recorded, and the checklist CMS-104 shows:
         Apple D-U-N-S number, Apple Developer account, Google Play developer account, store listing, app icons
         and a published configuration. Secrets are never returned: a stored credential shows as `hasApiCredential`.
+        When each item is done, and what it says to do next, is `StorePublishingChecklist` (ADAM CR-304, option A).
 
         '
       tags:
@@ -6682,6 +6870,13 @@ paths:
       operationId: setStoreAccounts
       x-ticvai-consumed-by:
         - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'the checklist and the listing languages: the working draft''s languages and app_icons (the published
+          set''s languages where there is no draft) (ADAM CR-304, option A)'
+      - table: whitelabel.config_version
+        for: 'the checklist''s publishedConfiguration item: whether a current ConfigVersion exists, and the published
+          languages where there is no draft (ADAM CR-304, option A)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-agreed: '29 September: M24-08 (every client creates and owns its own Apple Developer (DUNS) and
@@ -6698,6 +6893,18 @@ paths:
         An Apple entry without a nine-digit `dunsNumber`, a store given twice, or a listing text missing a
         tenant language, is refused with 400. A credential is kept in the secret store and only its reference
         is stored here.
+
+
+        **The tenant languages a listing is checked against** (ADAM CR-304, option A, Chinmay, 29 October 2026):
+        the working draft''s `languages` (the `whitelabel.tenant_config` row with `is_draft`), or, where there is
+        no draft, the published set''s (the current `ConfigVersion`). Store accounts are outside the draft and take
+        effect at once, so a listing is checked against the languages the tenant is editing towards.
+
+
+        **One Apple account per tenant, so one Pass Type ID per tenant** (ADAM CR-304, option A). The body is a
+        tenant singleton with one entry per store, and the Apple entry records one Apple Developer account (one
+        team), so its `passTypeIdentifier` and certificate sign the Apple passes of every brand the tenant has. A
+        tenant whose brands each need their own Pass Type ID needs a later change, with brand modelling.
 
         '
       tags:
@@ -6735,7 +6942,7 @@ paths:
         '400':
           x-ticvai-problem-types: [duns-number-invalid, duplicate-store, listing-language-missing]
           description: An Apple account without a nine-digit D-U-N-S number, a store given twice, or a listing
-            text missing a tenant language
+            text missing a tenant language (the working draft's languages, else the published set's; ADAM CR-304)
           content:
             application/problem+json:
               schema:
@@ -7171,7 +7378,8 @@ components:
           maxLength: 200
           nullable: true
           writeOnly: true
-          description: The vault reference of the reporting credential. Accepted, never returned.
+          description: 'The vault reference of the reporting credential. Accepted, never returned. On
+            `setAnalyticsProvider`, left out keeps the credential held, `null` clears it (ADAM CR-323 (2)).'
         hasReportingCredential:
           type: boolean
           readOnly: true
@@ -8267,7 +8475,6 @@ components:
                 enum:
                 - requiredStepDisabled
                 - orderConstraintBroken
-                - conditionNeverHolds
                 - stepNotInType
                 - duplicateStep
                 - unknownStepSetting
@@ -8494,8 +8701,10 @@ components:
           nullable: true
           pattern: ^pass\.[A-Za-z0-9.-]+$
           description: '**The Apple Wallet Pass Type ID** (`pass.<reverse-domain>`), registered in the client''s own
-            Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate;
-            CHG-R6-033). Apple entry only; a Google entry sending it is refused with 400.'
+            Apple Developer account (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033), **one per
+            tenant** (ADAM CR-304, option A): the tenant records one Apple account, so this one Pass Type ID signs the
+            passes of all its brands; a Pass Type ID per brand needs a later change, with brand modelling. Apple
+            entry only; a Google entry sending it is refused with 400.'
         passCertificateSecretRef:
           x-ticvai-secret: vault-reference
           type: string
@@ -8506,7 +8715,8 @@ components:
             field, and its password in `passCertificatePassword`; the server keeps both in Key Vault as one secret and
             the row keeps only the vault name, as for `apiCredentialSecretRef`. A read shows `hasPassCertificate`
             and `passCertificateExpiresAt`, never the certificate or the password. It signs
-            every Apple pass the brand issues (orders `issueWalletPass`, `pushWalletPassUpdate`). On save the server
+            every Apple pass the tenant issues, for all its brands (orders `issueWalletPass`, `pushWalletPassUpdate`;
+            one per tenant, ADAM CR-304). On save the server
             reads the certificate''s Pass Type ID, team and expiry; a certificate whose Pass Type ID is not
             `passTypeIdentifier`, or whose team is not `developerAccountId`, is refused with 400 (CHG-R6-033).'
         passCertificatePassword:
@@ -8624,6 +8834,23 @@ components:
     StorePublishingChecklist:
       x-ticvai-persistence: none — computed
       type: object
+      description: '**When each item is done** (ADAM CR-304, option A, Chinmay, 29 October 2026; computed on every
+        read from the store accounts, the working draft and the published versions):
+
+        - `appleDunsNumber`: the `appleAppStore` entry is recorded with its `dunsNumber`.
+
+        - `appleDeveloperAccount`: an `appleAppStore` entry is recorded.
+
+        - `googlePlayDeveloperAccount`: a `googlePlay` entry is recorded.
+
+        - `storeListing`: at least one store is recorded, and every recorded store''s `listing` has `appName` and
+        `description` in every tenant language (the working draft''s `languages`, else the published set''s, as
+        `setStoreAccounts` checks), and `category`, `supportUrl` and `privacyPolicyUrl` set.
+
+        - `appIcons`: the working draft''s `appIcons` (`whitelabel.tenant_config.app_icons` on the `is_draft` row) is
+        set.
+
+        - `publishedConfiguration`: a current `ConfigVersion` exists (`isCurrent`).'
       required:
       - accounts
       - items
@@ -8656,7 +8883,14 @@ components:
                 description: True for the three accounts, which only the client can open.
               guidance:
                 type: string
-                description: What to do next, in the operator's language.
+                description: '**What to do next: fixed English copy, one text per item** (ADAM CR-304, option A), sent
+                  while the item is not done and absent once it is. `appleDunsNumber`: "Get a D-U-N-S number for your
+                  legal entity, then add it to your Apple account here." `appleDeveloperAccount`: "Enrol your
+                  organisation in the Apple Developer Program, then record its account here." `googlePlayDeveloperAccount`:
+                  "Create a Google Play developer account for your organisation, then record it here." `storeListing`:
+                  "Complete each store listing: app name and description in every language, category, support link and
+                  privacy policy link." `appIcons`: "Add the app icons to the draft configuration." `publishedConfiguration`:
+                  "Publish the configuration: the app is built from a published version."'
     AppBuild:
       x-ticvai-persistence: whitelabel.app_build
       # One build per platform while it is queued or building (ADAM CR-106, option 1; CHG-R10TEN-012).
@@ -9706,10 +9940,10 @@ components:
           description: >
             **Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29
             September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and
-            GST-001, returned with or without a session. **Published only**: a venue is listed when its scope
-            node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published
-            `ConfigVersion`; a venue added or reactivated since the last publish appears after the next
-            publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.
+            GST-001, returned with or without a session. **The active venues, on every read** (ADAM CR-338,
+            venues (a), 29 October 2026; CHG-CR338-001): a venue is listed when its scope node is active
+            (`tenancy.OrgUnit.isActive`), as `TenantConfig.venues` lists them, so `getTenantConfig` and this
+            agree. Ordered by `name`. Empty when nothing is published.
           items:
             type: object
             required:
@@ -9736,12 +9970,18 @@ components:
                 type: string
                 maxLength: 120
                 nullable: true
-                description: Shown under the name so two venues with similar names can be told apart.
+                description: Shown under the name so two venues with similar names can be told apart. The
+                  venue's `VenueSettings.city` (`platform.venue_settings.city`), read through `venueSettingsRecords`
+                  (ADAM CR-338, city and openingHoursToday (a); CHG-CR338-001). Null when it is not set.
               openingHoursToday:
                 type: object
                 nullable: true
                 description: Today's opening hours in the venue's time zone, from `tenancy.VenueSettings`
-                  opening hours. Null when the venue is closed today or has none set.
+                  opening hours. Null when the venue is closed today or has none set. Today's weekday entry of
+                  `VenueSettings.openingHours` (`platform.venue_settings.opening_hours`, jsonb by weekday), read
+                  through `venueSettingsRecords`; today is the date in the venue's region time zone
+                  (`RegionSettings.timeZone`, `regionSettingsRecords`) (ADAM CR-338, city and openingHoursToday
+                  (a); CHG-CR338-001).
                 properties:
                   opens:
                     type: string
@@ -9757,6 +9997,9 @@ components:
             **Public: the guest "what's new"** (decided 29 September, rev 3 GAP-B2). Newest first, at most
             10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has
             received; a release with no guest notes is skipped. Returned with or without a staff session.
+            **Read from the tenant-side copy** (ADAM CR-338, whatsNew (a), 29 October 2026; CHG-CR338-001):
+            `whitelabel.received_release` (`ReceivedRelease`), in the tenant's own database, so a public,
+            cacheable read never crosses to the control plane; newest `receivedAt` first.
           items:
             type: object
             required:
@@ -9775,8 +10018,13 @@ components:
                 $ref: '#/components/schemas/LocalisedText'
         recentChanges:
           type: array
-          description: Staff only. Names the principal behind each change, so it never reaches a public
-            response.
+          maxItems: 10
+          x-ticvai-derived: onRead
+          description: 'Staff only. Names the principal behind each change, so it never reaches a public
+            response. **Derived from `whitelabel.config_version`** (ADAM CR-338, recentChanges (a), 29 October
+            2026; CHG-CR338-001): one item per version, `area` `publish`, `description` the version''s `note`,
+            `principalId` its `published_by_principal_id`, `at` its `published_at`; newest first, at most 10. No new
+            storage.'
           items:
             type: object
             properties:
@@ -9790,6 +10038,48 @@ components:
               at:
                 type: string
                 format: date-time
+    ReceivedRelease:
+      x-ticvai-persistence: whitelabel.received_release
+      x-ticvai-unique-together: [[scopePath, releaseId]]
+      type: object
+      description: '**A release the tenant''s cell has received, copied into the tenant''s database** (ADAM CR-338,
+        whatsNew (a), with the tenant-side copy, 29 October 2026; CHG-CR338-001). Written by the workers host when
+        the cell takes a release: when the release''s rollout completes on the tenant''s database, one row with the
+        release''s `version` and `guestReleaseNotes` (`platform-ops.Release`) and that time, once per release (a
+        repeat writes nothing). `getTenantAppStatus` reads it for `whatsNew`, so a public,
+        cacheable read never crosses to the control plane.'
+      required:
+      - id
+      - releaseId
+      - version
+      - receivedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        releaseId:
+          type: string
+          format: uuid
+          description: The release received (`platform-ops.Release.id`). Its id in the control plane, kept as a value,
+            not a key, because the copy lives in the tenant's database.
+        version:
+          type: string
+          description: The release version (`platform-ops.Release.version`).
+        guestReleaseNotes:
+          allOf:
+          - $ref: '#/components/schemas/LocalisedText'
+          nullable: true
+          description: The release's `guestReleaseNotes` as received; null where the release has none, and then
+            `whatsNew` skips it.
+        receivedAt:
+          type: string
+          format: date-time
+          description: When the tenant's database took the release.
+        scopePath:
+          type: string
+          readOnly: true
+          description: The partition key (ADR-0005). Written at `tenant` scope.
     MinimumAppVersion:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
@@ -10044,12 +10334,18 @@ components:
           type: string
           nullable: true
           readOnly: true
-          description: Icon currently shipped. Differs from the draft until the next release.
+          x-ticvai-derived: onRead
+          description: 'Icon currently shipped. Differs from the draft until the next release. **Where it comes from**
+            (ADAM CR-325, option A, 29 October 2026; CHG-CR325-001): the `ConfigVersion.version` (`configVersion`) of
+            the newest `whitelabel.app_build` (latest `requestedAt`) with `status` `released`, on either platform; its icon is that version''s
+            `snapshot` `appIcons.sourceAssetRef` (`whitelabel.config_version`). Null while no build is released.'
         requiresRebuild:
           type: boolean
           readOnly: true
           x-ticvai-derived: onRead
-          description: True while the draft's source differs from the icon in `liveVersion`.
+          description: True while the draft's source differs from the icon in `liveVersion`, that is when the
+            released version's `snapshot` `appIcons.sourceAssetRef` differs from the draft's `sourceAssetRef`; true
+            when nothing is released (`liveVersion` null) (ADAM CR-325, option A; CHG-CR325-001).
     BookingFlowSettings:
       type: object
       x-ticvai-persistence: none — embedded in tenant_config
@@ -10457,6 +10753,23 @@ components:
           - pill
           default: solid
           description: Button shape (decided 29 September, rev 3 CFG-3).
+        venueSkins:
+          type: array
+          default: []
+          description: '**The guest app skin each venue takes** (ADAM CR-280, option B, 28 October 2026; CHG-R11TEN-007):
+            one entry per venue, naming one of the approved app design''s skins (`handoff/design-tokens/guest-app.yaml`,
+            `skins.byVenueKind`). A venue with no entry has none set, and the guest app shell then uses the base skin
+            with `park`. `getPublishedTenantConfig` answers the asked venue''s entry as `skinKey`.'
+          items:
+            type: object
+            additionalProperties: false
+            required: [venueId, skinKey]
+            properties:
+              venueId:
+                type: string
+                format: uuid
+              skinKey:
+                $ref: '#/components/schemas/GuestAppSkinKey'
         componentColours:
           type: object
           description: '**Colours for single interactive elements (decided 17 September, M17-11).** Each is
@@ -11929,31 +12242,36 @@ components:
         and an `error` when the default language is the one missing; every other kind is an `error`. A publish is
         blocked when `errorCount` is above 0, and a warning never blocks.
 
-        | kind | severity |
 
-        |---|---|
+        **Reported when** (ADAM CR-320, option A, 29 October 2026; CHG-CR320-001): the rule of each kind, read by
+        `validateTenantConfig` and `publishTenantConfig` alike. The four kinds the package already defined point at
+        their rule; the other seven are CR-320''s.
 
-        | missingTranslation | warning with a fallback language, error when the default language is missing |
+        | kind | severity | reported when |
 
-        | navigationTargetsDisabledModule | error |
+        |---|---|---|
 
-        | homepageReferencesMissingContent | error |
+        | missingTranslation | warning with a fallback language, error when the default language is missing | a `LocalisedText` field of the draft''s homepage sections, navigation item labels, content pages or policies has no text in one of the draft''s languages; the fallback is the default language being present |
 
-        | contrastFailure | error |
+        | navigationTargetsDisabledModule | error | a navigation item''s target points at a module that is not enabled (`setNavigation`) |
 
-        | missingRequiredAsset | error |
+        | homepageReferencesMissingContent | error | a homepage section whose `contentPageId` has no `whitelabel.content_page` row |
 
-        | policyVersionMissing | error |
+        | contrastFailure | error | a colour pair of `Theme.x-ticvai-contrast-pairs` fails the contrast check `setTheme` refuses on |
 
-        | noVisibleNavigationItems | error |
+        | missingRequiredAsset | error | `brand.logoAssetRef` or `appIcons.sourceAssetRef` is unset or is not a ready asset (`assets#mediaAssetRecords`) |
 
-        | unlicensedModuleEnabled | error |
+        | policyVersionMissing | error | terms (`termsAndConditions`) or `privacy`, the footer''s required legal links, has no current version |
 
-        | arabicFontMissing | error |
+        | noVisibleNavigationItems | error | a saved guestApp navigation has no visible item; a navigation never saved uses the default tabs (`NavigationConfig`) and passes |
 
-        | bookingFlowInvalid | error |
+        | unlicensedModuleEnabled | error | an enabled module is not in the tenant''s `LicencePosition.licensedModules` (by the map on `ModuleKey`, as `getModuleEnablement` sets `isLicensed`) |
 
-        | bookingFlowMissing | error |
+        | arabicFontMissing | error | `ar` is among the tenant''s languages and the fonts have no Arabic pair (`setFonts`) |
+
+        | bookingFlowInvalid | error | an enabled flow fails `validateBookingFlow` |
+
+        | bookingFlowMissing | error | an active venue (`tenancy#activeVenues`) has an active catalogue product (`catalogue#productRecords`) of a `ProductKind` that no enabled flow''s type serves (`BookingFlowType.productKinds`) |
 
         '
       enum:
@@ -12007,6 +12325,9 @@ components:
                 type: string
                 nullable: true
     ConfigValidationProblem:
+      description: 'The 409 `config-validation-failed` of `publishTenantConfig` (ADAM CR-324, A3; CHG-CR324-001). Its
+        findings take `ConfigValidationReport`''s shape: every finding is listed, warnings too, and only an `error`
+        blocks.'
       allOf:
       - $ref: ../shared/common.yaml#/components/schemas/Problem
       - type: object
@@ -12015,13 +12336,25 @@ components:
             type: array
             items:
               type: object
+              required:
+              - kind
+              - severity
+              - message
               properties:
                 kind:
                   $ref: '#/components/schemas/ConfigFindingKind'
+                severity:
+                  type: string
+                  enum:
+                  - error
+                  - warning
                 message:
                   type: string
                 area:
                   type: string
+                reference:
+                  type: string
+                  nullable: true
     KioskConfigValidation:
       x-ticvai-persistence: none — computed
       type: object
@@ -12108,6 +12441,8 @@ components:
           description: Why the scheduled activation failed, in the validation's words (R8 blocker IDENTITY-C63).
         contentHash:
           type: string
+          description: The lowercase hex SHA-256 of the `snapshot` JSON as stored, the same rule as the kiosk
+            snapshot's hash (ADAM CR-324, A1; CHG-CR324-001).
         pendingBuildTimeChanges:
           x-ticvai-persistence-column: jsonb
           x-ticvai-persistence-kind: valueObject
@@ -12115,12 +12450,20 @@ components:
           description: 'Changes in this version that will not reach guests until the next store release.
             Surfaced at publish so nobody expects a new icon tomorrow.
 
+
+            **How it is worked out** (ADAM CR-324, A1; CHG-CR324-001): the draft is compared with the previously
+            current version''s `snapshot`; on a first publish the list is empty. One entry for each changed
+            `buildTime` part: `area` `appIcons` (ios, android); `splash` (ios, android); `fonts` when
+            `customFontAssetRefs` differ (ios, android); and `features`, one entry for each `buildTime` `FeatureKey`
+            whose `isEnabled` differs (ios, android).
+
             '
           items:
             type: object
             properties:
               area:
                 type: string
+                description: '`appIcons`, `splash`, `fonts` or `features` (ADAM CR-324, A1).'
               description:
                 type: string
               platforms:
@@ -12232,7 +12575,8 @@ components:
         version:
           type: string
           description: The draft's working version label; the published one is `ConfigVersion.version`. A draft
-            created by the first `set*` call has the version `draft` (ADAM CR-230; CHG-R10TEN-003).
+            created by the first `set*` call has the version `draft` (ADAM CR-230; CHG-R10TEN-003). After publishing
+            `N` it is the text of `N+1` (ADAM CR-324, A3; CHG-CR324-001).
         isDraft:
           type: boolean
           readOnly: true
@@ -12392,6 +12736,11 @@ components:
                   $ref: '#/components/schemas/KioskConfigFindingKind'
                 message:
                   type: string
+    GuestAppSkinKey:
+      type: string
+      enum: [park, water, stadium, theatre, dining, kids, museum, rooms, transport]
+      description: The guest app's skins per venue kind, as the approved Mobile App v4 design draws them
+        (`handoff/design-tokens/guest-app.yaml` `skins.byVenueKind`; ADAM CR-280, CHG-R11TEN-007).
     PublishedTenantConfig:
       x-ticvai-persistence: none — computed from the current ConfigVersion snapshot and the live status on whitelabel.tenant_config
       type: object
@@ -12425,7 +12774,9 @@ components:
           description: '**What the guest sign-in buttons need before anyone is signed in** (r8, IDENTITY-C21): the
             public client ids of the tenant''s enabled social and UAE PASS providers, derived on read from Identity''s
             provider rows (no stored column, nothing secret). A provider the tenant has not enabled is absent, and
-            its button is not drawn.'
+            its button is not drawn. **Read through `identity#guestSignInProviders`, in process** (ADAM CR-327, part
+            (1), Chinmay, 29 October 2026: "Kind column on sso_provider"; CHG-CR327-001; XDR-021): the tenant''s
+            active `identity.sso_provider` rows with `audience` `guest`, each under its `guestProvider` key.'
           properties:
             apple:
               type: object
@@ -12441,7 +12792,10 @@ components:
               type: object
               additionalProperties: false
               properties:
-                authorizationUrl: { type: string, format: uri }
+                authorizationUrl:
+                  type: string
+                  format: uri
+                  description: The guest uaePass row's identity.sso_provider.authorization_url, through identity#guestSignInProviders (CHG-CR327-002).
                 clientId: { type: string }
         brand:
           $ref: '#/components/schemas/BrandIdentity'
@@ -12456,7 +12810,12 @@ components:
             the asset id + `/` + a rendition name, for example `{assetsBaseUrl}/{assetId}/card.webp`. The renditions are
             `thumb`, `card`, `hero` and `original`. Every media object in every guest response carries an asset id and
             nothing else, so no screen makes a media call per tile. Only public assets referenced by a published
-            version are served at it. `brandUrls` and the banner addresses below are this rule worked out for you.'
+            version are served at it. `brandUrls` and the banner addresses below are this rule worked out for you.
+
+
+            **Where it comes from** (ADAM CR-327, option A (3), 29 October 2026; CHG-CR327-001): a per-cell setting
+            (`Assets:PublicBaseUrl`), empty until the storage adapter is chosen; the field is left out of the response
+            while it is empty.'
         brandUrls:
           type: object
           nullable: true
@@ -12483,6 +12842,21 @@ components:
           $ref: '#/components/schemas/Theme'
         fonts:
           $ref: '#/components/schemas/FontConfig'
+        skinKey:
+          allOf:
+          - $ref: '#/components/schemas/GuestAppSkinKey'
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          x-ticvai-derived: onRead
+          description: '**The asked venue''s guest app skin** (ADAM CR-280, option B, 28 October 2026, additive;
+            CHG-R11TEN-007): the published `theme.venueSkins` entry for `venueId`. Null without `venueId`, or where the
+            venue has no entry; the shell then uses the base skin with `park`. **How the shell applies it**: the skin
+            sets every token, then `theme` overrides `--br` (`primaryColour`), `--bg` (`backgroundColour`) and `--ink`
+            (`textColour`) where set; `textColour` is never derived (Theme requires it), and `theme.darkMode` is never
+            used to render. `fonts` replace the skin''s faces (`--fh`, `--fb`), with the Arabic pair
+            (`primaryArabic`, `secondaryArabic`) under `dir=rtl`. `--rk` scales the base radii (sm 6, md 10, lg 16,
+            in px) by `theme.cornerRadius / 10`.'
         header:
           $ref: '#/components/schemas/HeaderConfig'
         footer:
@@ -12496,10 +12870,13 @@ components:
           readOnly: true
           x-ticvai-persisted: false
           x-ticvai-derived: onRead
-          description: '**The hero and other banners a guest sees now** (r8 walk of ticket 28335): the banners in the
-            published version whose state is `active` at the time of the read, by `sortOrder`. Draft, scheduled and
+          description: '**The hero and other banners a guest sees now** (r8 walk of ticket 28335): the banners
+            whose state is `active` at the time of the read, by `sortOrder`. Draft, scheduled and
             expired banners are never returned. `imageUrl` is the resolved address of `imageAssetRef`. Staff read
-            all banners with `listBanners`, which is unchanged.'
+            all banners with `listBanners`, which is unchanged. **Read live from `whitelabel.banner`** (ADAM CR-327,
+            option A (2), 29 October 2026; CHG-CR327-001), not from the published version''s snapshot: the rows whose
+            state is `active` now, at the tenant root or at the picked venue (`venueId`), so a scheduled banner going
+            live needs no republish.'
           items:
             $ref: '#/components/schemas/PublishedBanner'
         promoBlocks:
@@ -12507,8 +12884,9 @@ components:
           readOnly: true
           x-ticvai-persisted: false
           x-ticvai-derived: onRead
-          description: The promo blocks in the published version that are `active` at the time of the read, by
-            `sortOrder`, with the same rule as `banners`.
+          description: The promo blocks that are `active` at the time of the read, by `sortOrder`, with the same
+            rule as `banners`. **Read live from `whitelabel.promo_block`** (ADAM CR-327, option A (2); CHG-CR327-001),
+            at the tenant root or at the picked venue (`venueId`).
           items:
             $ref: '#/components/schemas/PublishedPromoBlock'
         bookingFlow:
@@ -12567,7 +12945,10 @@ components:
           nullable: true
           description: '**The provider the guest app tokenises cards with** (4 October 2026, CHG-FXC-010; GST-071): the
             `providerId` `storePaymentToken` requires, its kind and the publishable key the client SDK needs. Never a secret.
-            Null where no provider with tokenisation is connected.'
+            Null where no provider with tokenisation is connected. **Left out of the response until service sign-in
+            between deployables is built** (#37051, CR-281; ADAM CR-327, option A (4), 29 October 2026;
+            CHG-CR327-001): its read, payments#providerConnectionRecords, takes the service route, and a null would say
+            wrongly that no provider is connected.'
           required:
           - providerId
           - providerKind

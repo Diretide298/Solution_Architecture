@@ -233,137 +233,6 @@
    }
   }
  },
- "Wallet": {
-  "x-ticvai-rls": "grant-holder-read",
-  "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
-  "type": "object",
-  "required": [
-   "subjectId",
-   "balance",
-   "currency",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "transferRules": {
-    "type": "object",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "x-ticvai-derived": "onRead",
-    "description": "What the venue allows this guest to do with a transfer, read from the venue's `WalletTransferRules` so a guest screen can hide or limit the action (r8 walk of tickets 28310 and 28345). Worked out on read.",
-    "properties": {
-     "peerToPeerAllowed": {
-      "type": "boolean"
-     },
-     "withinSharedWalletOnly": {
-      "type": "boolean"
-     },
-     "maximumPerTransfer": {
-      "allOf": [
-       {
-        "$ref": "../shared/common.yaml#/components/schemas/Money"
-       }
-      ],
-      "nullable": true
-     }
-    }
-   },
-   "balance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "x-ticvai-column": "balance_amount"
-   },
-   "credits": {
-    "type": "array",
-    "description": "4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n",
-    "items": {
-     "type": "object",
-     "required": [
-      "kind",
-      "amount"
-     ],
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "cash",
-        "bonus",
-        "redemption",
-        "refund",
-        "goodwill"
-       ],
-       "description": "**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability. Worked out from the lot's credit type `category` (proposed, client to correct): `cash` -> cash; `bonus`, `promotional`, `loyalty`, `membership`, `giftCard` -> bonus; `redemption`, `ride`, `attraction`, `fnb`, `retail`, `parking`, `event` -> redemption; `refund` -> refund; `other` -> bonus. `goodwill` comes only from a lot whose `sourceKind` is `adjustment` and whose adjustment (`sourceReference`) is of kind `goodwill`, whatever the category (R8 blocker APPROVALS-TENANCY-C32).\n",
-       "x-ticvai-persisted": false
-      },
-      "amount": {
-       "x-ticvai-column": "remaining_amount",
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "expiresAt": {
-       "type": "string",
-       "format": "date-time",
-       "nullable": true
-      },
-      "sourceRef": {
-       "type": "string",
-       "nullable": true,
-       "x-ticvai-column": "source_reference"
-      },
-      "isRefundable": {
-       "type": "boolean",
-       "default": false,
-       "x-ticvai-persisted": false,
-       "description": "**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"
-      }
-     }
-    }
-   },
-   "bonusBalance": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "description": "Promotional value. Typically non-refundable and spent first."
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "active",
-     "suspended",
-     "closed"
-    ]
-   },
-   "homeCellName": {
-    "type": "string",
-    "nullable": true,
-    "description": "Where the authoritative balance lives. Present when the guest is linked across cells.\n"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "lastActivityAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
  "WalletConfigurationVersion": {
   "type": "object",
   "x-ticvai-persistence": "wallet.configuration_version",
@@ -376,7 +245,9 @@
   "description": "Boards 1.10 and 10.8. **Ten boards of configuration that interact.** `version` is the highest at the scope plus one; (scope, version) is unique.",
   "properties": {
    "version": {
-    "type": "integer"
+    "type": "integer",
+    "nullable": true,
+    "description": "Every stored row has its number. Null only on `restoreWalletConfigurationVersion`'s answer, the restored draft, which is not a version row (ADAM CR-312)."
    },
    "publishedAt": {
     "type": "string",
@@ -407,7 +278,8 @@
        ]
       },
       "code": {
-       "type": "string"
+       "type": "string",
+       "description": "The check that found it. Validation's codes are listed on `publishWalletConfiguration` (ADAM CR-311)."
       },
       "message": {
        "type": "string"

@@ -17400,6 +17400,14 @@ screens:
       provenance: structural — pack board 6 wiring, 11 September 2026
       carries:
       - tenantId
+    - to: ADM-420
+      trigger: Create tenant
+      control: primaryButton#createTenant
+      provenance: 'the lead, 29 October 2026 ("Open ADM-420"; CHG-R11FXT-008): opens Tenant & Organization
+        Provisioning on its Create tenant form (formCreateTenant), which collects code, name and billingEmail
+        and calls createTenant; no tenantId is carried, since the tenant does not exist yet'
+      carries:
+      - tenantId
     - to: ADM-421
       trigger: Venue & Operational Structure Creation
       provenance: structural — pack board 6 wiring, 11 September 2026
@@ -17447,6 +17455,12 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Subscription_Licensing_AI_Self_Service.pdf, page 72
+  - operation: createTenant
+    removed: true
+    why: 'Removed 29 October 2026 (the lead, "Open ADM-420"; CHG-R11FXT-008): nothing here collected the
+      body createTenant needs. Create tenant now opens ADM-420, whose form (formCreateTenant) collects
+      it and calls createTenant; ADM-005 has the same form.'
+    source: 'the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED'
   layout:
     template: split
     regions:
@@ -17456,10 +17470,11 @@ screens:
         derived: true
         impliedBy: createTenant
         label: Create tenant
-        notes: The act the screen exists for.
+        notes: Opens ADM-420 on its Create tenant form, which calls `createTenant` (the lead, 29 October
+          2026, "Open ADM-420"; CHG-R11FXT-008). This screen submits nothing itself.
       - kind: secondaryButton
         label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
+        notes: Leaves the screen for the Platform Dashboard (ADM-002); nothing is sent.
         derived: true
         impliedBy: createTenant
       - kind: dataTable
@@ -17469,18 +17484,13 @@ screens:
   states:
     loading: The provisioning list.
     error: Could not load. Names which read failed and leaves the provisioning untouched.
-    emptyFirstRun: No provisioning yet. Carries the create action; distinct from a filter that matched
-      nothing.
+    emptyFirstRun: No provisioning yet. Offers Create tenant, which opens the tenant form on ADM-420;
+      distinct from a filter that matched nothing.
     emptyNoResults: The filter narrowed it and the provisioning are still there. The pack's own statuses
       are Pending — the state names which is selected.
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: createTenant
-    contract: subscription
-    purpose: Provision the tenant
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: listCellJobs
     contract: subscription
     purpose: Provisioning jobs and how far each has got
@@ -17498,6 +17508,17 @@ screens:
     params:
     - name: cellId
       from: navigation
+    - name: tenantId
+      from: navigation
+      optional: true
+      notes: 'The tenant being provisioned, carried back from ADM-420 once it is created or picked there
+        (29 October 2026, CHG-R11FXT-008: this screen no longer creates it). The steps it opens carry
+        it on; opened from ADM-002 without it, each step picks its tenant itself.'
+    - name: regionId
+      from: navigation
+      optional: true
+      notes: The region of that tenant, carried back from ADM-420 with it (CHG-R11FXT-008), for the regional
+        defaults step (ADM-426).
 - id: ADM-420
   name: Tenant & Organization Provisioning
   module: Tenants & Licensing
@@ -17526,6 +17547,8 @@ screens:
       back: true
       carries:
       - cellId
+      - tenantId
+      - regionId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no
@@ -17652,13 +17675,23 @@ screens:
   - id: formCreateTenant
     component: modal
     trigger: Create tenant
-    body: '**Collects what `createTenant` sends before it is called.** Dismissing sends nothing; the screen
-      behind is unchanged.'
+    body: '**Collects what `createTenant` sends before it is called.** Required: `code`, `name`, `billingEmail`.
+      Optional: `billingAddress`, `accountManagerPrincipalId`, `planId`. Opened by this screen''s Create
+      tenant and by ADM-419''s, which arrives here for it (CHG-R11FXT-008). Dismissing sends nothing;
+      the screen behind is unchanged.'
+    bindsTo: CreateTenantRequest
     confirm:
       label: Create tenant
       operation: createTenant
     dismiss:
       label: Cancel
+      discards:
+      - code
+      - name
+      - billingEmail
+      - billingAddress
+      - accountManagerPrincipalId
+      - planId
     provenance: contract subscription.yaml POST /tenants; wiring fix, 2 October 2026
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -18856,6 +18889,8 @@ screens:
       trigger: Back to Provisioning Command Center
       provenance: structural — pack board 6 wiring, 11 September 2026
       back: true
+      carries:
+      - tenantId
   density: compact
   pattern: listDetail
   patternReason: '**nothing in the pack chooses a pattern for this screen** — no metric directory, no

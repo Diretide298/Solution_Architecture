@@ -68,11 +68,11 @@
    "operations": 13
   },
   {
-   "contract": "catalogue",
+   "contract": "tenancy",
    "operations": 8
   },
   {
-   "contract": "tenancy",
+   "contract": "catalogue",
    "operations": 8
   },
   {
@@ -84,11 +84,11 @@
    "operations": 5
   },
   {
-   "contract": "finance",
+   "contract": "reporting",
    "operations": 5
   },
   {
-   "contract": "reporting",
+   "contract": "finance",
    "operations": 5
   },
   {
@@ -96,20 +96,12 @@
    "operations": 5
   },
   {
-   "contract": "approvals",
-   "operations": 4
-  },
-  {
    "contract": "seating",
    "operations": 4
   },
   {
-   "contract": "workforce",
-   "operations": 2
-  },
-  {
-   "contract": "access",
-   "operations": 2
+   "contract": "approvals",
+   "operations": 4
   },
   {
    "contract": "queue",
@@ -120,11 +112,19 @@
    "operations": 2
   },
   {
-   "contract": "games",
-   "operations": 1
+   "contract": "access",
+   "operations": 2
+  },
+  {
+   "contract": "workforce",
+   "operations": 2
   },
   {
    "contract": "inventory",
+   "operations": 1
+  },
+  {
+   "contract": "games",
    "operations": 1
   }
  ],

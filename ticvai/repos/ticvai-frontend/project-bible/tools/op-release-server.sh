@@ -77,6 +77,15 @@ notify_off() {
   echo "== notifications off for the whole instance (saved: $saved). After the CR settlement: $0 notify-on"
 }
 
+# TICVAI's own mail filter (29 October 2026, PROCESS-LOG P-33): an interceptor in the container drops every mail of
+# project 153 and lets the other projects' through. With it in place, apply leaves the instance switch alone, so the
+# other projects keep their mail; without it, apply switches all mail off as before.
+ticvai_filter_in() {
+  docker exec "$CONTAINER" test -f /app/config/initializers/zz_ticvai_quiet_mail.rb || return 1
+  put_rb filter-get.rb 'puts(defined?(TicvaiQuietMail) && TicvaiQuietMail.identifier == "ticvai" ? "filter-on" : "filter-off")'
+  [ "$(rails_line filter-get.rb)" = "filter-on" ]
+}
+
 notify_on() {
   local saved="$OUT/notified_events.json" now
   [ -s "$saved" ] || die "no saved list in $saved"
@@ -203,7 +212,13 @@ apply() {
   copy_in
   docker exec "$CONTAINER" rm -f /tmp/op-created.json
   log="$OUT/$tag-apply-$stamp.log"
-  notify_off
+  local filtered=0
+  if ticvai_filter_in; then
+    filtered=1
+    echo "== TICVAI's mail filter is in the container: TICVAI mails nothing; the instance switch is left as it is"
+  else
+    notify_off
+  fi
   local rc=0
   run_rb "$log" -e APPLY=1 -e QUIET_ANYWAY=1 -e "EXPECT_RELEASE=$tag" ${ENV_ARGS[@]+"${ENV_ARGS[@]}"} || rc=$?
   touch "$OUT/$tag-applied"
@@ -216,7 +231,7 @@ apply() {
     echo "== no op-created.json (the create phase did not run)"
   fi
   echo "== log kept in $log"
-  echo "== notifications are still OFF: settle the CRs and file the child tasks, then: $0 notify-on"
+  [ "$filtered" = "1" ] || echo "== notifications are still OFF: settle the CRs and file the child tasks, then: $0 notify-on"
   [ "$rc" = "0" ] || die "op-release.rb stopped with status $rc; the phases before the failure are committed (see the log)"
 }
 
@@ -229,6 +244,7 @@ status() {
     mkdir -p "$OUT"
     put_rb notify-get.rb 'puts Setting.notified_events.to_json'
     echo "notifications: $(rails_line notify-get.rb)"
+    if ticvai_filter_in; then echo "TICVAI mail filter: in (TICVAI mails nothing)"; else echo "TICVAI mail filter: NOT in"; fi
   fi
 }
 

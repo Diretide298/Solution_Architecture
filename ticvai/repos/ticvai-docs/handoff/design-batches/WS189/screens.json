@@ -825,17 +825,6 @@
     ]
    },
    {
-    "operationId": "transferWalletBalance",
-    "contract": "wallet",
-    "purpose": "Move value between them",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getWallet",
-     "listWalletTransactions"
-    ]
-   },
-   {
     "operationId": "listSharedWallets",
     "contract": "wallet",
     "purpose": "Family, household and corporate structures",
@@ -1811,11 +1800,39 @@
        "bindsTo": "WalletBalance",
        "operation": "getWalletBalance",
        "provenance": "contract wallet.yaml GET /wallets/{walletId}/balance; wiring fix, 2 October 2026"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Transfer balance",
+       "operation": "transferWalletBalance",
+       "notes": "Opens the form that moves value from this wallet to another in the structure (r11 gate fix, CHG-R11FXS-004).",
+       "provenance": "contract wallet.yaml POST /wallets/{walletId}/transfer; r11 gate fix, 29 October 2026"
       }
      ]
     }
    ]
   },
+  "overlays": [
+   {
+    "id": "formTransferWalletBalance",
+    "component": "modal",
+    "trigger": "Transfer balance",
+    "body": "**Collects what `transferWalletBalance` sends before it is called.** Required: `amount` (cash credit only) and the receiving wallet, `toWalletId`, named outright: the only way to reach a parent, child, department or corporate wallet of the structure. Optional: `message`. The wallet the screen is on is the sender. A `409` (insufficient cash credit, a suspended or closed wallet, or transfer rules that forbid it) stays in the dialog and says which. Dismissing sends nothing; no value moves.",
+    "confirm": {
+     "label": "Transfer",
+     "operation": "transferWalletBalance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "toWalletId",
+      "amount",
+      "message"
+     ]
+    },
+    "provenance": "contract wallet.yaml POST /wallets/{walletId}/transfer; r11 gate fix, 29 October 2026 (CHG-R11FXS-004)"
+   }
+  ],
   "states": {
    "loading": "The shared wallet transfers configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the shared wallet transfers untouched.",

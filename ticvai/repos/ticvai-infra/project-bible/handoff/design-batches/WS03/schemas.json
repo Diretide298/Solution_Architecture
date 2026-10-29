@@ -1109,11 +1109,11 @@
   "properties": {
    "user": {
     "type": "string",
-    "description": "User"
+    "description": "User: the binding holder's `pii.subject.display_name`, read in process from Identity (ADAM CR-302, option A; XDR-010)."
    },
    "credential": {
     "type": "string",
-    "description": "Credential"
+    "description": "Credential: the binding's entitlement's `access.entitlement.media_code` (ADAM CR-302)."
    },
    "deviceId": {
     "type": "string",

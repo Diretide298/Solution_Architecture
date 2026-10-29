@@ -186,7 +186,7 @@
 | `ADM-416` | Payment, Contract & Commercial Validation | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-417` | Subscription Confirmation & Commercial Activation | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-418` | Subscription Lifecycle & Trial-to-Paid Handoff | Tenants & Licensing | 3 | 1 | yes |
-| `ADM-419` | Provisioning Command Center | Tenants & Licensing | 3 | 2 | yes |
+| `ADM-419` | Provisioning Command Center | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-420` | Tenant & Organization Provisioning | Tenants & Licensing | 3 | 5 | yes |
 | `ADM-421` | Venue & Operational Structure Creation | Tenants & Licensing | 3 | 5 | yes |
 | `ADM-422` | Administrator & Security Initialization | Tenants & Licensing | 3 | 6 | yes |

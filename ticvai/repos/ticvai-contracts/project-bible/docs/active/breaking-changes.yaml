@@ -1595,3 +1595,28 @@ changes:
     tag: r11
     producer-tickets: [SVC-WHITELABEL-CONTENT-3]
     consumer-tickets: [APP-WL-CMS-007]
+  - id: BC-494
+    contract: white-label
+    operation: getTenantConfig
+    change: "security changed"
+    reason: 'ADAM CR-307, option C (CHG-CR307-001): getTenantConfig is staff only, bearerAuth and TENANT_CONFIGURE;
+      guestAuth and the guest audience are removed and a guest reads getPublishedTenantConfig (GFIX-1, 2 October 2026),
+      as listContentPages did (BC-493). Every guest screen''s binding of it was already removed in that read''s favour
+      (WEB-001, GST-001, KSK-002), and the staff callers (P08 BO-834, P09 ADM-018, P13 CMS-009, CMS-011) are unchanged;
+      dropping a security scheme is breaking by the compat rule.'
+    approved-by: 'Chinmay, 29 October 2026 (CR-307: "All as recommended", option C)'
+    tag: r11
+    producer-tickets: [SVC-WHITELABEL-OVERVIEW-1]
+    consumer-tickets: [VM-BO-834, APP-WL-ADM-018, APP-WL-CMS-009, APP-WL-CMS-011]
+  - id: BC-495
+    contract: white-label
+    operation: validateBookingFlow
+    change: "lost enum value(s) ['conditionNeverHolds']"
+    reason: 'ADAM CR-308, option A (CHG-CR308-001): a conditional step decides only at booking time whether a guest
+      meets its condition, so a flow is never invalid for a condition that may hold later and the kind is dropped;
+      the five kinds a caller can break stay. No screen reads the kind by name (CMS-103 lists the problems). Removing
+      a response enum value is breaking by the compat rule.'
+    approved-by: 'Chinmay, 29 October 2026 (CR-308: "All as recommended", option A)'
+    tag: r11
+    producer-tickets: [SVC-WHITELABEL-BOOKINGFLOWS-2]
+    consumer-tickets: [APP-WL-CMS-103]

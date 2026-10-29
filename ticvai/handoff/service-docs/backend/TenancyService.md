@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy`, `kernel` |
-| Operations in the slice | 37 of 214 |
+| Operations in the slice | 38 of 214 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -37,7 +37,7 @@
 | approvals | [`approveRoleAuthorityDelegation`](#approveroleauthoritydelegation) | PUT | `/role-authority-delegation` | setup | 1 |  |
 | attendance | [`recordAttendance`](#recordattendance) | POST | `/attendance/clock` | core | 1 | BO-889, BO-935, BO-936, EMP-024, EMP-025, POS-009 |
 | delegation | [`createApprovalDelegation`](#createapprovaldelegation) | POST | `/delegations` | setup | 1 | ADM-243, ADM-534, BO-087, BO-385 |
-| devices | [`createDeviceFirmware`](#createdevicefirmware) | POST | `/device-firmware` | setup | 1 | ADM-587, BO-129 |
+| devices | [`createDeviceFirmware`](#createdevicefirmware) | POST | `/device-firmware` | setup | 1 | BO-129 |
 | devices | [`setDeviceAssignment`](#setdeviceassignment) | PUT | `/devices/{deviceId}/assignment` | core | 1 | ADM-582, BO-732, POS-016 |
 | devices | [`setDeviceFirmwareStatus`](#setdevicefirmwarestatus) | POST | `/device-firmware/{firmwareId}/status` | setup | 1 | BO-129 |
 | general | [`getDeviceAssignment`](#getdeviceassignment) | GET | `/devices/{deviceId}/assignment` | core | 1 | POS-016 |
@@ -50,7 +50,7 @@
 | request | [`decideApprovalRequest`](#decideapprovalrequest) | POST | `/approval-requests/{requestId}/decide` | core | 1 | ADM-145, BO-084, BO-085, BO-243, BO-367, BO-374 … |
 | request | [`evaluateApprovalRequirement`](#evaluateapprovalrequirement) | POST | `/approval-requests/evaluate` | core | 1 | ADM-337, ADM-530, ADM-532, POS-002 |
 | request | [`listApprovalRequests`](#listapprovalrequests) | GET | `/approval-requests` | core | 1 | ADM-130, ADM-145, ADM-224, BO-084, BO-085, BO-1181 … |
-| rota | [`createRotaAssignment`](#createrotaassignment) | POST | `/rota-assignments` | setup | 1 | BO-055, BO-712, BO-714, BO-884, BO-917 |
+| rota | [`createRotaAssignment`](#createrotaassignment) | POST | `/rota-assignments` | setup | 1 | BO-055, BO-714 |
 | rota | [`listRotaAssignments`](#listrotaassignments) | GET | `/rota-assignments` | core | 1 | BO-055, BO-712, BO-714, BO-883, BO-884, EMP-021 … |
 | rota | [`updateRotaAssignment`](#updaterotaassignment) | PATCH | `/rota-assignments/{assignmentId}` | setup | 1 | BO-055 |
 | scope | [`createOrgUnit`](#createorgunit) | POST | `/org-units` | setup | 1 | ADM-006, ADM-420, ADM-421, BO-064, BO-145 |
@@ -61,7 +61,8 @@
 | tenancy | [`setConfigurationProfile`](#setconfigurationprofile) | PUT | `/configuration-profiles/{profileId}` | setup | 1 | BO-123, BO-129 |
 | tenancy | [`setVenueSettings`](#setvenuesettings) | PUT | `/venues/{venueId}/settings` | setup | 1 | BO-065, BO-1063, BO-136, BO-187, BO-600 |
 | tenancy | [`setVenueSettingsDefaults`](#setvenuesettingsdefaults) | PUT | `/venue-settings-defaults` | setup | 1 | ADM-019, ADM-426, BO-1062 |
-| workstation | [`configureWorkstation`](#configureworkstation) | PUT | `/workstations/{workstationId}` | core | 1 | BO-036, BO-602, POS-016 |
+| workforce | [`setStaffingRules`](#setstaffingrules) | PUT | `/staffing-rules` | setup | 1 | BO-881, BO-885 |
+| workstation | [`configureWorkstation`](#configureworkstation) | PUT | `/workstations/{workstationId}` | core | 1 | BO-036, POS-016 |
 | workstation | [`createOutlet`](#createoutlet) | POST | `/outlets` | setup | 1 | BO-044 |
 | workstation | [`createSaleBoard`](#createsaleboard) | POST | `/sale-boards` | setup | 1 | BO-109, BO-124 |
 | workstation | [`getOutlet`](#getoutlet) | GET | `/outlets/{outletId}` | core | 1 | POS-021 |
@@ -117,7 +118,7 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 | Read routing | primary |
 | Step-up auth | mfa |
 | Reads | `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
-| Writes | `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
+| Writes | `approvals.matrix`, `approvals.matrix_version`, `approvals.rule`, `cache:idempotency` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
@@ -487,7 +488,7 @@ The artefact is an uploaded asset (`artefactAssetId`), **stored as sent and not 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `tenancy.device_firmware` |
 | Writes | `cache:idempotency`, `tenancy.device_firmware` |
-| Called by | ADM-587, BO-129 |
+| Called by | BO-129 |
 | State model | Device firmware release ([states/device-firmware.yaml](../../../states/device-firmware.yaml)): created as `draft` |
 
 **Parameters**
@@ -901,6 +902,8 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 
 **PUT semantics — the matrix is found by `kind` and the scope; the path's `matrixId` is its id** (accepted 26 October 2026, Chinmay, ADAM CR-245 option B). The body names its target: the matrix for `kind` at `scopeLevel`, on the scope node the caller is acting at (`scopePath` is read-only and set from it). Where no matrix exists for that pair, this creates version 1 with the path's `matrixId` as its id (a client UUIDv7, the same idempotency key as a body `id`) and answers `201`; where one does, the path's `matrixId` must equal that matrix's id, and the call stores a new version of it and answers `200`. A `matrixId` that is not the id of the matrix for (`kind`, scope), including one naming another kind's matrix, is `409 matrix-id-mismatch` and nothing changes. `ApprovalMatrix.id` is read-only in the body. **The body replaces the rule set whole**: the new version holds exactly the rules in `rules`, in their `order`, and a rule omitted from the body is not in the new version. Rule `id`s are read-only and ignored on input — each version carries its own rule rows. The previous version is kept, never edited, because requests in flight still point at it.
 
+**How the versions are stored** (ADAM CR-300, option B, Chinmay, 29 October 2026). One `approvals.matrix` row per (`kind`, scope node), keyed by the stable `matrixId` CR-245 gives it, so every version keeps that one id. Each version is one `approvals.matrix_version` row (`ApprovalMatrixVersion`: `matrix_id`, `version`, `is_active`, `created_at`), and each rule row names its version (`approvals.rule.matrix_version`). A new version inserts its `matrix_version` row and its rule rows and moves the matrix row's `version` and `is_active` to it; the earlier version's `matrix_version` row and rule rows are never touched. Unique (`matrix_id`, `version`) stops two versions with one number, and unique (`kind`, `scope_path`) on `approvals.matrix` stops two first saves at once from creating two matrices for one kind and scope (the second insert fails and nothing it sent is stored).
+
 |  |  |
 |---|---|
 | Permission | `APPROVAL_CONFIGURE` |
@@ -911,7 +914,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | Config scope | venue |
 | Conflict policy | serverWins |
 | Reads | `approvals.external_provider`, `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
-| Writes | `approvals.matrix`, `approvals.rule`, `cache:idempotency` |
+| Writes | `approvals.matrix`, `approvals.matrix_version`, `approvals.rule`, `cache:idempotency` |
 | Called by | ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334, ADM-335, ADM-530, BO-086, BO-087, BO-1120, BO-1149, BO-639, BO-863 |
 
 **Parameters**
@@ -931,6 +934,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | scopePath | string |  | (read-only) |
 | version | integer | yes | 11.1.80. (read-only) |
 | rules | array of ApprovalRule | yes |  |
+| rules[].matrixVersion | integer | yes | The version of its matrix this rule belongs to (ADAM CR-300, option B): with the rule's matrix_id, it names one approvals.matrix_version row. (read-only) |
 | rules[].id | string (uuid) |  | Added 20 August. (read-only) |
 | rules[].order | integer | yes | First match wins. |
 | rules[].minAmount | object |  | Amounts compare in the venue's currency (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020): a request amount in another currency (a supplier's, a tender's) is converted into the cur… |
@@ -978,6 +982,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 | scopePath | string |  | (read-only) |
 | version | integer | yes | 11.1.80. (read-only) |
 | rules | array of ApprovalRule | yes |  |
+| rules[].matrixVersion | integer | yes | The version of its matrix this rule belongs to (ADAM CR-300, option B): with the rule's matrix_id, it names one approvals.matrix_version row. (read-only) |
 | rules[].id | string (uuid) |  | Added 20 August. (read-only) |
 | rules[].order | integer | yes | First match wins. |
 | rules[].minAmount | object |  | Amounts compare in the venue's currency (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020): a request amount in another currency (a supplier's, a tender's) is converted into the cur… |
@@ -1216,6 +1221,7 @@ Draft is supported (11.1.51) for the case where a person raises it themselves an
 **A draft is saved, not routed — decided 28 September, audit R129 (3).** `isDraft: true` stores the request at `draft`: nobody is asked, no SLA runs, and it does not count as an open request for the `409` below, so a person may keep a draft while a contract raises the real one. The draft is sent with `submitApprovalRequest`, which is when the matrix is read, the approvers are resolved and `matrixVersion` is fixed. A contract raising a request never drafts. A request that is not a draft is routed here the same way: the matrix id and version are fixed and the approver chain is stored (`ApprovalRequest.approvers`; ADAM CR-102, CHG-R10ID-015).
 **A guest's request** (ADAM CR-101; CHG-R10ID-016). Identity raises a guest's privacy request in process for the guest (`exportSubjectData`, `deleteGuestAccount`): the request records the guest as `requestedBySubjectId`, and `requestedByPrincipalId` stays null. Every other request names its principal.
 **No route, no request** (lead's ruling on lane H review 3 N-1, 20 October 2026; CHG-R8SPN-015). A request that is not a draft and matches no active rule (no rule of its kind and subject type at its `scopePath`, or for subject type `tenant` no active platform rule) is refused `422 no-approval-route` and nothing is written: it is never approved automatically and never left `pending` with nobody to ask. The calling operation passes the refusal on to its own caller (`suspendTenant`, `reactivateTenant`). A rule that matches but whose roles have no holder is a different case (`rerouteOnNoApprover`, `noApproverAvailable`).
+**The platform rule is read from the control plane** ("All as recommended": ADAM CR-330 option A, Chinmay, 29 October 2026). For subject type `tenant` the rule is `control.platform_approval_rule`, Platform's table in the control database, seeded once by the control database's migration (approvers holding `PLATFORM_TENANT_MANAGE`, two approvals, active). This asks `platform-ops#platformApprovalRuleFor` with the request's kind and subject type over the service route, under service sign-in between deployables (#37051), and routes the request by the rule it answers; `found` false is the `422` above. A tenant's own `approvals.matrix` and `approvals.rule` are never read for it.
 
 |  |  |
 |---|---|
@@ -1534,6 +1540,7 @@ Read-only and deliberately cheap. It runs on the hot path — every refund, ever
 |---|---|---|---|
 | isRequired | boolean | yes |  |
 | matchedRule | object |  | (nullable) |
+| matchedRule.matrixVersion | integer | yes | The version of its matrix this rule belongs to (ADAM CR-300, option B): with the rule's matrix_id, it names one approvals.matrix_version row. (read-only) |
 | matchedRule.id | string (uuid) |  | Added 20 August. (read-only) |
 | matchedRule.order | integer | yes | First match wins. |
 | matchedRule.minAmount | object |  | Amounts compare in the venue's currency (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020): a request amount in another currency (a supplier's, a tender's) is converted into the cur… |
@@ -1722,6 +1729,8 @@ Who is expected where, and when
 **`POST /rota-assignments`**: Put someone on the rota
 
 Refused where the person already has an overlapping assignment, or lacks the role the position requires. **A rota that lets one person be in two places is a rota that gets ignored.**
+**Both checks look beyond the caller's venue, as a yes or no** (ADAM CR-336, option B, decided 29 October 2026). The overlap is asked of `workforce#principalHasOverlappingAssignment`: any other assignment of the person, at any venue of the tenant, that is not `cancelled` and overlaps the new one's times (`409 rota-assignment-overlap`). The role is asked of `identity#principalHoldsRoleAtVenue`: a live grant of `requiredRoleId` to the person at the venue or at a scope above it, a tenant-root grant included (`409 person-lacks-required-role`; no check when `requiredRoleId` is null). Each is answered under the tenant root grant and returns only true or false, so the caller learns nothing of another venue's rota or of where a role was granted. **The overlap also holds under races**: the exclusion constraint on `workforce.rota_assignment` (one person, overlapping times, not `cancelled`; RotaAssignment `x-ticvai-exclude`) refuses the second of two writes that pass the check at the same moment, and that refusal is the same `409 rota-assignment-overlap`.
+**The working-hour limit is flagged, not refused** (ADAM CR-334, option A, decided 29 October 2026): the venue's `workforce.staffing_rules` row is read and `breachesWorkingHourLimit` is set as that field says. The assignment is stored either way.
 Where the position needs a till, the assignment names the workstation their shift will open on — the link between a rota and a cash session, without merging the two.
 
 |  |  |
@@ -1732,9 +1741,9 @@ Where the position needs a till, the assignment names the workstation their shif
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.principal`, `platform.workstation`, `workforce.rota_assignment` |
+| Reads | `cache:idempotency`, `identity.delegated_access`, `identity.principal`, `platform.workstation`, `workforce.rota_assignment`, `workforce.staffing_rules` |
 | Writes | `cache:idempotency`, `workforce.rota_assignment` |
-| Called by | BO-055, BO-712, BO-714, BO-884, BO-917 |
+| Called by | BO-055, BO-714 |
 | State model | Rota assignment ([states/rota-assignment.yaml](../../../states/rota-assignment.yaml)): created as `planned`; moves `planned` -> `published` **(not settled: see the Gaps sheet)** |
 
 **Parameters**
@@ -1798,7 +1807,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Assigned |
-| 409 |  | Overlaps an existing assignment, or the person lacks the required role |
+| 409 |  | Overlaps another assignment of the person at any venue of the tenant, or the person lacks the required role at the venue or above it (ADAM CR-336). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listRotaAssignments
@@ -1872,6 +1881,12 @@ Where the position needs a till, the assignment names the workstation their shif
 
 **`PATCH /rota-assignments/{assignmentId}`**: Move or cancel an assignment
 
+**A move is checked as a new assignment is** (ADAM CR-315, option A). Whenever the PATCH changes `principalId`, `venueId`, `startsAt`, `endsAt` or `requiredRoleId`, the assignment as it would stand is checked against the same two rules `createRotaAssignment` applies, asked of the same two queries (ADAM CR-336, option B): the person has no other assignment overlapping it at any venue of the tenant (`workforce#principalHasOverlappingAssignment` with this assignment as `exceptAssignmentId`; `409 rota-assignment-overlap`, which the exclusion constraint also gives under races), and the person holds the required role at the venue or above it (`identity#principalHoldsRoleAtVenue`; `409 person-lacks-required-role`). Each answers only true or false. So a move cannot do what a create is refused. An assignment outside the caller's scope is the shared `404`.
+
+**The working-hour flag is set again on a move** (ADAM CR-334, option A): whenever the PATCH changes `principalId`, `venueId`, `startsAt`, `endsAt` or `breakMinutes`, `breachesWorkingHourLimit` is worked out as on create, from the venue's `workforce.staffing_rules`.
+
+**The status moves a PATCH may make** are the ones the state model gives this operation (states/rota-assignment.yaml): `planned` to `published` (the assignment becomes visible to the person rostered) or to `cancelled`; `published` to `confirmed` (the person acknowledged it) or to `cancelled`; and `swapPending` to `cancelled` (the swap was approved and a new assignment replaces this one). Any other `status` is refused with `409 rota-status-move-not-allowed`.
+
 |  |  |
 |---|---|
 | Permission | `WORKFORCE_MANAGE` |
@@ -1880,10 +1895,10 @@ Where the position needs a till, the assignment names the workstation their shif
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `workforce.rota_assignment` |
+| Reads | `cache:idempotency`, `workforce.rota_assignment`, `workforce.staffing_rules` |
 | Writes | `cache:idempotency`, `workforce.rota_assignment` |
 | Called by | BO-055 |
-| State model | Rota assignment ([states/rota-assignment.yaml](../../../states/rota-assignment.yaml)): moves `published` -> `confirmed`, `swapPending` -> `cancelled`, `planned` -> `cancelled`, `published` -> `cancelled` |
+| State model | Rota assignment ([states/rota-assignment.yaml](../../../states/rota-assignment.yaml)): moves `planned` -> `published`, `published` -> `confirmed`, `swapPending` -> `cancelled`, `planned` -> `cancelled`, `published` -> `cancelled` |
 
 **Parameters**
 
@@ -1943,6 +1958,8 @@ Where the position needs a till, the assignment names the workstation their shif
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | Refused, and nothing changes (ADAM CR-315). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -2354,6 +2371,29 @@ Support hours were an open conflict for eleven days and were never a design ques
 | contact.whatsapp | string |  | (nullable) |
 | contact.address | object |  | (nullable) |
 | contact.openingHours | object |  | Prose, as the guest reads it. (nullable) |
+| city | string |  | The venue's city, shown under its name in the guest venue list (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): platform.venue_settings.city, written by the venue settin… (max length 120; nullable) |
+| openingHours | object |  | The venue's opening hours by weekday (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): platform.venue_settings.opening_hours, one jsonb column, written by the venue setti… (nullable) |
+| openingHours.mon | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.mon.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.mon.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.tue | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.tue.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.tue.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.wed | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.wed.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.wed.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.thu | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.thu.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.thu.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.fri | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.fri.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.fri.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sat | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.sat.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sat.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sun | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.sun.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sun.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
@@ -2468,6 +2508,29 @@ Support hours were an open conflict for eleven days and were never a design ques
 | contact.whatsapp | string |  | (nullable) |
 | contact.address | object |  | (nullable) |
 | contact.openingHours | object |  | Prose, as the guest reads it. (nullable) |
+| city | string |  | The venue's city, shown under its name in the guest venue list (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): platform.venue_settings.city, written by the venue settin… (max length 120; nullable) |
+| openingHours | object |  | The venue's opening hours by weekday (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): platform.venue_settings.opening_hours, one jsonb column, written by the venue setti… (nullable) |
+| openingHours.mon | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.mon.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.mon.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.tue | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.tue.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.tue.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.wed | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.wed.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.wed.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.thu | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.thu.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.thu.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.fri | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.fri.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.fri.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sat | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.sat.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sat.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sun | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.sun.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sun.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
@@ -2618,6 +2681,29 @@ Support hours were an open conflict for eleven days and were never a design ques
 | contact.whatsapp | string |  | (nullable) |
 | contact.address | object |  | (nullable) |
 | contact.openingHours | object |  | Prose, as the guest reads it. (nullable) |
+| city | string |  | The venue's city, shown under its name in the guest venue list (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): platform.venue_settings.city, written by the venue settin… (max length 120; nullable) |
+| openingHours | object |  | The venue's opening hours by weekday (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): platform.venue_settings.opening_hours, one jsonb column, written by the venue setti… (nullable) |
+| openingHours.mon | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.mon.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.mon.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.tue | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.tue.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.tue.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.wed | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.wed.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.wed.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.thu | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.thu.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.thu.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.fri | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.fri.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.fri.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sat | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.sat.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sat.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sun | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.sun.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sun.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
@@ -2732,6 +2818,29 @@ Support hours were an open conflict for eleven days and were never a design ques
 | contact.whatsapp | string |  | (nullable) |
 | contact.address | object |  | (nullable) |
 | contact.openingHours | object |  | Prose, as the guest reads it. (nullable) |
+| city | string |  | The venue's city, shown under its name in the guest venue list (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): platform.venue_settings.city, written by the venue settin… (max length 120; nullable) |
+| openingHours | object |  | The venue's opening hours by weekday (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): platform.venue_settings.opening_hours, one jsonb column, written by the venue setti… (nullable) |
+| openingHours.mon | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.mon.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.mon.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.tue | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.tue.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.tue.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.wed | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.wed.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.wed.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.thu | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.thu.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.thu.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.fri | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.fri.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.fri.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sat | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.sat.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sat.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sun | VenueDayHours |  | One weekday's opening hours (ADAM CR-338); null is closed that day. (nullable) |
+| openingHours.sun.opens | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
+| openingHours.sun.closes | string | yes | (pattern ^([01][0-9]\|2[0-3]):[0-5][0-9]$) |
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | venueId | string (uuid) |  | From the path of setVenueSettings. (read-only) |
 | calendarDayStartHour | integer |  | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… (min 0; max 23; default 6; nullable) |
@@ -2846,6 +2955,106 @@ Support hours were an open conflict for eleven days and were never a design ques
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
+## Group: workforce
+
+### setStaffingRules
+
+**`PUT /staffing-rules`**: Minimum cover, working-hour limits and overtime
+
+Resource boards 4.3 and 3.9. **Minimum staffing is a safety rule before it is a cost rule.** A ride that requires two operators cannot run with one, and a rota that allows it has produced a closure or an incident.
+**Working-hour limits are law in most markets**, and a system that lets a manager roster somebody for fourteen hours has made the venue liable rather than the manager.
+**Writes `workforce.staffing_rules` and the rows of `workforce.position_requirement`** (decided 29 September, writers pass): each `minimumCover` entry is one position requirement, and the set sent replaces the venue's set, so a position left out no longer has a minimum.
+
+|  |  |
+|---|---|
+| Permission | `WORKFORCE_MANAGE` |
+| Scope level | venue |
+| Part of slice | setup, makes `workforce.staffing_rules` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Config scope | venue |
+| Reads | `cache:idempotency`, `workforce.position_requirement`, `workforce.staffing_rules` |
+| Writes | `cache:idempotency`, `workforce.position_requirement`, `workforce.staffing_rules` |
+| Called by | BO-881, BO-885 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `StaffingRules`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| minimumCover | array of object |  | Minimum staffing per position, venue and time window, with the qualifications it requires: the rows of workforce.position_requirement (data model for the agreed operations, 29 September). |
+| minimumCover[].id | string (uuid) | yes |  |
+| minimumCover[].positionCode | string | yes |  |
+| minimumCover[].label | string |  |  |
+| minimumCover[].venueId | string (uuid) |  | (nullable) |
+| minimumCover[].attractionId | string (uuid) |  | (nullable) |
+| minimumCover[].minimumHeadcount | integer | yes | (min 0) |
+| minimumCover[].daysOfWeek | array of enum (monday, tuesday, wednesday, thursday, friday, saturday, sunday) |  | Days the minimum applies; absent means every day the venue is open (nullable) |
+| minimumCover[].startsAt | string |  | Start of the time window, local time (HH:MM) as ShiftTemplate.startsAt; absent means opening (nullable) |
+| minimumCover[].endsAt | string |  | End of the time window, local time (HH:MM); absent means closing (nullable) |
+| minimumCover[].requiredQualifications | array of string |  |  |
+| minimumCover[].appliesWhenOpen | boolean |  | (default True) |
+| minimumCover[].blocksOperation | boolean |  | A ride requiring two operators cannot run with one. (default True) |
+| maximumHoursPerDay | integer |  | The most hours a person may be rostered on one calendar day in the venue's time zone. (nullable) |
+| maximumHoursPerWeek | integer |  | The most hours a person may be rostered in any 7 consecutive days, a rolling window rather than a calendar week. (nullable) |
+| minimumRestHours | integer |  | The fewest hours between the end of one of a person's assignments and the start of the next. (nullable) |
+| maximumConsecutiveDays | integer |  | (nullable) |
+| overtime | object |  |  |
+| overtime.allowed | boolean |  | (default True) |
+| overtime.afterHoursPerWeek | integer |  | (nullable) |
+| overtime.rateMultiplier | number |  | (nullable) |
+| overtime.requiresApproval | boolean |  | (default True) |
+| minimumAgeForNightShift | integer |  | (nullable) |
+| defaultIncentiveRateMultiplier | number |  | What an open shift pays above base when it is released. (min 1; nullable) |
+| maximumIncentiveRateMultiplier | number |  | The ceiling on an incentive. (min 1; nullable) |
+| incentiveApprovalAbove | number |  | Above this multiplier a second person approves the release. (min 1; nullable) |
+| scopePath | string |  |  |
+
+**Response**: `StaffingRules`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| minimumCover | array of object |  | Minimum staffing per position, venue and time window, with the qualifications it requires: the rows of workforce.position_requirement (data model for the agreed operations, 29 September). |
+| minimumCover[].id | string (uuid) | yes |  |
+| minimumCover[].positionCode | string | yes |  |
+| minimumCover[].label | string |  |  |
+| minimumCover[].venueId | string (uuid) |  | (nullable) |
+| minimumCover[].attractionId | string (uuid) |  | (nullable) |
+| minimumCover[].minimumHeadcount | integer | yes | (min 0) |
+| minimumCover[].daysOfWeek | array of enum (monday, tuesday, wednesday, thursday, friday, saturday, sunday) |  | Days the minimum applies; absent means every day the venue is open (nullable) |
+| minimumCover[].startsAt | string |  | Start of the time window, local time (HH:MM) as ShiftTemplate.startsAt; absent means opening (nullable) |
+| minimumCover[].endsAt | string |  | End of the time window, local time (HH:MM); absent means closing (nullable) |
+| minimumCover[].requiredQualifications | array of string |  |  |
+| minimumCover[].appliesWhenOpen | boolean |  | (default True) |
+| minimumCover[].blocksOperation | boolean |  | A ride requiring two operators cannot run with one. (default True) |
+| maximumHoursPerDay | integer |  | The most hours a person may be rostered on one calendar day in the venue's time zone. (nullable) |
+| maximumHoursPerWeek | integer |  | The most hours a person may be rostered in any 7 consecutive days, a rolling window rather than a calendar week. (nullable) |
+| minimumRestHours | integer |  | The fewest hours between the end of one of a person's assignments and the start of the next. (nullable) |
+| maximumConsecutiveDays | integer |  | (nullable) |
+| overtime | object |  |  |
+| overtime.allowed | boolean |  | (default True) |
+| overtime.afterHoursPerWeek | integer |  | (nullable) |
+| overtime.rateMultiplier | number |  | (nullable) |
+| overtime.requiresApproval | boolean |  | (default True) |
+| minimumAgeForNightShift | integer |  | (nullable) |
+| defaultIncentiveRateMultiplier | number |  | What an open shift pays above base when it is released. (min 1; nullable) |
+| maximumIncentiveRateMultiplier | number |  | The ceiling on an incentive. (min 1; nullable) |
+| incentiveApprovalAbove | number |  | Above this multiplier a second person approves the release. (min 1; nullable) |
+| scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Set |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+
 ## Group: workstation
 
 ### configureWorkstation
@@ -2870,7 +3079,7 @@ Support hours were an open conflict for eleven days and were never a design ques
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.pos_shift`, `platform.device`, `platform.outlet`, `platform.region_settings`, `platform.sale_board`, `platform.workstation` |
 | Writes | `cache:idempotency`, `platform.device`, `platform.workstation` |
-| Called by | BO-036, BO-602, POS-016 |
+| Called by | BO-036, POS-016 |
 
 **Parameters**
 
@@ -3647,6 +3856,15 @@ Every table this service owns that the slice reads or writes, with its columns a
 | version | integer | yes | 11.1.80. |
 | is_active | boolean | no |  |
 
+### `approvals.matrix_version`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| approval_matrix_id | uuid | yes | The matrix this is a version of (approvals.matrix.id, the stable matrixId). |
+| version | integer | yes | 1 for a new matrix, then the previous version plus one; with matrixId, the key. |
+| is_active | boolean | yes | Whether this version was saved active (ApprovalMatrix.isActive). |
+| created_at | timestamptz | yes | When the version was stored. |
+
 ### `approvals.request`
 
 | Column | Type | Required | Notes |
@@ -3702,6 +3920,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| matrix_version | integer | yes | The version of its matrix this rule belongs to (ADAM CR-300, option B): with the rule's matrix_id, it names one approvals.matrix_version row. |
 | id | uuid | yes | Added 20 August. |
 | sort_order | integer | yes | First match wins. |
 | min_amount | numeric(18,4) | no | Amounts compare in the venue's currency (the lead, 25 October 2026, r10 round 3, ADAM CR-102; CHG-R10ID-020): a request amount in another currency (a supplier's, a tender's) is converted into the cur… |
@@ -3952,6 +4171,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | contact | jsonb | no | How a guest reaches this venue (R8 blocker WHITE-C16, the storage-sat lane's request 5; CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the venue… |
+| city | text | no | The venue's city, shown under its name in the guest venue list (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): platform.venue_settings.city, written by the venue settin… |
+| opening_hours | jsonb | no | The venue's opening hours by weekday (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): platform.venue_settings.opening_hours, one jsonb column, written by the venue setti… |
 | id | uuid | yes | Added 20 August. |
 | venue_id | uuid | no | From the path of setVenueSettings. |
 | calendar_day_start_hour | integer | no | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… |
@@ -4132,6 +4353,24 @@ Every table this service owns that the slice reads or writes, with its columns a
 | occurred_at_after | timestamptz | yes | The time this correction set (correctedAt on the request). |
 | reason | text | yes |  |
 
+### `workforce.position_requirement`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| staffing_rules_id | uuid | yes | The parent row. |
+| id | uuid | yes |  |
+| position_code | text | yes |  |
+| label | text | no |  |
+| venue_id | uuid | no |  |
+| attraction_id | uuid | no |  |
+| minimum_headcount | integer | yes |  |
+| days_of_week | text[] | no | Days the minimum applies; absent means every day the venue is open |
+| starts_at | text | no | Start of the time window, local time (HH:MM) as ShiftTemplate.startsAt; absent means opening |
+| ends_at | text | no | End of the time window, local time (HH:MM); absent means closing |
+| required_qualifications | text[] | no |  |
+| applies_when_open | boolean | no |  |
+| blocks_operation | boolean | no | A ride requiring two operators cannot run with one. |
+
 ### `workforce.rota_assignment`
 
 | Column | Type | Required | Notes |
@@ -4154,9 +4393,25 @@ Every table this service owns that the slice reads or writes, with its columns a
 | break_minutes | integer | no |  |
 | note | text | no |  |
 
+### `workforce.staffing_rules`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| maximum_hours_per_day | integer | no | The most hours a person may be rostered on one calendar day in the venue's time zone. |
+| maximum_hours_per_week | integer | no | The most hours a person may be rostered in any 7 consecutive days, a rolling window rather than a calendar week. |
+| minimum_rest_hours | integer | no | The fewest hours between the end of one of a person's assignments and the start of the next. |
+| maximum_consecutive_days | integer | no |  |
+| overtime | jsonb | no |  |
+| minimum_age_for_night_shift | integer | no |  |
+| default_incentive_rate_multiplier | numeric | no | What an open shift pays above base when it is released. |
+| maximum_incentive_rate_multiplier | numeric | no | The ceiling on an incentive. |
+| incentive_approval_above | numeric | no | Above this multiplier a second person approves the release. |
+| scope_path | text | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ## Not in the first release
 
-177 operations, added to this service in later releases without changing any of the above.
+176 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -4172,5 +4427,5 @@ Every table this service owns that the slice reads or writes, with its columns a
 | rota | `requestShiftSwap` |
 | scope | `getOrgUnit` |
 | tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettings`, `getVenueSettingsDefaults`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `requeueDeadLetter`, `resolveTenantHost`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setTenantDomainMapping` |
-| workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setStaffingRules`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
+| workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
 | workstation | `getDevice`, `listOutlets`, `listWorkstations`, `recordDeviceHeartbeat`, `registerDevice` |

@@ -1964,6 +1964,35 @@
    }
   }
  },
+ "VenueOpeningHours": {
+  "type": "object",
+  "x-ticvai-persistence": "none — jsonb column of platform.venue_settings (opening_hours)",
+  "additionalProperties": false,
+  "description": "**A venue's opening hours by weekday** (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): one entry per weekday, local `HH:MM` in the venue's region time zone. A day left out or null is closed. `TenantAppStatus.venues[].openingHoursToday` is today's entry.\n",
+  "properties": {
+   "mon": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "tue": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "wed": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "thu": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "fri": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "sat": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   },
+   "sun": {
+    "$ref": "#/components/schemas/VenueDayHours"
+   }
+  }
+ },
  "VenueSettings": {
   "x-ticvai-retired-columns": [
    "org_unit_id"
@@ -1980,6 +2009,21 @@
     ],
     "nullable": true,
     "description": "**How a guest reaches this venue** (R8 blocker WHITE-C16, the storage-sat lane's request 5; CHG-R8MIG-011): phone, email, WhatsApp, address and opening-hours prose, one jsonb column, written by the venue settings write and read by White-Label's getTenantAppStatus through tenancy#venueSettingsRecords. Null means the tenant's contact is shown."
+   },
+   "city": {
+    "type": "string",
+    "maxLength": 120,
+    "nullable": true,
+    "description": "**The venue's city, shown under its name in the guest venue list** (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): `platform.venue_settings.city`, written by the venue settings write and read by White-Label's getTenantAppStatus (`TenantAppStatus.venues[].city`) through tenancy#venueSettingsRecords. Null when not set."
+   },
+   "openingHours": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/VenueOpeningHours"
+     }
+    ],
+    "nullable": true,
+    "description": "**The venue's opening hours by weekday** (ADAM CR-338, city and openingHoursToday (a), 29 October 2026; CHG-CR338-001): `platform.venue_settings.opening_hours`, one jsonb column, written by the venue settings write and read by White-Label's getTenantAppStatus for `TenantAppStatus.venues[].openingHoursToday` through tenancy#venueSettingsRecords. Null when not set."
    },
    "id": {
     "type": "string",

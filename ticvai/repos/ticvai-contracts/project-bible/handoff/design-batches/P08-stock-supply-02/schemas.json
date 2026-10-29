@@ -812,7 +812,8 @@
    "stationId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "description": "Not used for routing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). The item rule is `KitchenStation.menuItemIds`; `createFnbOrder` routes by it and the outlet's `KitchenRoutingRules`."
    },
    "menuSectionId": {
     "x-ticvai-references": "fnb.menu_section",

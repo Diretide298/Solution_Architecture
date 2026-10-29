@@ -10620,10 +10620,10 @@ screens:
         label: Browse Files
         operation: createUpload
         bindsTo: MediaAsset.id
-        notes: Picks the files and uploads each to the asset library (`createUpload` for a signed URL, then
-          `completeUpload` when the transfer ends); analyseMediaAsset auto-tags what arrives.
-        provenance: 'pack Digital Asset Management DAM.pdf, page 6 §Support; a fileUpload since 29 October 2026
-          (CHG-R11FXU-010; the lead: "Make it file upload")'
+        notes: Picks the files and uploads each to the asset library (`createUpload` for a signed URL,
+          then `completeUpload` when the transfer ends); analyseMediaAsset auto-tags what arrives.
+        provenance: 'pack Digital Asset Management DAM.pdf, page 6 §Support; a fileUpload since 29 October
+          2026 (CHG-R11FXU-010; the lead: "Make it file upload")'
       - kind: secondaryButton
         label: Bulk Upload
         operation: completeUpload
@@ -11095,9 +11095,9 @@ screens:
         - MediaAsset.status
         - MediaAsset.createdAt
         operation: searchMedia
-        notes: '**What the search finds**, narrowed by the facets above: Asset Type sends `kind`, Venue `venueId`,
-          Collection `collectionId`. Cursor pagination, never offset. File Format and Owner have no search
-          parameter yet and narrow nothing.'
+        notes: '**What the search finds**, narrowed by the facets above: Asset Type sends `kind`, Venue
+          `venueId`, Collection `collectionId`. Cursor pagination, never offset. File Format and Owner
+          have no search parameter yet and narrow nothing.'
         provenance: 'design change 29 October 2026 (CHG-R11FXU-011; the lead: "Add a results table")'
   states:
     loading: The advanced search discovery list.

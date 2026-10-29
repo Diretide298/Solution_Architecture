@@ -27,7 +27,7 @@ servicesCalled:
 - service: MarketingService
   operationCalls: 73
 - service: VenueOpsService
-  operationCalls: 67
+  operationCalls: 66
 - service: AiService
   operationCalls: 14
 - service: CatalogueService
@@ -1592,7 +1592,6 @@ screens:
   density: compact
   operations:
   - getMediaUsageAnalytics
-  - searchMedia
   states:
   - emptyFirstRun
   - emptyNoAccess

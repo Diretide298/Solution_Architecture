@@ -558,25 +558,6 @@
   "requestBody": null,
   "responds": "AuthorisationPolicy"
  },
- "setConfigurationProfile": {
-  "method": "PUT",
-  "path": "/configuration-profiles/{profileId}",
-  "contract": "tenancy",
-  "summary": "What a class of workstation is configured to be",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ConfigurationProfile",
-  "responds": "ConfigurationProfile"
- },
  "setDenominations": {
   "method": "PUT",
   "path": "/denominations",

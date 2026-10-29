@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-728` | Outlet Management | B–D | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
 | `BO-729` | Create / Edit Outlet | B–D | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
 | `BO-730` | Outlet Types & Templates | C | 10 | 14 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-731` | Operating Hours & Service Periods | B | 16 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-731` | Operating Hours & Service Periods | B | 17 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-732` | POS & Device Assignment | B | 7 | 22 | 6 | 11 | 3 | 0 | — | notStarted (—) |
 | `BO-733` | Service Channel Configuration | C | 0 | 33 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 

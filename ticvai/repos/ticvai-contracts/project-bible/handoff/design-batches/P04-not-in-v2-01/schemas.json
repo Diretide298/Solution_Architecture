@@ -1383,7 +1383,8 @@
    "stationId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "description": "Not used for routing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). The item rule is `KitchenStation.menuItemIds`; `createFnbOrder` routes by it and the outlet's `KitchenRoutingRules`."
    },
    "menuSectionId": {
     "x-ticvai-references": "fnb.menu_section",
@@ -1833,6 +1834,20 @@
  "RotaAssignment": {
   "type": "object",
   "x-ticvai-persistence": "workforce.rota_assignment",
+  "x-ticvai-exclude": [
+   {
+    "equal": [
+     "principalId"
+    ],
+    "during": [
+     "startsAt",
+     "endsAt"
+    ],
+    "unless": {
+     "status": "cancelled"
+    }
+   }
+  ],
   "required": [
    "principalId",
    "venueId",
@@ -1856,7 +1871,7 @@
     "type": "boolean",
     "default": false,
     "readOnly": true,
-    "description": "**Flagged at assignment, not discovered at payroll.** A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a month later means it was worked.\n"
+    "description": "**Flagged at assignment, not discovered at payroll.** A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a month later means it was worked.\n\n**The limit is the venue's working-hour rule** (ADAM CR-334, option A, decided 29 October 2026): the `workforce.staffing_rules` row of the assignment's venue, read by `createRotaAssignment` and, after a move, by `updateRotaAssignment`. True when the person's assignments at that venue that are not `cancelled`, this one included, exceed any of its three limits: more than `maximumHoursPerDay` hours on one calendar day in the venue's time zone; more than `maximumHoursPerWeek` hours in any 7 consecutive days (a rolling window, not a calendar week) that include this assignment; or less than `minimumRestHours` between this assignment and the person's assignment just before or just after it. An assignment's hours are `endsAt` minus `startsAt`, less `breakMinutes`. A limit the venue has not set (null), or a venue with no staffing rules, is not checked, and the flag is false. Flagged, never refused: the assignment is stored and the manager sees the flag. The flag is this assignment's, set when it is written; the person's other assignments keep the flag they were written with.\n"
    },
    "labourCost": {
     "allOf": [

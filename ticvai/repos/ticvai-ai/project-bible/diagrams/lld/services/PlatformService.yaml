@@ -2787,6 +2787,12 @@ tables:
   writtenBy:
   - subscription
   foreignWriters: null
+- table: control.platform_approval_rule
+  columns: 5
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: control.platform_operator
   columns: 6
   store: postgres
@@ -2867,14 +2873,6 @@ tables:
   writtenBy:
   - platform-ops
   foreignWriters: null
-- table: control.seo_metadata
-  columns: 15
-  store: postgres
-  parent: null
-  writtenBy:
-  - marketing-crm
-  foreignWriters:
-  - marketing-crm
 - table: control.support_notice
   columns: 8
   store: postgres

@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 102 operations, 46 tables
+title: IdentityService — 103 operations, 48 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -10,14 +10,14 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 102
+  operations: 103
   inAFlow: 21
-  percent: 21%
+  percent: 20%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: identity
-  tables: 40
+  tables: 42
   stores:
   - postgres
   - redis
@@ -29,7 +29,7 @@ schemas:
   largestTable: pii.subject_biometric
 operationsByContract:
 - contract: identity
-  count: 102
+  count: 103
   operations:
   - operation: changeOwnCredential
     verb: POST
@@ -173,7 +173,7 @@ operationsByContract:
     scope: tenant
     permission: GUEST_VIEW_PII
     offline: false
-    reads: 7
+    reads: 3
     writes: 4
   - operation: forceLogout
     verb: POST
@@ -317,7 +317,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 4
+    reads: 5
     writes: 5
   - operation: guestUaePassLogin
     verb: POST
@@ -325,7 +325,7 @@ operationsByContract:
     scope: tenant
     permission: null
     offline: false
-    reads: 5
+    reads: 6
     writes: 6
   - operation: linkGuestCheckout
     verb: POST
@@ -341,7 +341,7 @@ operationsByContract:
     scope: venue
     permission: PERMISSION_VIEW
     offline: false
-    reads: 2
+    reads: 1
     writes: 0
   - operation: listAccessReviewCampaigns
     verb: GET
@@ -590,6 +590,14 @@ operationsByContract:
     permission: null
     offline: false
     reads: 1
+    writes: 2
+  - operation: recordSubjectDataExportPart
+    verb: POST
+    path: /guest-data-export-parts
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 2
     writes: 2
   - operation: refreshToken
     verb: POST
@@ -890,6 +898,7 @@ tables:
   - openPlatformStaffGrant
   - recordBenefitUsage
   - recordConsentIdentifier
+  - recordSubjectDataExportPart
   - refreshToken
   - registerGuest
   - removeMfaMethod
@@ -951,6 +960,7 @@ tables:
   - openPlatformStaffGrant
   - recordBenefitUsage
   - recordConsentIdentifier
+  - recordSubjectDataExportPart
   - refreshToken
   - registerGuest
   - removeMfaMethod
@@ -1199,6 +1209,12 @@ tables:
   - marketing-crm
   foreignWriters:
   - marketing-crm
+- table: identity.guest_upload_ref
+  columns: 6
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: identity.guest_verification_policy
   columns: 14
   store: postgres
@@ -1358,7 +1374,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.sso_provider
-  columns: 17
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -1368,6 +1384,13 @@ tables:
   columns: 9
   store: postgres
   parent: null
+  writtenBy:
+  - identity
+  foreignWriters: null
+- table: identity.subject_data_export_part
+  columns: 7
+  store: postgres
+  parent: identity.subject_data_export
   writtenBy:
   - identity
   foreignWriters: null
@@ -1427,10 +1450,6 @@ tables:
 readsFrom:
 - service: TenancyService
   operations: 7
-- service: MarketingService
-  operations: 1
-- service: VenueOpsService
-  operations: 1
 writesOutside:
 - service: TenancyService
   operations: 14

@@ -1,6 +1,6 @@
 # WS186 — Wallet Configuration Backend Structure v1.0 board 1
 
-**10 screens · 13 operations · 9 schemas · 3 permissions**
+**10 screens · 12 operations · 8 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -109,7 +109,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1083` | Wallet Command Center | C | 26 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1084` | Wallet Type Library | C | 30 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1085` | Wallet Creation & Provisioning Rules | C | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1086` | Wallet Ownership & Account Association | C | 6 | 0 | 6 | 16 | 1 | 6 | — | notStarted (—) |
+| `BO-1086` | Wallet Ownership & Account Association | C | 6 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1087` | Wallet Currency & Monetary Configuration | C | 16 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1088` | Credit & Balance Type Configuration | A | 30 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1089` | Wallet Feature Profile | C | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |

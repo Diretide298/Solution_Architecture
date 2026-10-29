@@ -11232,7 +11232,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; cloneSeatMap · setConfigurationProfile · getSeatMap · listConfigurationProfiles</div>
+          <div><b>OPERATIONS</b> &middot; cloneSeatMap · getSeatMap · listConfigurationProfiles</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; seatMapId&larr;navigation, profileId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-1061">BO-1061</a>  &mdash; <i>Back to Platform Command Center</i></div>
@@ -12885,7 +12885,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listQuoteBookingConversion · createGroupBooking · updateGroupBooking</div>
+          <div><b>OPERATIONS</b> &middot; listQuoteBookingConversion · createGroupBooking</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; groupBookingId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-264">BO-264</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -13160,7 +13160,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; groupBookingId&larr;navigation, orderId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-274">BO-274</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formUpdateGroupBooking &middot; <i>Increase Guest Count, Reduce Guest Count</i> &middot; <b>Save guest count</b> &middot; Cancel <span class="dis">discards expectedSize · confirmedSize</span></div></div>
         </div>
       </div>
       <div id="bo-282" class="scr" data-ws="WS28">
@@ -13370,7 +13370,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; templateId&larr;navigation, benefitId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-284">BO-284</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formCreateEntitlementTemplate &middot; <i>Create entitlement template</i> &middot; <b>Create template</b> &middot; Cancel <span class="dis">discards code · name · validityKind · expiryNoticeDays</span></div></div>
         </div>
       </div>
       <div id="bo-289" class="scr" data-ws="WS29">
@@ -14415,7 +14415,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setEventResourcePlan · createRotaAssignment · getEventResourcePlan · listRotaAssignments</div>
+          <div><b>OPERATIONS</b> &middot; setEventResourcePlan · getEventResourcePlan · listRotaAssignments</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; eventId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-710">BO-710</a>  &mdash; <i>Back to Event Resource Command Center</i> <span class="car">eventId</span></div>
@@ -16966,7 +16966,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getWallet · updateWalletType · setSharedWalletMembers · listSharedWallets</div>
+          <div><b>OPERATIONS</b> &middot; updateWalletType · setSharedWalletMembers · listSharedWallets</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;navigation, walletTypeId&larr;navigation, sharedWalletId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-1083">BO-1083</a>  &mdash; <i>Back to Wallet Command Center</i></div>
@@ -17176,7 +17176,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getWalletFundingRules · listWalletTransactions</div>
+          <div><b>OPERATIONS</b> &middot; getWalletFundingRules</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-100">BO-100</a>  &mdash; <i>Back to Venue Home</i><br><a href="#bo-1094">BO-1094</a>  &mdash; <i>Funding Method Configuration</i><br><a href="#bo-1095">BO-1095</a>  &mdash; <i>Top-Up Rule Configuration</i><br><a href="#bo-1096">BO-1096</a>  &mdash; <i>Channel &amp; Funding Source Mapping</i><br><a href="#bo-1097">BO-1097</a>  &mdash; <i>Auto-Reload Configuration</i><br><a href="#bo-1098">BO-1098</a>  &mdash; <i>Recurring Funding Schedule</i><br><a href="#bo-1099">BO-1099</a>  &mdash; <i>Funding Authorization &amp; Approval Rules</i><br><a href="#bo-1100">BO-1100</a>  &mdash; <i>Funding Reversal &amp; Correction Management</i> <span class="car">subjectId</span><br><a href="#bo-1101">BO-1101</a>  &mdash; <i>Funding Limits &amp; Velocity Controls</i><br><a href="#bo-1102">BO-1102</a>  &mdash; <i>Funding Transaction Audit &amp; Reconciliation</i> <span class="car">subjectId</span></div>
@@ -17236,7 +17236,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setWalletFundingRules · getWalletFundingRules</div>
+          <div><b>OPERATIONS</b> &middot; getWalletFundingRules</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1093">BO-1093</a>  &mdash; <i>Back to Funding Command Center</i></div>
@@ -17266,7 +17266,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setWalletFundingRules · getWalletFundingRules</div>
+          <div><b>OPERATIONS</b> &middot; getWalletFundingRules</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1093">BO-1093</a>  &mdash; <i>Back to Funding Command Center</i></div>
@@ -17296,7 +17296,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setWalletFundingRules · getWalletFundingRules</div>
+          <div><b>OPERATIONS</b> &middot; getWalletFundingRules</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1093">BO-1093</a>  &mdash; <i>Back to Funding Command Center</i></div>
@@ -17356,7 +17356,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setWalletFundingRules · getWalletFundingRules</div>
+          <div><b>OPERATIONS</b> &middot; getWalletFundingRules</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1093">BO-1093</a>  &mdash; <i>Back to Funding Command Center</i></div>
@@ -17416,7 +17416,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setWalletFundingRules · getWalletFundingRules</div>
+          <div><b>OPERATIONS</b> &middot; getWalletFundingRules</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-1093">BO-1093</a>  &mdash; <i>Back to Funding Command Center</i></div>
@@ -17441,7 +17441,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Takings</b><span>AED 62,480</span></div><div class="kpi"><b>Settled</b><span>18</span></div><div class="kpi"><b>Variance</b><span>AED 40</span></div><div class="kpi"><b>Open</b><span>3</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>The funding audit trail</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every movement on the wallet, the record the exception buttons above are checked against (r11 gate fix, CHG-R11FXS-003).</span></div></div></div>
             </div>
           </div>
         </div>
@@ -17866,7 +17866,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setSharedWalletMembers · transferWalletBalance · listSharedWallets · getWalletBalance</div>
+          <div><b>OPERATIONS</b> &middot; setSharedWalletMembers · listSharedWallets · getWalletBalance</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; sharedWalletId&larr;navigation, walletId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-1113">BO-1113</a>  &mdash; <i>Back to Shared Wallet Command Center</i> <span class="car">sharedWalletId</span></div>
@@ -18021,7 +18021,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; walletId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-1113">BO-1113</a>  &mdash; <i>Back to Shared Wallet Command Center</i></div>
           
-          
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formTransferWalletBalance &middot; <i>Transfer balance</i> &middot; <b>Transfer</b> &middot; Cancel <span class="dis">discards toWalletId · amount · message</span></div></div>
         </div>
       </div>
       <div id="bo-1122" class="scr" data-ws="WS189">
@@ -18796,7 +18796,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setWalletRefundPolicy · createRefund · getOrder · listOrderRefunds</div>
+          <div><b>OPERATIONS</b> &middot; createRefund · getOrder · listOrderRefunds</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; orderId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-1143">BO-1143</a>  &mdash; <i>Back to Wallet Operations Command Center</i></div>
@@ -20165,13 +20165,13 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div class="body">
             <div class="top">
               <div><h2>Software, Configuration &amp; Version Manage</h2>
-                <small>Venue Management &middot; wave 2 &middot; compact</small></div>
+                <small>Venue Management &middot; wave 1 &middot; compact</small></div>
               <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
             </div>
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Venue id</b><div class="chip">Venue id</div><span class="why">Sends `?venueId=` to `listWorkstations`.</span></div><div class="panel"><b>Sale board kind</b><div class="chip">Sale board kind</div><span class="why">Sends `?saleBoardKind=` to `listWorkstations`.</span></div><div class="panel"><b>Every workstation</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="side"><div class="panel"><b>Search software, configuration</b><div class="chip">Search software, configuration</div></div><div class="panel"><span class="kind">publishGate</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Declares `deployConfigurationProfile`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escala</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Venue id</b><div class="chip">Venue id</div><span class="why">Sends `?venueId=` to `listWorkstations`.</span></div><div class="panel"><b>Sale board kind</b><div class="chip">Sale board kind</div><span class="why">Sends `?saleBoardKind=` to `listWorkstations`.</span></div><div class="panel"><b>Every workstation</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div><div class="side"><div class="panel"><b>Firmware releases</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">The fleet view: every firmware or software release, newest first, and how many devices run it. Picking a row opens it in The selected firmware release (`getDeviceFirmware</span></div><div class="panel"><b>Search software, configuration</b><div class="chip">Search software, configuration</div></div></div></div>
             </div>
           </div>
         </div>
@@ -20181,7 +20181,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, profileId&larr;deepLink, workstationId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-037">BO-037</a>  &mdash; <i>Each device&#x27;s cached package is checked</i> <span class="car">version</span><br><a href="#bo-108">BO-108</a>  &mdash; <i>Venue Operations</i><br><a href="#bo-124">BO-124</a>  &mdash; <i>Its sale board layout is built</i> <span class="car">deviceId · profileId</span><br><a href="#bo-130">BO-130</a>  &mdash; <i>Offline Policy &amp; Rules Configuration</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetConfigurationProfile &middot; <i>Save configuration profile</i> &middot; <b>Save configuration profile</b> &middot; Cancel <span class="dis">discards name · venueKindScope · scopePath · settings</span></div><div class="ov"><b>modal</b> formDeployConfigurationProfile &middot; <i>Deploy configuration profile</i> &middot; <b>Deploy configuration profile</b> &middot; Cancel <span class="dis">discards targetWorkstationIds · targetFilter · strategy</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetConfigurationProfile &middot; <i>Save configuration profile</i> &middot; <b>Save configuration profile</b> &middot; Cancel <span class="dis">discards name · venueKindScope · scopePath · settings</span></div><div class="ov"><b>modal</b> formDeployConfigurationProfile &middot; <i>Deploy configuration profile</i> &middot; <b>Deploy configuration profile</b> &middot; Cancel <span class="dis">discards targetWorkstationIds · targetFilter · strategy</span></div><div class="ov"><b>modal</b> formCreateDeviceFirmware &middot; <i>Register firmware release</i> &middot; <b>Register release</b> &middot; Cancel <span class="dis">discards deviceKind · version · vendor · artefactAssetId · checksum · checksumAlgorithm · minimumPreviousVersion · releaseNotes</span></div></div>
         </div>
       </div>
       <div id="bo-130" class="scr">
@@ -22842,7 +22842,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Account and balance</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The guest&#x27;s wallet as the screen opens on it, every kind of value it holds (r11 gate fix, CHG-R11FXS-003).</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
@@ -22872,12 +22872,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Save wallet funding rules</b><div class="chip cta">Save wallet funding rules</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>How a wallet may be topped up</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>How a wallet may be topped up</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setWalletFundingRules · getWalletFundingRules</div>
+          <div><b>OPERATIONS</b> &middot; getWalletFundingRules</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-414">BO-414</a>  &mdash; <i>Back to Wallet &amp; Credit Management Dashboard</i></div>
@@ -22902,12 +22902,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Save wallet funding rules</b><div class="chip cta">Save wallet funding rules</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><b>How a wallet may be topped up</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>How a wallet may be topped up</b><div class="rows"><div class="bar"><i style="width:64%"></i></div></div></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setWalletFundingRules · getWalletFundingRules</div>
+          <div><b>OPERATIONS</b> &middot; getWalletFundingRules</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-414">BO-414</a>  &mdash; <i>Back to Wallet &amp; Credit Management Dashboard</i></div>
@@ -29027,7 +29027,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createRotaAssignment · listRotaAssignments · getStaffingCoverage · listAttendance</div>
+          <div><b>OPERATIONS</b> &middot; listRotaAssignments · getStaffingCoverage · listAttendance</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-883">BO-883</a>  &mdash; <i>Back to Workforce Roster Command Center</i></div>
@@ -30017,7 +30017,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createRotaAssignment</div>
+          <div><b>OPERATIONS</b> &middot; none declared</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-913">BO-913</a>  &mdash; <i>Back to Event Resource Planning Command Cent</i></div>
@@ -31337,7 +31337,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; configureWorkstation</div>
+          <div><b>OPERATIONS</b> &middot; none declared</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-595">BO-595</a>  &mdash; <i>Back to AI Setup Command Center</i></div>
@@ -32142,12 +32142,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Save guest preferences</b><div class="chip cta">Save guest preferences</div><span class="why">The act the screen exists for.</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div><div class="side"><div class="panel"><b>Family and guardians</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">One record, read-only.</span></div><div class="panel"><b>Family and guardians</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; updateGuestPreferences · getGuestProfile · getGuestRelationships · setGuestRelationships</div>
+          <div><b>OPERATIONS</b> &middot; getGuestProfile · getGuestRelationships · setGuestRelationships</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; subjectId&larr;navigation, guestId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#bo-734">BO-734</a>  &mdash; <i>Back to CRM Command Center</i></div>
@@ -32352,12 +32352,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Save consent purposes</b><div class="chip cta">Save consent purposes</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div><div class="side"><div class="panel"><b>Consent forms</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Consent-form builder in Venue Management (decided 2 October 2026 by Chinmay, DEC-549; CHG-CSA-026):** the existing form builder extended to `consentForm` forms (biometr</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue&#x27;s busiest hour is a list that skips rows.</span></div><div class="panel"><b>Consent forms</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Consent-form builder in Venue Management (decided 2 October 2026 by Chinmay, DEC-549; CHG-CSA-026):** the existing form builder extended to `consentForm` forms (biometr</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listConsentPurposes · setConsentPurposes · createForm · listForms</div>
+          <div><b>OPERATIONS</b> &middot; listConsentPurposes · createForm · listForms</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-744">BO-744</a>  &mdash; <i>Back to Data Governance Center</i></div>
@@ -35022,12 +35022,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Save brand identity</b><div class="chip cta">Save brand identity</div><span class="why">The act the screen exists for.</span></div><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setBrandIdentity</div>
+          <div><b>OPERATIONS</b> &middot; none declared</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#bo-834">BO-834</a>  &mdash; <i>Back to Digital Experience Center</i></div>
@@ -43517,9 +43517,9 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getDeviceTelemetry · createWorkOrder · listDeviceFirmware · getDeviceFirmware +1</div>
+          <div><b>OPERATIONS</b> &middot; getDeviceTelemetry · createWorkOrder</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; deviceId&larr;session, firmwareId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; deviceId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-579">ADM-579</a>  &mdash; <i>Back to Terminal &amp; Card-Present Command Cent</i></div>
           
           
@@ -43967,7 +43967,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listB2bCreditAccounts · createB2bCreditAccount</div>
+          <div><b>OPERATIONS</b> &middot; createB2bCreditAccount</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-599">ADM-599</a>  &mdash; <i>Back to Mixed Tender &amp; Credit Command Center</i><br><a href="#adm-603">ADM-603</a>  &mdash; <i>B2B Invoice, On-Account &amp; Payment Terms Conf</i> <span class="car">accountId</span></div>
@@ -44262,12 +44262,12 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><b>Cancel</b><div class="chip">Cancel</div><span class="why">**A screen that can submit must be leaveable without submitting.**</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setWalletRefundPolicy</div>
+          <div><b>OPERATIONS</b> &middot; none declared</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-609">ADM-609</a>  &mdash; <i>Back to Refund &amp; Payment Adjustment Command </i></div>
@@ -52787,10 +52787,10 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; searchMedia · getMediaUsageAnalytics</div>
+          <div><b>OPERATIONS</b> &middot; getMediaUsageAnalytics</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
-          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Back to Tenant Workspace</i><br><a href="#cms-062">CMS-062</a>  &mdash; <i>Central Digital Asset Library</i><br><a href="#cms-063">CMS-063</a>  &mdash; <i>Upload &amp; Asset Ingestion Workspace</i> <span class="car">assetId</span><br><a href="#cms-064">CMS-064</a>  &mdash; <i>Folder, Collection &amp; Workspace Management</i><br><a href="#cms-065">CMS-065</a>  &mdash; <i>Metadata &amp; Taxonomy Management</i><br><a href="#cms-066">CMS-066</a>  &mdash; <i>Tags, Keywords &amp; Classification</i> <span class="car">assetId</span><br><a href="#cms-067">CMS-067</a>  &mdash; <i>Advanced Search &amp; Discovery</i><br><a href="#cms-068">CMS-068</a>  &mdash; <i>Digital Asset 360° Profile</i> <span class="car">assetId</span><br><a href="#cms-069">CMS-069</a>  &mdash; <i>Bulk Asset Management Workspace</i><br><a href="#cms-070">CMS-070</a>  &mdash; <i>Asset Activity, Recent Assets &amp; Library Heal</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Back to Tenant Workspace</i><br><a href="#cms-062">CMS-062</a>  &mdash; <i>Central Digital Asset Library</i><br><a href="#cms-063">CMS-063</a>  &mdash; <i>Upload &amp; Asset Ingestion Workspace</i><br><a href="#cms-064">CMS-064</a>  &mdash; <i>Folder, Collection &amp; Workspace Management</i><br><a href="#cms-065">CMS-065</a>  &mdash; <i>Metadata &amp; Taxonomy Management</i><br><a href="#cms-066">CMS-066</a>  &mdash; <i>Tags, Keywords &amp; Classification</i><br><a href="#cms-067">CMS-067</a>  &mdash; <i>Advanced Search &amp; Discovery</i><br><a href="#cms-068">CMS-068</a>  &mdash; <i>Digital Asset 360° Profile</i><br><a href="#cms-069">CMS-069</a>  &mdash; <i>Bulk Asset Management Workspace</i><br><a href="#cms-070">CMS-070</a>  &mdash; <i>Asset Activity, Recent Assets &amp; Library Heal</i></div>
           
           
         </div>
@@ -52962,7 +52962,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
             
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>Total</b><span>1,248</span></div><div class="kpi"><b>Active</b><span>978</span></div><div class="kpi"><b>Attention</b><span>142</span></div><div class="kpi"><b>Offline</b><span>12</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Implied by the split template — not declared on the screen.</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Matching assets</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**What the search finds**, narrowed by the facets above: Asset Type sends `kind`, Venue `venueId`, Collection `collectionId`. Cursor pagination, never offset. File Format</span></div></div></div>
             </div>
           </div>
         </div>

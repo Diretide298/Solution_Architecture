@@ -1,6 +1,6 @@
 # P02-account-self-service-02 — P02 · Account & Self-Service (2 of 2)
 
-**4 screens · 30 operations · 51 schemas · 8 permissions**
+**4 screens · 30 operations · 52 schemas · 8 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·

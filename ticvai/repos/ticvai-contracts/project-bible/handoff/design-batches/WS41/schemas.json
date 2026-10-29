@@ -428,6 +428,7 @@
   "description": "`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."
  },
  "CookieBannerPreferenceCenterDesignerView": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "marketing.cookie_banner_design",
   "description": "One version of a cookie banner and preference-centre design (pack 17.1.6).",
@@ -611,7 +612,8 @@
    "noticeVersion": {
     "type": "string",
     "readOnly": true,
-    "description": "Moves with the cookie policy (white-label `setPolicy`, kind `cookie`)."
+    "nullable": true,
+    "description": "Moves with the cookie policy (white-label `setPolicy`, kind `cookie`). **Null on a draft**; `approvePrivacyTesting` sets it when it publishes the version (ADAM CR-314)."
    },
    "version": {
     "type": "integer",
@@ -948,6 +950,7 @@
   }
  },
  "CookieTrackingDigitalTechnologyRegistryView": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "marketing.tracking_technology",
   "description": "One governed tracking technology (pack 17.1.5 Registry Fields; BL-073 §4a).",

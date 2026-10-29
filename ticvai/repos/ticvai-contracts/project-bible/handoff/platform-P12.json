@@ -82,11 +82,11 @@
    "operations": 2
   },
   {
-   "contract": "orders",
+   "contract": "white-label",
    "operations": 1
   },
   {
-   "contract": "white-label",
+   "contract": "orders",
    "operations": 1
   },
   {

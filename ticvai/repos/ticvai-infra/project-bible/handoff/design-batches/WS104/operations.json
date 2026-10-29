@@ -1,23 +1,4 @@
 {
- "configureWorkstation": {
-  "method": "PUT",
-  "path": "/workstations/{workstationId}",
-  "contract": "tenancy",
-  "summary": "Configure a workstation",
-  "permission": "WORKSTATION_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "ConfigureWorkstationRequest",
-  "responds": "Workstation"
- },
  "decideProposedAction": {
   "method": "POST",
   "path": "/proposed-actions/{actionId}/decide",

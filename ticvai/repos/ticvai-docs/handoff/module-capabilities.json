@@ -1376,7 +1376,7 @@
   "identity": {
    "title": "19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth",
    "capabilityCount": 12,
-   "unguardedOperations": 39,
+   "unguardedOperations": 40,
    "capabilities": [
     {
      "key": "AUDIT_VIEW",
@@ -1872,7 +1872,7 @@
   "marketing-crm": {
    "title": "22 — Marketing & CRM",
    "capabilityCount": 16,
-   "unguardedOperations": 30,
+   "unguardedOperations": 31,
    "capabilities": [
     {
      "key": "AI_CONFIGURE",
@@ -3945,9 +3945,10 @@
      "key": "PRODUCT_CONFIGURE",
      "label": null,
      "group": "Catalogue",
-     "operationCount": 1,
+     "operationCount": 2,
      "operations": [
-      "setVisitPlanPreset"
+      "setVisitPlanPreset",
+      "setVisitPlannerQuestions"
      ],
      "elevated": false,
      "segregationConstrained": false

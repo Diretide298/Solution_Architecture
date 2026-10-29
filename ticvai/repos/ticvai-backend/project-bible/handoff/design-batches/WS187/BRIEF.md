@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1093` | Funding Command Center | C | 28 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-1093` | Funding Command Center | C | 28 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1094` | Funding Method Configuration | A | 38 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1095` | Top-Up Rule Configuration | C | 23 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-1096` | Channel & Funding Source Mapping | C | 20 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1097` | Auto-Reload Configuration | C | 18 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1098` | Recurring Funding Schedule | C | 17 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1098` | Recurring Funding Schedule | C | 48 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1099` | Funding Authorization & Approval Rules | C | 21 | 20 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 | `BO-1100` | Funding Reversal & Correction Management | C | 12 | 19 | 6 | 28 | 1 | 0 | — | notStarted (—) |
 | `BO-1101` | Funding Limits & Velocity Controls | C | 30 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1102` | Funding Transaction Audit & Reconciliation | C | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-1102` | Funding Transaction Audit & Reconciliation | C | 0 | 7 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 
 ## Design inputs from the client meetings
 

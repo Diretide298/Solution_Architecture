@@ -7,7 +7,7 @@
   "permission": "GUEST_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "brand",
   "parameters": [
    {
     "name": null,
@@ -482,7 +482,7 @@
   "permission": "GUEST_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "brand",
   "parameters": [
    {
     "name": "bannerDesignId",
@@ -597,7 +597,7 @@
   "permission": "GUEST_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": "technologyId",

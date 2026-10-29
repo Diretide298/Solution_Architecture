@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 73 of 280 |
+| Operations in the slice | 75 of 281 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -25,7 +25,7 @@
 | [CatalogueService](CatalogueService.md) | `catalogue.event`, `catalogue.performance`, `catalogue.price`, `catalogue.price_assignment`, `catalogue.price_list`, `catalogue.product`, `catalogue.product_media`, `catalogue.variant`, `promotions.promotion` |
 | [IdentityService](IdentityService.md) | `identity.principal`, `pii.subject` |
 | [OrderService](OrderService.md) | `orders.invitation` |
-| [PlatformService](PlatformService.md) | `control.seo_metadata`, `control.url_redirect` |
+| [PlatformService](PlatformService.md) | `control.url_redirect` |
 | [VenueOpsService](VenueOpsService.md) | `venuemap.point` |
 
 ## Operations in the first release
@@ -36,6 +36,7 @@
 | campaign | [`launchCampaign`](#launchcampaign) | POST | `/campaigns/{campaignId}/launch` | setup | 1 | BO-766 |
 | campaign | [`stopCampaign`](#stopcampaign) | POST | `/campaigns/{campaignId}/stop` | setup | 1 |  |
 | campaign | [`updateCampaign`](#updatecampaign) | PATCH | `/campaigns/{campaignId}` | setup | 1 | BO-767, BO-768, BO-769, BO-772 |
+| consent | [`approvePrivacyTesting`](#approveprivacytesting) | PUT | `/privacy-testing` | setup | 1 | CMS-030 |
 | consent | [`claimDeviceConsent`](#claimdeviceconsent) | POST | `/guests/{subjectId}/consents/claim-device` | core | 1 | GST-042, WEB-016 |
 | consent | [`createConsentQuestion`](#createconsentquestion) | POST | `/consent-questions` | core | 1 | CMS-018 |
 | consent | [`getCookieConsentRuntime`](#getcookieconsentruntime) | GET | `/storefront/cookie-consent` | core | 1 | GST-001, WEB-001 |
@@ -45,11 +46,12 @@
 | consent | [`listConsentQuestions`](#listconsentquestions) | GET | `/consent-questions` | core | 1 | BO-008, CMS-018, CMS-103 |
 | consent | [`recordConsent`](#recordconsent) | POST | `/guests/{subjectId}/consents` | core | 1 | BO-748, GST-039, GST-065, GST-066, POS-027, WEB-020 … |
 | consent | [`recordConsentAnswers`](#recordconsentanswers) | POST | `/consent-answers` | core | 1 | GST-007, WEB-006, WEB-011 |
-| consent | [`setConsentPurposes`](#setconsentpurposes) | PUT | `/consent-purposes` | core | 1 | BO-747, CMS-018, CMS-023 |
+| consent | [`setConsentPurposes`](#setconsentpurposes) | PUT | `/consent-purposes` | core | 1 | CMS-018, CMS-023 |
 | consent | [`setCookieBannerDesign`](#setcookiebannerdesign) | PUT | `/cookie-banner-preference/{bannerDesignId}` | setup | 1 | CMS-026 |
 | consent | [`setDynamicFieldQuestion`](#setdynamicfieldquestion) | PUT | `/dynamic-field-question/{formId}/{key}` | setup | 1 |  |
 | consent | [`setTrackingTechnology`](#settrackingtechnology) | PUT | `/cookie-tracking-digital/{technologyId}` | setup | 1 | CMS-025 |
 | consent | [`updateConsentQuestion`](#updateconsentquestion) | PATCH | `/consent-questions/{questionId}` | core | 1 | CMS-018 |
+| consent | [`writeSubjectDataExportPart`](#writesubjectdataexportpart) | POST | `/subject-data-export-parts` | core | 1 |  |
 | feedback | [`submitReview`](#submitreview) | POST | `/reviews` | core | 1 | GST-035, WEB-026 |
 | guest | [`addToWishlist`](#addtowishlist) | POST | `/guests/{subjectId}/wishlist` | core | 1 | GST-020, WEB-009 |
 | guest | [`getWishlist`](#getwishlist) | GET | `/guests/{subjectId}/wishlist` | core | 1 | GST-020, WEB-009, WEB-017, WEB-024 |
@@ -97,7 +99,7 @@
 | marketing | [`setMarketingSubscription`](#setmarketingsubscription) | PUT | `/marketing-subscriptions` | core | 1 | GST-065, WEB-027 |
 | marketing | [`setSeoMetadata`](#setseometadata) | PUT | `/seo-metadata` | core | 1 | BO-842, CMS-013 |
 | marketing | [`submitForm`](#submitform) | POST | `/form-submissions` | core | 1 | GST-035, WEB-026 |
-| marketing | [`updateGuestPreferences`](#updateguestpreferences) | PUT | `/guests/{subjectId}/preferences` | core | 1 | BO-740, WEB-020 |
+| marketing | [`updateGuestPreferences`](#updateguestpreferences) | PUT | `/guests/{subjectId}/preferences` | core | 1 | WEB-020 |
 | marketing | [`updateMyProfile`](#updatemyprofile) | PATCH | `/guests/me/profile` | core | 1 | GST-039, GST-043, WEB-011, WEB-020 |
 | marketing | [`uploadGuestDocument`](#uploadguestdocument) | POST | `/guest-documents` | setup | 1 |  |
 | message | [`createMessageTemplate`](#createmessagetemplate) | POST | `/message-templates` | setup | 1 | BO-785, BO-786, BO-787, SUP-007 |
@@ -554,6 +556,104 @@ the shapes `createCampaign` takes. While the campaign is a draft both may change
 
 ## Group: consent
 
+### approvePrivacyTesting
+
+**`PUT /privacy-testing`**: Privacy Configuration Testing, Approval & Publication
+
+**The gate every privacy configuration change passes before it reaches a live journey.** One change set (drafts of consent purposes, capture points, preference categories, cookie banners, age rules or notices) moves through `action`: `simulate` runs a scenario (country, brand, channel, age, status, existing consents) and returns what the guest would see, changing nothing; `validate` runs the pack's checks (missing policy, consent mapping, language, processing purpose or guardian rule, conflicting rules, invalid dates, unmapped tracking technology, unpublished or circular dependency); `submit` opens an approvals request (`approvals.createApprovalRequest`, the workflow is the tenant's matrix, not job titles); `publish` publishes now or at `publishAt` to the selected brands, countries and channels, and is refused (409) until validation passes and the approval is granted; `rollback` restores the previous approved version and keeps the history. Every action is audited with who, before/after, when, reason, test result, approval and publication. AI review findings are advice; a human approves. Upsert keyed on `changeSetId`. (decided 29 September, readiness close-out)
+
+**Publishing a cookie banner design sets its `noticeVersion`**, which is null while it is a draft (ADAM CR-314, 29 October 2026).
+
+**At the owner's level** (the lead's ruling on ADAM CR-314, 29 October 2026: "Scan + approval at owner level"): this runs at brand level, as `setCookieBannerDesign` does, so publishing writes the brand's `marketing.cookie_banner_design` row (its `status` and the `noticeVersion` it sets) with a grant at that brand or above.
+
+|  |  |
+|---|---|
+| Permission | `GUEST_MANAGE` |
+| Scope level | brand |
+| Part of slice | setup, changes rows of `marketing.cookie_banner_design` that another operation creates |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `cache:idempotency`, `marketing.privacy_change_set` |
+| Writes | `cache:idempotency`, `marketing.cookie_banner_design`, `marketing.privacy_change_set` |
+| Called by | CMS-030 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**: `PrivacyConfigurationTestingApprovalPublicationInput`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| changeSetId | string (uuid) |  | Null on the first action, which opens a change set. (nullable) |
+| action | enum (simulate, validate, submit, publish, rollback) | yes |  |
+| items | array of object |  | The draft versions in the change set. |
+| items[].configurationType | enum (processingPurpose, consentPurpose, communicationPreference, capturePoint, cookieBanner, trackingTechnology, minorPrivacyRule, privacyNotice) | yes |  |
+| items[].configurationId | string (uuid) | yes |  |
+| items[].version | integer |  | (min 1) |
+| scenario | object |  | For simulate (the pack's Test Inputs). |
+| scenario.country | string |  | (pattern ^[A-Z]{2}$) |
+| scenario.brandId | string (uuid) |  | (nullable) |
+| scenario.channel | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) |  | checkout (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders checkoutCart marketingConsents[] and recorded by recordCheckoutConsents, bound to the order and the v… |
+| scenario.capturePoint | string |  | (nullable) |
+| scenario.customerAge | integer |  | (min 0; nullable) |
+| scenario.customerStatus | enum (new, returning, member) |  |  |
+| scenario.productId | string (uuid) |  | (nullable) |
+| scenario.existingConsents | array of ConsentPurpose: enum (marketing, personalisation, profiling, thirdPartySharing, aiProcessing, transactional, storedPaymentCredential, facePassEnrolment) |  |  |
+| scenario.acceptedPolicyVersions | array of string |  |  |
+| scenario.language | string |  | (max length 10) |
+| publishAt | string (date-time) |  | For publish; null publishes now. (nullable) |
+| target | object |  | For publish; an empty list means all. |
+| target.brandIds | array of string (uuid) |  |  |
+| target.countries | array of string |  |  |
+| target.channels | array of ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) |  |  |
+| reason | string |  | Required for submit, publish and rollback. (max length 1000) |
+
+**Response**: `PrivacyConfigurationTestingApprovalPublicationView`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| changeSetId | string (uuid) | yes | (read-only) |
+| status | enum (draft, validated, submitted, approved, scheduled, published, rolledBack, rejected) | yes |  |
+| items | array of object |  |  |
+| items[].configurationType | string |  |  |
+| items[].configurationId | string (uuid) |  |  |
+| items[].version | integer |  |  |
+| validationIssues | array of object |  |  |
+| validationIssues[].code | enum (missingPolicy, missingConsentMapping, missingLanguage, conflictingConsentRules, missingProcessingPurpose, invalidEffectiveDates, unmappedTrackingTechnology, missingGuardianRule, …) | yes |  |
+| validationIssues[].configurationId | string (uuid) |  | (nullable) |
+| validationIssues[].message | string |  |  |
+| simulation | array of object |  | What the scenario's guest would be shown, step by step (from simulate; not stored). |
+| simulation[].item | string | yes | e.g. |
+| simulation[].outcome | enum (display, consentRequired, optional, noConsentRequired, notApplicable, guardianFlow) | yes |  |
+| simulation[].lawfulBasis | string |  | (nullable) |
+| approvalRequestId | string |  | The approvals-engine request, once submitted. (nullable) |
+| publishAt | string (date-time) |  | (nullable) |
+| publishedAt | string (date-time) |  | (nullable) |
+| audit | array of object |  |  |
+| audit[].action | string | yes |  |
+| audit[].byPrincipalId | string (uuid) | yes |  |
+| audit[].at | string (date-time) | yes |  |
+| audit[].reason | string |  | (nullable) |
+| audit[].before | object |  | (nullable) |
+| audit[].after | object |  | (nullable) |
+| scopePath | string |  | The partition key (ADR-0005). (read-only) |
+| updatedAt | string (date-time) |  | (read-only) |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The change set after the action |
+| 400 | BadRequest | Validation failed |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 | Conflict | Idempotency conflict or optimistic concurrency failure. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### claimDeviceConsent
 
 **`POST /guests/{subjectId}/consents/claim-device`**: Attach a browser's cookie decision to the guest who turned out to own it
@@ -729,7 +829,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 | banner.languages | array of string | yes | Every language the storefront serves; Arabic renders right to left. (min items 1) |
 | banner.regulatoryRegimes | array of enum (gdpr, ePrivacy, ccpaCpra, lgpd, uaePdpl, saudiPdpl) |  | 2.6.60 (29 September, build). |
 | banner.recordIpAddress | boolean |  | 2.6.55, "if legally permitted" (29 September, build). (default False) |
-| banner.noticeVersion | string |  | Moves with the cookie policy (white-label setPolicy, kind cookie). (read-only) |
+| banner.noticeVersion | string |  | Moves with the cookie policy (white-label setPolicy, kind cookie). (read-only; nullable) |
 | banner.version | integer |  | (min 1; read-only) |
 | banner.status | enum (draft, published, superseded) |  | (read-only) |
 | banner.scopePath | string |  | The partition key (ADR-0005). (read-only) |
@@ -1158,7 +1258,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.consent_purpose`, `marketing.consent_purpose_channel` |
 | Writes | `cache:idempotency`, `cache:resolution`, `marketing.consent_purpose`, `marketing.consent_purpose_channel` |
-| Called by | BO-747, CMS-018, CMS-023 |
+| Called by | CMS-018, CMS-023 |
 
 **Parameters**
 
@@ -1193,10 +1293,12 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 **An upsert keyed on `brandId` + `channel` that always writes a new version** (the pack: banner wording and configuration must be version controlled). Saved as `draft`; publishing goes through `approvePrivacyTesting`. `rejectIsOneClick: false`, a non-essential category with `defaultOn: true` or a missing `strictlyNecessary` description is refused (422), and so is a design whose `regulatoryRegimes` include `ccpaCpra` with no `doNotSellOrShare` button (29 September, build). The published version is what visitors get from `getCookieConsentRuntime` and decide against with `recordDeviceConsent`. (decided 29 September, readiness close-out)
 
+**Written at its brand's node** (ADAM CR-314, option C, one decision with `setTrackingTechnology`, 29 October 2026): a design's row is at the path of the brand `brandId` names, and the corporate design (`brandId` null) at the tenant root, so the upsert key holds once per brand and channel; writing it needs `GUEST_MANAGE` at that node or above (the tenant, for the corporate design). The table reads beneath (`x-ticvai-rls: read-beneath`), so every venue's staff and storefront read their brand's banner and the corporate one. A draft's `noticeVersion` is null; `approvePrivacyTesting` sets it when it publishes the version.
+
 |  |  |
 |---|---|
 | Permission | `GUEST_MANAGE` |
-| Scope level | venue |
+| Scope level | brand |
 | Part of slice | setup, makes `marketing.cookie_banner_design` non-empty |
 | Wave | 1 |
 | Offline | no |
@@ -1240,7 +1342,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 | languages | array of string | yes | Every language the storefront serves; Arabic renders right to left. (min items 1) |
 | regulatoryRegimes | array of enum (gdpr, ePrivacy, ccpaCpra, lgpd, uaePdpl, saudiPdpl) |  | 2.6.60 (29 September, build). |
 | recordIpAddress | boolean |  | 2.6.55, "if legally permitted" (29 September, build). (default False) |
-| noticeVersion | string |  | Moves with the cookie policy (white-label setPolicy, kind cookie). (read-only) |
+| noticeVersion | string |  | Moves with the cookie policy (white-label setPolicy, kind cookie). (read-only; nullable) |
 | version | integer |  | (min 1; read-only) |
 | status | enum (draft, published, superseded) |  | (read-only) |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
@@ -1273,7 +1375,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 | languages | array of string | yes | Every language the storefront serves; Arabic renders right to left. (min items 1) |
 | regulatoryRegimes | array of enum (gdpr, ePrivacy, ccpaCpra, lgpd, uaePdpl, saudiPdpl) |  | 2.6.60 (29 September, build). |
 | recordIpAddress | boolean |  | 2.6.55, "if legally permitted" (29 September, build). (default False) |
-| noticeVersion | string |  | Moves with the cookie policy (white-label setPolicy, kind cookie). (read-only) |
+| noticeVersion | string |  | Moves with the cookie policy (white-label setPolicy, kind cookie). (read-only; nullable) |
 | version | integer |  | (min 1; read-only) |
 | status | enum (draft, published, superseded) |  | (read-only) |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
@@ -1328,10 +1430,10 @@ Each purpose names the channels it covers, whether it is required for service, a
 | fieldType | enum (shortText, longText, number, date, yesNo, checkbox, singleSelect, multiSelect, …) | yes |  |
 | standardField | enum (participantName, dateOfBirth, customerId, bookingReference, ticketNumber, guardianName, guardianRelationship, emergencyContact) |  | Set when the field is one of the reusable standard fields. (nullable) |
 | requirement | enum (required, optional, conditional, readOnly, autoPopulated) | yes | conditional needs conditions; autoPopulated and readOnly need mapsTo. |
-| options | array of object |  | The allowed values of a select, dropdown or multi-select field. |
+| options | array of object |  | The allowed values of a select, dropdown or multi-select field, each with the label a guest reads. |
 | options[].value | string | yes | (max length 100) |
 | options[].label | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
-| validation | object |  | (nullable) |
+| validation | object |  | Which members each fieldType accepts (ADAM CR-313, option A): minimum and maximum a number field; dateFrom and dateTo a date field; pattern and maxLength a shortText, longText, email, mobile or addre… (nullable) |
 | validation.minimum | number |  | (nullable) |
 | validation.maximum | number |  | (nullable) |
 | validation.dateFrom | string (date) |  | (nullable) |
@@ -1361,10 +1463,10 @@ Each purpose names the channels it covers, whether it is required for service, a
 | fieldType | enum (shortText, longText, number, date, yesNo, checkbox, singleSelect, multiSelect, …) | yes |  |
 | standardField | enum (participantName, dateOfBirth, customerId, bookingReference, ticketNumber, guardianName, guardianRelationship, emergencyContact) |  | Set when the field is one of the reusable standard fields. (nullable) |
 | requirement | enum (required, optional, conditional, readOnly, autoPopulated) | yes | conditional needs conditions; autoPopulated and readOnly need mapsTo. |
-| options | array of object |  | The allowed values of a select, dropdown or multi-select field. |
+| options | array of object |  | The allowed values of a select, dropdown or multi-select field, each with the label a guest reads. |
 | options[].value | string | yes | (max length 100) |
 | options[].label | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
-| validation | object |  | (nullable) |
+| validation | object |  | Which members each fieldType accepts (ADAM CR-313, option A): minimum and maximum a number field; dateFrom and dateTo a date field; pattern and maxLength a shortText, longText, email, mobile or addre… (nullable) |
 | validation.minimum | number |  | (nullable) |
 | validation.maximum | number |  | (nullable) |
 | validation.dateFrom | string (date) |  | (nullable) |
@@ -1399,10 +1501,12 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 **An upsert keyed on `name` + `provider` + `domainApplication`.** Approving a `detected` technology requires a `category`; `consentRequired` cannot be false for anything but `strictlyNecessary` (422). Retired rather than deleted: the registry is evidence of what a site did on a date. (decided 29 September, readiness close-out)
 
+**One registry per tenant, written at the tenant root** (ADAM CR-314, option C, one decision with `setCookieBannerDesign`, 29 October 2026): a technology's row is at the tenant's root path, once for the tenant, so the upsert key holds across its venues; writing it needs `GUEST_MANAGE` at the tenant. The table reads beneath (`x-ticvai-rls: read-beneath`), so every venue's staff and storefront read the tenant's registry.
+
 |  |  |
 |---|---|
 | Permission | `GUEST_MANAGE` |
-| Scope level | venue |
+| Scope level | tenant |
 | Part of slice | setup, makes `marketing.tracking_technology` non-empty |
 | Wave | 1 |
 | Offline | no |
@@ -1545,6 +1649,61 @@ Each purpose names the channels it covers, whether it is required for service, a
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### writeSubjectDataExportPart
+
+**`POST /subject-data-export-parts`**: Write Marketing's part of a guest's data export
+
+**The `identity.privacyRequestRaised` consumer that writes Marketing's part of a guest's data export** (the lead, 29 October 2026, r11 gate; CHG-R11FXC-005). Identity is Foundation and reads nothing above it (ADR-0028), so `exportSubjectData` no longer reads Marketing's tables: Marketing, which owns them, writes its own part and Identity's export job assembles the parts. Modelled as an operation so it has lineage and a ticket.
+
+**What it writes.** For `requestType` `access` only (an erasure writes no part): every row of the guest (`subjectId`) in marketing.consent_record, marketing.guest_profile, marketing.form_submission and marketing.guest_document, the tables of Marketing's that `handoff/subject-data-register.json` lists, in the export's `format`, as one object in the tenant's private storage (never a public or CDN path; encrypted at rest under the tenant's keys, ADR-0063). **Another guest's rows are left out even where they share a form or a document**, as `exportSubjectData` says. Then it publishes `marketing.subjectDataPartWritten` with the object's key, in the same transaction as its inbox record. A guest with no Marketing rows still gets a part, with `rowCount` 0, so the export job never waits for a part that will not come.
+
+**When.** On the event, which `exportSubjectData` raises with the request: the part is the guest's Marketing data as of the request. It is not delivered until the export is approved; the export job deletes it with the export (7 days after `readyAt`, or when the request is rejected, withdrawn or expired).
+
+**Idempotent on `approvalRequestId`**: a redelivered event finds the part already written and returns it. Invoked by the event relay, never by a screen.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | append |
+| Reads | `cache:idempotency`, `marketing.consent_record`, `marketing.form_submission`, `marketing.guest_document`, `marketing.guest_profile` |
+| Writes | `cache:idempotency`, `platform.outbox` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| eventId | string | yes | The identity.privacyRequestRaised event id, for the consumer's inbox record. |
+| subjectId | string (uuid) | yes | The guest the export is about. |
+| approvalRequestId | string (uuid) | yes | The export's id, carried on to marketing.subjectDataPartWritten. |
+| requestType | string | yes | access writes a part; deletion writes none and answers rowCount 0 with no fileRef. |
+| format | enum (json, csv, pdf) |  | The export's format; json where the event carries none. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| approvalRequestId | string (uuid) | yes |  |
+| fileRef | string |  | The part's object key; null for a deletion request. (nullable) |
+| rowCount | integer | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The part, written now or already written. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 
 ## Group: feedback
 
@@ -1619,8 +1778,8 @@ Guest-facing. A low rating may open a service case automatically where the venue
 
 Idempotent on the variant and performance — saving twice is one entry, not two. The count matters to the guest and to demand signals, so a double tap must not inflate it.
 **The same product for two different performances is two entries (decided 28 September, audit R149).** The entry key is `variantId` plus `performanceId`; a save with no `performanceId` is a third, date-less entry for the product generally.
-**Whether the variant may be sold is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM CR-081; CHG-TEN-002; ADR-0055 rule 4). Marketing runs in another deployable, so it asks Catalogue's declared query `variantsSellableAt(venueId, [variantId], channel)` through Catalogue's service route with the guest's channel (`web` or `mobile`) and never reads `catalogue.variant`. A variant Catalogue does not know, or one not sellable at the venue on that channel, is the `404`. Catalogue's published service operation for the query is not written yet (a follow-up of CHG-TEN-002).
-**What the saved row holds** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002). The same call to Catalogue's service route asks `variantListingFacts(variantIds, channel, performanceIds)` too, whose `venueId` is the venue `variantsSellableAt` is asked about, and the row stores its `productName`, `imageAssetRef`, `listPrice` (as `list_price`), `performanceStartsAt` and `isAvailable: true` as they are at the save; `getWishlist` replaces them with Catalogue's current answer on every read. A performance that is not the variant's product's is the same `404` (`unknown-variant`).
+**Whether the variant may be sold is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM CR-081; CHG-TEN-002; asked in process since ADAM CR-270, option A, 28 October 2026, CHG-R11TEN-001). Marketing asks Catalogue's declared query `variantsSellableAt(venueId, [variantId], channel)` in process, through Catalogue's own query class (the lead's granted read, docs/active/cross-deployable-writes.yaml XDR-007), at the venue the guest acts at with the guest's channel (`web` or `mobile`), and never reads `catalogue.variant` with its own SQL. A variant Catalogue does not know is the `404` `unknown-variant`; one not sellable at the venue on that channel is the `404` `variant-not-sellable`.
+**What the saved row holds** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002; the query as CR-270 declared it). It asks `variantListingFacts(venueId, channel, [variantId], [performanceId])` too, at the same venue, and the row stores its `productName`, `imageAssetRef`, `listPrice` (the amount only, as `list_price`), `performanceStartsAt` and `isAvailable: true` as they are at the save; `getWishlist` replaces them with Catalogue's current answer on every read. A performance that is not the variant's product's is answered `unknownVariant`, the same `404` (`unknown-variant`).
 **The idempotency is the database's**: a unique index on (`subject_id`, `variant_id`, `performance_id`) with a null performance colliding too (`NULLS NOT DISTINCT`), so two saves racing under different `Idempotency-Key`s make one row. The second save meets the index, reads the existing row and answers `200` with it, its `note` replaced when it sends one.
 
 **Its currency** (CHG-R10ORD-019; the lead's ruling of 25 October 2026 on check-money-currency): the Money this operation answers or accepts is in the currency of the venue it acts at, the caller's working venue, read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.
@@ -1690,7 +1849,7 @@ Idempotent on the variant and performance — saving twice is one entry, not two
 Deliberately here rather than in the catalogue. A wishlist is a record of a person's intent, not a property of a product — and it is the same shape as every other behavioural signal segmentation already reads.
 Items whose product has been withdrawn are returned with `isAvailable: false` rather than dropped. A guest who saved something and finds it silently gone assumes the feature is broken.
 **Newest first**: ordered by `addedAt` descending, `id` as the tiebreak.
-**What Catalogue knows is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002; ADR-0055 rule 4). Marketing runs in another deployable, so it never reads `catalogue.*`: it asks Catalogue's declared query `variantListingFacts(variantIds, channel, performanceIds)` through Catalogue's service route, once per read for every saved variant, with the guest's channel (`web` or `mobile`), and returns Catalogue's current `productName`, `imageAssetRef`, `price` and `performanceStartsAt`; `isAvailable` is false where Catalogue says the variant is not sellable (`unavailableReason` is its `reason`) or the saved performance has started (`performancePassed`). Nothing is written back: this read runs on a replica. **If Catalogue cannot be reached** the stored values are returned as they were when each item was saved, rather than an error. Catalogue's published service operation for the query is not written yet (a follow-up, as for `variantsSellableAt`, CHG-TEN-002).
+**What Catalogue knows is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002; asked in process since ADAM CR-270 and CR-273, option A, 28 October 2026, CHG-R11TEN-001). Marketing never reads `catalogue.*` with its own SQL: it asks Catalogue's declared query `variantListingFacts(venueId, channel, variantIds, performanceIds)` in process, through Catalogue's own query class (the lead's granted read, docs/active/cross-deployable-writes.yaml XDR-007), once per read for every saved item, at the venue the guest acts at and with the guest's channel (`web` or `mobile`), and returns Catalogue's current `productName`, `imageAssetRef`, `price` (its `listPrice`, with the venue's currency) and `performanceStartsAt`; `isAvailable` is false where Catalogue answers the item unavailable (`unavailableReason` is its `unavailableReason`) or the saved performance has started (`performancePassed`). Nothing is written back: this read runs on a replica.
 **Guests only** (ADR-0025): `bearerAuth` is not accepted; a staff token has no permission here (CHG-MKT-002, as the developer of ticket 30706 proposed).
 
 **Its currency** (CHG-R10ORD-019; the lead's ruling of 25 October 2026 on check-money-currency): the Money this operation answers or accepts is in the currency of the venue it acts at, the caller's working venue, read through `tenancy#venueSettingsRecords` with its scale; the rows behind it store the amount only.
@@ -3533,6 +3692,7 @@ Read from the primary, because a reply the guest has just sent must be in the th
 
 **The read `setSeoMetadata` had none of**, so the editor could not show what was there before replacing it.
 **Generated by default**, so there is always an answer: where nothing was set for the entity and locale, this returns the generated metadata with `isAutoGenerated: true` rather than 404.
+**Read from `marketing.seo_metadata`, Marketing's own table in the tenant database** (ADAM CR-317, option A, 29 October 2026), under the tenant's row-level security.
 
 |  |  |
 |---|---|
@@ -3543,7 +3703,7 @@ Read from the primary, because a reply the guest has just sent must be in the th
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `control.seo_metadata` |
+| Reads | `marketing.seo_metadata` |
 | Writes | - |
 | Called by | CMS-013 |
 
@@ -4339,6 +4499,7 @@ written by OrderService (`access.entitlement` with `invitationId`, CHG-FXC-007).
 
 22.8.18. **Routing depends on this and `SUP-003` had no operation behind it** until 17 August. **Sets the caller's own availability** — the agent is the session's principal, and there is no parameter naming another.
 An agent who forgets to go offline is an agent conversations queue for. **Availability expires** rather than persisting through a closed laptop.
+**When it expires** (ADAM CR-333, option C, Chinmay, 29 October 2026; CHG-CR333-001): every PUT sets `expiresAt` to the earlier of the caller's session expiry (`Session.expiresAt`, known from the caller's validated session as its scope is, never read from Identity's tables) and a heartbeat lapse of 15 minutes from now (a default, proposed, client to correct). Each PUT refreshes it, so the agent's open console keeps an agent available by sending its current availability again within the lapse; a closed laptop stops the heartbeat, and the availability lapses. **Once `expiresAt` has passed the state reads as `offline`**, whatever the row holds, for this operation's answer and for every read that routes or counts agents by it.
 
 |  |  |
 |---|---|
@@ -4451,6 +4612,7 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 
 22.11.1 and 22.11.11. **SEO is not a marketing nicety for a venue selling online** — an attraction that does not appear in search sells through OTAs at OTA commission.
 **Generated by default and overridable**: a venue with 400 products will not write 400 meta descriptions, and one with an important landing page will not accept a generated one.
+**Written to `marketing.seo_metadata`, in the tenant's own database and transaction** (ADAM CR-317, option A, 29 October 2026): SEO metadata is the tenant's configuration about entities in its own database, so Marketing owns the table beside them, under the tenant's row-level security, and no write crosses a module or a database. It moved from the shared control database, which Platform owned and Marketing wrote with no declared route.
 
 |  |  |
 |---|---|
@@ -4460,8 +4622,8 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `catalogue.product`, `control.seo_metadata` |
-| Writes | `cache:idempotency`, `cache:resolution`, `control.seo_metadata` |
+| Reads | `cache:idempotency`, `catalogue.product`, `marketing.seo_metadata` |
+| Writes | `cache:idempotency`, `cache:resolution`, `marketing.seo_metadata` |
 | Called by | BO-842, CMS-013 |
 
 **Parameters**
@@ -4524,6 +4686,8 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 **Bound to the version accepted, not to the form.** A submission pointing at a form that has since changed is a submission proving nothing.
 **A guardian may sign for a minor** — `onBehalfOfSubjectId` names them, because an unsigned or self-signed minor waiver is worth nothing at the moment it matters.
 Where the form has an expiry, a live acceptance means **a returning participant does not sign again.**
+
+**Who may submit, and what each outcome answers** (ADAM CR-318, option A, 29 October 2026). A guest submits for itself; a staff member with a grant at the venue records a guest's submission (the counter, the kiosk), as the guest could, and `marketing.form_submission` lets both write (`x-ticvai-rls: grant-holder-write`: any staff grant, or the guest's own subject). A form or form version that does not exist or is not published is `404 form-version-not-found`. Where a live acceptance already exists, the answer is `200` with the existing submission and no new row is written; a new acceptance is `201`.
 
 |  |  |
 |---|---|
@@ -4598,6 +4762,8 @@ Where the form has an expiry, a live acceptance means **a returning participant 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Submitted |
+| 200 |  | A live acceptance already exists (ADAM CR-318): the existing submission, and nothing new is written. |
+| 404 |  | The form, or the form version named, does not exist or is not published (ADAM CR-318); nothing is written. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateGuestPreferences
@@ -4619,7 +4785,7 @@ Board 4G. **Table, drink, dietary needs, contact channel.** A guest who states a
 | Guest callable | True |
 | Reads | `cache:idempotency`, `marketing.guest_preference`, `marketing.guest_profile` |
 | Writes | `cache:idempotency`, `marketing.guest_preference`, `marketing.guest_profile` |
-| Called by | BO-740, WEB-020 |
+| Called by | WEB-020 |
 
 **Parameters**
 
@@ -5542,7 +5708,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | field_type | text | yes |  |
 | standard_field | text | no | Set when the field is one of the reusable standard fields. |
 | requirement | text | yes | conditional needs conditions; autoPopulated and readOnly need mapsTo. |
-| validation | jsonb | no |  |
+| option_labels | jsonb | no | The allowed values of a select, dropdown or multi-select field, each with the label a guest reads. |
+| validation | jsonb | no | Which members each fieldType accepts (ADAM CR-313, option A): minimum and maximum a number field; dateFrom and dateTo a date field; pattern and maxLength a shortText, longText, email, mobile or addre… |
 | maps_to | text | no | The existing TICVAI record the field reads from, where the caller may read it. |
 | is_personal_data | boolean | no |  |
 | sort_order | integer | no |  |
@@ -5842,6 +6009,20 @@ Every table this service owns that the slice reads or writes, with its columns a
 | valid_to | timestamptz | no |  |
 | is_active | boolean | yes |  |
 
+### `marketing.privacy_change_set`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| change_set_id | uuid | yes |  |
+| status | text | yes |  |
+| items | jsonb | no |  |
+| approval_request_id | text | no | The approvals-engine request, once submitted. |
+| publish_at | timestamptz | no |  |
+| published_at | timestamptz | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
+| updated_at | timestamptz | no |  |
+| id | uuid | yes | Synthesised key. |
+
 ### `marketing.programme_tier`
 
 | Column | Type | Required | Notes |
@@ -5936,6 +6117,26 @@ Every table this service owns that the slice reads or writes, with its columns a
 | value | text | no |  |
 | values | text[] | no |  |
 | id | uuid | yes | Synthesised key. |
+
+### `marketing.seo_metadata`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| entity_kind | text | yes |  |
+| entity_id | uuid | yes |  |
+| locale | text | no |  |
+| title | text | no |  |
+| meta_description | text | no |  |
+| keywords | text[] | no |  |
+| canonical_url | text | no |  |
+| slug | text | no | 22.11.6. |
+| hreflang | jsonb | no | 22.11.11. |
+| schema_org_type | text | no |  |
+| open_graph | jsonb | no |  |
+| is_auto_generated | boolean | no | 22.11.2. |
+| is_excluded_from_index | boolean | no |  |
+| scope_path | text | no | The partition key (ADR-0005). |
 
 ### `marketing.subscription`
 
@@ -6057,13 +6258,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-207 operations, added to this service in later releases without changing any of the above.
+206 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | campaign | `getCampaign`, `getCampaignPerformance`, `listCampaigns`, `pauseCampaign`, `testSendCampaign`, `unscheduleCampaign` |
 | case | `addCaseMessage`, `createCase`, `createCaseClassificationIntelligent`, `escalateCase`, `getCase`, `getCaseInvestigationResolution`, `listAgentWorkloadAvailability`, `listCaseCategories`, `listCaseResolutionClosure`, `listCases`, `listContact`, `listContactAutomation`, `listCustomerService`, `listCustomerServiceProfile`, `listEscalationCollaborationInternal`, `listEscalationCriticalCase`, `listIntelligentRoutingSkills`, `listQualityAgentEvaluation`, `listServiceQueues`, `listServiceRootCause`, `listSlaPolicyService`, `listUnifiedInteractionCommunication`, `reopenCase`, `setAgentServiceProfile`, `setCaseCategoryDefinition`, `setCaseInternalRequest`, `setCaseInvestigationResolution`, `setCaseResolution`, `setContactAutomation`, `setCustomerServiceCopilot`, `setIntelligentRoutingSkill`, `setOrderBookingTicket`, `setQualityEvaluation`, `setRefundCompensationService`, `setServiceQueueDefinition`, `updateCase` |
-| consent | `actOnWaiverRequirements`, `addSuppression`, `approvePrivacyTesting`, `approveWaiverTesting`, `getConsentHistory`, `getDeviceConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanFindings`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listPublishedTrackingTechnologies`, `listSiteWaiverException`, `listTrackingTechnologyCatalogue`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCheckoutConsents`, `recordCookieScan`, `recordDeviceConsent`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnologyCatalogueEntry`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
+| consent | `actOnWaiverRequirements`, `addSuppression`, `approveWaiverTesting`, `getConsentHistory`, `getDeviceConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanFindings`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listPublishedTrackingTechnologies`, `listSiteWaiverException`, `listTrackingTechnologyCatalogue`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCheckoutConsents`, `recordCookieScan`, `recordDeviceConsent`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnologyCatalogueEntry`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
 | feedback | `listCustomerSatisfactionFeedback`, `listReviews`, `respondToReview` |
 | general | `getCustomerServiceCopilot` |
 | guest | `getGuestProfile`, `mergeGuestProfiles`, `updateGuestProfile` |

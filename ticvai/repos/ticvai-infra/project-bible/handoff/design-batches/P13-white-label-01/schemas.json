@@ -93,13 +93,14 @@
     "type": "string",
     "nullable": true,
     "readOnly": true,
-    "description": "Icon currently shipped. Differs from the draft until the next release."
+    "x-ticvai-derived": "onRead",
+    "description": "Icon currently shipped. Differs from the draft until the next release. **Where it comes from** (ADAM CR-325, option A, 29 October 2026; CHG-CR325-001): the `ConfigVersion.version` (`configVersion`) of the newest `whitelabel.app_build` (latest `requestedAt`) with `status` `released`, on either platform; its icon is that version's `snapshot` `appIcons.sourceAssetRef` (`whitelabel.config_version`). Null while no build is released."
    },
    "requiresRebuild": {
     "type": "boolean",
     "readOnly": true,
     "x-ticvai-derived": "onRead",
-    "description": "True while the draft's source differs from the icon in `liveVersion`."
+    "description": "True while the draft's source differs from the icon in `liveVersion`, that is when the released version's `snapshot` `appIcons.sourceAssetRef` differs from the draft's `sourceAssetRef`; true when nothing is released (`liveVersion` null) (ADAM CR-325, option A; CHG-CR325-001)."
    }
   }
  },
@@ -1201,6 +1202,21 @@
    }
   }
  },
+ "GuestAppSkinKey": {
+  "type": "string",
+  "enum": [
+   "park",
+   "water",
+   "stadium",
+   "theatre",
+   "dining",
+   "kids",
+   "museum",
+   "rooms",
+   "transport"
+  ],
+  "description": "The guest app's skins per venue kind, as the approved Mobile App v4 design draws them (`handoff/design-tokens/guest-app.yaml` `skins.byVenueKind`; ADAM CR-280, CHG-R11TEN-007)."
+ },
  "GuestListing": {
   "type": "string",
   "enum": [
@@ -1892,7 +1908,7 @@
  "MediaUsage": {
   "x-ticvai-persistence": "assets.media_usage",
   "type": "object",
-  "description": "One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it.\n",
+  "description": "One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it. **`surface: mediaCollectionCover` is never a stored row** (ADAM CR-326, option A; CHG-CR326-001): `deleteMediaAsset` works it out from `assets.media_collection.cover_asset_id` to name a collection whose cover the asset is, with `referenceId` the collection's id and `label` its name.\n",
   "required": [
    "surface",
    "referenceId"
@@ -1930,7 +1946,8 @@
      "seatingSection",
      "transportNetworkImport",
      "venueMap",
-     "venueMapVersion"
+     "venueMapVersion",
+     "mediaCollectionCover"
     ]
    },
    "referenceId": {
@@ -2479,6 +2496,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
+    "x-ticvai-references": "catalogue.event",
     "description": "**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a product page finds its event and the event's performances (`Performance.eventId`) give it dates. Null for a product not tied to an event (merchandise, a pass, a membership)."
    },
    "createdAt": {
@@ -3221,7 +3239,7 @@
     "type": "array",
     "maxItems": 200,
     "x-ticvai-derived": "onRead",
-    "description": "**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **Published only**: a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published `ConfigVersion`; a venue added or reactivated since the last publish appears after the next publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.\n",
+    "description": "**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **The active venues, on every read** (ADAM CR-338, venues (a), 29 October 2026; CHG-CR338-001): a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`), as `TenantConfig.venues` lists them, so `getTenantConfig` and this agree. Ordered by `name`. Empty when nothing is published.\n",
     "items": {
      "type": "object",
      "required": [
@@ -3252,12 +3270,12 @@
        "type": "string",
        "maxLength": 120,
        "nullable": true,
-       "description": "Shown under the name so two venues with similar names can be told apart."
+       "description": "Shown under the name so two venues with similar names can be told apart. The venue's `VenueSettings.city` (`platform.venue_settings.city`), read through `venueSettingsRecords` (ADAM CR-338, city and openingHoursToday (a); CHG-CR338-001). Null when it is not set."
       },
       "openingHoursToday": {
        "type": "object",
        "nullable": true,
-       "description": "Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set.",
+       "description": "Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set. Today's weekday entry of `VenueSettings.openingHours` (`platform.venue_settings.opening_hours`, jsonb by weekday), read through `venueSettingsRecords`; today is the date in the venue's region time zone (`RegionSettings.timeZone`, `regionSettingsRecords`) (ADAM CR-338, city and openingHoursToday (a); CHG-CR338-001).",
        "properties": {
         "opens": {
          "type": "string",
@@ -3276,7 +3294,7 @@
     "type": "array",
     "maxItems": 10,
     "x-ticvai-derived": "onRead",
-    "description": "**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session.\n",
+    "description": "**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session. **Read from the tenant-side copy** (ADAM CR-338, whatsNew (a), 29 October 2026; CHG-CR338-001): `whitelabel.received_release` (`ReceivedRelease`), in the tenant's own database, so a public, cacheable read never crosses to the control plane; newest `receivedAt` first.\n",
     "items": {
      "type": "object",
      "required": [
@@ -3302,7 +3320,9 @@
    },
    "recentChanges": {
     "type": "array",
-    "description": "Staff only. Names the principal behind each change, so it never reaches a public response.",
+    "maxItems": 10,
+    "x-ticvai-derived": "onRead",
+    "description": "Staff only. Names the principal behind each change, so it never reaches a public response. **Derived from `whitelabel.config_version`** (ADAM CR-338, recentChanges (a), 29 October 2026; CHG-CR338-001): one item per version, `area` `publish`, `description` the version's `note`, `principalId` its `published_by_principal_id`, `at` its `published_at`; newest first, at most 10. No new storage.",
     "items": {
      "type": "object",
      "properties": {
@@ -3340,7 +3360,7 @@
    },
    "version": {
     "type": "string",
-    "description": "The draft's working version label; the published one is `ConfigVersion.version`. A draft created by the first `set*` call has the version `draft` (ADAM CR-230; CHG-R10TEN-003)."
+    "description": "The draft's working version label; the published one is `ConfigVersion.version`. A draft created by the first `set*` call has the version `draft` (ADAM CR-230; CHG-R10TEN-003). After publishing `N` it is the text of `N+1` (ADAM CR-324, A3; CHG-CR324-001)."
    },
    "isDraft": {
     "type": "boolean",
@@ -3646,6 +3666,28 @@
     ],
     "default": "solid",
     "description": "Button shape (decided 29 September, rev 3 CFG-3)."
+   },
+   "venueSkins": {
+    "type": "array",
+    "default": [],
+    "description": "**The guest app skin each venue takes** (ADAM CR-280, option B, 28 October 2026; CHG-R11TEN-007): one entry per venue, naming one of the approved app design's skins (`handoff/design-tokens/guest-app.yaml`, `skins.byVenueKind`). A venue with no entry has none set, and the guest app shell then uses the base skin with `park`. `getPublishedTenantConfig` answers the asked venue's entry as `skinKey`.",
+    "items": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "venueId",
+      "skinKey"
+     ],
+     "properties": {
+      "venueId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "skinKey": {
+       "$ref": "#/components/schemas/GuestAppSkinKey"
+      }
+     }
+    }
    },
    "componentColours": {
     "type": "object",

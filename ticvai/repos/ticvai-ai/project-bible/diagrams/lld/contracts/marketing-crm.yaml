@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 280 operations
+title: marketing-crm — 281 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -167,7 +167,7 @@ operations:
 - operation: approvePrivacyTesting
   verb: PUT
   path: /privacy-testing
-  scope: venue
+  scope: brand
   permission: GUEST_MANAGE
   audience:
   - staff
@@ -177,6 +177,7 @@ operations:
   - marketing.privacy_change_set
   writes:
   - cache:idempotency
+  - marketing.cookie_banner_design
   - marketing.privacy_change_set
 - operation: approveWaiverTesting
   verb: PUT
@@ -996,7 +997,7 @@ operations:
   - staff
   offline: false
   reads:
-  - control.seo_metadata
+  - marketing.seo_metadata
   writes: []
 - operation: getSignatorySignatureGuardian
   verb: GET
@@ -3115,7 +3116,7 @@ operations:
 - operation: setCookieBannerDesign
   verb: PUT
   path: /cookie-banner-preference/{bannerDesignId}
-  scope: venue
+  scope: brand
   permission: GUEST_MANAGE
   audience:
   - staff
@@ -3598,11 +3599,11 @@ operations:
   reads:
   - cache:idempotency
   - catalogue.product
-  - control.seo_metadata
+  - marketing.seo_metadata
   writes:
   - cache:idempotency
   - cache:resolution
-  - control.seo_metadata
+  - marketing.seo_metadata
 - operation: setServiceQueueDefinition
   verb: PUT
   path: /service-queues/{queueId}
@@ -3650,7 +3651,7 @@ operations:
 - operation: setTrackingTechnology
   verb: PUT
   path: /cookie-tracking-digital/{technologyId}
-  scope: venue
+  scope: tenant
   permission: GUEST_MANAGE
   audience:
   - staff
@@ -4019,3 +4020,20 @@ operations:
   writes:
   - cache:idempotency
   - marketing.guest_document
+- operation: writeSubjectDataExportPart
+  verb: POST
+  path: /subject-data-export-parts
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.consent_record
+  - marketing.form_submission
+  - marketing.guest_document
+  - marketing.guest_profile
+  writes:
+  - cache:idempotency
+  - platform.outbox

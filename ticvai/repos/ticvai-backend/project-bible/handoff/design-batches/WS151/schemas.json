@@ -4,7 +4,8 @@
   "x-ticvai-persistence": "payments.credit_account",
   "description": "Board 5.4. **Exposure includes unbilled bookings, not just unpaid invoices.**",
   "required": [
-   "organisationId"
+   "organisationId",
+   "currencyCode"
   ],
   "properties": {
    "id": {
@@ -29,6 +30,14 @@
    },
    "availableCredit": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "currencyCode": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "pattern": "^[A-Z]{3}$",
+    "readOnly": true,
+    "description": "**The ISO 4217 currency of every Money of the account** (\"All as recommended\": ADAM CR-322 option A, Chinmay, 29 October 2026): `creditLimit`, `outstandingInvoiced`, `outstandingUnbilled` and `availableCredit` are all in it. A credit limit is agreed with the customer in a currency, a contract term like a ledger account's or a partner agreement's currency, so the account stores it (naming-and-style 5.1: a table whose currency genuinely differs from its venue stores one). Set by `createB2bCreditAccount` from `creditLimit.currency` and never changed after; its scale comes from the kernel's ISO 4217 list (CR-192)."
    },
    "status": {
     "type": "string",

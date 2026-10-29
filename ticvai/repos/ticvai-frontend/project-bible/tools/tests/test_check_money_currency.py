@@ -116,6 +116,19 @@ def test_a_scope_path_row_is_routed_only_once_tenancy_declares_scope_records():
     assert fx.queries_for("platform", {fx.SCOPE_Q}) == []   # a platform row stores its currency instead
 
 
+def test_an_alert_above_every_venue_takes_the_regions_currency():
+    """ADAM CR-299, option A (CHG-CR299-001): an alert's scope_path may name a region or the tenant root, so a
+    scope-path row that can sit above every venue also reads the region's settings (RegionSettingsAtOrAbove the
+    path); every other scope-path row keeps the venue's alone. Both alert operations that answer Alert carry it."""
+    assert fx.queries_for("scope", {fx.SCOPE_Q}, ["reporting.alert"]) == [fx.SCOPE_Q, fx.VENUE_Q, fx.REGION_Q]
+    assert fx.queries_for("scope", {fx.SCOPE_Q}, ["catalogue.template"]) == [fx.SCOPE_Q, fx.VENUE_Q]
+    assert "region" in fx.why("scope", fx.REGION_Q, "answers", ["Alert.threshold"])
+    ctx = mc.load()
+    for op in ("acknowledgeAlert", "listAlerts"):
+        qs = [r.get("query") for r in ctx["ops"][op]["op"].get("x-ticvai-read-via") or []]
+        assert fx.REGION_Q in qs, op
+
+
 CONTRACT = """paths:
   /a:
     post:

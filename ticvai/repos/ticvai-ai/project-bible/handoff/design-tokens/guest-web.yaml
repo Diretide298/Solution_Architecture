@@ -15,12 +15,15 @@ appliedFrom:
   theme.secondaryColour: 'the palette''s brand2: --brand-2 (web)'
   theme.accentColour: 'the palette''s accent: --accent'
   theme.backgroundColour: 'the palette''s bg: --bg'
-  theme.textColour: the ink the rules derive (--ink, --ink-2, --ink-3) when it is not set
-  theme.darkMode: 'the palette''s dark: which way the ink, line and shadow rules mix'
+  theme.textColour: fg, the ink every ink, line and surface rule mixes toward (--ink, --ink-2, --ink-3, --line,
+    --surface); Theme requires it, so it is never derived
+  theme.darkMode: never used to render (the contract deprecates it); dark is derived from theme.backgroundColour
+    (themeEngine.inputs.dark)
   theme.cornerRadius: --r and --r-sm (web), --rk (app, a scale on the base radii)
   theme.surfaceStyle: 'Glass or Solid: --surface, --surface-2, --line (web, data-glass on the root)'
   theme.buttonStyle: 'Solid, Outline or Pill: --btn-bg, --btn-fg, --btn-bd, --btn-r (web)'
-  fonts: 'the heading and body pair: --font-h and --font-b (web), --fh and --fb (app)'
+  fonts: 'FontConfig''s faces: primaryLatin -> --font-h, secondaryLatin (else primaryLatin) -> --font-b; under dir=rtl
+    the Arabic pair, primaryArabic -> --font-h and secondaryArabic (else primaryArabic) -> --font-b'
   direction: dir=rtl on the root when the guest's language is Arabic; every token is direction-free
 fonts:
   pairs:
@@ -45,6 +48,73 @@ fonts:
   default: Archivo / IBM Plex Sans
   headingFallback: '''Archivo'',sans-serif'
   bodyFallback: '''IBM Plex Sans'',sans-serif'
+themeEngine:
+  decision: 'ADAM CR-272, option A (Chinmay, 28 October 2026): the theme engine follows the prototype''s theme()
+    rules, with no contract change. The shell evaluates every token''s rule (`tokens`, below) with these inputs
+    and these functions; no token keeps its default once a tenant''s Theme is applied.'
+  inputs:
+    brand: theme.primaryColour
+    brand2: theme.secondaryColour, else brand
+    accent: theme.accentColour
+    bg: theme.backgroundColour
+    fg: theme.textColour (Theme requires it; never derived)
+    dark: 'relLum(bg) < 0.5: dark is derived from the background''s relative luminance (dark below 0.5); theme.darkMode
+      is never used to render'
+    surface: 'surf: the opaque surface the prototype''s palette carries and Theme does not (--surface-op, and `surface`
+      in every rule)'
+    surf: 'mix(bg, fg, 0.04): the background mixed 4% toward the ink'
+    surf2: 'mix(bg, fg, 0.08): the background mixed 8% toward the ink'
+    d: '1: the density the skin defaults fix (Standard: --sp2 16px, --sp3 24px, --sp4 36px, the token defaults)'
+    flat: 'false: the skin default has no solid bars (--card-bw 1.5px, the token default)'
+    glass: theme.surfaceStyle is Glass (Glass when it is not set), as data-glass on the root
+    r: theme.cornerRadius, else 10
+    btn: theme.buttonStyle, else Solid
+    fp: '[the heading face, the body face] from FontConfig (appliedFrom.fonts), the Arabic pair under dir=rtl'
+  functions:
+    hex2rgb:
+      signature: hex2rgb(h)
+      says: '#rgb or #rrggbb to [r, g, b] (0 where a pair does not parse)'
+      body: 'const s = String(h || '''').replace(''#'', ''''); const t = s.length === 3 ? s.split('''').map(c =>
+        c + c).join('''') : s; return [parseInt(t.slice(0, 2), 16) || 0, parseInt(t.slice(2, 4), 16) || 0, parseInt(t.slice(4,
+        6), 16) || 0];'
+      line: 5062
+    relLum:
+      signature: relLum(h)
+      says: WCAG relative luminance of a colour
+      body: 'const c = this.hex2rgb(h).map(v => { const s = v / 255; return s <= 0.03928 ? s / 12.92 : Math.pow((s
+        + 0.055) / 1.055, 2.4); }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];'
+      line: 5067
+    ratio:
+      signature: ratio(a, b)
+      says: WCAG contrast ratio of two colours, (lighter + 0.05) / (darker + 0.05)
+      body: const x = this.relLum(a), y = this.relLum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+      line: 5074
+    mix:
+      signature: mix(a, b, t)
+      says: 'sRGB mix by weight: each channel a + (b - a) x t, rounded, as #rrggbb'
+      body: const x = this.hex2rgb(a), y = this.hex2rgb(b); const c = i => Math.round(x[i] + (y[i] - x[i]) * t).toString(16).padStart(2,
+        '0'); return '#' + c(0) + c(1) + c(2);
+      line: 5101
+    rgba:
+      signature: rgba(h, a)
+      says: the colour's channels with alpha a, as rgba(r,g,b,a)
+      body: const [r, g, b] = this.hex2rgb(h); return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+      line: 5100
+    inkOn:
+      signature: inkOn(h, groundHex, target)
+      says: 'a readable ink of colour h on a ground: moves h 10% at a time toward #141416 (on a ground of relative
+        luminance above 0.34) or #ffffff until its WCAG contrast ratio against the ground reaches the target (4.5
+        by default), at most 16 steps'
+      body: 'const g = groundHex || ''#ffffff'', want = target || 4.5; const toward = this.relLum(g) > 0.34 ? ''#141416''
+        : ''#ffffff''; let c = h; for (let i = 0; i < 16; i++) { if (this.ratio(c, g) >= want) return c; c = this.mix(c,
+        toward, 0.1); } return c;'
+      line: 5087
+    onColor:
+      signature: onColor(h)
+      says: 'the readable text on a colour: #141416 or #ffffff, whichever has the higher WCAG contrast against it'
+      body: 'return this.ratio(''#141416'', h) >= this.ratio(''#ffffff'', h) ? ''#141416'' : ''#ffffff'';'
+      line: 5097
+  direction: under dir=rtl the Arabic pair from FontConfig maps to --font-h and --font-b; every other token is direction-free
 tokens:
   --accent:
     rule: accent
@@ -501,5 +571,8 @@ palettes:
 notes:
 - 'A variable''s `default` is what the markup falls back to before the theme is applied (the prototype''s own default
   venue): build the shell so it is never seen, by applying the tenant''s theme first.'
-- Colours are mixed by the rules (`mix`, `rgba`, `inkOn`, `onColor` in the prototype); the shell implements the
-  same functions, so a tenant's two or three colours give every variable.
+- Colours are mixed by the rules with the functions in themeEngine.functions, copied from the prototype; the shell
+  implements them exactly so, and derives the rules' other inputs as themeEngine.inputs says (ADAM CR-272), so a
+  tenant's Theme gives every variable.
+- 'The named palettes below are the prototype''s presets: their surface and dark are the prototype''s own, and a
+  tenant''s Theme derives both instead (themeEngine.inputs).'

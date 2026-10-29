@@ -130,6 +130,35 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Tenancy implements.
     served: [in-process]
+  # **Whether a person is already rostered at that time anywhere, as a yes or no** (ADAM CR-336, option B, decided 29
+  # October 2026; CHG-CR336-001). workforce.rota_assignment is under venue row security, so the overlap check of
+  # createRotaAssignment and updateRotaAssignment saw only the caller's venue and a person could be booked at two
+  # venues at once.
+  principalHasOverlappingAssignment:
+    module: workforce
+    table: workforce.rota_assignment
+    inputs:
+      principalId: {type: string, format: uuid, description: 'The person rostered (RotaAssignment.principalId).'}
+      startsAt: {type: string, format: date-time, description: 'Start of the assignment as it would stand (RotaAssignment.startsAt).'}
+      endsAt: {type: string, format: date-time, description: 'End of the assignment as it would stand (RotaAssignment.endsAt).'}
+      exceptAssignmentId: {type: string, format: uuid, nullable: true, description: 'The assignment being moved, which is not counted against itself (updateRotaAssignment); null on a create.'}
+    returns:
+      type: object
+      required: [overlaps]
+      properties:
+        overlaps: {type: boolean, description: 'True when the person holds another assignment overlapping the times asked, at any venue of the tenant. Which assignment, at which venue and when are never returned.'}
+    rule: >-
+      A rule question (ADAM CR-336, option B; Chinmay, 29 October 2026: "All as recommended"). True when a
+      workforce.rota_assignment row other than exceptAssignmentId has principal_id = principalId, a status other
+      than `cancelled`, and times that overlap the asked ones (starts_at < endsAt and ends_at > startsAt; an
+      assignment that ends when the next begins does not overlap), at any venue of the tenant. Workforce answers
+      it with one statement under the routed tenant's root grant (ITenantRootGrant), so the person's assignments
+      at venues outside the caller's scope are seen, and returns only `overlaps`; the caller's own grant is in
+      force again for every other statement of its transaction, so no row, venue or time of another venue's rota
+      reaches the caller. It is asked in process by createRotaAssignment and updateRotaAssignment, which refuse
+      409 rota-assignment-overlap when it is true; the exclusion constraint on RotaAssignment
+      (x-ticvai-exclude) holds the same rule when two writes race.
+    served: [in-process]
 paths:
   /rota-assignments:
     get:
@@ -201,23 +230,47 @@ paths:
       operationId: createRotaAssignment
       x-ticvai-consumed-by:
         - "P08 BO-055 Rota & Scheduling"
-        - "P08 BO-712 Staff & Role Assignment Configuration"
         - "P08 BO-714 Event Shift & Roster Configuration"
-        - "P08 BO-884 Attraction & Operational Staffing Roster"
-        - "P08 BO-917 Event Staff & Personnel Allocation"
       x-ticvai-read-via:
-      - query: identity#delegatedAccessRecords
+      - query: identity#principalHoldsRoleAtVenue
         route: in-process
-        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
+        for: 'whether the person holds the required role at the venue or above it, as a yes or no answered under the
+          tenant root grant, so a role granted above the caller''s scope is found (ADAM CR-336, option B;
+          CHG-CR336-001): identity.delegated_access, Identity''s data'
+      - query: workforce#principalHasOverlappingAssignment
+        route: in-process
+        for: 'whether the person already holds an overlapping assignment at any venue, as a yes or no answered under
+          the tenant root grant, so no other venue''s rota reaches the caller (ADAM CR-336, option B; CHG-CR336-001)'
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      x-ticvai-reads:
+      - table: workforce.staffing_rules
+        for: 'the venue''s working-hour limits (maximum hours per day, per rolling 7 days, minimum rest between
+          shifts) the assignment is measured against for breachesWorkingHourLimit (ADAM CR-334, option A; CHG-CR334-001)'
       x-ticvai-audience: [staff]
       summary: Put someone on the rota
       description: >
         Refused where the person already has an overlapping assignment, or lacks the role the
         position requires. **A rota that lets one person be in two places is a rota that gets
         ignored.**
+
+        **Both checks look beyond the caller's venue, as a yes or no** (ADAM CR-336, option B, decided 29
+        October 2026). The overlap is asked of `workforce#principalHasOverlappingAssignment`: any other
+        assignment of the person, at any venue of the tenant, that is not `cancelled` and overlaps the new
+        one's times (`409 rota-assignment-overlap`). The role is asked of
+        `identity#principalHoldsRoleAtVenue`: a live grant of `requiredRoleId` to the person at the venue or
+        at a scope above it, a tenant-root grant included (`409 person-lacks-required-role`; no check when
+        `requiredRoleId` is null). Each is answered under the tenant root grant and returns only true or
+        false, so the caller learns nothing of another venue's rota or of where a role was granted. **The
+        overlap also holds under races**: the exclusion constraint on `workforce.rota_assignment` (one
+        person, overlapping times, not `cancelled`; RotaAssignment `x-ticvai-exclude`) refuses the second of
+        two writes that pass the check at the same moment, and that refusal is the same `409
+        rota-assignment-overlap`.
+
+        **The working-hour limit is flagged, not refused** (ADAM CR-334, option A, decided 29 October 2026):
+        the venue's `workforce.staffing_rules` row is read and `breachesWorkingHourLimit` is set as that field
+        says. The assignment is stored either way.
 
         Where the position needs a till, the assignment names the workstation their shift will
         open on — the link between a rota and a cash session, without merging the two.
@@ -244,7 +297,10 @@ paths:
               schema: { $ref: '#/components/schemas/RotaAssignment' }
         '409':
           x-ticvai-problem-types: [rota-assignment-overlap, person-lacks-required-role]
-          description: Overlaps an existing assignment, or the person lacks the required role
+          description: >
+            Overlaps another assignment of the person at any venue of the tenant, or the person lacks the
+            required role at the venue or above it (ADAM CR-336). The problem says which, and nothing of the
+            other assignment or of where a role is held.
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -355,8 +411,47 @@ paths:
       operationId: updateRotaAssignment
       x-ticvai-consumed-by:
         - "P08 BO-055 Rota & Scheduling"
+      x-ticvai-read-via:
+      - query: identity#principalHoldsRoleAtVenue
+        route: in-process
+        for: 'whether the person holds the required role at the venue or above it after a move, as a yes or no under
+          the tenant root grant, as createRotaAssignment asks it (ADAM CR-315, CR-336 option B; CHG-CR336-001):
+          identity.delegated_access, Identity''s data'
+      - query: workforce#principalHasOverlappingAssignment
+        route: in-process
+        for: 'whether the person holds another overlapping assignment at any venue after a move, this one left out
+          (exceptAssignmentId), as createRotaAssignment asks it (ADAM CR-315, CR-336 option B; CHG-CR336-001)'
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001), as createRotaAssignment reads it (ADAM CR-315)'
+      x-ticvai-reads:
+      - table: workforce.staffing_rules
+        for: 'the venue''s working-hour limits, read again after a move to set breachesWorkingHourLimit as
+          createRotaAssignment does (ADAM CR-334, option A; CHG-CR334-001)'
       x-ticvai-audience: [staff]
       summary: Move or cancel an assignment
+      description: >
+        **A move is checked as a new assignment is** (ADAM CR-315, option A). Whenever the PATCH changes
+        `principalId`, `venueId`, `startsAt`, `endsAt` or `requiredRoleId`, the assignment as it would stand
+        is checked against the same two rules `createRotaAssignment` applies, asked of the same two queries
+        (ADAM CR-336, option B): the person has no other assignment overlapping it at any venue of the
+        tenant (`workforce#principalHasOverlappingAssignment` with this assignment as `exceptAssignmentId`;
+        `409 rota-assignment-overlap`, which the exclusion constraint also gives under races), and the person
+        holds the required role at the venue or above it (`identity#principalHoldsRoleAtVenue`; `409
+        person-lacks-required-role`). Each answers only true or false. So a move cannot do what a create is
+        refused. An assignment outside the caller's scope is the shared `404`.
+
+
+        **The working-hour flag is set again on a move** (ADAM CR-334, option A): whenever the PATCH changes
+        `principalId`, `venueId`, `startsAt`, `endsAt` or `breakMinutes`, `breachesWorkingHourLimit` is worked
+        out as on create, from the venue's `workforce.staffing_rules`.
+
+
+        **The status moves a PATCH may make** are the ones the state model gives this operation
+        (states/rota-assignment.yaml): `planned` to `published` (the assignment becomes visible to the person
+        rostered) or to `cancelled`; `published` to `confirmed` (the person acknowledged it) or to
+        `cancelled`; and `swapPending` to `cancelled` (the swap was approved and a new assignment replaces
+        this one). Any other `status` is refused with `409 rota-status-move-not-allowed`.
       tags: [rota]
       x-ticvai-permission: WORKFORCE_MANAGE
       x-ticvai-scope-level: venue
@@ -378,6 +473,21 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/RotaAssignment' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          x-ticvai-problem-types: [rota-assignment-overlap, person-lacks-required-role, rota-status-move-not-allowed]
+          description: >
+            Refused, and nothing changes (ADAM CR-315). `rota-assignment-overlap`: after the change the person
+            would hold another assignment overlapping this one, at any venue of the tenant (ADAM CR-336).
+            `person-lacks-required-role`: after the change the person lacks the required role at the venue or
+            above it (ADAM CR-336). Both are checked, as on create, whenever the
+            PATCH changes the person, the venue, the times or the required role.
+            `rota-status-move-not-allowed`: the `status` sent is not a move the state model makes from the
+            assignment's current status, or the assignment is already `cancelled`, `completed` or `noShow`.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -2944,6 +3054,10 @@ components:
           type: string
           nullable: true
     WorkforceEmployee:
+      # r11 gate RF-TENANT-ROOT (#31219; CHG-R11FXD-001): read below the tenant by getEmployee, listEmployees, listStaffConversations,
+      # validateWorkforceCompliance, suggestRoleAssignment and createAccessReviewCampaign, so any staff grant
+      # reads; writes keep the tenant root's rule (startSync, the HRMS sync, writes it at tenant).
+      x-ticvai-rls: grant-holder-read
       type: object
       x-ticvai-persistence: workforce.employee
       description: '**Taken from the backend workbook, 20 September.** Stores the main employee/staff master record.'
@@ -3055,6 +3169,9 @@ components:
           type: string
           format: date-time
     WorkforceJobTitle:
+      # r11 gate RF-TENANT-ROOT (#31220; CHG-R11FXD-002): setJobTitle (venue, x-ticvai-config-scope venue) writes it, so the
+      # row carries the scope that wrote it, and a venue reads its own and the ones above it (getEmployee, listJobTitles).
+      x-ticvai-rls: read-beneath
       type: object
       x-ticvai-persistence: workforce.job_title
       description: '**Taken from the backend workbook, 20 September.** Stores job/designation definitions such as Cashier, Manager, Chef or Technician.'
@@ -3064,7 +3181,15 @@ components:
       - name
       - isActive
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant
+            that configured it), set by the server from the caller''s scope and never taken from a request. Row-level
+            security reads it: a venue writes its own job titles and reads its own and those of the region and tenant above
+            it (ADR-0018, venue is the configuration floor; r11 gate, CHG-R11FXD-002).'
         id:
           type: string
           format: uuid
@@ -3094,6 +3219,9 @@ components:
           format: date-time
           nullable: true
     WorkforceLeaveBalance:
+      # r11 gate RF-TENANT-ROOT (#33591; CHG-R11FXD-002): read below the tenant by getEmployee and listLeaveBalances. No
+      # mark of its own: it follows its leave type (typeId) through the parent rule, so a balance is read wherever its
+      # leave type is (a venue reads the balances of its own leave types and of those above it).
       type: object
       x-ticvai-persistence: workforce.leave_balance
       description: '**Taken from the backend workbook, 20 September.** Stores leave entitlement, used amount and remaining balance per employee/period.'
@@ -3132,6 +3260,9 @@ components:
           type: string
           format: date-time
     WorkforceLeaveType:
+      # r11 gate RF-TENANT-ROOT (#33593; CHG-R11FXD-002): setLeaveType (venue, x-ticvai-config-scope venue) writes it, so the
+      # row carries the scope that wrote it, and a venue reads its own and the ones above it (listLeaveTypes).
+      x-ticvai-rls: read-beneath
       type: object
       x-ticvai-persistence: workforce.leave_type
       description: '**Taken from the backend workbook, 20 September.** Defines leave categories and basic leave behavior.'
@@ -3143,7 +3274,15 @@ components:
       - requiresApproval
       - isActive
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant
+            that configured it), set by the server from the caller''s scope and never taken from a request. Row-level
+            security reads it: a venue writes its own leave types and reads its own and those of the region and tenant above
+            it (ADR-0018, venue is the configuration floor; r11 gate, CHG-R11FXD-002).'
         id:
           type: string
           format: uuid
@@ -3169,6 +3308,9 @@ components:
           type: string
           format: date-time
     WorkforceShift:
+      # r11 gate RF-TENANT-ROOT (#31221; CHG-R11FXD-002): setShiftPattern (venue, x-ticvai-config-scope venue) writes it, so the
+      # row carries the scope that wrote it, and a venue reads its own and the ones above it (listShiftPatterns, suggestWorkOrderAssignee).
+      x-ticvai-rls: read-beneath
       type: object
       x-ticvai-persistence: workforce.shift
       description: '**Taken from the backend workbook, 20 September.** Defines reusable shifts such as Morning, Evening or Night.'
@@ -3181,7 +3323,15 @@ components:
       - breakMinutes
       - crossesMidnight
       - isActive
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant
+            that configured it), set by the server from the caller''s scope and never taken from a request. Row-level
+            security reads it: a venue writes its own shift patterns and reads its own and those of the region and tenant above
+            it (ADR-0018, venue is the configuration floor; r11 gate, CHG-R11FXD-002).'
         id:
           type: string
           format: uuid
@@ -3398,12 +3548,20 @@ components:
         maximumHoursPerDay:
           type: integer
           nullable: true
+          description: 'The most hours a person may be rostered on one calendar day in the venue''s time zone. Read at
+            assignment for `RotaAssignment.breachesWorkingHourLimit` (ADAM CR-334, option A); null is no limit.'
         maximumHoursPerWeek:
           type: integer
           nullable: true
+          description: 'The most hours a person may be rostered in any 7 consecutive days, a rolling window rather than
+            a calendar week. Read at assignment for `RotaAssignment.breachesWorkingHourLimit` (ADAM CR-334, option A);
+            null is no limit.'
         minimumRestHours:
           type: integer
           nullable: true
+          description: 'The fewest hours between the end of one of a person''s assignments and the start of the next.
+            Read at assignment for `RotaAssignment.breachesWorkingHourLimit` (ADAM CR-334, option A); null is no
+            limit.'
         maximumConsecutiveDays:
           type: integer
           nullable: true
@@ -3870,6 +4028,15 @@ components:
     RotaAssignment:
       type: object
       x-ticvai-persistence: "workforce.rota_assignment"
+      # **One person is never on two overlapping assignments, whatever venue and however two writes race** (ADAM
+      # CR-336, option B, decided 29 October 2026; CHG-CR336-001): an exclusion constraint over principal_id and the
+      # half-open range [starts_at, ends_at), for every row that is not cancelled. A constraint is not under row
+      # security, so it sees every venue's rows; createRotaAssignment and updateRotaAssignment answer its violation
+      # 409 rota-assignment-overlap. tools/derive-ddl.py writes it (EXCLUDE USING gist, btree_gist).
+      x-ticvai-exclude:
+      - equal: [principalId]
+        during: [startsAt, endsAt]
+        unless: {status: cancelled}
       required: [principalId, venueId, startsAt, endsAt, position]
       properties:
         overtimeMinutes:
@@ -3892,6 +4059,21 @@ components:
           description: >
             **Flagged at assignment, not discovered at payroll.** A rota that breaches a statutory
             limit is a rota somebody has to redo, and finding out a month later means it was worked.
+
+
+            **The limit is the venue's working-hour rule** (ADAM CR-334, option A, decided 29 October
+            2026): the `workforce.staffing_rules` row of the assignment's venue, read by
+            `createRotaAssignment` and, after a move, by `updateRotaAssignment`. True when the person's
+            assignments at that venue that are not `cancelled`, this one included, exceed any of its three
+            limits: more
+            than `maximumHoursPerDay` hours on one calendar day in the venue's time zone; more than
+            `maximumHoursPerWeek` hours in any 7 consecutive days (a rolling window, not a calendar week)
+            that include this assignment; or less than `minimumRestHours` between this assignment and the
+            person's assignment just before or just after it. An assignment's hours are `endsAt` minus
+            `startsAt`, less `breakMinutes`. A limit the venue has not set (null), or a venue with no
+            staffing rules, is not checked, and the flag is false. Flagged, never refused: the assignment
+            is stored and the manager sees the flag. The flag is this assignment's, set when it is written;
+            the person's other assignments keep the flag they were written with.
         labourCost:
           allOf:
             - $ref: '../shared/common.yaml#/components/schemas/Money'

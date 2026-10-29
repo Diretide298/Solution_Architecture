@@ -224,6 +224,12 @@
     "operation": null,
     "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read returns candidates for a rota position (skill, availability, suitability).",
     "source": "contracts/satellite/workforce.yaml#createRotaAssignment"
+   },
+   {
+    "operation": "createRotaAssignment",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXU-008, the lead: \"Remove + log text\"): a board reading of 19 September declared it, and nothing on the approved screen sends it: its tables show the roster, coverage and check-ins and nothing on it rosters a position. A person is rostered on BO-055 Rota & Scheduling and BO-714 Event Shift & Roster Configuration, where createRotaAssignment stays declared and reached. The screen keeps listRotaAssignments, getStaffingCoverage and listAttendance. A CR brings the write back here with the control and the fields that send it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
    }
   ],
   "layout": {
@@ -304,22 +310,11 @@
   "states": {
    "loading": "The attraction operational staffing list.",
    "error": "Could not load. Names which read failed and leaves the attraction operational staffing untouched.",
-   "emptyFirstRun": "No attraction operational staffing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No attraction operational staffing yet. Positions are rostered on Rota & Scheduling (BO-055); this screen shows the roster, its coverage and who has checked in.",
    "emptyNoResults": "The filter narrowed it and the attraction operational staffing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "createRotaAssignment",
-    "contract": "workforce",
-    "purpose": "Roster a position",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listRotaAssignments",
-     "getStaffingCoverage"
-    ]
-   },
    {
     "operationId": "listRotaAssignments",
     "contract": "workforce",

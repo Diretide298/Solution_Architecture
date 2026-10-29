@@ -6808,7 +6808,9 @@ screens:
       sends somebody to support with the wrong question. A caller who can see the screen but lacks what
       an action needs sees that action disabled, naming its permission: `DEVICE_MANAGE` for `setDeviceAssignment`;
       `SHIFT_OPEN` for `allocateDepositBox`; `WORKSTATION_CONFIGURE` for `configureWorkstation`.'
-    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
+    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.
+      **Configure workstation and Assign peripheral to this till are disabled offline:** `configureWorkstation`
+      and `setDeviceAssignment` are not offline-capable, so their buttons say to reconnect.'
   apis:
   - operationId: allocateDepositBox
     contract: shift
@@ -8023,7 +8025,8 @@ screens:
       `PRODUCT_CONFIGURE` for `setItemAvailability`.'
     offline: '**Selling continues from the cached menu.** 86 changes made while offline arrive on sync,
       which is why an item can be sold that the kitchen has just marked unavailable — the kitchen refuses
-      it and the guest is refunded at the counter.'
+      it and the guest is refunded at the counter. **Add cart line is disabled offline:** `addCartLine`
+      is not offline-capable, so the button says to reconnect.'
     denied: Ordering is refused without `payment.take`. The kitchen is not fired, so nothing is cooked
       against a sale that cannot be paid for.
     soldOutByCount: A dish whose daily count reached zero shows Sold out and cannot be added; the kitchen

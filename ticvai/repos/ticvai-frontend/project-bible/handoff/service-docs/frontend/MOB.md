@@ -77,7 +77,7 @@
 | [GST-047](#gst-047-maintenance-upgrade-page) | Maintenance / Upgrade Page | System States | 1 | 2 |
 | [GST-048](#gst-048-upsell-cross-sell) | Upsell / Cross-Sell | Booking & Selection | 1 | 5 |
 | [GST-049](#gst-049-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 1 | 6 |
-| [GST-050](#gst-050-resource-booking-cabana) | Resource Booking – Cabana | Booking & Selection | 1 | 4 |
+| [GST-050](#gst-050-resource-booking-cabana) | Resource Booking – Cabana | Booking & Selection | 1 | 5 |
 | [GST-051](#gst-051-plan) | Plan | Engagement & Support | 1 | 4 |
 | [GST-052](#gst-052-suggested-itineraries) | Suggested Itineraries | Engagement & Support | 1 | 2 |
 | [GST-053](#gst-053-your-plan) | Your Plan | Engagement & Support | 1 | 5 |
@@ -215,7 +215,7 @@
 | GST-044 | Multi-Currency & Pricing |  |  |
 | GST-047 | Maintenance / Upgrade Page |  |  |
 | GST-048 | Upsell / Cross-Sell | productId |  |
-| GST-050 | Resource Booking – Cabana |  |  |
+| GST-050 | Resource Booking – Cabana | productId |  |
 | GST-051 | Plan Your Adventure – Start |  |  |
 | GST-053 | Build Your Own Itinerary |  |  |
 | GST-057 | Accessibility Information |  |  |
@@ -2855,12 +2855,14 @@
 | Parameter | From |
 |---|---|
 | cartId | session |
+| productId | navigation |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the chosen cabana and time to the cart | `None` |
+| `listProductVariants` | [CatalogueService](../backend/CatalogueService.md#listproductvariants) | onAction | The types of the cabana the guest chose (its catalogue variants), read when the form opens: the Type the form asks is the `variantId` addCartLine sends. No component of its own: the form's picker (r11 gate fix, CHG-R11FXS-005; as GST-048, CHG-R10GFP-006). | `PRODUCT_VIEW` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `getAvailability` | [CatalogueService](../backend/CatalogueService.md#getavailability) | onLoad | Live remaining capacity | `PRODUCT_VIEW` |
 | `createCart` | [OrderService](../backend/OrderService.md#createcart) | background | Started by the runtime the first time a line is added, before the first addCartLine, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045; r8, GPS-C23). | `None` |

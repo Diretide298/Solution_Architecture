@@ -179,30 +179,6 @@
   "requestBody": "FraudRuleSet",
   "responds": "FraudRuleSet"
  },
- "setWalletRefundPolicy": {
-  "method": "PUT",
-  "path": "/wallet-refund-policy",
-  "contract": "wallet",
-  "summary": "What a refund puts back, and where",
-  "permission": "WALLET_CONFIGURE",
-  "offlineCapable": null,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "WalletRefundPolicy",
-  "responds": "WalletRefundPolicy"
- },
  "voidPayment": {
   "method": "POST",
   "path": "/payments/{paymentId}/void",

@@ -756,6 +756,7 @@ $$;
 #     to. Staff read and write by `scope_path`, as the scope rule; a guest reads a row naming its subject in
 #     `subject_id`, `over_subject_id` or `granted_by_subject_id`, and writes one whose `over_subject_id` (else
 #     `subject_id`) is its own: the account holder grants and revokes. identity.delegated_access, guest to guest.
+#     Since ADAM CR-295 (29 October 2026) the staff scope test admits only a session with no guest subject.
 #   * `x-ticvai-rls: any-grant-no-delete` (CHG-R9MIG-001; ADAM CR-166 as the lead ruled it, 21 October 2026): any
 #     connection holding a grant (a scope path set) reads, inserts and updates a row, and no policy lets one be deleted.
 #     For a row that belongs to no scope (`x-ticvai-scope: none`): platform.outbox_sequence, the per-aggregate counter
@@ -783,8 +784,18 @@ $$;
 #     staff read and write through the parent, as the parent rule does, for a session with no guest subject (CR-295's
 #     rule), OR `platform.subject_in_scope(subject_id)` for read and write: marketing.guest_profile, the guest's own
 #     profile under the segment it was first captured in.
+#   * `x-ticvai-rls: grant-holder-write` (CHG-R11FXC-003; r11 gate, check-rls-scope-fit RF-TENANT-ROOT on started tickets
+#     #27745 and #32125, the choice CHG-MOD-007 left to the lead for "writes by venue staff to rows a guest owns"):
+#     a row a guest owns that belongs to no venue or scope (a consent record, a stored card token, a wallet) is read
+#     AND written by any staff grant (`platform.grant_holder()`: scope paths set, no guest subject), and the guest
+#     still reads and writes its own rows (`platform.subject_in_scope(subject_id)`, the tenant root included). The
+#     staff-grant write rule, not "write under the tenant root after the venue check": a venue cashier or desk records
+#     the guest's consent, saves its card and moves its wallet with the grant it holds, and the permission and the
+#     operation's own rules decide the rest, as they already do for the read. On a table with no subject_id (a row of
+#     a guest's wallet that names the wallet, `wallet.balance`) any staff grant reads and writes.
 RLS_MARKS = ("read-beneath", "grant-holder-read", "own-row", "home-scope-write", "subject-self", "own-or-home-scope",
-             "signed-in-read", "scope-or-subject", "any-grant-no-delete", "guest-owns", "guest-reads-own")
+             "signed-in-read", "scope-or-subject", "any-grant-no-delete", "guest-owns", "guest-reads-own",
+             "grant-holder-write")
 # The checks `guest-owns` and `guest-reads-own` build on, `{a}` standing for the row's alias (CHG-R9CR-003/004). The
 # scope rule is migration 225's per-statement predicate (apply_statement_scope_rls in our team's repository), the
 # guest's subject compared the same way, so neither calls a function per row.
@@ -819,8 +830,11 @@ TABLE_RLS = {
     "fnb.delivery_location_outlet": "grant-holder-read",
     "whitelabel.homepage_section": "grant-holder-read",
     # The balances closeFiscalPeriod (region) reads through Wallet's periodCloseChecks (CHG-FIN-012). Batch STO declares
-    # wallet_id, after which the table follows wallet.wallet (opened the same way) and this line is moot.
-    "wallet.balance": "grant-holder-read",
+    # wallet_id, after which the table follows wallet.wallet (opened the same way) and this line is moot. A subject's
+    # wallet is no parent the parent rule follows (it is owned by subject), so the line stands, and since r11 the
+    # venue's writers of a wallet (topUpWallet, transferWalletBalance, holdWalletFunds ...) write its balance too, as
+    # they write wallet.wallet (CHG-R11FXC-003).
+    "wallet.balance": "grant-holder-write",
 }
 
 RLS_SPLIT = """
@@ -901,6 +915,19 @@ BEGIN
     PERFORM platform.apply_split_rls(target,
         'platform.grant_holder() OR platform.subject_in_scope(subject_id)',
         'platform.subject_in_scope(subject_id)');
+END
+$$;
+
+-- `x-ticvai-rls: grant-holder-write` on a table owned by subject (CHG-R11FXC-003): any staff grant reads and writes,
+-- and the guest reads and writes its own rows (the tenant root included, through subject_in_scope).
+CREATE OR REPLACE FUNCTION platform.apply_grant_holder_subject_rls(target regclass)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    PERFORM platform.apply_split_rls(target,
+        'platform.grant_holder() OR platform.subject_in_scope(subject_id)',
+        'platform.grant_holder() OR platform.subject_in_scope(subject_id)');
 END
 $$;
 
@@ -1587,6 +1614,50 @@ def deployable_read_grants(db: str = "tenant") -> str:
             "-- these roles read.\n" + "\n".join(out) + "\n")
 
 
+def seed_rows_sql(db: str, cols: dict) -> str:
+    """The rows a table is seeded with, from its schema's `x-ticvai-seed-rows` (ADAM CR-330, option A, "All as
+    recommended", Chinmay, 29 October 2026; CHG-CR330-001).
+
+    **A rule the platform holds is a row, and nothing seeded it.** ApprovalKind said the platform rule for a tenant
+    subject was "seeded when the platform is provisioned", and no table held it and no migration wrote it, so every
+    suspendTenant and reactivateTenant would be refused 422. A schema now lists the rows its table starts with, by
+    contract property; each is written as one `INSERT ... ON CONFLICT DO NOTHING` after the table's keys, so the
+    statement can run twice and never overwrites a row an operator changed. The forward migration carries it with the
+    new table (ddl_forward writes a statement that names only new tables). Keyed by the table's primary or unique key:
+    a seeded table without one is refused here, since nothing would stop a second copy."""
+    out = []
+    for name, marks in sorted(SCHEMA_MARKS.items()):
+        rows = marks.get("x-ticvai-seed-rows")
+        if not rows:
+            continue
+        table = str(marks.get("x-ticvai-persistence") or "").strip()
+        if not re.match(r"^[a-z_]+\.[a-z_]+$", table) or area(table.split(".", 1)[0]) != db:
+            continue
+        by_prop = {str(c.get("source") or "").rsplit(".", 1)[-1]: c["column"] for c in cols.get(table, [])
+                   if str(c.get("source") or "").startswith(name + ".")}
+        if not (marks.get("x-ticvai-primary-key") or marks.get("x-ticvai-unique-together")):
+            print(f"  ! {name}: x-ticvai-seed-rows on {table}, which declares no primary or unique key; no seed written")
+            continue
+        for row in rows if isinstance(rows, list) else []:
+            names, values = [], []
+            for prop, val in (row or {}).items():
+                col = by_prop.get(str(prop))
+                if not col:
+                    print(f"  ! {name}: seed row names {prop!r}, which is no column of {table}; no seed written")
+                    names = []
+                    break
+                names.append(col)
+                values.append("NULL" if val is None else ("true" if val is True else "false" if val is False
+                              else str(val) if isinstance(val, (int, float)) else sql_literal(val)))
+            if names:
+                out.append(f"INSERT INTO {table} ({', '.join(names)}) VALUES ({', '.join(values)}) "
+                           "ON CONFLICT DO NOTHING;")
+    if not out:
+        return ""
+    return ("\n-- **Seed rows** (each schema's `x-ticvai-seed-rows`; ADAM CR-330, CHG-CR330-001). Run twice, they insert\n"
+            "-- nothing the second time, and they never overwrite a row already there.\n" + "\n".join(out) + "\n")
+
+
 # **Ending every session of a principal, whatever venue the caller acts at** (ADAM CR-180, option A, accepted 21 October
 # 2026; CHG-R10ID-006). updatePrincipal runs at venue scope, but identity.refresh_token is tenant-root and
 # identity.session venue-isolated, so a venue manager's revoke updated no token and only its own venue's sessions, and
@@ -1695,6 +1766,34 @@ def index_sql(schema: str, short: str, table: str, group: list) -> str:
     return (f"-- declared index (x-ticvai-index): {table} ({', '.join(group)})\n"
             f"CREATE INDEX IF NOT EXISTS {obj_name(short, *group, suffix='idx')} ON {q(schema)}.{q(short)} "
             f"({', '.join(q(k) for k in group)});")
+
+
+RANGE_OF = {"timestamptz": "tstzrange", "timestamp": "tsrange", "date": "daterange"}
+
+
+def exclude_name(short: str, equal: list) -> str:
+    """The name of an `x-ticvai-exclude` constraint: `<table>_<equal columns>_overlap_excl` (CHG-CR336-001)."""
+    return obj_name(short, *equal, "overlap", suffix="excl")
+
+
+def exclude_sql(schema: str, short: str, table: str, equal: list, during: list, unless: dict, col_type: dict) -> str:
+    """`x-ticvai-exclude` (ADAM CR-336, option B; CHG-CR336-001): an exclusion constraint that no two rows with equal
+    `equal` columns hold overlapping half-open ranges `[during[0], during[1])`, among the rows `unless` does not name
+    (`{status: cancelled}`, or `{status: [a, b]}`). A row that ends when the next begins does not overlap: the
+    two-argument range constructor's bounds are `[)`, and it is written without the bounds literal, whose `)` would
+    unbalance the statement for the review's readers (check-ddl-conventions D-FWD-CUT). The range type follows the
+    columns' type (timestamptz -> tstzrange)."""
+    rng = RANGE_OF.get(col_type.get(during[0], "timestamptz"), "tstzrange")
+    preds = []
+    for k, v in sorted(unless.items()):
+        vals = v if isinstance(v, list) else [v]
+        preds.append(f"{q(k)} IS DISTINCT FROM {sql_literal(vals[0])}" if len(vals) == 1
+                     else f"({q(k)} IS NULL OR {q(k)} NOT IN ({', '.join(sql_literal(x) for x in vals)}))")
+    where = f" WHERE ({' AND '.join(preds)})" if preds else ""
+    return (f"-- no overlap (x-ticvai-exclude): {table} ({', '.join(equal)}) during [{during[0]}, {during[1]})\n"
+            f"ALTER TABLE {q(schema)}.{q(short)} ADD CONSTRAINT {exclude_name(short, equal)} EXCLUDE USING gist ("
+            + ", ".join(f"{q(k)} WITH =" for k in equal)
+            + f", {rng}({q(during[0])}, {q(during[1])}) WITH &&){where};")
 
 
 def unique_when_sql(schema: str, short: str, table: str, keycols: list, cond: dict, keys: list) -> str:
@@ -2009,6 +2108,18 @@ def table_marks(cols: dict, tables) -> dict:
                  {(column_of(str(k)) or (str(k) if str(k) in names else f"?{k}")): v
                   for k, v in (u.get("when") or {}).items()})
                 for u in uw if isinstance(u, dict) and u.get("columns") and u.get("when")]
+        # **No two rows of one key overlap in time** (ADAM CR-336, option B, decided 29 October 2026; CHG-CR336-001):
+        # `x-ticvai-exclude: [{equal: [principalId], during: [startsAt, endsAt], unless: {status: cancelled}}]` on the
+        # schema is an exclusion constraint (EXCLUDE USING gist; btree_gist is in 001-extensions), so the rule holds
+        # when two writes race and across every row, whatever row security a reader runs under. See exclude_sql.
+        exm = marks.get("x-ticvai-exclude")
+        if isinstance(exm, list) and exm:
+            def _c(p):
+                return column_of(str(p)) or (str(p) if str(p) in names else f"?{p}")
+            entry["exclude"] = [
+                ([_c(p) for p in (e.get("equal") or [])], [_c(p) for p in (e.get("during") or [])],
+                 {_c(k): v for k, v in (e.get("unless") or {}).items()})
+                for e in exm if isinstance(e, dict) and len(e.get("during") or []) == 2]
         if len(entry) > 1:
             out[t] = entry
     return out
@@ -2095,6 +2206,48 @@ def unique_key(col: str, col_type: dict, src_of: dict) -> str:
     if col_type.get(col) == "text" and str((src_of.get(col) or {}).get(UNIQUE_COMPARE) or "") != "exact":
         return f"lower({q(col)})"
     return q(col)
+
+
+_PLAIN_INDEX = re.compile(r"^CREATE INDEX IF NOT EXISTS \S+ ON (\S+) \(([^()]*)\);$", re.M)
+_UNIQUE_INDEX = re.compile(r"^CREATE UNIQUE INDEX IF NOT EXISTS \S+ ON (\S+) \(([^()]*)\)( NULLS NOT DISTINCT)?;$", re.M)
+
+
+# **The tables whose plain index a decision replaced with the unique one** (ADAM CR-278, option A, 28 October 2026;
+# CHG-R11TEN-005). Only these lose the plain index in the generated DDL, so the next forward migration drops it. Every
+# other plain index a whole-column unique index duplicates stays generated and is listed for a person in
+# handoff/migration-review.md (REDUNDANT_INDEXES), because a generated migration only adds: a drop is a person's.
+UNIQUE_REPLACES_INDEX = {"tenancy.device_assignment": "ADAM CR-278, option A, 28 October 2026"}
+# (table, plain index, unique index) found by without_redundant_indexes and not decided, for migration-review.md.
+REDUNDANT_INDEXES: list = []
+
+
+def without_redundant_indexes(lines: list) -> list:
+    """`idx_lines` less the plain indexes a decision replaced with a unique index on the same columns.
+
+    **A unique index serves every lookup a plain index on the same columns does** (ADAM CR-278, option A, accepted
+    28 October 2026; CHG-R11TEN-005, as CR-103 and CHG-R8MIG-004 decided for tenancy.device_assignment (device_id)).
+    A plain index whose columns are exactly a whole-column unique index's on the same table is a duplicate. On a table
+    in UNIQUE_REPLACES_INDEX it is not written, and ddl_forward drops it, guarded (R8-MIG-001). Any other duplicate is
+    kept and recorded in REDUNDANT_INDEXES for handoff/migration-review.md, so the lead decides each drop. A partial
+    unique index (WHERE), one on `lower()` or a plain index with a method or a predicate is not the same lookup and is
+    no duplicate."""
+    uniq = {}
+    for _s, line in lines:
+        for m in _UNIQUE_INDEX.finditer(line):
+            uniq[(m.group(1), m.group(2).replace(" ", ""))] = re.search(r"INDEX IF NOT EXISTS (\S+)", m.group(0)).group(1)
+    out = []
+    for s_, line in lines:
+        m = _PLAIN_INDEX.search(line)
+        key = (m.group(1), m.group(2).replace(" ", "")) if m else None
+        if key and key in uniq:
+            if key[0] in UNIQUE_REPLACES_INDEX:
+                continue
+            found = (key[0], re.search(r"INDEX IF NOT EXISTS (\S+)", m.group(0)).group(1), uniq[key])
+            if found not in REDUNDANT_INDEXES:
+                REDUNDANT_INDEXES.append(found)
+        out.append((s_, line))
+    REDUNDANT_INDEXES.sort()
+    return out
 
 
 # `table -> [columns]` from `x-ticvai-primary-key`, filled in `main` before any key is asked for.
@@ -2312,6 +2465,13 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
         if was is not None and was.decode("utf-8").replace("\r\n", "\n") != files[name]:
             extra.append(("both", "file changed", name, "the generator would write it differently",
                           "not applied anywhere: bring the application rules it documents up to date by hand"))
+    # **A plain index a unique index duplicates waits for the lead** (ADAM CR-278, CHG-R11TEN-005): only the tables in
+    # UNIQUE_REPLACES_INDEX lose theirs; a generated migration adds, and a drop is a person's.
+    for t, plain, uq in REDUNDANT_INDEXES:
+        extra.append(("tenant" if area(t.split(".")[0]) == "tenant" else CONTROL, "index duplicates a unique index",
+                      f"{t.split('.')[0]}.{plain}", f"same columns as the unique index {uq}, which serves every lookup",
+                      "decide: DROP INDEX by hand (CONCURRENTLY on a live table), or add the table to "
+                      "tools/derive-ddl.py UNIQUE_REPLACES_INDEX with the decision so the next migration drops it"))
     # **Two keys to one parent wait for a decision** (CHG-MGN-001, ADAM CR-148, CR-149): listed, not resolved
     # alphabetically. Nothing to migrate until the package decides; the policy then reaches a forward migration.
     for t, (cols, par, took) in sorted(OWNER_UNDECIDED.items()):
@@ -2967,6 +3127,18 @@ def main() -> int:
                 idx_lines.append((schema, index_sql(schema, short, t, group)))
                 n_idx += 1
 
+            # `x-ticvai-exclude` (ADAM CR-336, option B; CHG-CR336-001): no two rows of one key overlap in time. A
+            # partitioned table's exclusion constraint must hold its partition key with `=`, so it is added.
+            for equal, during, unless in (marks.get(t) or {}).get("exclude") or []:
+                bad = [k[1:] for k in [*equal, *during, *unless] if k.startswith("?")]
+                if bad or not equal:
+                    no_unique.append(f"{t} (x-ticvai-exclude {equal} {during}): "
+                                     f"{', '.join(bad) or 'no equal column'} is not a column")
+                    continue
+                eq = list(equal) + ([part_col] if part_col and part_col not in equal else [])
+                idx_lines.append((schema, exclude_sql(schema, short, t, eq, during, unless, col_type)))
+                n_uniq += 1
+
             if not inline_pk and pk_cols:
                 body.append(f"    CONSTRAINT {obj_name(short, suffix='pkey')} PRIMARY KEY "
                             f"({', '.join(q(k) for k in pk_cols)})")
@@ -3044,7 +3216,7 @@ def main() -> int:
             "",
         ] + mine) + "\n"
 
-        idx = sorted({line for s, line in idx_lines if area(s) == db})
+        idx = sorted({line for s, line in without_redundant_indexes(idx_lines) if area(s) == db})
         files[f"{db}/910-indexes.sql"] = "\n".join([
             f"-- Indexes in the {db} database: declared foreign keys, conventions and scope paths.",
             "-- **Derived by tools/derive-ddl.py. Do not hand-edit.**",
@@ -3267,9 +3439,12 @@ def main() -> int:
                 print(f"  ! {t}: x-ticvai-rls scope-or-subject needs a scope_path and a subject column; the base rule "
                       "stands")
                 continue
-            read = " OR ".join(["platform.in_scope(scope_path)"]
+            # ADAM CR-295 (29 October 2026): the scope test admits a session with no guest subject only, so a guest
+            # whose request carries a venue scope (CR-198) reads and writes these rows by subject alone.
+            read = " OR ".join([f"({NO_GUEST} AND platform.in_scope(scope_path))"]
                                + [f"platform.own_row(NULL::uuid, {x})" for x in subs])
-            write = "(platform.in_scope({a}scope_path) OR platform.own_row(NULL::uuid, {a}" + holder + "))"
+            write = (f"(({NO_GUEST} AND platform.in_scope({{a}}scope_path)) OR platform.own_row(NULL::uuid, {{a}}"
+                     + holder + "))")
             call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(read)}, "
                     f"{sql_literal(write.format(a=''))});")
             base = "its scope, or the guest account it is about"
@@ -3309,6 +3484,22 @@ def main() -> int:
             write = ("platform.own_row(" + ("{a}principal_id" if pc else "NULL::uuid") + ", "
                      + ("{a}subject_id" if sc else "NULL::uuid") + ")")
             base = "its own principal or guest"
+        elif mark == "grant-holder-write":
+            # **A guest's row that belongs to no scope, written by any staff grant** (CHG-R11FXC-003); see RLS_MARKS.
+            if base == "subject":
+                call = f"SELECT platform.apply_grant_holder_subject_rls('{tq(t)}'::regclass);"
+                write = "(platform.grant_holder() OR platform.subject_in_scope({a}subject_id))"
+                base = "any staff grant, or the guest it belongs to"
+            elif base == "tenant root":
+                write = "platform.grant_holder()"
+                call = (f"SELECT platform.apply_grant_holder_read_rls('{tq(t)}'::regclass, "
+                        f"{sql_literal(write)});")
+                base = "any staff grant"
+            else:
+                print(f"  ! {t}: x-ticvai-rls grant-holder-write is for a row that belongs to no scope (owned by subject, "
+                      f"or the tenant root's); its rows are owned by {base}, whose writers write at their scope. The "
+                      "base rule stands")
+                continue
         elif mark == "read-beneath" and base == "venue_id":
             # **Owned above, read below, for a venue_id table** (CHG-R8MIG-026; the storage-sat lane's request 7,
             # ORDERS-MONEY-C33 answer A): a row with no venue is the tenant's and is read at every venue; a venue's row
@@ -3469,6 +3660,14 @@ def main() -> int:
         key = f"{grant_db}/920-row-level-security.sql"
         if grants and key in files:
             files[key] = files[key].rstrip("\n") + "\n" + grants
+
+    # ADAM CR-330 (CHG-CR330-001): the rows a schema says its table starts with, last in the database's files so its
+    # keys exist; the forward migration carries them with a new table.
+    for seed_db in ("tenant", CONTROL):
+        seeds = seed_rows_sql(seed_db, cols)
+        key = f"{seed_db}/920-row-level-security.sql"
+        if seeds and key in files:
+            files[key] = files[key].rstrip("\n") + "\n" + seeds
 
     # ADAM CR-180 (CHG-R10ID-006): the one function that ends a principal's sessions everywhere, written beside the
     # policies it works within; the forward migration carries it (CREATE OR REPLACE) to databases already built.

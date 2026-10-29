@@ -2,16 +2,16 @@
  "generated": "2026-10-29",
  "note": "The package measured in one pass. Derived by tools/build-package-report.py from the files the refresh writes -- never from prose.",
  "counts": {
-  "operations": 2854,
+  "operations": 2857,
   "contracts": 33,
-  "tables": 1161,
+  "tables": 1167,
   "stores": 10,
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3300,
+  "relationships": 3309,
   "states": 209,
-  "events": 105,
+  "events": 107,
   "flows": 98,
   "flowsDerived": 193,
   "adrs": 72,
@@ -38,58 +38,58 @@
   },
   {
    "link": "Operations declaring a service",
-   "done": 2854,
-   "total": 2854,
+   "done": 2857,
+   "total": 2857,
    "percent": 100,
    "note": "the operation is owned by one of the seventeen deployables"
   },
   {
    "link": "Operations declaring a permission",
-   "done": 2660,
-   "total": 2854,
+   "done": 2661,
+   "total": 2857,
    "percent": 93,
    "note": "the checklist a grant screen renders is built from these"
   },
   {
    "link": "Operations with resolved lineage",
-   "done": 2823,
-   "total": 2854,
+   "done": 2826,
+   "total": 2857,
    "percent": 99,
    "note": "names the tables it reads and writes -- the join the DDL cannot make itself"
   },
   {
    "link": "Operations reaching a screen",
    "done": 2570,
-   "total": 2854,
+   "total": 2857,
    "percent": 90,
    "note": "sync, webhook and job operations legitimately have none"
   },
   {
    "link": "Screens naming an operation",
-   "done": 2390,
+   "done": 2386,
    "total": 2453,
    "percent": 97,
    "note": "the rest are static, navigation shells or workshop-blocked"
   },
   {
    "link": "Tables reached by an operation",
-   "done": 1147,
-   "total": 1161,
+   "done": 1151,
+   "total": 1167,
    "percent": 99,
    "note": "a table nothing reaches is a missing operation or a table that should not exist"
   },
   {
    "link": "Tables carrying a relationship",
-   "done": 1066,
-   "total": 1161,
+   "done": 1070,
+   "total": 1167,
    "percent": 92,
    "note": "either end of a declared reference"
   }
  ],
  "boundaries": {
-  "edgesTotal": 3300,
-  "insideOneService": 2042,
-  "crossingTwoServices": 1258,
+  "edgesTotal": 3309,
+  "insideOneService": 2049,
+  "crossingTwoServices": 1260,
   "endpointNotOwned": 0,
   "note": "A reference inside one service is a foreign key the database enforces. A reference across two is a distributed read somebody has to design.",
   "heaviest": [
@@ -129,12 +129,12 @@
     "edges": 48
    },
    {
-    "from": "OrderService",
+    "from": "VenueOpsService",
     "to": "TenancyService",
-    "edges": 36
+    "edges": 37
    },
    {
-    "from": "VenueOpsService",
+    "from": "OrderService",
     "to": "TenancyService",
     "edges": 36
    },
@@ -169,7 +169,7 @@
    },
    {
     "table": "platform.outbox",
-    "edges": 61
+    "edges": 62
    },
    {
     "table": "approvals.request",
@@ -228,11 +228,11 @@
    "tier": "operations",
    "contracts": 8,
    "schemas": 8,
-   "operations": 298,
-   "tables": 127,
+   "operations": 299,
+   "tables": 128,
    "screens": 53,
    "operationsOnAScreen": 278,
-   "edgesOut": 114,
+   "edgesOut": 115,
    "edgesIn": 42
   },
   {
@@ -240,8 +240,8 @@
    "tier": "engagement",
    "contracts": 1,
    "schemas": 1,
-   "operations": 280,
-   "tables": 132,
+   "operations": 281,
+   "tables": 133,
    "screens": 40,
    "operationsOnAScreen": 233,
    "edgesOut": 149,
@@ -277,11 +277,11 @@
    "contracts": 4,
    "schemas": 6,
    "operations": 214,
-   "tables": 106,
+   "tables": 107,
    "screens": 71,
    "operationsOnAScreen": 189,
    "edgesOut": 130,
-   "edgesIn": 376
+   "edgesIn": 377
   },
   {
    "service": "AiService",
@@ -293,7 +293,7 @@
    "screens": 21,
    "operationsOnAScreen": 131,
    "edgesOut": 64,
-   "edgesIn": 3
+   "edgesIn": 4
   },
   {
    "service": "FnbService",
@@ -313,10 +313,10 @@
    "contracts": 1,
    "schemas": 1,
    "operations": 110,
-   "tables": 36,
+   "tables": 37,
    "screens": 25,
    "operationsOnAScreen": 107,
-   "edgesOut": 19,
+   "edgesOut": 20,
    "edgesIn": 15
   },
   {
@@ -324,8 +324,8 @@
    "tier": "foundation",
    "contracts": 1,
    "schemas": 2,
-   "operations": 102,
-   "tables": 46,
+   "operations": 103,
+   "tables": 48,
    "screens": 36,
    "operationsOnAScreen": 80,
    "edgesOut": 27,
@@ -487,9 +487,9 @@
   },
   {
    "contract": "identity",
-   "operations": 102,
+   "operations": 103,
    "onAScreen": 80,
-   "withLineage": 101,
+   "withLineage": 102,
    "withPermission": 63,
    "percentOnAScreen": 78
   },
@@ -511,9 +511,9 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 280,
+   "operations": 281,
    "onAScreen": 233,
-   "withLineage": 279,
+   "withLineage": 280,
    "withPermission": 250,
    "percentOnAScreen": 83
   },
@@ -639,11 +639,11 @@
   },
   {
    "contract": "venue-map",
-   "operations": 26,
+   "operations": 27,
    "onAScreen": 23,
-   "withLineage": 25,
-   "withPermission": 20,
-   "percentOnAScreen": 88
+   "withLineage": 26,
+   "withPermission": 21,
+   "percentOnAScreen": 85
   },
   {
    "contract": "wallet",
@@ -744,8 +744,8 @@
    "targetApp": "venue-management",
    "operator": "venue",
    "screens": 1663,
-   "screensWithOperations": 1610,
-   "distinctOperations": 1895,
+   "screensWithOperations": 1606,
+   "distinctOperations": 1892,
    "percentWithOperations": 97
   },
   {
@@ -854,10 +854,10 @@
   "requirementsGapContract": 0,
   "requirementsGapDecision": 0,
   "requirementsPartial": 12,
-  "operationsNoScreen": 284,
-  "screensNoOperation": 63,
+  "operationsNoScreen": 287,
+  "screensNoOperation": 67,
   "operationsNoLineage": 31,
-  "tablesNotReached": 14,
+  "tablesNotReached": 16,
   "permissionsWithoutLabel": 70,
   "capabilityPairs": 291,
   "modulesWithCapabilities": 33

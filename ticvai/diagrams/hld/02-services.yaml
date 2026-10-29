@@ -1,7 +1,7 @@
 id: HLD
 title: TICVAI — seventeen modules in five tiers, five deployables
 generatedBy: tools/derive-diagrams.py
-about: '**What ships together.** 2,854 operations and 1,165 tables resolve into seventeen modules, deployed
+about: '**What ships together.** 2,857 operations and 1,171 tables resolve into seventeen modules, deployed
   as five units (ADR-0055), and **the data boundary decides where they split**: a module owns and migrates
   its schemas; another module reads them through published views and writes them only through the owner''s
   in-process API.
@@ -18,7 +18,7 @@ tiers:
   services:
   - service: TenancyService
     operations: 214
-    tables: 107
+    tables: 108
     schemas:
     - platform
     - workforce
@@ -36,14 +36,14 @@ tiers:
     ifDown: Same as identity — nothing runs without a scope.
     ref: diagrams/lld/services/TenancyService.yaml
   - service: IdentityService
-    operations: 102
-    tables: 46
+    operations: 103
+    tables: 48
     schemas:
     - identity
     - pii
     contracts:
     - identity
-    flowCoverage: 21%
+    flowCoverage: 20%
     scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
     ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
     ref: diagrams/lld/services/IdentityService.yaml
@@ -125,8 +125,8 @@ tiers:
     these runs none of them.
   services:
   - service: VenueOpsService
-    operations: 298
-    tables: 127
+    operations: 299
+    tables: 128
     schemas:
     - queue
     - maintenance
@@ -187,8 +187,8 @@ tiers:
     property and one that should be tested rather than assumed.
   services:
   - service: MarketingService
-    operations: 280
-    tables: 132
+    operations: 281
+    tables: 133
     schemas:
     - marketing
     contracts:
@@ -228,7 +228,7 @@ tiers:
     ref: diagrams/lld/services/PlatformService.yaml
   - service: WhiteLabelService
     operations: 110
-    tables: 36
+    tables: 37
     schemas:
     - whitelabel
     contracts:
@@ -351,6 +351,11 @@ crossServiceWrites:
   writes: 9
   reads: 2
   kind: strong
+- from: MarketingService
+  to: TenancyService
+  writes: 6
+  reads: 3
+  kind: strong
 - from: FnbService
   to: TenancyService
   writes: 5
@@ -366,13 +371,13 @@ crossServiceWrites:
   writes: 5
   reads: 0
   kind: strong
-- from: MarketingService
-  to: TenancyService
-  writes: 5
-  reads: 3
-  kind: strong
 - from: RetailService
   to: InventoryService
+  writes: 5
+  reads: 4
+  kind: strong
+- from: VenueOpsService
+  to: TenancyService
   writes: 5
   reads: 4
   kind: strong
@@ -395,11 +400,6 @@ crossServiceWrites:
   to: PlatformService
   writes: 4
   reads: 5
-  kind: ordinary
-- from: VenueOpsService
-  to: TenancyService
-  writes: 4
-  reads: 4
   kind: ordinary
 - from: VenueOpsService
   to: OrderService
@@ -435,11 +435,6 @@ crossServiceWrites:
   to: OrderService
   writes: 2
   reads: 21
-  kind: ordinary
-- from: MarketingService
-  to: PlatformService
-  writes: 2
-  reads: 3
   kind: ordinary
 - from: OrderService
   to: CrossRegionService
@@ -494,12 +489,17 @@ crossServiceWrites:
 - from: IdentityService
   to: MarketingService
   writes: 1
-  reads: 4
+  reads: 0
   kind: ordinary
 - from: LedgerService
   to: OrderService
   writes: 1
   reads: 14
+  kind: ordinary
+- from: MarketingService
+  to: PlatformService
+  writes: 1
+  reads: 1
   kind: ordinary
 - from: OrderService
   to: WalletService

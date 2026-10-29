@@ -575,6 +575,12 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Marketing_CRM_Configuration_Reference v1.0.pdf, page 12"
+   },
+   {
+    "operation": "setConsentPurposes",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXU-006, the lead: \"Remove + log text\"): a board reading of 19 September declared it, and nothing on the approved screen sends it: its Save consent purposes and Cancel were generated, and the purposes table is read-only. Consent purposes are configured on CMS-018 (Save consent purposes) and CMS-023, where setConsentPurposes stays declared and reached. The generated Save and Cancel buttons go with it; the screen keeps listConsentPurposes and the consent-form builder (listForms, createForm with its form). A CR brings the write back here with the control and the fields that send it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
    }
   ],
   "layout": {
@@ -589,20 +595,6 @@
        "impliedBy": "listConsentPurposes",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
        "operation": "listConsentPurposes"
-      },
-      {
-       "kind": "primaryButton",
-       "derived": true,
-       "impliedBy": "setConsentPurposes",
-       "label": "Save consent purposes",
-       "notes": "The act the screen exists for."
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Cancel",
-       "notes": "**A screen that can submit must be leaveable without submitting.**",
-       "derived": true,
-       "impliedBy": "setConsentPurposes"
       },
       {
        "kind": "dataTable",
@@ -641,13 +633,6 @@
     "contract": "marketing-crm",
     "purpose": "Purposes and lawful bases",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "setConsentPurposes",
-    "contract": "marketing-crm",
-    "purpose": "Configure them",
-    "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
    },
    {

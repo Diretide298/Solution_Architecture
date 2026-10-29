@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 102 operations
+title: identity — 103 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -328,10 +328,6 @@ operations:
   reads:
   - cache:idempotency
   - identity.subject_holding
-  - marketing.consent_record
-  - marketing.form_submission
-  - marketing.guest_document
-  - marketing.guest_profile
   - pii.subject
   writes:
   - approvals.request
@@ -581,6 +577,7 @@ operations:
   reads:
   - cache:idempotency
   - identity.mfa_method
+  - identity.sso_provider
   - pii.subject_contact
   - pii.subject_identity
   writes:
@@ -601,6 +598,7 @@ operations:
   - cache:idempotency
   - identity.mfa_method
   - identity.redirect_host
+  - identity.sso_provider
   - pii.subject_contact
   - pii.subject_identity
   writes:
@@ -634,7 +632,6 @@ operations:
   offline: false
   reads:
   - identity.access_decision
-  - identity.authz_audit
   writes: []
 - operation: listAccessReviewCampaigns
   verb: GET
@@ -1038,6 +1035,20 @@ operations:
   writes:
   - cache:idempotency
   - pii.consent_identifier
+- operation: recordSubjectDataExportPart
+  verb: POST
+  path: /guest-data-export-parts
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - identity.subject_data_export_part
+  writes:
+  - cache:idempotency
+  - identity.subject_data_export_part
 - operation: refreshToken
   verb: POST
   path: /auth/refresh
@@ -1362,9 +1373,9 @@ operations:
   - guest
   offline: false
   reads:
-  - assets.media_asset
   - cache:idempotency
   - identity.guest_identity_verification
+  - identity.guest_upload_ref
   - identity.guest_verification_policy
   writes:
   - cache:idempotency

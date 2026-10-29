@@ -1325,7 +1325,6 @@ paths:
       operationId: updateGuestPreferences
       x-ticvai-consumed-by:
         - "P01 WEB-020 Profile & Preferences"
-        - "P08 BO-740 Family & Guardians"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1725,6 +1724,15 @@ paths:
         Where the form has an expiry, a live acceptance means **a returning participant does not sign
         again.**
 
+
+        **Who may submit, and what each outcome answers** (ADAM CR-318, option A, 29 October 2026). A guest
+        submits for itself; a staff member with a grant at the venue records a guest''s submission (the
+        counter, the kiosk), as the guest could, and `marketing.form_submission` lets both write
+        (`x-ticvai-rls: grant-holder-write`: any staff grant, or the guest''s own subject). A form or form
+        version that does not exist or is not published is `404 form-version-not-found`. Where a live
+        acceptance already exists, the answer is `200` with the existing submission and no new row is
+        written; a new acceptance is `201`.
+
         '
       tags:
       - marketing
@@ -1754,6 +1762,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FormSubmission'
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: 'A live acceptance already exists (ADAM CR-318): the existing submission, and nothing new is
+            written.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormSubmission'
+        '404':
+          x-ticvai-problem-types: [form-version-not-found]
+          description: 'The form, or the form version named, does not exist or is not published (ADAM CR-318); nothing
+            is written.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/waiver-status:
@@ -1887,10 +1913,10 @@ paths:
         route: service
         for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       summary: Define a challenge, mission or streak
       description: '22.6.1. **Gamification is not loyalty** — loyalty pays for spend, and a challenge
@@ -1934,10 +1960,10 @@ paths:
         - "P08 BO-825 Challenge Builder"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -1998,10 +2024,10 @@ paths:
         - "P08 BO-825 Challenge Builder"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -2042,10 +2068,10 @@ paths:
         - "P08 BO-825 Challenge Builder"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -2093,10 +2119,10 @@ paths:
         - "P01 WEB-017 My Account Dashboard"
       x-ticvai-read-via:
       - query: tenancy#scopeRecords
-        route: service
+        route: in-process
         for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Challenge.rewardAmount (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
@@ -2147,16 +2173,15 @@ paths:
       operationId: getSeoMetadata
       x-ticvai-consumed-by:
         - "P13 CMS-013 SEO & Metadata"
-      x-ticvai-read-via:
-      - query: platform-ops#seoMetadataRecords
-        route: in-process
-        for: 'its read of control.seo_metadata, Platform''s data (CHG-MOD-001)'
       summary: The metadata in force for one page
       description: '**The read `setSeoMetadata` had none of**, so the editor could not show what was there
         before replacing it.
 
         **Generated by default**, so there is always an answer: where nothing was set for the entity and
         locale, this returns the generated metadata with `isAutoGenerated: true` rather than 404.
+
+        **Read from `marketing.seo_metadata`, Marketing''s own table in the tenant database** (ADAM CR-317,
+        option A, 29 October 2026), under the tenant''s row-level security.
 
         '
       tags:
@@ -2211,9 +2236,6 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      - query: platform-ops#seoMetadataRecords
-        route: in-process
-        for: 'its read of control.seo_metadata, Platform''s data (CHG-MOD-001)'
       x-ticvai-body-key: [entityId]
       x-ticvai-body-key-note: 'Keyed by the body''s `entityId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per entity and locale within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Titles, descriptions, canonicals and hreflang
@@ -2222,6 +2244,12 @@ paths:
 
         **Generated by default and overridable**: a venue with 400 products will not write 400 meta descriptions,
         and one with an important landing page will not accept a generated one.
+
+        **Written to `marketing.seo_metadata`, in the tenant''s own database and transaction** (ADAM CR-317,
+        option A, 29 October 2026): SEO metadata is the tenant''s configuration about entities in its own
+        database, so Marketing owns the table beside them, under the tenant''s row-level security, and no
+        write crosses a module or a database. It moved from the shared control
+        database, which Platform owned and Marketing wrote with no declared route.
 
         '
       tags:
@@ -3167,7 +3195,7 @@ paths:
         - "P02 GST-043 Arabic / RTL Experience"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
@@ -3218,7 +3246,7 @@ paths:
         - "P02 GST-043 Arabic / RTL Experience"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'The caller''s own profile: one per signed-in guest, so there is no key in the path.'
@@ -3988,6 +4016,14 @@ paths:
         An agent who forgets to go offline is an agent conversations queue for. **Availability expires**
         rather than persisting through a closed laptop.
 
+        **When it expires** (ADAM CR-333, option C, Chinmay, 29 October 2026; CHG-CR333-001): every PUT sets
+        `expiresAt` to the earlier of the caller''s session expiry (`Session.expiresAt`, known from the caller''s
+        validated session as its scope is, never read from Identity''s tables) and a heartbeat lapse of 15 minutes
+        from now (a default, proposed, client to correct). Each PUT refreshes it, so the agent''s open console keeps
+        an agent available by sending its current availability again within the lapse; a closed laptop stops the
+        heartbeat, and the availability lapses. **Once `expiresAt` has passed the state reads as `offline`**,
+        whatever the row holds, for this operation''s answer and for every read that routes or counts agents by it.
+
         '
       tags:
       - marketing
@@ -4380,7 +4416,7 @@ paths:
         - "P08 BO-735 Guest Directory"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-reads:
       - table: marketing.consent_record
@@ -4483,7 +4519,7 @@ paths:
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       security:
       - guestAuth: []
@@ -4521,7 +4557,7 @@ paths:
         - "P08 BO-735 Guest Directory"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -4777,6 +4813,118 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /subject-data-export-parts:
+    post:
+      operationId: writeSubjectDataExportPart
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-agreed: '29 October 2026: the lead, r11 gate (check-cross-module-reads XR-UNCOVERED and XR-FOUNDATION on
+        exportSubjectData, started ticket #27745): Marketing adds its part, Identity assembles the parts (CHG-R11FXC-005)'
+      summary: Write Marketing's part of a guest's data export
+      description: '**The `identity.privacyRequestRaised` consumer that writes Marketing''s part of a guest''s data
+        export** (the lead, 29 October 2026, r11 gate; CHG-R11FXC-005). Identity is Foundation and reads nothing above
+        it (ADR-0028), so `exportSubjectData` no longer reads Marketing''s tables: Marketing, which owns them, writes
+        its own part and Identity''s export job assembles the parts. Modelled as an operation so it has lineage and a
+        ticket.
+
+
+        **What it writes.** For `requestType` `access` only (an erasure writes no part): every row of the guest
+        (`subjectId`) in marketing.consent_record, marketing.guest_profile, marketing.form_submission and
+        marketing.guest_document, the tables of Marketing''s that `handoff/subject-data-register.json` lists, in the
+        export''s `format`, as one object in the tenant''s private storage (never a public or CDN path; encrypted at rest
+        under the tenant''s keys, ADR-0063). **Another guest''s rows are left out even where they share a form or a
+        document**, as `exportSubjectData` says. Then it publishes `marketing.subjectDataPartWritten` with the
+        object''s key, in the same transaction as its inbox record. A guest with no Marketing rows still gets a part,
+        with `rowCount` 0, so the export job never waits for a part that will not come.
+
+
+        **When.** On the event, which `exportSubjectData` raises with the request: the part is the guest''s Marketing
+        data as of the request. It is not delivered until the export is approved; the export job deletes it with the
+        export (7 days after `readyAt`, or when the request is rejected, withdrawn or expired).
+
+
+        **Idempotent on `approvalRequestId`**: a redelivered event finds the part already written and returns it. Invoked
+        by the event relay, never by a screen.'
+      tags:
+      - consent
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      x-ticvai-consumes:
+      - identity.privacyRequestRaised
+      x-ticvai-emits:
+      - marketing.subjectDataPartWritten
+      x-ticvai-reads:
+      - table: marketing.consent_record
+        for: 'the guest''s consent records, for its part of the export (CHG-R11FXC-005)'
+      - table: marketing.guest_profile
+        for: 'the guest''s profile, for its part of the export (CHG-R11FXC-005)'
+      - table: marketing.form_submission
+        for: 'the guest''s form submissions, for its part of the export (CHG-R11FXC-005)'
+      - table: marketing.guest_document
+        for: 'the guest''s documents, for its part of the export (CHG-R11FXC-005)'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              x-ticvai-persistence: none — request only
+              required:
+              - eventId
+              - subjectId
+              - approvalRequestId
+              - requestType
+              properties:
+                eventId:
+                  type: string
+                  description: The `identity.privacyRequestRaised` event id, for the consumer's inbox record.
+                subjectId:
+                  type: string
+                  format: uuid
+                  description: The guest the export is about.
+                approvalRequestId:
+                  type: string
+                  format: uuid
+                  description: The export's id, carried on to `marketing.subjectDataPartWritten`.
+                requestType:
+                  type: string
+                  description: '`access` writes a part; `deletion` writes none and answers `rowCount` 0 with no `fileRef`.'
+                format:
+                  type: string
+                  enum: [json, csv, pdf]
+                  description: The export's format; json where the event carries none.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The part, written now or already written.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - approvalRequestId
+                - rowCount
+                properties:
+                  approvalRequestId:
+                    type: string
+                    format: uuid
+                  fileRef:
+                    type: string
+                    nullable: true
+                    description: The part's object key; null for a `deletion` request. Server only.
+                  rowCount:
+                    type: integer
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent-records/checkout:
@@ -5092,7 +5240,6 @@ paths:
     put:
       operationId: setConsentPurposes
       x-ticvai-consumed-by:
-        - "P08 BO-747 Consent Policy Configuration"
         - "P13 CMS-018 Consent & Legal"
         - "P13 CMS-023 Consent Purpose & Consent Type Builder"
       x-ticvai-singleton: true
@@ -5263,16 +5410,15 @@ paths:
         **Newest first**: ordered by `addedAt` descending, `id` as the tiebreak.
 
         **What Catalogue knows is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002;
-        ADR-0055 rule 4). Marketing runs in another deployable, so it never reads `catalogue.*`: it asks
-        Catalogue''s declared query `variantListingFacts(variantIds, channel, performanceIds)` through
-        Catalogue''s service route, once per read for every saved variant, with the guest''s channel (`web` or
-        `mobile`), and returns Catalogue''s current `productName`, `imageAssetRef`, `price` and
-        `performanceStartsAt`; `isAvailable` is false where Catalogue says the variant is not sellable
-        (`unavailableReason` is its `reason`) or the saved performance has started (`performancePassed`).
-        Nothing is written back: this read runs on a replica. **If Catalogue cannot be reached** the stored
-        values are returned as they were when each item was saved, rather than an error. Catalogue''s
-        published service operation for the query is not written yet (a follow-up, as for
-        `variantsSellableAt`, CHG-TEN-002).
+        asked in process since ADAM CR-270 and CR-273, option A, 28 October 2026, CHG-R11TEN-001). Marketing never
+        reads `catalogue.*` with its own SQL: it asks Catalogue''s declared query
+        `variantListingFacts(venueId, channel, variantIds, performanceIds)` in process, through Catalogue''s own
+        query class (the lead''s granted read, docs/active/cross-deployable-writes.yaml XDR-007), once per read for
+        every saved item, at the venue the guest acts at and with the guest''s channel (`web` or `mobile`), and
+        returns Catalogue''s current `productName`, `imageAssetRef`, `price` (its `listPrice`, with the venue''s
+        currency) and `performanceStartsAt`; `isAvailable` is false where Catalogue answers the item unavailable
+        (`unavailableReason` is its `unavailableReason`) or the saved performance has started
+        (`performancePassed`). Nothing is written back: this read runs on a replica.
 
         **Guests only** (ADR-0025): `bearerAuth` is not accepted; a staff token has no permission here
         (CHG-MKT-002, as the developer of ticket 30706 proposed).
@@ -5289,8 +5435,8 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       - query: catalogue#variantListingFacts
-        route: service
-        for: "items[] productName, imageAssetRef, price, performanceStartsAt, isAvailable, unavailableReason"
+        route: in-process
+        for: "items[] productName, imageAssetRef, price, performanceStartsAt, isAvailable, unavailableReason (ADAM CR-270, CR-273; XDR-007)"
       x-ticvai-permission: null
       x-ticvai-scope-level: subject
       x-ticvai-config-scope: subject
@@ -5332,18 +5478,19 @@ paths:
         `performanceId` is a third, date-less entry for the product generally.
 
         **Whether the variant may be sold is asked of Catalogue** (decided 14 October 2026, Chinmay, ADAM
-        CR-081; CHG-TEN-002; ADR-0055 rule 4). Marketing runs in another deployable, so it asks Catalogue''s
-        declared query `variantsSellableAt(venueId, [variantId], channel)` through Catalogue''s service route
-        with the guest''s channel (`web` or `mobile`) and never reads `catalogue.variant`. A variant Catalogue
-        does not know, or one not sellable at the venue on that channel, is the `404`. Catalogue''s published
-        service operation for the query is not written yet (a follow-up of CHG-TEN-002).
+        CR-081; CHG-TEN-002; asked in process since ADAM CR-270, option A, 28 October 2026, CHG-R11TEN-001).
+        Marketing asks Catalogue''s declared query `variantsSellableAt(venueId, [variantId], channel)` in process,
+        through Catalogue''s own query class (the lead''s granted read, docs/active/cross-deployable-writes.yaml
+        XDR-007), at the venue the guest acts at with the guest''s channel (`web` or `mobile`), and never reads
+        `catalogue.variant` with its own SQL. A variant Catalogue does not know is the `404` `unknown-variant`; one
+        not sellable at the venue on that channel is the `404` `variant-not-sellable`.
 
-        **What the saved row holds** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002). The same call
-        to Catalogue''s service route asks `variantListingFacts(variantIds, channel, performanceIds)` too, whose
-        `venueId` is the venue `variantsSellableAt` is asked about, and the row stores its `productName`,
-        `imageAssetRef`, `listPrice` (as `list_price`), `performanceStartsAt` and `isAvailable: true` as they are
-        at the save; `getWishlist` replaces them with Catalogue''s current answer on every read. A performance that
-        is not the variant''s product''s is the same `404` (`unknown-variant`).
+        **What the saved row holds** (decided 14 October 2026, Chinmay, ADAM CR-087, CHG-MKT-002; the query as
+        CR-270 declared it). It asks `variantListingFacts(venueId, channel, [variantId], [performanceId])` too, at
+        the same venue, and the row stores its `productName`, `imageAssetRef`, `listPrice` (the amount only, as
+        `list_price`), `performanceStartsAt` and `isAvailable: true` as they are at the save; `getWishlist`
+        replaces them with Catalogue''s current answer on every read. A performance that is not the variant''s
+        product''s is answered `unknownVariant`, the same `404` (`unknown-variant`).
 
         **The idempotency is the database''s**: a unique index on (`subject_id`, `variant_id`, `performance_id`)
         with a null performance colliding too (`NULLS NOT DISTINCT`), so two saves racing under different
@@ -5362,11 +5509,11 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers or accepts: the venue it acts at (the caller''s working venue), Tenancy''s data (CHG-R10ORD-019, the lead''s ruling of 25 October 2026)'
       - query: catalogue#variantsSellableAt
-        route: service
-        for: "the saved variantId (404 unknown-variant, variant-not-sellable)"
+        route: in-process
+        for: "the saved variantId (404 unknown-variant, variant-not-sellable) (ADAM CR-270; XDR-007)"
       - query: catalogue#variantListingFacts
-        route: service
-        for: "the stored productName, imageAssetRef, list_price, performanceStartsAt (404 unknown-variant)"
+        route: in-process
+        for: "the stored productName, imageAssetRef, list_price, performanceStartsAt (404 unknown-variant) (ADAM CR-270; XDR-007)"
       x-ticvai-permission: null
       x-ticvai-scope-level: subject
       x-ticvai-config-scope: subject
@@ -5948,7 +6095,7 @@ paths:
       operationId: listSegmentMembers
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: GuestProfile.lifetimeValue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -5992,7 +6139,7 @@ paths:
         - "P08 BO-766 Campaign Builder"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
@@ -6038,7 +6185,7 @@ paths:
         - "P08 BO-767 Audience & Offer Selection"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -6090,7 +6237,7 @@ paths:
         - "P08 BO-772 A/B & AI Optimization"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Campaign.budgetCap, Campaign.budgetSpent, CampaignPerformance.attributedRevenue (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -6122,7 +6269,7 @@ paths:
         - "P08 BO-772 A/B & AI Optimization"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -6391,7 +6538,7 @@ paths:
       operationId: pauseCampaign
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -6452,7 +6599,7 @@ paths:
       operationId: unscheduleCampaign
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -6500,7 +6647,7 @@ paths:
       operationId: stopCampaign
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: Campaign.budgetCap, Campaign.budgetSpent (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -6566,7 +6713,7 @@ paths:
         - "P08 BO-773 Attribution & Audit"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.marketing": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -8587,7 +8734,7 @@ paths:
         - "P08 BO-792 Deliverability & Analytics"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: ProviderHealthUsageCostMonitoringView.cost, ProviderHealthUsageCostMonitoringView.costPerMessage, ProviderHealthUsageCostMonitoringView.costPerThousand (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
@@ -8716,7 +8863,7 @@ paths:
         route: service
         for: 'what its text calls "ai.suggestion": ai.suggestion, Ai''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiDeliveryOptimizationCommunicationPlatformDiagnostiView.estimatedMonthlySaving (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
@@ -9194,10 +9341,17 @@ paths:
         technology requires a `category`; `consentRequired` cannot be false for anything but
         `strictlyNecessary` (422). Retired rather than deleted: the registry is evidence of what a site
         did on a date. (decided 29 September, readiness close-out)
+
+
+        **One registry per tenant, written at the tenant root** (ADAM CR-314, option C, one decision with
+        `setCookieBannerDesign`, 29 October 2026): a technology's row is at the tenant's root path, once
+        for the tenant, so the upsert key holds across its venues; writing it needs `GUEST_MANAGE` at the
+        tenant. The table reads beneath (`x-ticvai-rls: read-beneath`), so every venue's staff and
+        storefront read the tenant's registry.
       tags:
         - consent
       x-ticvai-permission: GUEST_MANAGE
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
@@ -9335,10 +9489,19 @@ paths:
         design whose `regulatoryRegimes` include `ccpaCpra` with no `doNotSellOrShare` button (29 September,
         build). The published version is what visitors get from `getCookieConsentRuntime` and decide
         against with `recordDeviceConsent`. (decided 29 September, readiness close-out)
+
+
+        **Written at its brand's node** (ADAM CR-314, option C, one decision with `setTrackingTechnology`,
+        29 October 2026): a design's row is at the path of the brand `brandId` names, and the corporate
+        design (`brandId` null) at the tenant root, so the upsert key holds once per brand and channel;
+        writing it needs `GUEST_MANAGE` at that node or above (the tenant, for the corporate design). The
+        table reads beneath (`x-ticvai-rls: read-beneath`), so every venue's staff and storefront read
+        their brand's banner and the corporate one. A draft's `noticeVersion` is null;
+        `approvePrivacyTesting` sets it when it publishes the version.
       tags:
         - consent
       x-ticvai-permission: GUEST_MANAGE
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: brand
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
@@ -9687,7 +9850,7 @@ paths:
       x-ticvai-consumed-by:
         - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
       x-ticvai-body-key: [changeSetId]
-      x-ticvai-body-key-note: 'Keyed by the body''s `changeSetId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per privacy change set within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `changeSetId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
+      x-ticvai-body-key-note: 'Keyed by the body''s `changeSetId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per privacy change set within the caller''s brand (brand level since ADAM CR-314); a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `changeSetId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.16-18 (17.1.10); approval runs through the approvals engine (configurable workflow, no hard-coded job titles)'
@@ -9706,10 +9869,23 @@ paths:
         history. Every action is audited with who, before/after, when, reason, test result, approval and
         publication. AI review findings are advice; a human approves. Upsert keyed on `changeSetId`.
         (decided 29 September, readiness close-out)
+
+
+        **Publishing a cookie banner design sets its `noticeVersion`**, which is null while it is a draft
+        (ADAM CR-314, 29 October 2026).
+
+
+        **At the owner's level** (the lead's ruling on ADAM CR-314, 29 October 2026: "Scan + approval at
+        owner level"): this runs at brand level, as `setCookieBannerDesign` does, so publishing writes the
+        brand's `marketing.cookie_banner_design` row (its `status` and the `noticeVersion` it sets) with a
+        grant at that brand or above.
+      x-ticvai-writes:
+      - table: marketing.cookie_banner_design
+        for: 'publishing a cookie banner design: the version''s status and the noticeVersion it sets, at the brand''s node (ADAM CR-314 ruling, 29 October 2026)'
       tags:
         - consent
       x-ticvai-permission: GUEST_MANAGE
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: brand
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
@@ -11271,7 +11447,7 @@ paths:
         route: service
         for: 'what its text calls "ai.suggestion": ai.suggestion, Ai''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CaseInvestigationResolutionWorkspaceView.commercialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [caseId]
       x-ticvai-body-key-note: 'Keyed by the body''s `caseId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per case and linked record within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
@@ -11333,7 +11509,7 @@ paths:
         route: service
         for: 'what its text calls "ai.suggestion": ai.suggestion, Ai''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CaseInvestigationResolutionWorkspaceView.commercialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
@@ -11477,7 +11653,7 @@ paths:
         route: service
         for: 'what its text calls "orders.sales_order": orders.sales_order, Order''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RefundCompensationServiceExceptionWorkspaceInput.value (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
@@ -11706,7 +11882,7 @@ paths:
         route: service
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CaseResolutionClosureCustomerFeedbackView.financialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
@@ -11819,7 +11995,7 @@ paths:
         route: service
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: CaseResolutionClosureCustomerFeedbackView.financialImpact (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
         - staff
@@ -18932,6 +19108,16 @@ paths:
         category is not `strictlyNecessary` is a pre-consent violation**: it is flagged on the finding, counted in
         `CookieScanRun.preConsentViolationCount` and raises the administrator alert whether or not the technology is
         new. That is what proves nothing loads before consent (2.6.58).
+
+
+        **The registry write is the tenant's** (the lead's ruling on ADAM CR-314, 29 October 2026: "Scan +
+        approval at owner level"). A venue-level staff caller may start or submit a scan; matching a finding to
+        `marketing.tracking_technology` (moving `lastSeenAt`, adding a `detected` row) is a service write
+        at tenant level: it runs at the tenant root, so the registry row stays the tenant's, as
+        `setTrackingTechnology` writes it.
+      x-ticvai-writes:
+      - table: marketing.tracking_technology
+        for: 'a finding matched to the registry (lastSeenAt) or added as detected: a service write at tenant level, at the tenant root (ADAM CR-314 ruling, 29 October 2026)'
       tags:
       - consent
       x-ticvai-permission: GUEST_MANAGE
@@ -22975,7 +23161,7 @@ components:
             how the field is drawn, never what is stored. On any other type, or a value that does not fit the type,
             the server stores null.
     FormSubmission:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestTimeline, getWaiverStatus, listComplianceEvidenceWaiver, listContact and others
+      x-ticvai-rls: grant-holder-write   # ADAM CR-318, option A: any staff grant reads and writes (a venue's counter or kiosk records a guest's submission), the guest its own; was grant-holder-read (MOD audit, CHG-MOD-007)
       type: object
       x-ticvai-persistence: marketing.form_submission
       description: '**The acceptance record, and it is evidence.** Bound to the exact version accepted,
@@ -23327,11 +23513,15 @@ components:
           nullable: true
     SeoMetadata:
       type: object
-      x-ticvai-persistence: control.seo_metadata
+      x-ticvai-persistence: marketing.seo_metadata
       description: '22.11.1 to 22.11.12, CF-137. **Twelve requirements, checked against the matrix.**
 
         **SEO is not a marketing nicety for a venue selling online** — an attraction that does not appear
         in search sells through OTAs at OTA commission, which is the cost this avoids.
+
+        **Kept in the tenant database, as `marketing.seo_metadata`** (ADAM CR-317, option A, 29 October 2026):
+        the same columns, scope row security, owned by Marketing. It was Platform''s table in the shared
+        control database, under the same name.
 
         '
       required:
@@ -25329,7 +25519,11 @@ components:
           type: string
           format: date-time
     ConsentRecord:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by enrolFacePass, getConsentHistory, getGuestConsents, getGuestIntelligence and others
+      # MOD audit, CHG-MOD-007: read below the tenant by enrolFacePass, getConsentHistory, getGuestConsents,
+      # getGuestIntelligence and others. Written by venue staff and partners too (checkoutCart, enrolFacePass,
+      # submitForm: a desk or a partner records the guest's consent, recorded_by_principal_id), so any staff grant
+      # writes as well as reads, and the guest its own (r11 gate RF-TENANT-ROOT, #27745; CHG-R11FXC-003).
+      x-ticvai-rls: grant-holder-write
       x-ticvai-persistence: marketing.consent_record + marketing.consent_record_channel
       allOf:
       - $ref: '#/components/schemas/RecordConsentRequest'
@@ -26067,7 +26261,8 @@ components:
           nullable: true
           readOnly: true
           description: When this state lapses on its own — **availability expires** rather than persisting
-            through a closed laptop.
+            through a closed laptop. Set by every `setAgentAvailability` to the earlier of the session's expiry and
+            a 15-minute heartbeat lapse; once it has passed, `state` reads as `offline` (ADAM CR-333, option C).
         updatedAt:
           type: string
           format: date-time
@@ -27940,6 +28135,10 @@ components:
           format: date-time
           readOnly: true
     ConsentPreferenceCommunicationPolicyEnforcementView:
+      # r11 gate RF-TENANT-ROOT (#35910; CHG-R11FXD-003): a guest's row with no venue or scope, read at a venue by
+      # listConsentPreferenceCommunication and written behind sendTransactionalMessage (venue, partner), so any staff
+      # grant reads and writes, and the guest its own (CHG-R11FXC-003's rule).
+      x-ticvai-rls: grant-holder-write
       type: object
       x-ticvai-persistence: marketing.communication_policy_decision
       description: >
@@ -28858,6 +29057,7 @@ components:
           - retired
           default: active
     CookieTrackingDigitalTechnologyRegistryView:
+      x-ticvai-rls: read-beneath   # ADAM CR-314, option C: the tenant's registry, written at the tenant root, read by every venue beneath it
       type: object
       x-ticvai-persistence: marketing.tracking_technology
       description: One governed tracking technology (pack 17.1.5 Registry Fields; BL-073 §4a).
@@ -28994,6 +29194,7 @@ components:
           format: date-time
           readOnly: true
     CookieBannerPreferenceCenterDesignerView:
+      x-ticvai-rls: read-beneath   # ADAM CR-314, option C: a brand's design at its brand's node (the corporate one at the tenant root), read by every venue beneath it
       type: object
       x-ticvai-persistence: marketing.cookie_banner_design
       description: One version of a cookie banner and preference-centre design (pack 17.1.6).
@@ -29140,7 +29341,9 @@ components:
         noticeVersion:
           type: string
           readOnly: true
-          description: Moves with the cookie policy (white-label `setPolicy`, kind `cookie`).
+          nullable: true
+          description: Moves with the cookie policy (white-label `setPolicy`, kind `cookie`). **Null on a draft**;
+            `approvePrivacyTesting` sets it when it publishes the version (ADAM CR-314).
         version:
           type: integer
           minimum: 1
@@ -35502,6 +35705,9 @@ components:
           - autoPopulated
           description: '`conditional` needs `conditions`; `autoPopulated` and `readOnly` need `mapsTo`.'
         options:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-column: option_labels
           type: array
           items:
             type: object
@@ -35513,10 +35719,18 @@ components:
                 maxLength: 100
               label:
                 $ref: '#/components/schemas/LocalisedText'
-          description: The allowed values of a select, dropdown or multi-select field.
+          description: 'The allowed values of a select, dropdown or multi-select field, each with the label a guest
+            reads. **Stored whole** (ADAM CR-313, option A, additive): the options as sent, value and label, in
+            `marketing.form_definition_field.option_labels` (jsonb), so the 200 returns the field exactly as sent;
+            their values, in the same order, still go to `options` (text[]), which every existing reader of a
+            field''s options reads.'
         validation:
           type: object
           nullable: true
+          description: '**Which members each `fieldType` accepts** (ADAM CR-313, option A): `minimum` and `maximum` a
+            `number` field; `dateFrom` and `dateTo` a `date` field; `pattern` and `maxLength` a `shortText`,
+            `longText`, `email`, `mobile` or `address` field. A member on any other type is validation that
+            contradicts the type: `422 field-validation-invalid`.'
           properties:
             minimum:
               type: number

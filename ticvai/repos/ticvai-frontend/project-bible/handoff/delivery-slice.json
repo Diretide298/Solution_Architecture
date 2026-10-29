@@ -220,9 +220,9 @@
  },
  "deferredScreens": [],
  "counts": {
-  "core": 517,
-  "setup": 268,
-  "allOperations": 2854
+  "core": 519,
+  "setup": 274,
+  "allOperations": 2857
  },
  "services": {
   "AccessService": {
@@ -242,13 +242,13 @@
   },
   "FnbService": {
    "core": 57,
-   "setup": 21,
+   "setup": 23,
    "total": 138
   },
   "IdentityService": {
-   "core": 32,
-   "setup": 5,
-   "total": 102
+   "core": 33,
+   "setup": 6,
+   "total": 103
   },
   "InventoryService": {
    "core": 1,
@@ -261,9 +261,9 @@
    "total": 72
   },
   "MarketingService": {
-   "core": 52,
-   "setup": 21,
-   "total": 280
+   "core": 53,
+   "setup": 22,
+   "total": 281
   },
   "OrderService": {
    "core": 90,
@@ -287,13 +287,13 @@
   },
   "TenancyService": {
    "core": 17,
-   "setup": 20,
+   "setup": 21,
    "total": 214
   },
   "VenueOpsService": {
    "core": 45,
-   "setup": 35,
-   "total": 298
+   "setup": 36,
+   "total": 299
   },
   "WalletService": {
    "core": 8,
@@ -603,6 +603,21 @@
    "screens": [],
    "enables": [
     "approvals.rule"
+   ]
+  },
+  "approvePrivacyTesting": {
+   "part": "setup",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "PUT",
+   "path": "/privacy-testing",
+   "perm": "GUEST_MANAGE",
+   "platforms": [],
+   "screens": [
+    "CMS-030"
+   ],
+   "enables": [
+    "marketing.cookie_banner_design"
    ]
   },
   "approveRoleAuthorityDelegation": {
@@ -1220,7 +1235,6 @@
    ],
    "screens": [
     "BO-036",
-    "BO-602",
     "POS-016"
    ],
    "enables": []
@@ -1700,7 +1714,6 @@
    "perm": "DEVICE_MANAGE",
    "platforms": [],
    "screens": [
-    "ADM-587",
     "BO-129"
    ],
    "enables": [
@@ -2540,10 +2553,7 @@
    "platforms": [],
    "screens": [
     "BO-055",
-    "BO-712",
-    "BO-714",
-    "BO-884",
-    "BO-917"
+    "BO-714"
    ],
    "enables": [
     "workforce.rota_assignment"
@@ -2698,7 +2708,6 @@
    "platforms": [],
    "screens": [
     "ADM-005",
-    "ADM-419",
     "ADM-420"
    ],
    "enables": [
@@ -5778,7 +5787,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-1086",
     "BO-1100",
     "BO-1149",
     "BO-1150",
@@ -8049,8 +8057,10 @@
     "GST-008",
     "GST-041",
     "GST-048",
+    "GST-050",
     "GST-075",
     "KSK-004",
+    "KSK-015",
     "POS-002",
     "POS-003",
     "PTR-006",
@@ -8803,7 +8813,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-1093",
     "BO-1102",
     "BO-1142",
     "BO-1143",
@@ -9937,6 +9946,19 @@
    ],
    "enables": []
   },
+  "recordSubjectDataExportPart": {
+   "part": "core",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "POST",
+   "path": "/guest-data-export-parts",
+   "perm": null,
+   "platforms": [
+    "SVC-IDENTITY-IDENTITY-1"
+   ],
+   "screens": [],
+   "enables": []
+  },
   "redeemLoyaltyPoints": {
    "part": "core",
    "service": "MarketingService",
@@ -10880,7 +10902,6 @@
     "BO-094",
     "CMS-004",
     "CMS-010",
-    "CMS-061",
     "CMS-062",
     "CMS-067",
     "CMS-073"
@@ -11375,7 +11396,6 @@
    ],
    "screens": [
     "ADM-016",
-    "BO-836",
     "CMS-002",
     "CMS-004",
     "CMS-104"
@@ -11483,7 +11503,6 @@
    "perm": "TENANT_CONFIGURE",
    "platforms": [],
    "screens": [
-    "BO-1070",
     "BO-123",
     "BO-129"
    ],
@@ -11502,7 +11521,6 @@
     "WL"
    ],
    "screens": [
-    "BO-747",
     "CMS-018",
     "CMS-023"
    ],
@@ -12084,6 +12102,21 @@
    ],
    "enables": []
   },
+  "setKitchenRoutingRules": {
+   "part": "setup",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PUT",
+   "path": "/outlets/{outletId}/kitchen-routing",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-135"
+   ],
+   "enables": [
+    "fnb.kitchen_routing_rule"
+   ]
+  },
   "setKitchenSla": {
    "part": "core",
    "service": "FnbService",
@@ -12201,6 +12234,21 @@
     "WEB-027"
    ],
    "enables": []
+  },
+  "setMenuItemDailyCount": {
+   "part": "setup",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "PUT",
+   "path": "/menu-items/{itemId}/daily-count",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-140"
+   ],
+   "enables": [
+    "fnb.sold_out_item"
+   ]
   },
   "setMenuSections": {
    "part": "setup",
@@ -12742,6 +12790,37 @@
    ],
    "enables": []
   },
+  "setSsoConfig": {
+   "part": "setup",
+   "service": "IdentityService",
+   "contract": "identity",
+   "verb": "PUT",
+   "path": "/tenants/sso-config",
+   "perm": "USER_MANAGE",
+   "platforms": [],
+   "screens": [
+    "ADM-005"
+   ],
+   "enables": [
+    "identity.sso_provider"
+   ]
+  },
+  "setStaffingRules": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "workforce",
+   "verb": "PUT",
+   "path": "/staffing-rules",
+   "perm": "WORKFORCE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-881",
+    "BO-885"
+   ],
+   "enables": [
+    "workforce.staffing_rules"
+   ]
+  },
   "setStoreAccounts": {
    "part": "core",
    "service": "WhiteLabelService",
@@ -13025,6 +13104,19 @@
     "venuemap.visit_plan_preset"
    ]
   },
+  "setVisitPlannerQuestions": {
+   "part": "setup",
+   "service": "VenueOpsService",
+   "contract": "venue-map",
+   "verb": "PUT",
+   "path": "/venues/{venueId}/visit-planner-questions",
+   "perm": "PRODUCT_CONFIGURE",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "venuemap.visit_planner_question"
+   ]
+  },
   "setVisitReminder": {
    "part": "core",
    "service": "OrderService",
@@ -13081,14 +13173,7 @@
    "platforms": [],
    "screens": [
     "BO-1094",
-    "BO-1095",
-    "BO-1096",
-    "BO-1097",
-    "BO-1098",
-    "BO-1099",
-    "BO-1101",
-    "BO-417",
-    "BO-418"
+    "BO-1098"
    ],
    "enables": [
     "wallet.funding_rule"
@@ -13399,7 +13484,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-1116",
     "BO-1121",
     "GST-071",
     "WEB-021"
@@ -13698,7 +13782,6 @@
     "WEB"
    ],
    "screens": [
-    "BO-740",
     "WEB-020"
    ],
    "enables": []
@@ -14535,6 +14618,19 @@
    "enables": [
     "transport.timetable"
    ]
+  },
+  "writeSubjectDataExportPart": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/subject-data-export-parts",
+   "perm": null,
+   "platforms": [
+    "SVC-IDENTITY-IDENTITY-1"
+   ],
+   "screens": [],
+   "enables": []
   }
  },
  "fedElsewhere": {
@@ -14574,6 +14670,9 @@
   "orders.invitation": [
    "issueInvitation"
   ],
+  "orders.membership_renewal": [
+   "renewMembership"
+  ],
   "queue.reading": [
    "submitQueueReading",
    "testQueueFeed"
@@ -14607,7 +14706,6 @@
   "ai.training_run",
   "catalogue.demand_forecast",
   "catalogue.rate",
-  "fnb.sold_out_item",
   "identity.redirect_host",
   "identity.subject_holding",
   "inventory.serialised_item",
@@ -14620,6 +14718,7 @@
   "platform.sale_board_tile_for_catalogue",
   "promotions.promotion_rule",
   "seating.seat_block_item",
+  "whitelabel.received_release",
   "whitelabel.ui_string_pack",
   "workforce.attendance_amendment"
  ],

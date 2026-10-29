@@ -44,7 +44,7 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true,
-    "description": "When this state lapses on its own — **availability expires** rather than persisting through a closed laptop."
+    "description": "When this state lapses on its own — **availability expires** rather than persisting through a closed laptop. Set by every `setAgentAvailability` to the earlier of the session's expiry and a 15-minute heartbeat lapse; once it has passed, `state` reads as `offline` (ADAM CR-333, option C)."
    },
    "updatedAt": {
     "type": "string",

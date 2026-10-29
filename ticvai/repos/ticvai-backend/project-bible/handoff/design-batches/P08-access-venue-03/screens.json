@@ -325,10 +325,10 @@
   },
   "states": {
    "loading": "The booking and its condition history",
-   "error": "Could not load. **Check-out and check-in work offline** — the deposit hold reconciles on sync.",
+   "error": "Could not load. Names which read failed and leaves the booking untouched; nothing is checked out or in until it loads.",
    "emptyFirstRun": "Nothing is out. **The list a poolside attendant checks at close** — anything still here at the end of the day is a conversation.",
    "emptyNoAccess": "Shown when the caller lacks `RENTAL_VIEW`, which `getRentalBooking` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `authoriseStoredValue`, `relinquishStoredValue`, `captureStoredValue`; `RESOURCE_BOOK` for `checkOutResource`, `checkInResource`.",
-   "offline": "Queued locally. The deposit is authorised on sync, and **the condition note taken now is the only defence against a dispute later**."
+   "offline": "**Not available offline.** The back office runs in a browser and keeps no offline store, so check-out, check-in and the stored-value actions are disabled until the connection returns, each saying so. **The condition note is the only defence against a dispute later**: it goes with the check-out or check-in it belongs to, once the connection is back."
   },
   "apis": [
    {

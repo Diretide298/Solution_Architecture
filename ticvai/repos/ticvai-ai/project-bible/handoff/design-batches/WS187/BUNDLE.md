@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1093` | Funding Command Center | C | 28 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-1093` | Funding Command Center | C | 28 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1094` | Funding Method Configuration | A | 38 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1095` | Top-Up Rule Configuration | C | 23 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-1096` | Channel & Funding Source Mapping | C | 20 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1097` | Auto-Reload Configuration | C | 18 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1098` | Recurring Funding Schedule | C | 17 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-1098` | Recurring Funding Schedule | C | 48 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-1099` | Funding Authorization & Approval Rules | C | 21 | 20 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 | `BO-1100` | Funding Reversal & Correction Management | C | 12 | 19 | 6 | 28 | 1 | 0 | — | notStarted (—) |
 | `BO-1101` | Funding Limits & Velocity Controls | C | 30 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1102` | Funding Transaction Audit & Reconciliation | C | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-1102` | Funding Transaction Audit & Reconciliation | C | 0 | 7 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 
 ---
 
@@ -228,7 +228,6 @@ today:
 #### Permissions
 
 - `getWalletFundingRules` → `WALLET_VIEW` (read) · staff
-- `listWalletTransactions` → `WALLET_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -236,13 +235,7 @@ Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
-3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 1.1.112 | Transaction history | Ticketing Catalogue | CONTRACTED | `listWalletTransactions` |
-| 5.3.17 | Maintain guest wallet balances, top-ups, spending history, refunds, transfers, expirations, and transaction history. | F&B & Guest Management | CONTRACTED | `listWalletTransactions` |
-| 22.2.14 | Wallet History | Marketing & CRM | CONTRACTED | `listWalletTransactions` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -273,7 +266,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Flow F294 branch at step 1 (expected): when Nothing has been set up on Funding Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F294 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
 - ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
-- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -506,12 +498,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | Block C · task VM-BO-1095 |
-| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/top-up-rule-configuration-bo-1095` |
+
+**Known gaps.** Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing on the approved screen calls it: its pack select and text fields bind to no operation and it has no …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Rules for each top-up: minimum and maximum, presets, approval above an amount.
 
@@ -615,7 +609,6 @@ rules:
 
 #### Permissions
 
-- `setWalletFundingRules` → `WALLET_CONFIGURE` (configure) · staff
 - `getWalletFundingRules` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -649,12 +642,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (23), with its required mark, default, format and its error state (404, 412).
+- [ ] Every input above is drawn (23), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1095?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1093`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
+- [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -669,12 +662,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | Block C · task VM-BO-1096 |
-| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure funding availability across; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/channel-funding-source-mapping-bo-1096` |
+
+**Known gaps.** Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing on the approved screen calls it: its pack channel select fields bind to no operation and it has no …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Which funding methods each channel takes.
 
@@ -782,7 +777,6 @@ matrix:
 
 #### Permissions
 
-- `setWalletFundingRules` → `WALLET_CONFIGURE` (configure) · staff
 - `getWalletFundingRules` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -815,12 +809,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (20), with its required mark, default, format and its error state (404, 412).
+- [ ] Every input above is drawn (20), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1096?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1093`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
+- [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -835,12 +829,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | Block C · task VM-BO-1097 |
-| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/auto-reload-configuration-bo-1097` |
+
+**Known gaps.** Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing on the approved screen calls it: its only component is the read-only rules panel …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Automatic top-up when a balance falls below a threshold.
 
@@ -939,7 +935,6 @@ autoReload:
 
 #### Permissions
 
-- `setWalletFundingRules` → `WALLET_CONFIGURE` (configure) · staff
 - `getWalletFundingRules` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -972,12 +967,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (404, 412).
+- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1097?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1093`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
+- [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1033,6 +1028,42 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|
 | Wallet type | picker: choose a wallet type | — | — | `getWalletFundingRules` ?walletTypeId |
 
+**Sent by *Specific day of month*** (`setWalletFundingRules`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Wallet type `walletTypeId` | picker: choose a wallet type | optional | — | — | shows names, sends the id | The wallet type these rules are for; null for the venue default. | `setWalletFundingRules` body |
+| Minimum top up `minimumTopUp` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Maximum top up `maximumTopUp` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Preset amounts `presetAmounts` | repeatable rows | optional | — | — | — | — | `setWalletFundingRules` body |
+| Allowed channels `allowedChannels` | list of values (chips) | optional | — | — | — | — | `setWalletFundingRules` body |
+| Allowed funding sources `allowedFundingSources` | multi-select chips | optional | — | Card · Cash · Bank transfer · Voucher · Corporate account · Loyalty conversion | — | — | `setWalletFundingRules` body |
+| Bonus rules `bonusRules` | repeatable rows | optional | — | — | — | Board 2.3. *Top up 200, get 20.* The bonus is a separate lot of a separate credit type, which is how it can expire on different terms from the cash. | `setWalletFundingRules` body |
+| Minimum amount `bonusRules[].minimumAmount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Bonus amount `bonusRules[].bonusAmount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Bonus percent `bonusRules[].bonusPercent` | number field | optional | — | — | — | — | `setWalletFundingRules` body |
+| Bonus credit type `bonusRules[].bonusCreditTypeId` | picker: choose a bonus credit type | optional | — | — | shows names, sends the id | — | `setWalletFundingRules` body |
+| Valid from `bonusRules[].validFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setWalletFundingRules` body |
+| Valid to `bonusRules[].validTo` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setWalletFundingRules` body |
+| Auto reload `autoReload` | group | optional | — | — | — | Board 2.5, matrix 4.3.28. Fires when the balance drops. | `setWalletFundingRules` body |
+| Enabled `autoReload.enabled` | toggle | optional | off | — | — | — | `setWalletFundingRules` body |
+| Threshold amount `autoReload.thresholdAmount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Reload amount `autoReload.reloadAmount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Maximum per day `autoReload.maximumPerDay` | number field | optional | — | — | — | — | `setWalletFundingRules` body |
+| Recurring funding `recurringFunding` | group | optional | — | — | — | Board 2.6, matrix 4.3.29 — *"distinct from auto-reload"*. Fires on a date, which is what an allowance needs. | `setWalletFundingRules` body |
+| Enabled `recurringFunding.enabled` | toggle | optional | off | — | — | — | `setWalletFundingRules` body |
+| Cadence `recurringFunding.cadence` | segmented control | optional | — | Daily · Weekly · Monthly | — | — | `setWalletFundingRules` body |
+| Amount `recurringFunding.amount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Day of week `recurringFunding.dayOfWeek` | text field | optional | — | — | — | — | `setWalletFundingRules` body |
+| Day of month `recurringFunding.dayOfMonth` | number field | optional | — | — | — | — | `setWalletFundingRules` body |
+| Approval above amount `approvalAboveAmount` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Velocity limits `velocityLimits` | group | optional | — | — | — | A fraud control, not a commercial one. Ten top-ups of ninety-nine in an hour is a card being tested, and a daily cap in total value does not catch it. | `setWalletFundingRules` body |
+| Max transactions per hour `velocityLimits.maxTransactionsPerHour` | number field | optional | — | — | — | — | `setWalletFundingRules` body |
+| Max transactions per day `velocityLimits.maxTransactionsPerDay` | number field | optional | — | — | — | — | `setWalletFundingRules` body |
+| Max amount per day `velocityLimits.maxAmountPerDay` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Max amount per month `velocityLimits.maxAmountPerMonth` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setWalletFundingRules` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `setWalletFundingRules` body |
+
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
 - **recurringFunding**: Frequency, day, amount, payment method. *(source: contracts/satellite/wallet.yaml#setWalletFundingRules)*
@@ -1070,7 +1101,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Specific day of month (primary button) | navigation or local | — | — | — | — |
+| Specific day of month (primary button) | `setWalletFundingRules` PUT `/wallet-funding-rules` | WalletFundingRules | WalletFundingRules | 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry. | — |
 
 **Data it reads**: `getWalletFundingRules` (onLoad, How a wallet may be topped up)
 
@@ -1135,7 +1166,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (404, 412).
+- [ ] Every input above is drawn (48), with its required mark, default, format and its error state (404, 412).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1098?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: Specific day of month.
@@ -1155,12 +1186,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | Block C · task VM-BO-1099 |
-| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure approval based on; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/funding-authorization-approval-rules-bo-1099` |
+
+**Known gaps.** Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing on the approved screen calls it: its pack select fields bind to no operation and it has no Save or …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Approval controls on funding: above an amount a supervisor approves.
 
@@ -1262,7 +1295,6 @@ approval:
 
 #### Permissions
 
-- `setWalletFundingRules` → `WALLET_CONFIGURE` (configure) · staff
 - `getWalletFundingRules` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -1297,12 +1329,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (404, 412).
+- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1099?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1093`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
+- [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1490,12 +1522,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 3 · needs the `core` module |
 | Block | Block C · task VM-BO-1101 |
-| Who uses it | venue staff holding `WALLET_CONFIGURE`, `WALLET_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
 | Opens with | nothing: it opens on its own |
 | Route | `/orders-money/funding-limits-velocity-controls-bo-1101` |
+
+**Known gaps.** Removed 29 October 2026 (CHG-R11FXU-001): a board reading of 19 September declared it, and nothing on the approved screen calls it: its pack limit fields bind to no operation and it has no Save or …
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** Protection against excessive funding: maximum balance, daily top-up limit, single transaction limit, velocity.
 
@@ -1607,7 +1641,6 @@ limits:
 
 #### Permissions
 
-- `setWalletFundingRules` → `WALLET_CONFIGURE` (configure) · staff
 - `getWalletFundingRules` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
@@ -1640,12 +1673,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (30), with its required mark, default, format and its error state (404, 412).
+- [ ] Every input above is drawn (30), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1101?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1093`.
-- [ ] Every gated control is gated: `WALLET_CONFIGURE`, `WALLET_VIEW`.
+- [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1684,6 +1717,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**The funding audit trail** (data table, from `listWalletTransactions`): Every movement on the wallet, the record the exception buttons above are checked against (r11 gate fix, CHG-R11FXS-003).
+
+| Shows | Format | Notes |
+|---|---|---|
+| Recorded at | 1 Oct 2026, 14:30 | — |
+| Kind | chip: Top up, Spend, Refund, Adjustment, Bonus, Expiry… | — |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Balance after | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Order | text | — |
+| Reason | text | — |
+| Principal | the name it points at, never the id | — |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
@@ -1698,7 +1745,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **three-way reconciliation**: Wallet, ledger and acquirer totals side by side with differences. *(source: contracts/satellite/wallet.yaml#getWalletReconciliation)*
 
-**Data it reads**: `getWalletReconciliation` (onLoad, Against the acquirer and the ledger)
+**Data it reads**: `listWalletTransactions` (onLoad, The funding audit trail); `getWalletReconciliation` (onLoad, Against the acquirer and the ledger)
 
 **Where the user goes next**
 
@@ -1769,7 +1816,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1102?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Payment succeeded but wallet not funded, Wallet funded but payment unresolved, Duplicate funding, Missing external reference, Unreconciled transaction.
 - [ ] Every transition is wired: `BO-1093`.
@@ -1898,9 +1945,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`. **A currency other than the venue's or region's trading currency** (a tourist's USD cash at an AED till, `Payment.tenderAmount`; a guest-selected charge currency, `Order.chargeTotal`; a refund in the tender currency) **takes its ISO 4217 minor units**, held as one fixed list in the kernel (`TICVAI.Domain`, beside Money), so every module resolves it the same way and no table, query or migration holds it (ADAM CR-192, option A; Chinmay, 21 October 2026; CHG-R10ORD-018). The venue and region settings keep their own `currency_scale` for the trading currency.","minimum":0,"maximum":4}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"Wallet": {"x-ticvai-rls":"grant-holder-read","x-ticvai-persistence":"wallet.wallet + wallet.credit_lot","type":"object","required":["subjectId","balance","currency","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid"},"transferRules":{"type":"object","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"x-ticvai-derived":"onRead","description":"What the venue allows this guest to do with a transfer, read from the venue's `WalletTransferRules` so a guest screen can hide or limit the action (r8 walk of tickets 28310 and 28345). Worked out on read.","properties":{"peerToPeerAllowed":{"type":"boolean"},"withinSharedWalletOnly":{"type":"boolean"},"maximumPerTransfer":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true}}},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money","x-ticvai-column":"balance_amount"},"credits":{"type":"array","description":"4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n","items":{"type":"object","required":["kind","amount"],"properties":{"kind":{"type":"string","enum":["cash","bonus","redemption","refund","goodwill"],"description":"**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability. Worked out from the lot's credit type `category` (proposed, client to correct): `cash` -> cash; `bonus`, `promotional`, `loyalty`, `membership`, `giftCard` -> bonus; `redemption`, `ride`, `attraction`, `fnb`, `retail`, `parking`, `event` -> redemption; `refund` -> refund; `other` -> bonus. `goodwill` comes only from a lot whose `sourceKind` is `adjustment` and whose adjustment (`sourceReference`) is of kind `goodwill`, whatever the category (R8 blocker APPROVALS-TENANCY-C32).\n","x-ticvai-persisted":false},"amount":{"x-ticvai-column":"remaining_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceRef":{"type":"string","nullable":true,"x-ticvai-column":"source_reference"},"isRefundable":{"type":"boolean","default":false,"x-ticvai-persisted":false,"description":"**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"}}}},"bonusBalance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Promotional value. Typically non-refundable and spent first."},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"status":{"type":"string","enum":["active","suspended","closed"]},"homeCellName":{"type":"string","nullable":true,"description":"Where the authoritative balance lives. Present when the guest is linked across cells.\n"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"lastActivityAt":{"type":"string","format":"date-time","nullable":true}}},
+"Wallet": {"x-ticvai-rls":"grant-holder-write","x-ticvai-persistence":"wallet.wallet + wallet.credit_lot","type":"object","required":["subjectId","balance","currency","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid"},"transferRules":{"type":"object","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"x-ticvai-derived":"onRead","description":"What the venue allows this guest to do with a transfer, read from the venue's `WalletTransferRules` so a guest screen can hide or limit the action (r8 walk of tickets 28310 and 28345). Worked out on read.","properties":{"peerToPeerAllowed":{"type":"boolean"},"withinSharedWalletOnly":{"type":"boolean"},"maximumPerTransfer":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true}}},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money","x-ticvai-column":"balance_amount"},"credits":{"type":"array","description":"4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n","items":{"type":"object","required":["kind","amount"],"properties":{"kind":{"type":"string","enum":["cash","bonus","redemption","refund","goodwill"],"description":"**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability. Worked out from the lot's credit type `category` (proposed, client to correct): `cash` -> cash; `bonus`, `promotional`, `loyalty`, `membership`, `giftCard` -> bonus; `redemption`, `ride`, `attraction`, `fnb`, `retail`, `parking`, `event` -> redemption; `refund` -> refund; `other` -> bonus. `goodwill` comes only from a lot whose `sourceKind` is `adjustment` and whose adjustment (`sourceReference`) is of kind `goodwill`, whatever the category (R8 blocker APPROVALS-TENANCY-C32).\n","x-ticvai-persisted":false},"amount":{"x-ticvai-column":"remaining_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceRef":{"type":"string","nullable":true,"x-ticvai-column":"source_reference"},"isRefundable":{"type":"boolean","default":false,"x-ticvai-persisted":false,"description":"**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"}}}},"bonusBalance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Promotional value. Typically non-refundable and spent first."},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"status":{"type":"string","enum":["active","suspended","closed"]},"homeCellName":{"type":"string","nullable":true,"description":"Where the authoritative balance lives. Present when the guest is linked across cells.\n"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"lastActivityAt":{"type":"string","format":"date-time","nullable":true}}},
 "WalletAdjustment": {"type":"object","x-ticvai-persistence":"wallet.adjustment","description":"Board 7.7. **A correction, distinguishable from a spend.**","properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"kind":{"type":"string","description":"`expiry`, `forfeiture` and `extension` (r8 re-walk, CHG-R8RW-002) are `expireCreditLots`' acts, one row per wallet per act; `affectedLotIds` names the lots, and an extension's `amount` is zero.","enum":["reversal","chargeback","goodwill","correction","writeOff","expiry","forfeiture","extension"]},"amount":{"x-ticvai-column":"adjustment_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"affectedLotIds":{"type":"array","items":{"type":"string","format":"uuid"}},"reason":{"type":"string"},"performedBy":{"type":"string","format":"uuid"},"approvedBy":{"type":"string","format":"uuid","nullable":true},"at":{"type":"string","format":"date-time"},"scopePath":{"type":"string"}}},
-"WalletFundingRules": {"type":"object","x-ticvai-persistence":"wallet.funding_rule","x-ticvai-unique-together":[["scope_path","walletTypeId"]],"x-ticvai-unique-nulls":"not-distinct","description":"Board 2, which is the 27 August minute one screen for one. One set per wallet type at a venue, and one venue default with no wallet type.","properties":{"walletTypeId":{"type":"string","format":"uuid","nullable":true,"description":"The wallet type these rules are for; null for the venue default."},"minimumTopUp":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumTopUp":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"presetAmounts":{"x-ticvai-persistence-column":"numeric(18,4)[]","type":"array","items":{"$ref":"../shared/common.yaml#/components/schemas/Money"}},"allowedChannels":{"type":"array","items":{"type":"string"}},"allowedFundingSources":{"type":"array","items":{"type":"string","enum":["card","cash","bankTransfer","voucher","corporateAccount","loyaltyConversion"]}},"bonusRules":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","description":"Board 2.3. *Top up 200, get 20.* **The bonus is a separate lot of a separate credit type**, which is how it can expire on different terms from the cash.\n","items":{"type":"object","properties":{"minimumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"bonusAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"bonusPercent":{"type":"number","nullable":true},"bonusCreditTypeId":{"type":"string","format":"uuid"},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true}}}},"autoReload":{"type":"object","description":"Board 2.5, matrix 4.3.28. **Fires when the balance drops.**","properties":{"enabled":{"type":"boolean","default":false},"thresholdAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"reloadAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumPerDay":{"type":"integer","nullable":true}}},"recurringFunding":{"type":"object","description":"Board 2.6, matrix 4.3.29 — ***\"distinct from auto-reload\"***. **Fires on a date**, which is what an allowance needs.\n","properties":{"enabled":{"type":"boolean","default":false},"cadence":{"type":"string","enum":["daily","weekly","monthly"]},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"dayOfWeek":{"type":"string","nullable":true},"dayOfMonth":{"type":"integer","nullable":true}}},"approvalAboveAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"velocityLimits":{"type":"object","description":"**A fraud control, not a commercial one.** Ten top-ups of ninety-nine in an hour is a card being tested, and a daily cap in total value does not catch it.\n","properties":{"maxTransactionsPerHour":{"type":"integer","nullable":true},"maxTransactionsPerDay":{"type":"integer","nullable":true},"maxAmountPerDay":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maxAmountPerMonth":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},"scopePath":{"type":"string"}}},
+"WalletFundingRules": {"type":"object","x-ticvai-persistence":"wallet.funding_rule","x-ticvai-unique-together":[["scope_path","walletTypeId"]],"x-ticvai-unique-nulls":"not-distinct","description":"Board 2, which is the 27 August minute one screen for one. One set per wallet type at a venue, and one venue default with no wallet type.","required":["version"],"properties":{"walletTypeId":{"type":"string","format":"uuid","nullable":true,"description":"The wallet type these rules are for; null for the venue default."},"minimumTopUp":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumTopUp":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"presetAmounts":{"x-ticvai-persistence-column":"numeric(18,4)[]","type":"array","items":{"$ref":"../shared/common.yaml#/components/schemas/Money"}},"allowedChannels":{"type":"array","items":{"type":"string"}},"allowedFundingSources":{"type":"array","items":{"type":"string","enum":["card","cash","bankTransfer","voucher","corporateAccount","loyaltyConversion"]}},"bonusRules":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","description":"Board 2.3. *Top up 200, get 20.* **The bonus is a separate lot of a separate credit type**, which is how it can expire on different terms from the cash.\n","items":{"type":"object","properties":{"minimumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"bonusAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"bonusPercent":{"type":"number","nullable":true},"bonusCreditTypeId":{"type":"string","format":"uuid"},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true}}}},"autoReload":{"type":"object","description":"Board 2.5, matrix 4.3.28. **Fires when the balance drops.**","properties":{"enabled":{"type":"boolean","default":false},"thresholdAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"reloadAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumPerDay":{"type":"integer","nullable":true}}},"recurringFunding":{"type":"object","description":"Board 2.6, matrix 4.3.29 — ***\"distinct from auto-reload\"***. **Fires on a date**, which is what an allowance needs.\n","properties":{"enabled":{"type":"boolean","default":false},"cadence":{"type":"string","enum":["daily","weekly","monthly"]},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"dayOfWeek":{"type":"string","nullable":true},"dayOfMonth":{"type":"integer","nullable":true}}},"approvalAboveAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"velocityLimits":{"type":"object","description":"**A fraud control, not a commercial one.** Ten top-ups of ninety-nine in an hour is a card being tested, and a daily cap in total value does not catch it.\n","properties":{"maxTransactionsPerHour":{"type":"integer","nullable":true},"maxTransactionsPerDay":{"type":"integer","nullable":true},"maxAmountPerDay":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maxAmountPerMonth":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},"scopePath":{"type":"string"},"version":{"type":"integer","minimum":1,"default":1,"readOnly":true,"description":"**The row's version, its ETag** (\"All as recommended\": ADAM CR-332 option A, Chinmay, 29 October 2026, the rule CR-257 chose for group bookings): 1 on create and bumped on every write; `getWalletFundingRules` and `setWalletFundingRules` send it as `ETag`, and `setWalletFundingRules` checks `If-Match` against it (`412` on a mismatch)."}}},
 "WalletReconciliation": {"type":"object","description":"Board 9.4. **Three sources, and the exception names which pair disagrees.**","properties":{"from":{"type":"string","format":"date"},"to":{"type":"string","format":"date"},"subLedgerTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"generalLedgerTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"acquirerTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"exceptions":{"type":"array","items":{"type":"object","properties":{"pair":{"type":"string","enum":["subLedgerVsGeneralLedger","subLedgerVsAcquirer","generalLedgerVsAcquirer"]},"difference":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"transactionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"likelyCause":{"type":"string","nullable":true}}}}}},
 "WalletTransaction": {"x-ticvai-persistence":"wallet.wallet_transaction","type":"object","required":["id","kind","amount","balanceAfter","recordedAt"],"properties":{"id":{"type":"string"},"walletId":{"type":"string","format":"uuid","x-ticvai-references":"wallet.wallet","description":"The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance moved."},"walletHoldId":{"x-ticvai-column":"fund_reservation_id","type":"string","format":"uuid","nullable":true,"x-ticvai-references":"wallet.fund_reservation","description":"The hold a spend settled, where it came through `holdWalletFunds`."},"kind":{"$ref":"#/components/schemas/WalletTransactionKind"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money","x-ticvai-column":"transaction_amount"},"balanceAfter":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"orderId":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string","nullable":true},"principalId":{"type":"string","format":"uuid","nullable":true},"recordedAt":{"type":"string","format":"date-time"}}},
 "WalletTransactionKind": {"type":"string","enum":["topUp","spend","refund","adjustment","bonus","expiry","transfer"]},

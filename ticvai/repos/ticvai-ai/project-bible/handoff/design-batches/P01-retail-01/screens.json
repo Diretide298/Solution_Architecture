@@ -156,6 +156,9 @@
     "contract": "orders",
     "purpose": "Add the chosen item to the cart, for collection on the way out",
     "trigger": "onAction",
+    "inputSources": {
+     "variantId": "listMerchandise.productVariantId"
+    },
     "invalidates": [
      "listMerchandise"
     ]
@@ -367,6 +370,9 @@
     "contract": "orders",
     "purpose": "Put the item in the cart, marked for collection on the way out (audit R236)",
     "trigger": "onAction",
+    "inputSources": {
+     "variantId": "listMerchandise.productVariantId"
+    },
     "invalidates": [
      "listMerchandise"
     ]

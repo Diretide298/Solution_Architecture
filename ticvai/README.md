@@ -2,7 +2,7 @@
 
 Generated 17 August 2026
 
-**2854 operations · 1161 tables · 2453 screens · 209 state models · 105 events · 98 flows · 72 ADRs**
+**2857 operations · 1167 tables · 2453 screens · 209 state models · 107 events · 98 flows · 72 ADRs**
 
 **Conflicts: 92 raised, 0 blocking.** See `conflict-status.md`.
 
@@ -20,7 +20,7 @@ provenance and what each one rules out — including the six that were wrong fir
 | **`wireframes/TICVAI Wireframe Boards.dc.html`** | 219 boards, 2453 screens. Open in a browser |
 | **`handoff/platforms-and-apps.md`** | Twelve platforms, ten apps, named by who operates them |
 | **`handoff/build-order.md`** | Which apps can be built, and in what order |
-| **`handoff/TICVAI_Schema_Reference.xlsx`** | 1161 tables, 3,911 columns, nine sheets |
+| **`handoff/TICVAI_Schema_Reference.xlsx`** | 1167 tables, 3,911 columns, nine sheets |
 | **`handoff/ai-index.md`** | Where every AI artefact lives |
 | **`docs/active/workshop-packs.md`** | The three blocked domains, prepared |
 
@@ -28,10 +28,10 @@ provenance and what each one rules out — including the six that were wrong fir
 
 | | |
 |---|---|
-| `contracts/` | **2854 operations** across 25 files — 267 spine, 470 satellite |
+| `contracts/` | **2857 operations** across 25 files — 267 spine, 470 satellite |
 | `screens/` | 364 definitions across 16 platforms, all specified |
 | `frontend/` | 10 app manifests, with build readiness |
-| `states/` · `events/` | 209 state models · 105 events, cross-checked |
+| `states/` · `events/` | 209 state models · 107 events, cross-checked |
 | `flows/` | 23 user journeys with 137 unhappy paths |
 | `handoff/` | 144 registers738 indexes and workbooks — the derived layer |
 | `docs/` | Architecture, 72 ADRs, the conflict register |
@@ -52,7 +52,7 @@ fixed**, and they are under-specified rather than wrong.
 
 ## What this is
 
-A design package. **2854 operations, 1161 tables and 2453 screens are specified and none of it
+A design package. **2857 operations, 1167 tables and 2453 screens are specified and none of it
 has been executed** — no SQL is written, no code is built, and every number above is an
 assertion until something runs.
 

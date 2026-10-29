@@ -70,19 +70,19 @@
    "operations": 10
   },
   {
-   "contract": "identity",
-   "operations": 5
-  },
-  {
    "contract": "catalogue",
    "operations": 5
   },
   {
-   "contract": "tenancy",
-   "operations": 1
+   "contract": "identity",
+   "operations": 5
   },
   {
    "contract": "orders",
+   "operations": 1
+  },
+  {
+   "contract": "tenancy",
    "operations": 1
   }
  ],
@@ -624,7 +624,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/digital-asset-management-command-center-cms-061",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {

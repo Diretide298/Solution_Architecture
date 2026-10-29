@@ -113,7 +113,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-278` | Group Ticket, Seat & Entitlement Allocation | C | 8 | 16 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-279` | Group Ticket Fulfillment & Distribution | C | 3 | 16 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-280` | Group Arrival, Check-In & Admission Operations | C | 6 | 20 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-281` | Group Amendments, Cancellation & Refund Operations | C | 0 | 0 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
+| `BO-281` | Group Amendments, Cancellation & Refund Operations | C | 15 | 0 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
 | `BO-282` | Group Booking Reconciliation, Closure & Performance | C | 0 | 12 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-283` | Group Sales Analytics & AI Intelligence Center | C | 2 | 28 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 

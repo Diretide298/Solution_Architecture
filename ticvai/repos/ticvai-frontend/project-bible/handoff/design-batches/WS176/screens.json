@@ -1810,13 +1810,6 @@
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "setConfigurationProfile",
-    "contract": "tenancy",
-    "purpose": "Inherited settings",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "getSeatMap",
     "contract": "seating",
     "purpose": "Read a seat map with its structure",

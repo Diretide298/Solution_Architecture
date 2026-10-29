@@ -1,6 +1,6 @@
 # P09-branding-localisation-01 — P09 · Branding & Localisation
 
-**4 screens · 32 operations · 40 schemas · 7 permissions**
+**4 screens · 32 operations · 42 schemas · 7 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -124,10 +124,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-016` | White-Label Branding Management | A | 55 | 51 | 7 | 20 | 0 | 6 | configures | notStarted (generated) |
+| `ADM-016` | White-Label Branding Management | A | 58 | 51 | 7 | 20 | 0 | 6 | configures | notStarted (generated) |
 | `ADM-017` | Domain & Certificate Management | A | 10 | 27 | 7 | 1 | 1 | 0 | configures | notStarted (generated) |
 | `ADM-018` | Interface Languages | A | 9 | 27 | 7 | 9 | 2 | 6 | configures | notStarted (generated) |
-| `ADM-019` | Global Configuration & Defaults | B | 93 | 17 | 7 | 18 | 0 | 0 | — | notStarted (generated) |
+| `ADM-019` | Global Configuration & Defaults | B | 116 | 17 | 7 | 18 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

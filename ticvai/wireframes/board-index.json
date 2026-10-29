@@ -2479,8 +2479,8 @@
   {
    "file": "APP guest.dc.html",
    "provenance": "clientPack",
-   "bytes": 720503,
-   "sha256": "cf59009b29c3efb9",
+   "bytes": 747267,
+   "sha256": "7dbae3d97ef12dd8",
    "frames": 144,
    "screensFramed": 144,
    "screens": [
@@ -2891,8 +2891,8 @@
   {
    "file": "APP ticvai-control.dc.html",
    "provenance": "clientPack",
-   "bytes": 883883,
-   "sha256": "4f657d6c749f30e8",
+   "bytes": 884243,
+   "sha256": "17272f8153ee9ff5",
    "frames": 251,
    "screensFramed": 251,
    "screens": [
@@ -3414,8 +3414,8 @@
   {
    "file": "APP venue-management.dc.html",
    "provenance": "clientPack",
-   "bytes": 5707876,
-   "sha256": "169060358e4f0dd3",
+   "bytes": 5709282,
+   "sha256": "001c737e75753838",
    "frames": 1866,
    "screensFramed": 1866,
    "screens": [
@@ -7519,8 +7519,8 @@
   {
    "file": "P01 Guest Web.dc.html",
    "provenance": "generated",
-   "bytes": 129023,
-   "sha256": "663f806fbbedcb37",
+   "bytes": 155584,
+   "sha256": "7535969caf046d40",
    "frames": 50,
    "screensFramed": 50,
    "screens": [
@@ -7637,8 +7637,8 @@
   {
    "file": "P02 Guest App.dc.html",
    "provenance": "generated",
-   "bytes": 549356,
-   "sha256": "63c69a322109b135",
+   "bytes": 549430,
+   "sha256": "5fea2b529eaef16f",
    "frames": 77,
    "screensFramed": 77,
    "screens": [
@@ -7891,8 +7891,8 @@
   {
    "file": "P05 Guest Kiosk.dc.html",
    "provenance": "generated",
-   "bytes": 60100,
-   "sha256": "571a8661f9ed2957",
+   "bytes": 60229,
+   "sha256": "c7721310f3f43f2f",
    "frames": 17,
    "screensFramed": 17,
    "screens": [
@@ -8193,8 +8193,8 @@
   {
    "file": "P08 Venue Management.dc.html",
    "provenance": "generated",
-   "bytes": 5078989,
-   "sha256": "c3f9e0835e652e1b",
+   "bytes": 5080413,
+   "sha256": "a4a318f4537b71cd",
    "frames": 1663,
    "screensFramed": 1663,
    "screens": [
@@ -11538,8 +11538,8 @@
   {
    "file": "P09 TICVAI Web.dc.html",
    "provenance": "generated",
-   "bytes": 766324,
-   "sha256": "a001fdd7f97d0989",
+   "bytes": 766684,
+   "sha256": "88f1095bd13b4882",
    "frames": 211,
    "screensFramed": 211,
    "screens": [
@@ -12193,8 +12193,8 @@
   {
    "file": "P13 Venue CMS.dc.html",
    "provenance": "generated",
-   "bytes": 338757,
-   "sha256": "6df9bf9720c1723e",
+   "bytes": 338739,
+   "sha256": "7fa94afdd6f102de",
    "frames": 104,
    "screensFramed": 104,
    "screens": [

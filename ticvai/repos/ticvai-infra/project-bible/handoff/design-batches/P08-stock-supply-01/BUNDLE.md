@@ -2855,8 +2855,8 @@ Errors to draw in the form: 409 A business code the request names is already use
 | Average days late | 1,234.5 | — |
 | Short delivery percent | 1,234.5 | — |
 | Rejection percent | 1,234.5 | — |
-| Rejection reasons | grouped details | Rejected receipt lines counted by rejection reason, keyed by the reason. Sourced from the reason recorded against each rejected goods … |
-| Price variance percent | 1,234.5 | Quoted against invoiced. The number that finds a supplier quietly raising prices, which no delivery record shows. |
+| Rejection reasons | grouped details | Rejected receipt lines counted by rejection reason, keyed by the reason. Sourced from the `supplierReturn` inventory movement … |
+| Price variance percent | 1,234.5 | Quoted against ordered: (sum of `unit_price` x `ordered_quantity` minus sum of `quoted_unit_price` x `ordered_quantity`) / the quoted sum x … |
 
 **Actions and what each produces**
 

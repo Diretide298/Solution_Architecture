@@ -47,7 +47,8 @@ _NOT_CONFIG = {"platform.audit_record", "platform.outbox"}
 _GROUPS = (
     ("permissions", lambda t: t.startswith("identity.") or t == "platform.scope"),
     ("tenant-config", lambda t: t.startswith("whitelabel.") or t in (
-        "control.content_block", "control.seo_metadata", "control.url_redirect")),
+        # marketing.seo_metadata: moved from control.seo_metadata, still the tenant's config (ADAM CR-317, CHG-CR317-001)
+        "control.content_block", "marketing.seo_metadata", "control.url_redirect")),
     ("price-list", lambda t: t in ("catalogue.price_list", "catalogue.price")),
     ("venue-map", lambda t: t.startswith("venuemap.")),
     ("menu", lambda t: t.startswith("fnb.menu") or t == "catalogue.product_version"),

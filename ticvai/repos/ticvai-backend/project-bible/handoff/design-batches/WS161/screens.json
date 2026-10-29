@@ -738,7 +738,6 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
-  "permission": "WORKFORCE_MANAGE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "7",
@@ -777,6 +776,12 @@
     "operation": null,
     "why": "**This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape exists.",
     "source": "pack Resource_Management_Configuration_Reference.pdf, page 105 §Each candidate may display"
+   },
+   {
+    "operation": "createRotaAssignment",
+    "removed": true,
+    "why": "Removed 29 October 2026 (CHG-R11FXU-008, the lead: \"Remove + log text\"): a board reading of 19 September declared it, and nothing on the approved screen sends it: its four role buttons (Event manager, Supervisor, Security, Customer service) are pack text with no person or shift to send, and no read fills its staff table (contract gap CHG-WIR-004). A person is rostered on BO-055 Rota & Scheduling and BO-714 Event Shift & Roster Configuration, where createRotaAssignment stays declared and reached. With no operation left the screen has no permission of its own and its no-access state says so; the role buttons stay, bound to nothing, as before. A CR brings the write back here with the control and the fields that send it.",
+    "source": "the r11 final gate, 29 October 2026: check-screen-wiring S-OP-UNREACHED"
    }
   ],
   "layout": {
@@ -861,23 +866,11 @@
   "states": {
    "loading": "The event staff personnel list.",
    "error": "Could not load. Names which read failed and leaves the event staff personnel untouched.",
-   "emptyFirstRun": "No event staff personnel yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No event staff personnel yet. People are allocated to event roles on Event Shift & Roster Configuration (BO-714), not here.",
    "emptyNoResults": "The filter narrowed it and the event staff personnel are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [
-   {
-    "operationId": "createRotaAssignment",
-    "contract": "workforce",
-    "purpose": "Staff allocation",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listRotaAssignments",
-     "getStaffingCoverage"
-    ]
-   }
-  ],
+  "apis": [],
   "entryState": {
    "preloaded": [
     "Name",

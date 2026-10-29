@@ -1189,6 +1189,7 @@ The tiles go with it and come back with it. `reporting.dashboard_tile` carries `
 **The dashboard panel reads this.** Critical first, then unacknowledged, then by age — an alert list sorted by time puts a resolved info notice above an unacknowledged critical.
 **Venue scope is the rule; the filters below narrow inside it.** A till screen asks for its own workstation or shift, a replenishment screen for one item. Each alert carries its rule's name and metric, so a list can be read without a second call to `listAlertRules`.
 **A shift-variance alert goes only to those who may act on it** (r8, APPROVALS-TENANCY-C36; the rule is shift.yaml submitShiftCount's): one carrying `observedValue` and `threshold` for a till's count is listed only for a caller holding one of the rule's `recipientRoleIds` or `OVERSHORT_ACCEPT` at the venue; anyone else gets no such alert in the list (it is left out, not masked), so a cashier never sees the variance of their own count.
+**The Money of an alert** (`observedValue`, `threshold`, where the metric is money-valued; ADAM CR-296 and CR-299, option A, Chinmay, 29 October 2026; CHG-CR299-001) is in the currency of the nearest venue at or above the row's `scope_path` (tenancy#scopeRecords, then tenancy#venueSettingsRecords); for an alert above every venue (raised by a rule at a region or the tenant root), the region's currency and scale, RegionSettingsAtOrAbove the path (tenancy#regionSettingsRecords), all read in process (XDR-004), as `acknowledgeAlert` answers it.
 
 |  |  |
 |---|---|

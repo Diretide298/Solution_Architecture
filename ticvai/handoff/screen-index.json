@@ -40,6 +40,7 @@
    "marketing.device_consent_category",
    "marketing.tracking_technology",
    "whitelabel.analytics_provider",
+   "whitelabel.banner",
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.footer_config",
@@ -51,6 +52,8 @@
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.promo_block",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -2107,6 +2110,7 @@
    "identity.redirect_host",
    "identity.refresh_token",
    "identity.session",
+   "identity.sso_provider",
    "identity.subject_holding",
    "marketing.consent_question",
    "marketing.consent_question_version",
@@ -2406,12 +2410,18 @@
    },
    {
     "to": "WEB-018",
-    "trigger": "My Tickets",
+    "trigger": "View ticket",
     "carries": [
      "entitlementId",
      "orderId"
     ],
     "provenance": "derived \u2014 WEB-018 declares entryState.params entitlementId, orderId and WEB-017 holds entitlementId, orderId, so an edge into it carries them"
+   },
+   {
+    "to": "WEB-018",
+    "trigger": "All tickets",
+    "carries": [],
+    "provenance": "ADAM CR-290, a design change logged by Chitrangi Mestry on #33271, 28 October 2026: the overview header's All tickets link opens My Tickets on the whole list, so it carries no ticket."
    },
    {
     "to": "WEB-019",
@@ -2945,6 +2955,7 @@
    "wallet.wallet",
    "wallet.wallet_transaction",
    "whitelabel.analytics_provider",
+   "whitelabel.banner",
    "whitelabel.config_version",
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
@@ -2953,6 +2964,7 @@
    "whitelabel.homepage_section",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.promo_block",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -3145,6 +3157,8 @@
    "catalogue.product",
    "ledger.tax_invoice_line",
    "marketing.loyalty_position",
+   "orders.membership_renewal",
+   "orders.order_line",
    "orders.payment",
    "orders.sales_order",
    "payments.dunning_case",
@@ -3275,7 +3289,6 @@
    "marketing.form_definition",
    "marketing.form_submission",
    "marketing.guest_device",
-   "marketing.guest_document",
    "marketing.guest_profile",
    "marketing.wishlist_item",
    "pii.subject",
@@ -3397,6 +3410,7 @@
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.module_enablement",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -3666,6 +3680,7 @@
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.module_enablement",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -3730,6 +3745,7 @@
   ],
   "reads": [
    "whitelabel.analytics_provider",
+   "whitelabel.banner",
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.footer_config",
@@ -3740,6 +3756,8 @@
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.promo_block",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -5230,6 +5248,7 @@
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.module_enablement",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -5703,10 +5722,12 @@
    "venuemap.visit_plan",
    "venuemap.visit_plan_item",
    "venuemap.visit_plan_preset",
+   "venuemap.visit_planner_question",
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.guided_choice_answer",
    "whitelabel.module_enablement",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -5818,6 +5839,7 @@
    "marketing.guest_profile",
    "marketing.tracking_technology",
    "whitelabel.analytics_provider",
+   "whitelabel.banner",
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.footer_config",
@@ -5829,6 +5851,8 @@
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.promo_block",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -6256,7 +6280,10 @@
    {
     "to": "GST-050",
     "trigger": "Resource Booking \u2013 Cabana",
-    "provenance": "structural \u2014 GST-001 is P02's home screen and its exits are its launcher"
+    "provenance": "structural \u2014 GST-001 is P02's home screen and its exits are its launcher",
+    "carries": [
+     "productId"
+    ]
    },
    {
     "to": "GST-051",
@@ -7898,6 +7925,8 @@
    "identity.delegated_access",
    "ledger.tax_invoice_line",
    "marketing.loyalty_position",
+   "orders.membership_renewal",
+   "orders.order_line",
    "orders.payment",
    "orders.sales_order",
    "payments.dunning_case",
@@ -9238,6 +9267,7 @@
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.module_enablement",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -10196,6 +10226,7 @@
    "whitelabel.content_page",
    "whitelabel.guided_choice_answer",
    "whitelabel.module_enablement",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -10416,6 +10447,7 @@
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.module_enablement",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -10703,6 +10735,7 @@
    "identity.redirect_host",
    "identity.refresh_token",
    "identity.session",
+   "identity.sso_provider",
    "identity.subject_holding",
    "marketing.consent_record",
    "marketing.device_consent",
@@ -10913,6 +10946,7 @@
    "marketing.guest_preference",
    "marketing.guest_profile",
    "whitelabel.analytics_provider",
+   "whitelabel.banner",
    "whitelabel.config_version",
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
@@ -10921,6 +10955,7 @@
    "whitelabel.homepage_section",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.promo_block",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -11155,6 +11190,7 @@
   ],
   "reads": [
    "whitelabel.analytics_provider",
+   "whitelabel.banner",
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.footer_config",
@@ -11165,6 +11201,8 @@
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.promo_block",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -11454,6 +11492,7 @@
   "route": "/general/resource-booking-cabana",
   "operations": [
    "addCartLine",
+   "listProductVariants",
    "listProducts",
    "getAvailability",
    "createCart"
@@ -11529,6 +11568,9 @@
    {
     "id": "formAddCartLine",
     "component": "modal",
+    "reads": [
+     "listProductVariants"
+    ],
     "trigger": "Add to cart",
     "body": "**Type, date and guests**, then `addCartLine`; nothing else is asked.",
     "bindsTo": "AddCartLineRequest",
@@ -11588,10 +11630,12 @@
    "venuemap.visit_plan",
    "venuemap.visit_plan_item",
    "venuemap.visit_plan_preset",
+   "venuemap.visit_planner_question",
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.guided_choice_answer",
    "whitelabel.module_enablement",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -11688,7 +11732,8 @@
    "venuemap.point",
    "venuemap.visit_plan",
    "venuemap.visit_plan_item",
-   "venuemap.visit_plan_preset"
+   "venuemap.visit_plan_preset",
+   "venuemap.visit_planner_question"
   ],
   "writes": [
    "cache:idempotency",
@@ -12779,8 +12824,6 @@
    "marketing.consent_purpose",
    "marketing.consent_purpose_channel",
    "marketing.consent_record",
-   "marketing.form_submission",
-   "marketing.guest_document",
    "marketing.guest_profile",
    "pii.subject"
   ],
@@ -13368,6 +13411,7 @@
    "wallet.wallet",
    "wallet.wallet_transaction",
    "whitelabel.analytics_provider",
+   "whitelabel.banner",
    "whitelabel.config_version",
    "whitelabel.footer_config",
    "whitelabel.footer_config_column",
@@ -13376,6 +13420,7 @@
    "whitelabel.homepage_section",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.promo_block",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -17501,6 +17546,7 @@
    "cache:idempotency",
    "fnb.delivery_location",
    "fnb.delivery_location_outlet",
+   "fnb.kitchen_routing_rule",
    "fnb.kitchen_station",
    "fnb.kitchen_ticket",
    "fnb.kitchen_ticket_line",
@@ -18095,7 +18141,7 @@
    "error": "Could not load. Names which read failed and leaves the till untouched.",
    "emptyFirstRun": "No till configured. The form opens empty and `allocateDepositBox` saves the first one; it says what the platform does in the meantime.",
    "emptyNoAccess": "Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVICE_MANAGE` for `setDeviceAssignment`; `SHIFT_OPEN` for `allocateDepositBox`; `WORKSTATION_CONFIGURE` for `configureWorkstation`.",
-   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync."
+   "offline": "**Working from the local journal.** The till keeps taking money; this reconciles on sync. **Configure workstation and Assign peripheral to this till are disabled offline:** `configureWorkstation` and `setDeviceAssignment` are not offline-capable, so their buttons say to reconnect."
   },
   "overlays": [
    {
@@ -18710,7 +18756,7 @@
    "emptyFirstRun": "**No menu published for this outlet.** Names the back-office screen that publishes one rather than showing an empty board.",
    "emptyNoResults": "Nothing matches this section.",
    "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `getOutlet` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_VIEW` for `evaluatePromotions`; `PRODUCT_CONFIGURE` for `setItemAvailability`.",
-   "offline": "**Selling continues from the cached menu.** 86 changes made while offline arrive on sync, which is why an item can be sold that the kitchen has just marked unavailable \u2014 the kitchen refuses it and the guest is refunded at the counter.",
+   "offline": "**Selling continues from the cached menu.** 86 changes made while offline arrive on sync, which is why an item can be sold that the kitchen has just marked unavailable \u2014 the kitchen refuses it and the guest is refunded at the counter. **Add cart line is disabled offline:** `addCartLine` is not offline-capable, so the button says to reconnect.",
    "denied": "Ordering is refused without `payment.take`. The kitchen is not fired, so nothing is cooked against a sale that cannot be paid for.",
    "soldOutByCount": "A dish whose daily count reached zero shows Sold out and cannot be added; the kitchen or the back office sets tomorrow's count (DEC-194; CHG-CSA-017)."
   },
@@ -18807,6 +18853,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "fnb.kitchen_routing_rule",
    "fnb.kitchen_station",
    "fnb.kitchen_ticket",
    "fnb.kitchen_ticket_line",
@@ -20418,7 +20465,10 @@
    {
     "to": "KSK-015",
     "trigger": "Opens Assistant",
-    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "productId"
+    ]
    },
    {
     "to": "CMS-105",
@@ -20462,6 +20512,7 @@
   ],
   "reads": [
    "whitelabel.analytics_provider",
+   "whitelabel.banner",
    "whitelabel.config_version",
    "whitelabel.content_page",
    "whitelabel.footer_config",
@@ -20477,6 +20528,8 @@
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.promo_block",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -20628,14 +20681,20 @@
   "entryFrom": [],
   "transitions": [
    {
-    "to": "KSK-005",
-    "trigger": "Chooses a session",
-    "provenance": "flow F07 step 4\u21925"
-   },
-   {
     "to": "KSK-015",
     "trigger": "Assistant",
-    "provenance": "derived \u2014 KSK-015 declares entryState.params cartId, conversationId, messageId and KSK-004 holds none of them. The edge carries nothing: conversationId, messageId, cartId only pre-select (deep link or optional), and KSK-015 opens on its own"
+    "carries": [
+     "productId"
+    ],
+    "provenance": "derived \u2014 KSK-015 declares entryState.params cartId, conversationId, messageId, productId and KSK-004 holds productId, so an edge into it carries them"
+   },
+   {
+    "to": "KSK-005",
+    "trigger": "Chooses a session",
+    "provenance": "flow F07 step 4\u21925",
+    "carries": [
+     "variantId"
+    ]
    }
   ],
   "machine": null,
@@ -21333,6 +21392,7 @@
    "whitelabel.kiosk_config_start_tile",
    "whitelabel.kiosk_config_version",
    "whitelabel.module_enablement",
+   "whitelabel.received_release",
    "whitelabel.tenant_config"
   ],
   "writes": [],
@@ -21372,7 +21432,8 @@
    "getAvailability",
    "handoverToAgent",
    "createAiConversation",
-   "addCartLine"
+   "addCartLine",
+   "listProductVariants"
   ],
   "services": [
    "AiService",
@@ -21483,6 +21544,9 @@
    {
     "id": "formAddCartLine",
     "component": "modal",
+    "reads": [
+     "listProductVariants"
+    ],
     "trigger": "Add to basket",
     "body": "**Confirms what the assistant suggested: the item and how many** (a quantity stepper, 1 by default); the kiosk sends its cart, the product or variant the answer named, and the quantity. (CHG-R1S-022)",
     "confirm": {
@@ -28208,6 +28272,7 @@
   "reads": [
    "cache:idempotency",
    "fnb.dining_table",
+   "fnb.kitchen_routing_rule",
    "fnb.kitchen_station",
    "fnb.kitchen_ticket",
    "fnb.kitchen_ticket_line",
@@ -28499,6 +28564,7 @@
    "cache:idempotency",
    "catalogue.inventory_reservation",
    "fnb.bill_split",
+   "fnb.kitchen_routing_rule",
    "fnb.kitchen_station",
    "fnb.kitchen_ticket",
    "fnb.kitchen_ticket_line",
@@ -29669,7 +29735,6 @@
   ],
   "reads": [
    "cache:idempotency",
-   "identity.principal",
    "inventory.requisition",
    "inventory.requisition_line",
    "reporting.alert",
@@ -41651,7 +41716,8 @@
    "platform.scope",
    "platform.workstation",
    "workforce.rota_assignment",
-   "workforce.shift_swap"
+   "workforce.shift_swap",
+   "workforce.staffing_rules"
   ],
   "writes": [
    "approvals.request",
@@ -46016,6 +46082,7 @@
   ],
   "writes": [
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency"
   ],
@@ -46123,6 +46190,7 @@
   "writes": [
    "approvals.delegation",
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency"
   ],
@@ -47337,10 +47405,10 @@
   "machine": null,
   "states": {
    "loading": "The booking and its condition history",
-   "error": "Could not load. **Check-out and check-in work offline** \u2014 the deposit hold reconciles on sync.",
+   "error": "Could not load. Names which read failed and leaves the booking untouched; nothing is checked out or in until it loads.",
    "emptyFirstRun": "Nothing is out. **The list a poolside attendant checks at close** \u2014 anything still here at the end of the day is a conversation.",
    "emptyNoAccess": "Shown when the caller lacks `RENTAL_VIEW`, which `getRentalBooking` requires to show this screen, and names that permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `authoriseStoredValue`, `relinquishStoredValue`, `captureStoredValue`; `RESOURCE_BOOK` for `checkOutResource`, `checkInResource`.",
-   "offline": "Queued locally. The deposit is authorised on sync, and **the condition note taken now is the only defence against a dispute later**."
+   "offline": "**Not available offline.** The back office runs in a browser and keeps no offline store, so check-out, check-in and the stored-value actions are disabled until the connection returns, each saying so. **The condition note is the only defence against a dispute later**: it goes with the check-out or check-in it belongs to, once the connection is back."
   },
   "overlays": [
    {
@@ -52363,7 +52431,6 @@
    "redis"
   ],
   "reads": [
-   "assets.media_asset",
    "cache:idempotency",
    "platform.configuration_profile",
    "platform.device",
@@ -52385,7 +52452,7 @@
    "tenancy.device_rollout"
   ],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -52480,6 +52547,31 @@
      ]
     },
     "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
+   },
+   {
+    "id": "formCreateDeviceFirmware",
+    "component": "modal",
+    "trigger": "Register firmware release",
+    "body": "**Collects what `createDeviceFirmware` sends before it is called.** Required: `deviceKind`, `version`. Optional: `vendor`, `artefactAssetId` (the vendor image, uploaded to Assets from the form), `checksum`, `checksumAlgorithm`, `minimumPreviousVersion`, `releaseNotes`. A second release with the same device kind and version is refused (409, duplicate-code) and says so. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `status` (a release starts `draft`), `releasedAt`, `installedCount`, `statusReason`, `scopePath`.",
+    "bindsTo": "DeviceFirmware",
+    "confirm": {
+     "label": "Register release",
+     "operation": "createDeviceFirmware"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "deviceKind",
+      "version",
+      "vendor",
+      "artefactAssetId",
+      "checksum",
+      "checksumAlgorithm",
+      "minimumPreviousVersion",
+      "releaseNotes"
+     ]
+    },
+    "provenance": "contract tenancy.yaml POST /device-firmware; the lead, 29 October 2026 (\"Add list + panel\"; CHG-R11FXT-009)"
    }
   ]
  },
@@ -53434,6 +53526,7 @@
   "writes": [
    "cache:idempotency",
    "fnb.menu_item",
+   "fnb.sold_out_item",
    "fnb.temperature_checkpoint"
   ],
   "storedProcedures": [],
@@ -53523,7 +53616,6 @@
   ],
   "reads": [
    "cache:idempotency",
-   "identity.principal",
    "inventory.requisition",
    "inventory.requisition_line",
    "reporting.alert",
@@ -63150,8 +63242,7 @@
   "route": "/sell/quote-to-booking-conversion-confirmation-bo-272",
   "operations": [
    "listQuoteBookingConversion",
-   "createGroupBooking",
-   "updateGroupBooking"
+   "createGroupBooking"
   ],
   "services": [
    "OrderService"
@@ -63162,9 +63253,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "orders.deposit",
    "orders.group_booking",
-   "orders.group_participant",
    "orders.group_payment_milestone",
    "orders.group_payment_schedule",
    "orders.group_quote",
@@ -63860,7 +63949,27 @@
    "emptyNoResults": "The filter narrowed it and the group amendments cancellation are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formUpdateGroupBooking",
+    "component": "modal",
+    "trigger": "Increase Guest Count, Reduce Guest Count",
+    "body": "**Collects what `updateGroupBooking` sends before it is called:** the group's new size, `expectedSize` before the numbers are confirmed or `confirmedSize` once they are. The booking's version goes with it (If-Match), so a change made meanwhile is refused and shown, not overwritten. Dismissing sends nothing; the group is unchanged.",
+    "bindsTo": "UpdateGroupBookingRequest",
+    "confirm": {
+     "label": "Save guest count",
+     "operation": "updateGroupBooking"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "expectedSize",
+      "confirmedSize"
+     ]
+    },
+    "provenance": "contract orders.yaml PATCH /group-bookings/{groupBookingId}; r11 gate fix, 29 October 2026 (CHG-R11FXS-004)"
+   }
+  ]
  },
  "BO-282": {
   "name": "Group Booking Reconciliation, Closure & Performance",
@@ -64408,7 +64517,29 @@
    "emptyFirstRun": "No membership entitlement admission configured yet. Carries the create action and says what the platform does in the meantime.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formCreateEntitlementTemplate",
+    "component": "modal",
+    "trigger": "Create entitlement template",
+    "body": "**Collects what `createEntitlementTemplate` sends before it is called.** Required: `code`, `name` and `validityKind`; the server gives the template its identity. The entitlement the fields above define goes with it: `entriesAllowed` (Number of Visits), `validForDays` (Period), `daysOfWeek` (Days), `validTimeWindows` (Times, Timeslots), and `expiryNoticeDays` for the pre-expiry notice. Dismissing sends nothing; no template is created.",
+    "bindsTo": "EntitlementTemplate",
+    "confirm": {
+     "label": "Create template",
+     "operation": "createEntitlementTemplate"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "validityKind",
+      "expiryNoticeDays"
+     ]
+    },
+    "provenance": "contract catalogue.yaml POST /entitlement-templates; r11 gate fix, 29 October 2026 (CHG-R11FXS-002)"
+   }
+  ]
  },
  "BO-289": {
   "name": "Membership Usage, Visit & Consumption Rules",
@@ -73298,7 +73429,6 @@
   "app": "venue-management-web",
   "route": "/games-rides/top-up-configuration-bo-417",
   "operations": [
-   "setWalletFundingRules",
    "getWalletFundingRules"
   ],
   "services": [
@@ -73308,13 +73438,9 @@
    "postgres"
   ],
   "reads": [
-   "cache:idempotency",
    "wallet.funding_rule"
   ],
-  "writes": [
-   "cache:idempotency",
-   "wallet.funding_rule"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -73352,7 +73478,6 @@
   "app": "venue-management-web",
   "route": "/games-rides/top-up-bonus-rule-configuration-bo-418",
   "operations": [
-   "setWalletFundingRules",
    "getWalletFundingRules"
   ],
   "services": [
@@ -73362,13 +73487,9 @@
    "postgres"
   ],
   "reads": [
-   "cache:idempotency",
    "wallet.funding_rule"
   ],
-  "writes": [
-   "cache:idempotency",
-   "wallet.funding_rule"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -84848,30 +84969,11 @@
   "operator": "venue",
   "app": "venue-management-web",
   "route": "/setup-go-live/pos-payment-access-setup-bo-602",
-  "operations": [
-   "configureWorkstation"
-  ],
-  "services": [
-   "TenancyService"
-  ],
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "reads": [
-   "cache:idempotency",
-   "orders.pos_shift",
-   "platform.device",
-   "platform.outlet",
-   "platform.region_settings",
-   "platform.sale_board",
-   "platform.workstation"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "platform.device",
-   "platform.workstation"
-  ],
+  "operations": [],
+  "services": [],
+  "stores": [],
+  "reads": [],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -84896,7 +84998,7 @@
    "loading": "The pos payment access configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the pos payment access untouched.",
    "emptyFirstRun": "No pos payment access configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it \u2014 naming which is what stops somebody concluding the record does not exist"
   },
   "overlays": []
@@ -87292,6 +87394,7 @@
   ],
   "writes": [
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency"
   ],
@@ -91799,7 +91902,6 @@
   "route": "/sell/staff-role-assignment-configuration-bo-712",
   "operations": [
    "setEventResourcePlan",
-   "createRotaAssignment",
    "getEventResourcePlan",
    "listRotaAssignments"
   ],
@@ -91814,15 +91916,12 @@
   "reads": [
    "cache:idempotency",
    "catalogue.event_resource_plan",
-   "identity.delegated_access",
    "identity.principal",
-   "platform.workstation",
    "workforce.rota_assignment"
   ],
   "writes": [
    "cache:idempotency",
-   "catalogue.event_resource_plan",
-   "workforce.rota_assignment"
+   "catalogue.event_resource_plan"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -91850,7 +91949,7 @@
   "states": {
    "loading": "The staff role list.",
    "error": "Could not load. Names which read failed and leaves the staff role untouched.",
-   "emptyFirstRun": "No staff role yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No staff role yet. The roles an event needs come from its resource plan; people are rostered on Rota & Scheduling (BO-055), not here.",
    "emptyNoResults": "The filter narrowed it and the staff role are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -93726,7 +93825,6 @@
   "app": "venue-management-web",
   "route": "/engagement-support/family-guardians-bo-740",
   "operations": [
-   "updateGuestPreferences",
    "getGuestProfile",
    "getGuestRelationships",
    "setGuestRelationships"
@@ -93740,7 +93838,6 @@
   "reads": [
    "cache:idempotency",
    "marketing.consent_record",
-   "marketing.guest_preference",
    "marketing.guest_profile",
    "marketing.guest_relationship",
    "marketing.loyalty_position",
@@ -93749,8 +93846,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.guest_preference",
-   "marketing.guest_profile",
    "marketing.guest_relationship"
   ],
   "storedProcedures": [],
@@ -94223,7 +94318,6 @@
   "route": "/engagement-support/consent-policy-configuration-bo-747",
   "operations": [
    "listConsentPurposes",
-   "setConsentPurposes",
    "createForm",
    "listForms"
   ],
@@ -94245,8 +94339,6 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "marketing.consent_purpose",
-   "marketing.consent_purpose_channel",
    "marketing.form_definition",
    "marketing.form_definition_field"
   ],
@@ -100177,24 +100269,11 @@
   "operator": "venue",
   "app": "venue-management-web",
   "route": "/engagement-support/design-system-components-bo-836",
-  "operations": [
-   "setBrandIdentity"
-  ],
-  "services": [
-   "WhiteLabelService"
-  ],
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "reads": [
-   "cache:idempotency",
-   "whitelabel.tenant_config"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "whitelabel.tenant_config"
-  ],
+  "operations": [],
+  "services": [],
+  "stores": [],
+  "reads": [],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -100220,7 +100299,7 @@
    "error": "Could not load. Names which read failed and leaves the design system components untouched.",
    "emptyFirstRun": "No design system components yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the design system components are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
   "overlays": []
  },
@@ -100492,14 +100571,14 @@
   "reads": [
    "cache:idempotency",
    "catalogue.product",
-   "control.seo_metadata",
-   "control.url_redirect"
+   "control.url_redirect",
+   "marketing.seo_metadata"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "control.seo_metadata",
-   "control.url_redirect"
+   "control.url_redirect",
+   "marketing.seo_metadata"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -100562,6 +100641,7 @@
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.policy",
    "whitelabel.publish_review_policy",
    "whitelabel.tenant_config"
   ],
@@ -101927,6 +102007,7 @@
   "writes": [
    "approvals.control_policy",
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency",
    "resources.resource"
@@ -103434,7 +103515,6 @@
   "app": "venue-management-web",
   "route": "/rentals/attraction-operational-staffing-roster-bo-884",
   "operations": [
-   "createRotaAssignment",
    "listRotaAssignments",
    "getStaffingCoverage",
    "listAttendance"
@@ -103447,10 +103527,7 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency",
-   "identity.delegated_access",
    "identity.principal",
-   "platform.workstation",
    "workforce.attendance",
    "workforce.attendance_amendment",
    "workforce.forecast_requirement",
@@ -103461,10 +103538,7 @@
    "workforce.staffing_rules",
    "workforce.training_record"
   ],
-  "writes": [
-   "cache:idempotency",
-   "workforce.rota_assignment"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -103488,7 +103562,7 @@
   "states": {
    "loading": "The attraction operational staffing list.",
    "error": "Could not load. Names which read failed and leaves the attraction operational staffing untouched.",
-   "emptyFirstRun": "No attraction operational staffing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No attraction operational staffing yet. Positions are rostered on Rota & Scheduling (BO-055); this screen shows the roster, its coverage and who has checked in.",
    "emptyNoResults": "The filter narrowed it and the attraction operational staffing are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -105673,27 +105747,11 @@
   "operator": "venue",
   "app": "venue-management-web",
   "route": "/rentals/event-staff-personnel-allocation-bo-917",
-  "operations": [
-   "createRotaAssignment"
-  ],
-  "services": [
-   "TenancyService"
-  ],
-  "stores": [
-   "postgres",
-   "redis"
-  ],
-  "reads": [
-   "cache:idempotency",
-   "identity.delegated_access",
-   "identity.principal",
-   "platform.workstation",
-   "workforce.rota_assignment"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "workforce.rota_assignment"
-  ],
+  "operations": [],
+  "services": [],
+  "stores": [],
+  "reads": [],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -105717,9 +105775,9 @@
   "states": {
    "loading": "The event staff personnel list.",
    "error": "Could not load. Names which read failed and leaves the event staff personnel untouched.",
-   "emptyFirstRun": "No event staff personnel yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No event staff personnel yet. People are allocated to event roles on Event Shift & Roster Configuration (BO-714), not here.",
    "emptyNoResults": "The filter narrowed it and the event staff personnel are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
   "overlays": []
  },
@@ -115815,7 +115873,6 @@
   "route": "/access-venue/setup-clone-inheritance-bo-1070",
   "operations": [
    "cloneSeatMap",
-   "setConfigurationProfile",
    "getSeatMap",
    "listConfigurationProfiles"
   ],
@@ -115835,8 +115892,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "cache:resolution",
-   "platform.configuration_profile",
    "seating.seat_map",
    "seating.section"
   ],
@@ -116843,7 +116898,6 @@
   "app": "venue-management-web",
   "route": "/orders-money/wallet-ownership-account-association-bo-1086",
   "operations": [
-   "getWallet",
    "updateWalletType",
    "setSharedWalletMembers",
    "listSharedWallets"
@@ -116856,10 +116910,8 @@
   ],
   "reads": [
    "cache:idempotency",
-   "wallet.credit_lot",
    "wallet.shared_wallet",
    "wallet.shared_wallet_member",
-   "wallet.wallet",
    "wallet.wallet_type"
   ],
   "writes": [
@@ -117247,8 +117299,7 @@
   "app": "venue-management-web",
   "route": "/orders-money/funding-command-center-bo-1093",
   "operations": [
-   "getWalletFundingRules",
-   "listWalletTransactions"
+   "getWalletFundingRules"
   ],
   "services": [
    "WalletService"
@@ -117257,8 +117308,7 @@
    "postgres"
   ],
   "reads": [
-   "wallet.funding_rule",
-   "wallet.wallet_transaction"
+   "wallet.funding_rule"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -117415,7 +117465,6 @@
   "app": "venue-management-web",
   "route": "/orders-money/top-up-rule-configuration-bo-1095",
   "operations": [
-   "setWalletFundingRules",
    "getWalletFundingRules"
   ],
   "services": [
@@ -117425,13 +117474,9 @@
    "postgres"
   ],
   "reads": [
-   "cache:idempotency",
    "wallet.funding_rule"
   ],
-  "writes": [
-   "cache:idempotency",
-   "wallet.funding_rule"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -117469,7 +117514,6 @@
   "app": "venue-management-web",
   "route": "/orders-money/channel-funding-source-mapping-bo-1096",
   "operations": [
-   "setWalletFundingRules",
    "getWalletFundingRules"
   ],
   "services": [
@@ -117479,13 +117523,9 @@
    "postgres"
   ],
   "reads": [
-   "cache:idempotency",
    "wallet.funding_rule"
   ],
-  "writes": [
-   "cache:idempotency",
-   "wallet.funding_rule"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -117523,7 +117563,6 @@
   "app": "venue-management-web",
   "route": "/orders-money/auto-reload-configuration-bo-1097",
   "operations": [
-   "setWalletFundingRules",
    "getWalletFundingRules"
   ],
   "services": [
@@ -117533,13 +117572,9 @@
    "postgres"
   ],
   "reads": [
-   "cache:idempotency",
    "wallet.funding_rule"
   ],
-  "writes": [
-   "cache:idempotency",
-   "wallet.funding_rule"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -117631,7 +117666,6 @@
   "app": "venue-management-web",
   "route": "/orders-money/funding-authorization-approval-rules-bo-1099",
   "operations": [
-   "setWalletFundingRules",
    "getWalletFundingRules"
   ],
   "services": [
@@ -117641,13 +117675,9 @@
    "postgres"
   ],
   "reads": [
-   "cache:idempotency",
    "wallet.funding_rule"
   ],
-  "writes": [
-   "cache:idempotency",
-   "wallet.funding_rule"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -117748,7 +117778,6 @@
   "app": "venue-management-web",
   "route": "/orders-money/funding-limits-velocity-controls-bo-1101",
   "operations": [
-   "setWalletFundingRules",
    "getWalletFundingRules"
   ],
   "services": [
@@ -117758,13 +117787,9 @@
    "postgres"
   ],
   "reads": [
-   "cache:idempotency",
    "wallet.funding_rule"
   ],
-  "writes": [
-   "cache:idempotency",
-   "wallet.funding_rule"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -118742,7 +118767,6 @@
   "route": "/orders-money/parent-child-stored-value-distribution-bo-1116",
   "operations": [
    "setSharedWalletMembers",
-   "transferWalletBalance",
    "listSharedWallets",
    "getWalletBalance"
   ],
@@ -118755,23 +118779,13 @@
   ],
   "reads": [
    "cache:idempotency",
-   "pii.subject",
    "wallet.balance",
-   "wallet.credit_lot",
-   "wallet.credit_type",
    "wallet.shared_wallet",
-   "wallet.shared_wallet_member",
-   "wallet.transfer_rule",
-   "wallet.wallet",
-   "wallet.wallet_transaction"
+   "wallet.shared_wallet_member"
   ],
   "writes": [
    "cache:idempotency",
-   "wallet.balance",
-   "wallet.credit_lot",
-   "wallet.shared_wallet_member",
-   "wallet.wallet",
-   "wallet.wallet_transaction"
+   "wallet.shared_wallet_member"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -119011,6 +119025,7 @@
   ],
   "writes": [
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency",
    "wallet.shared_wallet_member"
@@ -119109,7 +119124,27 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
    "emptyNoResults": "**Nothing matched.** The filter or the scope narrowed it \u2014 naming which is what stops somebody concluding the record does not exist"
   },
-  "overlays": []
+  "overlays": [
+   {
+    "id": "formTransferWalletBalance",
+    "component": "modal",
+    "trigger": "Transfer balance",
+    "body": "**Collects what `transferWalletBalance` sends before it is called.** Required: `amount` (cash credit only) and the receiving wallet, `toWalletId`, named outright: the only way to reach a parent, child, department or corporate wallet of the structure. Optional: `message`. The wallet the screen is on is the sender. A `409` (insufficient cash credit, a suspended or closed wallet, or transfer rules that forbid it) stays in the dialog and says which. Dismissing sends nothing; no value moves.",
+    "confirm": {
+     "label": "Transfer",
+     "operation": "transferWalletBalance"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "toWalletId",
+      "amount",
+      "message"
+     ]
+    },
+    "provenance": "contract wallet.yaml POST /wallets/{walletId}/transfer; r11 gate fix, 29 October 2026 (CHG-R11FXS-004)"
+   }
+  ]
  },
  "BO-1122": {
   "name": "Shared Wallet Simulator, Monitoring & Audit",
@@ -120693,14 +120728,12 @@
   "app": "venue-management-web",
   "route": "/orders-money/refund-routing-credit-restoration-engine-bo-1147",
   "operations": [
-   "setWalletRefundPolicy",
    "createRefund",
    "getOrder",
    "listOrderRefunds"
   ],
   "services": [
-   "OrderService",
-   "WalletService"
+   "OrderService"
   ],
   "stores": [
    "postgres",
@@ -120716,8 +120749,7 @@
    "orders.refund",
    "orders.refund_line",
    "orders.refund_payment",
-   "orders.sales_order",
-   "wallet.refund_policy"
+   "orders.sales_order"
   ],
   "writes": [
    "cache:idempotency",
@@ -120727,8 +120759,7 @@
    "orders.refund",
    "orders.refund_line",
    "orders.refund_payment",
-   "platform.outbox",
-   "wallet.refund_policy"
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -120848,6 +120879,7 @@
   ],
   "writes": [
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency",
    "platform.outbox",
@@ -137553,6 +137585,7 @@
   "writes": [
    "approvals.delegation",
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency"
   ],
@@ -144432,10 +144465,7 @@
   "route": "/commercial/terminal-health-maintenance-incident-center-t57-adm-587",
   "operations": [
    "getDeviceTelemetry",
-   "createWorkOrder",
-   "listDeviceFirmware",
-   "getDeviceFirmware",
-   "createDeviceFirmware"
+   "createWorkOrder"
   ],
   "services": [
    "TenancyService",
@@ -144446,19 +144476,15 @@
    "redis"
   ],
   "reads": [
-   "assets.media_asset",
    "cache:idempotency",
    "maintenance.asset",
    "maintenance.priority_scoring_model",
    "maintenance.work_order",
-   "platform.device",
-   "tenancy.device_firmware",
    "tenancy.device_telemetry"
   ],
   "writes": [
    "cache:idempotency",
-   "maintenance.work_order",
-   "tenancy.device_firmware"
+   "maintenance.work_order"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -145412,7 +145438,6 @@
   "app": "venue-management-web",
   "route": "/commercial/b2b-credit-account-limit-manager-t95-adm-602",
   "operations": [
-   "listB2bCreditAccounts",
    "createB2bCreditAccount"
   ],
   "services": [
@@ -146091,23 +146116,11 @@
   "operator": "venue",
   "app": "venue-management-web",
   "route": "/commercial/refund-allocation-original-tender-manager-t119-adm-612",
-  "operations": [
-   "setWalletRefundPolicy"
-  ],
-  "services": [
-   "WalletService"
-  ],
-  "stores": [
-   "postgres"
-  ],
-  "reads": [
-   "cache:idempotency",
-   "wallet.refund_policy"
-  ],
-  "writes": [
-   "cache:idempotency",
-   "wallet.refund_policy"
-  ],
+  "operations": [],
+  "services": [],
+  "stores": [],
+  "reads": [],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -146133,7 +146146,7 @@
    "error": "Could not load. Names which read failed and leaves the refund allocation original untouched.",
    "emptyFirstRun": "No refund allocation original yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the refund allocation original are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
   "overlays": []
  },
@@ -152878,6 +152891,7 @@
   ],
   "writes": [
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency"
   ],
@@ -152934,6 +152948,7 @@
   ],
   "writes": [
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency"
   ],
@@ -152991,6 +153006,7 @@
   ],
   "writes": [
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency"
   ],
@@ -153047,6 +153063,7 @@
   ],
   "writes": [
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency"
   ],
@@ -153104,6 +153121,7 @@
   ],
   "writes": [
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency"
   ],
@@ -153161,6 +153179,7 @@
   ],
   "writes": [
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency"
   ],
@@ -158681,6 +158700,7 @@
    "control.tenant",
    "identity.platform_staff_grant",
    "whitelabel.analytics_provider",
+   "whitelabel.app_build",
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.config_version",
@@ -158694,6 +158714,7 @@
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.policy",
    "whitelabel.publish_review_policy",
    "whitelabel.site_package",
    "whitelabel.tenant_config"
@@ -165027,25 +165048,18 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/provisioning-command-center-adm-419",
   "operations": [
-   "createTenant",
    "listCellJobs"
   ],
   "services": [
    "PlatformService"
   ],
   "stores": [
-   "postgres",
-   "redis"
+   "postgres"
   ],
   "reads": [
-   "cache:idempotency",
-   "control.cell_job",
-   "control.tenant"
+   "control.cell_job"
   ],
-  "writes": [
-   "cache:idempotency",
-   "control.tenant"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -165076,6 +165090,15 @@
     "to": "ADM-420",
     "trigger": "Tenant & Organization Provisioning",
     "provenance": "structural \u2014 pack board 6 wiring, 11 September 2026",
+    "carries": [
+     "tenantId"
+    ]
+   },
+   {
+    "to": "ADM-420",
+    "trigger": "Create tenant",
+    "control": "primaryButton#createTenant",
+    "provenance": "the lead, 29 October 2026 (\"Open ADM-420\"; CHG-R11FXT-008): opens Tenant & Organization Provisioning on its Create tenant form (formCreateTenant), which collects code, name and billingEmail and calls createTenant; no tenantId is carried, since the tenant does not exist yet",
     "carries": [
      "tenantId"
     ]
@@ -165133,7 +165156,7 @@
   "states": {
    "loading": "The provisioning list.",
    "error": "Could not load. Names which read failed and leaves the provisioning untouched.",
-   "emptyFirstRun": "No provisioning yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyFirstRun": "No provisioning yet. Offers Create tenant, which opens the tenant form on ADM-420; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the provisioning are still there. The pack's own statuses are Pending \u2014 the state names which is selected.",
    "emptyNoAccess": "Names the missing permission. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question."
   },
@@ -165193,7 +165216,9 @@
     "provenance": "structural \u2014 pack board 6 wiring, 11 September 2026",
     "back": true,
     "carries": [
-     "cellId"
+     "cellId",
+     "tenantId",
+     "regionId"
     ]
    }
   ],
@@ -165211,13 +165236,22 @@
     "id": "formCreateTenant",
     "component": "modal",
     "trigger": "Create tenant",
-    "body": "**Collects what `createTenant` sends before it is called.** Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createTenant` sends before it is called.** Required: `code`, `name`, `billingEmail`. Optional: `billingAddress`, `accountManagerPrincipalId`, `planId`. Opened by this screen's Create tenant and by ADM-419's, which arrives here for it (CHG-R11FXT-008). Dismissing sends nothing; the screen behind is unchanged.",
+    "bindsTo": "CreateTenantRequest",
     "confirm": {
      "label": "Create tenant",
      "operation": "createTenant"
     },
     "dismiss": {
-     "label": "Cancel"
+     "label": "Cancel",
+     "discards": [
+      "code",
+      "name",
+      "billingEmail",
+      "billingAddress",
+      "accountManagerPrincipalId",
+      "planId"
+     ]
     },
     "provenance": "contract subscription.yaml POST /tenants; wiring fix, 2 October 2026"
    },
@@ -165860,7 +165894,10 @@
     "to": "ADM-419",
     "trigger": "Back to Provisioning Command Center",
     "provenance": "structural \u2014 pack board 6 wiring, 11 September 2026",
-    "back": true
+    "back": true,
+    "carries": [
+     "tenantId"
+    ]
    }
   ],
   "machine": null,
@@ -173635,6 +173672,7 @@
   ],
   "writes": [
    "approvals.matrix",
+   "approvals.matrix_version",
    "approvals.rule",
    "cache:idempotency",
    "identity.platform_staff_grant"
@@ -184449,6 +184487,7 @@
    "whitelabel.content_page",
    "whitelabel.feature_toggle",
    "whitelabel.module_enablement",
+   "whitelabel.received_release",
    "whitelabel.site_setup_progress",
    "whitelabel.tenant_config"
   ],
@@ -184891,6 +184930,8 @@
    "assets.media_collection_member",
    "assets.media_upload",
    "cache:idempotency",
+   "whitelabel.app_build",
+   "whitelabel.config_version",
    "whitelabel.tenant_config"
   ],
   "writes": [
@@ -186069,14 +186110,14 @@
   "reads": [
    "cache:idempotency",
    "catalogue.product",
-   "control.seo_metadata",
-   "control.url_redirect"
+   "control.url_redirect",
+   "marketing.seo_metadata"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "control.seo_metadata",
-   "control.url_redirect"
+   "control.url_redirect",
+   "marketing.seo_metadata"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -186251,10 +186292,12 @@
    "whitelabel.booking_flow",
    "whitelabel.booking_flow_step",
    "whitelabel.content_page",
+   "whitelabel.homepage_layout",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.policy",
    "whitelabel.publish_review_policy",
    "whitelabel.tenant_config"
   ],
@@ -186346,7 +186389,9 @@
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.policy",
    "whitelabel.publish_review_policy",
+   "whitelabel.received_release",
    "whitelabel.site_package",
    "whitelabel.tenant_config"
   ],
@@ -187811,6 +187856,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "marketing.cookie_banner_design",
    "marketing.privacy_change_set",
    "marketing.privacy_notice_governance"
   ],
@@ -189751,7 +189797,6 @@
   "app": "venue-management-web",
   "route": "/media-library/digital-asset-management-command-center-cms-061",
   "operations": [
-   "searchMedia",
    "getMediaUsageAnalytics"
   ],
   "services": [
@@ -189764,7 +189809,6 @@
   "reads": [
    "assets.audit",
    "assets.media_asset",
-   "assets.media_collection_member",
    "assets.media_usage",
    "assets.share",
    "assets.tag"
@@ -189805,10 +189849,7 @@
    {
     "to": "CMS-063",
     "trigger": "Upload & Asset Ingestion Workspace",
-    "provenance": "structural \u2014 pack board 1 wiring, 11 September 2026",
-    "carries": [
-     "assetId"
-    ]
+    "provenance": "structural \u2014 pack board 1 wiring, 11 September 2026"
    },
    {
     "to": "CMS-064",
@@ -189823,10 +189864,7 @@
    {
     "to": "CMS-066",
     "trigger": "Tags, Keywords & Classification",
-    "provenance": "structural \u2014 pack board 1 wiring, 11 September 2026",
-    "carries": [
-     "assetId"
-    ]
+    "provenance": "structural \u2014 pack board 1 wiring, 11 September 2026"
    },
    {
     "to": "CMS-067",
@@ -189836,10 +189874,7 @@
    {
     "to": "CMS-068",
     "trigger": "Digital Asset 360\u00b0 Profile",
-    "provenance": "structural \u2014 pack board 1 wiring, 11 September 2026",
-    "carries": [
-     "assetId"
-    ]
+    "provenance": "structural \u2014 pack board 1 wiring, 11 September 2026"
    },
    {
     "to": "CMS-069",
@@ -192449,11 +192484,14 @@
    "whitelabel.booking_flow_step",
    "whitelabel.config_version",
    "whitelabel.content_page",
+   "whitelabel.homepage_layout",
    "whitelabel.homepage_section",
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.policy",
    "whitelabel.publish_review_policy",
+   "whitelabel.received_release",
    "whitelabel.site_setup_progress",
    "whitelabel.tenant_config"
   ],
@@ -192710,6 +192748,7 @@
    "whitelabel.module_enablement",
    "whitelabel.navigation_config",
    "whitelabel.navigation_item",
+   "whitelabel.policy",
    "whitelabel.publish_review_policy",
    "whitelabel.tenant_config"
   ],
@@ -192935,7 +192974,7 @@
     "id": "formSetStoreAccounts",
     "component": "modal",
     "trigger": "Save store accounts and listing",
-    "body": "**Collects what `setStoreAccounts` sends**: per store, `accountHolderName`, `developerAccountId`, `appIdentifier`, `dunsNumber` (Apple, nine digits), optional `apiCredentialSecretRef` and the `listing` (name, subtitle, description and keywords in every tenant language, category, support and privacy links, screenshots). Refused `400` for an Apple account without a D-U-N-S number. **Apple Wallet** (Apple entry, optional): `passTypeIdentifier` and the Pass Type ID certificate (`passCertificateSecretRef`, a .p12 and its password uploaded once to Key Vault) from the client's own Apple Developer account, one per brand; the server reads its expiry (`passCertificateExpiresAt`) and refuses `400` a certificate for another Pass Type ID or team (Chinmay, 12 October 2026; CHG-R6-033). Dismissing sends nothing.",
+    "body": "**Collects what `setStoreAccounts` sends**: per store, `accountHolderName`, `developerAccountId`, `appIdentifier`, `dunsNumber` (Apple, nine digits), optional `apiCredentialSecretRef` and the `listing` (name, subtitle, description and keywords in every tenant language, category, support and privacy links, screenshots). Refused `400` for an Apple account without a D-U-N-S number. **Apple Wallet** (Apple entry, optional): `passTypeIdentifier` and the Pass Type ID certificate (`passCertificateSecretRef`, a .p12 and its password uploaded once to Key Vault) from the client's own Apple Developer account, one per tenant for all its brands (ADAM CR-304); the server reads its expiry (`passCertificateExpiresAt`) and refuses `400` a certificate for another Pass Type ID or team (Chinmay, 12 October 2026; CHG-R6-033). Dismissing sends nothing.",
     "bindsTo": "StoreAccount",
     "confirm": {
      "label": "Save",
@@ -196136,7 +196175,6 @@
    "ai.proposed_action",
    "ai.provider",
    "cache:idempotency",
-   "identity.principal",
    "identity.role",
    "orders.order_line",
    "orders.payment",
