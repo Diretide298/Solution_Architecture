@@ -1018,6 +1018,17 @@ def main() -> int:
              f"{put_id} does not say a stale If-Match is 412 and nothing changes (CR-332)")
 
     errors["BR-PARSE"].extend(PARSE_ERRORS)
+    # BR-GUEST-SSO (r11, CHG-CR327-002; the lead, 29 October 2026: "Get those 2 gaps sorted as well"): a guest
+    # sign-in provider stores its authorization URL and carries no staff group mapping. Fails on CR-327's first cut.
+    isch = (load("contracts/spine/identity.yaml").get("components") or {}).get("schemas") or {}
+    spc = (isch.get("SsoProviderConfig") or {}).get("properties") or {}
+    need("BR-GUEST-SSO", (spc.get("authorizationUrl") or {}).get("format") == "uri"
+         and "uaePass" in str((spc.get("authorizationUrl") or {}).get("description") or ""),
+         "SsoProviderConfig stores no authorizationUrl for a guest uaePass row (CHG-CR327-002)")
+    gm = spc.get("groupMappings") or {}
+    need("BR-GUEST-SSO", "minItems" not in gm and "guest" in str(gm.get("description") or ""),
+         "SsoProviderConfig.groupMappings still requires a mapping on a guest row (CHG-CR327-002)")
+
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
@@ -1030,7 +1041,7 @@ def main() -> int:
              "BR-PRESET-READONLY", "BR-END-SESSIONS", "BR-PLATFORM-TOKEN", "BR-GUEST-TOKENS", "BR-GUEST-VENUE",
              "BR-PLATFORM-INVOICE", "BR-WALLET-TOPUP-ONCE", "BR-WALLET-PUBLISH-CHECKS", "BR-WALLET-RESTORE-DRAFT",
              "BR-PLANNER-QUESTIONS", "BR-ROTA-HOUR-LIMIT", "BR-ROTA-CROSS-VENUE",
-             "BR-CREDIT-ACCOUNT-CURRENCY", "BR-PLATFORM-APPROVAL-RULE", "BR-WALLET-ETAG-VERSION"]
+             "BR-CREDIT-ACCOUNT-CURRENCY", "BR-PLATFORM-APPROVAL-RULE", "BR-WALLET-ETAG-VERSION", "BR-GUEST-SSO"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

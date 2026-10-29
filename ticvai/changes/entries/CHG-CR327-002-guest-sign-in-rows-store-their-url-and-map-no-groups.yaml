@@ -1,0 +1,42 @@
+id: CHG-CR327-002
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'A guest sign-in provider row stores its authorization URL (identity.sso_provider.authorization_url,
+  required for a guest uaePass row), which identity#guestSignInProviders returns for getPublishedTenantConfig''s
+  guestSignIn.uaePass.authorizationUrl; and SsoProviderConfig.groupMappings needs at least one mapping on a staff row
+  and none on a guest row, which grants no staff role.'
+decision:
+  what: 'The lead, 29 October 2026: "Get those 2 gaps sorted as well" (the two gaps CR-327 part (1) left). The URL
+    is stored rather than read from metadataUrl at sign-in, because the published config is a public cacheable read
+    that must not call out to the provider.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-327 (#31052): building part (1) (CHG-CR327-001) left guestSignIn.uaePass.authorizationUrl with no
+  source, and a guest row unsavable through setSsoConfig without a staff group mapping (groupMappings minItems 1).'
+keys_touched:
+  operations:
+  - setSsoConfig
+  - getPublishedTenantConfig
+  - guestUaePassLogin
+  tables:
+  - identity.sso_provider
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: 'a guest provider modelled on a staff SSO row without the fields only a guest provider has'
+tickets:
+  started:
+  - '31052 (getPublishedTenantConfig): answer guestSignIn.uaePass.authorizationUrl from the query.'
+  - '35778 (identity.sso_provider): the authorization_url column arrives in the forward migration.'
+  unstarted:
+  - 'setSsoConfig and the guest login tickets pick it up.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-327
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUEST-SSO
+status: open

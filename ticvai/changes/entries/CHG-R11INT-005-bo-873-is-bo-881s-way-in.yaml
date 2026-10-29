@@ -1,0 +1,43 @@
+id: CHG-R11INT-005
+date: '2026-10-29'
+proposed: '2026-10-29T21:05'
+source: audit
+kind: plan
+summary: 'BO-873 (Staff Resource Directory) is a section home of Venue Management in the plan (block-a-extra-tasks.json
+  navHomes), so BO-881 (Overtime & Working-Hour Rules), which joined Block A1 when createRotaAssignment and
+  updateRotaAssignment began reading workforce.staffing_rules, is reached from the back-office entry through Block A
+  screens.'
+decision:
+  what: 'The lead, 29 October 2026: "Bring BO-873 in" (over leaving the rules screen out, which would have left the
+    working-hour flag reading null limits).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: r11 final gate (29 October 2026), check-plan-closure C-REACH: BO-881 (P08, Block A1) is reached only
+  through BO-873, outside it (BO-100 > BO-873 > BO-881), after ADAM CR-334 (CHG-CR334-001) brought setStaffingRules
+  into the slice.'
+keys_touched:
+  screens:
+  - BO-873
+  - BO-881
+  operations:
+  - setStaffingRules
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: 'a screen pulled into Block A whose only way in is a screen outside it'
+tickets:
+  started: []
+  unstarted:
+  - 'BO-873 and BO-881 frontend tasks, created by the r11 release.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-334
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py::C-REACH
+status: open
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-29'
+    quote: 'Bring BO-873 in'

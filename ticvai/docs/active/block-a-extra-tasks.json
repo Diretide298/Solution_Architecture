@@ -1828,6 +1828,7 @@
   "recordDeviceHeartbeat": ["KERNEL-DEVICE-AUTH"]
  },
  "navHomes": {
+  "BO-873": "a section home of Venue Management (staff): the lead, 29 October 2026 (\"Bring BO-873 in\", r11 gate; CHG-R11INT-005): BO-881 joined Block A1 when rota assignments began reading the venue's working-hour rules (ADAM CR-334), and BO-873 is its only way in from the back-office entry",
   "CMS-021": "a section home of the white-label CMS (privacy and consent): the lead, 29 October 2026 (\"Bring CMS-021 in\", r11 gate; CHG-R11INT-004): CMS-030 joined Block A1 when approvePrivacyTesting declared its banner write (ADAM CR-314), and CMS-021 is its only way in from the CMS entry",
   "BO-101": "a section home of Venue Management: lever A, Chinmay, 3 October (CHG-RONEP-007): the navigation closure pulls in app homes only, and the section homes link to their setup screens",
   "BO-102": "a section home of Venue Management: lever A, Chinmay, 3 October (CHG-RONEP-007): the navigation closure pulls in app homes only, and the section homes link to their setup screens",

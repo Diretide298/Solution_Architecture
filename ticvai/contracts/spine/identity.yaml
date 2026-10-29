@@ -324,11 +324,12 @@ x-ticvai-queries:
           clientId: {type: string}
           displayName: {type: string}
           iconAssetRef: {type: string, nullable: true}
+          authorizationUrl: {type: string, format: uri, nullable: true}
     rule: >-
       A rule question (ADAM CR-327, part (1), Chinmay, 29 October 2026: "Kind column on sso_provider";
       CHG-CR327-001). Identity answers with the identity.sso_provider rows of the caller's tenant whose audience is
       guest and whose is_active is true (a null is_active counts as not active, as listSsoProviders reads it), each
-      as its guestProvider, client_id, display_name and icon_asset_ref. client_secret_ref, the metadata, the group
+      as its guestProvider, client_id, display_name, icon_asset_ref and authorization_url. client_secret_ref, the metadata, the group
       mappings and every staff row are never returned. It is asked in process by White-label's
       getPublishedTenantConfig for guestSignIn, under the caller's connection and the table's row-level security
       (XDR-021).
@@ -11355,9 +11356,10 @@ components:
           description: Key vault reference. The secret itself is never returned.
         groupMappings:
           type: array
-          minItems: 1
           description: '**A group with no mapping grants nothing.** No default role, ever — otherwise
-            the identity provider becomes a way to mint access nobody configured.
+            the identity provider becomes a way to mint access nobody configured. **At least one for an `audience`
+            `staff` row; none for a `guest` row** (r11, CHG-CR327-002): a guest provider grants no staff role, so
+            `setSsoConfig` refuses `400` `validation` a staff row with no mapping and a guest row with any.
 
             '
           items:
@@ -11415,6 +11417,17 @@ components:
           nullable: true
           description: 'Which guest provider a `guest` row is (ADAM CR-327, part (1); CHG-CR327-001); null for `staff`.
             `guestSocialLogin` and `guestUaePassLogin` pick their row by `audience` `guest` and this.'
+        authorizationUrl:
+          type: string
+          format: uri
+          maxLength: 2000
+          nullable: true
+          description: '**Where a guest app sends the guest to sign in** (r11, CHG-CR327-002; the lead, 29 October 2026:
+            "Get those 2 gaps sorted as well"): the provider''s authorization endpoint for this tenant''s client.
+            Required for a `guest` `uaePass` row (`setSsoConfig` refuses `400` `validation` one without it), optional
+            for `apple` and `google`, null for `staff` (a staff start is built by `startSsoAuthorization`). Stored, not
+            read from `metadataUrl` at sign-in, so the published config, a public cacheable read, never calls out to
+            the provider.'
     MfaKind:
       type: string
       enum:

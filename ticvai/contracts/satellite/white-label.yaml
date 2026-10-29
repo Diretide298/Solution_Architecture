@@ -12792,7 +12792,10 @@ components:
               type: object
               additionalProperties: false
               properties:
-                authorizationUrl: { type: string, format: uri }
+                authorizationUrl:
+                  type: string
+                  format: uri
+                  description: The guest uaePass row's identity.sso_provider.authorization_url, through identity#guestSignInProviders (CHG-CR327-002).
                 clientId: { type: string }
         brand:
           $ref: '#/components/schemas/BrandIdentity'
