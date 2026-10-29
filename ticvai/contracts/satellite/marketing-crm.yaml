@@ -2249,7 +2249,7 @@ paths:
         **Written to `marketing.seo_metadata`, in the tenant''s own database and transaction** (ADAM CR-317,
         option A, 29 October 2026): SEO metadata is the tenant''s configuration about entities in its own
         database, so Marketing owns the table beside them, under the tenant''s row-level security, and no
-        write crosses a module or a database. It moved from `control.seo_metadata` in the shared control
+        write crosses a module or a database. It moved from the shared control
         database, which Platform owned and Marketing wrote with no declared route.
 
         '
@@ -23514,8 +23514,8 @@ components:
         in search sells through OTAs at OTA commission, which is the cost this avoids.
 
         **Kept in the tenant database, as `marketing.seo_metadata`** (ADAM CR-317, option A, 29 October 2026):
-        the same columns, scope row security, owned by Marketing. It was `control.seo_metadata` in the shared
-        control database.
+        the same columns, scope row security, owned by Marketing. It was Platform''s table in the shared
+        control database, under the same name.
 
         '
       required:

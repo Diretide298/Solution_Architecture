@@ -5895,7 +5895,7 @@ components:
             request''s `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).
             **Stored as** (ADAM CR-300, option B): the matrix row keeps the version in force (the highest) in
             `version` and that version''s `isActive` in `is_active`; every version, the earlier ones included, is
-            an `approvals.matrix_version` row (`ApprovalMatrixVersion`) unique on (`matrix_id`, `version`), and its
+            an `approvals.matrix_version` row (`ApprovalMatrixVersion`) unique on (`approval_matrix_id`, `version`), and its
             rules are the `approvals.rule` rows with that `matrix_version`. The matrix row itself is unique on
             (`kind`, `scope_path`).
             **Never null** (ADAM CR-102, CHG-R10ID-015): the server sets it, 1 for a new matrix and the previous
@@ -5911,8 +5911,8 @@ components:
     ApprovalMatrixVersion:
       type: object
       x-ticvai-persistence: approvals.matrix_version
-      # Keyed (matrix_id, version): two versions of one matrix cannot share a number (ADAM CR-300, option B).
-      x-ticvai-primary-key: [matrixId, version]
+      # Keyed (approval_matrix_id, version): two versions of one matrix cannot share a number (ADAM CR-300, option B).
+      x-ticvai-primary-key: [approvalMatrixId, version]
       description: '**One version of an approval matrix** (ADAM CR-300, option B, Chinmay, 29 October 2026). The
         matrix keeps one stable id across its versions (CR-245), so its versions are rows here, one per version,
         each with its own rule rows (`approvals.rule` with this `matrix_id` and `matrix_version`).
@@ -5921,12 +5921,12 @@ components:
         (`ApprovalRequest.approvalMatrixId` and `matrixVersion`). No operation returns this schema: a read answers
         `ApprovalMatrix`, whose `version` and `isActive` are the version in force.'
       required:
-      - matrixId
+      - approvalMatrixId
       - version
       - isActive
       - createdAt
       properties:
-        matrixId:
+        approvalMatrixId:
           type: string
           format: uuid
           x-ticvai-references: approvals.matrix

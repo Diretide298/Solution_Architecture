@@ -1828,6 +1828,7 @@
   "recordDeviceHeartbeat": ["KERNEL-DEVICE-AUTH"]
  },
  "navHomes": {
+  "CMS-021": "a section home of the white-label CMS (privacy and consent): the lead, 29 October 2026 (\"Bring CMS-021 in\", r11 gate; CHG-R11INT-004): CMS-030 joined Block A1 when approvePrivacyTesting declared its banner write (ADAM CR-314), and CMS-021 is its only way in from the CMS entry",
   "BO-101": "a section home of Venue Management: lever A, Chinmay, 3 October (CHG-RONEP-007): the navigation closure pulls in app homes only, and the section homes link to their setup screens",
   "BO-102": "a section home of Venue Management: lever A, Chinmay, 3 October (CHG-RONEP-007): the navigation closure pulls in app homes only, and the section homes link to their setup screens",
   "BO-103": "a section home of Venue Management: lever A, Chinmay, 3 October (CHG-RONEP-007): the navigation closure pulls in app homes only, and the section homes link to their setup screens",

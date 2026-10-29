@@ -1,0 +1,44 @@
+id: CHG-R11INT-004
+date: '2026-10-29'
+proposed: '2026-10-29T16:55'
+source: audit
+kind: plan
+summary: 'CMS-021 (Privacy & Consent Configuration Command Center) is a section home of the white-label CMS in the
+  plan (block-a-extra-tasks.json navHomes), so CMS-030 (privacy testing, approval and publication), which joined Block
+  A1 when approvePrivacyTesting declared its write of the published banner, is reached from the CMS entry through
+  Block A screens.'
+decision:
+  what: 'The lead, 29 October 2026: "Bring CMS-021 in" (over leaving banner publishing out of the first release).
+    Guests read the published banner in Block A, so its publication belongs in Block A, and its screen needs its way
+    in.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: r11 final gate (29 October 2026), check-plan-closure C-REACH: CMS-030 (P13, Block A1) is reached only
+  through CMS-021, outside it (CMS-001 > CMS-021 > CMS-030), after ADAM CR-314 (CHG-CR314-001) made
+  approvePrivacyTesting declare its write of marketing.cookie_banner_design.'
+keys_touched:
+  screens:
+  - CMS-021
+  - CMS-030
+  operations:
+  - approvePrivacyTesting
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: 'a screen pulled into Block A whose only way in is a command centre outside it'
+tickets:
+  started: []
+  unstarted:
+  - 'CMS-021 and CMS-030 frontend tasks, created by the r11 release.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-314
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py::C-REACH
+status: open
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-29'
+    quote: 'Bring CMS-021 in'
