@@ -48,12 +48,12 @@ tickets:
   unstarted: []
 release_tag: pending
 decision_owner: Chinmay
-adam_cr: 'none: r11 fix lane (fix/r11-fix-contracts), a gate finding on a started ticket; the lead confirms the rule'
+adam_cr: 'none: r11 fix lane (fix/r11-fix-contracts), a gate finding on a started ticket; the rule confirmed by the lead, 29 October 2026'
 triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-ddl.py::RLS_MARKS
 status: open
-notes: 'Not changed, for the lead: a guest''s own transferWalletBalance still cannot write the recipient''s wallet row
+notes: 'The lead confirmed grant-holder-write as proposed (29 October 2026). Open, left for a later decision: a guest''s own transferWalletBalance still cannot write the recipient''s wallet row
   (another subject''s) nor wallet.balance (no guest branch), and a guest reads no wallet.balance; guests are not judged
   by check-rls-scope-fit.'

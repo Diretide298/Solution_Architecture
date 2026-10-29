@@ -1,0 +1,56 @@
+id: CHG-R11FXC-005
+date: '2026-10-29'
+source: audit
+kind: contract
+summary: 'A guest''s data export is assembled from parts: Marketing writes its own part (consent records, guest profile,
+  form submissions, guest documents) when Identity raises the request, says so by marketing.subjectDataPartWritten,
+  and Identity records it in identity.subject_data_export_part; exportSubjectData reads no Marketing table.'
+decision:
+  what: 'The lead''s decision, "Marketing adds its part": events/identity-privacyRequestRaised.yaml gains a second
+    marketing consumer, marketing-crm.writeSubjectDataExportPart (new, serviceAuth, x-ticvai-consumes the event; for
+    requestType access it reads the guest''s rows of marketing.consent_record, guest_profile, form_submission and
+    guest_document, writes them as one object in the tenant''s private storage, and emits the new event
+    marketing.subjectDataPartWritten, rowCount 0 where the guest has none). Identity''s consumer
+    identity.recordSubjectDataExportPart (new) records the part as SubjectDataExportPart (new persisted schema,
+    identity.subject_data_export_part, unique on exportId and owner, exportId referencing identity.subject_data_export).
+    exportSubjectData''s text: the job assembles Identity''s own tables, its projections and the recorded parts, runs
+    once every owner''s part is recorded, and deletes the parts with the export; the subjectDataRecords sentence
+    replaced. handoff/api-data-lineage-overrides.json: the four marketing reads removed from exportSubjectData. The
+    eight check-cross-module-reads baseline entries and acknowledgements for exportSubjectData''s marketing reads
+    (consent_record, guest_profile, form_submission, guest_document) removed: nothing reads those tables raw now.
+    Forward migration (derive-ddl): the new table.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: r11 gate, check-cross-module-reads XR-UNCOVERED and XR-FOUNDATION, built on by started ticket #27745
+  (Ready for QA, Sanket Keluskar): exportSubjectData (Identity, foundation tier) read marketing.consent_record and
+  marketing.guest_profile raw, and form_submission and guest_document under acknowledgement; ADR-0028 lets Identity
+  read nothing above it but a projection, and a view named for Identity is not one (CHG-R8GEN-005). Lead''s decision
+  of 29 October 2026 (Chinmay, through the r11 coordinator): Marketing adds its part, Identity assembles the parts
+  (refresh-safe run 20261029-020957-8105).'
+keys_touched:
+  operations: [exportSubjectData, writeSubjectDataExportPart, recordSubjectDataExportPart]
+  schemas: [SubjectDataExportPart]
+  tables: [identity.subject_data_export_part, identity.subject_data_export, marketing.consent_record,
+    marketing.guest_profile, marketing.form_submission, marketing.guest_document]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - events/identity-privacyRequestRaised.yaml
+  - events/marketing-subjectDataPartWritten.yaml
+  - handoff/api-data-lineage-overrides.json
+  - handoff/audit-baseline.json
+root_class: 'a foundation module assembling data it may not read from the modules above it'
+tickets:
+  started:
+  - '27745 (exportSubjectData): its Marketing reads are removed; the export waits for Marketing''s part instead.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'The two new consumer operations are new plan work (a Marketing and an Identity task) and the new table a
+  migration task: the light release creates no plan tickets, so they reach the plan at the next full release.'
