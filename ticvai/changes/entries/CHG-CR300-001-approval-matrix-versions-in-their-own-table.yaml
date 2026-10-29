@@ -1,0 +1,57 @@
+id: CHG-CR300-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'An approval matrix keeps one stable id across its versions: one approvals.matrix row per kind and scope,
+  unique on (kind, scope_path), its versions approvals.matrix_version rows keyed (matrix_id, version), and every
+  approvals.rule row naming its matrix_version.'
+decision:
+  what: '"All as recommended": ADAM CR-300, option B (Chinmay, 29 October 2026). contracts/spine/approvals.yaml:
+    ApprovalMatrixVersion (new, no operation returns it) persists to approvals.matrix_version (matrix_id referencing
+    approvals.matrix, version, is_active, created_at), x-ticvai-primary-key [matrixId, version]; ApprovalRule gains
+    matrixVersion (readOnly, required; approvals.rule.matrix_version); ApprovalMatrix gains x-ticvai-unique-together
+    [kind, scopePath] beside the existing [kind, scopePath, version]; ApprovalMatrix.version and setApprovalMatrix say
+    how a version is stored (the matrix row keeps the version in force and its is_active; earlier versions and their
+    rules are never touched); setApprovalMatrix and approveMatrixMultiLevel declare x-ticvai-writes
+    approvals.matrix_version. CR-245''s contract (one client-minted matrixId, approvalMatrixId plus matrixVersion on a
+    request, the highest version in force) is unchanged. CR-102''s rule-code key widens from (matrix_id, code) to
+    (matrix_id, matrix_version, code) (ApprovalRule x-ticvai-unique-together; check-business-rules BR-APPROVAL-ENGINE
+    to match): this follows from "All as recommended", option B, under which a version repeats its rules'' codes and
+    the old key would make a coded matrix unsavable a second time; CR-102''s intent, no duplicate code within one rule
+    set, is kept per version. Derived at the final refresh: the table, the column (added nullable; its backfill and NOT
+    NULL are a migration-review row), matrix_kind_scope_path_uniq and rule_matrix_id_matrix_version_code_uniq in the
+    forward migration, and rule_matrix_id_code_uniq dropped, guarded, in the names migration.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-300 (Deep Khanvilkar, #31185 setApprovalMatrix, blocking): CR-245 keeps one matrixId across versions,
+  but approvals.matrix was keyed by id with one version column and approvals.rule had no version, so a previous
+  version and its rules could not be kept, and no unique key stopped two first saves making two matrices. Settled by
+  the lead on 29 October 2026.'
+keys_touched:
+  operations: [setApprovalMatrix, approveMatrixMultiLevel]
+  schemas: [ApprovalMatrix, ApprovalRule, ApprovalMatrixVersion]
+  tables: [approvals.matrix, approvals.rule, approvals.matrix_version]
+  files:
+  - contracts/spine/approvals.yaml
+  - tools/check-business-rules.py
+root_class: 'a versioned record whose tables cannot hold its versions'
+tickets:
+  started:
+  - '27658, 30216, 30218 ([DB] approvals, approvals.matrix, approvals.rule; Ready for QA, Hrushikant Patkar): apply
+    the r11 forward migration: approvals.matrix_version, approvals.rule.matrix_version (backfill each existing rule
+    with its matrix''s version, then NOT NULL, as migration-review.md says), the unique index on approvals.matrix
+    (kind, scope_path), and rule_matrix_id_code_uniq replaced by rule_matrix_id_matrix_version_code_uniq. Nothing
+    already built changes.'
+  unstarted:
+  - '31185, 27934 (setApprovalMatrix): build to option B through CR-300''s comment.'
+  - '30846, 27812 (approveMatrixMultiLevel): a new version is stored the same way.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-300
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-APPROVAL-VERSIONS holds option B; BR-APPROVAL-ENGINE holds the per-version rule-code key. Beyond the
+  comment''s words: the widened rule-code key and rules[].matrixVersion in responses (how the column is declared).'

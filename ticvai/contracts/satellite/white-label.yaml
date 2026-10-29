@@ -6650,6 +6650,13 @@ paths:
       operationId: getStoreAccounts
       x-ticvai-consumed-by:
         - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'the checklist and the listing languages: the working draft''s languages and app_icons (the published
+          set''s languages where there is no draft) (ADAM CR-304, option A)'
+      - table: whitelabel.config_version
+        for: 'the checklist''s publishedConfiguration item: whether a current ConfigVersion exists, and the published
+          languages where there is no draft (ADAM CR-304, option A)'
       x-ticvai-agreed: '29 September: M24-08 (impact.json names it getStorePublishingChecklist; the read half
         of setStoreAccounts); shape follows getBrandIdentity'
       x-ticvai-audience:
@@ -6659,6 +6666,7 @@ paths:
       description: 'The Apple and Google accounts the client has recorded, and the checklist CMS-104 shows:
         Apple D-U-N-S number, Apple Developer account, Google Play developer account, store listing, app icons
         and a published configuration. Secrets are never returned: a stored credential shows as `hasApiCredential`.
+        When each item is done, and what it says to do next, is `StorePublishingChecklist` (ADAM CR-304, option A).
 
         '
       tags:
@@ -6682,6 +6690,13 @@ paths:
       operationId: setStoreAccounts
       x-ticvai-consumed-by:
         - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-reads:
+      - table: whitelabel.tenant_config
+        for: 'the checklist and the listing languages: the working draft''s languages and app_icons (the published
+          set''s languages where there is no draft) (ADAM CR-304, option A)'
+      - table: whitelabel.config_version
+        for: 'the checklist''s publishedConfiguration item: whether a current ConfigVersion exists, and the published
+          languages where there is no draft (ADAM CR-304, option A)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-agreed: '29 September: M24-08 (every client creates and owns its own Apple Developer (DUNS) and
@@ -6698,6 +6713,18 @@ paths:
         An Apple entry without a nine-digit `dunsNumber`, a store given twice, or a listing text missing a
         tenant language, is refused with 400. A credential is kept in the secret store and only its reference
         is stored here.
+
+
+        **The tenant languages a listing is checked against** (ADAM CR-304, option A, Chinmay, 29 October 2026):
+        the working draft''s `languages` (the `whitelabel.tenant_config` row with `is_draft`), or, where there is
+        no draft, the published set''s (the current `ConfigVersion`). Store accounts are outside the draft and take
+        effect at once, so a listing is checked against the languages the tenant is editing towards.
+
+
+        **One Apple account per tenant, so one Pass Type ID per tenant** (ADAM CR-304, option A). The body is a
+        tenant singleton with one entry per store, and the Apple entry records one Apple Developer account (one
+        team), so its `passTypeIdentifier` and certificate sign the Apple passes of every brand the tenant has. A
+        tenant whose brands each need their own Pass Type ID needs a later change, with brand modelling.
 
         '
       tags:
@@ -6735,7 +6762,7 @@ paths:
         '400':
           x-ticvai-problem-types: [duns-number-invalid, duplicate-store, listing-language-missing]
           description: An Apple account without a nine-digit D-U-N-S number, a store given twice, or a listing
-            text missing a tenant language
+            text missing a tenant language (the working draft's languages, else the published set's; ADAM CR-304)
           content:
             application/problem+json:
               schema:
@@ -8494,8 +8521,10 @@ components:
           nullable: true
           pattern: ^pass\.[A-Za-z0-9.-]+$
           description: '**The Apple Wallet Pass Type ID** (`pass.<reverse-domain>`), registered in the client''s own
-            Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate;
-            CHG-R6-033). Apple entry only; a Google entry sending it is refused with 400.'
+            Apple Developer account (Chinmay, 12 October 2026: the client owns the certificate; CHG-R6-033), **one per
+            tenant** (ADAM CR-304, option A): the tenant records one Apple account, so this one Pass Type ID signs the
+            passes of all its brands; a Pass Type ID per brand needs a later change, with brand modelling. Apple
+            entry only; a Google entry sending it is refused with 400.'
         passCertificateSecretRef:
           x-ticvai-secret: vault-reference
           type: string
@@ -8506,7 +8535,8 @@ components:
             field, and its password in `passCertificatePassword`; the server keeps both in Key Vault as one secret and
             the row keeps only the vault name, as for `apiCredentialSecretRef`. A read shows `hasPassCertificate`
             and `passCertificateExpiresAt`, never the certificate or the password. It signs
-            every Apple pass the brand issues (orders `issueWalletPass`, `pushWalletPassUpdate`). On save the server
+            every Apple pass the tenant issues, for all its brands (orders `issueWalletPass`, `pushWalletPassUpdate`;
+            one per tenant, ADAM CR-304). On save the server
             reads the certificate''s Pass Type ID, team and expiry; a certificate whose Pass Type ID is not
             `passTypeIdentifier`, or whose team is not `developerAccountId`, is refused with 400 (CHG-R6-033).'
         passCertificatePassword:
@@ -8624,6 +8654,23 @@ components:
     StorePublishingChecklist:
       x-ticvai-persistence: none — computed
       type: object
+      description: '**When each item is done** (ADAM CR-304, option A, Chinmay, 29 October 2026; computed on every
+        read from the store accounts, the working draft and the published versions):
+
+        - `appleDunsNumber`: the `appleAppStore` entry is recorded with its `dunsNumber`.
+
+        - `appleDeveloperAccount`: an `appleAppStore` entry is recorded.
+
+        - `googlePlayDeveloperAccount`: a `googlePlay` entry is recorded.
+
+        - `storeListing`: at least one store is recorded, and every recorded store''s `listing` has `appName` and
+        `description` in every tenant language (the working draft''s `languages`, else the published set''s, as
+        `setStoreAccounts` checks), and `category`, `supportUrl` and `privacyPolicyUrl` set.
+
+        - `appIcons`: the working draft''s `appIcons` (`whitelabel.tenant_config.app_icons` on the `is_draft` row) is
+        set.
+
+        - `publishedConfiguration`: a current `ConfigVersion` exists (`isCurrent`).'
       required:
       - accounts
       - items
@@ -8656,7 +8703,14 @@ components:
                 description: True for the three accounts, which only the client can open.
               guidance:
                 type: string
-                description: What to do next, in the operator's language.
+                description: '**What to do next: fixed English copy, one text per item** (ADAM CR-304, option A), sent
+                  while the item is not done and absent once it is. `appleDunsNumber`: "Get a D-U-N-S number for your
+                  legal entity, then add it to your Apple account here." `appleDeveloperAccount`: "Enrol your
+                  organisation in the Apple Developer Program, then record its account here." `googlePlayDeveloperAccount`:
+                  "Create a Google Play developer account for your organisation, then record it here." `storeListing`:
+                  "Complete each store listing: app name and description in every language, category, support link and
+                  privacy policy link." `appIcons`: "Add the app icons to the draft configuration." `publishedConfiguration`:
+                  "Publish the configuration: the app is built from a published version."'
     AppBuild:
       x-ticvai-persistence: whitelabel.app_build
       # One build per platform while it is queued or building (ADAM CR-106, option 1; CHG-R10TEN-012).

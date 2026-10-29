@@ -355,8 +355,30 @@ paths:
       operationId: updateRotaAssignment
       x-ticvai-consumed-by:
         - "P08 BO-055 Rota & Scheduling"
+      x-ticvai-read-via:
+      - query: identity#delegatedAccessRecords
+        route: in-process
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001): whether the person holds the required
+          role at the venue after a move, as createRotaAssignment checks it (ADAM CR-315)'
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001), as createRotaAssignment reads it (ADAM CR-315)'
       x-ticvai-audience: [staff]
       summary: Move or cancel an assignment
+      description: >
+        **A move is checked as a new assignment is** (ADAM CR-315, option A). Whenever the PATCH changes
+        `principalId`, `venueId`, `startsAt`, `endsAt` or `requiredRoleId`, the assignment as it would stand
+        is checked against the same two rules `createRotaAssignment` applies: the person has no other
+        assignment overlapping it (`409 rota-assignment-overlap`), and the person holds the required role
+        at the venue (`409 person-lacks-required-role`). So a move cannot do what a create is refused. An
+        assignment outside the caller's scope is the shared `404`.
+
+
+        **The status moves a PATCH may make** are the ones the state model gives this operation
+        (states/rota-assignment.yaml): `planned` to `published` (the assignment becomes visible to the person
+        rostered) or to `cancelled`; `published` to `confirmed` (the person acknowledged it) or to
+        `cancelled`; and `swapPending` to `cancelled` (the swap was approved and a new assignment replaces
+        this one). Any other `status` is refused with `409 rota-status-move-not-allowed`.
       tags: [rota]
       x-ticvai-permission: WORKFORCE_MANAGE
       x-ticvai-scope-level: venue
@@ -378,6 +400,20 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/RotaAssignment' }
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '409':
+          x-ticvai-problem-types: [rota-assignment-overlap, person-lacks-required-role, rota-status-move-not-allowed]
+          description: >
+            Refused, and nothing changes (ADAM CR-315). `rota-assignment-overlap`: after the change the person
+            would hold another assignment overlapping this one. `person-lacks-required-role`: after the change
+            the person lacks the required role at the venue. Both are checked, as on create, whenever the
+            PATCH changes the person, the venue, the times or the required role.
+            `rota-status-move-not-allowed`: the `status` sent is not a move the state model makes from the
+            assignment's current status, or the assignment is already `cancelled`, `completed` or `noShow`.
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 

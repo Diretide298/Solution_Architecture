@@ -4532,14 +4532,6 @@
    "reason": "4 October 2026 (CHG-FXC-004): derived from movements (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "getStoreAccounts": {
-   "reads": [
-    "whitelabel.config_version",
-    "whitelabel.tenant_config"
-   ],
-   "reason": "Checklist computed. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "getStorefrontInsights": {
    "reads": [
     "whitelabel.analytics_provider"

@@ -2183,8 +2183,9 @@ paths:
         **A pass that cannot be pushed to is a screenshot with better rounding.**
 
 
-        **An Apple pass is signed with the brand''s own Pass Type ID certificate** (Chinmay, 12 October 2026: the
-        client owns it, one per brand; CHG-R6-033), read from Key Vault through white-label
+        **An Apple pass is signed with the client''s own Pass Type ID certificate** (Chinmay, 12 October 2026: the
+        client owns it; CHG-R6-033), one per tenant for all its brands (ADAM CR-304, option A), read from Key Vault
+        through white-label
         `StoreAccount.passCertificateSecretRef`, never a TICVAI certificate. Its expiry is
         `StoreAccount.passCertificateExpiresAt`, warned 30 days ahead by `whitelabel.passCertificateExpiring`.
 
@@ -5051,12 +5052,38 @@ paths:
         `periodStart` and `periodEnd`, so `getBillingStatement` finds the same statement again.
 
 
+        **The cycles, their charges and the guest** (ADAM CR-303, option A, Chinmay, 29 October 2026). An
+        agreement''s statements are its first period and one per `orders.membership_renewal` row of it with `status`
+        `completed`. The first period runs from the agreement''s `start_at` to its first expiry (the
+        `previous_expiry_at` of its earliest completed renewal, or its `expires_at` while none has completed); a
+        renewal''s period runs from its `previous_expiry_at` to its `new_expiry_at`. `periodStart` and `periodEnd`
+        are those instants as dates in the venue''s time zone (the venue of the cycle''s order, its region settings
+        read through `tenancy#regionSettingsRecords`). A cycle''s charges are its order: the renewal row''s
+        `order_id`, and for the first period the agreement''s `source_order_id`. The lines, `total`, `taxTotal` and
+        `discountTotal` are worked out from that order''s lines and payments, with any `payments.dunning_case` on
+        that order as its failed attempts. The guest is the agreement''s `customer_id`, which is the guest''s
+        subject id (the id `subjectId` names): a guest reads the agreements whose `customer_id` is its own subject, a staff `subjectId`
+        is matched against `customer_id`, and `BillingStatement.subjectId` is it. The `id` is minted as
+        `BillingStatement.id` states (namespace and name), the one rule `getBillingStatement` uses too.
+
+
         **Order.** Most recent period first: `periodStart` descending, then `id` (one order; ADAM CR-099).'
       x-ticvai-read-via:
       - query: identity#customerMembershipRecords
         route: in-process
         for: 'the membership agreements whose billing cycles the statements are, identity.customer_membership, Identity''s
           data (ADAM CR-099); same deployable (commerce)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the time zone the cycle''s dates are in: the region settings at or above the scope_path of the cycle''s
+          order (RegionSettingsAtOrAbove), in the read''s transaction (ADAM CR-303, option A); same deployable (commerce)'
+      x-ticvai-reads:
+      - table: orders.membership_renewal
+        for: 'the billing cycles: an agreement''s completed renewal rows, each one statement, and the first expiry
+          that ends its first period (ADAM CR-303, option A)'
+      - table: orders.order_line
+        for: 'the lines of the cycle''s order, which the statement''s lines and totals are worked out from (ADAM CR-303,
+          option A)'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -5123,6 +5150,17 @@ paths:
         for: 'the membership agreements whose billing cycles it recomputes the statement ids of, to find the one
           `statementId` names, identity.customer_membership, Identity''s data (ADAM CR-099; CHG-R11FXC-002); same
           deployable (commerce)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the time zone the cycle''s dates are in: the region settings at or above the scope_path of the cycle''s
+          order (RegionSettingsAtOrAbove), in the read''s transaction (ADAM CR-303, option A); same deployable (commerce)'
+      x-ticvai-reads:
+      - table: orders.membership_renewal
+        for: 'the billing cycles: an agreement''s completed renewal rows, each one statement, and the first expiry
+          that ends its first period (ADAM CR-303, option A)'
+      - table: orders.order_line
+        for: 'the lines of the cycle''s order, which the statement''s lines and totals are worked out from (ADAM CR-303,
+          option A)'
       x-ticvai-audience:
       - guest
       - staff
@@ -5151,7 +5189,9 @@ paths:
         required: true
         x-ticvai-column: none
         description: 'The `id` `listBillingStatements` answered for the statement: a name-based UUID (v5) of
-          `agreementId`, `periodStart` and `periodEnd` (ADAM CR-099). **A statement is computed, never stored**
+          `agreementId`, `periodStart` and `periodEnd` (ADAM CR-099), minted under the namespace and from the name
+          `BillingStatement.id` states, over the cycles `listBillingStatements` defines (ADAM CR-303, option A), so
+          both operations give one statement one id. **A statement is computed, never stored**
           (`BillingStatement`), so no table has a `statement_id` and no row is selected by it. The server recomputes
           the id of each billing cycle of the membership agreements the caller may read (a guest its own,
           `x-ticvai-self-scoped: subject`), through `identity#customerMembershipRecords`, and answers the cycle whose
@@ -23908,7 +23948,7 @@ components:
             card needs replacing.
 
     BillingStatement:
-      x-ticvai-persistence: none — computed from orders.payment and payments.dunning_case
+      x-ticvai-persistence: none — computed from orders.membership_renewal, the cycle's order (orders.sales_order, orders.order_line, orders.payment) and payments.dunning_case
       type: object
       description: >
         2.14.19-2.14.23, 5.7.96, BL-100. **What a guest was charged over a period, and
@@ -23928,8 +23968,14 @@ components:
         id:
           type: string
           format: uuid
-          description: A name-based UUID (v5) of `agreementId`, `periodStart` and `periodEnd`, so the same statement
-            has the same id on every read (ADAM CR-099).
+          description: 'A name-based UUID (v5) of `agreementId`, `periodStart` and `periodEnd`, so the same statement
+            has the same id on every read (ADAM CR-099). **Minted one way, by both operations** (ADAM CR-303, option
+            A): RFC 4122 version 5 under the fixed namespace `dca779d2-f1de-5904-bbfc-5c8dcf79383f` (itself the v5
+            UUID of the URL namespace and `urn:ticvai:orders:billing-statement`), from the UTF-8 name
+            `<agreementId>|<periodStart>|<periodEnd>`: the agreement id as a lower-case hyphenated uuid and the two
+            dates as ISO `YYYY-MM-DD`, joined by `|`. For example agreement
+            `0192f0c4-7a10-7c3e-8b5d-2f1e9a6c4d01`, 2026-01-15 to 2026-02-15, is
+            `d14d1f91-9d2c-58b4-b34d-b6617a943373`.'
         agreementId:
           type: string
           format: uuid
@@ -23939,12 +23985,15 @@ components:
           type: string
           format: uuid
           readOnly: true
+          description: The guest, the agreement's `customer_id`, which is the guest's subject id (ADAM CR-303).
         periodStart:
           type: string
           format: date
+          description: The cycle's start as a date in the venue's time zone (`listBillingStatements`, ADAM CR-303).
         periodEnd:
           type: string
           format: date
+          description: The cycle's end as a date in the venue's time zone (`listBillingStatements`, ADAM CR-303).
         lines:
           type: array
           items:

@@ -13,7 +13,8 @@ the decision and passes after it. Two rules are general, because the same gap ca
   BR-PAIR-REFUSAL  An update that takes the same request schema as a create declares every refusal (4xx) the
                    create declares: the same body passes the same rules (`updateDashboard` skipped the refresh
                    budget, CHG-RUL-008). Pairs found before 3 October and not named by a rule are exempt below,
-                   each with its reason.
+                   each with its reason. A partial-update request schema (`a partial update of <table>`) counts as
+                   the body of the create that persists to that table (ADAM CR-315, CHG-CR315-001).
 
 And one rule per decision:
 
@@ -23,10 +24,20 @@ And one rule per decision:
                    approval-no-approver-available.
   BR-APPROVAL-ENGINE (r10, ADAM CR-102, CHG-R10ID-015) the engine's rules have storage: ApprovalRule.condition
                    defines its language (AND-joined comparisons) and the unreachableRule comparison; a rule's code is
-                   unique per matrix (x-ticvai-unique-together [matrix_id, code]); a matrix's version is required; the
+                   unique per rule set (x-ticvai-unique-together [matrix_id, matrixVersion, code], per version since
+                   CR-300, CHG-CR300-001); a matrix's version is required; the
                    approver chain is stored (ApprovalRequest.approvers, approvals.request_approver); a decision can be
                    return or requestInformation; the composite operations declare 400, 403 exceedsDelegatorAuthority
                    and 409.
+  BR-APPROVAL-VERSIONS (r11, ADAM CR-300, CHG-CR300-001) a matrix keeps one stable id across versions: its versions
+                   are approvals.matrix_version rows keyed (matrixId, version), each rule names its matrixVersion, and
+                   ApprovalMatrix is unique on (kind, scopePath); setApprovalMatrix writes the version table.
+  BR-BILLING-STATEMENT (r11, ADAM CR-303, CHG-CR303-001) a statement is a completed renewal row or the first period,
+                   its charges the cycle's order, its guest customer_id, its dates in the venue's time zone; the id's v5
+                   namespace and name are stated on BillingStatement.id, which both statement operations use.
+  BR-STORE-CHECKLIST (r11, ADAM CR-304, CHG-CR304-001) every StorePublishingChecklist item has a done-rule and fixed
+                   copy, setStoreAccounts names the languages a listing is checked against, and the Pass Type ID is
+                   one per tenant.
   BR-PRIVACY-REQUEST (r10, ADAM CR-101, CHG-R10ID-016) a guest's privacy request records a subject, not a principal
                    (ApprovalRequest exactly one of requestedByPrincipalId and requestedBySubjectId); exportSubjectData
                    answers an erased subject 410 subject-erased and emits identity.privacyRequestRaised (as
@@ -161,8 +172,6 @@ PAIR_EXEMPT = {
         "the staff create's 400/409 are about naming the guest, which an update does not do (not reviewed)",
     ("createReport", "updateReport"):
         "400 on create is the definition's validation; whether update shares it is open (not reviewed)",
-    ("createRotaAssignment", "updateRotaAssignment"):
-        "409 on create is a double booking; whether update re-checks it is open (not reviewed)",
     ("createTicketTemplate", "updateTicketTemplate"):
         "400 on create is the template's validation; whether update shares it is open (not reviewed)",
 }
@@ -267,10 +276,26 @@ def main() -> int:
         need("BR-STREAM", op(oid)[3].get("x-ticvai-streaming") == "sse", f"{oid} must stream ({why})")
 
     # -------------------------------------------------------------- BR-PAIR-REFUSAL (general)
+    # **A partial update is the create's body too** (ADAM CR-315, option A, 29 October 2026; CHG-CR315-001). Since the
+    # CR-089 pattern (CHG-SHP-008) an update may take its own `...Request` schema marked `x-ticvai-persistence: none —
+    # request only; a partial update of <table>`, so it no longer shared the create's `$ref` and the pair went unread:
+    # updateRotaAssignment ("Move or cancel") declared no 409 while createRotaAssignment refuses an overlap and a
+    # missing role. Such a schema is keyed here as the create's body that persists to the same table.
+    by_table = {}
+    for oid, (f, path, method, o, doc) in ops.items():
+        ref = body_schema(o).get("$ref")
+        if ref and method == "post" and oid.startswith("create"):
+            tbl = str(schema_of(doc, body_schema(o)).get("x-ticvai-persistence") or "").strip().strip('"')
+            if tbl and not tbl.startswith("none"):
+                by_table.setdefault((f.name, tbl), ref)
     by_schema = collections.defaultdict(list)
     for oid, (f, path, method, o, doc) in ops.items():
         ref = body_schema(o).get("$ref")
         if ref:
+            pers = str(schema_of(doc, body_schema(o)).get("x-ticvai-persistence") or "")
+            m_ = re.search(r"a partial update of ([a-z_]+\.[a-z_]+)", pers)
+            if m_ and (f.name, m_.group(1)) in by_table:
+                ref = by_table[(f.name, m_.group(1))]
             codes = {str(k) for k in (o.get("responses") or {}) if str(k)[0] == "4"} - {"401", "403", "404", "429"}
             by_schema[(f.name, ref)].append((oid, method, codes))
     for (fname, ref), members in sorted(by_schema.items()):
@@ -578,8 +603,10 @@ def main() -> int:
     need("BR-APPROVAL-ENGINE", " AND " in cond and "notIn" in cond and "unreachableRule" in cond,
          "ApprovalRule.condition does not define the condition language (AND-joined clauses, operators) and the "
          "unreachableRule comparison")
-    need("BR-APPROVAL-ENGINE", ["matrix_id", "code"] in (rule_s.get("x-ticvai-unique-together") or []),
-         "ApprovalRule has no unique (matrix_id, code)")
+    # Per version since ADAM CR-300, option B (CHG-CR300-001): a version repeats its rules' codes, so CR-102's "no
+    # duplicate code within one rule set" is (matrix_id, matrix_version, code).
+    need("BR-APPROVAL-ENGINE", ["matrix_id", "matrixVersion", "code"] in (rule_s.get("x-ticvai-unique-together") or []),
+         "ApprovalRule has no unique (matrix_id, matrix_version, code)")
     need("BR-APPROVAL-ENGINE", "version" in ((asch.get("ApprovalMatrix") or {}).get("required") or []),
          "ApprovalMatrix.version is not required (a matrix version may be null)")
     req_s = asch.get("ApprovalRequest") or {}
@@ -596,6 +623,52 @@ def main() -> int:
         r403 = text(((op(oid)[3].get("responses") or {}).get("403")) or {})
         need("BR-APPROVAL-ENGINE", "exceeds-delegator-authority" in r403,
              f"{oid} does not refuse exceedsDelegatorAuthority with 403")
+    # BR-APPROVAL-VERSIONS (ADAM CR-300, option B; CHG-CR300-001): one matrix row with a stable id, its versions in a
+    # table of their own, each rule naming its version, and the two unique keys.
+    mv = asch.get("ApprovalMatrixVersion") or {}
+    need("BR-APPROVAL-VERSIONS", str(mv.get("x-ticvai-persistence") or "") == "approvals.matrix_version"
+         and (mv.get("x-ticvai-primary-key") or []) == ["matrixId", "version"]
+         and ((mv.get("properties") or {}).get("matrixId") or {}).get("x-ticvai-references") == "approvals.matrix",
+         "no approvals.matrix_version keyed (matrixId, version) and referencing approvals.matrix (ApprovalMatrixVersion)")
+    need("BR-APPROVAL-VERSIONS", "matrixVersion" in (rule_s.get("properties") or {})
+         and "matrixVersion" in (rule_s.get("required") or []),
+         "ApprovalRule does not name its matrix version (a required matrixVersion, approvals.rule.matrix_version)")
+    need("BR-APPROVAL-VERSIONS", ["kind", "scopePath"] in ((asch.get("ApprovalMatrix") or {}).get("x-ticvai-unique-together")
+                                                          or []),
+         "ApprovalMatrix has no unique (kind, scopePath): two first saves can make two matrices for one kind and scope")
+    need("BR-APPROVAL-VERSIONS", "approvals.matrix_version" in text(op("setApprovalMatrix")[3].get("x-ticvai-writes") or []),
+         "setApprovalMatrix does not write approvals.matrix_version (x-ticvai-writes)")
+    # BR-BILLING-STATEMENT (ADAM CR-303, option A; CHG-CR303-001): the cycle, its charges, the v5 namespace and name,
+    # and the subject are stated, and both statement operations mint the id by the one rule.
+    odoc = op("listBillingStatements")[4]
+    bs_id = text((((((odoc.get("components") or {}).get("schemas") or {}).get("BillingStatement") or {})
+                   .get("properties") or {}).get("id")) or {})
+    need("BR-BILLING-STATEMENT", bool(re.search(r"namespace `[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`",
+                                                bs_id)) and "<agreementId>|<periodStart>|<periodEnd>" in bs_id,
+         "BillingStatement.id does not state its v5 namespace uuid and the name <agreementId>|<periodStart>|<periodEnd>")
+    lbs = text(op("listBillingStatements")[3])
+    for word in ("orders.membership_renewal", "completed", "source_order_id", "customer_id", "regionSettingsRecords"):
+        need("BR-BILLING-STATEMENT", word in lbs, f"listBillingStatements does not state the cycle rule ({word})")
+    for oid in ("listBillingStatements", "getBillingStatement"):
+        need("BR-BILLING-STATEMENT", "BillingStatement.id" in text(op(oid)[3]),
+             f"{oid} does not mint the statement id by BillingStatement.id's rule")
+    # BR-STORE-CHECKLIST (ADAM CR-304, option A; CHG-CR304-001): every checklist item has its done-rule and its copy,
+    # the listing languages are named, and the Pass Type ID is one per tenant.
+    wdoc = op("setStoreAccounts")[4]
+    wsch = ((wdoc.get("components") or {}).get("schemas") or {})
+    chk = wsch.get("StorePublishingChecklist") or {}
+    item_p = ((((chk.get("properties") or {}).get("items") or {}).get("items") or {}).get("properties") or {})
+    items_ = (item_p.get("item") or {}).get("enum") or []
+    rules_t = str(chk.get("description") or "")
+    copy_t = str((item_p.get("guidance") or {}).get("description") or "")
+    for it in items_:
+        need("BR-STORE-CHECKLIST", f"- `{it}`:" in rules_t, f"StorePublishingChecklist states no done-rule for {it}")
+        need("BR-STORE-CHECKLIST", f"`{it}`: \"" in copy_t, f"StorePublishingChecklist.guidance lists no copy for {it}")
+    need("BR-STORE-CHECKLIST", "is_draft" in text(op("setStoreAccounts")[3]),
+         "setStoreAccounts does not say which tenant languages a listing is checked against (the working draft's)")
+    ptid = text(((wsch.get("StoreAccount") or {}).get("properties") or {}).get("passTypeIdentifier") or {})
+    need("BR-STORE-CHECKLIST", "one per tenant" in ptid and "one per brand" not in ptid,
+         "StoreAccount.passTypeIdentifier is not one per tenant (CR-304)")
     # BR-PRIVACY-REQUEST (ADAM CR-101, CHG-R10ID-016): a guest's privacy request is recorded, clocked and readable.
     need("BR-PRIVACY-REQUEST", ["requestedByPrincipalId", "requestedBySubjectId"]
          in (req_s.get("x-ticvai-exactly-one-of") or []),
@@ -782,7 +855,8 @@ def main() -> int:
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
              "BR-AI-CURRENCY", "BR-QR", "BR-NEW-OPS", "BR-GUEST-PII", "BR-HOST-ROUTING", "BR-CASH-RECEIPT",
              "BR-HOLD-LAPSE", "BR-LOGIN-ATTEMPTS", "BR-GATE-CANCEL", "BR-APPROVAL-ROUTE", "BR-GUEST-SELF-403",
-             "BR-APPROVED-OUTCOME", "BR-APPROVAL-ENGINE", "BR-PRIVACY-REQUEST",
+             "BR-APPROVED-OUTCOME", "BR-APPROVAL-ENGINE", "BR-APPROVAL-VERSIONS", "BR-BILLING-STATEMENT",
+             "BR-STORE-CHECKLIST", "BR-PRIVACY-REQUEST",
              "BR-SCOPE-AUTHZ", "BR-SSO-ACTIVE", "BR-PERMISSION-FINDINGS", "BR-ENTITLEMENT-SHARE",
              "BR-PRESET-READONLY", "BR-END-SESSIONS", "BR-PLATFORM-TOKEN", "BR-GUEST-TOKENS", "BR-GUEST-VENUE",
              "BR-PLATFORM-INVOICE", "BR-WALLET-TOPUP-ONCE", "BR-WALLET-PUBLISH-CHECKS", "BR-WALLET-RESTORE-DRAFT"]

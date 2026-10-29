@@ -1,0 +1,44 @@
+id: CHG-CR315-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'updateRotaAssignment refuses a move into an overlap or to someone without the role, as create does (409
+  rota-assignment-overlap, person-lacks-required-role), declares the shared 404, and states the status moves a PATCH
+  may make, planned to published among them.'
+decision:
+  what: '"All as recommended": ADAM CR-315, option A (Chinmay, 29 October 2026). contracts/satellite/workforce.yaml
+    updateRotaAssignment: a description (the two checks re-run whenever principalId, venueId, startsAt, endsAt or
+    requiredRoleId change; the status moves planned to published or cancelled, published to confirmed or cancelled,
+    swapPending to cancelled); 404 NotFound; 409 [rota-assignment-overlap, person-lacks-required-role,
+    rota-status-move-not-allowed]; x-ticvai-read-via identity#delegatedAccessRecords and identity#principalRecords in
+    process, as create reads them. states/rota-assignment.yaml: planned to published by updateRotaAssignment.
+    tools/check-business-rules.py BR-PAIR-REFUSAL: a partial-update request schema counts as the body of the create
+    persisting to its table, and the createRotaAssignment/updateRotaAssignment exemption is removed (now decided).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-315 (Pranay Shinde, #32340 updateRotaAssignment, blocking): "Move or cancel" declared only 200 and 429,
+  so a move into a double booking or to an unqualified person had no declared answer. Settled by the lead on 29
+  October 2026.'
+keys_touched:
+  operations: [updateRotaAssignment, createRotaAssignment]
+  tables: [workforce.rota_assignment, identity.delegated_access]
+  files:
+  - contracts/satellite/workforce.yaml
+  - states/rota-assignment.yaml
+  - tools/check-business-rules.py
+root_class: 'an update that can change what a create checks, declaring fewer refusals than the create'
+tickets:
+  started: []
+  unstarted:
+  - '32340, 28416 (updateRotaAssignment): build to option A through CR-315''s comment.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-315
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Beyond the comment''s words: rota-status-move-not-allowed, the problem type for a status the state model does
+  not allow (option A says which moves are allowed; the refusal needed a type). The other partial-update request
+  schemas pass the widened BR-PAIR-REFUSAL today.'

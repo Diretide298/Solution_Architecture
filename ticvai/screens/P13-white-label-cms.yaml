@@ -16233,7 +16233,7 @@ screens:
       links, screenshots). Refused `400` for an Apple account without a D-U-N-S number. **Apple Wallet**
       (Apple entry, optional): `passTypeIdentifier` and the Pass Type ID certificate (`passCertificateSecretRef`,
       a .p12 and its password uploaded once to Key Vault) from the client''s own Apple Developer account,
-      one per brand; the server reads its expiry (`passCertificateExpiresAt`) and refuses `400` a certificate
+      one per tenant for all its brands (ADAM CR-304); the server reads its expiry (`passCertificateExpiresAt`) and refuses `400` a certificate
       for another Pass Type ID or team (Chinmay, 12 October 2026; CHG-R6-033). Dismissing sends nothing.'
     bindsTo: StoreAccount
     confirm:
