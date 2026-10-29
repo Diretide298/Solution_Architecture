@@ -1,0 +1,38 @@
+id: CHG-R11FXC-004
+date: '2026-10-29'
+source: audit
+kind: contract
+summary: 'storePaymentToken and transferWalletBalance say where each request field lands: providerToken in
+  payments.token.token, setDefault in is_default, toWalletId as the walletId of the recipient''s transfer transaction,
+  message as the reason of both transfer transactions; toSubjectId names the recipient and is not stored itself.'
+decision:
+  what: 'contracts/spine/orders.yaml storePaymentToken: providerToken x-ticvai-stored-as payments.token.token,
+    setDefault x-ticvai-stored-as payments.token.is_default (the guest''s other tokens cleared in the same
+    transaction). contracts/satellite/wallet.yaml transferWalletBalance: toWalletId x-ticvai-stored-as
+    wallet.wallet_transaction.wallet_id (the recipient''s credit leg), message x-ticvai-stored-as
+    wallet.wallet_transaction.reason (both legs), toSubjectId x-ticvai-persisted false (a selector resolved to the
+    recipient''s own wallet). No column added.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: r11 gate, check-request-fields-stored RF-ACTION-NOT-STORED, built on by started ticket #32125 (In
+  progress, Chitrangi Mestry): storePaymentToken.providerToken and .setDefault, transferWalletBalance.message,
+  .toSubjectId and .toWalletId had no column (refresh-safe run 20261029-020957-8105).'
+keys_touched:
+  operations: [storePaymentToken, transferWalletBalance]
+  tables: [payments.token, wallet.wallet_transaction]
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/satellite/wallet.yaml
+root_class: 'an act''s request field that says nowhere where it is kept'
+tickets:
+  started:
+  - '32125: message as the reason of both legs is the one new behaviour; the rest names what the build stores.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 fix lane (fix/r11-fix-contracts), a gate finding on a started ticket'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-request-fields-stored.py
+status: open

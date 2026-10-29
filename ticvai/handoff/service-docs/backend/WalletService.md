@@ -397,7 +397,7 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 | amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| message | string |  | (max length 140; nullable) |
+| message | string |  | The sender's note, stored as the reason of both transfer transactions, so the sender's history and the recipient's show it (WalletTransaction.reason; CHG-R11FXC-004). (max length 140; nullable) |
 
 **Response**: `WalletTransaction`
 

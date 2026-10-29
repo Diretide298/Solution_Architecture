@@ -3214,16 +3214,12 @@
   "exportSubjectData": {
    "reads": [
     "identity.subject_holding",
-    "marketing.consent_record",
-    "marketing.form_submission",
-    "marketing.guest_document",
-    "marketing.guest_profile",
     "pii.subject"
    ],
    "writes": [
     "approvals.request"
    ],
-   "reason": "14 October 2026 (ADAM CR-084, CHG-GDL-002): the orders and entitlements it lists come from Identity's projection identity.subject_holding, not access.entitlement or orders.sales_order (ADR-0028); requestId is the approvals.request raised through createApprovalRequest; cross-region createDsarRequest, which writes platform.dsar_request, is called only when guestLinkId is set (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "29 October 2026 (the lead, r11 gate; CHG-R11FXC-005): Marketing writes its own part of the export (marketing.subjectDataPartWritten) and the export job assembles the parts, so the export reads no marketing table. 14 October 2026 (ADAM CR-084, CHG-GDL-002): the orders and entitlements it lists come from Identity's projection identity.subject_holding, not access.entitlement or orders.sales_order (ADR-0028); requestId is the approvals.request raised through createApprovalRequest; cross-region createDsarRequest, which writes platform.dsar_request, is called only when guestLinkId is set (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "extendCart": {

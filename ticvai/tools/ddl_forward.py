@@ -838,6 +838,7 @@ RLS_HELPER_COLUMNS = {
     "apply_scope_rls": ("scope_path",), "apply_read_beneath_rls": ("scope_path",),
     "apply_shared_scope_rls": ("scope_path",), "apply_venue_rls": ("venue_id",),
     "apply_subject_rls": ("subject_id",), "apply_grant_holder_subject_read_rls": ("subject_id",),
+    "apply_grant_holder_subject_rls": ("subject_id",),   # CHG-R11FXC-003
 }
 
 

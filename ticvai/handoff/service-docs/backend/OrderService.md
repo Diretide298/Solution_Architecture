@@ -4417,7 +4417,7 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| statementId | path | yes | string (uuid) |  |
+| statementId | path | yes | string (uuid) | The id listBillingStatements answered for the statement: a name-based UUID (v5) of agreementId, periodStart and periodEnd (ADAM CR-099). |
 | format | query |  | enum (json, pdf) | 2.14.23. |
 | language | query |  | string |  |
 
@@ -4473,6 +4473,7 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Statement |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getGroupBooking
@@ -5684,9 +5685,9 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | providerId | string (uuid) | yes |  |
-| providerToken | string (password) | yes |  |
+| providerToken | string (password) | yes | The provider's reference to the credential it tokenised, stored field-encrypted as the token row's token (PaymentToken.token, write-only, never returned; CHG-R11FXC-004). |
 | consentPurposeId | string (uuid) | yes |  |
-| setDefault | boolean |  | (default False) |
+| setDefault | boolean |  | True makes the new token the guest's default (PaymentToken.isDefault, the row's is_default), and clears is_default on the guest's other tokens in the same transaction; false stores it with is_default… (default False) |
 
 **Response**: `PaymentToken`
 

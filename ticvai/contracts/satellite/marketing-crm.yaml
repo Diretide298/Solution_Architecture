@@ -4779,6 +4779,118 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /subject-data-export-parts:
+    post:
+      operationId: writeSubjectDataExportPart
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-agreed: '29 October 2026: the lead, r11 gate (check-cross-module-reads XR-UNCOVERED and XR-FOUNDATION on
+        exportSubjectData, started ticket #27745): Marketing adds its part, Identity assembles the parts (CHG-R11FXC-005)'
+      summary: Write Marketing's part of a guest's data export
+      description: '**The `identity.privacyRequestRaised` consumer that writes Marketing''s part of a guest''s data
+        export** (the lead, 29 October 2026, r11 gate; CHG-R11FXC-005). Identity is Foundation and reads nothing above
+        it (ADR-0028), so `exportSubjectData` no longer reads Marketing''s tables: Marketing, which owns them, writes
+        its own part and Identity''s export job assembles the parts. Modelled as an operation so it has lineage and a
+        ticket.
+
+
+        **What it writes.** For `requestType` `access` only (an erasure writes no part): every row of the guest
+        (`subjectId`) in marketing.consent_record, marketing.guest_profile, marketing.form_submission and
+        marketing.guest_document, the tables of Marketing''s that `handoff/subject-data-register.json` lists, in the
+        export''s `format`, as one object in the tenant''s private storage (never a public or CDN path; encrypted at rest
+        under the tenant''s keys, ADR-0063). **Another guest''s rows are left out even where they share a form or a
+        document**, as `exportSubjectData` says. Then it publishes `marketing.subjectDataPartWritten` with the
+        object''s key, in the same transaction as its inbox record. A guest with no Marketing rows still gets a part,
+        with `rowCount` 0, so the export job never waits for a part that will not come.
+
+
+        **When.** On the event, which `exportSubjectData` raises with the request: the part is the guest''s Marketing
+        data as of the request. It is not delivered until the export is approved; the export job deletes it with the
+        export (7 days after `readyAt`, or when the request is rejected, withdrawn or expired).
+
+
+        **Idempotent on `approvalRequestId`**: a redelivered event finds the part already written and returns it. Invoked
+        by the event relay, never by a screen.'
+      tags:
+      - consent
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      x-ticvai-consumes:
+      - identity.privacyRequestRaised
+      x-ticvai-emits:
+      - marketing.subjectDataPartWritten
+      x-ticvai-reads:
+      - table: marketing.consent_record
+        for: 'the guest''s consent records, for its part of the export (CHG-R11FXC-005)'
+      - table: marketing.guest_profile
+        for: 'the guest''s profile, for its part of the export (CHG-R11FXC-005)'
+      - table: marketing.form_submission
+        for: 'the guest''s form submissions, for its part of the export (CHG-R11FXC-005)'
+      - table: marketing.guest_document
+        for: 'the guest''s documents, for its part of the export (CHG-R11FXC-005)'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              x-ticvai-persistence: none — request only
+              required:
+              - eventId
+              - subjectId
+              - approvalRequestId
+              - requestType
+              properties:
+                eventId:
+                  type: string
+                  description: The `identity.privacyRequestRaised` event id, for the consumer's inbox record.
+                subjectId:
+                  type: string
+                  format: uuid
+                  description: The guest the export is about.
+                approvalRequestId:
+                  type: string
+                  format: uuid
+                  description: The export's id, carried on to `marketing.subjectDataPartWritten`.
+                requestType:
+                  type: string
+                  description: '`access` writes a part; `deletion` writes none and answers `rowCount` 0 with no `fileRef`.'
+                format:
+                  type: string
+                  enum: [json, csv, pdf]
+                  description: The export's format; json where the event carries none.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The part, written now or already written.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - approvalRequestId
+                - rowCount
+                properties:
+                  approvalRequestId:
+                    type: string
+                    format: uuid
+                  fileRef:
+                    type: string
+                    nullable: true
+                    description: The part's object key; null for a `deletion` request. Server only.
+                  rowCount:
+                    type: integer
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /consent-records/checkout:
     post:
       operationId: recordCheckoutConsents
@@ -25329,7 +25441,11 @@ components:
           type: string
           format: date-time
     ConsentRecord:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by enrolFacePass, getConsentHistory, getGuestConsents, getGuestIntelligence and others
+      # MOD audit, CHG-MOD-007: read below the tenant by enrolFacePass, getConsentHistory, getGuestConsents,
+      # getGuestIntelligence and others. Written by venue staff and partners too (checkoutCart, enrolFacePass,
+      # submitForm: a desk or a partner records the guest's consent, recorded_by_principal_id), so any staff grant
+      # writes as well as reads, and the guest its own (r11 gate RF-TENANT-ROOT, #27745; CHG-R11FXC-003).
+      x-ticvai-rls: grant-holder-write
       x-ticvai-persistence: marketing.consent_record + marketing.consent_record_channel
       allOf:
       - $ref: '#/components/schemas/RecordConsentRequest'

@@ -183,6 +183,10 @@ def classes(pol: dict) -> dict:
         elif helper == "apply_grant_holder_subject_read_rls":
             # a subject-owned table opened to staff grants, still read by its own guest (CHG-MOD-007)
             r = ("any", "subject")
+        elif helper == "apply_grant_holder_subject_rls":
+            # a guest's row that belongs to no scope, read and written by any staff grant and by its own guest
+            # (x-ticvai-rls grant-holder-write, CHG-R11FXC-003)
+            r = ("any", "any")
         elif helper in PARENT_HELPERS:
             p = parent_of(args)
             pc = cls(p, depth + 1) if p else None

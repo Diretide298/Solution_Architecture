@@ -3223,12 +3223,19 @@ paths:
                 providerToken:
                   type: string
                   format: password
+                  x-ticvai-stored-as: payments.token.token
+                  description: The provider's reference to the credential it tokenised, stored field-encrypted as the
+                    token row's `token` (`PaymentToken.token`, write-only, never returned; CHG-R11FXC-004).
                 consentPurposeId:
                   type: string
                   format: uuid
                 setDefault:
                   type: boolean
                   default: false
+                  x-ticvai-stored-as: payments.token.is_default
+                  description: True makes the new token the guest's default (`PaymentToken.isDefault`, the row's
+                    `is_default`), and clears `is_default` on the guest's other tokens in the same transaction; false
+                    stores it with `is_default` false (CHG-R11FXC-004).
       responses:
         '201':
           headers:
@@ -5106,6 +5113,11 @@ paths:
       - query: finance#taxInvoiceLineRecords
         route: in-process
         for: 'its read of ledger.tax_invoice_line, Ledger''s data (CHG-MOD-001)'
+      - query: identity#customerMembershipRecords
+        route: in-process
+        for: 'the membership agreements whose billing cycles it recomputes the statement ids of, to find the one
+          `statementId` names, identity.customer_membership, Identity''s data (ADAM CR-099; CHG-R11FXC-002); same
+          deployable (commerce)'
       x-ticvai-audience:
       - guest
       - staff
@@ -5132,6 +5144,13 @@ paths:
       - name: statementId
         in: path
         required: true
+        x-ticvai-column: none
+        description: 'The `id` `listBillingStatements` answered for the statement: a name-based UUID (v5) of
+          `agreementId`, `periodStart` and `periodEnd` (ADAM CR-099). **A statement is computed, never stored**
+          (`BillingStatement`), so no table has a `statement_id` and no row is selected by it. The server recomputes
+          the id of each billing cycle of the membership agreements the caller may read (a guest its own,
+          `x-ticvai-self-scoped: subject`), through `identity#customerMembershipRecords`, and answers the cycle whose
+          id matches; none matching is `404` (CHG-R11FXC-002).'
         schema:
           type: string
           format: uuid
@@ -5157,6 +5176,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BillingStatement'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /orders:
@@ -22898,7 +22919,10 @@ components:
 
             **Operations write it at `venue` scope.**'
     PaymentToken:
-      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by createInstalmentPlan, listPaymentTokens, storePaymentToken
+      # MOD audit, CHG-MOD-007: read below the tenant by createInstalmentPlan, listPaymentTokens, storePaymentToken.
+      # storePaymentToken is staff-callable at a venue too, so any staff grant writes as well as reads, and the guest
+      # its own (r11 gate RF-TENANT-ROOT, #32125; CHG-R11FXC-003).
+      x-ticvai-rls: grant-holder-write
       type: object
       x-ticvai-persistence: payments.token
       description: 'BL-116. **A stored credential, held by the provider and referenced here.** The platform

@@ -1,0 +1,39 @@
+id: CHG-R11FXC-002
+date: '2026-10-29'
+source: audit
+kind: contract
+summary: 'getBillingStatement''s statementId is described as what it is, the name-based id of a computed statement
+  (x-ticvai-column: none), found by recomputing the ids of the billing cycles of the agreements the caller may read
+  through identity#customerMembershipRecords; none matching is 404.'
+decision:
+  what: 'contracts/spine/orders.yaml getBillingStatement: statementId gains x-ticvai-column none and a description
+    (a v5 UUID of agreementId, periodStart and periodEnd, ADAM CR-099; BillingStatement is computed, never stored, so
+    no table holds statement_id); x-ticvai-read-via gains identity#customerMembershipRecords in-process (same
+    deployable, as listBillingStatements already asks it), which the lookup needs because the id names an agreement''s
+    cycle; a 404 NotFound response is declared. No table and no column added: a stored statement would be a second
+    source of truth about money, which BillingStatement''s own text refuses.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: r11 gate, check-parameter-columns P-PARAM-NO-COLUMN, built on by started tickets #32100 and #32102
+  (Ready for QA, Chinmay Patkar): orders.getBillingStatement took statementId and no table in its lineage had
+  statement_id (refresh-safe run 20261029-020957-8105).'
+keys_touched:
+  operations: [getBillingStatement]
+  schemas: [BillingStatement]
+  tables: [identity.customer_membership]
+  files:
+  - contracts/spine/orders.yaml
+root_class: 'an id parameter of a computed resource with no statement that it selects no row'
+tickets:
+  started:
+  - '32100, 32102 (getBillingStatement): the lookup by recomputed id and the 404 are what the build must do; a build
+    that stored or looked up a statement_id needs the change.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 fix lane (fix/r11-fix-contracts), a gate finding on a started ticket'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open

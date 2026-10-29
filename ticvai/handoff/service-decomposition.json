@@ -1,5 +1,5 @@
 {
- "note": "How 33 contracts and 1161 tables become 17 modules, deployed as 5 units. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own. **30 September 2026 (ADR-0055):** the 17 are modules of one .NET solution, and `deployable` on each says which of the five units it ships in; `workers` carries the relay, the consumers and the scheduled jobs and owns no module.",
+ "note": "How 33 contracts and 1162 tables become 17 modules, deployed as 5 units. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own. **30 September 2026 (ADR-0055):** the 17 are modules of one .NET solution, and `deployable` on each says which of the five units it ships in; `workers` carries the relay, the consumers and the scheduled jobs and owns no module.",
  "generated": "21 September 2026",
  "tiers": {
   "foundation": "Read by everything, reads nothing above. Deploys first and alone.",
@@ -26,14 +26,13 @@
     "identity",
     "pii"
    ],
-   "operations": 102,
-   "tables": 46,
+   "operations": 103,
+   "tables": 47,
    "why": "**Twelve contracts read it and it reads almost nothing.** The one service nothing can be deployed without, and the only writer of `pii` — which is what makes a subject-access export and a deletion request answerable at all (ADR-0023).",
    "scale": "Read-heavy, latency-critical, cached hard. Every request resolves a principal.",
    "risk": "**A restart is an outage everywhere.** Deploys go out first and alone.",
    "readsFrom": {
     "TenancyService": 7,
-    "MarketingService": 1,
     "VenueOpsService": 1
    },
    "writesOutside": {
@@ -354,7 +353,7 @@
    "schemas": [
     "marketing"
    ],
-   "operations": 280,
+   "operations": 281,
    "tables": 132,
    "why": "**93 operations and 37 tables — the biggest thing in the package, and probably two services eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly and written rarely; a campaign send is a burst of millions of rows nobody reads again.\n\n**Kept as one for now** because splitting a service before it has a load profile is guessing.",
    "scale": "Bursty on send, read-heavy otherwise. **The one to watch for a split.**",
@@ -370,7 +369,7 @@
     "WhiteLabelService": 1
    },
    "writesOutside": {
-    "TenancyService": 5,
+    "TenancyService": 6,
     "IdentityService": 4,
     "OrderService": 2,
     "PlatformService": 2
@@ -562,8 +561,8 @@
    "readsFrom": {
     "AccessService": 2,
     "AiService": 2,
-    "IdentityService": 2,
     "FnbService": 1,
+    "IdentityService": 1,
     "InventoryService": 1,
     "LedgerService": 1,
     "MarketingService": 1,

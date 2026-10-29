@@ -1,0 +1,37 @@
+id: CHG-R11FXC-001
+date: '2026-10-29'
+source: audit
+kind: contract
+summary: 'setConfigurationProfile takes a request schema of its own, SetConfigurationProfileRequest, in which status is
+  the caller''s choice (draft or published) and required, instead of the stored ConfigurationProfile row whose required
+  status is the server''s lifecycle.'
+decision:
+  what: 'contracts/spine/tenancy.yaml: new SetConfigurationProfileRequest (x-ticvai-persistence none, request only):
+    required name, venueKindScope, status; id optional (must equal the path''s profileId); the stored row''s fields by
+    the same names; version, deployedCount and publishedAt kept readOnly and the deployment states kept in the status
+    enum (400 validation on input, as the operation already said), so a client built on r1 still sends a valid body
+    (the DeployConfigurationProfileRequest precedent). setConfigurationProfile''s requestBody names it; the responses
+    stay ConfigurationProfile. Additive against r1 (check-contract-compat).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: r11 gate, check-contract-shapes C-REQUEST-SERVER-FIELDS (R079), built on by started ticket #30825
+  (In progress, Sanket Keluskar): setConfigurationProfile''s request body required server-owned status, not readOnly,
+  because the body was the persisted resource schema (refresh-safe run 20261029-020957-8105).'
+keys_touched:
+  operations: [setConfigurationProfile]
+  schemas: [SetConfigurationProfileRequest, ConfigurationProfile]
+  files:
+  - contracts/spine/tenancy.yaml
+root_class: 'R079: a persisted resource schema reused as a write body'
+tickets:
+  started:
+  - '30825 (setConfigurationProfile): the body''s fields and rules are unchanged; only the schema name differs.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 fix lane (fix/r11-fix-contracts), a gate finding on a started ticket'
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open

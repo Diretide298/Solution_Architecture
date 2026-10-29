@@ -1,0 +1,59 @@
+id: CHG-R11FXC-003
+date: '2026-10-29'
+source: audit
+kind: contract
+summary: 'A guest''s row that belongs to no venue or scope (marketing.consent_record, payments.token, wallet.wallet,
+  and wallet.balance, which names its wallet) is written by any staff grant as well as read by one, and the guest still
+  reads and writes its own: new x-ticvai-rls grant-holder-write, a generator rule and one forward migration.'
+decision:
+  what: 'The choice CHG-MOD-007 left to the lead for writes by venue staff to rows a guest owns ("a staff-grant write
+    rule for subject tables" or "writing under the tenant root after the venue check"), taken as the staff-grant write
+    rule. tools/derive-ddl.py: mark grant-holder-write (RLS_MARKS) and helper platform.apply_grant_holder_subject_rls
+    (read and write: platform.grant_holder() OR platform.subject_in_scope(subject_id)); on a tenant-root table with no
+    subject_id the write check is platform.grant_holder(); refused (base rule stands) on a scope_path or venue_id
+    table. TABLE_RLS wallet.balance grant-holder-write. Contract schemas ConsentRecord, PaymentToken and Wallet:
+    grant-holder-read becomes grant-holder-write. tools/ddl_forward.py knows the helper''s column;
+    tools/check-rls-scope-fit.py classes it (any grant reads, any grant writes). Per table: consent_record has no scope
+    and is the guest''s tenant-wide record, recorded by a desk or partner (recorded_by_principal_id) in checkoutCart,
+    enrolFacePass and submitForm; payments.token is the guest''s card reference, saved by staff at a venue in
+    storePaymentToken; wallet.wallet and wallet.balance are the guest''s tenant-wide wallet, moved at any venue by
+    topUpWallet, adjustWallet, suspendWallet, closeWallet, transferWalletBalance and their siblings. A scope column
+    would hide the row from every other venue the guest uses, and running these operations at tenant would need a
+    tenant grant at a till; the permission and the operation''s own rules decide who may act, as they already do for
+    the read. Forward migration (derive-ddl): the helper, and the four tables'' policies re-applied in guarded blocks
+    with their rollback.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: r11 gate, check-rls-scope-fit RF-TENANT-ROOT, built on by started tickets #27745 (Ready for QA, Sanket
+  Keluskar: checkoutCart, enrolFacePass and submitForm writing marketing.consent_record) and #32125 (In progress,
+  Chitrangi Mestry: storePaymentToken writing payments.token, transferWalletBalance writing wallet.balance and
+  wallet.wallet); CR-076 and CHG-GEN-010, the notes of CHG-MOD-007 (refresh-safe run 20261029-020957-8105). The class
+  query clears 33 baseline entries with them (the wallet siblings).'
+keys_touched:
+  operations: [checkoutCart, enrolFacePass, submitForm, storePaymentToken, transferWalletBalance, topUpWallet,
+    adjustWallet, suspendWallet, reinstateWallet, closeWallet, holdWalletFunds, captureWalletHold, releaseWalletHold]
+  schemas: [ConsentRecord, PaymentToken, Wallet]
+  tables: [marketing.consent_record, payments.token, wallet.wallet, wallet.balance]
+  files:
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  - tools/check-rls-scope-fit.py
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/spine/orders.yaml
+  - contracts/satellite/wallet.yaml
+root_class: 'a guest-owned row with no scope that staff below the tenant write'
+tickets:
+  started:
+  - '27745, 32125: the writes they build pass the row policy once the migration is applied.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 fix lane (fix/r11-fix-contracts), a gate finding on a started ticket; the rule confirmed by the lead, 29 October 2026'
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::RLS_MARKS
+status: open
+notes: 'The lead confirmed grant-holder-write as proposed (29 October 2026). Open, left for a later decision: a guest''s own transferWalletBalance still cannot write the recipient''s wallet row
+  (another subject''s) nor wallet.balance (no guest branch), and a guest reads no wallet.balance; guests are not judged
+  by check-rls-scope-fit.'

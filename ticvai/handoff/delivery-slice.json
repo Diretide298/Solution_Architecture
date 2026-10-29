@@ -221,8 +221,8 @@
  "deferredScreens": [],
  "counts": {
   "core": 517,
-  "setup": 269,
-  "allOperations": 2854
+  "setup": 268,
+  "allOperations": 2856
  },
  "services": {
   "AccessService": {
@@ -248,7 +248,7 @@
   "IdentityService": {
    "core": 32,
    "setup": 5,
-   "total": 102
+   "total": 103
   },
   "InventoryService": {
    "core": 1,
@@ -262,8 +262,8 @@
   },
   "MarketingService": {
    "core": 52,
-   "setup": 21,
-   "total": 280
+   "setup": 20,
+   "total": 281
   },
   "OrderService": {
    "core": 90,
@@ -14327,19 +14327,6 @@
     "WEB-050"
    ],
    "enables": []
-  },
-  "uploadGuestDocument": {
-   "part": "setup",
-   "service": "MarketingService",
-   "contract": "marketing-crm",
-   "verb": "POST",
-   "path": "/guest-documents",
-   "perm": "GUEST_VIEW_PII",
-   "platforms": [],
-   "screens": [],
-   "enables": [
-    "marketing.guest_document"
-   ]
   },
   "validateBookingFlow": {
    "part": "core",
