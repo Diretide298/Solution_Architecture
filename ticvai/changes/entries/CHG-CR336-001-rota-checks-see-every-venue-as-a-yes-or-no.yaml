@@ -8,7 +8,7 @@ summary: 'createRotaAssignment and updateRotaAssignment ask the overlap and the 
   scope are seen and nothing of another venue''s rota leaks; an exclusion constraint per person keeps the overlap
   rule under races.'
 decision:
-  what: '"As recommended", then "Include those in today as well" (Chinmay, 29 October 2026, about 19:20): ADAM CR-336,
+  what: '"As recommended, comment now", then "Include those in today as well" (Chinmay, 29 October 2026, about 19:20): ADAM CR-336,
     option B, with the exclusion constraint. contracts/satellite/workforce.yaml: x-ticvai-queries
     principalHasOverlappingAssignment (principalId, startsAt, endsAt, exceptAssignmentId; returns overlaps only;
     any venue, not cancelled, half-open times; one statement under ITenantRootGrant); createRotaAssignment and

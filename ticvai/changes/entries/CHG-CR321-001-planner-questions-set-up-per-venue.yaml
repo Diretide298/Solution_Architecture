@@ -7,7 +7,7 @@ summary: 'A venue sets up the visit planner''s questions from a closed list the 
   per venue. VisitPlannerOptions.questions answers them, one new table (venuemap.visit_planner_question) holds them,
   one staff write (setVisitPlannerQuestions) sets them, and generateVisitPlan refuses a missing required answer.'
 decision:
-  what: '"As recommended", then "Include those in today as well" (Chinmay, 29 October 2026, about 19:20): ADAM CR-321,
+  what: '"As recommended, comment now", then "Include those in today as well" (Chinmay, 29 October 2026, about 19:20): ADAM CR-321,
     option A. contracts/satellite/venue-map.yaml: VisitPlannerQuestionKey (the closed list of eight);
     VisitPlannerQuestion (venuemap.visit_planner_question, keyed (scopePath, questionKey); isEnabled, isRequired,
     sortOrder, label and help with their localised maps; a question with no row takes the default its description

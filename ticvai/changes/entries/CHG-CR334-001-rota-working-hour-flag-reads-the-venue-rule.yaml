@@ -6,7 +6,7 @@ summary: 'RotaAssignment.breachesWorkingHourLimit names its rule: the venue''s w
   per day, per rolling 7 days, minimum rest between shifts), measured over the person''s non-cancelled assignments at
   that venue, this one included, and set at create and after a move; both rota writes declare the read.'
 decision:
-  what: '"As recommended", then "Include those in today as well" (Chinmay, 29 October 2026, about 19:20): ADAM CR-334,
+  what: '"As recommended, comment now", then "Include those in today as well" (Chinmay, 29 October 2026, about 19:20): ADAM CR-334,
     option A. contracts/satellite/workforce.yaml: RotaAssignment.breachesWorkingHourLimit states the rule (a day in
     the venue''s time zone over maximumHoursPerDay; any 7 consecutive days including the assignment over
     maximumHoursPerWeek; less than minimumRestHours to the assignment just before or after; hours are endsAt minus
