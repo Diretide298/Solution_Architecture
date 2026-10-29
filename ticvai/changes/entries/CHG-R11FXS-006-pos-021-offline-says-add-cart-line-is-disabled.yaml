@@ -1,0 +1,41 @@
+id: CHG-R11FXS-006
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'POS-021 Sell - Food & Drink''s offline text says Add cart line is disabled offline, because addCartLine is
+  not offline-capable (frontend-patterns 4.4).'
+decision:
+  what: 'screens/P04-point-of-sale.yaml POS-021 states.offline: the approved text is kept and one sentence is added:
+    "Add cart line is disabled offline: `addCartLine` is not offline-capable, so the button says to reconnect." The
+    promotions and item-availability writes stay offline-capable as before. Logged in
+    docs/active/approved-ui-changes.yaml (state:offline).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 integration gate of 29 October 2026 (run 20261029-020957-8105): check-screen-wiring S-OFFLINE-QUEUED on
+  POS-021, built on by #31749 and #31751 (Ready for QA, Chinmay Patkar): the offline state promised sync and did not
+  say addCartLine is disabled offline. The lead''s rule: fix every finding at its source (29 October 2026, "fix at the
+  source").'
+keys_touched:
+  screens: [POS-021]
+  operations: [addCartLine]
+  files:
+  - screens/P04-point-of-sale.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'an offline state that promises sync and does not name a write that is online-only'
+tickets:
+  started:
+  - '31749 and 31751 (addCartLine, Ready for QA, Chinmay Patkar): the operation is unchanged; the till disables it
+    offline as 4.4 says. Told through the lead''s comment; their text is not rewritten.'
+  unstarted:
+  - 'POS-021''s screen ticket picks the copy up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r11 integration gate of 29 October 2026 (run 20261029-020957-8105), the lead''s rule to fix every
+  gate finding at its source'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Visible copy change to a client-verified screen, logged in approved-ui-changes.yaml with this entry. No database
+  change.'

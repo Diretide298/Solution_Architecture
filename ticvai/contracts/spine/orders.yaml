@@ -1161,7 +1161,6 @@ paths:
       operationId: updateGroupBooking
       x-ticvai-consumed-by:
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-272 Quote-to-Booking Conversion & Confirmation"
         - "P08 BO-281 Group Amendments, Cancellation & Refund Operations"
       x-ticvai-reads:
       - table: orders.deposit

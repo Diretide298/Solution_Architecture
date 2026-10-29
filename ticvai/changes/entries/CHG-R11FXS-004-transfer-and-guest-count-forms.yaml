@@ -1,0 +1,46 @@
+id: CHG-R11FXS-004
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'BO-1121 Shared Wallet Transfers & Balance Reallocation gets a "Transfer balance" button and the form
+  transferWalletBalance needs; BO-281 Group Amendments binds Increase and Reduce Guest Count to updateGroupBooking
+  through a form that collects the new size.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml. BO-1121: a primaryButton "Transfer balance" (transferWalletBalance) after
+    the wallet''s balance panel, opening formTransferWalletBalance (modal; confirm "Transfer"; dismiss Cancel), which
+    collects amount (cash credit only) and the receiving wallet toWalletId (the only way to reach a shared wallet,
+    per the contract), with an optional message; the wallet the screen is on sends. BO-281: "Increase Guest Count"
+    and "Reduce Guest Count" call updateGroupBooking and open formUpdateGroupBooking (modal; confirm "Save guest
+    count"; dismiss Cancel), which collects expectedSize before confirmation or confirmedSize after, with If-Match.
+    "Package Change" and the other amendment buttons are unchanged. Logged in docs/active/approved-ui-changes.yaml
+    (BO-1121 region:fields and its overlay; BO-281 its overlay).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 integration gate of 29 October 2026 (run 20261029-020957-8105): check-screen-wiring S-OP-UNREACHED on
+  BO-1121 transferWalletBalance (built on by #32125, In progress, Chitrangi Mestry) and BO-281 updateGroupBooking
+  (#32269, In progress, Sanket Keluskar). Each write takes a required body, so binding a button alone would only move
+  the finding to S-BUTTON-FORM. The lead''s rule: fix every finding at its source (29 October 2026, "fix at the
+  source").'
+keys_touched:
+  screens: [BO-1121, BO-281]
+  operations: [transferWalletBalance, updateGroupBooking]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'a declared write whose approved screen had no control or form for it'
+tickets:
+  started:
+  - '32125 (transferWalletBalance) and 32269 (updateGroupBooking): the operations are unchanged; these screens now
+    call them. Told through the lead''s comment; their text is not rewritten.'
+  unstarted:
+  - 'The two screens'' tickets pick the forms up at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r11 integration gate of 29 October 2026 (run 20261029-020957-8105), the lead''s rule to fix every
+  gate finding at its source'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Visible change to approved screens, logged in approved-ui-changes.yaml with this entry. No database change.'

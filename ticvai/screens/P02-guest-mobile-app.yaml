@@ -447,6 +447,8 @@ screens:
     - to: GST-050
       trigger: Resource Booking – Cabana
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
+      carries:
+      - productId
     - to: GST-051
       trigger: Plan Your Adventure – Start
       provenance: structural — GST-001 is P02's home screen and its exits are its launcher
@@ -2361,6 +2363,7 @@ screens:
       - kind: primaryButton
         label: Continue
         operation: addCartLine
+        collectedBy: Ticket types
         provenance: decided 29 September, rev 3 GAP-D3
   states:
     loading: The ticket types of the product, with prices.
@@ -6097,6 +6100,8 @@ screens:
     contract: orders
     purpose: Put the item in the cart, marked for collection on the way out (audit R236)
     trigger: onAction
+    inputSources:
+      variantId: listMerchandise.productVariantId
     invalidates:
     - listMerchandise
   - operationId: reserveMerchandise
@@ -6326,6 +6331,8 @@ screens:
     purpose: Put the car park's parking product in the cart; refused `soldOutForDay` when the car park
       is at capacity (decided 28 September, audit R166)
     trigger: onAction
+    inputSources:
+      variantId: listParkingFacilities.productVariantId
   - operationId: updateParkingEntitlement
     contract: access
     purpose: Change the plate, or revoke
@@ -10875,6 +10882,13 @@ screens:
     trigger: onAction
     invalidates:
     - listProducts
+  - operationId: listProductVariants
+    contract: catalogue
+    purpose: 'The types of the cabana the guest chose (its catalogue variants), read when the form opens:
+      the Type the form asks is the `variantId` addCartLine sends. No component of its own: the form''s
+      picker (r11 gate fix, CHG-R11FXS-005; as GST-048, CHG-R10GFP-006).'
+    trigger: onAction
+    provenance: r11 gate fix, 29 October 2026 (CHG-R11FXS-005)
   - operationId: listProducts
     contract: catalogue
     purpose: List products
@@ -10895,6 +10909,10 @@ screens:
     params:
     - name: cartId
       from: session
+    - name: productId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listProducts`.'
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded: []
   wireframe:
@@ -10929,6 +10947,8 @@ screens:
   overlays:
   - id: formAddCartLine
     component: modal
+    reads:
+    - listProductVariants
     trigger: Add to cart
     body: '**Type, date and guests**, then `addCartLine`; nothing else is asked.'
     bindsTo: AddCartLineRequest
@@ -14114,6 +14134,8 @@ screens:
     contract: orders
     purpose: Add the table deposit to the cart when the venue requires one
     trigger: onAction
+    inputSources:
+      variantId: createTableReservation.variantId
   - operationId: listMyTableReservations
     contract: fnb
     purpose: The guest's own table reservations and waitlist places (self-scoped)
@@ -15822,6 +15844,8 @@ screens:
     contract: orders
     purpose: Add the trip or pass to the basket (`attributes.transport`)
     trigger: onAction
+    inputSources:
+      variantId: getTransportFareTable.catalogueVariantId
   - operationId: saveFavouriteRoute
     contract: transport
     purpose: Save this route
@@ -15989,6 +16013,8 @@ screens:
     contract: orders
     purpose: Add the trip or pass to the basket (`attributes.transport`)
     trigger: onAction
+    inputSources:
+      variantId: listTransportPassOffers.variantId
   entryState:
     params:
     - name: cartId

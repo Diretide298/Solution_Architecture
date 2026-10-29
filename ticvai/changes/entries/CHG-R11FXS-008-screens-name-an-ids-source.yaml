@@ -1,0 +1,41 @@
+id: CHG-R11FXS-008
+date: '2026-10-29'
+source: audit
+kind: process
+summary: 'A screen action may name where an id it sends comes from (apis[].inputSources, e.g. variantId:
+  listProductVariants.productVariantId), and check-screen-wiring S-INPUT-SOURCE accepts it only when that operation is on
+  the screen and a 2xx response of it carries the field (list rows and what a write returns included). A source that is
+  not there is still a finding. Likewise a button may name the list whose rows collect its body (components[].collectedBy),
+  which S-BUTTON-FORM accepts only when a list of that label, filled by a declared read, is on the screen (GST-008''s
+  Continue: the Ticket types steppers).'
+decision:
+  what: 'The lead, 29 October 2026 ("Fix the check"): ten guest screens get addCartLine''s variantId from the picked row of a
+    list read or from an earlier write''s answer, which the rule could not see (it took only entry parameters, fields of
+    single-record reads, and reads of what the id names). Teaching the rule to read a named source fixes the check at its
+    source; it is not an exemption, because the named field is verified in the contract.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'Finding: r11 integration gate (29 October 2026), check-screen-wiring S-INPUT-SOURCE on GST-026, GST-027, GST-070, GST-077, GST-078, KSK-017,
+  WEB-033, WEB-041, WEB-042, WEB-049 and S-BUTTON-FORM on GST-008, built on by #31749 and #31751 (Chinmay Patkar, Ready for QA); the screens lane found
+  each screen already gets the variant where the contract puts it.'
+keys_touched:
+  operations:
+  - addCartLine
+  screens:
+  - GST-008
+  files:
+  - tools/check-screen-wiring.py
+  - screens/_schema.yaml
+root_class: 'a check that could not see a list row''s field or a write''s answer as an id''s source'
+tickets:
+  started:
+  - '31749, 31751 (addCartLine): nothing to change in the build; the screens name the source they already use.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r11 gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::input_sources
+status: open

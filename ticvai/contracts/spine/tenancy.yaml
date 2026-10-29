@@ -1090,7 +1090,6 @@ paths:
     put:
       operationId: setConfigurationProfile
       x-ticvai-consumed-by:
-        - "P08 BO-1070 Setup, Clone & Inheritance"
         - "P08 BO-123 POS Profile Management"
         - "P08 BO-129 Software, Configuration & Version Management"
       summary: What a class of workstation is configured to be

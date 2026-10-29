@@ -1,0 +1,37 @@
+id: CHG-R11FXS-007
+date: '2026-10-29'
+source: audit
+kind: spec
+summary: 'BO-129 Software, Configuration & Version Management says wave 1: the r10 bundle builds it in Block A (setup
+  tasks VM-BO-129 and APP-SETUP-BO-129-REST), and Block A is wave 1.'
+decision:
+  what: 'screens/P08-venue-back-office.yaml BO-129: wave 2 -> 1. The r10 release bundle (5afedc30,
+    handoff/service-docs/op-release.json) placed BO-129 in AM-SETUP-PLATFORM-FOUNDATION-P08 and its -REST feature
+    under BLOCK-A, after the r10 gate had run on 289e89b1, so the screen record still said wave 2 (the same
+    sequence as BO-954 at r4). Wave is invisible to check-approved-ui. The next bundle gives its tickets wave 1''s
+    priority.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'The r11 integration gate of 29 October 2026 (run 20261029-020957-8105): check-screen-patterns reported 40 findings
+  against the 39 pinned in tools/refresh-safe-baseline.json (P8 30 against 29); the new one is P8 BO-129 "a Block A
+  screen with wave 2". The lead''s rule: fix every finding at its source (29 October 2026, "fix at the source").'
+keys_touched:
+  screens: [BO-129]
+  files:
+  - screens/P08-venue-back-office.yaml
+root_class: 'a screen the bundle built in Block A whose record kept its old wave'
+tickets:
+  started: []
+  unstarted:
+  - 'VM-BO-129 and APP-SETUP-BO-129-REST: the priority follows the wave at the next bundle.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r11 integration gate of 29 October 2026 (run 20261029-020957-8105), the lead''s rule to fix every
+  gate finding at its source'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: 'check-screen-patterns after: 39 findings (NP 1, P8 29, READ 9), the count the baseline pins. No visible change.
+  No database change.'

@@ -34170,7 +34170,7 @@ screens:
   name: Software, Configuration & Version Management
   module: Venue Operations
   requiresModule: core
-  wave: 2
+  wave: 1
   permission: SCOPE_VIEW
   implementation:
     app: venue-management-web
@@ -53542,13 +53542,6 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listQuoteBookingConversion
-  - operationId: updateGroupBooking
-    contract: orders
-    purpose: Confirm numbers or the leader on the converted booking
-    trigger: onAction
-    provenance: decided 29 September, VM close-out (venue management and configuration)
-    invalidates:
-    - listQuoteBookingConversion
   entryState:
     preloaded: []
     params:
@@ -54746,9 +54739,11 @@ screens:
       components:
       - kind: primaryButton
         label: Increase Guest Count
+        operation: updateGroupBooking
         provenance: pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support
       - kind: secondaryButton
         label: Reduce Guest Count
+        operation: updateGroupBooking
         provenance: pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support
       - kind: secondaryButton
         label: Date Change
@@ -54770,6 +54765,25 @@ screens:
         provenance: pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 30 §Support
     - name: contentBody
       components: []
+  overlays:
+  - id: formUpdateGroupBooking
+    component: modal
+    trigger: Increase Guest Count, Reduce Guest Count
+    body: '**Collects what `updateGroupBooking` sends before it is called:** the group''s new size, `expectedSize`
+      before the numbers are confirmed or `confirmedSize` once they are. The booking''s version goes with
+      it (If-Match), so a change made meanwhile is refused and shown, not overwritten. Dismissing sends
+      nothing; the group is unchanged.'
+    bindsTo: UpdateGroupBookingRequest
+    confirm:
+      label: Save guest count
+      operation: updateGroupBooking
+    dismiss:
+      label: Cancel
+      discards:
+      - expectedSize
+      - confirmedSize
+    provenance: contract orders.yaml PATCH /group-bookings/{groupBookingId}; r11 gate fix, 29 October
+      2026 (CHG-R11FXS-004)
   states:
     loading: The group amendments cancellation list.
     error: Could not load. Names which read failed and leaves the group amendments cancellation untouched.
@@ -55887,6 +55901,33 @@ screens:
       - kind: secondaryButton
         label: Rental Benefit
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Support
+      - kind: secondaryButton
+        label: Create entitlement template
+        operation: createEntitlementTemplate
+        notes: Opens the form that creates the entitlement template the fields above define (r11 gate
+          fix, CHG-R11FXS-002).
+        provenance: contract catalogue.yaml POST /entitlement-templates; r11 gate fix, 29 October 2026
+  overlays:
+  - id: formCreateEntitlementTemplate
+    component: modal
+    trigger: Create entitlement template
+    body: '**Collects what `createEntitlementTemplate` sends before it is called.** Required: `code`,
+      `name` and `validityKind`; the server gives the template its identity. The entitlement the fields
+      above define goes with it: `entriesAllowed` (Number of Visits), `validForDays` (Period), `daysOfWeek`
+      (Days), `validTimeWindows` (Times, Timeslots), and `expiryNoticeDays` for the pre-expiry notice.
+      Dismissing sends nothing; no template is created.'
+    bindsTo: EntitlementTemplate
+    confirm:
+      label: Create template
+      operation: createEntitlementTemplate
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+      - name
+      - validityKind
+      - expiryNoticeDays
+    provenance: contract catalogue.yaml POST /entitlement-templates; r11 gate fix, 29 October 2026 (CHG-R11FXS-002)
   states:
     loading: The membership entitlement admission configuration as saved.
     error: Could not load. Names which read failed and leaves the membership entitlement admission untouched.
@@ -55915,9 +55956,10 @@ screens:
     trigger: onLoad
   - operationId: createEntitlementTemplate
     contract: catalogue
-    purpose: Set expiryNoticeDays on a pass template (pre-expiry notice)
+    purpose: Create the entitlement template the screen's fields define, with expiryNoticeDays for the
+      pre-expiry notice
     trigger: onAction
-    provenance: build, 29 September 2026
+    provenance: build, 29 September 2026; reached by Create entitlement template, r11 gate fix (CHG-R11FXS-002)
   wireframe:
     status: notStarted
     provenance: generated
@@ -72664,7 +72706,22 @@ screens:
         provenance: pack Game_and_Ride_Module.pdf, page 25 §Actions
         operation: suspendWallet
     - name: contentBody
-      components: []
+      components:
+      - kind: detailPanel
+        label: Account and balance
+        bindsTo: Wallet
+        columns:
+        - Wallet.balance
+        - Wallet.bonusBalance
+        - Wallet.credits
+        - Wallet.currency
+        - Wallet.status
+        - Wallet.expiresAt
+        - Wallet.lastActivityAt
+        operation: getWallet
+        notes: The guest's wallet as the screen opens on it, every kind of value it holds (r11 gate fix,
+          CHG-R11FXS-003).
+        provenance: contract wallet.yaml GET /wallets/{subjectId}; r11 gate fix, 29 October 2026
   states:
     loading: The wallet account balance list.
     error: Could not load. Names which read failed and leaves the wallet account balance untouched.
@@ -72678,7 +72735,7 @@ screens:
   - operationId: getWallet
     contract: wallet
     purpose: Account and balance
-    trigger: onAction
+    trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: listCreditLots
     contract: wallet
@@ -76784,6 +76841,7 @@ screens:
       components:
       - kind: searchField
         label: Search card lifecycle
+        operation: getGameCard
         provenance: pack Game_and_Ride_Module.pdf, page 64 §Filters
       - kind: multiSelect
         label: Filter by
@@ -76836,7 +76894,7 @@ screens:
   apis:
   - operationId: getGameCard
     contract: games
-    purpose: Cards in circulation
+    purpose: Find a card by its code and show its balances and status
     trigger: onAction
     provenance: board reading, 19 September 2026
   entryState:
@@ -80475,6 +80533,7 @@ screens:
       - kind: detailPanel
         label: The selected customer wallet balance
         bindsTo: null
+        operation: getWallet
         columns:
         - Card Status
         - Card Expiry
@@ -148070,11 +148129,6 @@ screens:
     purpose: Clone a map into a new venue
     trigger: onAction
     provenance: board reading, 19 September 2026
-  - operationId: setConfigurationProfile
-    contract: tenancy
-    purpose: Inherited settings
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getSeatMap
     contract: seating
     purpose: Read a seat map with its structure
@@ -149982,11 +150036,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: getWallet
-    contract: wallet
-    purpose: The wallet and its owner
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: updateWalletType
     contract: wallet
     purpose: Ownership and association rules
@@ -150681,7 +150730,7 @@ screens:
     purpose: Digital credentials
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id033
+    invalidates: &id032
     - getWallet
   - operationId: listWalletTypes
     contract: wallet
@@ -151047,11 +151096,6 @@ screens:
     contract: wallet
     purpose: Funding rules in force
     trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: listWalletTransactions
-    contract: wallet
-    purpose: Recent funding
-    trigger: onAction
     provenance: board reading, 19 September 2026
   wireframe:
     status: notStarted
@@ -152035,7 +152079,7 @@ screens:
     purpose: Reverse or correct a top-up
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id034
+    invalidates: &id033
     - listWalletTransactions
     - listCreditLots
   - operationId: adjustWallet
@@ -152319,7 +152363,23 @@ screens:
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 21 §Allow administrators
           to identify
     - name: contentBody
-      components: []
+      components:
+      - kind: dataTable
+        label: The funding audit trail
+        bindsTo: WalletTransaction
+        columns:
+        - WalletTransaction.recordedAt
+        - WalletTransaction.kind
+        - WalletTransaction.amount
+        - WalletTransaction.balanceAfter
+        - WalletTransaction.orderId
+        - WalletTransaction.reason
+        - WalletTransaction.principalId
+        operation: listWalletTransactions
+        notes: Every movement on the wallet, the record the exception buttons above are checked against
+          (r11 gate fix, CHG-R11FXS-003).
+        provenance: contract wallet.yaml GET /wallets/{subjectId}/transactions; r11 gate fix, 29 October
+          2026
   states:
     loading: The funding transaction audit list.
     error: Could not load. Names which read failed and leaves the funding transaction audit untouched.
@@ -152333,7 +152393,7 @@ screens:
   - operationId: listWalletTransactions
     contract: wallet
     purpose: The funding audit trail
-    trigger: onAction
+    trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: getWalletReconciliation
     contract: wallet
@@ -154199,14 +154259,6 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id030
-  - operationId: transferWalletBalance
-    contract: wallet
-    purpose: Move value between them
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates: &id031
-    - getWallet
-    - listWalletTransactions
   - operationId: listSharedWallets
     contract: wallet
     purpose: Family, household and corporate structures
@@ -154838,6 +154890,32 @@ screens:
         bindsTo: WalletBalance
         operation: getWalletBalance
         provenance: contract wallet.yaml GET /wallets/{walletId}/balance; wiring fix, 2 October 2026
+      - kind: primaryButton
+        label: Transfer balance
+        operation: transferWalletBalance
+        notes: Opens the form that moves value from this wallet to another in the structure (r11 gate
+          fix, CHG-R11FXS-004).
+        provenance: contract wallet.yaml POST /wallets/{walletId}/transfer; r11 gate fix, 29 October 2026
+  overlays:
+  - id: formTransferWalletBalance
+    component: modal
+    trigger: Transfer balance
+    body: '**Collects what `transferWalletBalance` sends before it is called.** Required: `amount` (cash
+      credit only) and the receiving wallet, `toWalletId`, named outright: the only way to reach a parent,
+      child, department or corporate wallet of the structure. Optional: `message`. The wallet the screen
+      is on is the sender. A `409` (insufficient cash credit, a suspended or closed wallet, or transfer
+      rules that forbid it) stays in the dialog and says which. Dismissing sends nothing; no value moves.'
+    confirm:
+      label: Transfer
+      operation: transferWalletBalance
+    dismiss:
+      label: Cancel
+      discards:
+      - toWalletId
+      - amount
+      - message
+    provenance: contract wallet.yaml POST /wallets/{walletId}/transfer; r11 gate fix, 29 October 2026
+      (CHG-R11FXS-004)
   states:
     loading: The shared wallet transfers configuration as saved.
     error: Could not load. Names which read failed and leaves the shared wallet transfers untouched.
@@ -154853,7 +154931,9 @@ screens:
     purpose: Reallocate balance
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id031
+    invalidates:
+    - getWallet
+    - listWalletTransactions
   - operationId: getWalletBalance
     contract: wallet
     purpose: A wallet's balance
@@ -155123,6 +155203,7 @@ screens:
         - Operational Alerts
         notes: 'The pack groups this record''s detail under its own headings: “Highlight”.'
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Display
+        operation: getWalletLiability
     - name: actionBar
       slot: rowActions
       components:
@@ -155140,9 +155221,11 @@ screens:
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions
       - kind: secondaryButton
         label: Search Instrument
+        operation: getGiftCard
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions
       - kind: secondaryButton
         label: Check Balance
+        operation: getGiftCard
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 49 §Quick Actions
       - kind: secondaryButton
         label: Investigate Redemption
@@ -156856,7 +156939,7 @@ screens:
     purpose: Channel configuration
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id032
+    invalidates: &id031
     - getWalletFundingRules
   wireframe:
     status: notStarted
@@ -156973,7 +157056,7 @@ screens:
     purpose: Payment and redemption policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id031
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1135
@@ -157117,7 +157200,7 @@ screens:
     purpose: Credential kinds accepted
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id031
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1136
@@ -157263,7 +157346,7 @@ screens:
     purpose: Bind a wearable to a wallet
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id033
+    invalidates: *id032
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1137
@@ -157368,7 +157451,7 @@ screens:
     purpose: NFC, RFID and QR rules
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id031
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1138
@@ -157486,7 +157569,7 @@ screens:
     purpose: Authentication and PIN policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id031
   - operationId: setWalletAuthenticationPolicy
     contract: wallet
     purpose: Save authentication policy
@@ -157622,7 +157705,7 @@ screens:
     purpose: Offline and degraded mode
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id031
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1140
@@ -158010,7 +158093,7 @@ screens:
         - Correction
         - Administrative Operation
         bindsTo: null
-        operation: null
+        operation: listWalletTransactions
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 75 §Display
     - name: contextPanel
       slot: selection
@@ -158062,7 +158145,7 @@ screens:
   - operationId: listWalletTransactions
     contract: wallet
     purpose: Recent activity
-    trigger: onAction
+    trigger: onLoad
     provenance: board reading, 19 September 2026
   entryState:
     preloaded:
@@ -158742,7 +158825,7 @@ screens:
     purpose: Reverse a transaction
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id034
+    invalidates: *id033
   - operationId: listWalletTransactions
     contract: wallet
     purpose: Wallet transaction history
@@ -161138,7 +161221,7 @@ screens:
     purpose: Credit types to ledger accounts
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id035
+    invalidates: &id034
     - getWalletLiability
   wireframe:
     status: notStarted
@@ -161812,7 +161895,7 @@ screens:
     purpose: Breakage recognition policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id035
+    invalidates: *id034
   entryState:
     preloaded:
     - Original value → AED 500
@@ -162830,7 +162913,7 @@ screens:
     purpose: Integration profile
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id032
+    invalidates: *id031
   - operationId: setWalletIntegrationMapping
     contract: wallet
     purpose: Save mapping
@@ -205343,7 +205426,7 @@ screens:
     purpose: Its payment configuration
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id036
+    invalidates: &id035
     - listPaymentTerminals
   wireframe:
     status: notStarted
@@ -205981,7 +206064,7 @@ screens:
     purpose: Store-and-forward limits
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id036
+    invalidates: *id035
   entryState:
     preloaded:
     - Terminal
@@ -207859,7 +207942,7 @@ screens:
     purpose: Which combinations are allowed
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id037
+    invalidates: &id036
     - getMixedTenderRules
   - operationId: getMixedTenderRules
     contract: payments
@@ -208509,7 +208592,7 @@ screens:
     purpose: Sequence and restrictions
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id037
+    invalidates: *id036
   - operationId: getMixedTenderRules
     contract: payments
     purpose: Which tenders may be combined, and in what order
@@ -213175,7 +213258,7 @@ screens:
     purpose: Declare them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id038
+    invalidates: &id037
     - listProductRelationships
   wireframe:
     status: notStarted
@@ -214135,7 +214218,7 @@ screens:
     purpose: Order it
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id038
+    invalidates: *id037
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-650
@@ -215335,7 +215418,7 @@ screens:
     purpose: Build the relationships
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id039
+    invalidates: &id038
     - listProductRelationships
   - operationId: listProductRelationships
     contract: promotions
@@ -215641,7 +215724,7 @@ screens:
     purpose: Across categories
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id039
+    invalidates: *id038
   - operationId: listProductRelationships
     contract: promotions
     purpose: The product relationships already declared
@@ -215743,7 +215826,7 @@ screens:
     purpose: Across attractions and partners
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id039
+    invalidates: *id038
   - operationId: listProductRelationships
     contract: promotions
     purpose: The product relationships already declared
@@ -221248,7 +221331,7 @@ screens:
     purpose: Create the workflow
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id040
+    invalidates: &id039
     - listWorkflow
   wireframe:
     status: notStarted
@@ -221330,7 +221413,7 @@ screens:
     purpose: Stages and approvers
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id040
+    invalidates: *id039
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-322
@@ -221554,7 +221637,7 @@ screens:
     purpose: Sequence and parallel routing
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id040
+    invalidates: *id039
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-324
@@ -221644,7 +221727,7 @@ screens:
     purpose: What happens on each outcome
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id043
+    invalidates: &id042
     - listCrossModuleOrchestration
   wireframe:
     status: notStarted
@@ -221823,7 +221906,7 @@ screens:
     purpose: Publish
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id040
+    invalidates: *id039
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-327
@@ -222156,7 +222239,7 @@ screens:
     purpose: Authority by role and value
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id041
+    invalidates: &id040
     - listApprovalMatrices
   wireframe:
     status: notStarted
@@ -222251,7 +222334,7 @@ screens:
     purpose: Route up the hierarchy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id041
+    invalidates: *id040
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-331
@@ -222336,7 +222419,7 @@ screens:
     purpose: By department
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id041
+    invalidates: *id040
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-332
@@ -222431,7 +222514,7 @@ screens:
     purpose: By venue and tenant
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id041
+    invalidates: *id040
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-333
@@ -222526,7 +222609,7 @@ screens:
     purpose: By value threshold
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id041
+    invalidates: *id040
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-334
@@ -222620,7 +222703,7 @@ screens:
     purpose: By risk and condition
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id041
+    invalidates: *id040
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-335
@@ -222714,7 +222797,7 @@ screens:
     purpose: Approver groups and decision policy
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id042
+    invalidates: &id041
     - listApprovalControlPolicies
   wireframe:
     status: notStarted
@@ -223254,7 +223337,7 @@ screens:
     purpose: Four-eyes and dual control
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id042
+    invalidates: *id041
   - operationId: listApprovalControlPolicies
     contract: approvals
     purpose: What is already required
@@ -224526,7 +224609,7 @@ screens:
     purpose: Workflow events
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id043
+    invalidates: *id042
   - operationId: listWebhookEventTypes
     contract: public-api
     purpose: Workflow events published through the event framework (publisher=approvals)
@@ -224873,7 +224956,7 @@ screens:
     purpose: Map external data onto a request
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id043
+    invalidates: *id042
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-355

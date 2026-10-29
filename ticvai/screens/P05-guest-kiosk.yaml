@@ -90,6 +90,8 @@ screens:
       trigger: Opens Assistant
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
+      carries:
+      - productId
     - to: CMS-105
       trigger: Rolls back when something is wrong
       provenance: flow F304 step 5→6
@@ -439,11 +441,14 @@ screens:
     - to: KSK-005
       trigger: Chooses a session
       provenance: flow F07 step 4→5
+      carries:
+      - variantId
     - to: KSK-015
       trigger: Assistant
-      provenance: 'derived — KSK-015 declares entryState.params cartId, conversationId, messageId and
-        KSK-004 holds none of them. The edge carries nothing: conversationId, messageId, cartId only pre-select
-        (deep link or optional), and KSK-015 opens on its own'
+      carries:
+      - productId
+      provenance: derived — KSK-015 declares entryState.params cartId, conversationId, messageId, productId
+        and KSK-004 holds productId, so an edge into it carries them
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
 
@@ -620,6 +625,13 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `addCartLine` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+    - name: variantId
+      from: KSK-004
+      optional: true
+      notes: 'The ticket types the guest chose on KSK-004 (its Tickets rows, read with `listProductVariants`),
+        with their quantities, kept by the kiosk through the sale: the screen loads without them (the
+        times and their room), and a tap on a time adds them for that time with `addCartLine` (r11 gate
+        fix, CHG-R11FXS-005).'
 - id: KSK-006
   name: Review
   module: Sell
@@ -1730,6 +1742,13 @@ screens:
     purpose: Add what the assistant suggests to the basket
     trigger: onAction
     provenance: design cross-check, 3 October 2026 (CHG-R1S-023)
+  - operationId: listProductVariants
+    contract: catalogue
+    purpose: 'The variants of a suggested product when the answer names a product and not a variant, read
+      when the guest taps Add to basket, so the form sends the variant the guest confirms as `variantId`.
+      No component of its own: the form''s picker (r11 gate fix, CHG-R11FXS-005; as GST-048, CHG-R10GFP-006).'
+    trigger: onAction
+    provenance: r11 gate fix, 29 October 2026 (CHG-R11FXS-005)
   entryState:
     params:
     - name: conversationId
@@ -1750,6 +1769,10 @@ screens:
       from: session
       notes: The kiosk's guest session, opened when a guest starts at the kiosk; nobody signs in at a
         kiosk. createAiConversation takes its scope from it, as KSK-013 does.
+    - name: productId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listProducts`.'
     coldEntry: 'None: a kiosk has no notification cold entry. The assistant opens from KSK-004 at the
       point of confusion and closes when the guest returns or the session times out.'
     preloaded: []
@@ -1778,6 +1801,8 @@ screens:
     provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
   - id: formAddCartLine
     component: modal
+    reads:
+    - listProductVariants
     trigger: Add to basket
     body: '**Confirms what the assistant suggested: the item and how many** (a quantity stepper, 1 by
       default); the kiosk sends its cart, the product or variant the answer named, and the quantity. (CHG-R1S-022)'
@@ -2075,6 +2100,8 @@ screens:
     contract: orders
     purpose: Add the chosen item to the kiosk basket
     trigger: onAction
+    inputSources:
+      variantId: listMerchandise.productVariantId
     invalidates:
     - listMerchandise
   - operationId: lookupMerchandise

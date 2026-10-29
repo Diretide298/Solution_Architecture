@@ -392,11 +392,23 @@ def main() -> int:
         collected = {((o.get("confirm") or {}).get("operation")) for o in overlays
                      if isinstance(o.get("confirm"), dict)}
         has_inputs = bool(kinds & INPUTS)
+        # A button may name the list whose rows collect its body (collectedBy, 29 October 2026): taken only when a
+        # list, card list or table of that label is on the screen and is filled by a read the screen declares.
+        reads = {a["operationId"] for a in apis
+                 if (facts.get(a["operationId"]) or {}).get("method") == "get" or a.get("trigger") == "onLoad"}
+        lists = {c.get("label") for c in comps
+                 if re.search(r"(?i)list|table|grid", str(c.get("kind"))) and c.get("operation") in reads}
         for c in comps:
             op_id = c.get("operation")
             f = ops.get(op_id) if op_id else None
+            by = c.get("collectedBy")
+            if by and by not in lists:
+                guard.add("S-BUTTON-FORM", f"{sid}:{op_id}",
+                          f"{sid}: button {c.get('label')!r} says {by!r} collects {op_id}'s body, but no list of "
+                          f"that label filled by a declared read is on the screen")
+                continue
             if f and "Button" in str(c.get("kind")) and f["method"] in WRITES \
-                    and required_body(f["op"]) and op_id not in collected and not has_inputs:
+                    and required_body(f["op"]) and op_id not in collected and not has_inputs and not by:
                 guard.add("S-BUTTON-FORM", f"{sid}:{op_id}",
                           f"{sid}: button {c.get('label')!r} calls {op_id}, which takes a body, and "
                           f"nothing on the screen collects it")
@@ -588,16 +600,18 @@ def input_sources(guard, all_screens, ops, by_schema) -> None:
         have = set(SESSION_IDS) | {p.get("name") for p in ((s.get("entryState") or {}).get("params") or [])
                                    if isinstance(p, dict)}
         kinds: set = set()
+        answers: dict = {}   # every operation on the screen -> the fields its 2xx responses carry, list rows included
         for a in apis:
             f = ops[a["operationId"]]
-            if f["method"] != "get" and a.get("trigger") != "onLoad":
-                continue
             for code, r in (f["op"].get("responses") or {}).items():
                 if not str(code).startswith("2") or not isinstance(r, dict):
                     continue
                 for media in (r.get("content") or {}).values():
                     fields, names = set(), set()
                     walk((media or {}).get("schema") or {}, f["contract"], 0, fields, names)
+                    answers.setdefault(a["operationId"], set()).update(fields)
+                    if f["method"] != "get" and a.get("trigger") != "onLoad":
+                        continue
                     kinds |= names
                     if not a["operationId"].startswith("list"):   # a list's fields belong to whichever row is picked
                         have |= fields
@@ -612,9 +626,22 @@ def input_sources(guard, all_screens, ops, by_schema) -> None:
             for b in (body or {}).get("allOf") or []:
                 req |= set((deref(b, bst)[0] or {}).get("required") or [])
             need += [r for r in sorted(req) if r.endswith(("Id", "Code")) and r not in need]
+            named = a.get("inputSources") if isinstance(a.get("inputSources"), dict) else {}
             for n in need:
                 thing = re.sub(r"(Id|Code)$", "", n).lower()
                 if n in have or (thing and any(thing in k for k in kinds)):
+                    continue
+                # The screen names the source (inputSources, 29 October 2026): a list's picked row, or what an earlier
+                # write returns. Taken only when that operation is on the screen and its response has the field.
+                src = str(named.get(n) or "")
+                if src:
+                    op_name, _, field = src.partition(".")
+                    if field in answers.get(op_name, set()):
+                        continue
+                    guard.add("S-INPUT-SOURCE", f"{sid}:{a['operationId']}:{n}",
+                              f"{sid} ({plat[:3]}): {a['operationId']} names {n}'s source as {src}, but "
+                              + (f"{op_name} is not on the screen" if op_name not in answers
+                                 else f"no 2xx response of {op_name} has {field}"))
                     continue
                 guard.add("S-INPUT-SOURCE", f"{sid}:{a['operationId']}:{n}",
                           f"{sid} ({plat[:3]}): {a['operationId']} needs {n} and nothing on the screen supplies it "
