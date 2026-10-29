@@ -39,6 +39,7 @@ keys_touched:
   - events/marketing-subjectDataPartWritten.yaml
   - handoff/api-data-lineage-overrides.json
   - handoff/audit-baseline.json
+  - tools/derive-delivery-slice.py
 root_class: 'a foundation module assembling data it may not read from the modules above it'
 tickets:
   started:
@@ -48,9 +49,18 @@ release_tag: pending
 decision_owner: Chinmay
 adam_cr: 'none: r11 gate'
 triage: blocker
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-29'
+    quote: 'Waive for r11'
 prevention:
   type: check
   ref: tools/check-cross-module-reads.py
 status: open
-notes: 'The two new consumer operations are new plan work (a Marketing and an Identity task) and the new table a
-  migration task: the light release creates no plan tickets, so they reach the plan at the next full release.'
+notes: 'The plan part (r11 is a full release, the lead, 29 October 2026, 04:40): the two new consumer operations
+  are in the first-release slice (tools/derive-delivery-slice.py ALSO_FOR, labelled SVC-IDENTITY-IDENTITY-1, the task
+  of exportSubjectData, whose done-when needs every owner''s part recorded), so they are first-release tasks of
+  Marketing and Identity and the r11 release creates their tickets; without them marketing.guest_document fell out
+  of the first-release MIG-MARKETING (check-ddl-conventions D-MIG-TABLES, r11 gate). The new table is a forward
+  migration task. The cooling-off is waived with r11''s plan changes (CHG-R11RUL-006, CHG-R11PLN-001).'
