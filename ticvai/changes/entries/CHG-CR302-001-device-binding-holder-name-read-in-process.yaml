@@ -1,0 +1,51 @@
+id: CHG-CR302-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'listDeviceBindingSession reads each binding holder''s pii.subject.display_name through identity#subjectRecords
+  in process from the access host (XDR-010, one column, the caller''s row security), and states its three readings:
+  credential is the entitlement''s media_code, a deactivated binding is left out, the summary is the venue''s
+  deviceBinding credential policy else the tenant''s.'
+decision:
+  what: 'ADAM CR-302, option A (Chinmay, 29 October 2026: "All as recommended"), recorded as a ruling the way CR-296
+    was: docs/active/cross-deployable-writes.yaml XDR-010 (reader access, SELECT on pii.subject,
+    identity#subjectRecords, for listDeviceBindingSession only); contracts/spine/access.yaml listDeviceBindingSession:
+    the read-via moves from service to in-process, its description states the source of user (display_name only),
+    credential (access.entitlement.media_code), the deactivated rule and the summary''s policy, and the two
+    properties say the same; contracts/spine/identity.yaml subjectRecords'' rule names the access host''s read;
+    ADR-0055''s 25 October amendment, item 3, names it. derive-ddl writes the guarded GRANT (and USAGE on pii) into the
+    next forward migration.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-302 (Sanket Keluskar, #32458, blocking): DeviceBindingSessionSecurityView.user is Identity''s pii.subject,
+  read over a service route nothing builds (CR-281, #37051) with no grant for the access role; the lead chose the
+  narrow in-process read of XDR-001, XDR-003 and CR-296.'
+keys_touched:
+  operations: [listDeviceBindingSession]
+  schemas: [DeviceBindingSessionSecurityView, DeviceBindingSessionSecurityViewSummary]
+  tables: [pii.subject, access.device_binding, access.entitlement, access.credential_policy]
+  files:
+  - docs/active/cross-deployable-writes.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/identity.yaml
+  - docs/adr/0055-a-modular-monolith-deployed-as-five-units.md
+  other:
+  - 'XDR-010 (granted read)'
+root_class: 'storage-route gap: a cross-deployable read on a route that is not built'
+tickets:
+  started: []
+  unstarted:
+  - '32458 (listDeviceBindingSession, New): build now against Identity''s in-process query class, through CR-302''s
+    comment.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-302
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/contract_shapes.py::read_route
+status: open
+notes: 'The grant is table-level SELECT, as every XDR is (derive-ddl writes no column grants); "display_name only" is
+  the operation''s and the query rule''s, under pii.subject''s row security. Eleven other access-host operations ask
+  identity#subjectRecords over the service route (lookupTicket, enrolFacePass, listCredential, listVirtualTicket,
+  verifyIdentity and others); XDR-010 lists only this one, and the lead decides whether the class follows.'

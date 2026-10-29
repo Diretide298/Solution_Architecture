@@ -1,0 +1,40 @@
+id: CHG-CR307-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: getTenantConfig is staff only (guestAuth and the guest audience removed); a guest reads getPublishedTenantConfig,
+  the published, non-sensitive part, as a visitor does.
+decision:
+  what: 'ADAM CR-307, option C (Chinmay, 29 October 2026: "All as recommended"). contracts/satellite/white-label.yaml
+    getTenantConfig: security bearerAuth only, audience staff, the guest sentences and the guest 404 wording removed,
+    and the description says a guest reads getPublishedTenantConfig; getPublishedTenantConfig''s description says a
+    signed-in guest reads it too. docs/active/breaking-changes.yaml BC-494 records the security change (tag r11). The
+    whitelabel policies are unchanged.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-307 (Hrushikant Patkar, #31054 getTenantConfig): under whitelabel.tenant_config''s tenant-root policy and
+  config_version''s read-beneath policy a guest session read nothing, so the guest half answered 404 not-configured for
+  every tenant; getPublishedTenantConfig already serves that read (GFIX-1).'
+keys_touched:
+  operations: [getTenantConfig, getPublishedTenantConfig]
+  tables: [whitelabel.tenant_config, whitelabel.config_version]
+  files:
+  - contracts/satellite/white-label.yaml
+  - docs/active/breaking-changes.yaml
+root_class: 'a guest half of an operation the guest''s row security can never read'
+tickets:
+  started:
+  - '27889, 31062, 31064 (WEB-029), 31071 (GST-043), 31074 (GST-047), 32125 (WEB-021), on getPublishedTenantConfig: a
+    sentence of its description only; nothing to do.'
+  unstarted:
+  - '31054 (getTenantConfig, New): builds the staff half only, through CR-307''s comment. Its staff screens (BO-834,
+    ADM-018, CMS-009, CMS-011) are unchanged; no guest screen binds it.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-307
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'A security scheme added back to getTenantConfig is a breaking change the compat check fails until approved.'

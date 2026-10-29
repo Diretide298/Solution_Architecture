@@ -1,0 +1,45 @@
+id: CHG-CR319-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'createFnbOrder: the till marks the replay of a queued order with X-Offline-Replay: true (then an unavailable
+  stock-tracked item is trackedItemOffline, otherwise itemUnavailable); the category code a productCategory rule
+  matches is read as XDR-008 already grants; an outlet with no kitchen routing rule is refused 409
+  outletNotAcceptingOrders.'
+decision:
+  what: 'ADAM CR-319, option A for (1) and (2), B for (3) (Chinmay, 29 October 2026: "All as recommended").
+    contracts/shared/common.yaml: parameter OfflineReplay (header X-Offline-Replay, value true). contracts/satellite/
+    fnb.yaml createFnbOrder: declares it, and the 409 says how it chooses trackedItemOffline over itemUnavailable; an
+    outlet with no fnb.kitchen_routing_rule row is 409 outletNotAcceptingOrders (problem type and refusedReason
+    added), in the description and in KitchenRoutingRules, and the operation declares its read of
+    fnb.kitchen_routing_rule (x-ticvai-reads). (2) is already in the package: XDR-008 grants
+    catalogue.product_category and createFnbOrder reads the code through catalogue#productCategoryRecords (the lead''s
+    correction of 29 October, CHG-R11TEN-002); nothing changes for it.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-319 (Hrushikant Patkar, #27708 createFnbOrder): nothing told the server a call was an offline replay, the
+  category code had no grant (since given by CHG-R11TEN-002), and an outlet with no routing rule had no default
+  station.'
+keys_touched:
+  operations: [createFnbOrder]
+  schemas: [KitchenRoutingRules, FnbProblem]
+  tables: [fnb.kitchen_routing_rule, catalogue.product_category]
+  files:
+  - contracts/shared/common.yaml
+  - contracts/satellite/fnb.yaml
+root_class: 'a refusal reason the server has no signal to choose, and a fallback with no row to fall back on'
+tickets:
+  started: []
+  unstarted:
+  - '27708 (A POS sale reaches the kitchen, On hold): build (1) and (3) as stated, (2) as XDR-008 already grants,
+    through CR-319''s comment. The till''s offline queue (POS tickets that replay createFnbOrder) sends
+    X-Offline-Replay: true on a replay.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-319
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'Rules in prose (what marks a replay, what an outlet with no routing rule answers); no check can read whether a
+    refusal reason names the signal that chooses it. Lead to approve.'
+status: open

@@ -207,6 +207,19 @@ components:
       schema:
         type: string
         format: uuid
+    OfflineReplay:
+      name: X-Offline-Replay
+      in: header
+      required: false
+      description: '**This call replays a write the client queued while it was offline** (ADAM CR-319 (1), option A,
+        Chinmay, 29 October 2026; CHG-CR319-001). The till knows when it replays a queued order and the server
+        cannot tell it from a timestamp, so the client marks the replay of a queued write (sent with the
+        `Idempotency-Key` it was queued under) with `X-Offline-Replay: true`. Absent, or any other value, the call is
+        a live one. Only operations that name this parameter read it; it is never stored on a row.'
+      schema:
+        type: string
+        enum:
+        - 'true'
   headers:
     ConsistencyToken:
       description: 'WAL LSN of the write that produced this response. A client that reads its own

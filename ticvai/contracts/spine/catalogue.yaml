@@ -388,6 +388,35 @@ x-ticvai-queries:
       CR-167; ADR-0055, amended 25 October 2026). It is asked in process by the operations host for
       createFnbOrder's productCategory routing match (ADAM CR-277, option A, 28 October 2026; XDR-008).
     served: [in-process, service]
+  # **Which products list an asset** (ADAM CR-309, option (b), Chinmay, 29 October 2026; CHG-CR309-001). Assets'
+  # deleteMediaAsset (operations host) refuses 409 in-use while a product lists the asset, and productRecords answers
+  # by product id or product column only, never by the asset a product's media row names.
+  productMediaRecords:
+    module: catalogue
+    table: catalogue.product_media
+    # product_media's row security is its parent's (catalogue.product), read under that table's own policy.
+    reads: [catalogue.product]
+    inputs:
+      assetIds: {type: array, minItems: 1, items: {type: string, format: uuid}, description: 'The assets asked about (catalogue.product_media.asset_id).'}
+    returns:
+      type: array
+      description: 'One entry per catalogue.product_media row that names an asked asset and the caller''s scope lets
+        it see; an asset no visible product lists is absent.'
+      items:
+        type: object
+        required: [assetId, productId]
+        properties:
+          assetId: {type: string, format: uuid, description: 'catalogue.product_media.asset_id, one of those asked.'}
+          productId: {type: string, format: uuid, description: 'catalogue.product_media.product_id, the product that lists it.'}
+    rule: >-
+      A data read, not a rule question (CHG-MOD-001). Catalogue answers with the product_id of each of its
+      catalogue.product_media rows whose asset_id is asked, as the caller's scope lets it see them (the row-level
+      security product_media takes from catalogue.product, under the caller's connection and transaction). It
+      decides nothing: the asker states what a listing means for it. It is asked in process by the operations host
+      for Assets' deleteMediaAsset, the products that list the asset (409 in-use, MediaUsage surface product), through
+      the C# query interface Catalogue implements, as CR-260 serves Tenancy's (ADAM CR-309, option (b), 29 October
+      2026; docs/active/cross-deployable-writes.yaml XDR-011).
+    served: [in-process]
   bundleApplicationRecords:
     module: catalogue
     table: catalogue.bundle_application
@@ -3604,7 +3633,14 @@ paths:
 
 
         **Order.** Sorted by `name` ascending, then by `id`. **Statuses.** For staff every `lifecycleState`; for a
-        guest only `onSale` and `live`, as above.'
+        guest only `onSale` and `live`, as above.
+
+
+        **`venueId` and `X-Venue-Id` name the same thing** (ADAM CR-305 G3, option A, Chinmay, 29 October 2026;
+        CHG-CR305-001). Either names the venue; both sent and different is `400 unknown-venue`. An unknown
+        venue, from either, is `400 unknown-venue` (not the header''s usual `404`), and so is a caller with a
+        credential naming a venue other than the one they act at, so the answer says nothing about which other
+        venues exist.'
       security:
       - bearerAuth: []
       - guestAuth: []
@@ -3629,7 +3665,8 @@ paths:
         description: '**Whose venue to read, for a caller with no venue** (as `listProductCategories`; GPS-C30). A guest
           with a credential, or staff, act at a venue already and may leave it out; a visitor with no credential
           **must send it** (missing: `400 venue-required`; not a venue of the tenant: `400 unknown-venue`). With a
-          credential it must be the venue the caller acts at.'
+          credential it must be the venue the caller acts at (another venue: `400 unknown-venue`). `X-Venue-Id` names
+          it as well; both sent and different is `400 unknown-venue` (ADAM CR-305 G3).'
         schema:
           type: string
           format: uuid
@@ -3638,8 +3675,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
       responses:
         '400':
-          description: 'No `venueId` from a caller with no venue (`venue-required`), or one that is not a venue of the tenant
-            (`unknown-venue`).'
+          description: 'No `venueId` or `X-Venue-Id` from a caller with no venue (`venue-required`); or a venue, from either,
+            that is not a venue of the tenant, a `venueId` and `X-Venue-Id` that differ, or a credentialed caller''s venue
+            other than the one they act at (`unknown-venue`; ADAM CR-305 G3).'
           x-ticvai-problem-types: [venue-required, unknown-venue]
           content:
             application/problem+json:
@@ -3742,13 +3780,16 @@ paths:
       summary: List performances of an event
       description: >
         **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
-        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published performances,
-        and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found.
-        `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`). What that means (ADAM CR-305 G1, option A, Chinmay,
+        29 October 2026; CHG-CR305-001): a guest or a visitor sees a performance whose `status` is `onSale` or
+        `soldOut`, and only when its event is one `listEvents` shows a guest (`onSale` or `live`, and
+        `isActive`); for any other event the path's event answers `404 not-found`. `PRODUCT_VIEW` is what a staff
+        caller must hold, and staff see every `status` (ADR-0025).
 
         **Order.** Soonest first, by `startsAt` ascending, then by `id`.
 
-        **Statuses.** Every `status` is returned, ended ones included (`cancelled`); a screen that shows only live rows filters on `status` itself.
+        **Statuses.** For staff every `status` is returned, ended ones included (`cancelled`); a screen that shows
+        only live rows filters on `status` itself. For a guest or a visitor only `onSale` and `soldOut`, as above.
       tags:
       - event
       x-ticvai-permission: PRODUCT_VIEW
@@ -3777,9 +3818,13 @@ paths:
           format: date-time
       - name: categoryId
         in: query
-        description: 'Only performances of products in this product category (a product in several
-          categories matches each), the calendar''s category filter (17 September minutes M17-03, added 30
-          September). With `from` and `to` it is what the day, week and month calendar views ask for.'
+        description: 'Only performances of an event with a product in this product category, the calendar''s
+          category filter (17 September minutes M17-03, added 30 September). With `from` and `to` it is what the
+          day, week and month calendar views ask for. **How it matches** (ADAM CR-305 G2, option A, Chinmay, 29
+          October 2026; CHG-CR305-001): a performance has no product of its own, so the event''s performances
+          are kept when at least one of its products (`catalogue.product.event_id` = the event, Catalogue''s own
+          declared join) has `category_id` = `categoryId`, an exact match with no descendant categories; otherwise
+          none of them are.'
         schema:
           type: string
           format: uuid
@@ -3799,6 +3844,8 @@ paths:
       responses:
         '400':
           $ref: ../shared/common.yaml#/components/responses/VenueRequired
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '200':
           description: Performances, by `startsAt` ascending with `id` as the tiebreak — the order a
             date-and-performance picker shows them in, and the key the cursor pages on.
@@ -24649,6 +24696,7 @@ components:
           type: string
           format: uuid
           nullable: true
+          x-ticvai-references: catalogue.event
           description: '**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a
             product page finds its event and the event''s performances (`Performance.eventId`) give it dates. Null for a product
             not tied to an event (merchandise, a pass, a membership).'

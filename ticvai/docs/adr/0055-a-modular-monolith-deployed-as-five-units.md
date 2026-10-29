@@ -34,7 +34,11 @@ security still scopes every row:
    (`tenancy#workstationRecords`, `catalogue#entitlementTemplateRecords`): getOfflinePackage reads the session's
    access point and each entitlement's re-entry and admission rules this way, and so does every Access operation
    that reads the template (CR-240). Granted read XDR-003. Pinning the template values onto `access.entitlement` at
-   issue (CR-240 option C) is a later change.
+   issue (CR-240 option C) is a later change. **And Identity's subject query for one operation** (ADAM CR-302,
+   option A, 29 October 2026; CHG-CR302-001): `listDeviceBindingSession` reads each binding holder's
+   `pii.subject.display_name` through `identity#subjectRecords` in process, that one column and nothing else of the
+   subject, under the caller's row security. Granted read XDR-010; the other Access reads of `pii.subject` still go
+   over the service route.
 
 Writes are unchanged: rule 3 and the cross-deployable write routes stand. A call into another host's write is still
 an event (Queue's Fast Pass redemption writes `queueEntry.redeemed`, which Access consumes; CR-238) or the owner's

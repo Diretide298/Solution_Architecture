@@ -1662,18 +1662,17 @@ paths:
         for: 'the venues whose overrides it returns: platform.scope, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
-      - guest
       x-ticvai-read-routing: replica
       summary: Full working configuration
       description: 'Everything the builder edits. **A staff caller gets the working draft**, or with
-        `version` the snapshot of that published version. **A guest caller always gets the current published
-        version**: `version` is ignored and `TENANT_CONFIGURE` is not needed, because reading the published
-        app is not configuring it. The dashboard''s status view (published state, module and page counts,
-        recent changes) is `getTenantAppStatus`, not this.
+        `version` the snapshot of that published version. The dashboard''s status view (published state, module
+        and page counts, recent changes) is `getTenantAppStatus`, not this.
 
-        **A visitor with no session reads `getPublishedTenantConfig`** (decided 2 October, GFIX-1): the
-        published, non-sensitive part of this, resolved from the host and cacheable, so a storefront renders
-        in the tenant''s brand before anyone signs in.
+        **Staff only; a guest reads `getPublishedTenantConfig`** (ADAM CR-307, option C, Chinmay, 29 October 2026;
+        CHG-CR307-001). A guest, like a visitor with no session (decided 2 October, GFIX-1), reads the
+        published, non-sensitive part of this, resolved from the host and cacheable, so a storefront renders in
+        the tenant''s brand before anyone signs in. The full configuration is not answered to a guest: it holds
+        what the published one deliberately leaves out (sender addresses, licensing, module counts).
 
         '
       tags:
@@ -1683,12 +1682,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       security:
-      - guestAuth: []
       - bearerAuth: []
       parameters:
       - name: version
         in: query
-        description: Read a published version's snapshot instead of the working draft. Staff only.
+        description: Read a published version's snapshot instead of the working draft.
         schema:
           type: string
       responses:
@@ -1702,7 +1700,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '404':
           description: '`version` names no published version (`not-found`), or the tenant has no working
-            draft yet — for a guest, nothing has been published yet (`not-configured`).
+            draft yet (`not-configured`).
 
             '
           x-ticvai-problem-types:
@@ -5693,7 +5691,8 @@ paths:
         `getTenantConfig` needs a guest or a staff session, so a visitor with neither could not load the
         tenant''s brand, theme, fonts, header, footer or navigation, and the home page (WEB-001, GST-001), the
         maintenance and sold-out pages (WEB-029, GST-047) and the kiosk (KSK-002) had nothing to style
-        themselves with. This is that read with no session at all.
+        themselves with. This is that read with no session at all. **A signed-in guest reads this too**:
+        `getTenantConfig` is staff only (ADAM CR-307, option C, 29 October 2026; CHG-CR307-001).
 
 
         **The tenant comes from the host, never from the caller.** The request carries no tenant: the edge
@@ -6523,8 +6522,16 @@ paths:
       description: '**Says whether a flow can be published, and why not (decided 29 September, W12).** With
         no body it checks the saved flow; with `steps` it checks that order without saving it, so the builder
         can mark a drag that breaks a constraint before it is dropped. A required step turned off, a step out
-        of its allowed order, a conditional step whose condition can never hold, a step the type does not
-        have and a step given twice are each a problem. Writes nothing.
+        of its allowed order, a step the type does not have and a step given twice are each a problem. Writes
+        nothing.
+
+        **Five kinds, and none for a condition** (ADAM CR-308, option A, Chinmay, 29 October 2026;
+        CHG-CR308-001). A conditional step decides only at booking time whether a guest meets its condition
+        (the type''s `commonConditions` and step conditions: a second active venue, a published `GuidedChoice`, a
+        product in the cart that asks), and that can change after the flow is saved, so a flow is never invalid
+        for a condition that may hold later and no problem is reported for one. **A required step missing from
+        the `steps` a caller sends** is `requiredStepDisabled` for that step, as a required step turned off is (a
+        saved flow holds every step of its type, so only a caller''s list can leave one out).
 
         '
       tags:
@@ -8267,7 +8274,6 @@ components:
                 enum:
                 - requiredStepDisabled
                 - orderConstraintBroken
-                - conditionNeverHolds
                 - stepNotInType
                 - duplicateStep
                 - unknownStepSetting

@@ -6562,6 +6562,9 @@ paths:
       - query: catalogue#productCategoryRecords
         route: in-process
         for: 'the product''s category''s code, which an outlet''s productCategory routing rule matches (ADAM CR-277 (2); XDR-008)'
+      x-ticvai-reads:
+      - table: fnb.kitchen_routing_rule
+        for: 'the outlet''s routing rule (category rules and default station), and its absence: 409 outletNotAcceptingOrders (ADAM CR-319 (3); CHG-CR319-001)'
       x-ticvai-calls:
       - access.validateAccess
       x-ticvai-note: >-
@@ -6608,6 +6611,12 @@ paths:
         `catalogue#productCategoryRecords` in process, XDR-008). `MenuItem.stationId` (`fnb.menu_item.station_id`) is
         not used for routing.
 
+        **An outlet with no routing rule takes no order** (ADAM CR-319 (3), option B, Chinmay, 29 October 2026;
+        CHG-CR319-001). An outlet that sells food must have its `fnb.kitchen_routing_rule` row
+        (`KitchenRoutingRules`, which holds its `defaultStationId`); with none, the order is refused `409`
+        `outletNotAcceptingOrders` and nothing is written, so the misconfiguration shows at the till rather than as
+        an order no kitchen sees.
+
         **A line with `redeemEntitlementId` waits** (ADAM CR-277 (5)): its redemption calls access `validateAccess`
         on the access host, which waits for service sign-in between the apps (CR-241).
         Until that follow-up, a line carrying `redeemEntitlementId` is refused `400` (validation) and nothing is
@@ -6625,6 +6634,7 @@ paths:
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - $ref: ../shared/common.yaml#/components/parameters/OfflineReplay
       requestBody:
         required: true
         content:
@@ -6646,15 +6656,17 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          x-ticvai-problem-types: [item-unavailable, modifier-constraint-unmet, tracked-item-offline, entitlement-not-redeemable]
+          x-ticvai-problem-types: [item-unavailable, modifier-constraint-unmet, tracked-item-offline, entitlement-not-redeemable, outlet-not-accepting-orders]
           description: 'An item is unavailable, modifier constraints are unmet, a tracked item was
-            ordered offline, or a line''s `redeemEntitlementId` cannot be redeemed here
-            (`entitlementNotRedeemable`: used, another item or outlet, not yet valid; MOB-4). One reason per
-            cause.
+            ordered offline, a line''s `redeemEntitlementId` cannot be redeemed here
+            (`entitlementNotRedeemable`: used, another item or outlet, not yet valid; MOB-4), or the outlet has
+            no kitchen routing rule (`outletNotAcceptingOrders`; ADAM CR-319 (3)). One reason per cause.
 
             **`trackedItemOffline` is stock that ran out while the terminal was offline** (proposed, client
             to correct (audit R125 (11))): an order queued offline with a recipe-linked item is replayed, and
-            the stock it needs was used up meanwhile.
+            the stock it needs was used up meanwhile. **The till marks the replay** (ADAM CR-319 (1), option A, Chinmay, 29 October 2026;
+            CHG-CR319-001): with `X-Offline-Replay: true`, a stock-tracked item that is unavailable is
+            `trackedItemOffline`; without it, `itemUnavailable`.
 
             '
           content:
@@ -6670,6 +6682,7 @@ paths:
                       - modifierConstraintUnmet
                       - trackedItemOffline
                       - entitlementNotRedeemable
+                      - outletNotAcceptingOrders
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fnb-orders/{orderId}/accept:
@@ -13091,7 +13104,9 @@ components:
       description: '**Where a line goes when its item names no station** (Chinmay, 2 October, workbook Q189 and Q190;
         DI-323; CHG-CSA-015). Item rules are `KitchenStation.menuItemIds`; these are the category rules, the
         default station and the fallback station of one outlet. One row per outlet. `MenuItem.stationId` is not
-        an item rule and routes nothing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002).
+        an item rule and routes nothing (ADAM CR-277 (4), 28 October 2026; CHG-R11TEN-002). An outlet with no row
+        has no default station, and `createFnbOrder` refuses its orders `409 outletNotAcceptingOrders` (ADAM CR-319
+        (3), option B, 29 October 2026; CHG-CR319-001).
 
         '
       required:

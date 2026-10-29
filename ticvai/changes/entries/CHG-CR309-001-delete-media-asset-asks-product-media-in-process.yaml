@@ -1,0 +1,45 @@
+id: CHG-CR309-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: 'deleteMediaAsset finds the products that list an asset through a new Catalogue query,
+  catalogue#productMediaRecords (catalogue.product_media by asset id), asked in process from the operations host under
+  XDR-011 (SELECT on catalogue.product_media and catalogue.product).'
+decision:
+  what: 'ADAM CR-309, option (b) (Chinmay, 29 October 2026: "All as recommended"). contracts/spine/catalogue.yaml
+    declares productMediaRecords (table catalogue.product_media, reads catalogue.product for its parent row
+    security, input assetIds, returns assetId and productId per row, served in-process).
+    contracts/satellite/assets.yaml deleteMediaAsset: its read-via is catalogue#productMediaRecords in-process (was
+    catalogue#productRecords over service), and its description says how a product''s use is found.
+    docs/active/cross-deployable-writes.yaml XDR-011 (reader operations, the two tables, the query, deleteMediaAsset).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-309 (Narayan Gaonkar, #30905 deleteMediaAsset, blocking): productRecords was served to operations only by
+  a service route nothing builds and could not be asked which products list an asset; the route CR-260 and XDR-004
+  took for the operations host needs one read grant and one small query.'
+keys_touched:
+  operations: [deleteMediaAsset]
+  schemas: [MediaUsage, MediaInUseProblem]
+  tables: [catalogue.product_media, catalogue.product, assets.media_usage]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/assets.yaml
+  - docs/active/cross-deployable-writes.yaml
+  other:
+  - 'XDR-011 (granted read)'
+root_class: 'storage-route gap: a cross-deployable read on a route that is not built'
+tickets:
+  started: []
+  unstarted:
+  - '30905 (deleteMediaAsset, New): build now against Catalogue''s in-process query class, through CR-309''s comment.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-309
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py
+status: open
+notes: 'updateMediaAsset (archiving refused while referenced) still asks catalogue#productRecords over the service
+  route for the same fact; the decision names deleteMediaAsset only. MediaUsage still says Catalogue writes a
+  surface-product row, which option (a) would build; nothing writes one today.'

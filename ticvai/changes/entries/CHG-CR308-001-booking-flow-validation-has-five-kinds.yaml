@@ -1,0 +1,36 @@
+id: CHG-CR308-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: validateBookingFlow drops conditionNeverHolds (a condition is decided at booking time, so a flow is never invalid
+  for one that may hold later) and reports a required step missing from a caller's steps as requiredStepDisabled;
+  five kinds remain.
+decision:
+  what: 'ADAM CR-308, option A (Chinmay, 29 October 2026: "All as recommended"). contracts/satellite/white-label.yaml:
+    validateBookingFlow''s description drops the "condition can never hold" problem and says why, and that a required
+    step missing from the sent steps is requiredStepDisabled; BookingFlowValidation.problems.kind loses
+    conditionNeverHolds. docs/active/breaking-changes.yaml BC-495 records the removed response enum value (tag r11).'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-308 (Hrushikant Patkar, #31037 validateBookingFlow): "never" cannot be known from the data the operation
+  reads, or from any data today, for any of the catalogue''s conditions.'
+keys_touched:
+  operations: [validateBookingFlow]
+  schemas: [BookingFlowValidation]
+  files:
+  - contracts/satellite/white-label.yaml
+  - docs/active/breaking-changes.yaml
+root_class: 'a validation problem that no data the operation reads can decide'
+tickets:
+  started: []
+  unstarted:
+  - '31037 (validateBookingFlow, New): as built, five kinds (CR-308''s comment).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-308
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-compat.py
+status: open
+notes: 'A value added back to the response enum is a breaking change the compat check fails until approved.'

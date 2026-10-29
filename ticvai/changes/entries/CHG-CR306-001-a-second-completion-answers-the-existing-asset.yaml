@@ -1,0 +1,35 @@
+id: CHG-CR306-001
+date: '2026-10-29'
+source: cr
+kind: contract
+summary: completeUpload, called again for an upload that already became an asset, answers 201 with that asset unchanged,
+  writes nothing and ignores the body, so one file never becomes two assets.
+decision:
+  what: 'ADAM CR-306, option (a) (Chinmay, 29 October 2026: "All as recommended"). contracts/satellite/assets.yaml
+    completeUpload: a second completion (media_upload.asset_id set; a new Idempotency-Key, a retry after a lost
+    response or a second tab) answers 201 with the asset the upload already became, unchanged, writes nothing, and
+    ignores the second body; the upload row read FOR UPDATE makes a concurrent second completion wait and answer the
+    same. No schema or refusal change.'
+  by: Chinmay
+  date: '2026-10-29'
+why: 'ADAM CR-306 (Narayan Gaonkar, #30912 completeUpload): the contract did not say what a second completion of an
+  upload that already became an asset answers.'
+keys_touched:
+  operations: [completeUpload]
+  tables: [assets.media_upload, assets.media_asset]
+  files:
+  - contracts/satellite/assets.yaml
+root_class: 'a write''s repeat under a new idempotency key left unstated'
+tickets:
+  started: []
+  unstarted:
+  - '30912 (completeUpload, New): as built (CR-306''s comment).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-306
+triage: fix-forward
+prevention:
+  type: none
+  reason: 'A behaviour stated in prose (what a repeated completion answers); no check can read whether a write states its
+    repeat under a new Idempotency-Key. Lead to approve.'
+status: open
