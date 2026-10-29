@@ -214,6 +214,17 @@ properties:
                   component is added. A read a person sees is never `background` (the lead, 20
                   October 2026): without such an element it stays onLoad and unreached. check-screen-wiring counts the read as
                   reached and checks the text is in the prototype file (S-SHOWN-BY).
+              inputSources:
+                type: object
+                additionalProperties: { type: string, pattern: '^\w+\.\w+$' }
+                description: >
+                  **Where an id this action sends comes from, when it is not an entry parameter, a
+                  field of a single-record read, or a read of what it names** (29 October 2026, the
+                  lead, r11 gate): `{variantId: listProductVariants.productVariantId}`, the picked
+                  row of a list read, or what an earlier write on the screen returns
+                  (`createTableReservation.variantId`). check-screen-wiring S-INPUT-SOURCE accepts it
+                  only when that operation is on this screen and a 2xx response of it has that
+                  field (in a list's rows too); a source it cannot find is still a finding.
         layout:
           type: object
           properties:
