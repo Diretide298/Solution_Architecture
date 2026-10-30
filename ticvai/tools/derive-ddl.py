@@ -884,7 +884,9 @@ $$;
 #     to. Staff read and write by `scope_path`, as the scope rule; a guest reads a row naming its subject in
 #     `subject_id`, `over_subject_id` or `granted_by_subject_id`, and writes one whose `over_subject_id` (else
 #     `subject_id`) is its own: the account holder grants and revokes. identity.delegated_access, guest to guest.
-#     Since ADAM CR-295 (29 October 2026) the staff scope test admits only a session with no guest subject.
+#     Since ADAM CR-295 (29 October 2026) the staff scope test admits only a session with no guest subject. Since ADAM
+#     CR-362 (30 October 2026) a guest also writes a grant over a subject its own active household grant is over
+#     (HOUSEHOLD_GRANT, CHG-R12DB-007).
 #   * `x-ticvai-rls: any-grant-no-delete` (CHG-R9MIG-001; ADAM CR-166 as the lead ruled it, 21 October 2026): any
 #     connection holding a grant (a scope path set) reads, inserts and updates a row, and no policy lets one be deleted.
 #     For a row that belongs to no scope (`x-ticvai-scope: none`): platform.outbox_sequence, the per-aggregate counter
@@ -1112,6 +1114,41 @@ BEGIN
     PERFORM platform.apply_split_rls(target,
         format('EXISTS (SELECT 1 FROM %s parent_row WHERE %s)', parent, link),
         format('EXISTS (SELECT 1 FROM %s parent_row WHERE %s AND (%s))', parent, link, parent_write));
+END
+$$;
+"""
+
+# **A guest acts for the household it holds a grant over** (ADAM CR-362, settled by the lead 30 October 2026, posted on
+# #30672; CHG-R12DB-007). The write check of `x-ticvai-rls: scope-or-subject` (identity.delegated_access) admitted a
+# guest only for a grant over itself, so the linked adult's grant over a minor the contract allows (grantDelegation;
+# audit R126) was refused. It also admits a guest whose subject holds an active ALLOW familyMember or primaryHolder
+# grant over the row's `over_subject_id`. Not SECURITY DEFINER: it reads only the guest's own held grants, which the
+# table's read rule already shows it (`own_row(NULL, subject_id)`), and plpgsql, so the planner never inlines a read of
+# the table into the table's own write rule.
+HOUSEHOLD_GRANT = "platform.subject_holds_household_grant_over"
+HOUSEHOLD_GRANT_SQL = """
+-- `x-ticvai-rls: scope-or-subject`'s household rule (ADAM CR-362; CHG-R12DB-007): the session's guest holds an active
+-- ALLOW familyMember or primaryHolder grant over `target_subject_id` (not revoked, now inside its validity window).
+CREATE OR REPLACE FUNCTION platform.subject_holds_household_grant_over(target_subject_id uuid)
+    RETURNS boolean
+    LANGUAGE plpgsql
+    STABLE
+AS $$
+DECLARE
+    me uuid := NULLIF(current_setting('ticvai.subject_id', true), '')::uuid;
+BEGIN
+    IF me IS NULL OR target_subject_id IS NULL THEN
+        RETURN false;
+    END IF;
+    RETURN EXISTS (
+        SELECT 1 FROM identity.delegated_access held
+         WHERE held.subject_id = me
+           AND held.over_subject_id = target_subject_id
+           AND held.delegation_kind IN ('familyMember', 'primaryHolder')
+           AND held.effect = 'ALLOW'
+           AND held.revoked_at IS NULL
+           AND (held.valid_from IS NULL OR held.valid_from <= now())
+           AND (held.valid_to IS NULL OR now() < held.valid_to));
 END
 $$;
 """
@@ -1538,6 +1575,8 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
         body.append(RLS_APPEND_AUDIT)
     if split or any(len(e) > 4 for e in by_parent):
         body.append(RLS_SPLIT)
+    if db == "tenant" and any(HOUSEHOLD_GRANT in str(e) for e in split):
+        body.append(HOUSEHOLD_GRANT_SQL)   # ADAM CR-362 (CHG-R12DB-007), before the calls that name it
     n_venue = len(by_venue) if db == "tenant" else 0
     # **Counted, not asserted.** The line this replaced called every table with neither column
     # "reference data, a registry, or the migration log", and the audit of 26 September found
@@ -3599,7 +3638,11 @@ def main() -> int:
             read = " OR ".join([f"({NO_GUEST} AND platform.in_scope(scope_path))"]
                                + [f"platform.own_row(NULL::uuid, {x})" for x in subs])
             write = (f"(({NO_GUEST} AND platform.in_scope({{a}}scope_path)) OR platform.own_row(NULL::uuid, {{a}}"
-                     + holder + "))")
+                     + holder + ")"
+                     # ADAM CR-362 (settled 30 October 2026; CHG-R12DB-007): a guest also writes the grants over a
+                     # subject its own active household grant (familyMember or primaryHolder) is over.
+                     + (f" OR {HOUSEHOLD_GRANT}({{a}}over_subject_id)" if holder == "over_subject_id" else "")
+                     + ")")
             call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(read)}, "
                     f"{sql_literal(write.format(a=''))});")
             base = "its scope, or the guest account it is about"

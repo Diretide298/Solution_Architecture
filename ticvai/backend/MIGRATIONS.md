@@ -158,7 +158,10 @@ and `ticvai.principal_id` (the signed-in principal's own rows: its credentials a
 The schema-level marks that build on these (`tools/derive-ddl.py` RLS_MARKS): `own-row` (the row's principal or
 guest, or the tenant root: the MFA tables), `own-or-home-scope` (a principal's credential: the principal, a grant over
 its home scope, or the tenant root), `home-scope-write` (`identity.principal`: any grant reads; the tenant root or a
-grant over the home scope writes) and `subject-self` (`pii.subject`).
+grant over the home scope writes) and `subject-self` (`pii.subject`). `scope-or-subject` (`identity.delegated_access`)
+lets a guest write a grant over itself, and since ADAM CR-362 (30 October 2026; CHG-R12DB-007) over a subject its own
+active ALLOW familyMember or primaryHolder grant is over (`platform.subject_holds_household_grant_over`, a 920 helper,
+not SECURITY DEFINER: it reads only the guest's own held grants).
 
 ## The control database has no row-level security
 

@@ -44,6 +44,8 @@ RULES = {
                         "provisioning's own order (CHG-R12DB-001)",
     "D-RECORDED": "a function, trigger or CHECK docs/active/recorded-ddl records that no migration carries "
                   "(CHG-R12DB-002..006)",
+    "D-HOUSEHOLD-WRITE": "identity.delegated_access's write check, as the migrations last apply it, without the "
+                         "household grant rule ADAM CR-362 settled, or the rule's function not created (CHG-R12DB-007)",
     "D-RECORDED-GRANTS": "the recorded apply_deployable_grants() owners or kernel grants differ from "
                          "service-decomposition.json and cross-deployable-writes.yaml (CHG-R12DB-004)",
     "D-CHILD-PARENT": "an item, line, amendment or media table whose key to its parent is not a NOT NULL declared "
@@ -609,6 +611,25 @@ def check_recorded(guard, backend: Path) -> None:
                               f"{m.group(1)} is recorded and no {db} migration carries it")
 
 
+def check_household_write(guard, backend: Path) -> None:
+    """D-HOUSEHOLD-WRITE (ADAM CR-362; CHG-R12DB-007): the last policy call the tenant migrations make for
+    identity.delegated_access carries platform.subject_holds_household_grant_over(over_subject_id) in its write check,
+    and a migration creates that function."""
+    series = "\n".join(f.read_text(encoding="utf-8") for f in sorted((backend / "tenant").glob("*.sql"),
+                                                                       key=lambda p: p.name))
+    # the calls as applied, in order: a commented-out line (a ROLLBACK section) applies nothing
+    calls = [line for line in series.splitlines() if not line.lstrip().startswith("--")
+             and re.search(r"platform\.apply_\w+_rls\('identity\.delegated_access'::regclass", line)]
+    last = calls[-1] if calls else ""
+    if "subject_holds_household_grant_over(over_subject_id)" not in last:
+        guard.add("D-HOUSEHOLD-WRITE", "identity.delegated_access:write",
+                  "the tenant migrations' last policy for identity.delegated_access does not admit a guest's household "
+                  "grant (ADAM CR-362): run tools/derive-ddl.py --apply")
+    if not re.search(r"CREATE OR REPLACE FUNCTION platform\.subject_holds_household_grant_over\(", series):
+        guard.add("D-HOUSEHOLD-WRITE", "platform.subject_holds_household_grant_over",
+                  "no tenant migration creates platform.subject_holds_household_grant_over (ADAM CR-362)")
+
+
 def check_recorded_grants(guard, db: str, body: str) -> None:
     dec = g.load_json(g.ROOT / "handoff" / "service-decomposition.json", {}) or {}
     owns: dict = {}
@@ -682,6 +703,7 @@ def main() -> int:
             guard.add("D-PROVISION-TYPE", f"{db}:{label}:{typ}", f"{label} uses {typ} ({where}) before any earlier "
                       "provisioning step creates it: provision-tenant.sh stops there")
     check_recorded(guard, backend)
+    check_household_write(guard, backend)
     tables = {}          # table -> {col: line}
     pk = {}
     for db in ("tenant", "control"):
