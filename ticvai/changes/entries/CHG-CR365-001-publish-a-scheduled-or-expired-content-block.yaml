@@ -1,0 +1,53 @@
+id: CHG-CR365-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'publishContentBlock publishes a scheduled block now or reschedules it, and publishes an expired block now or
+  schedules it again (states/content-block.yaml gains scheduled -> published and scheduled -> scheduled by operation,
+  and expired -> published); published and archived are still 409. The block''s expireAt, sent or stored, must be after
+  the moment it goes live, or 400 on expireAt. With review on, the block keeps its status and schedule until approved;
+  approvals'' 422 no-approval-route is passed on with status and reviewStatus unchanged and nothing written; the
+  identity.principal read is for approvedByPrincipalId.'
+decision:
+  what: 'Chinmay, 30 October 2026, reviewing the day''s CRs ("for each one actually check if they hold and if not then
+    find out the best way keeping in mind what client needs"), posted on #30785: "as you recommended, with one rule
+    added. A scheduled block may be published now (no publishAt) or rescheduled (a new publishAt). An expired block may
+    be published now or scheduled again ... The block''s expireAt, whether sent or already stored, must be after the
+    moment it goes live, or 400 on expireAt ... With review on, the call raises the approval request and answers 202,
+    and until the request is approved the block keeps its current status and schedule. When approvals refuses 422
+    no-approval-route, pass it on as 422 no-approval-route, leave status and reviewStatus unchanged, and write
+    nothing. The identity.principal read is for approvedByPrincipalId: the publisher on a single publish, the approver
+    from approval.granted."'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-365 (Hrushikant Patkar, #30785 publishContentBlock): the state model had no publish of a scheduled block
+  and no publish-now of an expired one, yet the 409s refused neither; approvals'' createApprovalRequest can refuse 422
+  no-approval-route, which was not listed; and the identity.principal read stated no purpose (audit R163 for expireAt
+  after publishAt).'
+keys_touched:
+  operations: [publishContentBlock]
+  schemas: [ContentBlock]
+  files:
+  - contracts/satellite/white-label.yaml
+  - states/content-block.yaml
+  - tools/check-business-rules.py
+root_class: 'an operation whose state model and refusals disagree about which statuses it moves'
+tickets:
+  started:
+  - '30785 (publishContentBlock, Hrushikant Patkar): add the go-live expireAt check (400) and keep status and
+    reviewStatus unchanged on 422; the rest is as built. Told through the lead''s comment.'
+  - '31152-31154 (CMS-007): offer Publish block on scheduled and expired blocks, and show the 422 no-approval-route
+    message.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-365
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-CONTENT-PUBLISH fails on the r11 contract (6 findings) and passes now; check-states and
+  check-state-refusals read the new transitions. Beyond the comment''s words: the expired -> published edge is marked
+  isReversal, as expired -> scheduled is. Seen, not settled here: publishTenantConfig also calls createApprovalRequest
+  and lists no 422 no-approval-route; the same pass-on rule belongs there, for its own CR.'

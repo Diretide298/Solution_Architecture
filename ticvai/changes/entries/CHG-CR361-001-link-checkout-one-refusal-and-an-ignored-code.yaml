@@ -1,0 +1,49 @@
+id: CHG-CR361-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'linkGuestCheckout''s verificationCode stays in the request (the approved WEB-016 form shows it) but is
+  optional and ignored: not checked, not stored, not used to spot a retry. The proof is the order''s verifiedContactRef
+  matching the keyed hash of one of the caller''s verified contacts; an orderReference with no subject_holding row, a
+  mismatch and a booking attached to another account all answer the same 403 contact-mismatch, emit nothing and take
+  the same time; a booking already attached to the caller answers 200, attaching any other subject-less orders with
+  the same verifiedContactRef (attachedOrderCount counts those, 0 if none).'
+decision:
+  what: 'Chinmay, 30 October 2026, reviewing the day''s CRs ("for each one actually check if they hold and if not then
+    find out the best way keeping in mind what client needs"), posted on #30671: "as you recommended, with two
+    corrections. Keep verificationCode in the request, because the approved WEB-016 form shows it. It is optional and
+    ignored: not checked, not stored, and not used to spot a retry (the Idempotency-Key does that) ... An
+    orderReference with no subject_holding row, one whose contact does not match, and one already attached to another
+    account all answer the same 403 contact-mismatch, emit nothing, and take the same time. A booking already attached
+    to the caller is not refused: the call still attaches any other subject-less orders with the same
+    verifiedContactRef and answers 200, with attachedOrderCount counting those (0 if there are none)."'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-361 (Hrushikant Patkar, #30671 linkGuestCheckout): the request''s verificationCode "proves possession"
+  but nothing stores a code to check it against (identity.subject_holding, order.created), and the contract did not say
+  what an unknown or already-attached booking answers. Anti-enumeration as for guest sign-in (ADR-0045 keyed hashes).'
+keys_touched:
+  operations: [linkGuestCheckout]
+  screens: [WEB-016, GST-042]
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: 'a request field promising a check no stored value can perform'
+tickets:
+  started:
+  - '30671 (linkGuestCheckout, Hrushikant Patkar): stop treating verificationCode as a retry marker; answer 200 for a
+    booking already attached to the caller; keep the single 403 for the other three cases. Told through the lead''s
+    comment.'
+  - '30696, 30697 (WEB-016, Chitrangi) and 30702, 30703 (GST-042): no change; the field may be left empty.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-361
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-LINK-CHECKOUT fails on the r11 contract (3 findings) and passes now. The approved WEB-016 form is
+  unchanged; a frontend developer who wants the ignored field off it logs a "Design change:" CR. Nothing beyond the
+  comment''s words.'

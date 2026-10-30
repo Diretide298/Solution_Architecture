@@ -1,0 +1,70 @@
+id: CHG-CR362-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'grantDelegation and listDelegations read beyond the guest''s row security the package''s way (CR-336): a new
+  rule question identity#subjectMinorStatus (subjectIds in; displayName and minorStatus minor, adult or unknown out;
+  one statement under ITenantRootGrant over pii.subject, no date of birth returned) and the tenant root''s scope from
+  tenancy#scopeRecords (level tenant) under ITenantRootGrant, cacheable per process. The write check on
+  identity.delegated_access also admits a guest whose subject holds an active ALLOW familyMember or primaryHolder grant
+  over over_subject_id; the minor age is the region of the session''s venue, else the highest among the tenant''s
+  regions, else 18; staff need GUEST_MANAGE (GUEST_VIEW) at the tenant root, a venue grant answers 403, and both
+  operations are x-ticvai-scope-level tenant.'
+decision:
+  what: 'Chinmay, 30 October 2026, reviewing the day''s CRs ("for each one actually check if they hold and if not then
+    find out the best way keeping in mind what client needs"), posted on #30672: "not as recommended: keep A''s
+    outcome, but use the package''s settled pattern for the reads (CR-336), not a new SECURITY DEFINER function. (1)
+    Add a rule question, identity#subjectMinorStatus ... under ITenantRootGrant over pii.subject ... (2) Read the
+    tenant root''s scope id and path with tenancy#scopeRecords (level tenant) under ITenantRootGrant ... (3) The write
+    check on identity.delegated_access also admits a guest session where the session''s subject holds an active ALLOW
+    familyMember or primaryHolder grant over over_subject_id ... (4) The minor age is the minorAgeThreshold of the
+    region of the venue the session is in. With no venue, it is the highest threshold among the tenant''s regions, and
+    with no region settings it is 18. (5) Staff need GUEST_MANAGE (GUEST_VIEW for listDelegations) at the tenant root.
+    A venue-scoped grant answers 403, and both operations become x-ticvai-scope-level tenant."'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-362 (Hrushikant Patkar, #30672 grantDelegation, blocking): pii.subject''s subject row security hides
+  another guest''s date of birth (every adult counted as a minor, 409), platform.scope''s policy hides the tenant root a
+  guest-made grant is stored at, and delegated_access''s write check refused the linked adult''s grant over a minor the
+  contract allows (audit R126). The read pattern is CHG-CR336-001''s.'
+keys_touched:
+  operations: [grantDelegation, listDelegations]
+  schemas: [DelegatedAccess]
+  tables: [identity.delegated_access, pii.subject, platform.scope]
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'query identity#subjectMinorStatus'
+root_class: 'a rule check that must see beyond the caller''s scope, read under the caller''s row security'
+tickets:
+  started:
+  - '30672 (grantDelegation, Hrushikant Patkar): replace the pii.subject and platform.scope reads with
+    subjectMinorStatus and the tenant-root scopeRecords read; test the linked-adult grant against the migrated policy;
+    keep 403 for venue-scoped staff. Told through the lead''s comment.'
+  - '30673 (listDelegations, Hrushikant Patkar): fill overSubjectName and overSubjectIsMinor from subjectMinorStatus;
+    staff at the tenant root only.'
+  - '32103-32105 (GST-015), 32222-32224 (GST-069), 33277-33279 (WEB-024), Chitrangi: no change; names and minor flags
+    now arrive filled.'
+  unstarted:
+  - 'A [DB] migration child task for Hrushikant (to be filed by the lead): the forward migration re-applying
+    identity.delegated_access''s split policy with the widened write check and the new function (see notes).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-362
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-DELEGATION-READS fails on the r11 contract (6 findings) and passes now. **Not generated yet: the widened
+  write check.** It is stated on DelegatedAccess (beside x-ticvai-rls scope-or-subject) and on grantDelegation, but
+  the scope-or-subject policy is written by tools/derive-ddl.py''s generator logic, which the DDL lane owns, so this
+  lane did not change it: the generator must add OR platform.subject_holds_household_grant_over(over_subject_id) to
+  that write check (a STABLE plpgsql function, not SECURITY DEFINER, true when an identity.delegated_access row has
+  subject_id = current_setting(''ticvai.subject_id''), over_subject_id = the argument, delegation_kind familyMember or
+  primaryHolder, effect ALLOW, revoked_at null and now inside valid_from/valid_to), and 920-row-level-security.sql
+  and the next forward migration carry it. Beyond the comment''s words: grantDelegation and listDelegations list 403
+  (common Forbidden); subjectMinorStatus answers an id with no row by leaving it out. Seen, not settled here: no
+  operation writes the first familyMember or primaryHolder link over a child (grantDelegation says GST-069 writes it;
+  access enrolFacePass requires it to exist), for its own CR or the left-out list.'

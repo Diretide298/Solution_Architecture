@@ -136,6 +136,34 @@ x-ticvai-queries:
       process by createRotaAssignment and updateRotaAssignment, which refuse 409 person-lacks-required-role when
       it is false.
     served: [in-process]
+  # **Whether a guest is a minor, and its name, beyond the caller's own row** (ADAM CR-362, decided 30 October 2026;
+  # CHG-CR362-001). grantDelegation and listDelegations read pii.subject under subject row security, which shows a
+  # guest its own row only, so another guest's date of birth was hidden and every adult-to-adult grant was refused.
+  subjectMinorStatus:
+    module: identity
+    table: pii.subject
+    inputs:
+      subjectIds: {type: array, items: {type: string, format: uuid}, description: 'The guests asked about: grantDelegation''s path subjectId, or the other party of the delegations listDelegations answers (rows the caller can already see).'}
+    returns:
+      type: array
+      items:
+        type: object
+        required: [subjectId, minorStatus]
+        properties:
+          subjectId: {type: string, format: uuid}
+          displayName: {type: string, nullable: true, description: 'pii.subject.display_name.'}
+          minorStatus: {type: string, enum: [minor, adult, unknown], description: 'minor below the minor age, adult at or above it, unknown when no date of birth is held. The date of birth is never returned.'}
+    rule: >-
+      A rule question (ADAM CR-362, decided 30 October 2026, Chinmay: "not as recommended: keep A's outcome, but
+      use the package's settled pattern for the reads (CR-336), not a new SECURITY DEFINER function"). Identity
+      answers it with one statement under the routed tenant's root grant (ITenantRootGrant) over pii.subject and
+      returns, per id, only displayName and minorStatus; the date of birth never leaves that statement, and the
+      caller's own grant is in force again for every other statement of its transaction. The minor age is the
+      minorAgeThreshold of the region of the venue the session is in; with no venue, the highest threshold among
+      the tenant's regions; with no region settings, 18. An id with no row is absent. Asked in process by
+      grantDelegation, for the path's subjectId (unknown counts as a minor), and by listDelegations, only for the
+      other party of rows the caller can already see (overSubjectName, and overSubjectIsMinor, null when unknown).
+    served: [in-process]
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October). Rule questions keep queries of their own, above.
@@ -1713,6 +1741,10 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'minorAgeThreshold, for overSubjectIsMinor (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)'
+      - query: identity#subjectMinorStatus
+        route: in-process
+        for: 'overSubjectName and overSubjectIsMinor of the other party of the rows the caller can already see, beyond
+          its own pii.subject row (ADAM CR-362; CHG-CR362-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1723,6 +1755,11 @@ paths:
         **Ordered by `createdAt` descending, `id` as the tiebreak** (decided 14 October 2026, ADAM CR-077;
         CHG-IDR-002): the cursor pages the grants, and each of the two arrays keeps that order, so the newest
         delegation is first in either direction.
+
+        **Names and minor flags** (ADAM CR-362, decided 30 October 2026, Chinmay; CHG-CR362-001):
+        `overSubjectName` and `overSubjectIsMinor` come from `identity#subjectMinorStatus`, asked only for the other
+        party of rows the caller can already see; `overSubjectIsMinor` is null when the status is unknown. **Staff
+        need `GUEST_VIEW` at the tenant root**; a venue-scoped grant answers 403.
 
         '
       tags:
@@ -1735,7 +1772,7 @@ paths:
       x-ticvai-audience:
       - staff
       - guest
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1760,6 +1797,8 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/DelegatedAccess'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
@@ -1770,6 +1809,15 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'the minor age, RegionSettings.minorAgeThreshold in platform.region_settings, Tenancy''s data (IDENTITY-C19; CHG-R8SPN-024)'
+      - query: identity#subjectMinorStatus
+        route: in-process
+        for: 'whether the path''s subjectId is a minor (unknown counts as a minor), beyond the caller''s own pii.subject
+          row (ADAM CR-362; CHG-CR362-001)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the tenant root''s scope id and path (level tenant) a grant is stored at, one statement under
+          ITenantRootGrant; constant per tenant database, so it may be cached for the process (ADAM CR-362;
+          CHG-CR362-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1814,6 +1862,20 @@ paths:
         guest is refused 403. A revocation by a guest is recorded the same way. Staff recording a grant on the holder''s
         behalf store `grantedByKind` `principal`; the SSO callback''s group-to-role grants store `system`.
 
+
+        **What it reads beyond the caller''s row security, and the linked adult''s write** (ADAM CR-362, decided 30
+        October 2026, Chinmay; CHG-CR362-001). (1) Whether the path''s `subjectId` is a minor is asked of
+        `identity#subjectMinorStatus`, where `unknown` counts as a minor (409 `minor-grants-adult-authority` as
+        now). (2) The tenant root''s scope id and path come from `tenancy#scopeRecords` (level `tenant`) under
+        `ITenantRootGrant`, one statement; it is constant per tenant database, so it may be cached for the process.
+        (3) The write check on `identity.delegated_access` also admits a guest session whose subject holds an
+        active ALLOW `familyMember` or `primaryHolder` grant over `over_subject_id` (not revoked, inside its
+        validity). That check is a plain function reading only the guest''s own held grants, which the read policy
+        already shows the guest. This operation still allows that grant only when `overSubjectId` is a minor.
+        (4) The minor age is the `minorAgeThreshold` of the region of the venue the session is in; with no venue,
+        the highest threshold among the tenant''s regions; with no region settings, 18. (5) Staff need
+        `GUEST_MANAGE` at the tenant root; a venue-scoped grant answers 403.
+
         '
       tags:
       - identity
@@ -1822,7 +1884,7 @@ paths:
       x-ticvai-audience:
       - staff
       - guest
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -1876,6 +1938,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DelegatedAccess'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
           x-ticvai-problem-types: [delegation-cycle, minor-grants-adult-authority]
           description: '**A cycle, or a minor granting authority over an adult.** Both are refused — a
@@ -3788,7 +3852,8 @@ paths:
       x-ticvai-reads:
       - table: identity.sso_provider
         for: 'the tenant''s guest provider row, audience guest and its guestProvider: client id and
-          client_secret_ref (ADAM CR-327, part (1))'
+          client_secret_ref (ADAM CR-327, part (1)), and the issuer the token and userinfo endpoints are built from
+          (ADAM CR-360, CHG-CR360-001)'
       - table: pii.subject_identity
         for: 'the UAE Pass user id a returning guest is found by (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003;
           check-parameter-columns P-NAMED-TABLE)'
@@ -3797,7 +3862,13 @@ paths:
           ADR-0028; CHG-R10ID-018)'
       x-ticvai-writes:
       - table: pii.subject_identity
-        for: 'the uaePass identity row of a new link (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003)'
+        for: 'the uaePass identity row of a new link (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003), with the UAE
+          Pass email as email_at_link (ADAM CR-360, CHG-CR360-001)'
+      - table: pii.subject_contact
+        for: 'on a new account, the UAE Pass email with is_verified false (ADAM CR-360, CHG-CR360-001)'
+      - table: pii.subject_document
+        for: 'on a new account, the emiratesId document, only when the identity-number claim is present (ADAM CR-360,
+          CHG-CR360-001)'
       x-ticvai-read-via:
       - query: white-label#customDomainRedirectHosts
         route: projection
@@ -3822,6 +3893,22 @@ paths:
         OAuth authorisation-code exchange. Returns a verified identity, so an account created
         this way needs no further verification.
 
+
+        **How the exchange runs** (ADAM CR-360, decided 30 October 2026, Chinmay; CHG-CR360-001). UAE Pass is plain
+        OAuth 2.0: it publishes no discovery document and issues no ID token. For the guest `uaePass` row
+        `metadataUrl` is not used and may be null; the endpoints come from the row''s `issuer`: the token endpoint
+        is `issuer` followed by `/token`, and the userinfo endpoint is `issuer` followed by `/userinfo`. These are
+        UAE Pass''s documented paths (`issuer` `https://stg-id.uaepass.ae/idshub` in staging,
+        `https://id.uaepass.ae/idshub` in production), and `authorizationUrl` already sits beside them. The code is
+        exchanged with HTTP Basic client authentication (`clientId`, plus the secret behind `clientSecretRef`), then
+        the claims are read from userinfo. `providerSubject` is the userinfo `sub`. The Emirates ID number is the
+        claim the setting `SignIn:GuestProviders:UaePassIdentityNumberClaim` names, which defaults to `idn`.
+
+        **The UAE Pass email never matches or links an existing account.** It is stored as
+        `pii.subject_identity.email_at_link` (`SubjectIdentity.emailAtLink`) and, on a new account, written to
+        `pii.subject_contact` with `is_verified` false. Before the first production sign-in, the client''s sandbox
+        run confirms `sub` and `idn`.
+
         Government onboarding has lead time and should be started before it becomes the critical path.
 
 
@@ -3837,10 +3924,11 @@ paths:
         exchange (401) and nothing is exchanged.
 
 
-        **What it stores** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): a `pii.subject_identity` row (`provider`
-        `uaePass`, the UAE Pass user id as `providerSubject`), and on a new account a `pii.subject_document` of kind
-        `emiratesId` with the number from the UAE Pass identity-number claim (the claim''s name to be confirmed with the
-        client''s UAE Pass sandbox).
+        **What it stores** (R8 blocker IDENTITY-C54, CHG-R8MIG-015; ADAM CR-360, CHG-CR360-001): a
+        `pii.subject_identity` row (`provider` `uaePass`, the userinfo `sub` as `providerSubject`), and on a new
+        account a `pii.subject_document` of kind `emiratesId` with the number from the identity-number claim (`idn` by
+        default). The document is written only when that claim is present: a visitor profile has none, and that
+        guest is still signed in, with no document written.
 
         '
       tags:
@@ -3996,13 +4084,23 @@ paths:
       - guest
       summary: Attach a guest checkout to an account
       description: 'A guest who bought without an account, then registered. **The guest names one booking**
-        (`orderReference`, with `verificationCode` from its confirmation); it is attached only when its
-        contact detail matches the caller''s verified identifier, and 403 otherwise. Other guest-checkout
-        orders carrying the same verified contact detail are attached in the same call, and
-        `attachedOrderCount` counts every order attached.
+        (`orderReference`); it is attached only when its contact detail matches the caller''s verified
+        identifier, and 403 otherwise. Other guest-checkout orders carrying the same verified contact detail are
+        attached in the same call, and `attachedOrderCount` counts every order attached.
 
         **Only orders whose contact detail matches the now-verified identifier.** Attaching on an unverified
         claim would hand someone else''s booking history to whoever asked for it.
+
+
+        **The proof, and what is refused** (ADAM CR-361, decided 30 October 2026, Chinmay; CHG-CR361-001). The proof
+        is the order''s `verifiedContactRef` matching the keyed hash of one of the caller''s verified contacts.
+        `verificationCode` stays in the request because the approved WEB-016 form shows it; it is optional and
+        ignored: not checked, not stored, and not used to spot a retry (the `Idempotency-Key` does that). An
+        `orderReference` with no `identity.subject_holding` row, one whose contact does not match, and one already
+        attached to another account all answer the same 403 `contact-mismatch`, emit nothing, and take the same
+        time. A booking already attached to the caller is not refused: the call still attaches any other
+        subject-less orders with the same `verifiedContactRef` and answers 200, with `attachedOrderCount` counting
+        those (0 if there are none).
 
 
         **Read from Identity''s own projection, attached by Orders** (r10, the lead''s ruling on the ADR-0028 tiers,
@@ -4042,7 +4140,8 @@ paths:
                   type: string
                 verificationCode:
                   type: string
-                  description: From the booking confirmation. Proves possession of the booking.
+                  description: 'Optional and ignored (ADAM CR-361, CHG-CR361-001): kept because the approved WEB-016
+                    form shows it; not checked, not stored, and not used to spot a retry (the Idempotency-Key does).'
       responses:
         '200':
           headers:
@@ -4056,10 +4155,14 @@ paths:
                 properties:
                   attachedOrderCount:
                     type: integer
-                    description: The named booking plus any other orders with the same verified contact detail.
+                    description: 'The named booking plus any other orders with the same verified contact detail.
+                      When the named booking is already attached to the caller, only those other orders (0 if
+                      there are none; ADAM CR-361).'
         '403':
           x-ticvai-problem-types: [contact-mismatch]
-          description: Contact detail on the order does not match the verified identifier
+          description: 'The same answer for three cases (ADAM CR-361, CHG-CR361-001): the `orderReference` has no
+            `identity.subject_holding` row, its contact detail does not match the verified identifier, or it is
+            already attached to another account. Nothing is emitted, and each case takes the same time.'
           content:
             application/problem+json:
               schema:
@@ -4507,7 +4610,9 @@ paths:
                 $ref: '#/components/schemas/SsoProviderConfig'
         '400':
           x-ticvai-problem-types: [sso-metadata-unreachable, group-mappings-required]
-          description: Metadata unreachable, or no group mappings supplied
+          description: 'Metadata unreachable (`sso-metadata-unreachable`), for a staff row or a guest `apple` or
+            `google` row; a guest `uaePass` row is not refused for an absent or unreachable `metadataUrl`, which it
+            does not use (ADAM CR-360, CHG-CR360-001). Or no group mappings supplied.'
           content:
             application/problem+json:
               schema:
@@ -7308,16 +7413,12 @@ paths:
       operationId: getGuestVerificationPolicy
       x-ticvai-consumed-by:
         - "P08 ADM-342 Authentication & MFA Policy Manager"
-      x-ticvai-read-via:
-      - query: tenancy#scopeRecords
-        route: in-process
-        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: our build plan (5.3.21 "configurable identity workflows"); shape follows
         getPasswordPolicy'
       summary: The tenant's guest identity-verification workflow
+      description: '**`walletTopUpLimit` is answered in the row''s own `currency_code`** (ADAM CR-363, decided 30
+        October 2026, Chinmay; CHG-CR363-001): the policy is one row at the tenant root, which names no venue to
+        resolve a currency from, so nothing is read from Tenancy for it.'
       tags:
       - identity
       x-ticvai-permission: TENANT_CONFIGURE
@@ -7338,13 +7439,6 @@ paths:
       operationId: setGuestVerificationPolicy
       x-ticvai-consumed-by:
         - "P08 ADM-342 Authentication & MFA Policy Manager"
-      x-ticvai-read-via:
-      - query: tenancy#scopeRecords
-        route: in-process
-        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-agreed: '29 September: our build plan (5.3.21 "configurable identity workflows"); shape follows
@@ -7364,6 +7458,13 @@ paths:
         `provider` and `providerThenManual`, and a UAE Pass sign-in satisfies the document requirement. Both
         need the client''s access to the providers; until it exists a policy naming `icp` is refused `422
         provider-not-connected` and manual review is what runs.
+
+
+        **The wallet top-up limit is stored in its own currency** (ADAM CR-363, decided 30 October 2026, Chinmay:
+        "as you recommended"; CHG-CR363-001). `identity.guest_verification_policy.currency_code` is set from
+        `walletTopUpLimit.currency`, and the amount is checked against that currency''s ISO 4217 scale (CR-192): an
+        amount that does not fit answers 400 on `walletTopUpLimit`. With no `walletTopUpLimit`, both the column and
+        `currency_code` are null. No currency is read from Tenancy.
 
         '
       tags:
@@ -7393,6 +7494,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdentityGuestVerificationPolicy'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: '`walletTopUpLimit.amount` does not fit the ISO 4217 scale of `walletTopUpLimit.currency`
+            (ADAM CR-363, CHG-CR363-001; `errors[]` names `walletTopUpLimit`), or another field breaks a schema rule.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: '`verificationProvider` names a provider the tenant has no connection to yet
             (`provider-not-connected`; CHG-CSP-034).'
@@ -8828,6 +8937,18 @@ components:
             - walletTopUpAboveLimit
         walletTopUpLimit:
           $ref: ../shared/common.yaml#/components/schemas/Money
+        currencyCode:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z]{3}$'
+          nullable: true
+          readOnly: true
+          description: '**The ISO 4217 currency `walletTopUpLimit` is stored in** (ADAM CR-363, "as you recommended",
+            Chinmay, 30 October 2026; CHG-CR363-001). The policy is one row at the tenant root, where no venue or
+            region sits above it to resolve a currency from (naming-and-style 5.1: a table whose currency genuinely
+            differs from its venue stores one). Set by `setGuestVerificationPolicy` from `walletTopUpLimit.currency`;
+            null exactly when `walletTopUpLimit` is null. `getGuestVerificationPolicy` answers the Money in it.'
         acceptedDocumentKinds:
           type: array
           description: Proposed default passport, emiratesId, nationalId.
@@ -11344,9 +11465,16 @@ components:
         metadataUrl:
           type: string
           nullable: true
+          description: 'The provider''s metadata or discovery document. **Not used for a guest `uaePass` row, and may
+            be null there** (ADAM CR-360, 30 October 2026; CHG-CR360-001): UAE Pass publishes no discovery document,
+            so its endpoints come from `issuer`.'
         issuer:
           type: string
           nullable: true
+          description: 'The provider''s issuer. **For a guest `uaePass` row it is the base of the endpoints**
+            (ADAM CR-360; CHG-CR360-001): the token endpoint is `issuer` followed by `/token` and the userinfo endpoint
+            `issuer` followed by `/userinfo` (`https://stg-id.uaepass.ae/idshub` in staging,
+            `https://id.uaepass.ae/idshub` in production).'
         clientId:
           type: string
           nullable: true
@@ -11961,6 +12089,10 @@ components:
       # Who granted it: a principal, a guest or the system, and the matching column set (R8 blocker IDENTITY-C42,
       # CHG-R8MIG-021).
       # A guest reads the grants it is party to and the account holder writes them (CHG-R8MIG-021; IDENTITY-C48).
+      # **The linked adult writes one over a minor too** (ADAM CR-362, decided 30 October 2026; CHG-CR362-001): the
+      # write check also admits a guest session whose subject holds an active ALLOW familyMember or primaryHolder grant
+      # over over_subject_id (not revoked, inside valid_from/valid_to), through a plain STABLE function reading only the
+      # guest's own held grants (not SECURITY DEFINER). grantDelegation allows that grant only over a minor.
       x-ticvai-rls: scope-or-subject
       x-ticvai-required-when:
         grantedByPrincipalId: {grantedByKind: principal}
@@ -12046,7 +12178,8 @@ components:
           readOnly: true
           x-ticvai-persisted: false
           description: The display name of the guest acted for (`pii.subject.display_name`), read with the grant;
-            null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009).
+            null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009). listDelegations
+            reads it with `identity#subjectMinorStatus` (ADAM CR-362).
         overSubjectIsMinor:
           type: boolean
           nullable: true
