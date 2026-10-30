@@ -1,0 +1,48 @@
+id: CHG-R12GT-002
+date: '2026-10-30'
+source: audit
+kind: spec
+summary: 'CMS-076 (Asset Version Control & Revision History) reaches replaceMediaAsset: its unlabelled generated
+  primary button is Replace the current version, bound to replaceMediaAsset, and a file-upload control (Choose the new
+  file, createUpload) gives it the uploadId it sends. The upload is never completed (completeUpload would make the file
+  a new asset, not this one''s next version).'
+decision:
+  what: 'The lead''s brief for r12 (30 October 2026): "If I rebuild from scratch it should never have these or all our
+    prior logged errors" -- the finding is fixed, not acknowledged with --acknowledge-started. The two visible controls
+    are logged in docs/active/approved-ui-changes.yaml under the lead''s rule of 22 October 2026 that a change to
+    approved UI is made and logged.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'Finding: a fresh refresh of main (r11 + 22741c2e, 30 October 2026) failed check-screen-wiring S-OP-UNREACHED:
+  "CMS-076: declares replaceMediaAsset (onAction) and no component reaches it", a finding the baseline knew
+  and now built on by a started ticket (#30907 Ready for QA, ticket statuses read 2026-10-29T18:54Z). derive-components
+  (R273) gave the screen a primary button implied by replaceMediaAsset with no operation and no label, so nothing on
+  the screen called it; the replace needs a file, which nothing on the screen collected.'
+keys_touched:
+  screens:
+  - CMS-076
+  operations:
+  - replaceMediaAsset
+  - createUpload
+  files:
+  - screens/P13-white-label-cms.yaml
+  - docs/active/approved-ui-changes.yaml
+root_class: 'a generated button implied by an operation and bound to none'
+tickets:
+  started:
+  - '30907 ([BE] replaceMediaAsset: POST /media/{mediaId}/replace, Ready for QA, Narayan Gaonkar): nothing to change in
+    the back end; the operation is as built. CMS-076 now calls it, with the uploadId of an upload made by createUpload
+    and never completed: QA should replace an asset from CMS-076 that way (the upload''s asset_id is the asset, the old
+    file is kept as an asset_version row).'
+  - '30913 ([BE] createUpload: POST /media/uploads, In progress, Narayan Gaonkar): CMS-076 is one more screen that calls
+    it; nothing to do.'
+  unstarted:
+  - '29613 ([FE] CMS-076, New, Sanket Keluskar) and its sub-tasks 34975-34977: build Choose the new file (createUpload,
+    then the file PUT, no completeUpload) and Replace the current version (replaceMediaAsset with that uploadId).'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-OP-UNREACHED
+status: open

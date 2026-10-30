@@ -636,3 +636,44 @@ changes:
     changes. dont worry about it"). Matching assets, filled by searchMedia and narrowed by Asset Type, Venue and
     Collection.'
   change: CHG-R11FXU-011
+- screen: BO-134
+  field: 'overlay:formSetKitchenSla'
+  to: b6a6fad01285691b
+  approval: 'The r12 gate fix of 31 October 2026 (a fresh refresh of r11 failed check-screen-patterns and check-screen-wiring;
+    ticket statuses read 2026-10-29T18:54Z): the lead''s rule for r12, "If I rebuild from scratch it should never have
+    these or all our prior logged errors", every gate finding fixed where it is generated and never acknowledged or
+    baselined; and the lead''s rule of 22 October 2026 that a change to approved UI is made and logged ("let frontend
+    change ui and log it in changes. dont worry about it"). The form setKitchenSla needs, opened on the outlet''s
+    targets.'
+  change: CHG-R12GT-001
+- screen: BO-134
+  field: 'region:collection'
+  to: 0eea8e74e68f409d
+  approval: 'The r12 gate fix of 31 October 2026 (a fresh refresh of r11 failed check-screen-patterns and check-screen-wiring;
+    ticket statuses read 2026-10-29T18:54Z): the lead''s rule for r12, "If I rebuild from scratch it should never have
+    these or all our prior logged errors", every gate finding fixed where it is generated and never acknowledged or
+    baselined; and the lead''s rule of 22 October 2026 that a change to approved UI is made and logged ("let frontend
+    change ui and log it in changes. dont worry about it"). The outlet''s ticket targets, read by getKitchenSla: BO-134
+    sets them with setKitchenSla and read nothing back (check-screen-patterns READ).'
+  change: CHG-R12GT-001
+- screen: BO-134
+  field: 'region:rowActions'
+  to: 77a506767d85fda2
+  approval: 'The r12 gate fix of 31 October 2026 (a fresh refresh of r11 failed check-screen-patterns and check-screen-wiring;
+    ticket statuses read 2026-10-29T18:54Z): the lead''s rule for r12, "If I rebuild from scratch it should never have
+    these or all our prior logged errors", every gate finding fixed where it is generated and never acknowledged or
+    baselined; and the lead''s rule of 22 October 2026 that a change to approved UI is made and logged ("let frontend
+    change ui and log it in changes. dont worry about it"). The button that opens the ticket-target form; setKitchenSla
+    was declared and nothing reached it.'
+  change: CHG-R12GT-001
+- screen: CMS-076
+  field: 'region:-'
+  to: fccedb14b77e78f1
+  approval: 'The r12 gate fix of 31 October 2026 (a fresh refresh of r11 failed check-screen-patterns and check-screen-wiring;
+    ticket statuses read 2026-10-29T18:54Z): the lead''s rule for r12, "If I rebuild from scratch it should never have
+    these or all our prior logged errors", every gate finding fixed where it is generated and never acknowledged or
+    baselined; and the lead''s rule of 22 October 2026 that a change to approved UI is made and logged ("let frontend
+    change ui and log it in changes. dont worry about it"). The replace the screen exists for: a file-upload control for
+    the new file (createUpload) and the unlabelled primary button named and bound to replaceMediaAsset, which nothing
+    reached while #30907 (its back end) was in QA.'
+  change: CHG-R12GT-002

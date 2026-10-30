@@ -213,14 +213,13 @@ def apis(s):
     return [a for a in (s.get("apis") or []) if isinstance(a, dict) and a.get("operationId")]
 
 
-def block_a_screens(root: str = ROOT) -> set | None:
-    """The screens Block A tasks build, from the release the tickets were cut from; None if absent."""
-    p = os.path.join(root, "handoff", "service-docs", "op-release.json")
-    if not os.path.exists(p):
-        return None
-    with open(p, encoding="utf-8") as fh:
-        rel = json.load(fh)
-    T = {t["key"]: t for t in rel["tickets"]}
+BLOCK_A_ROOTS = ("BLOCK-A", "BLOCK-A2")    # both drops (CHG-RONEP-007)
+
+
+def block_a_of(tickets, builds_of) -> set:
+    """The screens the Block A tasks among `tickets` build: a task whose parent chain ends at a Block A epic, its
+    builds read by `builds_of(ticket)` ("screen BO-134", "operation ...")."""
+    T = {t["key"]: t for t in tickets}
 
     def root_of(k):
         n = 0
@@ -228,12 +227,41 @@ def block_a_screens(root: str = ROOT) -> set | None:
             k, n = T[k]["parent"], n + 1
         return k
     out = set()
-    for t in rel["tickets"]:
-        if t.get("type") == "Task" and root_of(t["key"]) in ("BLOCK-A", "BLOCK-A2"):    # both drops (CHG-RONEP-007)
-            for b in t.get("builds") or []:
+    for t in tickets:
+        if t.get("type") == "Task" and root_of(t["key"]) in BLOCK_A_ROOTS:
+            for b in builds_of(t) or []:
                 kind, _, val = b.partition(" ")
                 if kind == "screen":
                     out.add(val)
+    return out
+
+
+def block_a_screens(root: str = ROOT) -> set | None:
+    """The screens Block A tasks build: the release the tickets were cut from, and the plan this tree derives.
+
+    **The plan as well as the bundle** (r12 gate, 31 October 2026, CHG-R12GT-001). The bundle
+    (`op-release.json`) is built after the release gate, so a plan change that brings a screen into Block A is
+    invisible to the gate that should judge it: r4's BO-954, r6's 21 screens and r11's BO-134, BO-140, BO-873,
+    BO-881, CMS-021 and CMS-030 were each first seen by the next lane's refresh, on a screen still saying wave 2
+    or 3. The derived plan (`tasks.csv`, rewritten by every refresh) names the same tasks before the bundle does;
+    a screen either names is in Block A. None if neither is there."""
+    sd = os.path.join(root, "handoff", "service-docs")
+    p, q = os.path.join(sd, "op-release.json"), os.path.join(sd, "tasks.csv")
+    if not os.path.exists(p) and not os.path.exists(q):
+        return None
+    out = set()
+    if os.path.exists(p):
+        with open(p, encoding="utf-8") as fh:
+            out |= block_a_of(json.load(fh)["tickets"], lambda t: t.get("builds"))
+    if os.path.exists(q):
+        import csv
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("ticket_done", os.path.join(root, "tools", "ticket_done.py"))
+        td = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(td)
+        with open(q, encoding="utf-8", newline="") as fh:
+            rows = list(csv.DictReader(fh))
+        out |= block_a_of(rows, lambda r: td.builds_of(r, "", {}))
     return out
 
 

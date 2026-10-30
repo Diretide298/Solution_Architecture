@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 233
+  x-ticvai-screen-count: 234
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -9612,6 +9612,7 @@ paths:
       operationId: listPrivacyNoticePolicy
       x-ticvai-consumed-by:
         - "P13 CMS-028 Privacy Notice, Policy & Terms Version Management"
+        - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
       x-ticvai-read-via:
       - query: white-label#policyRecords
         route: in-process
@@ -9845,6 +9846,63 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /privacy-testing:
+    get:
+      operationId: listPrivacyChangeSets
+      x-ticvai-consumed-by:
+        - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
+      x-ticvai-audience:
+        - staff
+      x-ticvai-agreed: '31 October 2026: contract gap CHG-R12GT-001 (CMS-030 acts on a change set with approvePrivacyTesting and nothing read the change sets back); the rows approvePrivacyTesting returns, as listPrivacyNoticePolicy reads what setPrivacyNoticePolicyGovernance governs'
+      summary: Privacy change sets and where each stands
+      description: >
+        **The caller's brand's privacy change sets**, each as `approvePrivacyTesting` returns it after an
+        action: its status (draft, validated, submitted, approved, scheduled, published, rolled back,
+        rejected), the last validation's issues and simulation, its approval request, when it publishes or
+        published, and its audit trail. CMS-030 opens on this list and acts on the selected change set.
+        Filter by `status`. Ordered by `updatedAt` descending, `changeSetId` breaking every tie; where
+        `updatedAt` is null the row sorts last (NULLS LAST). Keyset cursor.
+      tags:
+        - consent
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: brand
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+            - draft
+            - validated
+            - submitted
+            - approved
+            - scheduled
+            - published
+            - rolledBack
+            - rejected
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
+        - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The change sets, newest change first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PrivacyConfigurationTestingApprovalPublicationView'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: approvePrivacyTesting
       x-ticvai-consumed-by:

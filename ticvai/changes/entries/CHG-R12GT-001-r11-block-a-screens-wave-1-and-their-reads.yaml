@@ -1,0 +1,70 @@
+id: CHG-R12GT-001
+date: '2026-10-30'
+source: audit
+kind: spec
+summary: 'The six screens r11''s plan brought into Block A are wave 1 (BO-134, BO-140, BO-873, BO-881, CMS-021,
+  CMS-030), and the three of them that edit saved data read it back: BO-134 binds getKitchenSla (the outlet''s ticket
+  targets, with the form and button setKitchenSla lacked), BO-881''s fields open on the new getStaffingRules
+  (workforce.yaml, GET /staffing-rules, closing the contract gap CHG-WIR-004 recorded) and CMS-030 binds the new
+  listPrivacyChangeSets (marketing-crm.yaml, GET /privacy-testing: the change sets approvePrivacyTesting acts on, whose
+  validation issues fill its checks) and listPrivacyNoticePolicy (the versions its governance form picks from).
+  check-screen-patterns P8 now reads Block A from the derived plan (tasks.csv) as well as the release bundle.'
+decision:
+  what: 'The lead''s brief for r12 (30 October 2026): "If I rebuild from scratch it should never have these or all our
+    prior logged errors" -- every finding fixed where it is generated, never baselined, acknowledged or exempted. The
+    screens'' wave lines and api bindings are invisible metadata; BO-134''s ticket-target panel, form and button are
+    visible and are logged in docs/active/approved-ui-changes.yaml under the lead''s rule of 22 October 2026 that a
+    change to approved UI is made and logged. No plan file is changed, so the cooling-off waiver the lead gave for
+    r12''s plan changes ("Waive for r12", 31 October 2026) is not used.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'Finding: a fresh refresh of main (r11 + 22741c2e, 30 October 2026) failed check-screen-patterns with 48 findings
+  (NP 1, P8 35, READ 12) against the 39 the r11 gate passed with. The nine new ones are r11''s plan, not its ticket
+  links: the r11 bundle (op-release.json, a32b7db3) was built after r11''s gate ran and is the first to hold the Block A
+  tasks of BO-134 and BO-140 (setup hosts once createFnbOrder read the routing rule and the daily count, CHG-CR319-001,
+  CHG-R11TEN-008), BO-873 and BO-881 (CHG-R11INT-005) and CMS-021 and CMS-030 (CHG-R11INT-004), while their screen
+  files still said wave 2 or 3 (P8 +6), and BO-134 (setKitchenSla), BO-881 and CMS-030 edit what no bound read returns
+  (READ +3). The same lag let r4''s BO-954 and r6''s 21 screens through (CHG-RONEP-005, CHG-TKT-008): P8 read Block A
+  only from the bundle, which every release cuts after its gate.'
+keys_touched:
+  screens:
+  - BO-134
+  - BO-140
+  - BO-873
+  - BO-881
+  - CMS-021
+  - CMS-030
+  operations:
+  - getKitchenSla
+  - setKitchenSla
+  - getStaffingRules
+  - listPrivacyChangeSets
+  - listPrivacyNoticePolicy
+  files:
+  - screens/P08-venue-back-office.yaml
+  - screens/P13-white-label-cms.yaml
+  - contracts/satellite/workforce.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - docs/active/approved-ui-changes.yaml
+  - tools/screen_patterns.py
+  - tools/check-screen-patterns.py
+root_class: 'a plan change that brings a screen into Block A, judged only against the bundle the release cuts after
+  its gate'
+tickets:
+  started:
+  - '32301 ([BE] getMenu, Ready for QA, Sanket Keluskar) and 32302 ([BE] setMenuItemDailyCount, Ready for QA, Sanket
+    Keluskar): they link BO-140, whose wave line alone moved; nothing to do.'
+  unstarted:
+  - 'The frontend tasks of BO-134, BO-140, BO-873, BO-881, CMS-021 and CMS-030 (created by r11, all New): the screens
+    are wave 1; BO-134 shows the outlet''s ticket targets (getKitchenSla) and saves them through Save ticket targets
+    (setKitchenSla); BO-881 opens its fields on getStaffingRules; CMS-030 lists the change sets (listPrivacyChangeSets)
+    and its governance form picks the document version from listPrivacyNoticePolicy.'
+  - 'New back-end work the next release plans: getStaffingRules (GET /staffing-rules, WORKFORCE_VIEW, 404 until the
+    venue has set its rules) and listPrivacyChangeSets (GET /privacy-testing, GUEST_VIEW, brand level, cursor-paged).'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open

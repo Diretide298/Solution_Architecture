@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Workforce
   version: 1.0.0
-  x-ticvai-screen-count: 46
+  x-ticvai-screen-count: 47
   x-ticvai-module: "18 — Employee Mobile App & AI Assistant (workforce)"
   x-ticvai-platforms:
     - P06 Venue Staff App
@@ -1054,6 +1054,41 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /staffing-rules:
+    get:
+      operationId: getStaffingRules
+      x-ticvai-consumed-by:
+        - "P08 BO-881 Overtime & Working-Hour Rules"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue, as `setStaffingRules` stores it. There is no key in the path.'
+      x-ticvai-audience:
+      - staff
+      x-ticvai-read-routing: replica
+      x-ticvai-agreed: '31 October 2026: contract gap CHG-R12GT-001 (BO-881 edits the rules with setStaffingRules and nothing read them back); shape follows setStaffingRules, as getKitchenSla follows setKitchenSla (CHG-WIR-011)'
+      summary: Minimum cover, working-hour limits and overtime (read)
+      description: 'The venue''s staffing rules as `setStaffingRules` stored them: the `workforce.staffing_rules` row and
+        its `workforce.position_requirement` rows as `minimumCover`. BO-881 opens on it, so a manager edits the rules
+        the rota is checked against (`createRotaAssignment` and `updateRotaAssignment` read the same row for
+        `breachesWorkingHourLimit`) instead of a blank form. **404 until the venue has set them**: the screen shows its
+        first-run state and the working-hour flag reads no limit, as it does today.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffingRules'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setStaffingRules
       x-ticvai-consumed-by:

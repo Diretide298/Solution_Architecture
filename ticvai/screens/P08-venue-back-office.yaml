@@ -35359,7 +35359,7 @@ screens:
   name: Kitchen & Preparation Stations
   module: Food & Beverage
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: PRODUCT_VIEW
   implementation:
     app: venue-management-web
@@ -35431,6 +35431,16 @@ screens:
       - kind: searchField
         label: Search kitchen
         provenance: carried from the previous definition
+      - kind: detailPanel
+        label: The outlet's ticket targets
+        bindsTo: KitchenSla
+        columns:
+        - KitchenSla.targets
+        - KitchenSla.priorityWeights
+        operation: getKitchenSla
+        notes: How long a ticket may sit per service mode, and the weights that push it up the rail, for the
+          outlet chosen in Outlet id, as `setKitchenSla` stored them. A 404 is an outlet with no targets yet.
+        provenance: contract fnb.yaml GET /outlets/{outletId}/kitchen-sla (CHG-R12GT-001)
     - name: contextPanel
       slot: selection
       components:
@@ -35461,6 +35471,10 @@ screens:
         notes: '**Kitchen printers are in release 1 (decided 2 October 2026 by Chinmay, DEC-187)**, assigned
           per station; prep sheets print from the venue template (DEC-185).'
         provenance: contract fnb.yaml POST /production-plans/{planId}/prep-sheet
+      - kind: secondaryButton
+        label: Save ticket targets
+        operation: setKitchenSla
+        provenance: contract fnb.yaml PUT /outlets/{outletId}/kitchen-sla (CHG-R12GT-001)
   states:
     loading: The kitchen preparation stations list.
     error: Could not load. Names which read failed and leaves the kitchen preparation stations untouched.
@@ -35492,6 +35506,12 @@ screens:
     provenance: decided 29 September, VM close-out (venue management and configuration)
     invalidates:
     - listKitchenStations
+    - getKitchenSla
+  - operationId: getKitchenSla
+    contract: fnb
+    purpose: The outlet's ticket targets and priority weights, as setKitchenSla stored them
+    trigger: onAction
+    provenance: r12 gate, 31 October 2026 (CHG-R12GT-001; check-screen-patterns READ)
   - operationId: listOutlets
     contract: tenancy
     purpose: The outlets whose kitchen SLA is set (setKitchenSla is per outlet)
@@ -35559,6 +35579,24 @@ screens:
       - target
       - stationIds
     provenance: contract fnb.yaml POST /production-plans/{planId}/prep-sheet
+  - id: formSetKitchenSla
+    component: modal
+    trigger: Save ticket targets
+    body: '**Collects what `setKitchenSla` sends before it is called**, opened on the outlet''s targets as
+      `getKitchenSla` returns them. Required: `targets` (a service mode and its minutes each). Optional:
+      `priorityWeights`. The targets and weights are replaced whole. Dismissing sends nothing; the screen
+      behind is unchanged.'
+    confirm:
+      label: Save ticket targets
+      operation: setKitchenSla
+    dismiss:
+      label: Cancel
+      discards:
+      - targets
+      - priorityWeights
+    reads:
+    - getKitchenSla
+    provenance: contract fnb.yaml PUT /outlets/{outletId}/kitchen-sla (CHG-R12GT-001)
 - id: BO-135
   name: Order Routing & KDS/Printer Rules
   module: Food & Beverage
@@ -36308,7 +36346,7 @@ screens:
   name: Product Availability, 86 & Operational Food Safety
   module: Stock & Supply
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: PRODUCT_VIEW
   implementation:
     app: venue-management-web
@@ -123737,7 +123775,7 @@ screens:
   name: Staff Resource Directory
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   permission: USER_MANAGE
   source:
     pack: Resource_Management_Configuration_Reference.pdf
@@ -124837,7 +124875,7 @@ screens:
   name: Overtime & Working-Hour Rules
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   permission: WORKFORCE_MANAGE
   source:
     pack: Resource_Management_Configuration_Reference.pdf
@@ -124875,30 +124913,37 @@ screens:
       components:
       - kind: selectField
         label: Standard daily hours
+        operation: getStaffingRules
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall
           configure
       - kind: selectField
         label: Standard weekly hours
+        operation: getStaffingRules
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall
           configure
       - kind: selectField
         label: Maximum daily hours
+        operation: getStaffingRules
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall
           configure
       - kind: selectField
         label: Maximum weekly hours
+        operation: getStaffingRules
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall
           configure
       - kind: selectField
         label: Minimum rest period
+        operation: getStaffingRules
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall
           configure
       - kind: textField
         label: Maximum consecutive working days
+        operation: getStaffingRules
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall
           configure
       - kind: selectField
         label: Overtime threshold
+        operation: getStaffingRules
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall
           configure
     - name: actionBar
@@ -124925,6 +124970,12 @@ screens:
     invalidates:
     - getStaffingCoverage
     - validateWorkforceCompliance
+    - getStaffingRules
+  - operationId: getStaffingRules
+    contract: workforce
+    purpose: The venue's staffing rules as saved, which the fields open on
+    trigger: onLoad
+    provenance: r12 gate, 31 October 2026 (CHG-R12GT-001; closes the contract gap CHG-WIR-004 recorded)
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-881
@@ -124934,11 +124985,7 @@ screens:
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here. **Pack actions reconciled 29 September (VM close-out):** Approval required are choices
     sent by `setStaffingRules` (overtime.requiresApproval).
-  gaps:
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of staffing rules (no getStaffingRules);
-      affects BO-881 and BO-885.'
-    source: contracts/satellite/workforce.yaml#setStaffingRules
+
 - id: BO-882
   name: Workforce Integration & Synchronization Center
   module: Rentals
