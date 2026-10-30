@@ -1093,6 +1093,9 @@ paths:
       - query: assets#mediaAssetRecords
         route: service
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for Product.fromPrice, should this operation fill it; it answers fromPrice null for now (ADAM CR-358, option (a); CHG-CR358-001; check-money-currency, ADR-0018), so the read is not asked until it does'
       x-ticvai-writes:
       - table: catalogue.product_version
         for: 'a version per committed change, unless content_hash is unchanged, as updateProduct defines (ADAM CR-214; CHG-R10CAT-006)'
@@ -1697,6 +1700,9 @@ paths:
       - query: assets#mediaAssetRecords
         route: service
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for Product.fromPrice, should this operation fill it; it answers fromPrice null for now (ADAM CR-358, option (a); CHG-CR358-001; check-money-currency, ADR-0018), so the read is not asked until it does'
       summary: Copy a product as a new draft
       description: '1.1.47 and 1.1.48. `copyPriceList` and `cloneSeatMap` are the precedents and **the
         product equivalent did not exist**, so a seasonal variant was built by hand each year.
@@ -2284,6 +2290,9 @@ paths:
       - query: white-label#guidedChoiceRecords
         route: service
         for: 'what its text calls "GuidedChoice": whitelabel.guided_choice, WhiteLabel''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Product.fromPrice (ADAM CR-358, option (a); CHG-CR358-001; ADR-0018)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2330,6 +2339,15 @@ paths:
         published and on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record
         answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts
         (ADR-0025).
+
+        **Each product carries its lowest list price** (ADAM CR-358, Chinmay, 30 October 2026, option (a);
+        CHG-CR358-001). `fromPrice` is the lowest `listPrice` among the product''s sellable variants on the caller''s
+        channel now, in the venue''s trading currency (read through `tenancy#venueSettingsRecords`), by the same
+        price-list rule as `searchCatalogue`''s `fromPrice` and `ProductVariant.listPrice`; null where no price list
+        prices it on that channel. The channel is the caller''s: a credential names it, a visitor sends `channel`
+        (`web` or `mobile`), and absent with no credential it is `web`. Other operations that answer `Product` leave
+        `fromPrice` null for now. WEB-035 and GST-044 show it as the price charged, and converted at the selected rate
+        as the price shown, marked approx. where the currency is not chargeable.
 
         
 
@@ -2411,6 +2429,14 @@ paths:
           items:
             type: string
             format: uuid
+      - name: channel
+        in: query
+        required: false
+        description: 'The channel `Product.fromPrice` is priced for (ADAM CR-358, option (a); CHG-CR358-001), as
+          `listProductVariants`'' `channel`. A guest or staff credential already names it and may leave it out; a
+          visitor with no credential sends `web` or `mobile`. Absent with no credential: `web`.'
+        schema:
+          $ref: '#/components/schemas/Channel'
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue
@@ -2453,6 +2479,9 @@ paths:
       - query: assets#mediaAssetRecords
         route: service
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for Product.fromPrice, should this operation fill it; it answers fromPrice null for now (ADAM CR-358, option (a); CHG-CR358-001; check-money-currency, ADR-0018), so the read is not asked until it does'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -2881,6 +2910,9 @@ paths:
       - query: assets#mediaAssetRecords
         route: in-process
         for: 'a guest read''s ProductMedia url and thumbnailUrl: the asset''s stable CDN address when it is public and ready (assets.media_asset), Assets'' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for Product.fromPrice, should this operation fill it; it answers fromPrice null for now (ADAM CR-358, option (a); CHG-CR358-001; check-money-currency, ADR-0018), so the read is not asked until it does'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -2957,6 +2989,9 @@ paths:
       - query: assets#mediaAssetRecords
         route: service
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for Product.fromPrice, should this operation fill it; it answers fromPrice null for now (ADAM CR-358, option (a); CHG-CR358-001; check-money-currency, ADR-0018), so the read is not asked until it does'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -5257,6 +5292,9 @@ paths:
       - query: assets#mediaAssetRecords
         route: service
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for Product.fromPrice, should this operation fill it; it answers fromPrice null for now (ADAM CR-358, option (a); CHG-CR358-001; check-money-currency, ADR-0018), so the read is not asked until it does'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: M17-04 (MoM 17 September): partners never create products, prices
@@ -24374,6 +24412,18 @@ components:
           maxLength: 200
         description:
           type: string
+        fromPrice:
+          oneOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          readOnly: true
+          x-ticvai-persisted: false
+          description: '**The lowest list price on the caller''s channel now** (ADAM CR-358, option (a); CHG-CR358-001):
+            the lowest `listPrice` among the product''s sellable variants on the caller''s channel, in the same currency
+            as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`''s `fromPrice` and
+            `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on
+            input. Null where no price list prices it on that channel, and null from every other operation that answers
+            `Product` for now.'
         nameLocalised:
           allOf:
           - $ref: '#/components/schemas/LocalisedText'

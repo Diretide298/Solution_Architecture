@@ -42,7 +42,9 @@ transitions:
   to: collected
   operation: collectShopAndDrop
   trigger: operation
-  guard: '**Came back for it the next day.** The reason uncollected is not terminal'
+  guard: '**Came back for it the next day.** The reason uncollected is not terminal. Only the call that takes the
+    last of it moves the drop: a partial take stays `uncollected`, its lines'' collectedQuantity grown, and
+    `pastCollectBy` never applies (ADAM CR-345)'
   isReversal: true
 - from: uncollected
   to: disposed

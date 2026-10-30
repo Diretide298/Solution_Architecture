@@ -1,0 +1,62 @@
+id: CHG-CR341-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'listMyOrders names no venue and reads each order''s venue settings through tenancy#venueSettingsRecords in
+  process (the venue''s row first, the tenant''s default row where a value is null) to write currency and
+  currencyScale; an order whose settings are not visible is a fault to log, never a default currency. guestAuth and
+  the venue and region settings queries state the decided guest read branch of platform.venue_settings and
+  platform.region_settings (any session with a guest subject reads; writes stay scoped; an anonymous session gains
+  nothing). orders.payment, order_line_discount and order_line_eligibility are unchanged.'
+decision:
+  what: 'ADAM CR-341, posted 30 October 2026: "Decided (Chinmay, 30 October 2026): not as recommended: option B for
+    the settings tables only. listMyOrders names no venue (no X-Venue-Id) and needs none ... What is missing is the
+    venue''s settings: platform.venue_settings, and platform.region_settings with it, get a read branch for any session
+    with a guest subject (ticvai.subject_id set); writes stay scoped and an anonymous session gains nothing. Read each
+    order''s venue settings through tenancy#venueSettingsRecords, in process, the venue''s row first and the tenant''s
+    default row where a value is null, and write currency and currencyScale from it. An order whose settings are still
+    not visible is a fault to log, never a silent default currency." Reviewed on the lead''s instruction of 30 October
+    2026: "for each one actually check if they hold and if not then find out the best way keeping in mind what client
+    needs".'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-341 (Deep Khanvilkar, #30987 listMyOrders): a guest request runs under the venue it names (CR-198) and
+  platform.venue_settings is venue-scoped only, so an order the guest placed at another venue could not be priced. Its
+  own orders and lines are already admitted by subject alone (CR-295, CHG-R11GST-001), and the payment, discount and
+  eligibility rows read through their parent; only the settings tables lacked a guest read. Builds on ADR-0018 (the
+  trading currency is frozen per venue).'
+keys_touched:
+  operations: [listMyOrders]
+  schemas: [VenueSettings, RegionSettings]
+  tables: [platform.venue_settings, platform.region_settings]
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/shared/common.yaml
+  - tools/check-business-rules.py
+root_class: 'a guest read above venue level whose published venue data sits behind a venue-only policy'
+tickets:
+  started:
+  - '30987 (listMyOrders, Deep Khanvilkar): build to CR-341''s comment and add the venueSettingsRecords read; an
+    integration test with one guest''s orders at two venues prices both once the [DB] policy is applied.'
+  - '30687 (getOrder, guest path; Ready for QA): no change; once the [DB] policy lands a guest''s order at a venue
+    other than the request''s prices correctly.'
+  unstarted:
+  - 'A [DB] child task of MIG-PLATFORM (27665) for Hrushikant: the guest read branch on platform.venue_settings and
+    platform.region_settings (listed for the lead to file with the r12 plan change).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-341
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUEST-SETTINGS
+status: open
+notes: 'The database half is not derived yet. tools/derive-ddl.py has no x-ticvai-rls mark for "the base read, or a
+  guest subject is set" (venue_settings is venue-scoped, region_settings read-beneath), and this lane may not change the
+  generator (the DDL lane owns it), so derive-ddl still writes the r11 policies and the [DB] task carries the decided
+  ones: platform.venue_settings read by venue_in_scope(venue_id) or a set ticvai.subject_id, written by
+  venue_in_scope(venue_id); platform.region_settings read by in_scope, above_scope or a set ticvai.subject_id, written by
+  in_scope. Until a mark exists, a rebuild from scratch does not carry it. Named beyond the comment''s words: guestAuth
+  names listBillingStatements beside listMyOrders as a tenant-level guest read, and the region settings branch as what
+  gives a billing statement its venue''s time zone (CR-342).'

@@ -663,6 +663,12 @@ paths:
       - query: identity#subjectRecords
         route: in-process
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'each order''s currency and currencyScale: the trading currency and scale of the order''s venue (the venue''s
+          row of platform.venue_settings, else the tenant''s default row where a value is null), read through the guest
+          read branch of platform.venue_settings (ADAM CR-341, option B for the settings tables; CHG-CR341-001; ADR-0018);
+          same deployable (commerce)'
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -678,7 +684,18 @@ paths:
 
         **Order.** Newest first, by `createdAt` descending, then by `id`.
 
-        **Statuses.** Every `status` is returned, ended ones included (`failed`, `voided`); a screen that shows only live rows filters on `status` itself.'
+        **Statuses.** Every `status` is returned, ended ones included (`failed`, `voided`); a screen that shows only live rows filters on `status` itself.
+
+        **Every venue the guest bought at** (ADAM CR-341, Chinmay, 30 October 2026, option B for the settings
+        tables only; CHG-CR341-001). `listMyOrders` names no venue (no `X-Venue-Id`) and needs none: the guest''s
+        own orders and lines are admitted by subject alone at every venue (CR-295). `orders.payment`,
+        `orders.order_line_discount` and `orders.order_line_eligibility` need no change: their read policy admits a
+        row whenever its parent order or line is visible (the scope path is their write check only), so a guest
+        already reads them for every order of its own. Each order''s venue settings are read through
+        `tenancy#venueSettingsRecords`, in process, the venue''s row first and the tenant''s default row where a value
+        is null, and `currency` and `currencyScale` are written from it; `platform.venue_settings` has a read branch
+        for any session with a guest subject (guestAuth, CR-341). An order whose settings are still not visible is a
+        fault to log, never a silent default currency.'
       tags:
       - orders
       x-ticvai-permission: null
@@ -5060,11 +5077,41 @@ paths:
         are those instants as dates in the venue''s time zone (the venue of the cycle''s order, its region settings
         read through `tenancy#regionSettingsRecords`). A cycle''s charges are its order: the renewal row''s
         `order_id`, and for the first period the agreement''s `source_order_id`. The lines, `total`, `taxTotal` and
-        `discountTotal` are worked out from that order''s lines and payments, with any `payments.dunning_case` on
-        that order as its failed attempts. The guest is the agreement''s `customer_id`, which is the guest''s
+        `discountTotal` are built from that order by the line rule below (ADAM CR-342). The guest is the agreement''s `customer_id`, which is the guest''s
         subject id (the id `subjectId` names): a guest reads the agreements whose `customer_id` is its own subject, a staff `subjectId`
         is matched against `customer_id`, and `BillingStatement.subjectId` is it. The `id` is minted as
         `BillingStatement.id` states (namespace and name), the one rule `getBillingStatement` uses too.
+
+
+        **The lines and totals** (ADAM CR-342, Chinmay, 30 October 2026, option A with refunds taken from
+        `orders.refund`; CHG-CR342-001). `listBillingStatements` and `getBillingStatement` build the same lines
+        from the cycle''s order, through one shared builder.
+
+        - `charge`: one per `orders.order_line` of the order. `amount` = its `gross_amount`, `netAmount` =
+        `net_amount`, `taxAmount` = `tax_amount`, `discountAmount` = the sum of its `orders.order_line_discount`
+        amounts, `occurredAt` = the order''s `created_at`. `taxRate`, `description` and `taxInvoiceId` come from the
+        `ledger.tax_invoice_line` issued for that line (`finance#taxInvoiceLineRecords`, by `order_line_id`), null
+        where none is visible.
+
+        - `refund`: one per `orders.refund` row of the order with `status` `completed`. `amount` =
+        `refunded_amount`, `occurredAt` = `completed_at`. A payment''s status is not a line.
+
+        - `failedAttempt`: one per `payments.dunning_case` on the order (CR-303). `amount` = `overdue_amount`, or
+        the order''s `gross_amount` when it is null; `occurredAt` = `first_failed_at`; `declineClass` =
+        `decline_class`.
+
+        - `adjustment`: none, until a source is named.
+
+        Lines run oldest first by `occurredAt`. `total` = the order''s `gross_amount` less its completed refunds;
+        `taxTotal` = its `tax_amount`; `discountTotal` = the charge lines'' `discountAmount` summed. Money is in the
+        trading currency of the order''s venue (`tenancy#venueSettingsRecords`).
+
+        **Not listed** (ADAM CR-342): a cycle with no order, and an open-ended first period (no completed renewal
+        and a null `expires_at`); `getBillingStatement` answers `404` for it.
+
+        **A guest''s dunning cases and tax invoices** (ADAM CR-342). A guest reads its dunning cases and tax invoices
+        by its own subject once the database task that gives them a guest read lands; until then they are simply
+        absent from its statement (no failed-attempt lines, no invoice on a charge), never another guest''s.
 
 
         **Order.** Most recent period first: `periodStart` descending, then `id` (one order; ADAM CR-099).'
@@ -5077,6 +5124,14 @@ paths:
         route: in-process
         for: 'the time zone the cycle''s dates are in: the region settings at or above the scope_path of the cycle''s
           order (RegionSettingsAtOrAbove), in the read''s transaction (ADAM CR-303, option A); same deployable (commerce)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the trading currency and scale of the order''s venue, which every Money of the statement is in (ADAM
+          CR-342; ADR-0018); same deployable (commerce)'
+      - query: finance#taxInvoiceLineRecords
+        route: in-process
+        for: 'a charge line''s taxRate, description and taxInvoiceId: the ledger.tax_invoice_line issued for its order
+          line, by order_line_id, Ledger''s data (ADAM CR-342); same deployable (commerce)'
       x-ticvai-reads:
       - table: orders.membership_renewal
         for: 'the billing cycles: an agreement''s completed renewal rows, each one statement, and the first expiry
@@ -5084,6 +5139,16 @@ paths:
       - table: orders.order_line
         for: 'the lines of the cycle''s order, which the statement''s lines and totals are worked out from (ADAM CR-303,
           option A)'
+      - table: orders.sales_order
+        for: 'the cycle''s order: its venue, created_at (a charge''s occurredAt), gross_amount and tax_amount (total and
+          taxTotal) (ADAM CR-342)'
+      - table: orders.order_line_discount
+        for: 'a charge line''s discountAmount: the sum of its order line''s discount amounts (ADAM CR-342)'
+      - table: orders.refund
+        for: 'the refund lines: the order''s refunds with status completed, refunded_amount and completed_at (ADAM CR-342)'
+      - table: payments.dunning_case
+        for: 'the failed-attempt lines: the dunning cases on the order (CR-303), overdue_amount, first_failed_at and
+          decline_class (ADAM CR-342)'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -5144,7 +5209,8 @@ paths:
       x-ticvai-read-via:
       - query: finance#taxInvoiceLineRecords
         route: in-process
-        for: 'its read of ledger.tax_invoice_line, Ledger''s data (CHG-MOD-001)'
+        for: 'its read of ledger.tax_invoice_line, Ledger''s data (CHG-MOD-001): a charge line''s taxRate, description
+          and taxInvoiceId, the line issued for its order line, by order_line_id (ADAM CR-342)'
       - query: identity#customerMembershipRecords
         route: in-process
         for: 'the membership agreements whose billing cycles it recomputes the statement ids of, to find the one
@@ -5154,6 +5220,10 @@ paths:
         route: in-process
         for: 'the time zone the cycle''s dates are in: the region settings at or above the scope_path of the cycle''s
           order (RegionSettingsAtOrAbove), in the read''s transaction (ADAM CR-303, option A); same deployable (commerce)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the trading currency and scale of the order''s venue, which every Money of the statement is in (ADAM
+          CR-342; ADR-0018); same deployable (commerce)'
       x-ticvai-reads:
       - table: orders.membership_renewal
         for: 'the billing cycles: an agreement''s completed renewal rows, each one statement, and the first expiry
@@ -5161,6 +5231,16 @@ paths:
       - table: orders.order_line
         for: 'the lines of the cycle''s order, which the statement''s lines and totals are worked out from (ADAM CR-303,
           option A)'
+      - table: orders.sales_order
+        for: 'the cycle''s order: its venue, created_at (a charge''s occurredAt), gross_amount and tax_amount (total and
+          taxTotal) (ADAM CR-342)'
+      - table: orders.order_line_discount
+        for: 'a charge line''s discountAmount: the sum of its order line''s discount amounts (ADAM CR-342)'
+      - table: orders.refund
+        for: 'the refund lines: the order''s refunds with status completed, refunded_amount and completed_at (ADAM CR-342)'
+      - table: payments.dunning_case
+        for: 'the failed-attempt lines: the dunning cases on the order (CR-303), overdue_amount, first_failed_at and
+          decline_class (ADAM CR-342)'
       x-ticvai-audience:
       - guest
       - staff
@@ -5170,6 +5250,14 @@ paths:
 
         **A failed attempt appears as a line.** A statement that shows only successful charges
         cannot explain why a pass lapsed, which is the question somebody is reading it to answer.
+
+        **The same lines as the list** (ADAM CR-342, Chinmay, 30 October 2026; CHG-CR342-001). The statement''s
+        lines and totals are built from the cycle''s order by the line rule `listBillingStatements` states, through
+        the one shared builder: charges from its `orders.order_line` rows (with `orders.order_line_discount` and the
+        `ledger.tax_invoice_line` issued for each, `finance#taxInvoiceLineRecords`), refunds from its completed
+        `orders.refund` rows, failed attempts from its `payments.dunning_case` rows, no adjustments, Money in the
+        trading currency of the order''s venue (`tenancy#venueSettingsRecords`). A cycle `listBillingStatements`
+        does not list (no order, or an open-ended first period) is `404`.
 
         '
       tags:
@@ -23912,43 +24000,63 @@ components:
         occurredAt:
           type: string
           format: date-time
+          description: 'A `charge`: the order''s `created_at`; a `refund`: the refund''s `completed_at`; a
+            `failedAttempt`: the dunning case''s `first_failed_at` (ADAM CR-342). Lines run oldest first by it.'
         kind:
           type: string
+          description: 'One `charge` per orders.order_line of the cycle''s order, one `refund` per orders.refund row of
+            it with status completed, one `failedAttempt` per payments.dunning_case on it; no `adjustment` until a
+            source is named (ADAM CR-342).'
           enum:
           - charge
           - refund
           - failedAttempt
           - adjustment
         amount:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: 'A `charge`: the line''s `gross_amount`; a `refund`: `refunded_amount`; a `failedAttempt`: the
+            case''s `overdue_amount`, or the order''s `gross_amount` when that is null (ADAM CR-342). In the trading
+            currency of the order''s venue.'
         description:
           type: string
+          description: 'A `charge`: the `description` of the ledger.tax_invoice_line issued for its order line, null
+            where none is visible (ADAM CR-342).'
         netAmount:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: A `charge`'s order line `net_amount` (ADAM CR-342).
         discountAmount:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: A `charge`'s order line discounts summed, its orders.order_line_discount amounts (ADAM CR-342).
         taxAmount:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: A `charge`'s order line `tax_amount` (ADAM CR-342).
         taxRate:
           type: number
           nullable: true
-          description: 2.14.23. The VAT rate the charge was posted with; `amount` is the gross.
+          description: 2.14.23. The VAT rate the charge was posted with; `amount` is the gross. The `tax_rate` of the
+            ledger.tax_invoice_line issued for the charge's order line (finance#taxInvoiceLineRecords, by
+            order_line_id), null where none is visible (ADAM CR-342).
         taxInvoiceId:
           type: string
           format: uuid
           nullable: true
           description: The finance tax invoice issued for this charge, where one was (`issueTaxInvoice`); the
-            guest downloads it with `getTaxDocumentRendition`.
+            guest downloads it with `getTaxDocumentRendition`. The `tax_invoice_id` of the ledger.tax_invoice_line
+            issued for the charge's order line, null where none is visible (ADAM CR-342).
         declineClass:
           type: string
           nullable: true
           description: >
             **Present on `failedAttempt` only**, and it is what turns *"your payment failed"* into
             something a guest can act on: a soft decline means try again, a hard one means the
-            card needs replacing.
+            card needs replacing. The dunning case's `decline_class` (ADAM CR-342).
 
     BillingStatement:
-      x-ticvai-persistence: none — computed from orders.membership_renewal, the cycle's order (orders.sales_order, orders.order_line, orders.payment) and payments.dunning_case
+      x-ticvai-persistence: none — computed from orders.membership_renewal, the cycle's order (orders.sales_order, orders.order_line, orders.order_line_discount, orders.refund), payments.dunning_case and ledger.tax_invoice_line (ADAM CR-342)
       type: object
       description: >
         2.14.19-2.14.23, 5.7.96, BL-100. **What a guest was charged over a period, and
@@ -23999,11 +24107,17 @@ components:
           items:
             $ref: '#/components/schemas/BillingStatementLine'
         total:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: The cycle's order's `gross_amount` less its completed refunds (ADAM CR-342).
         taxTotal:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: The cycle's order's `tax_amount` (ADAM CR-342).
         discountTotal:
-          $ref: ../shared/common.yaml#/components/schemas/Money
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          description: The charge lines' `discountAmount` summed (ADAM CR-342).
         pdfUrl:
           type: string
           format: uri
