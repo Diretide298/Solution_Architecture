@@ -1,0 +1,48 @@
+id: CHG-R12DB-001
+date: '2026-10-30'
+source: audit
+kind: spec
+summary: 'provision-tenant.sh could not provision a tenant from the package as shipped: it stopped at r1''s 010-pii.sql,
+  whose pii.subject.kind and pii.subject_contact.kind are typed pii.subject_kind and pii.contact_kind, types no file creates.
+  Provisioning now creates both as domains over text with CHG-R6-001''s values before the baseline files, and the forward
+  migration makes each column text NOT NULL with subject_kind_chk and subject_contact_kind_chk and drops the domain, guarded,
+  so a database already holding that end state (live) is left as it is.'
+decision:
+  what: 'The lead approved the r12 database lane on 30 October 2026: the package must provision a tenant as shipped, to
+    CHG-R6-001''s end state, without editing the frozen 010-pii.sql or adding a baseline file. Domains first, then a guarded
+    conversion: a domain over text with the value check is the type the baseline names, so the frozen file applies as written
+    and any row it could hold already satisfies the decided CHECK; the conversion is a binary-compatible ALTER COLUMN TYPE
+    (no table rewrite), then the named CHECK, then the domain dropped, each step guarded on the state it changes, so live
+    (text with the checks, no domains) and a second run do nothing. derive-ddl finds such types itself in the baseline at
+    the tag, so a type like them is handled the same way.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'Found by the live comparison of 30 October 2026 (live''s tenant and control schemas, PostgreSQL 17.6, compared with
+  r11 object by object): the reference build had to apply CHG-R6-001 by hand to get past 010-pii.sql. Builds on CHG-R6-001
+  (ADAM CR-001), whose D-UNDEFINED-TYPE read the schema reference, already right, rather than the frozen file provisioning
+  runs, and on CHG-R9MIG-002 (every forward statement guarded).'
+keys_touched:
+  tables:
+  - pii.subject
+  - pii.subject_contact
+  files:
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  - tools/check-ddl-conventions.py
+  - backend/MIGRATIONS.md
+root_class: a frozen baseline file naming a type no provisioning step creates, checked against the schema reference instead
+  of against what provisioning applies
+tickets:
+  started:
+  - '27650 ([DB] V0007 pii), 30171 (pii.subject), 30173 (pii.subject_contact): nothing to change. Live and db/ already have
+    both columns text NOT NULL with subject_kind_chk and subject_contact_kind_chk (MIG-PII), where the forward migration''s
+    blocks do nothing.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the live database comparison of 30 October 2026 (the r12 database lane)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py::D-PROVISION-TYPE
+status: open

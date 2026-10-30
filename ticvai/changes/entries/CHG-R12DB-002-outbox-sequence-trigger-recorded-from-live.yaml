@@ -1,0 +1,43 @@
+id: CHG-R12DB-002
+date: '2026-10-30'
+source: audit
+kind: spec
+summary: platform.outbox_advance_sequence() and its trigger outbox_advance_sequence on platform.outbox (AFTER INSERT, WHEN
+  new.sequence > 0), and the CHECK outbox_sequence_last_sequence_chk (last_sequence > 0) on platform.outbox_sequence, which
+  live has from the developers' migration 240 and the package did not, are recorded verbatim in docs/active/recorded-ddl/tenant.sql
+  and reach databases through the forward migration as guarded blocks.
+decision:
+  what: 'The lead, 30 October 2026: "Record all" (live''s own additions). A recorded function is created where it is missing
+    or its text differs with carriage returns taken out (live''s copies carry CRLF line endings from Windows checkouts,
+    which git cannot keep), so on live nothing is replaced; the trigger is CREATE OR REPLACE TRIGGER where its tables, columns
+    and function are; the CHECK is added NOT VALID and validated where no constraint of its name is yet.'
+  by: Chinmay
+  date: '2026-10-30'
+why: the live comparison of 30 October 2026 (live's tenant and control schemas, PostgreSQL 17.6, compared with r11 object
+  by object), section 3 (on live, not in the package). ADR-0058 is the outbox's; the counter is ADAM CR-166 (CHG-CRA-005).
+  The trigger keeps the counter at the highest sequence written, where the hosts' own allocation (INSERT ... ON CONFLICT
+  ... RETURNING) already leaves it, so it is a floor and changes no writer.
+keys_touched:
+  tables:
+  - platform.outbox
+  - platform.outbox_sequence
+  files:
+  - docs/active/recorded-ddl/tenant.sql
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  - tools/check-ddl-conventions.py
+  - backend/MIGRATIONS.md
+root_class: a database rule a developers' migration added that the package never recorded
+tickets:
+  started:
+  - '30334 ([DB] platform.outbox), 27665 ([DB] V0017 platform): nothing to change; live and migration 240 already have the
+    function, the trigger and the CHECK, and the forward migration''s blocks leave them.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the live database comparison of 30 October 2026 (the r12 database lane)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py::D-RECORDED
+status: open

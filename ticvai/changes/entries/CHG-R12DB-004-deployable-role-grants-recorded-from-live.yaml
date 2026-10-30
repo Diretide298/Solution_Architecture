@@ -1,0 +1,41 @@
+id: CHG-R12DB-004
+date: '2026-10-30'
+source: audit
+kind: spec
+summary: 'platform.apply_deployable_grants() and platform.grant_schema_to_role(text, text, boolean), the developers'' migration
+  004 (deployable roles), are recorded verbatim in both databases (each its own version) and reach them through the forward
+  migration. Reconciled with derive-ddl''s deployable_read_grants(), not duplicated: the functions grant each deployable
+  its own schemas and the kernel tables; the generated grants are the reads across deployables (cross-deployable-writes.yaml
+  `reads`), which the functions do not make.'
+decision:
+  what: 'The lead, 30 October 2026: "Record all" (live''s own additions). The recorded owners are exactly handoff/service-decomposition.json''s
+    deployables and schemas, and the kernel grants exactly cross-deployable-writes.yaml `kernel`; a check fails if either
+    drifts, so ownership keeps one source. The package does not call apply_deployable_grants: the migrator does, where the
+    roles exist.'
+  by: Chinmay
+  date: '2026-10-30'
+why: the live comparison of 30 October 2026 (live's tenant and control schemas, PostgreSQL 17.6, compared with r11 object
+  by object), section 3. DB-ROLES (ticket 27655) and ADR-0055; CHG-R9CR-005 and CHG-R10CRF-007 (the generated reads and
+  their schema USAGE).
+keys_touched:
+  files:
+  - docs/active/recorded-ddl/tenant.sql
+  - docs/active/recorded-ddl/control.sql
+  - tools/derive-ddl.py
+  - tools/check-ddl-conventions.py
+  - backend/MIGRATIONS.md
+root_class: a database rule a developers' migration added that the package never recorded
+tickets:
+  started:
+  - '27655 ([BE] one Postgres role per deployable): nothing to change. A later change to migration 004''s owners or kernel
+    grants must match service-decomposition.json and cross-deployable-writes.yaml, and docs/active/recorded-ddl changes
+    with it.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the live database comparison of 30 October 2026 (the r12 database lane)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py::D-RECORDED-GRANTS
+status: open

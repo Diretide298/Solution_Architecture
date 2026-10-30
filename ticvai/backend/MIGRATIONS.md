@@ -74,6 +74,24 @@ ticket carries the same sentence, and a V01nn file that changes a table it does 
 an index) is named on the ticket whose migration creates that table, as "Source DDL after r1", because
 the 010 files are frozen at r1 (`tools/check-migration-wording.py`).
 
+**Helpers our team's migrations made, recorded in the package** (the live comparison of 30 October 2026; the lead:
+"Record all"; CHG-R12DB-002 to CHG-R12DB-006). Beside 920's helpers: the row-security helper
+`platform.apply_statement_scope_rls(regclass)` (our migration 225: the scope rule read once per statement, on live
+access.scan_event's policy), the deployable-role grants `platform.grant_schema_to_role(text, text, boolean)` and
+`platform.apply_deployable_grants()` (migration 004, DB-ROLES; one version in each database, and the reads granted
+across deployables stay the generated `reads` grants), the outbox counter trigger `platform.outbox_advance_sequence()`
+on platform.outbox with the CHECK `outbox_sequence_last_sequence_chk` (migration 240), and the journal entry's legal
+entity `ledger.journal_entry_legal_entity_sync()` with its trigger and the CHECK `journal_entry_legal_entity_id_chk`
+(ADAM CR-168). Beside 930's partition helpers: `platform.detach_month_partitions_before(regclass, date)` (migration
+050, retention). Their text is in `docs/active/recorded-ddl/` and reaches a database through derive-ddl's forward
+migration, each a guarded block that leaves a database already holding it as it is.
+
+**Provisioning a tenant from the package** (CHG-R12DB-001). r1's 010-pii.sql types pii.subject.kind and
+pii.subject_contact.kind with two enum types nothing creates; CHG-R6-001 made them text with a CHECK, as our MIG-PII
+does. `provision-tenant.sh` creates the two types as domains before the baseline files, and the forward migration
+makes each column text with its named CHECK and drops the domain; on a database whose columns are already text (live,
+our db/) the block does nothing.
+
 The numbering:
 
 | Range | What | Who numbers it |
