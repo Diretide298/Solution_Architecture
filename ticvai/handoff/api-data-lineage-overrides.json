@@ -12092,10 +12092,9 @@
     "pii.subject_contact"
    ],
    "writes": [
-    "identity.otp_challenge",
-    "platform.outbox"
+    "identity.otp_challenge"
    ],
-   "reason": "adds platform.outbox for purpose passwordReset (identity.credentialResetRequested); 14 October 2026 (CHG-CRD-005, ADAM CR-078): a newer code invalidates the older one for the identifier and purpose; resendAfter (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "platform.outbox now derived from x-ticvai-emits identity.guestCodeIssued (ADAM CR-370, CHG-CR370-001; it also carries identity.credentialResetRequested for purpose passwordReset); 14 October 2026 (CHG-CRD-005, ADAM CR-078): a newer code invalidates the older one for the identifier and purpose; resendAfter (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "requestPricingRollback": {
@@ -16727,10 +16726,9 @@
    ],
    "writes": [
     "identity.otp_challenge",
-    "marketing.message_dispatch",
     "pii.subject"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); marketing.message_dispatch dropped: mode send emits identity.guestCodeIssued, Marketing writes its own row (ADAM CR-370, CHG-CR370-001)",
    "carried": true
   },
   "verifyGuestOtp": {

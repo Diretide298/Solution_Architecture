@@ -723,10 +723,9 @@ paths:
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
-        for: 'the venue''s guest code attempt limit (VenueSettings.identity), Tenancy''s data (r8 integration, CHG-R8INT-014)'
-      x-ticvai-write-via:
-      - table: marketing.message_dispatch
-        operation: sendTransactionalMessage
+        for: 'the venue''s guest code attempt limit and the code''s lifetime and resend interval (VenueSettings.identity: guestOtpMaxAttempts, guestOtpLifetimeSeconds, guestOtpResendSeconds), Tenancy''s data (r8 integration, CHG-R8INT-014; ADAM CR-370)'
+      x-ticvai-emits:
+      - identity.guestCodeIssued
       security:
       - guestAuth: []
       - {}
@@ -738,6 +737,12 @@ paths:
         `attemptsRemaining`, as `verifyMfaChallenge` answers, and the last wrong one voids the code (`410
         verification-token-expired`; ask for a new `send`). The session is the guest''s own (`guestAuth`), so the code needs no
         address. The link path (`send` an emailed single-use link, `confirm` its `token`) stays for emailed links.
+
+        **`mode` `send` emits `identity.guestCodeIssued`** (decided 30 October 2026, Chinmay, ADAM CR-370;
+        CHG-CR370-001) in the same transaction as its `otp_challenge` row, as `requestGuestOtp` does, instead of
+        calling Marketing''s `sendTransactionalMessage`: Identity and Marketing are in different deployables, so there is
+        no in-process write. Destination and code travel field-encrypted, and Marketing''s `sendGuestOneTimeCode` sends
+        them.
 
         **Raised in review by Deep.** `registerGuest` creates an account and nothing verifies
         the address on it — and **a guest account with an unverified email can receive somebody else''s
@@ -3363,7 +3368,7 @@ paths:
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
-        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts; guestOtpLifetimeSeconds and guestOtpResendSeconds, ADAM CR-370) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-audience:
       - anonymous
       summary: Create a guest account
@@ -3378,7 +3383,10 @@ paths:
         IDENTITY-C38): an `identity.otp_challenge` row with purpose `emailVerification`, channel `email`, and the venue''s
         attempt limit, which the guest enters through `verifyGuestEmail` with `mode` `code`. The `GuestSession` returned
         here is the session the guest continues in; it becomes verified when the code is confirmed, and
-        `linkGuestCheckout` then runs under that same session.
+        `linkGuestCheckout` then runs under that same session. **The code is carried as `requestGuestOtp` carries
+        it** (ADAM CR-370; CHG-CR370-001): `identity.guestCodeIssued` in the same transaction as the
+        `otp_challenge` row, destination and code field-encrypted, sent by Marketing''s `sendGuestOneTimeCode`; its
+        lifetime and resend interval are `guestOtpLifetimeSeconds` and `guestOtpResendSeconds`.
 
         **The consents given at registration are recorded by Marketing, which owns consent** (20 October 2026, R8
         blocker cause IDENTITY-C55; CHG-R8SPN-029). Identity stores none of them: in the same transaction as the
@@ -3398,6 +3406,7 @@ paths:
       - guestAuth
       x-ticvai-emits:
       - identity.guestRegistered
+      - identity.guestCodeIssued
       x-ticvai-permission: null
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3442,7 +3451,9 @@ paths:
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
-        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts; guestOtpLifetimeSeconds and guestOtpResendSeconds, ADAM CR-370) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
+      x-ticvai-emits:
+      - identity.guestCodeIssued
       x-ticvai-audience:
       - anonymous
       summary: Request a one-time code
@@ -3455,6 +3466,28 @@ paths:
         `guestSelfService`, the identifier hashed with the tenant key) whether or not the identifier exists
         (29 September, build pass, group G2; 8.3.34): a burst of resets against identifiers that resolve to
         nobody is the pattern worth seeing, and the answer to the caller stays the same.
+
+
+        **How the code reaches the guest** (decided 30 October 2026, Chinmay, ADAM CR-370, with its follow-up of 31
+        October; CHG-CR370-001). Identity and Marketing are in different deployables, so no in-process call: in the same
+        transaction as the `identity.otp_challenge` row this writes `identity.guestCodeIssued` v1 to the outbox, carrying
+        `subjectId`, `challengeId`, `channel`, `purpose`, `locale`, `expiresAt`, and `destination` and `code`, both
+        field-encrypted through the kernel''s field encryption (#37050, `x-ticvai-secret: field-encrypted`), never in
+        clear. Marketing''s `sendGuestOneTimeCode`, invoked by the relay, decrypts at send time and sends it. Until #37050
+        is Ready for QA the delivery seam (`IGuestCodeDelivery`) keeps its log-only default and no code is put in the
+        outbox.
+
+
+        **An identifier that resolves to nobody** (the CR-370 follow-up, 31 October 2026). With purpose `login`,
+        `passwordReset` or `stepUp` nothing is written for the code (no `otp_challenge` row, no
+        `identity.guestCodeIssued`) and the answer is the same `202`; `passwordReset` still publishes
+        `identity.credentialResetRequested`, as above. With purpose `register` or `verify` an identifier with no account
+        still gets a code: the `otp_challenge` row and `identity.guestCodeIssued` are written with `subjectId` null.
+
+
+        **Lifetime and resend interval** (ADAM CR-370). `VenueSettings.identity.guestOtpLifetimeSeconds` (default 600)
+        and `guestOtpResendSeconds` (default 60), read from the tenant default as `guestOtpMaxAttempts` is, are written
+        to `otp_challenge.expires_at` and `resend_after` and answered as `expiresInSeconds` and `resendAfterSeconds`.
 
         '
       tags:
@@ -3510,8 +3543,14 @@ paths:
                 properties:
                   expiresInSeconds:
                     type: integer
+                    description: '`VenueSettings.identity.guestOtpLifetimeSeconds` of the tenant default (600 unless the
+                      tenant sets it), as written to `otp_challenge.expires_at` (ADAM CR-370). The screens drive the
+                      code''s expiry from it.'
                   resendAfterSeconds:
                     type: integer
+                    description: '`VenueSettings.identity.guestOtpResendSeconds` of the tenant default (60 unless the
+                      tenant sets it), as written to `otp_challenge.resend_after` (ADAM CR-370). The screens drive the
+                      resend countdown from it, never a fixed number.'
         '429':
           $ref: ../shared/common.yaml#/components/responses/TooManyRequests
   /auth/guest/otp/verify:
@@ -9678,9 +9717,11 @@ components:
         writes one per send (a newer one for the same identifier and purpose invalidates the older); `verifyGuestOtp`
         reads it by `identifierHash`, counts wrong codes in `failedAttempts` up to `attemptLimit` and sets `consumedAt`
         on success; `verifyGuestEmail` writes the `send` half''s token and consumes it on `confirm`. **`subjectId` is
-        null where no account exists yet** (purpose `register`, or an identifier that resolves to nobody, which is sent
-        nothing and answered the same): under the subject policy (920) such a row is reachable only in the tenant-root
-        context.'
+        null where no account exists yet**: purpose `register` or `verify` to an identifier with no account, which
+        still gets a code (ADAM CR-370 follow-up, 31 October 2026). With purpose `login`, `passwordReset` or `stepUp`
+        an identifier that resolves to nobody gets no row and no code, and the same answer. Under the subject policy
+        (920) a row with no subject is reachable only in the tenant-root context. **Each row is sent by
+        `identity.guestCodeIssued`** (ADAM CR-370), written in the same transaction.'
       required: [identifierHash, channel, purpose, codeHash, expiresAt, failedAttempts, attemptLimit]
       properties:
         subjectId:
@@ -9709,8 +9750,15 @@ components:
           maximum: 10
           description: '`VenueSettings.identity.guestOtpMaxAttempts` when the code was sent (audit R094); reaching it
             invalidates the code.'
-        expiresAt: { type: string, format: date-time }
-        resendAfter: { type: string, format: date-time, nullable: true }
+        expiresAt:
+          type: string
+          format: date-time
+          description: The send time plus `VenueSettings.identity.guestOtpLifetimeSeconds` (ADAM CR-370).
+        resendAfter:
+          type: string
+          format: date-time
+          nullable: true
+          description: The send time plus `VenueSettings.identity.guestOtpResendSeconds` (ADAM CR-370).
         consumedAt: { type: string, format: date-time, nullable: true }
         invalidatedAt:
           type: string

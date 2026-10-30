@@ -123,6 +123,13 @@ And one rule per decision:
   BR-REGISTER-SOURCE (r12, ADAM CR-371, CHG-CR371-001) RegisterGuestRequest.source (guestWeb, guestApp, kiosk) is what
                    identity.guestRegistered carries as channel, and its Marketing consumer maps it to a ConsentSource
                    (never registration).
+  BR-GUEST-CODE-DELIVERY (r12, ADAM CR-370 and its follow-up of 31 October, CHG-CR370-001; general) every operation
+                   that writes identity.otp_challenge either mints a code and emits identity.guestCodeIssued, or is named
+                   in GUEST_CODE_NON_ISSUERS with why it mints none; the event carries destination and code
+                   field-encrypted, never in clear, to Marketing's relay-invoked sendGuestOneTimeCode; no issuer writes
+                   marketing.message_dispatch across deployables; the lifetime and resend interval are venue settings
+                   (600 s and 60 s) answered as expiresInSeconds and resendAfterSeconds; and requestGuestOtp states who
+                   with no account still gets a code (register, verify).
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -270,6 +277,14 @@ def props(doc, node):
 
 def body_schema(op):
     return (((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema") or {}
+
+
+# BR-GUEST-CODE-DELIVERY (ADAM CR-370): writers of identity.otp_challenge that mint no code, each with why. A new writer
+# either emits identity.guestCodeIssued or is listed here.
+GUEST_CODE_ISSUERS = ("requestGuestOtp", "registerGuest", "verifyGuestEmail")
+GUEST_CODE_NON_ISSUERS = {
+    "verifyGuestOtp": "checks a code and counts wrong entries or consumes it; it mints none",
+}
 
 
 # BR-GUEST-SELF-403: guest operations scoped to the caller's subject that declared 403 on 20 October 2026 (13 on the
@@ -1149,6 +1164,55 @@ def main() -> int:
          and "source `registration`" not in text(op("recordConsent")[3]),
          "recordConsent still records registration consents with source registration, which ConsentSource lacks (CR-371)")
 
+    # BR-GUEST-CODE-DELIVERY (r12, ADAM CR-370 and its follow-up of 31 October 2026). Fails on the r11 contract.
+    lin = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
+    otp_writers = {o for o, e in lin.items() if isinstance(e, dict) and "identity.otp_challenge" in (e.get("writes") or [])}
+    otp_writers |= {oid for oid, (_f, _p, _m, o, _d) in ops.items()
+                    if any((w or {}).get("table") == "identity.otp_challenge" for w in o.get("x-ticvai-writes") or [])}
+    for oid in sorted(otp_writers | set(GUEST_CODE_ISSUERS)):
+        o = op(oid)[3]
+        if oid in GUEST_CODE_NON_ISSUERS:
+            continue
+        need("BR-GUEST-CODE-DELIVERY", "identity.guestCodeIssued" in (o.get("x-ticvai-emits") or []),
+             f"{oid} writes identity.otp_challenge (a guest code) and does not emit identity.guestCodeIssued, so nothing "
+             "carries the code to the guest; or name it in GUEST_CODE_NON_ISSUERS with why it mints none (CR-370)")
+        need("BR-GUEST-CODE-DELIVERY", not any((w or {}).get("table") == "marketing.message_dispatch"
+                                               for w in o.get("x-ticvai-write-via") or []),
+             f"{oid} still writes marketing.message_dispatch through Marketing across deployables (CR-370)")
+    gci_path = ROOT / "events" / "identity-guestCodeIssued.yaml"
+    gci = load("events/identity-guestCodeIssued.yaml") if gci_path.exists() else {}
+    gpay = {(p or {}).get("field"): p for p in gci.get("payload") or []}
+    for fld in ("destination", "code"):
+        need("BR-GUEST-CODE-DELIVERY", (gpay.get(fld) or {}).get("x-ticvai-secret") == "field-encrypted",
+             f"identity.guestCodeIssued does not carry {fld} field-encrypted (never in clear; CR-370, ADR-0063)")
+    need("BR-GUEST-CODE-DELIVERY", (gpay.get("subjectId") or {}).get("required") is False,
+         "identity.guestCodeIssued's subjectId is required, but a register or verify code to an identifier with no "
+         "account has none (the CR-370 follow-up)")
+    need("BR-GUEST-CODE-DELIVERY", any((c or {}).get("operation") == "marketing-crm.sendGuestOneTimeCode"
+                                       and (c or {}).get("idempotencyKey") == "challengeId" for c in gci.get("consumers") or []),
+         "identity.guestCodeIssued has no Marketing consumer sendGuestOneTimeCode idempotent on challengeId (CR-370)")
+    sg1 = op("sendGuestOneTimeCode")[3]
+    need("BR-GUEST-CODE-DELIVERY", "identity.guestCodeIssued" in (sg1.get("x-ticvai-consumes") or [])
+         and "guestOneTimeCode" in text(sg1) and "expiresAt" in text(sg1),
+         "marketing-crm declares no relay-invoked sendGuestOneTimeCode consuming identity.guestCodeIssued with the system "
+         "template guestOneTimeCode and the expiry rule (CR-370)")
+    vsi = (((((load("contracts/spine/tenancy.yaml").get("components") or {}).get("schemas") or {}).get("VenueSettings") or {})
+            .get("properties") or {}).get("identity") or {}).get("properties") or {}
+    for key, dflt, lo_, hi in (("guestOtpLifetimeSeconds", 600, 60, 900), ("guestOtpResendSeconds", 60, 30, 300)):
+        s_ = vsi.get(key) or {}
+        need("BR-GUEST-CODE-DELIVERY", (s_.get("default"), s_.get("minimum"), s_.get("maximum")) == (dflt, lo_, hi),
+             f"VenueSettings.identity.{key} is not default {dflt}, {lo_} to {hi} (CR-370)")
+    rg = op("requestGuestOtp")[3]
+    rp = (((((rg.get("responses") or {}).get("202") or {}).get("content") or {}).get("application/json") or {})
+          .get("schema") or {}).get("properties") or {}
+    need("BR-GUEST-CODE-DELIVERY", "guestOtpLifetimeSeconds" in str((rp.get("expiresInSeconds") or {}).get("description"))
+         and "guestOtpResendSeconds" in str((rp.get("resendAfterSeconds") or {}).get("description")),
+         "requestGuestOtp's expiresInSeconds and resendAfterSeconds do not say which settings they answer (CR-370)")
+    rgd = " ".join(str(rg.get("description") or "").split())
+    need("BR-GUEST-CODE-DELIVERY", "`register` or `verify` an identifier with no account still gets a code" in rgd,
+         "requestGuestOtp does not say that a register or verify code to an identifier with no account is still sent "
+         "(the CR-370 follow-up of 31 October 2026)")
+
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
@@ -1162,7 +1226,8 @@ def main() -> int:
              "BR-PLATFORM-INVOICE", "BR-WALLET-TOPUP-ONCE", "BR-WALLET-PUBLISH-CHECKS", "BR-WALLET-RESTORE-DRAFT",
              "BR-PLANNER-QUESTIONS", "BR-ROTA-HOUR-LIMIT", "BR-ROTA-CROSS-VENUE",
              "BR-CREDIT-ACCOUNT-CURRENCY", "BR-PLATFORM-APPROVAL-RULE", "BR-WALLET-ETAG-VERSION", "BR-GUEST-SSO",
-             "BR-CONTENT-BLOCK", "BR-SCOPE-LOOKUP", "BR-ID-RESUBMIT", "BR-DOC-NUMBER-ENC", "BR-REGISTER-SOURCE"]
+             "BR-CONTENT-BLOCK", "BR-SCOPE-LOOKUP", "BR-ID-RESUBMIT", "BR-DOC-NUMBER-ENC", "BR-REGISTER-SOURCE",
+             "BR-GUEST-CODE-DELIVERY"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
