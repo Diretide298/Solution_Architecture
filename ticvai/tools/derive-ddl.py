@@ -903,7 +903,12 @@ $$;
 #     the rows whose parent it names by a declared reference is the guest's own (`orders.order_line` and
 #     `orders.order_event` through `orders.sales_order`). The scope-path rule is written in the per-statement shape of
 #     our team's repository migration 225 (`scope_path <@ ANY ((SELECT platform.current_scope_paths())::ltree[])`,
-#     evaluated once per statement on these hot tables), and the guest's subject the same way.
+#     evaluated once per statement on these hot tables), and the guest's subject the same way. `x-ticvai-guest-subject:
+#     <property>` beside it names the guest's column where it is not `subject_id` (ledger.tax_invoice's
+#     buyerSubjectId; ADAM CR-342, CHG-R12DB-009).
+#   * `x-ticvai-guest-read: true`, a modifier beside the base rule or read-beneath (ADAM CR-341, CHG-R12DB-008): the
+#     table's own read, or any session with a guest subject set; its writes unchanged (GUEST_SET). The venue and
+#     region settings.
 #   * **The staff branch of both admits only a session with no guest subject** (CHG-R11GST-001; ADAM CR-295, option A,
 #     decided 29 October 2026). CR-198 gives a guest request a read-only scope of its venue's path, so a staff branch
 #     that tests the scope alone opened every order and cart at the venue to any guest there. The read check is
@@ -934,6 +939,12 @@ STATEMENT_SCOPE = ("{a}scope_path IS NOT NULL AND {a}scope_path <@ ANY ((SELECT 
 GUEST_SUBJECT = "{a}subject_id = (SELECT NULLIF(current_setting('ticvai.subject_id', true), '')::uuid)"
 # A session with no guest subject: the condition a staff branch beside a guest branch carries (CHG-R11GST-001, CR-295).
 NO_GUEST = "NULLIF(current_setting('ticvai.subject_id', true), '') IS NULL"
+# **Any guest reads** (ADAM CR-341, settled by the lead 30 October 2026; CHG-R12DB-008): `x-ticvai-guest-read: true` on
+# a contract schema keeps the table's own policy for writes, and reads by it or by any session with a guest subject set
+# (an anonymous session gains nothing). For the settings a guest's reads need whatever venue they name: a venue's
+# currency, time zone and region rules (platform.venue_settings, by venue_in_scope; platform.region_settings,
+# read-beneath). Defined for a table under its base rule (scope_path or venue_id) or marked read-beneath.
+GUEST_SET = "NULLIF(current_setting('ticvai.subject_id', true), '') IS NOT NULL"
 
 # The check apply_split_rls gets for `any-grant-no-delete`: a scope path set, the WITH CHECK the append-only trail's
 # INSERT has (CHG-R6-002).
@@ -2226,6 +2237,16 @@ def table_marks(cols: dict, tables) -> dict:
         rls = marks.get("x-ticvai-rls")
         if rls is not None:
             entry["rls"] = str(rls).strip()
+        # **Any guest reads** (ADAM CR-341; CHG-R12DB-008): `x-ticvai-guest-read: true` keeps the table's policy for
+        # writes and reads it, or any session with a guest subject set. See GUEST_SET.
+        if marks.get("x-ticvai-guest-read") is True:
+            entry["guest_read"] = True
+        # **The guest's own rows, by a named column** (ADAM CR-342; CHG-R12DB-009): `x-ticvai-guest-subject: <property>`
+        # beside `x-ticvai-rls: guest-reads-own` names the column holding the row's guest (ledger.tax_invoice's
+        # buyerSubjectId) where it is not `subject_id`.
+        gs = marks.get("x-ticvai-guest-subject")
+        if isinstance(gs, str) and gs.strip():
+            entry["guest_subject"] = column_of(gs.strip()) or f"?{gs.strip()}"
         # **A table that takes no scope** (CHG-R9MIG-001, CR-166): `x-ticvai-scope: none`; see DESCOPED.
         sc = marks.get("x-ticvai-scope")
         if sc is not None:
@@ -3544,6 +3565,30 @@ def main() -> int:
     parent_of = {p[0]: p for p in by_parent}
     for t in sorted(real):
         mark = (marks.get(t) or {}).get("rls") or TABLE_RLS.get(t)
+        guest_read = bool((marks.get(t) or {}).get("guest_read"))
+        plain = (t in set(scoped) | set(venue_only) and t not in shared_scope and t not in parent_of
+                 and t not in APPEND_AUDIT and t != SCOPE_TABLE and area(t.split(".")[0]) == "tenant")
+        if guest_read and plain and mark in (None, "read-beneath"):
+            # ADAM CR-341 (CHG-R12DB-008): the table's own read and write, and any guest reads (GUEST_SET)
+            if mark == "read-beneath" and t in scoped:
+                rd = "platform.in_scope(scope_path) OR platform.above_scope(scope_path)"
+                wr = "platform.in_scope({a}scope_path)"
+            elif t in scoped:
+                rd, wr = "platform.in_scope(scope_path)", "platform.in_scope({a}scope_path)"
+            else:
+                rd, wr = "platform.venue_in_scope(venue_id)", "platform.venue_in_scope({a}venue_id)"
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(f'{rd} OR {GUEST_SET}')}, "
+                    f"{sql_literal(wr.format(a=''))});")
+            split_mark[t] = ((mark + "+" if mark else "") + "guest-read", "scope_path" if t in scoped else "venue_id")
+            split_calls[t] = (call, f"x-ticvai-guest-read{' with x-ticvai-rls: ' + mark if mark else ''}: any guest "
+                                    f"reads; written by its {'scope_path' if t in scoped else 'venue_id'} "
+                                    f"({(marks.get(t) or {}).get('schema')}; ADAM CR-341)")
+            split_write[t] = wr.format(a="{a}.")
+            split_depth[t] = 0
+            continue
+        if guest_read:
+            print(f"  ! {t}: x-ticvai-guest-read is defined for a scope_path or venue_id table under its base rule or "
+                  f"read-beneath (found {mark or 'its base rule'}); not applied (check-ddl-conventions D-GUEST-BRANCH)")
         if not mark:
             continue
         if t in APPEND_AUDIT and mark in APPEND_AUDIT_MARKS:
@@ -3579,7 +3624,15 @@ def main() -> int:
                 print(f"  ! {t}: x-ticvai-rls {mark} needs a scope_path or venue_id for staff; the base rule stands")
                 continue
             staff = STATEMENT_SCOPE if base == "scope_path" else "platform.venue_in_scope({a}venue_id)"
-            if "subject_id" in has:
+            gcol = (marks.get(t) or {}).get("guest_subject")
+            if gcol and (gcol.startswith("?") or gcol not in has):
+                print(f"  ! {t}: x-ticvai-guest-subject names {gcol.lstrip('?')}, which is not one of its columns; the "
+                      "base rule stands")
+                continue
+            if gcol and mark == "guest-reads-own":
+                # ADAM CR-342 (CHG-R12DB-009): the guest's column is named (ledger.tax_invoice.buyer_subject_id)
+                guest = GUEST_SUBJECT.replace("{a}subject_id", "{a}" + gcol)
+            elif "subject_id" in has:
                 guest = GUEST_SUBJECT
             elif mark == "guest-reads-own":
                 # the guest's own parent: the one declared reference to a table that carries the guest's subject and
@@ -3759,7 +3812,8 @@ def main() -> int:
         # venue_id) a child is read by staff where the parent is visible, by a guest only for its own subject
         # (customer_id or subject_id), and written where the parent may be written.
         pm = split_mark.get(par)
-        if pm and (pm[0] == "signed-in-read" or (pm[0] == "read-beneath" and pm[1] == "venue_id")):
+        if pm and (pm[0] == "signed-in-read" or (pm[0] == "read-beneath" and pm[1] == "venue_id")
+                   or pm[0].endswith("guest-read")):   # any guest reads the parent (CR-341), not its children
             ccols = {c_["column"] for c_ in cols.get(t, [])}
             subj = "customer_id" if "customer_id" in ccols else ("subject_id" if "subject_id" in ccols else None)
             link = f"pr.{q(key)} = {tq(t)}.{q(col)}"

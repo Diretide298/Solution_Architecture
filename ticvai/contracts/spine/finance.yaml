@@ -5399,6 +5399,10 @@ components:
             Art. 59(1)(h); equal to `grossAmount` on an invoice in the legal currency (CHG-FIN-011).
     FinTaxInvoice:
       x-ticvai-persistence: ledger.tax_invoice + ledger.tax_invoice_line
+      # Staff by scope; a guest reads its own invoices, those whose buyerSubjectId is its subject, and never writes
+      # (ADAM CR-342, settled 30 October 2026; CHG-CR342-001, CHG-R12DB-009).
+      x-ticvai-rls: guest-reads-own
+      x-ticvai-guest-subject: buyerSubjectId
       type: object
       description: '5.7.93, 5.10.3. **A guest tax invoice, as issued, never edited.** Corrections are credit
         memos. The supplier block is a snapshot of the legal entity at issue, so a later change of address does

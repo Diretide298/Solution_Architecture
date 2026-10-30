@@ -161,7 +161,10 @@ its home scope, or the tenant root), `home-scope-write` (`identity.principal`: a
 grant over the home scope writes) and `subject-self` (`pii.subject`). `scope-or-subject` (`identity.delegated_access`)
 lets a guest write a grant over itself, and since ADAM CR-362 (30 October 2026; CHG-R12DB-007) over a subject its own
 active ALLOW familyMember or primaryHolder grant is over (`platform.subject_holds_household_grant_over`, a 920 helper,
-not SECURITY DEFINER: it reads only the guest's own held grants).
+not SECURITY DEFINER: it reads only the guest's own held grants). `x-ticvai-guest-read` (ADAM CR-341; CHG-R12DB-008)
+keeps a table's own rule and adds a read for any session with a guest subject (`platform.venue_settings`,
+`platform.region_settings`); `guest-reads-own` with `x-ticvai-guest-subject` (ADAM CR-342; CHG-R12DB-009) reads the
+guest by a named column (`ledger.tax_invoice.buyer_subject_id`).
 
 ## The control database has no row-level security
 

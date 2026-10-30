@@ -44,6 +44,8 @@ RULES = {
                         "provisioning's own order (CHG-R12DB-001)",
     "D-RECORDED": "a function, trigger or CHECK docs/active/recorded-ddl records that no migration carries "
                   "(CHG-R12DB-002..006)",
+    "D-GUEST-BRANCH": "a contract schema states a guest branch (x-ticvai-guest-read, guest-reads-own, guest-owns) and "
+                      "the policy the migrations last apply to its table has none (CHG-R12DB-008, CHG-R12DB-009)",
     "D-HOUSEHOLD-WRITE": "identity.delegated_access's write check, as the migrations last apply it, without the "
                          "household grant rule ADAM CR-362 settled, or the rule's function not created (CHG-R12DB-007)",
     "D-RECORDED-GRANTS": "the recorded apply_deployable_grants() owners or kernel grants differ from "
@@ -611,6 +613,46 @@ def check_recorded(guard, backend: Path) -> None:
                               f"{m.group(1)} is recorded and no {db} migration carries it")
 
 
+# What a policy's guest branch looks like: any session with a guest subject (GUEST_SET), the row's own subject
+# compared per statement (GUEST_SUBJECT), or the subject helpers.
+GUEST_BRANCH = re.compile(r"current_setting\('ticvai\.subject_id', true\), ''\) IS NOT NULL"
+                          r"|\w+ = \(SELECT NULLIF\(current_setting\('ticvai\.subject_id', true\), ''\)::uuid\)"
+                          r"|platform\.subject_in_scope\(|platform\.own_row\(")
+
+
+def last_policy_calls(backend: Path) -> dict:
+    """{table: the last platform.apply_*_rls call the tenant migrations make for it, as applied}, quotes unescaped."""
+    out = {}
+    for f in sorted((backend / "tenant").glob("*.sql"), key=lambda p: p.name):
+        for line in f.read_text(encoding="utf-8").splitlines():
+            if line.lstrip().startswith("--"):
+                continue
+            m = re.search(r"platform\.apply_\w+_rls\('([\w.]+)'::regclass", line)
+            if m:
+                out[m.group(1)] = line.replace("''", "'")
+    return out
+
+
+def check_guest_branch(guard, backend: Path, marks: dict) -> None:
+    """D-GUEST-BRANCH (ADAM CR-341, CR-342; CHG-R12DB-008, CHG-R12DB-009): a contract schema that states a guest branch
+    (`x-ticvai-guest-read`, or `x-ticvai-rls` guest-reads-own or guest-owns) has one in the policy the tenant
+    migrations last apply to its table. lane D's CR-341 and CR-342 stated guest reads the generator had no mark for, so
+    a rebuild from the package would have refused the guest."""
+    calls = last_policy_calls(backend)
+    for t, mk in sorted(marks.items()):
+        stated = ("x-ticvai-guest-read" if mk.get("guest_read") else
+                  f"x-ticvai-rls {mk.get('rls')}" if mk.get("rls") in ("guest-reads-own", "guest-owns") else None)
+        if not stated or t.split(".", 1)[0] == "control":
+            continue
+        call = calls.get(t)
+        if call is None:
+            continue   # a table no migration gives a policy of its own (a child under its parent): its parent's rule
+        if not GUEST_BRANCH.search(call):
+            guard.add("D-GUEST-BRANCH", t, f"{mk.get('schema')} states a guest branch ({stated}) and the policy the "
+                      f"tenant migrations last apply to {t} has none: run tools/derive-ddl.py --apply, or the mark is "
+                      "not one derive-ddl defines for the table (its run prints why)")
+
+
 def check_household_write(guard, backend: Path) -> None:
     """D-HOUSEHOLD-WRITE (ADAM CR-362; CHG-R12DB-007): the last policy call the tenant migrations make for
     identity.delegated_access carries platform.subject_holds_household_grant_over(over_subject_id) in its write check,
@@ -1059,6 +1101,7 @@ def main() -> int:
     props = dd.load_contract_props({stem: doc for stem, _rel, doc in g.contracts()})
     real = [t for t in ref_cols if "." in t and ":" not in t
             and ref_store.get(t, "postgres") in ("postgres", "postgres-analytical")]
+    check_guest_branch(guard, backend, dd.table_marks(ref_cols, real))
     derived = {}
     for t, mk in dd.table_marks(ref_cols, real).items():
         short = t.split(".", 1)[1]

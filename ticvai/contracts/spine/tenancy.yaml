@@ -6184,6 +6184,9 @@ components:
 
     VenueSettings:
       x-ticvai-retired-columns: [org_unit_id]
+      # A guest reads every venue's settings (its orders' currency, time zone and rules, whatever venue they name);
+      # writes stay the venue's (ADAM CR-341, settled 30 October 2026; CHG-CR341-001, CHG-R12DB-008).
+      x-ticvai-guest-read: true
       type: object
       x-ticvai-persistence: "platform.venue_settings"
       description: >
@@ -6906,6 +6909,9 @@ components:
       # CHG-GEN-008 (ADAM CR-075): settings govern everything beneath their region, so everyone working at, above or
       # beneath it reads them; the region and the levels above it write them.
       x-ticvai-rls: read-beneath
+      # and any guest reads them too: a guest's statement takes its venue's time zone (ADAM CR-341, CR-342;
+      # CHG-R12DB-008).
+      x-ticvai-guest-read: true
       type: object
       required: [scopePath, countryCode, currencyCode, currencyScale, timeZone, fiscalYearStartMonth]
       properties:
