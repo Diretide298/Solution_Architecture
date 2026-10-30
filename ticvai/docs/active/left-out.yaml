@@ -149,3 +149,18 @@ items:
   owner: Chinmay
   added: '2026-10-25'
   change: CHG-R10UI-017
+- id: LO-CR366-001
+  kind: deferred
+  platform: P13
+  screens: [CMS-007]
+  what: 'The full body schema of each content-block kind: media references, links, form fields and embeds, beyond the
+    text keys ContentBlock.body lists. createContentBlock and updateContentBlock check only that the body and each
+    locale variant are JSON objects, that the listed text keys are strings and that items[] and fields[] are arrays of
+    objects; no other key is checked.'
+  source: 'ADAM CR-366 (Hrushikant Patkar, #30783), settled by Chinmay on 30 October 2026; CHG-CR366-001'
+  reason: 'the package defines no schema per kind beyond the text keys, and the schemas are design work that should not
+    hold the operation'
+  target: 'when the storefront renderer for content blocks is specified (not scheduled)'
+  owner: Chinmay
+  added: '2026-10-30'
+  change: CHG-CR366-001

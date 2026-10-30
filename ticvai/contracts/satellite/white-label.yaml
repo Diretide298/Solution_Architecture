@@ -1517,13 +1517,28 @@ paths:
       x-ticvai-read-via:
       - query: marketing-crm#segmentRecords
         route: in-process
-        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001): whether audienceSegmentId is a segment
+          the caller''s scope sees (ADAM CR-366)'
       summary: Author a block of content
       description: 'BL-172. **The CMS modelled configuration and not authoring** — a marketer could choose
         between things a developer had built and could not write something new.
 
         **Scheduled, localised and optionally personalised.** The page builder is a frontend over this,
         the same way the venue map''s canvas is a frontend over its graph.
+
+
+        **The segment is checked** (decided 30 October 2026, Chinmay, ADAM CR-366; CHG-CR366-001). An
+        `audienceSegmentId` that `marketing-crm#segmentRecords` (in process) does not return under the caller''s
+        scope is refused `422` `unknown-reference`, naming `audienceSegmentId`, and nothing is written; null means
+        everybody, as before. This is the package''s code for a reference the caller cannot use (ADAM CR-103), not
+        `400`.
+
+
+        **The body is checked only as far as the contract defines it** (ADAM CR-366). `body` and each
+        `localeVariants.<locale>` must be JSON objects; where present, the text keys `ContentBlock.body` lists for
+        the block''s `kind` must be strings, and an `items[]` or `fields[]` must be an array of objects. A failure is
+        `400` `validation`, with `errors[]` naming the field (for example `body.items[2].answer`). Other keys are not
+        checked: the full schema per kind is not defined now and is on the left-out list (LO-CR366-001).
 
         '
       tags:
@@ -1552,6 +1567,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContentBlock'
+        '400':
+          description: '`body` or a `localeVariants.<locale>` entry is not a JSON object, a text key `ContentBlock.body` lists for the
+            kind is not a string, or an `items[]` or `fields[]` is not an array of objects (`validation`, ADAM CR-366);
+            `errors[]` names each field.'
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`audienceSegmentId` names no segment `marketing-crm#segmentRecords` returns under the caller''s
+            scope (`unknown-reference`, ADAM CR-366, CR-103); the problem names the field, and nothing is written.'
+          x-ticvai-problem-types: [unknown-reference]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /content-blocks/{blockId}/publish:
@@ -7121,12 +7153,23 @@ paths:
       operationId: updateContentBlock
       x-ticvai-consumed-by:
         - "P13 CMS-007 Page Builder"
+      x-ticvai-read-via:
+      - query: marketing-crm#segmentRecords
+        route: in-process
+        for: 'whether a sent audienceSegmentId is a segment the caller''s scope sees, Marketing''s data (ADAM CR-366)'
       summary: Change a draft content block
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; CMS-007).** Changes a block's `body`, `localeVariants`, `position`,
         `publishAt`, `expireAt` or `audienceSegmentId`. A published block is not edited in place: it is refused with 409
         (`content-block-published`) and changed by creating a new draft and publishing it, so what a guest saw stays on
         record.
+
+        **The same two checks as `createContentBlock`** (decided 30 October 2026, Chinmay, ADAM CR-366; CHG-CR366-001), on
+        a change that sends the field. A sent `audienceSegmentId` that `marketing-crm#segmentRecords` (in process) does not
+        return under the caller's scope is refused `422` `unknown-reference`, naming `audienceSegmentId`, and nothing is
+        written; null means everybody. A sent `body` or `localeVariants` is checked as `createContentBlock` states, for the
+        block's `kind`: JSON objects, the kind's listed text keys strings where present, an `items[]` or `fields[]` an
+        array of objects; a failure is `400` `validation` with `errors[]` naming the field.
       tags:
       - whiteLabel
       x-ticvai-permission: TENANT_CONFIGURE
@@ -7183,8 +7226,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContentBlock'
+        '400':
+          description: A sent `body` or `localeVariants.<locale>` entry fails the body check `createContentBlock` states (`validation`,
+            ADAM CR-366); `errors[]` names each field.
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '422':
+          description: A sent `audienceSegmentId` names no segment `marketing-crm#segmentRecords` returns under the
+            caller's scope (`unknown-reference`, ADAM CR-366, CR-103); the problem names the field, and nothing is
+            written.
+          x-ticvai-problem-types: [unknown-reference]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: The block is published (`content-block-published`).
           x-ticvai-problem-types:
@@ -9676,7 +9736,11 @@ components:
         body:
           type: object
           additionalProperties: true
-          description: 'Typed by `kind`, and validated against the block''s own schema at save. **The text a
+          description: 'Typed by `kind`. **Checked at save only as far as this description defines it** (ADAM CR-366,
+            CHG-CR366-001): the body and each `localeVariants.<locale>` entry are JSON objects, the text keys listed below for the
+            block''s kind are strings where present, and an `items[]` or `fields[]` is an array of objects (`400`
+            `validation`); other keys are not checked, and the full schema per kind is on the left-out list
+            (LO-CR366-001). **The text a
             translation may fill** (R8 blocker FOUNDATION-AI-C40; the keys a body of each kind uses for its words, and
             the `fieldPath` a translation draft names, under `localeVariants.<locale>.`): richText `text`; image
             `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta

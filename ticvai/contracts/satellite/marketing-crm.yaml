@@ -4760,8 +4760,11 @@ paths:
 
         **A third path, with the same rules** (r8, IDENTITY-C55): the consents a guest gives on the registration
         form arrive as `identity.guestRegistered`, and Marketing''s consumer records each one through these
-        rules with source `registration` (idempotency: the event id and the purpose), so a registration never
-        leaves a consent unrecorded.
+        rules (idempotency: the event id and the purpose), so a registration never leaves a consent unrecorded.
+        **Its source is where the guest registered** (decided 30 October 2026, Chinmay, ADAM CR-371;
+        CHG-CR371-001): the event''s `channel` mapped to `ConsentSource`, `guestWeb` to `website`, `guestApp` to
+        `guestApp`, `kiosk` to `kiosk`. There is no `registration` source, and `consent_record_source_chk` refuses
+        one.
 
         **Two callers, two rules.** A guest recording their own consent uses a guest token and may only
         act on their own subject. An agent recording on a guest''s behalf uses a staff token, requires

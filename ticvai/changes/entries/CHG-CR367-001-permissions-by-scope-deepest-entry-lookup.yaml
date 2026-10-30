@@ -1,0 +1,59 @@
+id: CHG-CR367-001
+date: '2026-10-30'
+source: cr
+kind: spec
+summary: 'Session.permissionsByScope carries one entry for every scope path where the selected role holds a grant,
+  allow or deny (a wildcard deny included), each the full section 2 result at that path, and a permission holds at a
+  node when it is in the entry of the deepest listed path containing it; entries are never combined. No deny list goes
+  on the wire; the server keeps deciding with section 2''s algorithm. This corrects CR-189''s "the node acted on or one
+  of its ancestors" wording, which permitted what vectors V07, V08 and V12 deny.'
+decision:
+  what: 'The lead''s review, 30 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs". Posted on #30715 (Chinmay, 30 October 2026), not as recommended: no
+    deniesByScope on the wire. Session.permissionsByScope carries one entry for every scope path where the selected
+    role holds a grant, allow or deny; each entry''s permissions are the full section 2 result at that path; a
+    permission holds at a node when it is in the entry of the deepest listed path that contains the node. Entries are
+    never combined. The server keeps deciding with section 2''s algorithm (ResolvedAuthority); the kernel seam may keep
+    the denies internally. A test runs every vector in permission-vectors.json through the lookup on the published
+    set. This corrects the wording CR-189 settled; nothing else in CR-189 changes. A list''s reach is the paths whose
+    deepest entry holds the permission.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-367 (Hrushikant Patkar, #30715 selectRole): with ALLOW at t_ref and DENY at v_alpha1, the CR-189 rule
+  ("in the set of the node acted on or of one of its ancestors", permission-resolution.md 7.2 and
+  Session.permissionsByScope) finds the permission at t_ref and permits, where the normative vectors V07, V08 and V12
+  deny. The CR''s option A (publish the denies) would have every client run section 2 itself, against 7.3 ("Clients
+  never compute permissions") and CR-189''s "no wire shape changes".'
+keys_touched:
+  operations: [login, selectRole, getCurrentSession, resolvePermissions, listPrincipals, createRole]
+  schemas: [Session, ScopedPermissions]
+  files:
+  - docs/architecture/specs/permission-resolution.md
+  - contracts/spine/identity.yaml
+  - contracts/shared/permissions.yaml
+  - tools/check-business-rules.py
+root_class: 'a lookup rule over a resolved set that unions ancestors, which loses a deny below an allow'
+tickets:
+  started:
+  - '30674 (login, Hrushikant) and 30715 (selectRole, Hrushikant): publish permissionsByScope as decided (an entry per
+    grant path, allow or deny, fully resolved); keep authorising with ResolvedAuthority.Permits; add the vector test
+    over the published set.'
+  - '30722 (getCurrentSession, Deep Khanvilkar): return the same set.'
+  - '27692 (kernel seam, Pranay Shinde): the per-scope lookup takes the deepest listed path containing the node, never
+    the union of ancestors.'
+  - '30726-30728 (EMP-002) and 30732-30734 (EMP-001), and every staff front end filtering navigation: look a node up by
+    the deepest entry containing it.'
+  unstarted:
+  - 'resolvePermissions and every later operation pick the rule up from Session.permissionsByScope and section 7.2.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-367
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SCOPE-LOOKUP
+status: open
+notes: 'BR-SCOPE-LOOKUP runs every vector of docs/architecture/specs/permission-vectors.json (22) through the published
+  set and the deepest-entry lookup and fails on any answer that differs from the vector, and fails if the spec or
+  Session.permissionsByScope again says the node or any ancestor. R8 (cell) and R9 (inactive node) stay server-side
+  checks, as the posted decision says.'

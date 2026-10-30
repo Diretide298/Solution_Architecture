@@ -2489,7 +2489,8 @@ paths:
 
         **The reach is read from the per-scope set, never the flat one** (decided 25 October 2026, Chinmay,
         ADAM CR-189 option A; CHG-R10ID-001; the rule on `Session.permissionsByScope`): the reach is the scope
-        paths at which `USER_MANAGE` holds after deny resolution, not the session''s scope paths. A caller with
+        paths whose deepest listed entry holds `USER_MANAGE` (the lookup rule as ADAM CR-367 corrected it, 30
+        October 2026; CHG-CR367-001), not the session''s scope paths. A caller with
         `USER_MANAGE` at venue A and any other permission (for example `POS_SELL`) at venue B lists A''s
         principals only, and a `scopePath` under B is `403`.
 
@@ -2934,7 +2935,8 @@ paths:
 
 
         **`ROLE_MANAGE` must hold at the tenant root** (decided 25 October 2026, Chinmay, ADAM CR-189 option A;
-        CHG-R10ID-001; the rule on `Session.permissionsByScope`), read from the per-scope set: a caller holding
+        CHG-R10ID-001; the rule on `Session.permissionsByScope`), read from the per-scope set (the root''s own
+        entry, by the lookup rule ADAM CR-367 corrected; CHG-CR367-001): a caller holding
         `ROLE_MANAGE` only below the root is `403`, even when it holds another permission (for example
         `REPORT_VIEW`) at the root, which puts the root among its scope paths. Nothing is written.
 
@@ -3306,6 +3308,9 @@ paths:
                 properties:
                   permissionsByScope:
                     type: array
+                    description: 'As `Session.permissionsByScope` would carry it for this principal and role (ADAM
+                      CR-367): one entry per scope path where the role holds a grant, allow or deny, each the full
+                      section 2 result at that path; a node takes the entry of the deepest listed path containing it.'
                     items:
                       $ref: ../shared/permissions.yaml#/components/schemas/ScopedPermissions
                   suppressedByDeny:
@@ -3379,7 +3384,12 @@ paths:
         blocker cause IDENTITY-C55; CHG-R8SPN-029). Identity stores none of them: in the same transaction as the
         account it writes `identity.guestRegistered` to the outbox carrying the new `subjectId`, the channel and
         each `consents[]` item (purpose, granted, noticeVersion), and Marketing''s consumer records one consent per
-        item through its own `recordConsent` rules (source `registration`, idempotent on the event id and purpose).
+        item through its own `recordConsent` rules (idempotent on the event id and purpose). **The event''s `channel`
+        is where the guest registered**, the request''s `source` (decided 30 October 2026, Chinmay, ADAM CR-371;
+        CHG-CR371-001): `guestWeb`, `guestApp` or `kiosk`, `guestWeb` when left out. The code''s delivery `channel`
+        stays on the request and is not on the event. The consumer records each consent with the matching
+        `ConsentSource` (`guestWeb` is `website`, `guestApp` is `guestApp`, `kiosk` is `kiosk`), never
+        `registration`, which the source check constraint refuses.
         A registration with no `consents` still emits the event, with an empty list. Later changes of mind go
         through `recordConsent` directly (F56 step 5).
 
@@ -3840,7 +3850,9 @@ paths:
         **What it stores** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): a `pii.subject_identity` row (`provider`
         `uaePass`, the UAE Pass user id as `providerSubject`), and on a new account a `pii.subject_document` of kind
         `emiratesId` with the number from the UAE Pass identity-number claim (the claim''s name to be confirmed with the
-        client''s UAE Pass sandbox).
+        client''s UAE Pass sandbox). **The number is stored as `submitGuestIdentityDocument` stores it** (ADAM CR-369;
+        CHG-CR369-001): encrypted into `number_ciphertext` through the kernel''s field encryption (#37050), the last four
+        in clear, and no hash.
 
         '
       tags:
@@ -7039,8 +7051,12 @@ paths:
         (an age-restricted purchase, a resident rate, a high-value account).
 
 
-        **The number is hashed on arrival and never returned**; only the last four characters are kept in clear,
-        in `pii.subject_document`, as they are for every document in the package. The scan is the guest''s own
+        **The number is encrypted on arrival and never returned** (decided 30 October 2026, Chinmay, ADAM CR-369;
+        CHG-CR369-001; ADR-0063 section 5): it is stored in `pii.subject_document.number_ciphertext` through the
+        kernel''s field encryption (KERNEL-FIELD-ENC, #37050), as one string naming the key version, and only the
+        last four characters are kept in clear, as they are for every document in the package. No hash is written:
+        never Argon2id or any unkeyed hash, and no blind index until an operation needs a lookup by number
+        (`number_hash` is no longer written). The scan is the guest''s own
         upload (`createGuestUpload`, `completeGuestUpload`, in assets) and is deleted when the verification is
         decided, unless the policy keeps it (`documentImageRetention`).
 
@@ -7060,6 +7076,15 @@ paths:
         has expired or its kind is not one the tenant accepts. A guest verified through UAE Pass where the policy
         counts it (`uaePassSatisfiesIdDocument`) is never asked.
 
+
+        **The policy''s `maxResubmissions` is applied here** (decided 30 October 2026, Chinmay, ADAM CR-368;
+        CHG-CR368-001). The operation counts the guest''s `identity.guest_identity_verification` rows with status
+        `rejected` or `resubmissionRequested` decided after their latest `verified` one (all of them if never
+        verified). When that count is greater than `maxResubmissions` it refuses `422` `resubmission-limit-reached`,
+        and nothing is written; the problem''s `detail` tells the guest to contact the venue. With the default 3 a
+        guest has the first submission and three resubmissions; with 0, only the first. The count is computed,
+        never stored, so a tenant that raises `maxResubmissions` lets the guest submit again.
+
         '
       tags:
       - guestAuth
@@ -7071,8 +7096,11 @@ paths:
         for: 'whether documentAssetId and selfieAssetId are the caller''s own uploaded files of their purpose,
           Identity''s projection of assets.guest_upload (r11 gate, CHG-R11FXV-001; ADR-0028)'
       - table: identity.guest_verification_policy
-        for: 'the tenant''s accepted document kinds, selfieRequired and documentImageRetention (was carried in the
-          lineage overrides, CHG-R8GEN-001; stated here, CHG-R11FXV-001)'
+        for: 'the tenant''s accepted document kinds, selfieRequired, documentImageRetention and maxResubmissions (was
+          carried in the lineage overrides, CHG-R8GEN-001; stated here, CHG-R11FXV-001; maxResubmissions, ADAM CR-368)'
+      - table: identity.guest_identity_verification
+        for: 'the guest''s rejected and resubmissionRequested verifications decided after their latest verified one,
+          counted against maxResubmissions (ADAM CR-368, CHG-CR368-001)'
       x-ticvai-read-via:
       - query: assets#guestUploadsForIdentity
         route: projection
@@ -7113,11 +7141,13 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [identity-document-expired, document-kind-not-accepted, selfie-required,
-            guest-upload-not-usable]
+            guest-upload-not-usable, resubmission-limit-reached]
           description: The document has expired, or its kind is not accepted by the tenant's policy, or the policy
             asks for a selfie and none was sent (`selfie-required`, CHG-R8MIG-027), or `documentAssetId` or
             `selfieAssetId` is not the caller's own uploaded file of its purpose in Identity's projection
-            (`guest-upload-not-usable`, CHG-R11FXV-001)
+            (`guest-upload-not-usable`, CHG-R11FXV-001), or the guest's refusals since their latest verified
+            verification are more than the policy's `maxResubmissions` (`resubmission-limit-reached`, ADAM CR-368;
+            the detail tells the guest to contact the venue)
           content:
             application/problem+json:
               schema:
@@ -7232,7 +7262,8 @@ paths:
         stamps `pii.subject_document.verified_at` and makes the guest ''ID verified'' for everything the policy
         gates; `rejected` and `resubmissionRequested` carry a reason the guest sees. The document scan is deleted
         now unless the policy keeps it. **Decided once**: a second decision is a `409`, and a guest who was
-        refused submits again.
+        refused submits again, up to the policy''s `maxResubmissions` (`submitGuestIdentityDocument` counts them;
+        ADAM CR-368).
 
         '
       tags:
@@ -8663,7 +8694,13 @@ components:
           format: password
           writeOnly: true
           maxLength: 64
-          description: '**Write-only, never returned.** Hashed on arrival; only the last four are kept in clear.'
+          x-ticvai-secret: field-encrypted
+          x-ticvai-stored-as: pii.subject_document.number_ciphertext
+          description: '**Write-only, never returned.** Encrypted on arrival (decided 30 October 2026, Chinmay, ADAM
+            CR-369; CHG-CR369-001; ADR-0063 section 5): AES-256-GCM under the tenant''s data key through the kernel''s
+            field encryption (KERNEL-FIELD-ENC, #37050), stored in `pii.subject_document.number_ciphertext` as one
+            string naming the key version; only the last four are kept in clear. Never hashed: no Argon2id, no
+            unkeyed hash, and no blind index until an operation needs a lookup by number.'
         issuingCountry:
           type: string
           pattern: ^[A-Z]{2}$
@@ -8877,12 +8914,18 @@ components:
           - deleteOnDecision
           - keepUntilDocumentExpiry
           default: deleteOnDecision
-          description: How long the scan is kept. The outcome and the hashed number are kept either way.
+          description: How long the scan is kept. The outcome and the encrypted number are kept either way.
         maxResubmissions:
           type: integer
           minimum: 0
           maximum: 10
           default: 3
+          description: '**How many times a refused guest may submit again** (decided 30 October 2026, Chinmay, ADAM
+            CR-368; CHG-CR368-001). `submitGuestIdentityDocument` counts the guest''s verifications with status
+            `rejected` or `resubmissionRequested` decided after their latest `verified` one (all of them if never
+            verified) and refuses `422` `resubmission-limit-reached` when the count is greater than this. With 3 a
+            guest has the first submission and three resubmissions; with 0, only the first. Computed, never stored:
+            raising it lets a guest past the old limit submit again with no staff reset.'
         updatedAt:
           type: string
           format: date-time
@@ -11158,6 +11201,19 @@ components:
           description: '**Optional for a mobile number** (ADAM CR-222, 25 October 2026): left out, the server picks
             WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant''s configured delivery (DI-209), as `requestGuestOtp` does; an email
             identifier sends email. A caller that sends `channel` still gets it (additive).'
+        source:
+          type: string
+          enum:
+          - guestWeb
+          - guestApp
+          - kiosk
+          default: guestWeb
+          x-ticvai-persisted: false
+          description: '**Where the guest is registering** (decided 30 October 2026, Chinmay, ADAM CR-371;
+            CHG-CR371-001). Optional, additive. Not stored by Identity: `registerGuest` carries it on
+            `identity.guestRegistered` as `channel`, and Marketing records each consent with the matching
+            `ConsentSource`. The guest web (WEB-013, WEB-016) sends `guestWeb`, the guest app (GST-010, GST-042)
+            `guestApp`. Not the code''s delivery `channel` above.'
         displayName:
           type: string
           maxLength: 200
@@ -12478,11 +12534,21 @@ components:
             navigation on this and never compute permissions themselves.
 
 
+            **One entry per grant path, and the deepest one decides** (decided 30 October 2026, Chinmay, ADAM
+            CR-367; CHG-CR367-001; corrects CR-189''s "the node acted on or one of its ancestors"). There is one
+            entry for every scope path where the selected role holds a grant, allow or deny (a wildcard deny
+            included), and each entry''s permissions are the full section 2 result at that path: the allows
+            inherited from it and its ancestors, minus every deny that contains it. A permission holds at a node
+            when it is in the entry of the deepest listed path that contains the node (the node''s own entry, else
+            its nearest listed ancestor''s); entries are never combined. No deny list travels on the wire.
+
+
             **The server keeps the same set and authorises from it** (decided 25 October 2026, Chinmay, ADAM
             CR-189 option A; CHG-R10ID-001). The rule for every operation: `x-ticvai-permission` is evaluated
-            at the scope the operation acts on, from the per-scope set (the node acted on or one of its
-            ancestors); `effectivePermissions` is for coarse checks only. A list''s reach is the scope paths
-            where its permission holds, and a filter outside it is `403`; a tenant-level operation needs its
+            at the scope the operation acts on, from the per-scope set by the lookup above; on the server it is
+            decided with section 2''s algorithm over the session''s resolved grants, which gives the same answer
+            (ADAM CR-367); `effectivePermissions` is for coarse checks only. A list''s reach is the scope paths
+            whose deepest listed entry holds its permission, and a filter outside it is `403`; a tenant-level operation needs its
             permission at the tenant root. The request kernel''s seam carries this set beside the flat one
             (#27692 owns the field) and sign-in (#27666) fills it from the same resolution that fills this
             property; tests fill the seam until sign-in lands. The full statement is

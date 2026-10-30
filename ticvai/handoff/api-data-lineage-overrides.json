@@ -15783,7 +15783,7 @@
    "writes": [
     "pii.subject_document"
    ],
-   "reason": "r11 gate, CHG-R11FXV-001: the document row, its number hashed into number_hash with number_last4 kept; no contract schema persists pii.subject_document, so no x-ticvai-writes can state it. Reviewed: the carried entry's assets.media_asset read is gone (the uploads are checked against identity.guest_upload_ref, assets#guestUploadsForIdentity) and identity.guest_verification_policy is stated in the contract."
+   "reason": "r11 gate, CHG-R11FXV-001: the document row, its number encrypted into number_ciphertext with number_last4 kept (ADAM CR-369, CHG-CR369-001; was hashed into number_hash); no contract schema persists pii.subject_document, so no x-ticvai-writes can state it. Reviewed: the carried entry's assets.media_asset read is gone (the uploads are checked against identity.guest_upload_ref, assets#guestUploadsForIdentity) and identity.guest_verification_policy is stated in the contract."
   },
   "submitIntegrationListing": {
    "reads": [

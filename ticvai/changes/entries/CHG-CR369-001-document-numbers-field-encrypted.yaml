@@ -1,0 +1,59 @@
+id: CHG-CR369-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'A guest''s identity-document number is encrypted, not hashed (ADR-0063 section 5): documentNumber is
+  x-ticvai-secret field-encrypted, stored in the new column pii.subject_document.number_ciphertext through
+  KERNEL-FIELD-ENC (#37050) as one string naming the key version, with the last four in clear. No hash and no blind
+  index; number_hash becomes nullable and is no longer written. guestUaePassLogin stores the emiratesId number the same
+  way. ADR-0063 names number_ciphertext as the first identity-document field.'
+decision:
+  what: 'The lead''s review, 30 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs". Posted on #30660 (Chinmay, 30 October 2026), not as recommended:
+    store the number the way ADR-0063 section 5 says, encrypted, not hashed. documentNumber is declared x-ticvai-secret:
+    field-encrypted and stored in a new column pii.subject_document.number_ciphertext through #37050''s Encrypt, as one
+    string naming the key version; the last four stay in clear. Write no hash: no blind index until an operation needs
+    a lookup by number, and number_hash becomes nullable and is no longer written. Never Argon2id or any unkeyed hash.
+    guestUaePassLogin''s emiratesId number is stored the same way. #30660 does not go to Ready for QA before #37050
+    does (as CR-283).'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-369 (Hrushikant Patkar, #30660): documentNumber was "hashed on arrival" with no x-ticvai-secret form,
+  while ADR-0063 section 5 says identity-document numbers are encrypted by the application and its 14 October
+  amendment keeps Argon2id for passwords and PINs. An unpeppered hash of a short structured number with its last four
+  in clear can be brute-forced from a database copy (CR-271 ruled out unkeyed hashes), and the ICP check (DEC-457)
+  needs the number back after submit.'
+keys_touched:
+  operations: [submitGuestIdentityDocument, guestUaePassLogin]
+  schemas: [IdentityGuestDocumentSubmission, IdentityGuestVerificationPolicy]
+  tables: [pii.subject_document]
+  files:
+  - contracts/spine/identity.yaml
+  - handoff/schema-reference.json
+  - handoff/api-data-lineage-overrides.json
+  - docs/adr/0063-encryption-keys-and-biometric-templates.md
+  - tools/check-business-rules.py
+  other:
+  - 'pii.subject_document.number_ciphertext (new, text, nullable); number_hash NOT NULL dropped (the forward migration)'
+root_class: 'a stored secret that names no ADR-0063 form, on a request-only schema the storage check does not read'
+tickets:
+  started:
+  - '30660 (submitGuestIdentityDocument, Hrushikant): replace the Argon2id hash with #37050''s Encrypt into
+    number_ciphertext; wait for #37050 before Ready for QA.'
+  - '30670 (guestUaePassLogin, Hrushikant): store the UAE Pass emiratesId number the same way.'
+  - '37050 (KERNEL-FIELD-ENC, Pranay Shinde): pii.subject_document.number_ciphertext is a consumer; still held by
+    CR-339 (its tenant field-key table, batch C).'
+  - '27650 (V0007__pii.sql) and 30174 (pii.subject_document), both Ready for QA: the column and the dropped NOT NULL
+    arrive as a [DB] migration child task for Hrushikant (a new ticket, filed with the r12 plan change).'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-369
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-DOC-NUMBER-ENC
+status: open
+notes: 'The forward migration derive-ddl writes for this (ALTER TABLE pii.subject_document ADD COLUMN number_ciphertext
+  text; ALTER COLUMN number_hash DROP NOT NULL, guarded) is left for the release''s single regeneration. Dropping
+  number_hash is for a later release.'
