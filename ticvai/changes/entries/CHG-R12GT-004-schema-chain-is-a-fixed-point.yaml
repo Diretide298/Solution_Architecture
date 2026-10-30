@@ -1,0 +1,50 @@
+id: CHG-R12GT-004
+date: '2026-10-30'
+source: audit
+kind: process
+summary: 'check-regenerate-twice --chain now runs the steps whose output becomes DDL (derive-schema, derive-relationships,
+  derive-ddl, derive-table-notes, derive-schema-roots, in refresh order) and fails when a second regeneration changes
+  the schema reference, the relationship graph, the column types or a forward migration. Three generators that were
+  not a fixed point are fixed: derive-schema appends a synthesised surrogate key (it put it first on the run that made
+  the table and last on every run after), and derive-relationships and derive-schema-roots break ties by name, not by
+  the run''s string hashes (the graph''s keys and the schema roots changed order on every run).'
+decision:
+  what: 'The lead''s brief for r12 (30 October 2026): "If I rebuild from scratch it should never have these or all our
+    prior logged errors". A released tree must regenerate to itself; the check that says so has to run the steps that
+    write the schema.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'Finding: r11''s committed tree (a47956cb, one full refresh that created whitelabel.received_release and
+  identity.guest_upload_ref) did not regenerate to itself: the next refresh gave received_release.release_id a
+  convention key and wrote V0120 (an index, CHG-R12GT-003), and moved guest_upload_ref''s surrogate id from first to
+  last. derive-schema reads the previous run''s relationship graph and its own previous output, so a table new in a
+  refresh settles only on the refresh after. check-regenerate-twice (CHG-R8GEN-002, CHG-R8GEN-017) passed at r11 because
+  its chain held only the steps that write authored inputs; derive-schema and derive-relationships write derived files,
+  so the loop was never run twice. Shown on 31 October: the extended chain fails on r11''s tree (RT-CHAIN on V0120,
+  schema-reference.json, ddl-column-types.json) and passes after one derive with these fixes.'
+keys_touched:
+  tables:
+  - whitelabel.received_release
+  - identity.guest_upload_ref
+  files:
+  - tools/check-regenerate-twice.py
+  - tools/derive-schema.py
+  - tools/derive-relationships.py
+  - tools/derive-schema-roots.py
+root_class: 'a derived artefact that reaches a database settling only on the second refresh, unseen because the
+  fixed-point check never ran its steps'
+tickets:
+  started:
+  - '27753 ([DB] Forward migration V1001__identity.sql, Ready for QA, Hrushikant Patkar): nothing to do. Only the
+    schema reference''s column order for identity.guest_upload_ref moves (id last); the columns, key and constraints are
+    the same and no migration is written.'
+  - '27663 ([DB] Migration V0016__whitelabel.sql, Ready for QA, Hrushikant Patkar): see CHG-R12GT-003; nothing to do.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r12 gate-fix lane, a fresh refresh of main on 30 October 2026'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-regenerate-twice.py
+status: open

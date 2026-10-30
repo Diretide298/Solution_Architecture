@@ -1,0 +1,45 @@
+id: CHG-R12GT-003
+date: '2026-10-30'
+source: audit
+kind: contract
+summary: 'whitelabel.received_release.release_id is declared not a key (ReceivedRelease.releaseId x-ticvai-references:
+  none), as ADAM CR-338 wrote it: the control-plane release''s id kept as a value in the tenant''s database. The name
+  rule had pointed it at ai.release (an AI table, not the platform release), so the second refresh of r11''s tree gave
+  it a convention key and a forward migration with an index on it.'
+decision:
+  what: 'The lead''s brief for r12 (30 October 2026): "If I rebuild from scratch it should never have these or all our
+    prior logged errors". CR-338 already said the column is "kept as a value, not a key, because the copy lives in the
+    tenant''s database"; the contract now says it in the form derive-schema and derive-relationships read
+    (x-ticvai-references: none, CHG-R6-015, CHG-R6-016), so no index, constraint or convention reference is derived.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'Finding: a fresh refresh of main (r11 + 22741c2e, 30 October 2026) failed check-storage-promises SP-KEY-UNDECLARED
+  on whitelabel.received_release.release_id NOT NULL -> ai.release by convention only, and derive-ddl wrote V0120
+  (CREATE INDEX received_release_release_id_idx). r11''s full derive (a47956cb) created the table in the same run, so
+  derive-schema read a relationship graph that did not hold it yet; derive-relationships then added the convention
+  edge, and only the next refresh carried it into the schema reference (CHG-R12GT-004). CR-338 (CHG-CR338-001)
+  introduced the table.'
+keys_touched:
+  tables:
+  - whitelabel.received_release
+  schemas:
+  - ReceivedRelease
+  files:
+  - contracts/satellite/white-label.yaml
+root_class: 'an id kept as a value, named like a key, left for the name rule to guess'
+tickets:
+  started:
+  - '27663 ([DB] Migration V0016__whitelabel.sql, Ready for QA, Hrushikant Patkar): nothing to do. release_id stays a
+    plain uuid with no index and no foreign key, as the package had it at r11; the V0120 index the next refresh would
+    have written is never generated.'
+  - '37051 ([BE] service sign-in between deployables, Ready for QA, Pranay Shinde): links the table only; nothing to do.'
+  unstarted:
+  - '37083 ([DB] whitelabel.received_release): release_id is a value, not a key: no index and no foreign key on it.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-338
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-storage-promises.py
+status: open

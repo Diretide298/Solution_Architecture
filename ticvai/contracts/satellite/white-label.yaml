@@ -10059,10 +10059,12 @@ components:
           format: uuid
           readOnly: true
         releaseId:
+          x-ticvai-references: none
           type: string
           format: uuid
           description: The release received (`platform-ops.Release.id`). Its id in the control plane, kept as a value,
-            not a key, because the copy lives in the tenant's database.
+            not a key, because the copy lives in the tenant's database (ADAM CR-338). Declared not a key (CHG-R12GT-003), since
+            the name rule pointed `release_id` at `ai.release`, an AI table that is not the platform's release.
         version:
           type: string
           description: The release version (`platform-ops.Release.version`).
