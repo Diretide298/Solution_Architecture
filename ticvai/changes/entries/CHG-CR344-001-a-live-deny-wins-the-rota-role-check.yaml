@@ -1,0 +1,67 @@
+id: CHG-CR344-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'The two rota reads and the exclusion constraint CR-336 named were already in r11; the one addition: a live
+  DENY of the role at or above the venue makes identity#principalHoldsRoleAtVenue false (deny-overrides-allow), and
+  #32338 builds that query inside the Identity module. Both rota writes say a 23P01 on
+  rota_assignment_principal_id_overlap_excl is the 409, with the per-person advisory lock until the constraint is on
+  the databases.'
+decision:
+  what: 'The lead''s review, 30 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs". Posted to #32338: "not as recommended. Nothing needs adding: r11
+    already defines all three, so build to them as they stand. ... Build principalHoldsRoleAtVenue yourself in #32338,
+    inside the Identity module behind its query interface; no other ticket builds it. One addition to its rule: a live
+    DENY of that role at the venue or above it makes holds false (deny-overrides-allow, as createDelegatedAccess says).
+    ... Map SQLSTATE 23P01 on that constraint to 409 rota-assignment-overlap now. Until the constraint is on the
+    databases, keep your per-person advisory lock. In #32340, ask the same two queries with the assignment itself as
+    exceptAssignmentId." contracts/spine/identity.yaml principalHoldsRoleAtVenue (rule and holds);
+    contracts/satellite/workforce.yaml createRotaAssignment and updateRotaAssignment descriptions; CHG-CR336-001''s
+    notes now name #32338 as the builder.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-344 (Pranay Shinde, #32338, blocking): the r11 follow-up (CHG-CR336-001) named
+  rota_assignment_principal_id_overlap_excl and two yes/no reads that adam_search did not find. They are in r11
+  (workforce.yaml x-ticvai-queries principalHasOverlappingAssignment, identity.yaml principalHoldsRoleAtVenue,
+  RotaAssignment x-ticvai-exclude, handoff/migration-review.md "constraint added"); the review found one real gap:
+  the role query counted ALLOW grants only, while identity.delegated_access holds role DENYs too.'
+keys_touched:
+  operations:
+  - createRotaAssignment
+  - updateRotaAssignment
+  tables:
+  - identity.delegated_access
+  - workforce.rota_assignment
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/workforce.yaml
+  - changes/entries/CHG-CR336-001-rota-checks-see-every-venue-as-a-yes-or-no.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'query identity#principalHoldsRoleAtVenue'
+root_class: 'a rule question over grants that counts ALLOW and forgets DENY, where the platform''s resolution is
+  deny-overrides-allow'
+tickets:
+  started:
+  - '32338 (createRotaAssignment, Ready for QA, Pranay Shinde): ask the two queries instead of reading under the
+    caller''s grant; build identity#principalHoldsRoleAtVenue in the Identity module, with a DENY winning; map 23P01 on
+    rota_assignment_principal_id_overlap_excl to 409 rota-assignment-overlap; keep the advisory lock until the
+    constraint is on the databases. Told through the lead''s comment, its text is not rewritten.'
+  - '32340 (updateRotaAssignment, On hold, Pranay Shinde): the CR-315 part, plus the same two queries with
+    exceptAssignmentId set to the assignment, and the same 23P01 mapping.'
+  - '30384 and 27670 ([DB], Ready for QA, Hrushikant Patkar): add the exclusion constraint by hand after settling any
+    overlapping rows, as handoff/migration-review.md says; nothing new.'
+  unstarted:
+  - '28416 ([BE] TenancyService task holding both rota writes)'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-344
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Rule BR-ROTA-ROLE-DENY fails on the r11 contract (no DENY clause, no builder named) and passes now;
+  BR-ROTA-CROSS-VENUE still holds the two queries and the constraint. The verdict also found that adam_search misses
+  x-ticvai-queries entries and migration-review rows (viewer/lib/search.mjs builds that index); that is ADAM''s code,
+  outside the package, and is not changed here. No migration.'

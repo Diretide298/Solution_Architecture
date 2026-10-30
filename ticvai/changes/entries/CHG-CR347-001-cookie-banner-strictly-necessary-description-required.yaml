@@ -1,0 +1,49 @@
+id: CHG-CR347-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'setCookieBannerDesign names the refusal its description already made: 422 strictly-necessary-description-missing
+  when `categories` has no strictlyNecessary entry, or that entry''s description has no non-empty text for one of the
+  codes in `languages`; nothing is stored.'
+decision:
+  what: 'The lead''s review, 30 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs". Posted to #31159: "as you recommended. Add problem type
+    strictly-necessary-description-missing to setCookieBannerDesign''s 422. Refuse the design when `categories` has no
+    strictlyNecessary entry, or when that entry''s `description` has no non-empty text for one of the codes in
+    `languages`. Nothing is stored." contracts/satellite/marketing-crm.yaml: the operation''s description, its 422''s
+    x-ticvai-problem-types and description, and CookieBannerPreferenceCenterDesignerView.categories'' description.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-347 (Pranay Shinde, #31159, blocking): the description refused a missing strictlyNecessary description
+  with 422 while the 422 declared no problem type for it, and nothing said whether a design with no strictlyNecessary
+  category counted. BL-073 2.6.53 and 2.6.54 ask for a strictly necessary category whose cookies are explained, in
+  every language the banner is shown in (2.6.52).'
+keys_touched:
+  operations:
+  - setCookieBannerDesign
+  schemas:
+  - CookieBannerPreferenceCenterDesignerView
+  tables:
+  - marketing.cookie_banner_design
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-business-rules.py
+root_class: 'a refusal stated in an operation''s description with no problem type on its response'
+tickets:
+  started:
+  - '31159 (setCookieBannerDesign, On hold, Pranay Shinde): add the check and the problem type as decided; told through
+    the lead''s comment, its text is not rewritten.'
+  unstarted:
+  - '27921 ([BE] MarketingService task holding setCookieBannerDesign)'
+  - '28919, 33535, 33536, 33537 ([FE] CMS-026, On hold): show the new 422 type like the other three; no screen change'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-347
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Rule BR-COOKIE-STRICTLY-NECESSARY fails on the r11 contract (the 422 names three types) and passes now.
+  check-problem-types holds the general class: an operation-specific error response names its causes. CMS-026''s
+  approved layout does not change. No migration.'

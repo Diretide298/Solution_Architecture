@@ -4554,6 +4554,153 @@ components:
             the venue of the write, so a replay is found by whoever retries, including a caller with no grant (the
             payment webhook, a consumer, a job), and the row carries no venue data (the stored response is already
             what the caller was allowed to see). The partition key (ADR-0005).'
+    TenantFieldKey:
+      type: object
+      x-ticvai-persistence: platform.tenant_field_key
+      x-ticvai-agreed: '30 October 2026: ADAM CR-339 (Chinmay), ADR-0063 as amended 30 October 2026'
+      # Unique per purpose and version, and one active row per purpose (ADAM CR-339; CHG-CR339-001). No scope: the
+      # tenant database is the tenant's own (ADR-0038), as platform.tenant carries no scope_path either.
+      x-ticvai-unique-together: [[purpose, keyVersion]]
+      x-ticvai-unique-when:
+      - columns: [purpose]
+        when: {state: active}
+      x-ticvai-scope: none
+      x-ticvai-rls: any-grant-no-delete
+      description: '**A tenant''s wrapped field-encryption keys** (ADAM CR-339, decided 30 October 2026; ADR-0063 as
+        amended 30 October 2026; KERNEL-FIELD-ENC, #37050). One row per key version of the tenant''s data key
+        (AES-256-GCM) and blind-index key (HMAC-SHA-256), each wrapped by the tenant''s HSM-backed Key Vault key; the
+        unwrapped key lives only in the kernel''s memory. **Only the kernel reads or writes it**; the kernel''s
+        architecture test covers it as it covers the Key Vault client. Storage only: no operation returns it.
+
+
+        **A missing key is created at provisioning or on first use** with `INSERT ... ON CONFLICT DO NOTHING` and then
+        read again, so two hosts creating it at once end up with one key. A key is unwrapped with the Key Vault key
+        version `wrappingKeyId` names. **Rotating the data key** adds a new `active` row and moves the old one to
+        `decryptOnly`; the stored form `enc:v<version>:...` says which row decrypts. **Rotating the blind-index key**
+        does the same; only a blind index the server can decrypt is re-hashed (`BlindIndexRehash`), and a lookup on
+        one that hashes a token the server never keeps tries the `active` version and then each `decryptOnly` one,
+        newest first, for as long as a token made under it can still be presented (ADR-0063, 25 October and 30
+        October amendments).
+
+
+        **It takes no scope** (`x-ticvai-scope: none`): the tenant''s database is the tenant''s alone, so a key row
+        belongs to no node of it. Any connection holding a grant reads, inserts and updates a row and none deletes
+        one (`x-ticvai-rls: any-grant-no-delete`), since the kernel runs inside every host and every caller''s
+        request; a key that is no longer used is `retired`, never deleted.'
+      required:
+      - id
+      - purpose
+      - keyVersion
+      - wrappedKey
+      - wrappingKeyId
+      - state
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The row's own id, a UUIDv7 minted by the kernel.
+        purpose:
+          type: string
+          enum:
+          - dataKey
+          - blindIndexKey
+          x-ticvai-unique-compare: exact
+          description: '`dataKey`: the AES-256-GCM key that encrypts `x-ticvai-secret: field-encrypted` values.
+            `blindIndexKey`: the HMAC-SHA-256 key of `x-ticvai-secret: blind-index` values.'
+        keyVersion:
+          type: integer
+          minimum: 1
+          description: The key's version within its purpose, 1 for the first key and one more at each rotation. The
+            `<version>` of the stored form `enc:v<version>:...`. Unique with `purpose`.
+        wrappedKey:
+          $ref: '#/components/schemas/WrappedKeyBytes'
+        wrappingKeyId:
+          type: string
+          maxLength: 500
+          description: The Key Vault key that wrapped `wrappedKey`, with its version (the key's versioned identifier), so
+            the key is unwrapped with that version after the Key Vault key itself rotates.
+        state:
+          type: string
+          enum:
+          - active
+          - decryptOnly
+          - retired
+          description: '`active`: the version new writes use; at most one per purpose. `decryptOnly`: an older
+            version, still used to decrypt, and to look up a blind index that cannot be re-hashed. `retired`: no longer
+            used.'
+        createdAt:
+          type: string
+          format: date-time
+          description: When the key version was created.
+        rotatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When a rotation moved this version out of `active`; null while it is the active one.
+    WrappedKeyBytes:
+      type: string
+      format: byte
+      x-ticvai-persistence-column: bytea
+      description: A field-encryption key's bytes as Key Vault's wrap operation returned them (ADAM CR-339), stored as
+        bytea; never the unwrapped key.
+    BlindIndexRehash:
+      type: object
+      x-ticvai-persistence: platform.blind_index_rehash
+      x-ticvai-agreed: '30 October 2026: ADAM CR-339 (Chinmay), ADR-0063 as amended 30 October 2026'
+      x-ticvai-unique-together: [[columnName, toVersion]]
+      x-ticvai-scope: none
+      x-ticvai-rls: any-grant-no-delete
+      description: '**How far a blind-index re-hash has got, per column** (ADAM CR-339, decided 30 October 2026;
+        ADR-0063 as amended 30 October 2026). When the tenant''s blind-index key rotates, the kernel''s job re-hashes
+        only a blind index the server can decrypt (the contract marks it `x-ticvai-blind-index-of: <its
+        field-encrypted property>`), which today is `marketing.guest_device.token_fingerprint`, from
+        `token_ciphertext`. One row per column and target version, with the last row done in `lastId`. **A lookup on
+        that column tries both versions only while its row is unfinished.** A blind index over a token the server
+        never keeps (`x-ticvai-blind-index-of: none`) has no row here: it keeps its old key version for lookup
+        instead (`TenantFieldKey`). Only the kernel reads or writes it; storage only, no operation returns it. No
+        scope, as `TenantFieldKey`.'
+      required:
+      - id
+      - columnName
+      - fromVersion
+      - toVersion
+      - startedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The row's own id, a UUIDv7 minted by the kernel.
+        columnName:
+          type: string
+          maxLength: 190
+          x-ticvai-unique-compare: exact
+          description: The column re-hashed, as `schema.table.column` (`marketing.guest_device.token_fingerprint`).
+            Unique with `toVersion`.
+        fromVersion:
+          type: integer
+          minimum: 1
+          description: The blind-index key version the column's values were hashed under before the rotation.
+        toVersion:
+          type: integer
+          minimum: 1
+          description: The blind-index key version they are re-hashed under.
+        lastId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The id of the last row of the column's table re-hashed, so the job resumes after it; null before
+            the first batch.
+        startedAt:
+          type: string
+          format: date-time
+          description: When the re-hash began.
+        finishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When every row was re-hashed; null while the job runs, and lookups try both versions until it
+            is set.
     ControlAuditRecord:
       type: object
       x-ticvai-persistence: control.audit_record

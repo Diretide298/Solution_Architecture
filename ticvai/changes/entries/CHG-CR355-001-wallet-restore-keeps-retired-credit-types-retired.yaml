@@ -1,0 +1,54 @@
+id: CHG-CR355-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'restoreWalletConfigurationVersion never sets a credit type''s is_active from false to true, and names its
+  own two findings, both warnings: restore-credit-type-retired-since-version (the type kept retired) and
+  restore-left-newer-rows (rows of an area with no is_active left as they are); what relies on the retired type is
+  stopped by consumption-policy-names-retired-type (blocking, CR-311).'
+decision:
+  what: 'The lead''s review, 30 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs". Posted to #30857: "not as recommended. Use your two codes and keep the
+    type retired, but the retired-type finding is a warning, because publish does not run that check again. The
+    restore never sets a credit type''s is_active from false to true. ... report restore-credit-type-retired-since-version
+    (severity warning; the message names the credit type''s code and id). ... restore-left-newer-rows (severity
+    warning; the message names the area and the ids). ... a restored consumption policy naming it gets
+    consumption-policy-names-retired-type (blocking). Whoever wants the type back reactivates it on purpose with
+    updateCreditType. List both codes on restoreWalletConfigurationVersion." contracts/satellite/wallet.yaml: the
+    operation''s description and WalletConfigurationVersion.findings[].code.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-355 (Pranay Shinde, #30857): the restore named two findings of its own with no code while
+  findings[].code pointed only at publishWalletConfiguration''s two (CR-311), and "reported as a blocking finding
+  rather than silently revived" left open whether the upsert by id set is_active back to true. A blocking finding in
+  the restore''s answer stops nothing at publish (the restore stores no findings, CR-312), so the finding is a warning.'
+keys_touched:
+  operations:
+  - restoreWalletConfigurationVersion
+  schemas:
+  - WalletConfigurationVersion
+  tables:
+  - wallet.credit_type
+  files:
+  - contracts/satellite/wallet.yaml
+  - tools/check-business-rules.py
+root_class: 'a finding named in prose with no code and no severity, and a write rule ("rather than silently revived")
+  that does not say what is written'
+tickets:
+  started:
+  - '30857 (restoreWalletConfigurationVersion, On hold, Pranay Shinde): never set is_active back to true on a restore;
+    emit restore-credit-type-retired-since-version and restore-left-newer-rows as warnings beside publish''s validation
+    findings. Told through the lead''s comment, its text is not rewritten.'
+  unstarted:
+  - '27816 ([BE] WalletService task holding restoreWalletConfigurationVersion)'
+  - '28038, 31455, 31456, 31457 ([FE] BO-1162, On hold): two more warning codes to show; no screen change'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-355
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Rule BR-WALLET-RESTORE-FINDINGS fails on the r11 contract (no restore codes, "rather than silently revived")
+  and passes now. No migration.'

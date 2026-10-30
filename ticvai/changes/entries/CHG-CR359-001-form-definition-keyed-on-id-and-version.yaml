@@ -1,0 +1,87 @@
+id: CHG-CR359-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'marketing.form_definition is keyed (id, version): id is the form and each version is a row with the same id,
+  the rule CR-228 set for configuration profiles. form_definition_field (form_id, form_version), waiver_requirement
+  (form_definition_id, form_version) and waiver_signature (form_definition_id, form_version) reference the version
+  row; waiver_signature gains form_version, the exact version signed. setDynamicFieldQuestion finds the version by id
+  and version (404 none, 409 form-version-not-draft).'
+decision:
+  what: 'The lead''s review, 30 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs". Posted to #31160: "not as recommended. Use option B, the rule CR-228
+    set for configuration profiles. formId is form_definition.id, the form, and each version is a row with the same
+    id: the primary key becomes (id, version). ... In #31160, find the row by id = formId and version = formVersion.
+    No row is 404 not-found; a status other than draft is 409 form-version-not-draft. Write the field with form_id =
+    formId and form_version = formVersion; also set form_definition_id to formId until that column is retired.
+    Database (Hrushikant, a [DB] child task of MIG-MARKETING ...): drop form_definition_pkey and the foreign keys on
+    form_definition(id), and add primary key (id, version). form_definition_field (form_id, form_version) and
+    waiver_requirement (form_definition_id, form_version) then reference form_definition (id, version).
+    waiver_signature gains form_version integer, the exact version signed ... and references (form_definition_id,
+    form_version)." contracts/satellite/marketing-crm.yaml: FormDefinition x-ticvai-primary-key [id, version] and the
+    id and version descriptions; DynamicFieldsQuestionsConditionalLogicView.formId, WaiverRequirement.formDefinitionId
+    and MarketingWaiverSignature.templateId x-ticvai-references-version; MarketingWaiverSignature.formVersion;
+    setDynamicFieldQuestion and listForms descriptions. tools/derive-ddl.py''s existing rules write the keys
+    (x-ticvai-primary-key widening, CHG-R9KEY-001; x-ticvai-references-version, CHG-R8MIG-019).'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-359 (Pranay Shinde, #31160, blocking): form_definition kept every version but was keyed on id alone with
+  no column naming the form, so (formId, formVersion) could not be resolved to a version row. Every path and body
+  already addresses a version as formId plus formVersion, and setWaiverTemplateMaster and waiver_requirement name the
+  form by that id, so the API''s formId is the form (CR-228''s rule, CHG-R8MIG-019).'
+keys_touched:
+  operations:
+  - setDynamicFieldQuestion
+  - listForms
+  schemas:
+  - FormDefinition
+  - DynamicFieldsQuestionsConditionalLogicView
+  - WaiverRequirement
+  - MarketingWaiverSignature
+  tables:
+  - marketing.form_definition
+  - marketing.form_definition_field
+  - marketing.waiver_requirement
+  - marketing.waiver_signature
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'retired column marketing.form_definition_field.form_definition_id'
+root_class: 'a versioned record kept one row per version and keyed on id alone, so nothing groups a form''s versions'
+tickets:
+  started:
+  - '31160 (setDynamicFieldQuestion, On hold, Pranay Shinde): resolve (formId, formVersion) as form_definition id +
+    version; 404 not-found / 409 form-version-not-draft; write form_id, form_version and form_definition_id = formId.
+    Told through the lead''s comment, its text is not rewritten.'
+  - '31165 (submitForm, On hold, Pranay Shinde): find the version by id = formId and version = formVersion; otherwise
+    404 form-version-not-found, as the contract already says.'
+  - '30534, 30535, 30563 ([DB] form_definition, form_definition_field, waiver_requirement; Ready for QA, Hrushikant
+    Patkar) and 27677 ([DB] V0028 marketing): the key change and the composite references, by hand while the server
+    databases are frozen (a [DB] child task of MIG-MARKETING is to be filed).'
+  unstarted:
+  - '33313 ([DB] marketing.waiver_signature, New, Hrushikant Patkar): add form_version (backfilled from
+    form_definition, then NOT NULL) and the composite reference.'
+  - '33239 (createForm), 33243 (getForm), 33484 (listForms), 33378 (listWaiverSignatures): a form''s versions share its
+    id; listWaiverSignatures returns formVersion.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-359
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Rule BR-FORM-VERSION-KEY fails on the r11 contract and passes now; derive-ddl''s existing rules write the
+  widened key and the three composite keys into the forward migration. A general check (every schema whose versions
+  are kept forever has a key that includes its version) was not added: "kept forever" is prose, and the schemas with
+  a version column number in the dozens with different rules (a version counter on one row, CR-332, is not a
+  versioned row), so a heuristic would either miss or need a list as long as the class; this entry names the one the
+  CR found. Beyond the comment''s words: listForms'' "latest version of each form" is the highest version per id. Not
+  done: createForm still takes no formId, so the API cannot ask for version 2 of an existing form; that needs a
+  decision (the verdict''s follow-up suggests an optional formId on createForm). Also beyond the comment: the package
+  withdraws form_definition_field.form_definition_id (FormDefinition x-ticvai-retired-columns), which held the same id
+  as form_id once id is the form (check-ddl-conventions D-DOUBLE-KEY found the two keys); handoff/migration-review.md
+  lists its drop for the migration owner, to run only after the writers stop setting it, as the comment says
+  ("until that column is retired"). setDynamicFieldQuestion declares its read of marketing.form_definition
+  (check-parameter-columns P-NAMED-TABLE).'

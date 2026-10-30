@@ -1,0 +1,62 @@
+id: CHG-CR357-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'topUpWallet''s paid lot takes the tenant''s one active credit type of category cash (none or more than one is
+  a 500 misconfiguration, nothing credited); the bonus comes from the venue''s default funding rules, as a second lot of
+  the applying bonus rule''s bonusCreditTypeId; a body bonusAmount that differs, or one sent when no rule applies, is
+  422 bonus-not-applicable.'
+decision:
+  what: 'The lead''s review, 30 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs". Posted to #30860: "as you recommended for the paid lot; the bonus
+    lot''s credit type is already configured. Paid lot: the one active credit type of category cash ... None, or more
+    than one, is a misconfiguration: answer 500, credit nothing, and log the tenant and venue ... Bonus: take it from
+    the venue''s default funding rules (walletTypeId null ...). Of the bonus rules in force on recordedAt ... the one
+    with the highest minimumAmount applies ... Write it as a second lot, in the same transaction, of that rule''s
+    bonusCreditTypeId, with source_kind promotion, source_reference the payment''s id and order_line_id null. Refuse
+    with 422 bonus-not-applicable, crediting nothing, when the body''s bonusAmount differs from the rule''s bonus or no
+    rule applies. ... No migration." contracts/satellite/wallet.yaml: topUpWallet''s description, x-ticvai-reads
+    (wallet.credit_type, wallet.funding_rule), bonusAmount and its 422; CreditLot.creditTypeId.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-357 (Pranay Shinde, #30860, blocking): topUpWallet writes a credit lot, wallet.credit_lot.credit_type_id
+  is NOT NULL, and nothing named the lot''s credit type (a wallet carries no wallet type). The bonus also had a gap the
+  CR did not raise: topUpWallet is guest-callable and credited the body''s bonusAmount unchecked. WalletFundingRules
+  bonusRules[].bonusCreditTypeId already names the bonus lot''s credit type (pack board 2.3).'
+keys_touched:
+  operations:
+  - topUpWallet
+  schemas:
+  - CreditLot
+  tables:
+  - wallet.credit_lot
+  - wallet.credit_type
+  - wallet.funding_rule
+  files:
+  - contracts/satellite/wallet.yaml
+  - tools/check-business-rules.py
+root_class: 'a NOT NULL column (credit_lot.credit_type_id) that the writing operation gives no source, and a guest-sent
+  amount credited without comparing it with the venue''s configuration'
+tickets:
+  started:
+  - '30860 (topUpWallet, On hold, Pranay Shinde): the paid lot takes the tenant''s active cash credit type; the bonus
+    lot takes the applying bonus rule''s bonusCreditTypeId and amount; refuse a differing bonusAmount with 422
+    bonus-not-applicable. Told through the lead''s comment, its text is not rewritten.'
+  - '30858 (setWalletFundingRules, Ready for QA): no change; it already writes bonusRules[].bonusCreditTypeId.'
+  unstarted:
+  - '27817 ([BE] WalletService task holding topUpWallet)'
+  - '28621, 32871, 32872, 32873 ([FE] POS-005 Payment): send the bonus the venue''s rule gives, or none; no screen
+    change'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-357
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'Rule BR-WALLET-TOPUP-CREDIT-TYPE fails on the r11 contract (no credit type named, bonusAmount "not compared",
+  no reads, no bonus-not-applicable) and passes now. Read beyond the comment''s words: "or no rule applies" is taken
+  as a body that sends a bonusAmount when no rule applies (a top-up with no bonus at a venue with no bonus rule is not
+  refused). The 500 is stated in the description only; no 500 response is declared, as for the trading-currency case.
+  No migration.'
