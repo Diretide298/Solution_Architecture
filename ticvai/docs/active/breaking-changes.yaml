@@ -1620,3 +1620,27 @@ changes:
     tag: r11
     producer-tickets: [SVC-WHITELABEL-BOOKINGFLOWS-2]
     consumer-tickets: [APP-WL-CMS-103]
+  - id: BC-496
+    contract: platform-ops
+    operation: rejectRelease
+    change: "params `path:releaseId` type string -> string:uuid"
+    reason: 'ADAM CR-356 (CHG-CR356-001): releaseId is a release''s id, a uuid, as getRelease and promoteRelease
+      already declare (ADR-0056); a non-uuid is 400 validation. The value was always a release id; the declared format
+      now says so. A type change cannot be additive.'
+    approved-by: 'Chinmay, 30 October 2026 (CR-356 posted: "releaseId is format uuid on both operations, and a non-uuid is
+      400 validation")'
+    tag: r12
+    producer-tickets: [SVC-PLATFORM-RELEASE-2]
+    consumer-tickets: [APP-CONSOLE-ADM-022, APP-CONSOLE-ADM-023]
+  - id: BC-497
+    contract: platform-ops
+    operation: withdrawRelease
+    change: "params `path:releaseId` type string -> string:uuid"
+    reason: 'ADAM CR-356 (CHG-CR356-001): releaseId is a release''s id, a uuid, as getRelease and promoteRelease
+      already declare (ADR-0056); a non-uuid is 400 validation. The value was always a release id; the declared format
+      now says so. A type change cannot be additive.'
+    approved-by: 'Chinmay, 30 October 2026 (CR-356 posted: "releaseId is format uuid on both operations, and a non-uuid is
+      400 validation")'
+    tag: r12
+    producer-tickets: [SVC-PLATFORM-RELEASE-2]
+    consumer-tickets: [APP-CONSOLE-ADM-022]

@@ -1,0 +1,45 @@
+id: CHG-CR354-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'enrolmentState has a state model (states/device-enrolment.yaml): registered -> enrolled (enrolment code) ->
+  provisioned (testResult) -> active (approval, else 409 device-approval-required); active -> deactivated -> active;
+  any state but retired -> retired (credential revoked, retired_at set); retired terminal. Any other move, a skipped
+  step or the current state included, is 409 device-transition-not-allowed; each move emits device.enrolmentChanged.'
+decision:
+  what: 'ADAM CR-354, option A (Chinmay, 30 October 2026, posted: "as you recommended. The allowed moves are ... Any
+    other move is 409 with problem type device-transition-not-allowed, which is now listed beside
+    device-approval-required"), after the lead''s review of every CR ("for each one actually check if they hold and if
+    not then find out the best way keeping in mind what client needs"). New states/device-enrolment.yaml (anchored on
+    tenancy RegisteredDevice.enrolmentState). contracts/spine/tenancy.yaml enrolDevice: the description and the 409''s
+    problem types. states/registered-device-approval.yaml: the rejected guard names the retirement.
+    events/device-enrolmentChanged.yaml: the notes say the state model emits it. tools/check-states.py: an inline enum
+    under any property name anchors a state model (it read only status and state, so this model had no anchor).'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-354 (Sanket Keluskar, #33989 enrolDevice, blocking): enrolDevice gave only the list "registered ->
+  enrolled -> provisioned -> active -> deactivated -> retired", with no rule for retiring a rejected device or
+  reactivation and no problem type for a move not allowed (RFP 16.1.2, 16.1.3, 16.1.6; DEC-241, DEC-245).'
+keys_touched:
+  operations: [enrolDevice]
+  schemas: [RegisteredDevice, DeviceEnrolment]
+  tables: [platform.device]
+  files:
+  - states/device-enrolment.yaml
+  - contracts/spine/tenancy.yaml
+  - states/registered-device-approval.yaml
+  - events/device-enrolmentChanged.yaml
+  - tools/check-states.py
+root_class: 'a lifecycle written as a list in prose, with no state model the checks could anchor'
+tickets:
+  started:
+  - '33989 (enrolDevice, Sanket Keluskar): build to the decision; no longer blocked.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-354
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open

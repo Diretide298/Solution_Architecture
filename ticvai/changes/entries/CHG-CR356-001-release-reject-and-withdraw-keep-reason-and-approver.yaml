@@ -1,0 +1,57 @@
+id: CHG-CR356-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'control.release keeps status_reason, status_changed_by_principal_id, status_changed_at and
+  withdrawal_approved_by_principal_id; rejectRelease and withdrawRelease write them and put {reason} in the control
+  audit row. Withdrawing from inStaging or inProduction takes approverPrincipalId and stepUpToken as promoteRelease does
+  (400 validation, 403 approver-is-requester, step-up-token-missing, step-up-token-expired); from inDev neither.
+  releaseId is format uuid on both (400 otherwise); no approvalRequestId and no 409 approval-required.'
+decision:
+  what: 'ADAM CR-356 (Chinmay, 30 October 2026, posted: "not as recommended: A''s storage, but promoteRelease''s approval
+    pattern"), after the lead''s review of every CR ("for each one actually check if they hold and if not then find out
+    the best way keeping in mind what client needs"). contracts/satellite/platform-ops.yaml: releaseId format uuid and a
+    400 on rejectRelease and withdrawRelease; both descriptions; withdrawRelease''s body approverPrincipalId and
+    stepUpToken and its 403; Release (and so ReleaseDetail) gains the four optional readOnly fields, persisted to
+    control.release. states/release.yaml: the reject and withdraw guards. screens/P09 ADM-022 confirmWithdrawRelease:
+    the body says what it collects for staging and production (its approved component and trigger unchanged).
+    tools/check-states.py: rule 17 (APPROVER_IN_BODY) holds promoteRelease''s and withdrawRelease''s shape, and the two
+    withdraw moves leave rule 14''s known list. The reason and approver body fields carry x-ticvai-stored-as (their
+    control.release columns). docs/active/breaking-changes.yaml BC-496 and BC-497 record the releaseId format change.
+    derive-ddl writes the four columns into the next control migration.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-356 (Sanket Keluskar, #34126 rejectRelease and #34127 withdrawRelease): both require a reason no column
+  held, states/release.yaml marks withdrawal from staging and production requiresApproval with nothing to satisfy it,
+  and releaseId lacked format uuid (ADR-0056). suspendTenant''s approval-request shape (CR-172) is not the precedent;
+  promoteRelease''s approver and step-up in the same contract is.'
+keys_touched:
+  screens: [ADM-022]
+  operations: [rejectRelease, withdrawRelease]
+  schemas: [Release, ReleaseDetail]
+  tables: [control.release]
+  files:
+  - contracts/satellite/platform-ops.yaml
+  - states/release.yaml
+  - screens/P09-platform-admin-console.yaml
+  - tools/check-states.py
+  - docs/active/breaking-changes.yaml
+  other:
+  - 'BC-496, BC-497 (releaseId string -> uuid, approved by the posted decision)'
+root_class: 'an operation that requires a reason and an approval with no storage and no carrier for either'
+tickets:
+  started:
+  - '34126 (rejectRelease, Sanket Keluskar): store the reason, caller and time, add {reason} to the audit details, and
+    use releaseId format uuid.'
+  - '34127 (withdrawRelease): the same, plus the approver and step-up check when leaving inStaging or inProduction.'
+  unstarted:
+  - 'A [DB] child task of MIG-CONTROL-5 (#34047) for Hrushikant: the four columns on control.release, applied to the
+    live control database too (filed with the plan change).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-356
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-states.py
+status: open

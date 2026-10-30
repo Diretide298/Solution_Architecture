@@ -107,6 +107,16 @@ And one rule per decision:
   BR-WALLET-ETAG-VERSION (r11, ADAM CR-332 option A, CHG-CR332-001) WalletFundingRules and WalletRefundPolicy carry a
                    version (wallet.funding_rule.version, wallet.refund_policy.version); their GET and PUT send it as
                    ETag, and the PUT refuses a stale If-Match 412, the rule CR-257 chose for group bookings.
+  BR-BOOKING-FLOW-MISSING (r12, ADAM CR-343, CHG-CR343-001) bookingFlowMissing counts a venue's sellable bookable
+                   products of a kind some flow type books, against that venue's own enabled flows (no tenant-wide
+                   flow), and validateTenantConfig and publishTenantConfig ask catalogue#productRecords and
+                   tenancy#activeVenues in process.
+  BR-CALL-DISPOSITION (r12, ADAM CR-346, CHG-CR346-001) CallDisposition is stored on marketing.conversation in its
+                   four columns, and setCallDisposition ends a conversation an agent holds (withAgent or waitingOnGuest
+                   to resolved in states/conversation.yaml) and answers 400 for a callback without callbackAt.
+  BR-RESTORE-MISSING-PAGE (r12, ADAM CR-350, CHG-CR350-001) restoreConfigVersion restores a section or navigation item
+                   whose content page is gone hidden (contentPageId null, isVisible false), never refuses for it, and
+                   keeps content_page.is_referenced.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -1029,6 +1039,44 @@ def main() -> int:
     need("BR-GUEST-SSO", "minItems" not in gm and "guest" in str(gm.get("description") or ""),
          "SsoProviderConfig.groupMappings still requires a mapping on a guest row (CHG-CR327-002)")
 
+    # BR-BOOKING-FLOW-MISSING, BR-CALL-DISPOSITION, BR-RESTORE-MISSING-PAGE (r12, ADAM CR-343, CR-346, CR-350; the
+    # lead, 30 October 2026). Each fails on the r11 package and passes on the decision.
+    wl = load("contracts/satellite/white-label.yaml")
+    kind_text = " ".join(str((((wl.get("components") or {}).get("schemas") or {}).get("ConfigFindingKind") or {})
+                             .get("description") or "").split())
+    row = kind_text[kind_text.find("| bookingFlowMissing |"):]
+    for word in ("`isSellable` true", "`guestListing` `bookable`", "There is no tenant-wide flow", "`walletTopUp`"):
+        need("BR-BOOKING-FLOW-MISSING", word in row,
+             f"ConfigFindingKind's bookingFlowMissing row does not say {word!r} (CR-343)")
+    for oid in ("validateTenantConfig", "publishTenantConfig"):
+        vias = {(str(v.get("query")), str(v.get("route"))) for v in op(oid)[3].get("x-ticvai-read-via") or []
+                if isinstance(v, dict)}
+        for q in ("catalogue#productRecords", "tenancy#activeVenues"):
+            need("BR-BOOKING-FLOW-MISSING", (q, "in-process") in vias,
+                 f"{oid} does not ask {q} in process for bookingFlowMissing (CR-343, XDR-022)")
+    msch = (load("contracts/satellite/marketing-crm.yaml").get("components") or {}).get("schemas") or {}
+    cd = msch.get("CallDisposition") or {}
+    need("BR-CALL-DISPOSITION", cd.get("x-ticvai-persistence") == "marketing.conversation",
+         "CallDisposition is stored nowhere (x-ticvai-persistence marketing.conversation; CR-346)")
+    cols = {k: (v or {}).get("x-ticvai-column") for k, v in (cd.get("properties") or {}).items()}
+    need("BR-CALL-DISPOSITION", cols == {"outcome": "disposition_outcome", "callbackAt": "callback_at",
+                                         "callbackAssignedToPrincipalId": "callback_assigned_to_principal_id",
+                                         "note": "disposition_note"},
+         f"CallDisposition's columns are not the four CR-346 named: {cols}")
+    scd = op("setCallDisposition")[3]
+    need("BR-CALL-DISPOSITION", "400" in {str(k) for k in (scd.get("responses") or {})}
+         and "`callbackScheduled` without `callbackAt`" in " ".join(str(scd.get("description") or "").split()),
+         "setCallDisposition does not answer 400 for a callbackScheduled without callbackAt (CR-346)")
+    conv = load("states/conversation.yaml")
+    moves = {(t.get("from"), t.get("to")) for t in conv.get("transitions") or [] if t.get("operation") == "setCallDisposition"}
+    need("BR-CALL-DISPOSITION", moves == {("withAgent", "resolved"), ("waitingOnGuest", "resolved")},
+         f"states/conversation.yaml: setCallDisposition does not end a conversation an agent holds ({sorted(moves)}; CR-346)")
+    rcv = op("restoreConfigVersion")[3]
+    rtext = " ".join(str(rcv.get("description") or "").split())
+    for word in ("`contentPageId` null and `isVisible` false", "never causes a refusal", "`content_page.is_referenced`"):
+        need("BR-RESTORE-MISSING-PAGE", word in rtext,
+             f"restoreConfigVersion does not say {word!r} for a page deleted since the version (CR-350)")
+
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
@@ -1041,7 +1089,8 @@ def main() -> int:
              "BR-PRESET-READONLY", "BR-END-SESSIONS", "BR-PLATFORM-TOKEN", "BR-GUEST-TOKENS", "BR-GUEST-VENUE",
              "BR-PLATFORM-INVOICE", "BR-WALLET-TOPUP-ONCE", "BR-WALLET-PUBLISH-CHECKS", "BR-WALLET-RESTORE-DRAFT",
              "BR-PLANNER-QUESTIONS", "BR-ROTA-HOUR-LIMIT", "BR-ROTA-CROSS-VENUE",
-             "BR-CREDIT-ACCOUNT-CURRENCY", "BR-PLATFORM-APPROVAL-RULE", "BR-WALLET-ETAG-VERSION", "BR-GUEST-SSO"]
+             "BR-CREDIT-ACCOUNT-CURRENCY", "BR-PLATFORM-APPROVAL-RULE", "BR-WALLET-ETAG-VERSION", "BR-GUEST-SSO",
+             "BR-BOOKING-FLOW-MISSING", "BR-CALL-DISPOSITION", "BR-RESTORE-MISSING-PAGE"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

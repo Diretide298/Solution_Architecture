@@ -337,3 +337,27 @@ reads:
     query: the operations host asks identity#guestSignInProviders in process, through Identity''s own query class,
     under the caller''s connection, so the table''s row-level security scopes it, and it answers provider and
     display data only, never client_secret_ref. SELECT only, on the one table.'
+- id: XDR-022
+  reader: operations
+  tables: [catalogue.product, catalogue.product_media]
+  privileges: [SELECT]
+  queries: [catalogue#productRecords, tenancy#activeVenues]
+  operations: [validateTenantConfig, publishTenantConfig, restoreConfigVersion, setAnalyticsProvider,
+    setMaintenanceMode]
+  added: '2026-10-30'
+  decision_ref: ADAM CR-343, Chinmay, 30 October 2026 (A's sellable rule and in-process read, narrowed, and with the
+    venue read in process too)
+  why: 'white-label validateTenantConfig (operations host, #30778) reports bookingFlowMissing per active venue and
+    ProductKind, and publishTenantConfig (#30774) runs the same rule. It needs each active venue''s sellable bookable
+    products (catalogue.product, with catalogue.product_media for Product.media[], Catalogue''s data in commerce) and
+    the active venues (tenancy#activeVenues, platform.scope). Both were declared on the service route between
+    deployables, which is not built (CR-281; the kernel''s service sign-in, #37051). The operations host asks both in
+    process, through the owning module''s own query class, in the caller''s transaction under the caller''s
+    row-level security: catalogue#productRecords where {venueId} for each active venue, on the SELECT V0118 already
+    grants the operations role on catalogue.product and catalogue.product_media (as for createFnbOrder under
+    XDR-008), and tenancy#activeVenues, whose platform.scope is a kernel table every host may read (CR-002), as
+    CR-296 ruled for Tenancy''s other reads, so no grant is added for it. restoreConfigVersion,
+    setAnalyticsProvider (#30765) and setMaintenanceMode (#30766) ask tenancy#activeVenues in process under the same
+    ruling; the two tickets CR-281 left waiting for service sign-in waited only for this read. Not covered:
+    publishTenantConfig and restoreConfigVersion still ask orders#venueChargeCurrencies over the service route, and
+    getTenantConfig and setBookingFlowConfig still ask tenancy#activeVenues over it.'

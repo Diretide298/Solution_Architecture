@@ -114766,6 +114766,9 @@ screens:
       - kind: secondaryButton
         label: End conversation
         operation: setCallDisposition
+        notes: 'Ends the conversation and records the disposition in one call (ADAM CR-346): from withAgent or
+          waitingOnGuest the conversation becomes resolved. After it succeeds, refresh the conversation. Nothing
+          on the screen changes.'
         provenance: defined 4 October 2026 (CHG-FXS-001)
       - kind: secondaryButton
         label: Assist at kiosk

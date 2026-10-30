@@ -1,0 +1,47 @@
+id: CHG-CR351-001
+date: '2026-10-30'
+source: cr
+kind: spec
+summary: 'WEB-021 Wallet & Gift Cards is drawn and specified as the guest-web build on #32125: a full-width page, the
+  dark wallet card with its status pill, balance and credit chips (getWallet), saved cards as payment cards
+  (listPaymentTokens method, maskedIdentifier, expiresAt, isDefault; the scheme logo from maskedIdentifier, a plain mark
+  when none is recognised) with Add a card as the last tile, and row details that slide open. Same operations, fields,
+  errors and states.'
+decision:
+  what: 'ADAM CR-351 (Chinmay, 30 October 2026, posted: "as you recommended. Design change, logged under the rule of
+    28 October 2026. WEB-021''s wireframe, screen UI and page info are updated to match the build on #32125 ... Nothing
+    changes behind the screen, and nothing comes back to build"), after the lead''s review of every CR ("for each one
+    actually check if they hold and if not then find out the best way keeping in mind what client needs").
+    wireframes/frames/web-021.html: the frame redrawn from the CR''s description of the build in the guest-web tokens
+    (the prototype capture it held is replaced), with the signed-out, loading, partial error, first-run, unrecognised
+    card, offline, Add a card and Move balance overlay and Arabic states. screens/P01 WEB-021: notes, the wallet, saved
+    cards and Add a card notes and wireframe.prototype.differences (match stays partial).
+    tools/capture-plans/guest-web-v2.json: WEB-021 is not captured from the prototype. No visible screen field changed,
+    so docs/active/approved-ui-changes.yaml needs no entry.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-351 (Chitrangi Mestry, #32125 WEB-021, 29 October 2026): the build differs from the frame in look only.
+  The lead''s rule of 28 October 2026 (frontend starter, 28eb978d): a frontend developer changes a screen''s design on
+  their own and logs it, and the lead updates the wireframe, the screen''s UI and its page info.'
+keys_touched:
+  screens: [WEB-021]
+  operations: [getWallet, listPaymentTokens, storePaymentToken]
+  files:
+  - wireframes/frames/web-021.html
+  - screens/P01-guest-web-storefront.yaml
+  - tools/capture-plans/guest-web-v2.json
+root_class: a frontend design change logged after the build, brought back into the package's frame and screen record
+tickets:
+  started:
+  - '32125 (WEB-021, Chitrangi Mestry): nothing comes back to build.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-351
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open
+notes: 'The frame draws the rows the screen declares and leaves out the prototype''s Auto top-up row (the web wallet
+  has no auto top-up operation, CHG-SCG-004); the game card row offers Details, as the screen declares no top-up.'

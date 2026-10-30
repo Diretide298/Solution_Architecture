@@ -1,0 +1,51 @@
+id: CHG-CR346-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'A call disposition is stored on marketing.conversation (disposition_outcome, callback_at,
+  callback_assigned_to_principal_id, disposition_note; a later call replaces them), and setCallDisposition also ends a
+  conversation an agent holds: withAgent or waitingOnGuest to resolved, closed_at now, outcome resolved, in the same
+  transaction. withAssistant or queued is 409 conversation-not-ended; callbackScheduled without callbackAt is 400.'
+decision:
+  what: 'ADAM CR-346 (Chinmay, 30 October 2026, posted: "not as recommended: A and C together"), after the lead''s
+    review of every CR ("for each one actually check if they hold and if not then find out the best way keeping in
+    mind what client needs"). contracts/satellite/marketing-crm.yaml: CallDisposition x-ticvai-persistence
+    marketing.conversation with the four x-ticvai-column names (outcome stored nullable, callbackAssignedToPrincipalId
+    referencing identity.principal); setCallDisposition''s description, a 400, and its 409 narrowed to withAssistant or
+    queued. states/conversation.yaml: withAgent -> resolved and waitingOnGuest -> resolved by setCallDisposition.
+    screens/P08 BO-799: the End conversation note (nothing visible changes). docs/active/left-out.yaml LO-CR346-001:
+    a due-callbacks read for the assigned agent (RFP 2.8.10 reminders). tools/check-business-rules.py
+    BR-CALL-DISPOSITION. derive-ddl writes the four columns, their CHECK and key into the next forward migration.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-346 (Sanket Keluskar, #33522 setCallDisposition, blocking): no column held what the operation records,
+  Conversation.outcome is a different enum, and BO-799''s End conversation button calls setCallDisposition while its
+  409 refused any conversation that had not ended (RFP 2.8.7 and 2.8.10, BL-082).'
+keys_touched:
+  screens: [BO-799]
+  operations: [setCallDisposition]
+  schemas: [CallDisposition]
+  tables: [marketing.conversation]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - states/conversation.yaml
+  - screens/P08-venue-back-office.yaml
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+root_class: 'an operation that records a fact with no column to hold it, and a screen action the operation refused'
+tickets:
+  started:
+  - '33522 (setCallDisposition, Sanket Keluskar): build to the decision; the columns come from the [DB] child task.'
+  - '33454/33455 (BO-799 build and wire), if started: End conversation still calls only setCallDisposition; refresh the
+    conversation after it succeeds; Callback at is required when Outcome is callbackScheduled.'
+  unstarted:
+  - 'A [DB] child task of MIG-MARKETING (#30527) for Hrushikant: the four columns on marketing.conversation, applied to
+    the live database too (filed with the plan change).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-346
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open

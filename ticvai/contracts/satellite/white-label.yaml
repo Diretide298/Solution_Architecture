@@ -1842,8 +1842,9 @@ paths:
         for: 'the TenantAppStatus it answers: recentChanges (ADAM CR-338, recentChanges (a))'
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
-        for: 'TenantAppStatus.venues: only the active venues are listed (ADAM CR-096)'
+        route: in-process
+        for: 'TenantAppStatus.venues: only the active venues are listed (ADAM CR-096); in process since ADAM CR-343
+          (XDR-022)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the TenantAppStatus it answers: each venue''s contact, city and openingHours (ADAM CR-338):
@@ -4279,13 +4280,14 @@ paths:
         for: 'the steps validateBookingFlow checks (bookingFlowInvalid; W12)'
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
-        for: 'each active catalogue product''s ProductKind at an active venue, for bookingFlowMissing (ADAM CR-320), as
-          the booking-flow operations read catalogue.product, Catalogue''s data'
+        route: in-process
+        for: 'each active venue''s products, where {venueId}: their ProductKind, isSellable and guestListing, for
+          bookingFlowMissing (ADAM CR-320; in process since ADAM CR-343, XDR-022): catalogue.product, Catalogue''s
+          data'
       - query: tenancy#activeVenues
-        route: service
-        for: 'the active venues bookingFlowMissing is checked at (ADAM CR-320), as publishTenantConfig asks it:
-          platform.scope, Tenancy''s data'
+        route: in-process
+        for: 'the active venues bookingFlowMissing is checked at (ADAM CR-320; in process since ADAM CR-343,
+          XDR-022): platform.scope, Tenancy''s data'
       - query: assets#mediaAssetRecords
         route: in-process
         for: 'whether brand.logoAssetRef and appIcons.sourceAssetRef are ready assets, for missingRequiredAsset (ADAM
@@ -4310,6 +4312,13 @@ paths:
 
         **And the booking flows (decided 29 September, W12):** an enabled flow that fails `validateBookingFlow`
         is `bookingFlowInvalid`; a venue with bookable products and no flow serving their kind is `bookingFlowMissing`.
+
+        **`bookingFlowMissing`, narrowed and asked in process** (ADAM CR-343, 30 October 2026; CHG-CR343-001): the rule
+        is on `ConfigFindingKind`. Both of its reads are asked in process from the operations host, through the owning
+        module''s own query class and under the caller''s row-level security (XDR-022): `catalogue#productRecords`
+        where `{venueId}` for each active venue (the operations role''s SELECT on Catalogue''s product tables comes
+        from V0118, as for `createFnbOrder` under XDR-008), and `tenancy#activeVenues`
+        (`platform.scope` is a kernel table every host may read, as ADAM CR-296 ruled for Tenancy''s other reads).
 
         **What each kind checks** (ADAM CR-320, option A, both parts, 29 October 2026; CHG-CR320-001): the rule of
         every kind is on `ConfigFindingKind`, and `publishTenantConfig` runs the same rules. To decide them this reads
@@ -4350,8 +4359,9 @@ paths:
         - "P13 CMS-103 Booking Flows"
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
-        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
+        route: in-process
+        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001); in process since
+          ADAM CR-343 (XDR-022)'
       - query: assets#mediaAssetRecords
         route: in-process
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
@@ -4362,9 +4372,9 @@ paths:
         route: service
         for: 'what its text calls "orders.PaymentProvider.supportedMethods": payments.provider, Order''s data (CHG-R10GEN-001)'
       - query: catalogue#productRecords
-        route: service
-        for: 'the validation it runs, as validateTenantConfig asks it: each active product''s ProductKind, for
-          bookingFlowMissing (ADAM CR-320)'
+        route: in-process
+        for: 'the validation it runs, as validateTenantConfig asks it: each active venue''s products where {venueId},
+          for bookingFlowMissing (ADAM CR-320; the same rule and in-process read since ADAM CR-343, XDR-022)'
       - query: subscription#contractRecords
         route: in-process
         for: 'the validation it runs, as validateTenantConfig asks it: LicencePosition.licensedModules, for
@@ -4739,8 +4749,9 @@ paths:
         - "P13 CMS-015 Version History"
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
-        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
+        route: in-process
+        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001); in process since
+          ADAM CR-343 (XDR-022)'
       - query: assets#mediaAssetRecords
         route: in-process
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
@@ -4763,6 +4774,18 @@ paths:
         published, unless the request sends `discardDraftChanges` true, as `restoreKioskConfigVersion` does. The
         CMS-015 dialog says the unpublished changes are replaced, and sends true after the user confirms. The
         discarded draft is stored nowhere (the loss is intended, and the dialog is the only confirmation).
+
+
+        **A page deleted since the version was published** (ADAM CR-350, 30 October 2026; CHG-CR350-001). Content
+        pages are not in the snapshot, so a section or item may name a page that no longer exists. The restore
+        restores everything and hides whatever points at a missing page. A homepage section whose `contentPageId`
+        names no content page comes back with `contentPageId` null and `isVisible` false; the rest of the section is
+        as the snapshot has it. A navigation item whose target names a content page that no longer exists comes back
+        with `isVisible` false. A missing page never causes a refusal or a `500`: refusing would block that version
+        for good, because a recreated page gets a new id. In the same transaction the restore sets
+        `content_page.is_referenced` for the pages the restored homepage and navigation link, as `setHomepageLayout`
+        and `setNavigation` do. The review on CMS-015 shows those sections and items as hidden, and the user can point
+        them at a page before publishing. No new response field or problem type.
 
         '
       tags:
@@ -5562,8 +5585,9 @@ paths:
         - "P13 CMS-016 Site Settings"
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
-        for: '422: a venueId not among the tenant''s active venues (ADAM CR-096)'
+        route: in-process
+        for: '422: a venueId not among the tenant''s active venues (ADAM CR-096); in process since ADAM CR-343
+          (XDR-022)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: matrix 22.10.29; Chinmay''s brief for the build (venue configuration: provider, measurement id, the consent category it waits on); BL-073 design §4a; shape follows setBookingFlowConfig'
@@ -12271,7 +12295,7 @@ components:
 
         | bookingFlowInvalid | error | an enabled flow fails `validateBookingFlow` |
 
-        | bookingFlowMissing | error | an active venue (`tenancy#activeVenues`) has an active catalogue product (`catalogue#productRecords`) of a `ProductKind` that no enabled flow''s type serves (`BookingFlowType.productKinds`) |
+        | bookingFlowMissing | error | once per venue and `ProductKind` when all of these hold (ADAM CR-343, 30 October 2026): the venue is active (`tenancy#activeVenues`); it has a catalogue product with that `venueId`, `isSellable` true, `guestListing` `bookable` and that kind (`catalogue#productRecords` where `{venueId}`); the kind is in at least one `BookingFlowType`''s `productKinds`; and no enabled flow of that venue (`booking_flow.venue_id` the venue, `is_enabled` true) has a type whose `productKinds` include the kind. Kinds no flow type books (`retail`, `addOn`, `bundle`, `walletTopUp`) and `infoOnly` or `hidden` products are never reported. There is no tenant-wide flow: `createBookingFlowDefinition` always sets `venue_id` from its path, so a row with `venue_id` null serves no venue. The finding names the venue and the kind |
 
         '
       enum:

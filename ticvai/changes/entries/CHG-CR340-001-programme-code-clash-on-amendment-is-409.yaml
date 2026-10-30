@@ -1,0 +1,43 @@
+id: CHG-CR340-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'updateAccreditationProgramme answers 409 duplicate-code when the body''s code, compared case-insensitively, is
+  held by another programme of the tenant, and changes nothing; keeping its own code is no clash. Its 409 lists
+  [programme-is-template, duplicate-code]; a unique violation on programme_code_uniq maps to the same 409.'
+decision:
+  what: 'ADAM CR-340, option A (Chinmay, 30 October 2026, posted: "as you recommended ... The 409 now lists
+    [programme-is-template, duplicate-code] in x-ticvai-problem-types. Do not switch it to the DuplicateCode $ref ...
+    Check before writing, and also map a unique violation on programme_code_uniq to the same 409"), after the lead''s
+    review of every CR ("for each one actually check if they hold and if not then find out the best way keeping in
+    mind what client needs"). contracts/satellite/accreditation.yaml updateAccreditationProgramme: a description
+    paragraph and the 409''s problem types and text. tools/check-problem-types.py: a second ratchet, an amendment whose
+    body carries a writable x-ticvai-unique field (other than the key its path names the row by) lists duplicate-code
+    on a 409 (UNIQUE_CEILING 4).'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-340 (Sanket Keluskar, #33474 updateAccreditationProgramme): the PUT replaces the programme whole, code
+  included (x-ticvai-unique tenant), and its 409 listed only programme-is-template, so a clash would surface as a 500;
+  createAccreditationProgramme answers the shared DuplicateCode, and updateSaleBoard already answers the same case.'
+keys_touched:
+  operations: [updateAccreditationProgramme]
+  tables: [accreditation.programme]
+  files:
+  - contracts/satellite/accreditation.yaml
+  - tools/check-problem-types.py
+root_class: 'an amendment that replaces a unique code with no answer for a code another row holds'
+tickets:
+  started:
+  - '33474 (updateAccreditationProgramme, Sanket Keluskar, in build): add the duplicate-code answer; nothing else changes.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-340
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: open
+notes: 'The new ratchet holds four amendments of the same class that no CR has decided: setApprovalExternalProvider,
+  updateResourceCategory, updateResourceType and updateWalletType (each a PUT whose body carries a unique code and whose
+  409 lists no duplicate-code). It only falls; a new one fails.'
