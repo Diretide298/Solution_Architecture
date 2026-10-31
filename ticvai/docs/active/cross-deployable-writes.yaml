@@ -372,3 +372,56 @@ reads:
     ruling; the two tickets CR-281 left waiting for service sign-in waited only for this read. Not covered:
     publishTenantConfig and restoreConfigVersion still ask orders#venueChargeCurrencies over the service route, and
     getTenantConfig and setBookingFlowConfig still ask tenancy#activeVenues over it.'
+- id: XDR-031
+  reader: access
+  tables: [platform.device]
+  privileges: [SELECT]
+  queries: [tenancy#deviceRecords]
+  operations: [setBleBeaconGeofence, getBleBeaconGeofence]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-389, Chinmay, 31 October 2026 (not as recommended - A, with a centre for the circle and the
+    reads named)
+  why: 'access setBleBeaconGeofence (#30955) keeps one access.device_placement row (role proximity) per beacon, found by
+    device_id = beaconId, and a beaconId that names no registered platform.device is 404; its view and
+    getBleBeaconGeofence answer health and lastDetected, which are platform.device.health and last_heartbeat_at,
+    Tenancy''s register (ADR-0067) in commerce. The service route between deployables is not built (CR-281; the
+    kernel''s service sign-in, #37051), and the access role had no SELECT on platform.device. The access host asks
+    tenancy#deviceRecords in process, through Tenancy''s own query class, in the caller''s transaction under the
+    caller''s row-level security: a narrow read, as XDR-003 is. SELECT only, on the one table; the access role
+    already has USAGE on platform.'
+- id: XDR-032
+  reader: access
+  tables: [platform.venue_settings]
+  privileges: [SELECT]
+  queries: [tenancy#venueSettingsRecords]
+  operations: [setFaceTagTemporaryEnrollment, listFaceTagTemporary]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-390, Chinmay, 31 October 2026 (not as recommended - A, without a form version on the profile)
+  why: 'access setFaceTagTemporaryEnrollment (#30956) falls back to the venue''s biometric consent form
+    (VenueSettings.biometrics.consentFormId) when the profile names none, else 422 consent-form-required, and its view
+    and listFaceTagTemporary answer templatesHeldByTicvai from the same settings: platform.venue_settings, Tenancy''s
+    data in commerce. Both read it over the service route between deployables, which is not built (CR-281; #37051),
+    and the access role had no SELECT on platform.venue_settings. The access host asks tenancy#venueSettingsRecords
+    in process, through Tenancy''s own query class, in the caller''s transaction under the caller''s row-level
+    security: a narrow read, as XDR-003 is. SELECT only. Not covered by this decision: seven other access operations
+    (enrolFaceTag, enrolFacePass, createAdmissionRules, updateAdmissionRules, setRfidNfcCard,
+    listBiometricConsentGuardian, listSecurityDetectionGovernance) still ask venueSettingsRecords over the service
+    route.'
+- id: XDR-033
+  reader: operations
+  tables: [catalogue.event, catalogue.product, catalogue.product_media, catalogue.product_category]
+  privileges: [SELECT]
+  queries: [catalogue#productRecords, catalogue#productCategoryRecords, catalogue#eventRecords]
+  operations: [createGuidedChoice, proposeGuidedChoice, publishGuidedChoice]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-394, Chinmay, 31 October 2026 (not as recommended - A, on the queries that already exist, with
+    a rule stated for each kind)
+  why: 'white-label createGuidedChoice (#30924) and proposeGuidedChoice (#30931) refuse a target not in the choice''s
+    venue (400 target-not-in-venue), and publishGuidedChoice (#30932) refuses a target not on sale (422
+    answer-target-not-on-sale). Product, category and event targets are Catalogue''s rows in commerce, and none of the
+    three operations declared a read of them. The operations host asks catalogue#productRecords,
+    catalogue#productCategoryRecords and catalogue#eventRecords in process, through Catalogue''s own query classes,
+    in the caller''s transaction under the caller''s row-level security. The SELECT on catalogue.product,
+    catalogue.product_media and catalogue.product_category is the one V0118 already grants the operations role
+    (XDR-008, XDR-022); SELECT on catalogue.event is new, and the operations role already has USAGE on schema
+    catalogue.'

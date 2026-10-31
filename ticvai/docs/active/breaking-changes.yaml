@@ -1670,3 +1670,15 @@ changes:
     tag: r12
     producer-tickets: ['30784']
     consumer-tickets: ['31152', '31153', '31154']
+  - id: BC-520
+    contract: access
+    operation: getBleBeaconGeofence
+    change: "new required params `query:beaconId`"
+    reason: 'ADAM CR-389 (CHG-CR389-001): setBleBeaconGeofence keeps one access.device_placement row per beacon
+      (CHG-R8WFC-001), so the read must say which beacon it answers for: a required beaconId, the beacon''s registered
+      platform.device id, or 404. A read with no key had no record to answer from; it cannot be made additive.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-389 posted on #30955: "getBleBeaconGeofence takes a required beaconId
+      query parameter and answers for that beacon, or 404")'
+    tag: r12
+    producer-tickets: ['32505']
+    consumer-tickets: ['32508', '32509', '32510']

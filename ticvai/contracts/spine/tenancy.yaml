@@ -181,7 +181,11 @@ x-ticvai-queries:
       nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
       another deployable through Tenancy's service route (serviceAuth).
-    served: [service]
+      It is asked in process by the access host too, for setBleBeaconGeofence and getBleBeaconGeofence: whether a
+      beaconId is a registered device, and the beacon's health and last_heartbeat_at for the view, through
+      Tenancy's own query class under the caller's row security (ADAM CR-389, Chinmay, 31 October 2026;
+      docs/active/cross-deployable-writes.yaml XDR-031).
+    served: [in-process, service]
   outboxRecords:
     module: tenancy
     table: platform.outbox
@@ -287,6 +291,9 @@ x-ticvai-queries:
       (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008; docs/active/cross-deployable-writes.yaml XDR-004) and,
       since 29 October 2026, for every operation it serves that asks it (ADAM CR-296, option A; CHG-R11RUL-001), and
       by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
+      It is asked in process by the access host for setFaceTagTemporaryEnrollment and listFaceTagTemporary, for the
+      venue's biometrics settings (consentFormId for the fallback, templatesHeldByTicvai for the view), through
+      Tenancy's own query class under the caller's row security (ADAM CR-390, Chinmay, 31 October 2026; XDR-032).
       **A signed-in guest reads every venue's settings** (ADAM CR-341, Chinmay, 30 October 2026, option B for the settings tables; CHG-CR341-001): platform.venue_settings has a read branch for any
       session with a guest subject (`ticvai.subject_id` set), so a signed-in guest's read above venue level
       (listMyOrders pricing an order at a venue other than the request's) sees that venue's row and the tenant's

@@ -3546,8 +3546,13 @@ paths:
       description: 'Replaces the page''s editable fields. `status` is taken only to archive the page
         (`states/content.yaml`: withdrawn or abandoned); publishing is `publishTenantConfig`.
 
-        **A published page may only be archived (decided 28 September, audit R163).** On a `published`
-        page the only change taken is `status: archived`; anything else is refused with 409
+        **A published page may only be archived or switched on and off (decided 28 September, audit R163;
+        ADAM CR-393, Chinmay, 31 October 2026).** On a `published` page the changes taken are `status: archived`,
+        which withdraws the page, and a change to `isEnabled`: if every other editable field in the body equals
+        the stored value, `isEnabled` is written, the status stays `published`, and the answer is `200`. The
+        switch takes effect at once, with no publish and no approval, because it changes whether approved content
+        shows and never what it says; it invalidates the edge cache of `listPublishedContentPages`, as
+        `publishTenantConfig` does. Any other change to a published page is refused with 409
         `published-page-locked`. To change what guests read, archive it and author a new page.
 
         '
@@ -3576,8 +3581,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/ContentPage'
         '409':
-          description: The page is `published` and the body changes more than its status to `archived`
-            (audit R163).
+          description: The page is `published` and the body changes more than its status to `archived` or its
+            `isEnabled` (audit R163; ADAM CR-393).
           x-ticvai-problem-types:
           - published-page-locked
           content:
@@ -3730,6 +3735,11 @@ paths:
         September, audit R163).** Without `includeHistory` the list holds one entry per `PolicyKind`,
         its current version; with it, every version, newest first within each kind.
 
+        **The current version** (ADAM CR-392, Chinmay, 31 October 2026) is, for each kind, the one with the latest
+        `effectiveFrom` on or before today (UTC); on a tie, the higher `version` wins. A version with a later
+        `effectiveFrom` is **scheduled**: `includeHistory` shows it, but nothing serves it or prompts re-consent
+        until its day. `listPublishedPolicies` answers with the same current version.
+
         **Staff only. Guests read `listPublishedPolicies`** (decided 2 October, GFIX-2): the current version
         of each published policy, with no session, for checkout terms, sign-up and the help centre.
 
@@ -3783,6 +3793,15 @@ paths:
         is a compliance failure. Publishing creates a new version; prior versions remain readable.
         **There is no title to send**: the heading a guest sees is derived from `kind` (`PolicyKind`).
 
+        **How a version is numbered and when it takes effect** (ADAM CR-392, Chinmay, 31 October 2026).
+        `version` is the next integer for its kind, stored as text ("1", "2", ...): one more than the highest
+        stored for that kind, set in the same transaction. A unique key on (`kind`, `version`) refuses a
+        concurrent duplicate with `409 concurrency-conflict`. A missing `effectiveFrom` is the publish day in
+        UTC. An `effectiveFrom` before today (UTC) is `400 effective-from-in-past`, so no version can be
+        backdated under a recorded consent. A version whose `effectiveFrom` is later than today is scheduled:
+        it becomes the kind''s current version on its day (`listPolicies`, `listPublishedPolicies`), and only
+        then is it served or does it prompt re-consent.
+
         **English and Arabic are both required before a policy can be published (decided 28 September,
         audit R096)**: `body` must carry non-empty `en` and `ar` entries, or 400. Other enabled languages
         are optional.
@@ -3817,6 +3836,8 @@ paths:
                 effectiveFrom:
                   type: string
                   format: date
+                  description: The day the version takes effect, UTC. Missing is the publish day (UTC); before
+                    today (UTC) is `400 effective-from-in-past` (ADAM CR-392).
       responses:
         '201':
           headers:
@@ -3828,12 +3849,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Policy'
         '400':
-          x-ticvai-problem-types: [english-version-required, arabic-version-required]
-          description: The English (`en`) or Arabic (`ar`) version is missing (audit R096)
+          x-ticvai-problem-types: [english-version-required, arabic-version-required, effective-from-in-past]
+          description: The English (`en`) or Arabic (`ar`) version is missing (audit R096), or `effectiveFrom` is
+            before today in UTC (`effective-from-in-past`, ADAM CR-392)
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: ../shared/common.yaml#/components/responses/Conflict
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenant-config/modules:
@@ -5077,12 +5101,28 @@ paths:
       operationId: createGuidedChoice
       x-ticvai-consumed-by:
         - "P13 CMS-101 Help Me Choose"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'a product target''s venue_id (catalogue.product, Catalogue''s data), asked in process through Catalogue''s own query class under the caller''s row security (ADAM CR-394; XDR-033, on the SELECT XDR-008 and XDR-022 already grant)'
+      - query: catalogue#productCategoryRecords
+        route: in-process
+        for: 'a category target''s scope_path (catalogue.product_category, Catalogue''s data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants)'
+      - query: catalogue#eventRecords
+        route: in-process
+        for: 'an event target''s venue_id (catalogue.event, Catalogue''s data), in process (ADAM CR-394; XDR-033)'
       x-ticvai-audience:
       - staff
       summary: Set up Help me choose for a venue
       description: '**Venue configuration (decided 29 September, rev 3 REV3-11).** Created as `draft`
         with `source` `manual`; guests see nothing until `publishGuidedChoice`. Every target must belong
         to this venue, or 400.
+
+        **In this venue** (ADAM CR-394, Chinmay, 31 October 2026): a target is in the venue when it is a product or
+        event whose `venue_id` is the choice''s venue, or a category whose `scope_path` is the venue''s or an
+        ancestor of it, read in process from Catalogue (`catalogue#productRecords`, `#productCategoryRecords`,
+        `#eventRecords`; XDR-033). Else `400 target-not-in-venue`, which names the failing target in `errors[]` by
+        its pointer (`questions/i/answers/j/target`), because a new answer has no id yet.
 
         '
       tags:
@@ -5130,6 +5170,16 @@ paths:
         format: uuid
     post:
       operationId: proposeGuidedChoice
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'a product target''s venue_id (catalogue.product, Catalogue''s data), asked in process through Catalogue''s own query class under the caller''s row security (ADAM CR-394; XDR-033, on the SELECT XDR-008 and XDR-022 already grant)'
+      - query: catalogue#productCategoryRecords
+        route: in-process
+        for: 'a category target''s scope_path (catalogue.product_category, Catalogue''s data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants)'
+      - query: catalogue#eventRecords
+        route: in-process
+        for: 'an event target''s venue_id (catalogue.event, Catalogue''s data), in process (ADAM CR-394; XDR-033)'
       x-ticvai-audience:
       - service
       summary: Record an AI-proposed Help me choose set-up for review
@@ -5143,6 +5193,11 @@ paths:
         **The caller is ai `suggestGuidedChoice`** (29 September, build; AI system design 3.11). `suggestionRef`
         is the id of its `AiGuidedChoiceSuggestion`, which the review screen passes to ai
         `getGuidedChoiceSuggestion` to show why each question, answer and target was proposed.
+
+        **The same venue check as `createGuidedChoice`** (ADAM CR-394, Chinmay, 31 October 2026): a product or
+        event target whose `venue_id` is not the choice''s venue, or a category whose `scope_path` is neither the
+        venue''s nor an ancestor of it, is `400 target-not-in-venue`, named in `errors[]` by its pointer
+        (`questions/i/answers/j/target`); Catalogue is read in process (XDR-033).
 
         '
       tags:
@@ -5422,6 +5477,16 @@ paths:
       operationId: publishGuidedChoice
       x-ticvai-consumed-by:
         - "P13 CMS-101 Help Me Choose"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'a product target''s venue_id, is_sellable, guest_listing, on_sale_from and on_sale_to (catalogue.product, Catalogue''s data), asked in process through Catalogue''s own query class under the caller''s row security (ADAM CR-394; XDR-033, on the SELECT XDR-008 and XDR-022 already grant)'
+      - query: catalogue#productCategoryRecords
+        route: in-process
+        for: 'a category target''s scope_path, is_active, and its products on sale (catalogue.product_category, Catalogue''s data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants)'
+      - query: catalogue#eventRecords
+        route: in-process
+        for: 'an event target''s venue_id, is_active and lifecycle_state (catalogue.event, Catalogue''s data), in process (ADAM CR-394; XDR-033)'
       x-ticvai-audience:
       - staff
       summary: Publish a Help me choose set-up to guests
@@ -5432,6 +5497,17 @@ paths:
         `filter` (`behaviour` `filter`) or the last-question `target` (`recommend`) it needs (W4). **One published choice per
         venue**: publishing this one returns the venue''s previously published choice to `draft` in the
         same transaction. Live at once; not part of `publishTenantConfig`.
+
+
+        **The rule for each kind** (ADAM CR-394, Chinmay, 31 October 2026). Catalogue is asked in process from the
+        operations host, through Catalogue''s own query classes and under the caller''s row security
+        (`catalogue#productRecords`, `#productCategoryRecords`, `#eventRecords`; XDR-033). A target is on sale
+        (else `422 answer-target-not-on-sale`) when it is: a product with `is_sellable` true, `guest_listing`
+        `bookable`, and the current time inside `on_sale_from` and `on_sale_to` where they are set; a category
+        with `is_active` true and at least one such product of this venue in it; an event with `is_active` true
+        and `lifecycle_state` `onSale` or `live`. A module target must be enabled in the published configuration
+        (`422 answer-target-not-enabled`), and a booking-flow target must be one of the venue''s enabled flows.
+        The `422` answers with `GuidedChoiceAnswerProblem`: `Problem` plus `questionId` and `answerId`.
 
         '
       tags:
@@ -5467,11 +5543,12 @@ paths:
         '422':
           x-ticvai-problem-types: [answer-target-not-on-sale, answer-target-not-enabled, answer-filter-or-target-missing]
           description: An answer's target is not on sale or not enabled, or an answer lacks the filter or
-            target its behaviour needs; the problem names the answer
+            target its behaviour needs; the problem names the answer by `questionId` and `answerId`
+            (`GuidedChoiceAnswerProblem`, ADAM CR-394)
           content:
             application/problem+json:
               schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+                $ref: '#/components/schemas/GuidedChoiceAnswerProblem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guided-choices/{guidedChoiceId}/unpublish:
@@ -6055,6 +6132,13 @@ paths:
         empty. History and who published it stay on `listPolicies`. The tenant comes from the host, as for
         `getPublishedTenantConfig`. Cached at the edge and invalidated by `setPolicy`.
 
+
+        **The current version** (ADAM CR-392, Chinmay, 31 October 2026) is the one with the latest
+        `effectiveFrom` on or before today (UTC); on a tie, the higher `version` wins, as `listPolicies` answers
+        it. A scheduled version (a later `effectiveFrom`) is never served here and prompts no re-consent until
+        its day, and a kind whose only versions are scheduled is absent. The edge cache expires no later than
+        the next scheduled `effectiveFrom`.
+
         '
       tags:
       - content
@@ -6062,7 +6146,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '2 October: **servable from a local cache.** A policy changes only when the tenant
-        publishes a new version.
+        publishes a new version, or when a scheduled version''s `effectiveFrom` arrives (ADAM CR-392).
 
         '
       x-ticvai-conflict-policy: serverWins
@@ -6174,7 +6258,8 @@ paths:
         then by slug. `slug` fetches one known page; `categoryCode` is how a screen reads its own category
         (GST-057 reads the accessibility pages), fixed by the screen and never typed by a guest. The tenant
         comes from the host, as for `getPublishedTenantConfig`. Cached at the edge and invalidated by
-        `publishTenantConfig`.
+        `publishTenantConfig`, and by `updateContentPage` when it switches a published page''s `isEnabled` (ADAM
+        CR-393).
 
         '
       tags:
@@ -6183,7 +6268,7 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: '2 October: **servable from a local cache.** Published content changes only on a
-        publish.
+        publish or an `isEnabled` switch (ADAM CR-393).
 
         '
       x-ticvai-conflict-policy: serverWins
@@ -7629,6 +7714,17 @@ components:
         event, or a module such as `membership`. Each id must belong to the choice''s venue and be on sale
         or enabled when the choice is published, or `publishGuidedChoice` refuses it.
 
+
+        **The rules, per kind** (ADAM CR-394, Chinmay, 31 October 2026). In the venue (checked by
+        `createGuidedChoice` and `proposeGuidedChoice`, else `400 target-not-in-venue`): a product or event whose
+        `venue_id` is the choice''s venue, or a category whose `scope_path` is the venue''s or an ancestor of it.
+        On sale (checked by `publishGuidedChoice`, else `422 answer-target-not-on-sale`): a product with
+        `isSellable` true, `guestListing` `bookable`, and the current time inside `onSaleFrom` and `onSaleTo`
+        where they are set; a category with `isActive` true and at least one such product of this venue in it;
+        an event with `isActive` true and `lifecycleState` `onSale` or `live`. A module must be enabled in the
+        published configuration (`422 answer-target-not-enabled`); a booking flow must be one of the venue''s
+        enabled flows.
+
         '
       required:
       - kind
@@ -7667,6 +7763,23 @@ components:
           nullable: true
           description: Required when `kind` is `bookingFlow` (decided 29 September, W12; BUILD-YOUR-EXPERIENCE
             "each answer points to one booking flow"). One of the venue's enabled `BookingFlow`s.
+    GuidedChoiceAnswerProblem:
+      x-ticvai-persistence: none — error shape
+      description: 'The `422` of `publishGuidedChoice` (ADAM CR-394, Chinmay, 31 October 2026): `Problem` plus the
+        answer it refuses, as fields, so a client marks the answer without reading `detail`.'
+      allOf:
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        required: [questionId, answerId]
+        properties:
+          questionId:
+            type: string
+            format: uuid
+            description: The question whose answer is refused.
+          answerId:
+            type: string
+            format: uuid
+            description: The refused answer.
     GuidedChoicePreviewRequest:
       x-ticvai-persistence: none — request only
       type: object
@@ -11744,6 +11857,9 @@ components:
         isEnabled:
           type: boolean
           default: true
+          description: 'The one field a `published` page takes besides `status: archived` (ADAM CR-393): when every
+            other editable field equals the stored value, it is written at once, the page stays `published`, and
+            the answer is `200`.'
         iconAssetRef:
           type: string
           format: uuid
@@ -11901,6 +12017,8 @@ components:
       - accessibility
     Policy:
       x-ticvai-persistence: whitelabel.policy
+      x-ticvai-unique-together:
+      - [kind, version]
       type: object
       required:
       - kind
@@ -11924,6 +12042,9 @@ components:
           description: 'Immutable. A guest who consented to version 3 consented to version 3, and a policy
             that changes under a recorded consent is a compliance failure.
 
+            **Set by the server** (ADAM CR-392): the next integer for its kind, stored as text ("1", "2", ...),
+            one more than the highest stored for that kind, in the same transaction; unique with `kind`.
+
             '
         body:
           $ref: '#/components/schemas/LocalisedRichText'
@@ -11932,6 +12053,9 @@ components:
         effectiveFrom:
           type: string
           format: date
+          description: 'The day this version takes effect, UTC (ADAM CR-392). The publish day when not sent; never
+            before the publish day. A kind''s current version is the one with the latest `effectiveFrom` on or
+            before today (UTC), the higher `version` on a tie; a later one is scheduled.'
         publishedByPrincipalId:
           type: string
           format: uuid

@@ -1,0 +1,62 @@
+id: CHG-CR392-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'setPolicy numbers a version as the next integer for its kind, stored as text, one more than the highest stored,
+  in the same transaction, under a unique key on whitelabel.policy (kind, version) that answers a concurrent duplicate
+  409 concurrency-conflict. A missing effectiveFrom is the publish day in UTC; one before today (UTC) is 400
+  effective-from-in-past. A kind''s current version is the one with the latest effectiveFrom on or before today (UTC),
+  the higher version on a tie, for listPolicies and listPublishedPolicies; a later one is scheduled, shown only with
+  includeHistory, and the storefront cache expires no later than the next scheduled effectiveFrom.'
+decision:
+  what: 'Posted on #30934 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually
+    check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction
+    "Include them in r12": "not as recommended: A''s numbering and default, with B''s current version. version is the
+    next integer for its kind, stored as text ... A unique key on (kind, version) refuses a concurrent duplicate with
+    409 concurrency-conflict. A missing effectiveFrom is the publish day in UTC. An effectiveFrom before today (UTC) is
+    400 effective-from-in-past ... A kind''s current version is the one with the latest effectiveFrom on or before today
+    (UTC); on a tie, the higher version wins. listPublishedPolicies and listPolicies (by default) both answer with it. A
+    version with a later effectiveFrom is scheduled ... listPublishedPolicies'' edge cache expires no later than the
+    next scheduled effectiveFrom." contracts/satellite/white-label.yaml: setPolicy (the numbering and dates, its 400 and
+    the shared 409 Conflict), the effectiveFrom field, listPolicies and listPublishedPolicies (the current-version rule,
+    scheduled versions, the cache), Policy (x-ticvai-unique-together [kind, version]; the version and effectiveFrom
+    descriptions). tools/check-business-rules.py BR-POLICY-VERSIONS.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-392 (Hrushikant Patkar, #30934 setPolicy): version and effective_from are NOT NULL, yet the package said
+  neither how a version is numbered nor what a missing effectiveFrom is, nor whether a future effectiveFrom is current;
+  whitelabel.policy had no unique (kind, version). Taking the newest published as current would serve and prompt
+  re-consent for a notice before it is in force.'
+keys_touched:
+  operations: [setPolicy, listPolicies, listPublishedPolicies]
+  schemas: [Policy]
+  tables: [whitelabel.policy]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'new unique index whitelabel.policy (kind, version) (the [DB] task the plan lane filed)'
+root_class: 'an unstated server rule (numbering, a default, what counts as current) on a versioned record'
+tickets:
+  started:
+  - '30934 (setPolicy, Hrushikant): keep the next integer per kind and the UTC default; add 400 effective-from-in-past
+    and map a unique-key clash to 409 concurrency-conflict.'
+  - '30930 (listPublishedPolicies, Hrushikant): the current version becomes the one with the latest effectiveFrom on or
+    before today (UTC), not the newest published; do not serve scheduled versions; expire the cache at the next
+    effectiveFrom.'
+  unstarted:
+  - '30940 (listPolicies, Sanket Keluskar): the same current-version rule by default; scheduled versions with
+    includeHistory.'
+  - '33386 to 33388 (CMS-018): a scheduled version shows in the history only; a past effectiveFrom is refused 400.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-392
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-POLICY-VERSIONS
+status: open
+notes: 'The 409 is the shared Conflict response (idempotency-conflict and concurrency-conflict). Beyond the posted words:
+  listPublishedPolicies says a kind whose only versions are scheduled is absent, which follows from "a kind never
+  published is absent" and "nothing serves it until its day"; and its offline note says a policy also changes when a
+  scheduled effectiveFrom arrives.'

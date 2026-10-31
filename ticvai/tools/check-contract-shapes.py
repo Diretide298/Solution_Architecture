@@ -37,6 +37,12 @@ same kind that nothing held:
                            required fields (`kind`, `text`, ...) are what a PATCH must not require.
   C-PAGED-STATUS           a cursor-paged list whose items' status can end (revoked, cancelled, expired ...) that
                            says neither which statuses it returns nor takes a status filter (ADAM CR-088, CHG-MKT-003)
+  C-PUT-CREATE             a PUT on a required path id whose text still promises the create of a body without the
+                           id: "keyed on the body's `id`", "No `id` creates", "A body without `ruleId` creates", or a
+                           body key field "Absent creates ...". The path id is always sent, so that create can never
+                           happen (ADAM CR-390 and CR-395, CHG-CR395-001: setFaceTagTemporaryEnrollment's and
+                           setAccessPointGroup's 201 were unreachable). CR-245's rule: the path id is the record's id,
+                           a create takes it (201), and a body id must equal it.
   C-PUT-KEY                a PUT whose path id carries the stock "Addresses the item this write creates or
                            replaces" text while its description keys the write on something else (`code`, `kind`
                            and the scope, a selector set); a path parameter promising `409 <noun>-id-mismatch` on an
@@ -99,6 +105,8 @@ RULES = {
     "C-PATCH-FULL-BODY": "a PATCH body is the full resource schema with its required list (ADAM CR-089, CHG-CNS-001)",
     "C-PAGED-STATUS": "a paged list of items whose status can end (revoked, cancelled ...) that says neither which "
                       "statuses it returns nor takes a status filter (ADAM CR-088, CHG-MKT-003)",
+    "C-PUT-CREATE": "a PUT on a required path id that promises the create of a body without the id, which can never "
+                    "happen (ADAM CR-390, CR-395; CHG-CR395-001)",
     "C-PUT-KEY": "a PUT keyed on a natural key whose path id carries the stock 'creates or replaces' text, a promised "
                  "409 <noun>-id-mismatch its 409 does not list, or 'no id in the path' beside a path id (ADAM CR-245, "
                  "CHG-R10CRF-005)",
@@ -132,6 +140,26 @@ def finding_rule_gaps(schema: dict) -> list:
 def promised_statuses(text: str) -> set:
     """The refusal statuses an operation's own description or body-key note promises (C-REFUSAL-UNDECLARED)."""
     return {a or b for a, b in PROMISED_STATUS.findall(text or "")}
+# ADAM CR-390 and CR-395 (CHG-CR395-001): a PUT on a required path id that promises the create of a body without the
+# id. The operation's text ("keyed on the body's `id`", "No `id` creates", "A body without `ruleId` creates") or the
+# body key field's ("Absent creates a rule", "Absent in a body, it creates").
+UNREACHABLE_CREATE = re.compile(r"\bkeyed (?:on|by) the body's `id`|\b(?:a body without|no) `[A-Za-z]+`\**"
+                                r"(?: in the body)? creates", re.I)
+ABSENT_CREATES = re.compile(r"\babsent(?: in a body)?,? (?:it )?(?:creates|adds)\b", re.I)
+
+
+def put_create_unreachable(text: str, key_descriptions: dict) -> list:
+    """What promises an unreachable create (C-PUT-CREATE): the operation text's phrase, and each body key field
+    (`id`, or a field named for the path parameter) whose description says its absence creates."""
+    out = []
+    hit = UNREACHABLE_CREATE.search(" ".join(str(text or "").split()))
+    if hit:
+        out.append(hit.group(0))
+    out += [f"{k}: {str(d).strip()[:60]}" for k, d in sorted(key_descriptions.items())
+            if ABSENT_CREATES.search(str(d or "").replace("*", ""))]
+    return out
+
+
 # ADAM CR-245 (CHG-R10CRF-005): the text the 14 October shapes pass stamped on every PUT path id it added
 # (tools/applied/shp-contract-shapes-14-october/apply_noaddr.py), right only for a PUT keyed on that id.
 STOCK_ADDRESS = "Addresses the item this write creates or replaces"
@@ -627,6 +655,15 @@ def extra_rules(guard, ops, docs):
                           f"declare x-ticvai-body-key")
         if m in ("put", "patch", "delete") and not path_params and not op.get("x-ticvai-singleton")                 and not (f["item"] or {}).get("x-ticvai-singleton") and not (body_key and not missing_key):
             guard.add("C-NO-ADDRESS", oid, f"{oid}: {m.upper()} {path} has no path key and is not a singleton")
+        # C-PUT-CREATE (ADAM CR-390, CR-395; CHG-CR395-001): a PUT on a required path id promises no create that
+        # only a body without the id could reach.
+        if m == "put" and path_params:
+            keys = {k: (v or {}).get("description") for k, v in (body_props or {}).items()
+                    if isinstance(v, dict) and (k == "id" or k in path_params)}
+            for why in put_create_unreachable(op.get("description"), keys):
+                guard.add("C-PUT-CREATE", f"{oid}:{why.split(':')[0][:40]}",
+                          f"{oid}: PUT {path} promises a create without the id ({why[:80]!r}), but the path id is "
+                          f"always sent: say the path id is the record's id and a create takes it (201; ADAM CR-245)")
         # C-PUT-KEY (ADAM CR-245, CHG-R10CRF-005): a PUT path id says what it is against the write's key.
         if m == "put" and path_params:
             ptext = " ".join(str(op.get(k) or "") for k in ("description", "summary"))

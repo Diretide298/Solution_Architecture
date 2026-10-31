@@ -1,0 +1,83 @@
+id: CHG-CR389-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'A BLE beacon is one access.device_placement row (role proximity) found by device_id = beaconId, a registered
+  platform.device (else 404), and its drawn activation zone is a new jsonb column access.device_placement.activation_zone
+  ({centre, radiusMeters} or {boundary}). Each input field names its column; geofenceCentre is added to the input and the
+  view (a radius 5 to 5000 needs it, a boundary needs three points, both is 400); health and lastDetected are ignored on
+  input and read from platform.device through tenancy#deviceRecords in process (XDR-031). getBleBeaconGeofence takes a
+  required beaconId and answers that beacon or 404. setAccessPointGeofence stays the gate''s validation fence.'
+decision:
+  what: 'Posted on #30955 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually
+    check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction
+    "Include them in r12": "not as recommended: A, with a centre for the circle and the reads named. Each beacon is one
+    access.device_placement row (role proximity), found by device_id = beaconId ... a beaconId that names no registered
+    device is 404 ... The geofence goes in a new jsonb column, access.device_placement.activation_zone ... Add an
+    optional geofenceCentre ... health and lastDetected are ignored on input. The view reads them from
+    platform.device.health and last_heartbeat_at through tenancy#deviceRecords, in process ... getBleBeaconGeofence
+    takes a required beaconId query parameter and answers for that beacon, or 404. setAccessPointGeofence stays the
+    gate''s validation fence; this write does not touch access.access_point." contracts/spine/access.yaml:
+    setBleBeaconGeofence (the "Overlaps setAccessPointGeofence" paragraph replaced by the rule, 400 and 404, read-via
+    route in-process, body-key note naming device_id), getBleBeaconGeofence (required beaconId, read-via), the input
+    (persistence access.device_placement, x-ticvai-stored-as on each field, geofenceCentre, health and lastDetected
+    x-ticvai-persisted false), the view (geofenceCentre), AccessDevicePlacement.activationZone.
+    contracts/spine/tenancy.yaml deviceRecords served [in-process, service]. docs/active/cross-deployable-writes.yaml
+    XDR-031. handoff/api-data-lineage-overrides.json: both beacon operations no longer read or write
+    access.access_point. screens/P08-venue-back-office.yaml BO-168 overlay names geofenceCentre (the wireframe is
+    notStarted). tools/check-business-rules.py BR-BEACON-GEOFENCE.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-389 (Hrushikant Patkar, #30955 setBleBeaconGeofence): no table the write used could hold the geofence
+  (access.access_point.geofence is a gate''s handheld fence, circle only), the input said it was applied to
+  access.access_point, the location members named no column, health and lastDetected sat in Tenancy''s register with no
+  grant for the access role, and getBleBeaconGeofence took no key though the write keeps one record per beacon
+  (CHG-R8WFC-001). A radius alone had no centre on a map-based editor (BO-168).'
+keys_touched:
+  operations: [setBleBeaconGeofence, getBleBeaconGeofence]
+  schemas: [BleBeaconGeofenceConfigurationInput, BleBeaconGeofenceConfigurationView, AccessDevicePlacement]
+  tables: [access.device_placement, platform.device]
+  screens: [BO-168]
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/tenancy.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - docs/active/breaking-changes.yaml
+  - handoff/api-data-lineage-overrides.json
+  - screens/P08-venue-back-office.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'XDR-031 (new: SELECT on platform.device for the access role)'
+  - 'BC-520 (getBleBeaconGeofence: the required beaconId query parameter)'
+  - 'new column access.device_placement.activation_zone jsonb (the [DB] task the plan lane filed)'
+root_class: 'storage-route gap: a write''s fields with no column and a read on a route that is not built'
+tickets:
+  started:
+  - '30955 (setBleBeaconGeofence, Hrushikant): keep the device_placement write and add activation_zone, with
+    geofenceCentre and its 400 rules; map the location fields as stated, return 404 for an unregistered beaconId, ignore
+    health and lastDetected on input and read them from platform.device for the view.'
+  unstarted:
+  - '32505 (getBleBeaconGeofence, Narayan Gaonkar): the required beaconId, the 404, and the in-process device read.'
+  - '32372 to 32374 and 32508 to 32510 (BO-168, on hold): send beaconId on the read and geofenceCentre with a radius.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-389
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-BEACON-GEOFENCE
+status: open
+notes: 'tools/check-cross-module-reads.py XR-ROUTE holds the in-process reads to XDR-031, and
+  check-stored-request-fields SR-STORED-NO-COLUMN holds each x-ticvai-stored-as to a column the write''s lineage
+  writes. setBleBeaconGeofence asks tenancy#deviceRecords as well as the view, for the 404 on an unregistered beaconId
+  the posted text gives the write; XDR-031 lists both operations. The input''s health and lastDetected are marked
+  x-ticvai-persisted false (ignored on input) rather than readOnly, because check-request-fields-stored
+  RF-READONLY-REQUEST refuses readOnly on a request-only schema. getBleBeaconGeofence''s beaconId carries
+  x-ticvai-column access.device_placement.device_id, and setBleBeaconGeofence lists access.access_point in
+  x-ticvai-names-for-context (named only to say it is left alone; check-parameter-columns). **A plan effect for the
+  lead**: setBleBeaconGeofence was in the first-release setup slice only because its lineage wrote access.access_point;
+  no core operation reads access.device_placement, so tools/derive-delivery-slice.py now leaves setBleBeaconGeofence,
+  BO-168 and access.device_placement out of Block A although #30955 and #30502 have started. After the release
+  refresh check-plan-closure C-UNTICKETED (BO-168), check-ddl-conventions D-MIG-TABLES (MIG-ACCESS lists
+  access.device_placement) and check-plan-owners (the schedule re-balanced: MIG-ACCESS-17 unowned, five O-SELF-TEST)
+  fail until the plan records it; the plan files are the plan lane''s. Beyond the posted words: none.'

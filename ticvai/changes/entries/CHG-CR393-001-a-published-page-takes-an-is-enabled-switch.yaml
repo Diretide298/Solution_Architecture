@@ -1,0 +1,50 @@
+id: CHG-CR393-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'On a published content page updateContentPage also takes a change to isEnabled: when every other editable
+  field equals the stored value, isEnabled is written at once, the page stays published and the answer is 200, with no
+  publish and no approval; it invalidates the edge cache of listPublishedContentPages. Any other change to a published
+  page is still 409 published-page-locked (audit R163), and status archived still withdraws it.'
+decision:
+  what: 'Posted on #30937 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually
+    check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction
+    "Include them in r12": "as you recommended. On a published page, updateContentPage also accepts a change to
+    isEnabled. If every other editable field in the body equals the stored value, isEnabled is written, the status stays
+    published, and the answer is 200. Any other change to a published page is still 409 published-page-locked (audit
+    R163), and status archived still withdraws the page. The switch takes effect at once, with no publish and no
+    approval ... listPublishedContentPages already serves only pages with isEnabled true; this write invalidates its edge
+    cache, as publishTenantConfig does." contracts/satellite/white-label.yaml: updateContentPage''s description and its
+    409, UpdateContentPageRequest.isEnabled, listPublishedContentPages (invalidated by the switch; its offline note).
+    tools/check-business-rules.py BR-CONTENT-PAGE-SWITCH.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-393 (Hrushikant Patkar, #30937 updateContentPage): ContentPage.isEnabled (BL-005) exists to switch a
+  published page off for a season, but audit R163 let a published page take only status archived and nothing else
+  writes isEnabled, so the seasonal switch was impossible.'
+keys_touched:
+  operations: [updateContentPage, listPublishedContentPages]
+  schemas: [UpdateContentPageRequest]
+  tables: [whitelabel.content_page]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: 'a lock rule that left a field''s stated purpose with no writer'
+tickets:
+  started:
+  - '30937 (updateContentPage, Hrushikant): accept a change to isEnabled alone on a published page (200) and invalidate
+    the storefront pages cache; keep 409 published-page-locked for any other change.'
+  unstarted:
+  - '30942 (listPublishedContentPages, Sanket Keluskar): the cache is invalidated by the switch too.'
+  - '31152 to 31154 (CMS-007): the enable toggle on a published page saves without a publish.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-393
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CONTENT-PAGE-SWITCH
+status: open
+notes: 'The review asked to check that navigation and the homepage do not link a disabled page. The package does not
+  say so today: setNavigation and setHomepageLayout keep content_page.is_referenced, and nothing states what a link to
+  a disabled page renders. That is outside the posted decision and is left for the lead. Beyond the posted words: none.'

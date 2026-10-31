@@ -40507,8 +40507,8 @@ screens:
     trigger: Save beacon
     body: '**Collects what `setBleBeaconGeofence` sends before it is called.** Required: `beaconId`, `venue`.
       Optional: `beaconName`, `zone`, `gate`, `proximityThreshold`, `activeInactive`, `health`, `lastDetected`,
-      `park`, `attraction`, `geofenceRadiusMeters`, `geofenceBoundary`. Dismissing sends nothing; the
-      screen behind is unchanged.'
+      `park`, `attraction`, `geofenceRadiusMeters`, `geofenceCentre`, `geofenceBoundary` (a radius needs
+      its centre; ADAM CR-389). Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Save beacon
       operation: setBleBeaconGeofence
@@ -40527,6 +40527,7 @@ screens:
       - park
       - attraction
       - geofenceRadiusMeters
+      - geofenceCentre
       - geofenceBoundary
     provenance: contract access.yaml PUT /ble-beacon-geofence
 - id: BO-169

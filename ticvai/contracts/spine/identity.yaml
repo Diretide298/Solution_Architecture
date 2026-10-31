@@ -302,7 +302,10 @@ x-ticvai-queries:
       scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Identity's service route (serviceAuth).
+      from another deployable through Identity's service route (serviceAuth): `listSubjectBiometricRecords`,
+      GET /internal/subject-biometrics, which the access host's revokeFacePass asks for the enrolment it revokes
+      (ADAM CR-391, Chinmay, 31 October 2026). The access role has no grant on pii.subject_biometric; the route
+      needs the kernel's service sign-in (#37051, ADAM CR-281).
     served: [service]
   subjectContactRecords:
     module: identity
@@ -414,6 +417,78 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SupervisorStepUpVerdict'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '401':
+          description: The calling workload's token is missing or invalid (`unauthenticated`).
+          x-ticvai-problem-types:
+          - unauthenticated
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /internal/subject-biometrics:
+    get:
+      operationId: listSubjectBiometricRecords
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-read-routing: primary
+      x-ticvai-bounded: the rows the ids name (at most 50), or one subject's enrolments (a Face Pass per entitlement and the day's Face Tags)
+      summary: Read biometric enrolment rows for another deployable
+      description: '**The `service` route of the `subjectBiometricRecords` query** (ADAM CR-391, Chinmay, 31 October
+        2026; ADR-0055 rule 4). `access.revokeFacePass` (in `access`) asks it, cell-internal over mTLS, for the
+        enrolment it revokes: the access role has no grant on `pii`, so it never reads `pii.subject_biometric` in
+        process. Identity answers with the rows as it stores them and as the caller''s scope lets it see them, the
+        enrolment''s metadata only: TICVAI holds no template (ADR-0063). It decides nothing: the asker refuses or
+        chooses on the rows in its own operation. An id with no visible row is absent from the answer, not a `404`.
+        The route needs the kernel''s service sign-in (#37051, ADAM CR-281), and revokeFacePass connects to it when
+        that is ready.
+
+        '
+      tags:
+      - identity
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: ids
+        in: query
+        required: false
+        description: The `pii.subject_biometric` rows asked for, by id. With `subjectId` or `kind`, the two narrow.
+        style: form
+        explode: false
+        schema:
+          type: array
+          maxItems: 50
+          items: { type: string, format: uuid }
+      - name: subjectId
+        in: query
+        required: false
+        description: Or the rows of this subject.
+        schema: { type: string, format: uuid }
+      - name: kind
+        in: query
+        required: false
+        description: Only `facePass` or only `faceTag` rows.
+        schema:
+          type: string
+          enum: [facePass, faceTag]
+      responses:
+        '200':
+          description: The rows found; an id with no visible row is absent.
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 50
+                items:
+                  $ref: ../spine/access.yaml#/components/schemas/FacePassEnrolment
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '401':

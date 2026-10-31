@@ -3499,11 +3499,9 @@
   },
   "getBleBeaconGeofence": {
    "reads": [
-    "access.access_point",
     "access.device_placement"
    ],
-   "reason": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
+   "reason": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none); 31 October 2026 (ADAM CR-389, CHG-CR389-001): the beacon's access.device_placement row, not access.access_point, and platform.device through tenancy#deviceRecords (x-ticvai-read-via)"
   },
   "getBookingFlowConfig": {
    "reads": [
@@ -13220,15 +13218,12 @@
   },
   "setBleBeaconGeofence": {
    "reads": [
-    "access.access_point",
     "access.device_placement"
    ],
    "writes": [
-    "access.access_point",
     "access.device_placement"
    ],
-   "reason": "beacon is an access.device_placement row (hardwareType beacon, proximityThresholdMeters); the geofence itself stays on access.access_point.geofence; health and lastDetected are device-reported, not written (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
+   "reason": "31 October 2026 (ADAM CR-389, CHG-CR389-001): a beacon is one access.device_placement row (role proximity) found by device_id = beaconId, and its geofence is the placement's activation_zone; this write does not touch access.access_point (setAccessPointGeofence stays the gate's validation fence). health and lastDetected are read from platform.device through tenancy#deviceRecords (x-ticvai-read-via), not written"
   },
   "setBookingFlowConfig": {
    "reads": [
