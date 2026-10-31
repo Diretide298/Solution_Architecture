@@ -1732,3 +1732,16 @@ changes:
     tag: r12
     producer-tickets: ['35172']
     consumer-tickets: ['29742', '35710', '29836', '29747']
+  - id: BC-565
+    contract: catalogue
+    operation: listDynamicPricingStrategy
+    change: "automationMode"
+    reason: 'ADAM CR-423 (CHG-CR423-001), with CR-417: the strategy row answers automationLevel from the most specific
+      dynamic_pricing_control covering the strategy, or advisory, and automationMode (which could not say autonomous) is
+      retired with its filter, which becomes an automationLevel filter. A removed response field and parameter are
+      breaking by the compat rule.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-423 posted on #35286: "automationMode is retired (CR-417). The row
+      answers automationLevel ... The filter is automationLevel"; and on the ADM-088 panel: "Panel shows the level")'
+    tag: r12
+    producer-tickets: ['35286']
+    consumer-tickets: ['29840', '29841', '29801']

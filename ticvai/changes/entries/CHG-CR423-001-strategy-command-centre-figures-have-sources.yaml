@@ -7,8 +7,10 @@ summary: 'listDynamicPricingStrategy gives each figure its rule from the deploye
   governing control''s limit, else the ladder''s), ruleConflicts (the seven open-conflict counts) and the
   operationalAlerts codes; status derives ready and scheduled, and testing leaves the filter (LO-CR423-001); venue
   and owner are names through tenancy#scopeRecords and identity#principalRecords; reads price_execution and
-  price_ladder. NOT built: the automationMode retirement on DynamicPricingStrategyCommandCenterView, which the
-  approved ADM-088 detail panel shows (stopped; see notes).'
+  price_ladder. automationMode is retired: the row answers automationLevel from the most specific
+  dynamic_pricing_control covering the strategy (or advisory) and the filter is automationLevel (BC-565); the approved
+  ADM-088 detail panel binds automationLevel, labelled "Automation level", in the same place (the lead: "Panel shows
+  the level").'
 decision:
   what: 'ADAM CR-423, posted 31 October 2026 on #35286: "Decided (Chinmay, 31 October 2026): not as recommended: the
     figures have sources now that the deployed execution is the live price (CR-422), so build them. currentPrice is the
@@ -20,7 +22,9 @@ decision:
     scheduled ..., then active, paused, frozen, expired and retired as stored. testing leaves the filter. venue is the
     venue''s name (tenancy#scopeRecords), and owner is the principal''s display name (identity#principalRecords).
     Declare the reads of catalogue.price_execution and catalogue.price_ladder." Built into r12 on the lead''s
-    instruction of 31 October 2026: "Include them in r12".'
+    instruction of 31 October 2026: "Include them in r12". On the approved ADM-088 detail panel, which bound
+    automationMode, the lead decided on 31 October 2026: "Panel shows the level": the field binds automationLevel and
+    reads "Automation level", in the same place.'
   by: Chinmay
   date: '2026-10-31'
 why: 'ADAM CR-423 (Hrushikant Patkar, #35286): the command centre''s summary figures and the row''s currentPrice had no
@@ -34,20 +38,26 @@ keys_touched:
            catalogue.dynamic_pricing_control]
   files:
   - contracts/spine/catalogue.yaml
+  - screens/P08-venue-back-office.yaml
+  - docs/active/approved-ui-changes.yaml
   - docs/active/breaking-changes.yaml
   - docs/active/left-out.yaml
   - tools/check-business-rules.py
   other:
-  - 'BC-562 (listDynamicPricingStrategy: testing removed from the status filter), approved by the posted decision'
+  - 'BC-562 (listDynamicPricingStrategy: testing removed from the status filter) and BC-565 (automationMode removed
+    from the row and the filter, automationLevel in its place), approved by the posted decision'
+  - 'docs/active/approved-ui-changes.yaml: ADM-088 region:selection (to 14f20beaeec022f9), the lead''s "Panel shows
+    the level"'
 root_class: 'KPI figures drafted from the pack with no rule, though their sources exist once the live price has a
   record'
 tickets:
   started:
   - '35286 (listDynamicPricingStrategy): add the five figures and currentPrice by the rules, derive ready and
-    scheduled, drop testing from the filter, and read the venue and owner names. The automationMode to automationLevel
-    part waits for the lead''s follow-up (stopped in the package; see notes).'
+    scheduled, drop testing from the filter, answer and filter automationLevel instead of automationMode, and read
+    the venue and owner names. Nothing to do beyond the posted text.'
   unstarted:
-  - 'VM-ADM-088 (#29840), VM-ADM-089 (#29841) and VM-BO-1044 (#29801) move to r12 with BC-562.'
+  - 'VM-ADM-088 (#29840), VM-ADM-089 (#29841) and VM-BO-1044 (#29801) move to r12 with BC-562 and BC-565; ADM-088''s
+    detail panel shows automationLevel as "Automation level" where automationMode was.'
 release_tag: pending
 decision_owner: Chinmay
 adam_cr: CR-423
@@ -56,11 +66,8 @@ prevention:
   type: check
   ref: tools/check-business-rules.py::BR-STRATEGY-FIGURES
 status: open
-notes: 'STOPPED on one bullet, "automationMode is retired (CR-417). The row answers automationLevel from the most
-  specific dynamic_pricing_control covering the strategy ..., or advisory where there is none. The filter is
-  automationLevel.": the approved ADM-088 detail panel (handoff/approved-ui.json, region:selection) binds
-  DynamicPricingStrategyCommandCenterView.automationMode, so retiring the member changes what an approved screen shows,
-  which a package fix may not do. The view keeps automationMode and its filter as they were until the lead posts a
-  follow-up (for example, approve the panel''s column change, or keep the member). Named beyond the posted words: the
+notes: 'The automationMode bullet was first stopped because the approved ADM-088 detail panel bound the member; the
+  lead decided it on 31 October 2026 ("Panel shows the level"), recorded in docs/active/approved-ui-changes.yaml. The
+  label "Automation level" is the bound member''s name as the screens render it. Named beyond the posted words: the
   operationalAlerts codes are described as conditions (pricesAtMaximumGuardrail above 0, open conflicts, a strategy
   activating within 48 hours) only by their names; no enum is added to the response.'

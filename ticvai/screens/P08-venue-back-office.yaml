@@ -171983,7 +171983,7 @@ screens:
         - DynamicPricingStrategyCommandCenterView.basePriceSource
         - DynamicPricingStrategyCommandCenterView.currentPrice
         - DynamicPricingStrategyCommandCenterView.ruleCount
-        - DynamicPricingStrategyCommandCenterView.automationMode
+        - DynamicPricingStrategyCommandCenterView.automationLevel
         - DynamicPricingStrategyCommandCenterView.status
         notes: null
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 75 §Each strategy should show

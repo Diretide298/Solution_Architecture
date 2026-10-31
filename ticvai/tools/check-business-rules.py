@@ -221,7 +221,8 @@ And one rule per decision:
                    approvals#requestRecords, and declares 400 validation and 422 approval-required / guardrail-breached.
   BR-STRATEGY-FIGURES (r12, ADAM CR-423, CHG-CR423-001) listDynamicPricingStrategy reads price_execution and
                    price_ladder, names venue and owner through tenancy#scopeRecords and identity#principalRecords, gives
-                   each figure its rule and offers no testing status (LO-CR423-001).
+                   each figure its rule, answers and filters automationLevel (no automationMode) and offers no testing
+                   status (LO-CR423-001).
   BR-PRICE-BAND-ORDER (r12, ADAM CR-424, CHG-CR424-001) listDynamicPriceBand sorts by ladderId only, a member of its
                    view; a sort on `code`, which a price ladder lacks, fails.
   BR-GUARDRAIL-SCOPE (r12, ADAM CR-425, CHG-CR425-001) setDynamicPricingGuardrailPolicy is keyed by [scopeLevel, scopeId],
@@ -1713,6 +1714,11 @@ def main() -> int:
     need("BR-STRATEGY-FIGURES", {"catalogue.price_execution", "catalogue.price_ladder"} <= reads_of("listDynamicPricingStrategy")
          and {"tenancy#scopeRecords", "identity#principalRecords"} <= vias_of("listDynamicPricingStrategy"),
          "listDynamicPricingStrategy does not read price_execution and price_ladder, or the venue and owner names (CR-423)")
+    need("BR-STRATEGY-FIGURES", "automationMode" not in sprops("DynamicPricingStrategyCommandCenterView")
+         and "automationLevel" in sprops("DynamicPricingStrategyCommandCenterView")
+         and param_enum("listDynamicPricingStrategy", "automationMode") is None
+         and param_enum("listDynamicPricingStrategy", "automationLevel"),
+         "the strategy row still answers or filters automationMode instead of automationLevel (CR-423, CR-417)")
     need("BR-STRATEGY-FIGURES", "testing" not in (param_enum("listDynamicPricingStrategy", "status") or [])
          and "LO-CR423-001" in lo_ids,
          "listDynamicPricingStrategy still offers testing, or it is not on the left-out list (CR-423)")

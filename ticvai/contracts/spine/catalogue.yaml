@@ -13404,7 +13404,9 @@ paths:
         words them. `status` answers `draft`, `ready` (a draft with a ladder and at least one rule, whose scope is not
         frozen), `scheduled` (active, with `effectiveFrom` after now), then `active`, `paused`, `frozen`, `expired`
         and `retired` as stored; `testing` leaves the filter (a saved test case names no strategy; LO-CR423-001).
-        `venue` is the venue''s name (`tenancy#scopeRecords`), and `owner` is the principal''s display name
+        `automationMode` is retired (ADAM CR-417): the row answers `automationLevel` from the most specific
+        `dynamic_pricing_control` covering the strategy (strategy, product, event, venue, market, global), or
+        `advisory` where there is none, and the filter is `automationLevel`. `venue` is the venue''s name (`tenancy#scopeRecords`), and `owner` is the principal''s display name
         (`identity#principalRecords`).
 
         **Order.** Sorted by `strategyId` descending (a UUIDv7, so newest first).'
@@ -13452,17 +13454,17 @@ paths:
               - retired
           description: Status, as the row answers it; ready and scheduled are derived, and testing is not offered
             (ADAM CR-423)
-        - name: automationMode
+        - name: automationLevel
           in: query
           required: false
           schema:
             type: string
             enum:
-              - monitor
-              - recommend
-              - prepareChange
-              - autoExecuteWithinGuardrails
-          description: Automation mode
+              - advisory
+              - humanInTheLoop
+              - conditionalAutonomous
+              - autonomous
+          description: Automation level, as the row answers it (replaces the automationMode filter; ADAM CR-423, CR-417)
         - name: venue
           in: query
           required: false
@@ -36693,15 +36695,16 @@ components:
               description: Effective to; empty for open-ended
               nullable: true
           description: Effective period
-        automationMode:
+        automationLevel:
           type: string
           enum:
-            - monitor
-            - recommend
-            - prepareChange
-            - autoExecuteWithinGuardrails
-          description: Automation mode from the automation policy (listDynamicPricingAutomation); recommend by
-            default
+            - advisory
+            - humanInTheLoop
+            - conditionalAutonomous
+            - autonomous
+          description: Automation level, from the most specific dynamic_pricing_control covering the strategy
+            (strategy, product, event, venue, market, global); advisory where there is none (replaces automationMode;
+            ADAM CR-423, CR-417)
         status:
           type: string
           description: 'Status: draft, ready (a draft with a ladder and at least one rule, whose scope is not
