@@ -1,0 +1,53 @@
+id: CHG-R12DB-007
+date: '2026-10-30'
+source: cr
+kind: spec
+summary: 'identity.delegated_access''s write check (x-ticvai-rls scope-or-subject) also admits a guest session whose
+  subject holds an active household grant over the row''s over_subject_id: tools/derive-ddl.py adds `OR
+  platform.subject_holds_household_grant_over(over_subject_id)` to the generated write check and creates the function
+  (STABLE plpgsql, not SECURITY DEFINER): true when an identity.delegated_access row has subject_id the session''s
+  ticvai.subject_id, over_subject_id the argument, delegation_kind familyMember or primaryHolder, effect ALLOW,
+  revoked_at null and now inside valid_from and valid_to. The forward migration carries the function and re-applies
+  the table''s split policy, guarded, twice-runnable.'
+decision:
+  what: 'Chinmay, 30 October 2026, posted on #30672 (ADAM CR-362, "not as recommended: keep A''s outcome, but use the
+    package''s settled pattern"): "(3) The write check on identity.delegated_access also admits a guest session where
+    the session''s subject holds an active ALLOW familyMember or primaryHolder grant over over_subject_id". The
+    contract side is CHG-CR362-001; this is the generator''s part it left to the database lane.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-362 (Hrushikant Patkar, #30672 grantDelegation): the write check refused the linked adult''s grant over a
+  minor the contract allows (audit R126). The function reads only the guest''s own held grants, which the table''s read
+  rule (own_row on subject_id) already shows it, so no row security is widened beyond the decision; plpgsql, so the
+  read of the table is never inlined into its own write rule. Builds on CHG-R8MIG-021 (scope-or-subject) and
+  CHG-R11GST-001 (ADAM CR-295, the staff branch admits no guest session).'
+keys_touched:
+  operations:
+  - grantDelegation
+  tables:
+  - identity.delegated_access
+  files:
+  - tools/derive-ddl.py
+  - tools/check-ddl-conventions.py
+  - backend/MIGRATIONS.md
+root_class: 'a guest acting for its household, refused by a row rule that knew only the guest itself'
+tickets:
+  started:
+  - '30196 ([DB] identity.delegated_access) and 27657 ([DB] V0009 identity): apply the forward migration''s block for
+    identity.delegated_access (the function, then drop_rls_policies and apply_split_rls with the widened write check)
+    on live and in db/; on live it also brings the CR-295 staff branch V0118 carries.'
+  - '30672 (grantDelegation, Hrushikant Patkar, in progress per CHG-CR362-001): test the linked adult''s grant over a
+    minor against the migrated policy.'
+  unstarted:
+  - 'The [DB] migration child task CHG-CR362-001 names (to be filed by the lead) is this block.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-362
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py::D-HOUSEHOLD-WRITE
+status: open
+notes: 'Proved on a tenant provisioned with provision-tenant.sh (30 October 2026, r12 database lane): a guest holding an
+  active familyMember grant over a minor inserts a grant over that minor; a guest holding none, a revoked grant, an
+  expired grant or only a groupLeader grant is refused by row security. The block re-run changes nothing.'

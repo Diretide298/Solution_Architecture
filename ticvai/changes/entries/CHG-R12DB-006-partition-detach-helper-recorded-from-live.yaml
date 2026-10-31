@@ -1,0 +1,30 @@
+id: CHG-R12DB-006
+date: '2026-10-30'
+source: audit
+kind: spec
+summary: platform.detach_month_partitions_before(regclass, date), partition retention from the developers' migration 050,
+  is recorded verbatim beside 930's partition helpers and reaches databases through the forward migration.
+decision:
+  what: 'The lead, 30 October 2026: "Record all" (live''s own additions).'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'the live comparison of 30 October 2026 (live''s tenant and control schemas, PostgreSQL 17.6, compared with r11 object
+  by object), section 3: record it with the partition helpers (ADR-0056).'
+keys_touched:
+  files:
+  - docs/active/recorded-ddl/tenant.sql
+  - tools/derive-ddl.py
+  - backend/MIGRATIONS.md
+root_class: a database rule a developers' migration added that the package never recorded
+tickets:
+  started:
+  - '27649 ([DB] monthly partitions: create ahead, detach what retention has expired): nothing to change.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the live database comparison of 30 October 2026 (the r12 database lane)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py::D-RECORDED
+status: open

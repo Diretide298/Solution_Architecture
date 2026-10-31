@@ -1,0 +1,44 @@
+id: CHG-R12DB-003
+date: '2026-10-30'
+source: audit
+kind: spec
+summary: ledger.journal_entry_legal_entity_sync() and its trigger (BEFORE INSERT OR UPDATE OF fiscal_period_id, legal_entity_id
+  ON ledger.journal_entry), and the CHECK journal_entry_legal_entity_id_chk (legal_entity_id IS NOT NULL), which live has
+  and the package did not, are recorded verbatim and reach databases through the forward migration. The CHECK makes every
+  entry carry its legal entity, which the trigger copies from the fiscal period (whose legal_entity_id is NOT NULL).
+decision:
+  what: 'The lead, 30 October 2026: "Record all" (live''s own additions). No contract change: finance.JournalEntry.legalEntityId
+    is readOnly, so no request carries it, and a response field the contract leaves optional that is now always present
+    changes no response shape; adding it to the schema''s `required` would, and is not done. The schema reference keeps
+    the column nullable; the CHECK holds it.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'the live comparison of 30 October 2026 (live''s tenant and control schemas, PostgreSQL 17.6, compared with r11 object
+  by object), section 3: the reference had the column optional and live requires it. Builds on ADAM CR-168 (CHG-CRA-007):
+  entry numbers unique per legal entity, the legal entity copied from the fiscal period.'
+keys_touched:
+  tables:
+  - ledger.journal_entry
+  files:
+  - docs/active/recorded-ddl/tenant.sql
+  - tools/derive-ddl.py
+  - tools/ddl_forward.py
+  - backend/MIGRATIONS.md
+root_class: a database rule a developers' migration added that the package never recorded
+tickets:
+  started:
+  - '30416 ([DB] ledger.journal_entry), 27672 ([DB] V0023 ledger): nothing to change on live. On a database built from the
+    package before this, an entry written without legal_entity_id stops the block''s VALIDATE: fill it from its fiscal period
+    first (UPDATE ledger.journal_entry je SET legal_entity_id = fp.legal_entity_id FROM ledger.fiscal_period fp WHERE fp.id
+    = je.fiscal_period_id AND je.legal_entity_id IS NULL).'
+  unstarted:
+  - 'The journal operations (createJournalEntry, getJournalEntry, reverseJournalEntry and the rest, all New): the database
+    fills legalEntityId from the period; a writer never sets it from the request.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the live database comparison of 30 October 2026 (the r12 database lane)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py::D-RECORDED
+status: open

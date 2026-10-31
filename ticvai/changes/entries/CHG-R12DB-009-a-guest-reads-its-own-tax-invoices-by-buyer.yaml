@@ -1,0 +1,45 @@
+id: CHG-R12DB-009
+date: '2026-10-30'
+source: cr
+kind: spec
+summary: 'x-ticvai-rls guest-reads-own takes the guest''s column from a new mark, `x-ticvai-guest-subject:
+  <property>`, where it is not subject_id. finance.FinTaxInvoice is marked guest-reads-own with buyerSubjectId, so
+  ledger.tax_invoice is read by staff by scope_path in a session with no guest subject, and by the guest whose subject
+  is the row''s buyer_subject_id; written by scope_path. ledger.tax_invoice_line follows it as a split child (read where
+  its invoice is visible, written where its invoice may be). The forward migration re-applies both policies, guarded.'
+decision:
+  what: 'ADAM CR-342, settled by the lead on 30 October 2026 (CHG-CR342-001): a billing statement''s charge line takes
+    its tax rate, description and invoice from the tax invoice line issued for it, read as the guest. Lane D found
+    that ledger.tax_invoice names its guest in buyer_subject_id, which guest-reads-own did not read, and left the
+    generator to the database lane.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-342: listBillingStatements and getBillingStatement read the guest''s tax invoices; under the scope rule a
+  guest session saw none, so every line''s tax fields would be null. The staff branch keeps CR-295''s rule (no guest
+  subject), and the guest''s subject is compared once per statement as the mark already does (CHG-R9CR-004).'
+keys_touched:
+  schemas:
+  - finance.FinTaxInvoice
+  tables:
+  - ledger.tax_invoice
+  - ledger.tax_invoice_line
+  files:
+  - contracts/spine/finance.yaml
+  - tools/derive-ddl.py
+  - tools/check-ddl-conventions.py
+root_class: 'a guest read the contracts state with no row-security mark to generate it'
+tickets:
+  started:
+  - '30422 ([DB] ledger.tax_invoice), 30423 ([DB] ledger.tax_invoice_line), 27672 ([DB] V0023 ledger): apply the
+    forward migration''s blocks for the two tables on live and in db/.'
+  unstarted:
+  - '30986 listBillingStatements and 31487 getBillingStatement: read the tax invoice lines as the guest session; the
+    policy now admits the guest''s own.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-342
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py::D-GUEST-BRANCH
+status: open

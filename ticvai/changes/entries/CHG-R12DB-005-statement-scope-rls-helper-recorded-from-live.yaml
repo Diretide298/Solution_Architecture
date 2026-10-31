@@ -1,0 +1,36 @@
+id: CHG-R12DB-005
+date: '2026-10-30'
+source: audit
+kind: spec
+summary: 'platform.apply_statement_scope_rls(regclass), the developers'' row-security helper from migration 225 (hot tables),
+  is recorded verbatim beside 920''s helpers. Nothing on live calls it as a function (no other function, no policy); it
+  made one policy, access.scan_event''s scan_event_scope: the scope rule with the caller''s paths read once per statement.
+  The package keeps apply_scope_rls on access.scan_event, which admits the same rows.'
+decision:
+  what: 'The lead, 30 October 2026: "Record all" (live''s own additions). The helper is recorded; which helper access.scan_event
+    takes is not changed here.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'the live comparison of 30 October 2026 (live''s tenant and control schemas, PostgreSQL 17.6, compared with r11 object
+  by object), section 3: record it, or the package''s row-security design is incomplete. The package''s generated rules
+  already use the same per-statement predicate (derive-ddl STATEMENT_SCOPE, CHG-R9CR-003, CHG-R9CR-004).'
+keys_touched:
+  tables:
+  - access.scan_event
+  files:
+  - docs/active/recorded-ddl/tenant.sql
+  - tools/derive-ddl.py
+  - backend/MIGRATIONS.md
+root_class: a database rule a developers' migration added that the package never recorded
+tickets:
+  started:
+  - '27646 ([DB] V0001 baseline, the row-security helpers), 27676 ([DB] V0027 access): nothing to change.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the live database comparison of 30 October 2026 (the r12 database lane)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py::D-RECORDED
+status: open

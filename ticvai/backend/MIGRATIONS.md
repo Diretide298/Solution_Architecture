@@ -74,6 +74,24 @@ ticket carries the same sentence, and a V01nn file that changes a table it does 
 an index) is named on the ticket whose migration creates that table, as "Source DDL after r1", because
 the 010 files are frozen at r1 (`tools/check-migration-wording.py`).
 
+**Helpers our team's migrations made, recorded in the package** (the live comparison of 30 October 2026; the lead:
+"Record all"; CHG-R12DB-002 to CHG-R12DB-006). Beside 920's helpers: the row-security helper
+`platform.apply_statement_scope_rls(regclass)` (our migration 225: the scope rule read once per statement, on live
+access.scan_event's policy), the deployable-role grants `platform.grant_schema_to_role(text, text, boolean)` and
+`platform.apply_deployable_grants()` (migration 004, DB-ROLES; one version in each database, and the reads granted
+across deployables stay the generated `reads` grants), the outbox counter trigger `platform.outbox_advance_sequence()`
+on platform.outbox with the CHECK `outbox_sequence_last_sequence_chk` (migration 240), and the journal entry's legal
+entity `ledger.journal_entry_legal_entity_sync()` with its trigger and the CHECK `journal_entry_legal_entity_id_chk`
+(ADAM CR-168). Beside 930's partition helpers: `platform.detach_month_partitions_before(regclass, date)` (migration
+050, retention). Their text is in `docs/active/recorded-ddl/` and reaches a database through derive-ddl's forward
+migration, each a guarded block that leaves a database already holding it as it is.
+
+**Provisioning a tenant from the package** (CHG-R12DB-001). r1's 010-pii.sql types pii.subject.kind and
+pii.subject_contact.kind with two enum types nothing creates; CHG-R6-001 made them text with a CHECK, as our MIG-PII
+does. `provision-tenant.sh` creates the two types as domains before the baseline files, and the forward migration
+makes each column text with its named CHECK and drops the domain; on a database whose columns are already text (live,
+our db/) the block does nothing.
+
 The numbering:
 
 | Range | What | Who numbers it |
@@ -140,7 +158,13 @@ and `ticvai.principal_id` (the signed-in principal's own rows: its credentials a
 The schema-level marks that build on these (`tools/derive-ddl.py` RLS_MARKS): `own-row` (the row's principal or
 guest, or the tenant root: the MFA tables), `own-or-home-scope` (a principal's credential: the principal, a grant over
 its home scope, or the tenant root), `home-scope-write` (`identity.principal`: any grant reads; the tenant root or a
-grant over the home scope writes) and `subject-self` (`pii.subject`).
+grant over the home scope writes) and `subject-self` (`pii.subject`). `scope-or-subject` (`identity.delegated_access`)
+lets a guest write a grant over itself, and since ADAM CR-362 (30 October 2026; CHG-R12DB-007) over a subject its own
+active ALLOW familyMember or primaryHolder grant is over (`platform.subject_holds_household_grant_over`, a 920 helper,
+not SECURITY DEFINER: it reads only the guest's own held grants). `x-ticvai-guest-read` (ADAM CR-341; CHG-R12DB-008)
+keeps a table's own rule and adds a read for any session with a guest subject (`platform.venue_settings`,
+`platform.region_settings`); `guest-reads-own` with `x-ticvai-guest-subject` (ADAM CR-342; CHG-R12DB-009) reads the
+guest by a named column (`ledger.tax_invoice.buyer_subject_id`).
 
 ## The control database has no row-level security
 

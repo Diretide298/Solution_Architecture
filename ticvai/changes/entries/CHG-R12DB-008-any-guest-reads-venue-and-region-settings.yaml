@@ -1,0 +1,55 @@
+id: CHG-R12DB-008
+date: '2026-10-30'
+source: cr
+kind: spec
+summary: 'A new contract mark, `x-ticvai-guest-read: true`: the table keeps its own policy for writes, and reads by it
+  or by any session with a guest subject set (ticvai.subject_id); an anonymous session gains nothing. On
+  tenancy.VenueSettings (platform.venue_settings: read venue_in_scope(venue_id) or a guest, written by
+  venue_in_scope(venue_id)) and tenancy.RegionSettings (platform.region_settings, read-beneath: read in_scope or
+  above_scope or a guest, written by in_scope). tools/derive-ddl.py writes each as apply_split_rls, and the forward
+  migration re-applies the two tables'' policies, guarded. A child that follows such a parent is read by a guest only
+  for its own subject, as under signed-in-read.'
+decision:
+  what: 'ADAM CR-341, settled by the lead on 30 October 2026 (CHG-CR341-001): guestAuth and the venue and region
+    settings queries state the guest read branch of platform.venue_settings and platform.region_settings: any session
+    with a guest subject reads; writes stay scoped; an anonymous session gains nothing. Lane D built the contract side
+    and left the mark to the database lane, since derive-ddl had no mark for "the base read, or a guest subject is
+    set".'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-341: listMyOrders names no venue and reads each order''s venue settings (currency, scale) in process,
+  and a billing statement takes its venue''s time zone from the region settings (CR-342); under the venue and scope
+  rules a guest session saw neither. A modifier rather than a new x-ticvai-rls value, because region_settings already
+  carries read-beneath and the mark changes only the read. Builds on CHG-GEN-005 (x-ticvai-rls), CHG-R8MIG-011
+  (signed-in-read, the child protection reused) and CHG-R11GST-001 (CR-295).'
+keys_touched:
+  schemas:
+  - tenancy.VenueSettings
+  - tenancy.RegionSettings
+  tables:
+  - platform.venue_settings
+  - platform.region_settings
+  files:
+  - contracts/spine/tenancy.yaml
+  - tools/derive-ddl.py
+  - tools/check-ddl-conventions.py
+root_class: 'a guest read the contracts state with no row-security mark to generate it'
+tickets:
+  started:
+  - '30342 ([DB] platform.venue_settings), 30336 ([DB] platform.region_settings), 27665 ([DB] V0017 platform): apply
+    the forward migration''s blocks for the two tables (drop_rls_policies, then apply_split_rls with the guest read) on
+    live and in db/.'
+  - '30823 getVenueSettings, 27959 and 31258 getVenueSettingsDefaults, 30794 configureWorkstation, 30795 createOutlet,
+    30800 updateOutlet, 32643 listDenominations, 27789 and 27790 TenancyService: nothing to change; a staff session
+    reads and writes as before.'
+  unstarted:
+  - '30987 listMyOrders and 30986 listBillingStatements (Deep Khanvilkar): read the settings as the guest session; the
+    policy now admits it.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-341
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py::D-GUEST-BRANCH
+status: open
