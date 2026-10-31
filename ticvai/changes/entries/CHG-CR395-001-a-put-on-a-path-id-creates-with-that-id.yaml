@@ -1,0 +1,75 @@
+id: CHG-CR395-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'setAccessPointGroup applies ADAM CR-245''s rule: the path groupId is the group''s id; no group has it, one is
+  created with it (a client UUIDv7, which BO-151 creates) and the answer is 201; one does, the body replaces it whole
+  (200); a different body id is 400 validation; the PUT no longer answers 404. The same class (a PUT on a required path
+  id whose text creates only when the body has no id, so its create can never happen) is swept on 17 other access PUTs
+  to CR-245''s rule, and tools/check-contract-shapes.py C-PUT-CREATE keeps it from coming back.'
+decision:
+  what: 'Posted on #30953 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually
+    check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction
+    "Include them in r12": "as you recommended. Apply CR-245''s rule: the path groupId is the group''s id. If no group
+    has it, one is created with that id (a client UUIDv7) and the answer is 201. If one does, the body replaces it whole
+    and the answer is 200. An id sent in the body must equal the path''s, else 400 validation. This PUT no longer
+    answers 404. The route and DELETE /access-point-groups/{groupId} stay as they are, and 409 group-cycle and 422
+    access-point-not-in-venue are unchanged. BO-151 creates the UUIDv7 for a new group. setParkingFacility is settled on
+    its own request, CR-398." The sweep applies CR-245''s decision of 26 October 2026 (CHG-R10CRF-005: "sweeps every PUT
+    path parameter ... so the next build cannot reintroduce it"), which its rule C-PUT-KEY did not reach for this
+    phrasing. contracts/spine/access.yaml: setAccessPointGroup (description, its own groupId path text, 404 removed);
+    setEntitlementConsumption, setGuestCompanionEligibility, setCredentialActivationDisplay, setMediaTypeTechnology,
+    setMediaIssuanceEncoding, setHotelWalletExternal, setFaceMatchingVerification, setBiometricLifecycleRetention and
+    setFraudDetectionRule (the "Upsert keyed by" paragraph and path text in CR-245 form, a 201 beside the 200, the
+    shared 400, the body key field''s "Absent creates" text); setOperatingCalendarEntry, setHardwareModel, setPodium,
+    setReasonCode, setMediaBindingRule, setJourneySequenceRule, setJourneyProfile and setFastPassProfile (the "keyed on
+    the body''s id" paragraph in CR-245 form). tools/check-contract-shapes.py C-PUT-CREATE.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-395 (Hrushikant Patkar, #30953 setAccessPointGroup): the PUT was an upsert keyed on the body''s id, where
+  no id creates (server id, 201), but groupId is a required path parameter and AccessAccessPointGroup.id is readOnly, so
+  the 201 could never happen. CR-390 (#30956) found the same on setFaceTagTemporaryEnrollment, and the review found the
+  text on 17 more access PUTs (and setParkingFacility, CR-398). CR-245 (CHG-R10CRF-005) settled the rule on 26 October.'
+keys_touched:
+  operations: [setAccessPointGroup, setEntitlementConsumption, setGuestCompanionEligibility,
+    setCredentialActivationDisplay, setMediaTypeTechnology, setMediaIssuanceEncoding, setHotelWalletExternal,
+    setFaceMatchingVerification, setBiometricLifecycleRetention, setFraudDetectionRule, setOperatingCalendarEntry,
+    setHardwareModel, setPodium, setReasonCode, setMediaBindingRule, setJourneySequenceRule, setJourneyProfile,
+    setFastPassProfile]
+  screens: [BO-151]
+  files:
+  - contracts/spine/access.yaml
+  - tools/check-contract-shapes.py
+root_class: 'an unreachable create: a PUT on a required path id whose text creates only when the body has no id (the
+  writers pass of 29 September wrote it before the id moved into the path)'
+tickets:
+  started:
+  - '30953 (setAccessPointGroup, Hrushikant): add the create (an unknown path id creates the group with that id, 201),
+    keep replace (200) and the 400 for a different body id, and remove the 404.'
+  - '32344 (setCredentialActivationDisplay, Narayan Gaonkar) and 32346 (setFaceMatchingVerification, Narayan Gaonkar):
+    New when last read (29 October); if started, a path id no record has creates it (201) and a different body key is
+    400, instead of a body without the key creating one. Needs the lead''s follow-up comment (beyond CR-395''s posted
+    text, under CR-245''s decision).'
+  unstarted:
+  - '32360 to 32362 (BO-151, on hold): mint a UUIDv7 for a new group and expect 201.'
+  - '32366 to 32368 (BO-166) and 32384 to 32386 (BO-189), on hold: mint a UUIDv7 for a new record.'
+  - 'The other 15 swept operations have no ticket in the first release slice.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-395
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'C-PUT-CREATE fails a PUT on a required path id whose description says "keyed on the body''s `id`", "No `id`
+  creates" or "A body without `X` creates", or whose body key field (`id`, or the field named for the path parameter)
+  says "Absent creates" or "Absent in a body, it creates". On the r12 candidate it finds setAccessPointGroup,
+  setFaceTagTemporaryEnrollment, the 17 swept and setParkingFacility (29 findings); after this change only
+  setParkingFacility''s two, which lane I''s CR-398 rewrites (the posted CR-395 text leaves it to CR-398). The sweep keeps
+  each operation''s 404 response where it had one (an id the caller cannot see); CR-395 removed setAccessPointGroup''s
+  because its posted text says so. updateAdmissionRules ("the path decides which profile is written; an unknown
+  profileId is a 404, never a create") is a pure replace beside createAdmissionRules and is not this class.
+  Beyond the posted words of CR-395: the 17 swept operations, each now "Where no record has that id, one is created
+  with it (a client UUIDv7) and the answer is 201; where one does, the body replaces it whole and the answer is 200. A
+  <key> sent in the body must equal the path''s, else 400 validation."'

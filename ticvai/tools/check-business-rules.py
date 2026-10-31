@@ -190,6 +190,20 @@ And one rule per decision:
   BR-PRODUCT-FROM-PRICE (r12, ADAM CR-358 option (a), CHG-CR358-001) Product.fromPrice is a nullable, readOnly,
                    unstored Money; listProducts takes channel and asks tenancy#venueSettingsRecords; WEB-035's and
                    GST-044's price cards bind Product.fromPrice.
+  BR-BEACON-GEOFENCE (r12, ADAM CR-389, CHG-CR389-001) a beacon's geofence is access.device_placement.activation_zone,
+                   each input field names its column, health and lastDetected are not stored, and both beacon
+                   operations ask tenancy#deviceRecords in process and answer 404 for a beaconId with no beacon.
+  BR-FACE-TAG-PROFILE (r12, ADAM CR-390, CHG-CR390-001) setFaceTagTemporaryEnrollment creates on its path id (201,
+                   no 404), lists both 422 types, stores consentFormId, and reads the venue's settings in process.
+  BR-FACE-PASS-REVOKE (r12, ADAM CR-391, CHG-CR391-001) revokeFacePass declares its 404 and reads the enrolment on
+                   Identity's service route (listSubjectBiometricRecords), never in process; Identity's consumer
+                   deletes the row on revoked.
+  BR-POLICY-VERSIONS (r12, ADAM CR-392, CHG-CR392-001) a policy version is the next integer per kind, unique with
+                   kind; an effectiveFrom in the past is 400; the current version is the latest in force (UTC).
+  BR-CONTENT-PAGE-SWITCH (r12, ADAM CR-393, CHG-CR393-001) a published page takes an isEnabled switch, which
+                   invalidates the storefront pages cache.
+  BR-GUIDED-CHOICE-TARGETS (r12, ADAM CR-394, CHG-CR394-001) the three guided-choice writes ask Catalogue in process,
+                   publish states the on-sale rule per kind, and its 422 is GuidedChoiceAnswerProblem.
   BR-BOOKING-FLOW-MISSING (r12, ADAM CR-343, CHG-CR343-001) bookingFlowMissing counts a venue's sellable bookable
                    products of a kind some flow type books, against that venue's own enabled flows (no tenant-wide
                    flow), and validateTenantConfig and publishTenantConfig ask catalogue#productRecords and
@@ -1696,6 +1710,111 @@ def main() -> int:
                  if isinstance(c, dict) and c.get("label") == "Prices in your currency"]
         need("BR-PRODUCT-FROM-PRICE", bool(cards) and all("Product.fromPrice" in (c.get("columns") or []) for c in cards),
              f"{sid}'s price card does not bind Product.fromPrice (CR-358)")
+    # BR-BEACON-GEOFENCE, BR-FACE-TAG-PROFILE, BR-FACE-PASS-REVOKE, BR-POLICY-VERSIONS, BR-CONTENT-PAGE-SWITCH,
+    # BR-GUIDED-CHOICE-TARGETS (r12, ADAM CR-389 to CR-394; the lead's review, 31 October 2026, "for each one actually
+    # check if they hold"). Each fails on the r12 candidate (8535bc29) and passes on the decision.
+    acc = op("setBleBeaconGeofence")[4]
+    asch = (acc.get("components") or {}).get("schemas") or {}
+
+    def inproc(oid, q):
+        return any(isinstance(v, dict) and v.get("query") == q and v.get("route") == "in-process"
+                   for v in op(oid)[3].get("x-ticvai-read-via") or [])
+
+    az = ((asch.get("AccessDevicePlacement") or {}).get("properties") or {}).get("activationZone") or {}
+    need("BR-BEACON-GEOFENCE", az.get("type") == "object" and {"centre", "radiusMeters", "boundary"}
+         <= set((az.get("properties") or {})),
+         "AccessDevicePlacement has no activationZone {centre, radiusMeters, boundary} for the beacon geofence (CR-389)")
+    bin_ = (asch.get("BleBeaconGeofenceConfigurationInput") or {}).get("properties") or {}
+    want = {"beaconName": "name", "beaconId": "device_id", "venue": "venue_id", "gate": "access_point_id",
+            "park": "access_area_id", "zone": "access_area_id", "attraction": "access_area_id",
+            "proximityThreshold": "proximity_threshold_meters", "activeInactive": "is_active",
+            "geofenceRadiusMeters": "activation_zone", "geofenceCentre": "activation_zone",
+            "geofenceBoundary": "activation_zone"}
+    got = {k: str((bin_.get(k) or {}).get("x-ticvai-stored-as") or "").replace("access.device_placement.", "")
+           for k in want}
+    need("BR-BEACON-GEOFENCE", got == want, f"BleBeaconGeofenceConfigurationInput's columns are not CR-389's: {got}")
+    need("BR-BEACON-GEOFENCE", all((bin_.get(k) or {}).get("x-ticvai-persisted") is False
+                                   for k in ("health", "lastDetected")),
+         "BleBeaconGeofenceConfigurationInput keeps health or lastDetected, which are ignored on input (CR-389)")
+    for oid in ("setBleBeaconGeofence", "getBleBeaconGeofence"):
+        need("BR-BEACON-GEOFENCE", inproc(oid, "tenancy#deviceRecords"),
+             f"{oid} does not ask tenancy#deviceRecords in process (CR-389, XDR-031)")
+        need("BR-BEACON-GEOFENCE", "404" in {str(k) for k in op(oid)[3].get("responses") or {}},
+             f"{oid} declares no 404 for a beaconId with no beacon (CR-389)")
+    need("BR-BEACON-GEOFENCE", any(isinstance(p, dict) and p.get("name") == "beaconId" and p.get("required") is True
+                                   for p in op("getBleBeaconGeofence")[3].get("parameters") or []),
+         "getBleBeaconGeofence takes no required beaconId (CR-389)")
+    need("BR-BEACON-GEOFENCE", "this write does not touch `access.access_point`" in flat(op("setBleBeaconGeofence")[3]),
+         "setBleBeaconGeofence does not say it leaves access.access_point to setAccessPointGeofence (CR-389)")
+
+    ft = op("setFaceTagTemporaryEnrollment")[3]
+    fcodes = {str(k) for k in ft.get("responses") or {}}
+    need("BR-FACE-TAG-PROFILE", "201" in fcodes and "404" not in fcodes,
+         "setFaceTagTemporaryEnrollment does not create on the path id (201, no 404; CR-390, CR-245)")
+    need("BR-FACE-TAG-PROFILE", ((ft.get("responses") or {}).get("422") or {}).get("x-ticvai-problem-types")
+         == ["retention-threshold-required", "consent-form-required"],
+         "setFaceTagTemporaryEnrollment's 422 does not list its two types (CR-390)")
+    need("BR-FACE-TAG-PROFILE", "consentFormId" in ((asch.get("AccessBiometricProfile") or {}).get("properties") or {}),
+         "AccessBiometricProfile has no consentFormId (access.biometric_profile.consent_form_id; CR-390)")
+    for oid in ("setFaceTagTemporaryEnrollment", "listFaceTagTemporary"):
+        need("BR-FACE-TAG-PROFILE", inproc(oid, "tenancy#venueSettingsRecords"),
+             f"{oid} does not ask tenancy#venueSettingsRecords in process (CR-390, XDR-032)")
+
+    rv = op("revokeFacePass")[3]
+    need("BR-FACE-PASS-REVOKE", "404" in {str(k) for k in rv.get("responses") or {}},
+         "revokeFacePass declares no 404 for an unknown or another guest's enrolment (CR-391)")
+    need("BR-FACE-PASS-REVOKE", not inproc("revokeFacePass", "identity#subjectBiometricRecords"),
+         "revokeFacePass reads pii.subject_biometric in process: biometric records stay off the access role (CR-391)")
+    sv = op("listSubjectBiometricRecords")
+    need("BR-FACE-PASS-REVOKE", sv[1] == "/internal/subject-biometrics"
+         and {"serviceAuth": []} in (sv[3].get("security") or []),
+         "identity#subjectBiometricRecords has no service operation (listSubjectBiometricRecords, serviceAuth; CR-391)")
+    ev = load("events/biometric-enrolmentChanged.yaml")
+    idc = next((c for c in ev.get("consumers") or [] if isinstance(c, dict) and c.get("context") == "identity"), {})
+    purpose = " ".join(str(idc.get("purpose") or "").split())
+    need("BR-FACE-PASS-REVOKE", "delete the row on revoked" in purpose and "or deactivate the enrolment" not in purpose,
+         "biometric.enrolmentChanged: Identity's consumer does not delete the row on revoked (CR-391)")
+    xdr = load("docs/active/cross-deployable-writes.yaml")
+    need("BR-FACE-PASS-REVOKE", not any(r.get("reader") == "access" and "pii.subject_biometric" in (r.get("tables") or [])
+                                        for r in xdr.get("reads") or [] if isinstance(r, dict)),
+         "a reads entry grants the access role pii.subject_biometric (CR-391: wait for service sign-in)")
+
+    wls = (op("setPolicy")[4].get("components") or {}).get("schemas") or {}
+    need("BR-POLICY-VERSIONS", ["kind", "version"] in ((wls.get("Policy") or {}).get("x-ticvai-unique-together") or []),
+         "Policy is not unique on (kind, version) (CR-392)")
+    sp = op("setPolicy")[3]
+    need("BR-POLICY-VERSIONS", "effective-from-in-past" in problem_types(sp) and "409" in {str(k) for k in sp.get("responses") or {}},
+         "setPolicy declares no 400 effective-from-in-past or no 409 for a concurrent version (CR-392)")
+    need("BR-POLICY-VERSIONS", "one more than the highest stored for that kind" in flat(sp),
+         "setPolicy does not say how a version is numbered (CR-392)")
+    for oid in ("listPolicies", "listPublishedPolicies"):
+        need("BR-POLICY-VERSIONS", "latest `effectiveFrom` on or before today (UTC)" in flat(op(oid)[3]),
+             f"{oid} does not state the current-version rule (CR-392)")
+    need("BR-POLICY-VERSIONS", "next scheduled `effectiveFrom`" in flat(op("listPublishedPolicies")[3]),
+         "listPublishedPolicies' cache does not expire at the next scheduled effectiveFrom (CR-392)")
+
+    need("BR-CONTENT-PAGE-SWITCH", "a change to `isEnabled`" in flat(op("updateContentPage")[3]),
+         "updateContentPage refuses an isEnabled switch on a published page (CR-393)")
+    need("BR-CONTENT-PAGE-SWITCH", "by `updateContentPage`" in flat(op("listPublishedContentPages")[3]),
+         "listPublishedContentPages' cache is not invalidated by an isEnabled switch (CR-393)")
+
+    for oid in ("createGuidedChoice", "proposeGuidedChoice", "publishGuidedChoice"):
+        for q in ("catalogue#productRecords", "catalogue#productCategoryRecords", "catalogue#eventRecords"):
+            need("BR-GUIDED-CHOICE-TARGETS", inproc(oid, q), f"{oid} does not ask {q} in process (CR-394, XDR-033)")
+    pg = op("publishGuidedChoice")[3]
+    need("BR-GUIDED-CHOICE-TARGETS", str(((((pg.get("responses") or {}).get("422") or {}).get("content") or {})
+                                          .get("application/problem+json") or {}).get("schema", {}).get("$ref", ""))
+         .endswith("/GuidedChoiceAnswerProblem"),
+         "publishGuidedChoice's 422 is not GuidedChoiceAnswerProblem (CR-394)")
+    gap = props(op("publishGuidedChoice")[4], {"$ref": "#/components/schemas/GuidedChoiceAnswerProblem"})
+    need("BR-GUIDED-CHOICE-TARGETS", {"questionId", "answerId"} <= set(gap),
+         "GuidedChoiceAnswerProblem carries no questionId and answerId (CR-394)")
+    ptext = flat(pg)
+    for word in ("`guest_listing` `bookable`", "`lifecycle_state` `onSale` or `live`", "at least one such product",
+                 "enabled in the published configuration"):
+        need("BR-GUIDED-CHOICE-TARGETS", word in ptext, f"publishGuidedChoice does not state {word!r} (CR-394)")
+    need("BR-GUIDED-CHOICE-TARGETS", "questions/i/answers/j/target" in flat(op("createGuidedChoice")[3]),
+         "createGuidedChoice's 400 does not name the failing target by its pointer (CR-394)")
     # BR-BOOKING-FLOW-MISSING, BR-CALL-DISPOSITION, BR-RESTORE-MISSING-PAGE (r12, ADAM CR-343, CR-346, CR-350; the
     # lead, 30 October 2026). Each fails on the r11 package and passes on the decision.
     wl = load("contracts/satellite/white-label.yaml")
@@ -1900,7 +2019,8 @@ def main() -> int:
              "BR-UAEPASS-ENDPOINTS", "BR-LINK-CHECKOUT", "BR-DELEGATION-READS", "BR-GUEST-POLICY-CURRENCY",
              "BR-CONTENT-PAGE-KEY", "BR-CONTENT-PUBLISH",
              "BR-CONTENT-BLOCK", "BR-SCOPE-LOOKUP", "BR-ID-RESUBMIT", "BR-DOC-NUMBER-ENC", "BR-REGISTER-SOURCE",
-             "BR-GUEST-CODE-DELIVERY",
+             "BR-GUEST-CODE-DELIVERY", "BR-BEACON-GEOFENCE", "BR-FACE-TAG-PROFILE", "BR-FACE-PASS-REVOKE",
+             "BR-POLICY-VERSIONS", "BR-CONTENT-PAGE-SWITCH", "BR-GUIDED-CHOICE-TARGETS",
              "BR-GUEST-SETTINGS", "BR-BILLING-LINES", "BR-SHOP-DROP-COLLECT", "BR-DELEGATION-KEY", "BR-FOREIGN-TENDER",
              "BR-PRODUCT-FROM-PRICE",
              "BR-BOOKING-FLOW-MISSING", "BR-CALL-DISPOSITION", "BR-RESTORE-MISSING-PAGE",

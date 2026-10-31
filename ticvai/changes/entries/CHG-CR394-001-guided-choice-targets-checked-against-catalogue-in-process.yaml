@@ -1,0 +1,70 @@
+id: CHG-CR394-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'createGuidedChoice, proposeGuidedChoice and publishGuidedChoice ask catalogue#productRecords,
+  #productCategoryRecords and #eventRecords in process from the operations host (XDR-033: SELECT on catalogue.event is
+  new; the product and category reads are on V0118''s grants). In the venue (400 target-not-in-venue, named in errors[]
+  by questions/i/answers/j/target): a product or event whose venue_id is the choice''s venue, a category whose
+  scope_path is the venue''s or an ancestor. On sale at publish (422 answer-target-not-on-sale): a product with
+  is_sellable, guest_listing bookable and now inside on_sale_from/on_sale_to where set; an active category with such a
+  product of this venue; an active event onSale or live. A module must be enabled in the published configuration, a
+  booking flow one of the venue''s enabled flows. The 422 is GuidedChoiceAnswerProblem (questionId, answerId).'
+decision:
+  what: 'Posted on #30932 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually
+    check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction
+    "Include them in r12": "not as recommended: A, on the queries that already exist, with a rule stated for each kind.
+    createGuidedChoice, proposeGuidedChoice and publishGuidedChoice ask Catalogue in process from the operations host
+    ... catalogue#productRecords ..., catalogue#productCategoryRecords ... and catalogue#eventRecords (new: SELECT on
+    catalogue.event). A target is in this venue ... A target is on sale (checked at publish, else 422
+    answer-target-not-on-sale) when it is: a product with is_sellable true, guest_listing bookable, and the current time
+    inside on_sale_from and on_sale_to where they are set; a category with is_active true and at least one such product
+    of this venue in it; an event with is_active true and lifecycle_state onSale or live. A module target must be enabled
+    in the published configuration (422 answer-target-not-enabled), and a booking-flow target must be one of the
+    venue''s enabled flows. The 422 answers with GuidedChoiceAnswerProblem: Problem plus questionId and answerId. The 400
+    names the failing target in errors[] by its pointer (questions/i/answers/j/target)." contracts/satellite/white-label.yaml:
+    the three operations'' read-vias (route in-process) and rules, GuidedChoiceTarget''s rules per kind, the new
+    GuidedChoiceAnswerProblem on publishGuidedChoice''s 422. contracts/spine/catalogue.yaml: eventRecords served
+    [in-process, service]; the productRecords and productCategoryRecords rules name the three operations.
+    docs/active/cross-deployable-writes.yaml XDR-033. tools/check-business-rules.py BR-GUIDED-CHOICE-TARGETS.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-394 (Hrushikant Patkar, #30932 publishGuidedChoice, blocking; the same on #30924 and #30931): the three
+  operations must refuse a target not in the venue (400) or not on sale (422) yet declared no Catalogue read, and the
+  package stated no on-sale rule for a category or an event; the 422 "named the answer" with the bare Problem.'
+keys_touched:
+  operations: [createGuidedChoice, proposeGuidedChoice, publishGuidedChoice]
+  schemas: [GuidedChoiceTarget, GuidedChoiceAnswerProblem]
+  tables: [catalogue.product, catalogue.product_media, catalogue.product_category, catalogue.event]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/catalogue.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'XDR-033 (new: SELECT on catalogue.event for the operations role; product and category on V0118''s grants)'
+root_class: 'storage-route gap: a refusal rule over another deployable''s rows with no declared read and no stated
+  rule per kind'
+tickets:
+  started:
+  - '30924 (createGuidedChoice, Hrushikant): check product, category and event targets against the venue (400
+    target-not-in-venue, with the errors[] pointer) through the in-process Catalogue reads.'
+  - '30931 (proposeGuidedChoice, Hrushikant): the same venue checks.'
+  - '30932 (publishGuidedChoice, Hrushikant): raise answer-target-not-on-sale by the rule for each kind; keep checking
+    modules against the published configuration (as built); answer with GuidedChoiceAnswerProblem (questionId,
+    answerId).'
+  unstarted:
+  - '31144 to 31146 (CMS-101): read questionId and answerId from the 422 to mark the answer.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-394
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUIDED-CHOICE-TARGETS
+status: open
+notes: 'tools/check-cross-module-reads.py XR-ROUTE holds the in-process reads to XDR-033. The on-sale rule for a product
+  is the one lane M''s CR-426 and CR-427 reuse (CHG-CR426-001), kept as posted. XDR-033 is this lane''s own entry;
+  lane M''s XDR-051 covers deleteBookingFlow and getPublishedBookingFlow. Not covered by this decision: previewGuidedChoice
+  still asks catalogue#productRecords and catalogue#productEligibilityRuleRecords over the service route, and
+  updateGuidedChoice (which replaces the questions of a draft) states no target check. Beyond the posted words: none.'

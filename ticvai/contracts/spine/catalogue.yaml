@@ -248,7 +248,11 @@ x-ticvai-queries:
       decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
       from another deployable through Catalogue's service route (serviceAuth).
-    served: [service]
+      It is asked in process by the operations host for white-label createGuidedChoice, proposeGuidedChoice and
+      publishGuidedChoice, whose event targets must be the choice's venue's and, at publish, on sale (ADAM CR-394,
+      Chinmay, 31 October 2026; docs/active/cross-deployable-writes.yaml XDR-033), through Catalogue's own query
+      class under the caller's row security.
+    served: [in-process, service]
   groupPackageRecords:
     module: catalogue
     table: catalogue.group_package
@@ -384,6 +388,9 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
       process within commerce, through the C# query interface Catalogue implements, and asked from another
       deployable through Catalogue's service route (serviceAuth).
+      It is asked in process by the operations host for white-label createGuidedChoice, proposeGuidedChoice and
+      publishGuidedChoice, whose product targets must be the choice's venue's and, at publish, on sale (ADAM
+      CR-394, Chinmay, 31 October 2026; XDR-033).
       It is asked in process by the workers host for the consumers it runs, issueOrderEntitlements among them (ADAM
       CR-167; ADR-0055, amended 25 October 2026). It is asked in process by the operations host for
       createFnbOrder's productCategory routing match (ADAM CR-277, option A, 28 October 2026; XDR-008), and for
@@ -462,6 +469,9 @@ x-ticvai-queries:
       description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
       items: {$ref: '#/components/schemas/ProductCategory'}
     rule: >-
+      Asked in process by the operations host for white-label createGuidedChoice, proposeGuidedChoice and
+      publishGuidedChoice too, whose category targets must be the choice's venue's (or an ancestor's) and, at
+      publish, active with a product on sale (ADAM CR-394, Chinmay, 31 October 2026; XDR-033).
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
       October). Catalogue answers with its catalogue.product_category rows, as it stores them and as the
       caller's scope lets it see them (the table's row-level security, under the caller's connection and

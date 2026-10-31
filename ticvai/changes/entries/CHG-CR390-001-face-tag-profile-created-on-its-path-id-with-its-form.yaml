@@ -1,0 +1,68 @@
+id: CHG-CR390-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'setFaceTagTemporaryEnrollment creates a faceTagEnrolment profile on its path profileId (a client UUIDv7, 201)
+  or replaces it whole (200), a different body profileId is 400 validation, and it no longer answers 404 (ADAM CR-245''s
+  rule). access.biometric_profile gains consent_form_id (uuid, null, no foreign key), written from consentFormId and read
+  back; the form''s version is not kept on the profile. The venue''s biometrics settings are read through
+  tenancy#venueSettingsRecords in process (XDR-032), by listFaceTagTemporary too. The 422 lists
+  retention-threshold-required and consent-form-required.'
+decision:
+  what: 'Posted on #30956 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually
+    check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction
+    "Include them in r12": "not as recommended: A, without a form version on the profile. The path profileId is the
+    profile''s id (ADAM CR-245). If no faceTagEnrolment profile has it, one is created with that id (a client UUIDv7)
+    and the answer is 201 ... access.biometric_profile gains consent_form_id (uuid, null) ... Do not keep the form''s
+    version on the profile ... Read the venue''s biometrics settings ... through tenancy#venueSettingsRecords, in
+    process ... listFaceTagTemporary reads them the same way. The 422 lists two types: retention-threshold-required ...
+    and consent-form-required." contracts/spine/access.yaml: setFaceTagTemporaryEnrollment (description and path text
+    in CR-245 form, 201 and 400 added, 404 removed, the 422''s two types, read-via route in-process),
+    listFaceTagTemporary (read-via route in-process), FaceTagTemporaryEnrollmentInput.profileId and consentFormId
+    (x-ticvai-stored-as), AccessBiometricProfile.consentFormId. contracts/spine/tenancy.yaml venueSettingsRecords: the
+    rule names the access host. docs/active/cross-deployable-writes.yaml XDR-032. tools/check-business-rules.py
+    BR-FACE-TAG-PROFILE; tools/check-contract-shapes.py C-PUT-CREATE (CHG-CR395-001).'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-390 (Hrushikant Patkar, #30956 setFaceTagTemporaryEnrollment, blocking): the path profileId was required
+  while "a body without profileId creates one", so no profile could ever be created; access.biometric_profile had no
+  consent_form_id for the consent-first rule (DEC-128, CHG-CSP-018); the venue settings were read over the service
+  route, which is not built (CR-281, #37051), with no grant for the access role; and the 422 named two causes but
+  listed one type.'
+keys_touched:
+  operations: [setFaceTagTemporaryEnrollment, listFaceTagTemporary]
+  schemas: [FaceTagTemporaryEnrollmentInput, AccessBiometricProfile]
+  tables: [access.biometric_profile, platform.venue_settings]
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/tenancy.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'XDR-032 (new: SELECT on platform.venue_settings for the access role)'
+  - 'new column access.biometric_profile.consent_form_id uuid (the [DB] task the plan lane filed)'
+root_class: 'an unreachable create (a PUT on a required path id that creates only when the body has no id), a field
+  with no column, and a read on a route that is not built'
+tickets:
+  started:
+  - '30956 (setFaceTagTemporaryEnrollment, Hrushikant): create or replace on the path id (201 or 200), store
+    consent_form_id, read the venue fallback and templatesHeldByTicvai through tenancy#venueSettingsRecords in process,
+    and return the two 422 types.'
+  unstarted:
+  - '32490 (listFaceTagTemporary, Narayan Gaonkar): read the venue settings in process.'
+  - '32381 to 32383 (BO-188 setup, on hold): mint a UUIDv7 for a new profile and expect 201.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-390
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'The class (an unreachable create on a required path id) is C-PUT-CREATE in tools/check-contract-shapes.py,
+  added with CHG-CR395-001, which carries the sweep of the other access PUTs. BR-FACE-TAG-PROFILE holds this
+  operation''s 201, 422 types, column and in-process reads. Not covered by this decision: seven other access operations
+  (enrolFaceTag, enrolFacePass, createAdmissionRules, updateAdmissionRules, setRfidNfcCard,
+  listBiometricConsentGuardian, listSecurityDetectionGovernance) still ask venueSettingsRecords over the service route;
+  the review suggested they join XDR-032 as a class, which needs the lead. Beyond the posted words: setFaceTagTemporaryEnrollment
+  also declares the shared 400 for the different body profileId the posted text refuses.'

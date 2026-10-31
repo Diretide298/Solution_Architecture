@@ -1,0 +1,67 @@
+id: CHG-CR391-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'revokeFacePass reads the enrolment through identity#subjectBiometricRecords on Identity''s service route,
+  now declared (listSubjectBiometricRecords, GET /internal/subject-biometrics, serviceAuth); the access role gets no grant
+  on pii. An unknown enrolmentId, one that is not a facePass, or another guest''s (for a guest caller) is 404 not-found,
+  now declared; otherwise biometric.enrolmentChanged with change revoked and the row''s fields, and 204. Identity''s
+  consumer deletes the pii.subject_biometric row on revoked, never deactivates it; the vendor delete joins it once
+  ADR-0063 is settled. The read is connected when service sign-in (#37051) is Ready for QA.'
+decision:
+  what: 'Posted on #30952 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually
+    check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction
+    "Include them in r12": "as you recommended. revokeFacePass reads the enrolment through
+    identity#subjectBiometricRecords on Identity''s service route. Identity declares the service path (serviceAuth), and
+    the access role gets no grant on pii. If the enrolmentId is unknown, is not a facePass, or belongs to another guest
+    (for a guest caller), the answer is 404 not-found; declare that response. Otherwise, publish
+    biometric.enrolmentChanged with change revoked and the row''s fields, and answer 204. On revoked, Identity''s
+    consumer deletes the pii.subject_biometric row; it never deactivates it ... The read needs service sign-in
+    (#37051, CR-281): build the operation and the consumer change now, and connect the read when #37051 is Ready for
+    QA." The lead''s answer to the review''s question, 31 October 2026: "wait for service sign-in (biometric records stay
+    off the access role)". contracts/spine/access.yaml revokeFacePass (the rule, the 404, the 204 text);
+    contracts/spine/identity.yaml listSubjectBiometricRecords (new, the query''s service operation) and the
+    subjectBiometricRecords rule naming it; events/biometric-enrolmentChanged.yaml Identity''s consumer purpose;
+    docs/adr/0063 action item 4 (the vendor delete in the revoked consumer); tools/check-business-rules.py
+    BR-FACE-PASS-REVOKE.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-391 (Hrushikant Patkar, #30952 revokeFacePass, blocking): identity#subjectBiometricRecords was served over
+  a service route with no operation and no path, the access role may not read pii.subject_biometric (XDR-010 covers
+  pii.subject only), the event''s Identity consumer was told to "write, re-enrol or deactivate", contradicting
+  "destroyed, not flagged", and the operation refused another guest''s enrolment as one that does not exist without
+  declaring the 404. ADR-0063 items 6 and 10 (the vendor holds the template and its delete) are still proposed.'
+keys_touched:
+  operations: [revokeFacePass, listSubjectBiometricRecords]
+  tables: [pii.subject_biometric]
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/identity.yaml
+  - events/biometric-enrolmentChanged.yaml
+  - docs/adr/0063-encryption-keys-and-biometric-templates.md
+  - tools/check-business-rules.py
+root_class: 'a cross-deployable read on a route with no operation, and an event consumer contradicting the operation
+  that emits it'
+tickets:
+  started:
+  - '30952 (revokeFacePass, Hrushikant): build the operation now (404 for an unknown enrolment, one that is not a
+    facePass, or another guest''s; publish revoked; answer 204) and connect the service read when #37051 is Ready for QA.'
+  - 'The ticket for Identity''s biometric.enrolmentChanged consumer: delete the row on revoked instead of deactivating
+    it (enrolled and reenrolled still write).'
+  unstarted:
+  - 'listSubjectBiometricRecords (identity, new): no ticket yet; the plan lane files it (a [BE] task behind #37051).'
+  - '32222 to 32224 (GST-069) and 33277 to 33279 (WEB-024): a 404 on revoke is a normal answer (gone or not theirs).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-391
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-FACE-PASS-REVOKE
+status: open
+notes: 'BR-FACE-PASS-REVOKE also fails if revokeFacePass''s read moves in process or a reads entry grants the access role
+  pii.subject_biometric, per the lead''s answer. The service operation answers the enrolment metadata as
+  FacePassEnrolment (access.yaml''s schema of pii.subject_biometric), up to 50 ids, by ids, subjectId or kind. Beyond the
+  posted words: the operation''s name and path (listSubjectBiometricRecords, GET /internal/subject-biometrics), its
+  inputs (ids, subjectId, kind) and its bound (50), which the posted text leaves to the package; and the ADR-0063 action
+  item text.'
