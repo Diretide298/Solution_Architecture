@@ -126,7 +126,30 @@ And one rule per decision:
   BR-CONTENT-PUBLISH (r12, ADAM CR-365, CHG-CR365-001) the content block state model publishes a scheduled block now,
                    reschedules it and publishes an expired one by operation; publishContentBlock lists 400 on expireAt
                    and passes approvals' 422 no-approval-route on, and its identity read names approvedByPrincipalId.
-  BR-GUEST-SELF-403 (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
+  BR-CONTENT-BLOCK (r12, ADAM CR-366, CHG-CR366-001) createContentBlock and updateContentBlock ask
+                   marketing-crm#segmentRecords in process for audienceSegmentId and refuse it 422 unknown-reference,
+                   and check the body only as far as ContentBlock.body defines it (400 validation); the full per-kind
+                   schema is left out (LO-CR366-001), never "validated against the block's own schema".
+  BR-SCOPE-LOOKUP  (r12, ADAM CR-367, CHG-CR367-001) permissionsByScope has an entry per grant path, allow or deny, each
+                   the full section 2 result, and a node takes the deepest listed entry containing it: every vector of
+                   docs/architecture/specs/permission-vectors.json run through that lookup gives the vector's answer, and
+                   neither the spec nor Session.permissionsByScope says "the node acted on or one of its ancestors".
+  BR-ID-RESUBMIT   (r12, ADAM CR-368, CHG-CR368-001) submitGuestIdentityDocument applies the policy's maxResubmissions
+                   (refusals since the latest verified one, 422 resubmission-limit-reached) and reads the count's table.
+  BR-DOC-NUMBER-ENC (r12, ADAM CR-369, CHG-CR369-001) a document number is field-encrypted into
+                   pii.subject_document.number_ciphertext (ADR-0063 section 5), never hashed, and number_hash is
+                   nullable.
+  BR-REGISTER-SOURCE (r12, ADAM CR-371, CHG-CR371-001) RegisterGuestRequest.source (guestWeb, guestApp, kiosk) is what
+                   identity.guestRegistered carries as channel, and its Marketing consumer maps it to a ConsentSource
+                   (never registration).
+  BR-GUEST-CODE-DELIVERY (r12, ADAM CR-370 and its follow-up of 31 October, CHG-CR370-001; general) every operation
+                   that writes identity.otp_challenge either mints a code and emits identity.guestCodeIssued, or is named
+                   in GUEST_CODE_NON_ISSUERS with why it mints none; the event carries destination and code
+                   field-encrypted, never in clear, to Marketing's relay-invoked sendGuestOneTimeCode; no issuer writes
+                   marketing.message_dispatch across deployables; the lifetime and resend interval are venue settings
+                   (600 s and 60 s) answered as expiresInSeconds and resendAfterSeconds; and requestGuestOtp states who
+                   with no account still gets a code (register, verify).
+  BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
 
@@ -273,6 +296,14 @@ def props(doc, node):
 
 def body_schema(op):
     return (((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema") or {}
+
+
+# BR-GUEST-CODE-DELIVERY (ADAM CR-370): writers of identity.otp_challenge that mint no code, each with why. A new writer
+# either emits identity.guestCodeIssued or is listed here.
+GUEST_CODE_ISSUERS = ("requestGuestOtp", "registerGuest", "verifyGuestEmail")
+GUEST_CODE_NON_ISSUERS = {
+    "verifyGuestOtp": "checks a code and counts wrong entries or consumes it; it mints none",
+}
 
 
 # BR-GUEST-SELF-403: guest operations scoped to the caller's subject that declared 403 on 20 October 2026 (13 on the
@@ -1132,6 +1163,158 @@ def main() -> int:
     need("BR-CONTENT-PUBLISH", any("approvedByPrincipalId" in str((v or {}).get("for") or "")
                                    for v in pcb.get("x-ticvai-read-via") or [] if isinstance(v, dict)),
          "publishContentBlock's identity read gives no purpose (approvedByPrincipalId, CR-365)")
+    # BR-CONTENT-BLOCK (r12, ADAM CR-366; the lead's review, 30 October 2026). Fails on the r11 contract.
+    wl = load("contracts/satellite/white-label.yaml")
+    for oid in ("createContentBlock", "updateContentBlock"):
+        o = op(oid)[3]
+        vias = {(str(v.get("query")), str(v.get("route"))) for v in o.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+        need("BR-CONTENT-BLOCK", ("marketing-crm#segmentRecords", "in-process") in vias,
+             f"{oid} does not ask marketing-crm#segmentRecords in process for audienceSegmentId (CR-366)")
+        rs = o.get("responses") or {}
+        need("BR-CONTENT-BLOCK", "unknown-reference" in ((rs.get("422") or {}).get("x-ticvai-problem-types") or []),
+             f"{oid} does not refuse an unusable audienceSegmentId 422 unknown-reference (CR-366, CR-103)")
+        need("BR-CONTENT-BLOCK", "validation" in ((rs.get("400") or {}).get("x-ticvai-problem-types") or []),
+             f"{oid} does not answer a failed body check 400 validation (CR-366)")
+    cbody = ((((wl.get("components") or {}).get("schemas") or {}).get("ContentBlock") or {}).get("properties") or {}).get("body") or {}
+    cbd = " ".join(str(cbody.get("description") or "").split())
+    need("BR-CONTENT-BLOCK", "own schema" not in cbd and "CR-366" in cbd and "LO-CR366-001" in cbd,
+         "ContentBlock.body still promises a schema per kind no file defines, or does not name the left-out item (CR-366)")
+    lo = load("docs/active/left-out.yaml")
+    need("BR-CONTENT-BLOCK", any((i or {}).get("id") == "LO-CR366-001" for i in lo.get("items") or []),
+         "docs/active/left-out.yaml has no LO-CR366-001 for the per-kind body schemas (CR-366)")
+
+    # BR-SCOPE-LOOKUP (r12, ADAM CR-367). The published set and its lookup give section 2's answer for every vector.
+    def contains(a, b):
+        return b == a or b.startswith(a + ".")
+
+    def resolve(grants, perm, node):
+        if any(g["effect"] == "DENY" and g["permission"] in (perm, "*") and contains(g["scope"], node) for g in grants):
+            return "DENY"
+        return "PERMIT" if any(g["effect"] == "ALLOW" and g["permission"] == perm and contains(g["scope"], node)
+                               for g in grants) else "DENY"
+
+    def published(grants):
+        perms = {g["permission"] for g in grants if g["permission"] != "*"}
+        return {p: {x for x in perms if resolve(grants, x, p) == "PERMIT"} for p in {g["scope"] for g in grants}}
+
+    def lookup(pub, perm, node):
+        listed = [p for p in pub if contains(p, node)]
+        if not listed:
+            return "DENY"
+        return "PERMIT" if perm in pub[max(listed, key=lambda p: p.count(".") + 1)] else "DENY"
+
+    vec = json.loads((ROOT / "docs" / "architecture" / "specs" / "permission-vectors.json").read_text(encoding="utf-8"))
+    for v in vec.get("vectors") or []:
+        q = v["query"]
+        got = lookup(published(v["grants"]), q["permission"], q["scope"])
+        need("BR-SCOPE-LOOKUP", got == v["expect"],
+             f"{v['id']}: the published-set lookup answers {got}, the vector expects {v['expect']} (CR-367)")
+    spec_s = " ".join(spec.split())
+    pbs_s = " ".join(" ".join(json.loads(pbs).get("description", "").split()).split()) if pbs else ""
+    for where, t in (("permission-resolution.md 7.2", spec_s), ("Session.permissionsByScope", pbs_s)):
+        need("BR-SCOPE-LOOKUP", "deepest listed path" in t and "allow or deny" in t and "CR-367" in t,
+             f"{where} does not state the entry per grant path (allow or deny) and the deepest-listed-path lookup (CR-367)")
+        need("BR-SCOPE-LOOKUP", "it is in the set of the node acted on or of one of its ancestors" not in t
+             and "(the node acted on or one of its ancestors);" not in t,
+             f"{where} still says a permission holds when held at the node or any ancestor, which V07, V08 and V12 deny "
+             "(CR-367)")
+    sp = " ".join(str((((load("contracts/shared/permissions.yaml").get("components") or {}).get("schemas") or {})
+                       .get("ScopedPermissions") or {}).get("description") or "").split())
+    need("BR-SCOPE-LOOKUP", "deepest listed path" in sp, "ScopedPermissions does not state the lookup rule (CR-367)")
+
+    # BR-ID-RESUBMIT (r12, ADAM CR-368)
+    sg = op("submitGuestIdentityDocument")[3]
+    need("BR-ID-RESUBMIT", "resubmission-limit-reached" in (((sg.get("responses") or {}).get("422") or {})
+                                                            .get("x-ticvai-problem-types") or []),
+         "submitGuestIdentityDocument does not refuse a guest past maxResubmissions 422 resubmission-limit-reached")
+    rd = {str((r or {}).get("table")): " ".join(str((r or {}).get("for") or "").split()) for r in sg.get("x-ticvai-reads") or []}
+    need("BR-ID-RESUBMIT", "maxResubmissions" in rd.get("identity.guest_verification_policy", "")
+         and "identity.guest_identity_verification" in rd,
+         "submitGuestIdentityDocument does not read maxResubmissions and the guest's verifications it counts (CR-368)")
+    mr = ((isch.get("IdentityGuestVerificationPolicy") or {}).get("properties") or {}).get("maxResubmissions") or {}
+    mrd = " ".join(str(mr.get("description") or "").split())
+    need("BR-ID-RESUBMIT", "latest `verified`" in mrd and "greater than" in mrd,
+         "IdentityGuestVerificationPolicy.maxResubmissions does not say what counts and from when (CR-368)")
+
+    # BR-DOC-NUMBER-ENC (r12, ADAM CR-369; ADR-0063 section 5)
+    dn = ((isch.get("IdentityGuestDocumentSubmission") or {}).get("properties") or {}).get("documentNumber") or {}
+    need("BR-DOC-NUMBER-ENC", dn.get("x-ticvai-secret") == "field-encrypted"
+         and dn.get("x-ticvai-stored-as") == "pii.subject_document.number_ciphertext",
+         "documentNumber is not field-encrypted into pii.subject_document.number_ciphertext (CR-369, ADR-0063 section 5)")
+    for oid in ("submitGuestIdentityDocument", "guestUaePassLogin"):
+        need("BR-DOC-NUMBER-ENC", "hashed on arrival" not in text(op(oid)[3]).lower()
+             and "number_ciphertext" in text(op(oid)[3]),
+             f"{oid} does not store the document number encrypted in number_ciphertext (CR-369)")
+    sref = json.loads((ROOT / "handoff" / "schema-reference.json").read_text(encoding="utf-8"))
+    sdc = {c.get("column"): c for c in (sref.get("cols") or {}).get("pii.subject_document") or []}
+    need("BR-DOC-NUMBER-ENC", "number_ciphertext" in sdc and (sdc.get("number_hash") or {}).get("required") != "yes",
+         "pii.subject_document has no number_ciphertext, or number_hash is still NOT NULL (CR-369)")
+
+    # BR-REGISTER-SOURCE (r12, ADAM CR-371)
+    rsrc = ((isch.get("RegisterGuestRequest") or {}).get("properties") or {}).get("source") or {}
+    need("BR-REGISTER-SOURCE", rsrc.get("enum") == ["guestWeb", "guestApp", "kiosk"] and rsrc.get("default") == "guestWeb",
+         "RegisterGuestRequest has no source (guestWeb, guestApp, kiosk; default guestWeb) for the event's channel (CR-371)")
+    gr = load("events/identity-guestRegistered.yaml")
+    ch = next((p for p in gr.get("payload") or [] if (p or {}).get("field") == "channel"), {})
+    need("BR-REGISTER-SOURCE", "RegisterGuestRequest.source" in str(ch.get("notes") or ""),
+         "identity.guestRegistered's channel does not say it is RegisterGuestRequest.source (CR-371)")
+    mk = [c for c in gr.get("consumers") or [] if (c or {}).get("context") == "marketing"]
+    mkp = " ".join(str((mk[0] if mk else {}).get("purpose") or "").split())
+    need("BR-REGISTER-SOURCE", "guestWeb is website" in mkp and "source registration" not in mkp,
+         "identity.guestRegistered's Marketing consumer does not map channel to a ConsentSource (CR-371)")
+    msch = ((load("contracts/satellite/marketing-crm.yaml").get("components") or {}).get("schemas") or {})
+    need("BR-REGISTER-SOURCE", "registration" not in ((msch.get("ConsentSource") or {}).get("enum") or [])
+         and "source `registration`" not in text(op("recordConsent")[3]),
+         "recordConsent still records registration consents with source registration, which ConsentSource lacks (CR-371)")
+
+    # BR-GUEST-CODE-DELIVERY (r12, ADAM CR-370 and its follow-up of 31 October 2026). Fails on the r11 contract.
+    lin = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
+    otp_writers = {o for o, e in lin.items() if isinstance(e, dict) and "identity.otp_challenge" in (e.get("writes") or [])}
+    otp_writers |= {oid for oid, (_f, _p, _m, o, _d) in ops.items()
+                    if any((w or {}).get("table") == "identity.otp_challenge" for w in o.get("x-ticvai-writes") or [])}
+    for oid in sorted(otp_writers | set(GUEST_CODE_ISSUERS)):
+        o = op(oid)[3]
+        if oid in GUEST_CODE_NON_ISSUERS:
+            continue
+        need("BR-GUEST-CODE-DELIVERY", "identity.guestCodeIssued" in (o.get("x-ticvai-emits") or []),
+             f"{oid} writes identity.otp_challenge (a guest code) and does not emit identity.guestCodeIssued, so nothing "
+             "carries the code to the guest; or name it in GUEST_CODE_NON_ISSUERS with why it mints none (CR-370)")
+        need("BR-GUEST-CODE-DELIVERY", not any((w or {}).get("table") == "marketing.message_dispatch"
+                                               for w in o.get("x-ticvai-write-via") or []),
+             f"{oid} still writes marketing.message_dispatch through Marketing across deployables (CR-370)")
+    gci_path = ROOT / "events" / "identity-guestCodeIssued.yaml"
+    gci = load("events/identity-guestCodeIssued.yaml") if gci_path.exists() else {}
+    gpay = {(p or {}).get("field"): p for p in gci.get("payload") or []}
+    for fld in ("destination", "code"):
+        need("BR-GUEST-CODE-DELIVERY", (gpay.get(fld) or {}).get("x-ticvai-secret") == "field-encrypted",
+             f"identity.guestCodeIssued does not carry {fld} field-encrypted (never in clear; CR-370, ADR-0063)")
+    need("BR-GUEST-CODE-DELIVERY", (gpay.get("subjectId") or {}).get("required") is False,
+         "identity.guestCodeIssued's subjectId is required, but a register or verify code to an identifier with no "
+         "account has none (the CR-370 follow-up)")
+    need("BR-GUEST-CODE-DELIVERY", any((c or {}).get("operation") == "marketing-crm.sendGuestOneTimeCode"
+                                       and (c or {}).get("idempotencyKey") == "challengeId" for c in gci.get("consumers") or []),
+         "identity.guestCodeIssued has no Marketing consumer sendGuestOneTimeCode idempotent on challengeId (CR-370)")
+    sg1 = op("sendGuestOneTimeCode")[3]
+    need("BR-GUEST-CODE-DELIVERY", "identity.guestCodeIssued" in (sg1.get("x-ticvai-consumes") or [])
+         and "guestOneTimeCode" in text(sg1) and "expiresAt" in text(sg1),
+         "marketing-crm declares no relay-invoked sendGuestOneTimeCode consuming identity.guestCodeIssued with the system "
+         "template guestOneTimeCode and the expiry rule (CR-370)")
+    vsi = (((((load("contracts/spine/tenancy.yaml").get("components") or {}).get("schemas") or {}).get("VenueSettings") or {})
+            .get("properties") or {}).get("identity") or {}).get("properties") or {}
+    for key, dflt, lo_, hi in (("guestOtpLifetimeSeconds", 600, 60, 900), ("guestOtpResendSeconds", 60, 30, 300)):
+        s_ = vsi.get(key) or {}
+        need("BR-GUEST-CODE-DELIVERY", (s_.get("default"), s_.get("minimum"), s_.get("maximum")) == (dflt, lo_, hi),
+             f"VenueSettings.identity.{key} is not default {dflt}, {lo_} to {hi} (CR-370)")
+    rg = op("requestGuestOtp")[3]
+    rp = (((((rg.get("responses") or {}).get("202") or {}).get("content") or {}).get("application/json") or {})
+          .get("schema") or {}).get("properties") or {}
+    need("BR-GUEST-CODE-DELIVERY", "guestOtpLifetimeSeconds" in str((rp.get("expiresInSeconds") or {}).get("description"))
+         and "guestOtpResendSeconds" in str((rp.get("resendAfterSeconds") or {}).get("description")),
+         "requestGuestOtp's expiresInSeconds and resendAfterSeconds do not say which settings they answer (CR-370)")
+    rgd = " ".join(str(rg.get("description") or "").split())
+    need("BR-GUEST-CODE-DELIVERY", "`register` or `verify` an identifier with no account still gets a code" in rgd,
+         "requestGuestOtp does not say that a register or verify code to an identifier with no account is still sent "
+         "(the CR-370 follow-up of 31 October 2026)")
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -1147,7 +1330,9 @@ def main() -> int:
              "BR-PLANNER-QUESTIONS", "BR-ROTA-HOUR-LIMIT", "BR-ROTA-CROSS-VENUE",
              "BR-CREDIT-ACCOUNT-CURRENCY", "BR-PLATFORM-APPROVAL-RULE", "BR-WALLET-ETAG-VERSION", "BR-GUEST-SSO",
              "BR-UAEPASS-ENDPOINTS", "BR-LINK-CHECKOUT", "BR-DELEGATION-READS", "BR-GUEST-POLICY-CURRENCY",
-             "BR-CONTENT-PAGE-KEY", "BR-CONTENT-PUBLISH"]
+             "BR-CONTENT-PAGE-KEY", "BR-CONTENT-PUBLISH",
+             "BR-CONTENT-BLOCK", "BR-SCOPE-LOOKUP", "BR-ID-RESUBMIT", "BR-DOC-NUMBER-ENC", "BR-REGISTER-SOURCE",
+             "BR-GUEST-CODE-DELIVERY"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

@@ -1,0 +1,78 @@
+id: CHG-CR370-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'A guest one-time code reaches the guest through an outbox event: requestGuestOtp, registerGuest (channel
+  email) and verifyGuestEmail (mode send) write identity.guestCodeIssued v1 in the same transaction as the
+  identity.otp_challenge row, with destination and code field-encrypted (#37050), and Marketing''s relay-invoked
+  sendGuestOneTimeCode decrypts at send time and sends with the system template guestOneTimeCode. verifyGuestEmail no
+  longer writes marketing.message_dispatch through sendTransactionalMessage. The lifetime and resend interval are
+  VenueSettings.identity.guestOtpLifetimeSeconds (600, 60 to 900) and guestOtpResendSeconds (60, 30 to 300), answered
+  as expiresInSeconds and resendAfterSeconds. An identifier that resolves to nobody gets nothing for purposes login,
+  passwordReset and stepUp; for register and verify it still gets a code, with subjectId null.'
+decision:
+  what: 'The lead''s review, 30 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs". Posted on #30659 (Chinmay, 30 October 2026), not as recommended:
+    Identity and Marketing are in different deployables, so no in-process call; an outbox event identity.guestCodeIssued
+    v1 carrying subjectId, challengeId, channel, purpose, locale, expiresAt, and destination and code, both
+    field-encrypted through #37050, never in clear. Marketing''s new sendGuestOneTimeCode, invoked by the relay as
+    notifyPerformanceHolders is, decrypts at send time, sends with the system template guestOneTimeCode in the guest''s
+    language and writes a transactional message_dispatch row without the code; idempotent on challengeId; after
+    expiresAt it stops retrying and is not dead-lettered. Lifetime and resend interval are
+    VenueSettings.identity.guestOtpLifetimeSeconds (default 600, 60 to 900) and guestOtpResendSeconds (default 60, 30
+    to 300). Until #37050 is Ready for QA, IGuestCodeDelivery keeps its log-only default. Follow-up posted on #30659 on
+    31 October 2026 ("ADAM CR-370 · follow-up — read before building"): "nothing is written / same 202" applies to
+    purposes login, passwordReset and stepUp only; passwordReset still publishes identity.credentialResetRequested
+    whether or not the identifier exists; for register and verify an identifier with no account still gets a code,
+    with the otp_challenge row and identity.guestCodeIssued written with subjectId null.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-370 (Hrushikant Patkar, #30659 requestGuestOtp, blocking): nothing in the package carried a guest''s code
+  to the guest, and expiresInSeconds and resendAfterSeconds had no source. The CR''s option B, an in-process call to
+  Marketing, crosses deployables (ADR-0028 as amended by ADR-0055, rule 4) and would put Marketing on the sign-in path;
+  the code and address cannot travel in clear (ADR-0063, 14 October amendment). The 31 October follow-up keeps guest
+  checkout''s code proof (checkoutCart 403 contactNotConfirmed) and purpose register working for an identifier with no
+  account.'
+keys_touched:
+  operations: [requestGuestOtp, registerGuest, verifyGuestEmail, sendGuestOneTimeCode]
+  schemas: [OtpChallenge, VenueSettings]
+  tables: [identity.otp_challenge, marketing.message_dispatch, platform.outbox]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - events/identity-guestCodeIssued.yaml
+  - events/_schema.yaml
+  - handoff/api-data-lineage-overrides.json
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'identity.guestCodeIssued v1 (new event)'
+root_class: 'an operation that mints a guest code and declares nothing that carries it'
+tickets:
+  started:
+  - '30659 (requestGuestOtp, Hrushikant): write identity.guestCodeIssued as decided behind IGuestCodeDelivery; read
+    the two new settings; keep the log-only default until #37050; apply the 31 October follow-up (register and verify
+    to an identifier with no account still get a code, subjectId null).'
+  - '30658 (registerGuest, Hrushikant): the same for the channel-email code.'
+  - '30676 (verifyGuestEmail, Chinmay Patkar): mode send emits the same event instead of calling
+    sendTransactionalMessage.'
+  - '30697 (WEB-016) and 30703 (GST-042): drive the resend countdown and expiry from resendAfterSeconds and
+    expiresInSeconds, never a hard-coded value.'
+  - '37050 (KERNEL-FIELD-ENC): guest code delivery now depends on it; still held by open blocking CR-339 (batch C).'
+  unstarted:
+  - 'New child task (Marketing backend): sendGuestOneTimeCode and the seeded guestOneTimeCode system template; filed
+    with the r12 plan change.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-370
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUEST-CODE-DELIVERY
+status: open
+notes: 'Left out, for a decision of their own (the coordinator, 31 October 2026): the same carrier gap exists for the
+  staff and guest second-factor codes (createMfaChallenge smsOtp and emailOtp) and the prospect sign-up code
+  (startProspectSignup). BR-GUEST-CODE-DELIVERY covers the writers of identity.otp_challenge only, which those two do
+  not write. sendGuestOneTimeCode writes no message_dispatch row for a code with no subject (register or verify to an
+  identifier with no account), because marketing.message_dispatch.subject_id is required; the send is still made.'

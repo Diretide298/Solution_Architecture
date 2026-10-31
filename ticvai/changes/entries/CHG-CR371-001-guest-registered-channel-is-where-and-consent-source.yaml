@@ -1,0 +1,52 @@
+id: CHG-CR371-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'RegisterGuestRequest gains an optional source (guestWeb, guestApp, kiosk; default guestWeb), which
+  identity.guestRegistered carries as channel; the code''s delivery channel stays on the request and is not on the
+  event. Marketing''s consumer records each consent with the matching ConsentSource (guestWeb website, guestApp
+  guestApp, kiosk kiosk), not "registration", which ConsentSource lacks and the source check refuses. The guest web
+  (WEB-013, WEB-016) sends guestWeb and the guest app (GST-010, GST-042) guestApp; nothing visible changes.'
+decision:
+  what: 'The lead''s review, 30 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs". Posted on #30658 (Chinmay, 30 October 2026), as recommended (option
+    A): RegisterGuestRequest gains an optional source (guestWeb, guestApp, kiosk; default guestWeb), and
+    identity.guestRegistered carries it as channel. The delivery channel stays where it is and is not on the event.
+    The guest web (WEB-013, WEB-016) sends guestWeb and the guest app (GST-010, GST-042) sends guestApp. Marketing''s
+    consumer records each consent with the matching ConsentSource (guestWeb is website, guestApp is guestApp, kiosk is
+    kiosk), not registration.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-371 (Hrushikant Patkar, #30658 registerGuest): the event''s channel is where the guest registered
+  (guestWeb, guestApp, kiosk) while the request''s only channel is the code''s delivery channel; and the consumer was
+  told to record source registration, which ConsentSource has no value for and consent_record_source_chk refuses.
+  Requirement 2.6.56 (consent audit trail) keeps the sources apart.'
+keys_touched:
+  operations: [registerGuest, recordConsent]
+  schemas: [RegisterGuestRequest, ConsentSource]
+  screens: [WEB-013, WEB-016, GST-010, GST-042]
+  tables: [marketing.consent_record]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - events/identity-guestRegistered.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - tools/check-business-rules.py
+root_class: 'an event field named like a request field with a different meaning, and a consumer told to write a value
+  its own enum lacks'
+tickets:
+  started:
+  - '30658 (registerGuest, Hrushikant): accept source and put it on the event as channel, replacing the delivery
+    channel.'
+  - 'The Marketing consumer of identity.guestRegistered: map channel to ConsentSource as decided.'
+  - '30690 (WEB-013), 30697 (WEB-016): send source guestWeb; 30700 (GST-010), 30703 (GST-042): send source guestApp.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-371
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-REGISTER-SOURCE
+status: open

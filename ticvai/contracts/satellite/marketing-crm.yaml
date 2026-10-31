@@ -4760,8 +4760,11 @@ paths:
 
         **A third path, with the same rules** (r8, IDENTITY-C55): the consents a guest gives on the registration
         form arrive as `identity.guestRegistered`, and Marketing''s consumer records each one through these
-        rules with source `registration` (idempotency: the event id and the purpose), so a registration never
-        leaves a consent unrecorded.
+        rules (idempotency: the event id and the purpose), so a registration never leaves a consent unrecorded.
+        **Its source is where the guest registered** (decided 30 October 2026, Chinmay, ADAM CR-371;
+        CHG-CR371-001): the event''s `channel` mapped to `ConsentSource`, `guestWeb` to `website`, `guestApp` to
+        `guestApp`, `kiosk` to `kiosk`. There is no `registration` source, and `consent_record_source_chk` refuses
+        one.
 
         **Two callers, two rules.** A guest recording their own consent uses a guest token and may only
         act on their own subject. An agent recording on a guest''s behalf uses a staff token, requires
@@ -5121,6 +5124,147 @@ paths:
                   noContact:
                     type: integer
                     description: Holders with no guest record to tell.
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /guest-one-time-codes:
+    post:
+      operationId: sendGuestOneTimeCode
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-agreed: '30 October 2026: ADAM CR-370 (Chinmay, with its follow-up of 31 October; CHG-CR370-001); the
+        identity.guestCodeIssued consumer, shaped as notifyPerformanceHolders'
+      summary: Send a guest the one-time code Identity minted
+      description: '**The `identity.guestCodeIssued` consumer that sends a guest''s one-time code** (decided 30 October
+        2026, Chinmay, ADAM CR-370; CHG-CR370-001). `requestGuestOtp`, `registerGuest` (channel email) and
+        `verifyGuestEmail` (mode send) mint the code in Identity, which is in another deployable, so the code reaches
+        Marketing by the outbox and this operation sends it. Invoked by the event relay, never by a screen, as
+        `notifyPerformanceHolders` is.
+
+
+        **What it does.** It decrypts `destination` and `code` at send time through the kernel''s field encryption
+        (#37050) and sends the code on `channel` through the tenant''s configured provider for that channel
+        (`marketing.communication_provider`), with the system template `guestOneTimeCode` in the guest''s `locale`. The
+        template carries its own subject line, so the message needs none. It writes a transactional
+        `marketing.message_dispatch` row for the send, without the code: sent under contract performance, not marketing
+        consent. The decrypted values are never logged or stored.
+
+
+        **Idempotent on `challengeId`**: a redelivered event finds the send already made and answers it. **Once
+        `expiresAt` has passed it stops retrying** and answers `expired`; the event is not dead-lettered for replay,
+        because an expired code is worthless.
+
+
+        **A code with no subject** (purpose `register` or `verify` to an identifier with no account, the CR-370
+        follow-up of 31 October 2026) is sent the same way; `marketing.message_dispatch` keys every row to a guest
+        (`subject_id` is required), so such a send writes no dispatch row.'
+      tags:
+      - message
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      x-ticvai-consumes:
+      - identity.guestCodeIssued
+      x-ticvai-reads:
+      - table: marketing.message_template
+        for: 'the system template guestOneTimeCode in the guest''s language (ADAM CR-370)'
+      - table: marketing.communication_provider
+        for: 'the tenant''s configured provider for the code''s channel (ADAM CR-370)'
+      x-ticvai-writes:
+      - table: marketing.message_dispatch
+        for: 'the transactional dispatch of the send, without the code (ADAM CR-370)'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - eventId
+              - challengeId
+              - channel
+              - purpose
+              - expiresAt
+              - destination
+              - code
+              properties:
+                eventId:
+                  type: string
+                  description: The `identity.guestCodeIssued` event id, for the consumer's inbox record.
+                challengeId:
+                  type: string
+                  format: uuid
+                  x-ticvai-persisted: false
+                  description: The `identity.otp_challenge` row; the idempotency key.
+                subjectId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The guest; null for a register or verify code to an identifier with no account.
+                channel:
+                  type: string
+                  enum:
+                  - email
+                  - sms
+                  - whatsapp
+                purpose:
+                  type: string
+                  x-ticvai-persisted: false
+                  enum: [login, register, verify, passwordReset, stepUp, emailVerification]
+                locale:
+                  type: string
+                  nullable: true
+                  x-ticvai-persisted: false
+                  description: The guest's language, which the template is sent in.
+                expiresAt:
+                  type: string
+                  format: date-time
+                  x-ticvai-persisted: false
+                  description: After it the code is not sent and the event is not retried.
+                destination:
+                  type: string
+                  writeOnly: true
+                  x-ticvai-secret: field-encrypted
+                  x-ticvai-persisted: false
+                  description: The address, field-encrypted (#37050); decrypted at send time, never stored here.
+                code:
+                  type: string
+                  writeOnly: true
+                  x-ticvai-secret: field-encrypted
+                  x-ticvai-persisted: false
+                  description: The code, field-encrypted (#37050); decrypted at send time, never stored or logged.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The code was sent, now or already, or had expired.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - challengeId
+                - outcome
+                properties:
+                  challengeId:
+                    type: string
+                    format: uuid
+                  outcome:
+                    type: string
+                    enum:
+                    - sent
+                    - alreadySent
+                    - expired
+                  messageDispatchId:
+                    type: string
+                    nullable: true
+                    description: The dispatch row written; null when expired or for a code with no subject.
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/consents/history:

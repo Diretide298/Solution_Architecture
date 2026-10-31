@@ -1,0 +1,57 @@
+id: CHG-CR366-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'createContentBlock and updateContentBlock check audienceSegmentId through marketing-crm#segmentRecords (in
+  process) and refuse one the caller''s scope does not see 422 unknown-reference, writing nothing; and they check the
+  body only as far as ContentBlock.body defines it (JSON objects, the kind''s listed text keys strings, items[] and
+  fields[] arrays of objects), 400 validation with errors[] naming the field. The full schema per kind is on the
+  left-out list (LO-CR366-001).'
+decision:
+  what: 'The lead''s review, 30 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs". Posted on #30783 (Chinmay, 30 October 2026), not as recommended: (1)
+    on createContentBlock and updateContentBlock, an audienceSegmentId that marketing-crm#segmentRecords (it already
+    exists, in-process) does not return under the caller''s scope is refused 422 unknown-reference naming
+    audienceSegmentId, and nothing is written; null means everybody. This is the package''s code for a reference the
+    caller cannot use (CR-103), not 400. (2) The body check is only what the contract already defines: body and each
+    localeVariants.<locale> must be JSON objects, the text keys ContentBlock.body lists for the kind must be strings
+    where present, an items[] or fields[] must be an array of objects; a failure is 400 validation with errors[]
+    naming the field. Other keys are not checked; the full schema per kind is on the left-out list.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-366 (Hrushikant Patkar, #30783 createContentBlock): ContentBlock.body promised validation "against the
+  block''s own schema" that no file defines, and the marketing.segment read stated no rule and no error. The CR''s
+  option B used 400 where CR-103 settled 422 unknown-reference, left out updateContentBlock (which also takes
+  audienceSegmentId), and dropped every body check, leaving CMS-007''s "blocks the tenant cannot break" with nothing
+  behind it.'
+keys_touched:
+  operations: [createContentBlock, updateContentBlock]
+  schemas: [ContentBlock]
+  screens: [CMS-007]
+  tables: [whitelabel.content_block, marketing.segment]
+  files:
+  - contracts/satellite/white-label.yaml
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+  - tools/check-problem-types.py
+root_class: 'a rule promised in prose ("validated against its own schema") with nothing defined behind it, and a
+  cross-module read with no stated rule or error'
+tickets:
+  started:
+  - '30783 (createContentBlock, Hrushikant): add the segment check and the text-key check, 422 unknown-reference and
+    400 validation as decided.'
+  - '31084 (updateContentBlock, Chinmay Patkar): the same segment check and body check on a PATCH that sends
+    audienceSegmentId, body or localeVariants; the operation now declares the in-process segmentRecords read.'
+  - '31153 (CMS-007 connect to API): show the 422 on the audience picker and the 400 errors[] on the block''s fields.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-366
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CONTENT-BLOCK
+status: open
+notes: 'tools/check-problem-types.py also gains FIXED_STATUS (unknown-reference is 422 and validation is 400 in every
+  contract), the class CR-366''s option B would have opened; it holds today with no exception. The body and locale
+  check is applied to localeVariants entries too, since translation drafts fill the same text keys there by fieldPath.'

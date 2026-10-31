@@ -1,0 +1,44 @@
+id: CHG-CR368-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'submitGuestIdentityDocument applies the policy''s maxResubmissions: it counts the guest''s rejected and
+  resubmissionRequested verifications decided after their latest verified one (all of them if never verified) and,
+  when the count is greater than maxResubmissions, refuses 422 resubmission-limit-reached and writes nothing. The count
+  is computed, never stored; maxResubmissions has a description; decideGuestIdentityVerification is unchanged but for
+  naming the limit.'
+decision:
+  what: 'The lead''s review, 30 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs". Posted on #30660 (Chinmay, 30 October 2026), as recommended (option
+    1): count the guest''s verifications with status rejected or resubmissionRequested decided after their latest
+    verified one (all of them if never verified); when that count is greater than maxResubmissions, refuse 422
+    resubmission-limit-reached, nothing written, the detail telling the guest to contact the venue. Default 3 gives the
+    first submission and three resubmissions; 0 only the first. Add maxResubmissions to the policy fields read and
+    identity.guest_identity_verification for the count. Computed, never stored. decideGuestIdentityVerification is
+    unchanged.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-368 (Hrushikant Patkar, #30660 submitGuestIdentityDocument): IdentityGuestVerificationPolicy.maxResubmissions
+  (0 to 10, default 3) had no description and no operation read it; the operation''s 422 list had no limit error, so
+  #30660 applied no limit. Requirement 5.3.21 (configurable identity workflows) makes it the tenant''s setting.'
+keys_touched:
+  operations: [submitGuestIdentityDocument, decideGuestIdentityVerification]
+  schemas: [IdentityGuestVerificationPolicy]
+  tables: [identity.guest_identity_verification, identity.guest_verification_policy]
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: 'a configured limit with no rule and no answer, so nothing applies it'
+tickets:
+  started:
+  - '30660 (submitGuestIdentityDocument, Hrushikant): apply the count and the 422 resubmission-limit-reached as decided,
+    replacing "no limit applied".'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-368
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ID-RESUBMIT
+status: open

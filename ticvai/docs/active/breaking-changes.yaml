@@ -1620,3 +1620,17 @@ changes:
     tag: r11
     producer-tickets: [SVC-WHITELABEL-BOOKINGFLOWS-2]
     consumer-tickets: [APP-WL-CMS-103]
+  - id: BC-496
+    contract: identity
+    operation: requestGuestOtp
+    operations: [requestGuestOtp, verifyGuestEmail]
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-370 (CHG-CR370-001): a guest one-time code reaches Marketing''s sender by the outbox event
+      identity.guestCodeIssued, destination and code field-encrypted, because Identity and Marketing are in different
+      deployables; verifyGuestEmail''s mode send emits it in place of an in-process call to sendTransactionalMessage. No
+      response changes; an emitted event added to an operation is breaking by the compat rule.'
+    approved-by: 'Chinmay, 30 October 2026 (CR-370, posted on #30659: "Use an outbox event"), with the follow-up of 31
+      October 2026 on #30659'
+    tag: r12
+    producer-tickets: ['30659', '30676']
+    consumer-tickets: ['30690', '30697', '30700', '30703']
