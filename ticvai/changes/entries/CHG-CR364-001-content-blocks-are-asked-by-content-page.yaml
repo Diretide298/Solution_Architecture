@@ -1,0 +1,47 @@
+id: CHG-CR364-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'listContentBlocks'' pageKey is a content page''s id only (format uuid): a value that is not a uuid answers 400
+  validation, an unknown page id an empty page. A homepage section''s blocks are those of the content page its
+  contentPageId names, so CMS-007 sends that id; a section with no page gets one first (createContentPage, then
+  setHomepageLayout), and createContentBlock''s pageId is always a content page id.'
+decision:
+  what: 'Chinmay, 30 October 2026, reviewing the day''s CRs ("for each one actually check if they hold and if not then
+    find out the best way keeping in mind what client needs"), posted on #30784: "as you recommended. pageKey is a
+    content page''s id only (format uuid). A value that is not a uuid answers 400 validation, not an empty page. An
+    unknown page id answers an empty page. A homepage section''s blocks are the blocks of the content page its
+    contentPageId names, so CMS-007 sends that id. A section with no page yet gets one first (createContentPage, then
+    setHomepageLayout setting contentPageId), and createContentBlock''s pageId is always a content page id."'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-364 (Hrushikant Patkar, #30784 listContentBlocks): pageKey was "a content page''s id or a homepage
+  section key", but whitelabel.content_block names its page only by page_id (uuid); whitelabel.homepage_section
+  already points a section at its content page (content_page_id).'
+keys_touched:
+  operations: [listContentBlocks, createContentBlock]
+  schemas: [ContentBlock]
+  screens: [CMS-007]
+  files:
+  - contracts/satellite/white-label.yaml
+  - screens/P13-white-label-cms.yaml
+  - tools/check-business-rules.py
+root_class: 'a parameter given two meanings where the store holds only one'
+tickets:
+  started:
+  - '30784 (listContentBlocks, Hrushikant Patkar): validate pageKey as a uuid (400) instead of answering an empty page
+    for a non-uuid. Told through the lead''s comment.'
+  - '31152-31154 (CMS-007 Page Builder): for a section, send its contentPageId as pageKey and as createContentBlock''s
+    pageId.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-364
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-CONTENT-PAGE-KEY fails on the r11 contract and passes now. CMS-007''s change is to two components'' notes
+  (invisible metadata; check-approved-ui compares none), so the approved screen does not change. No column. Nothing
+  beyond the comment''s words.'

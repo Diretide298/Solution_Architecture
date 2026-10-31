@@ -107,7 +107,26 @@ And one rule per decision:
   BR-WALLET-ETAG-VERSION (r11, ADAM CR-332 option A, CHG-CR332-001) WalletFundingRules and WalletRefundPolicy carry a
                    version (wallet.funding_rule.version, wallet.refund_policy.version); their GET and PUT send it as
                    ETag, and the PUT refuses a stale If-Match 412, the rule CR-257 chose for group bookings.
-  BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
+  BR-UAEPASS-ENDPOINTS (r12, ADAM CR-360, CHG-CR360-001) guestUaePassLogin builds the token and userinfo endpoints
+                   from the row's issuer (UAE Pass publishes no discovery document), uses HTTP Basic, reads sub and
+                   the idn claim from userinfo, and never matches an account on the UAE Pass email; setSsoConfig does
+                   not refuse a guest uaePass row for its metadataUrl.
+  BR-LINK-CHECKOUT (r12, ADAM CR-361, CHG-CR361-001) linkGuestCheckout's verificationCode is optional and ignored; one
+                   403 contact-mismatch covers unknown, mismatched and attached-elsewhere; a booking already the
+                   caller's answers 200.
+  BR-DELEGATION-READS (r12, ADAM CR-362, CHG-CR362-001) grantDelegation and listDelegations ask
+                   identity#subjectMinorStatus (one statement under ITenantRootGrant, no date of birth returned) and
+                   grantDelegation the tenant root by tenancy#scopeRecords; both are tenant-level; the linked adult's
+                   write over a minor is stated on DelegatedAccess and grantDelegation.
+  BR-GUEST-POLICY-CURRENCY (r12, ADAM CR-363, CHG-CR363-001) IdentityGuestVerificationPolicy stores currencyCode
+                   (identity.guest_verification_policy.currency_code) and neither policy operation resolves the
+                   wallet top-up limit's currency from a venue; the set answers 400 on a scale that does not fit.
+  BR-CONTENT-PAGE-KEY (r12, ADAM CR-364, CHG-CR364-001) listContentBlocks' pageKey is a uuid (a content page's id),
+                   refused 400 otherwise; a homepage section is asked by its contentPageId.
+  BR-CONTENT-PUBLISH (r12, ADAM CR-365, CHG-CR365-001) the content block state model publishes a scheduled block now,
+                   reschedules it and publishes an expired one by operation; publishContentBlock lists 400 on expireAt
+                   and passes approvals' 422 no-approval-route on, and its identity read names approvedByPrincipalId.
+  BR-GUEST-SELF-403 (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
 
@@ -1029,6 +1048,91 @@ def main() -> int:
     need("BR-GUEST-SSO", "minItems" not in gm and "guest" in str(gm.get("description") or ""),
          "SsoProviderConfig.groupMappings still requires a mapping on a guest row (CHG-CR327-002)")
 
+    # BR-UAEPASS-ENDPOINTS .. BR-CONTENT-PUBLISH (r12, ADAM CR-360 to CR-365, decided 30 October 2026, Chinmay; the
+    # lead: "for each one actually check if they hold and if not then find out the best way keeping in mind what client
+    # needs"). Each fails on the r11 contract.
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def vias(o_):
+        return {str((v or {}).get("query")) for v in o_.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    uae = op("guestUaePassLogin")[3]
+    ud = words(uae.get("description"))
+    for frag in ("`issuer` followed by `/token`", "`issuer` followed by `/userinfo`", "HTTP Basic",
+                 "`providerSubject` is the userinfo `sub`", "defaults to `idn`",
+                 "never matches or links an existing account", "only when that claim is present"):
+        need("BR-UAEPASS-ENDPOINTS", frag in ud, f"guestUaePassLogin does not say: {frag} (CR-360)")
+    need("BR-UAEPASS-ENDPOINTS", "uaePass" in str((spc.get("metadataUrl") or {}).get("description") or ""),
+         "SsoProviderConfig.metadataUrl does not say it is not used for a guest uaePass row (CR-360)")
+    s400 = words(((op("setSsoConfig")[3].get("responses") or {}).get("400") or {}).get("description"))
+    need("BR-UAEPASS-ENDPOINTS", "uaePass" in s400 and "not refused" in s400,
+         "setSsoConfig's 400 sso-metadata-unreachable still reaches a guest uaePass row (CR-360)")
+
+    lgc = op("linkGuestCheckout")[3]
+    vc = (props({}, body_schema(lgc)).get("verificationCode") or {})
+    need("BR-LINK-CHECKOUT", "ignored" in str(vc.get("description") or "") and "verificationCode" not in
+         (body_schema(lgc).get("required") or []),
+         "linkGuestCheckout's verificationCode is not optional and ignored (CR-361)")
+    l403 = words(((lgc.get("responses") or {}).get("403") or {}).get("description"))
+    need("BR-LINK-CHECKOUT", "subject_holding" in l403 and "another account" in l403 and "same time" in l403,
+         "linkGuestCheckout's 403 does not cover unknown, mismatched and attached-elsewhere alike (CR-361)")
+    need("BR-LINK-CHECKOUT", "already attached to the caller is not refused" in words(lgc.get("description")),
+         "linkGuestCheckout does not answer 200 for a booking already the caller's (CR-361)")
+
+    iq = (load("contracts/spine/identity.yaml").get("x-ticvai-queries") or {}).get("subjectMinorStatus") or {}
+    iqp = (((iq.get("returns") or {}).get("items") or {}).get("properties") or {})
+    need("BR-DELEGATION-READS", "ITenantRootGrant" in str(iq.get("rule") or "")
+         and (iqp.get("minorStatus") or {}).get("enum") == ["minor", "adult", "unknown"]
+         and set(iqp) == {"subjectId", "displayName", "minorStatus"},
+         "identity#subjectMinorStatus does not answer only displayName and minorStatus under the tenant root grant "
+         "(CR-362)")
+    gdo, ldo = op("grantDelegation")[3], op("listDelegations")[3]
+    need("BR-DELEGATION-READS", {"identity#subjectMinorStatus", "tenancy#scopeRecords"} <= vias(gdo),
+         "grantDelegation does not ask identity#subjectMinorStatus and tenancy#scopeRecords (CR-362)")
+    need("BR-DELEGATION-READS", "identity#subjectMinorStatus" in vias(ldo),
+         "listDelegations does not ask identity#subjectMinorStatus for overSubjectName/IsMinor (CR-362)")
+    for oid_, o_ in (("grantDelegation", gdo), ("listDelegations", ldo)):
+        need("BR-DELEGATION-READS", o_.get("x-ticvai-scope-level") == "tenant",
+             f"{oid_} is not x-ticvai-scope-level tenant (staff at the tenant root only, CR-362)")
+    gdd = words(gdo.get("description"))
+    need("BR-DELEGATION-READS", "`familyMember` or `primaryHolder` grant over `over_subject_id`" in gdd
+         and "highest threshold among the tenant's regions" in gdd,
+         "grantDelegation does not state the linked adult's write check and the minor-age region rule (CR-362)")
+
+    gvp = (isch.get("IdentityGuestVerificationPolicy") or {}).get("properties") or {}
+    need("BR-GUEST-POLICY-CURRENCY", (gvp.get("currencyCode") or {}).get("readOnly") is True,
+         "IdentityGuestVerificationPolicy stores no currencyCode, so a tenant-root limit has no currency (CR-363)")
+    for oid_ in ("getGuestVerificationPolicy", "setGuestVerificationPolicy"):
+        need("BR-GUEST-POLICY-CURRENCY",
+             not {"tenancy#scopeRecords", "tenancy#venueSettingsRecords"} & vias(op(oid_)[3]),
+             f"{oid_} still resolves walletTopUpLimit's currency from a venue (CR-363)")
+    need("BR-GUEST-POLICY-CURRENCY", "validation" in ptypes(op("setGuestVerificationPolicy")[3], "400"),
+         "setGuestVerificationPolicy lists no 400 for a walletTopUpLimit that does not fit its currency (CR-363)")
+
+    lcb = op("listContentBlocks")[3]
+    pk = next((p for p in lcb.get("parameters") or [] if isinstance(p, dict) and p.get("name") == "pageKey"), {})
+    need("BR-CONTENT-PAGE-KEY", (pk.get("schema") or {}).get("format") == "uuid"
+         and "validation" in ptypes(lcb, "400") and "or a homepage section key" not in words(lcb.get("description")),
+         "listContentBlocks' pageKey is not a content page's uuid only, refused 400 otherwise (CR-364)")
+
+    cbs = load("states/content-block.yaml")
+    edges = {(t.get("from"), t.get("to"), t.get("trigger")) for t in cbs.get("transitions") or []}
+    for e in (("scheduled", "published", "operation"), ("scheduled", "scheduled", "operation"),
+              ("expired", "published", "operation")):
+        need("BR-CONTENT-PUBLISH", e in edges, f"states/content-block.yaml has no {e[0]} -> {e[1]} by operation (CR-365)")
+    pcb = op("publishContentBlock")[3]
+    need("BR-CONTENT-PUBLISH", "validation" in ptypes(pcb, "400") and "no-approval-route" in ptypes(pcb, "422"),
+         "publishContentBlock lists no 400 on expireAt or 422 no-approval-route (CR-365)")
+    need("BR-CONTENT-PUBLISH", "must be after the moment it goes live" in words(pcb.get("description")),
+         "publishContentBlock does not say expireAt must be after the moment the block goes live (CR-365)")
+    need("BR-CONTENT-PUBLISH", any("approvedByPrincipalId" in str((v or {}).get("for") or "")
+                                   for v in pcb.get("x-ticvai-read-via") or [] if isinstance(v, dict)),
+         "publishContentBlock's identity read gives no purpose (approvedByPrincipalId, CR-365)")
+
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
@@ -1041,7 +1145,9 @@ def main() -> int:
              "BR-PRESET-READONLY", "BR-END-SESSIONS", "BR-PLATFORM-TOKEN", "BR-GUEST-TOKENS", "BR-GUEST-VENUE",
              "BR-PLATFORM-INVOICE", "BR-WALLET-TOPUP-ONCE", "BR-WALLET-PUBLISH-CHECKS", "BR-WALLET-RESTORE-DRAFT",
              "BR-PLANNER-QUESTIONS", "BR-ROTA-HOUR-LIMIT", "BR-ROTA-CROSS-VENUE",
-             "BR-CREDIT-ACCOUNT-CURRENCY", "BR-PLATFORM-APPROVAL-RULE", "BR-WALLET-ETAG-VERSION", "BR-GUEST-SSO"]
+             "BR-CREDIT-ACCOUNT-CURRENCY", "BR-PLATFORM-APPROVAL-RULE", "BR-WALLET-ETAG-VERSION", "BR-GUEST-SSO",
+             "BR-UAEPASS-ENDPOINTS", "BR-LINK-CHECKOUT", "BR-DELEGATION-READS", "BR-GUEST-POLICY-CURRENCY",
+             "BR-CONTENT-PAGE-KEY", "BR-CONTENT-PUBLISH"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

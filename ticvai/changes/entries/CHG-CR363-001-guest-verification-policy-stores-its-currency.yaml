@@ -1,0 +1,60 @@
+id: CHG-CR363-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'The guest verification policy stores the currency of its wallet top-up limit:
+  IdentityGuestVerificationPolicy.currencyCode (identity.guest_verification_policy.currency_code, ISO 4217, readOnly,
+  null exactly when walletTopUpLimit is), set by setGuestVerificationPolicy from walletTopUpLimit.currency with the
+  amount checked against that currency''s scale (400 on walletTopUpLimit); getGuestVerificationPolicy answers the Money
+  in it, and neither operation reads tenancy#scopeRecords or tenancy#venueSettingsRecords for a currency any more.'
+decision:
+  what: 'Chinmay, 30 October 2026, reviewing the day''s CRs ("for each one actually check if they hold and if not then
+    find out the best way keeping in mind what client needs"), posted on #30716: "as you recommended.
+    identity.guest_verification_policy gains currency_code. setGuestVerificationPolicy sets it from
+    walletTopUpLimit.currency and checks the amount against that currency''s ISO 4217 scale (CR-192), answering 400 on
+    walletTopUpLimit when it does not fit. With no walletTopUpLimit, both the column and currency_code are null.
+    getGuestVerificationPolicy answers the Money from the row''s own currency_code. Drop the two tenancy reads
+    (scopeRecords and venueSettingsRecords) both operations declared for the currency. Stop refusing walletTopUpLimit
+    with 400."'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-363 (Hrushikant Patkar, #30716 setGuestVerificationPolicy): the policy is one row at the tenant root,
+  whose scope_path names no venue, and CR-299''s region fallback finds nothing above the regions, so
+  walletTopUpLimit had no currency; the same gap CR-322 settled for payments.credit_account (CHG-CR322-001).'
+keys_touched:
+  operations: [getGuestVerificationPolicy, setGuestVerificationPolicy]
+  schemas: [IdentityGuestVerificationPolicy]
+  tables: [identity.guest_verification_policy]
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-package.py
+  - tools/check-business-rules.py
+root_class: 'Money whose currency is resolved from a scope that, for a tenant-wide record, has no venue or region above
+  it'
+tickets:
+  started:
+  - '30716 (setGuestVerificationPolicy, Hrushikant Patkar): accept walletTopUpLimit and store currency_code; remove the
+    400 refusal and the tenancy currency reads. Told through the lead''s comment.'
+  - '31248 (getGuestVerificationPolicy, Pranay Shinde): answer walletTopUpLimit from the row''s currency_code.'
+  - '31250-31252 (ADM-342, on hold): no change; the form already sends walletTopUpLimit as Money with its currency.'
+  unstarted:
+  - 'A [DB] migration child task for Hrushikant (to be filed by the lead): the currency_code column with its checks
+    (see notes).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-363
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-GUEST-POLICY-CURRENCY fails on the r11 contract (4 findings) and passes now; check-package rule 33 lists
+  identity.guest_verification_policy among the tables that store a currency, and check-money-currency keeps the class.
+  derive-ddl adds currency_code (text, length 3) in the next forward migration. Not expressible in a contract mark, so
+  for the migration task: CHECK ((wallet_top_up_limit IS NULL) = (currency_code IS NULL)) and the 3-letter format
+  check; no backfill (the build never wrote wallet_top_up_limit). Beyond the comment''s words: currencyCode is answered
+  on the wire (a stored column is a contract property here, as CR-322''s), and getGuestVerificationPolicy gains a
+  description. Not done here: naming-and-style 5.1''s list lives in the setup starter and the repos/* project-bible
+  copies, which this lane does not commit. Seen, for the left-out list or its own CR: nothing enforces
+  walletTopUpAboveLimit (wallet topUpWallet reads no verification policy), and how a top-up in another currency is
+  compared with the limit is undecided.'

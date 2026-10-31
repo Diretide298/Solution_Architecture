@@ -1,0 +1,58 @@
+id: CHG-CR360-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'guestUaePassLogin builds the UAE Pass token and userinfo endpoints from the guest uaePass row''s issuer
+  (issuer + /token, issuer + /userinfo; UAE Pass publishes no discovery document, so metadataUrl is not used and may be
+  null), exchanges the code with HTTP Basic client authentication, reads the claims from userinfo (no ID token),
+  takes providerSubject from sub and the Emirates ID number from the claim SignIn:GuestProviders:UaePassIdentityNumberClaim
+  names (default idn), writing the emiratesId document only when that claim is present; the UAE Pass email never
+  matches or links an account, is stored as email_at_link and, on a new account, as an unverified contact; and
+  setSsoConfig does not refuse a guest uaePass row for an absent or unreachable metadataUrl.'
+decision:
+  what: 'Chinmay, 30 October 2026, reviewing the day''s CRs ("for each one actually check if they hold and if not then
+    find out the best way keeping in mind what client needs"), posted on #30670: "not as recommended: UAE Pass
+    publishes no discovery document, so metadata_url cannot give the endpoints. For a guest uaePass row, metadataUrl
+    is not used and may be null. The token endpoint is the row''s issuer followed by /token, and the userinfo endpoint
+    is the issuer followed by /userinfo ... Exchange the code with HTTP Basic client authentication ... providerSubject
+    is the userinfo sub. Keep SignIn:GuestProviders:UaePassIdentityNumberClaim but default it to idn. Write the
+    emiratesId pii.subject_document only when that claim is present ... The UAE Pass email never matches or links an
+    existing account. Store it as pii.subject_identity.email_at_link and, on a new account, write it to
+    pii.subject_contact with is_verified false ... setSsoConfig does not refuse a guest uaePass row whose metadataUrl
+    is absent or unreachable."'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-360 (Hrushikant Patkar, #30670 guestUaePassLogin): the contract named "the UAE Pass user id" and an
+  Emirates ID claim "to be confirmed", gave identity.sso_provider no token or userinfo endpoint, and said nothing about
+  the UAE Pass email; the build read metadata_url as a discovery document, which UAE Pass does not publish, and
+  setSsoConfig refuses an unreachable metadata URL 400. The authorization URL is stored for the same reason
+  (CHG-CR327-002).'
+keys_touched:
+  operations: [guestUaePassLogin, setSsoConfig]
+  schemas: [SsoProviderConfig]
+  tables: [identity.sso_provider, pii.subject_identity, pii.subject_contact, pii.subject_document]
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: 'an external provider integrated on an assumed standard (OIDC discovery, ID token) the provider does not
+  follow'
+tickets:
+  started:
+  - '30670 (guestUaePassLogin, Hrushikant Patkar): take the token and userinfo endpoints from the issuer, not from
+    metadata_url; default the identity-number claim to idn and write the document when it is present; store the email
+    as email_at_link and, on a new account, as an unverified contact. Told through the lead''s comment.'
+  - '31276 (setSsoConfig, Pranay Shinde): do not refuse a guest uaePass row for an absent or unreachable metadataUrl.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-360
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-UAEPASS-ENDPOINTS fails on the r11 contract (9 findings) and passes now. No column and no screen change.
+  Beyond the comment''s words: guestUaePassLogin now declares its pii.subject_contact and pii.subject_document writes
+  (x-ticvai-writes), which its description already made; SsoProviderConfig.issuer says it is the base of the
+  endpoints. Seen, not settled here: the live tenant database of 30 October has no identity.sso_provider audience,
+  guest_provider or authorization_url (CR-327''s columns), which #30670 reads; that is the live-DB catch-up.'
