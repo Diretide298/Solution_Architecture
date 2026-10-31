@@ -1,0 +1,60 @@
+id: CHG-R12PL-025
+date: '2026-10-31'
+source: cr
+kind: plan
+proposed: '2026-10-31'
+summary: 'A [DB] task for CR-403: seating.seat_map_template, not in the live database yet, carries the copied structure
+  and read-beneath row security from its first creation (MIG-SEATING-8).'
+decision:
+  what: 'The lead, 31 October 2026, on the 64 settled CRs (CR-372 to CR-435): "Include them in r12". docs/active/block-a-extra-tasks.json:
+    a new [DB] task CR403-DB-SEAT-MAP-TEMPLATE-STRUCTURE (Hrushikant Patkar, epic PLATFORM, not before 2 November 2026),
+    the database work of MIG-SEATING-8 (V1203__seating.sql, Block C, not ticketed), which creates seating.seat_map_template,
+    following MIG-SEATING-8: seating.seat_map_template is not in the live database yet, so this is no ALTER: its first creation
+    carries structure, view_box, stage_position, source_seat_map_id and scope_path, with read-beneath row security in place
+    of the parent policy on region_id; the task checks MIG-SEATING-8 carries them and writes the difference as a guarded
+    forward migration if it has run without them. Its text carries the decision''s statements and names the release''s forward
+    migration as its Source DDL after r1. Plan change waived from the cooling-off by the lead ("Waive for r12").'
+  by: Chinmay
+  date: '2026-10-31'
+why: ADAM CR-403; the lead's decision of 31 October 2026, posted on the ticket. The ticket the work belongs to has started
+  or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the release apply makes (no
+  ticket is made through the API).
+keys_touched:
+  tickets:
+  - CR403-DB-SEAT-MAP-TEMPLATE-STRUCTURE (new)
+  tables:
+  - seating.seat_map_template
+  operations:
+  - createSeatMapTemplate
+  - createSeatMap
+  - listSeatMapTemplates
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started: []
+  unstarted:
+  - '#35673 (createSeatMap, Hrushikant): replace the 400 on templateId with the copy and the 422 unknown-reference. [status:
+    #35673 New]'
+  - 'createSeatMapTemplate, listSeatMapTemplates and importSeatMap back-end tickets, when picked: store and read the structure
+    as above. (no ticket yet)'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-403
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the verdict names as parent is recorded in the task''s
+  text; its OpenProject parent is the app-module the plan places it in, and it follows the migration that creates its table(s).
+  It changes tables another migration creates, so it is marked `area: database` (a [DB] ticket) and its key does not end
+  in -DB (a -DB task''s `table` builds count as created by it: CHG-R8MIG-016, CHG-R12PL-008). A started migration it would
+  come after is not made to wait on it (tools/build-service-docs.py, CHG-R12PL-008). MIG-SEATING-8 is in Block C and has
+  no ticket; this task stays a Block A task timed after it (8 December 2026 in this plan, both on Hrushikant Patkar). createSeatMap
+  (#35673) answers 422 unknown-reference for a template it cannot read until then, as decided.'

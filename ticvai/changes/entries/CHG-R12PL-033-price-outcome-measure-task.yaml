@@ -1,0 +1,52 @@
+id: CHG-R12PL-033
+date: '2026-10-31'
+source: cr
+kind: plan
+proposed: '2026-10-31'
+summary: 'A Block A task for the AI engineers for CR-418: specify how an executed price''s actual outcome (revenue and demand
+  after it, against its forecast) is measured; listLearningModelPerformance (#35225) follows it.'
+decision:
+  what: 'The lead, 31 October 2026, on the 64 settled CRs (CR-372 to CR-435): "Include them in r12". docs/active/block-a-extra-tasks.json:
+    a new AI engine task AI-ENGINE-PRICE-OUTCOME-MEASURE (Block A, 3 engineer-days, not before 2 November 2026, following
+    AI-ENGINE-GATEWAY), with no named owner: the schedule places it on whichever AI engineer can start it first (tools/build-service-docs.py:
+    an AI engine task with no named owner is no longer given to the least-loaded back-end developer). It serves ADM-117''s
+    scorecards, CR-416''s actual revenue result and CR-407''s performance KPIs. `operationWaits`: listLearningModelPerformance
+    -> AI-ENGINE-PRICE-OUTCOME-MEASURE, so its task (SVC-CATALOGUE-DRAFTED-27, #29746, New) follows it. ADM-117 stays in
+    Block A and is not moved to the left-out list. The lead, 31 October 2026: "the AI engineers specify the price outcome
+    measure now; ADM-117 stays in Block A". Plan change waived from the cooling-off by the lead ("Waive for r12").'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-418; the lead''s answer of 31 October 2026 to the verdict''s question: the AI engineers specify the price
+  outcome measure now, as a new Block A task, and ADM-117 stays in Block A.'
+keys_touched:
+  tickets:
+  - AI-ENGINE-PRICE-OUTCOME-MEASURE (new)
+  - SVC-CATALOGUE-DRAFTED-27 (29746)
+  operations:
+  - listLearningModelPerformance
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/build-service-docs.py
+root_class: a settled CR whose answer is a new specification task no screen or operation implies
+tickets:
+  started: []
+  unstarted:
+  - '#35225 (listLearningModelPerformance): stop, propose On hold naming CR-418, and keep nothing built that answers invented
+    figures. [status: #35225 New]'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-418
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'operationWaits makes the whole task that builds listLearningModelPerformance wait (SVC-CATALOGUE-DRAFTED-27, which
+  also builds listPriceElasticityRevenue, listPricingRecommendationExplainability and listRecommendationReviewDecision),
+  as it does for every operation it names; all four sub-tasks are New. The verdict''s package follow-up (a left-out entry
+  for listLearningModelPerformance) is replaced by the lead''s answer: no left-out entry.'

@@ -1,0 +1,53 @@
+id: CHG-R12PL-035
+date: '2026-10-31'
+source: cr
+kind: plan
+proposed: '2026-10-31'
+summary: 'A Catalogue back-end task for CR-422: the channel deployment job in the workers host, the consumer of the new
+  event catalogue.priceExecuted, which moves a live dynamic price execution to deployed, partly deployed or failed.'
+decision:
+  what: 'The lead, 31 October 2026, on the 64 settled CRs (CR-372 to CR-435): "Include them in r12". docs/active/block-a-extra-tasks.json:
+    a new task CR422-PRICE-EXECUTION-DEPLOYMENT-JOB (epic PLATFORM, `pool: backend`, 3 points, not before 2 November 2026),
+    following PLATFORM-KERNEL, PLATFORM-OUTBOX, MIG-CATALOGUE and SVC-CATALOGUE-DRAFTED-25 (createLiveDynamicPrice, which
+    publishes the event): it consumes catalogue.priceExecuted and moves catalogue.price_execution through states/price-execution.yaml,
+    with its audit entries. The operation formula builds tasks for operations only; this consumer is a job named by the
+    event (lane L, events/catalogue-priceExecuted.yaml), not an operation, so no task would build it. Block A: createLiveDynamicPrice
+    is in Block A (ADM-115 binds it). Plan change waived from the cooling-off by the lead ("Waive for r12").'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-422; the lead''s decision of 31 October 2026, posted on #35182: createLiveDynamicPrice writes the execution
+  and publishes catalogue.priceExecuted, whose consumer, the channel deployment job, moves it.'
+keys_touched:
+  tickets:
+  - CR422-PRICE-EXECUTION-DEPLOYMENT-JOB (new)
+  tables:
+  - catalogue.price_execution
+  - catalogue.audit_entry
+  operations:
+  - createLiveDynamicPrice
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose decision names a job (an event consumer) that is no operation, carried by no plan task
+tickets:
+  started: []
+  unstarted:
+  - '#35182 (createLiveDynamicPrice): stop writing catalogue.price; require the strategy; take previousPrice from the newest
+    deployed execution, else the ladder basePrice; check the approval reference against approvals#requestRecords (CR-415''s
+    request for a recommendation); answer refusals with 422 approval-required or guardrail-breached instead of 400; set
+    execution_id on the decision row; publish catalogue.priceExecuted. [status: #35182 New]'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-422
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The event file is lane L''s (fix/r12-cr-l) and not in this tree, so the task names it in its text, not in its builds.
+  Owner: `pool: backend`, the plan''s default rule (the least-loaded back-end developer), as CR370-GUEST-ONE-TIME-CODE;
+  CatalogueService has no fixed owner.'

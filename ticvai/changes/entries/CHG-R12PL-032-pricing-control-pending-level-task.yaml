@@ -1,0 +1,58 @@
+id: CHG-R12PL-032
+date: '2026-10-31'
+source: cr
+kind: plan
+proposed: '2026-10-31'
+summary: 'A [DB] task for CR-425: catalogue.dynamic_pricing_control keeps a raised automation level pending its approval.'
+decision:
+  what: 'The lead, 31 October 2026, on the 64 settled CRs (CR-372 to CR-435): "Include them in r12". docs/active/block-a-extra-tasks.json:
+    a new [DB] task CR425-DB-PRICING-CONTROL-PENDING-LEVEL (Hrushikant Patkar, epic PLATFORM, not before 2 November 2026),
+    the database work of #35785 ([DB] catalogue.dynamic_pricing_control, under MIG-CATALOGUE, #27671), following MIG-CATALOGUE:
+    pending_automation_level with its check and pending_approval_request_id, both nullable, with the index dynamic_pricing_control_pending_approval_request_id_idx.
+    Its text carries the decision''s statements and names the release''s forward migration as its Source DDL after r1. Plan
+    change waived from the cooling-off by the lead ("Waive for r12").'
+  by: Chinmay
+  date: '2026-10-31'
+why: ADAM CR-425; the lead's decision of 31 October 2026, posted on the ticket. The ticket the work belongs to has started
+  or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the release apply makes (no
+  ticket is made through the API).
+keys_touched:
+  tickets:
+  - CR425-DB-PRICING-CONTROL-PENDING-LEVEL (new)
+  tables:
+  - catalogue.dynamic_pricing_control
+  operations:
+  - setDynamicPricingGuardrailPolicy
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started:
+  - '27671 (MIG-CATALOGUE, [DB] V0019__catalogue.sql, Ready for QA, Hrushikant Patkar): not rewritten'
+  - '35785 (MIG-CATALOGUE#catalogue.dynamic_pricing_control, [DB] catalogue.dynamic_pricing_control, Ready for QA, Hrushikant
+    Patkar): not rewritten'
+  unstarted:
+  - '#35172 (setDynamicPricingGuardrailPolicy): key by scopeLevel and scopeId; check market and channel scopeIds against
+    pricing_market and sales_channel (422 scope-not-found); keep a raise pending in the two new columns, raised as CR-415''s
+    requests are; handle subjectType dynamicPricingControl in the shared catalogue approval consumer; type the three lists
+    as arrays. [status: #35172 New]'
+  - '#30848 (createApprovalRequest / IApprovalRequests): a raise waits on it; also add CancelAsync (CR-421). [status: #30848
+    On hold]'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-425
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the verdict names as parent is recorded in the task''s
+  text; its OpenProject parent is the app-module the plan places it in, and it follows the migration that creates its table(s).
+  It changes tables another migration creates, so it is marked `area: database` (a [DB] ticket) and its key does not end
+  in -DB (a -DB task''s `table` builds count as created by it: CHG-R8MIG-016, CHG-R12PL-008). A started migration it would
+  come after is not made to wait on it (tools/build-service-docs.py, CHG-R12PL-008).'

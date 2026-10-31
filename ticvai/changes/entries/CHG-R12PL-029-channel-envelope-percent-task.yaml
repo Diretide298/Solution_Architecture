@@ -1,0 +1,60 @@
+id: CHG-R12PL-029
+date: '2026-10-31'
+source: cr
+kind: plan
+proposed: '2026-10-31'
+summary: 'A [DB] task for CR-412: catalogue.channel_envelope keeps a percentage allocation and the units released and returned.'
+decision:
+  what: 'The lead, 31 October 2026, on the 64 settled CRs (CR-372 to CR-435): "Include them in r12". docs/active/block-a-extra-tasks.json:
+    a new [DB] task CR412-DB-CHANNEL-ENVELOPE-PERCENT (Hrushikant Patkar, epic PLATFORM, not before 2 November 2026), the
+    database work of #35659 ([DB] catalogue.channel_envelope, under MIG-CATALOGUE, #27671), following MIG-CATALOGUE: allocation_percent
+    with its 0-100 check, released_units and returned_units default 0. Its text carries the decision''s statements and names
+    the release''s forward migration as its Source DDL after r1. Plan change waived from the cooling-off by the lead ("Waive
+    for r12").'
+  by: Chinmay
+  date: '2026-10-31'
+why: ADAM CR-412; the lead's decision of 31 October 2026, posted on the ticket. The ticket the work belongs to has started
+  or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the release apply makes (no
+  ticket is made through the API).
+keys_touched:
+  tickets:
+  - CR412-DB-CHANNEL-ENVELOPE-PERCENT (new)
+  tables:
+  - catalogue.channel_envelope
+  operations:
+  - setChannelAllocations
+  - relinquishChannelAllocation
+  - listInventoryCapacityChannel
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started:
+  - '27671 (MIG-CATALOGUE, [DB] V0019__catalogue.sql, Ready for QA, Hrushikant Patkar): not rewritten'
+  - '35659 (MIG-CATALOGUE#catalogue.channel_envelope, [DB] catalogue.channel_envelope, Ready for QA, Hrushikant Patkar):
+    not rewritten'
+  unstarted:
+  - '#35242: answer allocation, released and returned from the new columns; replace the product filter''s 400 with the event
+    path; order by channel, capacity pool, id. [status: #35242 New]'
+  - '#31628 (setChannelAllocations): take allocationPercent for percentage allocations and size allocated_units from it.
+    [status: #31628 New]'
+  - '#31627 (relinquishChannelAllocation): add the freed units to returned_units; the allocation release job adds them to
+    released_units. [status: #31627 New]'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-412
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the verdict names as parent is recorded in the task''s
+  text; its OpenProject parent is the app-module the plan places it in, and it follows the migration that creates its table(s).
+  It changes tables another migration creates, so it is marked `area: database` (a [DB] ticket) and its key does not end
+  in -DB (a -DB task''s `table` builds count as created by it: CHG-R8MIG-016, CHG-R12PL-008). A started migration it would
+  come after is not made to wait on it (tools/build-service-docs.py, CHG-R12PL-008).'

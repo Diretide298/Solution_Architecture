@@ -1,0 +1,58 @@
+id: CHG-R12PL-020
+date: '2026-10-31'
+source: cr
+kind: plan
+proposed: '2026-10-31'
+summary: 'A [DB] task for CR-390: access.biometric_profile gains consent_form_id, and the access role reads platform.venue_settings
+  for the venue''s biometrics settings.'
+decision:
+  what: 'The lead, 31 October 2026, on the 64 settled CRs (CR-372 to CR-435): "Include them in r12". docs/active/block-a-extra-tasks.json:
+    a new [DB] task CR390-DB-BIOMETRIC-CONSENT-FORM (Hrushikant Patkar, epic PLATFORM, not before 2 November 2026), the
+    database work of #30497 ([DB] access.biometric_profile, under MIG-ACCESS, #27676), following MIG-ACCESS and MIG-PLATFORM:
+    ADD COLUMN consent_form_id uuid (no foreign key), and the guarded GRANT SELECT ON platform.venue_settings TO access.
+    Its text carries the decision''s statements and names the release''s forward migration as its Source DDL after r1. Plan
+    change waived from the cooling-off by the lead ("Waive for r12").'
+  by: Chinmay
+  date: '2026-10-31'
+why: ADAM CR-390; the lead's decision of 31 October 2026, posted on the ticket. The ticket the work belongs to has started
+  or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the release apply makes (no
+  ticket is made through the API).
+keys_touched:
+  tickets:
+  - CR390-DB-BIOMETRIC-CONSENT-FORM (new)
+  tables:
+  - access.biometric_profile
+  operations:
+  - setFaceTagTemporaryEnrollment
+  - listFaceTagTemporary
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started:
+  - '27676 (MIG-ACCESS, [DB] V0012__access.sql, Ready for QA, Hrushikant Patkar): not rewritten'
+  - '30497 (MIG-ACCESS#access.biometric_profile, [DB] access.biometric_profile, Ready for QA, Hrushikant Patkar): not rewritten'
+  - '30342 (MIG-PLATFORM#platform.venue_settings, [DB] platform.venue_settings, Ready for QA, Hrushikant Patkar): not rewritten;
+    the grant is CR390-DB-BIOMETRIC-CONSENT-FORM''s'
+  unstarted:
+  - '#30956: build it now: create or replace on the path id (201 or 200), store consent_form_id, read the venue fallback
+    and templatesHeldByTicvai through tenancy#venueSettingsRecords in process, and return the two 422 types. [status: #30956
+    New]'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-390
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the verdict names as parent is recorded in the task''s
+  text; its OpenProject parent is the app-module the plan places it in, and it follows the migration that creates its table(s).
+  It changes tables another migration creates, so it is marked `area: database` (a [DB] ticket) and its key does not end
+  in -DB (a -DB task''s `table` builds count as created by it: CHG-R8MIG-016, CHG-R12PL-008). A started migration it would
+  come after is not made to wait on it (tools/build-service-docs.py, CHG-R12PL-008).'

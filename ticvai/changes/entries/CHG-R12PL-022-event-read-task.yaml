@@ -1,0 +1,57 @@
+id: CHG-R12PL-022
+date: '2026-10-31'
+source: cr
+kind: plan
+proposed: '2026-10-31'
+summary: 'A [DB] task for CR-394: the operations role reads catalogue.event for the guided-choice target checks.'
+decision:
+  what: 'The lead, 31 October 2026, on the 64 settled CRs (CR-372 to CR-435): "Include them in r12". docs/active/block-a-extra-tasks.json:
+    a new [DB] task CR394-DB-EVENT-READ (Hrushikant Patkar, epic PLATFORM, not before 2 November 2026), the database work
+    of #30389 ([DB] catalogue.event, under MIG-CATALOGUE, #27671), following MIG-CATALOGUE: the guarded GRANT SELECT ON
+    catalogue.event TO operations. Its text carries the decision''s statements and names the release''s forward migration
+    as its Source DDL after r1. Plan change waived from the cooling-off by the lead ("Waive for r12").'
+  by: Chinmay
+  date: '2026-10-31'
+why: ADAM CR-394; the lead's decision of 31 October 2026, posted on the ticket. The ticket the work belongs to has started
+  or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the release apply makes (no
+  ticket is made through the API).
+keys_touched:
+  tickets:
+  - CR394-DB-EVENT-READ (new)
+  tables:
+  - catalogue.event
+  operations:
+  - createGuidedChoice
+  - proposeGuidedChoice
+  - publishGuidedChoice
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started:
+  - '27671 (MIG-CATALOGUE, [DB] V0019__catalogue.sql, Ready for QA, Hrushikant Patkar): not rewritten'
+  - '30389 (MIG-CATALOGUE#catalogue.event, [DB] catalogue.event, Ready for QA, Hrushikant Patkar): not rewritten'
+  unstarted:
+  - '#30924: check product, category and event targets against the venue (400 target-not-in-venue, with the errors[] pointer)
+    through the in-process Catalogue reads. [status: #30924 New]'
+  - '#30931: the same venue checks on proposeGuidedChoice. [status: #30931 New]'
+  - '#30932: raise answer-target-not-on-sale by the rule for each kind; keep checking modules against the published configuration
+    (as built); answer with GuidedChoiceAnswerProblem (questionId, answerId). [status: #30932 New]'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-394
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the verdict names as parent is recorded in the task''s
+  text; its OpenProject parent is the app-module the plan places it in, and it follows the migration that creates its table(s).
+  It changes tables another migration creates, so it is marked `area: database` (a [DB] ticket) and its key does not end
+  in -DB (a -DB task''s `table` builds count as created by it: CHG-R8MIG-016, CHG-R12PL-008). A started migration it would
+  come after is not made to wait on it (tools/build-service-docs.py, CHG-R12PL-008).'

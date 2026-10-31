@@ -1,0 +1,62 @@
+id: CHG-R12PL-027
+date: '2026-10-31'
+source: cr
+kind: plan
+proposed: '2026-10-31'
+summary: A [DB] task for CR-409 creating catalogue.competitor_price_observation, one row per competitor price observed under
+  a competitorPrice demand signal.
+decision:
+  what: 'The lead, 31 October 2026, on the 64 settled CRs (CR-372 to CR-435): "Include them in r12". docs/active/block-a-extra-tasks.json:
+    a new [DB] task CR409-COMPETITOR-PRICE-OBSERVATION-DB (Hrushikant Patkar, epic PLATFORM, not before 2 November 2026),
+    the database work of #35327 (listCompetitorPricingMarket), following MIG-CATALOGUE and MIG-CATALOGUE-10 (which creates
+    catalogue.demand_signal): the new table with its key to catalogue.demand_signal, its index and scope row security. It
+    is the table''s migration (a -DB key). Its text carries the decision''s statements and names the release''s forward
+    migration as its Source DDL after r1. Plan change waived from the cooling-off by the lead ("Waive for r12").'
+  by: Chinmay
+  date: '2026-10-31'
+why: ADAM CR-409; the lead's decision of 31 October 2026, posted on the ticket. The ticket the work belongs to has started
+  or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the release apply makes (no
+  ticket is made through the API).
+keys_touched:
+  tickets:
+  - CR409-COMPETITOR-PRICE-OBSERVATION-DB (new)
+  tables:
+  - catalogue.competitor_price_observation
+  operations:
+  - listCompetitorPricingMarket
+  - setDemandSignalConfiguration
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/build-service-docs.py
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started:
+  - '29711 (MIG-CATALOGUE-10, [DB] V1237__catalogue.sql, which creates catalogue.demand_signal, Ready for QA, Hrushikant
+    Patkar): not rewritten'
+  unstarted:
+  - '#35327: not built. Build the read on the new table and the rules above once the migration lands. [status: #35327 New]'
+  - '#35171 (setDemandSignalConfiguration): accept and store the competitorPrice configuration keys {venueProduct, currency,
+    collectionMethod, comparabilityApproved}; isApproved is sourceApproved. [status: #35171 New]'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-409
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the verdict names is recorded in the task''s text;
+  its OpenProject parent is the app-module the plan places it in. The table is new, so this task is its migration (a -DB
+  key: its `table` build counts as created by it, CHG-R8MIG-016, and the plan plans no second migration for it). The table
+  comes into the contracts with the CR''s build lane; until that merges, this tree''s check-ticket-builds cannot resolve
+  its `table` build. Generator rule (tools/build-service-docs.py, the forward-migration waits): every later forward migration
+  of a schema waited on the schema''s earlier migrations, a hand-written [DB] task''s included, so this task made every
+  later catalogue forward migration, and the catalogue back end behind them, wait for it; Block A1''s overtime went from
+  35 to 109 hours and the plan moved Venue Management''s completion work into A2 (check-plan-closure: 60 findings). A hand-written
+  [DB] task with no ticket yet is now waited on by a forward migration only where a key of that migration points into its
+  tables; a ticketed one (PRD-W1-DB) keeps its waits as pushed. CR379-GUEST-BROADCAST-DB (workforce) is under the same rule.'
