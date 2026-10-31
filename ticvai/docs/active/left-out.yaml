@@ -178,3 +178,44 @@ items:
   owner: Chinmay
   added: '2026-10-30'
   change: CHG-CR346-001
+- id: LO-CR416-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-113]
+  what: 'AiRecommendationReviewDecisionQueueView.actualRevenueResultPercent, the Feedback Loop''s actual revenue result
+    after an executed price. The member stays in the view and listRecommendationReviewDecision answers it null; every
+    other member of the queue is answered.'
+  source: 'ADAM CR-416 (#35228 listRecommendationReviewDecision), decided by Chinmay on 31 October 2026; CHG-CR416-001'
+  reason: 'nothing measures revenue after an execution yet: it needs the pricing outcome measurement, the same gap as
+    the scorecard (ADAM CR-418) and the performance KPIs (ADAM CR-407)'
+  target: 'when the AI engineers specify the price outcome measure (a Block A task, ADAM CR-418)'
+  owner: Chinmay, with the AI engineers
+  added: '2026-10-31'
+  change: CHG-CR416-001
+- id: LO-CR419-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-076]
+  what: 'PriceBreakdownCalculationSimulationExplainabilityView.aiInsights, the AI observations on a price simulation.
+    The member stays in the view and simulatePriceBreakdownCalculation answers it as an empty list; every other member
+    is answered by the rule CR-419 names.'
+  source: 'ADAM CR-419 (#35288 simulatePriceBreakdownCalculation), decided by Chinmay on 31 October 2026; CHG-CR419-001'
+  reason: no AI producer of simulation insights exists, and inventing one would be AI output nobody specified
+  target: 'when an AI producer for pricing simulation insights is specified (not scheduled)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR419-001
+- id: LO-CR423-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-088]
+  what: 'The testing status of a dynamic pricing strategy (pack p.75 lists Testing). DynamicPricingStrategyCommandCenterView.status
+    never answers testing and listDynamicPricingStrategy''s status filter no longer offers it; ready and scheduled are
+    derived, and the other statuses are as stored.'
+  source: 'ADAM CR-423 (#35286 listDynamicPricingStrategy), decided by Chinmay on 31 October 2026; CHG-CR423-001'
+  reason: 'a saved test case (catalogue.pricing_test_case) names no strategy, so no stored fact says a strategy is being
+    tested'
+  target: 'when a test case names the strategy it tests (a change request of its own; not scheduled)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR423-001

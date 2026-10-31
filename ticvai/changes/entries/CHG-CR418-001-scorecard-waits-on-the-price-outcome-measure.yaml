@@ -1,0 +1,50 @@
+id: CHG-CR418-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'listLearningModelPerformance is built once the price outcome measure is specified: the AI engineers specify
+  it now as a Block A task (the plan lane files it), ADM-117 stays in Block A, and nothing answers invented figures
+  until then. No catalogue.model_scorecard table: the scorecard is assembled from that measurement, the AI module''s
+  forecast accuracy and model stages (getForecastAccuracy, ai.capability_maturity) and Catalogue''s recommendation
+  decisions (humanOverrideRate = modified decisions / all decisions).'
+decision:
+  what: 'ADAM CR-418, posted 31 October 2026 on #35225: "Decided (Chinmay, 31 October 2026): not as recommended: C now,
+    and no catalogue.model_scorecard table. ADM-117 stays in Block A. A scorecard needs the actual outcome of each
+    executed price: the revenue and demand after it, against its forecast, and nothing measures that yet. The AI
+    engineers specify that measurement now, as a new Block A task (the price outcome measure); it serves this screen,
+    the queue''s actual revenue result (CR-416) and the performance KPIs (CR-407). #35225 follows that task ... The
+    scorecard is then assembled from three sources, not from a second store: that measurement; the AI module''s
+    measured forecast accuracy and model stages (getForecastAccuracy, ai.capability_maturity); Catalogue''s own
+    recommendation decisions (humanOverrideRate is modified decisions divided by all decisions)." The lead''s answer of
+    31 October 2026: "the AI engineers specify the price outcome measure now; ADM-117 stays in Block A." Built into
+    r12 on the lead''s instruction of 31 October 2026: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-418 (Hrushikant Patkar, #35225, blocking): a row of listLearningModelPerformance is one model scorecard,
+  but its four tables hold forecasts and recommendations, not outcomes, and no job writes a scorecard. Forecast
+  accuracy and model stages already live in the AI module (ADR-0020 keeps AI its own deployable), so a Catalogue
+  scorecard table would duplicate them; what nobody measures is the executed price''s outcome.'
+keys_touched:
+  screens: [ADM-117]
+  operations: [listLearningModelPerformance]
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: 'a read whose rows need an outcome measurement nothing in the package specifies'
+tickets:
+  started:
+  - '35225 (listLearningModelPerformance): follow the price outcome measure task; build the operation once it is
+    specified from the three sources, and take the next workable ticket until then (no invented figures).'
+  unstarted:
+  - 'New Block A task for the AI engineers, the price outcome measure (filed by the plan lane, not here); #35225 follows
+    it.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-418
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRICING-SCORECARD
+status: open
+notes: 'No left-out entry for listLearningModelPerformance or ADM-117 (the lead''s answer keeps ADM-117 in Block A
+  behind the new task); the queue''s actualRevenueResultPercent, which waits on the same measure, is LO-CR416-001.'

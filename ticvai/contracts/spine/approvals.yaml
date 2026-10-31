@@ -807,6 +807,13 @@ paths:
         rejection. The reason is required and kept. **Expiry stays the timer** set by `ApprovalRule.expiresAfterMinutes`;
         no operation forces it.
 
+
+        **The same move in process** (ADAM CR-421, decided 31 October 2026; CHG-CR421-001). The approvals kernel
+        interface `IApprovalRequests` gains `CancelAsync(requestId, reason)`, which makes the move this operation
+        makes, for a module of the commerce deployable inside its own transaction (ADR-0055 rule 3): Catalogue''s
+        cancelPricingRollback cancels its rollback''s waiting request with it, and setDynamicPricingGuardrailPolicy
+        its control''s open automation raise (ADAM CR-425). A request that is no longer waiting is left as it is.
+
         '
       tags:
       - request

@@ -42,4 +42,11 @@ consumers:
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: catalogue
+  purpose: '**Catalogue''s approval consumer, by `subjectType`** (the consumer ADAM CR-415 adds for `pricingRecommendation`). For `subjectType` `dynamicPricingControl` (ADAM CR-425, CHG-CR425-001): the expired raise is dropped, `pending_automation_level` and `pending_approval_request_id` cleared on the row whose pending request is `requestId`, and `automation_level` keeps the current level; a row whose pending request is another, or none, changes nothing. For `subjectType` `rollbackAction` (ADAM CR-421): an outcome for a pricing rollback that is no longer `requested` or `scheduled` (cancelled with cancelPricingRollback, which cancels its request in process) changes nothing.'
+  writes:
+  - catalogue.dynamic_pricing_control
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: Retained with the request. This is an audit record, not an operational message

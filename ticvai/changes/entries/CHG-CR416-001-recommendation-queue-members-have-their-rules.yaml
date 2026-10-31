@@ -1,0 +1,61 @@
+id: CHG-CR416-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'listRecommendationReviewDecision and listPricingRecommendationExplainability state each member''s rule:
+  venue is the venue''s name through tenancy#scopeRecords; priceCategory is catalogue.price_category.name (null where
+  none); productEvent is product and event joined by " / "; the queue title adds " / " and the price category, with no
+  title column; simulationRevenueUplift is expected_revenue minus baseline_revenue of the newest linked
+  catalogue.pricing_simulation (by created_at, then id), null where none; actualRevenueResultPercent stays and is
+  answered null (LO-CR416-001); expectedRevenueImpact is revenue_opportunity; confidence and the breakdown are stored
+  0 to 1 and answered times 100. Both operations declare the two reads and the read-via.'
+decision:
+  what: 'ADAM CR-416, posted 31 October 2026 on #35228: "Decided (Chinmay, 31 October 2026): not as recommended: only
+    the actual revenue result waits, because the title and the simulation uplift have sources now. These rules apply on
+    both listRecommendationReviewDecision and listPricingRecommendationExplainability: venue is the venue''s name,
+    read in process through tenancy#scopeRecords by venue_id. priceCategory is catalogue.price_category.name by
+    price_category_id, and null where there is none. ... recommendation, the queue''s title, is productEvent followed
+    by " / " and the price category name where there is one. No title column is added. simulationRevenueUplift is
+    expected_revenue minus baseline_revenue of the newest catalogue.pricing_simulation whose pricing_recommendation_id
+    is the recommendation ... actualRevenueResultPercent stays in the view and is answered null until the pricing
+    outcome measurement exists. It is on the left-out list. ... confidence and every confidenceBreakdown member are
+    stored 0 to 1 and answered as a percent, multiplied by 100. Declare the reads of catalogue.pricing_simulation and
+    catalogue.price_category, and the tenancy#scopeRecords read-via, on both operations." Built into r12 on the lead''s
+    instruction of 31 October 2026: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-416 (Hrushikant Patkar, #35228): AiRecommendationReviewDecisionQueueView declared a title, a venue, a
+  simulation uplift and an actual revenue result, and the explainability view a price category, with no rule and no
+  declared read for any of them; catalogue.pricing_simulation and catalogue.price_category already hold the title''s
+  and the uplift''s sources. Only the actual revenue result has none (the price outcome measure, CR-418).'
+keys_touched:
+  screens: [ADM-113, ADM-106]
+  operations: [listRecommendationReviewDecision, listPricingRecommendationExplainability]
+  schemas: [AiRecommendationReviewDecisionQueueView, AiPricingRecommendationExplainabilityCenterView,
+            PricingRecommendation]
+  tables: [catalogue.pricing_simulation, catalogue.price_category, catalogue.pricing_recommendation]
+  files:
+  - contracts/spine/catalogue.yaml
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+root_class: 'view members drafted from the pack with no rule and no declared read, though their source tables exist'
+tickets:
+  started:
+  - '35228 (listRecommendationReviewDecision): answer recommendation, venue and simulationRevenueUplift by the rules,
+    keep actualRevenueResultPercent in the body as null, and add the pricing_simulation, price_category and
+    tenancy#scopeRecords reads.'
+  - '35227 (listPricingRecommendationExplainability): answer priceCategory from catalogue.price_category and venue as
+    the venue''s name; multiply confidence and the breakdown by 100.'
+  unstarted:
+  - 'VM-ADM-113 (#29756) and VM-ADM-106 (#29755) pick up the member rules at the next tag; no approved column changes.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-416
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRICING-QUEUE-MEMBERS
+status: open
+notes: 'actualRevenueResultPercent and simulationRevenueUplift are marked nullable (the posted text answers them
+  null); check-contract-compat does not count a response field becoming nullable as breaking, so no BC entry is
+  needed for it. ADM-113''s approved columns (recommendation, venue, event, ... governanceLevel) are all kept.'

@@ -1,0 +1,61 @@
+id: CHG-CR419-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'simulatePriceBreakdownCalculation states its rule: no singleton (it stores nothing; the Idempotency-Key
+  stays); optional variantId (400 validation); the selected rate by searchCatalogue''s fromPrice resolution at date
+  (422 no-selected-rate); the steps of the venue''s active default calculation profile in force (422
+  no-calculation-profile; calculationVersion its code and version); membershipId a membership programme whose pricing
+  rules choose the rate; customerId not read; the live dynamic price (CR-422) at the dynamic step; promotionCode to
+  evaluatePromotions without orderId; tax through finance#taxCodeRecords; rounding with a rounding line; aiInsights
+  empty (LO-CR419-001); channelComparison the same rule per channel. check-contract-shapes C-NO-ADDRESS no longer asks
+  an operation the lineage marks pure.'
+decision:
+  what: 'ADAM CR-419, posted 31 October 2026 on #35288: "Decided (Chinmay, 31 October 2026): as you recommended, with
+    each read named. Drop x-ticvai-singleton, because a simulation stores nothing. The Idempotency-Key stays. Add
+    optional variantId ... Either failure is 400 validation on variantId. Selected rate: the price that
+    searchCatalogue''s fromPrice resolution gives the variant at venueId on channel, taken at date (and timeslotId)
+    instead of now. No such price is 422 no-selected-rate. Sequence: the steps, in sequence order, of the venue''s
+    active isDefault calculation profile in force on date. No such profile is 422 no-calculation-profile. ... Tax: the
+    tax_profile''s taxCodeId is read through finance#taxCodeRecords, in process (it exists since CR-110), with the tax
+    base each catalogue.tax_rule sets. ... aiInsights answers an empty list until an AI producer exists.
+    channelComparison runs the same rule for each channel asked." Built into r12 on the lead''s instruction of 31
+    October 2026: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-419 (Hrushikant Patkar, #35288, blocking): the simulation named inputs and a trace but no rule between
+  them, took productId though prices are per variant, and carried x-ticvai-singleton beside "a simulation never
+  creates an order". The tax read exists (finance#taxCodeRecords since CR-110), and the rest of the rule is already
+  in the package (the fromPrice resolution of CR-270 and CR-358, the calculation profile''s steps, the membership
+  pricing rules, evaluatePromotions without orderId).'
+keys_touched:
+  screens: [ADM-076, BO-1049]
+  operations: [simulatePriceBreakdownCalculation]
+  schemas: [PriceBreakdownCalculationSimulationExplainabilityInput, PriceBreakdownCalculationSimulationExplainabilityView]
+  tables: [catalogue.price_execution, catalogue.membership_programme, ledger.tax_code]
+  files:
+  - contracts/spine/catalogue.yaml
+  - docs/active/left-out.yaml
+  - tools/check-contract-shapes.py
+  - tools/check-business-rules.py
+root_class: 'a calculation operation with inputs and a trace and no rule between them; a singleton flag on a write
+  that stores nothing'
+tickets:
+  started:
+  - '35288 (simulatePriceBreakdownCalculation): expose the Domain service through the endpoint as a thin adapter, with
+    the reads named (tax through finance#taxCodeRecords in process, promotion through evaluatePromotions without
+    orderId); add variantId; answer aiInsights as [].'
+  unstarted:
+  - 'VM-ADM-076 (#29829) picks up variantId and the refusals at the next tag; its approved inputs are unchanged.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-419
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRICE-SIMULATION
+status: open
+notes: 'check-contract-shapes C-NO-ADDRESS required every PUT with no path key to be a singleton or body-keyed, which
+  is why the simulation carried a false singleton flag. The rule now prints and does not ask an operation the lineage
+  marks pure (it computes and writes no table); simulatePriceBreakdownCalculation is the only PUT so marked. A
+  pricing.dynamic_price_rule contextual-rule sentence for this operation is batch K''s (CR-410), not written here.'

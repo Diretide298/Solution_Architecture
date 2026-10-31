@@ -1,0 +1,66 @@
+id: CHG-CR423-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'listDynamicPricingStrategy gives each figure its rule from the deployed execution (CR-422): currentPrice (one
+  target only, else null), currentPriceAdjustments, pricesAtMaximumGuardrail and pricesAtMinimumGuardrail (the
+  governing control''s limit, else the ladder''s), ruleConflicts (the seven open-conflict counts) and the
+  operationalAlerts codes; status derives ready and scheduled, and testing leaves the filter (LO-CR423-001); venue
+  and owner are names through tenancy#scopeRecords and identity#principalRecords; reads price_execution and
+  price_ladder. NOT built: the automationMode retirement on DynamicPricingStrategyCommandCenterView, which the
+  approved ADM-088 detail panel shows (stopped; see notes).'
+decision:
+  what: 'ADAM CR-423, posted 31 October 2026 on #35286: "Decided (Chinmay, 31 October 2026): not as recommended: the
+    figures have sources now that the deployed execution is the live price (CR-422), so build them. currentPrice is the
+    newPrice of the strategy''s newest deployed or partiallyDeployed catalogue.price_execution, where the strategy
+    prices one target ... currentPriceAdjustments counts ... pricesAtMaximumGuardrail counts ... ruleConflicts is the
+    sum of the seven open-conflict counts listRulePriorityConflict''s summary gives for the venue. operationalAlerts
+    lists a code for each condition that holds: pricesAtUpperBand, unresolvedRuleConflicts, activatingWithin48Hours.
+    ... automationMode is retired (CR-417). The row answers automationLevel ... status answers draft, ready ...,
+    scheduled ..., then active, paused, frozen, expired and retired as stored. testing leaves the filter. venue is the
+    venue''s name (tenancy#scopeRecords), and owner is the principal''s display name (identity#principalRecords).
+    Declare the reads of catalogue.price_execution and catalogue.price_ladder." Built into r12 on the lead''s
+    instruction of 31 October 2026: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-423 (Hrushikant Patkar, #35286): the command centre''s summary figures and the row''s currentPrice had no
+  rule, the status filter offered values dynamic_pricing_strategy_status_chk lacks, and automationMode could not say
+  autonomous. With the execution as the live price (CR-422), every figure has a source in Catalogue''s own tables.'
+keys_touched:
+  screens: [ADM-088, ADM-089, BO-1044]
+  operations: [listDynamicPricingStrategy]
+  schemas: [DynamicPricingStrategyCommandCenterView, DynamicPricingStrategyCommandCenterSummary]
+  tables: [catalogue.price_execution, catalogue.price_ladder, catalogue.dynamic_pricing_strategy,
+           catalogue.dynamic_pricing_control]
+  files:
+  - contracts/spine/catalogue.yaml
+  - docs/active/breaking-changes.yaml
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'BC-562 (listDynamicPricingStrategy: testing removed from the status filter), approved by the posted decision'
+root_class: 'KPI figures drafted from the pack with no rule, though their sources exist once the live price has a
+  record'
+tickets:
+  started:
+  - '35286 (listDynamicPricingStrategy): add the five figures and currentPrice by the rules, derive ready and
+    scheduled, drop testing from the filter, and read the venue and owner names. The automationMode to automationLevel
+    part waits for the lead''s follow-up (stopped in the package; see notes).'
+  unstarted:
+  - 'VM-ADM-088 (#29840), VM-ADM-089 (#29841) and VM-BO-1044 (#29801) move to r12 with BC-562.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-423
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-STRATEGY-FIGURES
+status: open
+notes: 'STOPPED on one bullet, "automationMode is retired (CR-417). The row answers automationLevel from the most
+  specific dynamic_pricing_control covering the strategy ..., or advisory where there is none. The filter is
+  automationLevel.": the approved ADM-088 detail panel (handoff/approved-ui.json, region:selection) binds
+  DynamicPricingStrategyCommandCenterView.automationMode, so retiring the member changes what an approved screen shows,
+  which a package fix may not do. The view keeps automationMode and its filter as they were until the lead posts a
+  follow-up (for example, approve the panel''s column change, or keep the member). Named beyond the posted words: the
+  operationalAlerts codes are described as conditions (pricesAtMaximumGuardrail above 0, open conflicts, a strategy
+  activating within 48 hours) only by their names; no enum is added to the response.'

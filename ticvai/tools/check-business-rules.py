@@ -198,6 +198,36 @@ And one rule per decision:
   BR-RESTORE-MISSING-PAGE (r12, ADAM CR-350, CHG-CR350-001) restoreConfigVersion restores a section or navigation item
                    whose content page is gone hidden (contentPageId null, isVisible false), never refuses for it, and
                    keeps content_page.is_referenced.
+  BR-PRICING-QUEUE-MEMBERS (r12, ADAM CR-416, CHG-CR416-001) the recommendation queue and explainability reads declare
+                   catalogue.pricing_simulation, catalogue.price_category and tenancy#scopeRecords, state each member's
+                   rule, answer actualRevenueResultPercent null (nullable, LO-CR416-001) and confidence times 100.
+  BR-PRICING-AUTOMATION-LEVEL (r12, ADAM CR-417, CHG-CR417-001) both automation views answer automationLevel and no
+                   automationMode; the policy view's scopeLevel and listDynamicPricingAutomation's filter list every
+                   level DynamicPricingControl stores; the orchestrator reads pricing_market and sales_channel for
+                   market and channel, and channel is nullable.
+  BR-PRICING-SCORECARD (r12, ADAM CR-418, CHG-CR418-001) listLearningModelPerformance waits on the price outcome
+                   measure and is assembled from three sources, with no catalogue.model_scorecard anywhere.
+  BR-PRICE-SIMULATION (r12, ADAM CR-419, CHG-CR419-001) simulatePriceBreakdownCalculation is no singleton, takes variantId,
+                   reads tax through finance#taxCodeRecords and the live price from price_execution, declares 400
+                   validation and 422 no-selected-rate / no-calculation-profile, and answers aiInsights empty.
+  BR-CALC-PROFILE-VERSION (r12, ADAM CR-420, CHG-CR420-001) CalculationProfile is unique on (scopePath, code, version),
+                   setPriceCalculationPolicy finds its record by the path id, numbers versions on the server and
+                   answers a second active default 409 default-profile-exists; dependsOn names sequence numbers.
+  BR-ROLLBACK-CANCEL (r12, ADAM CR-421, CHG-CR421-001) cancelPricingRollback cancels its waiting approval request in
+                   process (IApprovalRequests.CancelAsync), writes no outbox row, and cancelApprovalRequest names the
+                   in-process move.
+  BR-LIVE-PRICE    (r12, ADAM CR-422, CHG-CR422-001) createLiveDynamicPrice never writes catalogue.price, emits
+                   catalogue.priceExecuted (an event file with a consumer), reads its approval through
+                   approvals#requestRecords, and declares 400 validation and 422 approval-required / guardrail-breached.
+  BR-STRATEGY-FIGURES (r12, ADAM CR-423, CHG-CR423-001) listDynamicPricingStrategy reads price_execution and
+                   price_ladder, names venue and owner through tenancy#scopeRecords and identity#principalRecords, gives
+                   each figure its rule and offers no testing status (LO-CR423-001).
+  BR-PRICE-BAND-ORDER (r12, ADAM CR-424, CHG-CR424-001) listDynamicPriceBand sorts by ladderId only, a member of its
+                   view; a sort on `code`, which a price ladder lacks, fails.
+  BR-GUARDRAIL-SCOPE (r12, ADAM CR-425, CHG-CR425-001) setDynamicPricingGuardrailPolicy is keyed by [scopeLevel, scopeId],
+                   declares 400 validation and 422 scope-id-required / scope-not-found / no-approval-route, keeps a raise
+                   in pendingAutomationLevel and pendingApprovalRequestId (readOnly), types its three lists as arrays,
+                   and Catalogue consumes the four approval outcomes for subjectType dynamicPricingControl.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -1555,6 +1585,170 @@ def main() -> int:
         need("BR-RESTORE-MISSING-PAGE", word in rtext,
              f"restoreConfigVersion does not say {word!r} for a page deleted since the version (CR-350)")
 
+    # ---------------------------------------------------------------- r12 CR lane L, pricing (ADAM CR-416 to CR-425;
+    # the lead, 31 October 2026: "Include them in r12"). Each rule fails on the r12 candidate before the posted decision
+    # (8535bc29) and passes once the decision is in the package.
+    cat_s = ((load("contracts/spine/catalogue.yaml").get("components") or {}).get("schemas") or {})
+
+    def sprops(name):
+        return (cat_s.get(name) or {}).get("properties") or {}
+
+    def descr(oid):
+        return " ".join(str(op(oid)[3].get("description") or "").split())
+
+    def codes_of(oid, code):
+        return set(((op(oid)[3].get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def param_enum(oid, name):
+        for p_ in op(oid)[3].get("parameters") or []:
+            if isinstance(p_, dict) and p_.get("name") == name:
+                return list((p_.get("schema") or {}).get("enum") or [])
+        return None
+
+    lo_ids = {str(i.get("id")) for i in (load("docs/active/left-out.yaml").get("items") or []) if isinstance(i, dict)}
+    # BR-PRICING-QUEUE-MEMBERS (ADAM CR-416; CHG-CR416-001)
+    for oid in ("listRecommendationReviewDecision", "listPricingRecommendationExplainability"):
+        miss = {"catalogue.pricing_simulation", "catalogue.price_category"} - reads_of(oid)
+        need("BR-PRICING-QUEUE-MEMBERS", not miss, f"{oid} does not declare the read of {', '.join(sorted(miss))} (CR-416)")
+        need("BR-PRICING-QUEUE-MEMBERS", "tenancy#scopeRecords" in vias_of(oid),
+             f"{oid} does not read the venue's name through tenancy#scopeRecords (CR-416)")
+        d_ = descr(oid)
+        for frag in ("`expected_revenue` minus `baseline_revenue`", "newest by `created_at`, ties broken by `id`",
+                     "no title column is stored", "multiplied by 100", "`catalogue.price_category.name`"):
+            need("BR-PRICING-QUEUE-MEMBERS", frag in d_, f"{oid} does not state {frag!r} (CR-416)")
+    arr = sprops("AiRecommendationReviewDecisionQueueView").get("actualRevenueResultPercent") or {}
+    need("BR-PRICING-QUEUE-MEMBERS", arr.get("nullable") is True and "LO-CR416-001" in lo_ids,
+         "actualRevenueResultPercent is not nullable, or not on the left-out list as LO-CR416-001 (CR-416)")
+    # BR-PRICING-AUTOMATION-LEVEL (ADAM CR-417; CHG-CR417-001)
+    levels = (sprops("DynamicPricingControl").get("scopeLevel") or {}).get("enum") or []
+    for vn in ("DynamicPricingAutomationPolicyControlView", "AutomationPolicyAutonomousPricingOrchestratorView"):
+        pr = sprops(vn)
+        need("BR-PRICING-AUTOMATION-LEVEL", "automationMode" not in pr and "automationLevel" in pr,
+             f"{vn} answers automationMode, or no automationLevel (CR-417)")
+    need("BR-PRICING-AUTOMATION-LEVEL", set((sprops("DynamicPricingAutomationPolicyControlView").get("scopeLevel") or {})
+                                            .get("enum") or []) == set(levels),
+         "DynamicPricingAutomationPolicyControlView.scopeLevel does not list every level dynamic_pricing_control stores (CR-417)")
+    need("BR-PRICING-AUTOMATION-LEVEL", set(param_enum("listDynamicPricingAutomation", "scopeLevel") or []) == set(levels)
+         and param_enum("listDynamicPricingAutomation", "automationMode") is None
+         and param_enum("listDynamicPricingAutomation", "automationLevel"),
+         "listDynamicPricingAutomation does not filter all eight scope levels and automationLevel, or still filters "
+         "automationMode (CR-417)")
+    need("BR-PRICING-AUTOMATION-LEVEL", {"catalogue.pricing_market", "catalogue.sales_channel"}
+         <= reads_of("listAutomationPolicyAutonomous")
+         and (sprops("AutomationPolicyAutonomousPricingOrchestratorView").get("channel") or {}).get("nullable") is True,
+         "listAutomationPolicyAutonomous does not read pricing_market and sales_channel, or channel is not nullable (CR-417)")
+    need("BR-PRICING-AUTOMATION-LEVEL", "effectiveFrom" in descr("listDynamicPricingAutomation")
+         and "`start`" not in descr("listDynamicPricingAutomation"),
+         "listDynamicPricingAutomation still orders by `start` (CR-417)")
+    # BR-PRICING-SCORECARD (ADAM CR-418; CHG-CR418-001)
+    lmp = descr("listLearningModelPerformance")
+    for frag in ("price outcome measure", "No `catalogue.model_scorecard` table", "`getForecastAccuracy`",
+                 "capability maturity stages", "modified decisions divided by all decisions"):
+        need("BR-PRICING-SCORECARD", frag in lmp, f"listLearningModelPerformance does not state {frag!r} (CR-418)")
+    need("BR-PRICING-SCORECARD", not any(str((s or {}).get("x-ticvai-persistence") or "").startswith("catalogue.model_scorecard")
+                                         for s in cat_s.values() if isinstance(s, dict)),
+         "a schema persists to catalogue.model_scorecard, which CR-418 ruled out")
+    # BR-PRICE-SIMULATION (ADAM CR-419; CHG-CR419-001)
+    sim = op("simulatePriceBreakdownCalculation")[3]
+    need("BR-PRICE-SIMULATION", not sim.get("x-ticvai-singleton") and not sim.get("x-ticvai-singleton-note"),
+         "simulatePriceBreakdownCalculation is still flagged a singleton though it stores nothing (CR-419)")
+    need("BR-PRICE-SIMULATION", "variantId" in sprops("PriceBreakdownCalculationSimulationExplainabilityInput"),
+         "PriceBreakdownCalculationSimulationExplainabilityInput has no variantId (CR-419)")
+    need("BR-PRICE-SIMULATION", "finance#taxCodeRecords" in vias_of("simulatePriceBreakdownCalculation")
+         and {"catalogue.price_execution", "catalogue.membership_programme"} <= reads_of("simulatePriceBreakdownCalculation"),
+         "simulatePriceBreakdownCalculation does not read tax through finance#taxCodeRecords, or the live price and the "
+         "membership programme (CR-419)")
+    need("BR-PRICE-SIMULATION", "validation" in codes_of("simulatePriceBreakdownCalculation", "400")
+         and {"no-selected-rate", "no-calculation-profile"} <= codes_of("simulatePriceBreakdownCalculation", "422"),
+         "simulatePriceBreakdownCalculation does not declare 400 validation and 422 no-selected-rate / "
+         "no-calculation-profile (CR-419)")
+    need("BR-PRICE-SIMULATION", "evaluatePromotions" in descr("simulatePriceBreakdownCalculation")
+         and "LO-CR419-001" in lo_ids,
+         "simulatePriceBreakdownCalculation names no promotion rule, or aiInsights is not on the left-out list (CR-419)")
+    # BR-CALC-PROFILE-VERSION (ADAM CR-420; CHG-CR420-001)
+    cp = cat_s.get("CalculationProfile") or {}
+    need("BR-CALC-PROFILE-VERSION", ["scopePath", "code", "version"] in (cp.get("x-ticvai-unique-together") or []),
+         "CalculationProfile is not unique on (scopePath, code, version), so two saves can take one number (CR-420)")
+    need("BR-CALC-PROFILE-VERSION", "default-profile-exists" in codes_of("setPriceCalculationPolicy", "409")
+         and "validation" in codes_of("setPriceCalculationPolicy", "400"),
+         "setPriceCalculationPolicy does not answer a second default 409 default-profile-exists, or a step's profile id "
+         "400 validation (CR-420)")
+    spc = descr("setPriceCalculationPolicy")
+    need("BR-CALC-PROFILE-VERSION", "keyed by `code`" not in spc and "numbered by the server" in spc
+         and "`sequence` number" in spc,
+         "setPriceCalculationPolicy still keys on code and version, or does not say the server numbers versions and "
+         "dependsOn names sequence numbers (CR-420)")
+    # BR-ROLLBACK-CANCEL (ADAM CR-421; CHG-CR421-001)
+    cpr = descr("cancelPricingRollback")
+    need("BR-ROLLBACK-CANCEL", "IApprovalRequests.CancelAsync" in cpr and "is withdrawn" not in cpr
+         and "no outbox row is written" in cpr,
+         "cancelPricingRollback does not cancel its waiting request in process through IApprovalRequests.CancelAsync, "
+         "or still withdraws it (CR-421)")
+    ov = (json.loads((ROOT / "handoff" / "api-data-lineage-overrides.json").read_text(encoding="utf-8"))
+          .get("operations") or {})
+    need("BR-ROLLBACK-CANCEL", "platform.outbox" not in ((ov.get("cancelPricingRollback") or {}).get("writes") or []),
+         "the lineage still has cancelPricingRollback write platform.outbox (CR-421)")
+    need("BR-ROLLBACK-CANCEL", "CancelAsync" in descr("cancelApprovalRequest"),
+         "cancelApprovalRequest does not name the in-process move IApprovalRequests.CancelAsync (CR-421)")
+    # BR-LIVE-PRICE (ADAM CR-422; CHG-CR422-001)
+    clp = op("createLiveDynamicPrice")[3]
+    need("BR-LIVE-PRICE", "catalogue.price" not in ((ov.get("createLiveDynamicPrice") or {}).get("writes") or []),
+         "the lineage still has createLiveDynamicPrice write catalogue.price, the base (CR-422)")
+    lin_in = sprops("LiveDynamicPriceExecutionDeploymentMonitorInput")
+    need("BR-LIVE-PRICE", "applied to `catalogue.price`" not in str((cat_s.get("LiveDynamicPriceExecutionDeploymentMonitorInput")
+                                                                       or {}).get("x-ticvai-persistence") or "")
+         and "strategy" in lin_in,
+         "LiveDynamicPriceExecutionDeploymentMonitorInput is still applied to catalogue.price (CR-422)")
+    ev = ROOT / "events" / "catalogue-priceExecuted.yaml"
+    evd = load("events/catalogue-priceExecuted.yaml") if ev.exists() else {}
+    need("BR-LIVE-PRICE", "catalogue.priceExecuted" in (clp.get("x-ticvai-emits") or [])
+         and "createLiveDynamicPrice" in (evd.get("emittedBy") or []) and bool(evd.get("consumers")),
+         "createLiveDynamicPrice does not emit catalogue.priceExecuted, or the event has no file or consumer (CR-422)")
+    need("BR-LIVE-PRICE", "approvals#requestRecords" in vias_of("createLiveDynamicPrice")
+         and "validation" in codes_of("createLiveDynamicPrice", "400")
+         and {"approval-required", "guardrail-breached"} <= codes_of("createLiveDynamicPrice", "422"),
+         "createLiveDynamicPrice does not read its approval through approvals#requestRecords, or declare 400 validation "
+         "and 422 approval-required / guardrail-breached (CR-422)")
+    # BR-STRATEGY-FIGURES (ADAM CR-423; CHG-CR423-001)
+    need("BR-STRATEGY-FIGURES", {"catalogue.price_execution", "catalogue.price_ladder"} <= reads_of("listDynamicPricingStrategy")
+         and {"tenancy#scopeRecords", "identity#principalRecords"} <= vias_of("listDynamicPricingStrategy"),
+         "listDynamicPricingStrategy does not read price_execution and price_ladder, or the venue and owner names (CR-423)")
+    need("BR-STRATEGY-FIGURES", "testing" not in (param_enum("listDynamicPricingStrategy", "status") or [])
+         and "LO-CR423-001" in lo_ids,
+         "listDynamicPricingStrategy still offers testing, or it is not on the left-out list (CR-423)")
+    lds = descr("listDynamicPricingStrategy")
+    for frag in ("`currentPriceAdjustments` counts", "`pricesAtMaximumGuardrail` counts", "seven open-conflict counts",
+                 "`pricesAtUpperBand`", "a draft with a ladder and at least one rule"):
+        need("BR-STRATEGY-FIGURES", frag in lds, f"listDynamicPricingStrategy does not state {frag!r} (CR-423)")
+    # BR-PRICE-BAND-ORDER (ADAM CR-424; CHG-CR424-001)
+    ldb = descr("listDynamicPriceBand")
+    need("BR-PRICE-BAND-ORDER", "Sorted by `ladderId` ascending" in ldb and "Sorted by `code`" not in ldb
+         and "ladderId" in sprops("DynamicPriceBandsLaddersAdjustmentMatrixView"),
+         "listDynamicPriceBand does not sort by ladderId alone, a member of its view (CR-424)")
+    # BR-GUARDRAIL-SCOPE (ADAM CR-425; CHG-CR425-001)
+    gp = op("setDynamicPricingGuardrailPolicy")[3]
+    need("BR-GUARDRAIL-SCOPE", gp.get("x-ticvai-body-key") == ["scopeLevel", "scopeId"]
+         and "400 validation" in str(gp.get("x-ticvai-body-key-note") or "")
+         and "is refused `400 validation`" not in str(gp.get("x-ticvai-body-key-note") or ""),
+         "setDynamicPricingGuardrailPolicy is not keyed by [scopeLevel, scopeId], or still answers a missing scopeId "
+         "400 (CR-425)")
+    need("BR-GUARDRAIL-SCOPE", "validation" in codes_of("setDynamicPricingGuardrailPolicy", "400")
+         and {"scope-id-required", "scope-not-found", "no-approval-route"} <= codes_of("setDynamicPricingGuardrailPolicy", "422"),
+         "setDynamicPricingGuardrailPolicy does not declare 400 validation and 422 scope-id-required / scope-not-found / "
+         "no-approval-route (CR-425)")
+    dpc = sprops("DynamicPricingControl")
+    need("BR-GUARDRAIL-SCOPE", all((dpc.get(k) or {}).get("readOnly") is True
+                                   for k in ("pendingAutomationLevel", "pendingApprovalRequestId")),
+         "DynamicPricingControl has no readOnly pendingAutomationLevel and pendingApprovalRequestId (CR-425)")
+    for k in ("authorityTiers", "noChangeWindows", "circuitBreakers"):
+        need("BR-GUARDRAIL-SCOPE", (dpc.get(k) or {}).get("type") == "array",
+             f"DynamicPricingControl.{k} is not an array of the objects its description lists (CR-425)")
+    for evn in ("granted", "rejected", "withdrawn", "expired"):
+        cons = load(f"events/approval-{evn}.yaml").get("consumers") or []
+        need("BR-GUARDRAIL-SCOPE", any(isinstance(c, dict) and c.get("context") == "catalogue"
+                                       and "dynamicPricingControl" in str(c.get("purpose") or "") for c in cons),
+             f"events/approval-{evn}.yaml has no catalogue consumer for subjectType dynamicPricingControl (CR-425)")
+
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
@@ -1576,7 +1770,10 @@ def main() -> int:
              "BR-GUEST-CODE-DELIVERY",
              "BR-GUEST-SETTINGS", "BR-BILLING-LINES", "BR-SHOP-DROP-COLLECT", "BR-DELEGATION-KEY", "BR-FOREIGN-TENDER",
              "BR-PRODUCT-FROM-PRICE",
-             "BR-BOOKING-FLOW-MISSING", "BR-CALL-DISPOSITION", "BR-RESTORE-MISSING-PAGE"]
+             "BR-BOOKING-FLOW-MISSING", "BR-CALL-DISPOSITION", "BR-RESTORE-MISSING-PAGE",
+             "BR-PRICING-QUEUE-MEMBERS", "BR-PRICING-AUTOMATION-LEVEL", "BR-PRICING-SCORECARD", "BR-PRICE-SIMULATION",
+             "BR-CALC-PROFILE-VERSION", "BR-ROLLBACK-CANCEL", "BR-LIVE-PRICE", "BR-STRATEGY-FIGURES",
+             "BR-PRICE-BAND-ORDER", "BR-GUARDRAIL-SCOPE"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

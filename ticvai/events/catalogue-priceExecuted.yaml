@@ -1,0 +1,45 @@
+# catalogue.priceExecuted v1 — published by catalogue
+# Added 31 October 2026 (ADAM CR-422, decided by Chinmay; CHG-CR422-001): the live dynamic price is the
+# catalogue.price_execution createLiveDynamicPrice writes, never catalogue.price, and this event carries it to the
+# channels and the caches.
+
+name: catalogue.priceExecuted
+version: 1
+publisher: catalogue
+description: A live dynamic price execution was recorded for a target (a product, narrowed to event and performance
+  where sent) on its channels.
+aggregate: priceExecution
+emittedWhen: PriceExecution created, scheduled or executing (createLiveDynamicPrice)
+emittedBy:
+- createLiveDynamicPrice
+payload:
+- field: executionId
+  type: uuid
+- field: strategyId
+  type: uuid
+- field: target
+  type: object
+  notes: '`{productId, eventId, performanceId}`: the product, with the event and the performance where the execution
+    names them (null otherwise)'
+- field: newPrice
+  type: Money
+- field: channels
+  type: array
+  notes: The channels the price is deployed to (LiveDynamicPriceExecutionDeploymentMonitorInput.channels values),
+    the product's enabled channel assignments where none were sent
+consumers:
+- context: catalogue
+  purpose: The channel deployment job (workers) deploys the price to each channel and moves the execution as
+    states/price-execution.yaml has it (executing to deployed, partiallyDeployed or failed; scheduled to executing at
+    scheduledFor), with its channelDeployments
+  writes:
+  - catalogue.price_execution
+  idempotencyKey: executionId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+- context: cache
+  purpose: Drop cached price answers for the target's product, so no guest is shown the price it replaced
+  idempotencyKey: scopePath+eventId
+  onFailure: retryThenDeadLetter
+  isCritical: true
+retention: 30 days after publication

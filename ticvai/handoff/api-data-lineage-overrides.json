@@ -1022,10 +1022,9 @@
   },
   "cancelPricingRollback": {
    "writes": [
-    "catalogue.audit_entry",
-    "platform.outbox"
+    "catalogue.audit_entry"
    ],
-   "reason": "W-WE (new, writers pass): requested/scheduled -> cancelled; open approval request withdrawn via outbox (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "W-WE (new, writers pass): requested/scheduled -> cancelled; a waiting approval request is cancelled in process through IApprovalRequests.CancelAsync, and no outbox row is written (ADAM CR-421, CHG-CR421-001) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "cancelPurchaseOrder": {
@@ -2014,19 +2013,16 @@
     "catalogue.dynamic_pricing_control",
     "catalogue.dynamic_pricing_strategy",
     "catalogue.price",
-    "catalogue.price_ladder",
     "catalogue.pricing_recommendation",
     "catalogue.pricing_recommendation_decision",
     "pricing.dynamic_price_rule"
    ],
    "writes": [
     "catalogue.audit_entry",
-    "catalogue.price",
     "catalogue.price_execution",
-    "catalogue.pricing_recommendation_decision",
-    "platform.outbox"
+    "catalogue.pricing_recommendation_decision"
    ],
-   "reason": "DM3: writes catalogue.price_execution (states/price-execution.yaml) and the new catalogue.price; stamps executionId on the decision | L2: executes one approved change: approval from pricing_recommendation_decision or automation policy; updates catalogue.price and emits channel deployment via platform.outbox; execution record needs pricing.price_execution (missing) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "DM3: writes catalogue.price_execution (states/price-execution.yaml), the live dynamic price, and never catalogue.price, the base (ADAM CR-422, CHG-CR422-001); stamps executionId on the decision | L2: executes one approved change: approval from an approvals request (approvals#requestRecords) or automation policy; emits catalogue.priceExecuted via platform.outbox; execution record needs pricing.price_execution (missing) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "createMessageTemplate": {
@@ -13651,10 +13647,9 @@
    ],
    "writes": [
     "catalogue.audit_entry",
-    "catalogue.dynamic_pricing_strategy",
-    "platform.outbox"
+    "catalogue.dynamic_pricing_strategy"
    ],
-   "reason": "W-WE (new, writers pass): upsert by scopeLevel+scopeId; freeze/kill switch cascades strategies to frozen; raising automation opens a pricingChange approval via outbox (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "W-WE (new, writers pass): upsert by scopeLevel+scopeId; freeze/kill switch cascades strategies to frozen; raising automation opens a pricingChange approval in process through IApprovalRequests and keeps it pending on the row, no outbox row (ADAM CR-425, CHG-CR425-001) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "setDynamicPricingStrategy": {

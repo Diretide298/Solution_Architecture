@@ -12037,8 +12037,21 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-076 Price Breakdown, Calculation Simulation & Explainability"
         - "P08 BO-1049 Scenario & What-If Planning"
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-reads:
+      - table: catalogue.price_execution
+        for: 'the dynamic adjustment: the newest deployed or partiallyDeployed execution for the target, the live
+          dynamic price (ADAM CR-419, CR-422; CHG-CR419-001)'
+      - table: catalogue.membership_programme
+        for: 'the member adjustment: the membership programme membershipId names (ADAM CR-419; CHG-CR419-001)'
+      x-ticvai-read-via:
+      - query: finance#taxCodeRecords
+        route: in-process
+        for: 'the tax step: the ledger.tax_code the tax profile''s taxCodeId names, Ledger''s data (ADAM CR-110,
+          CR-419; CHG-CR419-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers
+          and the rounding profile of that currency (ADAM CR-419; CHG-CR419-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.50-51 (10.3.9 Simulation
@@ -12056,7 +12069,28 @@ paths:
         totals typed Money; channel comparison and AI notes added. A simulation never creates an order; each
         component carries its source, rule, formula, input, output, reason, tax treatment and sequence so every
         amount can be explained before configuration goes live; AI QA notes expected differences (Call Center
-        Booking Fee) and is advisory.'
+        Booking Fee) and is advisory.
+
+
+        **The rule from inputs to trace** (ADAM CR-419, decided 31 October 2026; CHG-CR419-001). A simulation stores
+        nothing, so it is not a singleton; the Idempotency-Key stays. **Variant**: the optional `variantId` must be a
+        variant of `productId`, and it is required when the product has more than one sellable variant; either
+        failure is `400 validation` on `variantId`. **Selected rate**: the price that searchCatalogue''s `fromPrice`
+        resolution gives the variant at `venueId` on `channel`, taken at `date` (and `timeslotId`) instead of now; no
+        such price is `422 no-selected-rate`. **Sequence**: the steps, in `sequence` order, of the venue''s active
+        `isDefault` calculation profile in force on `date`; no such profile is `422 no-calculation-profile`.
+        `calculationVersion` is that profile''s `code` and `version`. **Member adjustment**: `membershipId` names the
+        `catalogue.membership_programme` the simulated customer holds; at the `contextualRateSelection` step the
+        membership pricing rules (`pricing.dynamic_price_rule` rows with membership conditions) choose the rate.
+        `customerId` is not read: a simulation never looks up a real guest. **Dynamic adjustment**: at the
+        `dynamicPricingAdjustment` step the live dynamic price for the target replaces the selected rate; that price
+        is the newest `deployed` or `partiallyDeployed` `catalogue.price_execution` (ADAM CR-422). **Promotion**:
+        `promotionCode` goes to Promotions'' `evaluatePromotions` in process, without `orderId`, so nothing is stored.
+        **Tax**: the tax profile''s `taxCodeId` is read through `finance#taxCodeRecords`, in process (it exists since
+        ADAM CR-110), with the tax base each `catalogue.tax_rule` sets. **Rounding** follows the currency''s rounding
+        profile and stage, with a `rounding` component so the totals add up. `aiInsights` answers an empty list
+        until an AI producer exists (LO-CR419-001). `channelComparison` runs the same rule for each channel asked in
+        `compareChannels`.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -12079,6 +12113,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PriceBreakdownCalculationSimulationExplainabilityView'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: '`validation` on `variantId`: it is not a variant of `productId`, or it is missing while the
+            product has more than one sellable variant (ADAM CR-419). Nothing is stored.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          x-ticvai-problem-types: [no-selected-rate, no-calculation-profile]
+          description: '`no-selected-rate`: no price resolves for the variant at the venue on the channel on the date.
+            `no-calculation-profile`: the venue has no active default calculation profile in force on the date (ADAM
+            CR-419). Nothing is stored.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /calculation-validation-reconciliation:
@@ -13301,7 +13352,20 @@ paths:
         - "P08 ADM-088 Dynamic Pricing Strategy Command Center"
         - "P08 ADM-089 Dynamic Pricing Strategy Builder"
         - "P08 BO-1044 Dynamic Seat Pricing"
+      x-ticvai-reads:
+      - table: catalogue.price_execution
+        for: 'currentPrice and the price figures: the newest deployed or partiallyDeployed execution of each target
+          (ADAM CR-423, CR-422; CHG-CR423-001)'
+      - table: catalogue.price_ladder
+        for: 'the guardrail counts where no control sets a price limit: the ladder''s maximumPrice and minimumPrice,
+          and the ladder a ready strategy needs (ADAM CR-423; CHG-CR423-001)'
       x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'venue: the strategy''s venue''s name, by venue_id (ADAM CR-423; CHG-CR423-001)'
+      - query: identity#principalRecords
+        route: in-process
+        for: 'owner: the owner principal''s display name, by owner_principal_id (ADAM CR-423; CHG-CR423-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DynamicPricingStrategyCommandCenterView.currentPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
@@ -13324,6 +13388,24 @@ paths:
         effective period, automation mode, status). Quick actions Create Strategy (setDynamicPricingStrategy),
         Duplicate, Open, Test (listRulePriorityConflict test console), Compare, Pause, Freeze and Retire are
         buttons on ADM-088.
+
+
+        **The figures and the row** (ADAM CR-423, decided 31 October 2026; CHG-CR423-001). The deployed execution
+        is the live price (ADAM CR-422), so every figure has a source in Catalogue''s own tables. `currentPrice` is
+        the `newPrice` of the strategy''s newest `deployed` or `partiallyDeployed` `catalogue.price_execution`, where
+        the strategy prices one target (`scope_type` `singleProduct`, or an event with at most one performance);
+        otherwise it is null. In the summary, `currentPriceAdjustments` counts the targets of the listed strategies
+        whose newest execution is `deployed` or `partiallyDeployed`; `pricesAtMaximumGuardrail` counts those whose
+        `newPrice` is at or above the governing `dynamic_pricing_control`''s `absoluteMaximumPrice`, or the ladder''s
+        `maximumPrice` where no control sets one, and `pricesAtMinimumGuardrail` does the same at or below
+        `absoluteMinimumPrice` or `minimumPrice`; `ruleConflicts` is the sum of the seven open-conflict counts
+        listRulePriorityConflict''s summary gives for the venue; `operationalAlerts` lists a code for each condition
+        that holds, `pricesAtUpperBand`, `unresolvedRuleConflicts` and `activatingWithin48Hours`, and the screen
+        words them. `status` answers `draft`, `ready` (a draft with a ladder and at least one rule, whose scope is not
+        frozen), `scheduled` (active, with `effectiveFrom` after now), then `active`, `paused`, `frozen`, `expired`
+        and `retired` as stored; `testing` leaves the filter (a saved test case names no strategy; LO-CR423-001).
+        `venue` is the venue''s name (`tenancy#scopeRecords`), and `owner` is the principal''s display name
+        (`identity#principalRecords`).
 
         **Order.** Sorted by `strategyId` descending (a UUIDv7, so newest first).'
       tags:
@@ -13361,7 +13443,6 @@ paths:
             type: string
             enum:
               - draft
-              - testing
               - ready
               - scheduled
               - active
@@ -13369,7 +13450,8 @@ paths:
               - frozen
               - expired
               - retired
-          description: Status
+          description: Status, as the row answers it; ready and scheduled are derived, and testing is not offered
+            (ADAM CR-423)
         - name: automationMode
           in: query
           required: false
@@ -13807,7 +13889,9 @@ paths:
         at most maxBandsPerMovement bands per movement (P3 AED 250 -> P4 AED 265, not AED 286); continuous range
         is allowed only where the ladder permits it.
 
-        **Order.** Sorted by `code` ascending, then by `ladderId`.'
+        **Order.** Sorted by `ladderId` ascending (a UUIDv7, so oldest first), with no other key (ADAM CR-424,
+        CHG-CR424-001): a ladder has no code of its own, and a strategy has one ladder, so the strategy is not read
+        to sort.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -13956,7 +14040,8 @@ paths:
 
 
         **Agreed (decided 29 September, readiness close-out).** each row is one automation policy for a scope:
-        the mode fields became automationMode (recommend by default), the scope fields scopeLevel + scopeId,
+        the mode fields became one automation setting (advisory, the pack''s recommend-only, by default; since ADAM
+        CR-417 it is `automationLevel`), the scope fields scopeLevel + scopeId,
         the authority example an authorityTiers list; rate of change typed with no-change windows; the manual
         override fields grouped into activeOverride; safe-failure behaviour added. Default is recommend-only:
         the engine proposes and a Revenue Manager acts (decided 29 September, readiness close-out); auto-execute
@@ -13964,7 +14049,21 @@ paths:
         goes to Board 4 governance (approval matrix). autoExecuteIfConfident is treated as not met until the
         AI forecasting component exists (MoM 19 Aug).
 
-        **Order.** Soonest first, by `start` ascending, then by `policyId`.'
+
+        **Scope and automation level** (ADAM CR-417, decided 31 October 2026; CHG-CR417-001). Both automation views
+        (listDynamicPricingAutomation and listAutomationPolicyAutonomous) answer `automationLevel` (`advisory`,
+        `humanInTheLoop`, `conditionalAutonomous`, `autonomous`) straight from `automation_level`; `automationMode` is
+        retired. `scopeLevel` answers and filters all eight levels: `global`, `market`, `venue`, `strategy`, `product`,
+        `event`, `performance` and `channel`, and `scopeId` is null at `global`. At `market`, `scopeId` is a
+        `catalogue.pricing_market` id, and the view''s `market` is that row''s `market_code`. At `channel`, `scopeId`
+        is a `catalogue.sales_channel` id, the same key `pricing.dynamic_price_rule.channel_id` uses (ADAM CR-410);
+        the view''s `channel` is that row''s `sales_channel` mapped to `Channel` as GPS-C39 maps it (`guestWeb` to
+        `web`, `guestApp` to `mobile`, `partner` to `b2b`, and the rest by the same name), and null for `api` and
+        `backOffice`. At every other level `market` and `channel` are null. `minAiConfidence` is stored and written 0
+        to 1 and answered as a percent, multiplied by 100.
+
+        **Order.** Soonest first, by `effectiveFrom` (the row''s `effective_from`) ascending, NULLS LAST, then by
+        `policyId` (ADAM CR-417).'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -13979,24 +14078,26 @@ paths:
           schema:
             type: string
             enum:
-              - product
-              - event
+              - global
+              - market
               - venue
               - strategy
+              - product
+              - event
+              - performance
               - channel
-              - market
-          description: Scope level
-        - name: automationMode
+          description: Scope level, all eight (ADAM CR-417)
+        - name: automationLevel
           in: query
           required: false
           schema:
             type: string
             enum:
-              - monitor
-              - recommend
-              - prepareChange
-              - autoExecuteWithinGuardrails
-          description: Automation mode
+              - advisory
+              - humanInTheLoop
+              - conditionalAutonomous
+              - autonomous
+          description: Automation level, from automation_level (replaces the automationMode filter; ADAM CR-417)
         - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
@@ -15066,7 +15167,15 @@ paths:
       operationId: listPricingRecommendationExplainability
       x-ticvai-consumed-by:
         - "P08 ADM-106 AI Pricing Recommendation & Explainability Center"
+      x-ticvai-reads:
+      - table: catalogue.pricing_simulation
+        for: 'simulationRevenueUplift: the newest simulation of the recommendation (ADAM CR-416; CHG-CR416-001)'
+      - table: catalogue.price_category
+        for: 'priceCategory and the queue title: the price category''s name (ADAM CR-416; CHG-CR416-001)'
       x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'venue: the venue''s name, by the recommendation''s venue_id (ADAM CR-416; CHG-CR416-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiPricingRecommendationExplainabilityCenterView.currentPrice, AiPricingRecommendationExplainabilityCenterView.expectedRevenueImpact, AiPricingRecommendationExplainabilityCenterView.recommendedPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
@@ -15102,6 +15211,21 @@ paths:
         discount for a quantity band, a conversion price, or a standard change), the window it applies in, the
         quantity band, the objective, and the price (seat) category it is for; each is a filter. The producer is
         the rules-first pricing producer until a model is promoted per tenant (AI design 3.10, 3.12).
+
+
+        **What each member answers** (ADAM CR-416, decided 31 October 2026; CHG-CR416-001). The same rules hold on
+        listRecommendationReviewDecision and listPricingRecommendationExplainability, for the members each view has.
+        `venue` is the venue''s name, read in process through `tenancy#scopeRecords` by the recommendation''s
+        `venue_id`. `priceCategory` is `catalogue.price_category.name` by `price_category_id`, and null where there is
+        none. `productEvent` is the product name and the event name joined by " / ", without the event part when there
+        is none. `recommendation`, the queue''s title, is that product and event text followed by " / " and the price
+        category name where there is one; no title column is stored. `simulationRevenueUplift` is `expected_revenue`
+        minus `baseline_revenue` of the newest `catalogue.pricing_simulation` whose `pricing_recommendation_id` is the
+        recommendation (newest by `created_at`, ties broken by `id`), in the venue''s currency, and null where there is
+        no such simulation or either figure is null. `actualRevenueResultPercent` stays in the view and is answered
+        null until the pricing outcome measurement exists (the price outcome measure, ADAM CR-418; left out as
+        LO-CR416-001). `expectedRevenueImpact` is `revenue_opportunity`. `confidence` and every `confidenceBreakdown`
+        member are stored 0 to 1 and answered as a percent, multiplied by 100.
 
         **Order.** Newest first, by `generatedAt` descending, then by `recommendationId`.'
       tags:
@@ -15698,7 +15822,15 @@ paths:
       operationId: listRecommendationReviewDecision
       x-ticvai-consumed-by:
         - "P08 ADM-113 AI Recommendation Review & Decision Queue"
+      x-ticvai-reads:
+      - table: catalogue.pricing_simulation
+        for: 'simulationRevenueUplift: the newest simulation of the recommendation (ADAM CR-416; CHG-CR416-001)'
+      - table: catalogue.price_category
+        for: 'priceCategory and the queue title: the price category''s name (ADAM CR-416; CHG-CR416-001)'
       x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'venue: the venue''s name, by the recommendation''s venue_id (ADAM CR-416; CHG-CR416-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiRecommendationReviewDecisionQueueView.currentPrice, AiRecommendationReviewDecisionQueueView.humanSelectedPrice, AiRecommendationReviewDecisionQueueView.recommendedPrice, AiRecommendationReviewDecisionQueueView.revenueOpportunity and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
@@ -15724,6 +15856,21 @@ paths:
         explicitly allows conditional/autonomous execution; accepted or modified prices go live only through
         createLiveDynamicPrice; the outcome feeds listLearningModelPerformance (decided 29 September, readiness
         close-out).
+
+
+        **What each member answers** (ADAM CR-416, decided 31 October 2026; CHG-CR416-001). The same rules hold on
+        listRecommendationReviewDecision and listPricingRecommendationExplainability, for the members each view has.
+        `venue` is the venue''s name, read in process through `tenancy#scopeRecords` by the recommendation''s
+        `venue_id`. `priceCategory` is `catalogue.price_category.name` by `price_category_id`, and null where there is
+        none. `productEvent` is the product name and the event name joined by " / ", without the event part when there
+        is none. `recommendation`, the queue''s title, is that product and event text followed by " / " and the price
+        category name where there is one; no title column is stored. `simulationRevenueUplift` is `expected_revenue`
+        minus `baseline_revenue` of the newest `catalogue.pricing_simulation` whose `pricing_recommendation_id` is the
+        recommendation (newest by `created_at`, ties broken by `id`), in the venue''s currency, and null where there is
+        no such simulation or either figure is null. `actualRevenueResultPercent` stays in the view and is answered
+        null until the pricing outcome measurement exists (the price outcome measure, ADAM CR-418; left out as
+        LO-CR416-001). `expectedRevenueImpact` is `revenue_opportunity`. `confidence` and every `confidenceBreakdown`
+        member are stored 0 to 1 and answered as a percent, multiplied by 100.
 
         **Order.** Soonest first, by `scheduledFor` ascending, then by `recommendationId`. Where `scheduledFor` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
@@ -15799,6 +15946,11 @@ paths:
       operationId: listAutomationPolicyAutonomous
       x-ticvai-consumed-by:
         - "P08 ADM-114 Automation Policy & Autonomous Pricing Orchestrator"
+      x-ticvai-reads:
+      - table: catalogue.pricing_market
+        for: 'market: the market_code of the pricing market a market-level control names (ADAM CR-417; CHG-CR417-001)'
+      - table: catalogue.sales_channel
+        for: 'channel: the sales_channel of the sales channel a channel-level control names (ADAM CR-417; CHG-CR417-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.123-125 (10.7.7
@@ -15824,6 +15976,19 @@ paths:
         and still run inside the guardrails, thresholds, quiet period and circuit breakers; a tripped breaker
         returns the scope to humanInTheLoop. PAUSE ALL AUTONOMOUS PRICING is a button behind a dedicated strict
         permission (decided 29 September, readiness close-out).
+
+
+        **Scope and automation level** (ADAM CR-417, decided 31 October 2026; CHG-CR417-001). Both automation views
+        (listDynamicPricingAutomation and listAutomationPolicyAutonomous) answer `automationLevel` (`advisory`,
+        `humanInTheLoop`, `conditionalAutonomous`, `autonomous`) straight from `automation_level`; `automationMode` is
+        retired. `scopeLevel` answers and filters all eight levels: `global`, `market`, `venue`, `strategy`, `product`,
+        `event`, `performance` and `channel`, and `scopeId` is null at `global`. At `market`, `scopeId` is a
+        `catalogue.pricing_market` id, and the view''s `market` is that row''s `market_code`. At `channel`, `scopeId`
+        is a `catalogue.sales_channel` id, the same key `pricing.dynamic_price_rule.channel_id` uses (ADAM CR-410);
+        the view''s `channel` is that row''s `sales_channel` mapped to `Channel` as GPS-C39 maps it (`guestWeb` to
+        `web`, `guestApp` to `mobile`, `partner` to `b2b`, and the rest by the same name), and null for `api` and
+        `backOffice`. At every other level `market` and `channel` are null. `minAiConfidence` is stored and written 0
+        to 1 and answered as a percent, multiplied by 100.
 
         **Order.** Soonest first, by `effectiveFrom` ascending, then by `policyId`.'
       tags:
@@ -15886,7 +16051,19 @@ paths:
       operationId: createLiveDynamicPrice
       x-ticvai-consumed-by:
         - "P08 ADM-115 Live Dynamic Price Execution & Deployment Monitor"
+      x-ticvai-reads:
+      - table: catalogue.price_ladder
+        for: 'previousPrice when the target has no deployed execution: the strategy''s ladder basePrice (ADAM CR-422;
+          CHG-CR422-001)'
+      - table: catalogue.product_channel_assignment
+        for: 'the default channels: the product''s enabled channel assignments (ADAM CR-422; CHG-CR422-001)'
+      x-ticvai-emits:
+      - catalogue.priceExecuted
       x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: in-process
+        for: 'the approval reference: an approvals.request of kind pricingChange, approved; for a recommendation, the
+          request decidePricingRecommendation''s sendForApproval raised for it (ADAM CR-415, CR-422; CHG-CR422-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: LiveDynamicPriceExecutionDeploymentMonitorInput.newPrice, LiveDynamicPriceExecutionDeploymentMonitorView.newPrice, LiveDynamicPriceExecutionDeploymentMonitorView.previousPrice, LiveDynamicPriceExecutionDeploymentMonitorView.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
@@ -15912,7 +16089,32 @@ paths:
         dropped. Refused unless an approval reference is present or the scope''s automation policy is conditionalAutonomous/autonomous
         and its conditions pass; guardrails are re-checked at execution. Formal publication, rollback and audit
         stay with Board 4. Failed-deployment buttons Retry, Hold, Revert, Escalate and Freeze Channel on ADM-115
-        (decided 29 September, readiness close-out).'
+        (decided 29 September, readiness close-out).
+
+
+        **The execution is the live dynamic price** (ADAM CR-422, decided 31 October 2026; CHG-CR422-001; pack p.76:
+        never an uncontrolled independent base price). `catalogue.price` is never written: it is the base, per price
+        list and variant. The call writes one `catalogue.price_execution` and its `catalogue.audit_entry`. A
+        `deployed` or `partiallyDeployed` execution is the price for its target (the product, narrowed to event and
+        performance where sent) on its channels; the calculation''s `dynamicPricingAdjustment` step uses the newest
+        one in place of the strategy''s base rate. **Strategy** is required, from the body or from `aiRecommendation`''s
+        `dynamic_pricing_strategy_id`; without it, `400 validation` on `strategy`. Its `basePriceSource` is the rate
+        that moves. **previousPrice** is the `newPrice` of the newest `deployed` or `partiallyDeployed` execution for
+        the same strategy and target; with none, it is the strategy''s ladder `basePrice`. When `aiRecommendation` is
+        sent, `execution_id` is set on that recommendation''s newest `accept`, `modify` or `sendForApproval` decision
+        row, where there is one. **catalogue.priceExecuted** (executionId, strategyId, target, newPrice, channels)
+        is published through the outbox. **Approval**: the reference is an approvals request id, read through
+        `approvals#requestRecords`; it must be `approved` and of kind `pricingChange`. When `aiRecommendation` is sent,
+        the request decidePricingRecommendation''s `sendForApproval` raised for that recommendation (ADAM CR-415:
+        `subjectType` `pricingRecommendation`, `subjectId` the recommendation) is the one that counts. `422
+        approval-required`: no reference where the scope''s automation level does not permit automatic execution or
+        its conditions fail, or a reference that does not pass those checks. **Guardrails**: a price outside the
+        governing `dynamic_pricing_control`, or a scope that is frozen or kill-switched, is `422 guardrail-breached`
+        naming the guardrail. **Statuses** map `queued` = `scheduled`, `processing` = `executing`, `live` =
+        `deployed`, `partial` = `partiallyDeployed`, `failed` = `failed`, `rolledBack` = `reverted`. **Channels**
+        default to the product''s enabled `catalogue.product_channel_assignment` rows, mapped `web` to `b2c`, `mobile`
+        to `mobileApp`, `callCentre` to `callCenter`, and the rest by the same name; `reseller` and `api` are deployed
+        only when sent.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_CONFIGURE
@@ -15938,6 +16140,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LiveDynamicPriceExecutionDeploymentMonitorView'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: '`validation` on `strategy`: neither the body nor the recommendation names a strategy (ADAM
+            CR-422). Nothing is written.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          x-ticvai-problem-types: [approval-required, guardrail-breached]
+          description: '`approval-required`: no approval reference where the scope''s automation level does not
+            permit automatic execution or its conditions fail, or a reference that is not an approved pricingChange
+            request (for a recommendation, the one its sendForApproval raised). `guardrail-breached`: the price is
+            outside the governing dynamic_pricing_control, or the scope is frozen or kill-switched; names the
+            guardrail (ADAM CR-422). Nothing is written.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /dynamic-pricing-performance:
@@ -16089,6 +16310,20 @@ paths:
         is described; example values and stray prose from the next board dropped. Learning read model; AI optimisation
         suggestions need governance and never silently change production logic; override analysis is for learning,
         not employee scoring (pack p.130); model governance stays with the registry in listSignalDataQuality.
+
+
+        **Built once the price outcome measure is specified** (ADAM CR-418, decided 31 October 2026; CHG-CR418-001).
+        A scorecard needs the actual outcome of each executed price: the revenue and demand after it, against its
+        forecast, and nothing measures that yet. The AI engineers specify that measurement now, as a Block A task
+        (the price outcome measure); it serves this screen, the queue''s `actualRevenueResultPercent`
+        (listRecommendationReviewDecision, ADAM CR-416) and the performance KPIs (listDynamicPricingPerformance, ADAM
+        CR-407). ADM-117 stays in Block A. This operation is built once that measure is specified, and until then
+        nothing answers invented figures. **No `catalogue.model_scorecard` table**: the scorecard is assembled from
+        three sources, not from a second store: (1) that measurement; (2) the AI module''s measured forecast accuracy
+        and model stages (`getForecastAccuracy`, and the capability maturity stages the AI module keeps; asked of the
+        AI module when this operation is built, ADR-0020); (3) Catalogue''s own recommendation
+        decisions (`catalogue.pricing_recommendation_decision`), where `humanOverrideRate` is the modified decisions
+        divided by all decisions.
 
         **Order.** Sorted by `product` ascending. Where `product` is null the row sorts after the rows that have it (NULLS LAST), and `id` breaks every tie. (r10 default ruling, CHG-R10GEN-004)'
       tags:
@@ -18549,9 +18784,20 @@ paths:
         - "P08 ADM-086 Pricing Rollback & Emergency Control Center"
       summary: Cancel a rollback that has not started
       description: '**Only before it runs** (29 September, writers pass). Moves a `requested` or `scheduled`
-        pricing rollback action to `cancelled`; an open approval request for it is withdrawn. One already
-        `executing` cannot be cancelled (`409` `alreadyExecuting`); undoing a completed rollback is a new
-        rollback. Written to `catalogue.audit_entry`.
+        pricing rollback action to `cancelled`. One already `executing` cannot be cancelled (`409`
+        `alreadyExecuting`); undoing a completed rollback is a new rollback. Written to `catalogue.audit_entry`.
+
+
+        **Its waiting approval request is cancelled in process** (ADAM CR-421, decided 31 October 2026;
+        CHG-CR421-001; ADR-0055 rule 3: Approvals is a module of the same commerce deployable). In the same
+        transaction as the move to `cancelled`: if the action''s `approval_request_id` names a request that is still
+        waiting (`pending`, `escalated`, `returned` or `informationRequested`), it is cancelled through Approvals''
+        in-process API, `IApprovalRequests.CancelAsync(requestId, reason)`, with the rollback''s cancel `reason`; that
+        call makes the move `cancelApprovalRequest` makes. A request already decided, withdrawn, expired or
+        cancelled is left as it is, and the rollback is still cancelled. No catalogue event is published and no
+        outbox row is written. Catalogue''s approval consumer (ADAM CR-415) changes nothing for a rollback
+        that is no longer `requested` or `scheduled`. A rollback whose `subject` is `product` answers 404 on this
+        path.
 
         '
       tags:
@@ -19441,15 +19687,26 @@ paths:
         - "P08 ADM-074 Price Calculation Sequence & Formula Engine"
       summary: Save a price calculation sequence, whole
       description: '**The ordered steps that turn a rate into a payable amount** (29 September, writers pass).
-        Writes a `catalogue.calculation_profile` and its `catalogue.calculation_step` rows, whole, keyed by `code`
-        and `version`. **Versioned, never edited once used**: saving an `active` version is refused (`409`
-        `versionInUse`); a change is a new `version` saved `draft` and activated through `setPricingChangeRequest`,
-        so every calculation stays reproducible from its `calculationVersion`. At most one `isDefault` profile is
-        `active` per venue.
+        Writes a `catalogue.calculation_profile` and its `catalogue.calculation_step` rows, whole. **Versioned,
+        never edited once used**: saving an `active` version is refused (`409` `versionInUse`); a change is a new
+        `version` saved `draft` and activated through `setPricingChangeRequest`, so every calculation stays
+        reproducible from its `calculationVersion`. At most one `isDefault` profile is `active` per venue.
 
 
-        Rules: a step depending on a later or unknown step, or a cycle, is refused (`422` `invalidSequence` /
-        `circularDependency`); sequences must be unique and start at 1 (`422` `invalidSequence`). Written to
+        **The record and its version** (ADAM CR-420, decided 31 October 2026; CHG-CR420-001). The record is the one
+        the path''s `calculationProfileId` names. A new id saves a new version of its `code`, numbered by the server
+        one above that code''s highest version at the venue (1 for a new code); an existing id keeps its version. A
+        body `code` that differs from the existing row''s `code` is `409 calculation-profile-id-mismatch`. Any
+        `version` in the body is ignored, because it is readOnly. A unique index on `catalogue.calculation_profile`
+        (`scope_path`, `code`, `version`) backs the numbering, so two saves at once cannot take the same number. A
+        save that would leave two active `isDefault` profiles at the venue is `409 default-profile-exists`, not 400.
+        `dependsOn` names earlier steps of the profile by their `sequence` number, written as a string ("1", "2"). A
+        step''s `calculationProfileId`, when sent, must equal the path id, else `400 validation` on
+        `calculationProfileId`.
+
+
+        Rules: a `dependsOn` that names no earlier step of the profile is `422 invalid-sequence`, and a cycle is
+        `422 circular-dependency`; sequences must be unique and start at 1 (`422` `invalidSequence`). Written to
         `catalogue.audit_entry` (`domain: pricing`).
 
         '
@@ -19470,7 +19727,7 @@ paths:
       - name: calculationProfileId
         in: path
         required: true
-        description: 'The record''s id (ADAM CR-245). This write finds its record by `code` and `version`: where there is none, the new record takes this id (a client UUIDv7, the same key as a body `id`); where there is one, this must equal its id, else `409 calculation-profile-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
+        description: 'The record''s id (ADAM CR-245, CR-420). This write finds its record by this id: where there is none, the new record takes it (a client UUIDv7, the same key as a body `id`) and is a new version of its `code`, numbered by the server; where there is one, the body''s `code` must equal that row''s `code`, else `409 calculation-profile-id-mismatch` and nothing changes. The body''s `id`, when sent, must equal it.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -19489,16 +19746,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CalculationProfile'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: '`validation` on `calculationProfileId`: a step''s `calculationProfileId` is sent and is not
+            the path id (ADAM CR-420). Nothing changes.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          x-ticvai-problem-types: [version-in-use, calculation-profile-id-mismatch]
-          description: '`versionInUse`. `calculation-profile-id-mismatch` (ADAM CR-245): a record for `code` and `version` exists and the path''s `calculationProfileId` is not its id (or names another such record); nothing changes.'
+          x-ticvai-problem-types: [version-in-use, calculation-profile-id-mismatch, default-profile-exists]
+          description: '`versionInUse`. `calculation-profile-id-mismatch` (ADAM CR-245, CR-420): the path''s `calculationProfileId` names an existing row whose `code` is not the body''s; nothing changes. `default-profile-exists` (ADAM CR-420): the save would leave two active `isDefault` profiles at the venue; nothing changes.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [invalid-sequence, circular-dependency]
-          description: '`invalidSequence` or `circularDependency`.'
+          description: '`invalidSequence`: a `dependsOn` names no earlier step of the profile, or the sequences are not
+            unique from 1. `circularDependency`: the steps depend on each other in a cycle (ADAM CR-420).'
           content:
             application/problem+json:
               schema:
@@ -19586,8 +19852,20 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: DynamicPricingControl.absoluteMaximumPrice, DynamicPricingControl.absoluteMinimumPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
-      x-ticvai-body-key: [scopeId]
-      x-ticvai-body-key-note: 'Keyed by the body''s `scopeId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per scope node within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. **Required in fact**: a body without `scopeId` is refused `400 validation`; the schema leaves it optional only so a client built at r1 still validates.'
+      x-ticvai-reads:
+      - table: catalogue.pricing_market
+        for: 'a market scopeId: it must name a pricing market row the caller can see (ADAM CR-425, CR-417; CHG-CR425-001)'
+      - table: catalogue.sales_channel
+        for: 'a channel scopeId: it must name a sales channel row the caller can see, the CR-410 key (ADAM CR-425;
+          CHG-CR425-001)'
+      - table: catalogue.product
+        for: 'a product scopeId must name a product the caller can see (ADAM CR-425; CHG-CR425-001)'
+      - table: catalogue.event
+        for: 'an event scopeId must name an event the caller can see (ADAM CR-425; CHG-CR425-001)'
+      - table: catalogue.performance
+        for: 'a performance scopeId must name a performance the caller can see (ADAM CR-425; CHG-CR425-001)'
+      x-ticvai-body-key: [scopeLevel, scopeId]
+      x-ticvai-body-key-note: 'Keyed by the body''s `scopeLevel` and `scopeId`, not a singleton (r8 walk fix, CHG-R8WFC-001; ADAM CR-425): one record per scope level and node within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body. Every `global` row has a null `scopeId`, so the level is part of the key. A missing `scopeId` below `global` is `422 scope-id-required`; at `global`, `scopeId` must be absent or null, else `400 validation` on `scopeId`.'
       summary: Set the guardrails and automation level of dynamic pricing at one scope
       description: '**Guardrails and automation policy, one row per scope** (29 September, writers pass). Creates or
         updates the `catalogue.dynamic_pricing_control` for `scopeLevel` and `scopeId`: price floors and ceilings,
@@ -19598,11 +19876,32 @@ paths:
 
         **Turning the kill switch on (`isKillSwitchActive`) or freezing (`isFrozen`) takes effect at once** and
         stops every automatic change in scope; a strategy in scope reads as `frozen`
-        (`states/dynamic-pricing-strategy.yaml`). Raising `automationLevel` to `conditionalAutonomous` or
-        `autonomous` opens an `approvals.ApprovalRequest` of kind `pricingChange` and applies only when approved;
-        lowering it applies at once. Rules: `absoluteMinimumPrice` above `absoluteMaximumPrice` is refused (`422`
-        `invalidRange`); `scopeId` is required except at `global` (`422` `scopeIdRequired`). Written to
-        `catalogue.audit_entry` (`domain: pricing`).
+        (`states/dynamic-pricing-strategy.yaml`). Rules: `absoluteMinimumPrice` above `absoluteMaximumPrice` is
+        refused (`422` `invalidRange`). Written to `catalogue.audit_entry` (`domain: pricing`).
+
+
+        **The scope** (ADAM CR-425, decided 31 October 2026, with the scope match from ADAM CR-417; CHG-CR425-001).
+        The record is keyed by `scopeLevel` and `scopeId`. A missing `scopeId` below `global` is `422
+        scope-id-required`; at `global`, `scopeId` must be absent or null, or the call answers `400 validation` on
+        `scopeId`. At `market`, `scopeId` is a `catalogue.pricing_market` id; at `channel`, it is a
+        `catalogue.sales_channel` id (the CR-410 key); at the other levels it is the venue, strategy, product, event
+        or performance id. A `scopeId` that names no row of its level the caller can see is `422 scope-not-found`. A
+        market control covers the strategies whose `market_code` is that row''s `market_code`; a channel control
+        covers the executions on that sales channel.
+
+
+        **Raising the automation level waits for approval.** Raising `automationLevel` to `conditionalAutonomous` or
+        `autonomous` keeps the row''s current level: it writes the requested level to `pending_automation_level` and
+        the request to `pending_approval_request_id`. The request is opened in process through `IApprovalRequests`,
+        as decidePricingRecommendation opens its own (ADAM CR-415), with kind `pricingChange`, `subjectContract`
+        `catalogue`, `subjectType` `dynamicPricingControl` and `subjectId` the row''s id. If approvals refuses with
+        `422 no-approval-route`, the call answers `422 no-approval-route` and writes nothing. Catalogue''s approval
+        consumer (ADAM CR-415) handles this `subjectType`: on `approval.granted` it sets `automation_level` to the
+        pending level and clears both columns; on `approval.rejected`, `approval.withdrawn` or `approval.expired` it
+        only clears them. A later save that asks for a different level cancels the open request in process
+        (`IApprovalRequests.CancelAsync`, as in ADAM CR-421); a lower level then applies at once, and a raise opens a
+        new request. Lowering always applies at once. Until `IApprovalRequests` exists (#30848), a raise fails, as
+        built.
 
         '
       tags:
@@ -19637,9 +19936,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DynamicPricingControl'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: '`validation` on `scopeId`: a `global` control sent with a `scopeId` (ADAM CR-425). Nothing is
+            written.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          x-ticvai-problem-types: [invalid-range, scope-id-required]
-          description: '`invalidRange` or `scopeIdRequired`.'
+          x-ticvai-problem-types: [invalid-range, scope-id-required, scope-not-found, no-approval-route]
+          description: '`invalidRange`. `scope-id-required`: no `scopeId` below `global`. `scope-not-found`: the
+            `scopeId` names no row of its level the caller can see. `no-approval-route`: approvals has no route for the
+            automation raise''s pricingChange request (ADAM CR-425). Nothing is written.'
           content:
             application/problem+json:
               schema:
@@ -34632,7 +34941,7 @@ components:
           description: Tax total
         calculationVersion:
           type: string
-          description: Calculation version used
+          description: Calculation version used, the calculation profile's code and version (ADAM CR-419)
         channelComparison:
           type: array
           items:
@@ -34650,7 +34959,8 @@ components:
           type: array
           items:
             type: string
-          description: AI observations for this screen; advisory only, never applied automatically
+          description: AI observations for this screen; advisory only, never applied automatically. Answered as an
+            empty list until an AI producer exists (ADAM CR-419; LO-CR419-001)
     PriceBreakdownCalculationSimulationExplainabilityInput:
       type: object
       x-ticvai-drafted-shape: true
@@ -34663,10 +34973,16 @@ components:
         customerId:
           type: string
           nullable: true
-          description: Customer
+          description: 'Customer. Not read: a simulation never looks up a real guest (ADAM CR-419)'
         productId:
           type: string
           description: Product
+        variantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The variant priced; a variant of productId, required when the product has more than one
+            sellable variant, else 400 validation on variantId (ADAM CR-419)
         quantity:
           type: integer
           description: Quantity
@@ -34693,11 +35009,13 @@ components:
         membershipId:
           type: string
           nullable: true
-          description: Membership
+          description: Membership, the catalogue.membership_programme the simulated customer holds; its membership
+            pricing rules choose the rate at the contextualRateSelection step (ADAM CR-419)
         promotionCode:
           type: string
           nullable: true
-          description: Promotion
+          description: Promotion, evaluated by Promotions' evaluatePromotions in process without orderId, so nothing
+            is stored (ADAM CR-419)
         paymentMethod:
           type: string
           nullable: true
@@ -36337,7 +36655,7 @@ components:
           description: Product or event the strategy controls
         venue:
           type: string
-          description: Venue
+          description: Venue's name, through tenancy#scopeRecords by venue_id (ADAM CR-423)
         basePriceSource:
           type: string
           description: 'Base price source: the Board 1 price list and rate the strategy moves from, e.g. UAE Standard
@@ -36345,7 +36663,9 @@ components:
         currentPrice:
           allOf:
             - $ref: ../shared/common.yaml#/components/schemas/Money
-          description: Current resolved dynamic price (for a single-price scope)
+          description: 'Current resolved dynamic price: the newPrice of the strategy''s newest deployed or
+            partiallyDeployed price_execution where the strategy prices one target (singleProduct, or an event with at
+            most one performance); otherwise null (ADAM CR-423)'
           nullable: true
         adjustmentRange:
           type: object
@@ -36384,10 +36704,13 @@ components:
             default
         status:
           type: string
-          description: 'Status: draft, testing, ready, scheduled, active, paused, frozen, expired or retired'
+          description: 'Status: draft, ready (a draft with a ladder and at least one rule, whose scope is not
+            frozen), scheduled (active, with effectiveFrom after now), active, paused, frozen, expired or retired;
+            ready and scheduled are derived, the rest as stored, and testing is not answered (ADAM CR-423;
+            LO-CR423-001)'
         owner:
           type: string
-          description: Owner
+          description: Owner, the owner principal's display name through identity#principalRecords (ADAM CR-423)
     DynamicPricingStrategyCommandCenterSummary:
       type: object
       x-ticvai-drafted-shape: true
@@ -36417,16 +36740,21 @@ components:
           description: Rules Active
         currentPriceAdjustments:
           type: integer
-          description: Current Price Adjustments
+          description: Current Price Adjustments, the targets of the listed strategies whose newest price_execution is
+            deployed or partiallyDeployed (ADAM CR-423)
         pricesAtMaximumGuardrail:
           type: integer
-          description: Prices at Maximum Guardrail
+          description: Prices at Maximum Guardrail, those targets whose newPrice is at or above the governing
+            dynamic_pricing_control's absoluteMaximumPrice, or the ladder's maximumPrice where no control sets one
+            (ADAM CR-423)
         pricesAtMinimumGuardrail:
           type: integer
-          description: Prices at Minimum Guardrail
+          description: Prices at Minimum Guardrail, those targets whose newPrice is at or below the governing
+            control's absoluteMinimumPrice, or the ladder's minimumPrice where no control sets one (ADAM CR-423)
         ruleConflicts:
           type: integer
-          description: Rule Conflicts
+          description: Rule Conflicts, the sum of the seven open-conflict counts listRulePriorityConflict's summary
+            gives for the venue (ADAM CR-423)
         frozenStrategies:
           type: integer
           description: Frozen Strategies
@@ -36438,8 +36766,8 @@ components:
           type: array
           items:
             type: string
-          description: Operational Alerts (pack p.76), e.g. performances at their upper band, strategies with
-            unresolved conflicts, strategies activating within 48 hours
+          description: 'Operational Alerts (pack p.76): a code for each condition that holds, pricesAtUpperBand,
+            unresolvedRuleConflicts or activatingWithin48Hours; the screen words them (ADAM CR-423)'
     DynamicPricingStrategyBuilderView:
       type: object
       x-ticvai-drafted-shape: true
@@ -37663,24 +37991,30 @@ components:
         scopeLevel:
           type: string
           enum:
-            - product
-            - event
+            - global
+            - market
             - venue
             - strategy
+            - product
+            - event
+            - performance
             - channel
-            - market
-          description: Automation Scope (pack p.88)
+          description: Automation Scope (pack p.88), all eight levels of dynamic_pricing_control (ADAM CR-417)
         scopeId:
           type: string
-          description: ID of the product, event, venue, strategy, channel or market
-        automationMode:
+          nullable: true
+          description: 'ID of the scope: null at global; a catalogue.pricing_market id at market; a
+            catalogue.sales_channel id at channel (the CR-410 key); otherwise the venue, strategy, product, event or
+            performance id (ADAM CR-417)'
+        automationLevel:
           type: string
           enum:
-            - monitor
-            - recommend
-            - prepareChange
-            - autoExecuteWithinGuardrails
-          description: Automation mode; defaults to recommend (decided 29 September, readiness close-out)
+            - advisory
+            - humanInTheLoop
+            - conditionalAutonomous
+            - autonomous
+          description: Automation level, straight from automation_level; defaults to advisory (replaces automationMode;
+            ADAM CR-417)
         authorityTiers:
           type: array
           items:
@@ -39031,22 +39365,23 @@ components:
       properties:
         expectedRevenueImpact:
           $ref: ../shared/common.yaml#/components/schemas/Money
-          description: Expected Revenue Impact
+          description: Expected Revenue Impact, the recommendation's revenue_opportunity (ADAM CR-416)
         expectedOccupancy:
           type: number
           description: Expected Occupancy, percent
         confidence:
           type: number
-          description: Overall confidence, percent
+          description: Overall confidence, percent (stored 0 to 1, answered multiplied by 100; ADAM CR-416)
         recommendationId:
           type: string
           description: Recommendation id
         productEvent:
           type: string
-          description: Product/event/performance the card applies to
+          description: 'Product/event the card applies to: the product name and the event name joined by " / ",
+            without the event part when there is none (ADAM CR-416)'
         venue:
           type: string
-          description: Venue
+          description: Venue's name, through tenancy#scopeRecords by venue_id (ADAM CR-416)
         currentPrice:
           $ref: ../shared/common.yaml#/components/schemas/Money
           description: Current Price
@@ -39118,7 +39453,8 @@ components:
             externalSignalConfidence:
               type: number
               description: External Signal Confidence, percent
-          description: Confidence Breakdown
+          description: Confidence Breakdown; each member is stored 0 to 1 and answered multiplied by 100 (ADAM
+            CR-416)
         explanation:
           type: string
           description: Natural-language explanation in business language (advisory)
@@ -39151,7 +39487,8 @@ components:
         priceCategory:
           type: string
           nullable: true
-          description: The price category's name, for the card
+          description: The price category's name, catalogue.price_category.name by price_category_id; null where
+            there is none (ADAM CR-416)
         recommendationType:
           type: string
           enum:
@@ -40122,10 +40459,12 @@ components:
       properties:
         recommendation:
           type: string
-          description: Recommendation title
+          description: 'Recommendation title: the product name and the event name joined by " / " (without the event
+            part when there is none), then " / " and the price category name where there is one. Derived, no column
+            (ADAM CR-416)'
         venue:
           type: string
-          description: Venue
+          description: Venue's name, through tenancy#scopeRecords by venue_id (ADAM CR-416)
         event:
           type: string
           description: Event
@@ -40146,7 +40485,7 @@ components:
           description: Demand Impact, percent
         confidence:
           type: number
-          description: AI Confidence, percent
+          description: AI Confidence, percent (stored 0 to 1, answered multiplied by 100; ADAM CR-416)
         urgency:
           type: string
           description: Urgency
@@ -40159,8 +40498,12 @@ components:
           type: string
           description: 'Governance Level: approval level required, from the configured approval matrix'
         simulationRevenueUplift:
-          $ref: ../shared/common.yaml#/components/schemas/Money
-          description: Simulation Revenue Uplift (Board 7)
+          allOf:
+            - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: 'Simulation Revenue Uplift (Board 7): expected_revenue minus baseline_revenue of the newest
+            catalogue.pricing_simulation of this recommendation (by created_at, then id), in the venue''s currency;
+            null where there is none or either figure is null (ADAM CR-416)'
         recommendationId:
           type: string
           description: Recommendation id
@@ -40236,7 +40579,9 @@ components:
           nullable: true
         actualRevenueResultPercent:
           type: number
-          description: 'Feedback Loop: actual revenue result after execution; empty until measured, percent'
+          nullable: true
+          description: 'Feedback Loop: actual revenue result after execution, percent. Answered null until the
+            pricing outcome measurement exists (ADAM CR-416; the price outcome measure, CR-418; LO-CR416-001)'
     AutomationPolicyAutonomousPricingOrchestratorView:
       type: object
       x-ticvai-drafted-shape: true
@@ -40265,11 +40610,16 @@ components:
           type: string
           description: Dynamic pricing strategy (Board 5)
         channel:
-          $ref: '#/components/schemas/Channel'
-          description: Channel
+          allOf:
+            - $ref: '#/components/schemas/Channel'
+          nullable: true
+          description: 'Channel: at scope channel, the sales_channel of the catalogue.sales_channel row scopeId names,
+            mapped as GPS-C39 maps it (guestWeb to web, guestApp to mobile, partner to b2b, the rest by the same
+            name); null for api and backOffice and at every other level (ADAM CR-417)'
         market:
           type: string
-          description: Market
+          description: 'Market: at scope market, the market_code of the catalogue.pricing_market row scopeId names;
+            null at every other level (ADAM CR-417)'
           nullable: true
         effectiveFrom:
           type: string
@@ -40321,7 +40671,7 @@ components:
         minAiConfidence:
           type: number
           description: Auto-execute only if AI confidence is at or above this, percent; default 90 (decided 29
-            September, readiness close-out)
+            September, readiness close-out). Stored and written 0 to 1, answered multiplied by 100 (ADAM CR-417)
         minRevenueUpliftPercent:
           type: number
           description: Auto-execute only if expected uplift is at or above this, percent; default 2 (decided 29
@@ -40407,7 +40757,9 @@ components:
             - autonomous
         status:
           type: string
-          description: 'Status: queued, processing, live, partial, failed or rolledBack'
+          description: 'Status: queued, processing, live, partial, failed or rolledBack, mapped from
+            price_execution.status: queued = scheduled, processing = executing, live = deployed, partial =
+            partiallyDeployed, failed = failed, rolledBack = reverted (ADAM CR-422)'
         executionId:
           type: string
           description: Execution id
@@ -40452,7 +40804,7 @@ components:
     LiveDynamicPriceExecutionDeploymentMonitorInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: 'none — request only; applied to `catalogue.price` (with `catalogue.audit_entry`, `catalogue.price_execution`, `catalogue.pricing_recommendation_decision`, `platform.outbox`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
+      x-ticvai-persistence: 'none — request only; applied to `catalogue.price_execution` (with `catalogue.audit_entry`, `catalogue.pricing_recommendation_decision`, `platform.outbox`), the table its operation writes (CHG-STO-021; never `catalogue.price`, ADAM CR-422); a field with no column there is a working input of the screen and is not kept'
       description: '**What Live Dynamic Price Execution & Deployment Monitor submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -40469,7 +40821,8 @@ components:
           description: New Price
         strategy:
           type: string
-          description: Strategy id
+          description: Strategy id; required, here or through aiRecommendation's dynamic_pricing_strategy_id, else 400
+            validation on strategy (ADAM CR-422)
           nullable: true
         aiRecommendation:
           type: string
@@ -40477,7 +40830,9 @@ components:
           nullable: true
         approval:
           type: string
-          description: Approval reference; required unless the automation policy permits automatic execution
+          description: Approval reference, an approvals request id (approved, kind pricingChange; for a recommendation
+            the request its sendForApproval raised); required unless the automation policy permits automatic
+            execution, else 422 approval-required (ADAM CR-415, CR-422)
           nullable: true
         executionSource:
           type: string
@@ -44183,10 +44538,15 @@ components:
     CalculationProfile:
       type: object
       x-ticvai-persistence: catalogue.calculation_profile + catalogue.calculation_step
+      # ADAM CR-420 (CHG-CR420-001): the server numbers a code's versions at the venue; this index backs the number.
+      x-ticvai-unique-together:
+      - [scopePath, code, version]
       description: >-
         **The ordered sequence that turns a rate into a payable amount** (29 September, data model DM3). ADM-074: base
         rate, contextual rate, dynamic adjustment, promotion, package adjustment, fees, tax, rounding, final amount.
-        Versioned; a calculation records the version it used (`calculationVersion`), so history is reproducible.
+        Versioned; a calculation records the version it used (`calculationVersion`), so history is reproducible. The
+        `dynamicPricingAdjustment` step takes the live dynamic price, the newest `deployed` or `partiallyDeployed`
+        `catalogue.price_execution` for the target, in place of the strategy's base rate (ADAM CR-422).
       required:
       - id
       - scopePath
@@ -44213,6 +44573,9 @@ components:
           readOnly: true
           type: integer
           minimum: 1
+          description: 'Numbered by the server: a new id is one above its code''s highest version at the venue (1 for
+            a new code), and an existing id keeps its version; a body version is ignored. Unique with scopePath and
+            code (ADAM CR-420).'
         isDefault:
           type: boolean
           default: false
@@ -44244,8 +44607,9 @@ components:
       type: object
       x-ticvai-persistence: catalogue.calculation_step
       description: >-
-        **One step of a calculation profile** (29 September, data model DM3). `dependsOn` names earlier steps; a cycle
-        or a step depending on a later one is refused (`422 circularDependency` / `invalidSequence`).
+        **One step of a calculation profile** (29 September, data model DM3). `dependsOn` names earlier steps of the
+        profile by their `sequence` number, written as a string ("1", "2") (ADAM CR-420); a cycle or a step depending
+        on a later or unknown one is refused (`422 circularDependency` / `invalidSequence`).
       required:
       - id
       - calculationProfileId
@@ -44298,6 +44662,9 @@ components:
           type: array
           items:
             type: string
+          description: 'The earlier steps of the profile this step depends on, each by its `sequence` number as a
+            string ("1", "2"). One that names no earlier step is 422 invalid-sequence; a cycle is 422
+            circular-dependency (ADAM CR-420).'
         output:
           type: string
           maxLength: 200
@@ -44930,7 +45297,9 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: Null at `global`.
+          description: 'Null at `global`. At `market` a `catalogue.pricing_market` id; at `channel` a
+            `catalogue.sales_channel` id, the key `pricing.dynamic_price_rule.channel_id` uses (ADAM CR-410); at
+            `venue`, `strategy`, `product`, `event` and `performance` that row''s id (ADAM CR-417, CR-425).'
         absoluteMinimumPrice:
           allOf:
           - $ref: ../shared/common.yaml#/components/schemas/Money
@@ -45005,11 +45374,50 @@ components:
           - conditionalAutonomous
           - autonomous
           default: advisory
-        authorityTiers:
-          type: object
-          additionalProperties: true
+        pendingAutomationLevel:
+          type: string
+          readOnly: true
           nullable: true
-          description: '`[{maxAdjustmentPercent, action, confidenceThreshold}]`.'
+          enum:
+          - advisory
+          - humanInTheLoop
+          - conditionalAutonomous
+          - autonomous
+          - null
+          description: 'A raise to `conditionalAutonomous` or `autonomous` waiting for its approval; `automationLevel`
+            keeps the current level until approval.granted, and approval.rejected, withdrawn or expired clears it
+            (ADAM CR-425).'
+        pendingApprovalRequestId:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+          description: The approvals request the pending raise waits on (kind pricingChange, subjectType
+            dynamicPricingControl); cleared with pendingAutomationLevel (ADAM CR-425).
+        authorityTiers:
+          type: array
+          nullable: true
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          description: 'The authority tiers, smallest adjustment first, stored as the jsonb list it always was (typed
+            as an array, ADAM CR-425).'
+          items:
+            type: object
+            properties:
+              maxAdjustmentPercent:
+                type: number
+                nullable: true
+              action:
+                type: string
+                enum:
+                - autoExecute
+                - autoExecuteIfConfident
+                - revenueManager
+                - commercialDirector
+                - board4Governance
+              confidenceThreshold:
+                type: number
+                nullable: true
         maxAdjustmentPercent:
           type: number
           nullable: true
@@ -45035,15 +45443,56 @@ components:
           nullable: true
           minimum: 0
         noChangeWindows:
-          type: object
-          additionalProperties: true
+          type: array
           nullable: true
-          description: '`[{anchor, minutesBefore, minutesAfter, clockFrom, clockTo}]`.'
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          description: 'The no-change windows, stored as the jsonb list it always was (typed as an array, ADAM CR-425).'
+          items:
+            type: object
+            properties:
+              anchor:
+                type: string
+                enum:
+                - gatesOpening
+                - eventStart
+                - clockTime
+              minutesBefore:
+                type: integer
+                nullable: true
+              minutesAfter:
+                type: integer
+                nullable: true
+              clockFrom:
+                type: string
+                nullable: true
+              clockTo:
+                type: string
+                nullable: true
         circuitBreakers:
-          type: object
-          additionalProperties: true
+          type: array
           nullable: true
-          description: '`[{trigger, threshold, enabled, tripped}]`.'
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          description: 'The circuit breakers, stored as the jsonb list it always was (typed as an array, ADAM CR-425).'
+          items:
+            type: object
+            properties:
+              trigger:
+                type: string
+                enum:
+                - dataQualityFalls
+                - modelConfidenceDrops
+                - conversionDropsAbnormally
+                - priceVolatilityExceedsThreshold
+                - revenueFalls
+                - integrationFails
+              threshold:
+                type: number
+              enabled:
+                type: boolean
+              tripped:
+                type: boolean
         requireGuardrailsPassed:
           type: boolean
           default: true
@@ -45746,7 +46195,9 @@ components:
           type: object
           additionalProperties: true
           nullable: true
-          description: '`{dataQuality, forecastConfidence, elasticityConfidence, externalSignalConfidence}`.'
+          description: '`{dataQuality, forecastConfidence, elasticityConfidence, externalSignalConfidence}`, each
+            0 to 1 like `confidence`, written by the same recommendation engine job; the views answer them as a
+            percent, multiplied by 100 (ADAM CR-416).'
         risk:
           type: string
           enum:
