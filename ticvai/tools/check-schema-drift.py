@@ -333,7 +333,11 @@ def stage_backend(dst, backend=BACKEND, rows=None):
     for db in DATABASES:
         files = [(n, (dst / db / n).read_text(encoding="utf-8")) for n in provision_order(
             p.name for p in (dst / db).glob("*.sql"))]
-        for fname, before, after, obj in undefined_type_adjustments(files, [r for r in rows if r["db"] in (db, "both")]):
+        # provision-tenant.sh creates, before the tenant files, the types the frozen baseline names (CHG-R12DB-001):
+        # a type it creates is created, so no adjustment is made for it.
+        given = [("provision-tenant.sh", (dst / "provision-tenant.sh").read_text(encoding="utf-8"))] if db == "tenant" else []
+        for fname, before, after, obj in undefined_type_adjustments(given + files,
+                                                                    [r for r in rows if r["db"] in (db, "both")]):
             p = dst / db / fname
             text = p.read_text(encoding="utf-8")
             p.write_bytes(text.replace(before, after, 1).encode("utf-8"))
@@ -1111,6 +1115,9 @@ def self_test():
            and adj[0][2].endswith(","), f"adjustment: not applied as decided: {adj}")
     expect(undefined_type_adjustments([("000-types.sql", "CREATE TYPE pii.subject_kind AS ENUM ('guest');"),
                                        ("010-pii.sql", pii)], [row]) == [], "adjustment: on although the type exists")
+    expect(undefined_type_adjustments([("provision-tenant.sh", "psql <<'SQL'\nCREATE DOMAIN pii.subject_kind AS text;\nSQL\n"),
+                                       ("010-pii.sql", pii)], []) == [],
+           "adjustment: on although provision-tenant.sh creates the type")
     expect(undefined_type_adjustments([("010-pii.sql", pii.replace("pii.subject_kind", "text"))], [row]) == [],
            "adjustment: on although the column is text")
     try:

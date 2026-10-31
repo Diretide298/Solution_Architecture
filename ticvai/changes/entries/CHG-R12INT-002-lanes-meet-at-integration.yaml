@@ -1,0 +1,48 @@
+id: CHG-R12INT-002
+date: '2026-10-31'
+source: audit
+kind: process
+summary: 'Four places where r12''s lanes each passed alone and failed together, fixed at the source.
+  (1) The recorded platform.apply_deployable_grants() grants SELECT, INSERT, UPDATE on platform.tenant_field_key and
+  platform.blind_index_rehash to every host, as the kernel list in docs/active/cross-deployable-writes.yaml says since
+  CR-339 (derive-ddl writes the changed function into the forward migration; its md5 guard replaces live''s copy).
+  (2) check-schema-drift counts the types provision-tenant.sh creates before the tenant files (pii.subject_kind,
+  pii.contact_kind, CHG-R12DB-001) as created, so the package provisions as shipped without an adjustment.
+  (3) handoff/cross-deployable-writes.md rewritten from the routes (verifyGuestEmail no longer writes
+  marketing.message_dispatch, CR-370; the two CR-339 kernel tables; XDR-022). (4) CMS-076''s "Choose the new file"
+  binds UploadTicket.uploadId, the id the replace sends (it was the one unbound control the binding ratchet counted).'
+decision:
+  what: 'The lead''s brief for r12 (30 October 2026): "finish up and we deploy"; fix findings at the source.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'Finding: the r12 integration refresh (31 October) failed check-ddl-conventions D-RECORDED-GRANTS (the DDL
+  lane recorded live''s grant function, CHG-R12DB-004, and batch C added the two kernel tables, CHG-CR339-001),
+  check-schema-drift (the live-check lane''s CHG-R12LV-001 read only the .sql files, the DDL lane''s CHG-R12DB-001
+  creates the types in provision-tenant.sh), check-cross-deployable-writes X-DOC (no lane rewrote the document) and
+  check-binding-ratchet (venue-management block B unbound controls 808 to 809: CMS-076, CHG-R12GT-002).'
+keys_touched:
+  tables:
+  - platform.tenant_field_key
+  - platform.blind_index_rehash
+  - pii.subject
+  - pii.subject_contact
+  files:
+  - docs/active/recorded-ddl/tenant.sql
+  - tools/check-schema-drift.py
+  - handoff/cross-deployable-writes.md
+  - screens/P13-white-label-cms.yaml
+root_class: 'two lanes each changing one side of a rule a check holds together, each checked without the other'
+tickets:
+  started:
+  - '37050 (KERNEL-FIELD-ENC, CR-339): nothing to do. The grants are the follow-up already posted (commerce, access,
+    operations, workers); the shared function gives ticvai_ai the same, as for every kernel table.'
+  - '30907 ([BE] replaceMediaAsset, Ready for QA, Narayan Gaonkar): nothing to do; see CHG-R12GT-002.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r12 integration gate, 31 October 2026'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open

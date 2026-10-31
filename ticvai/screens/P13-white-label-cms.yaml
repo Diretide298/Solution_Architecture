@@ -12289,6 +12289,7 @@ screens:
           a venue''s busiest hour is a list that skips rows.'
       - kind: fileUpload
         label: Choose the new file
+        bindsTo: UploadTicket.uploadId
         operation: createUpload
         notes: 'Asks the platform for an upload (`createUpload`) and sends the file; the replace then names that
           upload. It never calls `completeUpload`, which would make the file a new asset rather than this one''s

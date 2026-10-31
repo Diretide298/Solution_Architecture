@@ -204,6 +204,13 @@ BEGIN
         IF to_regclass('platform.outbox_sequence') IS NOT NULL THEN
             EXECUTE format('GRANT SELECT, INSERT, UPDATE ON platform.outbox_sequence TO %I', host);
         END IF;
+        -- CR-339: every host's kernel reads and creates the tenant's field keys and reads re-hash progress.
+        IF to_regclass('platform.tenant_field_key') IS NOT NULL THEN
+            EXECUTE format('GRANT SELECT, INSERT, UPDATE ON platform.tenant_field_key TO %I', host);
+        END IF;
+        IF to_regclass('platform.blind_index_rehash') IS NOT NULL THEN
+            EXECUTE format('GRANT SELECT, INSERT, UPDATE ON platform.blind_index_rehash TO %I', host);
+        END IF;
     END LOOP;
 
     -- The register is the migrator's alone.

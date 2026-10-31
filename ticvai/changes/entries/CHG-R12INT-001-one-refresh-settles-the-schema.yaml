@@ -1,0 +1,45 @@
+id: CHG-R12INT-001
+date: '2026-10-31'
+source: audit
+kind: process
+summary: 'One refresh now settles the schema. refresh.sh writes the screen index (now tools/build-screen-index.py, the
+  inline block moved as it was) before derive-relationships as well as at the end, runs derive-schema a second time on
+  the relationship graph just derived, before derive-ddl, and runs derive-schema-roots before derive-table-notes as well
+  as after. Each was a step reading a later step''s previous output, so a column, table or screen link added in a
+  refresh reached the derived files only on the next one.'
+decision:
+  what: 'The lead''s brief for r12 (30 October 2026): "If I rebuild from scratch it should never have these or all our
+    prior logged errors". A released tree must regenerate to itself (CHG-R12GT-004).'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'Finding: the r12 integration refresh (fix/r12-integration at 6c63145d, 31 October) failed
+  check-regenerate-twice --chain: a second run wrote backend/control/V0122 (indexes on control.release
+  status_changed_by_principal_id and withdrawal_approved_by_principal_id, CR-356''s new columns), gave those columns
+  their identity.principal convention reference in the schema reference, added the "Hangs off" line to CR-339''s two new
+  tables'' notes, and moved five screens (WEB-020, GST-073, CMS-030, WEB-023, GST-015) in the relationship graph''s
+  table-to-screen lists. derive-schema reads relationship-graph.json, which derive-relationships writes after it;
+  derive-relationships reads handoff/screen-index.json, which the end of refresh.sh wrote; derive-table-notes reads the
+  schemaRoot derive-schema-roots writes after it. Shown the same day: from the pre-refresh tree, the new order gives
+  the settled schema reference and relationship graph in one pass, and control''s V0120 carries the two indexes, so no
+  later migration is needed for them.'
+keys_touched:
+  tables:
+  - control.release
+  - platform.tenant_field_key
+  - platform.blind_index_rehash
+  files:
+  - tools/refresh.sh
+  - tools/build-screen-index.py
+root_class: 'a refresh step reading a later step''s previous output, so a release''s own change settles one refresh late
+  and its indexes ship in the next release''s migration'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r12 integration gate, 31 October 2026'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-regenerate-twice.py
+status: open
