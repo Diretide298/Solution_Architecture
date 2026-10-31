@@ -695,3 +695,13 @@ changes:
     on 30 October 2026, option (a)) gives the card that price as Product.fromPrice. The record is brought in line with
     the approved frame; what the client sees does not change.'
   change: CHG-CR358-001
+- screen: GST-008
+  field: 'state:loading'
+  to: 3c17c196844eb2c3
+  approval: 'ADAM CR-349 (raised by Chitrangi Mestry on #31775, 30 October 2026; settled 30 October 2026 by Chinmay, as
+    recommended with one condition): the lead''s rule of 28 October 2026 that frontend developers change a screen''s
+    design on their own, with no change behind it, and log it in ADAM, after which the lead updates the wireframe, the
+    screen''s UI and its page info (written into the frontend starter in 28eb978d); this CR is that log. GST-008 as
+    built: the mascot-only loader, with no venue tile or venue name; the booking-flow settings still drive the cards and
+    the step line'
+  change: CHG-CR349-001

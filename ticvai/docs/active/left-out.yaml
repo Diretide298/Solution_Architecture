@@ -164,3 +164,17 @@ items:
   owner: Chinmay
   added: '2026-10-30'
   change: CHG-CR366-001
+- id: LO-CR346-001
+  kind: deferred
+  platform: P08
+  screens: [BO-799]
+  what: 'A list of the callbacks due for the assigned agent (RFP 2.8.10 "reminders"): the conversations whose
+    callback_at is due and whose callback_assigned_to_principal_id is the agent. setCallDisposition stores the callback
+    (ADAM CR-346); no read lists due callbacks, and no screen shows them.'
+  source: 'ADAM CR-346 (#33522 setCallDisposition), decided 30 October 2026; RFP 2.8.10 (sources/requirements/Ticvai_matrix_20260621_2.xlsx); CHG-CR346-001'
+  reason: the decision stores the callback and ends the conversation; a due-callbacks read and where an agent sees it
+    were not part of it, and inventing one would be a read and a screen nobody decided
+  target: 'r13 or later: a due-callbacks read for the agent workspace, decided by the lead'
+  owner: Chinmay
+  added: '2026-10-30'
+  change: CHG-CR346-001

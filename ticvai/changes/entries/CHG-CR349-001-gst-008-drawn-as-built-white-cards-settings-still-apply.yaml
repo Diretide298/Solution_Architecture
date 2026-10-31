@@ -1,0 +1,53 @@
+id: CHG-CR349-001
+date: '2026-10-30'
+source: cr
+kind: spec
+summary: 'GST-008 Tickets & Add-ons is drawn and specified as the guest-app build on #31775: the venue''s hero photo
+  under a dark overlay, white rounded ticket cards (photo beside the details when shut, across the top when open), the
+  Choose your tickets title over Step n of m and the step line, no expand hint, and a mascot-only loader; and the screen
+  still follows the published booking-flow settings (every cardLayout and cardSize drawn with the white card, tags only
+  with ticketTags, descriptions only with cardInfo, the step line in stepIndicator''s style, none hiding it).'
+decision:
+  what: 'ADAM CR-349 (Chinmay, 30 October 2026, posted: "as you recommended, with one condition. Design change, logged
+    under the rule of 28 October 2026 ... The condition: the screen still follows the published booking-flow
+    settings"), after the lead''s review of every CR ("for each one actually check if they hold and if not then find
+    out the best way keeping in mind what client needs"). wireframes/frames/gst-008.html (and its copy
+    wireframes/incoming/P02-mobile-v4/gst-008.html): the frame redrawn from the CR''s description of the build in the
+    guest-app look, with the open and shut cards, the loader, cardsAcross with dots, posterCards with no step line,
+    ticketTags and cardInfo off, error, first-run, offline and Arabic. screens/P02 GST-008: notes, the ticket types''
+    and step line''s notes, the loading state''s text, wireframe.note and prototype.differences (match stays partial).
+    screens/_state-patterns.yaml: a P02 mascot-loader pattern (the splash''s mascot and message, frame gst-008) mapped
+    to GST-008''s loading, so its stateViews loading is P02/mascot-loader. docs/active/approved-ui-changes.yaml: the
+    changed loading state, as CR-349. tools/capture-plans/guest-mobile-v4.json: GST-008 is pending, not captured.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-349 (Chitrangi Mestry, #31775 GST-008, 30 October 2026): the build differs from the client-verified frame
+  in look; the lead''s rule of 28 October 2026 (frontend starter, 28eb978d) lets the developer change it and log it.
+  GST-008 is drawn from settings the CMS publishes (rev 3 DG-6, 23SEP-3, 23SEP-6), so the new look is accepted as the
+  way those settings are drawn, not as a replacement for them.'
+keys_touched:
+  screens: [GST-008]
+  operations: [listProductVariants, getPublishedBookingFlow]
+  files:
+  - wireframes/frames/gst-008.html
+  - wireframes/incoming/P02-mobile-v4/gst-008.html
+  - screens/P02-guest-mobile-app.yaml
+  - screens/_state-patterns.yaml
+  - docs/active/approved-ui-changes.yaml
+  - tools/capture-plans/guest-mobile-v4.json
+root_class: a frontend design change logged after the build, brought back into the package's frame and screen record
+tickets:
+  started:
+  - '31775 (GST-008, Chitrangi Mestry): check that cardLayout, cardSize, cardInfo, ticketTags and stepIndicator still
+    take effect; nothing else to do.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-349
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py
+status: open
+notes: 'tools/check-state-views.py holds the new mascot-loader pattern to the prototype''s splash text and to the
+  board''s gst-008 frame.'

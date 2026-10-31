@@ -1,0 +1,40 @@
+id: CHG-CR350-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'restoreConfigVersion restores everything: a homepage section whose contentPageId names no content page comes
+  back with contentPageId null and isVisible false, a navigation item whose target names a missing page comes back with
+  isVisible false, and content_page.is_referenced is set for the pages the restored homepage and navigation link. A
+  missing page never causes a refusal or a 500; no new field or problem type.'
+decision:
+  what: 'ADAM CR-350 (Chinmay, 30 October 2026, posted: "not as recommended: restore everything, and hide whatever
+    points at a page that no longer exists"), after the lead''s review of every CR ("for each one actually check if they
+    hold and if not then find out the best way keeping in mind what client needs"). contracts/satellite/white-label.yaml
+    restoreConfigVersion: a description paragraph. tools/check-business-rules.py BR-RESTORE-MISSING-PAGE.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-350 (Narayan Gaonkar, #30775 restoreConfigVersion): a page only an older version linked can be deleted,
+  and restoring that version would fail the homepage_section foreign key with a 500. Refusing (option A) would block
+  the version for good, because a recreated page gets a new id; rollback is restore, review, publish (R139, CMS-015).'
+keys_touched:
+  operations: [restoreConfigVersion]
+  tables: [whitelabel.homepage_section, whitelabel.navigation_item, whitelabel.content_page]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: 'a restore of a snapshot whose references may name rows deleted since, with no stated outcome'
+tickets:
+  started:
+  - '30775 (restoreConfigVersion, Narayan Gaonkar): build to the decision.'
+  - '31098/31099 (CMS-015 build and wire), if started: nothing changes on the screen.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-350
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'restoreConfigVersion''s tenancy#activeVenues read moved in process under CR-343 (CHG-CR343-001, XDR-022); its
+  orders#venueChargeCurrencies service read is a separate open gap.'

@@ -396,8 +396,12 @@ x-ticvai-queries:
       tree (platform.scope, level venue) has is_active true. Tenancy answers for the tenant whose database the caller
       is connected to, under the caller's scope. White Label refuses a venueId that is absent (setAnalyticsProvider,
       422) and lists only these venues in TenantAppStatus.venues. It is asked from another deployable through
-      Tenancy's service route (serviceAuth).
-    served: [service]
+      Tenancy's service route (serviceAuth). The operations host asks it in process, through Tenancy's own query
+      class and under the caller's row-level security, for validateTenantConfig, publishTenantConfig,
+      restoreConfigVersion, setAnalyticsProvider and setMaintenanceMode (ADAM CR-343, 30 October 2026; XDR-022;
+      CHG-CR343-001): platform.scope is a kernel table every host's role may read (CR-002), as CR-296 ruled for
+      Tenancy's other reads, so no grant is added.
+    served: [in-process, service]
 paths:
   /tenant-domains/{hostname}:
     parameters:
@@ -2808,9 +2812,15 @@ paths:
         unprovisioned is a device that will fail at the gate on its first morning, and the two states are
         never usefully apart.
 
-        The transitions are the matrix''s own: registered → enrolled → provisioned → active →
-        deactivated → retired. **Retirement revokes the credential** — a retired device whose certificate
-        still validates is a spare key in a drawer.
+        **The moves are one step at a time** (ADAM CR-354, option A, 30 October 2026; CHG-CR354-001;
+        states/device-enrolment.yaml). registered → enrolled (needs the enrolment code); enrolled →
+        provisioned (records `testResult`); provisioned → active (needs `approvalStatus` approved, else
+        `409 device-approval-required`); active → deactivated; deactivated → active (reactivation; the
+        approval still holds); and any state except retired → retired. `retired` is terminal. Any other
+        move is `409 device-transition-not-allowed`, including skipping a step and moving to the state the
+        device is already in. Each successful move emits `device.enrolmentChanged` with `fromState` and
+        `toState`. **Retirement revokes the credential and sets `retired_at`** — a retired device whose
+        certificate still validates is a spare key in a drawer.
 
 
         **The enrolment code and the approval gate** (decided 2 October 2026, Chinmay, critical set 1,
@@ -2848,10 +2858,12 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: The transition is not allowed from the current state, or the move to `active` comes
-            before the device is approved (`device-approval-required`; CHG-CSP-011).
+          description: The move to `active` comes before the device is approved (`device-approval-required`;
+            CHG-CSP-011), or the move is not one states/device-enrolment.yaml allows from the current state,
+            a skipped step or the current state included (`device-transition-not-allowed`; ADAM CR-354).
           x-ticvai-problem-types:
           - device-approval-required
+          - device-transition-not-allowed
           content:
             application/problem+json:
               schema:

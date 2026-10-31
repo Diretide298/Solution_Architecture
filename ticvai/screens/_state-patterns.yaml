@@ -208,6 +208,19 @@ platforms:
         draws: >-
           The whole phone frame in the brand colour with the venue's hero image faint behind: the venue's initial in a
           white rounded tile, the venue name, the mascot when the skin has one, and the message line.
+      # ADAM CR-349 (a design change logged by Chitrangi Mestry on #31775, 30 October 2026, settled by the lead):
+      # GST-008's loader is the splash's mascot and message only, on the venue's hero photo, with no venue tile or
+      # name. The look is the splash's; the frame is GST-008's own drawing on the board.
+      mascot-loader:
+        name: the mascot-only loader (GST-008 as built)
+        prototype: app
+        where: lines 1582-1590 (the splash's mascot, "{{ splash.mascot }}", and its message line), drawn without the
+          tile and the venue name on GST-008's frame
+        find: ['{{ splash.mascot }}', '{{ splash.msg }}']
+        frame: gst-008
+        draws: >-
+          The venue's hero photo under a dark overlay with only the mascot, bobbing, and the message line
+          ("Loading..."); no venue initial tile and no venue name.
       dashed-note:
         name: the dashed empty note
         prototype: app
@@ -361,6 +374,8 @@ platforms:
     screens:
       GST-047:
         maintenance: maintenance-page
+      GST-008:
+        loading: mascot-loader
 
   P04:
     name: Venue POS

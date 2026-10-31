@@ -42,6 +42,7 @@ prevention:
   type: check
   ref: tools/check-business-rules.py
 status: open
+breaking_change: 'BC-499 in docs/active/breaking-changes.yaml (pageKey string -> uuid), added at the r12 integration'
 notes: 'BR-CONTENT-PAGE-KEY fails on the r11 contract and passes now. CMS-007''s change is to two components'' notes
   (invisible metadata; check-approved-ui compares none), so the approved screen does not change. No column. Nothing
   beyond the comment''s words.'

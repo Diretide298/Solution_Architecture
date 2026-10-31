@@ -386,7 +386,9 @@ x-ticvai-queries:
       deployable through Catalogue's service route (serviceAuth).
       It is asked in process by the workers host for the consumers it runs, issueOrderEntitlements among them (ADAM
       CR-167; ADR-0055, amended 25 October 2026). It is asked in process by the operations host for
-      createFnbOrder's productCategory routing match (ADAM CR-277, option A, 28 October 2026; XDR-008).
+      createFnbOrder's productCategory routing match (ADAM CR-277, option A, 28 October 2026; XDR-008), and for
+      validateTenantConfig's and publishTenantConfig's bookingFlowMissing, where {venueId} for each active venue
+      (ADAM CR-343, 30 October 2026; XDR-022).
     served: [in-process, service]
   # **Which products list an asset** (ADAM CR-309, option (b), Chinmay, 29 October 2026; CHG-CR309-001). Assets'
   # deleteMediaAsset (operations host) refuses 409 in-use while a product lists the asset, and productRecords answers

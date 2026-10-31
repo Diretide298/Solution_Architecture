@@ -2556,6 +2556,21 @@ paths:
       description: 'BL-082. **A conversation could be closed and nothing recorded why**, so every one
         looked identical in a report — and a promise to ring back lived in somebody''s notebook.
 
+
+        **Stored on the conversation** (ADAM CR-346, options A and C, 30 October 2026; CHG-CR346-001): one
+        disposition per conversation, in `marketing.conversation`''s `disposition_outcome`, `callback_at`,
+        `callback_assigned_to_principal_id` and `disposition_note`. A later call replaces them (serverWins).
+        `Conversation.outcome` keeps its own meaning.
+
+
+        **It also ends the conversation**, because BO-799''s End conversation button is this call. From
+        `withAgent` or `waitingOnGuest` it moves the conversation to `resolved`, sets `closed_at` to now and
+        `Conversation.outcome` to `resolved`, and records the disposition, in the same transaction. On a
+        conversation already `resolved`, `abandoned` or `timedOut` it only records or replaces the
+        disposition. `withAssistant` or `queued` (no agent holds it) is `409` `conversation-not-ended`.
+        `outcome` `callbackScheduled` without `callbackAt` is `400` `validation` on `callbackAt`. A scheduled
+        callback changes nothing on the case. The answer is `200` with the `CallDisposition` as stored.
+
         '
       tags:
       - marketing
@@ -2583,8 +2598,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CallDisposition'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          description: 'The conversation has not ended (`withAssistant`, `queued`, `withAgent` or `waitingOnGuest`); a disposition records why it ended. Nothing is recorded.'
+          description: 'No agent holds the conversation (`withAssistant` or `queued`), so there is nothing to end
+            and no disposition to record (ADAM CR-346). Nothing is recorded.'
           x-ticvai-problem-types: [conversation-not-ended]
           content:
             application/problem+json:
@@ -24219,12 +24237,22 @@ components:
         no sale, sale successful. **That is the measure a contact centre runs on**, and its absence makes
         every conversation look identical in a report.
 
+
+        **Stored on the conversation it describes** (ADAM CR-346, 30 October 2026; CHG-CR346-001): four
+        nullable columns of `marketing.conversation`, written by `setCallDisposition`; a later call replaces
+        them. `outcome` lands in `disposition_outcome`, never in the conversation''s own `outcome`.
+
         '
+      x-ticvai-persistence: marketing.conversation
       required:
       - outcome
       properties:
         outcome:
           type: string
+          x-ticvai-column: disposition_outcome
+          x-ticvai-column-nullable: true
+          description: The contact-centre result. Required on the call; stored nullable, because a conversation
+            has no disposition until `setCallDisposition` records one.
           enum:
           - information
           - resolved
@@ -24239,17 +24267,24 @@ components:
           type: string
           format: date-time
           nullable: true
+          x-ticvai-column: callback_at
           description: '**An agent could not schedule a callback with the case attached**, so a promise
             to ring back lived in somebody''s notebook.
+
+
+            Required when `outcome` is `callbackScheduled` (`400` `validation` on `callbackAt`; ADAM CR-346).
 
             '
         callbackAssignedToPrincipalId:
           type: string
           format: uuid
           nullable: true
+          x-ticvai-column: callback_assigned_to_principal_id
+          x-ticvai-references: identity.principal
         note:
           type: string
           nullable: true
+          x-ticvai-column: disposition_note
     TouchPoint:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestIntelligence, getGuestTimeline
       type: object
