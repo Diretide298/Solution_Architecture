@@ -1,0 +1,46 @@
+id: CHG-R12PL-012
+date: '2026-10-30'
+source: cr
+kind: plan
+proposed: '2026-10-30'
+summary: 'setAnalyticsProvider and setMaintenanceMode no longer wait on KERNEL-SERVICE-AUTH: the read they needed it for,
+  tenancy#activeVenues, is asked in process.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: operationWaits loses setAnalyticsProvider and setMaintenanceMode, KERNEL-SERVICE-AUTH''s
+    `builds` loses the two operations, and its text no longer lists them among the operations that wait for it (it says
+    why); operationWaitsNote records it. Plan change waived from the cooling-off by the lead (31 October 2026: "Waive for
+    r12").'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-343; the lead''s decision of 30 October 2026 changes CR-281''s statement (CHG-R11PLN-001) that #30765 and
+  #30766 wait for service sign-in: they waited only for tenancy#activeVenues, which every host may now ask in process.'
+keys_touched:
+  tickets:
+  - KERNEL-SERVICE-AUTH (37051)
+  operations:
+  - setAnalyticsProvider
+  - setMaintenanceMode
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR that changes a hand-written plan task's text or waits
+tickets:
+  started:
+  - '37051 (KERNEL-SERVICE-AUTH, Ready for QA, Pranay Shinde): its OpenProject text is not rewritten; nothing to build:
+    the two operations leave its list'
+  - '30765 (setAnalyticsProvider, Ready for QA, Deep Khanvilkar): ask tenancy#activeVenues in process; the hand-made follows
+    link to #37051 stays (the apply prunes only links between two plan tasks), for the lead to remove'
+  unstarted:
+  - '30766 (setMaintenanceMode, New, Deep Khanvilkar): ask tenancy#activeVenues in process; no longer waits on #37051'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-343
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open

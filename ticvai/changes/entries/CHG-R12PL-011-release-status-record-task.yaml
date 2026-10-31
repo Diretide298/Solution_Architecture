@@ -1,0 +1,54 @@
+id: CHG-R12PL-011
+date: '2026-10-30'
+source: cr
+kind: plan
+proposed: '2026-10-30'
+summary: 'A [DB] task for CR-356: control.release records the status reason, who changed it and when, and who approved a
+  withdrawal.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: a new [DB] task CR356-DB-RELEASE-STATUS (Hrushikant Patkar, epic PLATFORM,
+    not before 2 November 2026), the database work of #34047 (MIG-CONTROL-5#control.release), following MIG-CONTROL-5: status_reason,
+    status_changed_by_principal_id, status_changed_at and withdrawal_approved_by_principal_id in the control database. Its
+    text carries the decision''s statements and names the release''s forward migration as its Source DDL after r1. Plan
+    change waived from the cooling-off by the lead (31 October 2026: "Waive for r12").'
+  by: Chinmay
+  date: '2026-10-30'
+why: ADAM CR-356; the lead's decision of 30 October 2026, posted on the ticket. The ticket the work belongs to has started
+  or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the release apply makes (no
+  ticket is made through the API).
+keys_touched:
+  tickets:
+  - CR356-DB-RELEASE-STATUS (new)
+  tables:
+  - control.release
+  operations:
+  - rejectRelease
+  - withdrawRelease
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started: []
+  unstarted:
+  - '34047 ([DB] control.release, New, Hrushikant Patkar): the columns are CR356-DB-RELEASE-STATUS''s'
+  - '34126 (rejectRelease) and 34127 (withdrawRelease), New, Sanket Keluskar: write them as decided'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-356
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task (epics, app-module features, tasks, then the sub-tasks build-service-docs
+  makes), so the ticket the brief names as parent is recorded in the task''s text; its OpenProject parent is the app-module
+  the plan places it in, and it follows the migration that creates its table(s). It changes tables another migration creates,
+  so it is marked `area: database` (the Database track, a [DB] ticket) and its key does not end in -DB: a -DB task''s `table`
+  builds count as created by it (ticket_done.hand_db_tables, CHG-R8MIG-016), which took identity.guest_verification_policy,
+  marketing.waiver_signature and control.release off MIG-IDENTITY-2, MIG-MARKETING-2 and MIG-CONTROL-5 in the first build
+  (check-migration-wording MW-AFTER-R1).'

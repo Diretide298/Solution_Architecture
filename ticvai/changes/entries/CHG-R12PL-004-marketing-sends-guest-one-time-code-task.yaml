@@ -1,0 +1,51 @@
+id: CHG-R12PL-004
+date: '2026-10-30'
+source: cr
+kind: plan
+proposed: '2026-10-30'
+summary: 'A Marketing back-end task for CR-370: sendGuestOneTimeCode, invoked by the relay on identity.guestCodeIssued,
+  and the seeded guestOneTimeCode system template.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: a new task CR370-GUEST-ONE-TIME-CODE (epic PLATFORM, `pool: backend`, 3 points,
+    not before 2 November 2026) that claims the operation sendGuestOneTimeCode (`operations`, so no task of the operation
+    formula builds it too) and seeds the system template guestOneTimeCode; it follows PLATFORM-KERNEL, PLATFORM-OUTBOX,
+    KERNEL-FIELD-ENC (it decrypts the destination and code) and MIG-MARKETING. Plan change waived from the cooling-off by
+    the lead (31 October 2026: "Waive for r12").'
+  by: Chinmay
+  date: '2026-10-30'
+why: ADAM CR-370 (ADR-0063 field encryption); the lead's decision of 30 October 2026, posted on the ticket, names a new
+  Marketing child task for sendGuestOneTimeCode and the seeded template.
+keys_touched:
+  tickets:
+  - CR370-GUEST-ONE-TIME-CODE (new)
+  tables:
+  - marketing.message_dispatch
+  operations:
+  - sendGuestOneTimeCode
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started: []
+  unstarted:
+  - '30659 (requestGuestOtp, New) and 30658 (registerGuest, New), Hrushikant Patkar; 30676 (verifyGuestEmail, New, Chinmay
+    Patkar): write identity.guestCodeIssued as decided (the CR''s ticket comments)'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-370
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'Owner: the brief named the developer of the marketing tasks around #30690/#30697, but those are the wire sub-tasks
+  of WEB-013 and WEB-016 (frontend: Chinmay Patkar, Chitrangi Mestry), not Marketing back-end tasks, and MarketingService''s
+  back end has no single owner (no serviceOwners entry; its tasks are spread over seven developers). So the task is left
+  to the plan''s default owner rule, `pool: backend` (the least-loaded back-end developer), for the lead to change. sendGuestOneTimeCode
+  is added to the contracts by the CR lane (CHG-CR370-001); until that merges, the claim names no operation the plan has
+  and the task sits in the Platform kernel app-module; after it, the task''s operation places it in Marketing''s.'

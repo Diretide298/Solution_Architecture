@@ -4045,6 +4045,21 @@ def main() -> int:
     for n_ in notes:
         print(f"key stability: {n_}")
     print(f"key stability: {len(renamed)} planned keys written under the key their work was pushed as")
+    # **A started migration never waits on a new hand-written [DB] task** (31 October 2026, CHG-R12PL-008; the
+    # started-ticket rule of CHG-R9UI-001). A forward migration waits on every earlier migration of its schema, a
+    # hand-written [DB] task's included (its tables are in mig_of, CHG-R8MIG-016), so CR339-FIELD-KEY-TABLES-DB, which
+    # creates two new platform tables, made MIG-PLATFORM-4 (#29202, Ready for QA) follow it. Here, under the keys the
+    # tickets were pushed with, a Database task whose ticket has started drops a wait on a hand-written task that has
+    # no ticket yet; a pushed hand-written task (PRD-W1-DB) keeps its waits as they are.
+    hand_new_ = set(hand_db.values()) - set(kmap_early)
+    if hand_new_:
+        started_mig_ = started_plan_keys()
+        for t_ in tasks:
+            if t_["type"] == "Task" and t_["track"] == "Database" and t_["key"] in started_mig_:
+                deps_ = t_["dependsOn"].split()
+                if set(deps_) & hand_new_:
+                    print(f"started migration {t_['key']} not made to wait on {', '.join(sorted(set(deps_) & hand_new_))}")
+                    t_["dependsOn"] = " ".join(d_ for d_ in deps_ if d_ not in hand_new_)
 
     # **Every forward migration names its file** (3 October, CHG-TBF-002; Block A audit pattern 6). Until now only the
     # first release's migrations had a file name (V0002-V0099, in schema order) and the 135 forward migrations of the

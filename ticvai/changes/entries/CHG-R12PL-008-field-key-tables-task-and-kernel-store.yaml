@@ -1,0 +1,62 @@
+id: CHG-R12PL-008
+date: '2026-10-30'
+source: cr
+kind: plan
+proposed: '2026-10-30'
+summary: A [DB] task for CR-339 creating platform.tenant_field_key and platform.blind_index_rehash, and KERNEL-FIELD-ENC's
+  text says where wrapped keys live and how each kind of blind index rotates.
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: a new [DB] task CR339-FIELD-KEY-TABLES-DB (Hrushikant Patkar, epic PLATFORM,
+    not before 2 November 2026), the database work of #27665 (MIG-PLATFORM), following MIG-PLATFORM: the two tables with
+    their unique keys, row security any-grant-no-delete and grants to the commerce, access, operations and workers roles;
+    it is their migration (`builds` table, CHG-R8MIG-016). Its text carries the decision''s statements and names the release''s
+    forward migration as its Source DDL after r1. Plan change waived from the cooling-off by the lead (31 October 2026:
+    "Waive for r12"). KERNEL-FIELD-ENC (#37050) detail: the key store on platform.tenant_field_key (INSERT ... ON CONFLICT
+    DO NOTHING on first use, unwrap by wrapping_key_id), data-key rotation to decryptOnly, the re-hash of marketing.guest_device.token_fingerprint
+    tracked in platform.blind_index_rehash, the one-way blind indexes kept by version for lookup, Key Vault soft-delete
+    and purge protection, and its Done when.'
+  by: Chinmay
+  date: '2026-10-30'
+why: ADAM CR-339 (ADR-0063); the lead's decision of 30 October 2026, posted on the ticket. The ticket the work belongs to
+  has started or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the release apply
+  makes (no ticket is made through the API).
+keys_touched:
+  tickets:
+  - CR339-FIELD-KEY-TABLES-DB (new)
+  - KERNEL-FIELD-ENC (37050)
+  tables:
+  - platform.tenant_field_key
+  - platform.blind_index_rehash
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/build-service-docs.py
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started:
+  - '27665 ([DB] V0017__platform.sql, Ready for QA, Hrushikant Patkar): not rewritten; the tables are CR339-FIELD-KEY-TABLES-DB''s'
+  unstarted:
+  - '37050 (KERNEL-FIELD-ENC, New, Pranay Shinde): build the key store and the re-hash as decided; its plan text carries
+    the decision. KERNEL-FIELD-ENC is not made to wait on CR339-FIELD-KEY-TABLES-DB: the decision has it build behind its
+    key-store abstraction until the tables land'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-339
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task (epics, app-module features, tasks, then the sub-tasks build-service-docs
+  makes), so the ticket the brief names as parent is recorded in the task''s text; its OpenProject parent is the app-module
+  the plan places it in, and it follows the migration that creates its table(s). The two tables are new, so this task is
+  their migration (a -DB key, CHG-R8MIG-016). The two tables come into the contracts with the CR lane (CHG-CR339-001); until
+  that merges, this tree''s check-ticket-builds cannot resolve `table platform.tenant_field_key` and `table platform.blind_index_rehash`.
+  Generator rule (tools/build-service-docs.py, the forward-migration waits): every later forward migration of a schema waits
+  on the schema''s earlier migrations, a hand-written [DB] task''s included, so this task made MIG-PLATFORM-4 (#29202, Ready
+  for QA) follow it; a started forward migration is now never made to wait on a hand-written [DB] task the release has not
+  ticketed yet (the started-ticket rule of CHG-R9UI-001), and a pushed one (PRD-W1-DB) keeps its waits.'
