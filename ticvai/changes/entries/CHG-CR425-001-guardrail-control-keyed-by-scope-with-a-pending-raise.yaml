@@ -1,0 +1,77 @@
+id: CHG-CR425-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'setDynamicPricingGuardrailPolicy is keyed by [scopeLevel, scopeId]; a missing scopeId below global is 422
+  scope-id-required, a scopeId at global 400 validation, one naming no visible row of its level 422 scope-not-found
+  (market a pricing_market id, channel a sales_channel id, the CR-417 match). A raise to conditionalAutonomous or
+  autonomous keeps the current level and waits in the new pending_automation_level and pending_approval_request_id
+  (readOnly pendingAutomationLevel and pendingApprovalRequestId), its request opened in process as CR-415 opens its
+  own (422 no-approval-route); Catalogue''s approval consumer applies or clears it; a later different level cancels it
+  in process (CR-421). authorityTiers, noChangeWindows and circuitBreakers are typed arrays.'
+decision:
+  what: 'ADAM CR-425, posted 31 October 2026 on #35172: "Decided (Chinmay, 31 October 2026): as you recommended, with
+    the scope match taken from CR-417. The record is keyed by scopeLevel and scopeId (x-ticvai-body-key [scopeLevel,
+    scopeId]). The 400 note goes. A missing scopeId below global is 422 scope-id-required. At global, scopeId must be
+    absent or null, or the call answers 400 validation on scopeId. ... A scopeId that names no row of its level the
+    caller can see is 422 scope-not-found. ... Raising automationLevel to conditionalAutonomous or autonomous keeps the
+    row''s current level. It writes the requested level to pending_automation_level and the request to
+    pending_approval_request_id. ... Catalogue''s approval consumer (CR-415) handles this subjectType. ... A later save
+    that asks for a different level cancels the open request in process, as in CR-421. ... DynamicPricingControl gains
+    readOnly pendingAutomationLevel and pendingApprovalRequestId. authorityTiers, noChangeWindows and circuitBreakers
+    are arrays of the objects their descriptions list. Until IApprovalRequests exists (#30848), a raise fails, as you
+    built it." Built into r12 on the lead''s instruction of 31 October 2026: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-425 (Hrushikant Patkar, #35172): a missing scopeId was both 400 validation (the body-key note) and 422
+  scopeIdRequired (the description); a market control''s scope_id is a uuid while a strategy''s market_code is text;
+  a raise "applies only when approved" with nothing to keep the pending level and no Catalogue consumer of the approval
+  events; and three jsonb lists were typed object. The CR-417 scope match and the CR-415 consumer are the shared
+  pricing model.'
+keys_touched:
+  screens: [ADM-095, ADM-096, ADM-114]
+  operations: [setDynamicPricingGuardrailPolicy]
+  schemas: [DynamicPricingControl]
+  tables: [catalogue.dynamic_pricing_control, catalogue.pricing_market, catalogue.sales_channel]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/approvals.yaml
+  - events/approval-granted.yaml
+  - events/approval-rejected.yaml
+  - events/approval-withdrawn.yaml
+  - events/approval-expired.yaml
+  - handoff/api-data-lineage-overrides.json
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'BC-564 (setDynamicPricingGuardrailPolicy: authorityTiers, noChangeWindows, circuitBreakers object to array),
+    approved by the posted decision'
+root_class: 'one refusal answered two ways; an approval-gated change with nowhere to wait and no consumer to apply it'
+tickets:
+  started:
+  - '35172 (setDynamicPricingGuardrailPolicy): key by scopeLevel and scopeId; check market and channel scopeIds against
+    pricing_market and sales_channel (422 scope-not-found); keep a raise pending in the two new columns, raised as
+    CR-415''s requests are; handle subjectType dynamicPricingControl in the shared catalogue approval consumer; type
+    the three lists as arrays.'
+  - '30848 (createApprovalRequest / IApprovalRequests): a raise waits on it; also add CancelAsync (CR-421).'
+  unstarted:
+  - 'A [DB] child task of the catalogue MIG ticket (MIG-CATALOGUE, #27671) for Hrushikant: catalogue.dynamic_pricing_control
+    gains pending_automation_level text (nullable, CHECK in advisory, humanInTheLoop, conditionalAutonomous,
+    autonomous) and pending_approval_request_id uuid (nullable, with its index
+    dynamic_pricing_control_pending_approval_request_id_idx), applied to the live tenant databases too (filed by the
+    plan lane).'
+  - 'VM-ADM-095 (#29742), APP-SETUP-ADM-095-REST (#35710), VM-ADM-096 (#29836) and VM-ADM-114 (#29747) move to r12
+    with BC-564.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-425
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUARDRAIL-SCOPE
+status: open
+notes: 'derive-ddl writes the two columns and an index on pending_approval_request_id into the next forward migration
+  (seen in this lane''s regeneration, then deleted for the integration refresh). The lineage override drops
+  platform.outbox from the write (the request is opened in process). Not in the package and not in the posted words:
+  cancelApprovalRequest publishes no event, so a request an approvals administrator cancels leaves the pending
+  columns set until the next save (the review''s note; an approval.cancelled event is for a later approvals change).'

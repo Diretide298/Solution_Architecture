@@ -1,0 +1,57 @@
+id: CHG-CR420-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'setPriceCalculationPolicy finds its record by the path''s calculationProfileId; a new id saves a new version
+  of its code, numbered one above the code''s highest version at the venue (1 for a new code), an existing id keeps its
+  version, a body code that differs is 409 calculation-profile-id-mismatch, and a body version is ignored. dependsOn
+  names earlier steps by sequence number as a string (422 invalid-sequence / circular-dependency); a step''s
+  calculationProfileId must equal the path id (400 validation); a second active default is 409
+  default-profile-exists. CalculationProfile is unique on (scopePath, code, version), which derive-ddl writes as
+  calculation_profile_scope_path_code_version_uniq.'
+decision:
+  what: 'ADAM CR-420, posted 31 October 2026 on #35159: "Decided (Chinmay, 31 October 2026): not as recommended: A,
+    with two changes. The record is found by the path''s calculationProfileId. A new id saves a new version of its
+    code, numbered one above the code''s highest version at the venue (1 for a new code). An existing id keeps its
+    version. A body code that differs from the existing row''s code is 409 calculation-profile-id-mismatch. ... dependsOn
+    names earlier steps by their sequence number, written as a string (\"1\", \"2\"). ... Change one: a save that
+    would leave two active isDefault profiles at the venue is 409 default-profile-exists, not 400. Change two: a
+    unique index on catalogue.calculation_profile (scope_path, code, version) backs the numbering, so two saves at
+    once cannot take the same number." Built into r12 on the lead''s instruction of 31 October 2026: "Include them in
+    r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-420 (Hrushikant Patkar, #35159): the description and the CR-245 path text found the record by code and
+  version while CalculationProfile.version is readOnly and ADM-074 does not send it; dependsOn named no step field;
+  "at most one isDefault active per venue" had no error; and server numbering had no unique index behind it (the
+  CR-300 approval matrix versions are the precedent).'
+keys_touched:
+  screens: [ADM-074]
+  operations: [setPriceCalculationPolicy]
+  schemas: [CalculationProfile, CalculationStep]
+  tables: [catalogue.calculation_profile, catalogue.calculation_step]
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: 'a write keyed on a readOnly field the client never sends; a numbering the server owns with no unique
+  index behind it'
+tickets:
+  started:
+  - '35159 (setPriceCalculationPolicy): keep the build; answer a second active default 409 default-profile-exists
+    instead of 400, and rely on the new unique index for the version number.'
+  unstarted:
+  - 'A [DB] child task of the catalogue MIG ticket that creates the table (MIG-CATALOGUE-6, #28492) for Hrushikant: CREATE UNIQUE INDEX
+    calculation_profile_scope_path_code_version_uniq ON catalogue.calculation_profile (scope_path, lower(code),
+    version), after checking the live tenant databases hold no duplicate (filed by the plan lane).'
+  - 'VM-ADM-074 (#29876) picks up the refusals at the next tag; its approved fields are unchanged.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-420
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CALC-PROFILE-VERSION
+status: open
+notes: 'derive-ddl writes the index as (scope_path, lower(code), version): a text code in a unique key is compared
+  case-insensitively by the generator''s rule, one step stricter than the posted (scope_path, code, version). The 400
+  for a step''s calculationProfileId is a declared response now (C-REFUSAL-UNDECLARED).'

@@ -1,0 +1,58 @@
+id: CHG-CR417-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'Both automation views answer automationLevel straight from automation_level; automationMode is retired from
+  DynamicPricingAutomationPolicyControlView and listDynamicPricingAutomation filters automationLevel. scopeLevel
+  answers and filters all eight levels, scopeId null at global; a market scopeId is a catalogue.pricing_market id (the
+  view''s market its market_code), a channel scopeId a catalogue.sales_channel id (the CR-410 key; channel its
+  sales_channel mapped as GPS-C39 maps it, null for api and backOffice). listDynamicPricingAutomation orders by
+  effectiveFrom ascending, NULLS LAST, then id; minAiConfidence is stored 0 to 1 and answered times 100. No new column.'
+decision:
+  what: 'ADAM CR-417, posted 31 October 2026 on #35184: "Decided (Chinmay, 31 October 2026): not as recommended: C, but
+    without new columns. Both views (listDynamicPricingAutomation and listAutomationPolicyAutonomous) answer
+    automationLevel (advisory, humanInTheLoop, conditionalAutonomous, autonomous), straight from automation_level.
+    automationMode is retired from DynamicPricingAutomationPolicyControlView, and listDynamicPricingAutomation''s
+    automationMode filter becomes an automationLevel filter. scopeLevel answers and filters all eight levels ... At
+    market, scopeId is a catalogue.pricing_market id ... At channel, scopeId is a catalogue.sales_channel id, the same
+    key pricing.dynamic_price_rule.channel_id uses (CR-410). ... The \"start\" in listDynamicPricingAutomation''s order
+    is effectiveFrom: ascending, NULLS LAST, then id. minAiConfidence is stored and written 0 to 1, and answered as a
+    percent, multiplied by 100." Built into r12 on the lead''s instruction of 31 October 2026: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-417 (Hrushikant Patkar, #35184): DynamicPricingAutomationPolicyControlView answered automationMode in
+  Board 5''s words with six scope levels, while catalogue.dynamic_pricing_control stores automation_level and eight
+  levels; DynamicPricingControl already rules automationLevel the one vocabulary. Both scopes already have a keyed
+  table (catalogue.pricing_market, catalogue.sales_channel), the channel key batch K settled under CR-410.'
+keys_touched:
+  screens: [ADM-096, ADM-114]
+  operations: [listDynamicPricingAutomation, listAutomationPolicyAutonomous]
+  schemas: [DynamicPricingAutomationPolicyControlView, AutomationPolicyAutonomousPricingOrchestratorView,
+            DynamicPricingControl]
+  tables: [catalogue.dynamic_pricing_control, catalogue.pricing_market, catalogue.sales_channel]
+  files:
+  - contracts/spine/catalogue.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'BC-560 (listDynamicPricingAutomation: automationMode and its filter removed, scopeLevel gains global and
+    performance) and BC-561 (listAutomationPolicyAutonomous: channel nullable), approved by the posted decision'
+root_class: 'a view vocabulary that differs from the table it projects (mode against level, six scopes against
+  eight), so the view cannot be read back from the row'
+tickets:
+  started:
+  - '35184 (the automation policy views): take channel and market from the pricing_market or sales_channel row scopeId
+    names; answer minAiConfidence multiplied by 100.'
+  - '35329 (listDynamicPricingAutomation): answer and filter automationLevel instead of automationMode, list all eight
+    scope levels, and order by effectiveFrom ascending, NULLS LAST, then id.'
+  unstarted:
+  - 'VM-ADM-096 (#29836) and VM-ADM-114 (#29747), not started: they move to r12 with BC-560 and BC-561.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-417
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRICING-AUTOMATION-LEVEL
+status: open
+notes: 'The strategy view''s automationMode (ADM-088, CR-423) is not retired here: see CHG-CR423-001.'

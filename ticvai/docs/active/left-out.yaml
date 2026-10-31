@@ -211,3 +211,80 @@ items:
   owner: Chinmay
   added: '2026-10-31'
   change: CHG-CR399-001
+- id: LO-CR416-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-113]
+  what: 'AiRecommendationReviewDecisionQueueView.actualRevenueResultPercent, the Feedback Loop''s actual revenue result
+    after an executed price. The member stays in the view and listRecommendationReviewDecision answers it null; every
+    other member of the queue is answered.'
+  source: 'ADAM CR-416 (#35228 listRecommendationReviewDecision), decided by Chinmay on 31 October 2026; CHG-CR416-001'
+  reason: 'nothing measures revenue after an execution yet: it needs the pricing outcome measurement, the same gap as
+    the scorecard (ADAM CR-418) and the performance KPIs (ADAM CR-407)'
+  target: 'when the AI engineers specify the price outcome measure (a Block A task, ADAM CR-418)'
+  owner: Chinmay, with the AI engineers
+  added: '2026-10-31'
+  change: CHG-CR416-001
+- id: LO-CR419-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-076]
+  what: 'PriceBreakdownCalculationSimulationExplainabilityView.aiInsights, the AI observations on a price simulation.
+    The member stays in the view and simulatePriceBreakdownCalculation answers it as an empty list; every other member
+    is answered by the rule CR-419 names.'
+  source: 'ADAM CR-419 (#35288 simulatePriceBreakdownCalculation), decided by Chinmay on 31 October 2026; CHG-CR419-001'
+  reason: no AI producer of simulation insights exists, and inventing one would be AI output nobody specified
+  target: 'when an AI producer for pricing simulation insights is specified (not scheduled)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR419-001
+- id: LO-CR423-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-088]
+  what: 'The testing status of a dynamic pricing strategy (pack p.75 lists Testing). DynamicPricingStrategyCommandCenterView.status
+    never answers testing and listDynamicPricingStrategy''s status filter no longer offers it; ready and scheduled are
+    derived, and the other statuses are as stored.'
+  source: 'ADAM CR-423 (#35286 listDynamicPricingStrategy), decided by Chinmay on 31 October 2026; CHG-CR423-001'
+  reason: 'a saved test case (catalogue.pricing_test_case) names no strategy, so no stored fact says a strategy is being
+    tested'
+  target: 'when a test case names the strategy it tests (a change request of its own; not scheduled)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR423-001
+- id: LO-CR407-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-116]
+  what: 'DynamicPricingPerformanceOptimizationAnalyticsView.incrementalRevenue, revenueUplift, marginUplift,
+    averageSellingPrice, conversion, attendance, occupancy, revenuePerAvailableCapacity, strategyRoi, successful and
+    negativeOutcome, and the priceTimeline points'' demand, occupancy, conversion, bookingVelocity and revenue; the
+    market level, the market filter, and the comparisons dynamicVsFixed, aiVsRules and aiVsHuman. Every member stays in
+    the view (ADM-116''s approved columns and its four comparison buttons are kept) and listDynamicPricingPerformance
+    answers these absent, not zero; the level, the filter and the three comparisons are refused 400 validation naming
+    the parameter. Every other member is answered from catalogue''s own tables by the rule CR-407 names.'
+  source: 'ADAM CR-407 (#35241 listDynamicPricingPerformance), decided by Chinmay on 31 October 2026; CHG-CR407-001'
+  reason: 'they need sales by node and period, a baseline rule or a measured outcome, and none is in the operation''s
+    tables: orders#salesOrderRecords returns order headers by id, no baseline rule is written, and nothing measures an
+    executed price''s outcome yet (the price outcome measure, ADAM CR-418); market has no single meaning in the tables
+    (dynamic_pricing_strategy.market_code is text, a control''s market is a scope id)'
+  target: 'r13 or later: a separate change request for a sales-by-node read with each KPI''s baseline rule, after the
+    AI engineers specify the price outcome measure (ADAM CR-418)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR407-001
+- id: LO-CR408-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-108, BO-1043, BO-1050]
+  what: 'RevenueOptimizationCommandCenterView.revenueRisk and RevenueOptimizationCommandCenterSummary.revenueAtRisk,
+    incrementalRevenueGenerated, optimizationSuccessRate and aiRevenueBrief. Every member stays (ADM-108''s approved
+    tiles and columns are kept) and listRevenue answers these five absent, not zero; rankBy revenueRisk falls back to
+    optimizationId. Every other figure is answered by the rule CR-408 names.'
+  source: 'ADAM CR-408 (#35287 listRevenue), decided by Chinmay on 31 October 2026; CHG-CR408-001'
+  reason: 'nothing stores their inputs yet: no risk amount is stored on a recommendation, no outcome of an executed
+    price is measured, and no generator writes the revenue brief'
+  target: 'the AI phase-2 dynamic pricing unit (AI-ENGINE-DYNAMIC-PRICING-AI) or a separate change request'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR408-001

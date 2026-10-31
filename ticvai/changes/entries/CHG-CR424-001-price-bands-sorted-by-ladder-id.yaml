@@ -1,0 +1,37 @@
+id: CHG-CR424-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'listDynamicPriceBand is sorted by ladderId ascending (a UUIDv7, so oldest first), with no other key and no
+  read of dynamic_pricing_strategy for it: a price ladder has no code.'
+decision:
+  what: 'ADAM CR-424, posted 31 October 2026 on #35328: "Decided (Chinmay, 31 October 2026): as you recommended.
+    listDynamicPriceBand is sorted by id ascending (a UUIDv7, so oldest first), with no other key and no read of
+    dynamic_pricing_strategy for it." Built into r12 on the lead''s instruction of 31 October 2026: "Include them in
+    r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-424 (Hrushikant Patkar, #35328): the order named `code`, but catalogue.price_ladder has no code and the
+  view no code member; a strategy has one ladder, so the strategy''s code would add a read only to sort.'
+keys_touched:
+  screens: [ADM-094]
+  operations: [listDynamicPriceBand]
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: 'an order that names a field neither the listed item nor its table has'
+tickets:
+  started:
+  - '35328 (listDynamicPriceBand): nothing to change; the build already sorts by id.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-424
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRICE-BAND-ORDER
+status: open
+notes: 'A class gap: check-contract-shapes C-PAGED-ORDER accepts any backticked name as the sort field, so an order on
+  a field neither the item nor any table it reads has passes. The rule here holds this operation only; a general rule
+  (the sort field is an item property or a column of a table the operation reads) is left to the class analysis.'

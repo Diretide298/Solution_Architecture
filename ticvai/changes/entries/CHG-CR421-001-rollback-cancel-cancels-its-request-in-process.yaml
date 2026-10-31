@@ -1,0 +1,58 @@
+id: CHG-CR421-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'cancelPricingRollback cancels, in the same transaction as the move to cancelled, the waiting approval request
+  its action''s approval_request_id names (pending, escalated, returned or informationRequested), through
+  IApprovalRequests.CancelAsync(requestId, reason) with the rollback''s reason, the move cancelApprovalRequest makes; a
+  request no longer waiting is left as it is. No catalogue event and no platform.outbox row (the lineage override
+  drops it). Catalogue''s approval consumer (CR-415) changes nothing for a rollback no longer requested or scheduled.
+  cancelApprovalRequest names the in-process move.'
+decision:
+  what: 'ADAM CR-421, posted 31 October 2026 on #35156: "Decided (Chinmay, 31 October 2026): not as recommended: an
+    in-process call, as ADR-0055 rule 3 has it and as CR-415 raises its request, and a cancellation rather than a
+    withdrawal. In the same transaction as the move to cancelled: if the action''s approval_request_id names a request
+    that is still waiting (pending, escalated, returned or informationRequested), cancel it through Approvals''
+    in-process API with the rollback''s cancel reason. For this, IApprovalRequests gains CancelAsync(requestId,
+    reason), which makes the move cancelApprovalRequest makes. ... No catalogue event is published and platform.outbox
+    is not written. Catalogue''s approval consumer (CR-415) changes nothing for a rollback that is no longer requested
+    or scheduled." Built into r12 on the lead''s instruction of 31 October 2026: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-421 (Hrushikant Patkar, #35156): cancelPricingRollback promised that an open approval request is
+  withdrawn but declared nothing that does it, and IApprovalRequests could only create. Approvals is a module of the
+  same commerce deployable (ADR-0055), so the in-process call inside the cancel''s transaction is the rule-3 route and
+  closes the window in which a cancelled rollback could still be approved.'
+keys_touched:
+  screens: [ADM-086]
+  operations: [cancelPricingRollback, cancelApprovalRequest]
+  tables: [catalogue.rollback_action, approvals.request]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/approvals.yaml
+  - events/approval-granted.yaml
+  - events/approval-rejected.yaml
+  - events/approval-withdrawn.yaml
+  - events/approval-expired.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: 'a promised cross-module side effect with no declared call, event or write'
+tickets:
+  started:
+  - '35156 (cancelPricingRollback): in the cancel''s transaction, cancel the waiting approval request through
+    IApprovalRequests.CancelAsync; drop the outbox write.'
+  - '30848 (createApprovalRequest, the approvals kernel interface): add CancelAsync(requestId, reason) to
+    IApprovalRequests, doing what cancelApprovalRequest does.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-421
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ROLLBACK-CANCEL
+status: open
+notes: 'The rollbackAction sentence sits in the catalogue consumer entries this lane adds to the four approval events
+  for subjectType dynamicPricingControl (CHG-CR425-001); batch K adds the same consumer for pricingRecommendation
+  (CR-415), and the integration merges the entries into one catalogue consumer. The lineage override entry keeps its
+  carried mark with one write fewer.'

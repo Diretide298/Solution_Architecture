@@ -92,7 +92,8 @@ RULES = {
     "C-PROSE-SPLIT": "a word split in contract prose (R138)",
     "C-TWO-IDEMPOTENCY": "a body idempotency key beside the Idempotency-Key header (R153)",
     "C-SEARCH-PARAM": "a search/q parameter that says nothing about what it matches (R182)",
-    "C-NO-ADDRESS": "a PUT/PATCH/DELETE with no path key and no x-ticvai-singleton or x-ticvai-body-key (R162 R103)",
+    "C-NO-ADDRESS": "a PUT/PATCH/DELETE with no path key and no x-ticvai-singleton or x-ticvai-body-key (R162 R103); "
+                    "an operation the lineage marks pure stores nothing and is not asked (ADAM CR-419, CHG-CR419-001)",
     "C-SINGLETON-KEYED": "a write flagged x-ticvai-singleton whose body picks the record (its note names the body's key, "
                          "or the body requires a record id other than venueId or tenantId): it is x-ticvai-body-key "
                          "(r8 walk, CHG-R8WFC-001)",
@@ -387,8 +388,22 @@ def walk_enums(node, where, out, depth=0):
         walk_enums(v, f"{where}.{k}" if k not in ("properties", "items") else where, out, depth + 1)
 
 
+def pure_operations() -> dict:
+    """The operations the lineage marks `pure` (they compute and write no table), with the reason it gives."""
+    p = g.ROOT / "handoff" / "api-data-lineage.json"
+    try:
+        lin = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return {o: str(e.get("pure")) for o, e in lin.items() if isinstance(e, dict) and e.get("pure")}
+
+
+PURE_OPS: dict = {}
+
+
 def main() -> int:
     g.force_utf8()
+    PURE_OPS.update(pure_operations())
     guard = g.Guard("check-contract-shapes", RULES)
     ops = g.operations()
     docs = {stem: doc for stem, _, doc in g.contracts()}
@@ -727,7 +742,15 @@ def extra_rules(guard, ops, docs):
                           f"{oid}: flagged a singleton, but its body picks the record ({', '.join(named or ids)}): "
                           f"declare x-ticvai-body-key")
         if m in ("put", "patch", "delete") and not path_params and not op.get("x-ticvai-singleton")                 and not (f["item"] or {}).get("x-ticvai-singleton") and not (body_key and not missing_key):
-            guard.add("C-NO-ADDRESS", oid, f"{oid}: {m.upper()} {path} has no path key and is not a singleton")
+            # **A write that stores nothing has no record to address** (ADAM CR-419, 31 October 2026, CHG-CR419-001).
+            # simulatePriceBreakdownCalculation carried `x-ticvai-singleton` ("one per venue, a PUT replaces it
+            # whole") only to pass this rule, while it stores nothing. An operation the lineage marks `pure` (it
+            # computes and writes no table; handoff/api-data-lineage.json) answers the question this rule asks, and
+            # is printed every run instead of found.
+            if oid in PURE_OPS:
+                guard.note(f"C-NO-ADDRESS not asked of {oid}: it stores nothing ({PURE_OPS[oid][:100]})")
+            else:
+                guard.add("C-NO-ADDRESS", oid, f"{oid}: {m.upper()} {path} has no path key and is not a singleton")
         # C-PUT-CREATE (ADAM CR-390, CR-395; CHG-CR395-001): a PUT on a required path id promises no create that
         # only a body without the id could reach.
         if m == "put" and path_params:

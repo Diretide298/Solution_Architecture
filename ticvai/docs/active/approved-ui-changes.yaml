@@ -705,3 +705,11 @@ changes:
     built: the mascot-only loader, with no venue tile or venue name; the booking-flow settings still drive the cards and
     the step line'
   change: CHG-CR349-001
+- screen: ADM-088
+  field: 'region:selection'
+  to: 14f20beaeec022f9
+  approval: 'The lead''s decision on ADAM CR-423 (raised by Hrushikant Patkar on #35286; settled 31 October 2026 by
+    Chinmay): "Panel shows the level". The detail panel''s automation field binds
+    DynamicPricingStrategyCommandCenterView.automationLevel, labelled "Automation level", in the same place, because
+    automationMode is retired (CR-417); every other field of the panel is unchanged'
+  change: CHG-CR423-001

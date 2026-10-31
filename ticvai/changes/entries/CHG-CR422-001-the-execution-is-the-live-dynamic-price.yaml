@@ -1,0 +1,66 @@
+id: CHG-CR422-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'createLiveDynamicPrice never writes catalogue.price: it writes one catalogue.price_execution and its
+  audit_entry, and a deployed or partiallyDeployed execution is the live price the dynamicPricingAdjustment step uses.
+  Strategy is required (400 validation); previousPrice is the newest deployed execution''s newPrice, else the ladder
+  basePrice; the recommendation''s decision row gets execution_id; catalogue.priceExecuted is published (new event);
+  the approval reference is an approved pricingChange request read through approvals#requestRecords, CR-415''s request
+  for a recommendation (422 approval-required); guardrails 422 guardrail-breached; the status mapping and the default
+  channels are stated.'
+decision:
+  what: 'ADAM CR-422, posted 31 October 2026 on #35182: "Decided (Chinmay, 31 October 2026): not as recommended: A''s
+    errors and statuses, but the write goes neither to catalogue.price nor through Board 4. catalogue.price is never
+    written: it is the base, per price list and variant. The execution is the live dynamic price. Write one
+    catalogue.price_execution and its audit_entry. ... strategy is required ... previousPrice is the newPrice of the
+    newest deployed or partiallyDeployed execution for the same strategy and target. With none, it is the strategy''s
+    ladder basePrice. ... Publish catalogue.priceExecuted (executionId, strategyId, target, newPrice, channels) through
+    the outbox. Approval: the reference is an approvals request id, read through approvals#requestRecords. ... 422
+    approval-required ... 422 guardrail-breached naming the guardrail. Statuses map queued = scheduled ... Channels
+    default to the product''s enabled catalogue.product_channel_assignment rows ..." Built into r12 on the lead''s
+    instruction of 31 October 2026: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-422 (Hrushikant Patkar, #35182): the input''s persistence note applied the price to catalogue.price,
+  which holds one amount per price list and variant, so a dynamic price there would move every performance''s base
+  (pack p.76: never an uncontrolled independent base price); previousPrice, the decision link and the status
+  vocabulary had no rule. catalogue.price_execution already holds every field written.'
+keys_touched:
+  screens: [ADM-115]
+  operations: [createLiveDynamicPrice]
+  schemas: [LiveDynamicPriceExecutionDeploymentMonitorInput, LiveDynamicPriceExecutionDeploymentMonitorView,
+            CalculationProfile]
+  tables: [catalogue.price_execution, catalogue.price, catalogue.price_ladder, catalogue.product_channel_assignment,
+           catalogue.pricing_recommendation_decision]
+  files:
+  - contracts/spine/catalogue.yaml
+  - events/catalogue-priceExecuted.yaml
+  - handoff/api-data-lineage-overrides.json
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'BC-563 (createLiveDynamicPrice: x-ticvai-emits gains catalogue.priceExecuted), approved by the posted decision'
+root_class: 'a write applied to a base table that cannot hold it, so the live value has no record of its own'
+tickets:
+  started:
+  - '35182 (createLiveDynamicPrice): stop writing catalogue.price; require the strategy; take previousPrice from the
+    newest deployed execution, else the ladder basePrice; check the approval reference against
+    approvals#requestRecords (CR-415''s request for a recommendation); answer refusals with 422 approval-required or
+    guardrail-breached instead of 400; set execution_id on the decision row; publish catalogue.priceExecuted.'
+  unstarted:
+  - 'VM-ADM-115 (#29748) moves to r12 with BC-563; its approved columns are unchanged.'
+  - 'The channel deployment job (workers) that consumes catalogue.priceExecuted and moves the execution as
+    states/price-execution.yaml has it: no ticket names it yet (listed for the plan lane).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-422
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-LIVE-PRICE
+status: open
+notes: 'Named beyond the posted words: events/catalogue-priceExecuted.yaml needs at least one consumer
+  (events/_schema.yaml), and the decision names none; it lists the catalogue channel deployment job (workers; the
+  "job" trigger states/price-execution.yaml already has for executing to deployed) and the cache. The CalculationProfile
+  description says the dynamicPricingAdjustment step takes the newest deployed execution.'

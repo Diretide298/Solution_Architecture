@@ -1,0 +1,59 @@
+id: CHG-CR408-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'listRevenue''s row is one catalogue.pricing_recommendation not ignored, with every figure''s rule: prices and
+  confidence (x100) from the recommendation, forecastRevenue and expectedUplift from its demand_forecast row (a new
+  declared read), approvalStatus and executionStatus mapped from its status and its latest price_execution,
+  automationMode from the dynamic_pricing_control in force (most specific scope, else advisory), eventProximity,
+  inventoryPosition, demandVariance and nextAction; the summary''s counts and forecastAccuracy have rules; revenueRisk,
+  revenueAtRisk, incrementalRevenueGenerated, optimizationSuccessRate and aiRevenueBrief are absent (LO-CR408-001); the
+  list is ordered by rankBy, priorityRank its position.'
+decision:
+  what: 'ADAM CR-408, posted 31 October 2026 on #35287: "Decided (Chinmay, 31 October 2026): as you recommended for the
+    row, with five figures left out. One optimisation is one catalogue.pricing_recommendation whose status is not
+    ignored. ... forecastRevenue is outputs.revenue of its demand_forecast_id row (add catalogue.demand_forecast to the
+    reads). ... approvalStatus: notRequired where its latest price_execution has execution_source conditionalAutonomous
+    or autonomous; otherwise pending for pending, sentToSimulation or sentForApproval, approved for accepted or
+    modified, and rejected for rejected. executionStatus comes from its latest price_execution ... automationMode is
+    automation_level of the dynamic_pricing_control in force now ... taking the most specific scope that matches:
+    performance, then event, then product, then strategy, then venue, then global. With none, it is advisory. ... The
+    list is ordered by rankBy (default revenueOpportunity) ... with nulls last and then optimizationId descending.
+    priorityRank is the position in that order. Summary, over the filtered rows: ... Leave out (absent, not zero):
+    revenueRisk (so rankBy revenueRisk falls back to optimizationId), revenueAtRisk, incrementalRevenueGenerated,
+    optimizationSuccessRate and aiRevenueBrief. Nothing stores their inputs yet, and the package lists them as left
+    out." Built into r12 on the lead''s instruction of 31 October 2026: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-408 (Hrushikant Patkar, #35287 listRevenue): nothing defined a row; approvalStatus and executionStatus
+  matched neither pricing_recommendation.status nor price_execution.status; demand_forecast was not among the
+  operation''s reads; no rule picked the control in force; and the order "by optimizationId" disagreed with rankBy.'
+keys_touched:
+  operations: [listRevenue]
+  schemas: [RevenueOptimizationCommandCenterView, RevenueOptimizationCommandCenterSummary]
+  tables: [catalogue.pricing_recommendation, catalogue.price_execution, catalogue.dynamic_pricing_control,
+           catalogue.demand_forecast, catalogue.pricing_experiment, catalogue.channel_capacity]
+  files:
+  - contracts/spine/catalogue.yaml
+  - handoff/api-data-lineage-overrides.json
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+root_class: 'a command-centre view drafted from the pack with no row definition and status vocabularies that match no
+  stored state'
+tickets:
+  started:
+  - '35287 (listRevenue, Hrushikant): build it to the rules instead of not building it.'
+  - '35289 to 35291 (BO-1043, Chitrangi Mestry), 35304 to 35306 (BO-1050, Pradnya Yeram), 36320 to 36322 (ADM-108,
+    Pranay Shinde): the five left-out figures arrive absent and show empty, not 0.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-408
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-REVENUE-ROW
+status: open
+notes: 'automationMode keeps its name and its four values, which are exactly DynamicPricingControl.automationLevel''s
+  (CR-417, lane L); ADM-108''s approved column binds automationMode, so it is not renamed. The demand_forecast read is
+  declared in the contract (x-ticvai-reads), so the lineage override needs no new table; its reason is rewritten.'

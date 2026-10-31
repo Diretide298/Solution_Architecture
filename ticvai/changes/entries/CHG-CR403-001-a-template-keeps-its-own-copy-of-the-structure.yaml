@@ -1,0 +1,71 @@
+id: CHG-CR403-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'A seat map template keeps its own copy of the source map''s structure, taken when it is saved (view_box,
+  stage_position and a structure jsonb of sections, rows and seats), plus source_seat_map_id for lineage only; its
+  scope_path is the region it is saved at and its row security is read-beneath, so the venues under the region read it.
+  createSeatMap with templateId writes the new draft''s sections, rows and seats from the copy with new ids (seat
+  categories matched by code in the venue, view photos not copied) and answers 422 unknown-reference naming templateId
+  for a template the caller cannot read or one outside the venue''s region. SeatMapTemplate gains sourceSeatMapId.'
+decision:
+  what: 'ADAM CR-403, posted 31 October 2026 on #35673: "Decided (Chinmay, 31 October 2026): not as recommended:
+    option B, because a template is a region''s and the map it came from is a venue''s. Under row security, another
+    venue cannot read the source map, and the source may later change or be archived. createSeatMapTemplate copies the
+    source map''s structure into the template when it is saved: view_box, stage_position and structure jsonb, a list
+    of sections (code, name, boundary), each with its rows (label, numberingDirection) and their seats (seatNumber,
+    displayLabel, position, attribute, the seat category''s code). It also stores source_seat_map_id for lineage only.
+    The template''s scope_path is the region it is saved at, with read-beneath row security, so venues under that
+    region can read it. createSeatMap with templateId reads the template and writes the new draft map''s sections, rows
+    and seats from it with new ids. ... View photos are not copied, because they show another venue. A templateId the
+    caller cannot read, or one outside the venue''s region, answers 422 unknown-reference naming templateId, and
+    nothing is written. createSeatMap declares the read of seating.seat_map_template and the write of seating.seat.
+    SeatMapTemplate gains sourceSeatMapId (read-only)." Built into r12 on the lead''s instruction of 31 October 2026:
+    "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-403 (Hrushikant Patkar, #35673 createSeatMap): createSeatMap''s templateId had nothing to copy:
+  seating.seat_map_template kept no structure and no source map (createSeatMapTemplate''s sourceSeatMapId was not
+  persisted), and createSeatMap declared no read of it. Copying from the source map at use (option A) fails under row
+  security exactly when a template rolls a layout out to another venue.'
+keys_touched:
+  operations: [createSeatMap, createSeatMapTemplate, listSeatMapTemplates]
+  schemas: [SeatMapTemplate, CreateSeatMapRequest]
+  tables: [seating.seat_map_template, seating.seat, seating.section, seating.section_row]
+  files:
+  - contracts/satellite/seating.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: 'a "from a template" input whose template table stores no structure to copy, and a template meant to cross
+  venues that only reads its source under the source venue''s row security'
+tickets:
+  started:
+  - '35673 (createSeatMap, Hrushikant): replace the 400 on templateId with the copy from the template''s structure and
+    the 422 unknown-reference naming templateId.'
+  unstarted:
+  - 'The createSeatMapTemplate, listSeatMapTemplates and importSeatMap back-end tickets, when picked: store and read
+    the structure as decided.'
+  - 'MIG-SEATING-8 (V1203__seating.sql, Block C, not ticketed yet): creates seating.seat_map_template with the new
+    columns and read-beneath row security; the [DB] task the plan lane filed for CR-403 checks it.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-403
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SEAT-TEMPLATE-COPY
+status: open
+notes: 'Named beyond the posted words: (1) the package keeps a table''s columns as contract properties, so
+  SeatMapTemplate also answers structure, viewBox, stagePosition and scopePath (read-only), besides the posted
+  sourceSeatMapId; listSeatMapTemplates therefore answers each template''s structure; (2) createSeatMapTemplate declares
+  its reads of seating.seat_map, section and seat (x-ticvai-reads) and section_row (a lineage override: the child table
+  of Section.rows has no schema of its own to name), the copy the decision describes; createSeatMap''s templateId is
+  x-ticvai-persisted: false (the template is read, its id is not kept on the map); (3) sourceSeatMapId is
+  nullable on the template. The [DB] task the plan lane filed says source_seat_map_id is ON DELETE SET NULL; derive-ddl
+  has no mark for a delete action, so the package''s derived DDL carries a plain foreign key: the task''s "matches the
+  package''s derived DDL" cannot hold for that clause until the lead rules which wins. (4) A plan consequence for
+  the lead, not settled here: the declared write of seating.seat makes createSeatMap a setup operation of the delivery
+  slice, and its read of the template makes createSeatMapTemplate one too, so BO-962 joins Block A1 (check-plan-closure
+  C-REACH: reached only through BO-953) and seating.seat_map_template and seating.section_row join the first-release
+  MIG-SEATING, whose started ticket lists 11 tables (check-ddl-conventions D-MIG-TABLES). The [DB] task for CR-403
+  places the template in MIG-SEATING-8 (Block C).'

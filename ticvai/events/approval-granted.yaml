@@ -138,6 +138,10 @@ consumers:
     notApplied duplicate-code; an expiresAt already passed writes nothing and records notApplied entry-expired'
   writes:
   - access.blacklist
+- context: catalogue
+  purpose: '**Catalogue''s approval consumer, by `subjectType`** (the consumer ADAM CR-415 adds for `pricingRecommendation`). For `subjectType` `dynamicPricingControl` (ADAM CR-425, CHG-CR425-001): an automation raise setDynamicPricingGuardrailPolicy kept pending on the row whose `pending_approval_request_id` is `requestId` is applied, `automation_level` set to `pending_automation_level` and both pending columns cleared; a row whose pending request is another, or none, changes nothing. For `subjectType` `rollbackAction` (ADAM CR-421): an outcome for a pricing rollback that is no longer `requested` or `scheduled` (cancelled with cancelPricingRollback, which cancels its request in process) changes nothing.'
+  writes:
+  - catalogue.dynamic_pricing_control
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true

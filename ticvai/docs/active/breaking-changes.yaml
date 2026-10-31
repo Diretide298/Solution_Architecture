@@ -1719,3 +1719,78 @@ changes:
     tag: r12
     producer-tickets: ['30957', '30967']
     consumer-tickets: ['32388', '32502']
+  - id: BC-560
+    contract: catalogue
+    operation: listDynamicPricingAutomation
+    reason: 'ADAM CR-417 (CHG-CR417-001): the automation view answers automationLevel, the one vocabulary
+      dynamic_pricing_control stores, and automationMode (which had no value for autonomous and could not be read back)
+      is retired with its filter; scopeLevel answers and filters all eight levels the table holds, global and
+      performance included. A removed field and parameter and a response enum that gains values are breaking by the
+      compat rule. ADM-096 has not started.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-417 posted on #35184: "automationMode is retired from
+      DynamicPricingAutomationPolicyControlView, and listDynamicPricingAutomation''s automationMode filter becomes an
+      automationLevel filter")'
+    tag: r12
+    producer-tickets: ['35329']
+    consumer-tickets: ['29836']
+  - id: BC-561
+    contract: catalogue
+    operation: listAutomationPolicyAutonomous
+    reason: 'ADAM CR-417 (CHG-CR417-001): channel is the sales_channel of the catalogue.sales_channel row a
+      channel-level control names, mapped to Channel as GPS-C39 maps it, and null at every other level and for api and
+      backOffice; a response field that becomes nullable (written allOf Channel, nullable) is breaking. ADM-114 has not
+      started.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-417 posted on #35184: "The view''s channel is that row''s sales_channel,
+      mapped to Channel as GPS-C39 maps it ... It is null for api and backOffice. At every other level, market and
+      channel are null")'
+    tag: r12
+    producer-tickets: ['35184']
+    consumer-tickets: ['29747']
+  - id: BC-562
+    contract: catalogue
+    operation: listDynamicPricingStrategy
+    change: "params `query:status` lost enum value(s) ['testing']"
+    reason: 'ADAM CR-423 (CHG-CR423-001): a saved test case names no strategy, so no stored fact says a strategy is
+      being tested; testing leaves the status filter and waits on the left-out list (LO-CR423-001), while ready and
+      scheduled are derived. Removing a request enum value is breaking by the compat rule.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-423 posted on #35286: "testing leaves the filter")'
+    tag: r12
+    producer-tickets: ['35286']
+    consumer-tickets: ['29840', '29841', '29801']
+  - id: BC-563
+    contract: catalogue
+    operation: createLiveDynamicPrice
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-422 (CHG-CR422-001): the live dynamic price is the catalogue.price_execution the call writes, never
+      catalogue.price, and it publishes catalogue.priceExecuted (executionId, strategyId, target, newPrice, channels)
+      through the outbox for the channel deployment job and the caches. An emitted event added to an operation is
+      breaking by the compat rule.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-422 posted on #35182: "Publish catalogue.priceExecuted (executionId,
+      strategyId, target, newPrice, channels) through the outbox")'
+    tag: r12
+    producer-tickets: ['35182']
+    consumer-tickets: ['29748']
+  - id: BC-564
+    contract: catalogue
+    operation: setDynamicPricingGuardrailPolicy
+    reason: 'ADAM CR-425 (CHG-CR425-001): authorityTiers, noChangeWindows and circuitBreakers were typed object while
+      their descriptions and every view list them; they become arrays of the objects their descriptions list, stored as
+      the jsonb lists they were (the price ladder bands precedent, BC-392). A type change cannot be additive.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-425 posted on #35172: "authorityTiers, noChangeWindows and
+      circuitBreakers are arrays of the objects their descriptions list")'
+    tag: r12
+    producer-tickets: ['35172']
+    consumer-tickets: ['29742', '35710', '29836', '29747']
+  - id: BC-565
+    contract: catalogue
+    operation: listDynamicPricingStrategy
+    change: "automationMode"
+    reason: 'ADAM CR-423 (CHG-CR423-001), with CR-417: the strategy row answers automationLevel from the most specific
+      dynamic_pricing_control covering the strategy, or advisory, and automationMode (which could not say autonomous) is
+      retired with its filter, which becomes an automationLevel filter. A removed response field and parameter are
+      breaking by the compat rule.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-423 posted on #35286: "automationMode is retired (CR-417). The row
+      answers automationLevel ... The filter is automationLevel"; and on the ADM-088 panel: "Panel shows the level")'
+    tag: r12
+    producer-tickets: ['35286']
+    consumer-tickets: ['29840', '29841', '29801']

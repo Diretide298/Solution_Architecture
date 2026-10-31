@@ -1,0 +1,42 @@
+id: CHG-CR404-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'updateSeatMap has no 409: its body (name, description, isActive, section views) holds no structural change,
+  so each is accepted on a published map; sections, rows and seats change through editSeatMapStructure, and a published
+  map is changed by cloning it, amending the clone and publishing that. The 409 seat-map-published response and the
+  sentence "Structural changes to a published map are rejected" leave updateSeatMap.'
+decision:
+  what: 'ADAM CR-404, posted 31 October 2026 on #35675: "Decided (Chinmay, 31 October 2026): as you recommended.
+    updateSeatMap has no 409. Its description becomes: saves the name, description, isActive and section views of a
+    map; none of them is a structural change, so each is accepted on a published map; sections, rows and seats change
+    through editSeatMapStructure, and a published map is changed by cloning it, amending the clone and publishing that.
+    The sentence ''Structural changes to a published map are rejected'' and the 409 seat-map-published response leave
+    updateSeatMap. No contract test is written for it." Built into r12 on the lead''s instruction of 31 October 2026:
+    "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-404 (Hrushikant Patkar, #35675 updateSeatMap): structure moved to editSeatMapStructure on 12 October
+  (CHG-R6-035), which has its own 409 seat-map-published; nothing left in updateSeatMap''s body could produce its 409.'
+keys_touched:
+  operations: [updateSeatMap]
+  files:
+  - contracts/satellite/seating.yaml
+  - tools/check-business-rules.py
+root_class: 'an error response left on an operation after the input that caused it moved to another operation'
+tickets:
+  started:
+  - '35675 (updateSeatMap, Hrushikant): as built, no 409 path; no contract test for a 409.'
+  - '35676 to 35678 (BO-954 front end, Chinmay Patkar): no 409 handling for updateSeatMap.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-404
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SEAT-MAP-UPDATE
+status: open
+notes: 'check-contract-compat does not refuse removing an error response, and seat-map-published stays defined through
+  editSeatMapStructure and updateSeats, so no BC entry. The class (an error response whose cause no longer reaches the
+  operation) has no general check: whether a body can cause a 409 is prose, so the rule holds this operation only.'
