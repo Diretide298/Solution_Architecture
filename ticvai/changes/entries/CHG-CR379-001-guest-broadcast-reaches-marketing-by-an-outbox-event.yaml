@@ -1,0 +1,86 @@
+id: CHG-CR379-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'broadcastToGuests names its venue (venueId, required; the permissions checked there), writes a
+  workforce.guest_broadcast row (GuestBroadcast, new; id = broadcastId) and the workforce.guestBroadcastAccepted v1
+  event (new) in one transaction, and takes recipientCount from access#liveEntitlementSubjects (new; asked in process
+  by commerce under XDR-001, extended). Marketing''s new relay-invoked sendGuestBroadcast (critical consumer) asks the
+  same query in process (operations role, new XDR-023) and sends to each guest on every channel they have, ignoring
+  suppression, quiet hours, throttling and channel preference, one transactional message_dispatch per guest and
+  channel with sourceRef = broadcastId (MessageDispatch.sourceRef, new, indexed), idempotent on broadcastId +
+  subjectId + channel. An evacuation needs a second person signing in place with supervisorStepUp, holding
+  ANNOUNCEMENT_EMERGENCY at the venue and not the caller, else 403 supervisor-step-up-refused; stored as
+  secondPrincipalId; the body''s secondPrincipalId is deprecated and ignored. The write through
+  sendTransactionalMessage is dropped.'
+decision:
+  what: 'The lead''s review, 31 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs", then "Include them in r12". Posted on #37101 (Chinmay, 31 October
+    2026), as recommended: the body gains a required venueId; one transaction writes workforce.guest_broadcast and a
+    workforce.guestBroadcastAccepted v1 event carrying everything but the counts; recipientCount from a new query
+    access#liveEntitlementSubjects(venueId, at) (distinct subjectId of access.entitlement rows at the venue with a
+    subject, status issued or partiallyConsumed, validFrom and validTo where set around now), served in process,
+    commerce''s XDR-001 grant extended to it; Marketing''s new sendGuestBroadcast, invoked by the relay (critical
+    consumer), asks the same query in process (a new XDR for the operations role, SELECT on access.entitlement), sends
+    push to each active guest_device then SMS and email to the guest_profile contacts, messageLocalised in the
+    guest''s language else message, ignores suppression, quiet hours, throttling and channel preference, writes one
+    transactional message_dispatch per subject and channel with sourceRef = broadcastId, idempotent on broadcastId +
+    subjectId + channel; an evacuation needs a second person to sign in place with supervisorStepUp, holding
+    ANNOUNCEMENT_EMERGENCY at the venue and not the caller, otherwise 403 supervisor-step-up-refused and nothing
+    written; the signer is stored as secondPrincipalId; secondPrincipalId in the body is deprecated and ignored;
+    other kinds need no second person; drop the x-ticvai-write-via to sendTransactionalMessage.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-379 (Hrushikant Patkar, #37101 broadcastToGuests): the only declared write was marketing.message_dispatch
+  through sendTransactionalMessage, which honours suppression, against "must not ride the marketing path"; the 202 named
+  nothing stored; the body had no venue; "live entitlement" had no query; secondPrincipalId had no rule. Workforce runs
+  in commerce and Marketing, which owns the guests'' contacts and devices, in operations (ADR-0055), so the carrier is
+  an outbox event with a relay-invoked consumer, as CR-370 settled. Requirement matrix 19.2.65 and 18.9.4; BL-020 and
+  audit R091.'
+keys_touched:
+  operations: [broadcastToGuests, sendGuestBroadcast, listMessageDispatches]
+  schemas: [GuestBroadcast, GuestBroadcastAccepted, MessageDispatch]
+  tables: [workforce.guest_broadcast, marketing.message_dispatch, access.entitlement, platform.outbox]
+  files:
+  - contracts/satellite/workforce.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/spine/access.yaml
+  - events/workforce-guestBroadcastAccepted.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - docs/active/breaking-changes.yaml
+  - handoff/api-data-lineage-overrides.json
+  - handoff/cross-deployable-writes.md
+  - tools/check-business-rules.py
+  other:
+  - 'workforce.guestBroadcastAccepted v1 (new event)'
+  - 'access#liveEntitlementSubjects (new query)'
+  - 'XDR-023 (new); XDR-001 extended'
+  - 'BC-500, BC-501'
+root_class: 'a cross-deployable send with no carrier, no record and no audience rule'
+tickets:
+  started:
+  - '37101 (broadcastToGuests): build to the decision once the [DB] task lands; never answer 202 without the row and
+    the event. Told through the lead''s comment; its text is not rewritten.'
+  unstarted:
+  - 'The [DB] task the plan lane filed (owner Hrushikant): create workforce.guest_broadcast with venue row security,
+    add marketing.message_dispatch.source_ref with its index, and the XDR-023 grant (SELECT on access.entitlement to
+    operations).'
+  - 'New child task needed (Marketing backend): sendGuestBroadcast, the workforce.guestBroadcastAccepted consumer.'
+  - 'New child task needed (Access backend): access#liveEntitlementSubjects, the query served in process.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-379
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUEST-BROADCAST
+status: open
+notes: 'Beyond the comment''s words, for the lead to confirm: broadcastToGuests no longer declares the reads of
+  access#entitlementRecords (service route) and marketing-crm#guestProfileRecords (service route), replaced by
+  access#liveEntitlementSubjects in process and by Marketing''s own read in sendGuestBroadcast; it keeps
+  venue-map#pointRecords over the service route for the assembly points, which the decision does not settle (who
+  resolves the nearest assembly point per guest now that Marketing sends is open). It reads
+  identity#verifySupervisorStepUp in process for the second person''s PIN, as voidOrder does. MessageDispatch gains
+  sourceRef, which notifyPerformanceHolders and listMessageDispatches already used without a column. BC-500 and
+  BC-501 approve the required venueId and the new emitted event; no screen calls broadcastToGuests, so no consumer
+  ticket moves.'

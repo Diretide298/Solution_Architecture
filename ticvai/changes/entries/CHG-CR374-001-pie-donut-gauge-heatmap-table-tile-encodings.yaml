@@ -1,0 +1,44 @@
+id: CHG-CR374-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'The mark table on DashboardTile.visualisation gains its last five rows, so 422 tile-encoding-missing has a
+  rule for every mark: pie and donut one category dimension and one value measure; gauge one value measure and
+  optionally one target measure, its bands and status tile parameters; heatmap an x dimension, a y dimension and a
+  value measure; table at least one column and nothing more. Extra columns are allowed on every mark.'
+decision:
+  what: 'The lead''s review, 31 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs", then "Include them in r12". Posted on #33107 (Chinmay, 31 October
+    2026), as recommended, with these exact rules for 422 tile-encoding-missing: pie and donut one dimension with
+    encoding category and one measure with encoding value; gauge one measure with encoding value and may have one
+    measure with encoding target, its bands and status tile parameters; heatmap one dimension with encoding x, one
+    with encoding y and one measure with encoding value; table at least one column and nothing more (a column with no
+    role is shown as is); extra columns are allowed on every mark.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-374 (Hrushikant Patkar, #33107 createDashboard): the mark table covered the nine newer marks and left
+  pie, donut, gauge, heatmap and table "as their names", so the server had nothing to refuse them on. The client''s
+  dashboard visualisation requirements describe each (part-to-whole by category; actual, target, bands and status;
+  colour intensity across two dimensions; exact detail), and the encodings already exist on ReportColumn.encoding.'
+keys_touched:
+  operations: [createDashboard, updateDashboard]
+  schemas: [DashboardTile]
+  files:
+  - contracts/satellite/reporting.yaml
+  - tools/check-business-rules.py
+root_class: 'a validation table that leaves some enum values to their names'
+tickets:
+  started:
+  - '33107 (createDashboard): add the pie, donut, gauge, heatmap and table checks to the encoding validation. Told
+    through the lead''s comment; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-374
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-TILE-MARKS
+status: open
+notes: 'BR-TILE-MARKS fails when any value of DashboardTile.visualisation has no row in the mark table (number, line,
+  area, bar and the stacked bars are stated in the sentence under it), so a mark added later needs its row.'

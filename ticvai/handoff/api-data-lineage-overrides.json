@@ -864,16 +864,13 @@
   },
   "broadcastToGuests": {
    "reads": [
-    "access.entitlement",
     "identity.principal",
-    "marketing.guest_profile",
     "venuemap.point"
    ],
    "writes": [
-    "marketing.message_dispatch",
     "workforce.announcement"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); access.entitlement now through access#liveEntitlementSubjects, marketing.guest_profile and marketing.message_dispatch dropped: the broadcast reaches Marketing by workforce.guestBroadcastAccepted and sendGuestBroadcast reads and writes its own rows (ADAM CR-379, CHG-CR379-001)",
    "carried": true
   },
   "buildConfigurationPlan": {

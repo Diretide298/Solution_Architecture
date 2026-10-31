@@ -1,0 +1,62 @@
+# workforce.guestBroadcastAccepted v1 — published by workforce
+# Added 31 October 2026 (ADAM CR-379, settled by Chinmay on 31 October 2026; CHG-CR379-001): the carrier of a venue-wide
+# guest broadcast. Workforce (commerce) and Marketing, which owns the guests' contacts and push devices (operations),
+# are different deployables (ADR-0055), so the broadcast reaches Marketing's sender by the outbox, as CR-370 settled
+# for the guest one-time code.
+
+name: workforce.guestBroadcastAccepted
+version: 1
+publisher: workforce
+description: A venue-wide notice to every guest on site was accepted and is to be sent.
+aggregate: guestBroadcast
+emittedWhen: broadcastToGuests writes a workforce.guest_broadcast row, in the same transaction
+emittedBy:
+- workforce.broadcastToGuests
+payload:
+- field: broadcastId
+  type: uuid
+  notes: The workforce.guest_broadcast row. Each dispatch's sourceRef
+- field: venueId
+  type: uuid
+  notes: The venue whose guests are told; the consumer asks access#liveEntitlementSubjects for it
+- field: kind
+  type: string
+  notes: evacuation, weather, rideClosure, lostChild, operational or allClear
+- field: message
+  type: string
+  notes: The default text, sent where the guest's language has none
+- field: messageLocalised
+  type: object
+  required: false
+  notes: The text by language code
+- field: assemblyPointIds
+  type: array
+  required: false
+  notes: For an evacuation, the assembly points named
+- field: sentByPrincipalId
+  type: uuid
+  notes: The caller
+- field: secondPrincipalId
+  type: uuid
+  required: false
+  notes: For an evacuation, the second person who signed in place (SupervisorStepUp); null for other kinds
+- field: acceptedAt
+  type: timestamp
+  notes: When the broadcast was accepted; the live entitlements are asked at this time
+consumers:
+- context: marketing
+  purpose: 'Send the notice to every guest with a live entitlement at the venue, on every channel they have, ignoring
+    suppression, quiet hours, throttling and channel preference, and record one transactional
+    marketing.message_dispatch row per guest and channel with sourceRef the broadcastId'
+  operation: marketing-crm.sendGuestBroadcast
+  writes:
+  - marketing.message_dispatch
+  idempotencyKey: broadcastId + subjectId + channel
+  onFailure: retry
+  isCritical: true
+retention: 30 days after publication
+notes: '**A notice nobody receives is an evacuation nobody hears**, so the consumer is critical. The counts
+  (recipientCount) are not carried: the consumer asks the live entitlements itself.
+
+
+  **Not offered to webhooks**: a guest broadcast is sent by the platform, not relayed.'

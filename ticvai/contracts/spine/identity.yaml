@@ -2728,6 +2728,29 @@ paths:
         (`changeOwnCredential`), so the supervisor who set it never knows the credential in use. All
         sessions of the principal are ended, and the reset is audited with `reason`.
 
+
+        **The step-up it demands** (ADAM CR-375, Chinmay, 31 October 2026; CHG-CR375-001): the client calls
+        `createMfaChallenge` with `action` `resetPrincipalCredential`, then `verifyMfaChallenge`. The reset looks on
+        the caller''s own session for an `identity.mfa_challenge` row with that action, status `verified` and no
+        `consumedAt`, and sets `consumedAt` in the reset''s own transaction. With no such row it answers `403
+        step-up-token-missing`; when the newest one is older than 5 minutes (from its `verifiedAt`) it answers `403
+        step-up-token-expired`; nothing is written in either case (the rule in `verifyMfaChallenge`).
+
+
+        **The reason goes to the audit row** (ADAM CR-376, 31 October 2026; CHG-CR376-001): the operation puts the
+        body''s `reason` on the request''s audit context, and the audit interceptor writes it to
+        the audit row''s `reason`, which `listAuditRecords` returns, in the same row as the other audit fields.
+        `identity.credentialResetRequested` and `identity.principal_credential_history` do not change.
+
+
+        **Every session and refresh token of the principal is ended through `identity.end_principal_sessions`**
+        (ADAM CR-377, 31 October 2026; CHG-CR377-001), exactly as `updatePrincipal` does (ADAM CR-180): in the
+        reset''s own transaction it calls `identity.end_principal_sessions(principalId, the caller''s principal id,
+        ''credential-reset'')`, which checks the caller may update that principal, ends every active session of the
+        principal at every venue with `ended_at`, `ended_by_principal_id` and `end_reason` `credential-reset`, and
+        revokes every live refresh token. If it refuses, the whole reset fails and nothing is written.
+        `identity.session`''s policy is not widened.
+
         **What it writes** (14 October 2026, CHG-CRD-001, ADAM CR-078): the principal''s `identity.principal_credential`
         row for `method` (created if the principal had none, which is how a single sign-on principal is given a local
         PIN for a till) takes the temporary credential''s PHC hash (ADR-0071), `failedAttempts` 0 and `lockedUntil`
@@ -2756,7 +2779,14 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: '`forbidden` as the shared answer says; `step-up-token-missing` when the caller''s session has no
+            verified, unconsumed step-up for `resetPrincipalCredential`; `step-up-token-expired` when the newest one is
+            older than 5 minutes (from its `verifiedAt`) (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
@@ -5085,7 +5115,9 @@ paths:
                   type: string
                   description: What the step-up is for. Recorded in the audit trail. `signIn` is the
                     second factor after `login` answered `requiresMfa` (audit R135); it is the only
-                    action a pending, not yet usable, session may ask for.
+                    action a pending, not yet usable, session may ask for. **For a step-up it is the
+                    `operationId` of the operation that demands it** (for example `resetPrincipalCredential`;
+                    ADAM CR-375, CHG-CR375-001), and the step-up counts only for that operation.
                 methodId:
                   type: string
                   format: uuid
@@ -5223,6 +5255,16 @@ paths:
         MFA step-up; a supervisor PIN step-up travels in the body or a header instead (`SupervisorStepUp`,
         CHG-RUL-014). The returned `stepUpToken` stays for clients built at r1.
 
+
+        **The action, the lifetime and the refusals, for every operation that declares `x-ticvai-step-up: mfa`**
+        (ADAM CR-375, Chinmay, 31 October 2026; CHG-CR375-001). The step-up action is the operation''s
+        `operationId`: the client calls `createMfaChallenge` with that `action`, then this operation. A verified
+        step-up counts for 5 minutes from `verifiedAt`, which is the `expiresAt` this operation returns. The
+        operation looks on the caller''s own session for an `identity.mfa_challenge` row with that action, status
+        `verified` and no `consumedAt`, and sets `consumedAt` in its own transaction. With no such row it answers
+        `403 step-up-token-missing`; when the newest one is older than 5 minutes it answers `403
+        step-up-token-expired`; nothing is written in either case.
+
         '
       tags:
       - mfa
@@ -5263,6 +5305,8 @@ paths:
                   expiresAt:
                     type: string
                     format: date-time
+                    description: For a step-up, `verifiedAt` plus 5 minutes, after which the step-up no longer
+                      counts and the operation answers `403 step-up-token-expired` (ADAM CR-375).
                   session:
                     nullable: true
                     description: Only for a `signIn` challenge, and only where no role selection is
@@ -5548,6 +5592,13 @@ paths:
           x-ticvai-problem-types:
           - use-logout
           - session-ended
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
           content:
             application/problem+json:
               schema:
@@ -6517,7 +6568,12 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: '`forbidden` as the shared answer says; or the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /platform-staff-grants/mine:
@@ -11876,7 +11932,8 @@ components:
           nullable: true
           readOnly: true
           description: Why it was ended, as `forceLogout` was given it (or `supervisor-takeover` from the till door, or
-            `credential-changed` when `changeOwnCredential` ended it; ADAM CR-242).
+            `credential-changed` when `changeOwnCredential` ended it; ADAM CR-242; or `credential-reset` when
+            `resetPrincipalCredential` ended it through `identity.end_principal_sessions`, ADAM CR-377).
         roleId:
           type: string
           format: uuid

@@ -1,0 +1,58 @@
+id: CHG-CR376-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'platform.audit_record gains a nullable reason (AuditRecord.reason, 3 to 500 characters) that
+  listAuditRecords returns. An operation whose request carries a reason the audit is to record puts it on the
+  request''s audit context, and the audit interceptor writes it in the same row as the other audit fields;
+  resetPrincipalCredential does this with the body''s reason. identity.credentialResetRequested and
+  identity.principal_credential_history do not change.'
+decision:
+  what: 'The lead''s review, 31 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs", then "Include them in r12". Posted on #31238 (Chinmay, 31 October
+    2026), as recommended: platform.audit_record gains a nullable reason column (text, 3 to 500 characters), and
+    AuditRecord gains an optional reason that listAuditRecords returns. The operation puts its request''s reason on
+    the request''s audit context, and the audit interceptor writes it in the same row as the other audit fields;
+    resetPrincipalCredential does this with the body''s reason. identity.credentialResetRequested and
+    identity.principal_credential_history do not change.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-376 (Hrushikant Patkar, #31238 resetPrincipalCredential): the reset "is audited with reason" and requires
+  reason, but platform.audit_record had no column for it, and other operations make the same promise. One nullable
+  column on the trail every write already lands in (CR-179) serves them all; the control plane keeps reasons in its
+  own audit row (CR-356).'
+keys_touched:
+  operations: [resetPrincipalCredential, listAuditRecords]
+  schemas: [AuditRecord]
+  tables: [platform.audit_record]
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/spine/identity.yaml
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: 'a promise to record a value in a table that has no column for it'
+tickets:
+  started:
+  - '31238 (resetPrincipalCredential): write the reason through the audit context once the column is migrated. Told
+    through the lead''s comment; its text is not rewritten.'
+  unstarted:
+  - 'The audit interceptor (PLATFORM-AUDIT, #27694; its state was not checked by this lane): write the audit
+    context''s reason into the row.'
+  - 'The [DB] task the plan lane filed (owner Hrushikant): platform.audit_record ADD COLUMN reason on the partitioned
+    parent, in the next forward migration.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-376
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-AUDIT-REASON
+status: open
+notes: 'The two subscription request fields that said "Reason, recorded in the audit" now say they are the audit row''s reason;
+  BR-AUDIT-REASON fails on any such field that does not. Not changed: setApiClientStatus (public-api) keeps its
+  reason in control.api_client.status_reason, and its write is audited by the control variant of the interceptor into
+  control.audit_record (CR-292), which has no reason column, so it does not point at platform.audit_record. Two
+  generator facts for the lead''s class analysis: derive-ddl writes the column''s CHECK as char_length(reason) <= 500
+  only (it does not carry minLength 3), as it does for ActiveSession.endReason; and the two subscription reasons have
+  no minLength, so a 1- or 2-character reason there would pass the request and fail a 3-character floor if the
+  [DB] task adds one.'

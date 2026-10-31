@@ -1,0 +1,55 @@
+id: CHG-CR378-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'listPrivacyConsent states the source and rule of every figure on the privacy command centre (CMS-021): what
+  a policy in force is (a published whitelabel.policy row in effect, the latest of its kind at the scope or above,
+  read through white-label#policyRecords in process); each of the nine counts; each warning code''s rule (other is
+  not raised), most severe first then by configurationId, at most 100; each directory type''s source table and status
+  map, most recently changed first, at most 50; and which items each filter narrows. The operation declares its reads
+  of the nine Marketing tables, and the view names them. No visible change to CMS-021.'
+decision:
+  what: 'The lead''s review, 31 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs", then "Include them in r12". Posted on #37138 (Chinmay, 31 October
+    2026), not as recommended in detail: a policy is in force when it is a whitelabel.policy row (read through
+    white-label#policyRecords, which exists and is served in process) with publishedAt set and effectiveFrom on or
+    before today, and is the latest such row of its kind at the item''s scope or above; the counts, the warnings (most
+    severe first, then by configurationId, at most 100), the directory (most recently changed first, at most 50) and
+    the filters as the comment lists them; return all four required fields.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-378 (Hrushikant Patkar, #37138 listPrivacyConsent): the four required fields and the optional counts had
+  no rule, which blocks the approved CMS-021. Three premises of the CR were wrong: white-label#policyRecords is
+  declared and served in process within operations (ADR-0055), minor privacy has a table (marketing.minor_privacy_rule)
+  and preference types carry their channels. The client''s privacy reference (17.1.1) asks for the KPIs, the
+  configuration directory, the global filters and the two AI examples.'
+keys_touched:
+  operations: [listPrivacyConsent]
+  schemas: [PrivacyConsentConfigurationCommandCenterView]
+  tables: [marketing.consent_purpose, marketing.consent_purpose_channel, marketing.communication_preference_type,
+    marketing.consent_capture_point, marketing.tracking_technology, marketing.cookie_banner_design,
+    marketing.minor_privacy_rule, marketing.privacy_notice_governance, marketing.processing_purpose, whitelabel.policy]
+  screens: [CMS-021]
+  files:
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-business-rules.py
+root_class: 'a projection whose required figures name no source and no rule'
+tickets:
+  started:
+  - '37138 (listPrivacyConsent): add the four required fields and the four optional counts by the rules posted, read
+    privacy_notice_governance, processing_purpose, minor_privacy_rule, cookie_banner_design and
+    consent_purpose_channel, and apply the filters as stated. Told through the lead''s comment; its text is not
+    rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-378
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRIVACY-CONSENT
+status: open
+notes: 'CMS-021 is approved UI: nothing it shows changes, and its page info is not edited (the posted decision changes
+  only the server''s figures). BR-PRIVACY-CONSENT fails on a count, warning code, directory type or filter that
+  listPrivacyConsent states no rule for, so one added later needs its rule. Every table read is Marketing''s own
+  except whitelabel.policy, read in process within the operations host; no grant is new.'

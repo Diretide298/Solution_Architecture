@@ -84,11 +84,12 @@ reads:
   reader: commerce
   tables: [access.entitlement, access.scan_event]
   privileges: [SELECT]
-  queries: [access#entitlementRecords, access#scanEventRecords]
-  operations: [getMediaEntitlements, listDeviceAuditRecords]
+  queries: [access#entitlementRecords, access#scanEventRecords, access#liveEntitlementSubjects]
+  operations: [getMediaEntitlements, listDeviceAuditRecords, broadcastToGuests]
   added: '2026-10-21'
   decision_ref: ADAM CR-196, option B, Chinmay, 21 October 2026; listDeviceAuditRecords added by ADAM CR-232, option A,
-    Chinmay, 25 October 2026 (CHG-R10TEN-005)
+    Chinmay, 25 October 2026 (CHG-R10TEN-005); access#liveEntitlementSubjects and workforce broadcastToGuests (its
+    recipientCount) added by ADAM CR-379, Chinmay, 31 October 2026 (CHG-CR379-001), on the same SELECT
   why: 'orders getMediaEntitlements (commerce) answers from Access''s entitlements on a media code and their scans. The
     service route between deployables (serviceAuth inside a cell) is not built and has no ticket (CR-174), and a call
     on it would run at the tenant root and lose the caller''s scope, so a venue cashier would see every venue''s
@@ -372,3 +373,18 @@ reads:
     ruling; the two tickets CR-281 left waiting for service sign-in waited only for this read. Not covered:
     publishTenantConfig and restoreConfigVersion still ask orders#venueChargeCurrencies over the service route, and
     getTenantConfig and setBookingFlowConfig still ask tenancy#activeVenues over it.'
+- id: XDR-023
+  reader: operations
+  tables: [access.entitlement]
+  privileges: [SELECT]
+  queries: [access#liveEntitlementSubjects]
+  operations: [sendGuestBroadcast]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-379, Chinmay, 31 October 2026 ("as you recommended", with the audience query, the venue and the
+    second-principal rule stated; CHG-CR379-001)
+  why: 'marketing-crm sendGuestBroadcast (operations host), the relay-invoked consumer of workforce.guestBroadcastAccepted,
+    sends a venue-wide broadcast to every guest with a live entitlement at the venue, and the entitlements are
+    access.entitlement rows, Access''s data in its own deployable. The service route between deployables is not built
+    (CR-174, CR-281). The operations host asks access#liveEntitlementSubjects in process, through Access''s own query
+    class, in the caller''s transaction under the caller''s row-level security, as commerce does under XDR-001. SELECT
+    only, on the one table.'

@@ -1670,3 +1670,27 @@ changes:
     tag: r12
     producer-tickets: ['30784']
     consumer-tickets: ['31152', '31153', '31154']
+  - id: BC-500
+    contract: workforce
+    operation: broadcastToGuests
+    change: "new required request `venueId`"
+    reason: 'ADAM CR-379 (CHG-CR379-001): the body had no venue, so nothing said whose guests are told or where
+      ANNOUNCEMENT_PUBLISH and ANNOUNCEMENT_EMERGENCY are checked; the venue cannot be inferred from a staff session
+      that holds several venues. A new required field cannot be additive.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-379 posted on #37101: "The body gains a required venueId")'
+    tag: r12
+    producer-tickets: ['37101']
+    consumer-tickets: [none-linked]
+  - id: BC-501
+    contract: workforce
+    operation: broadcastToGuests
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-379 (CHG-CR379-001): the broadcast reaches Marketing''s sender by the outbox event
+      workforce.guestBroadcastAccepted, because Workforce (commerce) and Marketing (operations) are different
+      deployables, in place of a write through sendTransactionalMessage. No response changes; an emitted event added
+      to an operation is breaking by the compat rule.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-379 posted on #37101: "a workforce.guestBroadcastAccepted v1 event to
+      the outbox")'
+    tag: r12
+    producer-tickets: ['37101']
+    consumer-tickets: [none-linked]

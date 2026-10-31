@@ -5165,6 +5165,145 @@ paths:
                     description: Holders with no guest record to tell.
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /guest-broadcasts:
+    post:
+      operationId: sendGuestBroadcast
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-agreed: '31 October 2026: ADAM CR-379 (Chinmay; CHG-CR379-001); the workforce.guestBroadcastAccepted
+        consumer, shaped as sendGuestOneTimeCode'
+      summary: Send a venue-wide broadcast to every guest on site
+      description: '**The `workforce.guestBroadcastAccepted` consumer that sends a venue-wide guest broadcast** (decided
+        31 October 2026, Chinmay, ADAM CR-379; CHG-CR379-001). `broadcastToGuests` is a staff act in Workforce, which
+        is in another deployable, so the broadcast reaches Marketing, which owns the guests'' contacts and push
+        devices, by the outbox. Invoked by the event relay, never by a screen, as `sendGuestOneTimeCode` is; a
+        critical consumer.
+
+
+        **Who is told.** The guests `access#liveEntitlementSubjects(venueId, acceptedAt)` answers, asked in process
+        (the operations role reads `access.entitlement` under XDR-023).
+
+
+        **What is sent.** To each guest on every channel they have: push to each active `marketing.guest_device`, then
+        SMS and email to the contacts on `marketing.guest_profile`, through the tenant''s configured provider for the
+        channel (`marketing.communication_provider`). The text is `messageLocalised` in the guest''s language, else
+        `message`. It ignores suppression, quiet hours, throttling and channel preference, and writes one
+        transactional `marketing.message_dispatch` row per guest and channel with `sourceRef` the `broadcastId`.
+
+
+        **Idempotent on `broadcastId` + `subjectId` + `channel`**: a redelivered event finds the dispatch already
+        written and does not send it again.'
+      tags:
+      - message
+      x-ticvai-permission: null
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      x-ticvai-consumes:
+      - workforce.guestBroadcastAccepted
+      x-ticvai-read-via:
+      - query: access#liveEntitlementSubjects
+        route: in-process
+        for: 'the guests with a live entitlement at the venue, to send to (ADAM CR-379; CHG-CR379-001), Access''s data,
+          read in process by operations under XDR-023'
+      x-ticvai-reads:
+      - table: marketing.guest_device
+        for: 'each guest''s active push devices (ADAM CR-379)'
+      - table: marketing.guest_profile
+        for: 'each guest''s email and phone, and language (ADAM CR-379)'
+      - table: marketing.communication_provider
+        for: 'the tenant''s configured provider for each channel (ADAM CR-379)'
+      x-ticvai-writes:
+      - table: marketing.message_dispatch
+        for: 'one transactional dispatch per guest and channel, sourceRef the broadcastId (ADAM CR-379)'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - eventId
+              - broadcastId
+              - venueId
+              - kind
+              - message
+              - sentByPrincipalId
+              - acceptedAt
+              properties:
+                eventId:
+                  type: string
+                  description: The `workforce.guestBroadcastAccepted` event id, for the consumer's inbox record.
+                broadcastId:
+                  type: string
+                  format: uuid
+                  description: The `workforce.guest_broadcast` row; each dispatch's `sourceRef`.
+                venueId:
+                  type: string
+                  format: uuid
+                  x-ticvai-persisted: false
+                kind:
+                  type: string
+                  x-ticvai-persisted: false
+                  enum: [evacuation, weather, rideClosure, lostChild, operational, allClear]
+                message:
+                  type: string
+                  x-ticvai-persisted: false
+                  description: The default text, sent where the guest's language has none.
+                messageLocalised:
+                  type: object
+                  nullable: true
+                  x-ticvai-persisted: false
+                  additionalProperties:
+                    type: string
+                assemblyPointIds:
+                  type: array
+                  nullable: true
+                  x-ticvai-persisted: false
+                  items:
+                    type: string
+                    format: uuid
+                sentByPrincipalId:
+                  type: string
+                  format: uuid
+                  x-ticvai-persisted: false
+                secondPrincipalId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  x-ticvai-persisted: false
+                acceptedAt:
+                  type: string
+                  format: date-time
+                  x-ticvai-persisted: false
+                  description: The live entitlements are asked at this time.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The broadcast was sent, now or already.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - broadcastId
+                - dispatched
+                properties:
+                  broadcastId:
+                    type: string
+                    format: uuid
+                  dispatched:
+                    type: integer
+                    description: Dispatch rows written for the broadcast, one per guest and channel.
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-one-time-codes:
     post:
       operationId: sendGuestOneTimeCode
@@ -9115,7 +9254,29 @@ paths:
       x-ticvai-read-via:
       - query: white-label#policyRecords
         route: in-process
-        for: 'what its text calls "whitelabel.policy": whitelabel.policy, WhiteLabel''s data (CHG-R10GEN-001)'
+        for: 'what its text calls "whitelabel.policy": whitelabel.policy, WhiteLabel''s data (CHG-R10GEN-001), served
+          in process within the operations host; the policies in force, scheduled and in the directory (ADAM CR-378)'
+      x-ticvai-reads:
+      - table: marketing.consent_purpose
+        for: 'activeConsentPurposes, the review and policyExpired checks on noticeVersion, and the directory''s
+          consentPurpose items (ADAM CR-378; CHG-CR378-001)'
+      - table: marketing.consent_purpose_channel
+        for: 'the channel filter on consent purposes (ADAM CR-378)'
+      - table: marketing.communication_preference_type
+        for: 'communicationPreferenceTypes and the directory''s communicationPreference items (ADAM CR-378)'
+      - table: marketing.consent_capture_point
+        for: 'activeConsentCapturePoints, supportedLanguages, the review count, the capture-point warnings and the
+          directory''s capturePoint items (ADAM CR-378)'
+      - table: marketing.tracking_technology
+        for: 'cookieCategories, the distinct categories of approved tracking technologies (ADAM CR-378)'
+      - table: marketing.cookie_banner_design
+        for: 'the directory''s cookieCategory items, one per banner (ADAM CR-378)'
+      - table: marketing.minor_privacy_rule
+        for: 'the directory''s minorPrivacy items (ADAM CR-378)'
+      - table: marketing.privacy_notice_governance
+        for: 'pendingPolicyApprovals and the status of the directory''s privacyPolicy items (ADAM CR-378)'
+      - table: marketing.processing_purpose
+        for: 'the purposeWithoutLawfulBasis warning (ADAM CR-378)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' p.4 (17.1.1); MoM 20 Aug §4.3; filters are the pack''s Global Filters'
@@ -9124,12 +9285,68 @@ paths:
         **One object: the privacy configuration's health, and the latest configuration changes.** The KPI
         counts are over the tenant's consent purposes (`listConsentPurposes`), privacy notices
         (white-label `listPolicies`, shown by `listPrivacyNoticePolicy`), cookie categories, capture points and preference types; the directory
-        lists the 50 most recently changed configuration items, newest `effectiveFrom` first. The pack's
+        lists the 50 most recently changed configuration items, most recently changed first. The pack's
         Global Filters are query parameters; the tenant comes from the token. Quick actions are the
         operations that own them (`setConsentPurposes`, `setCommunicationPreferenceMarketing`,
         `setConsentCapturePoint`, `approvePrivacyTesting`). `configurationWarnings` carries the checks the
         pack gives as AI examples (a capture point collecting data with no notice, one purpose worded
         differently on two channels). (decided 29 September, readiness close-out)
+
+
+        **Every figure's source and rule** (ADAM CR-378, Chinmay, 31 October 2026; CHG-CR378-001). All four
+        required fields are returned.
+
+
+        **A policy in force.** A `whitelabel.policy` row (read through `white-label#policyRecords`, served in
+        process) with `publishedAt` set and `effectiveFrom` on or before today, and the latest such row of its kind
+        at the item's scope or above.
+
+
+        **Counts.** `activeConsentPurposes` = `marketing.consent_purpose` rows. `activePrivacyPolicies` = in-force
+        policies of kind `privacy` or `cookie`. `pendingPolicyApprovals` = `marketing.privacy_notice_governance` rows
+        with status `review`. `scheduledPolicyChanges` = published `privacy` or `cookie` policies whose
+        `effectiveFrom` is after today. `communicationPreferenceTypes` = preference types with status `active`.
+        `cookieCategories` = distinct `category` of `marketing.tracking_technology` rows with status `approved`.
+        `activeConsentCapturePoints` = capture points with status `active` and `publicationStatus` `published`.
+        `supportedLanguages` = distinct languages over those capture points.
+        `consentConfigurationsRequiringReview` = capture points with `publicationStatus` `review`, plus consent
+        purposes whose `noticeVersion` is not the in-force privacy policy's version.
+
+
+        **Warnings**, most severe first, then by `configurationId`, at most 100. `capturePointWithoutNotice`: a
+        published capture point with no `privacyNotice` step, or whose `privacyNotice` step's `policyKind` has no
+        policy in force. `policyExpired`: a consent purpose whose `noticeVersion` is not the in-force privacy
+        policy's version. `purposeWithoutLawfulBasis`: an active `marketing.processing_purpose` whose `lawfulBasis`
+        is `unclassified` (`configurationType` `processingPurpose`). `purposeWordingDiffersByChannel`: two
+        published capture points on different channels whose consent steps for the same `consentPurpose` have
+        different wording in a language both list. `translationMissing`: a published capture point listing a
+        language for which one of its steps' wording, or the body of a policy one of its steps shows, has no text.
+        `other` is not raised.
+
+
+        **Directory**, most recently changed first, at most 50. `consentPurpose` from `consent_purpose` (`name`
+        `displayName`, `version` `noticeVersion`, status `published`, sorted last as it has no timestamp).
+        `privacyPolicy` from `whitelabel.policy` of kind `privacy` or `cookie` (`version`, `effectiveFrom`, status
+        from its `privacy_notice_governance` row with `superseded` and `archived` shown as `retired`; with no
+        governance row, `published` if in force, `scheduled` if `effectiveFrom` is after today, `retired` if a later
+        version is in force). `cookieCategory` from `marketing.cookie_banner_design` (one item per banner, `name`
+        "Cookie banner, <channel>", `draft` and `published` as is, `superseded` as `retired`). `capturePoint` from
+        `consent_capture_point` (its `publicationStatus`; `superseded`, or status `retired`, as `retired`).
+        `communicationPreference` from `communication_preference_type` (`active` as `published`, `retired` as
+        `retired`). `minorPrivacy` from `marketing.minor_privacy_rule` (`name` "Minor privacy, <country>", status
+        `published`). `effectiveFrom` is set only on policies; the other items sort by `updatedAt`.
+
+
+        **Filters.** `status`, `effectiveFrom` and `effectiveTo` narrow only the directory (by status, and by
+        `effectiveFrom` or else `updatedAt`). `brandId`, `country`, `venueId`, `channel`, `language`,
+        `consentPurpose` and `policyId` narrow every count and item that carries that attribute. Brand: capture
+        point `brandId`, preference type `applicableBrandIds`, banner `brandId`. Country: capture point, preference
+        type `applicableCountries`, minor rule, tracking technology `countries`. Venue: `scopePath` at or beneath
+        the venue. Channel: capture point, `marketing.consent_purpose_channel`, preference type
+        `availableChannels`, banner, tracking technology `channels`. Language: capture point and banner
+        `languages`, policy body keys. `consentPurpose`: the purpose, capture points with a consent step for it,
+        preference types naming it. `policyId`: that policy and its governance row. An item without the attribute
+        applies everywhere and stays in.
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW
@@ -26985,6 +27202,7 @@ components:
     MessageDispatch:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getCampaignPerformance, getGuestTimeline, getJourneyPerformance, getMessageStatus and others
       x-ticvai-append-only: queuedAt
+      x-ticvai-index: [[sourceRef]]   # listMessageDispatches filters on it (ADAM CR-379; CHG-CR379-001)
       x-ticvai-persistence: marketing.message_dispatch
       type: object
       required:
@@ -27073,6 +27291,11 @@ components:
           type: string
           format: date-time
           nullable: true
+        sourceRef:
+          type: string
+          nullable: true
+          description: The id of the record whose business event triggered the message (a performance id, a guest
+            broadcast id), which `listMessageDispatches` filters on (ADAM CR-379; CHG-CR379-001). Null for a campaign.
     CaseStatus:
       type: string
       enum:
@@ -28976,11 +29199,14 @@ components:
                 format: date-time
     PrivacyConsentConfigurationCommandCenterView:
       type: object
-      x-ticvai-persistence: none — projection over marketing.consent_purpose, marketing.consent_capture_point
-        (new), marketing.communication_preference_type (new), the cookie categories and white-label's
-        whitelabel.policy (read through listPolicies)
+      x-ticvai-persistence: none — projection over marketing.consent_purpose, marketing.consent_purpose_channel,
+        marketing.consent_capture_point, marketing.communication_preference_type, marketing.tracking_technology,
+        marketing.cookie_banner_design, marketing.minor_privacy_rule, marketing.privacy_notice_governance,
+        marketing.processing_purpose and white-label's whitelabel.policy (read through white-label#policyRecords in
+        process; ADAM CR-378)
       description: The privacy command centre's figures for the filters given, and the latest configuration
-        changes. Counts are of items currently in force unless the name says otherwise.
+        changes. Counts are of items currently in force unless the name says otherwise. **Each figure's source and
+        rule is stated on `listPrivacyConsent`** (ADAM CR-378, Chinmay, 31 October 2026; CHG-CR378-001).
       required:
       - activeConsentPurposes
       - activePrivacyPolicies
@@ -28991,36 +29217,46 @@ components:
         activeConsentPurposes:
           type: integer
           minimum: 0
+          description: '`marketing.consent_purpose` rows (ADAM CR-378).'
         activePrivacyPolicies:
           type: integer
           minimum: 0
+          description: In-force policies of kind `privacy` or `cookie`, as `listPrivacyConsent` defines in force (ADAM
+            CR-378).
         communicationPreferenceTypes:
           type: integer
           minimum: 0
+          description: Preference types with status `active` (ADAM CR-378).
         cookieCategories:
           type: integer
           minimum: 0
+          description: Distinct `category` of `marketing.tracking_technology` rows with status `approved` (ADAM CR-378).
         activeConsentCapturePoints:
           type: integer
           minimum: 0
+          description: Capture points with status `active` and `publicationStatus` `published` (ADAM CR-378).
         supportedLanguages:
           type: integer
           minimum: 0
+          description: Distinct languages over the capture points `activeConsentCapturePoints` counts (ADAM CR-378).
         pendingPolicyApprovals:
           type: integer
           minimum: 0
+          description: '`marketing.privacy_notice_governance` rows with status `review` (ADAM CR-378).'
         scheduledPolicyChanges:
           type: integer
           minimum: 0
-          description: Published items with an `effectiveFrom` still in the future.
+          description: Published `privacy` or `cookie` policies whose `effectiveFrom` is after today (ADAM CR-378).
         consentConfigurationsRequiringReview:
           type: integer
           minimum: 0
-          description: Items in `review`, or whose reconfirmation interval has passed.
+          description: Capture points with `publicationStatus` `review`, plus consent purposes whose `noticeVersion`
+            is not the in-force privacy policy's version (ADAM CR-378).
         configurationWarnings:
           type: array
           maxItems: 100
-          description: Configuration checks that failed, most severe first.
+          description: Configuration checks that failed, most severe first, then by `configurationId`, at most 100;
+            each code's rule is stated on `listPrivacyConsent`, and `other` is not raised (ADAM CR-378).
           items:
             type: object
             required:
@@ -29048,7 +29284,9 @@ components:
         configurationDirectory:
           type: array
           maxItems: 50
-          description: The 50 most recently changed configuration items, newest `effectiveFrom` first.
+          description: The 50 most recently changed configuration items, most recently changed first (by
+            `effectiveFrom` on policies, else `updatedAt`); each type's source and status map is stated on
+            `listPrivacyConsent` (ADAM CR-378).
           items:
             type: object
             required:

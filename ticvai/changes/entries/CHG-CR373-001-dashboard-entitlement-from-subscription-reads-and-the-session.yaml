@@ -1,0 +1,60 @@
+id: CHG-CR373-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'A dashboard''s module entitlement is stated once, on CreateDashboardRequest.module, and used by
+  createDashboard, updateDashboard, listDashboards and getCommandCentre. Licensed: the module is in the tenant''s
+  LicencePosition.licensedModules, read in process through subscription#contractRecords, #licenceAddOnRecords and
+  #planRecords (as CR-320 settled); core is always licensed. Permission held: the caller''s session
+  (permissionsByScope) holds at least one permission listed under the ModuleKey in x-ticvai-permission-modules, at the
+  dashboard''s venue or anywhere in its scope for a tenant-wide dashboard. Both writes refuse 409 module-not-licensed,
+  else module-permission-not-held, and write nothing; updateDashboard no longer names module-not-entitled. The lists
+  leave out every dashboard whose module fails, and a module filter for such a module answers 200 with an empty
+  list. No new query.'
+decision:
+  what: 'The lead''s review, 31 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs", then "Include them in r12". Posted on #33107 (Chinmay, 31 October
+    2026), not as recommended: no new queries. Licences through subscription#contractRecords,
+    subscription#licenceAddOnRecords and subscription#planRecords in process, exactly as validateTenantConfig and
+    getModuleEnablement do (ADAM CR-320); core is always licensed. A module''s permissions are its list in
+    x-ticvai-permission-modules; the caller holds the module when its session (permissionsByScope) holds at least one
+    of them at the dashboard''s venue, or anywhere in its scope for a tenant-wide dashboard. createDashboard and
+    updateDashboard refuse 409 module-not-licensed, else 409 module-permission-not-held, and write nothing;
+    updateDashboard uses these two types instead of module-not-entitled. listDashboards and getCommandCentre leave out
+    every dashboard whose module fails either check, and a module filter naming such a module answers 200 with an
+    empty list.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-373 (Hrushikant Patkar, #33107 createDashboard): createDashboard answered 409 module-not-licensed and
+  module-permission-not-held and listDashboards said "entitlement still applies", but the only declared read was
+  tenancy#venueSettingsRecords. The CR''s option A asked for subscription#licensedModuleKeys and
+  identity#moduleKeysOfPermissions; the first would duplicate the reads CR-320 settled, and Identity runs in commerce
+  (ADR-0055), so the second cannot be asked in process from Reporting, while the session already carries the
+  permissions (CR-367) and permissions.yaml maps each to one module.'
+keys_touched:
+  operations: [createDashboard, updateDashboard, listDashboards, getCommandCentre]
+  schemas: [CreateDashboardRequest]
+  files:
+  - contracts/satellite/reporting.yaml
+  - tools/check-business-rules.py
+root_class: 'a refusal whose inputs no declared read supplies'
+tickets:
+  started:
+  - '33107 (createDashboard, updateDashboard): answer both 409s with the three Subscription reads and the
+    permission-module map, as decided. Told through the lead''s comment; its text is not rewritten.'
+  - '33109 (listDashboards): filter by the same two checks; a module filter for a module the caller is not entitled to
+    returns an empty list.'
+  unstarted:
+  - 'getCommandCentre picks the rule up from CreateDashboardRequest.module.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-373
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-DASHBOARD-ENTITLEMENT
+status: open
+notes: 'The four operations declare the three reads (x-ticvai-read-via, in process). The operations role already
+  reads the Subscription tables for CR-320''s operations (Reporting and Platform share the operations host), so no
+  grant is new. Beyond the comment''s words: getCommandCentre''s description no longer points at identity.listModules
+  and listPermissions for the permission half.'

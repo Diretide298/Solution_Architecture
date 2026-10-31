@@ -6688,7 +6688,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Refund'
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: '`forbidden` as the shared answer says; or the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: 'The refund is not waiting for approval (`notPendingApproval`) — it was already
             approved, declined, completed or failed. Only a `pendingApproval` refund is approved
