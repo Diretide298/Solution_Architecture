@@ -1,0 +1,60 @@
+id: CHG-R12PL-036
+date: '2026-11-01'
+source: audit
+kind: plan
+proposed: '2026-11-01'
+summary: 'The Block A slice keeps the scope r11 gave it after lanes F to M: createSeatMapTemplate is held out of the
+  slice (tools/derive-delivery-slice.py LATER_BLOCK_OPERATIONS), so BO-962 stays in wave 3; BO-168 leaves Block A for
+  Block C with its operations; workforce.field_ownership and workforce.integration_source, already built by #28946,
+  carry their reason in docs/active/block-a-extra-tasks.json departures.'
+decision:
+  what: 'The lead, 1 November 2026: "Lets ship r12 first". Nothing joins Block A at this release and only what no started
+    ticket builds leaves it. (1) ADAM CR-403 has createSeatMap copy a template''s structure when it is given a templateId,
+    so the slice read seating.seat_map_template as a table to fill first and took createSeatMapTemplate as a setup
+    operation, which pulled BO-962 (wave 3) into Block A behind BO-953 (check-plan-closure C-REACH, check-screen-patterns
+    P8); a template is optional, so its writer stays where r11 had it. (2) ADAM CR-389 stores the beacon geofence on the
+    device placement, so setBleBeaconGeofence no longer makes access.access_point non-empty and BO-168, built in Block A
+    only as its setup screen, follows its operations to Block C; its tickets #28427 and #28473 are On hold and were never
+    started. (3) r11 had the two workforce tables in Block A only beside workforce.training_record in one migration; ADAM
+    CR-380 (claimOpenShift reads training hours) now builds training_record in MIG-WORKFORCE-5, and #28946
+    (MIG-WORKFORCE-3, Ready for QA) has created all four tables already. Plan change waived from the cooling-off by the
+    lead ("Waive for r12").'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'Finding: the r12 integration gate of 1 November 2026 (run 20261101-011538): check-plan-closure C-REACH (BO-962) and C-UNTICKETED (screen BO-168,
+  tables workforce.field_ownership and workforce.integration_source), check-screen-patterns P8 (BO-962).'
+keys_touched:
+  tickets:
+  - APP-SETUP-BO-168
+  - APP-SETUP-BO-168-REST
+  - MIG-WORKFORCE-3
+  tables:
+  - workforce.field_ownership
+  - workforce.integration_source
+  - seating.seat_map_template
+  operations:
+  - createSeatMapTemplate
+  - setBleBeaconGeofence
+  files:
+  - tools/derive-delivery-slice.py
+  - docs/active/block-a-extra-tasks.json
+root_class: 'a CR that changes which tables an operation reads or writes moves the slice''s setup closure, and the plan
+  follows it with no one deciding'
+tickets:
+  started:
+  - '28946 (MIG-WORKFORCE-3, Ready for QA, Hrushikant Patkar): nothing to do; it already creates both tables.'
+  unstarted:
+  - '28427 and 28473 (BO-168, On hold): leave Block A for Block C.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r12 integration gate, 1 November 2026 (follows CR-380, CR-389, CR-403)'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
