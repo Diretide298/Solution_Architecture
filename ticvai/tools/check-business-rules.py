@@ -1970,7 +1970,7 @@ def main() -> int:
     def writes_of(oid):
         return {str(r.get("table")) for r in op(oid)[3].get("x-ticvai-writes") or [] if isinstance(r, dict)}
 
-    def ptypes(oid, code):
+    def ptypes_of_id(oid, code):
         return set((((op(oid)[3].get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types")) or [])
 
     rdoc_ = load("contracts/satellite/reporting.yaml")
@@ -1989,7 +1989,7 @@ def main() -> int:
         miss = lic - vias_of(oid)
         need("BR-DASHBOARD-ENTITLEMENT", not miss, f"{oid} does not ask {', '.join(sorted(miss))} in process (CR-373)")
     for oid in ("createDashboard", "updateDashboard"):
-        need("BR-DASHBOARD-ENTITLEMENT", {"module-not-licensed", "module-permission-not-held"} <= ptypes(oid, "409"),
+        need("BR-DASHBOARD-ENTITLEMENT", {"module-not-licensed", "module-permission-not-held"} <= ptypes_of_id(oid, "409"),
              f"{oid}'s 409 does not name module-not-licensed and module-permission-not-held (CR-373)")
     for oid_, (f_, _p, _m, o_, _d) in sorted(ops.items()):
         if f_.name == "reporting.yaml":
@@ -2066,7 +2066,7 @@ def main() -> int:
     need("BR-GUEST-BROADCAST", "supervisorStepUp" in (bb.get("properties") or {}) and btg.get("x-ticvai-step-up") == "pin"
          and btg.get("x-ticvai-step-up-carrier") == "body:supervisorStepUp",
          "broadcastToGuests does not sign an evacuation with supervisorStepUp (x-ticvai-step-up pin, CR-379)")
-    need("BR-GUEST-BROADCAST", "supervisor-step-up-refused" in ptypes("broadcastToGuests", "403"),
+    need("BR-GUEST-BROADCAST", "supervisor-step-up-refused" in ptypes_of_id("broadcastToGuests", "403"),
          "broadcastToGuests' 403 does not name supervisor-step-up-refused (CR-379)")
     need("BR-GUEST-BROADCAST", not any((w or {}).get("operation") == "sendTransactionalMessage"
                                        for w in btg.get("x-ticvai-write-via") or []),
@@ -2105,7 +2105,7 @@ def main() -> int:
     miss = {"identity#principalHoldsRoleAtVenue", "workforce#principalHasOverlappingAssignment"} - vias_of("claimOpenShift")
     need("BR-OPEN-SHIFT-CLAIM", not miss, f"claimOpenShift does not ask {', '.join(sorted(miss))} (CR-380)")
     need("BR-OPEN-SHIFT-CLAIM", {"shift-claimant-not-eligible", "working-hour-rule-breach", "rota-assignment-overlap"}
-         <= ptypes("claimOpenShift", "409"), "claimOpenShift's 409 does not name all three refusals (CR-380)")
+         <= ptypes_of_id("claimOpenShift", "409"), "claimOpenShift's 409 does not name all three refusals (CR-380)")
     wsch_ = (load("contracts/satellite/workforce.yaml").get("components") or {}).get("schemas") or {}
     rq = flat(((wsch_.get("OpenShift") or {}).get("properties") or {}).get("requiredQualifications") or {})
     need("BR-OPEN-SHIFT-CLAIM", "`courseName`" in rq and "ignoring case" in rq and "`passed`" in rq,
