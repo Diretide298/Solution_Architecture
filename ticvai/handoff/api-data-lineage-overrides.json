@@ -3485,10 +3485,7 @@
   },
   "getBillingStatement": {
    "reads": [
-    "ledger.tax_invoice_line",
-    "orders.payment",
-    "orders.sales_order",
-    "payments.dunning_case"
+    "ledger.tax_invoice_line"
    ],
    "reason": "tax, discount and taxInvoiceId per line; format=pdf renders to object storage and returns pdfUrl (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -5570,15 +5567,6 @@
     "promotions.promotion"
    ],
    "reason": "Best-offer resolution computed from promotion.stacking_mode/precedence against prices (as evaluatePromotions) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "listBillingStatements": {
-   "reads": [
-    "orders.payment",
-    "orders.sales_order",
-    "payments.dunning_case"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
   "listBiometric": {

@@ -1,0 +1,48 @@
+id: CHG-CR345-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'collectShopAndDrop: ShopAndDropProblem.refusedReason gains disposed; the 409 declares one problem type per
+  reason (shop-and-drop-already-collected, shop-and-drop-past-collect-by, shop-and-drop-disposed); a partial take from
+  uncollected keeps the drop uncollected until the call that takes the last of it, with the state model unchanged; and
+  pastCollectBy compares collect_by with the server''s clock, recordedAt deciding nothing.'
+decision:
+  what: 'ADAM CR-345, posted 30 October 2026: "Decided (Chinmay, 30 October 2026): as you recommended. (1)
+    ShopAndDropProblem.refusedReason gains disposed. (2) collectShopAndDrop''s 409 declares one problem type per reason
+    ...: shop-and-drop-already-collected (alreadyCollected), shop-and-drop-past-collect-by (pastCollectBy),
+    shop-and-drop-disposed (disposed). (3) A collection from uncollected that leaves something behind keeps the drop
+    uncollected with its lines'' collectedQuantity grown; the call that takes the last of it moves it to collected.
+    pastCollectBy never applies to an uncollected drop, and the state model is unchanged. (4) pastCollectBy compares
+    collect_by with the server''s clock when the call arrives; recordedAt is stored as collected_at and decides
+    nothing." Reviewed on the lead''s instruction of 30 October 2026: "for each one actually check if they hold and if
+    not then find out the best way keeping in mind what client needs".'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-345 (Deep Khanvilkar, #30869 collectShopAndDrop, blocking): the 409 promised a disposed refusal its
+  problem schema could not carry (CHG-R10GEN-005), named no problem types though the shared Problem rule wants one per
+  cause, had no target state for a partial take from uncollected, and left the deadline''s clock unnamed.'
+keys_touched:
+  operations: [collectShopAndDrop]
+  schemas: [ShopAndDropProblem]
+  files:
+  - contracts/satellite/retail.yaml
+  - states/shop-and-drop.yaml
+  - tools/check-business-rules.py
+root_class: 'a refusal promised in prose that its error shape and problem types do not carry'
+tickets:
+  started:
+  - '30869 (collectShopAndDrop, Deep Khanvilkar): build to CR-345''s comment.'
+  unstarted:
+  - '27820 (RetailService build holding collectShopAndDrop and createShopAndDrop) picks it up at the next release.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-345
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SHOP-DROP-COLLECT
+status: open
+notes: 'Not done: the review also suggested declaring createShopAndDrop''s three 409 reasons as problem types
+  (shop-and-drop-already-dropped, -item-not-droppable, -collection-point-closed); the posted decision does not say so,
+  so its 409 is unchanged and still counts under check-problem-types'' ceiling. The states file''s uncollected ->
+  collected guard says a partial take stays uncollected; no transition was added.'

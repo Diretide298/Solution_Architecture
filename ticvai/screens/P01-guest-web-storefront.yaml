@@ -8803,12 +8803,17 @@ screens:
         columns:
         - Product.name
         - Product.description
+        - Product.fromPrice
         operation: listProducts
-        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3); the price,
+          Product.fromPrice, ADAM CR-358 option (a), decided by Chinmay 30 October 2026 (CHG-CR358-001)
         notes: The venue's products with the price converted at the rate above; the venue's own currency
-          stays the price charged. The venue is the one the guest picked on Home (`venueId` from the session,
-          audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns
-          removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
+          stays the price charged. Each card shows `Product.name`, `Product.fromPrice` as the price charged,
+          and `fromPrice` converted at the selected rate as the price shown, marked approx. where the
+          selected currency is not chargeable (ADAM CR-358; the client-verified frame's Item / Charged
+          · Shown). The venue is the one the guest picked on Home (`venueId` from the session, audit R267),
+          never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided
+          by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
     - name: contextPanel
       slot: selection
       components:
@@ -8845,7 +8850,8 @@ screens:
     trigger: onLoad
   - operationId: listProducts
     contract: catalogue
-    purpose: List products
+    purpose: The venue's products, each with `fromPrice`, its lowest list price on the caller's channel
+      in the venue's trading currency, for the price card (ADAM CR-358, CHG-CR358-001)
     trigger: onLoad
   entryState:
     preloaded:

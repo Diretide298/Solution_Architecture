@@ -1,0 +1,60 @@
+id: CHG-CR358-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'Product gains fromPrice (Money, nullable, readOnly, not stored): the lowest listPrice among its sellable
+  variants on the caller''s channel now, by the searchCatalogue / listPrice rule, null where no price list prices it.
+  listProducts sets it, takes the optional channel parameter listProductVariants has, and reads the currency through
+  tenancy#venueSettingsRecords; other operations leave it null. WEB-035''s and GST-044''s price card binds
+  Product.fromPrice: charged, and converted at the selected rate as shown, marked approx. where not chargeable.'
+decision:
+  what: 'ADAM CR-358, posted 30 October 2026: "Decided (Chinmay, 30 October 2026): as you recommended, option (a).
+    Product gains fromPrice: Money, nullable, readOnly, not stored (x-ticvai-persisted: false): the lowest listPrice
+    among the product''s sellable variants on the caller''s channel now, in the venue''s trading currency, by the same
+    price-list rule as searchCatalogue''s fromPrice and ProductVariant.listPrice; null where no price list prices it on
+    that channel. listProducts sets it, gains the optional channel parameter listProductVariants has ..., and reads the
+    currency through tenancy#venueSettingsRecords. Other operations that answer Product leave it null for now. On
+    WEB-035 and GST-044 the card shows Product.name, fromPrice as charged, and fromPrice converted at the selected rate
+    as shown, marked approx. where the currency is not chargeable." Reviewed on the lead''s instruction of 30 October
+    2026: "for each one actually check if they hold and if not then find out the best way keeping in mind what client
+    needs".'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-358 (Chitrangi Mestry, #32309 WEB-035, blocking): the price card binds Product through listProducts and
+  Product carried no price, while the client-verified rev 3 frame (REV3, sources/designs/guest-rev3-30-september) shows a
+  charged and a shown price per item. The same pattern as ProductVariant.listPrice (CHG-R8SPN-028); additive.'
+keys_touched:
+  screens: [WEB-035, GST-044]
+  operations: [listProducts, getProduct, createProduct, updateProduct, cloneProduct, restoreProductVersion,
+               transitionProductLifecycle]
+  schemas: [Product]
+  files:
+  - contracts/spine/catalogue.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - docs/active/approved-ui-changes.yaml
+  - tools/check-business-rules.py
+root_class: 'a screen card bound to a schema that does not carry the value the approved frame shows'
+tickets:
+  started:
+  - '32309 (WEB-035 price card, Chitrangi Mestry): build the card on Product.fromPrice and the selected rate.'
+  unstarted:
+  - '31009 (listProducts, Narayan Gaonkar) and 27870 (the CatalogueService build): add fromPrice, the channel parameter
+    and the venue settings read at the next release.'
+  - 'GST-044''s frontend ticket picks the card''s binding up at the next release.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-358
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRODUCT-FROM-PRICE
+status: open
+notes: 'The card''s columns gain Product.fromPrice; Product.description stays, as the approved record had it.
+  docs/active/approved-ui-changes.yaml records the two region:collection changes (to 9e2c2b7cb02078d3) against the
+  client-verified frame and CR-358: what the client sees does not change. The design-r1 page info of both screens is generated from screens/ and follows at
+  the next design batch rebuild. Named beyond
+  the comment''s words: check-money-currency (MC-NO-CURRENCY) fails any operation that answers Money with no currency
+  source, so the six other operations that answer Product (getProduct, createProduct, updateProduct, cloneProduct,
+  restoreProductVersion, transitionProductLifecycle) declare tenancy#venueSettingsRecords for fromPrice, each saying it
+  answers fromPrice null for now and does not ask the read until it fills it (written by tools/fix-money-currency.py).'

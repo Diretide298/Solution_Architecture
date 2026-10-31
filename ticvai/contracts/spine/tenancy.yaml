@@ -242,6 +242,10 @@ x-ticvai-queries:
       It is asked in process by the operations host too (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008;
       XDR-004), for every operation it serves that asks it since 29 October 2026 (ADAM CR-296, option A;
       CHG-R11RUL-001), and by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
+      **A signed-in guest reads every venue's settings** (ADAM CR-341, Chinmay, 30 October 2026, option B for the settings tables; CHG-CR341-001): platform.region_settings has a read branch for any
+      session with a guest subject (`ticvai.subject_id` set), so a signed-in guest's read above venue level (the time
+      zone of a billing statement's venue, CR-342) sees the region rows of every venue it has dealt with; writes stay
+      scoped and an anonymous session gains nothing.
     served: [in-process, service]
   tenantRecords:
     module: tenancy
@@ -283,6 +287,10 @@ x-ticvai-queries:
       (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008; docs/active/cross-deployable-writes.yaml XDR-004) and,
       since 29 October 2026, for every operation it serves that asks it (ADAM CR-296, option A; CHG-R11RUL-001), and
       by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
+      **A signed-in guest reads every venue's settings** (ADAM CR-341, Chinmay, 30 October 2026, option B for the settings tables; CHG-CR341-001): platform.venue_settings has a read branch for any
+      session with a guest subject (`ticvai.subject_id` set), so a signed-in guest's read above venue level
+      (listMyOrders pricing an order at a venue other than the request's) sees that venue's row and the tenant's
+      default row; writes stay scoped and an anonymous session gains nothing.
     served: [in-process, service]
   workstationRecords:
     module: tenancy
@@ -6333,6 +6341,10 @@ components:
       x-ticvai-retired-columns: [org_unit_id]
       type: object
       x-ticvai-persistence: "platform.venue_settings"
+      # ADAM CR-341 (Chinmay, 30 October 2026; CHG-CR341-001): read 'platform.venue_in_scope(venue_id) OR a guest subject
+      # is set (ticvai.subject_id)', write 'platform.venue_in_scope(venue_id)'. tools/derive-ddl.py has no x-ticvai-rls
+      # mark for that read yet (the DDL lane's), so the base venue rule is still what derive-ddl writes; the [DB] task
+      # carries the policy until the mark exists.
       description: >
         **Venue-level operational configuration that no other level can answer.**
 
@@ -7073,6 +7085,9 @@ components:
       x-ticvai-persistence: "platform.region_settings"
       # CHG-GEN-008 (ADAM CR-075): settings govern everything beneath their region, so everyone working at, above or
       # beneath it reads them; the region and the levels above it write them.
+      # ADAM CR-341 (Chinmay, 30 October 2026; CHG-CR341-001): and any session with a guest subject reads them (read
+      # 'in_scope OR above_scope OR a guest subject is set', write 'in_scope'). tools/derive-ddl.py has no mark for the
+      # guest branch yet (the DDL lane's); the [DB] task carries the policy until it exists.
       x-ticvai-rls: read-beneath
       type: object
       required: [scopePath, countryCode, currencyCode, currencyScale, timeZone, fiscalYearStartMonth]

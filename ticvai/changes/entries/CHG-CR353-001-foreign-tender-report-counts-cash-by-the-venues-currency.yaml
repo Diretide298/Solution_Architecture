@@ -1,0 +1,50 @@
+id: CHG-CR353-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'getForeignTenderReport states its five rules: cash payments captured or refunded whose tender_currency differs
+  from the trading currency of the shift''s venue; one line per (shift, tender_currency, fx_rate); from and to filter
+  recorded_at (CR-251); foreignAmount sums tender_amount and baseAmount payment_amount in the venue''s currency and scale;
+  the shift is the order''s shift_id and the cashier''s name the principal''s display_name. Lines by the shift''s
+  opened_at, then currency, then rate. It asks tenancy#venueSettingsRecords, orders#salesOrderRecords and
+  identity#principalRecords.'
+decision:
+  what: 'ADAM CR-353, posted 30 October 2026: "Decided (Chinmay, 30 October 2026): not as recommended: option A with
+    three corrections. (1) Count cash payments (tender cash) with status captured or refunded whose tender_currency is
+    set and differs from the trading currency of the shift''s venue. ... (2) One line per (shift, tender_currency,
+    fx_rate) ... (3) from/to filter the payment''s recorded_at, by the CR-251 rule as now. (4) foreignAmount is the sum
+    of tender_amount at that currency''s scale; baseAmount is the sum of payment_amount in the trading currency and scale
+    of the shift''s venue (tenancy#venueSettingsRecords, added), not the region''s ... (5) A payment''s shift is its
+    order''s shift_id (orders#salesOrderRecords, added ...); principalId is that shift''s principal_id and principalName
+    the principal''s display_name through identity#principalRecords (added). transactionCount counts the line''s
+    payments. Lines by the shift''s opened_at, then currency, then rate." Reviewed on the lead''s instruction of 30
+    October 2026: "for each one actually check if they hold and if not then find out the best way keeping in mind what
+    client needs".'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-353 (Deep Khanvilkar, #32818, blocking): the report named none of the rules its aggregation needs. A
+  venue may trade in a currency its region does not (ADR-0018), a cash refund goes out in local currency so the foreign
+  notes stay in the drawer, card and wallet tenders are never in the drawer (CR-218), and orders.payment has no shift
+  column.'
+keys_touched:
+  operations: [getForeignTenderReport]
+  schemas: [ForeignTenderReport]
+  tables: [orders.payment, orders.sales_order, orders.pos_shift, identity.principal, platform.venue_settings]
+  files:
+  - contracts/spine/finance.yaml
+  - tools/check-business-rules.py
+root_class: 'an aggregate report whose counting rules nobody wrote down'
+tickets:
+  started:
+  - '32818 (getForeignTenderReport, Deep Khanvilkar): build to CR-353''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-353
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-FOREIGN-TENDER
+status: open
+notes: 'Named beyond the comment''s words: each ForeignTenderReport line field names its column. orders.pos_shift also
+  stores principal_display_name; the decision reads the name through identity#principalRecords, and the contract says so.'

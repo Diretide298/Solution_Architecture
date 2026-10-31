@@ -1,0 +1,64 @@
+id: CHG-CR342-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'listBillingStatements and getBillingStatement build the same lines from the cycle''s order: a charge per
+  order line (gross, net, tax, its discounts summed, the order''s created_at; tax rate, description and invoice from the
+  tax invoice line issued for it, null where none is visible), a refund per completed orders.refund row, a failed attempt
+  per dunning case (overdue_amount or the order''s gross, first_failed_at, decline_class), no adjustment; totals from the
+  order less completed refunds; Money in the venue''s trading currency. A cycle with no order or an open-ended first
+  period is not listed and is 404. Both declare the reads; payments.dunning_case gets the CR-295 guest read branch.'
+decision:
+  what: 'ADAM CR-342, posted 30 October 2026: "Decided (Chinmay, 30 October 2026): not as recommended: option A with
+    refunds taken from orders.refund. listBillingStatements and getBillingStatement build the same lines from the
+    cycle''s order. charge: one per orders.order_line ... refund: one per orders.refund row of the order with status
+    completed ... A payment''s status is not a line. failedAttempt: one per payments.dunning_case on the order (CR-303)
+    ... adjustment: none until a source is named. ... A cycle with no order, or an open-ended first period ..., is not
+    listed, and getBillingStatement answers 404 for it. Declare on both: reads orders.sales_order,
+    orders.order_line_discount, orders.refund and payments.dunning_case; read-via tenancy#venueSettingsRecords and
+    finance#taxInvoiceLineRecords. A guest reads its dunning cases and tax invoices by its own subject once the [DB]
+    task lands; until then they are simply absent." Reviewed on the lead''s instruction of 30 October 2026: "for each
+    one actually check if they hold and if not then find out the best way keeping in mind what client needs".'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-342 (Deep Khanvilkar, #30986 listBillingStatements, blocking): CR-303 (CHG-CR303-001) settled the cycle
+  and its order but left the statement''s contents as "worked out from that order''s lines and payments", so the two
+  operations built apart would disagree on what a guest was charged. A payment''s refunded status cannot carry a
+  partial refund; orders.refund is the record of money going back.'
+keys_touched:
+  operations: [listBillingStatements, getBillingStatement]
+  schemas: [BillingStatement, BillingStatementLine, DunningCase]
+  tables: [orders.sales_order, orders.order_line, orders.order_line_discount, orders.refund, payments.dunning_case,
+           ledger.tax_invoice_line, ledger.tax_invoice]
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/satellite/payments.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: 'a computed resource whose contents depend on rules nobody wrote down'
+tickets:
+  started:
+  - '30986 (listBillingStatements, Deep Khanvilkar): build the line, total and listing rules through CR-342''s comment.'
+  - '31487 (getBillingStatement, Pranay Shinde): the same rule through one shared builder; 404 for an unlisted cycle.'
+  unstarted:
+  - '27863 and 28047 (the OrderService builds holding the two operations) pick it up at the next release.'
+  - '31927 (listMyPaymentIssues) and 31986 (getTaxDocumentRendition) rely on the same guest branch; no text change.'
+  - 'A [DB] child task of MIG-LEDGER (27672) for Hrushikant: the guest read of ledger.tax_invoice by buyer_subject_id
+    (listed for the lead to file with the r12 plan change). The payments.dunning_case policy is derived (below).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-342
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-BILLING-LINES
+status: open
+notes: 'Database: DunningCase is marked x-ticvai-rls guest-reads-own, so tools/derive-ddl.py writes the decided
+  payments.dunning_case policy (staff by scope_path for a session with no guest subject, a guest by its own subject_id;
+  writes by scope_path) into the forward migration, which this lane deleted for the final refresh to write (MIG-PAYMENTS,
+  27679). ledger.tax_invoice names its guest in buyer_subject_id, which no derive-ddl mark reads (guest-reads-own reads
+  subject_id), and the generator is the DDL lane''s, so its policy rests on the [DB] task until a mark exists. The lineage
+  overrides that carried orders.payment, orders.sales_order and payments.dunning_case for both operations are gone: the
+  contract now derives the last two, and a payment is no longer read. Named beyond the comment''s words: each
+  BillingStatementLine and total field names its column, and getBillingStatement''s text says "through the one shared
+  builder".'

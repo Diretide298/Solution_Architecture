@@ -2520,6 +2520,15 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'what its text calls "region''s time zone": platform.region_settings, Tenancy''s data (CHG-RTE-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the trading currency and scale of the shift''s venue (platform.venue_settings currency_code, currency_scale): which tenders are foreign, and baseAmount''s currency and scale (ADAM CR-353; CHG-CR353-001; ADR-0018)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'a payment''s shift: its order''s shift_id (orders.sales_order), since orders.payment has no shift column (ADAM CR-353; CHG-CR353-001)'
+      - query: identity#principalRecords
+        route: in-process
+        for: 'principalName: the shift principal''s display_name (identity.principal), Identity''s data (ADAM CR-353; CHG-CR353-001)'
       x-ticvai-audience:
       - staff
       summary: What was taken in which currency
@@ -2532,6 +2541,21 @@ paths:
 
 
         **Whose midnight bounds a day** (the rule of ADAM CR-251, which the lead applied to every finance day filter on 26 October 2026: "Yes, same rule (Recommended)"). `from` or `to` are a day in the time zone of the region at or above the caller''s scope (`tenancy#regionSettingsRecords`, by the caller''s scope path). When the caller''s scope gives no single region (a brand or the tenant root) and `from` or `to` is sent, the answer is `400 validation` on `from` ("filter by day from one venue or region"). Without a day filter the operation works at any scope.
+
+
+        **What it counts, and how a line is made** (ADAM CR-353, Chinmay, 30 October 2026, option A with three corrections; CHG-CR353-001).
+
+        1. **Which payments.** Cash payments (`tender` `cash`) with status `captured` or `refunded` whose `tender_currency` is set and differs from the trading currency of the shift''s venue. A cash refund goes out in the venue''s currency, so the foreign notes stay in the drawer. `voided`, `declined`, `failed`, `authorised` and `pendingConfirmation` are left out, and so are card and wallet tenders, which are not in the drawer.
+
+        2. **One line per (shift, `tender_currency`, `fx_rate`).** `rateApplied` is the rate those payments carry.
+
+        3. **The day filter.** `from` and `to` filter the payment''s `recorded_at`, by the CR-251 rule above.
+
+        4. **The amounts.** `foreignAmount` is the sum of `tender_amount` at that currency''s scale. `baseAmount` is the sum of `payment_amount` in the trading currency and scale of the shift''s venue (`tenancy#venueSettingsRecords`), not the region''s: a venue may trade in a currency its region does not (ADR-0018).
+
+        5. **The cashier.** A payment''s shift is its order''s `shift_id` (`orders#salesOrderRecords`; `orders.payment` has no shift column). `principalId` is that shift''s `principal_id`, and `principalName` the principal''s `display_name` through `identity#principalRecords`. `transactionCount` counts the line''s payments.
+
+        **Order.** Lines by the shift''s `opened_at`, then currency, then rate.
 
         '
       tags:
@@ -7632,28 +7656,38 @@ components:
               shiftId:
                 type: string
                 format: uuid
+                description: The payments' shift, their order's `shift_id` (orders.sales_order; ADAM CR-353).
               principalId:
                 type: string
                 format: uuid
+                description: The shift's cashier, orders.pos_shift.principal_id (ADAM CR-353).
               principalName:
                 type: string
+                description: That principal's `display_name` (identity.principal, through identity#principalRecords;
+                  ADAM CR-353).
               currency:
                 type: string
                 pattern: ^[A-Z]{3}$
+                description: The payments' `tender_currency` (orders.payment), a currency other than the trading
+                  currency of the shift's venue (ADAM CR-353).
               foreignAmount:
                 allOf:
                 - $ref: ../shared/common.yaml#/components/schemas/Money
                 description: What was physically taken, in the foreign `currency` (its `currency` and
-                  `scale` are that currency's, not the region's). The cashier counts this in the drawer.
+                  `scale` are that currency's, not the region's). The cashier counts this in the drawer. The
+                  sum of the line's payments' `tender_amount` (ADAM CR-353).
               rateApplied:
                 allOf:
                 - $ref: '#/components/schemas/FxRateValue'
+                description: The `fx_rate` the line's payments carry; one line per rate (ADAM CR-353).
               baseAmount:
                 allOf:
                 - $ref: ../shared/common.yaml#/components/schemas/Money
-                description: What the ledger holds. The only figure that reconciles.
+                description: What the ledger holds. The only figure that reconciles. The sum of the line's payments'
+                  `payment_amount`, in the trading currency and scale of the shift's venue (ADAM CR-353; ADR-0018).
               transactionCount:
                 type: integer
+                description: How many payments the line counts (ADAM CR-353).
     InterEntityObligation:
       type: object
       x-ticvai-persistence: ledger.inter_entity_obligation

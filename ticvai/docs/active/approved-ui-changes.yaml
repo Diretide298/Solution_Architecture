@@ -677,3 +677,21 @@ changes:
     the new file (createUpload) and the unlabelled primary button named and bound to replaceMediaAsset, which nothing
     reached while #30907 (its back end) was in QA.'
   change: CHG-R12GT-002
+- screen: WEB-035
+  field: 'region:collection'
+  to: 9e2c2b7cb02078d3
+  approval: 'The client-verified rev 3 frame (sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html,
+    Discover -> ''Prices in your currency'', verified 28 September 2026, match exact) shows a charged and a shown price per
+    item (Item / Charged · Shown); ADAM CR-358 (raised by Chitrangi Mestry on #32309, 30 October 2026; settled by Chinmay
+    on 30 October 2026, option (a)) gives the card that price as Product.fromPrice. The record is brought in line with
+    the approved frame; what the client sees does not change.'
+  change: CHG-CR358-001
+- screen: GST-044
+  field: 'region:collection'
+  to: 9e2c2b7cb02078d3
+  approval: 'The client-verified rev 3 frame (sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html,
+    Discover -> ''Prices in your currency'', verified 28 September 2026, match exact) shows a charged and a shown price per
+    item (Item / Charged · Shown); ADAM CR-358 (raised by Chitrangi Mestry on #32309, 30 October 2026; settled by Chinmay
+    on 30 October 2026, option (a)) gives the card that price as Product.fromPrice. The record is brought in line with
+    the approved frame; what the client sees does not change.'
+  change: CHG-CR358-001

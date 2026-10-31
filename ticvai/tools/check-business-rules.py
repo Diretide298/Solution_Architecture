@@ -165,6 +165,29 @@ And one rule per decision:
                    marketing.message_dispatch across deployables; the lifetime and resend interval are venue settings
                    (600 s and 60 s) answered as expiresInSeconds and resendAfterSeconds; and requestGuestOtp states who
                    with no account still gets a code (register, verify).
+  BR-GUEST-SETTINGS (r12, ADAM CR-341 option B for the settings tables, CHG-CR341-001) listMyOrders names no venue and
+                   reads each order's venue settings through tenancy#venueSettingsRecords (an order whose settings are not
+                   visible is a fault, never a default currency); guestAuth and the venue and region settings queries
+                   state the guest read branch of platform.venue_settings and platform.region_settings.
+  BR-BILLING-LINES (r12, ADAM CR-342 option A with refunds from orders.refund, CHG-CR342-001) both statement
+                   operations read orders.sales_order, orders.order_line_discount, orders.refund and payments.dunning_case
+                   and ask tenancy#venueSettingsRecords and finance#taxInvoiceLineRecords; listBillingStatements states the
+                   line, total and listing rules (completed refunds, overdue_amount, no adjustment, a cycle with no order or
+                   an open-ended first period not listed) and getBillingStatement its 404; BillingStatement is computed
+                   from no orders.payment; payments.dunning_case is guest-reads-own (the CR-295 pattern).
+  BR-SHOP-DROP-COLLECT (r12, ADAM CR-345 as recommended, CHG-CR345-001) ShopAndDropProblem.refusedReason has
+                   disposed; collectShopAndDrop's 409 declares shop-and-drop-already-collected, -past-collect-by and
+                   -disposed, and states that a partial take from uncollected stays uncollected and that pastCollectBy is
+                   judged on the server's clock (recordedAt decides nothing).
+  BR-DELEGATION-KEY (r12, ADAM CR-352, CHG-CR352-001) approveRoleAuthorityDelegation is no singleton: it is keyed by
+                   x-ticvai-body-key [delegator, delegate] at the caller's venue, touches no other delegation, and its
+                   200 stays RolesAuthorityDelegationApprovalLimitsView.
+  BR-FOREIGN-TENDER (r12, ADAM CR-353, CHG-CR353-001) getForeignTenderReport counts cash payments captured or refunded
+                   in a currency other than the shift venue's, one line per (shift, tender_currency, fx_rate), filters
+                   recorded_at, and asks tenancy#venueSettingsRecords, orders#salesOrderRecords and identity#principalRecords.
+  BR-PRODUCT-FROM-PRICE (r12, ADAM CR-358 option (a), CHG-CR358-001) Product.fromPrice is a nullable, readOnly,
+                   unstored Money; listProducts takes channel and asks tenancy#venueSettingsRecords; WEB-035's and
+                   GST-044's price cards bind Product.fromPrice.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -1384,6 +1407,106 @@ def main() -> int:
     need("BR-GUEST-CODE-DELIVERY", "`register` or `verify` an identifier with no account still gets a code" in rgd,
          "requestGuestOtp does not say that a register or verify code to an identifier with no account is still sent "
          "(the CR-370 follow-up of 31 October 2026)")
+    # ---------------------------------------------------------------- r12 CR lane D (the lead, 30 October 2026: "for
+    # each one actually check if they hold and if not then find out the best way keeping in mind what client needs").
+    # Each rule fails on the r11 package and passes once the posted decision is in it.
+    def vias_of(oid):
+        return {str(v.get("query")) for v in op(oid)[3].get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+
+    def reads_of(oid):
+        return {str(r.get("table")) for r in op(oid)[3].get("x-ticvai-reads") or [] if isinstance(r, dict)}
+
+    def flat(o):
+        return " ".join(text(o).replace("\\n", " ").split())
+
+    # BR-GUEST-SETTINGS (ADAM CR-341, option B for the settings tables; CHG-CR341-001)
+    lmo = op("listMyOrders")[3]
+    need("BR-GUEST-SETTINGS", "tenancy#venueSettingsRecords" in vias_of("listMyOrders"),
+         "listMyOrders does not read each order's venue settings through tenancy#venueSettingsRecords (CR-341)")
+    lmo_t = flat(lmo.get("description") or "")
+    need("BR-GUEST-SETTINGS", "names no venue" in lmo_t and "a fault to log, never a silent default currency" in lmo_t,
+         "listMyOrders does not say it names no venue and that an order whose settings are not visible is a fault (CR-341)")
+    cdoc_s = load("contracts/shared/common.yaml")
+    ga = " ".join(str((((cdoc_s.get("components") or {}).get("securitySchemes") or {}).get("guestAuth") or {})
+                      .get("description") or "").split())
+    need("BR-GUEST-SETTINGS", "platform.venue_settings" in ga and "platform.region_settings" in ga and "CR-341" in ga,
+         "guestAuth does not state the guest read branch of platform.venue_settings and platform.region_settings (CR-341)")
+    tq_ = load("contracts/spine/tenancy.yaml").get("x-ticvai-queries") or {}
+    for qn in ("venueSettingsRecords", "regionSettingsRecords"):
+        need("BR-GUEST-SETTINGS", "CR-341" in str((tq_.get(qn) or {}).get("rule") or ""),
+             f"tenancy#{qn} does not state the guest read branch (CR-341)")
+    # BR-BILLING-LINES (ADAM CR-342, option A with refunds from orders.refund; CHG-CR342-001)
+    for oid in ("listBillingStatements", "getBillingStatement"):
+        miss = {"orders.sales_order", "orders.order_line_discount", "orders.refund", "payments.dunning_case"} - reads_of(oid)
+        need("BR-BILLING-LINES", not miss, f"{oid} does not declare its reads of {', '.join(sorted(miss))} (CR-342)")
+        missq = {"tenancy#venueSettingsRecords", "finance#taxInvoiceLineRecords"} - vias_of(oid)
+        need("BR-BILLING-LINES", not missq, f"{oid} does not ask {', '.join(sorted(missq))} (CR-342)")
+    lbs_t = flat(op("listBillingStatements")[3].get("description") or "")
+    for frag in ("`orders.refund` row of the order with `status` `completed`", "`overdue_amount`",
+                 "`adjustment`: none", "A payment's status is not a line", "**Not listed**", "open-ended first period"):
+        need("BR-BILLING-LINES", frag in lbs_t,
+             f"listBillingStatements does not state the line rule ({frag!r}; CR-342)")
+    need("BR-BILLING-LINES", "`404`" in flat(op("getBillingStatement")[3].get("description") or ""),
+         "getBillingStatement does not answer 404 for a cycle listBillingStatements does not list (CR-342)")
+    osch = (op("listBillingStatements")[4].get("components") or {}).get("schemas") or {}
+    bsp = str((osch.get("BillingStatement") or {}).get("x-ticvai-persistence") or "")
+    need("BR-BILLING-LINES", "orders.refund" in bsp and "orders.payment" not in bsp,
+         "BillingStatement is still computed from orders.payment, not orders.refund (CR-342)")
+    dc = ((load("contracts/satellite/payments.yaml").get("components") or {}).get("schemas") or {}).get("DunningCase") or {}
+    need("BR-BILLING-LINES", dc.get("x-ticvai-rls") == "guest-reads-own",
+         "DunningCase (payments.dunning_case) is not x-ticvai-rls guest-reads-own, so a guest's statement shows no "
+         "failed attempt, or another guest's under a venue scope (CR-342, the CR-295 pattern)")
+    # BR-SHOP-DROP-COLLECT (ADAM CR-345, as recommended; CHG-CR345-001)
+    rdoc = op("collectShopAndDrop")[4]
+    sdp = (((rdoc.get("components") or {}).get("schemas") or {}).get("ShopAndDropProblem") or {})
+    rr = {}
+    for part in sdp.get("allOf") or []:
+        rr = ((part or {}).get("properties") or {}).get("refusedReason") or rr
+    need("BR-SHOP-DROP-COLLECT", "disposed" in (rr.get("enum") or []),
+         "ShopAndDropProblem.refusedReason has no disposed (CR-345)")
+    csd = op("collectShopAndDrop")[3]
+    r409 = ((csd.get("responses") or {}).get("409") or {})
+    need("BR-SHOP-DROP-COLLECT", set(r409.get("x-ticvai-problem-types") or []) == {
+         "shop-and-drop-already-collected", "shop-and-drop-past-collect-by", "shop-and-drop-disposed"},
+         "collectShopAndDrop's 409 does not declare one problem type per reason (CR-345)")
+    csd_t = flat(csd.get("description") or "")
+    need("BR-SHOP-DROP-COLLECT", "keeps the drop `uncollected`" in csd_t and "server's clock" in csd_t,
+         "collectShopAndDrop does not say a partial take from uncollected stays uncollected, or whose clock "
+         "pastCollectBy reads (CR-345)")
+    # BR-DELEGATION-KEY (ADAM CR-352; CHG-CR352-001)
+    ard = op("approveRoleAuthorityDelegation")[3]
+    need("BR-DELEGATION-KEY", not ard.get("x-ticvai-singleton") and ard.get("x-ticvai-body-key") == ["delegator", "delegate"],
+         "approveRoleAuthorityDelegation is still a singleton, or not keyed by x-ticvai-body-key [delegator, delegate] (CR-352)")
+    need("BR-DELEGATION-KEY", "No other delegation at the venue is touched" in flat(ard.get("x-ticvai-body-key-note") or ""),
+         "approveRoleAuthorityDelegation's body-key note does not state the upsert rule (CR-352)")
+    need("BR-DELEGATION-KEY", "RolesAuthorityDelegationApprovalLimitsView" in text(((ard.get("responses") or {}).get("200") or {})),
+         "approveRoleAuthorityDelegation's 200 is no longer RolesAuthorityDelegationApprovalLimitsView (CR-352)")
+    # BR-FOREIGN-TENDER (ADAM CR-353; CHG-CR353-001)
+    missq = {"tenancy#venueSettingsRecords", "orders#salesOrderRecords", "identity#principalRecords"} - vias_of("getForeignTenderReport")
+    need("BR-FOREIGN-TENDER", not missq, f"getForeignTenderReport does not ask {', '.join(sorted(missq))} (CR-353)")
+    ftr = flat(op("getForeignTenderReport")[3].get("description") or "")
+    for frag in ("(`tender` `cash`)", "`captured` or `refunded`", "One line per (shift, `tender_currency`, `fx_rate`)",
+                 "`recorded_at`", "`opened_at`"):
+        need("BR-FOREIGN-TENDER", frag in ftr, f"getForeignTenderReport does not state {frag!r} (CR-353)")
+    # BR-PRODUCT-FROM-PRICE (ADAM CR-358, option (a); CHG-CR358-001)
+    cat = op("listProducts")[4]
+    fp = ((((cat.get("components") or {}).get("schemas") or {}).get("Product") or {}).get("properties") or {}).get("fromPrice") or {}
+    need("BR-PRODUCT-FROM-PRICE", fp.get("readOnly") is True and fp.get("nullable") is True
+         and fp.get("x-ticvai-persisted") is False and "Money" in text(fp),
+         "Product has no nullable, readOnly, unstored fromPrice Money (CR-358)")
+    lp = op("listProducts")[3]
+    need("BR-PRODUCT-FROM-PRICE", any(isinstance(p, dict) and p.get("name") == "channel" for p in lp.get("parameters") or []),
+         "listProducts takes no channel parameter for a visitor (CR-358)")
+    need("BR-PRODUCT-FROM-PRICE", "tenancy#venueSettingsRecords" in vias_of("listProducts"),
+         "listProducts does not read the currency through tenancy#venueSettingsRecords (CR-358)")
+    for sf, sid in (("screens/P01-guest-web-storefront.yaml", "WEB-035"), ("screens/P02-guest-mobile-app.yaml", "GST-044")):
+        scr = load(sf)
+        scr = scr if isinstance(scr, list) else (scr.get("screens") or [])
+        s_ = next((x for x in scr if isinstance(x, dict) and x.get("id") == sid), {})
+        cards = [c for r in (s_.get("layout") or {}).get("regions") or [] for c in (r.get("components") or [])
+                 if isinstance(c, dict) and c.get("label") == "Prices in your currency"]
+        need("BR-PRODUCT-FROM-PRICE", bool(cards) and all("Product.fromPrice" in (c.get("columns") or []) for c in cards),
+             f"{sid}'s price card does not bind Product.fromPrice (CR-358)")
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -1403,7 +1526,9 @@ def main() -> int:
              "BR-UAEPASS-ENDPOINTS", "BR-LINK-CHECKOUT", "BR-DELEGATION-READS", "BR-GUEST-POLICY-CURRENCY",
              "BR-CONTENT-PAGE-KEY", "BR-CONTENT-PUBLISH",
              "BR-CONTENT-BLOCK", "BR-SCOPE-LOOKUP", "BR-ID-RESUBMIT", "BR-DOC-NUMBER-ENC", "BR-REGISTER-SOURCE",
-             "BR-GUEST-CODE-DELIVERY"]
+             "BR-GUEST-CODE-DELIVERY",
+             "BR-GUEST-SETTINGS", "BR-BILLING-LINES", "BR-SHOP-DROP-COLLECT", "BR-DELEGATION-KEY", "BR-FOREIGN-TENDER",
+             "BR-PRODUCT-FROM-PRICE"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

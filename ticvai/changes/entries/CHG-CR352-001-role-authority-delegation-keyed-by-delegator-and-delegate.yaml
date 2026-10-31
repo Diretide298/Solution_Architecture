@@ -1,0 +1,46 @@
+id: CHG-CR352-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'approveRoleAuthorityDelegation is no longer a singleton: x-ticvai-body-key [delegator, delegate] at the
+  caller''s venue. The PUT replaces the active approvals.delegation between those two people (is_active, valid_to after
+  now, scope_path at or under the venue) whole from the body, or creates one as createApprovalDelegation does; no other
+  delegation is touched. The 200 stays RolesAuthorityDelegationApprovalLimitsView, filled from the row written; the 400,
+  403 and 409 are unchanged.'
+decision:
+  what: 'ADAM CR-352, posted 30 October 2026: "Decided (Chinmay, 30 October 2026): not as recommended: option A for the
+    key, with the answer kept as declared. approveRoleAuthorityDelegation is not a singleton: drop x-ticvai-singleton and
+    its note; it is keyed by the body''s delegator and delegate (x-ticvai-body-key: [delegator, delegate]) at the
+    caller''s venue. ... No other delegation at the venue is touched. The 200 stays
+    RolesAuthorityDelegationApprovalLimitsView, filled from the row written; it does not become ApprovalDelegation. The
+    400, 403 and 409 and their problem types are unchanged." Reviewed on the lead''s instruction of 30 October 2026:
+    "for each one actually check if they hold and if not then find out the best way keeping in mind what client
+    needs".'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-352 (Deep Khanvilkar, #30847, blocking): the operation was flagged a singleton ("one per venue, a PUT
+  replaces it whole") while its field table (CHG-FXC-005) writes one approvals.delegation row per pair of people, so a
+  whole-venue replace would drop other people''s delegations. The package''s rule for a write keyed in its body is
+  x-ticvai-body-key (CHG-R8WFC-001); switching the 200 to ApprovalDelegation would change a published response.'
+keys_touched:
+  operations: [approveRoleAuthorityDelegation]
+  tables: [approvals.delegation]
+  files:
+  - contracts/spine/approvals.yaml
+  - tools/check-business-rules.py
+root_class: 'a write keyed in its body flagged a singleton'
+tickets:
+  started:
+  - '30847 (approveRoleAuthorityDelegation, Deep Khanvilkar): build the upsert by (delegator, delegate) at the caller''s
+    venue through CR-352''s comment; keep the declared response.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-352
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-DELEGATION-KEY
+status: open
+notes: 'check-contract-shapes C-NO-ADDRESS and C-BODY-KEY pass with the body key (delegator and delegate are required
+  body fields); neither had the operation baselined.'
