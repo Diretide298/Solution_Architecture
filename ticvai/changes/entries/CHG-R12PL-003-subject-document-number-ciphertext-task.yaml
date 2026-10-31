@@ -1,0 +1,56 @@
+id: CHG-R12PL-003
+date: '2026-10-30'
+source: cr
+kind: plan
+proposed: '2026-10-30'
+summary: 'A [DB] task for CR-369: pii.subject_document keeps the number encrypted in number_ciphertext, and number_hash
+  becomes nullable.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: a new [DB] task CR369-DB-SUBJECT-DOCUMENT-NUMBER (Hrushikant Patkar, epic
+    PLATFORM, not before 2 November 2026), the database work of #27650 (MIG-PII, whose V0007__pii.sql creates pii.subject_document;
+    #30174 is its table sub-task), following MIG-PII: ADD COLUMN number_ciphertext text; number_hash DROP NOT NULL. Its
+    text carries the decision''s statements and names the release''s forward migration as its Source DDL after r1. Plan
+    change waived from the cooling-off by the lead (31 October 2026: "Waive for r12").'
+  by: Chinmay
+  date: '2026-10-30'
+why: ADAM CR-369 (ADR-0063 section 5); the lead's decision of 30 October 2026, posted on the ticket. The ticket the work
+  belongs to has started or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the
+  release apply makes (no ticket is made through the API).
+keys_touched:
+  tickets:
+  - CR369-DB-SUBJECT-DOCUMENT-NUMBER (new)
+  tables:
+  - pii.subject_document
+  operations:
+  - submitGuestIdentityDocument
+  - guestUaePassLogin
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started:
+  - '27650 ([DB] V0007__pii.sql) and 30174 ([DB] pii.subject_document), Ready for QA, Hrushikant Patkar: not rewritten;
+    the change is CR369-DB-SUBJECT-DOCUMENT-NUMBER''s'
+  unstarted:
+  - '30660 (submitGuestIdentityDocument, New) and 30670 (guestUaePassLogin, New), Hrushikant Patkar: write the number through
+    KERNEL-FIELD-ENC into number_ciphertext'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-369
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task (epics, app-module features, tasks, then the sub-tasks build-service-docs
+  makes), so the ticket the brief names as parent is recorded in the task''s text; its OpenProject parent is the app-module
+  the plan places it in, and it follows the migration that creates its table(s). It changes tables another migration creates,
+  so it is marked `area: database` (the Database track, a [DB] ticket) and its key does not end in -DB: a -DB task''s `table`
+  builds count as created by it (ticket_done.hand_db_tables, CHG-R8MIG-016), which took identity.guest_verification_policy,
+  marketing.waiver_signature and control.release off MIG-IDENTITY-2, MIG-MARKETING-2 and MIG-CONTROL-5 in the first build
+  (check-migration-wording MW-AFTER-R1). #27650 is chosen over #30174: it is the migration ticket; #30174 is its sub-task.'
