@@ -2410,6 +2410,12 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
+  "createSeatMapTemplate": {
+   "reads": [
+    "seating.section_row"
+   ],
+   "reason": "ADAM CR-403 (CHG-CR403-001): the source map's rows are copied into the template's structure when it is saved; seating.section_row is the child table derive-schema makes of Section.rows, which no schema persists to by name, so x-ticvai-reads cannot name it"
+  },
   "createShopAndDrop": {
    "reads": [
     "retail.sale",
@@ -4442,6 +4448,12 @@
    ],
    "reason": "one-read state of every seat: holds, blocks, hold pools, killed/out-of-service seats; sold state via seat_hold status (orders not read directly) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
+  },
+  "getSeatMap": {
+   "reads": [
+    "seating.section_row"
+   ],
+   "reason": "ADAM CR-402 (CHG-CR402-001): getSeatMap answers the map's sections with their rows from seating.section_row, the child table derive-schema makes of Section.rows, which no schema persists to by name, so no contract fact can name it"
   },
   "getSeatMapImport": {
    "reads": [
@@ -6682,10 +6694,9 @@
    "reads": [
     "catalogue.channel_capacity",
     "catalogue.demand_forecast",
-    "catalogue.performance",
-    "orders.sales_order"
+    "catalogue.performance"
    ],
-   "reason": "DM3: catalogue.demand_forecast with forecastKind demand | L2: forecasts need pricing.demand_forecast (missing); actual booking curve and remaining inventory from orders.sales_order and channel_capacity/performance (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "DM3: catalogue.demand_forecast with forecastKind demand; every member, the booking curve's actuals included, comes from the forecast row the forecasting job writes, and nothing is read from Orders (ADAM CR-405, CHG-CR405-001) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "listDenominations": {
@@ -6917,10 +6928,9 @@
     "catalogue.price_execution",
     "catalogue.pricing_recommendation",
     "catalogue.pricing_recommendation_decision",
-    "catalogue.product",
-    "orders.sales_order"
+    "catalogue.product"
    ],
-   "reason": "DM3: executions and recommendation outcomes | L2: KPIs from orders.sales_order and channel_capacity; recommendation outcomes from pricing_recommendation_decision; price timeline needs pricing.price_execution (missing) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "DM3: executions and recommendation outcomes; counts from pricing_recommendation and price_execution, sell-through from channel_capacity, opportunity lost from rejected recommendations' revenue_opportunity; the KPIs that need sales by node wait (LO-CR407-001) and nothing is read from Orders (ADAM CR-407, CHG-CR407-001) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "listDynamicPricingStrategy": {
@@ -8501,10 +8511,9 @@
   "listPriceElasticityRevenue": {
    "reads": [
     "catalogue.demand_forecast",
-    "catalogue.price",
-    "orders.sales_order"
+    "catalogue.price"
    ],
-   "reason": "DM3: catalogue.demand_forecast with forecastKind elasticity | L2: response-curve points need pricing.elasticity_estimate (missing); observed demand at price from orders.sales_order and catalogue.price (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "DM3: catalogue.demand_forecast with forecastKind elasticity; each item is one point of the latest run's response_curve for its slice and context, and nothing is read from Orders (ADAM CR-406, CHG-CR406-001) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "listPriceListTemplate": {
@@ -9308,7 +9317,7 @@
     "catalogue.pricing_simulation",
     "catalogue.product"
    ],
-   "reason": "DM3: command centre over recommendations, executions, automation, simulations and experiments | L2: optimisation portfolio over recommendations/executions/policies (missing tables); approval status from pricing_recommendation_decision, inventory position from channel_capacity/performance (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "DM3: command centre over recommendations, executions, automation, simulations and experiments; one row per pricing_recommendation not ignored, its latest price_execution, the dynamic_pricing_control in force and its demand_forecast row (ADAM CR-408, CHG-CR408-001); inventory position from channel_capacity/performance (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "listRevenueAllocationCost": {

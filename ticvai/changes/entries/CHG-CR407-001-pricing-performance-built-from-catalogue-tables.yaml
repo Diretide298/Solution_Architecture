@@ -1,0 +1,68 @@
+id: CHG-CR407-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'listDynamicPricingPerformance is built now from catalogue''s own tables and keeps every member of the view
+  (ADM-116''s approved columns and four comparison buttons): a row is one node at the requested level (default venue),
+  the period is dateFrom to dateTo in the venue''s time (default the last 30 days), and recommendation counts, price
+  changes, auto-executions, sell-through, opportunity lost and the price timeline (from price_execution, the live price
+  of CR-422) have their rules. Five comparisons are answered, dynamicVsFixed, aiVsRules, aiVsHuman, the market level and
+  the market filter are refused 400 validation, and the KPIs that need sales by node are absent (LO-CR407-001). Money
+  through tenancy#venueSettingsRecords; orders#salesOrderRecords dropped; ordered by label, then key.'
+decision:
+  what: 'ADAM CR-407, posted 31 October 2026 on #35241: "Decided (Chinmay, 31 October 2026): not as recommended: build
+    now from catalogue''s own tables, but keep every member of the view, because ADM-116''s approved columns and its
+    four comparison buttons stay. A row is one node at the requested level (default venue): venue, event, performance,
+    product or price category. Ordered by label, then key. The period is dateFrom to dateTo in the venue''s time,
+    default the last 30 days. Answer: recommendationsGenerated ...; accepted, rejected and modified ...;
+    numberOfPriceChanges (price_execution deployed or partiallyDeployed, executed in the period); autoExecuted ...;
+    sellThrough ...; opportunityLost (sum of revenue_opportunity of the rejected recommendations); and priceTimeline at
+    performance, product or price-category level (one point per deployed execution: at executed_at, price new_price).
+    Money is in the venue''s currency through tenancy#venueSettingsRecords (in process); drop orders#salesOrderRecords.
+    compareBy: strategyVsStrategy ..., venueVsVenue, eventVsEvent, channelVsChannel ..., and currentVsPreviousPeriod
+    .... dynamicVsFixed, aiVsRules and aiVsHuman, the market level and the market filter are refused 400 validation
+    naming the parameter. Leave out (absent, not zero): incrementalRevenue, revenueUplift, marginUplift,
+    averageSellingPrice, conversion, attendance, occupancy, revenuePerAvailableCapacity, strategyRoi, successful,
+    negativeOutcome, and the timeline points'' demand, occupancy, conversion, bookingVelocity and revenue. They wait
+    for a sales-by-node read with a baseline rule, which the package lists as left out." Built into r12 on the lead''s
+    instruction of 31 October 2026: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-407 (Hrushikant Patkar, #35241 listDynamicPricingPerformance): most KPIs need a baseline, costs, sales
+  by node and period or a measured outcome, and none is in the operation''s tables; orders#salesOrderRecords returns
+  headers by id; the order "by at" named a member the row does not have. Cutting the view to catalogue''s counts would
+  have removed approved ADM-116 columns.'
+keys_touched:
+  operations: [listDynamicPricingPerformance]
+  schemas: [DynamicPricingPerformanceOptimizationAnalyticsView]
+  tables: [catalogue.dynamic_pricing_strategy, catalogue.price_execution, catalogue.pricing_recommendation,
+           catalogue.channel_capacity, orders.sales_order]
+  files:
+  - contracts/spine/catalogue.yaml
+  - handoff/api-data-lineage-overrides.json
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+root_class: 'an analytics view drafted from the pack whose KPIs had no rule, whose order named a nested member, and
+  whose only declared read answered none of them'
+tickets:
+  started:
+  - '35241 (listDynamicPricingPerformance, Hrushikant): build the answered figures and comparisons and the 400
+    refusals instead of not building it; read the price timeline from price_execution, the live price (CR-422).'
+  - '36719 to 36721 (ADM-116 front end, on hold until its wireframe is signed): show a left-out figure as empty, not 0.'
+  unstarted:
+  - 'A separate change request for the sales-by-node read with each KPI''s baseline rule (LO-CR407-001), after the AI
+    engineers'' price outcome measure (CR-418).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-407
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRICING-PERFORMANCE
+status: open
+notes: 'Named beyond the posted words: the operation declares the shared 400 BadRequest for the posted refusals (it
+  had no 400), and the venue read''s purpose names the venue''s time zone for the period as well as the currency.
+  Not decided by the posted text: level channel (in the level enum) is neither answered nor refused; the package
+  states the five answered levels and says nothing more for channel, for the lead to rule. check-contract-shapes
+  C-PAGED-ORDER accepted "by `at`" because `at` is a member of a nested object (priceTimeline[].at), not of the row: the
+  class is reported to the lead.'

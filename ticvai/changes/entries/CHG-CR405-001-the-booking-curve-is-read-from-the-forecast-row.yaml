@@ -1,0 +1,54 @@
+id: CHG-CR405-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'listDemandBookingCurve answers every member from the catalogue.demand_forecast row, the booking curve''s
+  actuals included, and reads nothing from Orders: orders#salesOrderRecords leaves its read-via and its lineage.
+  revenue is in the trading currency and scale of the row''s venue through tenancy#venueSettingsRecords (in process);
+  a venue with no trading currency is a 500 with the tenant and venue logged, never a left-out revenue. confidence is
+  the stored 0-1 value times 100; the other percent members are as the job writes them.'
+decision:
+  what: 'ADAM CR-405, posted 31 October 2026 on #35285: "Decided (Chinmay, 31 October 2026): as you recommended, with
+    one correction. Declare tenancy#venueSettingsRecords (in process) for revenue, in the trading currency and scale of
+    the row''s venue. Remove orders#salesOrderRecords: every member comes from the catalogue.demand_forecast row,
+    including the actuals in bookingCurve, which the forecasting job stores. confidence is the stored 0-1 value times
+    100. The other percent members are answered as the job writes them in outputs and errorMetrics, which are already
+    percent. A venue with no trading currency is a misconfiguration: answer 500 and log the tenant and the venue, as
+    the package does wherever a venue has no trading currency. Do not leave revenue out." Built into r12 on the lead''s
+    instruction of 31 October 2026: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-405 (Hrushikant Patkar, #35285 listDemandBookingCurve): revenue is Money but the read-via declared only
+  orders#salesOrderRecords, which answers nothing the view needs, and confidence is a percent in the view but 0-1 on
+  DemandForecast.'
+keys_touched:
+  operations: [listDemandBookingCurve]
+  schemas: [AiDemandForecastingBookingCurveStudioView]
+  tables: [catalogue.demand_forecast, orders.sales_order]
+  files:
+  - contracts/spine/catalogue.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: 'a computed read whose Money had no currency source, hidden because an unrelated read of a table that
+  holds a currency satisfied the currency check'
+tickets:
+  started:
+  - '35285 (listDemandBookingCurve, Hrushikant): keep the venue read and the x100; replace "left out when the venue has
+    no currency" with 500 and a log line naming the tenant and venue; drop the orders read.'
+  - '35295 to 35300, 35307 to 35309, 35405 to 35410, 36716 to 36718 (front ends of BO-1046, BO-1047, BO-1058, BO-591,
+    BO-946 and ADM-104): confidence arrives as a percent.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-405
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-FORECAST-CURVE
+status: open
+notes: 'check-money-currency MC-NO-CURRENCY passed this operation (and listPriceElasticityRevenue and
+  listDynamicPricingPerformance, CR-406 and CR-407) because, by its "precision first" rule, a computed answer next to a
+  read of a table holding a currency (orders.sales_order, through the read-via) passes though the read serves another
+  field. The rule holds the three; the class is reported to the lead rather than tightened here, as the check states
+  that precision choice on purpose. The lineage keeps the catalogue.channel_capacity and catalogue.performance reads
+  the override already listed.'

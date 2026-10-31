@@ -219,3 +219,39 @@ items:
   owner: Chinmay
   added: '2026-10-31'
   change: CHG-CR423-001
+- id: LO-CR407-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-116]
+  what: 'DynamicPricingPerformanceOptimizationAnalyticsView.incrementalRevenue, revenueUplift, marginUplift,
+    averageSellingPrice, conversion, attendance, occupancy, revenuePerAvailableCapacity, strategyRoi, successful and
+    negativeOutcome, and the priceTimeline points'' demand, occupancy, conversion, bookingVelocity and revenue; the
+    market level, the market filter, and the comparisons dynamicVsFixed, aiVsRules and aiVsHuman. Every member stays in
+    the view (ADM-116''s approved columns and its four comparison buttons are kept) and listDynamicPricingPerformance
+    answers these absent, not zero; the level, the filter and the three comparisons are refused 400 validation naming
+    the parameter. Every other member is answered from catalogue''s own tables by the rule CR-407 names.'
+  source: 'ADAM CR-407 (#35241 listDynamicPricingPerformance), decided by Chinmay on 31 October 2026; CHG-CR407-001'
+  reason: 'they need sales by node and period, a baseline rule or a measured outcome, and none is in the operation''s
+    tables: orders#salesOrderRecords returns order headers by id, no baseline rule is written, and nothing measures an
+    executed price''s outcome yet (the price outcome measure, ADAM CR-418); market has no single meaning in the tables
+    (dynamic_pricing_strategy.market_code is text, a control''s market is a scope id)'
+  target: 'r13 or later: a separate change request for a sales-by-node read with each KPI''s baseline rule, after the
+    AI engineers specify the price outcome measure (ADAM CR-418)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR407-001
+- id: LO-CR408-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-108, BO-1043, BO-1050]
+  what: 'RevenueOptimizationCommandCenterView.revenueRisk and RevenueOptimizationCommandCenterSummary.revenueAtRisk,
+    incrementalRevenueGenerated, optimizationSuccessRate and aiRevenueBrief. Every member stays (ADM-108''s approved
+    tiles and columns are kept) and listRevenue answers these five absent, not zero; rankBy revenueRisk falls back to
+    optimizationId. Every other figure is answered by the rule CR-408 names.'
+  source: 'ADAM CR-408 (#35287 listRevenue), decided by Chinmay on 31 October 2026; CHG-CR408-001'
+  reason: 'nothing stores their inputs yet: no risk amount is stored on a recommendation, no outcome of an executed
+    price is measured, and no generator writes the revenue brief'
+  target: 'the AI phase-2 dynamic pricing unit (AI-ENGINE-DYNAMIC-PRICING-AI) or a separate change request'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR408-001

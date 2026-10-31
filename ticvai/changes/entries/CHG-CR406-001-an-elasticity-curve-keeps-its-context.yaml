@@ -1,0 +1,63 @@
+id: CHG-CR406-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'catalogue.demand_forecast keeps the context an elasticity curve was estimated for (day_type, peak_period,
+  season, event_proximity_from_days, event_proximity_to_days; null means any), written by the forecasting job.
+  listPriceElasticityRevenue states the four filters against them, time and elasticityConfidence by rule, the latest run
+  of each slice, one item per response_curve point, inRecommendedRevenueZone, the venue currency through
+  tenancy#venueSettingsRecords instead of orders#salesOrderRecords, and a full order (product nulls last, forecast id,
+  point position).'
+decision:
+  what: 'ADAM CR-406, posted 31 October 2026 on #35226: "Decided (Chinmay, 31 October 2026): as you recommended.
+    catalogue.demand_forecast gains the context an elasticity curve was estimated for, which the forecasting job writes
+    and null means any: day_type (weekday or weekend), peak_period (peak or offPeak), season (text, up to 60), and
+    event_proximity_from_days and event_proximity_to_days (integers). The filters: weekdayWeekend matches day_type,
+    peakOffPeak matches peak_period, season matches season exactly, and eventProximity = n matches rows whose from is
+    null or at most n and whose to is null or at least n. time is the non-null parts joined by '', '' in that order ...
+    elasticityConfidence: confidence below 0.5 is low, 0.5 up to 0.8 is medium, 0.8 and above is high, absent when
+    null. List only the latest run of each slice ... Each item is one point of response_curve on a forecast_kind =
+    ''elasticity'' row. inRecommendedRevenueZone is revenue_zone_min <= price <= revenue_zone_max, absent if either is
+    null. price, revenue, margin, revenueZoneMin and revenueZoneMax are in the venue''s trading currency through
+    tenancy#venueSettingsRecords (in process), and orders#salesOrderRecords is dropped. Order: product ascending with
+    nulls last, then forecast id, then the point''s position in the curve." Built into r12 on the lead''s instruction
+    of 31 October 2026: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-406 (Hrushikant Patkar, #35226 listPriceElasticityRevenue): catalogue.demand_forecast stored no time
+  context, so the view''s time member and the weekdayWeekend, peakOffPeak, eventProximity and season filters had
+  nothing to match; confidence had no bands, no venue currency was read for the five Money members, and the order had
+  no tiebreak. ADM-105''s approved columns include time, so the context is stored rather than dropped.'
+keys_touched:
+  operations: [listPriceElasticityRevenue]
+  schemas: [DemandForecast, PriceElasticityRevenueResponseIntelligenceView]
+  tables: [catalogue.demand_forecast, orders.sales_order]
+  files:
+  - contracts/spine/catalogue.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: 'context filters and a view member drafted from the pack with no stored column to match'
+tickets:
+  started:
+  - '35226 (listPriceElasticityRevenue, Hrushikant): read and filter on the new columns instead of refusing the four
+    filters, answer time and elasticityConfidence by the rules, list the latest run per slice, and use the full order.'
+  - '35784 ([DB] catalogue.demand_forecast, under MIG-CATALOGUE #27671): the five nullable columns, as the [DB] task the
+    plan lane filed for CR-406 says (its text is not rewritten).'
+  - '36698 to 36700 (ADM-105 front end, on hold until its wireframe is signed): no change.'
+  unstarted:
+  - 'The AI engine''s elasticity writer (phase 2; elasticity is learnt only once prices have varied): write the context
+    columns on every elasticity row. No AI unit names the elasticity writer yet; listed for the plan lane.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-406
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ELASTICITY-CONTEXT
+status: open
+notes: 'The new DemandForecast members (dayType, peakPeriod, season, eventProximityFromDays, eventProximityToDays) are
+  new optional response fields, additive by check-contract-compat. The [DB] task the plan lane filed adds a CHECK that
+  event_proximity_from_days <= event_proximity_to_days where both are set; the package states it in the
+  eventProximityFromDays description, but derive-ddl has no mark for a two-column check, so the derived DDL does not
+  carry it and the task''s "matches the package''s derived DDL" cannot hold for that clause until the lead rules which
+  wins. docs/active/ai-phase-plan.json is not changed: it holds no elasticity unit to name the columns on.'

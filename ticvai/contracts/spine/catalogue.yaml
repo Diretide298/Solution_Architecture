@@ -14923,9 +14923,10 @@ paths:
         - "P08 BO-591 Rental Forecasting & Demand Intelligence"
         - "P08 BO-946 Demand Forecast Accuracy & Planning Performance"
       x-ticvai-read-via:
-      - query: orders#salesOrderRecords
+      - query: tenancy#venueSettingsRecords
         route: in-process
-        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it
+          answers: AiDemandForecastingBookingCurveStudioView.revenue, in the currency of the row''s venue (naming-and-style 5.1, ADR-0018; ADAM CR-405, CHG-CR405-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.103-105 (10.6.7
@@ -14955,6 +14956,16 @@ paths:
         `seating.Section.code` of the performance''s published map) as well as per price category, so BO-1047
         Section Revenue Forecast filters by `sectionCode` and the pricing card by `priceCategory`. Unseated products
         have no section and are unaffected.
+
+
+        **Every member comes from the forecast row** (ADAM CR-405, decided 31 October 2026; CHG-CR405-001). Each
+        item is one `catalogue.demand_forecast` row (`forecast_kind` `demand`), the actuals in `bookingCurve`
+        included: the forecasting job stores them on the row, and nothing is read from Orders. `confidence` is the
+        stored 0-1 value times 100; the other percent members are answered as the job writes them in `outputs` and
+        `errorMetrics`, which are already percent. `revenue` is in the trading currency and scale of the row''s
+        venue, read in process through `tenancy#venueSettingsRecords`. A venue with no trading currency is a
+        misconfiguration: the answer is 500 and the tenant and the venue are logged, as wherever a venue has no
+        trading currency; `revenue` is never left out.
 
         **Order.** Newest first, by `generatedAt` descending, then by `forecastId`.'
       tags:
@@ -15059,9 +15070,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-105 Price Elasticity & Revenue Response Intelligence"
       x-ticvai-read-via:
-      - query: orders#salesOrderRecords
+      - query: tenancy#venueSettingsRecords
         route: in-process
-        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it
+          answers: PriceElasticityRevenueResponseIntelligenceView.price, revenue, margin, revenueZoneMin and revenueZoneMax (naming-and-style 5.1, ADR-0018; ADAM CR-406, CHG-CR406-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.105-107 (10.6.8
@@ -15083,7 +15095,24 @@ paths:
         Advisory estimates; where data is thin the confidence reads low and no false precision is shown (pack
         p.106).
 
-        **Order.** Sorted by `product` ascending.'
+
+        **The context and the rules** (ADAM CR-406, decided 31 October 2026; CHG-CR406-001). Each item is one point
+        of `response_curve` on a `catalogue.demand_forecast` row with `forecast_kind` `elasticity`. The forecasting
+        job writes the context the curve was estimated for, and null means any: `day_type`, `peak_period`,
+        `season`, `event_proximity_from_days` and `event_proximity_to_days`. The filters: `weekdayWeekend` matches
+        `day_type`, `peakOffPeak` matches `peak_period`, `season` matches `season` exactly, and `eventProximity` =
+        n matches rows whose from is null or at most n and whose to is null or at least n. `time` is the non-null
+        parts joined by '', '' in that order, with the proximity written as ''{from}-{to} days'', and absent when all
+        are null. `elasticityConfidence`: `confidence` below 0.5 is `low`, 0.5 up to 0.8 is `medium`, 0.8 and above
+        is `high`, absent when null. Only the latest run of each slice is listed (latest `generated_at`, then
+        `id`), where a slice is the same venue, product, event, performance, price category, channel, customer
+        segment and context, with nulls counted equal. `inRecommendedRevenueZone` is `revenue_zone_min` <= price
+        <= `revenue_zone_max`, absent if either is null. `price`, `revenue`, `margin`, `revenueZoneMin` and
+        `revenueZoneMax` are in the venue''s trading currency, read in process through
+        `tenancy#venueSettingsRecords`; nothing is read from Orders.
+
+        **Order.** Sorted by `product` ascending with nulls last, then by the forecast''s `id`, then by the point''s
+        position in the curve.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -15424,6 +15453,10 @@ paths:
         - "P08 ADM-108 Revenue Optimization Command Center"
         - "P08 BO-1043 Revenue Command Center"
         - "P08 BO-1050 Revenue Analytics & Audit"
+      x-ticvai-reads:
+      - table: catalogue.demand_forecast
+        for: 'forecastRevenue: outputs.revenue of the recommendation''s demand_forecast_id row; demandVariance from its
+          bookingCurve; forecastAccuracy from errorMetrics.mape (ADAM CR-408; CHG-CR408-001)'
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -15452,7 +15485,53 @@ paths:
         changes a live price without human approval; autonomous execution is off by default and bounded by Board
         5 guardrails (listAutomationPolicyAutonomous).
 
-        **Order.** Sorted by `optimizationId` descending (a UUIDv7, so newest first).'
+
+        **The row** (ADAM CR-408, decided 31 October 2026; CHG-CR408-001). One optimisation is one
+        `catalogue.pricing_recommendation` whose status is not `ignored`. `optimizationId` and `recommendationId`
+        are its id. `currentPrice` and `recommendedPrice` are its prices. `confidence` is its confidence times 100.
+        `revenueOpportunity` and `urgency` are its own. `forecastRevenue` is `outputs.revenue` of its
+        `demand_forecast_id` row (`catalogue.demand_forecast`). `expectedUplift` is `revenueOpportunity` over
+        `forecastRevenue`, times 100. Both are absent without a forecast.
+
+
+        **Statuses.** `approvalStatus`: `notRequired` where its latest `price_execution` has `execution_source`
+        `conditionalAutonomous` or `autonomous`; otherwise `pending` for pending, sentToSimulation or
+        sentForApproval, `approved` for accepted or modified, and `rejected` for rejected. `executionStatus` comes
+        from its latest `price_execution` (by `pricing_recommendation_id`, latest `created_at`): scheduled is
+        `queued`, executing is `processing`, deployed is `live`, partiallyDeployed is `partial`, failed is
+        `failed`, reverted is `rolledBack`, and no execution is `notStarted`.
+
+
+        **The other members.** `automationMode` is `automation_level` of the `dynamic_pricing_control` in force now
+        (`effective_from` null or past, `effective_to` null or future), taking the most specific scope that matches:
+        performance, then event, then product, then strategy, then venue, then global; with none, it is `advisory`.
+        `eventProximity` is the days from the venue''s today to the performance''s `starts_at`. `inventoryPosition`
+        is the sum of `channel_capacity` remaining over the sum of capacity for the performance, times 100.
+        `demandVariance` is (actualPercentSold minus forecastPercentSold) over forecastPercentSold, times 100, at the
+        latest point of the forecast''s `bookingCurve` that has an actual. `nextAction` is `review` for pending,
+        `simulate` for sentToSimulation, `approve` for sentForApproval, and absent otherwise. `priorityRank` is the
+        row''s position in the order below.
+
+
+        **Summary, over the filtered rows.** `revenueOpportunity` is the sum over pending rows.
+        `activeOptimizations` counts rows pending, sentToSimulation or sentForApproval, or whose execution is
+        executing, scheduled, deployed or partially deployed. `recommendationsAwaitingAction` counts pending.
+        `pendingSimulations` counts sentToSimulation. `approvalRequired` counts sentForApproval.
+        `autoExecutedChanges` counts executions with source conditionalAutonomous or autonomous in the last 30
+        days. `activeABTests` counts `catalogue.pricing_experiment` rows whose stage is `running`.
+        `pricingExceptions` counts executions in the last 30 days that failed or have `price_inconsistency`.
+        `forecastAccuracy` is 100 minus the mean `errorMetrics.mape` of the venue''s demand forecasts generated in
+        the last 30 days.
+
+
+        **Left out (absent, not zero)**: `revenueRisk`, `revenueAtRisk`, `incrementalRevenueGenerated`,
+        `optimizationSuccessRate` and `aiRevenueBrief`. Nothing stores their inputs yet (docs/active/left-out.yaml
+        LO-CR408-001).
+
+        **Order.** By `rankBy` (default `revenueOpportunity`): descending, except `eventProximity` and
+        `inventoryPosition` ascending, `urgency` critical first and `demandVariance` by size; rows without the
+        factor sort last (NULLS LAST), and `optimizationId` descending breaks every tie. `rankBy` `revenueRisk`, left
+        out, falls back to `optimizationId` descending.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -16168,10 +16247,14 @@ paths:
       operationId: listDynamicPricingPerformance
       x-ticvai-consumed-by:
         - "P08 ADM-116 Dynamic Pricing Performance & Optimization Analytics"
+      x-ticvai-reads:
+      - table: catalogue.dynamic_pricing_strategy
+        for: 'compareBy strategyVsStrategy: one row per strategy, comparisonGroup its code (ADAM CR-407; CHG-CR407-001)'
       x-ticvai-read-via:
-      - query: orders#salesOrderRecords
+      - query: tenancy#venueSettingsRecords
         route: in-process
-        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it
+          answers: DynamicPricingPerformanceOptimizationAnalyticsView.opportunityLost and priceTimeline.price, and the venue''s time zone for the period (naming-and-style 5.1, ADR-0018; ADAM CR-407, CHG-CR407-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Pricing___Revenue_Management_Reference.pdf'' pp.126-128 (10.7.9
@@ -16192,7 +16275,37 @@ paths:
         lost added; example values and prose dropped. Opportunity lost is an analytical estimate, not a certainty
         (pack p.128).
 
-        **Order.** Newest first, by `at` descending.'
+
+        **Built from catalogue''s own tables, every member kept** (ADAM CR-407, decided 31 October 2026;
+        CHG-CR407-001). ADM-116''s approved columns and its four comparison buttons stay. A row is one node at the
+        requested `level` (default `venue`): venue, event, performance, product or price category. The period is
+        `dateFrom` to `dateTo` in the venue''s time, default the last 30 days. Answered: `recommendationsGenerated`
+        (`catalogue.pricing_recommendation` rows generated in the period); `accepted`, `rejected` and `modified`
+        (those rows by status); `numberOfPriceChanges` (`catalogue.price_execution` rows `deployed` or
+        `partiallyDeployed`, executed in the period); `autoExecuted` (those with `execution_source`
+        `conditionalAutonomous` or `autonomous`); `sellThrough` (the sum of `channel_capacity` sold over the sum of
+        capacity, times 100, for the node''s performances starting in the period); `opportunityLost` (the sum of
+        `revenue_opportunity` of the rejected recommendations); and `priceTimeline` at performance, product or
+        price-category level (one point per deployed execution: `at` its `executed_at`, `price` its `new_price`).
+        Money is in the venue''s currency, read in process through `tenancy#venueSettingsRecords`; nothing is read
+        from Orders.
+
+
+        **Comparisons.** `strategyVsStrategy`: one row per `catalogue.dynamic_pricing_strategy`, `comparisonGroup`
+        its code. `venueVsVenue` and `eventVsEvent`: one row per venue or event. `channelVsChannel`: one row per
+        channel in the executions'' `channelDeployments`, with only the execution counts. `currentVsPreviousPeriod`:
+        each node twice, `comparisonGroup` `current` or `previous`, the previous period being the same length just
+        before. `dynamicVsFixed`, `aiVsRules` and `aiVsHuman`, `level` `market` and the `market` filter are refused
+        `400 validation` naming the parameter.
+
+
+        **Left out (absent, not zero)**: `incrementalRevenue`, `revenueUplift`, `marginUplift`,
+        `averageSellingPrice`, `conversion`, `attendance`, `occupancy`, `revenuePerAvailableCapacity`, `strategyRoi`,
+        `successful`, `negativeOutcome`, and the timeline points'' `demand`, `occupancy`, `conversion`,
+        `bookingVelocity` and `revenue`. They wait for a sales-by-node read with a baseline rule
+        (docs/active/left-out.yaml LO-CR407-001).
+
+        **Order.** By `label`, then by `key`.'
       tags:
         - drafted
       x-ticvai-permission: PRODUCT_VIEW
@@ -16284,6 +16397,8 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/DynamicPricingPerformanceOptimizationAnalyticsView'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /learning-model-performance:
@@ -39171,7 +39286,7 @@ components:
           description: Channel
         confidence:
           type: number
-          description: Forecast Confidence, percent
+          description: Forecast Confidence, percent (`DemandForecast.confidence` x 100; ADAM CR-405)
         forecastFinalOccupancy:
           type: number
           description: Forecast Final Occupancy, percent
@@ -39323,7 +39438,8 @@ components:
           description: Channel
         time:
           type: string
-          description: 'Time context of the curve: weekday/weekend, peak/off-peak or season label'
+          description: 'Time context of the curve: the non-null parts of day type, peak period, season and event
+            proximity (''{from}-{to} days''), joined by '', '' in that order; absent when all are null (ADAM CR-406)'
         product:
           type: string
           description: Product id
@@ -39343,7 +39459,8 @@ components:
           nullable: true
         elasticityConfidence:
           type: string
-          description: Elasticity Confidence
+          description: 'Elasticity Confidence, banded from `DemandForecast.confidence`: below 0.5 `low`, 0.5 up to 0.8
+            `medium`, 0.8 and above `high`; absent when it is null (ADAM CR-406)'
           enum:
             - low
             - medium
@@ -39746,10 +39863,14 @@ components:
             - autonomous
         approvalStatus:
           type: string
-          description: 'Approval Status: notRequired, pending, approved or rejected'
+          description: 'Approval Status: notRequired, pending, approved or rejected. notRequired where the latest
+            execution''s source is conditionalAutonomous or autonomous; else pending for pending, sentToSimulation or
+            sentForApproval, approved for accepted or modified, rejected for rejected (ADAM CR-408)'
         executionStatus:
           type: string
-          description: 'Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack'
+          description: 'Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack, from
+            the latest price_execution: scheduled queued, executing processing, deployed live, partiallyDeployed
+            partial, failed failed, reverted rolledBack, none notStarted (ADAM CR-408)'
         revenueRisk:
           $ref: ../shared/common.yaml#/components/schemas/Money
           description: Revenue Risk if no action is taken
@@ -46035,6 +46156,39 @@ components:
           type: string
           maxLength: 60
           nullable: true
+        dayType:
+          type: string
+          nullable: true
+          enum:
+          - weekday
+          - weekend
+          - null
+          description: 'Elasticity: the day type the curve was estimated for; null means any (ADAM CR-406). Written by
+            the forecasting job.'
+        peakPeriod:
+          type: string
+          nullable: true
+          enum:
+          - peak
+          - offPeak
+          - null
+          description: 'Elasticity: the peak period the curve was estimated for; null means any (ADAM CR-406).'
+        season:
+          type: string
+          maxLength: 60
+          nullable: true
+          description: 'Elasticity: the configured season name the curve was estimated for; null means any (ADAM
+            CR-406).'
+        eventProximityFromDays:
+          type: integer
+          nullable: true
+          description: 'Elasticity: the nearest days before the event the curve holds for; null means no lower bound.
+            At most eventProximityToDays where both are set (ADAM CR-406).'
+        eventProximityToDays:
+          type: integer
+          nullable: true
+          description: 'Elasticity: the furthest days before the event the curve holds for; null means no upper bound
+            (ADAM CR-406).'
         horizon:
           type: string
           enum:

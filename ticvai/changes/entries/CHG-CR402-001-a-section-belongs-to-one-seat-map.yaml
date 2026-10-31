@@ -1,0 +1,74 @@
+id: CHG-CR402-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'seating.section belongs to one seat map: seat_map_id uuid NOT NULL, a foreign key to seating.seat_map(id),
+  and the unique index section_seat_map_id_code_uniq on (seat_map_id, code), the code matched exactly as seats and
+  every sectionCode match it. Section answers seatMapId (read-only, required). Every writer of a section sets it to the
+  map it writes into (createSeatMap, editSeatMapStructure addSections, cloneSeatMap, copySeatMapSection, the imports
+  when committed); a code already used on the map is 409 seat-label-taken; getSeatMap answers the map''s sections with
+  their rows; updateSeatMap answers 404 not-found for a sectionViews code that is not one of the map''s sections.'
+decision:
+  what: 'ADAM CR-402, posted 31 October 2026 on #35674: "Decided (Chinmay, 31 October 2026): as you recommended, with
+    one change: the unique key is on (seat_map_id, code), not lower(code), because seats and every sectionCode in the
+    API match the code exactly. seating.section gains seat_map_id uuid NOT NULL, a foreign key to
+    seating.seat_map(id), and the unique index section_seat_map_id_code_uniq on (seat_map_id, code). Section gains
+    seatMapId (uuid, read-only, additive). Every writer of a section sets it to the map it writes into: createSeatMap,
+    editSeatMapStructure addSections, cloneSeatMap, copySeatMapSection, and the imports when committed. A code already
+    used on that map is refused 409 seat-label-taken, as editSeatMapStructure does now. getSeatMap answers the map''s
+    sections (seat_map_id = seatMapId) with their rows from seating.section_row. In updateSeatMap, a sectionViews
+    sectionCode that is not one of this map''s sections answers 404 not-found and nothing is written. Row security on
+    section is unchanged (its scope_path)." Built into r12 on the lead''s instruction of 31 October 2026: "Include
+    them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-402 (Hrushikant Patkar, #35674 getSeatMap, blocking): seating.section had no column naming its map
+  (scope_path is the venue''s, and a venue has many maps), so getSeatMap could only answer sections: [] and
+  updateSeatMap could only answer 404 for every sectionCode, while seat, zone and seating_rules already carry
+  seat_map_id. The package''s own lineage said seating.section "reaches the root through nothing".'
+keys_touched:
+  operations: [getSeatMap, updateSeatMap, createSeatMap, editSeatMapStructure, cloneSeatMap, copySeatMapSection,
+               commitImportJob]
+  schemas: [Section]
+  tables: [seating.section]
+  files:
+  - contracts/satellite/seating.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+  - tools/check-storage-promises.py
+root_class: 'a child table drafted from a response shape with no key to the parent the response nests it under, so
+  "on this map" had nothing to match'
+tickets:
+  started:
+  - '35674 (getSeatMap, Hrushikant): read the map''s sections by seat_map_id, with their rows from section_row,
+    instead of answering sections: [].'
+  - '35675 (updateSeatMap, Hrushikant): answer 404 not-found only for a sectionCode not among the map''s sections, and
+    write view_asset_id on the matching row; nothing is written on a 404.'
+  - '35673 (createSeatMap, Hrushikant): set seat_map_id on every section it writes (see CR-403).'
+  - '35668 (editSeatMapStructure, Sanket Keluskar): set seat_map_id on addSections and resolve every sectionCode within
+    the map; a taken code is 409 seat-label-taken.'
+  - '35653 ([DB] seating.section, under MIG-SEATING #27668): the column, its foreign key and the unique index, as the
+    [DB] task the plan lane filed for CR-402 says (its text is not rewritten).'
+  unstarted:
+  - 'The cloneSeatMap, copySeatMapSection, importSeatMap and commitImportJob back-end tickets, when picked: write
+    seat_map_id = the target map; copySeatMapSection answers 409 seat-label-taken for a code the target map already
+    uses.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-402
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SEAT-MAP-SECTIONS
+status: open
+notes: 'Named beyond the posted words: (1) copySeatMapSection gains a 409 response listing seat-label-taken, since it
+  is the one writer that adds a section to an existing map and had no 409 to carry the posted refusal; (2) updateSeatMap
+  declares its 404 (the shared NotFound), which the posted 404 not-found needs and the operation lacked; (3) Section.code
+  carries x-ticvai-unique-compare: exact so derive-ddl keys the index on code, not lower(code), as the decision says;
+  (4) commitImportJob declares its write of seating.section (x-ticvai-writes) and getSeatMap its read of
+  seating.section_row (a lineage override: the child table of Section.rows has no schema to name), the reads and
+  writes the posted text describes; neither changes the delivery slice.
+  check-contract-compat counts a new required response field and new error responses as additive, so no BC entry.
+  check-storage-promises SP-DUPLICATE-409 read copySeatMapSection''s new 409 as a per-tenant promise on sectionCode,
+  because it looked for x-ticvai-unique-together on the answered resource only, not on a child it nests: it now counts
+  a nested child''s unique-together (Section [seatMapId, code], named sectionCode in the request).'

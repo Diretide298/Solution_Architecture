@@ -229,6 +229,28 @@ And one rule per decision:
                    declares 400 validation and 422 scope-id-required / scope-not-found / no-approval-route, keeps a raise
                    in pendingAutomationLevel and pendingApprovalRequestId (readOnly), types its three lists as arrays,
                    and Catalogue consumes the four approval outcomes for subjectType dynamicPricingControl.
+  BR-SEAT-MAP-SECTIONS (r12, ADAM CR-402, CHG-CR402-001) Section carries a required, read-only seatMapId referencing
+                   seating.seat_map, unique with code (matched exactly); getSeatMap answers the map's sections by it, the
+                   five writers say they set it, and editSeatMapStructure and copySeatMapSection answer a taken code 409
+                   seat-label-taken.
+  BR-SEAT-TEMPLATE-COPY (r12, ADAM CR-403, CHG-CR403-001) SeatMapTemplate keeps its own structure at its region's
+                   scope_path, read-beneath, with a read-only sourceSeatMapId; createSeatMapTemplate persists the source;
+                   createSeatMap reads the template, writes seating.seat, answers 422 unknown-reference and copies no
+                   view photo.
+  BR-SEAT-MAP-UPDATE (r12, ADAM CR-404, CHG-CR404-001) updateSeatMap declares no 409 its body cannot cause and does
+                   declare the 404 a sectionViews code off the map answers (CR-402).
+  BR-FORECAST-CURVE (r12, ADAM CR-405, CHG-CR405-001) listDemandBookingCurve reads the venue currency through
+                   tenancy#venueSettingsRecords, nothing from Orders, answers confidence x 100 and a venue with no
+                   currency 500, never a left-out revenue.
+  BR-ELASTICITY-CONTEXT (r12, ADAM CR-406, CHG-CR406-001) DemandForecast stores the five context columns;
+                   listPriceElasticityRevenue reads the venue currency (not Orders) and states the filters, the
+                   latest-run rule, the confidence bands, the item and the full order.
+  BR-PRICING-PERFORMANCE (r12, ADAM CR-407, CHG-CR407-001) listDynamicPricingPerformance reads the venue currency and
+                   the strategies (not Orders), orders by label then key (not a nested `at`), refuses what it cannot
+                   compare 400, and keeps every view member with the left-out KPIs on LO-CR407-001.
+  BR-REVENUE-ROW   (r12, ADAM CR-408, CHG-CR408-001) listRevenue declares its demand_forecast read, defines the row,
+                   the status mappings and the control in force, orders by rankBy and lists the five left-out figures
+                   (LO-CR408-001).
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -1755,6 +1777,113 @@ def main() -> int:
                                        and "dynamicPricingControl" in str(c.get("purpose") or "") for c in cons),
              f"events/approval-{evn}.yaml has no catalogue consumer for subjectType dynamicPricingControl (CR-425)")
 
+    # ---------------------------------------------------------------- r12 CR lane J, seat maps and revenue reads (ADAM
+    # CR-402 to CR-408; the lead, 31 October 2026: "Include them in r12"). Each rule fails on the r12 candidate before
+    # the posted decision (28bc5f7b) and passes once the decision is in the package.
+    seat_doc = load("contracts/satellite/seating.yaml")
+    seat_s = ((seat_doc.get("components") or {}).get("schemas") or {})
+
+    def seat_props(name):
+        return (seat_s.get(name) or {}).get("properties") or {}
+
+    def writes_of(oid):
+        return {str(r.get("table")) for r in op(oid)[3].get("x-ticvai-writes") or [] if isinstance(r, dict)}
+
+    ov_j = (json.loads((ROOT / "handoff" / "api-data-lineage-overrides.json").read_text(encoding="utf-8"))
+            .get("operations") or {})
+    lo_j = {str(i.get("id")) for i in (load("docs/active/left-out.yaml").get("items") or []) if isinstance(i, dict)}
+    # BR-SEAT-MAP-SECTIONS (ADAM CR-402; CHG-CR402-001)
+    sec = seat_s.get("Section") or {}
+    smi = seat_props("Section").get("seatMapId") or {}
+    need("BR-SEAT-MAP-SECTIONS", smi.get("readOnly") is True and smi.get("x-ticvai-references") == "seating.seat_map"
+         and "seatMapId" in (sec.get("required") or []),
+         "Section has no required, read-only seatMapId referencing seating.seat_map, so no section belongs to a map (CR-402)")
+    need("BR-SEAT-MAP-SECTIONS", ["seatMapId", "code"] in (sec.get("x-ticvai-unique-together") or [])
+         and (seat_props("Section").get("code") or {}).get("x-ticvai-unique-compare") == "exact",
+         "Section is not unique on (seatMapId, code) with code matched exactly, as Seat's key matches it (CR-402)")
+    need("BR-SEAT-MAP-SECTIONS", "`seat_map_id` is `seatMapId`" in descr("getSeatMap"),
+         "getSeatMap does not answer the map's sections by seat_map_id (CR-402)")
+    for oid in ("createSeatMap", "editSeatMapStructure", "cloneSeatMap", "copySeatMapSection", "commitImportJob"):
+        need("BR-SEAT-MAP-SECTIONS", "seat_map_id" in descr(oid),
+             f"{oid} does not say the sections it writes take seat_map_id (CR-402)")
+    for oid in ("editSeatMapStructure", "copySeatMapSection"):
+        need("BR-SEAT-MAP-SECTIONS", "seat-label-taken" in codes_of(oid, "409"),
+             f"{oid} does not answer a section code already on the map 409 seat-label-taken (CR-402)")
+    # BR-SEAT-TEMPLATE-COPY (ADAM CR-403; CHG-CR403-001)
+    tpl = seat_s.get("SeatMapTemplate") or {}
+    tp = seat_props("SeatMapTemplate")
+    need("BR-SEAT-TEMPLATE-COPY", tpl.get("x-ticvai-rls") == "read-beneath" and "scopePath" in tp
+         and {"structure", "scopePath"} <= set(tpl.get("required") or []),
+         "SeatMapTemplate keeps no structure, or is not read-beneath at its region's scope_path (CR-403)")
+    need("BR-SEAT-TEMPLATE-COPY", (tp.get("sourceSeatMapId") or {}).get("readOnly") is True
+         and (tp.get("sourceSeatMapId") or {}).get("x-ticvai-references") == "seating.seat_map",
+         "SeatMapTemplate has no read-only sourceSeatMapId for lineage (CR-403)")
+    cst = (((((op("createSeatMapTemplate")[3].get("requestBody") or {}).get("content") or {}).get("application/json")
+            or {}).get("schema") or {}).get("properties") or {}).get("sourceSeatMapId") or {}
+    need("BR-SEAT-TEMPLATE-COPY", cst and cst.get("x-ticvai-persisted") is not False,
+         "createSeatMapTemplate's sourceSeatMapId is still not persisted (CR-403)")
+    need("BR-SEAT-TEMPLATE-COPY", "seating.seat_map_template" in reads_of("createSeatMap")
+         and "seating.seat" in writes_of("createSeatMap")
+         and "unknown-reference" in codes_of("createSeatMap", "422"),
+         "createSeatMap does not declare the read of seating.seat_map_template, the write of seating.seat, or 422 "
+         "unknown-reference for a template it cannot use (CR-403)")
+    need("BR-SEAT-TEMPLATE-COPY", "View photos are not copied" in descr("createSeatMap"),
+         "createSeatMap does not say a template's copy carries no view photos (CR-403)")
+    # BR-SEAT-MAP-UPDATE (ADAM CR-404; CHG-CR404-001)
+    usm = op("updateSeatMap")[3]
+    need("BR-SEAT-MAP-UPDATE", "409" not in (usm.get("responses") or {})
+         and "Structural changes to a published map are rejected" not in descr("updateSeatMap"),
+         "updateSeatMap still declares a 409 its body cannot cause, or still says structural changes are rejected (CR-404)")
+    need("BR-SEAT-MAP-UPDATE", "404" in (usm.get("responses") or {}),
+         "updateSeatMap does not declare the 404 a sectionViews code off the map answers (CR-402)")
+    # BR-FORECAST-CURVE (ADAM CR-405; CHG-CR405-001)
+    ldc = descr("listDemandBookingCurve")
+    need("BR-FORECAST-CURVE", "tenancy#venueSettingsRecords" in vias_of("listDemandBookingCurve")
+         and "orders#salesOrderRecords" not in vias_of("listDemandBookingCurve")
+         and "orders.sales_order" not in ((ov_j.get("listDemandBookingCurve") or {}).get("reads") or []),
+         "listDemandBookingCurve does not read the venue currency through tenancy#venueSettingsRecords, or still reads "
+         "Orders (CR-405)")
+    for frag in ("stored 0-1 value times 100", "the answer is 500", "`revenue` is never left out"):
+        need("BR-FORECAST-CURVE", frag in ldc, f"listDemandBookingCurve does not state {frag!r} (CR-405)")
+    # BR-ELASTICITY-CONTEXT (ADAM CR-406; CHG-CR406-001)
+    dfp = sprops("DemandForecast")
+    miss = {"dayType", "peakPeriod", "season", "eventProximityFromDays", "eventProximityToDays"} - set(dfp)
+    need("BR-ELASTICITY-CONTEXT", not miss,
+         f"DemandForecast does not store the elasticity context {', '.join(sorted(miss))} (CR-406)")
+    need("BR-ELASTICITY-CONTEXT", "tenancy#venueSettingsRecords" in vias_of("listPriceElasticityRevenue")
+         and "orders#salesOrderRecords" not in vias_of("listPriceElasticityRevenue")
+         and "orders.sales_order" not in ((ov_j.get("listPriceElasticityRevenue") or {}).get("reads") or []),
+         "listPriceElasticityRevenue does not read the venue currency through tenancy#venueSettingsRecords, or still "
+         "reads Orders (CR-406)")
+    lpe = descr("listPriceElasticityRevenue")
+    for frag in ("`weekdayWeekend` matches `day_type`", "latest run of each slice", "below 0.5 is `low`",
+                 "one point of `response_curve`", "Sorted by `product` ascending with nulls last"):
+        need("BR-ELASTICITY-CONTEXT", frag in lpe, f"listPriceElasticityRevenue does not state {frag!r} (CR-406)")
+    # BR-PRICING-PERFORMANCE (ADAM CR-407; CHG-CR407-001)
+    ldp = descr("listDynamicPricingPerformance")
+    need("BR-PRICING-PERFORMANCE", "tenancy#venueSettingsRecords" in vias_of("listDynamicPricingPerformance")
+         and "orders#salesOrderRecords" not in vias_of("listDynamicPricingPerformance")
+         and "catalogue.dynamic_pricing_strategy" in reads_of("listDynamicPricingPerformance")
+         and "orders.sales_order" not in ((ov_j.get("listDynamicPricingPerformance") or {}).get("reads") or []),
+         "listDynamicPricingPerformance does not read the venue currency and the strategies, or still reads Orders (CR-407)")
+    need("BR-PRICING-PERFORMANCE", "by `at`" not in ldp and "By `label`, then by `key`" in ldp,
+         "listDynamicPricingPerformance orders by a member its row does not have, not by label then key (CR-407)")
+    need("BR-PRICING-PERFORMANCE", "400" in (op("listDynamicPricingPerformance")[3].get("responses") or {})
+         and "`400 validation` naming the parameter" in ldp,
+         "listDynamicPricingPerformance does not refuse the comparisons and the market level it cannot answer (CR-407)")
+    need("BR-PRICING-PERFORMANCE", "LO-CR407-001" in lo_j and "absent, not zero" in ldp
+         and "incrementalRevenue" in sprops("DynamicPricingPerformanceOptimizationAnalyticsView"),
+         "the KPIs CR-407 leaves out are not absent and on the left-out list, or the view lost an approved member")
+    # BR-REVENUE-ROW (ADAM CR-408; CHG-CR408-001)
+    lrv = descr("listRevenue")
+    need("BR-REVENUE-ROW", "catalogue.demand_forecast" in reads_of("listRevenue"),
+         "listRevenue does not declare its read of catalogue.demand_forecast (CR-408)")
+    for frag in ("whose status is not `ignored`", "scheduled is `queued`", "most specific scope that matches",
+                 "By `rankBy` (default `revenueOpportunity`)", "LO-CR408-001"):
+        need("BR-REVENUE-ROW", frag in lrv, f"listRevenue does not state {frag!r} (CR-408)")
+    need("BR-REVENUE-ROW", "Sorted by `optimizationId` descending" not in lrv and "LO-CR408-001" in lo_j,
+         "listRevenue still orders by optimizationId against its rankBy, or the left-out figures are not listed (CR-408)")
+
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
@@ -1779,7 +1908,9 @@ def main() -> int:
              "BR-BOOKING-FLOW-MISSING", "BR-CALL-DISPOSITION", "BR-RESTORE-MISSING-PAGE",
              "BR-PRICING-QUEUE-MEMBERS", "BR-PRICING-AUTOMATION-LEVEL", "BR-PRICING-SCORECARD", "BR-PRICE-SIMULATION",
              "BR-CALC-PROFILE-VERSION", "BR-ROLLBACK-CANCEL", "BR-LIVE-PRICE", "BR-STRATEGY-FIGURES",
-             "BR-PRICE-BAND-ORDER", "BR-GUARDRAIL-SCOPE"]
+             "BR-PRICE-BAND-ORDER", "BR-GUARDRAIL-SCOPE",
+             "BR-SEAT-MAP-SECTIONS", "BR-SEAT-TEMPLATE-COPY", "BR-SEAT-MAP-UPDATE", "BR-FORECAST-CURVE",
+             "BR-ELASTICITY-CONTEXT", "BR-PRICING-PERFORMANCE", "BR-REVENUE-ROW"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
