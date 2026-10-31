@@ -1,0 +1,47 @@
+id: CHG-CR397-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'createAccessPoint states that a new access point is created active (isActive true) with no active flag in
+  the request, and is taken out of use with updateAccessPoint; setAccessPointDirection no longer promises a device
+  status: an offline device keeps its old direction until it reconnects, which the returned AccessPoint shows through
+  lastHeartbeatAt (and directionEffectiveAt for a pending switch). No new field, no column default.'
+decision:
+  what: 'ADAM CR-397 (Chinmay, 31 October 2026, posted on #30963: "not as recommended: no new field. createAccessPoint
+    always writes a new access point with is_active true, as you built it ... the AccessPoint returned shows that
+    through lastHeartbeatAt (and directionEffectiveAt for a pending switch). Build nothing for a device status"), after
+    the lead''s review of every CR ("for each one actually check if they hold and if not then find out the best way
+    keeping in mind what client needs") and his instruction "Include them in r12". contracts/spine/access.yaml:
+    createAccessPoint gains a description; setAccessPointDirection''s last sentence re-pointed at lastHeartbeatAt.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-397 (Hrushikant Patkar, #30963 createAccessPoint): access_point.is_active is NOT NULL with no default
+  and CreateAccessPointRequest had no isActive, and setAccessPointDirection promised a device status AccessPoint does
+  not have. The approved BO-064 create form sends no active flag and updateAccessPoint already takes isActive, so a new
+  request field (option A) or AccessPoint.deviceStatus (option B) would add members with no source.'
+keys_touched:
+  screens: [BO-064, BO-230]
+  operations: [createAccessPoint, setAccessPointDirection]
+  schemas: [AccessPoint]
+  tables: [access.access_point]
+  files:
+  - contracts/spine/access.yaml
+  - tools/check-business-rules.py
+root_class: 'a required column a create does not say how it sets, and a response promise naming a member the
+  schema does not have'
+tickets:
+  started:
+  - '30963 (createAccessPoint, Hrushikant Patkar): no change; keep writing is_active true.'
+  - '30965 (setAccessPointDirection), if started: no device-status member to build; return AccessPoint as defined.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-397
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ACCESS-POINT-ACTIVE
+status: open
+notes: 'The class (prose promising a response member the schema lacks) has no general check; BR-ACCESS-POINT-ACTIVE
+  holds these two sentences only. A general one would have to read member names out of free prose, which is
+  disproportionate for one finding.'

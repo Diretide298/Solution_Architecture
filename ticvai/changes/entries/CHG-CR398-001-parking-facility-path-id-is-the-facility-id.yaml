@@ -1,0 +1,49 @@
+id: CHG-CR398-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'setParkingFacility follows CR-245''s rule: the path parkingFacilityId is the facility''s id. No facility has
+  it: one is created with it (a client UUIDv7, which BO-006 mints) and the answer is 201; one the caller can see: it is
+  replaced whole, 200; one the caller cannot see holds it: 404, nothing written. A body id, when sent, must equal the
+  path id, else 400 validation. ParkingFacility.id says so.'
+decision:
+  what: 'ADAM CR-398 (Chinmay, 31 October 2026, posted on #30958: "as you recommended. CR-245''s rule: the path
+    parkingFacilityId is the facility''s id ... An id held by a facility the caller cannot see: 404, nothing written. A
+    body id, when sent, must equal the path id, else 400 validation. The BO-006 screen mints a UUIDv7 for a new
+    facility"), after the lead''s review of every CR ("for each one actually check if they hold and if not then find
+    out the best way keeping in mind what client needs") and his instruction "Include them in r12".
+    contracts/spine/access.yaml: setParkingFacility''s PUT-semantics paragraph and parkingFacilityId parameter text;
+    ParkingFacility.id. tools/check-contract-shapes.py C-PUT-KEY also reads "the path carries no id".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-398 (Hrushikant Patkar, #30958 setParkingFacility): the description keyed the upsert on the body''s id
+  because "the collection path carries no id", while the route has carried {parkingFacilityId} since BC-340, so the
+  listed 201 could never be reached. CR-245 (r10) settled this shape for every PUT with a path id; setGateModePolicy
+  already carries it. C-PUT-KEY looked only for the words "there is no id in the path", so this wording passed.'
+keys_touched:
+  screens: [BO-006]
+  operations: [setParkingFacility]
+  schemas: [ParkingFacility]
+  tables: [access.parking_facility]
+  files:
+  - contracts/spine/access.yaml
+  - tools/check-contract-shapes.py
+root_class: 'a PUT with a path id whose description still keys the write on the body (CR-245''s class, in words the
+  check did not read)'
+tickets:
+  started:
+  - '30958 (setParkingFacility, Hrushikant Patkar): an unknown path id now creates (201) with that id instead of 404;
+    keep the replace (200); 404 only for an id held by a row the caller cannot see.'
+  - '32349 / 32453 (BO-006 wire), if started: mint a UUIDv7 for a new facility and PUT to it.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-398
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'C-PUT-KEY now also fails on "path carries no id" beside a path id; it fails on the r11 text of
+  setParkingFacility. setAccessPointGroup has the same defect and is CR-395''s (another lane); the sweep of the other
+  access PUTs that still say "never a create" is CR-395''s too.'

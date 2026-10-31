@@ -366,12 +366,13 @@ def load_breaking() -> tuple[list[dict], list[str]]:
 
 def approval(entries: list[dict], contract: str, line: str) -> dict | None:
     """The entry that approves one breaking change: same contract, same operation, and, when the entry
-    names a `change`, a change whose description contains it."""
+    names a `change`, a change whose description contains it. **An entry that names the change wins over one that
+    names none** (ADAM CR-396, CHG-CR396-001): BC-340 approves every breaking change to setGateModePolicy, so CR-396's
+    later whoCanActivate change was reported under it and its own entry, BC-530, read as matching nothing."""
     o, _, why = line.partition(": ")
-    for e in entries:
-        if str(e["contract"]) == contract and o in entry_operations(e) and str(e.get("change") or "") in why:
-            return e
-    return None
+    hits = [e for e in entries
+            if str(e["contract"]) == contract and o in entry_operations(e) and str(e.get("change") or "") in why]
+    return next((e for e in hits if e.get("change")), hits[0] if hits else None)
 
 
 def entry_operations(e: dict) -> set:

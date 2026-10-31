@@ -1534,11 +1534,12 @@ paths:
         A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs on the parking
         system''s own POS (14 August).
 
-        **PUT semantics — an upsert of one facility, keyed on the body''s `id`.** The collection path
-        carries no id, so the body names the target. **No `id`** creates a facility: the server assigns
-        the id and answers `201`. **An `id` that exists** replaces that facility whole and answers
-        `200`: a field left out takes its default or null, it does not keep its stored value. **An `id`
-        that does not exist** is a `404`, never a create with a client-chosen id. `takesPayment` and
+        **PUT semantics: the path `parkingFacilityId` is the facility''s id** (ADAM CR-245''s rule; ADAM CR-398,
+        decided 31 October 2026; CHG-CR398-001). **No facility has that id**: one is created with it (a client
+        UUIDv7; BO-006 mints it for a new facility) and the answer is `201`. **A facility the caller can see has
+        it**: the body replaces it whole and the answer is `200`: a field left out takes its default or null, it
+        does not keep its stored value. **The id is held by a facility the caller cannot see**: `404`, and nothing
+        is written. A body `id`, when sent, must equal the path id, else `400 validation`. `takesPayment` and
         `vendorSwapTargetDays` are read-only and ignored in a body.
 
         '
@@ -1556,7 +1557,9 @@ paths:
       - name: parkingFacilityId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The facility''s id (ADAM CR-245; CR-398). Where no facility has it, the new facility takes it
+          (a client UUIDv7); where one the caller can see has it, that facility is replaced; where one the caller
+          cannot see holds it, `404`. The body''s `id`, when sent, must equal it, else `400 validation`.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -2476,6 +2479,12 @@ paths:
         - "P07 SCN-016 Gate mode"
         - "P08 BO-230 Live Gate Mode & Lane Control"
       x-ticvai-names-for-context: [access.configuration_change]
+      x-ticvai-read-via:
+      - query: identity#principalHoldsRoleAtVenue
+        route: in-process
+        for: 'whether the caller holds one of the governing gate mode policy''s whoCanActivate roles at the access
+          point''s venue or above it, as a yes or no answered under the tenant root grant (ADAM CR-396, decided 31
+          October 2026; CHG-CR396-001; XDR-035): identity.delegated_access, Identity''s data'
       x-ticvai-audience:
       - staff
       summary: Set the operating mode of an access point
@@ -2496,9 +2505,32 @@ paths:
         is operational, so it is not also logged in `access.configuration_change`.
 
 
-        **The gate mode policy is enforced here** (`setGateModePolicy`): for `freeFlow` or `dropArm`, a caller whose role
-        is not in the policy''s `whoCanActivate` is refused `403`, a missing reason where `reasonRequired` is `400`, and
-        an activation whose policy says `createsIncident` opens an access incident.
+        **The gate mode policy is enforced here** (`setGateModePolicy`; ADAM CR-396, decided 31 October 2026;
+        CHG-CR396-001). For `operatingMode` `freeFlow` or `dropArm`:
+
+
+        - **Which policy governs.** A policy on a group that lists the access point beats a policy on that group''s
+        parent group, which beats the venue default (`accessPointGroupId` null). When two or more policies are equally
+        specific, the call must pass every one of them, and an incident is opened if any of them sets
+        `createsIncident`.
+
+        - **Who may activate.** `whoCanActivate` holds role ids (`Role.id`). For a governing policy that lists roles,
+        Access asks `identity#principalHoldsRoleAtVenue` in process with the caller''s `principalId`, each role id in
+        turn, and the access point''s venue path; no role held is `403 gate-mode-role-required`, and nothing is
+        written. A policy with no roles, or no policy, adds no check beyond `TURNSTILE_MODE_SET`.
+
+        - **Reason.** A missing `reason` where a governing policy has `reasonRequired` is `400 reason-required`.
+
+        - **Incident.** Where a governing policy sets `createsIncident`, the transaction that applies the mode writes
+        one `access.access_incident`: `incidentType` `emergencyAccessEvent` for `dropArm` and `securityEvent` for
+        `freeFlow`, `assignedTeam` `accessSupervisor`, `status` `open`, `createdByPrincipalId` the operator,
+        `venueId` and `scopePath` the access point''s, and a `description` naming the mode, the access point''s
+        `code` and the reason.
+
+        - **A scheduled change** (a future `effectiveAt`) is checked when it is scheduled, and opens its incident when
+        the timer applies it; a cancelled one opens none. It keeps its turnstile mode in
+        `AccessGateModeChange.targetTurnstileMode`, and the timer sets both the operating mode and the turnstile mode;
+        a scheduled change that carries a turnstile mode is not refused.
 
 
         **R221 amended 2 October 2026** (Chinmay, critical set 1, BO-230; DEC-255; CHG-CSP-032): the direction can now be
@@ -2554,9 +2586,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccessPoint'
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          description: 'The request breaks a schema rule, or sends a turnstile mode with an operating mode other than
+            `normal` or `podium` (`validation`); or a governing gate mode policy has `reasonRequired` and no `reason` was
+            sent (`reason-required`; ADAM CR-396). Nothing is written.'
+          x-ticvai-problem-types: [validation, reason-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: 'The caller lacks `TURNSTILE_MODE_SET` at the venue; or, for `freeFlow` or `dropArm`, a governing
+            gate mode policy lists roles in `whoCanActivate` and the caller holds none of them at the access point''s
+            venue (`gate-mode-role-required`; ADAM CR-396). Nothing is written.'
+          x-ticvai-problem-types: [gate-mode-role-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '202':
@@ -2623,6 +2669,11 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Create an access point
+      description: '**A new access point is created active** (ADAM CR-397, decided 31 October 2026; CHG-CR397-001):
+        the row is written with `isActive` true, and the request carries no active flag (the approved BO-064 create
+        form sends none). A gate is taken out of use afterwards with `updateAccessPoint` and `isActive` false.
+
+        '
       tags:
       - accessPoint
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
@@ -2686,7 +2737,9 @@ paths:
         operator, reason, effective time), which Live Gate Mode & Lane Control and the shift handover read, and one
         `access.configuration_change` row. Takes effect at once, or at a future `effectiveAt` (then `202`,
         cancelled with `cancelGateModeChange`). Devices pick it up from the next push; an offline device keeps its
-        old direction until it reconnects, and the response''s `AccessPoint` says so through its device status.
+        old direction until it reconnects, and the response''s `AccessPoint` shows that through `lastHeartbeatAt`
+        (and `directionEffectiveAt` for a pending switch); it has no device status (ADAM CR-397, decided 31 October
+        2026; CHG-CR397-001).
 
         '
       tags:
@@ -2917,6 +2970,10 @@ paths:
         - "P08 BO-154 Access Rule Command Center"
         - "P08 BO-222 Special Event, Free View & Alternative Admission"
       x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the caller''s working venue''s path (platform.scope, by id), written as the profile''s scope_path,
+          Tenancy''s data (ADAM CR-400, decided 31 October 2026, CR-217''s rule; CHG-CR400-001; XDR-036)'
       - query: tenancy#regionSettingsRecords
         route: service
         for: 'what its text calls "RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
@@ -2927,6 +2984,17 @@ paths:
       - staff
       x-ticvai-config-scope: venue
       summary: Create an admission profile
+      description: '**Where the profile is written** (ADAM CR-400, decided 31 October 2026, CR-217''s rule;
+        CHG-CR400-001). `access.admission_rules.scope_path` is set by the server, never taken from the body: it is the
+        path of the session''s working venue, read with `tenancy#scopeRecords` by id. **A session with no working
+        venue** is `403 working-venue-required`, and nothing is written.
+
+
+        **The same rules as `updateAdmissionRules`** (CR-400): a count missing for an `n*` entry mode
+        (`entry-count-required`), `days` missing for a relative validity anchor (`validity-days-required`), or
+        `validity.to` before `validity.from` (`validity-ends-before-start`) is a `422`, and nothing is written.
+
+        '
       tags:
       - accessPoint
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
@@ -2954,8 +3022,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdmissionRules'
+        '403':
+          description: 'The session has no working venue, so the profile has no venue to be written under
+            (`working-venue-required`; ADAM CR-400); or the caller lacks ACCESS_POINT_CONFIGURE at the venue. Nothing
+            is written.'
+          x-ticvai-problem-types: [working-venue-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
+        '422':
+          x-ticvai-problem-types: [entry-count-required, validity-days-required, validity-ends-before-start]
+          description: A count missing for an n* entry mode, days missing for a relative validity anchor, or
+            validity.to before validity.from (ADAM CR-400, as updateAdmissionRules). Nothing is written.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /admission-rules/{profileId}:
@@ -2994,6 +3079,8 @@ paths:
         default or null; it does not keep its stored value. `perProductRules` is replaced as one
         list, never merged product by product. The body''s `id` is read-only and ignored — the path
         decides which profile is written — and an unknown `profileId` is a `404`, never a create.
+        **Where the profile lives does not move** (ADAM CR-400, decided 31 October 2026; CHG-CR400-001): its
+        `scope_path` is kept as stored, never re-derived from the editor''s working venue, so no scope read is asked.
 
         **Entry limits, re-entry, validity and crossover are blocks of the same profile (decided 29 September,
         VM close-out).** `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly` and
@@ -3083,6 +3170,9 @@ paths:
       operationId: addBlacklistEntry
       x-ticvai-consumed-by:
         - "P08 BO-033 Blacklist Management"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-read-via:
       - query: approvals#requestRecords
         route: service
@@ -3101,6 +3191,26 @@ paths:
         `accessPermissionChange`, subject type `whitelistEntry`) and the entry is written when a second person
         approves; the requester cannot approve their own. Until 2 October this write could only blacklist; `listType`
         and `disableScope` are optional and default to the blacklist behaviour.
+
+
+        **How a whitelist entry is raised** (ADAM CR-399, decided 31 October 2026; CHG-CR399-001; the pattern of
+        `suspendTenant`, CR-172). A code already on either list is refused `409 duplicate-code` at once. Otherwise the
+        entry''s id is minted now (a UUIDv7) and this calls approvals'' `createApprovalRequest` (`x-ticvai-write-via`,
+        service route) with kind `accessPermissionChange`, `subjectContract` `access`, `subjectType`
+        `whitelistEntry`, `subjectId` that id, and `attributes` `{mediaCode, reason, expiresAt, disableScope}` as sent,
+        and answers `202` `AccessPendingSecondApproval` with the request''s id and that `subjectId`. **The approval
+        request is all this call writes.** Where approvals refuses `422 no-approval-route`, this call passes it on,
+        and nothing is written.
+
+
+        **The grant writes the entry** (events/approval-granted.yaml, context `access`). Access''s consumer of
+        `approval.granted` takes the events whose `subjectContract` is `access` and `subjectType` `whitelistEntry`
+        (idempotency key `requestId`), reads the request through `approvals#requestRecords` for its `attributes`, and
+        writes the `access.blacklist` row with the request''s `subjectId` as its id, `listType` `whitelist`, the
+        attributes, `addedByPrincipalId` the requester and `addedAt` now. It records the outcome with approvals''
+        `recordApprovedActionOutcome`: `applied`; `notApplied` with `duplicate-code` if the code was listed while the
+        request waited, or `entry-expired` if `expiresAt` has passed, writing nothing in either case.
+        `approval.rejected`, `approval.withdrawn` or `approval.expired` writes nothing.
 
         **One entry per media code in the tenant** (decided 28 September, audit R108). A media code is
         honoured at every venue of the tenant, so a second entry for the same code is refused `409`
@@ -3164,13 +3274,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/BlacklistEntry'
         '202':
-          description: 'A whitelist entry, held for a second approver (DEC-254; CHG-CSP-031). Written when approved.'
+          description: 'A whitelist entry, held for a second approver (DEC-254; CHG-CSP-031). Written when approved;
+            `subjectId` is the id the entry will take (ADAM CR-399).'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessPendingSecondApproval'
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '422':
+          description: 'A whitelist entry for which approvals finds no active approval rule (`no-approval-route`,
+            passed on from `createApprovalRequest`; ADAM CR-399). Nothing is written.'
+          x-ticvai-problem-types: [no-approval-route]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /blacklist/{mediaCode}:
@@ -15398,8 +15517,11 @@ paths:
       summary: Set a policy for a non-standard gate mode
       description: '**The write behind Gate Modes, Free Spin & Emergency Controls** (BO-201): for `freeFlow` or `dropArm`
         (R221 vocabulary), who may activate it, on which gate group, whether a reason is required, the emergency code,
-        notification and whether activation opens an incident. `setTurnstileMode` enforces it: a caller whose role
-        is not in `whoCanActivate` is refused, and a missing reason where `reasonRequired` is refused.
+        notification and whether activation opens an incident. `setTurnstileMode` enforces it (ADAM CR-396, decided
+        31 October 2026; CHG-CR396-001): a caller who holds none of the `whoCanActivate` roles at the access point''s
+        venue is refused `403 gate-mode-role-required`, a missing reason where `reasonRequired` is `400
+        reason-required`, and `createsIncident` opens an access incident. **`whoCanActivate` holds role
+        ids** (`Role.id`, uuid strings, the roles BO-201 picks from `listRoles`); a malformed one is `400 validation`.
 
 
         **PUT semantics: an upsert keyed on `mode` and `accessPointGroupId` (one policy per mode per gate group; a
@@ -22054,7 +22176,10 @@ components:
           type: array
           items:
             type: string
-          description: Roles allowed to activate this mode
+            format: uuid
+          description: 'The roles allowed to activate this mode, as role ids (`Role.id`; ADAM CR-396; CHG-CR396-001).
+            `setTurnstileMode` asks `identity#principalHoldsRoleAtVenue` for each; empty or absent adds no check
+            beyond `TURNSTILE_MODE_SET`.'
         accessPointGroupId:
           type: string
           format: uuid
@@ -22348,7 +22473,8 @@ components:
       description: 'One gate mode change on an access point, pending or applied: from and target mode, operator, reason
         and effective time. Append-only history (declared 29 September, data-model close-out DM1) Written by setTurnstileMode
         (applied at once, or pending until a future effectiveAt) and cancelGateModeChange; a timer applies a pending change
-        at its effective time (decided 29 September, writers pass).'
+        at its effective time (decided 29 September, writers pass), setting the access point''s operating mode to
+        targetMode and its turnstile mode to targetTurnstileMode (ADAM CR-396; CHG-CR396-001).'
       required:
       - id
       - venueId
@@ -22377,6 +22503,13 @@ components:
         targetMode:
           allOf:
           - $ref: '#/components/schemas/AccessPointOperatingMode'
+        targetTurnstileMode:
+          allOf:
+          - $ref: '#/components/schemas/TurnstileMode'
+          nullable: true
+          description: 'The turnstile mode (`mode`) a `setTurnstileMode` change sets with `targetMode`: `freeRotation`
+            or `closed`, or null for none (ADAM CR-396, decided 31 October 2026; CHG-CR396-001). A pending change
+            keeps it until the timer applies both. Null on a direction switch.'
         fromDirection:
           allOf:
           - $ref: '#/components/schemas/Direction'
@@ -26712,8 +26845,8 @@ components:
         id:
           type: string
           format: uuid
-          description: '**Server-assigned, and the upsert key of `setParkingFacility`.** Absent in a body,
-            it creates; present, it names the facility being replaced. A client never mints one.
+          description: '**The record''s id, and the path id of `setParkingFacility`** (ADAM CR-245; CR-398): a new
+            facility takes the path id, a client UUIDv7. A body `id`, when sent, must equal the path id.
 
             '
         name:
@@ -27191,7 +27324,8 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: The lock being released; null for a lock or an entry not yet written.
+          description: 'The lock being released; for `whitelistEntry`, the id the entry will take (minted when the
+            request is raised; ADAM CR-399); null for a lock not yet written.'
     BlacklistEntry:
       x-ticvai-persistence: access.blacklist
       type: object

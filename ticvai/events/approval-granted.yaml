@@ -127,6 +127,20 @@ consumers:
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: access
+  purpose: 'Write a whitelist entry a second person approved (`subjectContract` access, `subjectType` whitelistEntry;
+    ADAM CR-399, decided 31 October 2026; CHG-CR399-001), the way Subscription''s consumer applies a suspendTenant.
+    addBlacklistEntry writes only the approval request, so the consumer reads it by `requestId` through
+    approvals#requestRecords for its `attributes` (mediaCode, reason, expiresAt, disableScope) and writes the
+    access.blacklist row with the request''s `subjectId` as its id, list_type whitelist, the attributes,
+    added_by_principal_id the requester and added_at now, then records the outcome with approvals''
+    recordApprovedActionOutcome (applied). A code listed while the request waited writes nothing and records
+    notApplied duplicate-code; an expiresAt already passed writes nothing and records notApplied entry-expired'
+  writes:
+  - access.blacklist
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: Retained with the request. This is an audit record, not an operational message
 notes: '**The event that replaces four bespoke callbacks.** Each owning contract consumed its own approval
   signal before this existed; now there is one, and adding a fifth approval kind means adding a consumer

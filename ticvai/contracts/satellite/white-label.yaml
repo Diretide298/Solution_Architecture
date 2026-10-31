@@ -1590,6 +1590,13 @@ paths:
         `400` `validation`, with `errors[]` naming the field (for example `body.items[2].answer`). Other keys are not
         checked: the full schema per kind is not defined now and is on the left-out list (LO-CR366-001).
 
+
+        **Rich text is sanitised on write** (ADAM CR-401, decided 31 October 2026; CHG-CR401-001): before the row is
+        stored, a `richText` block''s `text` (in `body` and in each `localeVariants` entry)
+        runs through the module''s one shared sanitiser, against the allow-list `LocalisedRichText` states.
+        Disallowed markup is stripped, never refused, so there is no new error; the stored, sanitised HTML is what
+        the response returns, so the editor sees what was kept.
+
         '
       tags:
       - whiteLabel
@@ -3577,6 +3584,12 @@ paths:
       description: 'Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are the
         server''s and are ignored if sent.
 
+        **Rich text is sanitised on write** (ADAM CR-401, decided 31 October 2026; CHG-CR401-001): before the row is
+        stored, each language of `body`
+        runs through the module''s one shared sanitiser, against the allow-list `LocalisedRichText` states.
+        Disallowed markup is stripped, never refused, so there is no new error; the stored, sanitised HTML is what
+        the response returns, so the editor sees what was kept.
+
         **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200
         with the would-be result without writing, for the AI executor''s plan validation; registered as an
         AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
@@ -3648,6 +3661,12 @@ paths:
         shows and never what it says; it invalidates the edge cache of `listPublishedContentPages`, as
         `publishTenantConfig` does. Any other change to a published page is refused with 409
         `published-page-locked`. To change what guests read, archive it and author a new page.
+
+        **Rich text is sanitised on write** (ADAM CR-401, decided 31 October 2026; CHG-CR401-001): before the row is
+        stored, each language of a sent `body`
+        runs through the module''s one shared sanitiser, against the allow-list `LocalisedRichText` states.
+        Disallowed markup is stripped, never refused, so there is no new error; the stored, sanitised HTML is what
+        the response returns, so the editor sees what was kept.
 
         '
       tags:
@@ -3779,6 +3798,12 @@ paths:
       description: 'Also the grounding corpus for the AI concierge, which is why an answer here is content
         rather than a support ticket.
 
+        **Rich text is sanitised on write** (ADAM CR-401, decided 31 October 2026; CHG-CR401-001): before the row is
+        stored, each language of every entry''s `answer`
+        runs through the module''s one shared sanitiser, against the allow-list `LocalisedRichText` states.
+        Disallowed markup is stripped, never refused, so there is no new error; the stored, sanitised HTML is what
+        the response returns, so the editor sees what was kept.
+
         '
       tags:
       - content
@@ -3899,6 +3924,12 @@ paths:
         **English and Arabic are both required before a policy can be published (decided 28 September,
         audit R096)**: `body` must carry non-empty `en` and `ar` entries, or 400. Other enabled languages
         are optional.
+
+        **Rich text is sanitised on write** (ADAM CR-401, decided 31 October 2026; CHG-CR401-001): before the row is
+        stored, each language of `body`
+        runs through the module''s one shared sanitiser, against the allow-list `LocalisedRichText` states.
+        Disallowed markup is stripped, never refused, so there is no new error; the stored, sanitised HTML is what
+        the response returns, so the editor sees what was kept.
 
         '
       tags:
@@ -7509,6 +7540,11 @@ paths:
         written; null means everybody. A sent `body` or `localeVariants` is checked as `createContentBlock` states, for the
         block's `kind`: JSON objects, the kind's listed text keys strings where present, an `items[]` or `fields[]` an
         array of objects; a failure is `400` `validation` with `errors[]` naming the field.
+
+        **Rich text is sanitised on write** (ADAM CR-401, decided 31 October 2026; CHG-CR401-001): a sent `richText`
+        block's `text` (in `body` and in each `localeVariants` entry) runs through the same shared sanitiser as
+        `createContentBlock`, against the allow-list `LocalisedRichText` states, before it is stored. Disallowed markup
+        is stripped, never refused; the response returns the sanitised HTML.
       tags:
       - whiteLabel
       x-ticvai-permission: TENANT_CONFIGURE
@@ -10116,7 +10152,10 @@ components:
             `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta
             `heading`, `text`, `label`; faq `items[].question`, `items[].answer`; form `title`, `fields[].label`,
             `submitLabel`; embed `title`; productGrid `heading`; countdown `heading`, `endedText`; testimonial
-            `quote`, `author`. Every other key (links, ids, numbers, media references) is not translated.'
+            `quote`, `author`. Every other key (links, ids, numbers, media references) is not translated.
+            **A `richText` block''s `text` is HTML, sanitised on write** (ADAM CR-401; CHG-CR401-001): in `body` and in
+            each `localeVariants` entry, by the shared sanitiser and allow-list `LocalisedRichText` states, stripped,
+            never refused. Every other text key is plain text, escaped on render.'
         localeVariants:
           type: object
           additionalProperties: true
@@ -10233,7 +10272,29 @@ components:
     LocalisedRichText:
       x-ticvai-persistence: none — jsonb column
       type: object
-      description: Keyed by language code. Values are sanitised HTML.
+      description: 'Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31
+        October 2026; CHG-CR401-001).
+
+
+        **Who sanitises, and against what.** Every operation that writes a value of this schema (`createContentPage`,
+        `updateContentPage`, `setFaqs`, `setPolicy`), and `createContentBlock` and `updateContentBlock` for a
+        `richText` block''s `text`, runs each language''s HTML through one shared sanitiser in the White-label module
+        before storing it: Ganss.Xss (HtmlSanitizer, MIT). The stored value is the sanitised HTML, and that is what is
+        returned and served to every reader.
+
+        - **Allowed tags**: p, br, hr, strong, b, em, i, u, s, sub, sup, h2, h3, h4, ul, ol, li, blockquote, a, img,
+        table, thead, tbody, tr, th, td, span.
+
+        - **Allowed attributes**: dir and lang on any tag; href and title on a; src, alt, width and height on img;
+        colspan and rowspan on th and td.
+
+        - **URL schemes**: https, mailto and tel for href; https only for src.
+
+        - **Everything else is stripped, never refused.** script, style, iframe, object, embed, form and svg are
+        removed with their content; any other unknown tag is unwrapped and keeps its text. Every on* attribute,
+        style, and any javascript: or data: URL is removed.
+
+        '
       additionalProperties:
         type: string
     ChangeScope:

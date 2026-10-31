@@ -1,0 +1,57 @@
+id: CHG-CR400-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'createAdmissionRules answers 422 with updateAdmissionRules'' three problem types (entry-count-required,
+  validity-days-required, validity-ends-before-start), and sets scope_path by CR-217''s rule: the session''s working
+  venue''s path, read with tenancy#scopeRecords by id (in process, XDR-036); no working venue is 403
+  working-venue-required, nothing written. updateAdmissionRules keeps the stored scope_path and asks no scope read.'
+decision:
+  what: 'ADAM CR-400 (Chinmay, 31 October 2026, posted on #30964: "not as recommended: as you proposed for create, but
+    not for update. createAdmissionRules answers 422 with the same three problem types as update ... It sets scope_path
+    by CR-217''s rule ... A session with no working venue is 403 working-venue-required, nothing written.
+    updateAdmissionRules does not re-derive scope_path: it keeps the stored one, so it needs no scopeRecords read"),
+    after the lead''s review of every CR ("for each one actually check if they hold and if not then find out the best
+    way keeping in mind what client needs") and his instruction "Include them in r12". contracts/spine/access.yaml:
+    createAdmissionRules gains a description, the tenancy#scopeRecords read-via, a 403 and a 422;
+    updateAdmissionRules'' description says scope_path is kept. docs/active/cross-deployable-writes.yaml XDR-036
+    (reader access, tenancy#scopeRecords, createAdmissionRules; platform.scope is a kernel table, so no new privilege).'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-400 (Hrushikant Patkar, #30964 createAdmissionRules): the AdmissionRules schema both operations take
+  makes three rules 422s, and only update listed the 422; access.admission_rules has no venue_id and nothing gave
+  Access the working venue''s path on create (CR-217''s situation). On update the row''s scope_path is the server''s and
+  row security already bounds which profiles a caller reaches, so re-deriving it would move a profile to the editor''s
+  venue.'
+keys_touched:
+  screens: [BO-032]
+  operations: [createAdmissionRules, updateAdmissionRules]
+  schemas: [AdmissionRules]
+  tables: [access.admission_rules, platform.scope]
+  files:
+  - contracts/spine/access.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'XDR-036 (granted in-process read of tenancy#scopeRecords by the access host)'
+root_class: 'a create and an update sharing one schema whose refusals only the update lists, and a server-set scope
+  with no stated source'
+tickets:
+  started:
+  - '30964 (createAdmissionRules, Hrushikant Patkar): keep the 422s; set scope_path from tenancy#scopeRecords (in
+    process); 403 working-venue-required with no working venue.'
+  - '30969 (updateAdmissionRules): keep the stored scope_path; remove any re-derivation from the working venue.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-400
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ADMISSION-CREATE
+status: open
+notes: 'The posted decision names tenancy#scopeRecords and CR-217''s rule but not the route. The package reads it in
+  process (CR-217''s route, and the access host''s other Tenancy reads under XDR-003), recorded as XDR-036, because the
+  service route between deployables is not built (CR-281; #37051). The general class (a create whose shared schema
+  promises a refusal its responses do not list) is what check-contract-shapes C-REFUSAL-UNDECLARED reads in an
+  operation''s own text; it does not follow a promise into the body schema.'

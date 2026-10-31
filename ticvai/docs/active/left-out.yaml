@@ -178,3 +178,36 @@ items:
   owner: Chinmay
   added: '2026-10-30'
   change: CHG-CR346-001
+- id: LO-CR396-001
+  kind: deferred
+  platform: P08
+  screens: [BO-230, BO-201]
+  what: 'Two gate mode policy settings setTurnstileMode does not enforce: the emergency code (BO-230''s rule for its
+    reason input asks, for Drop arm, the emergency code from BO-201''s policy as well, and setTurnstileMode''s body has
+    no field for it), and automaticNotification (nothing is notified when a policy sets it). BO-201 keeps both fields
+    and stores them (setGateModePolicy); BO-230 keeps every member it shows.'
+  source: 'ADAM CR-396 (Hrushikant Patkar, #30967 setTurnstileMode), settled by Chinmay on 31 October 2026;
+    design-r1/apps/venue-management/screens/BO-230.md (the reason rule); CHG-CR396-001'
+  reason: 'the decision settles the role check, the policy precedence, the incident and the scheduled turnstile mode;
+    where an emergency code is entered and checked, and who is notified and how, were not part of it, and inventing
+    either would be a field and a channel nobody decided'
+  target: 'r13 or later: an emergency-code field and a notification rule for gate mode activations, decided by the lead'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR396-001
+- id: LO-CR399-001
+  kind: deferred
+  platform: P08
+  screens: [BO-229, BO-247]
+  what: 'The other two access acts held for a second approver: a permanent identity lock (lockIdentity, subject type
+    identityLock) and the release of a full-identity or permanent lock (releaseIdentityLock, subject type
+    identityLockRelease). Neither declares the x-ticvai-write-via to approvals createApprovalRequest that raises its
+    request, and no Access consumer of approval.granted applies them; CR-399 settled only whitelistEntry.'
+  source: 'ADAM CR-399 (Hrushikant Patkar, #30962 addBlacklistEntry), settled by Chinmay on 31 October 2026; DEC-254,
+    DEC-260; CHG-CR399-001'
+  reason: 'the decision covers the whitelist entry only; the same pattern for the two lock acts is its own decision
+    (raise it as a CR on the lockIdentity and releaseIdentityLock tickets)'
+  target: 'r13 or later: a CR applying CR-399''s pattern to lockIdentity and releaseIdentityLock'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR399-001

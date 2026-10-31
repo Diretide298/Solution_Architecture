@@ -480,3 +480,35 @@ reads:
     catalogue.product_media and catalogue.product_category is the one V0118 already grants the operations role
     (XDR-008, XDR-022); SELECT on catalogue.event is new, and the operations role already has USAGE on schema
     catalogue.'
+- id: XDR-035
+  reader: access
+  tables: [identity.delegated_access]
+  privileges: [SELECT]
+  queries: [identity#principalHoldsRoleAtVenue]
+  operations: [setTurnstileMode]
+  added: '2026-10-31'
+  decision_ref: 'ADAM CR-396, Chinmay, 31 October 2026 (posted on 30967: "not as recommended", keep whoCanActivate and
+    ask identity#principalHoldsRoleAtVenue in process)'
+  why: 'access setTurnstileMode (Access, access host, #30967) refuses freeFlow or dropArm to a caller who holds none of
+    the governing gate mode policy''s whoCanActivate roles at the access point''s venue (403 gate-mode-role-required).
+    Whether a person holds a role at a venue is identity.delegated_access, Identity''s data in commerce, and
+    identity#principalHoldsRoleAtVenue already answers it as a yes or no (ADAM CR-336, CR-344; built by #32338). The
+    lead chose to ask it in process, as the access host already asks identity#subjectRecords (XDR-010): through
+    Identity''s own query class, which answers the one statement under the routed tenant''s root grant and returns only
+    `holds`, never which grant or where. The service route between deployables is not built (CR-281; #37051). SELECT
+    only, on the one table; no grant, role or scope is returned to Access.'
+- id: XDR-036
+  reader: access
+  tables: [platform.scope]
+  privileges: [SELECT]
+  queries: [tenancy#scopeRecords]
+  operations: [createAdmissionRules]
+  added: '2026-10-31'
+  decision_ref: 'ADAM CR-400, Chinmay, 31 October 2026 (posted on 30964: createAdmissionRules sets scope_path by
+    CR-217''s rule, the path of the session''s working venue read with tenancy#scopeRecords by id)'
+  why: 'access createAdmissionRules (Access, access host, #30964) writes access.admission_rules.scope_path as the path
+    of the session''s working venue, which the session carries only as a venue id. CR-217''s rule reads that path with
+    tenancy#scopeRecords by id, in process, through Tenancy''s own query class, in the caller''s transaction under the
+    caller''s row-level security, as XDR-003 does for the access host''s other Tenancy read and CR-296 ruled for the
+    operations host (XDR-004). platform.scope is a kernel table every host may already SELECT (CR-002), so the grant
+    derive-ddl writes for it adds no privilege. The service route between deployables is not built (CR-281; #37051).'

@@ -1706,3 +1706,16 @@ changes:
     tag: r12
     producer-tickets: ['32505']
     consumer-tickets: ['32508', '32509', '32510']
+  - id: BC-530
+    contract: access
+    operation: setGateModePolicy
+    change: "`whoCanActivate` type array<string> -> array<string:uuid>"
+    reason: 'ADAM CR-396 (CHG-CR396-001): whoCanActivate holds identity.role ids, which setTurnstileMode asks
+      identity#principalHoldsRoleAtVenue about one by one; a malformed id is 400 validation. The roles BO-201 picks
+      come from listRoles, so the values are role ids; the declared format now says so (the column stays text[]). A
+      type change cannot be additive.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-396 posted on 30967: "whoCanActivate holds identity.role ids (uuid
+      strings; setGateModePolicy refuses a malformed one 400 validation)")'
+    tag: r12
+    producer-tickets: ['30957', '30967']
+    consumer-tickets: ['32388', '32502']
