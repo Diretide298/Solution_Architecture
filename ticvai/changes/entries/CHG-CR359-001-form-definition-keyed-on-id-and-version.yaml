@@ -33,6 +33,7 @@ keys_touched:
   operations:
   - setDynamicFieldQuestion
   - listForms
+  - createForm
   schemas:
   - FormDefinition
   - DynamicFieldsQuestionsConditionalLogicView
@@ -62,7 +63,7 @@ tickets:
   unstarted:
   - '33313 ([DB] marketing.waiver_signature, New, Hrushikant Patkar): add form_version (backfilled from
     form_definition, then NOT NULL) and the composite reference.'
-  - '33239 (createForm), 33243 (getForm), 33484 (listForms), 33378 (listWaiverSignatures): a form''s versions share its
+  - '33239 (createForm): the optional formId as decided on 31 October; 33243 (getForm), 33484 (listForms), 33378 (listWaiverSignatures): a form''s versions share its
     id; listWaiverSignatures returns formVersion.'
 release_tag: pending
 decision_owner: Chinmay
@@ -77,9 +78,11 @@ notes: 'Rule BR-FORM-VERSION-KEY fails on the r11 contract and passes now; deriv
   are kept forever has a key that includes its version) was not added: "kept forever" is prose, and the schemas with
   a version column number in the dozens with different rules (a version counter on one row, CR-332, is not a
   versioned row), so a heuristic would either miss or need a list as long as the class; this entry names the one the
-  CR found. Beyond the comment''s words: listForms'' "latest version of each form" is the highest version per id. Not
-  done: createForm still takes no formId, so the API cannot ask for version 2 of an existing form; that needs a
-  decision (the verdict''s follow-up suggests an optional formId on createForm). Also beyond the comment: the package
+  CR found. Beyond the comment''s words: listForms'' "latest version of each form" is the highest version per id. createForm
+  takes an optional formId (the lead''s review, 31 October 2026, posted to #31160 as a follow-up): absent, a new form,
+  version 1; present, the next version of that form (highest version + 1), saved from the body alone with nothing
+  copied implicitly, 404 when no form has that id, the same permission and scope as an update of that form; additive,
+  the CR-228 rule. A query parameter, so FormDefinition gains no column; BR-FORM-VERSION-KEY holds it. Also beyond the comment: the package
   withdraws form_definition_field.form_definition_id (FormDefinition x-ticvai-retired-columns), which held the same id
   as form_id once id is the form (check-ddl-conventions D-DOUBLE-KEY found the two keys); handoff/migration-review.md
   lists its drop for the migration owner, to run only after the writers stop setting it, as the comment says

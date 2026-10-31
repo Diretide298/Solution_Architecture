@@ -110,7 +110,8 @@ And one rule per decision:
                    of the role at or above the venue (deny-overrides-allow), and names #32338 as its builder.
   BR-FORM-VERSION-KEY (r12, ADAM CR-359, CHG-CR359-001) FormDefinition is keyed (id, version), id the form, and the
                    field, requirement and signature rows reference the version row by (form id, version);
-                   MarketingWaiverSignature records formVersion.
+                   MarketingWaiverSignature records formVersion; createForm's optional formId makes the next version
+                   of an existing form (highest version + 1, 404 when there is none).
   BR-CREDIT-ACCOUNT-CURRENCY (r11, ADAM CR-322 option A, CHG-CR322-001) a B2B credit account stores the currency
                    its limit is agreed in: B2bCreditAccount.currencyCode (required, readOnly; payments.credit_account.
                    currency_code), set by createB2bCreditAccount from creditLimit.currency and never changed after, and
@@ -978,6 +979,13 @@ def main() -> int:
         need("BR-FORM-VERSION-KEY", (pp.get(prop) or {}).get("x-ticvai-references") == "marketing.form_definition"
              and (pp.get(prop) or {}).get("x-ticvai-references-version") == vprop and vprop in pp,
              f"{sname}.{prop} does not reference marketing.form_definition by ({prop}, {vprop}) (CR-359)")
+    cf = op("createForm")[3]
+    cfq = [x for x in cf.get("parameters") or [] if isinstance(x, dict) and x.get("name") == "formId"]
+    need("BR-FORM-VERSION-KEY", len(cfq) == 1 and cfq[0].get("in") == "query" and not cfq[0].get("required")
+         and "404" in {str(k) for k in (cf.get("responses") or {})}
+         and "highest version + 1" in " ".join(str(cf.get("description") or "").split()),
+         "createForm takes no optional formId making the next version of an existing form (highest version + 1, "
+         "404 when no form has that id) (CR-359, decided 31 October 2026)")
 
     # BR-PLANNER-QUESTIONS, BR-ROTA-HOUR-LIMIT, BR-ROTA-CROSS-VENUE (r11, ADAM CR-321, CR-334, CR-336; the lead, 29
     # October 2026, "As recommended", then "Include those in today as well"). Each fails on the r10 contract.

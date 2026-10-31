@@ -1620,6 +1620,15 @@ paths:
         Published as a version. **A change creates a new version and the old one stays readable forever**
         — 2.15.13 requires the exact accepted version retained.
 
+
+        **A new form, or the next version of one** (ADAM CR-359, decided 31 October 2026; the CR-228 rule for
+        configuration profiles). Without `formId` the body is a new form: a new `id`, `version` 1, as before. With
+        `formId` it is the next version of that form: a row with `id` = `formId` and `version` = the form''s highest
+        version + 1, saved as a draft from the body alone; nothing is copied implicitly from an earlier version (its
+        fields and layout are whatever this body and the later field and layout writes give it). No form with that
+        id is `404`. The next version takes the same permission and scope as an update of that form: `MARKETING_MANAGE`
+        at the form''s node or above, and a form outside the caller''s scope is the same `404`.
+
         '
       tags:
       - marketing
@@ -1631,6 +1640,15 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - name: formId
+        in: query
+        required: false
+        description: 'The form this is the next version of (`FormDefinition.id`; ADAM CR-359, decided 31 October 2026).
+          Absent: a new form, version 1. Present: the next version of that form, its highest version + 1; no form with
+          that id in the caller''s scope is `404`.'
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
@@ -1642,11 +1660,13 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Created as a draft version
+          description: Created as a draft version (version 1 of a new form, or the next version of `formId`)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FormDefinition'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forms/{formId}:
