@@ -138,6 +138,9 @@ consumers:
     duplicate-code; an expiresAt already passed writes nothing and records notApplied entry-expired'
   writes:
   - access.blacklist
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 - context: catalogue
   purpose: '**Catalogue''s approval consumer, by `subjectType`** (the consumer ADAM CR-415 adds for `pricingRecommendation`).
     For `subjectType` `dynamicPricingControl` (ADAM CR-425, CHG-CR425-001): an automation raise

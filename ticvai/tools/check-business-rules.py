@@ -274,7 +274,7 @@ And one rule per decision:
                    market and channel, and channel is nullable.
   BR-PRICING-SCORECARD (r12, ADAM CR-418, CHG-CR418-001) listLearningModelPerformance waits on the price outcome
                    measure and is assembled from three sources, with no catalogue.model_scorecard anywhere.
-  BR-PRICE-SIMULATION (r12, ADAM CR-419, CHG-CR419-001) simulatePriceBreakdownCalculation is no singleton, takes variantId,
+  BR-PRICE-SIMULATION (r12, ADAM CR-419, CHG-CR419-001) simulatePriceBreakdownCalculation is no singleton, takes productVariantId,
                    reads tax through finance#taxCodeRecords and the live price from price_execution, declares 400
                    validation and 422 no-selected-rate / no-calculation-profile, and answers aiInsights empty.
   BR-CALC-PROFILE-VERSION (r12, ADAM CR-420, CHG-CR420-001) CalculationProfile is unique on (scopePath, code, version),
@@ -2178,8 +2178,8 @@ def main() -> int:
     sim = op("simulatePriceBreakdownCalculation")[3]
     need("BR-PRICE-SIMULATION", not sim.get("x-ticvai-singleton") and not sim.get("x-ticvai-singleton-note"),
          "simulatePriceBreakdownCalculation is still flagged a singleton though it stores nothing (CR-419)")
-    need("BR-PRICE-SIMULATION", "variantId" in sprops("PriceBreakdownCalculationSimulationExplainabilityInput"),
-         "PriceBreakdownCalculationSimulationExplainabilityInput has no variantId (CR-419)")
+    need("BR-PRICE-SIMULATION", "productVariantId" in sprops("PriceBreakdownCalculationSimulationExplainabilityInput"),
+         "PriceBreakdownCalculationSimulationExplainabilityInput has no productVariantId (CR-419)")
     need("BR-PRICE-SIMULATION", "finance#taxCodeRecords" in vias_of("simulatePriceBreakdownCalculation")
          and {"catalogue.price_execution", "catalogue.membership_programme"} <= reads_of("simulatePriceBreakdownCalculation"),
          "simulatePriceBreakdownCalculation does not read tax through finance#taxCodeRecords, or the live price and the "

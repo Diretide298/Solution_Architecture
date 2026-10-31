@@ -3,7 +3,7 @@ date: '2026-10-31'
 source: cr
 kind: contract
 summary: 'simulatePriceBreakdownCalculation states its rule: no singleton (it stores nothing; the Idempotency-Key
-  stays); optional variantId (400 validation); the selected rate by searchCatalogue''s fromPrice resolution at date
+  stays); optional productVariantId (400 validation); the selected rate by searchCatalogue''s fromPrice resolution at date
   (422 no-selected-rate); the steps of the venue''s active default calculation profile in force (422
   no-calculation-profile; calculationVersion its code and version); membershipId a membership programme whose pricing
   rules choose the rate; customerId not read; the live dynamic price (CR-422) at the dynamic step; promotionCode to
@@ -13,7 +13,7 @@ summary: 'simulatePriceBreakdownCalculation states its rule: no singleton (it st
 decision:
   what: 'ADAM CR-419, posted 31 October 2026 on #35288: "Decided (Chinmay, 31 October 2026): as you recommended, with
     each read named. Drop x-ticvai-singleton, because a simulation stores nothing. The Idempotency-Key stays. Add
-    optional variantId ... Either failure is 400 validation on variantId. Selected rate: the price that
+    optional productVariantId ... Either failure is 400 validation on productVariantId. Selected rate: the price that
     searchCatalogue''s fromPrice resolution gives the variant at venueId on channel, taken at date (and timeslotId)
     instead of now. No such price is 422 no-selected-rate. Sequence: the steps, in sequence order, of the venue''s
     active isDefault calculation profile in force on date. No such profile is 422 no-calculation-profile. ... Tax: the
@@ -44,9 +44,9 @@ tickets:
   started:
   - '35288 (simulatePriceBreakdownCalculation): expose the Domain service through the endpoint as a thin adapter, with
     the reads named (tax through finance#taxCodeRecords in process, promotion through evaluatePromotions without
-    orderId); add variantId; answer aiInsights as [].'
+    orderId); add productVariantId; answer aiInsights as [].'
   unstarted:
-  - 'VM-ADM-076 (#29829) picks up variantId and the refusals at the next tag; its approved inputs are unchanged.'
+  - 'VM-ADM-076 (#29829) picks up productVariantId and the refusals at the next tag; its approved inputs are unchanged.'
 release_tag: pending
 decision_owner: Chinmay
 adam_cr: CR-419

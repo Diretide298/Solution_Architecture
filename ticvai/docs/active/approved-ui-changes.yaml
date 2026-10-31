@@ -729,3 +729,11 @@ changes:
     button". One primary button, Save rule, bound to setDynamicPriceRule, which closes the CHG-WIR-027 gap that the
     screen had no write.'
   change: CHG-CR410-001
+- screen: ADM-093
+  field: 'region:-'
+  to: b6ee579d477b2aaf
+  approval: 'The lead''s decision of 1 November 2026 on ADAM CR-410 ("Add a save button"), which needs what the
+    button saves: the content body, empty until now (the pack gave the screen no display), gains the contextual
+    rule''s fields setDynamicPriceRule takes: name, dimension, that dimension''s channel, segment or location, the
+    adjustment range, protection, dynamic pricing on or off, priority and active.'
+  change: CHG-CR410-001

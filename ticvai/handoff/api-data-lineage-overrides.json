@@ -3884,9 +3884,10 @@
     "whitelabel.config_version",
     "whitelabel.kiosk_config",
     "whitelabel.kiosk_config_attract_slide",
-    "whitelabel.kiosk_config_start_tile"
+    "whitelabel.kiosk_config_start_tile",
+    "whitelabel.module_enablement"
    ],
-   "reason": "Reads the published tenant configuration (fonts, languages), the venue's booking flows and its products on sale. Writes nothing. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "Reads the published tenant configuration (fonts, languages), the venue's booking flows and its products on sale. Writes nothing. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)) Adds whitelabel.module_enablement, White Label's own table, which the tileWithoutProducts check reads for each enabled tile's module (ADAM CR-385, 31 October 2026; CHG-R12INT-004).",
    "carried": true
   },
   "getKpiValues": {
@@ -6860,9 +6861,11 @@
   },
   "listDynamicPricingAutomation": {
    "reads": [
-    "catalogue.dynamic_pricing_control"
+    "catalogue.dynamic_pricing_control",
+    "catalogue.pricing_market",
+    "catalogue.sales_channel"
    ],
-   "reason": "DM3: automation columns of catalogue.dynamic_pricing_control | L2: automation policies need pricing.automation_policy (missing) — no existing table read (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "DM3: automation columns of catalogue.dynamic_pricing_control | L2: automation policies need pricing.automation_policy (missing) — no existing table read (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)) Adds catalogue.pricing_market and catalogue.sales_channel, read for the view's market code and channel at the market and channel scope levels (ADAM CR-417, 31 October 2026; CHG-R12INT-004).",
    "carried": true
   },
   "listDynamicPricingGuardrail": {
@@ -12146,18 +12149,20 @@
   },
   "resetPrincipalCredential": {
    "reads": [
+    "identity.mfa_challenge",
     "identity.password_policy",
     "identity.principal",
     "identity.principal_credential"
    ],
    "writes": [
+    "identity.mfa_challenge",
     "identity.principal",
     "identity.principal_credential",
     "identity.principal_credential_history",
     "identity.session",
     "platform.outbox"
    ],
-   "reason": "adds platform.outbox (identity.credentialResetRequested); 14 October 2026 (CHG-CRD-001, ADAM CR-078): the PIN length and policy; the replaced hash is kept; mustChangeCredential is set (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "adds platform.outbox (identity.credentialResetRequested); 14 October 2026 (CHG-CRD-001, ADAM CR-078): the PIN length and policy; the replaced hash is kept; mustChangeCredential is set (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)) Adds identity.mfa_challenge: the reset reads the caller's verified, unconsumed step-up for its action (ADAM CR-375, 31 October 2026; CHG-R12INT-004). and writes its consumedAt in the reset's transaction.",
    "carried": true
   },
   "resolveBookingConflict": {

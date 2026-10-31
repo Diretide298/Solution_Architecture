@@ -1,0 +1,72 @@
+id: CHG-R12INT-004
+date: '2026-11-01'
+source: audit
+kind: process
+summary: 'Where r12''s CR lanes F to M (CR-372 to CR-435) and the plan lane each passed alone and failed together,
+  fixed at the source. (1) Catalogue''s approval consumer is one consumer per approval event, by subjectType, for
+  CR-415 (pricing recommendations), CR-421 (rollbacks) and CR-425 (automation raises), writing both tables; the access
+  consumer of approval.granted (CR-399) keeps its idempotencyKey, onFailure and isCritical. (2) Lane F''s
+  problem-type helper in check-business-rules is ptypes_of_id, so lane M''s rules get the response-based ptypes. (3)
+  ADM-093''s Save rule (the lead, 1 November 2026: "Add a save button") has the contextual rule''s fields to save: the
+  empty content body gains name, dimension, channel, segment, segment reference, location level, location, the
+  adjustment range, protection, dynamic pricing on or off, priority and active, bound to PricingDynamicPriceRule and
+  recorded in docs/active/approved-ui-changes.yaml. (4) simulatePriceBreakdownCalculation''s variant is
+  productVariantId (the glossary bans a bare variant). (5) The lineage lists what four descriptions say they use:
+  getKioskConfigValidation reads whitelabel.module_enablement, listDynamicPricingAutomation reads catalogue.pricing_market
+  and catalogue.sales_channel, resetPrincipalCredential reads and consumes identity.mfa_challenge; the three banner
+  writes declare whitelabel.tenant_config named for context (they never touch it, CR-387). (6) check-error-sources
+  reads a backticked `membership` or `wallet` as a code (White Label''s module keys, catalogue''s product kinds), as it
+  already reads `order`: publishKioskConfigs reads no Identity or Wallet data. (7) handoff/cross-deployable-writes.md
+  rewritten from the routes. (8) The Block A slice keeps the scope r11 had: createSeatMapTemplate is held out of the
+  slice (a template is optional for createSeatMap, CR-403), so BO-962 stays in wave 3; BO-168 leaves Block A with its
+  operations (CR-389 moved the geofence to the placement; its two tickets are On hold, never started); and
+  workforce.field_ownership and workforce.integration_source, built by #28946, carry their reason in departures.'
+decision:
+  what: 'The lead, 1 November 2026: "Lets ship r12 first"; fix findings at the source. The slice keeps Block A as
+    approved: nothing joins it and only what no started ticket builds leaves it.'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'Finding: the r12 integration refresh of 1 November 2026 (the merge of lanes F to M and the plan lane) failed
+  check-states (approval.granted access consumer with no idempotency key, a merge of two lanes'' consumer lists),
+  check-business-rules (two lanes defined ptypes), check-screen-wiring S-BUTTON-FORM (ADM-093), check-glossary-terms
+  G-BANNED-NAME (variantId), check-parameter-columns P-NAMED-TABLE (7), check-error-sources E-SCHEMA-READ-VIA
+  (publishKioskConfigs 409), check-cross-deployable-writes X-DOC, check-plan-closure C-REACH (BO-962) and C-UNTICKETED
+  (BO-168, two workforce tables), and check-screen-patterns P8 (BO-962).'
+keys_touched:
+  tables:
+  - whitelabel.module_enablement
+  - catalogue.pricing_market
+  - catalogue.sales_channel
+  - identity.mfa_challenge
+  - workforce.field_ownership
+  - workforce.integration_source
+  files:
+  - events/approval-expired.yaml
+  - events/approval-granted.yaml
+  - events/approval-rejected.yaml
+  - events/approval-withdrawn.yaml
+  - tools/check-business-rules.py
+  - screens/P08-venue-back-office.yaml
+  - docs/active/approved-ui-changes.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/white-label.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-error-sources.py
+  - handoff/cross-deployable-writes.md
+  - tools/derive-delivery-slice.py
+  - docs/active/block-a-extra-tasks.json
+root_class: 'lanes each changing one side of a rule a check holds together, each checked without the other'
+tickets:
+  started:
+  - '28946 (MIG-WORKFORCE-3, Ready for QA, Hrushikant Patkar): nothing to do; it already creates both workforce tables.'
+  unstarted:
+  - '29834 (VM-ADM-093) and its wire task 36684 build the rule fields with the Save rule button.'
+  - '28427 and 28473 (BO-168, On hold): leave Block A for Block C at this release.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r12 integration gate, 1 November 2026'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open

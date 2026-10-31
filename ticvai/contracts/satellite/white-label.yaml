@@ -3070,6 +3070,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createBanner
+      x-ticvai-names-for-context:
+        - whitelabel.tenant_config
       x-ticvai-consumed-by:
         - "P13 CMS-008 Content Blocks"
       x-ticvai-writes:
@@ -3127,6 +3129,8 @@ paths:
         format: uuid
     patch:
       operationId: updateBanner
+      x-ticvai-names-for-context:
+        - whitelabel.tenant_config
       x-ticvai-consumed-by:
         - "P13 CMS-008 Content Blocks"
       x-ticvai-audience:
@@ -3214,6 +3218,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: deleteBanner
+      x-ticvai-names-for-context:
+        - whitelabel.tenant_config
       x-ticvai-consumed-by:
         - "P13 CMS-008 Content Blocks"
       x-ticvai-writes:

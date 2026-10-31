@@ -12154,9 +12154,9 @@ paths:
 
 
         **The rule from inputs to trace** (ADAM CR-419, decided 31 October 2026; CHG-CR419-001). A simulation stores
-        nothing, so it is not a singleton; the Idempotency-Key stays. **Variant**: the optional `variantId` must be a
+        nothing, so it is not a singleton; the Idempotency-Key stays. **Variant**: the optional `productVariantId` must be a
         variant of `productId`, and it is required when the product has more than one sellable variant; either
-        failure is `400 validation` on `variantId`. **Selected rate**: the price that searchCatalogue''s `fromPrice`
+        failure is `400 validation` on `productVariantId`. **Selected rate**: the price that searchCatalogue''s `fromPrice`
         resolution gives the variant at `venueId` on `channel`, taken at `date` (and `timeslotId`) instead of now; no
         such price is `422 no-selected-rate`. **Sequence**: the steps, in `sequence` order, of the venue''s active
         `isDefault` calculation profile in force on `date`; no such profile is `422 no-calculation-profile`.
@@ -12196,7 +12196,7 @@ paths:
                 $ref: '#/components/schemas/PriceBreakdownCalculationSimulationExplainabilityView'
         '400':
           x-ticvai-problem-types: [validation]
-          description: '`validation` on `variantId`: it is not a variant of `productId`, or it is missing while the
+          description: '`validation` on `productVariantId`: it is not a variant of `productId`, or it is missing while the
             product has more than one sellable variant (ADAM CR-419). Nothing is stored.'
           content:
             application/problem+json:
@@ -21957,7 +21957,7 @@ components:
         productId:
           type: string
           format: uuid
-        variantId:
+        productVariantId:
           type: string
           format: uuid
           nullable: true
@@ -24091,7 +24091,7 @@ components:
           format: uuid
         partnerName:
           type: string
-        variantId:
+        productVariantId:
           type: string
           format: uuid
         note:
@@ -24762,7 +24762,7 @@ components:
         performanceId:
           type: string
           format: uuid
-        variantId:
+        productVariantId:
           type: string
           format: uuid
           nullable: true
@@ -26174,7 +26174,7 @@ components:
         priceListId:
           type: string
           format: uuid
-        variantId:
+        productVariantId:
           type: string
           format: uuid
         amount:
@@ -26190,7 +26190,7 @@ components:
       - variantId
       - amount
       properties:
-        variantId:
+        productVariantId:
           type: string
           format: uuid
         amount:
@@ -35410,12 +35410,12 @@ components:
         productId:
           type: string
           description: Product
-        variantId:
+        productVariantId:
           type: string
           format: uuid
           nullable: true
           description: The variant priced; a variant of productId, required when the product has more than one
-            sellable variant, else 400 validation on variantId (ADAM CR-419)
+            sellable variant, else 400 validation on productVariantId (ADAM CR-419)
         quantity:
           type: integer
           description: Quantity
