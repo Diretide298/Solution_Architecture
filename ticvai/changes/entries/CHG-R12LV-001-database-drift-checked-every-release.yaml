@@ -1,0 +1,59 @@
+id: CHG-R12LV-001
+date: '2026-10-30'
+source: audit
+kind: process
+summary: 'A database drifting from the package, either way, is found by a tool every release: tools/check-schema-drift.py
+  builds the package''s reference in a throwaway Postgres container of the dumps'' major (control in initdb order, then
+  backend/provision-tenant.sh from a staged copy of backend/), restores any schema-only dump (live, or a database the
+  Migrator builds from the repository''s db/ folder alone), snapshots both with one query and sorts every difference into
+  one bucket against the intended state, the built SQL plus handoff/migration-review.md: the latest release''s objects
+  to add, change or drop; hand changes open, waiting on a decision or done (with what rides on a done one); objects only
+  on the target; tables not built, by their ticket (a gap only when the ticket is started or closed, or no task names the
+  table); objects defined differently. It writes drift-<label>.md and drift-<label>.json. Release runbook step 6a: after
+  each deploy the database owner sends schema-only dumps of live and of a fresh db/ build, the release runs the tool and
+  both reports go to the lead; its findings are never baselined. The gate runs it bare: its self-test (fixture snapshots
+  for every bucket and lesson, no Docker) and the inputs it judges by still parse, every review kind has a rule.'
+decision:
+  what: 'The lead, 30 October 2026, on turning the live database check into a package tool that every release runs and
+    running it on a second dump of a db/-only build: "Yes, both". Kept from the 30 October check, each held by the
+    self-test: keys built from ::text casts (a name || name is cut at 63 characters and fakes collisions); a key the
+    package creates NOT VALID and the target validated is the same key; function bodies compared by md5 of
+    pg_get_functiondef; review rows judged on the target, and a dropped column''s key and index, a retyped column''s new
+    key or check and the composite venue keys behind a hand-added unique key counted as done; tables not built classified
+    by MIGRATIONS.md task, pms-map.json and the ticket statuses (adam-links.json, or a tickets file given). The one
+    adjustment to the package''s files for the build is CHG-R6-001''s (pii.subject.kind and pii.subject_contact.kind text
+    NOT NULL with their checks, from their migration-review.md rows), applied only while a column is typed with a type no
+    package file creates, so it switches itself off once the package provisions cleanly; an undefined type no review row
+    decides stops the build.'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'Finding: the live database comparison of 30 October 2026 (live''s schema-only dumps, Postgres 17.6, against r11):
+  r11 not on live outside five modules, 27 hand changes open, 13 objects on live the package never recorded, 236 tables
+  not built and none a gap. It was made by hand-run scripts, so the next drift would again be found by a developer (the
+  catch-up list of about 1,060 objects described the db/ folder, not live). The reference build applies CHG-R6-001; the
+  hand changes are those derive-ddl leaves for a person (CHG-R9MIG-002).'
+keys_touched:
+  files:
+  - tools/check-schema-drift.py
+  - tools/tests/test_check_schema_drift.py
+  - tools/run-checks.py
+  - docs/active/release-runbook.md
+root_class: 'a database''s drift from the package found only when a developer happens to compare them'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the live database check of 30 October, a release process step'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-schema-drift.py
+status: open
+notes: 'Proven on the 30 October live dumps (live-tenant.sql, live-control.sql): 58 + 8 r11 objects, 27 hand changes
+  open, 13 objects only on live, 236 tables not built and 0 gaps, the same as the hand-made report; its reference and
+  live snapshots are byte for byte the hand-made ones. Where it says more: the six `index duplicates a unique index` rows
+  are on live waiting on their decision (the scripts read the index name as a table and called them not built); 11 of the
+  236 tables are ones the package retires (a done `table dropped`), not storage-only or New; access.scan_event''s scope
+  policy is defined differently from 920-row-level-security.sql (live inlines platform.in_scope; the report judged it
+  equivalent by hand, which a tool cannot prove, so it stays a finding for a person). The db/ dump has not been sent yet.'
