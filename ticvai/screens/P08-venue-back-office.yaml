@@ -172704,12 +172704,6 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
     source: pack Pricing___Revenue_Management_Reference.pdf, page 83
-  - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-027): No write for channel, segment and location
-      dynamic pricing rules (unless setDynamicPriceRule carries them). Since ADAM CR-410 (31 October 2026)
-      setDynamicPriceRule carries them (a contextual rule); the screen has no save control to bind it
-      to, and adding one would change the approved UI, so the binding waits for a design change.'
-    source: contracts/spine/catalogue.yaml#listChannelCustomerSegment
   layout:
     template: split
     regions:
@@ -172725,6 +172719,15 @@ screens:
       - kind: secondaryButton
         label: API
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 83 §Support
+      - kind: primaryButton
+        label: Save rule
+        operation: setDynamicPriceRule
+        permission: PRICE_CONFIGURE
+        notes: '**Saves one contextual rule** (ADAM CR-410; the lead, 1 November 2026: "Add a save button"):
+          the rule''s dimension and that dimension''s fields, its range, protection and on/off, as the
+          screen shows them (ChannelCustomerSegmentLocationDynamicRulesView), sent as a rule with ruleType
+          contextual and no conditions or actions.'
+        provenance: contract catalogue.yaml PUT /pricing/dynamic-rules/{ruleId}
     - name: contentBody
       components: []
   states:
@@ -172741,9 +172744,20 @@ screens:
     contract: catalogue
     purpose: Channel, Customer Segment & Location Dynamic Rules
     trigger: onLoad
+  - operationId: setDynamicPriceRule
+    contract: catalogue
+    purpose: Save a channel, customer segment or location rule, a contextual rule (ADAM CR-410)
+    trigger: onAction
+    invalidates:
+    - listChannelCustomerSegment
   entryState:
     preloaded:
     - ChannelCustomerSegmentLocationDynamicRulesView.channel
+    params:
+    - name: ruleId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listChannelCustomerSegment`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -194747,9 +194761,6 @@ screens:
         provenance: pack Sales_Channel_Management_Reference.pdf, page 5 §Configure
       - kind: selectField
         label: Market
-        provenance: pack Sales_Channel_Management_Reference.pdf, page 5 §Configure
-      - kind: selectField
-        label: Currency
         provenance: pack Sales_Channel_Management_Reference.pdf, page 5 §Configure
       - kind: selectField
         label: Time Zone

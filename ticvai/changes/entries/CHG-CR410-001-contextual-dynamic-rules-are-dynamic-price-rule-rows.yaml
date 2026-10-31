@@ -7,7 +7,8 @@ summary: 'A channel, customer-segment or location dynamic rule is a pricing.dyna
   is_dynamic_pricing_enabled); setDynamicPriceRule writes them and answers 422 contextual-rule-incomplete for a rule
   without its dimension''s fields or with another''s, conditions or actions; listChannelCustomerSegment lists the
   contextual rows from that table alone. dynamic_price_rule.channel_id keys catalogue.sales_channel (one channel
-  profile; null for every channel).'
+  profile; null for every channel). ADM-093 gains a Save rule button bound to setDynamicPriceRule (the lead, 1
+  November 2026: "Add a save button").'
 decision:
   what: 'ADAM CR-410, posted 31 October 2026: "Decided (Chinmay, 31 October 2026): not as recommended: option A, with the
     channel as its own column. A contextual rule is a pricing.dynamic_price_rule row with rule_type ''contextual''. The
@@ -33,6 +34,7 @@ keys_touched:
   files:
   - contracts/spine/catalogue.yaml
   - screens/P08-venue-back-office.yaml
+  - docs/active/approved-ui-changes.yaml
   - handoff/api-data-lineage-overrides.json
   - tools/check-business-rules.py
 root_class: 'a list drafted from the pack whose dimensions no table stores, while the table that holds the rest of the
@@ -45,7 +47,8 @@ tickets:
     contextual-rule-incomplete.'
   - '28091 (MIG-PRICING-2, Hrushikant Patkar): the seven columns and the channel_id key as a [DB] child task (to be filed
     by the plan lane).'
-  unstarted: []
+  unstarted:
+  - '29834 (VM-ADM-093) and its wire task 36684 pick up the Save rule button and its binding at the next release.'
 release_tag: pending
 decision_owner: Chinmay
 adam_cr: CR-410
@@ -64,9 +67,11 @@ notes: 'Shared model with lanes J and L: channel_id is one catalogue.sales_chann
   validates), the enum columns carry CHECKs except sales_channel (a nullable SalesChannel through allOf, which the
   generator does not follow; the SalesChannel values are the application''s to hold until it does), channel_id gets its
   key and index from x-ticvai-references, and location_id is marked x-ticvai-references none (text, not a key: the
-  convention had guessed it a cross-module key to inventory.location). Not built either: the verdict''s
-  follow-up bound ADM-093''s save to setDynamicPriceRule, but ADM-093 has no save control (its approved regions hold
-  POS, Call Center and API buttons only), so binding it fails check-screen-wiring S-OP-UNREACHED and adding a control
-  would change the approved UI; the screen''s CHG-WIR-027 gap now says setDynamicPriceRule carries the rule and the
-  binding waits for a design change (a frontend "Design change:" CR). The carried lineage override for
+  convention had guessed it a cross-module key to inventory.location). ADM-093 had no save control (its approved
+  rowActions held POS, Call Center and API only), so the lane stopped on binding it; the lead decided on 1 November
+  2026: "Add a save button". One primary button, Save rule (PRICE_CONFIGURE), sends the contextual rule as the screen
+  shows it, the screen''s apis call setDynamicPriceRule onAction (invalidating listChannelCustomerSegment), the
+  approved-UI change is recorded (docs/active/approved-ui-changes.yaml, region:rowActions, to 446cc503b3c53ad4), and
+  the CHG-WIR-027 gap ("No write ... unless setDynamicPriceRule carries them") is closed and removed from the
+  screen. The carried lineage override for
   listChannelCustomerSegment (condition and action tables) is replaced by the contract''s x-ticvai-reads.'

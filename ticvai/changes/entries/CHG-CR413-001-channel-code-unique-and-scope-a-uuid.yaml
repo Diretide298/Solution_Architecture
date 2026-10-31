@@ -32,6 +32,8 @@ keys_touched:
   files:
   - contracts/spine/catalogue.yaml
   - docs/active/breaking-changes.yaml
+  - docs/active/approved-ui-changes.yaml
+  - screens/P08-venue-back-office.yaml
   - tools/check-business-rules.py
 root_class: 'a uniqueness promised in prose with no index or refusal, and a request id typed looser than its column'
 tickets:
@@ -41,7 +43,8 @@ tickets:
   - '29679 (MIG-CATALOGUE-7, Hrushikant Patkar): the unique index, after listing any duplicate codes, as a [DB] child
     task (to be filed by the plan lane).'
   unstarted:
-  - '29749 (VM-ADM-259) and its wire task 35833: scopeId is a uuid from r12 (BC-550).'
+  - '29749 (VM-ADM-259) and its wire task 35833: scopeId is a uuid from r12 (BC-550), and the form has no Currency
+    field.'
 release_tag: pending
 decision_owner: Chinmay
 adam_cr: CR-413
@@ -50,9 +53,9 @@ prevention:
   type: check
   ref: tools/check-business-rules.py::BR-CHANNEL-CODE-UNIQUE
 status: open
-notes: 'Not built, and stopped for the lead: "the screen does not ask for it" would drop the Currency field from
-  ADM-259''s approved region:fields (handoff/approved-ui.json), which a package change must not do without an approval
-  recorded in docs/active/approved-ui-changes.yaml; the screen still shows Currency and the server drops the value. The
+notes: 'ADM-259''s form drops the Currency field ("the screen does not ask for it"): the lane stopped on it because
+  it changes the approved region:fields, and the lead decided it on 1 November 2026: "Remove the field" (recorded in
+  docs/active/approved-ui-changes.yaml, to 1ed34b6d3380d5b5); the server never stores the input''s currency. The
   scopeId type change is breaking against r1 and is BC-550. ChannelCreationProfileConfigurationInput.channelCode
   carries x-ticvai-unique: tenant too, the request field the 409 names (check-storage-promises SP-DUPLICATE-409). createChannelProfile also declares the 400 the decision
   names (it declared none).'

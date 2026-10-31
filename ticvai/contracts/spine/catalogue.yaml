@@ -18101,6 +18101,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-443 Pricing Audit, Approval & Publication"
+        - "P08 ADM-093 Channel, Customer Segment & Location Dynamic Rules"
       summary: Replace a rule, its conditions and its actions
       description: >
         **Applied whole.** A rule whose conditions have been updated and whose actions have not is a
@@ -18110,7 +18111,7 @@ paths:
 
         **A contextual rule** (ADAM CR-410, decided 31 October 2026, Chinmay) is saved here too, with `rule.ruleType`
         `contextual` and the optional `dimension`, `salesChannel`, `customerSegment`, `segmentRef`, `locationLevel`,
-        `locationId` and `dynamicPricingEnabled`. It carries its dimension and that dimension's
+        `locationId` and `dynamicPricingEnabled` (ADM-093's Save rule). It carries its dimension and that dimension's
         fields, and no other dimension's: `channel` needs `salesChannel`; `customerSegment` needs `customerSegment`,
         plus `segmentRef` for `loyaltyTier` or `customSegment`; `location` needs `locationLevel` and `locationId`. A
         contextual rule has no conditions or actions. Otherwise the call answers `422 contextual-rule-incomplete` and
