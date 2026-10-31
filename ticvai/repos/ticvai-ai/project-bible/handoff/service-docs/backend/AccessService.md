@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `access` |
 | Schemas owned | `access` |
-| Operations in the slice | 35 of 259 |
+| Operations in the slice | 34 of 259 |
 | Scale | Read-heavy, extreme latency sensitivity, edge-cached. `frozenDays` is held rather than replayed precisely because the gate cannot afford the arithmetic. |
 | If it is down | Down means the gates stop. Runs at the edge with a local decision cache. |
 
@@ -42,7 +42,6 @@
 | access | [`revokeFacePass`](#revokefacepass) | DELETE | `/face-pass/enrolments/{enrolmentId}` | core | 1 | GST-069, WEB-024 |
 | access | [`setAccessPointGroup`](#setaccesspointgroup) | PUT | `/access-point-groups/{groupId}` | setup | 1 | BO-151 |
 | access | [`setBiometricVerificationProfile`](#setbiometricverificationprofile) | PUT | `/biometric-verification-profile` | setup | 1 | BO-185 |
-| access | [`setBleBeaconGeofence`](#setblebeacongeofence) | PUT | `/ble-beacon-geofence` | setup | 1 | BO-168 |
 | access | [`setCredentialActivationDisplay`](#setcredentialactivationdisplay) | PUT | `/credential-activation-display/{credentialPolicyId}` | setup | 1 | BO-166 |
 | access | [`setDeviceBindingPolicy`](#setdevicebindingpolicy) | PUT | `/device-binding-policy` | setup | 1 | BO-167 |
 | access | [`setFaceMatchingVerification`](#setfacematchingverification) | PUT | `/face-matching-verification/{profileId}` | setup | 1 | BO-189 |
@@ -129,6 +128,7 @@
 |---|---|---|
 | 200 |  | Manual Override & Supervisor Approval |
 | 409 |  | The body's scanId was not a denial (scan-not-denied), or has already been overridden (scan-already-overridden), exactly as overrideAccess refuses it (r8 walk fix, CHG-R8WFC-001). |
+| 403 |  | A step-up refusal: the caller's session has no verified, unconsumed MFA step-up for this operation (step-up-token-missing), or the newest one is older than 5 minutes (step-up-token-expired), by the r… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### bindCredentialDevice
@@ -844,7 +844,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of ParkingFacility | yes |  |
-| items[].id | string (uuid) |  | Server-assigned, and the upsert key of setParkingFacility. |
+| items[].id | string (uuid) |  | The record's id, and the path id of setParkingFacility (ADAM CR-245; CR-398): a new facility takes the path id, a client UUIDv7. |
 | items[].name | string | yes |  |
 | items[].venueId | string (uuid) | yes |  |
 | items[].mode | ParkingIntegrationMode: enum (none, plateWhitelist, qrHandoff) | yes | CF-52, settled 14 August. |
@@ -878,6 +878,8 @@ Withdrawn by the guest, ended with the pass, or erased under a DSAR.
 **The entitlement survives.** A guest who withdraws their face still has their annual pass and enters another way (3.2.9 allows the check to be deactivated per ticket type).
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own FacePass enrolment; another guest's enrolment is refused exactly as one that does not exist, never returned. `GUEST_MANAGE` is what a staff caller must hold to act for any guest (ADR-0025).
 
+**How the row is destroyed** (ADAM CR-391, Chinmay, 31 October 2026). The operation reads the enrolment through `identity#subjectBiometricRecords` on Identity's service route (`listSubjectBiometricRecords`, `serviceAuth`); the access role gets no grant on `pii`. If the `enrolmentId` is unknown, is not a `facePass`, or belongs to another guest (for a guest caller), the answer is `404 not-found`. Otherwise it publishes `biometric.enrolmentChanged` with `change` `revoked` and the row's fields, and answers `204`. On `revoked`, Identity's consumer deletes the `pii.subject_biometric` row; it never deactivates it. The vendor's delete and its receipt join that consumer once ADR-0063 is settled; until then TICVAI holds no template and the row is the whole record. The read needs service sign-in (#37051, ADAM CR-281): the operation and the consumer change are built now, and the read is connected when #37051 is Ready for QA.
+
 |  |  |
 |---|---|
 | Permission | `GUEST_MANAGE` |
@@ -901,7 +903,8 @@ Withdrawn by the guest, ended with the pass, or erased under a DSAR.
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 204 |  | Destroyed |
+| 204 |  | Revoked; Identity deletes the row from the event (ADAM CR-391) |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAccessPointGroup
@@ -910,7 +913,7 @@ Withdrawn by the guest, ended with the pass, or erased under a DSAR.
 
 **The write behind Access Location Grouping** (BO-151): a named group of access points in one venue (e.g. Main Entrance), optionally nested under another group, whose counts roll up to a common occupancy.
 
-**PUT semantics: an upsert of one row, keyed on the body's `id`** (the pattern of `setParkingFacility`). No `id` creates it: the server assigns the id and answers `201`. An `id` that exists replaces the row whole and answers `200`: a field left out takes its default or null, it does not keep its stored value. An `id` that does not exist is a `404`, never a create with a client-chosen id. `scopePath`, `createdAt` and `updatedAt` are the server's and are ignored in a body.
+**PUT semantics: an upsert of one row, keyed on the path's `groupId`, the group's id** (ADAM CR-245's rule, applied by ADAM CR-395, Chinmay, 31 October 2026). Where no group has that id, one is created with it (a client UUIDv7, which BO-151 creates for a new group) and the answer is `201`. Where one does, the body replaces it whole and the answer is `200`: a field left out takes its default or null, it does not keep its stored value. An `id` sent in the body must equal the path's, else `400 validation`. This PUT never answers `404`. `scopePath`, `createdAt` and `updatedAt` are the server's and are ignored in a body.
 
 A group may not be its own ancestor (`409 group-cycle`), and every member access point must belong to the group's venue (`422`).
 
@@ -932,6 +935,7 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | groupId | path | yes | string (uuid) |  |
+| groupId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id (ADAM CR-245, CR-395). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AccessAccessPointGroup`
@@ -965,10 +969,9 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | An existing group, replaced |
-| 201 |  | A new group, created |
+| 201 |  | A new group, created with the path's groupId |
 | 400 | BadRequest | Validation failed |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | group-cycle: the parent named would make the group its own ancestor. |
 | 422 |  | A member access point is not in the group's venue. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -1041,87 +1044,13 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 | 200 |  | Biometric Verification Profile Builder |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### setBleBeaconGeofence
-
-**`PUT /ble-beacon-geofence`**: BLE Beacon & Geofence Configuration
-
-**Drafted from the workshop pack and checked against it on 29 September.** Access Control Module, page 34. The screen says: Configure location-aware credential activation. This is a major requirement under 3.1.9. The matrix requires BLE beacon proximity and geofence boundaries to activate/deactivate credentials at venue, attraction, zone and gate level.
-
-**Every property carries the sentence it came from.** 12 were read from the screen's own bulleted directory and 9 bullets were dropped as prose, examples or hierarchy illustrations rather than bent into fields. Names and types are this package's reading of those sentences, checked against the pack on 29 September.
-
-**Agreed (decided 29 September, readiness close-out).** Active/inactive and health are states, proximity is metres, and the drawn activation zone is a radius or polygon. Health and last detected are reported, not written.
-
-**Overlaps `setAccessPointGeofence`,** which stays the operation of record for that write; this one serves the screen's composite view of it.
-
-|  |  |
-|---|---|
-| Permission | `ACCESS_POINT_CONFIGURE` |
-| Scope level | venue |
-| Part of slice | setup, makes `access.access_point` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | primary |
-| Reads | `access.access_point`, `access.device_placement`, `cache:idempotency` |
-| Writes | `access.access_point`, `access.configuration_change`, `access.device_placement`, `cache:idempotency` |
-| Called by | BO-168 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `BleBeaconGeofenceConfigurationInput`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| beaconName | string |  | Beacon Name |
-| beaconId | string | yes | Beacon ID |
-| venue | string | yes | Venue |
-| zone | string |  | Zone |
-| gate | string |  | Gate |
-| proximityThreshold | integer |  | Metres |
-| activeInactive | enum (active, inactive) |  | Active/Inactive |
-| health | enum (healthy, degraded, offline) |  | Read-only, reported by the beacon |
-| lastDetected | string (date-time) |  | Last detected |
-| park | string |  | Park |
-| attraction | string |  | Attraction |
-| geofenceRadiusMeters | integer |  | Radius of a circular activation zone |
-| geofenceBoundary | array of string |  | Polygon points as lat,lng when the zone is drawn |
-
-**Response**: `BleBeaconGeofenceConfigurationView`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| beaconName | string |  | Beacon Name |
-| beaconId | string | yes | Beacon ID |
-| venue | string | yes | Venue |
-| zone | string |  | Zone |
-| gate | string |  | Gate |
-| proximityThreshold | integer |  | Metres |
-| activeInactive | enum (active, inactive) |  | Active/Inactive |
-| health | enum (healthy, degraded, offline) |  | Read-only, reported by the beacon |
-| lastDetected | string (date-time) |  | Last detected |
-| park | string |  | Park |
-| attraction | string |  | Attraction |
-| geofenceRadiusMeters | integer |  | Radius of a circular activation zone |
-| geofenceBoundary | array of string |  | Polygon points as lat,lng when the zone is drawn |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | BLE Beacon & Geofence Configuration |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### setCredentialActivationDisplay
 
 **`PUT /credential-activation-display/{credentialPolicyId}`**: Save a credential activation and display rule
 
 **The write behind Credential Activation & Display Rules** (decided 29 September, VM close-out). `listCredentialActivationDisplay` read these rules and nothing wrote them.
 
-**Upsert keyed by `ruleId`.** A body without `ruleId` creates one and the response carries the new key; a body with one replaces that record whole (PUT semantics: a field left out takes its default or null); an unknown `ruleId` is a `404`, never a create.
+**Upsert keyed on the path's `credentialPolicyId`, the record's id** (ADAM CR-245's rule, as ADAM CR-395 applied it, 31 October 2026). Where no record has that id, one is created with it (a client UUIDv7) and the answer is `201`; where one does, the body replaces it whole and the answer is `200` (PUT semantics: a field left out takes its default or null). A `ruleId` sent in the body must equal the path's, else `400 validation`.
 
 A rule takes effect for credentials rendered after the save; a QR already shown is not re-rendered until the guest's app next refreshes it.
 
@@ -1142,14 +1071,14 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| credentialPolicyId | path | yes | string (uuid) | Addresses the activation and display rule this write creates or replaces. |
+| credentialPolicyId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id (ADAM CR-245, CR-395). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CredentialActivationDisplayRulesInput`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| ruleId | string (uuid) |  | Absent creates a rule |
+| ruleId | string (uuid) |  | The record's id, when sent; it must equal the path's credentialPolicyId (ADAM CR-245, CR-395). |
 | venueId | string | yes | Venue the rule applies to |
 | name | string | yes | (max length 200) |
 | beforeActivationDisplay | array of enum (hideQr, blurQr, showCountdown, showAvailableAtVenue, showVenueDirections) | yes | What the guest sees before the credential activates |
@@ -1171,6 +1100,8 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Saved |
+| 201 |  | A new record, created with the path's credentialPolicyId (ADAM CR-245, CR-395) |
+| 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | No activation trigger, or a display option that contradicts another (hideQr with blurQr) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -1264,7 +1195,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 **The write behind Face Matching & Verification Thresholds** (decided 29 September, VM close-out).
 
-**Upsert keyed by `profileId`.** A body without `profileId` creates one and the response carries the new key; a body with one replaces that record whole (PUT semantics: a field left out takes its default or null); an unknown `profileId` is a `404`, never a create.
+**Upsert keyed on the path's `profileId`, the record's id** (ADAM CR-245's rule, as ADAM CR-395 applied it, 31 October 2026). Where no record has that id, one is created with it (a client UUIDv7) and the answer is `201`; where one does, the body replaces it whole and the answer is `200` (PUT semantics: a field left out takes its default or null). A `profileId` sent in the body must equal the path's, else `400 validation`.
 
 `reviewRangeMin` must be below `highConfidenceMin` (`422`). A change applies to the next match; a decision already made is not re-scored.
 
@@ -1286,14 +1217,14 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| profileId | path | yes | string (uuid) | Addresses the item this write creates or replaces. |
+| profileId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id (ADAM CR-245, CR-395). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FaceMatchingVerificationThresholdsInput`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| profileId | string (uuid) |  | Absent creates a threshold profile |
+| profileId | string (uuid) |  | The record's id, when sent; it must equal the path's profileId (ADAM CR-245, CR-395). |
 | venueId | string | yes |  |
 | accessContext | string | yes | Where the thresholds apply, e.g. (max length 100) |
 | highConfidenceMin | number | yes | Score at or above which the match is high confidence (allow if every other rule passes) (min 0; max 1) |
@@ -1329,6 +1260,8 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Saved |
+| 201 |  | A new record, created with the path's profileId (ADAM CR-245, CR-395) |
+| 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | reviewRangeMin is not below highConfidenceMin |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -1407,11 +1340,13 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 **The write behind Face Tag Temporary Enrollment** (decided 29 September, VM close-out). Where a Face Tag may be captured, what it binds to and when it is deleted.
 
-**Upsert keyed by `profileId`.** A body without `profileId` creates one and the response carries the new key; a body with one replaces that record whole (PUT semantics: a field left out takes its default or null); an unknown `profileId` is a `404`, never a create.
+**PUT semantics: an upsert keyed on the path's `profileId`, the profile's id** (ADAM CR-245's rule, applied by ADAM CR-390, Chinmay, 31 October 2026). Where no `faceTagEnrolment` profile has that id, one is created with it (a client UUIDv7) and the answer is `201`. Where one does, the body replaces it whole and the answer is `200`: a field left out takes its default or null. A `profileId` sent in the body must equal the path's, else `400 validation`.
 
-**Face Tags are kept apart from Face Pass records and deleted automatically at the trigger.** A trigger of `operationalRetentionThreshold` needs `retentionThresholdHours` (`422` without it). That number has no default: it is the one make-or-break value on this screen, and until the client's counsel names it a venue can use every other trigger.
+**Face Tags are kept apart from Face Pass records and deleted automatically at the trigger.** A trigger of `operationalRetentionThreshold` needs `retentionThresholdHours` (`422 retention-threshold-required` without it). That number has no default: it is the one make-or-break value on this screen, and until the client's counsel names it a venue can use every other trigger.
 
 **Consent first, on the venue's own form, and a warning where TICVAI holds the data** (decided 2 October 2026, Chinmay, batch 4, BO-188; DEC-128; CHG-CSP-018). A profile names the consent form its captures are taken on (`consentFormId`); where TICVAI stores the templates the response says so (`FaceTagTemporaryEnrollmentView.templatesHeldByTicvai`) and the screen warns the venue. How long a Face Tag may be kept past its trigger is still for counsel (DEC-240, research pending).
+
+**The profile names the form, not a version** (ADAM CR-390). `consentFormId` is stored on the profile (`access.biometric_profile.consent_form_id`) and read back on the view. The form's version is not kept on the profile: each capture records the version the guest accepted on its own enrolment record (CHG-CSP-018). The venue's biometrics settings (`consentFormId` for the fallback, `templatesHeldByTicvai` for the view) are read through `tenancy#venueSettingsRecords`, in process, through Tenancy's own query class and under the caller's row security (XDR-032). No `consentFormId` on the profile and none on the venue is `422 consent-form-required`.
 
 |  |  |
 |---|---|
@@ -1431,14 +1366,14 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| profileId | path | yes | string (uuid) | Addresses the item this write creates or replaces. |
+| profileId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id (ADAM CR-245, CR-390). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FaceTagTemporaryEnrollmentInput`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| profileId | string (uuid) |  | Absent creates a Face Tag profile |
+| profileId | string (uuid) |  | The profile's id, when sent; it must equal the path's profileId (ADAM CR-245, CR-390). |
 | venueId | string | yes |  |
 | name | string | yes | (max length 200) |
 | enrollmentChannels | array of enum (ticketCounter, entryGate) | yes | Where a Face Tag may be captured (min items 1) |
@@ -1468,16 +1403,17 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Saved |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 422 |  | operationalRetentionThreshold chosen with no retentionThresholdHours, or no consent form on the profile or the venue (consent-form-required; CHG-CSP-018) |
+| 200 |  | An existing profile, replaced |
+| 201 |  | A new profile, created with the path's profileId |
+| 400 | BadRequest | Validation failed |
+| 422 |  | retention-threshold-required: deletionTrigger is operationalRetentionThreshold and no retentionThresholdHours is sent. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setGateModePolicy
 
 **`PUT /gate-mode-policies/{gateModePolicyId}`**: Set a policy for a non-standard gate mode
 
-**The write behind Gate Modes, Free Spin & Emergency Controls** (BO-201): for `freeFlow` or `dropArm` (R221 vocabulary), who may activate it, on which gate group, whether a reason is required, the emergency code, notification and whether activation opens an incident. `setTurnstileMode` enforces it: a caller whose role is not in `whoCanActivate` is refused, and a missing reason where `reasonRequired` is refused.
+**The write behind Gate Modes, Free Spin & Emergency Controls** (BO-201): for `freeFlow` or `dropArm` (R221 vocabulary), who may activate it, on which gate group, whether a reason is required, the emergency code, notification and whether activation opens an incident. `setTurnstileMode` enforces it (ADAM CR-396, decided 31 October 2026; CHG-CR396-001): a caller who holds none of the `whoCanActivate` roles at the access point's venue is refused `403 gate-mode-role-required`, a missing reason where `reasonRequired` is `400 reason-required`, and `createsIncident` opens an access incident. **`whoCanActivate` holds role ids** (`Role.id`, uuid strings, the roles BO-201 picks from `listRoles`); a malformed one is `400 validation`.
 
 **PUT semantics: an upsert keyed on `mode` and `accessPointGroupId` (one policy per mode per gate group; a null group is the venue default).** A body whose key has no row creates one (`201`); a body whose key has a row replaces it whole (`200`): a field left out takes its default or null. `id`, `scopePath`, `createdAt` and `updatedAt` are the server's and are ignored in a body.
 
@@ -1509,7 +1445,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | id | string (uuid) | yes | (read-only) |
 | venueId | string (uuid) | yes |  |
 | mode | enum (freeFlow, dropArm) | yes | Non-standard operating mode governed (R221 vocabulary) |
-| whoCanActivate | array of string |  | Roles allowed to activate this mode |
+| whoCanActivate | array of string (uuid) |  | The roles allowed to activate this mode, as role ids (Role.id; ADAM CR-396; CHG-CR396-001). |
 | accessPointGroupId | string (uuid) |  | Gate group the policy applies to (access.access_point_group); null for the whole venue (nullable) |
 | reasonRequired | boolean |  | (default True) |
 | emergencyCode | string |  | (nullable) |
@@ -1526,7 +1462,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | id | string (uuid) | yes | (read-only) |
 | venueId | string (uuid) | yes |  |
 | mode | enum (freeFlow, dropArm) | yes | Non-standard operating mode governed (R221 vocabulary) |
-| whoCanActivate | array of string |  | Roles allowed to activate this mode |
+| whoCanActivate | array of string (uuid) |  | The roles allowed to activate this mode, as role ids (Role.id; ADAM CR-396; CHG-CR396-001). |
 | accessPointGroupId | string (uuid) |  | Gate group the policy applies to (access.access_point_group); null for the whole venue (nullable) |
 | reasonRequired | boolean |  | (default True) |
 | emergencyCode | string |  | (nullable) |
@@ -1557,7 +1493,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 `plateWhitelist` — the guest gives a plate at checkout and the platform pushes it to the parking system's whitelist. **The barrier opens without anything being presented**, which is the best experience and the only mode that needs a plate captured at sale.
 `qrHandoff` — TICVAI sends a code the barrier validates. No plate needed, and it fails the way any code fails: a dead phone at a barrier with a queue behind it.
 A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs on the parking system's own POS (14 August).
-**PUT semantics — an upsert of one facility, keyed on the body's `id`.** The collection path carries no id, so the body names the target. **No `id`** creates a facility: the server assigns the id and answers `201`. **An `id` that exists** replaces that facility whole and answers `200`: a field left out takes its default or null, it does not keep its stored value. **An `id` that does not exist** is a `404`, never a create with a client-chosen id. `takesPayment` and `vendorSwapTargetDays` are read-only and ignored in a body.
+**PUT semantics: the path `parkingFacilityId` is the facility's id** (ADAM CR-245's rule; ADAM CR-398, decided 31 October 2026; CHG-CR398-001). **No facility has that id**: one is created with it (a client UUIDv7; BO-006 mints it for a new facility) and the answer is `201`. **A facility the caller can see has it**: the body replaces it whole and the answer is `200`: a field left out takes its default or null, it does not keep its stored value. **The id is held by a facility the caller cannot see**: `404`, and nothing is written. A body `id`, when sent, must equal the path id, else `400 validation`. `takesPayment` and `vendorSwapTargetDays` are read-only and ignored in a body.
 
 |  |  |
 |---|---|
@@ -1576,14 +1512,14 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| parkingFacilityId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
+| parkingFacilityId | path | yes | string (uuid) | The facility's id (ADAM CR-245; CR-398). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ParkingFacility`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) |  | Server-assigned, and the upsert key of setParkingFacility. |
+| id | string (uuid) |  | The record's id, and the path id of setParkingFacility (ADAM CR-245; CR-398): a new facility takes the path id, a client UUIDv7. |
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
 | mode | ParkingIntegrationMode: enum (none, plateWhitelist, qrHandoff) | yes | CF-52, settled 14 August. |
@@ -1602,7 +1538,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) |  | Server-assigned, and the upsert key of setParkingFacility. |
+| id | string (uuid) |  | The record's id, and the path id of setParkingFacility (ADAM CR-245; CR-398): a new facility takes the path id, a client UUIDv7. |
 | name | string | yes |  |
 | venueId | string (uuid) | yes |  |
 | mode | ParkingIntegrationMode: enum (none, plateWhitelist, qrHandoff) | yes | CF-52, settled 14 August. |
@@ -1834,6 +1770,10 @@ Revocation removes the plate from the whitelist. A refunded parking entitlement 
 Denies outright regardless of entitlement state. Included in the offline package so it holds during an outage — a blacklist that only works online is not a blacklist.
 
 **A whitelist entry needs a second approver; a blacklist entry does not** (decided 2 October 2026, Chinmay, critical set 1, BO-229: "Second approver for permanent locks, whitelist, and releasing identity/permanent locks"; DEC-254; CHG-CSP-031). `listType` `whitelist` (an approved exception to a restriction, BO-229) is not written at once: the call answers `202` with the approval request it raised (approvals kind `accessPermissionChange`, subject type `whitelistEntry`) and the entry is written when a second person approves; the requester cannot approve their own. Until 2 October this write could only blacklist; `listType` and `disableScope` are optional and default to the blacklist behaviour.
+
+**How a whitelist entry is raised** (ADAM CR-399, decided 31 October 2026; CHG-CR399-001; the pattern of `suspendTenant`, CR-172). A code already on either list is refused `409 duplicate-code` at once. Otherwise the entry's id is minted now (a UUIDv7) and this calls approvals' `createApprovalRequest` (`x-ticvai-write-via`, service route) with kind `accessPermissionChange`, `subjectContract` `access`, `subjectType` `whitelistEntry`, `subjectId` that id, and `attributes` `{mediaCode, reason, expiresAt, disableScope}` as sent, and answers `202` `AccessPendingSecondApproval` with the request's id and that `subjectId`. **The approval request is all this call writes.** Where approvals refuses `422 no-approval-route`, this call passes it on, and nothing is written.
+
+**The grant writes the entry** (events/approval-granted.yaml, context `access`). Access's consumer of `approval.granted` takes the events whose `subjectContract` is `access` and `subjectType` `whitelistEntry` (idempotency key `requestId`), reads the request through `approvals#requestRecords` for its `attributes`, and writes the `access.blacklist` row with the request's `subjectId` as its id, `listType` `whitelist`, the attributes, `addedByPrincipalId` the requester and `addedAt` now. It records the outcome with approvals' `recordApprovedActionOutcome`: `applied`; `notApplied` with `duplicate-code` if the code was listed while the request waited, or `entry-expired` if `expiresAt` has passed, writing nothing in either case. `approval.rejected`, `approval.withdrawn` or `approval.expired` writes nothing.
 **One entry per media code in the tenant** (decided 28 September, audit R108). A media code is honoured at every venue of the tenant, so a second entry for the same code is refused `409` rather than stored beside the first; change the existing entry by removing and re-adding it.
 
 |  |  |
@@ -1845,7 +1785,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 | Offline | no |
 | Conflict policy | append |
 | Reads | `access.blacklist`, `cache:idempotency` |
-| Writes | `access.blacklist`, `cache:idempotency` |
+| Writes | `access.blacklist`, `approvals.request`, `cache:idempotency` |
 | Called by | BO-033 |
 
 **Parameters**
@@ -1885,11 +1825,14 @@ Denies outright regardless of entitlement state. Included in the offline package
 | 201 |  | Added |
 | 202 |  | A whitelist entry, held for a second approver (DEC-254; CHG-CSP-031). |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 422 |  | A whitelist entry for which approvals finds no active approval rule (no-approval-route, passed on from createApprovalRequest; ADAM CR-399). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createAccessPoint
 
 **`POST /access-points`**: Create an access point
+
+**A new access point is created active** (ADAM CR-397, decided 31 October 2026; CHG-CR397-001): the row is written with `isActive` true, and the request carries no active flag (the approved BO-064 create form sends none). A gate is taken out of use afterwards with `updateAccessPoint` and `isActive` false.
 
 |  |  |
 |---|---|
@@ -1969,6 +1912,10 @@ Denies outright regardless of entitlement state. Included in the offline package
 ### createAdmissionRules
 
 **`POST /admission-rules`**: Create an admission profile
+
+**Where the profile is written** (ADAM CR-400, decided 31 October 2026, CR-217's rule; CHG-CR400-001). `access.admission_rules.scope_path` is set by the server, never taken from the body: it is the path of the session's working venue, read with `tenancy#scopeRecords` by id. **A session with no working venue** is `403 working-venue-required`, and nothing is written.
+
+**The same rules as `updateAdmissionRules`** (CR-400): a count missing for an `n*` entry mode (`entry-count-required`), `days` missing for a relative validity anchor (`validity-days-required`), or `validity.to` before `validity.from` (`validity-ends-before-start`) is a `422`, and nothing is written.
 
 |  |  |
 |---|---|
@@ -2088,7 +2035,9 @@ Denies outright regardless of entitlement state. Included in the offline package
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 403 |  | The session has no working venue, so the profile has no venue to be written under (working-venue-required; ADAM CR-400); or the caller lacks ACCESS_POINT_CONFIGURE at the venue. |
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
+| 422 |  | A count missing for an n* entry mode, days missing for a relative validity anchor, or validity.to before validity.from (ADAM CR-400, as updateAdmissionRules). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAccessPointDirection
@@ -2097,7 +2046,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 
 **A gate's direction can be switched live, by a holder of the permission, and the switch is logged** (decided 2 October 2026, Chinmay, critical set 1, BO-230: "Live direction switch with permission, logged; R221 amended"; DEC-255; CHG-CSP-032; DI-648, the client on 2 September: more entry gates in the morning, more exit gates in the evening). Until then direction was fixed per access point and changed only by editing the access point in the back office (audit R221).
 
-**The permission** is `ACCESS_DIRECTION_SET`, the dedicated gate-direction permission (joined the vocabulary 2 October, CHG-FUP-006), not the podium's `TURNSTILE_MODE_SET`: a steward who may switch a lane to free flow may not turn it round, and the live switch is a narrower right than `ACCESS_POINT_CONFIGURE`, which edits the access point itself. **Logged** twice: one `access.gate_mode_change` row (from and to direction, operator, reason, effective time), which Live Gate Mode & Lane Control and the shift handover read, and one `access.configuration_change` row. Takes effect at once, or at a future `effectiveAt` (then `202`, cancelled with `cancelGateModeChange`). Devices pick it up from the next push; an offline device keeps its old direction until it reconnects, and the response's `AccessPoint` says so through its device status.
+**The permission** is `ACCESS_DIRECTION_SET`, the dedicated gate-direction permission (joined the vocabulary 2 October, CHG-FUP-006), not the podium's `TURNSTILE_MODE_SET`: a steward who may switch a lane to free flow may not turn it round, and the live switch is a narrower right than `ACCESS_POINT_CONFIGURE`, which edits the access point itself. **Logged** twice: one `access.gate_mode_change` row (from and to direction, operator, reason, effective time), which Live Gate Mode & Lane Control and the shift handover read, and one `access.configuration_change` row. Takes effect at once, or at a future `effectiveAt` (then `202`, cancelled with `cancelGateModeChange`). Devices pick it up from the next push; an offline device keeps its old direction until it reconnects, and the response's `AccessPoint` shows that through `lastHeartbeatAt` (and `directionEffectiveAt` for a pending switch); it has no device status (ADAM CR-397, decided 31 October 2026; CHG-CR397-001).
 
 |  |  |
 |---|---|
@@ -2264,7 +2213,13 @@ Podium operation. Changes what the gate does, not who may pass it.
 
 **Every call writes one `access.gate_mode_change` row** (decided 29 September, writers pass): from and target mode, operator, reason and effective time, `applied` at once or `pending` until a future `effectiveAt` (then `202`). That row is the mode-change history Live Gate Mode & Lane Control and the shift handover read; a live mode change is operational, so it is not also logged in `access.configuration_change`.
 
-**The gate mode policy is enforced here** (`setGateModePolicy`): for `freeFlow` or `dropArm`, a caller whose role is not in the policy's `whoCanActivate` is refused `403`, a missing reason where `reasonRequired` is `400`, and an activation whose policy says `createsIncident` opens an access incident.
+**The gate mode policy is enforced here** (`setGateModePolicy`; ADAM CR-396, decided 31 October 2026; CHG-CR396-001). For `operatingMode` `freeFlow` or `dropArm`:
+
+- **Which policy governs.** A policy on a group that lists the access point beats a policy on that group's parent group, which beats the venue default (`accessPointGroupId` null). When two or more policies are equally specific, the call must pass every one of them, and an incident is opened if any of them sets `createsIncident`.
+- **Who may activate.** `whoCanActivate` holds role ids (`Role.id`). For a governing policy that lists roles, Access asks `identity#principalHoldsRoleAtVenue` in process with the caller's `principalId`, each role id in turn, and the access point's venue path; no role held is `403 gate-mode-role-required`, and nothing is written. A policy with no roles, or no policy, adds no check beyond `TURNSTILE_MODE_SET`.
+- **Reason.** A missing `reason` where a governing policy has `reasonRequired` is `400 reason-required`.
+- **Incident.** Where a governing policy sets `createsIncident`, the transaction that applies the mode writes one `access.access_incident`: `incidentType` `emergencyAccessEvent` for `dropArm` and `securityEvent` for `freeFlow`, `assignedTeam` `accessSupervisor`, `status` `open`, `createdByPrincipalId` the operator, `venueId` and `scopePath` the access point's, and a `description` naming the mode, the access point's `code` and the reason.
+- **A scheduled change** (a future `effectiveAt`) is checked when it is scheduled, and opens its incident when the timer applies it; a cancelled one opens none. It keeps its turnstile mode in `AccessGateModeChange.targetTurnstileMode`, and the timer sets both the operating mode and the turnstile mode; a scheduled change that carries a turnstile mode is not refused.
 
 **R221 amended 2 October 2026** (Chinmay, critical set 1, BO-230; DEC-255; CHG-CSP-032): the direction can now be switched live, by `setAccessPointDirection` and its own permission, not by this operation; a mode change still never changes the direction.
 
@@ -2337,8 +2292,8 @@ Podium operation. Changes what the gate does, not who may pass it.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Mode set |
-| 400 | BadRequest | Validation failed |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 400 |  | The request breaks a schema rule, or sends a turnstile mode with an operating mode other than normal or podium (validation); or a governing gate mode policy has reasonRequired and no reason was sent… |
+| 403 |  | The caller lacks TURNSTILE_MODE_SET at the venue; or, for freeFlow or dropArm, a governing gate mode policy lists roles in whoCanActivate and the caller holds none of them at the access point's venue… |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 202 |  | Scheduled: a future effectiveAt was sent and the change is held pending |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -2432,7 +2387,7 @@ Podium operation. Changes what the gate does, not who may pass it.
 **`PUT /admission-rules/{profileId}`**: Update an admission profile
 
 Changes take effect at terminals after the next offline package refresh, not immediately. A profile change during trading is not retroactive.
-**PUT semantics — replaces the profile the path names, whole.** A field left out takes its default or null; it does not keep its stored value. `perProductRules` is replaced as one list, never merged product by product. The body's `id` is read-only and ignored — the path decides which profile is written — and an unknown `profileId` is a `404`, never a create.
+**PUT semantics — replaces the profile the path names, whole.** A field left out takes its default or null; it does not keep its stored value. `perProductRules` is replaced as one list, never merged product by product. The body's `id` is read-only and ignored — the path decides which profile is written — and an unknown `profileId` is a `404`, never a create. **Where the profile lives does not move** (ADAM CR-400, decided 31 October 2026; CHG-CR400-001): its `scope_path` is kept as stored, never re-derived from the editor's working venue, so no scope read is asked.
 **Entry limits, re-entry, validity and crossover are blocks of the same profile (decided 29 September, VM close-out).** `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly` and `designatedAccessPointIds` (BO-156, pack p.19), `validity` (BO-158, p.21) and `crossover` (BO-160 and BO-220, p.23) extend `AdmissionRules` rather than adding operations, so one profile states every admission rule a gate evaluates. A count missing for an `n*` entry mode, `days` missing for a relative validity anchor, or `to` before `from` is a `422`.
 
 |  |  |
@@ -2754,6 +2709,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | deletion_trigger | text | no | faceTagEnrolment rows. |
 | retention_threshold_hours | integer | no | faceTagEnrolment rows, required when deletionTrigger is operationalRetentionThreshold. |
 | consent_capture | text | no | faceTagEnrolment rows. |
+| consent_form_id | uuid | no | faceTagEnrolment rows. |
 | access_context | text | no | faceMatch rows. |
 | high_confidence_min | numeric | no | faceMatch rows. |
 | review_range_min | numeric | no | faceMatch rows. |
@@ -2855,29 +2811,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | yes | ltree of the owning scope node |
 | updated_at | timestamptz | no |  |
 
-### `access.device_placement`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes |  |
-| venue_id | uuid | yes |  |
-| device_id | uuid | yes | The registered device placed here (platform.device, tenancy registerDevice). |
-| access_area_id | uuid | no | Most specific park, zone or attraction the device sits in (access.access_area) |
-| access_point_id | uuid | no | Access point (gate) the device serves |
-| gate_lane_id | uuid | no | Lane the device is mounted on (access.gate_lane) |
-| role | text | yes | What the device does at this place. |
-| name | text | no | Label at this place, e.g. |
-| device_group_id | text | no | Device group the placement belongs to, as targeted by hardware deployments and device configurations |
-| controller_reference | text | no |  |
-| proximity_threshold_meters | integer | no | Beacons only: activation distance in metres |
-| installation_date | date | no |  |
-| provisioning_checklist | jsonb | no | Access's provisioning stages, as a checklist on the placement (ADR-0067). |
-| is_active | boolean | yes | Whether this placement is in use (beacons: activeInactive). |
-| scope_path | text | yes | ltree of the owning scope node (ADR-0005) |
-| created_at | timestamptz | no |  |
-| updated_at | timestamptz | no |  |
-| hardware_model_id | uuid | no | Points at access.hardware_model. |
-
 ### `access.entitlement`
 
 | Column | Type | Required | Notes |
@@ -2956,6 +2889,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | access_point_id | uuid | yes |  |
 | from_mode | text | no |  |
 | target_mode | text | yes |  |
+| target_turnstile_mode | text | no | The turnstile mode (mode) a setTurnstileMode change sets with targetMode: freeRotation or closed, or null for none (ADAM CR-396, decided 31 October 2026; CHG-CR396-001). |
 | from_direction | text | no | Set on a live direction switch (setAccessPointDirection; DEC-255; CHG-CSP-032); null on a mode change. |
 | to_direction | text | no | The direction switched to (CHG-CSP-032). |
 | status | text | yes |  |
@@ -2975,7 +2909,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | venue_id | uuid | yes |  |
 | mode | text | yes | Non-standard operating mode governed (R221 vocabulary) |
-| who_can_activate | text[] | no | Roles allowed to activate this mode |
+| who_can_activate | text[] | no | The roles allowed to activate this mode, as role ids (Role.id; ADAM CR-396; CHG-CR396-001). |
 | access_point_group_id | uuid | no | Gate group the policy applies to (access.access_point_group); null for the whole venue |
 | is_reason_required | boolean | no |  |
 | emergency_code | text | no |  |
@@ -3006,7 +2940,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Server-assigned, and the upsert key of setParkingFacility. |
+| id | uuid | yes | The record's id, and the path id of setParkingFacility (ADAM CR-245; CR-398): a new facility takes the path id, a client UUIDv7. |
 | name | text | yes |  |
 | venue_id | uuid | yes |  |
 | mode | text | yes |  |
@@ -3051,11 +2985,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-224 operations, added to this service in later releases without changing any of the above.
+225 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
-| access | `approveMultiMediaPreview`, `archiveMediaTemplate`, `cancelGateModeChange`, `createParkingEntitlement`, `deleteJourneySequenceRule`, `deleteMediaBindingRule`, `deleteOperatingCalendarEntry`, `deletePodium`, `deleteReasonCode`, `deliverCredential`, `endPodiumShift`, `getAccessRiskScore`, `getCredentialIssuanceRetryPolicy`, `getFaceReenrolmentImages`, `getHardwareModelCertification`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listDynamicPolicyEffectiveness`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `listVisualAccessRules`, `lockIdentity`, `placeAccessDevice`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `releaseCredentialDevice`, `releaseIdentityLock`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `reviewFaceReenrolment`, `rollbackAccessPolicy`, `rollbackConfigurationVersion`, `setAccessAreaCapacity`, `setAccessAreaZone`, `setAccessAttributeCatalog`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBrandingLocalizationTemplate`, `setContextTimeEvent`, `setCredentialEventPropagationRule`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFastPassProfile`, `setFraudDetectionRule`, `setGateLane`, `setGateOfflinePolicy`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHardwareModel`, `setHardwareModelCertification`, `setHotelWalletExternal`, `setJourneyProfile`, `setJourneySequenceRule`, `setMediaBindingActivation`, `setMediaBindingRule`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperatingCalendarEntry`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPodium`, `setPolicyEvaluationSetting`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setReasonCode`, `setRelationshipFraudRule`, `setRfidNfc`, `setRfidNfcCard`, `setRiskScoringConfig`, `setSecurityInvestigationEvidence`, `setTicketStatusTransition`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVerificationMethodPolicy`, `setVirtualTicketCredential`, `setVisualDynamicPolicy`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `startPodiumShift`, `updateAccessDevicePlacement`, `updateSecurityAlert`, `verifyIdentity` |
+| access | `approveMultiMediaPreview`, `archiveMediaTemplate`, `cancelGateModeChange`, `createParkingEntitlement`, `deleteJourneySequenceRule`, `deleteMediaBindingRule`, `deleteOperatingCalendarEntry`, `deletePodium`, `deleteReasonCode`, `deliverCredential`, `endPodiumShift`, `getAccessRiskScore`, `getCredentialIssuanceRetryPolicy`, `getFaceReenrolmentImages`, `getHardwareModelCertification`, `listAccess`, `listAccessAttributeCatalog`, `listAccessChanges`, `listAccessExecutiveInsight`, `listAccessLocationGrouping`, `listAccessMonitoring`, `listAccessReportScheduled`, `listAccessRiskScoring`, `listAccessRule`, `listAccessSecurityFraud`, `listAccessValidityTime`, `listAntiPassbackJourney`, `listAttendanceAdmission`, `listAuthorizationGovernanceTemporary`, `listBiometric`, `listBiometricAccess`, `listBiometricIdentityIntegrity`, `listBiometricValidationGate`, `listBrandingLocalizationTemplate`, `listConnectivityFailureDegraded`, `listCredential`, `listCredentialActivationDisplay`, `listCredentialDeliveryDistribution`, `listCredentialDisableBlacklist`, `listCredentialGenerationIssuance`, `listCredentialIdentityToken`, `listCredentialReplacementReissue`, `listCredentialRevocationLifecycle`, `listCredentialSecurity`, `listCredentialSecurityOperational`, `listCredentialSharingConcurrent`, `listCredentialTransferRebinding`, `listCredentialUsageCross`, `listDeviceBindingSession`, `listDeviceGate`, `listDeviceTypeHardware`, `listDigitalCredentialSecurity`, `listDynamicAccessPolicy`, `listDynamicPolicyEffectiveness`, `listEdgePackageData`, `listEdgeSecurityDeployment`, `listEntitlementConsumption`, `listEntitlementCrossMedia`, `listEntryExitCrossover`, `listEntryExitRule`, `listEntryRulePoints`, `listEntryTemporaryExit`, `listExternalPartnerCredential`, `listFaceChangeEnrollment`, `listFaceMatchingVerification`, `listFaceTagTemporary`, `listFailedGenerationDelivery`, `listFamilyChildPod`, `listFastPassAttraction`, `listFraudDetectionRule`, `listGateModeFree`, `listGraphicalAccessMap`, `listGroupAdmissionQuantity`, `listGroupAttendancePartial`, `listGroupLeaderFast`, `listGuestCompanionEligibility`, `listGuestDwellTime`, `listGuestJourney`, `listHardwareCompatibilityHealth`, `listHotelWalletExternal`, `listIdentityMembershipAccreditation`, `listLiveAccess`, `listLiveGateMode`, `listLiveVenueOccupancy`, `listMediaActivationPriority`, `listMediaCredential`, `listMediaDesign`, `listMediaIssuanceEncoding`, `listMediaReplacementRevocation`, `listMediaSwapReplacement`, `listMediaTypeCredential`, `listMediaTypeTechnology`, `listMultiMediaBinding`, `listMultiParkCrossover`, `listMultiParkCrossover2`, `listOfflineCredentialRevocation`, `listOfflineCryptographicValidation`, `listOfflineEdge`, `listOfflineEntitlementUsage`, `listOperatingCalendarSpecial`, `listPhysicalDeviceRegistration`, `listPodiumConsole`, `listPolicyEvaluationArchitecture`, `listPolicyScopeHierarchy`, `listQueueThroughputLane`, `listReconnectionSynchronizationConflict`, `listRelationshipCompanionFraud`, `listSecurityDetectionGovernance`, `listShiftHandoverSummary`, `listSpecialEventFree`, `listThroughputQueueValidation`, `listTicketCredentialInvestigation`, `listTicketMedia`, `listUnifiedIdentityCredential`, `listValidationExceptionReason`, `listValidationOutcomeRejection`, `listVenueParkAccess`, `listVerificationMethodSelection`, `listVirtualCredentialMedia`, `listVirtualTicket`, `listVirtualTicketArchitecture`, `listVirtualTicketStatus`, `listVisualAccessRules`, `lockIdentity`, `placeAccessDevice`, `publishHardwareDeployment`, `publishMediaCompatibilityTesting`, `publishRuleConflictCheck`, `publishTopologyValidation`, `releaseCredentialDevice`, `releaseIdentityLock`, `replaceCredential`, `resolveCredentialException`, `retryCredentialGeneration`, `reviewFaceReenrolment`, `rollbackAccessPolicy`, `rollbackConfigurationVersion`, `setAccessAreaCapacity`, `setAccessAreaZone`, `setAccessAttributeCatalog`, `setAccessGraphicalMap`, `setAppleWalletPass`, `setAttractionAccess`, `setBiometricLifecycleRetention`, `setBleBeaconGeofence`, `setBrandingLocalizationTemplate`, `setContextTimeEvent`, `setCredentialEventPropagationRule`, `setCredentialIssuanceRetryPolicy`, `setDeviceSoftwareContent`, `setDigitalBarcodeTicket`, `setDigitalCardMembership`, `setDynamicFieldData`, `setDynamicSecurityProfile`, `setEdgeNodeLocal`, `setEmbeddedEntitlementPayload`, `setEntitlementConsumption`, `setEntryRulePoints`, `setFastPassProfile`, `setFraudDetectionRule`, `setGateLane`, `setGateOfflinePolicy`, `setGoogleWalletPass`, `setGroupAdmissionProfile`, `setGuestCompanionEligibility`, `setHandheldMobileAccess`, `setHardwareModel`, `setHardwareModelCertification`, `setHotelWalletExternal`, `setJourneyProfile`, `setJourneySequenceRule`, `setMediaBindingActivation`, `setMediaBindingRule`, `setMediaIssuanceEncoding`, `setMediaReplacementRevocation`, `setMediaTypeTechnology`, `setOperatingCalendarEntry`, `setOperationalIncidentException`, `setPdfPrintablePos`, `setPodium`, `setPolicyEvaluationSetting`, `setPolicyScopeHierarchy`, `setReaderScannerPeripheral`, `setRealTimeSecurity`, `setReasonCode`, `setRelationshipFraudRule`, `setRfidNfc`, `setRfidNfcCard`, `setRiskScoringConfig`, `setSecurityInvestigationEvidence`, `setTicketStatusTransition`, `setTurnstileLaneBehavior`, `setValidationOutcomeGuest`, `setVerificationMethodPolicy`, `setVirtualTicketCredential`, `setVisualDynamicPolicy`, `simulateBiometricConfiguration`, `simulateGuestJourney`, `simulateOfflineResilienceTesting`, `simulatePolicyConflictImpact`, `startPodiumShift`, `updateAccessDevicePlacement`, `updateSecurityAlert`, `verifyIdentity` |
 | accessPoint | `getAccessPoint`, `listAccessPoints`, `listAdmissionRules`, `listBlacklist`, `removeBlacklistEntry` |
 | drafted | `listBiometricConsentGuardian`, `listBiometricLifecycleRetention` |
 | general | `getBiometricVerificationProfile`, `getBleBeaconGeofence`, `getFacePassEnrollmentConfiguration`, `getPdfPrintablePos`, `getVirtualTicketIdentity` |

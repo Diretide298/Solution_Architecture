@@ -156,7 +156,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-017` | Capacity Management | B | 24 | 20 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
+| `BO-017` | Capacity Management | B | 25 | 20 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
 | `BO-018` | Allocation & Holds | B | 4 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-019` | Closures & Blackouts | B | 50 | 31 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
 | `BO-037` | Offline Package Status | B | 51 | 32 | 6 | 3 | 0 | 0 | — | notStarted (generated) |

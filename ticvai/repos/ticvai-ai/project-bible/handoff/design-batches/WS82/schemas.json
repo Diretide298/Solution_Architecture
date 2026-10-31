@@ -267,7 +267,7 @@
  "PricingDynamicPriceRule": {
   "type": "object",
   "x-ticvai-persistence": "pricing.dynamic_price_rule",
-  "description": "**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule.",
+  "description": "**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule.\n\n**A contextual rule** (ADAM CR-410, decided 31 October 2026, Chinmay: option A, with the channel as its own column) is a row with `ruleType` `contextual`: it carries its `dimension` (channel, customerSegment or location) and that dimension's fields, and no other dimension's: `channel` needs `salesChannel`; `customerSegment` needs `customerSegment`, plus `segmentRef` for `loyaltyTier` or `customSegment`; `location` needs `locationLevel` and `locationId`. `rangeMinPercent`, `rangeMaxPercent` and `isProtected` are its range and protection, and `dynamicPricingEnabled` switches dynamic pricing off in that context. A contextual rule has no conditions or actions and leaves `channelId` null. `listChannelCustomerSegment` lists these rows.",
   "required": [
    "pricingRuleCode",
    "name",
@@ -304,7 +304,9 @@
    "channelId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "x-ticvai-references": "catalogue.sales_channel",
+    "description": "One configured channel profile (`catalogue.sales_channel`) the rule is limited to; null means every channel (ADAM CR-410). A contextual rule leaves it null and names its channel type in `salesChannel`."
    },
    "priority": {
     "type": "integer"
@@ -332,7 +334,7 @@
     "type": "string",
     "maxLength": 40,
     "nullable": true,
-    "description": "Static rules: `PricingRuleCommandCenterView.ruleType`; dynamic rules: the builder's `ruleKind`."
+    "description": "Static rules: `PricingRuleCommandCenterView.ruleType`; dynamic rules: the builder's `ruleKind`; `contextual` for a channel, customer-segment or location rule (ADAM CR-410)."
    },
    "inputMetric": {
     "type": "string",
@@ -373,6 +375,72 @@
     "type": "boolean",
     "default": false,
     "description": "A protected segment or channel: dynamic adjustments never apply."
+   },
+   "dimension": {
+    "type": "string",
+    "enum": [
+     "channel",
+     "customerSegment",
+     "location"
+    ],
+    "nullable": true,
+    "description": "A contextual rule's dimension (ADAM CR-410); null for every other rule."
+   },
+   "salesChannel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
+    "description": "A `channel` contextual rule's channel type (B2C = guestWeb, Mobile App = guestApp, Reseller = partner), the pack's channel dimension rather than one configured profile (ADAM CR-410)."
+   },
+   "customerSegment": {
+    "type": "string",
+    "enum": [
+     "standardCustomer",
+     "member",
+     "loyaltyTier",
+     "resident",
+     "vip",
+     "corporate",
+     "group",
+     "b2b",
+     "customSegment"
+    ],
+    "nullable": true,
+    "description": "A `customerSegment` contextual rule's segment (pack p.83; ADAM CR-410)."
+   },
+   "segmentRef": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "The loyalty tier or custom segment id, required for `loyaltyTier` and `customSegment` (ADAM CR-410)."
+   },
+   "locationLevel": {
+    "type": "string",
+    "enum": [
+     "country",
+     "market",
+     "venue",
+     "attraction",
+     "zone",
+     "eventLocation"
+    ],
+    "nullable": true,
+    "description": "A `location` contextual rule's level (pack pp.83-84; ADAM CR-410)."
+   },
+   "locationId": {
+    "type": "string",
+    "maxLength": 100,
+    "x-ticvai-references": "none",
+    "nullable": true,
+    "description": "A `location` contextual rule's place, as text, a country code or an id (ADAM CR-410)."
+   },
+   "dynamicPricingEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "Whether dynamic pricing applies in this context; a contextual rule with it false switches it off there (ADAM CR-410)."
    }
   }
  },

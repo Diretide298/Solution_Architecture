@@ -27,8 +27,6 @@ access.access_point,via createAccessPoint,access.configuration_change,ambient,li
 access.access_point,via setAccessPointDirection,access.configuration_change,ambient,lineage,,
 access.access_point,via setAccessPointDirection,access.gate_mode_change,ambient,lineage,,
 access.access_point,via setAccessPointGeofence,access.configuration_change,ambient,lineage,,
-access.access_point,via setBleBeaconGeofence,access.configuration_change,ambient,lineage,,
-access.access_point,via setBleBeaconGeofence,access.device_placement,ambient,lineage,,
 access.access_point,via updateAccessPoint,access.configuration_change,ambient,lineage,,
 access.access_point_configuration,access_point_id,access.access_point,child,declared,,yes
 access.access_point_configuration,venue_id,platform.scope,reference,declared,yes,yes
@@ -69,6 +67,7 @@ access.biometric_profile,via setFacePassEnrollment,access.configuration_change,a
 access.biometric_profile,via setFaceTagTemporaryEnrollment,access.configuration_change,ambient,lineage,,
 access.biometric_profile,zone_id,seating.zone,reference,convention,yes,
 access.blacklist,added_by_principal_id,identity.principal,reference,declared,yes,yes
+access.blacklist,via addBlacklistEntry,approvals.request,ambient,lineage,yes,
 access.branding_profile,approval_request_id,approvals.request,reference,convention,yes,
 access.branding_profile,parent_scope_id,platform.scope,reference,convention,yes,
 access.branding_profile,reviewer_principal_id,identity.principal,reference,convention,yes,
@@ -95,6 +94,7 @@ access.configuration_change,via rollbackAccessPolicy,access.dynamic_policy,ambie
 access.configuration_change,via rollbackAccessPolicy,access.dynamic_policy_version,ambient,lineage,,
 access.configuration_change,via rollbackConfigurationVersion,access.configuration_version,ambient,lineage,,
 access.configuration_change,via setAppleWalletPass,access.media_template,ambient,lineage,,
+access.configuration_change,via setBleBeaconGeofence,access.device_placement,ambient,lineage,,
 access.configuration_change,via setContextTimeEvent,access.dynamic_policy,ambient,lineage,,
 access.configuration_change,via setContextTimeEvent,access.dynamic_policy_version,ambient,lineage,,
 access.configuration_change,via setCredentialActivationDisplay,access.credential_policy,ambient,lineage,,
@@ -663,6 +663,8 @@ approvals.request,via closeFiscalPeriod,ledger.fiscal_period_event,ambient,linea
 approvals.request,via closeFiscalPeriod,platform.outbox,ambient,lineage,yes,
 approvals.request,via createPartnerAgreement,control.partner_agreement,ambient,lineage,yes,
 approvals.request,via createPartnerChangeRequest,control.partner_change_request,ambient,lineage,yes,
+approvals.request,via decidePricingRecommendation,catalogue.pricing_recommendation,ambient,lineage,yes,
+approvals.request,via decidePricingRecommendation,catalogue.pricing_recommendation_decision,ambient,lineage,yes,
 approvals.request,via deleteGuestAccount,identity.subject_data_export,ambient,lineage,yes,
 approvals.request,via deleteGuestAccount,pii.subject,ambient,lineage,yes,
 approvals.request,via deleteGuestAccount,platform.outbox,ambient,lineage,yes,
@@ -773,13 +775,12 @@ catalogue.audit_entry,rollback_action_id,catalogue.rollback_action,reference,con
 catalogue.audit_entry,sales_channel_id,catalogue.sales_channel,reference,convention,,
 catalogue.audit_entry,via approveReviewDecision,catalogue.change_request,ambient,lineage,,
 catalogue.audit_entry,via cancelPricingRollback,catalogue.rollback_action,ambient,lineage,,
-catalogue.audit_entry,via cancelPricingRollback,platform.outbox,ambient,lineage,yes,
 catalogue.audit_entry,via createChannelProfile,catalogue.sales_channel,ambient,lineage,,
+catalogue.audit_entry,via createLiveDynamicPrice,catalogue.price_execution,ambient,lineage,,
+catalogue.audit_entry,via createLiveDynamicPrice,catalogue.pricing_recommendation_decision,ambient,lineage,,
+catalogue.audit_entry,via createLiveDynamicPrice,platform.outbox,ambient,lineage,yes,
 catalogue.audit_entry,via decidePricingChangeRequest,catalogue.change_request,ambient,lineage,,
 catalogue.audit_entry,via decidePricingChangeRequest,platform.outbox,ambient,lineage,yes,
-catalogue.audit_entry,via decidePricingRecommendation,catalogue.pricing_recommendation,ambient,lineage,,
-catalogue.audit_entry,via decidePricingRecommendation,catalogue.pricing_recommendation_decision,ambient,lineage,,
-catalogue.audit_entry,via decidePricingRecommendation,platform.outbox,ambient,lineage,yes,
 catalogue.audit_entry,via publishActivationScheduler,catalogue.lifecycle_action,ambient,lineage,,
 catalogue.audit_entry,via publishChannelAvailability,catalogue.product,ambient,lineage,,
 catalogue.audit_entry,via publishChannelAvailability,catalogue.product_channel_assignment,ambient,lineage,,
@@ -808,7 +809,6 @@ catalogue.audit_entry,via setDemandOccupancyAvailability,pricing.dynamic_price_r
 catalogue.audit_entry,via setDemandSignalConfiguration,catalogue.demand_signal,ambient,lineage,,
 catalogue.audit_entry,via setDynamicPricingGuardrailPolicy,catalogue.dynamic_pricing_control,ambient,lineage,,
 catalogue.audit_entry,via setDynamicPricingGuardrailPolicy,catalogue.dynamic_pricing_strategy,ambient,lineage,,
-catalogue.audit_entry,via setDynamicPricingGuardrailPolicy,platform.outbox,ambient,lineage,yes,
 catalogue.audit_entry,via setDynamicPricingStrategy,catalogue.dynamic_pricing_strategy,ambient,lineage,,
 catalogue.audit_entry,via setEntitlementTemplateBlackoutDates,catalogue.entitlement_template,ambient,lineage,,
 catalogue.audit_entry,via setFeeApplicabilityCharging,catalogue.fee_rule,ambient,lineage,,
@@ -884,6 +884,7 @@ catalogue.channel_sales_rule,product_id,catalogue.product,reference,convention,,
 catalogue.channel_sales_rule,sales_channel_id,catalogue.sales_channel,reference,declared,,yes
 catalogue.channel_sync,channel_connection_id,catalogue.channel_connection,reference,convention,,
 catalogue.channel_sync,sales_channel_id,catalogue.sales_channel,reference,declared,,yes
+catalogue.competitor_price_observation,demand_signal_id,catalogue.demand_signal,reference,declared,,yes
 catalogue.configuration_template,owner_principal_id,identity.principal,reference,convention,yes,
 catalogue.configuration_template,source_price_list_id,catalogue.price_list,reference,convention,,
 catalogue.configuration_template,source_product_id,catalogue.product,reference,convention,,
@@ -897,6 +898,7 @@ catalogue.demand_signal,product_id,catalogue.product,reference,convention,,
 catalogue.demand_signal,venue_id,platform.scope,reference,precedent,yes,
 catalogue.donation_campaign,liability_account_id,ledger.account,reference,declared,yes,
 catalogue.donation_campaign,venue_id,platform.scope,reference,declared,yes,yes
+catalogue.dynamic_pricing_control,pending_approval_request_id,approvals.request,reference,convention,yes,
 catalogue.dynamic_pricing_control,scope_id,platform.scope,reference,convention,yes,
 catalogue.dynamic_pricing_strategy,event_id,catalogue.event,reference,convention,,
 catalogue.dynamic_pricing_strategy,owner_principal_id,identity.principal,reference,convention,yes,
@@ -2131,7 +2133,6 @@ marketing.message_dispatch,subject_id,pii.subject,reference,declared,yes,yes
 marketing.message_dispatch,template_id,marketing.message_template,reference,convention,,
 marketing.message_dispatch,via actOnWaiverRequirements,marketing.waiver_requirement,ambient,lineage,,
 marketing.message_dispatch,via actOnWaiverRequirements,marketing.waiver_requirement_event,ambient,lineage,,
-marketing.message_dispatch,via broadcastToGuests,workforce.announcement,ambient,lineage,yes,
 marketing.message_dispatch,via createPaymentLink,orders.payment_link,ambient,lineage,yes,
 marketing.message_dispatch,via createPaymentLink,orders.sales_order,ambient,lineage,yes,
 marketing.message_dispatch,via resendPaymentLink,orders.payment_link,ambient,lineage,yes,
@@ -2609,6 +2610,8 @@ platform.device,via recordDeviceHeartbeat,tenancy.device_telemetry,ambient,linea
 platform.device,workstation_id,platform.workstation,reference,declared,,
 platform.idempotency_record,principal_id,identity.principal,reference,convention,yes,
 platform.outbox,via adjustWallet,wallet.wallet,ambient,lineage,yes,
+platform.outbox,via broadcastToGuests,workforce.announcement,ambient,lineage,yes,
+platform.outbox,via broadcastToGuests,workforce.guest_broadcast,ambient,lineage,yes,
 platform.outbox,via claimCustomDomain,whitelabel.custom_domain,ambient,lineage,yes,
 platform.outbox,via concludeRecommendationExperiment,promotions.recommendation_experiment,ambient,lineage,yes,
 platform.outbox,via createPreview,whitelabel.tenant_config,ambient,lineage,yes,
@@ -2679,6 +2682,7 @@ pricing.dynamic_price_action,via setDynamicPriceRule,pricing.dynamic_price_condi
 pricing.dynamic_price_action,via setDynamicPriceRule,pricing.dynamic_price_rule,ambient,lineage,,
 pricing.dynamic_price_condition,dynamic_price_rule_id,pricing.dynamic_price_rule,reference,declared,,yes
 pricing.dynamic_price_condition,rule_id,approvals.rule,reference,convention,yes,
+pricing.dynamic_price_rule,channel_id,catalogue.sales_channel,reference,declared,yes,
 pricing.dynamic_price_rule,dynamic_pricing_strategy_id,catalogue.dynamic_pricing_strategy,reference,convention,yes,
 pricing.dynamic_price_rule,price_list_id,catalogue.price_list,reference,convention,yes,
 pricing.dynamic_price_rule,product_id,catalogue.product,reference,declared,yes,
@@ -2978,12 +2982,16 @@ seating.group_request_participant,seat_id,seating.seat,reference,convention,,
 seating.hold_pool,hold_type_id,seating.hold_type,reference,declared,,yes
 seating.hold_pool,performance_id,catalogue.performance,reference,declared,yes,yes
 seating.import_job,seat_map_id,seating.seat_map,reference,declared,,yes
+seating.import_job,via commitImportJob,seating.section,ambient,lineage,,
 seating.reassignment,order_id,orders.sales_order,reference,declared,yes,
 seating.recommendation_rule,performance_id,catalogue.performance,reference,convention,yes,
 seating.recommendation_rule,seat_map_id,seating.seat_map,reference,convention,,
 seating.seat,category_id,seating.seat_category,reference,convention,,
 seating.seat,seat_map_id,seating.seat_map,reference,declared,,
 seating.seat,via assignSeats,seating.seat_reservation,ambient,lineage,,
+seating.seat,via createSeatMap,seating.seat_map,ambient,lineage,,
+seating.seat,via createSeatMap,seating.section,ambient,lineage,,
+seating.seat,via createSeatMap,seating.section_row,ambient,lineage,,
 seating.seat,via editSeatMapStructure,seating.seat_map,ambient,lineage,,
 seating.seat,via editSeatMapStructure,seating.section,ambient,lineage,,
 seating.seat_block,created_by_principal_id,identity.principal,reference,declared,yes,
@@ -2994,13 +3002,12 @@ seating.seat_category,venue_id,platform.scope,reference,declared,yes,yes
 seating.seat_category,via createSeatCategory,seating.seat_price_band,ambient,lineage,,
 seating.seat_map,venue_id,platform.scope,reference,declared,yes,yes
 seating.seat_map,via cloneSeatMap,seating.section,ambient,lineage,,
-seating.seat_map,via createSeatMap,seating.section,ambient,lineage,,
-seating.seat_map,via createSeatMap,seating.section_row,ambient,lineage,,
 seating.seat_map,via importSeatMap,seating.section,ambient,lineage,,
 seating.seat_map,via importSeatMap,seating.section_row,ambient,lineage,,
 seating.seat_map,via updateSeatMap,seating.section,ambient,lineage,,
 seating.seat_map,via updateSeatMap,seating.section_row,ambient,lineage,,
 seating.seat_map_template,region_id,platform.scope,reference,declared,yes,yes
+seating.seat_map_template,source_seat_map_id,seating.seat_map,child,declared,,
 seating.seat_price_band,customer_segment_id,marketing.segment,reference,convention,yes,
 seating.seat_price_band,seat_category_id,seating.seat_category,reference,convention,,
 seating.seat_reservation,block_id,seating.seat_block,reference,declared,,
@@ -3012,6 +3019,7 @@ seating.seat_reservation_item,seat_id,seating.seat,child,declared,,yes
 seating.seat_reservation_item,seat_reservation_id,seating.seat_reservation,child,declared,,yes
 seating.seat_rules,seat_map_id,seating.seat_map,reference,convention,,
 seating.seating_rules,seat_map_id,seating.seat_map,reference,declared,,yes
+seating.section,seat_map_id,seating.seat_map,reference,declared,,yes
 seating.section,view_asset_id,assets.media_asset,reference,declared,yes,
 seating.section_row,section_id,seating.section,child,declared,,yes
 seating.zone,seat_category_id,seating.seat_category,reference,declared,,
@@ -3184,8 +3192,6 @@ wallet.wallet_transaction,wallet_id,wallet.wallet,child,declared,,
 whitelabel.analytics_provider,venue_id,platform.scope,reference,precedent,yes,
 whitelabel.app_build,requested_by_principal_id,identity.principal,reference,convention,yes,
 whitelabel.app_build,store_account_id,whitelabel.store_account,reference,convention,,
-whitelabel.banner,tenant_config_id,whitelabel.tenant_config,reference,declared,,yes
-whitelabel.banner,via deleteBanner,whitelabel.tenant_config,ambient,lineage,,
 whitelabel.booking_flow,venue_id,platform.scope,reference,precedent,yes,
 whitelabel.booking_flow,via createBookingFlowDefinition,whitelabel.booking_flow_step,ambient,lineage,,
 whitelabel.booking_flow,via deleteBookingFlow,whitelabel.booking_flow_step,ambient,lineage,,
@@ -3226,14 +3232,11 @@ whitelabel.kiosk_assignment,workstation_id,platform.workstation,reference,conven
 whitelabel.kiosk_config,venue_id,platform.scope,reference,precedent,yes,
 whitelabel.kiosk_config,via createKioskConfig,whitelabel.kiosk_config_attract_slide,ambient,lineage,,
 whitelabel.kiosk_config,via createKioskConfig,whitelabel.kiosk_config_start_tile,ambient,lineage,,
-whitelabel.kiosk_config,via deleteKioskConfig,whitelabel.kiosk_config_attract_slide,ambient,lineage,,
-whitelabel.kiosk_config,via deleteKioskConfig,whitelabel.kiosk_config_start_tile,ambient,lineage,,
 whitelabel.kiosk_config,via publishKioskConfigs,whitelabel.kiosk_config_version,ambient,lineage,,
 whitelabel.kiosk_config,via restoreKioskConfigVersion,whitelabel.kiosk_config_attract_slide,ambient,lineage,,
 whitelabel.kiosk_config,via restoreKioskConfigVersion,whitelabel.kiosk_config_start_tile,ambient,lineage,,
-whitelabel.kiosk_config,via updateKioskConfig,whitelabel.kiosk_config_attract_slide,ambient,lineage,,
-whitelabel.kiosk_config,via updateKioskConfig,whitelabel.kiosk_config_start_tile,ambient,lineage,,
 whitelabel.kiosk_config_attract_slide,kiosk_config_id,whitelabel.kiosk_config,child,convention,,
+whitelabel.kiosk_config_attract_slide,via updateKioskConfig,whitelabel.kiosk_config_start_tile,ambient,lineage,,
 whitelabel.kiosk_config_start_tile,kiosk_config_id,whitelabel.kiosk_config,child,convention,,
 whitelabel.kiosk_config_version,kiosk_config_id,whitelabel.kiosk_config,child,declared,,yes
 whitelabel.kiosk_config_version,published_by_principal_id,identity.principal,reference,convention,yes,
@@ -3270,6 +3273,9 @@ workforce.employee,via startSync,workforce.sync_run,ambient,lineage,,
 workforce.employment,employee_id,workforce.employee,reference,declared,,yes
 workforce.field_ownership,source_id,workforce.integration_source,reference,convention,,
 workforce.forecast_requirement,venue_id,platform.scope,reference,precedent,yes,
+workforce.guest_broadcast,second_principal_id,identity.principal,reference,declared,yes,
+workforce.guest_broadcast,sent_by_principal_id,identity.principal,reference,declared,yes,yes
+workforce.guest_broadcast,venue_id,platform.scope,reference,declared,yes,yes
 workforce.labour_budget,venue_id,platform.scope,reference,declared,yes,yes
 workforce.leave_balance,employee_id,workforce.employee,reference,declared,,yes
 workforce.leave_balance,type_id,workforce.leave_type,reference,declared,,yes
@@ -3278,6 +3284,7 @@ workforce.leave_request,principal_id,identity.principal,reference,declared,yes,y
 workforce.open_shift,rota_assignment_id,workforce.rota_assignment,reference,convention,,
 workforce.open_shift,shift_template_id,workforce.shift_template,reference,convention,,
 workforce.open_shift,venue_id,platform.scope,reference,declared,yes,
+workforce.open_shift,via claimOpenShift,workforce.rota_assignment,ambient,lineage,,
 workforce.position_requirement,staffing_rules_id,workforce.staffing_rules,reference,declared,,yes
 workforce.position_requirement,venue_id,platform.scope,reference,precedent,yes,
 workforce.position_requirement,via setStaffingRules,workforce.staffing_rules,ambient,lineage,,

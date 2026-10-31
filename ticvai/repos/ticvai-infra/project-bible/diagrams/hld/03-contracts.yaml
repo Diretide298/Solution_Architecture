@@ -17,12 +17,12 @@ tiers:
 contracts:
 - contract: marketing-crm
   tier: satellite
-  operations: 283
+  operations: 284
   holds: null
   service: MarketingService
   verbs:
     GET: 135
-    POST: 79
+    POST: 80
     PUT: 60
     PATCH: 7
     DELETE: 2
@@ -44,6 +44,7 @@ contracts:
   guestCallable: 24
   offlineCapable: 10
   events:
+  - catalogue-priceExecuted
   - catalogue-productPublished
   - catalogue-productWithdrawn
   - entitlement-statusChanged
@@ -197,12 +198,12 @@ contracts:
   ref: diagrams/lld/contracts/white-label.yaml
 - contract: identity
   tier: spine
-  operations: 103
+  operations: 104
   holds: null
   service: IdentityService
   verbs:
     POST: 46
-    GET: 42
+    GET: 43
     PUT: 8
     DELETE: 4
     PATCH: 3
@@ -368,7 +369,8 @@ contracts:
     PATCH: 1
   guestCallable: 0
   offlineCapable: 10
-  events: null
+  events:
+  - workforce-guestBroadcastAccepted
   ref: diagrams/lld/contracts/workforce.yaml
 - contract: payments
   tier: satellite

@@ -333,7 +333,7 @@
        "medium",
        "high"
       ],
-      "description": "Combined refresh load of every tile."
+      "description": "**Combined refresh load of every tile, as a share of the refresh budget** (ADAM CR-372, Chinmay, 31 October 2026; CHG-CR372-001). The load is the sum over the tiles of 60 / `refreshSeconds` (refreshes per minute); a tile with no `refreshSeconds` adds 0. The share is the load divided by the budget `createDashboard` already checks: `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` for the dashboard's `venueId`, the tenant default when `venueId` is absent. `low` below 0.5, `medium` from 0.5 to below 0.8, `high` from 0.8; a share above 1 is still refused `400 refresh-budget-exceeded` before the band is worked out. `createDashboard` and `updateDashboard` work it out and store it in `reporting.dashboard.aggregate_cost` on every save; a later change to the budget does not rewrite stored dashboards. **The bands 0.5 and 0.8 are proposed defaults for the client to correct**, like the budget itself (configured-limits-proposal.md)."
      },
      "archivedAt": {
       "type": "string",

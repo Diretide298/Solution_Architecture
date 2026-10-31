@@ -50,7 +50,7 @@
    },
    "confidence": {
     "type": "number",
-    "description": "Forecast Confidence, percent"
+    "description": "Forecast Confidence, percent (`DemandForecast.confidence` x 100; ADAM CR-405)"
    },
    "forecastFinalOccupancy": {
     "type": "number",

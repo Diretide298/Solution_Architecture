@@ -283,7 +283,7 @@
  "BookingFlow": {
   "x-ticvai-persistence": "whitelabel.booking_flow",
   "type": "object",
-  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies, chosen by `getPublishedBookingFlow`'s kind rule where several do (ADAM CR-427).\n",
   "required": [
    "flowTypeKey",
    "name"
@@ -399,7 +399,7 @@
     "maxItems": 10,
     "uniqueItems": true,
     "default": [],
-    "description": "**The flow's own consent questions (rev 3 REV3-26).** Asked on every booking through this flow, together with those of each product in the cart, each question once. Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400. A Help me choose answer may pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.\n",
+    "description": "**The flow's own consent questions (rev 3 REV3-26).** Asked on every booking through this flow, together with those of each product in the cart, each question once. Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400 `consent-question-not-active`, naming the ids: `createBookingFlowDefinition` and `updateBookingFlowDefinition` read them with `marketing-crm#consentQuestionRecords` in process (ADAM CR-429). A Help me choose answer may pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.\n",
     "items": {
      "type": "string",
      "format": "uuid"
@@ -534,14 +534,34 @@
     }
    ],
    "commonConditions": {
-    "location": "the tenant has more than one active venue and `locationSwitcher` is on",
-    "helpMeChoose": "the venue has a published `GuidedChoice`",
-    "consent": "the flow's `consentQuestionIds` or a product in the cart asks a consent question (REV3-26); cannot be turned off while either does",
-    "attendees": "a product in the cart asks attendee details"
+    "location": {
+     "en": "the tenant has more than one active venue and `locationSwitcher` is on",
+     "ar": "لدى الجهة أكثر من موقع نشط، ومبدّل الموقع (locationSwitcher) مفعّل"
+    },
+    "helpMeChoose": {
+     "en": "the venue has a published `GuidedChoice`",
+     "ar": "للموقع دليل «ساعدني في الاختيار» (GuidedChoice) منشور"
+    },
+    "consent": {
+     "en": "the flow's `consentQuestionIds` or a product in the cart asks a consent question (REV3-26); cannot be turned off while either does",
+     "ar": "يطرح المسار (consentQuestionIds) أو منتج في السلة سؤال موافقة؛ ولا يمكن إيقاف الخطوة ما دام أحدهما يطرحه"
+    },
+    "attendees": {
+     "en": "a product in the cart asks attendee details",
+     "ar": "يطلب منتج في السلة بيانات الحضور"
+    }
    },
    "types": [
     {
      "key": "datedDayPass",
+     "name": {
+      "en": "Dated day pass",
+      "ar": "تذكرة يوم بتاريخ محدد"
+     },
+     "description": {
+      "en": "Admission for one chosen day: the guest picks a date, then tickets.",
+      "ar": "دخول ليوم واحد يختاره الضيف: يختار التاريخ ثم التذاكر."
+     },
      "productKinds": [
       "admission",
       "datedAdmission"
@@ -605,6 +625,14 @@
     },
     {
      "key": "timedEntry",
+     "name": {
+      "en": "Timed entry",
+      "ar": "دخول بموعد محدد"
+     },
+     "description": {
+      "en": "Admission at a set time: the guest picks a date, a time, then tickets.",
+      "ar": "دخول في موعد محدد: يختار الضيف التاريخ ثم الوقت ثم التذاكر."
+     },
      "productKinds": [
       "timedAdmission"
      ],
@@ -684,6 +712,14 @@
     },
     {
      "key": "openDated",
+     "name": {
+      "en": "Open-dated",
+      "ar": "تذكرة مفتوحة التاريخ"
+     },
+     "description": {
+      "en": "Tickets with no date to pick, used on any day they are valid.",
+      "ar": "تذاكر بلا تاريخ يُختار، تُستخدم في أي يوم تكون صالحة فيه."
+     },
      "productKinds": [
       "openDated",
       "admission"
@@ -739,6 +775,14 @@
     },
     {
      "key": "seatedFixedPerformance",
+     "name": {
+      "en": "Seated fixed performance",
+      "ar": "عرض بمقاعد في موعد ثابت"
+     },
+     "description": {
+      "en": "A seated event with set performances: the guest picks a performance, then seats on the map.",
+      "ar": "فعالية بمقاعد وعروض محددة: يختار الضيف العرض ثم المقاعد على الخريطة."
+     },
      "productKinds": [
       "seated"
      ],
@@ -750,7 +794,10 @@
       {
        "stepKey": "performance",
        "requirement": "required",
-       "condition": "skipped for the guest when the event has one on-sale performance"
+       "condition": {
+        "en": "skipped for the guest when the event has one on-sale performance",
+        "ar": "تُتخطى للضيف عندما يكون للفعالية عرض واحد معروض للبيع"
+       }
       },
       {
        "stepKey": "seatMap",
@@ -765,7 +812,10 @@
       {
        "stepKey": "tickets",
        "requirement": "conditional",
-       "condition": "the seat's price category has more than one ticket type (adult or child)"
+       "condition": {
+        "en": "the seat's price category has more than one ticket type (adult or child)",
+        "ar": "لفئة سعر المقعد أكثر من نوع تذكرة (بالغ أو طفل)"
+       }
       },
       {
        "stepKey": "consent",
@@ -804,6 +854,14 @@
     },
     {
      "key": "seatedDateTimeSeatMap",
+     "name": {
+      "en": "Seated date, time and seat map",
+      "ar": "مقاعد بالتاريخ والوقت وخريطة المقاعد"
+     },
+     "description": {
+      "en": "A seated event by date and time: the guest picks a date, a time, then seats on the map.",
+      "ar": "فعالية بمقاعد حسب التاريخ والوقت: يختار الضيف التاريخ ثم الوقت ثم المقاعد على الخريطة."
+     },
      "productKinds": [
       "seated"
      ],
@@ -844,7 +902,10 @@
       {
        "stepKey": "tickets",
        "requirement": "conditional",
-       "condition": "the seat's price category has more than one ticket type"
+       "condition": {
+        "en": "the seat's price category has more than one ticket type",
+        "ar": "لفئة سعر المقعد أكثر من نوع تذكرة"
+       }
       },
       {
        "stepKey": "consent",
@@ -888,6 +949,14 @@
     },
     {
      "key": "experienceWorkshop",
+     "name": {
+      "en": "Experience or workshop",
+      "ar": "تجربة أو ورشة عمل"
+     },
+     "description": {
+      "en": "An experience or workshop: the guest picks the product first, then a date and a time.",
+      "ar": "تجربة أو ورشة عمل: يختار الضيف المنتج أولاً ثم التاريخ والوقت."
+     },
      "productKinds": [
       "timedAdmission",
       "admission"
@@ -982,6 +1051,14 @@
     },
     {
      "key": "surfSession",
+     "name": {
+      "en": "Surf or session",
+      "ar": "ركوب الأمواج أو جلسة"
+     },
+     "description": {
+      "en": "A session by level: the guest picks a date, a time, then a level.",
+      "ar": "جلسة حسب المستوى: يختار الضيف التاريخ ثم الوقت ثم المستوى."
+     },
      "productKinds": [
       "timedAdmission",
       "rental"
@@ -1069,6 +1146,14 @@
     },
     {
      "key": "meetingRoomHourly",
+     "name": {
+      "en": "Meeting room by the hour",
+      "ar": "قاعة اجتماعات بالساعة"
+     },
+     "description": {
+      "en": "A room by the hour: the guest picks a date, the length, then a start time.",
+      "ar": "قاعة بالساعة: يختار الضيف التاريخ ثم المدة ثم وقت البدء."
+     },
      "productKinds": [
       "rental"
      ],
@@ -1164,6 +1249,14 @@
     },
     {
      "key": "cabanaMap",
+     "name": {
+      "en": "Cabana on a map",
+      "ar": "كابانا على الخريطة"
+     },
+     "description": {
+      "en": "A cabana or other resource, picked on a map for a chosen date.",
+      "ar": "كابانا أو مورد آخر يُختار على الخريطة لتاريخ محدد."
+     },
      "productKinds": [
       "rental"
      ],
@@ -1182,7 +1275,10 @@
       {
        "stepKey": "resourceMap",
        "requirement": "required",
-       "condition": "the venue's resource selection policy lets the guest choose (resources setResourceSelectionPolicy guestMayChoose; REV3-15)",
+       "condition": {
+        "en": "the venue's resource selection policy lets the guest choose (resources setResourceSelectionPolicy guestMayChoose; REV3-15)",
+        "ar": "تسمح سياسة اختيار الموارد في الموقع للضيف بالاختيار"
+       },
        "settingsOwned": [
         "mapView"
        ]
@@ -1224,6 +1320,14 @@
     },
     {
      "key": "guidedTourByLanguage",
+     "name": {
+      "en": "Guided tour by language",
+      "ar": "جولة إرشادية حسب اللغة"
+     },
+     "description": {
+      "en": "A guided tour: the guest picks a date, a language, then a time.",
+      "ar": "جولة إرشادية: يختار الضيف التاريخ ثم اللغة ثم الوقت."
+     },
      "productKinds": [
       "timedAdmission"
      ],
@@ -1302,6 +1406,14 @@
     },
     {
      "key": "transport",
+     "name": {
+      "en": "Transport",
+      "ar": "النقل"
+     },
+     "description": {
+      "en": "A ride on a route: the guest picks the route, a date, a time, then tickets.",
+      "ar": "رحلة على مسار: يختار الضيف المسار ثم التاريخ ثم الوقت ثم التذاكر."
+     },
      "productKinds": [
       "admission",
       "timedAdmission"
@@ -1367,6 +1479,14 @@
     },
     {
      "key": "tableReservation",
+     "name": {
+      "en": "Table reservation",
+      "ar": "حجز طاولة"
+     },
+     "description": {
+      "en": "A table at an outlet: the guest picks a date, the party size, then a time.",
+      "ar": "طاولة في منفذ: يختار الضيف التاريخ ثم عدد الأشخاص ثم الوقت."
+     },
      "productKinds": [
       "fnb"
      ],
@@ -1422,7 +1542,10 @@
       {
        "stepKey": "payment",
        "requirement": "conditional",
-       "condition": "the venue takes a deposit or pre-order for the table",
+       "condition": {
+        "en": "the venue takes a deposit or pre-order for the table",
+        "ar": "يأخذ الموقع عربوناً أو طلباً مسبقاً للطاولة"
+       },
        "settingsOwned": [
         "signInAt"
        ]
@@ -1443,6 +1566,14 @@
     },
     {
      "key": "membership",
+     "name": {
+      "en": "Membership",
+      "ar": "العضوية"
+     },
+     "description": {
+      "en": "A membership: the guest picks a plan, then gives each members details.",
+      "ar": "عضوية: يختار الضيف الخطة ثم يُدخل بيانات كل عضو."
+     },
      "productKinds": [
       "membership"
      ],
@@ -1485,6 +1616,14 @@
     },
     {
      "key": "giftCard",
+     "name": {
+      "en": "Gift card",
+      "ar": "بطاقة هدية"
+     },
+     "description": {
+      "en": "A gift card: the guest picks a value and a recipient.",
+      "ar": "بطاقة هدية: يختار الضيف القيمة والمستلم."
+     },
      "productKinds": [
       "giftCard"
      ],
@@ -1512,6 +1651,14 @@
     },
     {
      "key": "multiLocation",
+     "name": {
+      "en": "Several locations",
+      "ar": "مواقع متعددة"
+     },
+     "description": {
+      "en": "Products across several venues: the guest picks a location, then a product.",
+      "ar": "منتجات في عدة مواقع: يختار الضيف الموقع ثم المنتج."
+     },
      "productKinds": [
       "admission",
       "timedAdmission",
@@ -1541,7 +1688,10 @@
       {
        "stepKey": "date",
        "requirement": "conditional",
-       "condition": "the product is dated or timed",
+       "condition": {
+        "en": "the product is dated or timed",
+        "ar": "المنتج بتاريخ أو بموعد محدد"
+       },
        "settingsOwned": [
         "dateStripDays",
         "performanceReveal"
@@ -1550,7 +1700,10 @@
       {
        "stepKey": "time",
        "requirement": "conditional",
-       "condition": "the product is timed",
+       "condition": {
+        "en": "the product is timed",
+        "ar": "المنتج بموعد محدد"
+       },
        "settingsOwned": [
         "timesPerPage",
         "dayPartFilter",
@@ -1626,7 +1779,7 @@
    },
    "productKinds": {
     "type": "array",
-    "description": "The catalogue `ProductKind` values this type books. A venue's default flow for a type serves every product of these kinds that names no flow of its own.",
+    "description": "The catalogue `ProductKind` values this type books, in the order the kind rule reads them. A venue's default flow for a type serves a product of these kinds that names no flow of its own only where the type wins `getPublishedBookingFlow`'s kind rule among the venue's enabled defaults (the type whose `productKinds` lists the kind earliest, then the type that comes first in the catalogue; ADAM CR-427, CHG-CR427-001).",
     "items": {
      "type": "string"
     }
@@ -1660,15 +1813,17 @@
         }
        ],
        "nullable": true,
-       "description": "For `conditional`, when a guest meets the step."
+       "description": "For `conditional`, when a guest meets the step, as `{en, ar}`. The catalogue's condition for the step, else `commonConditions[stepKey]` (ADAM CR-428, CHG-CR428-001)."
       },
       "defaultEnabled": {
        "type": "boolean",
-       "default": true
+       "default": true,
+       "description": "True unless the catalogue says otherwise (ADAM CR-428)."
       },
       "defaultSortOrder": {
        "type": "integer",
-       "minimum": 0
+       "minimum": 0,
+       "description": "The step's index in the type's `steps`, counting from 0 (ADAM CR-428)."
       },
       "settingsOwned": {
        "type": "array",
@@ -2568,7 +2723,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
+    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`, as white-label `getPublishedBookingFlow`'s kind rule picks it where several of the venue's enabled defaults list the kind (ADAM CR-427, 31 October 2026). A venue that wants a different flow for a product sets this or the category's `bookingFlowId`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
     "x-ticvai-persistence-column": "jsonb",
@@ -2761,7 +2916,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "**The booking flow for every product filed here** that names none of its own (decided 29 September, W12, BO-115). Null means the venue's flow for each product's `kind`. A white-label `BookingFlow` of the venue; `setProductCategories` refuses any other id with `422`.\n"
+    "description": "**The booking flow for every product filed here** that names none of its own (decided 29 September, W12, BO-115). Null means the venue's flow for each product's `kind`, as white-label `getPublishedBookingFlow`'s kind rule picks it (ADAM CR-427). A white-label `BookingFlow` of the venue; `setProductCategories` refuses any other id with `422`.\n"
    },
    "isActive": {
     "type": "boolean",

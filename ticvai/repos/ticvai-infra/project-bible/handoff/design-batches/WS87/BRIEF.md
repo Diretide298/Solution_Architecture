@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-484` | Self-Service Experience Command Center | B | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-485` | Self-Service Kiosk Profile & Channel Configuration | A2 | 167 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-485` | Self-Service Kiosk Profile & Channel Configuration | A2 | 181 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-486` | Customer Card / Wallet Identification | D | 0 | 4 | 6 | 2 | 1 | 6 | — | notStarted (—) |
 | `BO-487` | Customer Wallet & Balance Summary | C | 0 | 6 | 6 | 16 | 1 | 6 | — | notStarted (—) |
 | `BO-488` | Self-Service Wallet Top-Up | C | 0 | 19 | 6 | 33 | 1 | 6 | — | notStarted (—) |

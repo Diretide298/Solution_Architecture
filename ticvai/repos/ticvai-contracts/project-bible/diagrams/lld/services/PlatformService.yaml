@@ -1539,7 +1539,7 @@ operationsByContract:
     scope: platform
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 3
+    reads: 2
     writes: 3
   - operation: rollbackMigrationRun
     verb: POST
@@ -3069,7 +3069,7 @@ readsFrom:
 - service: OrderService
   operations: 32
 - service: TenancyService
-  operations: 24
+  operations: 23
 - service: LedgerService
   operations: 14
 - service: AccessService

@@ -1,7 +1,7 @@
 id: HLD
 title: TICVAI — seventeen modules in five tiers, five deployables
 generatedBy: tools/derive-diagrams.py
-about: '**What ships together.** 2,860 operations and 1,173 tables resolve into seventeen modules, deployed
+about: '**What ships together.** 2,862 operations and 1,175 tables resolve into seventeen modules, deployed
   as five units (ADR-0055), and **the data boundary decides where they split**: a module owns and migrates
   its schemas; another module reads them through published views and writes them only through the owner''s
   in-process API.
@@ -18,7 +18,7 @@ tiers:
   services:
   - service: TenancyService
     operations: 215
-    tables: 110
+    tables: 111
     schemas:
     - platform
     - workforce
@@ -36,7 +36,7 @@ tiers:
     ifDown: Same as identity — nothing runs without a scope.
     ref: diagrams/lld/services/TenancyService.yaml
   - service: IdentityService
-    operations: 103
+    operations: 104
     tables: 48
     schemas:
     - identity
@@ -52,7 +52,7 @@ tiers:
   services:
   - service: CatalogueService
     operations: 470
-    tables: 143
+    tables: 144
     schemas:
     - catalogue
     - pricing
@@ -187,7 +187,7 @@ tiers:
     property and one that should be tested rather than assumed.
   services:
   - service: MarketingService
-    operations: 283
+    operations: 284
     tables: 133
     schemas:
     - marketing
@@ -303,13 +303,13 @@ crossServiceWrites:
   kind: strong
 - from: CatalogueService
   to: TenancyService
-  writes: 29
+  writes: 27
   reads: 1
   kind: strong
 - from: PlatformService
   to: TenancyService
   writes: 20
-  reads: 25
+  reads: 24
   kind: strong
 - from: OrderService
   to: LedgerService
@@ -341,15 +341,15 @@ crossServiceWrites:
   writes: 12
   reads: 0
   kind: strong
+- from: AccessService
+  to: TenancyService
+  writes: 10
+  reads: 2
+  kind: strong
 - from: OrderService
   to: AccessService
   writes: 10
   reads: 49
-  kind: strong
-- from: AccessService
-  to: TenancyService
-  writes: 9
-  reads: 2
   kind: strong
 - from: MarketingService
   to: TenancyService
@@ -456,11 +456,6 @@ crossServiceWrites:
   writes: 2
   reads: 4
   kind: ordinary
-- from: TenancyService
-  to: MarketingService
-  writes: 2
-  reads: 1
-  kind: ordinary
 - from: WalletService
   to: VenueOpsService
   writes: 2
@@ -508,6 +503,11 @@ crossServiceWrites:
   kind: ordinary
 - from: PlatformService
   to: CrossRegionService
+  writes: 1
+  reads: 0
+  kind: ordinary
+- from: TenancyService
+  to: MarketingService
   writes: 1
   reads: 0
   kind: ordinary

@@ -32,7 +32,7 @@ operationsByContract:
     permission: ACCESS_POINT_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: approveManualOverrideSupervisor
     verb: PUT
     path: /manual-override-supervisor
@@ -207,7 +207,7 @@ operationsByContract:
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 1
     writes: 0
   - operation: getCredentialIssuanceRetryPolicy
     verb: GET
@@ -1495,8 +1495,8 @@ operationsByContract:
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
-    reads: 3
-    writes: 4
+    reads: 2
+    writes: 3
   - operation: setBrandingLocalizationTemplate
     verb: PUT
     path: /branding-localization-template
@@ -2445,7 +2445,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.biometric_profile
-  columns: 37
+  columns: 38
   store: postgres
   parent: null
   writtenBy:
@@ -2577,7 +2577,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.device_placement
-  columns: 18
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -2671,7 +2671,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.gate_mode_change
-  columns: 16
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -2924,13 +2924,16 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 8
+  operations: 9
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
     each inserts or updates, or which operation or event TenancyService published for it — check each
     against ADR-0028.'
   writes:
+  - operation: addBlacklistEntry
+    tables:
+    - approvals.request
   - operation: enrolFacePass
     tables:
     - platform.outbox

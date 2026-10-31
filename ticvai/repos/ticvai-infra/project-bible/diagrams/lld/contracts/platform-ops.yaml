@@ -415,7 +415,6 @@ operations:
   reads:
   - cache:idempotency
   - control.outbox_republish
-  - platform.outbox
   writes:
   - cache:idempotency
   - control.outbox_republish

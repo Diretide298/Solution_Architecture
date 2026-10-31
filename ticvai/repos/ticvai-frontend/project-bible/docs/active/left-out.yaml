@@ -178,3 +178,215 @@ items:
   owner: Chinmay
   added: '2026-10-30'
   change: CHG-CR346-001
+- id: LO-CR396-001
+  kind: deferred
+  platform: P08
+  screens: [BO-230, BO-201]
+  what: 'Two gate mode policy settings setTurnstileMode does not enforce: the emergency code (BO-230''s rule for its
+    reason input asks, for Drop arm, the emergency code from BO-201''s policy as well, and setTurnstileMode''s body has
+    no field for it), and automaticNotification (nothing is notified when a policy sets it). BO-201 keeps both fields
+    and stores them (setGateModePolicy); BO-230 keeps every member it shows.'
+  source: 'ADAM CR-396 (Hrushikant Patkar, #30967 setTurnstileMode), settled by Chinmay on 31 October 2026;
+    design-r1/apps/venue-management/screens/BO-230.md (the reason rule); CHG-CR396-001'
+  reason: 'the decision settles the role check, the policy precedence, the incident and the scheduled turnstile mode;
+    where an emergency code is entered and checked, and who is notified and how, were not part of it, and inventing
+    either would be a field and a channel nobody decided'
+  target: 'r13 or later: an emergency-code field and a notification rule for gate mode activations, decided by the lead'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR396-001
+- id: LO-CR399-001
+  kind: deferred
+  platform: P08
+  screens: [BO-229, BO-247]
+  what: 'The other two access acts held for a second approver: a permanent identity lock (lockIdentity, subject type
+    identityLock) and the release of a full-identity or permanent lock (releaseIdentityLock, subject type
+    identityLockRelease). Neither declares the x-ticvai-write-via to approvals createApprovalRequest that raises its
+    request, and no Access consumer of approval.granted applies them; CR-399 settled only whitelistEntry.'
+  source: 'ADAM CR-399 (Hrushikant Patkar, #30962 addBlacklistEntry), settled by Chinmay on 31 October 2026; DEC-254,
+    DEC-260; CHG-CR399-001'
+  reason: 'the decision covers the whitelist entry only; the same pattern for the two lock acts is its own decision
+    (raise it as a CR on the lockIdentity and releaseIdentityLock tickets)'
+  target: 'r13 or later: a CR applying CR-399''s pattern to lockIdentity and releaseIdentityLock'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR399-001
+- id: LO-CR416-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-113]
+  what: 'AiRecommendationReviewDecisionQueueView.actualRevenueResultPercent, the Feedback Loop''s actual revenue result
+    after an executed price. The member stays in the view and listRecommendationReviewDecision answers it null; every
+    other member of the queue is answered.'
+  source: 'ADAM CR-416 (#35228 listRecommendationReviewDecision), decided by Chinmay on 31 October 2026; CHG-CR416-001'
+  reason: 'nothing measures revenue after an execution yet: it needs the pricing outcome measurement, the same gap as
+    the scorecard (ADAM CR-418) and the performance KPIs (ADAM CR-407)'
+  target: 'when the AI engineers specify the price outcome measure (a Block A task, ADAM CR-418)'
+  owner: Chinmay, with the AI engineers
+  added: '2026-10-31'
+  change: CHG-CR416-001
+- id: LO-CR419-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-076]
+  what: 'PriceBreakdownCalculationSimulationExplainabilityView.aiInsights, the AI observations on a price simulation.
+    The member stays in the view and simulatePriceBreakdownCalculation answers it as an empty list; every other member
+    is answered by the rule CR-419 names.'
+  source: 'ADAM CR-419 (#35288 simulatePriceBreakdownCalculation), decided by Chinmay on 31 October 2026; CHG-CR419-001'
+  reason: no AI producer of simulation insights exists, and inventing one would be AI output nobody specified
+  target: 'when an AI producer for pricing simulation insights is specified (not scheduled)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR419-001
+- id: LO-CR423-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-088]
+  what: 'The testing status of a dynamic pricing strategy (pack p.75 lists Testing). DynamicPricingStrategyCommandCenterView.status
+    never answers testing and listDynamicPricingStrategy''s status filter no longer offers it; ready and scheduled are
+    derived, and the other statuses are as stored.'
+  source: 'ADAM CR-423 (#35286 listDynamicPricingStrategy), decided by Chinmay on 31 October 2026; CHG-CR423-001'
+  reason: 'a saved test case (catalogue.pricing_test_case) names no strategy, so no stored fact says a strategy is being
+    tested'
+  target: 'when a test case names the strategy it tests (a change request of its own; not scheduled)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR423-001
+- id: LO-CR407-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-116]
+  what: 'DynamicPricingPerformanceOptimizationAnalyticsView.incrementalRevenue, revenueUplift, marginUplift,
+    averageSellingPrice, conversion, attendance, occupancy, revenuePerAvailableCapacity, strategyRoi, successful and
+    negativeOutcome, and the priceTimeline points'' demand, occupancy, conversion, bookingVelocity and revenue; the
+    market level, the market filter, and the comparisons dynamicVsFixed, aiVsRules and aiVsHuman. Every member stays in
+    the view (ADM-116''s approved columns and its four comparison buttons are kept) and listDynamicPricingPerformance
+    answers these absent, not zero; the level, the filter and the three comparisons are refused 400 validation naming
+    the parameter. Every other member is answered from catalogue''s own tables by the rule CR-407 names.'
+  source: 'ADAM CR-407 (#35241 listDynamicPricingPerformance), decided by Chinmay on 31 October 2026; CHG-CR407-001'
+  reason: 'they need sales by node and period, a baseline rule or a measured outcome, and none is in the operation''s
+    tables: orders#salesOrderRecords returns order headers by id, no baseline rule is written, and nothing measures an
+    executed price''s outcome yet (the price outcome measure, ADAM CR-418); market has no single meaning in the tables
+    (dynamic_pricing_strategy.market_code is text, a control''s market is a scope id)'
+  target: 'r13 or later: a separate change request for a sales-by-node read with each KPI''s baseline rule, after the
+    AI engineers specify the price outcome measure (ADAM CR-418)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR407-001
+- id: LO-CR408-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-108, BO-1043, BO-1050]
+  what: 'RevenueOptimizationCommandCenterView.revenueRisk and RevenueOptimizationCommandCenterSummary.revenueAtRisk,
+    incrementalRevenueGenerated, optimizationSuccessRate and aiRevenueBrief. Every member stays (ADM-108''s approved
+    tiles and columns are kept) and listRevenue answers these five absent, not zero; rankBy revenueRisk falls back to
+    optimizationId. Every other figure is answered by the rule CR-408 names.'
+  source: 'ADAM CR-408 (#35287 listRevenue), decided by Chinmay on 31 October 2026; CHG-CR408-001'
+  reason: 'nothing stores their inputs yet: no risk amount is stored on a recommendation, no outcome of an executed
+    price is measured, and no generator writes the revenue brief'
+  target: 'the AI phase-2 dynamic pricing unit (AI-ENGINE-DYNAMIC-PRICING-AI) or a separate change request'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR408-001
+- id: LO-CR409-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-102]
+  what: 'The writer of competitor price observations (catalogue.competitor_price_observation): the signal ingestion job
+    for a feed source, and a manual-entry write for collectionMethod manualEntry. Until one exists the list is empty,
+    and ADM-102 keeps every member of CompetitorPricingMarketPositionIntelligenceView (the six prices, availability,
+    date, timeslot, observationId, observedAt, marketMedianPrice, positionVsMedian and movementPercent) with no row to
+    show.'
+  source: 'ADAM CR-409 (#35327 listCompetitorPricingMarket), decided 31 October 2026; pack Pricing___Revenue_Management_Reference.pdf p.100, 10.6.5 Track (sources/workshop/pack.json); CHG-CR409-001'
+  reason: no competitor data provider named by the client, so no feed to ingest; the decision stores and reads the
+    observations and names no writer
+  target: 'when the client names a competitor data provider or asks for manual entry (not scheduled; the lead decides
+    the release)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR409-001
+- id: LO-CR409-002
+  kind: deferred
+  platform: P08
+  screens: [ADM-102]
+  what: 'The writer of a competitor registry row''s reading.historicalCorrelation {demand, conversion, priceSensitivity}:
+    the AI layer''s correlation of competitor changes with TICVAI outcomes. Until it writes it, ADM-102 keeps the member
+    CompetitorPricingMarketPositionIntelligenceView.historicalCorrelation and answers it null.'
+  source: 'ADAM CR-409 (#35327), decided 31 October 2026 ("null until the AI layer writes it"); pack p.100 Historical
+    Correlation (sources/workshop/pack.json); CHG-CR409-001'
+  reason: the decision states where the figure is read from and that it is null until written; no AI job that computes
+    it is specified
+  target: 'with the AI pricing work that specifies the correlation job (not scheduled)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR409-001
+- id: LO-CR411-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-263]
+  what: 'ChannelSalesScheduleAvailabilityWindowsView.aiInsights (unusual schedule configurations AI detects, pack p.12):
+    always an empty list until an insight source is declared. ADM-263 keeps the member.'
+  source: 'ADAM CR-411 (#35240 listChannelSaleSchedule), decided 31 October 2026; pack Sales_Channel_Management_Reference.pdf p.12 AI Capability (sources/workshop/pack.json); CHG-CR411-001'
+  reason: no insight source is declared; the decision answers the list empty rather than invent one
+  target: 'when an insight source for channel schedules is decided (not scheduled)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR411-001
+- id: LO-CR412-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-262]
+  what: 'InventoryCapacityChannelAllocationView.aiInsights (AI reallocation suggestions, pack p.11): an empty list until
+    an insight source is declared. ADM-262 keeps the member.'
+  source: 'ADAM CR-412 (#35242 listInventoryCapacityChannel), decided 31 October 2026; pack Sales_Channel_Management_Reference.pdf p.11 AI Capability (sources/workshop/pack.json); CHG-CR412-001'
+  reason: no insight source is declared; the decision answers the list empty rather than invent one
+  target: 'when an insight source for channel allocation is decided (not scheduled)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR412-001
+- id: LO-CR428-001
+  kind: deferred
+  platform: P13
+  screens: [CMS-103]
+  what: 'A sixteenth booking flow type, "cabana by size" (W6). CMS-103''s notes ("cabana on a map or by size") and its
+    design notes ("Cards for the 16 types", handoff/design-notes/white-label.yaml) name it; the system catalogue
+    (BookingFlowType x-ticvai-system-catalogue) has 15 types and no cabana-by-size type, so listBookingFlowTypes serves
+    15 cards.'
+  source: 'ADAM CR-428 (#31034 listBookingFlowTypes), decided 31 October 2026; screens/P13-white-label-cms.yaml CMS-103;
+    MoM 29 September W6; CHG-CR428-001'
+  reason: the decision names the 15 catalogue types and serves them verbatim; whether cabana by size is a type of its
+    own (its steps, its kinds) or a cabanaMap setting was not part of it, and inventing a type would be one nobody
+    decided
+  target: 'r13 or later: the lead decides whether the catalogue gains a cabana-by-size type or CMS-103''s notes drop it'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR428-001
+- id: LO-CR430-001
+  kind: deferred
+  platform: P13
+  screens: [CMS-016]
+  what: 'A later change of a venue''s GuestMatchPolicy.matchBy (marketing-crm setGuestMatchPolicy) is not checked
+    against the booking-flow guestContactFields in force at that venue, so a venue can come to match on a contact its
+    guest-checkout pop-up does not collect. setBookingFlowConfig checks the fields against the policy in force when the
+    fields are saved (ADAM CR-430).'
+  source: 'ADAM CR-430 (#31043 setBookingFlowConfig), decided 31 October 2026; CHG-CR430-001'
+  reason: the decision checks setBookingFlowConfig only; a check on setGuestMatchPolicy, which writes another module''s
+    row, was not part of it
+  target: 'r13 or later: the lead decides whether setGuestMatchPolicy refuses or warns'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR430-001
+- id: LO-CR435-001
+  kind: deferred
+  platform: P09
+  screens: [ADM-318]
+  what: 'listDeadLetters (platform-ops) still declares tenancy#outboxRecords over the service route between
+    deployables, which is not built, as republishOutbox did before ADAM CR-435.'
+  source: 'ADAM CR-435 (#27700 republish from the outbox), decided 31 October 2026; contracts/satellite/platform-ops.yaml
+    listDeadLetters; CHG-CR435-001'
+  reason: the decision settles republishOutbox only; whether listDeadLetters reads outbox rows at all, and by which
+    route, is a question of its own
+  target: 'r13 or later: its own CR or the lead''s ruling on the platform-ops reads of tenant outboxes'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR435-001

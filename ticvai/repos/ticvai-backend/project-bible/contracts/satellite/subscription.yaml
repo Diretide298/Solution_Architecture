@@ -5066,6 +5066,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -6966,6 +6973,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PartnerApprovalStatusLifecycleManagementView'
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -7853,6 +7867,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookingLimitsCommercialExceptionsApprovalView'
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -10488,6 +10509,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /partner-agreements/{agreementId}/commission-rules:
@@ -10587,6 +10615,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /partner-agreements/{agreementId}/credit-profile:
@@ -10661,6 +10696,13 @@ paths:
         '422':
           x-ticvai-problem-types: [thresholds-out-of-order, credit-status-read-only, temporary-limit-end-required]
           description: Thresholds out of order, a computed credit status sent, or a temporary limit with no end
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
           content:
             application/problem+json:
               schema:
@@ -11244,6 +11286,13 @@ paths:
         '422':
           x-ticvai-problem-types: [schedule-date-required, reason-required, dispute-case-required]
           description: schedule with no date, hold or void with no reason, dispute with no case
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
           content:
             application/problem+json:
               schema:
@@ -21292,7 +21341,9 @@ components:
           nullable: true
         reason:
           type: string
-          description: Reason, recorded in the audit
+          description: 'Reason, recorded in the audit: the operation puts it on the request''s audit context and the
+            audit interceptor writes it to the audit row''s `reason`, which `listAuditRecords` returns (ADAM CR-376;
+            CHG-CR376-001).'
           nullable: true
     MembershipProductStatus:
       type: string
@@ -22324,7 +22375,9 @@ components:
             (decided 29 September, readiness close-out)
         reason:
           type: string
-          description: Reason, recorded in the audit
+          description: 'Reason, recorded in the audit: the operation puts it on the request''s audit context and the
+            audit interceptor writes it to the audit row''s `reason`, which `listAuditRecords` returns (ADAM CR-376;
+            CHG-CR376-001).'
           nullable: true
         approvalRequestId:
           type: string

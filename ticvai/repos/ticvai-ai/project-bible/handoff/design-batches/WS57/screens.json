@@ -457,11 +457,6 @@
       },
       {
        "kind": "selectField",
-       "label": "Currency",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 5 §Configure"
-      },
-      {
-       "kind": "selectField",
        "label": "Time Zone",
        "provenance": "pack Sales_Channel_Management_Reference.pdf, page 5 §Configure"
       },
@@ -1506,7 +1501,7 @@
     }
    ]
   },
-  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
+  "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.\n\n**Effective dates are instants** (ADAM CR-414, decided 31 October 2026): `effectiveFrom` and `effectiveTo` are answered as stored and as setChannelSalesRule takes them, and the screen shows the day in the venue's time zone; an empty `effectiveFrom` is in effect from when the rule was saved, an empty `effectiveTo` is open-ended.",
   "density": "compact",
   "purposeNote": "Administrators can enforce channel-specific operational and transaction restrictions without changing the master product definition.",
   "pattern": "configEditor",

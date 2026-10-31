@@ -58,7 +58,7 @@
     "maxLength": 500,
     "nullable": true,
     "readOnly": true,
-    "description": "Why it was ended, as `forceLogout` was given it (or `supervisor-takeover` from the till door, or `credential-changed` when `changeOwnCredential` ended it; ADAM CR-242)."
+    "description": "Why it was ended, as `forceLogout` was given it (or `supervisor-takeover` from the till door, or `credential-changed` when `changeOwnCredential` ended it; ADAM CR-242; or `credential-reset` when `resetPrincipalCredential` ended it through `identity.end_principal_sessions`, ADAM CR-377)."
    },
    "roleId": {
     "type": "string",

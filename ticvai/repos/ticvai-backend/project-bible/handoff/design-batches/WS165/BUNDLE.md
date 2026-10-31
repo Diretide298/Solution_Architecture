@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-959` | Stage & Focal Point | C | 0 | 20 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-960` | Entrances, Exits & Aisles | C | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-961` | Amenities & Obstructions | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-962` | Templates, Validation & Publish | C | 0 | 6 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-962` | Templates, Validation & Publish | C | 0 | 20 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -387,10 +387,10 @@ Errors to draw in the form: 409 A label is already taken in the map, or a remova
 | X | 1,234.5 | — |
 | Y | 1,234.5 | — |
 | Sections | list or chips (count when long) | — |
+| Seat map | the name it points at, never the id | The map the section belongs to (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into … |
 | Code | text | — |
 | Name | text | — |
 | Row count | 1,234 | — |
-| Seat count | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -414,7 +414,7 @@ Errors to draw in the form: 409 A label is already taken in the map, or a remova
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the venue canvas are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A label is already taken in the map, or a removal touches a published map; 409 Structural change attempted on a published map |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A label is already taken in the map, or a removal touches a published map; 422 `templateId` names a template the caller cannot read, or one outside the venue's region; the problem names `templateId` and nothing is written (ADAM CR-403) |
 
 #### Sample data for the mock-up
 
@@ -473,7 +473,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 404, 409).
+- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 404, 409, 422).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-954?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create seat map, Cancel, Add sections, rows and seats.
@@ -562,10 +562,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | X | 1,234.5 | — |
 | Y | 1,234.5 | — |
 | Sections | list or chips (count when long) | — |
+| Seat map | the name it points at, never the id | The map the section belongs to (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into … |
 | Code | text | — |
 | Name | text | — |
 | Row count | 1,234 | — |
-| Seat count | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -573,7 +573,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|---|
 | Save map zones (primary button) | `setMapZones` PUT `/seat-maps/{seatMapId}/zones` | inline | MapZone[] | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
-| Save section views (secondary button) | `updateSeatMap` PATCH `/seat-maps/{seatMapId}` | inline | SeatMap | 409 Structural change attempted on a published map | — |
+| Save section views (secondary button) | `updateSeatMap` PATCH `/seat-maps/{seatMapId}` | inline | SeatMap | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -593,7 +593,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the sections zones are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Content type not permitted, or size beyond the limit for that kind. Checked here rather than after a guest has uploaded two hundred megabytes.; 409 Structural change attempted on a published map; 409 The transfer never finished (`transferIncomplete`), the upload ticket expired (`uploadExpired`), or the stored file is larger than the ticket allowed … (UploadRefusedProblem) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Content type not permitted, or size beyond the limit for that kind. Checked here rather than after a guest has uploaded two hundred megabytes.; 409 The transfer never finished (`transferIncomplete`), the upload ticket expired (`uploadExpired`), or the stored file is larger than the ticket allowed … (UploadRefusedProblem) |
 
 #### Sample data for the mock-up
 
@@ -910,10 +910,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | X | 1,234.5 | — |
 | Y | 1,234.5 | — |
 | Sections | list or chips (count when long) | — |
+| Seat map | the name it points at, never the id | The map the section belongs to (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into … |
 | Code | text | — |
 | Name | text | — |
 | Row count | 1,234 | — |
-| Seat count | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -1052,10 +1052,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | X | 1,234.5 | — |
 | Y | 1,234.5 | — |
 | Sections | list or chips (count when long) | — |
+| Seat map | the name it points at, never the id | The map the section belongs to (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into … |
 | Code | text | — |
 | Name | text | — |
 | Row count | 1,234 | — |
-| Seat count | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -1196,10 +1196,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | X | 1,234.5 | — |
 | Y | 1,234.5 | — |
 | Sections | list or chips (count when long) | — |
+| Seat map | the name it points at, never the id | The map the section belongs to (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into … |
 | Code | text | — |
 | Name | text | — |
 | Row count | 1,234 | — |
-| Seat count | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -1342,10 +1342,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | X | 1,234.5 | — |
 | Y | 1,234.5 | — |
 | Sections | list or chips (count when long) | — |
+| Seat map | the name it points at, never the id | The map the section belongs to (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into … |
 | Code | text | — |
 | Name | text | — |
 | Row count | 1,234 | — |
-| Seat count | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -1480,10 +1480,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | X | 1,234.5 | — |
 | Y | 1,234.5 | — |
 | Sections | list or chips (count when long) | — |
+| Seat map | the name it points at, never the id | The map the section belongs to (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into … |
 | Code | text | — |
 | Name | text | — |
 | Row count | 1,234 | — |
-| Seat count | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -1598,12 +1598,26 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
+| Source seat map | the name it points at, never the id | The map the template was copied from, for lineage only (ADAM CR-403). |
+| Structure | list or chips (count when long) | The copied structure (ADAM CR-403): the sections, each with its rows and their seats, as they were on the source map when the template was … |
+| Code | text | — |
+| Name | text | — |
+| Boundary | list or chips (count when long) | — |
+| X | 1,234.5 | — |
+| Y | 1,234.5 | — |
+| Rows | list or chips (count when long) | — |
+| Label | text | — |
+| Numbering direction | chip: Left to right, Right to left | — |
+| Seats | list or chips (count when long) | — |
+| View box | grouped details | The source map's coordinate space, copied (ADAM CR-403). |
+| Width | 1,234.5 | — |
+| Height | 1,234.5 | — |
+| Stage position | grouped details | The source map's stage position, copied (ADAM CR-403). |
+| X | 1,234.5 | — |
+| Y | 1,234.5 | — |
 | ID | the name it points at, never the id | — |
 | Name | text | — |
 | Description | text | — |
-| Seat count | 1,234 | — |
-| Section count | 1,234 | — |
-| Has geometry | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -1689,7 +1703,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-962?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create seat map template, Cancel, What publishing changes.
 - [ ] Every transition is wired: `BO-953`.
@@ -1822,7 +1836,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "AiSeatMapProposal": {"type":"object","x-ticvai-persistence":"none — the plan is ai.action_plan and ai.action_step, presented as one ai.proposed_action; the findings are the evidence of its decision record","description":"What `proposeSeatMapChanges` proposed: findings with the seats they concern, and except for `consistency` the plan a person approves (1.4.23, 1.4.25, 1.4.26, 1.4.29).","required":["kind","findings"],"properties":{"kind":{"type":"string","enum":["categories","numbering","stageVariant","consistency"]},"seatMapId":{"type":"string","format":"uuid"},"planId":{"type":"string","format":"uuid","nullable":true,"description":"The `ai.action_plan`, readable with `getActionPlan`. Null for `consistency`."},"proposedActionId":{"type":"string","format":"uuid","nullable":true,"description":"The `ai.proposed_action` a person decides. Null for `consistency`."},"summary":{"type":"object","additionalProperties":true,"description":"Counts: seats re-categorised or relabelled, seats blocked, capacity by category before and after."},"findings":{"type":"array","items":{"type":"object","required":["code","severity"],"properties":{"code":{"type":"string","description":"e.g. `accessibleSeatWithoutAccessiblePrice`, `restrictedViewInPremium`, `companionWithoutWheelchairSpace`, `sightLineLost`, `behindStage`, `numberingGap`, `duplicateLabel`, `categoryChange`, `labelChange`."},"severity":{"type":"string","enum":["blocking","warning","info"]},"seatIds":{"type":"array","items":{"type":"string","format":"uuid"}},"sectionId":{"type":"string","format":"uuid","nullable":true},"current":{"type":"string","nullable":true},"proposed":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true}}}},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"decisionRecordId":{"type":"string","format":"uuid"}}},
 "BulkUpdateSeatsRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["selection"],"properties":{"selection":{"type":"object","description":"Seats to amend. Combine filters; an empty selection is rejected.","properties":{"seatIds":{"type":"array","items":{"type":"string"}},"sectionCodes":{"type":"array","items":{"type":"string"}},"rowLabels":{"type":"array","items":{"type":"string"}}}},"categoryId":{"type":"string","format":"uuid"},"attribute":{"$ref":"#/components/schemas/SeatAttribute"},"isActive":{"type":"boolean"}}},
-"CreateSeatMapRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","venueId"],"properties":{"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"description":{"type":"string","maxLength":1000},"templateId":{"type":"string","format":"uuid","description":"Create from a template rather than empty."}}},
+"CreateSeatMapRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","venueId"],"properties":{"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"description":{"type":"string","maxLength":1000},"templateId":{"x-ticvai-persisted":false,"type":"string","format":"uuid","description":"Create from a template rather than empty. The new draft's sections, rows and seats are written from the template's stored structure (ADAM CR-403; see `createSeatMap`)."}}},
 "MapZone": {"type":"object","x-ticvai-persistence":"seating.zone","description":"BL-166. **`seating` is strong on everything that is a seat and the map itself was only seats.**\n**A standing area is a capacity without individual seats**, and modelling it as seats means inventing seat numbers nobody prints and a guest cannot find. A suite is the opposite — one sellable unit containing many seats, sold whole.\nNon-sellable zones matter too: **a stage, an entry and a sightline obstruction are not inventory and they change what the seats beside them are worth.**\n","required":["id","seatMapId","kind","name"],"properties":{"id":{"type":"string","format":"uuid"},"seatMapId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["standing","suite","box","lounge","accessiblePlatform","stage","entry","exit","concourse","obstruction","camera","aisle"]},"name":{"type":"string"},"capacity":{"type":"integer","nullable":true,"description":"**For a standing zone this is the inventory** — sold as a count rather than as seats. Null for a stage or an obstruction, which sell nothing.\n"},"seatCategoryId":{"type":"string","format":"uuid","nullable":true},"containsSeatIds":{"type":"array","description":"For a suite or box. **Sold whole, so the seats inside are held together** — selling one seat of a suite is not a thing a venue does.\n","items":{"type":"string","format":"uuid"}},"obstructsZoneIds":{"type":"array","description":"What this blocks the view of. **A pillar is not inventory and it decides what the seats behind it are worth**, which is the only reason to draw it.\n","items":{"type":"string","format":"uuid"}},"geometry":{"type":"string","nullable":true}}},
 "MediaAsset": {"x-ticvai-persistence":"assets.media_asset","type":"object","required":["id","kind","status","filename","contentType","sizeBytes","referenceCount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/assets::MediaKind"},"status":{"$ref":"#/components/schemas/MediaStatus"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"title":{"$ref":"#/components/schemas/assets::LocalisedText"},"description":{"allOf":[{"$ref":"#/components/schemas/assets::LocalisedText"}],"description":"Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"},"altText":{"allOf":[{"$ref":"#/components/schemas/assets::LocalisedText"}],"description":"Required before use in a guest-facing surface. WCAG 2.2 AA."},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"hasTransparency":{"type":"boolean","nullable":true,"readOnly":true,"description":"Whether the image has an alpha channel with any pixel not fully opaque, recorded from the file when the upload completes; null for a file that is not an image (ADAM CR-106, option 1; CHG-R10TEN-012). White Label's setAppIcons refuses a source where it is true."},"durationSeconds":{"type":"number","nullable":true},"customMetadata":{"type":"object","nullable":true,"additionalProperties":true,"description":"BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"},"sharedWithTenantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"},"tags":{"type":"array","items":{"type":"string"}},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"url":{"type":"string","description":"Signed and expiring for private assets; stable CDN URL for public ones. **A public asset that a published white-label version references is served at its stable CDN URL**, and `getPublishedTenantConfig` returns that address (`brandUrls`, `banners[].imageUrl`) so a guest client never needs this read (r8 walk of ticket 28335)."},"thumbnailUrl":{"type":"string","nullable":true},"referenceCount":{"type":"integer","description":"How many surfaces reference this asset. Non-zero refuses deletion.\n"},"rights":{"$ref":"#/components/schemas/MediaRights"},"isRightsExpired":{"type":"boolean"},"version":{"type":"integer"},"uploadedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"},"extractedText":{"type":"string","nullable":true,"readOnly":true,"description":"**The text pulled out of an uploaded document** (R8 blocker ORDERS-MONEY-C19): written by the upload's processing job once text extraction finishes (PDF, Word and plain-text kinds), replaced when the file is replaced, null for an image, video or audio file or while the asset is still processing. One value per asset, so AI's `ingestKnowledgeDocument` reads it through `mediaAssetRecords`."},"releasedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal","description":"The reviewer who released the asset from `quarantined` (R8 blocker ORDERS-MONEY-C24, CHG-R8MIG-022); null if it never was."},"releasedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When it was released from `quarantined`."}}},
 "MediaRights": {"x-ticvai-persistence":"none — embedded in asset","type":"object","description":"Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n","properties":{"licenceKind":{"type":"string","enum":["owned","royaltyFree","rightsManaged","creativeCommons","editorialOnly","unknown"]},"licensor":{"type":"string","nullable":true},"licenceReference":{"type":"string","nullable":true},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"permittedUses":{"type":"array","items":{"type":"string","enum":["web","print","socialMedia","inVenue","advertising","internal"]}},"attributionRequired":{"type":"boolean","default":false},"attributionText":{"type":"string","nullable":true},"permittedTerritories":{"type":"array","items":{"type":"string"},"description":"ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"},"permittedChannels":{"type":"array","items":{"type":"string"},"description":"Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"},"modelReleaseHeld":{"type":"boolean","default":false},"renewalOwner":{"type":"string","format":"uuid","nullable":true}}},
@@ -1834,8 +1848,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "SeatMap": {"x-ticvai-persistence":"seating.seat_map","allOf":[{"$ref":"#/components/schemas/SeatMapSummary"},{"type":"object","required":["sections"],"properties":{"description":{"type":"string","nullable":true},"viewBox":{"type":"object","description":"Coordinate space for rendering. Absent when there is no geometry.","nullable":true,"properties":{"width":{"type":"number"},"height":{"type":"number"}}},"stagePosition":{"$ref":"#/components/schemas/Point"},"sections":{"type":"array","items":{"$ref":"#/components/schemas/Section"}},"isActive":{"type":"boolean"}}}]},
 "SeatMapStatus": {"type":"string","enum":["draft","validated","published","archived"]},
 "SeatMapSummary": {"x-ticvai-persistence":"seating.seat_map","type":"object","required":["id","name","venueId","status","seatCount"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"status":{"$ref":"#/components/schemas/SeatMapStatus"},"seatCount":{"type":"integer"},"sectionCount":{"type":"integer"},"hasGeometry":{"type":"boolean","description":"False when only a manifest has been imported. Such a map can be sold from a list but not rendered.\n"},"publishedAt":{"type":"string","format":"date-time","nullable":true}}},
-"SeatMapTemplate": {"x-ticvai-persistence":"seating.seat_map_template","type":"object","required":["id","name","seatCount","sectionCount"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"seatCount":{"type":"integer"},"sectionCount":{"type":"integer"},"hasGeometry":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"}}},
-"Section": {"x-ticvai-persistence":"seating.section","type":"object","required":["code","name","rowCount","seatCount"],"properties":{"code":{"type":"string"},"name":{"type":"string"},"rowCount":{"type":"integer"},"seatCount":{"type":"integer"},"boundary":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"$ref":"#/components/schemas/Point"},"description":"Polygon for rendering. Absent without geometry."},"viewAssetId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"assets.MediaAsset","description":"**The view of the stage from this section, as a photo**, uploaded through `assets` like any other media (decided 29 September, rev 3 23SEP-14). Optional: where it is null the client renders the view from the imported geometry (the section `boundary`, the map's `stagePosition` and the seat positions), so a closer section shows a larger stage and fewer rows ahead. Set with `updateSeatMap` `sectionViews`, which is allowed on a published map because a photo does not change the map's shape.\n"},"rows":{"type":"array","items":{"type":"object","required":["label","seatCount"],"properties":{"label":{"type":"string"},"seatCount":{"type":"integer"},"numberingDirection":{"type":"string","enum":["leftToRight","rightToLeft"],"description":"Which end row numbering starts from. Not recoverable from a manifest and must be stated — it determines whether a guest finds their seat.\n"}}}},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
+"SeatMapTemplate": {"x-ticvai-persistence":"seating.seat_map_template","x-ticvai-rls":"read-beneath","description":"**A reusable layout with its own copy of the structure** (ADAM CR-403, decided 31 October 2026). createSeatMapTemplate copies the source map's structure when the template is saved; createSeatMap with `templateId` writes a new map from it. The source map is kept for lineage only.","type":"object","required":["id","name","seatCount","sectionCount","structure","scopePath"],"properties":{"scopePath":{"type":"string","readOnly":true,"description":"**The region the template is saved at** (ADR-0005; ADAM CR-403). Row security is read-beneath, so the venues under that region read the template."},"sourceSeatMapId":{"type":"string","format":"uuid","readOnly":true,"nullable":true,"x-ticvai-references":"seating.seat_map","description":"The map the template was copied from, for lineage only (ADAM CR-403)."},"structure":{"readOnly":true,"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","description":"The copied structure (ADAM CR-403): the sections, each with its rows and their seats, as they were on the source map when the template was saved. View photos are not kept.","items":{"type":"object","required":["code","name"],"properties":{"code":{"type":"string"},"name":{"type":"string"},"boundary":{"type":"array","items":{"$ref":"#/components/schemas/Point"}},"rows":{"type":"array","items":{"type":"object","required":["label"],"properties":{"label":{"type":"string"},"numberingDirection":{"type":"string","enum":["leftToRight","rightToLeft"]},"seats":{"type":"array","items":{"type":"object","required":["seatNumber"],"properties":{"seatNumber":{"type":"string"},"displayLabel":{"type":"string"},"position":{"$ref":"#/components/schemas/Point"},"attribute":{"$ref":"#/components/schemas/SeatAttribute"},"categoryCode":{"type":"string","nullable":true,"description":"The seat category's code on the source map; matched by code in the new map's venue."}}}}}}}}}},"viewBox":{"readOnly":true,"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"object","nullable":true,"description":"The source map's coordinate space, copied (ADAM CR-403).","properties":{"width":{"type":"number"},"height":{"type":"number"}}},"stagePosition":{"readOnly":true,"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","allOf":[{"$ref":"#/components/schemas/Point"}],"nullable":true,"description":"The source map's stage position, copied (ADAM CR-403)."},"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"seatCount":{"type":"integer"},"sectionCount":{"type":"integer"},"hasGeometry":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"}}},
+"Section": {"x-ticvai-persistence":"seating.section","x-ticvai-unique-together":[["seatMapId","code"]],"type":"object","required":["seatMapId","code","name","rowCount","seatCount"],"properties":{"seatMapId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"seating.seat_map","description":"**The map the section belongs to** (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into: createSeatMap, editSeatMapStructure addSections, cloneSeatMap, copySeatMapSection, and the imports when committed. A map's codes are unique on it, matched exactly (`section_seat_map_id_code_uniq`)."},"code":{"type":"string","x-ticvai-unique-compare":"exact"},"name":{"type":"string"},"rowCount":{"type":"integer"},"seatCount":{"type":"integer"},"boundary":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"$ref":"#/components/schemas/Point"},"description":"Polygon for rendering. Absent without geometry."},"viewAssetId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"assets.MediaAsset","description":"**The view of the stage from this section, as a photo**, uploaded through `assets` like any other media (decided 29 September, rev 3 23SEP-14). Optional: where it is null the client renders the view from the imported geometry (the section `boundary`, the map's `stagePosition` and the seat positions), so a closer section shows a larger stage and fewer rows ahead. Set with `updateSeatMap` `sectionViews`, which is allowed on a published map because a photo does not change the map's shape.\n"},"rows":{"type":"array","items":{"type":"object","required":["label","seatCount"],"properties":{"label":{"type":"string"},"seatCount":{"type":"integer"},"numberingDirection":{"type":"string","enum":["leftToRight","rightToLeft"],"description":"Which end row numbering starts from. Not recoverable from a manifest and must be stated — it determines whether a guest finds their seat.\n"}}}},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "SuggestionBasis": {"type":"string","description":"**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n","enum":["heuristic","statistical","model","hybrid","manual"]},
 "UploadTicket": {"x-ticvai-persistence":"assets.media_upload","type":"object","required":["uploadId","uploadUrl","method","expiresAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"uploadId":{"type":"string","format":"uuid"},"uploadUrl":{"type":"string","description":"Signed. PUT the file here, then confirm with `/complete`."},"method":{"type":"string","enum":["PUT","POST"]},"headers":{"type":"object","additionalProperties":{"type":"string"}},"maxSizeBytes":{"type":"integer"},"expiresAt":{"type":"string","format":"date-time"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"venueId":{"type":"string","format":"uuid","nullable":true},"assetId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The asset this upload became — created by `completeUpload`, or the asset whose file `replaceMediaAsset` swapped. Null while the transfer is outstanding.\n"}}},
 "ValidationFinding": {"x-ticvai-persistence":"none — computed","type":"object","required":["kind","severity","message"],"properties":{"kind":{"$ref":"#/components/schemas/ValidationFindingKind"},"severity":{"$ref":"#/components/schemas/ValidationSeverity"},"message":{"type":"string"},"sectionCode":{"type":"string","nullable":true},"rowLabel":{"type":"string","nullable":true},"seatNumbers":{"type":"array","items":{"type":"string"}},"affectedCount":{"type":"integer"}}},

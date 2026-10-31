@@ -242,7 +242,7 @@
         "DynamicPricingStrategyCommandCenterView.basePriceSource",
         "DynamicPricingStrategyCommandCenterView.currentPrice",
         "DynamicPricingStrategyCommandCenterView.ruleCount",
-        "DynamicPricingStrategyCommandCenterView.automationMode",
+        "DynamicPricingStrategyCommandCenterView.automationLevel",
         "DynamicPricingStrategyCommandCenterView.status"
        ],
        "notes": null,
@@ -1266,11 +1266,6 @@
     "operation": null,
     "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
     "source": "pack Pricing___Revenue_Management_Reference.pdf, page 83"
-   },
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-027): No write for channel, segment and location dynamic pricing rules (unless setDynamicPriceRule carries them).",
-    "source": "contracts/spine/catalogue.yaml#listChannelCustomerSegment"
    }
   ],
   "layout": {
@@ -1294,12 +1289,99 @@
        "kind": "secondaryButton",
        "label": "API",
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 83 §Support"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Save rule",
+       "operation": "setDynamicPriceRule",
+       "permission": "PRICE_CONFIGURE",
+       "notes": "**Saves one contextual rule** (ADAM CR-410; the lead, 1 November 2026: \"Add a save button\"): the rule's dimension and that dimension's fields, its range, protection and on/off, as the screen shows them (ChannelCustomerSegmentLocationDynamicRulesView), sent as a rule with ruleType contextual and no conditions or actions.",
+       "provenance": "contract catalogue.yaml PUT /pricing/dynamic-rules/{ruleId}"
       }
      ]
     },
     {
      "name": "contentBody",
-     "components": []
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Rule name",
+       "bindsTo": "PricingDynamicPriceRule.name",
+       "provenance": "decision ADAM CR-410 (the lead, 1 November 2026: \"Add a save button\"): the fields Save rule sends"
+      },
+      {
+       "kind": "selectField",
+       "label": "Dimension",
+       "bindsTo": "PricingDynamicPriceRule.dimension",
+       "provenance": "decision ADAM CR-410 (the lead, 1 November 2026: \"Add a save button\"): the fields Save rule sends"
+      },
+      {
+       "kind": "selectField",
+       "label": "Sales channel",
+       "bindsTo": "PricingDynamicPriceRule.salesChannel",
+       "provenance": "decision ADAM CR-410 (the lead, 1 November 2026: \"Add a save button\"): the fields Save rule sends"
+      },
+      {
+       "kind": "selectField",
+       "label": "Customer segment",
+       "bindsTo": "PricingDynamicPriceRule.customerSegment",
+       "provenance": "decision ADAM CR-410 (the lead, 1 November 2026: \"Add a save button\"): the fields Save rule sends"
+      },
+      {
+       "kind": "textField",
+       "label": "Segment reference",
+       "bindsTo": "PricingDynamicPriceRule.segmentRef",
+       "provenance": "decision ADAM CR-410 (the lead, 1 November 2026: \"Add a save button\"): the fields Save rule sends"
+      },
+      {
+       "kind": "selectField",
+       "label": "Location level",
+       "bindsTo": "PricingDynamicPriceRule.locationLevel",
+       "provenance": "decision ADAM CR-410 (the lead, 1 November 2026: \"Add a save button\"): the fields Save rule sends"
+      },
+      {
+       "kind": "textField",
+       "label": "Location",
+       "bindsTo": "PricingDynamicPriceRule.locationId",
+       "provenance": "decision ADAM CR-410 (the lead, 1 November 2026: \"Add a save button\"): the fields Save rule sends"
+      },
+      {
+       "kind": "numberField",
+       "label": "Lowest adjustment (%)",
+       "bindsTo": "PricingDynamicPriceRule.rangeMinPercent",
+       "provenance": "decision ADAM CR-410 (the lead, 1 November 2026: \"Add a save button\"): the fields Save rule sends"
+      },
+      {
+       "kind": "numberField",
+       "label": "Highest adjustment (%)",
+       "bindsTo": "PricingDynamicPriceRule.rangeMaxPercent",
+       "provenance": "decision ADAM CR-410 (the lead, 1 November 2026: \"Add a save button\"): the fields Save rule sends"
+      },
+      {
+       "kind": "toggle",
+       "label": "Protected",
+       "bindsTo": "PricingDynamicPriceRule.isProtected",
+       "provenance": "decision ADAM CR-410 (the lead, 1 November 2026: \"Add a save button\"): the fields Save rule sends"
+      },
+      {
+       "kind": "toggle",
+       "label": "Dynamic pricing on",
+       "bindsTo": "PricingDynamicPriceRule.dynamicPricingEnabled",
+       "provenance": "decision ADAM CR-410 (the lead, 1 November 2026: \"Add a save button\"): the fields Save rule sends"
+      },
+      {
+       "kind": "numberField",
+       "label": "Priority",
+       "bindsTo": "PricingDynamicPriceRule.priority",
+       "provenance": "decision ADAM CR-410 (the lead, 1 November 2026: \"Add a save button\"): the fields Save rule sends"
+      },
+      {
+       "kind": "toggle",
+       "label": "Active",
+       "bindsTo": "PricingDynamicPriceRule.isActive",
+       "provenance": "decision ADAM CR-410 (the lead, 1 November 2026: \"Add a save button\"): the fields Save rule sends"
+      }
+     ]
     }
    ]
   },
@@ -1316,11 +1398,28 @@
     "contract": "catalogue",
     "purpose": "Channel, Customer Segment & Location Dynamic Rules",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "setDynamicPriceRule",
+    "contract": "catalogue",
+    "purpose": "Save a channel, customer segment or location rule, a contextual rule (ADAM CR-410)",
+    "trigger": "onAction",
+    "invalidates": [
+     "listChannelCustomerSegment"
+    ]
    }
   ],
   "entryState": {
    "preloaded": [
     "ChannelCustomerSegmentLocationDynamicRulesView.channel"
+   ],
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listChannelCustomerSegment`."
+    }
    ]
   },
   "wireframe": {

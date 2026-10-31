@@ -38774,6 +38774,7 @@
   ],
   "writes": [
    "access.blacklist",
+   "approvals.request",
    "cache:idempotency"
   ],
   "storedProcedures": [],
@@ -55820,12 +55821,10 @@
    "redis"
   ],
   "reads": [
-   "access.access_point",
    "access.device_placement",
    "cache:idempotency"
   ],
   "writes": [
-   "access.access_point",
    "access.configuration_change",
    "access.device_placement",
    "cache:idempotency"
@@ -55862,7 +55861,7 @@
     "id": "formSetBleBeaconGeofence",
     "component": "modal",
     "trigger": "Save beacon",
-    "body": "**Collects what `setBleBeaconGeofence` sends before it is called.** Required: `beaconId`, `venue`. Optional: `beaconName`, `zone`, `gate`, `proximityThreshold`, `activeInactive`, `health`, `lastDetected`, `park`, `attraction`, `geofenceRadiusMeters`, `geofenceBoundary`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setBleBeaconGeofence` sends before it is called.** Required: `beaconId`, `venue`. Optional: `beaconName`, `zone`, `gate`, `proximityThreshold`, `activeInactive`, `health`, `lastDetected`, `park`, `attraction`, `geofenceRadiusMeters`, `geofenceCentre`, `geofenceBoundary` (a radius needs its centre; ADAM CR-389). Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Save beacon",
      "operation": "setBleBeaconGeofence"
@@ -55882,6 +55881,7 @@
       "park",
       "attraction",
       "geofenceRadiusMeters",
+      "geofenceCentre",
       "geofenceBoundary"
      ]
     },
@@ -84252,8 +84252,7 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.demand_forecast",
-   "catalogue.performance",
-   "orders.sales_order"
+   "catalogue.performance"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -107819,8 +107818,7 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.demand_forecast",
-   "catalogue.performance",
-   "orders.sales_order"
+   "catalogue.performance"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -108303,7 +108301,9 @@
   "reads": [
    "cache:idempotency",
    "seating.seat_map",
-   "seating.section"
+   "seating.seat_map_template",
+   "seating.section",
+   "seating.section_row"
   ],
   "writes": [
    "cache:idempotency",
@@ -108393,6 +108393,7 @@
    "seating.seat",
    "seating.seat_map",
    "seating.section",
+   "seating.section_row",
    "seating.zone"
   ],
   "writes": [
@@ -108541,6 +108542,7 @@
    "seating.seat",
    "seating.seat_map",
    "seating.section",
+   "seating.section_row",
    "seating.zone"
   ],
   "writes": [
@@ -108599,6 +108601,7 @@
    "seating.seat",
    "seating.seat_map",
    "seating.section",
+   "seating.section_row",
    "seating.zone"
   ],
   "writes": [
@@ -108667,6 +108670,7 @@
    "seating.seat_category",
    "seating.seat_map",
    "seating.section",
+   "seating.section_row",
    "seating.zone"
   ],
   "writes": [
@@ -108729,6 +108733,7 @@
    "seating.seat",
    "seating.seat_map",
    "seating.section",
+   "seating.section_row",
    "seating.zone"
   ],
   "writes": [
@@ -108787,6 +108792,7 @@
    "seating.seat",
    "seating.seat_map",
    "seating.section",
+   "seating.section_row",
    "seating.zone"
   ],
   "writes": [
@@ -108844,9 +108850,11 @@
   ],
   "reads": [
    "cache:idempotency",
+   "seating.seat",
    "seating.seat_map",
    "seating.seat_map_template",
-   "seating.section"
+   "seating.section",
+   "seating.section_row"
   ],
   "writes": [
    "cache:idempotency",
@@ -109547,7 +109555,8 @@
    "cache:idempotency",
    "seating.import_job",
    "seating.seat_map",
-   "seating.section"
+   "seating.section",
+   "seating.section_row"
   ],
   "writes": [
    "cache:idempotency",
@@ -109712,7 +109721,11 @@
   ],
   "reads": [
    "cache:idempotency",
-   "seating.seat_map_template"
+   "seating.seat",
+   "seating.seat_map",
+   "seating.seat_map_template",
+   "seating.section",
+   "seating.section_row"
   ],
   "writes": [
    "cache:idempotency",
@@ -109785,6 +109798,7 @@
    "seating.seat_category",
    "seating.seat_map",
    "seating.section",
+   "seating.section_row",
    "seating.zone"
   ],
   "writes": [
@@ -109849,7 +109863,8 @@
   "reads": [
    "cache:idempotency",
    "seating.seat_map",
-   "seating.section"
+   "seating.section",
+   "seating.section_row"
   ],
   "writes": [
    "cache:idempotency",
@@ -110201,6 +110216,7 @@
    "seating.seat_category",
    "seating.seat_map",
    "seating.section",
+   "seating.section_row",
    "seating.zone"
   ],
   "writes": [
@@ -114067,6 +114083,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
+   "catalogue.demand_forecast",
    "catalogue.dynamic_pricing_control",
    "catalogue.event",
    "catalogue.performance",
@@ -114172,6 +114189,8 @@
    "catalogue.dynamic_pricing_strategy",
    "catalogue.event",
    "catalogue.price",
+   "catalogue.price_execution",
+   "catalogue.price_ladder",
    "catalogue.product",
    "pricing.dynamic_price_rule"
   ],
@@ -114284,8 +114303,7 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.demand_forecast",
-   "catalogue.performance",
-   "orders.sales_order"
+   "catalogue.performance"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -114337,8 +114355,7 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.demand_forecast",
-   "catalogue.performance",
-   "orders.sales_order"
+   "catalogue.performance"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -114453,8 +114470,10 @@
    "catalogue.calculation_step",
    "catalogue.fee",
    "catalogue.fee_rule",
+   "catalogue.membership_programme",
    "catalogue.price",
    "catalogue.price_assignment",
+   "catalogue.price_execution",
    "catalogue.price_list",
    "catalogue.price_resolution_policy",
    "catalogue.product",
@@ -114518,6 +114537,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
+   "catalogue.demand_forecast",
    "catalogue.dynamic_pricing_control",
    "catalogue.event",
    "catalogue.performance",
@@ -115038,8 +115058,7 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.demand_forecast",
-   "catalogue.performance",
-   "orders.sales_order"
+   "catalogue.performance"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -115915,7 +115934,8 @@
    "cache:idempotency",
    "platform.configuration_profile",
    "seating.seat_map",
-   "seating.section"
+   "seating.section",
+   "seating.section_row"
   ],
   "writes": [
    "cache:idempotency",
@@ -126249,8 +126269,10 @@
    "catalogue.calculation_step",
    "catalogue.fee",
    "catalogue.fee_rule",
+   "catalogue.membership_programme",
    "catalogue.price",
    "catalogue.price_assignment",
+   "catalogue.price_execution",
    "catalogue.price_list",
    "catalogue.price_resolution_policy",
    "catalogue.product",
@@ -127100,6 +127122,7 @@
    "catalogue.dynamic_pricing_strategy",
    "catalogue.event",
    "catalogue.price",
+   "catalogue.price_execution",
    "catalogue.price_ladder",
    "catalogue.product",
    "pricing.dynamic_price_rule"
@@ -127258,6 +127281,7 @@
    "catalogue.dynamic_pricing_strategy",
    "catalogue.event",
    "catalogue.price",
+   "catalogue.price_execution",
    "catalogue.price_ladder",
    "catalogue.price_list",
    "catalogue.product",
@@ -127551,7 +127575,8 @@
   "app": "venue-management-web",
   "route": "/commercial/channel-customer-segment-location-dynamic-rules-adm-093",
   "operations": [
-   "listChannelCustomerSegment"
+   "listChannelCustomerSegment",
+   "setDynamicPriceRule"
   ],
   "services": [
    "CatalogueService"
@@ -127561,11 +127586,17 @@
    "redis"
   ],
   "reads": [
+   "cache:idempotency",
    "pricing.dynamic_price_action",
    "pricing.dynamic_price_condition",
    "pricing.dynamic_price_rule"
   ],
-  "writes": [],
+  "writes": [
+   "cache:idempotency",
+   "pricing.dynamic_price_action",
+   "pricing.dynamic_price_condition",
+   "pricing.dynamic_price_rule"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -127714,14 +127745,18 @@
   "reads": [
    "cache:idempotency",
    "catalogue.dynamic_pricing_control",
-   "catalogue.dynamic_pricing_strategy"
+   "catalogue.dynamic_pricing_strategy",
+   "catalogue.event",
+   "catalogue.performance",
+   "catalogue.pricing_market",
+   "catalogue.product",
+   "catalogue.sales_channel"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.audit_entry",
    "catalogue.dynamic_pricing_control",
-   "catalogue.dynamic_pricing_strategy",
-   "platform.outbox"
+   "catalogue.dynamic_pricing_strategy"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -127806,14 +127841,18 @@
   "reads": [
    "cache:idempotency",
    "catalogue.dynamic_pricing_control",
-   "catalogue.dynamic_pricing_strategy"
+   "catalogue.dynamic_pricing_strategy",
+   "catalogue.event",
+   "catalogue.performance",
+   "catalogue.pricing_market",
+   "catalogue.product",
+   "catalogue.sales_channel"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.audit_entry",
    "catalogue.dynamic_pricing_control",
-   "catalogue.dynamic_pricing_strategy",
-   "platform.outbox"
+   "catalogue.dynamic_pricing_strategy"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -128309,8 +128348,13 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.competitor_price_observation",
    "catalogue.demand_signal",
-   "catalogue.product"
+   "catalogue.price",
+   "catalogue.price_assignment",
+   "catalogue.price_list",
+   "catalogue.product",
+   "catalogue.variant"
   ],
   "writes": [
    "cache:idempotency",
@@ -128490,8 +128534,7 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.demand_forecast",
-   "catalogue.performance",
-   "orders.sales_order"
+   "catalogue.performance"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -128542,8 +128585,7 @@
   ],
   "reads": [
    "catalogue.demand_forecast",
-   "catalogue.price",
-   "orders.sales_order"
+   "catalogue.price"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -128598,16 +128640,17 @@
    "catalogue.dynamic_pricing_control",
    "catalogue.event",
    "catalogue.price",
+   "catalogue.price_category",
    "catalogue.pricing_recommendation",
    "catalogue.pricing_recommendation_decision",
+   "catalogue.pricing_simulation",
    "catalogue.product"
   ],
   "writes": [
+   "approvals.request",
    "cache:idempotency",
-   "catalogue.audit_entry",
    "catalogue.pricing_recommendation",
-   "catalogue.pricing_recommendation_decision",
-   "platform.outbox"
+   "catalogue.pricing_recommendation_decision"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -128755,6 +128798,7 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
+   "catalogue.demand_forecast",
    "catalogue.dynamic_pricing_control",
    "catalogue.event",
    "catalogue.performance",
@@ -129120,16 +129164,17 @@
    "catalogue.dynamic_pricing_control",
    "catalogue.event",
    "catalogue.price",
+   "catalogue.price_category",
    "catalogue.pricing_recommendation",
    "catalogue.pricing_recommendation_decision",
+   "catalogue.pricing_simulation",
    "catalogue.product"
   ],
   "writes": [
+   "approvals.request",
    "cache:idempotency",
-   "catalogue.audit_entry",
    "catalogue.pricing_recommendation",
-   "catalogue.pricing_recommendation_decision",
-   "platform.outbox"
+   "catalogue.pricing_recommendation_decision"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -129181,14 +129226,18 @@
   "reads": [
    "cache:idempotency",
    "catalogue.dynamic_pricing_control",
-   "catalogue.dynamic_pricing_strategy"
+   "catalogue.dynamic_pricing_strategy",
+   "catalogue.event",
+   "catalogue.performance",
+   "catalogue.pricing_market",
+   "catalogue.product",
+   "catalogue.sales_channel"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.audit_entry",
    "catalogue.dynamic_pricing_control",
-   "catalogue.dynamic_pricing_strategy",
-   "platform.outbox"
+   "catalogue.dynamic_pricing_strategy"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -129277,12 +129326,12 @@
    "catalogue.price_ladder",
    "catalogue.pricing_recommendation",
    "catalogue.pricing_recommendation_decision",
+   "catalogue.product_channel_assignment",
    "pricing.dynamic_price_rule"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.audit_entry",
-   "catalogue.price",
    "catalogue.price_execution",
    "catalogue.pricing_recommendation_decision",
    "platform.outbox"
@@ -129335,13 +129384,13 @@
   ],
   "reads": [
    "catalogue.channel_capacity",
+   "catalogue.dynamic_pricing_strategy",
    "catalogue.event",
    "catalogue.performance",
    "catalogue.price_execution",
    "catalogue.pricing_recommendation",
    "catalogue.pricing_recommendation_decision",
-   "catalogue.product",
-   "orders.sales_order"
+   "catalogue.product"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -138984,6 +139033,7 @@
    "catalogue.channel_envelope",
    "catalogue.inventory_reservation",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.sales_channel",
    "catalogue.waitlist_entry"
   ],
@@ -139041,6 +139091,7 @@
    "catalogue.event",
    "catalogue.performance",
    "catalogue.product",
+   "catalogue.product_channel_assignment",
    "catalogue.sales_channel"
   ],
   "writes": [
@@ -185553,8 +185604,7 @@
    "whitelabel.banner",
    "whitelabel.content_page",
    "whitelabel.homepage_section",
-   "whitelabel.promo_block",
-   "whitelabel.tenant_config"
+   "whitelabel.promo_block"
   ],
   "writes": [
    "ai.action_plan",
@@ -185563,8 +185613,7 @@
    "ai.proposed_action",
    "cache:idempotency",
    "whitelabel.banner",
-   "whitelabel.promo_block",
-   "whitelabel.tenant_config"
+   "whitelabel.promo_block"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -187219,6 +187268,11 @@
    "marketing.communication_preference_type",
    "marketing.consent_capture_point",
    "marketing.consent_purpose",
+   "marketing.consent_purpose_channel",
+   "marketing.cookie_banner_design",
+   "marketing.minor_privacy_rule",
+   "marketing.privacy_notice_governance",
+   "marketing.processing_purpose",
    "marketing.tracking_technology"
   ],
   "writes": [],
@@ -193074,7 +193128,8 @@
    "whitelabel.kiosk_config",
    "whitelabel.kiosk_config_attract_slide",
    "whitelabel.kiosk_config_start_tile",
-   "whitelabel.kiosk_config_version"
+   "whitelabel.kiosk_config_version",
+   "whitelabel.module_enablement"
   ],
   "writes": [
    "cache:idempotency",

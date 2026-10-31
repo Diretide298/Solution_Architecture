@@ -1281,7 +1281,7 @@
  "LocalisedRichText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
-  "description": "Keyed by language code. Values are sanitised HTML.",
+  "description": "Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001).\n\n**Who sanitises, and against what.** Every operation that writes a value of this schema (`createContentPage`, `updateContentPage`, `setFaqs`, `setPolicy`), and `createContentBlock` and `updateContentBlock` for a `richText` block's `text`, runs each language's HTML through one shared sanitiser in the White-label module before storing it: Ganss.Xss (HtmlSanitizer, MIT). The stored value is the sanitised HTML, and that is what is returned and served to every reader.\n- **Allowed tags**: p, br, hr, strong, b, em, i, u, s, sub, sup, h2, h3, h4, ul, ol, li, blockquote, a, img, table, thead, tbody, tr, th, td, span.\n- **Allowed attributes**: dir and lang on any tag; href and title on a; src, alt, width and height on img; colspan and rowspan on th and td.\n- **URL schemes**: https, mailto and tel for href; https only for src.\n- **Everything else is stripped, never refused.** script, style, iframe, object, embed, form and svg are removed with their content; any other unknown tag is unwrapped and keeps its text. Every on* attribute, style, and any javascript: or data: URL is removed.\n",
   "additionalProperties": {
    "type": "string"
   }
@@ -1401,6 +1401,12 @@
  },
  "Policy": {
   "x-ticvai-persistence": "whitelabel.policy",
+  "x-ticvai-unique-together": [
+   [
+    "kind",
+    "version"
+   ]
+  ],
   "type": "object",
   "required": [
    "kind",
@@ -1421,7 +1427,7 @@
    },
    "version": {
     "type": "string",
-    "description": "Immutable. A guest who consented to version 3 consented to version 3, and a policy that changes under a recorded consent is a compliance failure.\n"
+    "description": "Immutable. A guest who consented to version 3 consented to version 3, and a policy that changes under a recorded consent is a compliance failure.\n**Set by the server** (ADAM CR-392): the next integer for its kind, stored as text (\"1\", \"2\", ...), one more than the highest stored for that kind, in the same transaction; unique with `kind`.\n"
    },
    "body": {
     "$ref": "#/components/schemas/LocalisedRichText"
@@ -1431,7 +1437,8 @@
    },
    "effectiveFrom": {
     "type": "string",
-    "format": "date"
+    "format": "date",
+    "description": "The day this version takes effect, UTC (ADAM CR-392). The publish day when not sent; never before the publish day. A kind's current version is the one with the latest `effectiveFrom` on or before today (UTC), the higher `version` on a tie; a later one is scheduled."
    },
    "publishedByPrincipalId": {
     "type": "string",

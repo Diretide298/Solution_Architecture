@@ -7,7 +7,7 @@ sourceFiles:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 210 state models and 108 events
+title: 210 state models and 110 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -2754,14 +2754,15 @@ stateModels:
   owner: whitelabel
   service: WhiteLabelService
   states: null
-  transitions: 5
+  transitions: 6
   initial:
   - draft
   terminal:
   - expired
   operations:
   - updateBanner
-  guarded: 5
+  - updatePromoBlock
+  guarded: 6
   ref: diagrams/lld/lifecycles/schedule.yaml
 - entity: Seat hold
   contract: seating
@@ -3489,6 +3490,9 @@ events:
   description: A Face Pass or Face Tag enrolment was made, re-enrolled after review, or removed.
 - event: cart-abandoned
   description: A cart lapsed without checking out.
+- event: catalogue-priceExecuted
+  description: A live dynamic price execution was recorded for a target (a product, narrowed to event
+    and performance where sent) on its channels.
 - event: catalogue-productPublished
   description: A product is on sale, or has returned to sale.
 - event: catalogue-productWithdrawn
@@ -3673,3 +3677,5 @@ events:
   description: A tenant's custom domain was claimed, verified, made primary, re-tokened or relinquished.
 - event: whitelabel-passCertificateExpiring
   description: A brand's Apple Wallet Pass Type ID certificate expires within 30 days.
+- event: workforce-guestBroadcastAccepted
+  description: A venue-wide notice to every guest on site was accepted and is to be sent.

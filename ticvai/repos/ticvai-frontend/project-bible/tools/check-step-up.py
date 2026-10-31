@@ -39,11 +39,17 @@ approving a journal entry need a second factor?* has to be one answer and not th
   reason and a carrier, and its carrier is the session (an MFA factor verified on the caller's session) or the
   body; the reason must say which rule or policy demands it.
 
+- **SU-MFA-REFUSAL: an MFA step-up with no way to say it is missing or stale** (ADAM CR-375, Chinmay, 31 October
+  2026; CHG-CR375-001). The step-up action is the operation's `operationId`, a verified step-up counts for 5 minutes
+  from `verifiedAt`, and the operation consumes it in its own transaction (identity `verifyMfaChallenge`). Every
+  operation that declares `x-ticvai-step-up: mfa` therefore lists both `step-up-token-missing` and
+  `step-up-token-expired` on its `403`; on 31 October none of the 20 did, so the refusal had no type.
+
 **And what it reports without refusing:** a screen calling a step-up operation that declares no way
 to present the challenge. That is authoring work on real screens rather than a defect in the
 contract, and failing the package for it would only teach people to run the pipeline less.
 
-    python3 tools/check-step-up.py [--verbose]
+    python3 tools/check-step-up.py [--verbose] [--self-test]
 """
 
 from __future__ import annotations
@@ -132,6 +138,33 @@ def carrier_problems(oid: str, op: dict, doc: dict, path_params: list) -> list:
     return out
 
 
+MFA_REFUSALS = ("step-up-token-missing", "step-up-token-expired")
+
+
+def mfa_refusal_problems(oid: str, op: dict) -> list:
+    """SU-MFA-REFUSAL: an `x-ticvai-step-up: mfa` operation's 403 names both step-up refusals (ADAM CR-375)."""
+    if op.get("x-ticvai-step-up") != "mfa":
+        return []
+    r403 = (op.get("responses") or {}).get("403") or {}
+    types = set(r403.get("x-ticvai-problem-types") or [])
+    missing = [t for t in MFA_REFUSALS if t not in types]
+    if not missing:
+        return []
+    return [f"{oid}: SU-MFA-REFUSAL demands an MFA step-up and its 403 does not list {', '.join(missing)} -- the "
+            "refusal for an absent or stale step-up has no type (ADAM CR-375, CHG-CR375-001)"]
+
+
+def _self_test() -> int:
+    ok = (not mfa_refusal_problems("a", {"x-ticvai-step-up": "pin"})
+          and mfa_refusal_problems("b", {"x-ticvai-step-up": "mfa", "responses": {"403": {"$ref": "x"}}})
+          and len(mfa_refusal_problems("c", {"x-ticvai-step-up": "mfa", "responses": {"403": {
+              "x-ticvai-problem-types": ["forbidden", "step-up-token-missing"]}}})) == 1
+          and not mfa_refusal_problems("d", {"x-ticvai-step-up": "mfa", "responses": {"403": {
+              "x-ticvai-problem-types": ["forbidden", "step-up-token-missing", "step-up-token-expired"]}}}))
+    print("self-test " + ("PASS" if ok else "FAIL"))
+    return 0 if ok else 1
+
+
 def _utf8() -> None:
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -142,6 +175,8 @@ def _utf8() -> None:
 def main() -> int:
     _utf8()
     verbose = "--verbose" in sys.argv
+    if "--self-test" in sys.argv:
+        return _self_test()
 
     guarded: dict = {}          # operationId -> (strength, reason, scopeLevel, file)
     policy_ops: dict = {}       # operationId -> config-scope
@@ -163,6 +198,7 @@ def main() -> int:
                                     op.get("x-ticvai-step-up-reason"),
                                     op.get("x-ticvai-scope-level"), f.name)
                     carrier_errors += carrier_problems(oid, op, doc, item.get("parameters") or [])
+                    carrier_errors += mfa_refusal_problems(oid, op)
                 if oid in ("listStepUpPolicies", "setStepUpPolicy"):
                     policy_ops[oid] = op.get("x-ticvai-config-scope")
 

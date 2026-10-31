@@ -577,6 +577,11 @@ def expected(stored: dict, fresh: dict, overrides: dict, stale: list = None) -> 
             e["stores"] = list(ov["stores"])     # where the operation's data lives, when no table says it
         reads = set(f.get("reads") or [])
         writes = set(f.get("writes") or []) | set(f.get("_response_writes") or [])
+        # **A routed write is a write** (ADAM CR-399, 31 October 2026; CHG-CR399-001). `x-ticvai-write-via` names the
+        # table the operation writes through its owner, and the override list says so ("change its contract ...
+        # x-ticvai-write-via"), but only the overrides of suspendTenant and publishContentBlock had put the table in
+        # `writes`: addBlacklistEntry's new route read as stale (check-cross-deployable-writes X-STALE).
+        writes |= {w["table"] for w in f.get("writeVia") or [] if w.get("table")}
         if e.get("pure"):
             # A `pure` entry writes nothing, whatever its body refs (CHG-FXC-004); a cache it fills is not a table.
             writes = {t for t in writes if ":" in t}

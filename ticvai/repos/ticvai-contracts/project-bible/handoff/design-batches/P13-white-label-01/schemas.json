@@ -107,6 +107,9 @@
  "Banner": {
   "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "whitelabel.banner",
+  "x-ticvai-retired-columns": [
+   "tenant_config_id"
+  ],
   "type": "object",
   "required": [
    "id",
@@ -160,20 +163,21 @@
     ],
     "readOnly": true,
     "x-ticvai-derived": "sweeper",
-    "description": "Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant's timezone (`states/schedule.yaml`). **The rule, which no request field moves** (r8 walk of ticket 27920): a new banner is `draft`. The server sets `scheduled` when `updateBanner` leaves `startsAt` set (`endsAt` null means no end, so the banner runs until switched off; when `endsAt` is set it must follow `startsAt`), and sets `draft` again when a later update clears `startsAt`. Sending `isActive` false on an `active` banner pulls it to `draft`. `state` is derived by the server on every save and is never in a request."
+    "description": "Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant's timezone (`states/schedule.yaml`). **The rule, which no request field moves** (r8 walk of ticket 27920; ADAM CR-388, Chinmay, 31 October 2026, CHG-CR388-001): a new banner is `draft`. `startsAt` is always set (it is required, and null on `updateBanner` is 400). After every `updateBanner` save the server sets `state` from the stored banner: `isActive` false puts a `draft`, `scheduled` or `active` banner in `draft`; otherwise a `draft` or `scheduled` banner becomes `scheduled` (`endsAt` null means no end, so the banner runs until switched off; when `endsAt` is set it must follow `startsAt`) and an `active` one stays `active`. An `expired` banner's state does not change. A banner never returns to `draft` by clearing `startsAt`; that move is the promo block's only. `state` is derived by the server on every save and is never in a request."
    },
    "sortOrder": {
     "type": "integer"
    },
    "isActive": {
-    "type": "boolean"
+    "type": "boolean",
+    "description": "Stored. `false` holds the banner in `draft` through later edits until an update sends `true` (ADAM CR-388, CHG-CR388-001); it is how staff take a banner back to `draft`."
    }
   }
  },
  "BookingFlow": {
   "x-ticvai-persistence": "whitelabel.booking_flow",
   "type": "object",
-  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies, chosen by `getPublishedBookingFlow`'s kind rule where several do (ADAM CR-427).\n",
   "required": [
    "flowTypeKey",
    "name"
@@ -496,7 +500,7 @@
       "name"
      ]
     },
-    "description": "**What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1).** The prototype's Email only, + name and + mobile. Must include the contact the guest's code is sent to and matched on (identity `GuestMatchPolicy.matchBy`), or 400. After the code is verified the guest is not asked for these again: the flow goes to the terms and payment, and the profile is completed later (WEB-020, GST-039). Read only where the `guestCheckout` feature is on.\n"
+    "description": "**What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1).** The prototype's Email only, + name and + mobile. Must include the contact the guest's code is sent to and matched on at every active venue, by the marketing-crm `GuestMatchPolicy` in force there (the venue's row, else the default `matchBy` `email`), on the fields in force at that venue (its `venueOverrides` entry's, else the tenant's, else `[email]`): `email` for `email`, `mobile` for `mobile`, `email` or `mobile` for `emailOrMobile`; or 400 (ADAM CR-430, `setBookingFlowConfig`). After the code is verified the guest is not asked for these again: the flow goes to the terms and payment, and the profile is completed later (WEB-020, GST-039). Read only where the `guestCheckout` feature is on.\n"
    },
    "dateStripDays": {
     "type": "integer",
@@ -720,7 +724,7 @@
    "body": {
     "type": "object",
     "additionalProperties": true,
-    "description": "Typed by `kind`. **Checked at save only as far as this description defines it** (ADAM CR-366, CHG-CR366-001): the body and each `localeVariants.<locale>` entry are JSON objects, the text keys listed below for the block's kind are strings where present, and an `items[]` or `fields[]` is an array of objects (`400` `validation`); other keys are not checked, and the full schema per kind is on the left-out list (LO-CR366-001). **The text a translation may fill** (R8 blocker FOUNDATION-AI-C40; the keys a body of each kind uses for its words, and the `fieldPath` a translation draft names, under `localeVariants.<locale>.`): richText `text`; image `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta `heading`, `text`, `label`; faq `items[].question`, `items[].answer`; form `title`, `fields[].label`, `submitLabel`; embed `title`; productGrid `heading`; countdown `heading`, `endedText`; testimonial `quote`, `author`. Every other key (links, ids, numbers, media references) is not translated."
+    "description": "Typed by `kind`. **Checked at save only as far as this description defines it** (ADAM CR-366, CHG-CR366-001): the body and each `localeVariants.<locale>` entry are JSON objects, the text keys listed below for the block's kind are strings where present, and an `items[]` or `fields[]` is an array of objects (`400` `validation`); other keys are not checked, and the full schema per kind is on the left-out list (LO-CR366-001). **The text a translation may fill** (R8 blocker FOUNDATION-AI-C40; the keys a body of each kind uses for its words, and the `fieldPath` a translation draft names, under `localeVariants.<locale>.`): richText `text`; image `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta `heading`, `text`, `label`; faq `items[].question`, `items[].answer`; form `title`, `fields[].label`, `submitLabel`; embed `title`; productGrid `heading`; countdown `heading`, `endedText`; testimonial `quote`, `author`. Every other key (links, ids, numbers, media references) is not translated. **A `richText` block's `text` is HTML, sanitised on write** (ADAM CR-401; CHG-CR401-001): in `body` and in each `localeVariants` entry, by the shared sanitiser and allow-list `LocalisedRichText` states, stripped, never refused. Every other text key is plain text, escaped on render."
    },
    "localeVariants": {
     "type": "object",
@@ -1552,7 +1556,7 @@
  "LocalisedRichText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
-  "description": "Keyed by language code. Values are sanitised HTML.",
+  "description": "Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001).\n\n**Who sanitises, and against what.** Every operation that writes a value of this schema (`createContentPage`, `updateContentPage`, `setFaqs`, `setPolicy`), and `createContentBlock` and `updateContentBlock` for a `richText` block's `text`, runs each language's HTML through one shared sanitiser in the White-label module before storing it: Ganss.Xss (HtmlSanitizer, MIT). The stored value is the sanitised HTML, and that is what is returned and served to every reader.\n- **Allowed tags**: p, br, hr, strong, b, em, i, u, s, sub, sup, h2, h3, h4, ul, ol, li, blockquote, a, img, table, thead, tbody, tr, th, td, span.\n- **Allowed attributes**: dir and lang on any tag; href and title on a; src, alt, width and height on img; colspan and rowspan on th and td.\n- **URL schemes**: https, mailto and tel for href; https only for src.\n- **Everything else is stripped, never refused.** script, style, iframe, object, embed, form and svg are removed with their content; any other unknown tag is unwrapped and keeps its text. Every on* attribute, style, and any javascript: or data: URL is removed.\n",
   "additionalProperties": {
    "type": "string"
   }
@@ -2002,6 +2006,7 @@
  },
  "ModuleEnablement": {
   "x-ticvai-persistence": "whitelabel.module_enablement",
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "required": [
    "moduleKey",
@@ -2406,7 +2411,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
+    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`, as white-label `getPublishedBookingFlow`'s kind rule picks it where several of the venue's enabled defaults list the kind (ADAM CR-427, 31 October 2026). A venue that wants a different flow for a product sets this or the category's `bookingFlowId`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
     "x-ticvai-persistence-column": "jsonb",
@@ -3809,7 +3814,8 @@
    },
    "isEnabled": {
     "type": "boolean",
-    "default": true
+    "default": true,
+    "description": "The one field a `published` page takes besides `status: archived` (ADAM CR-393): when every other editable field equals the stored value, it is written at once, the page stays `published`, and the answer is `200`."
    },
    "iconAssetRef": {
     "type": "string",

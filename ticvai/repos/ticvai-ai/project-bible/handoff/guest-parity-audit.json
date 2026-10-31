@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/audit-guest-parity.py",
- "generated": "2026-10-31",
+ "generated": "2026-11-01",
  "screens": {
   "P01": 50,
   "P02": 77
@@ -1918,7 +1918,7 @@
   {
    "severity": "low",
    "dimension": "documents",
-   "where": "contracts/spine/catalogue.yaml:1791",
+   "where": "contracts/spine/catalogue.yaml:1808",
    "detail": "\"browses by category and cannot search\" — GST-063 Search exists since 17 August",
    "fix": "rewrite to the 12 September rule"
   },

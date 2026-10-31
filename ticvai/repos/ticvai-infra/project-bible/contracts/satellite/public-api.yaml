@@ -3007,7 +3007,13 @@ components:
           x-ticvai-references: control.tenant
           description: 'The tenant whose events are replayed: the caller''s tenant, set by the server, one of the API
             client''s `allowedTenantIds` (ADAM CR-201, option A, 25 October 2026; CHG-R10ID-012). The dispatcher
-            reads only this tenant''s outbox.'
+            reads only this tenant''s outbox. **NOT NULL, backfilled, not failed** (ADAM CR-434, decided 31 October
+            2026, Chinmay; CHG-CR434-001): replayEvents always sets it. V0116 added the column nullable only because
+            derive-ddl writes additive changes; the contract migration (#36203) has three steps: (1) set tenant_id on
+            every row that has none, from its subscription''s API client (control.webhook_subscription.client_id),
+            when that client''s allowed_tenant_ids holds exactly one tenant; (2) if any row is still without a tenant,
+            stop with an error that says how many, delete nothing, and tell the lead; (3) ALTER TABLE
+            control.webhook_replay ALTER COLUMN tenant_id SET NOT NULL.'
         from: { type: string, format: date-time, x-ticvai-column: window_from }
         to: { type: string, format: date-time, nullable: true, x-ticvai-column: window_to }
         eventTypes: { type: array, items: { $ref: '#/components/schemas/WebhookEventType' } }

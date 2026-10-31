@@ -1952,7 +1952,7 @@
    "id": {
     "type": "string",
     "format": "uuid",
-    "description": "**Server-assigned, and the upsert key of `setParkingFacility`.** Absent in a body, it creates; present, it names the facility being replaced. A client never mints one.\n"
+    "description": "**The record's id, and the path id of `setParkingFacility`** (ADAM CR-245; CR-398): a new facility takes the path id, a client UUIDv7. A body `id`, when sent, must equal the path id.\n"
    },
    "name": {
     "type": "string"

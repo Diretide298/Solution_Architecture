@@ -1026,7 +1026,7 @@ Errors to draw in the form: 400 Lines do not balance, or an account is not posta
 |---|---|---|---|---|---|---|---|
 | Note `note` | text area | optional | — | max length 500 | — | — | `approveJournalEntry` body |
 
-Errors to draw in the form: 403 Approver is the poster, or lacks LEDGER_APPROVE; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The entry is not awaiting approval (it is `posted` or `reversed` already; only a `draft` or `pendingApproval` entry is approved), or its fiscal period has …
+Errors to draw in the form: 403 Approver is the poster, or lacks LEDGER_APPROVE; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`) …; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The entry is not awaiting approval (it is `posted` or `reversed` already; only a `draft` or `pendingApproval` entry is approved), or its fiscal period has …
 
 **Sent by *Reject journal*** (`rejectJournal`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -1080,7 +1080,7 @@ Errors to draw in the form: 403 Approver is the poster, or lacks LEDGER_APPROVE;
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Create journal entry (primary button) | `createJournalEntry` POST `/journal-entries` | CreateJournalEntryRequest | JournalEntry | 400 Lines do not balance, or an account is not postable; 409 The fiscal period is not `open`. Postings stop once a close begins, so a `closing` period refuses them as a `closed` one does. | opens modal first |
-| Approve journal entry (secondary button) | `approveJournalEntry` POST `/journal-entries/{entryId}/approve` | inline | JournalEntry | 403 Approver is the poster, or lacks LEDGER_APPROVE; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The entry is not awaiting approval (it is `posted` or … | step-up: mfa (Posts to the ledger. The entry is the record; there is no undo that is not another entry.); opens modal first |
+| Approve journal entry (secondary button) | `approveJournalEntry` POST `/journal-entries/{entryId}/approve` | inline | JournalEntry | 403 Approver is the poster, or lacks LEDGER_APPROVE; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`) …; 404 The resource does not exist, or is outside the … | step-up: mfa (Posts to the ledger. The entry is the record; there is no undo that is not another entry.); opens modal first |
 | Reject journal (destructive button) | `rejectJournal` POST `/journal-entries/{entryId}/reject` | inline | JournalEntry | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The entry is not `pendingApproval`. | — |
 | Reverse journal entry (destructive button) | `reverseJournalEntry` POST `/journal-entries/{entryId}/reverse` | inline | JournalEntry | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Already reversed, not yet posted, or the target period is not `open`. Three causes, three types. | — |
 

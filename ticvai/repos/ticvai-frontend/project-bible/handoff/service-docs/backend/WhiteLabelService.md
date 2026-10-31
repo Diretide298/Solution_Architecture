@@ -469,7 +469,9 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 
 **`POST /venues/{venueId}/booking-flows`**: Pick a booking flow for a venue
 
-**A venue picks a flow type and gets its steps (decided 29 September, W12).** Steps left out of the body are filled from the type: every step of the type, `enabled` at the type's default and in the type's default order. The body may reorder, turn off an optional step or set a step's own settings. **Saved even when it does not validate**, so an operator can work step by step; `isValid` says whether it does and `validateBookingFlow` says why. `publishTenantConfig` refuses a draft holding an invalid flow. **A step the type does not have**, or a step given twice, is refused with 400. `isDefaultForType` true makes this the venue's flow for every product of the type's kinds that names no flow (catalogue `Product.bookingFlowId`); the venue's previous default for the type loses the flag in the same transaction.
+**A venue picks a flow type and gets its steps (decided 29 September, W12).** Steps left out of the body are filled from the type: every step of the type, `enabled` at the type's default and in the type's default order. The body may reorder, turn off an optional step or set a step's own settings. **Saved even when it does not validate**, so an operator can work step by step; `isValid` says whether it does and `validateBookingFlow` says why. `publishTenantConfig` refuses a draft holding an invalid flow. **A step the type does not have**, or a step given twice, is refused with 400. `isDefaultForType` true makes this the venue's default for the type: it serves the products of the type's kinds that name no flow (catalogue `Product.bookingFlowId`), where it wins the kind rule of `getPublishedBookingFlow` (ADAM CR-427); the venue's previous default for the type loses the flag in the same transaction.
+
+**Consent questions, and the steps left out** (ADAM CR-429, decided 31 October 2026, Chinmay; CHG-CR429-001). `settings.consentQuestionIds` are read with `marketing-crm#consentQuestionRecords` in process (ids = `settings.consentQuestionIds`): Marketing runs in the operations host. An id with no row, or a `status` other than `active`, is refused 400 `consent-question-not-active`, naming the ids. Every step of the type that the body leaves out is added at its index in the type with the type's `defaultEnabled`, so a saved flow holds every step of its type.
 
 |  |  |
 |---|---|
@@ -556,7 +558,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created in the working draft |
-| 400 |  | An unknown flow type, a step the type does not have, or a step given twice |
+| 400 |  | An unknown flow type, a step the type does not have, a step given twice, or a consent question id with no row or not active (consent-question-not-active, naming the ids; ADAM CR-429) |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -565,6 +567,8 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 **`DELETE /booking-flows/{bookingFlowId}`**: Remove a booking flow from a venue
 
 Removed from the working draft; guests keep the published copy until the next publish. **Refused with 409 while a product or category names it** (catalogue `bookingFlowId`) or while it is the venue's default for its type and products of that kind are on sale: reassign them first, so no product is left without a way to book.
+
+**When it is in use** (ADAM CR-426, decided 31 October 2026, Chinmay; CHG-CR426-001). Catalogue's `catalogue#productRecords` and `catalogue#productCategoryRecords` are asked in process from the operations host (XDR-051), with their `where` input. `409 flow-in-use`, naming the products and categories, in two cases. (1) A product or category names the flow: `productRecords` or `productCategoryRecords` where {`bookingFlowId`} finds a row. (2) The flow is the venue's default for its type, no other enabled default flow of the venue has a type that lists the same kind, and the venue has a product on sale that would fall back to this flow: a product with that `venueId` and a `kind` the type lists, where neither it nor its category names a flow. On sale means `isSellable` true, `guestListing` `bookable`, and the current time inside `onSaleFrom` and `onSaleTo` where they are set, the rule CR-394 uses. Otherwise the flow is removed from the draft with 204.
 
 |  |  |
 |---|---|
@@ -660,7 +664,9 @@ Removed from the working draft; guests keep the published copy until the next pu
 
 **`GET /venues/{venueId}/booking-flow`**: The published booking flow a product or category books through
 
-**What the guest booking screens read to order their steps (decided 29 September, W12).** Public and cacheable, like the rest of the published app; reads the current `ConfigVersion`, never the draft. Resolved in this order: the product's own `bookingFlowId` (catalogue), then its category's, then the venue's default flow for the type serving the product's kind. With `flowTypeKey` alone, the venue's default for that type. Only enabled flows resolve: the snapshot holds the disabled ones too, and they are skipped (ADAM CR-324, A3; CHG-CR324-001). Returns only the enabled steps, in order, with their settings and the flow-level settings; `name` is left out of this view. 404 when nothing resolves, and the guest screens use the type's default order.
+**What the guest booking screens read to order their steps (decided 29 September, W12).** Public and cacheable, like the rest of the published app; reads the current `ConfigVersion`, never the draft. Only enabled flows resolve: the snapshot holds the disabled ones too, and they are skipped (ADAM CR-324, A3; CHG-CR324-001). Returns only the enabled steps, in order, with their settings and the flow-level settings; `name` is left out of this view.
+
+**How a flow is resolved** (ADAM CR-427, decided 31 October 2026, Chinmay; CHG-CR427-001). Catalogue's `catalogue#productRecords` and `catalogue#productCategoryRecords` are asked in process from the operations host (XDR-051). Against the published snapshot's enabled flows of the path's venue, in this order: (1) with `productId`, the product's own `bookingFlowId`; the product is `productRecords` ids [`productId`] where {`venueId`}, and no such product is 404; (2) the category's `bookingFlowId`: the product's `categoryId`, or `productCategoryId` when no `productId` is sent; (3) with a product, the venue's enabled default flow whose type lists the product's `kind` in its `productKinds`; when several do, the type whose `productKinds` lists the kind earliest, then the type that comes first in `x-ticvai-system-catalogue`, so `admission` resolves to `datedDayPass` before `transport` or `multiLocation`, and `rental` to `meetingRoomHourly` before `cabanaMap` or `surfSession`; (4) with `flowTypeKey`, the venue's enabled default for that type. Then 404 `not-found`, and the guest screens use the type's default order. A step whose flow id names a missing or disabled flow falls through to the next step. With none of `productId`, `productCategoryId` and `flowTypeKey` the answer is 400 `validation`. A venue that wants a different flow for a product sets the product's or the category's `bookingFlowId`. The most recently updated flow decides nothing: editing a flow never changes which flow guests get.
 
 |  |  |
 |---|---|
@@ -719,6 +725,7 @@ Removed from the working draft; guests keep the published copy until the next pu
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | The published flow, enabled steps only |
+| 400 | BadRequest | Validation failed |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -728,8 +735,9 @@ Removed from the working draft; guests keep the published copy until the next pu
 
 **The system catalogue of booking flows (decided 29 September, W12).** Shipped with the service and the same for every tenant; a venue never edits it, it picks from it (`createBookingFlowDefinition`). Each type lists its steps, each `required`, `optional` or `conditional` (with the condition), the order constraints the venue's own order must respect (for example payment is last, and the seat map comes after date and time), and the settings each step owns. The full catalogue is `x-ticvai-system-catalogue` on `BookingFlowType`.
 
+**Served verbatim from the catalogue** (ADAM CR-428, decided 31 October 2026, Chinmay; CHG-CR428-001). Each type's `name` and `description` are the catalogue's, `{en, ar}`, and every step's `condition` is served as `{en, ar}`: the step's own where the catalogue gives one, else `commonConditions[stepKey]`, else none. `defaultSortOrder` is the step's index in the type's `steps`, counting from 0. `defaultEnabled` is true unless the catalogue says otherwise.
 
-**Order.** Sorted by `name` ascending.
+**Order.** Catalogue order: by the type's position in `x-ticvai-system-catalogue`, then by `key` (ADAM CR-428; not by `name`, which would not match the order CMS-103 shows).
 
 |  |  |
 |---|---|
@@ -760,13 +768,13 @@ Removed from the working draft; guests keep the published copy until the next pu
 | items[].key | BookingFlowTypeKey: enum (datedDayPass, timedEntry, openDated, seatedFixedPerformance, seatedDateTimeSeatMap, experienceWorkshop, surfSession, meetingRoomHourly, …) | yes | The flow types the system catalogue offers (decided 29 September, W12; impact.md b). |
 | items[].name | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | items[].description | LocalisedText |  | Keyed by ISO 639-1 code. |
-| items[].productKinds | array of string | yes | The catalogue ProductKind values this type books. |
+| items[].productKinds | array of string | yes | The catalogue ProductKind values this type books, in the order the kind rule reads them. |
 | items[].steps | array of object | yes | In the type's default order. |
 | items[].steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
 | items[].steps[].requirement | enum (required, optional, conditional) | yes |  |
-| items[].steps[].condition | object |  | For conditional, when a guest meets the step. (nullable) |
-| items[].steps[].defaultEnabled | boolean |  | (default True) |
-| items[].steps[].defaultSortOrder | integer | yes | (min 0) |
+| items[].steps[].condition | object |  | For conditional, when a guest meets the step, as {en, ar}. (nullable) |
+| items[].steps[].defaultEnabled | boolean |  | True unless the catalogue says otherwise (ADAM CR-428). (default True) |
+| items[].steps[].defaultSortOrder | integer | yes | The step's index in the type's steps, counting from 0 (ADAM CR-428). (min 0) |
 | items[].steps[].settingsOwned | array of string |  | Names of BookingFlowSettings (venue-wide) or BookingFlowLevelSettings (this flow) fields shown beside the step. |
 | items[].steps[].stepSettings | array of object |  | The step's own settings, kept in BookingFlowStep.settings. |
 | items[].orderConstraints | array of object | yes | first and last pin a step; before puts stepKey somewhere ahead of otherStepKey. |
@@ -852,7 +860,7 @@ The flows this venue has picked, each with its steps in the venue's order. Draft
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | The venue's flows, defaults first |
+| 200 |  | The venue's flows, in the order the description states |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -861,6 +869,8 @@ The flows this venue has picked, each with its steps in the venue's order. Draft
 **`PATCH /booking-flows/{bookingFlowId}`**: Reorder a flow's steps, switch optional steps, change its settings
 
 A partial update of the working draft; guests see it after `publishTenantConfig`. `steps` replaces the whole step list (same rules as on create: a step the type does not have, or given twice, is 400). Saved even when the order breaks a constraint; `isValid` turns false and the publish refuses it until it is fixed.
+
+**The same checks and names as create** (ADAM CR-429, decided 31 October 2026, Chinmay; CHG-CR429-001). `settings.consentQuestionIds` are read with `marketing-crm#consentQuestionRecords` in process (ids = `settings.consentQuestionIds`); an id with no row, or a `status` other than `active`, is refused 400 `consent-question-not-active`, naming the ids. A step the type does not have is `step-not-in-flow-type` and a step given twice `duplicate-flow-step`, as on create (`step-not-in-type` and `step-given-twice` are retired). When `steps` is sent, every step of the type that it leaves out is added at its index in the type with the type's `defaultEnabled`, so a saved flow holds every step of its type.
 
 |  |  |
 |---|---|
@@ -941,7 +951,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
-| 400 |  | A step the type does not have, or a step given twice |
+| 400 |  | A step the type does not have, a step given twice, or a consent question id with no row or not active (consent-question-not-active, naming the ids; ADAM CR-429) |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1319,6 +1329,8 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 **What is left here is venue-wide (decided 29 September, W12).** `performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour` and `consentQuestionIds` belong to one booking flow and moved to `BookingFlow.settings` (`updateBookingFlowDefinition`, CMS-103); `categoryDisplay` is removed (W7, superseding 23SEP-18: `cardLayout` carries rows or grid). Added: `guestContactFields` (W1) and `dateStripDays` (M17-08).
 **Per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** `venueOverrides` holds the fields a venue changes; everything else it inherits. A `venueId` not among the tenant's active venues, or one given twice, is refused with 400.
 
+**The guest contact fields, checked per venue** (ADAM CR-430, decided 31 October 2026, Chinmay; CHG-CR430-001). Every active venue (`tenancy#activeVenues`, asked in process as CR-343 did for `validateTenantConfig`) is checked against the `GuestMatchPolicy` in force there: the row whose `scope_path` is the venue's (`marketing-crm#guestMatchPolicyRecords`, in process); with no row it is the default, `matchBy` `email`. The fields in force at the venue are its `venueOverrides` entry's `guestContactFields`, else the tenant's, else `[email]`. They must include `email` for `email`, `mobile` for `mobile`, and `email` or `mobile` for `emailOrMobile`. Otherwise the answer is 400 `validation` naming the venue and `guestContactFields` or `venueOverrides[i].settings.guestContactFields`. The policy is marketing-crm's, not identity's.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -1488,6 +1500,8 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 
 Scheduled by date window. A campaign banner set to run through a religious or national period should not need someone awake at midnight to switch it on.
 
+**A banner is not part of the working draft, so it does not point at it** (ADAM CR-387, Chinmay, 31 October 2026; CHG-CR387-001). `createBanner` writes the `whitelabel.banner` row with `tenant_config_id` null (the column is retired) and never reads or creates the `whitelabel.tenant_config` row; `updateBanner` and `deleteBanner` never read or write `tenant_config` either, and nothing joins or filters banners on `tenant_config_id`. Banners stay tenant-wide rows under their existing row-level security; existing rows keep their value, which nothing reads. A tenant that has made only banners still answers `getTenantConfig` 404 `not-configured`.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -1529,7 +1543,7 @@ Scheduled by date window. A campaign banner set to run through a religious or na
 | endsAt | string (date-time) |  | Must follow startsAt when set (decided 28 September, audit R163). (nullable) |
 | state | object |  | Moved by updateBanner between draft and scheduled, and by the schedule timer from scheduled to active and active to expired at startsAt and endsAt, in the tenant's timezone (states/schedule.yaml). (read-only) |
 | sortOrder | integer |  |  |
-| isActive | boolean |  |  |
+| isActive | boolean |  | Stored. |
 
 **Response**: `Banner`
 
@@ -1553,7 +1567,7 @@ Scheduled by date window. A campaign banner set to run through a religious or na
 | endsAt | string (date-time) |  | Must follow startsAt when set (decided 28 September, audit R163). (nullable) |
 | state | object |  | Moved by updateBanner between draft and scheduled, and by the schedule timer from scheduled to active and active to expired at startsAt and endsAt, in the tenant's timezone (states/schedule.yaml). (read-only) |
 | sortOrder | integer |  |  |
-| isActive | boolean |  |  |
+| isActive | boolean |  | Stored. |
 
 **Responses**
 
@@ -1567,6 +1581,7 @@ Scheduled by date window. A campaign banner set to run through a religious or na
 **`POST /tenant-config/pages`**: Create a content page
 
 Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are the server's and are ignored if sent.
+**Rich text is sanitised on write** (ADAM CR-401, decided 31 October 2026; CHG-CR401-001): before the row is stored, each language of `body` runs through the module's one shared sanitiser, against the allow-list `LocalisedRichText` states. Disallowed markup is stripped, never refused, so there is no new error; the stored, sanitised HTML is what the response returns, so the editor sees what was kept.
 **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation; registered as an AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
 
 |  |  |
@@ -1635,6 +1650,7 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 **`POST /venues/{venueId}/guided-choices`**: Set up Help me choose for a venue
 
 **Venue configuration (decided 29 September, rev 3 REV3-11).** Created as `draft` with `source` `manual`; guests see nothing until `publishGuidedChoice`. Every target must belong to this venue, or 400.
+**In this venue** (ADAM CR-394, Chinmay, 31 October 2026): a target is in the venue when it is a product or event whose `venue_id` is the choice's venue, or a category whose `scope_path` is the venue's or an ancestor of it, read in process from Catalogue (`catalogue#productRecords`, `#productCategoryRecords`, `#eventRecords`; XDR-033). Else `400 target-not-in-venue`, which names the failing target in `errors[]` by its pointer (`questions/i/answers/j/target`), because a new answer has no id yet.
 
 |  |  |
 |---|---|
@@ -1818,6 +1834,8 @@ Presentation only. A block may point at a promotion, but it does not create or p
 
 **`DELETE /tenant-config/banners/{bannerId}`**: Delete a banner
 
+Deletes the `whitelabel.banner` row only; it never reads or writes `whitelabel.tenant_config`, since a banner is outside the working draft (ADAM CR-387, Chinmay, 31 October 2026; CHG-CR387-001).
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -1826,8 +1844,8 @@ Presentation only. A block may point at a promotion, but it does not create or p
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `whitelabel.tenant_config` |
-| Writes | `cache:idempotency`, `whitelabel.banner`, `whitelabel.tenant_config` |
+| Reads | `cache:idempotency`, `whitelabel.banner` |
+| Writes | `cache:idempotency`, `whitelabel.banner` |
 | Called by | CMS-008 |
 
 **Parameters**
@@ -2061,7 +2079,7 @@ A `published` choice is unpublished first, or 409.
 | items[].endsAt | string (date-time) |  | Must follow startsAt when set (decided 28 September, audit R163). (nullable) |
 | items[].state | object |  | Moved by updateBanner between draft and scheduled, and by the schedule timer from scheduled to active and active to expired at startsAt and endsAt, in the tenant's timezone (states/schedule.yaml). (read-only) |
 | items[].sortOrder | integer |  |  |
-| items[].isActive | boolean |  |  |
+| items[].isActive | boolean |  | Stored. |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -2202,6 +2220,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 **`GET /tenant-config/policies`**: List legal policies
 
 **The current version of each policy only, with history on request (decided 28 September, audit R163).** Without `includeHistory` the list holds one entry per `PolicyKind`, its current version; with it, every version, newest first within each kind.
+**The current version** (ADAM CR-392, Chinmay, 31 October 2026) is, for each kind, the one with the latest `effectiveFrom` on or before today (UTC); on a tie, the higher `version` wins. A version with a later `effectiveFrom` is **scheduled**: `includeHistory` shows it, but nothing serves it or prompts re-consent until its day. `listPublishedPolicies` answers with the same current version.
 **Staff only. Guests read `listPublishedPolicies`** (decided 2 October, GFIX-2): the current version of each published policy, with no session, for checkout terms, sign-up and the help centre.
 
 |  |  |
@@ -2259,7 +2278,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 
 **`GET /storefront/pages`**: The live content pages, readable before sign-in
 
-**The help, accessibility and information pages a visitor reads** (decided 2 October by Chinmay, GFIX-2). `listContentPages` needs a session and answers staff with drafts; this answers anyone with the live pages only: `status` `published` and `isEnabled` true. Ordered by `sortOrder`, then by slug. `slug` fetches one known page; `categoryCode` is how a screen reads its own category (GST-057 reads the accessibility pages), fixed by the screen and never typed by a guest. The tenant comes from the host, as for `getPublishedTenantConfig`. Cached at the edge and invalidated by `publishTenantConfig`.
+**The help, accessibility and information pages a visitor reads** (decided 2 October by Chinmay, GFIX-2). `listContentPages` needs a session and answers staff with drafts; this answers anyone with the live pages only: `status` `published` and `isEnabled` true. Ordered by `sortOrder`, then by slug. `slug` fetches one known page; `categoryCode` is how a screen reads its own category (GST-057 reads the accessibility pages), fixed by the screen and never typed by a guest. The tenant comes from the host, as for `getPublishedTenantConfig`. Cached at the edge and invalidated by `publishTenantConfig`, and by `updateContentPage` when it switches a published page's `isEnabled` (ADAM CR-393).
 
 |  |  |
 |---|---|
@@ -2342,6 +2361,8 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 **Terms, privacy, refund, cookie and accessibility, as a guest reads them** (decided 2 October by Chinmay, GFIX-2). `listPolicies` is staff-only (`TENANT_CONFIGURE`), so no guest could read a policy: not the terms they tick at checkout (WEB-012, GST-009), not the privacy notice before they sign up, not the help centre's policy tab (WEB-045, GST-040). Every policy is public by nature, so this needs no session.
 
 **The current version of each kind only**, one entry per `PolicyKind` that has been published, with its `version` so a consent records exactly what was shown. A kind never published is absent, not empty. History and who published it stay on `listPolicies`. The tenant comes from the host, as for `getPublishedTenantConfig`. Cached at the edge and invalidated by `setPolicy`.
+
+**The current version** (ADAM CR-392, Chinmay, 31 October 2026) is the one with the latest `effectiveFrom` on or before today (UTC); on a tie, the higher `version` wins, as `listPolicies` answers it. A scheduled version (a later `effectiveFrom`) is never served here and prompts no re-consent until its day, and a kind whose only versions are scheduled is absent. The edge cache expires no later than the next scheduled `effectiveFrom`.
 
 |  |  |
 |---|---|
@@ -2428,6 +2449,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 
 **Where the AI's proposal lands (decided 29 September, rev 3 REV3-11).** After a venue's products are uploaded, the `ai` service analyses them and calls this once per proposed set-up. It is stored as `draft` with `source` `aiSuggested` and the proposing job in `suggestionRef`, and appears in `listGuidedChoices` for a person to review, edit, publish or delete. **A suggestion is never published by the system**: this operation cannot publish, and `publishGuidedChoice` refuses a service caller.
 **The caller is ai `suggestGuidedChoice`** (29 September, build; AI system design 3.11). `suggestionRef` is the id of its `AiGuidedChoiceSuggestion`, which the review screen passes to ai `getGuidedChoiceSuggestion` to show why each question, answer and target was proposed.
+**The same venue check as `createGuidedChoice`** (ADAM CR-394, Chinmay, 31 October 2026): a product or event target whose `venue_id` is not the choice's venue, or a category whose `scope_path` is neither the venue's nor an ancestor of it, is `400 target-not-in-venue`, named in `errors[]` by its pointer (`questions/i/answers/j/target`); Catalogue is read in process (XDR-033).
 
 |  |  |
 |---|---|
@@ -2531,6 +2553,8 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 
 **A person publishes, always (decided 29 September, rev 3 REV3-11).** Needs a staff session; a service caller is refused with 403, so an AI suggestion cannot publish itself. Every target is checked at this moment: a product or event not on sale, a category with no products on sale, or a module not enabled is refused with 422 naming the answer, and so is an answer without the `filter` (`behaviour` `filter`) or the last-question `target` (`recommend`) it needs (W4). **One published choice per venue**: publishing this one returns the venue's previously published choice to `draft` in the same transaction. Live at once; not part of `publishTenantConfig`.
 
+**The rule for each kind** (ADAM CR-394, Chinmay, 31 October 2026). Catalogue is asked in process from the operations host, through Catalogue's own query classes and under the caller's row security (`catalogue#productRecords`, `#productCategoryRecords`, `#eventRecords`; XDR-033). A target is on sale (else `422 answer-target-not-on-sale`) when it is: a product with `is_sellable` true, `guest_listing` `bookable`, and the current time inside `on_sale_from` and `on_sale_to` where they are set; a category with `is_active` true and at least one such product of this venue in it; an event with `is_active` true and `lifecycle_state` `onSale` or `live`. A module target must be enabled in the published configuration (`422 answer-target-not-enabled`), and a booking-flow target must be one of the venue's enabled flows. The `422` answers with `GuidedChoiceAnswerProblem`: `Problem` plus `questionId` and `answerId`.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_PUBLISH` |
@@ -2594,7 +2618,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | Already published |
-| 422 |  | An answer's target is not on sale or not enabled, or an answer lacks the filter or target its behaviour needs; the problem names the answer |
+| 422 |  | An answer's target is not on sale or not enabled, or an answer lacks the filter or target its behaviour needs; the problem names the answer by questionId and answerId (GuidedChoiceAnswerProblem, ADAM… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFaqs
@@ -2602,6 +2626,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 **`PUT /tenant-config/faqs`**: Set FAQ categories and entries
 
 Also the grounding corpus for the AI concierge, which is why an answer here is content rather than a support ticket.
+**Rich text is sanitised on write** (ADAM CR-401, decided 31 October 2026; CHG-CR401-001): before the row is stored, each language of every entry's `answer` runs through the module's one shared sanitiser, against the allow-list `LocalisedRichText` states. Disallowed markup is stripped, never refused, so there is no new error; the stored, sanitised HTML is what the response returns, so the editor sees what was kept.
 
 |  |  |
 |---|---|
@@ -2649,7 +2674,9 @@ Also the grounding corpus for the AI concierge, which is why an answer here is c
 **`PUT /tenant-config/policies/{policyKind}`**: Publish a policy version
 
 **Policies are versioned and never overwritten.** A guest who consented to version 3 consented to version 3, and a privacy notice that changes silently under a recorded consent is a compliance failure. Publishing creates a new version; prior versions remain readable. **There is no title to send**: the heading a guest sees is derived from `kind` (`PolicyKind`).
+**How a version is numbered and when it takes effect** (ADAM CR-392, Chinmay, 31 October 2026). `version` is the next integer for its kind, stored as text ("1", "2", ...): one more than the highest stored for that kind, set in the same transaction. A unique key on (`kind`, `version`) refuses a concurrent duplicate with `409 concurrency-conflict`. A missing `effectiveFrom` is the publish day in UTC. An `effectiveFrom` before today (UTC) is `400 effective-from-in-past`, so no version can be backdated under a recorded consent. A version whose `effectiveFrom` is later than today is scheduled: it becomes the kind's current version on its day (`listPolicies`, `listPublishedPolicies`), and only then is it served or does it prompt re-consent.
 **English and Arabic are both required before a policy can be published (decided 28 September, audit R096)**: `body` must carry non-empty `en` and `ar` entries, or 400. Other enabled languages are optional.
+**Rich text is sanitised on write** (ADAM CR-401, decided 31 October 2026; CHG-CR401-001): before the row is stored, each language of `body` runs through the module's one shared sanitiser, against the allow-list `LocalisedRichText` states. Disallowed markup is stripped, never refused, so there is no new error; the stored, sanitised HTML is what the response returns, so the editor sees what was kept.
 
 |  |  |
 |---|---|
@@ -2677,7 +2704,7 @@ Also the grounding corpus for the AI concierge, which is why an answer here is c
 |---|---|---|---|
 | body | LocalisedRichText | yes | Keyed by language code. |
 | requiresReconsent | boolean | yes | True prompts existing guests to consent again on next launch. |
-| effectiveFrom | string (date) |  |  |
+| effectiveFrom | string (date) |  | The day the version takes effect, UTC. |
 
 **Response**: `Policy`
 
@@ -2688,7 +2715,7 @@ Also the grounding corpus for the AI concierge, which is why an answer here is c
 | version | string | yes | Immutable. |
 | body | LocalisedRichText | yes | Keyed by language code. |
 | requiresReconsent | boolean |  |  |
-| effectiveFrom | string (date) | yes |  |
+| effectiveFrom | string (date) | yes | The day this version takes effect, UTC (ADAM CR-392). |
 | publishedByPrincipalId | string (uuid) |  |  |
 | publishedAt | string (date-time) | yes |  |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
@@ -2698,7 +2725,8 @@ Also the grounding corpus for the AI concierge, which is why an answer here is c
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | New version published |
-| 400 |  | The English (en) or Arabic (ar) version is missing (audit R096) |
+| 400 |  | The English (en) or Arabic (ar) version is missing (audit R096), or effectiveFrom is before today in UTC (effective-from-in-past, ADAM CR-392) |
+| 409 | Conflict | Idempotency conflict or optimistic concurrency failure. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### unpublishGuidedChoice
@@ -2775,6 +2803,8 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 
 **`PATCH /tenant-config/banners/{bannerId}`**: Amend or activate a banner
 
+**The state after every save** (ADAM CR-388, Chinmay, 31 October 2026; CHG-CR388-001). `startsAt` stays required: `startsAt` null is 400 `validation-failed`. After every `updateBanner` save the server sets `state` from the stored banner: `isActive` false puts a `draft`, `scheduled` or `active` banner in `draft`; otherwise a `draft` or `scheduled` banner becomes `scheduled` (the timer moves it to `active` at `startsAt` and to `expired` at `endsAt`) and an `active` one stays `active`. An `expired` banner's state does not change. Because `isActive` is stored, a banner held in `draft` stays there through later edits until an update sends `isActive` true. The move from `scheduled` to `draft` by clearing `startsAt` is the promo block's only (`states/schedule.yaml`). It never reads or writes `whitelabel.tenant_config` (ADAM CR-387).
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -2815,7 +2845,7 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 | startsAt | string (date-time) |  |  |
 | endsAt | string (date-time) |  | Null runs the banner with no end. (nullable) |
 | sortOrder | integer |  |  |
-| isActive | boolean |  |  |
+| isActive | boolean |  | Stored. |
 
 **Response**: `Banner`
 
@@ -2839,13 +2869,14 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 | endsAt | string (date-time) |  | Must follow startsAt when set (decided 28 September, audit R163). (nullable) |
 | state | object |  | Moved by updateBanner between draft and scheduled, and by the schedule timer from scheduled to active and active to expired at startsAt and endsAt, in the tenant's timezone (states/schedule.yaml). (read-only) |
 | sortOrder | integer |  |  |
-| isActive | boolean |  |  |
+| isActive | boolean |  | Stored. |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 400 |  | startsAt sent null (it stays required; ADAM CR-388), or endsAt not after startsAt (audit R163) |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateContentPage
@@ -2853,7 +2884,8 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 **`PUT /tenant-config/pages/{pageId}`**: Amend a content page
 
 Replaces the page's editable fields. `status` is taken only to archive the page (`states/content.yaml`: withdrawn or abandoned); publishing is `publishTenantConfig`.
-**A published page may only be archived (decided 28 September, audit R163).** On a `published` page the only change taken is `status: archived`; anything else is refused with 409 `published-page-locked`. To change what guests read, archive it and author a new page.
+**A published page may only be archived or switched on and off (decided 28 September, audit R163; ADAM CR-393, Chinmay, 31 October 2026).** On a `published` page the changes taken are `status: archived`, which withdraws the page, and a change to `isEnabled`: if every other editable field in the body equals the stored value, `isEnabled` is written, the status stays `published`, and the answer is `200`. The switch takes effect at once, with no publish and no approval, because it changes whether approved content shows and never what it says; it invalidates the edge cache of `listPublishedContentPages`, as `publishTenantConfig` does. Any other change to a published page is refused with 409 `published-page-locked`. To change what guests read, archive it and author a new page.
+**Rich text is sanitised on write** (ADAM CR-401, decided 31 October 2026; CHG-CR401-001): before the row is stored, each language of a sent `body` runs through the module's one shared sanitiser, against the allow-list `LocalisedRichText` states. Disallowed markup is stripped, never refused, so there is no new error; the stored, sanitised HTML is what the response returns, so the editor sees what was kept.
 
 |  |  |
 |---|---|
@@ -2882,7 +2914,7 @@ Replaces the page's editable fields. `status` is taken only to archive the page 
 | slug | string | yes | (pattern ^[a-z0-9-]+$) |
 | title | LocalisedText | yes | Keyed by ISO 639-1 code. |
 | body | LocalisedRichText | yes | Keyed by language code. |
-| isEnabled | boolean |  | (default True) |
+| isEnabled | boolean |  | The one field a published page takes besides status: archived (ADAM CR-393): when every other editable field equals the stored value, it is written at once, the page stays published, and the answer i… (default True) |
 | iconAssetRef | string (uuid) |  | (nullable) |
 | categoryCode | string |  | (nullable) |
 | sortOrder | integer |  |  |
@@ -2909,7 +2941,7 @@ Replaces the page's editable fields. `status` is taken only to archive the page 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
-| 409 |  | The page is published and the body changes more than its status to archived (audit R163). |
+| 409 |  | The page is published and the body changes more than its status to archived or its isEnabled (audit R163; ADAM CR-393). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateGuidedChoice
@@ -3011,6 +3043,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | Reads | `cache:idempotency`, `whitelabel.promo_block` |
 | Writes | `cache:idempotency`, `whitelabel.promo_block` |
 | Called by | CMS-008 |
+| State model | Content schedule ([states/schedule.yaml](../../../states/schedule.yaml)): moves `scheduled` -> `draft` |
 
 **Parameters**
 
@@ -6225,6 +6258,8 @@ BL-172. **The CMS modelled configuration and not authoring** — a marketer coul
 
 **The body is checked only as far as the contract defines it** (ADAM CR-366). `body` and each `localeVariants.<locale>` must be JSON objects; where present, the text keys `ContentBlock.body` lists for the block's `kind` must be strings, and an `items[]` or `fields[]` must be an array of objects. A failure is `400` `validation`, with `errors[]` naming the field (for example `body.items[2].answer`). Other keys are not checked: the full schema per kind is not defined now and is on the left-out list (LO-CR366-001).
 
+**Rich text is sanitised on write** (ADAM CR-401, decided 31 October 2026; CHG-CR401-001): before the row is stored, a `richText` block's `text` (in `body` and in each `localeVariants` entry) runs through the module's one shared sanitiser, against the allow-list `LocalisedRichText` states. Disallowed markup is stripped, never refused, so there is no new error; the stored, sanitised HTML is what the response returns, so the editor sees what was kept.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -6514,6 +6549,11 @@ written; null means everybody. A sent `body` or `localeVariants` is checked as `
 block's `kind`: JSON objects, the kind's listed text keys strings where present, an `items[]` or `fields[]` an
 array of objects; a failure is `400` `validation` with `errors[]` naming the field.
 
+**Rich text is sanitised on write** (ADAM CR-401, decided 31 October 2026; CHG-CR401-001): a sent `richText`
+block's `text` (in `body` and in each `localeVariants` entry) runs through the same shared sanitiser as
+`createContentBlock`, against the allow-list `LocalisedRichText` states, before it is stored. Disallowed markup
+is stripped, never refused; the response returns the sanitised HTML.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -6629,8 +6669,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | ends_at | timestamptz | no | Must follow startsAt when set (decided 28 September, audit R163). |
 | state | text | no | Moved by updateBanner between draft and scheduled, and by the schedule timer from scheduled to active and active to expired at startsAt and endsAt, in the tenant's timezone (states/schedule.yaml). |
 | sort_order | integer | no |  |
-| is_active | boolean | no |  |
-| tenant_config_id | uuid | yes | Points at whitelabel.tenant_config. |
+| is_active | boolean | no | Stored. |
 
 ### `whitelabel.booking_flow`
 
@@ -6909,7 +6948,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | version | text | yes | Immutable. |
 | body | jsonb | yes |  |
 | requires_reconsent | boolean | no |  |
-| effective_from | date | yes |  |
+| effective_from | date | yes | The day this version takes effect, UTC (ADAM CR-392). |
 | published_by_principal_id | uuid | no |  |
 | published_at | timestamptz | yes |  |
 | scope_path | text | no | The partition key (ADR-0005). |

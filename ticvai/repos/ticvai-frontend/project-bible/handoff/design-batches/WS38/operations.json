@@ -111,7 +111,7 @@
     "required": false
    },
    {
-    "name": "automationMode",
+    "name": "automationLevel",
     "in": "query",
     "required": false
    },
@@ -184,7 +184,7 @@
     "required": false
    },
    {
-    "name": "automationMode",
+    "name": "automationLevel",
     "in": "query",
     "required": false
    },
@@ -317,6 +317,30 @@
   ],
   "requestBody": "DemandSignal",
   "responds": "DemandSignal"
+ },
+ "setDynamicPriceRule": {
+  "method": "PUT",
+  "path": "/pricing/dynamic-rules/{ruleId}",
+  "contract": "catalogue",
+  "summary": "Replace a rule, its conditions and its actions",
+  "permission": "PRICE_CONFIGURE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "ruleId",
+    "in": "path",
+    "required": true
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "DynamicPriceRuleDetail",
+  "responds": "DynamicPriceRuleDetail"
  },
  "setDynamicPricingGuardrailPolicy": {
   "method": "PUT",

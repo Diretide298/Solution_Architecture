@@ -1011,6 +1011,11 @@ def main() -> int:
         # recommended", Chinmay, 30 October 2026; CHG-CR363-001). The policy is one row at the tenant root, where no
         # venue or region sits above it; a threshold the tenant sets is a term stated in a currency, as CR-322's limit.
         "identity.guest_verification_policy",
+        # **A competitor's observed price is in the currency the competitor published it in** (ADAM CR-409, decided 31
+        # October 2026, Chinmay; CHG-CR409-001): "The six prices are Money in the observation's own currency, with that
+        # currency's ISO 4217 scale, and are never converted". The competitor is not a scope of the venue, so nothing
+        # resolves its currency; only observations in the venue's trading currency count towards the median.
+        "catalogue.competitor_price_observation",
     }
     _schema = ROOT / "handoff" / "schema-reference.json"
     if _schema.exists():

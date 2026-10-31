@@ -36,7 +36,7 @@ transitions:
   to: sentForApproval
   operation: decidePricingRecommendation
   trigger: operation
-  guard: '`sendForApproval`; the governance level is above the caller''s'
+  guard: '`sendForApproval`: always opens an approvals request (kind `pricingChange`, subjectType `pricingRecommendation`; ADAM CR-415)'
 - from: pending
   to: sentToSimulation
   operation: setPricing
@@ -61,16 +61,18 @@ transitions:
   to: sentForApproval
   operation: decidePricingRecommendation
   trigger: operation
-  guard: '`sendForApproval` after the simulation'
+  guard: '`sendForApproval` after the simulation: always opens an approvals request (ADAM CR-415)'
 - from: sentForApproval
   to: accepted
   trigger: externalEvent
-  guard: The approval request is approved
+  guard: 'The approval request is approved: Catalogue''s consumer of `approval.granted` for subjectType
+    `pricingRecommendation` (ADAM CR-415)'
   requiresApproval: true
 - from: sentForApproval
   to: rejected
   trigger: externalEvent
-  guard: The approval request is rejected
+  guard: 'The approval request is rejected, expired or withdrawn: Catalogue''s consumer of `approval.rejected`,
+    `approval.expired` and `approval.withdrawn` (ADAM CR-415)'
 - from: pending
   to: ignored
   trigger: timer

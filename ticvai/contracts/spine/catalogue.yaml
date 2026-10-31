@@ -18468,9 +18468,9 @@ paths:
     put:
       operationId: setDynamicPriceRule
       x-ticvai-consumed-by:
+        - "P08 ADM-093 Channel, Customer Segment & Location Dynamic Rules"
         - "P08 BO-009 Pricing Rules"
         - "P08 BO-443 Pricing Audit, Approval & Publication"
-        - "P08 ADM-093 Channel, Customer Segment & Location Dynamic Rules"
       summary: Replace a rule, its conditions and its actions
       description: >
         **Applied whole.** A rule whose conditions have been updated and whose actions have not is a

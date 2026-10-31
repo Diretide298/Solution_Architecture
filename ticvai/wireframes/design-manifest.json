@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/derive-design-manifest.py",
- "generated": "2026-10-31",
+ "generated": "2026-11-01",
  "note": "The Claude Design work list. Status is read off wireframes/frames/ every run and never stored, so a batch cannot claim to be finished and not be. Batches with thin screens sort last: a screen with fewer than 4 components cannot be drawn from what it declares, and drawing it invents requirements.",
  "batchSize": 10,
  "drawableAt": 4,
@@ -1210,6 +1210,28 @@
    "status": "pending"
   },
   {
+   "id": "WS38",
+   "kind": "workshop",
+   "label": "Pricing   Revenue Management board 5",
+   "platform": "P08",
+   "screens": [
+    "ADM-088",
+    "ADM-089",
+    "ADM-090",
+    "ADM-091",
+    "ADM-092",
+    "ADM-093",
+    "ADM-094",
+    "ADM-095",
+    "ADM-096",
+    "ADM-097"
+   ],
+   "drawable": 9,
+   "thin": 1,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS58",
    "kind": "workshop",
    "label": "Sales Channel Management board 2",
@@ -1881,28 +1903,6 @@
     "ADM-055",
     "ADM-056",
     "ADM-057"
-   ],
-   "drawable": 8,
-   "thin": 2,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS38",
-   "kind": "workshop",
-   "label": "Pricing   Revenue Management board 5",
-   "platform": "P08",
-   "screens": [
-    "ADM-088",
-    "ADM-089",
-    "ADM-090",
-    "ADM-091",
-    "ADM-092",
-    "ADM-093",
-    "ADM-094",
-    "ADM-095",
-    "ADM-096",
-    "ADM-097"
    ],
    "drawable": 8,
    "thin": 2,

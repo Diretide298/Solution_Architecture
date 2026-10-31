@@ -183,11 +183,10 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - whitelabel.tenant_config
+  - whitelabel.banner
   writes:
   - cache:idempotency
   - whitelabel.banner
-  - whitelabel.tenant_config
 - operation: deleteBookingFlow
   verb: DELETE
   path: /booking-flows/{bookingFlowId}
@@ -253,8 +252,6 @@ operations:
   writes:
   - cache:idempotency
   - whitelabel.kiosk_config
-  - whitelabel.kiosk_config_attract_slide
-  - whitelabel.kiosk_config_start_tile
 - operation: deletePromoBlock
   verb: DELETE
   path: /tenant-config/promo-blocks/{promoBlockId}
@@ -432,6 +429,7 @@ operations:
   - whitelabel.kiosk_config
   - whitelabel.kiosk_config_attract_slide
   - whitelabel.kiosk_config_start_tile
+  - whitelabel.module_enablement
   writes: []
 - operation: getModuleEnablement
   verb: GET
@@ -1563,7 +1561,6 @@ operations:
   - whitelabel.kiosk_config_start_tile
   writes:
   - cache:idempotency
-  - whitelabel.kiosk_config
   - whitelabel.kiosk_config_attract_slide
   - whitelabel.kiosk_config_start_tile
 - operation: updatePromoBlock

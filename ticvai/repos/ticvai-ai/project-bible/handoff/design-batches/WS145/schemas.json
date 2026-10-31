@@ -107,7 +107,7 @@
  "BookingFlow": {
   "x-ticvai-persistence": "whitelabel.booking_flow",
   "type": "object",
-  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies, chosen by `getPublishedBookingFlow`'s kind rule where several do (ADAM CR-427).\n",
   "required": [
    "flowTypeKey",
    "name"
@@ -459,7 +459,7 @@
    "body": {
     "type": "object",
     "additionalProperties": true,
-    "description": "Typed by `kind`. **Checked at save only as far as this description defines it** (ADAM CR-366, CHG-CR366-001): the body and each `localeVariants.<locale>` entry are JSON objects, the text keys listed below for the block's kind are strings where present, and an `items[]` or `fields[]` is an array of objects (`400` `validation`); other keys are not checked, and the full schema per kind is on the left-out list (LO-CR366-001). **The text a translation may fill** (R8 blocker FOUNDATION-AI-C40; the keys a body of each kind uses for its words, and the `fieldPath` a translation draft names, under `localeVariants.<locale>.`): richText `text`; image `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta `heading`, `text`, `label`; faq `items[].question`, `items[].answer`; form `title`, `fields[].label`, `submitLabel`; embed `title`; productGrid `heading`; countdown `heading`, `endedText`; testimonial `quote`, `author`. Every other key (links, ids, numbers, media references) is not translated."
+    "description": "Typed by `kind`. **Checked at save only as far as this description defines it** (ADAM CR-366, CHG-CR366-001): the body and each `localeVariants.<locale>` entry are JSON objects, the text keys listed below for the block's kind are strings where present, and an `items[]` or `fields[]` is an array of objects (`400` `validation`); other keys are not checked, and the full schema per kind is on the left-out list (LO-CR366-001). **The text a translation may fill** (R8 blocker FOUNDATION-AI-C40; the keys a body of each kind uses for its words, and the `fieldPath` a translation draft names, under `localeVariants.<locale>.`): richText `text`; image `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta `heading`, `text`, `label`; faq `items[].question`, `items[].answer`; form `title`, `fields[].label`, `submitLabel`; embed `title`; productGrid `heading`; countdown `heading`, `endedText`; testimonial `quote`, `author`. Every other key (links, ids, numbers, media references) is not translated. **A `richText` block's `text` is HTML, sanitised on write** (ADAM CR-401; CHG-CR401-001): in `body` and in each `localeVariants` entry, by the shared sanitiser and allow-list `LocalisedRichText` states, stripped, never refused. Every other text key is plain text, escaped on render."
    },
    "localeVariants": {
     "type": "object",
@@ -1248,7 +1248,7 @@
  "LocalisedRichText": {
   "x-ticvai-persistence": "none — jsonb column",
   "type": "object",
-  "description": "Keyed by language code. Values are sanitised HTML.",
+  "description": "Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001).\n\n**Who sanitises, and against what.** Every operation that writes a value of this schema (`createContentPage`, `updateContentPage`, `setFaqs`, `setPolicy`), and `createContentBlock` and `updateContentBlock` for a `richText` block's `text`, runs each language's HTML through one shared sanitiser in the White-label module before storing it: Ganss.Xss (HtmlSanitizer, MIT). The stored value is the sanitised HTML, and that is what is returned and served to every reader.\n- **Allowed tags**: p, br, hr, strong, b, em, i, u, s, sub, sup, h2, h3, h4, ul, ol, li, blockquote, a, img, table, thead, tbody, tr, th, td, span.\n- **Allowed attributes**: dir and lang on any tag; href and title on a; src, alt, width and height on img; colspan and rowspan on th and td.\n- **URL schemes**: https, mailto and tel for href; https only for src.\n- **Everything else is stripped, never refused.** script, style, iframe, object, embed, form and svg are removed with their content; any other unknown tag is unwrapped and keeps its text. Every on* attribute, style, and any javascript: or data: URL is removed.\n",
   "additionalProperties": {
    "type": "string"
   }
@@ -1292,6 +1292,7 @@
  },
  "ModuleEnablement": {
   "x-ticvai-persistence": "whitelabel.module_enablement",
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "required": [
    "moduleKey",

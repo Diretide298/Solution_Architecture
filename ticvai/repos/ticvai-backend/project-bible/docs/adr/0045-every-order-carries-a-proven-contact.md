@@ -88,6 +88,15 @@ has. It holds the contact, the order, the tickets and the consents captured at c
 access — which is what `linkGuestCheckout` already does from the other direction, attaching prior
 orders once an identifier is verified under a new account.
 
+> **Amended 31 October 2026 (ADAM CR-432, Chinmay; CHG-CR432-001).** A one-time guest checkout creates
+> **no** profile: *"a guest profile is created only when the guest later makes an account"* (the lead,
+> 31 October 2026). The code proves the contact for this cart: `verifyGuestOtp` takes the purpose `verify`
+> code under the cart's anonymous guest session, records the proved contact on that session and answers
+> `204`, with no subject and no `GuestSession`. `checkoutCart` writes the order with no subject and that
+> `verifiedContactRef`, which `order.created` carries (the r10 subject-less order, CHG-R10ID-018), and
+> `linkGuestCheckout` attaches it once the guest makes an account (ADAM CR-361). §2's proof and §4's
+> attachment of a returning contact are unchanged; the order still belongs to a proven contact.
+
 ### 4. A returning contact attaches the order, never the access
 
 **When a guest checkout verifies a contact the platform already holds, the new order, its tickets

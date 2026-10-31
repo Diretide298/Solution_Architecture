@@ -1,6 +1,6 @@
 # WS167 — Seat Management Venue Mapping Reference v1.0 board 3
 
-**10 screens · 17 operations · 19 schemas · 4 permissions**
+**10 screens · 17 operations · 20 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -155,7 +155,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-973` | Layout Command Center | C | 0 | 11 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-974` | Template Library | C | 0 | 6 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-974` | Template Library | C | 0 | 20 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `BO-975` | Event-Specific Layout | D | 0 | 20 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 | `BO-976` | Clone & Inheritance | C | 0 | 20 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `BO-977` | Version Compare | C | 2 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |

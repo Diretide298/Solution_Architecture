@@ -40,9 +40,10 @@
  "noTestTakeoverNote": "Never given a module test moved off someone who never tests (Chinmay, 7 October 2026, CHG-R5-005: asked whether Surendra keeps the 7 module tests Hrushikant gave up, \"No\"). tools/build-service-docs.py spreads such a test over the other peers in its stack; a test Surendra already owned for his own reasons stays his.",
  "migrations": {
   "owner": "Hrushikant Patkar",
-  "keys": "^(VM-)?MIG-"
+  "keys": "^(VM-)?MIG-",
+  "exceptKeys": "^(VM-)?MIG-AI(-[0-9]+)?$"
  },
- "migrationsNote": "Every migration task is its owner's, with its table sub-tasks (KEY#schema.table), in every block and wave, ticketed or not, now and for every migration the plan makes later: the rule is the key pattern, not a list (CHG-R5-001; Chinmay, 7 October 2026: \"shift all the migration tickets to Hrushikant\"). It overrides the owner a pushed ticket keeps from the last release (sprintPlan.stableOwners): tools/build-service-docs.py and tools/derive-block-a-schedule.py apply it after the pins, so op-release moves them, and tools/check-plan-owners.py (O-MIG-OWNER) fails on a migration task anyone else owns. The Venue Management migrations (VM-MIG-*) are matched too (Chinmay, 7 October; CHG-R5-003).",
+ "migrationsNote": "Every migration task is its owner's, with its table sub-tasks (KEY#schema.table), in every block and wave, ticketed or not, now and for every migration the plan makes later: the rule is the key pattern, not a list (CHG-R5-001; Chinmay, 7 October 2026: \"shift all the migration tickets to Hrushikant\"). It overrides the owner a pushed ticket keeps from the last release (sprintPlan.stableOwners): tools/build-service-docs.py and tools/derive-block-a-schedule.py apply it after the pins, so op-release moves them, and tools/check-plan-owners.py (O-MIG-OWNER) fails on a migration task anyone else owns. The Venue Management migrations (VM-MIG-*) are matched too (Chinmay, 7 October; CHG-R5-003). **The ai schema is the exception** (`exceptKeys`, CHG-R12PL-034; the lead, 31 October 2026, answering Hrushikant Patkar's note that #27716 SVC-AI-FORECAST-2 and #27841 SVC-AI-RETRIEVAL-1 belong to the AI team: \"All to the AI engineers\", then \"The tasks that are for qdrant or postgre. And than api. From ai server that will be undertaken by AI engineer\"): its migrations (MIG-AI and every later MIG-AI-<n>, VM-MIG-AI included) are the AI's Postgres, the ai schema of each tenant database that only the AI module migrates (ADR-0055 rule 1), so they are the AI engineers' (`aiServer`), not the migration owner's; a started one keeps the owner it has (the release leaves started tickets alone).",
  "successors": {
   "Tanmay Dukhande": "Narayan Gaonkar"
  },
@@ -54,7 +55,7 @@
  "serviceOwners": {
   "LedgerService": "Hrushikant Patkar"
  },
- "serviceOwnersNote": "A service whose owner (the reviewing owner: accountable for its back end and migrations, and the owner who reviews a helper's task in it) the lead fixed, over the load balancer that otherwise gives whole services to the back-end developers largest first (CHG-PPL-002; Chinmay, 15 October 2026: \"keep hrushikant\", when the r6 audit reported that the load balancer moves LedgerService's reviewing owner between Hrushikant Patkar and Tanmay Dukhande as service sizes change). tools/build-service-docs.py gives a service named here to its owner where its turn comes in the balancing, so every other service is balanced as before; tools/derive-block-a-schedule.py uses the same owner; tools/check-plan-owners.py (O-SVC-OWNER) fails on a back-end task of the service with any other accountable.",
+ "serviceOwnersNote": "A service whose owner (the reviewing owner: accountable for its back end and migrations, and the owner who reviews a helper's task in it) the lead fixed, over the load balancer that otherwise gives whole services to the back-end developers largest first (CHG-PPL-002; Chinmay, 15 October 2026: \"keep hrushikant\", when the r6 audit reported that the load balancer moves LedgerService's reviewing owner between Hrushikant Patkar and Tanmay Dukhande as service sizes change). tools/build-service-docs.py gives a service named here to its owner where its turn comes in the balancing, so every other service is balanced as before; tools/derive-block-a-schedule.py uses the same owner; tools/check-plan-owners.py (O-SVC-OWNER) fails on a back-end task of the service with any other accountable. 31 October 2026 (CHG-R12PL-034): AiService is not named here although its reviewing owner is now Kalpita Mejari: a service named here is given to its owner in the balancing, which runs before the pins and decides the blocks, so naming it moved three more app-modules from Block A into A2 (measured 31 October 2026). The AI server's rule (`aiServer`) gives its tasks and its accountable to the AI engineers after the pins instead, as the migration rule does.",
  "onboard": {
   "Pradnya Yeram": "frontend",
   "Chitrangi Mestry": "frontend",
@@ -113,8 +114,22 @@
    "Kalpita Mejari",
    "Second AI engineer"
   ],
-  "note": "Both from Monday 5 October 2026 (Chinmay, 30 September); no third AI engineer. They carry the AI engine tasks in docs/active/block-a-extra-tasks.json; the AI endpoints and screens are developers' tickets like any other module. Every AI function is built inside the six months, baseline first. 1 October: the AI engine needs about 50 AI-engineer weeks against 35; its tasks past 2 April are created unassigned (Chinmay: more developers are coming)."
+  "note": "Both from Monday 5 October 2026 (Chinmay, 30 September); no third AI engineer. They carry the AI engine tasks in docs/active/block-a-extra-tasks.json and, since 31 October 2026, everything on the AI server (`aiServer`): its API (the AiService back end), its Qdrant and its Postgres (the ai schema's migrations). The AI screens stay the frontend developers' tickets like any other screen. Every AI function is built inside the six months, baseline first. 1 October: the AI engine needs about 50 AI-engineer weeks against 35; its tasks past 2 April are created unassigned (Chinmay: more developers are coming)."
  },
+ "aiServer": {
+  "pool": "ai",
+  "services": [
+   "AiService"
+  ],
+  "tracks": [
+   "Backend",
+   "Database"
+  ],
+  "keys": [
+   "SETUP-QDRANT"
+  ]
+ },
+ "aiServerNote": "Everything on the AI server is the AI engineers' (CHG-R12PL-034; the lead, 31 October 2026, answering Hrushikant Patkar's note that #27716 SVC-AI-FORECAST-2 and #27841 SVC-AI-RETRIEVAL-1 belong to the AI team: \"All to the AI engineers\", then \"The tasks that are for qdrant or postgre. And than api. From ai server that will be undertaken by AI engineer\"). The AI server is ticvai-ai, the separate Python deployable (ADR-0055, ADR-0020; the architecture tests keep it out of every .NET host), with its Qdrant and its Postgres. A task is the AI server's when it is a `tracks` task of a `services` service (the AiService back end, the AI server's API; its Database tasks, the ai schema's migrations, MIG-AI and every MIG-AI-<n>) or is named in `keys` (SETUP-QDRANT, the Qdrant cluster; the AI engine's own Qdrant work, AI-ENGINE-QDRANT, is already theirs). tools/build-service-docs.py gives such a task to the `pool` after the pins of the last release, as the migration rule does, and the schedule places it on whichever AI engineer can start it first, balanced as the AI engine's tasks are; a task whose ticket has started keeps its owner (the release leaves started tickets alone); one the AI engineers cannot finish by 2 April and that is not ticketed is created unassigned, as the AI engine's are. Each says in its text that it is built in ticvai-ai or on the AI server's Qdrant or Postgres, never in a .NET module of ticvai-backend, and an AI server task that reads or writes Qdrant waits on the cluster (SETUP-QDRANT) and the tenancy and retrieval client (AI-ENGINE-QDRANT). Its accountable (the reviewing owner) is the first AI engineer, Kalpita Mejari. Not earlier than the pins: the balancing and the passes that place app-modules in blocks keep the owners they had, so the move takes no app-module out of its block (measured 31 October 2026: given to the AI engineers before those passes, three more Block A app-modules went to A2), and the schedule then times the work on the AI engineers. tools/derive-block-a-schedule.py applies the same rule; tools/check-plan-owners.py (O-AI-SERVER) fails on an AI server task that has not started and is owned, in the plan or the schedule, by anyone but an AI engineer.",
  "pace": {
   "Surendra": 0.6,
   "Pranay Shinde": 1.17,

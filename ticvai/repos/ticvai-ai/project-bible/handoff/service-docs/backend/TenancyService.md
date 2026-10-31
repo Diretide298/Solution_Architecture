@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy`, `kernel` |
-| Operations in the slice | 38 of 215 |
+| Operations in the slice | 39 of 215 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -61,6 +61,7 @@
 | tenancy | [`setConfigurationProfile`](#setconfigurationprofile) | PUT | `/configuration-profiles/{profileId}` | setup | 1 | BO-123, BO-129 |
 | tenancy | [`setVenueSettings`](#setvenuesettings) | PUT | `/venues/{venueId}/settings` | setup | 1 | BO-065, BO-1063, BO-136, BO-187, BO-600 |
 | tenancy | [`setVenueSettingsDefaults`](#setvenuesettingsdefaults) | PUT | `/venue-settings-defaults` | setup | 1 | ADM-019, ADM-426, BO-1062 |
+| workforce | [`claimOpenShift`](#claimopenshift) | POST | `/shift-marketplace` | setup | 1 |  |
 | workforce | [`setStaffingRules`](#setstaffingrules) | PUT | `/staffing-rules` | setup | 1 | BO-881, BO-885 |
 | workstation | [`configureWorkstation`](#configureworkstation) | PUT | `/workstations/{workstationId}` | core | 1 | BO-036, POS-016 |
 | workstation | [`createOutlet`](#createoutlet) | POST | `/outlets` | setup | 1 | BO-044 |
@@ -190,6 +191,7 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 | 400 |  | Validation failed: module missing or not an ApprovalKind; venue not the venue the caller acts at (audit R183); or a new rule with no requiredApproverRole (approver-role-required). |
 | 409 |  | Refused, and nothing is stored: the rule would loosen a rule set above (loosensParentRule) or can never match because an earlier rule always does (unreachableRule), as setApprovalMatrix refuses it. |
 | 422 |  | skipConditions cannot become the rule's condition (ADAM CR-102, CHG-R10ID-015): a clause does not parse in the condition language (ApprovalRule.condition), or it joins clauses with AND , whose negati… |
+| 403 |  | A step-up refusal: the caller's session has no verified, unconsumed MFA step-up for this operation (step-up-token-missing), or the newest one is older than 5 minutes (step-up-token-expired), by the r… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### approveRoleAuthorityDelegation
@@ -2247,6 +2249,7 @@ Found by mapping the POS pack: four separate frames wanted an audit view — sta
 | items[].subjectRef | string |  | The thing acted on — a profile, a shift, an order. (nullable) |
 | items[].occurredAt | string (date-time) | yes | When. |
 | items[].platformStaffGrantId | string (uuid) |  | Set when a TICVAI platform operator acted, naming the grant they acted under (identity.openPlatformStaffGrant; decided 28 September, audit R098). (nullable) |
+| items[].reason | string |  | Why it was done, where the request said (ADAM CR-376, 31 October 2026; CHG-CR376-001): the reason the operation put on the request's audit context, written by the audit interceptor in this row; listA… (min length 3; max length 500; nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -2971,6 +2974,72 @@ Support hours were an open conflict for eleven days and were never a design ques
 
 ## Group: workforce
 
+### claimOpenShift
+
+**`POST /shift-marketplace`**: Pick up a released shift
+
+**The claim, as decided** (ADAM CR-380, Chinmay, 31 October 2026; CHG-CR380-001).
+
+**Eligibility.** Every value in the open shift's `requiredQualifications` must be held as `OpenShift.requiredQualifications` states (a `workforce.training_record` row of the claimant with that `courseName`, state `passed`, and `expiresAt` empty or after the shift's `to`). Where the shift's rota assignment names a `requiredRoleId`, the claimant must also hold it (`identity#principalHoldsRoleAtVenue`, as `createRotaAssignment` asks it). Otherwise `409 shift-claimant-not-eligible`; a shift with no `requiredQualifications` needs no record.
+
+**Working hours.** The claimant's rota with this shift added is measured against the venue's `workforce.staffing_rules` exactly as `RotaAssignment.breachesWorkingHourLimit` is worked out (ADAM CR-334), and the claim is refused `409 working-hour-rule-breach` if any limit is passed. A claim is the employee's own act with no manager deciding, unlike `createRotaAssignment`, which still flags.
+
+**Overlap.** `workforce#principalHasOverlappingAssignment` is asked too, and a true answer is `409 rota-assignment-overlap`.
+
+**Effect, in one transaction under the row lock on the open shift.** When `rotaAssignmentId` is set, that assignment's `principalId` becomes the claimant and its `breachesWorkingHourLimit` is worked out again. Otherwise a rota assignment is created with the claimant, `venueId`, `position` = `positionCode`, `startsAt` = `from`, `endsAt` = `to` and status `published`, and `rotaAssignmentId` is set to it. The open shift ends `claimed`, with `claimedBy` and `claimedAt`. `pendingApproval` is not used until an approve operation exists.
+
+|  |  |
+|---|---|
+| Permission | `WORKFORCE_VIEW` |
+| Scope level | venue |
+| Part of slice | setup, makes `workforce.rota_assignment` non-empty |
+| Wave | 1 |
+| Offline | no |
+| Reads | `cache:idempotency`, `workforce.open_shift`, `workforce.rota_assignment`, `workforce.staffing_rules`, `workforce.training_record` |
+| Writes | `cache:idempotency`, `workforce.open_shift`, `workforce.rota_assignment` |
+| Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| openShiftId | string (uuid) | yes |  |
+
+**Response**: `OpenShift`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) |  |  |
+| rotaAssignmentId | string (uuid) |  | (nullable) |
+| shiftTemplateId | string (uuid) |  | (nullable) |
+| venueId | string (uuid) |  |  |
+| positionCode | string |  |  |
+| from | string (date-time) |  |  |
+| to | string (date-time) |  |  |
+| releasedBy | string (uuid) |  | (nullable) |
+| reason | string |  | (nullable) |
+| requiredQualifications | array of string |  | What a claimant must hold (ADAM CR-380, Chinmay, 31 October 2026; CHG-CR380-001). |
+| eligiblePrincipalCount | integer |  | (read-only) |
+| incentiveRateMultiplier | number |  | (nullable) |
+| status | enum (open, claimed, pendingApproval, filled, expired, withdrawn) |  |  |
+| claimedBy | string (uuid) |  | (nullable) |
+| claimedAt | string (date-time) |  | (nullable) |
+| scopePath | string |  |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Claimed |
+| 409 |  | Already taken, not eligible, it would breach a working-hour rule, or it overlaps another assignment of the claimant at any venue of the tenant (ADAM CR-380) |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### setStaffingRules
 
 **`PUT /staffing-rules`**: Minimum cover, working-hour limits and overtime
@@ -3077,6 +3146,7 @@ Resource boards 4.3 and 3.9. **Minimum staffing is a safety rule before it is a 
 
 **Configures an existing workstation; it never creates one** (pull audit R103). The target is the workstation in the path, and the body has no code, venue or region, which a new workstation would need — an unknown `workstationId` is `404`. `loadedMediaStockId` and `mediaStockRemaining` are deprecated and ignored: nothing stores them until BL-095 (the media stock record, on the printer device, waits on the BOCA stock answer; ADAM CR-082, CHG-TEN-003).
 **PUT replaces the configuration** (pull audit R103, as `updateSaleBoard`; decided 14 October 2026, ADAM CR-082, CHG-TEN-003). The body is the workstation's whole configuration, not a patch: a field left out takes its declared default (`cashierInputMode` `hybrid`, `guestDisplayContent` `[lineItems]`, `isActive` true) or, where it has none, null (`saleBoardId`, `outletId`, `cashDrawerLimit`, `departmentId`, `accessPointId`, `edgeNodeId`) or empty (`devices`). A client that changes one setting sends back the configuration it read (`getWorkstation`) with that setting changed. `cashierInputMode` and `guestDisplayContent` are stored on the workstation and returned on `Workstation`.
+**`channel` is the one exception** (ADAM CR-384, Chinmay, 31 October 2026; CHG-CR384-001): `kiosk` for a self-service kiosk a guest operates, `pos` for a staffed till. Left out, it keeps the stored value instead of taking a default, so a POS-016 or BO-036 client built before the field never turns a kiosk back into a till. It is stored as `platform.workstation.channel` and returned on `Workstation`.
 **Refused while a shift is open on this workstation** (F73, pull audit R078). Changing the rules under an open shift means it closes against rules it did not open under, so the change waits for the shift to close.
 **How it knows: it asks Orders, which owns the shift** (decided 14 October 2026, Chinmay, ADAM CR-083; CHG-TEN-004; ADR-0055 rule 2). In one transaction Tenancy first locks the workstation row (`SELECT ... FOR UPDATE` on `platform.workstation`), then calls Orders' declared query `openShiftForWorkstation(workstationId)` in process (`x-ticvai-read-via`), then writes. The lock serialises the check against `openShift`, whose insert of a shift takes a key-share lock on the same row through its foreign key, so a shift cannot open between the question and the write. **Open means every state before `closed` or `autoClosed`** (`pendingApproval`, `open`, `suspended`, `pendingClosure`, `pendingVariance`; the query's rule in shift.yaml). A shift open is `409 shift-open`, naming the shift (`WorkstationShiftOpenProblem`).
 **The till layout is the outlet's unless this till overrides it** (decided 2 October 2026, Chinmay, BO-109; DEC-183; CHG-CSP-006). `saleBoardId` is optional since 2 October: absent or null, the workstation uses its outlet's `Outlet.saleBoardId`; set, it overrides it for this till alone. A workstation with neither an outlet board nor its own is refused `422 sale-board-required`, because a till must open on something. `cashDrawerLimit` overrides the venue's drawer limit for this till (DEC-179; CHG-CSP-016).
@@ -3106,6 +3176,7 @@ Resource boards 4.3 and 3.9. **Minimum staffing is a safety rule before it is a 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| channel | object |  | kiosk for a self-service kiosk a guest operates, pos for a staffed till (ADAM CR-384; CHG-CR384-001). |
 | cashierInputMode | enum (keyboard, touch, scanner, hybrid) |  | BL-061. (default hybrid) |
 | guestDisplayContent | array of enum (lineItems, total, loyaltyBalance, promotions, branding, upsell, queuePosition) |  | What the guest-facing screen shows while a sale is in progress. (default ['lineItems']) |
 | loadedMediaStockId | string (uuid) |  | Deprecated: not stored until BL-095 (the media stock record, on the printer device, waits on the BOCA stock answer; ADAM CR-082, CHG-TEN-003). (nullable) |
@@ -3133,6 +3204,7 @@ Resource boards 4.3 and 3.9. **Minimum staffing is a safety rule before it is a 
 | id | string (uuid) | yes |  |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
+| channel | enum (pos, kiosk) | yes | Who operates this workstation (ADAM CR-384, Chinmay, 31 October 2026; CHG-CR384-001; the values are catalogue's Channel, so the workstation and a sale from it use the same word). (default pos) |
 | venueId | string (uuid) | yes |  |
 | regionId | string (uuid) | yes |  |
 | departmentId | string (uuid) |  | (nullable) |
@@ -3448,6 +3520,7 @@ Workstation determines presentation, hardware binding, till identity, access poi
 | id | string (uuid) | yes |  |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
+| channel | enum (pos, kiosk) | yes | Who operates this workstation (ADAM CR-384, Chinmay, 31 October 2026; CHG-CR384-001; the values are catalogue's Channel, so the workstation and a sale from it use the same word). (default pos) |
 | venueId | string (uuid) | yes |  |
 | regionId | string (uuid) | yes |  |
 | departmentId | string (uuid) |  | (nullable) |
@@ -3991,6 +4064,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | subject_ref | text | no | The thing acted on — a profile, a shift, an order. |
 | occurred_at | timestamptz | yes | When. |
 | platform_staff_grant_id | uuid | no | Set when a TICVAI platform operator acted, naming the grant they acted under (identity.openPlatformStaffGrant; decided 28 September, audit R098). |
+| reason | text | no | Why it was done, where the request said (ADAM CR-376, 31 October 2026; CHG-CR376-001): the reason the operation put on the request's audit context, written by the audit interceptor in this row; listA… |
 
 ### `platform.configuration_profile`
 
@@ -4227,6 +4301,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | code | text | yes |  |
 | name | text | yes |  |
+| channel | text | yes | Who operates this workstation (ADAM CR-384, Chinmay, 31 October 2026; CHG-CR384-001; the values are catalogue's Channel, so the workstation and a sale from it use the same word). |
 | venue_id | uuid | yes |  |
 | region_id | uuid | yes |  |
 | department_id | uuid | no |  |
@@ -4367,6 +4442,27 @@ Every table this service owns that the slice reads or writes, with its columns a
 | occurred_at_after | timestamptz | yes | The time this correction set (correctedAt on the request). |
 | reason | text | yes |  |
 
+### `workforce.open_shift`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| rota_assignment_id | uuid | no |  |
+| shift_template_id | uuid | no |  |
+| venue_id | uuid | no |  |
+| position_code | text | no |  |
+| valid_from | timestamptz | no |  |
+| valid_to | timestamptz | no |  |
+| released_by | uuid | no |  |
+| reason | text | no |  |
+| required_qualifications | text[] | no | What a claimant must hold (ADAM CR-380, Chinmay, 31 October 2026; CHG-CR380-001). |
+| eligible_principal_count | integer | no |  |
+| incentive_rate_multiplier | numeric | no |  |
+| status | text | no |  |
+| claimed_by | uuid | no |  |
+| claimed_at | timestamptz | no |  |
+| scope_path | text | no |  |
+
 ### `workforce.position_requirement`
 
 | Column | Type | Required | Notes |
@@ -4423,9 +4519,22 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |
 
+### `workforce.training_record`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| principal_id | uuid | no |  |
+| course_name | text | no |  |
+| is_required | boolean | no |  |
+| completed_at | timestamptz | no |  |
+| expires_at | timestamptz | no |  |
+| state | text | no |  |
+| evidence_ref | text | no |  |
+
 ## Not in the first release
 
-177 operations, added to this service in later releases without changing any of the above.
+176 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -4441,5 +4550,5 @@ Every table this service owns that the slice reads or writes, with its columns a
 | rota | `requestShiftSwap` |
 | scope | `getOrgUnit` |
 | tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettings`, `getVenueSettingsDefaults`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `requeueDeadLetter`, `resolveTenantHost`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setTenantDomainMapping` |
-| workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `getStaffingRules`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
+| workforce | `broadcastToGuests`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `getStaffingRules`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
 | workstation | `getDevice`, `listOutlets`, `listWorkstations`, `recordDeviceHeartbeat`, `registerDevice` |

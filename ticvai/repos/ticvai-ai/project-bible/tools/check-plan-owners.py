@@ -35,6 +35,12 @@ docs/active/ai-phase-plan.json):
   O-SVC-OWNER      (15 October 2026, CHG-PPL-002: "keep hrushikant" for LedgerService) a back-end, database or setup
                    task of a service team.json `serviceOwners` fixes whose accountable (its reviewing owner) is anyone
                    but that owner
+  O-AI-SERVER      (31 October 2026, CHG-R12PL-034; the lead: "All to the AI engineers") an AI server task (team.json
+                   `aiServer`: the AiService back end and the ai schema's migrations, SETUP-QDRANT) whose ticket has not
+                   started, owned in the plan or the schedule by anyone but an AI engineer (team.json `ai.who`; nobody
+                   is allowed: past 2 April it is created unassigned), or accountable to anyone but the first AI
+                   engineer. A started ticket keeps its owner (the release leaves it alone), so it is counted, not
+                   checked
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
@@ -59,6 +65,7 @@ RULES = {
     "O-NO-TAKEOVER": "a module test given up by someone who never tests, taken by someone team.json noTestTakeover keeps off it (CHG-R5-005)",
     "O-LEFT": "work or a pin still on someone who left the team (team.json successors; CHG-PPL-001)",
     "O-SVC-OWNER": "a fixed service's back end reviewed by anyone but its fixed owner (team.json serviceOwners; CHG-PPL-002)",
+    "O-AI-SERVER": "an AI server task not started owned or reviewed by anyone but the AI engineers (team.json aiServer; CHG-R12PL-034)",
 }
 SD = Path("handoff") / "service-docs"
 
@@ -160,6 +167,8 @@ def main() -> int:
                               f"noTestTakeover keeps {who} off it (CHG-R5-005)")
     n_left = check_left(guard, team, extra, rows, assign)
     n_svc = check_service_owners(guard, team, rows)
+    n_srv, n_srv_started = check_ai_server(guard, team, rows, assign)
+    guard.note(f"{n_srv} AI server tasks checked ({n_srv_started} started, keeping their owners)")
     guard.note(f"{n_left} people left the team (successors), {n_svc} back-end tasks of fixed services checked")
     guard.note(f"{n_tests} module tests, {len(phase2)} phase 2 app-modules of the AI engine, "
                f"{n_mig} migration tasks ({mig_owner or 'no owner'}'s)")
@@ -213,6 +222,43 @@ def check_service_owners(guard, team, rows) -> int:
                 guard.add("O-SVC-OWNER", r["key"], f"{r['key']} ({r['service']}) is reviewed by "
                           f"{r.get('accountable') or 'nobody'}, not {fixed[r['service']]} (serviceOwners, CHG-PPL-002)")
     return n
+
+
+def started_plan_keys() -> set:
+    """Plan task keys whose ticket has started: the reading of tools/build-service-docs.py started_plan_keys (a status
+    other than New, On hold or Rejected in handoff/service-docs/adam-links.json, on the task or a sub-task, through
+    pms-map.json)."""
+    links = (g.load_json(g.ROOT / SD / "adam-links.json", {}) or {}).get("links") or []
+    mp = g.load_json(g.ROOT / SD / "pms-map.json", {}) or {}
+    started = {str(x.get("key")) for x in links if x.get("status") and x.get("status") not in ("New", "On hold", "Rejected")
+               and x.get("type") not in ("Epic", "Feature")}
+    return {k.split("#", 1)[0] for k, v in mp.items() if isinstance(v, int) and str(v) in started}
+
+
+def check_ai_server(guard, team, rows, assign):
+    """O-AI-SERVER (CHG-R12PL-034; the lead, 31 October 2026: "All to the AI engineers", then "The tasks that are for
+    qdrant or postgre. And than api. From ai server that will be undertaken by AI engineer"): the AI server's API, its
+    Postgres and its Qdrant are the AI engineers', in the plan and the schedule, and reviewed by the first of them."""
+    is_srv = sp.ai_server(team)
+    ai_who = set((team.get("ai") or {}).get("who") or [])
+    ai_lead = ((team.get("ai") or {}).get("who") or [""])[0]
+    started = started_plan_keys()
+    n = n_started = 0
+    for r in rows:
+        if r["type"] != "Task" or not is_srv(r["key"], r["service"], r["track"]):
+            continue
+        n += 1
+        if r["key"] in started:
+            n_started += 1
+            continue
+        for where, who in (("plan", r["assignee"]), ("schedule", assign.get(r["key"]))):
+            if who and who not in ai_who:
+                guard.add("O-AI-SERVER", f"{r['key']}:{where}", f"{r['key']} ({r['service'] or r['track']}) is {who}'s in "
+                          f"the {where}, not an AI engineer's (aiServer, CHG-R12PL-034)")
+        if r.get("accountable") != ai_lead:
+            guard.add("O-AI-SERVER", f"{r['key']}:accountable", f"{r['key']} is reviewed by "
+                      f"{r.get('accountable') or 'nobody'}, not {ai_lead} (aiServer, CHG-R12PL-034)")
+    return n, n_started
 
 
 if __name__ == "__main__":

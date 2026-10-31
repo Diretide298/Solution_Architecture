@@ -807,6 +807,13 @@ paths:
         rejection. The reason is required and kept. **Expiry stays the timer** set by `ApprovalRule.expiresAfterMinutes`;
         no operation forces it.
 
+
+        **The same move in process** (ADAM CR-421, decided 31 October 2026; CHG-CR421-001). The approvals kernel
+        interface `IApprovalRequests` gains `CancelAsync(requestId, reason)`, which makes the move this operation
+        makes, for a module of the commerce deployable inside its own transaction (ADR-0055 rule 3): Catalogue''s
+        cancelPricingRollback cancels its rollback''s waiting request with it, and setDynamicPricingGuardrailPolicy
+        its control''s open automation raise (ADAM CR-425). A request that is no longer waiting is left as it is.
+
         '
       tags:
       - request
@@ -2003,6 +2010,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -2097,10 +2111,15 @@ paths:
                 $ref: '#/components/schemas/DelegationRefusedProblem'
         '403':
           description: 'The delegation would hand over authority that is not there: `delegateLacksPermission` or
-            `exceedsDelegatorAuthority`, with the same status as `createApprovalDelegation`.
+            `exceedsDelegatorAuthority`, with the same status as `createApprovalDelegation`. **Or the step-up is not
+            there** (ADAM CR-375; CHG-CR375-001): the caller''s session has no verified, unconsumed MFA step-up for
+            this operation (`step-up-token-missing`, `refusedReason` `stepUpTokenMissing`), or the newest one is
+            older than 5 minutes (`step-up-token-expired`, `refusedReason` `stepUpTokenExpired`), by the rule in
+            identity `verifyMfaChallenge`. Nothing is written.
 
             '
-          x-ticvai-problem-types: [delegate-lacks-permission, exceeds-delegator-authority]
+          x-ticvai-problem-types: [delegate-lacks-permission, exceeds-delegator-authority, step-up-token-missing,
+            step-up-token-expired]
           content:
             application/problem+json:
               schema:
@@ -2347,6 +2366,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VersioningGovernanceApprovalPublicationView'
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -2521,9 +2547,16 @@ paths:
             here**: this body has no signature field, so such a request is decided through `decideApprovalRequest`,
             whose body carries one.
 
+
+            **Its own MFA step-up** (`x-ticvai-step-up: mfa`; ADAM CR-375, CHG-CR375-001): the caller''s session has
+            no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`, `refusedReason`
+            `stepUpTokenMissing`), or the newest one is older than 5 minutes (`step-up-token-expired`,
+            `refusedReason` `stepUpTokenExpired`), by the rule in identity `verifyMfaChallenge`. Nothing is written.
+
             '
           x-ticvai-problem-types: [approver-is-requester, not-in-approver-chain, insufficient-permission, mfa-required,
-            signature-required, delegation-expired, already-decided-at-this-level, level-decided-externally]
+            signature-required, delegation-expired, already-decided-at-this-level, level-decided-externally,
+            step-up-token-missing, step-up-token-expired]
           content:
             application/problem+json:
               schema:
@@ -5565,6 +5598,14 @@ components:
         `activate`, which are refused until it is approved. An existing kind narrowed by `subjectTypes`, so no kind is
         added.
 
+        **An AI pricing recommendation sent for approval** (ADAM CR-415, decided 31 October 2026, Chinmay;
+        CHG-CR415-001). `pricingChange`, subject `pricingRecommendation`, `subjectContract` `catalogue`, `subjectId` the
+        recommendation: raised by catalogue `decidePricingRecommendation` on `sendForApproval`, in process and in its own
+        transaction, with `amount` the recommended price and `attributes` `{productId, performanceId,
+        adjustmentPercent, governanceLevel}`. Catalogue consumes `approval.granted`, `approval.rejected`,
+        `approval.expired` and `approval.withdrawn` for it. An existing kind narrowed by `subjectTypes`, so no kind is
+        added.
+
         **A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request
         with no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the
         ShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.
@@ -6548,7 +6589,9 @@ components:
             description: '`levelDecidedExternally` (29 September): the current level waits on an external
               workflow system and a person cannot decide it until it falls back on timeout.
               `notExternalProvider`: `recordExternalApprovalDecision` called by a client that is not the
-              provider the level was sent to.
+              provider the level was sent to. `stepUpTokenMissing` and `stepUpTokenExpired`: an operation that
+              declares `x-ticvai-step-up: mfa` (`approveUnifiedDecision`) found no verified, unconsumed step-up on
+              the caller''s session, or only one older than 5 minutes (ADAM CR-375; CHG-CR375-001).
 
               '
             enum:
@@ -6561,6 +6604,8 @@ components:
             - alreadyDecidedAtThisLevel
             - levelDecidedExternally
             - notExternalProvider
+            - stepUpTokenMissing
+            - stepUpTokenExpired
     ApprovalStateProblem:
       x-ticvai-persistence: none — error shape
       description: 'A request is not in a state that allows the call. Returned as `409` by
@@ -6643,7 +6688,8 @@ components:
       description: 'Why `createApprovalDelegation` stored nothing. `invalidWindow` and
         `delegateIsDelegator` come with `400`; `delegateLacksPermission` and
         `exceedsDelegatorAuthority` with `403`; `delegateLacksRequiredRole` (the delegate does not hold the role the
-        delegation names, `approveRoleAuthorityDelegation`) with `409`. Also what `approveRoleAuthorityDelegation`
+        delegation names, `approveRoleAuthorityDelegation`) with `409`; `stepUpTokenMissing` and `stepUpTokenExpired`
+        (`approveRoleAuthorityDelegation`''s own MFA step-up, ADAM CR-375) with `403`. Also what `approveRoleAuthorityDelegation`
         answers, with the same status for each value (R8 blocker fix, APPROVALS-TENANCY-C04).
 
         '
@@ -6661,6 +6707,8 @@ components:
             - delegateLacksPermission
             - exceedsDelegatorAuthority
             - delegateLacksRequiredRole
+            - stepUpTokenMissing
+            - stepUpTokenExpired
     StepUpPolicyRefusedProblem:
       x-ticvai-persistence: none — error shape
       description: '`setStepUpPolicy` refused to lower a requirement below the operation''s own floor.

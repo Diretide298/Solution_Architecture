@@ -9,9 +9,9 @@ about: '**A multi-tenant venue platform.** One tenant operates several venues; a
   contracts persist to 26 schemas, and every artefact in the package is drawn by resolving against that
   join rather than by being written twice.'
 scale:
-  operations: 2860
+  operations: 2862
   contracts: 33
-  tables: 1173
+  tables: 1175
   tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
     stores. **They own no service and should not**: a cache entry is derived from something already
     read, invalidated by an event already consumed, and losable without consequence. **Both numbers
@@ -30,7 +30,7 @@ scale:
   screens: 2453
   flows: 291
   stateModels: 210
-  events: 108
+  events: 110
   decisions: 73
   requirements: 3184
   buildPercent: 0
@@ -518,7 +518,7 @@ services:
     workers: []
 stores:
 - store: postgres
-  operations: 2846
+  operations: 2848
   usedBy:
   - service: CatalogueService
     operations: 470
@@ -527,7 +527,7 @@ stores:
   - service: VenueOpsService
     operations: 299
   - service: MarketingService
-    operations: 283
+    operations: 284
   - service: AccessService
     operations: 259
   - service: PlatformService
@@ -541,7 +541,7 @@ stores:
   - service: WhiteLabelService
     operations: 110
   - service: IdentityService
-    operations: 98
+    operations: 99
   - service: LedgerService
     operations: 72
   - service: WalletService
@@ -557,7 +557,7 @@ stores:
   note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
     is a partition key, not a deployment boundary.'
 - store: redis
-  operations: 2077
+  operations: 2078
   usedBy:
   - service: CatalogueService
     operations: 415
@@ -578,7 +578,7 @@ stores:
   - service: WhiteLabelService
     operations: 97
   - service: IdentityService
-    operations: 94
+    operations: 95
   - service: LedgerService
     operations: 46
   - service: InventoryService
@@ -640,7 +640,6 @@ external:
   - MarketingService
   - OrderService
   - PlatformService
-  - TenancyService
   reachedThrough: marketing.message_dispatch
   note: '**One dispatch table, six services.** A payment link from Order, a booking confirmation from
     Order, an OTP from Identity, a rota change from Tenancy, an allergen alert from F&B, a campaign
@@ -682,9 +681,9 @@ layers:
 - layer: frontend
   holds: 477 screens, 93 flows, 15 platforms, 12 apps
 - layer: contracts
-  holds: 2860 operations across 28 contracts — the join
+  holds: 2862 operations across 28 contracts — the join
 - layer: backend
-  holds: 1173 tables in 26 schemas, 910 relationships
+  holds: 1175 tables in 26 schemas, 910 relationships
 - layer: domain
   holds: 113 state models, 29 events
 - layer: decisions

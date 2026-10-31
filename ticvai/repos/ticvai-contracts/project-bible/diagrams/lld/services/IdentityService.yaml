@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 103 operations, 48 tables
+title: IdentityService — 104 operations, 48 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -10,7 +10,7 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 103
+  operations: 104
   inAFlow: 21
   percent: 20%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -29,7 +29,7 @@ schemas:
   largestTable: pii.subject_biometric
 operationsByContract:
 - contract: identity
-  count: 103
+  count: 104
   operations:
   - operation: changeOwnCredential
     verb: POST
@@ -551,6 +551,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: listSubjectBiometricRecords
+    verb: GET
+    path: /internal/subject-biometrics
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
   - operation: login
     verb: POST
     path: /auth/login
@@ -637,8 +645,8 @@ operationsByContract:
     scope: venue
     permission: USER_MANAGE
     offline: false
-    reads: 4
-    writes: 6
+    reads: 5
+    writes: 7
   - operation: resolvePermissions
     verb: POST
     path: /permissions/resolve

@@ -1443,6 +1443,16 @@ def main() -> int:
     # app-module into another block (measured 7 October: giving them to one person before those passes took seven
     # apps' completion work out of A1, which the pushed tickets would have followed).
     MIG_OWNER, MIG_RX = sp.migration_owner(team)
+    # **Everything on the AI server is the AI engineers'** (team.json `aiServer`, CHG-R12PL-034; the lead, 31 October 2026:
+    # "All to the AI engineers"): the AiService back end (the AI server's API), its Database tasks (the ai schema's
+    # migrations, the exception to the migration rule above) and SETUP-QDRANT (the Qdrant cluster). Given to the AI pool
+    # after the pins, as the migration rule is (below), and not earlier: the balancing, the helper pass and the passes
+    # that place app-modules in blocks keep the owners they had, so the move takes no app-module out of its block
+    # (measured 31 October 2026: moved before them, three more Block A app-modules went to A2).
+    AI_SRV = sp.ai_server(team)
+
+    def ai_srv_t(t_):
+        return t_.get("type") == "Task" and AI_SRV(t_["key"], t_.get("service"), t_.get("track"))
     tasks = []
 
     # **Frontend or backend is on every task, and in its OpenProject subject**, so a board, a filter or a
@@ -2334,7 +2344,10 @@ def main() -> int:
             pts = "" if is_ai else int(t_["points"])
             # **A frontend repository's shell is its main builder's** (`ownerRule: mainBuilder`, CHG-R9UI-001): given
             # once every block's screen tasks exist (the app shell pass, below), not here, where only Block A's do
-            who = "" if t_.get("ownerRule") == "mainBuilder" else (
+            # an AI engine task with no named owner, and an AI server task (`aiServer`, CHG-R12PL-034), are placed by
+            # the schedule on whichever AI engineer can start them first, never on the least-loaded back-end developer
+            who = "" if t_.get("ownerRule") == "mainBuilder" or (not t_.get("assignee") and (
+                is_ai or AI_SRV(t_["key"], "", ""))) else (
                 t_.get("assignee") or (min(backend_, key=lambda x: load[x]) if backend_ else ""))
             # a task due now (`due`, CHG-R8INT-032) is not balanced against anyone's load: it names its owner
             if not is_ai and who and not t_.get("due"):
@@ -2812,9 +2825,16 @@ def main() -> int:
             # CHG-R6G-001) is in the first release but keeps its forward file, so making every later catalogue
             # migration wait on it as "the schema's first-release migration" had V1091 to V1122 run before the file
             # they waited on. It is a forward migration like them: a wait only where a key points into its tables.
+            # **A hand-written [DB] task not ticketed yet is waited on only for a key into its tables** (31 October 2026,
+            # CHG-R12PL-034; the r12 plan lane, second round): CR409-COMPETITOR-PRICE-OBSERVATION-DB, a new catalogue
+            # table of a settled CR, made every later catalogue forward migration and the catalogue back end behind
+            # them wait for it, so Block A1's overtime went from 35 to 109 hours and the plan moved Venue Management's
+            # completion work into A2. A table added by a CR after those migrations were planned is no earlier step of
+            # them; one whose keys point into it still waits. A ticketed one (PRD-W1-DB) keeps its waits as pushed.
             keys_into = {x for t in ts_all for x in ddl[t]["fks"]}
+            hand_late_ = {t for t, m in hand_db.items() if m not in kmap_early}
             prior = sorted({m for t, m in mig_of.items() if t.split(".")[0] == sch and m not in later_mig.values()
-                            and (t not in fwd_kept or t in keys_into)})
+                            and (t not in fwd_kept or t in keys_into) and (t not in hand_late_ or t in keys_into)})
             for mk, ts in parts:
                 for t in ts:
                     mig_of[t] = mk
@@ -3099,8 +3119,9 @@ def main() -> int:
                 tk = f"AI-BE-{cid}-{n_}"
                 task(tk, k, "Task", f"AI back end: {short} (part {n_})",
                      f"The back-end work the AI review names for {c['name']} beyond the AI engineers' own "
-                     "(validate-only tool operations, semantic-spec compile, historical import). Additive to AiService "
-                     "and the owning services; their owners review." + be_note, 3, service="AiService", pts=p_, area="backend",
+                     "(validate-only tool operations, semantic-spec compile, historical import). Additive to AiService, "
+                     "the AI server's API (CHG-R12PL-034); where it needs an owning service's operation changed, that "
+                     "change is a change request on that service, its owner's to build and review." + be_note, 3, service="AiService", pts=p_, area="backend",
                      depends=["PLATFORM-KERNEL"])
                 by_key[tk]["notBefore"] = nb
                 am_of[tk] = k
@@ -3254,6 +3275,48 @@ def main() -> int:
         t_["description"] = (head_ + ("" if not head_ or head_[-1] in ".!?" else ".") + " " + sent_ + tail_).strip()
     print(f"app shells and the mock API (CHG-R9UI-001, -002): {n_wait_} screen task(s) wait on them, "
           f"{n_told_} started one(s) told in their text")
+
+    # **An AI server task says where it is built, and one on Qdrant waits on the cluster** (team.json `aiServer`,
+    # CHG-R12PL-034; the lead, 31 October 2026: "All to the AI engineers"). AiService is ticvai-ai, the separate Python
+    # deployable (ADR-0055, ADR-0020), with its Qdrant and its Postgres, so each AI server task whose ticket has not
+    # started says so in one sentence the pointer carries (ticket_done.CARRY, "Built on the AI server: ..."), and one
+    # whose operations read or write Qdrant (the lineage's qdrant:* stores) waits on SETUP-QDRANT, the cluster, and
+    # AI-ENGINE-QDRANT, the per-tenant collections and the retrieval client: SVC-AI-RETRIEVAL-1 (#27841) needed the
+    # cluster and waited on neither. A started ticket keeps its owner, its text and its waits (CHG-R9UI-001).
+    ops_of_task_ = defaultdict(set)
+    for o_, k_ in task_of_op.items():
+        ops_of_task_[k_].add(o_)
+    qdrant_need_ = [k_ for k_ in ("SETUP-QDRANT", "AI-ENGINE-QDRANT") if k_ in by_key]
+    n_srv_, n_q_ = 0, []
+    for t_ in tasks:
+        if not ai_srv_t(t_) or t_["key"] in started_:
+            continue
+        n_srv_ += 1
+        if t_["track"] == "Database":
+            sent_ = ("Built on the AI server: by the AI engineers, on the AI server's Postgres, the ai schema of each "
+                     "tenant database, which only the AI module migrates (ADR-0055 rule 1); the file joins the "
+                     "migration series SqlMigrationRunner applies and is never written in a .NET module of "
+                     "ticvai-backend (the lead, 31 October 2026: \"All to the AI engineers\").")
+        elif t_.get("service") in ("", None):
+            sent_ = ("Built on the AI server: by the AI engineers, the AI server's Qdrant cluster, in ticvai-infra's "
+                     "cluster stage, never in a .NET module of ticvai-backend (the lead, 31 October 2026: \"All to the "
+                     "AI engineers\").")
+        else:
+            sent_ = ("Built on the AI server: by the AI engineers, in ticvai-ai (Python), the AI server's API, never in "
+                     "a .NET module of ticvai-backend (ADR-0055, ADR-0020; the lead, 31 October 2026: \"All to the AI "
+                     "engineers\").")
+        d_ = (t_["description"] or "").rstrip()
+        m_ = ticket_done.DONE_WHEN.search(d_)
+        head_, tail_ = (d_[:m_.start()].rstrip(), " " + d_[m_.start():]) if m_ else (d_, "")
+        t_["description"] = (head_ + ("" if not head_ or head_[-1] in ".!?" else ".") + " " + sent_ + tail_).strip()
+        uses_q_ = any(str(x).startswith("qdrant") for o_ in ops_of_task_.get(t_["key"], ())
+                      for x in ((lineage.get(o_) or {}).get("reads") or []) + ((lineage.get(o_) or {}).get("writes") or []))
+        need_ = set(qdrant_need_) - {t_["key"]} - set(t_["dependsOn"].split())
+        if uses_q_ and t_["track"] == "Backend" and need_:
+            t_["dependsOn"] = " ".join(sorted(set(t_["dependsOn"].split()) | need_))
+            n_q_.append(t_["key"])
+    print(f"AI server (CHG-R12PL-034): {n_srv_} task(s) not started say where they are built; {len(n_q_)} on Qdrant "
+          f"wait on {' and '.join(qdrant_need_) or 'nothing (no cluster task)'}" + (f" ({', '.join(sorted(n_q_))})" if n_q_ else ""))
 
     # **Chronology.** Every task gets its place in the order work can happen: block, then app-module (a module on
     # one app, in build-phase order), then build phase, wave, how many tasks stand in front of it, and database
@@ -4227,6 +4290,25 @@ def main() -> int:
                 t_["assignee"] = MIG_OWNER
         print(f"migrations: every task matching {MIG_RX.pattern} is {MIG_OWNER}'s (CHG-R5-001); "
               f"{len(mig_moved)} moved from the pin or the plan")
+    # **The AI server's rule wins over the pin too** (team.json `aiServer`, CHG-R12PL-034; the lead, 31 October 2026:
+    # "All to the AI engineers"): an AI server task whose ticket has not started leaves the back-end developer the pin or
+    # the plan gave it and goes to the AI pool, where the schedule below places it on whichever AI engineer can start it
+    # first (op-release moves New tickets); a started one keeps its owner, as the release keeps it.
+    srv_started_ = started_plan_keys()
+    srv_moved_, srv_kept_ = Counter(), []
+    for t_ in tasks:
+        if not ai_srv_t(t_):
+            continue
+        t_["pool"] = sp.ai_server_pool(team)
+        if t_["key"] in srv_started_:
+            srv_kept_.append(f"{t_['key']} ({t_['assignee'] or 'nobody'})")
+            continue
+        srv_moved_[t_["assignee"] or "nobody"] += 1
+        t_["assignee"] = ""
+    print(f"AI server: {sum(srv_moved_.values())} task(s) to the AI engineers (CHG-R12PL-034), the plan or the pin "
+          "giving them to "
+          + (", ".join(f"{w} {n}" for w, n in srv_moved_.most_common()) or "nobody")
+          + f"; {len(srv_kept_)} started, kept: {', '.join(srv_kept_) or 'none'}")
     # **The lead's owner moves** (block-a-extra-tasks.json `ownerMoves`, CHG-R5-003, 7 October): a task named there moves
     # from `from` to `to` while `from` still holds it (the pin or the plan), so the work the migrations took away is
     # given back and Block A keeps its r2 dates. Once pushed at the new owner the pin holds it, and the entry is inert.
@@ -4264,13 +4346,16 @@ def main() -> int:
     for t_ in leaf:
         if t_["key"] in ai_phase2 and t_["area"] == "ai":
             t_["assignee"] = ""
-    ai_open = [t_ for t_ in leaf if t_["area"] == "ai" and t_["key"] not in kmap and t_["key"] not in ai_phase2
-               and (second.get(t_["key"]) or {}).get("end", 0) > ai_cut]
+    # an AI server task (`aiServer`, CHG-R12PL-034) not ticketed yet is the AI engineers' work like the engine's: left
+    # unassigned past 2 April too
+    ai_open = [t_ for t_ in leaf if (t_["area"] == "ai" or ai_srv_t(t_)) and t_["key"] not in kmap
+               and t_["key"] not in ai_phase2 and (second.get(t_["key"]) or {}).get("end", 0) > ai_cut]
     for t_ in ai_open:
         t_["assignee"] = ""
         t_["description"] = (t_["description"].rstrip() + " Unassigned (1 October): past what the two AI engineers "
                              "finish by 2 April; for the AI developers joining.")
-    print(f"AI engine: {len(ai_open)} task(s) of phase 1 past 2 April left unassigned (should be none), "
+    print(f"AI engine and AI server: {len(ai_open)} task(s) of phase 1 past 2 April left unassigned "
+          f"({sum(1 for t_ in ai_open if ai_srv_t(t_))} of the AI server; the engine's should be none), "
           f"{sum(1 for k in ai_phase2 if k in ai_unit)} phase 2 unit(s) after 2 April, unassigned and not ticketed")
     # **The completion check of every phase 1 unit** (CHG-AIPH-001, "do not pick trails that we cannot complete"): the
     # unit's own work, its module test and everything the test waits on (its back end, the owner-side operations,
@@ -4335,6 +4420,8 @@ def main() -> int:
             continue
         if t_["key"] in block_tests:
             t_["accountable"] = tests["lead"]
+        elif ai_srv_t(t_):
+            t_["accountable"] = ai_lead      # the AI server's reviewing owner, the first AI engineer (CHG-R12PL-034)
         elif t_["track"] in ("Backend", "Database", "DevOps", "Setup", "Onboarding"):
             t_["accountable"] = svc_owner.get(t_["service"]) or devops
         elif t_["track"] == "AI":

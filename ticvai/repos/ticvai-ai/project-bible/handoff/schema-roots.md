@@ -23,15 +23,15 @@ tables**, and the distribution is the honest shape of the package:
 
 | Terminal table | Tables that reach it |
 |---|---:|
-| `platform.scope` | 900 |
-| `identity.role` | 764 |
-| `control.partner` | 743 |
-| `approvals.matrix` | 362 |
-| `ledger.legal_entity` | 335 |
-| `access.admission_rules` | 240 |
+| `platform.scope` | 901 |
+| `identity.role` | 767 |
+| `control.partner` | 746 |
+| `approvals.matrix` | 363 |
+| `ledger.legal_entity` | 336 |
+| `access.admission_rules` | 241 |
 | `platform.configuration_profile` | 226 |
-| `pii.subject` | 210 |
-| `catalogue.variant` | 154 |
+| `pii.subject` | 211 |
+| `catalogue.variant` | 155 |
 | `access.hardware_model` | 83 |
 
 `platform.scope` is reached by 289 of 353 — **the tenancy spine, and almost
@@ -66,12 +66,12 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `catalogue` — 87 tables
+## `catalogue` — 88 tables
 
 **Root: `catalogue.product`**  ·  own 33 · reach 56 · out 10
 
 - **1 step from the root** — `ai_catalogue_session`, `ai_finding`, `alternative_code`, `audit_entry`, `change_request`, `channel_incident`, `channel_sales_rule`, `configuration_template`, `demand_forecast`, `demand_signal`, `dynamic_pricing_strategy`, `group_package`, `lifecycle_action`, `package_pricing`, `price_assignment`, `price_execution`, `pricing_experiment`, `pricing_recommendation`, `pricing_simulation`, `product_channel_assignment`, `product_channel_text`, `product_eligibility_rule`, `product_link`, `product_media`, `product_owner_form`, `product_sale_permission`, `product_version`, `rollback_action`, `tax_rule`, `variant`, `variant_dimension`
-- **2 steps from the root** — `change_request_line`, `entitlement_template`, `import_job`, `price`, `price_ladder`, `price_list_version`, `pricing_publication`, `pricing_recommendation_decision`, `waitlist_entry`
+- **2 steps from the root** — `change_request_line`, `competitor_price_observation`, `entitlement_template`, `import_job`, `price`, `price_ladder`, `price_list_version`, `pricing_publication`, `pricing_recommendation_decision`, `waitlist_entry`
 - **3 steps from the root** — `membership_benefit`, `plan_benefit`, `pricing_publication_target`
 
 - **Reaches the root through nothing** — `approval_policy`, `bundle_application`, `calculation_profile`, `calculation_step`, `channel_capacity`, `channel_connection`, `channel_envelope`, `channel_sync`, `donation_campaign`, `dynamic_pricing_control`, `event`, `event_capacity_profile`, `event_change_treatment_policy`, `event_registration`, `event_reschedule`, `event_resource_plan`, `event_schedule`, `event_type`, `fee`, `fee_rule`, `inventory_reservation`, `lifecycle_workflow`, `membership_programme`, `performance`, `performance_media`, `performance_template`, `prepaid_minutes`, `price_category`, `price_list`, `price_resolution_policy`, `pricing_market`, `pricing_test_case`, `product_category`, `product_tag`, `published_bundle`, `rate`, `rounding_profile`, `sales_channel`, `seat_pricing_rule`, `signal_registry`, `space`, `tax_profile`, `waiting_room_setting`
@@ -133,7 +133,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `identity` — 42 tables
 
-**Root: `identity.principal`**  ·  own 25 · reach 392 · out 3
+**Root: `identity.principal`**  ·  own 25 · reach 394 · out 3
 
 - **1 step from the root** — `access_decision`, `access_override`, `access_review_campaign`, `access_review_item`, `authz_audit`, `delegated_access`, `guest_identity_verification`, `membership_history`, `mfa_challenge`, `mfa_method`, `mfa_recovery_code`, `module_access`, `principal_credential`, `principal_external_identity`, `refresh_token`, `role_permission`, `session`
 - **2 steps from the root** — `principal_credential_history`
@@ -164,7 +164,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `approvals` — 32 tables
 
-**Root: `approvals.request`**  ·  own 10 · reach 53 · out 5
+**Root: `approvals.request`**  ·  own 10 · reach 54 · out 5
 
 - **1 step from the root** — `accreditation_badge`, `approved_action_execution`, `decision`, `decision_record`, `escalation`, `external_dispatch`, `request_approver`, `signature`, `workflow_step_execution`, `workflow_version`
 - **2 steps from the root** — `automation_execution`, `workflow_definition`, `workflow_exception`, `workflow_instance`, `workflow_intervention`
@@ -196,13 +196,13 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `workforce` — 28 tables
+## `workforce` — 29 tables
 
 **Root: `workforce.employee`**  ·  own 5 · reach 5 · out 2
 
 - **1 step from the root** — `employment`, `leave_balance`, `sync_conflict`, `work_assignment`
 
-- **Reaches the root through nothing** — `announcement`, `announcement_receipt`, `attendance`, `attendance_amendment`, `field_ownership`, `forecast_requirement`, `integration_source`, `job_title`, `labour_budget`, `leave_request`, `leave_type`, `open_shift`, `position_requirement`, `rota_assignment`, `shift`, `shift_swap`, `shift_template`, `staff_conversation`, `staff_conversation_participant`, `staff_message`, `staffing_rules`, `sync_run`, `training_record`
+- **Reaches the root through nothing** — `announcement`, `announcement_receipt`, `attendance`, `attendance_amendment`, `field_ownership`, `forecast_requirement`, `guest_broadcast`, `integration_source`, `job_title`, `labour_budget`, `leave_request`, `leave_type`, `open_shift`, `position_requirement`, `rota_assignment`, `shift`, `shift_swap`, `shift_template`, `staff_conversation`, `staff_conversation_participant`, `staff_message`, `staffing_rules`, `sync_run`, `training_record`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -220,7 +220,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `platform` — 25 tables
 
-**Root: `platform.scope`**  ·  own 12 · reach 213 · out 1
+**Root: `platform.scope`**  ·  own 12 · reach 214 · out 1
 
 - **1 step from the root** — `audit_read`, `audit_record`, `outlet`, `region_settings`, `sale_board`, `tenant`, `venue_settings`, `workstation`
 - **2 steps from the root** — `device`, `outlet_opening_hour`, `sale_board_page`
@@ -276,12 +276,12 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `seating` — 22 tables
 
-**Root: `seating.seat_map`**  ·  own 7 · reach 11 · out 1
+**Root: `seating.seat_map`**  ·  own 9 · reach 13 · out 1
 
-- **1 step from the root** — `accessible`, `import_job`, `recommendation_rule`, `seat`, `seat_rules`, `seating_rules`, `zone`
-- **2 steps from the root** — `group_request_participant`, `seat_block_item`, `seat_reservation_item`
+- **1 step from the root** — `accessible`, `import_job`, `recommendation_rule`, `seat`, `seat_map_template`, `seat_rules`, `seating_rules`, `section`, `zone`
+- **2 steps from the root** — `group_request_participant`, `seat_block_item`, `seat_reservation_item`, `section_row`
 
-- **Reaches the root through nothing** — `group_request`, `hold_pool`, `hold_type`, `reassignment`, `seat_block`, `seat_category`, `seat_map_template`, `seat_price_band`, `seat_reservation`, `section`, `section_row`
+- **Reaches the root through nothing** — `group_request`, `hold_pool`, `hold_type`, `reassignment`, `seat_block`, `seat_category`, `seat_price_band`, `seat_reservation`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -407,7 +407,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `pricing` — 3 tables
 
-**Root: `pricing.dynamic_price_rule`**  ·  own 2 · reach 2 · out 3
+**Root: `pricing.dynamic_price_rule`**  ·  own 2 · reach 2 · out 4
 
 - **1 step from the root** — `dynamic_price_action`, `dynamic_price_condition`
 

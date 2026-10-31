@@ -431,11 +431,11 @@
   "properties": {
    "recommendation": {
     "type": "string",
-    "description": "Recommendation title"
+    "description": "Recommendation title: the product name and the event name joined by \" / \" (without the event part when there is none), then \" / \" and the price category name where there is one. Derived, no column (ADAM CR-416)"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue's name, through tenancy#scopeRecords by venue_id (ADAM CR-416)"
    },
    "event": {
     "type": "string",
@@ -463,7 +463,7 @@
    },
    "confidence": {
     "type": "number",
-    "description": "AI Confidence, percent"
+    "description": "AI Confidence, percent (stored 0 to 1, answered multiplied by 100; ADAM CR-416)"
    },
    "urgency": {
     "type": "string",
@@ -480,8 +480,13 @@
     "description": "Governance Level: approval level required, from the configured approval matrix"
    },
    "simulationRevenueUplift": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Simulation Revenue Uplift (Board 7)"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Simulation Revenue Uplift (Board 7): expected_revenue minus baseline_revenue of the newest catalogue.pricing_simulation of this recommendation (by created_at, then id), in the venue's currency; null where there is none or either figure is null (ADAM CR-416)"
    },
    "recommendationId": {
     "type": "string",
@@ -574,7 +579,8 @@
    },
    "actualRevenueResultPercent": {
     "type": "number",
-    "description": "Feedback Loop: actual revenue result after execution; empty until measured, percent"
+    "nullable": true,
+    "description": "Feedback Loop: actual revenue result after execution, percent. Answered null until the pricing outcome measurement exists (ADAM CR-416; the price outcome measure, CR-418; LO-CR416-001)"
    }
   }
  },
@@ -608,12 +614,17 @@
     "description": "Dynamic pricing strategy (Board 5)"
    },
    "channel": {
-    "$ref": "#/components/schemas/Channel",
-    "description": "Channel"
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Channel"
+     }
+    ],
+    "nullable": true,
+    "description": "Channel: at scope channel, the sales_channel of the catalogue.sales_channel row scopeId names, mapped as GPS-C39 maps it (guestWeb to web, guestApp to mobile, partner to b2b, the rest by the same name); null for api and backOffice and at every other level (ADAM CR-417)"
    },
    "market": {
     "type": "string",
-    "description": "Market",
+    "description": "Market: at scope market, the market_code of the catalogue.pricing_market row scopeId names; null at every other level (ADAM CR-417)",
     "nullable": true
    },
    "effectiveFrom": {
@@ -675,7 +686,7 @@
    },
    "minAiConfidence": {
     "type": "number",
-    "description": "Auto-execute only if AI confidence is at or above this, percent; default 90 (decided 29 September, readiness close-out)"
+    "description": "Auto-execute only if AI confidence is at or above this, percent; default 90 (decided 29 September, readiness close-out). Stored and written 0 to 1, answered multiplied by 100 (ADAM CR-417)"
    },
    "minRevenueUpliftPercent": {
     "type": "number",
@@ -775,7 +786,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Null at `global`."
+    "description": "Null at `global`. At `market` a `catalogue.pricing_market` id; at `channel` a `catalogue.sales_channel` id, the key `pricing.dynamic_price_rule.channel_id` uses (ADAM CR-410); at `venue`, `strategy`, `product`, `event` and `performance` that row's id (ADAM CR-417, CR-425)."
    },
    "absoluteMinimumPrice": {
     "allOf": [
@@ -876,11 +887,55 @@
     ],
     "default": "advisory"
    },
-   "authorityTiers": {
-    "type": "object",
-    "additionalProperties": true,
+   "pendingAutomationLevel": {
+    "type": "string",
+    "readOnly": true,
     "nullable": true,
-    "description": "`[{maxAdjustmentPercent, action, confidenceThreshold}]`."
+    "enum": [
+     "advisory",
+     "humanInTheLoop",
+     "conditionalAutonomous",
+     "autonomous",
+     null
+    ],
+    "description": "A raise to `conditionalAutonomous` or `autonomous` waiting for its approval; `automationLevel` keeps the current level until approval.granted, and approval.rejected, withdrawn or expired clears it (ADAM CR-425)."
+   },
+   "pendingApprovalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "nullable": true,
+    "description": "The approvals request the pending raise waits on (kind pricingChange, subjectType dynamicPricingControl); cleared with pendingAutomationLevel (ADAM CR-425)."
+   },
+   "authorityTiers": {
+    "type": "array",
+    "nullable": true,
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "description": "The authority tiers, smallest adjustment first, stored as the jsonb list it always was (typed as an array, ADAM CR-425).",
+    "items": {
+     "type": "object",
+     "properties": {
+      "maxAdjustmentPercent": {
+       "type": "number",
+       "nullable": true
+      },
+      "action": {
+       "type": "string",
+       "enum": [
+        "autoExecute",
+        "autoExecuteIfConfident",
+        "revenueManager",
+        "commercialDirector",
+        "board4Governance"
+       ]
+      },
+      "confidenceThreshold": {
+       "type": "number",
+       "nullable": true
+      }
+     }
+    }
    },
    "maxAdjustmentPercent": {
     "type": "number",
@@ -913,16 +968,72 @@
     "minimum": 0
    },
    "noChangeWindows": {
-    "type": "object",
-    "additionalProperties": true,
+    "type": "array",
     "nullable": true,
-    "description": "`[{anchor, minutesBefore, minutesAfter, clockFrom, clockTo}]`."
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "description": "The no-change windows, stored as the jsonb list it always was (typed as an array, ADAM CR-425).",
+    "items": {
+     "type": "object",
+     "properties": {
+      "anchor": {
+       "type": "string",
+       "enum": [
+        "gatesOpening",
+        "eventStart",
+        "clockTime"
+       ]
+      },
+      "minutesBefore": {
+       "type": "integer",
+       "nullable": true
+      },
+      "minutesAfter": {
+       "type": "integer",
+       "nullable": true
+      },
+      "clockFrom": {
+       "type": "string",
+       "nullable": true
+      },
+      "clockTo": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
    },
    "circuitBreakers": {
-    "type": "object",
-    "additionalProperties": true,
+    "type": "array",
     "nullable": true,
-    "description": "`[{trigger, threshold, enabled, tripped}]`."
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "description": "The circuit breakers, stored as the jsonb list it always was (typed as an array, ADAM CR-425).",
+    "items": {
+     "type": "object",
+     "properties": {
+      "trigger": {
+       "type": "string",
+       "enum": [
+        "dataQualityFalls",
+        "modelConfidenceDrops",
+        "conversionDropsAbnormally",
+        "priceVolatilityExceedsThreshold",
+        "revenueFalls",
+        "integrationFails"
+       ]
+      },
+      "threshold": {
+       "type": "number"
+      },
+      "enabled": {
+       "type": "boolean"
+      },
+      "tripped": {
+       "type": "boolean"
+      }
+     }
+    }
    },
    "requireGuardrailsPassed": {
     "type": "boolean",
@@ -1129,7 +1240,7 @@
  "LiveDynamicPriceExecutionDeploymentMonitorInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; applied to `catalogue.price` (with `catalogue.audit_entry`, `catalogue.price_execution`, `catalogue.pricing_recommendation_decision`, `platform.outbox`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.price_execution` (with `catalogue.audit_entry`, `catalogue.pricing_recommendation_decision`, `platform.outbox`), the table its operation writes (CHG-STO-021; never `catalogue.price`, ADAM CR-422); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Live Dynamic Price Execution & Deployment Monitor submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "product": {
@@ -1147,7 +1258,7 @@
    },
    "strategy": {
     "type": "string",
-    "description": "Strategy id",
+    "description": "Strategy id; required, here or through aiRecommendation's dynamic_pricing_strategy_id, else 400 validation on strategy (ADAM CR-422)",
     "nullable": true
    },
    "aiRecommendation": {
@@ -1157,7 +1268,7 @@
    },
    "approval": {
     "type": "string",
-    "description": "Approval reference; required unless the automation policy permits automatic execution",
+    "description": "Approval reference, an approvals request id (approved, kind pricingChange; for a recommendation the request its sendForApproval raised); required unless the automation policy permits automatic execution, else 422 approval-required (ADAM CR-415, CR-422)",
     "nullable": true
    },
    "executionSource": {
@@ -1263,7 +1374,7 @@
    },
    "status": {
     "type": "string",
-    "description": "Status: queued, processing, live, partial, failed or rolledBack"
+    "description": "Status: queued, processing, live, partial, failed or rolledBack, mapped from price_execution.status: queued = scheduled, processing = executing, live = deployed, partial = partiallyDeployed, failed = failed, rolledBack = reverted (ADAM CR-422)"
    },
    "executionId": {
     "type": "string",
@@ -1958,11 +2069,11 @@
    },
    "approvalStatus": {
     "type": "string",
-    "description": "Approval Status: notRequired, pending, approved or rejected"
+    "description": "Approval Status: notRequired, pending, approved or rejected. notRequired where the latest execution's source is conditionalAutonomous or autonomous; else pending for pending, sentToSimulation or sentForApproval, approved for accepted or modified, rejected for rejected (ADAM CR-408)"
    },
    "executionStatus": {
     "type": "string",
-    "description": "Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack"
+    "description": "Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack, from the latest price_execution: scheduled queued, executing processing, deployed live, partiallyDeployed partial, failed failed, reverted rolledBack, none notStarted (ADAM CR-408)"
    },
    "revenueRisk": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",

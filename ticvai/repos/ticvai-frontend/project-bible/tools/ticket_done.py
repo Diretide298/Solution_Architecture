@@ -518,7 +518,9 @@ def define_sentence(sid: str, day: float, why: str | None = "gaps") -> str:
 
 # "App shell and mock API: ..." (CHG-R9UI-001, -002): what a screen task waits on first, or, when it started before
 # them, that it does not wait and is aligned with them when they land; its pointer carries it like the scope.
-CARRY = re.compile(r"((?:Scope|Waits for its definition|App shell and mock API|App shell|Mock API): [^\n]+?\.)(?= |$)")
+# "Built on the AI server: ..." (CHG-R12PL-034): where an AI server task is built (ticvai-ai, its Qdrant or its Postgres).
+CARRY = re.compile(r"((?:Scope|Waits for its definition|App shell and mock API|App shell|Mock API|Built on the AI server): "
+                   r"[^\n]+?\.)(?= |$)")
 
 # **A migration is written in the developer's repository, copied from the package's SQL** (CHG-R5-002, 7 October). A
 # developer's agent stopped MIG-BASELINE (#27646): the ticket names V0001__baseline.sql, which the package no longer

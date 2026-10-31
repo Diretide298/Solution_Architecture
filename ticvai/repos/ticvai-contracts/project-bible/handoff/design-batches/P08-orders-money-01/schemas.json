@@ -2731,6 +2731,11 @@
  "MessageDispatch": {
   "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-append-only": "queuedAt",
+  "x-ticvai-index": [
+   [
+    "sourceRef"
+   ]
+  ],
   "x-ticvai-persistence": "marketing.message_dispatch",
   "type": "object",
   "required": [
@@ -2834,6 +2839,11 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "sourceRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The id of the record whose business event triggered the message (a performance id, a guest broadcast id), which `listMessageDispatches` filters on (ADAM CR-379; CHG-CR379-001). Null for a campaign."
    }
   }
  },
@@ -5711,7 +5721,8 @@
    "saleBoard",
    "currency",
    "currencyScale",
-   "timeZone"
+   "timeZone",
+   "channel"
   ],
   "properties": {
    "id": {
@@ -5725,6 +5736,15 @@
    "name": {
     "type": "string",
     "maxLength": 200
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "pos",
+     "kiosk"
+    ],
+    "default": "pos",
+    "description": "**Who operates this workstation** (ADAM CR-384, Chinmay, 31 October 2026; CHG-CR384-001; the values are catalogue's `Channel`, so the workstation and a sale from it use the same word). `kiosk` is a self-service kiosk a guest operates; `pos` is a staffed till, including a staffed stand in an outlet of kind `kiosk`. Stored as `platform.workstation.channel` (not null, default `pos`), set by `configureWorkstation`, which keeps the stored value when the field is left out. White Label's kiosk operations ask it through `workstationRecords` (XDR-027): a venue's kiosks are its active workstations with channel `kiosk`.\n"
    },
    "venueId": {
     "type": "string",

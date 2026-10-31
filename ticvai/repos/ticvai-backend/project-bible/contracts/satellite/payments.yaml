@@ -78,6 +78,28 @@ x-ticvai-queries:
       (white-label's getPublishedTenantConfig, for paymentTokenisation) through the service route (serviceAuth; r8
       integration, CHG-R8INT-005).
     served: [in-process, service]
+  # **The payment methods, as Orders stores them** (ADAM CR-385, Chinmay, 31 October 2026; CHG-CR385-001): White
+  # Label's kiosk publish check paymentMethodUnavailable reads them in process from the operations host (XDR-028).
+  paymentMethodRecords:
+    module: payments
+    table: payments.method
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The payments.method rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/PaymentMethod'}
+    rule: >-
+      A data read, not a rule question (ADR-0055 rule 2 as amended 14 October). Orders answers with its
+      payments.method rows, as it stores them and as the caller's scope lets it see them (the table's row-level
+      security, under the caller's connection and transaction). It decides nothing: an asker that refuses or chooses
+      on these rows states that rule in its own operation. It is asked in process by the operations host, through the
+      C# query interface Orders implements, for White Label's getKioskConfigValidation and publishKioskConfigs, which
+      report paymentMethodUnavailable for an accepted method that is not an active row available at the venue (its
+      venueIds contain the venue or are empty) (ADAM CR-385, 31 October 2026; XDR-028; SELECT on payments.method
+      granted to the operations role).
+    served: [in-process]
   approvedPaymentMethods:
     module: payments
     table: payments.method

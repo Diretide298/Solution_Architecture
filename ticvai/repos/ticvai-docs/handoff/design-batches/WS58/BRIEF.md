@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-269` | Channel Connection & Integration Manager | A | 33 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-270` | Product, Price & Availability Synchronization | B | 6 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-271` | Real-Time Channel Availability & Inventory Monitor | B | 0 | 14 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `ADM-272` | Channel Allocation & Rebalancing Operations | B | 15 | 18 | 6 | 9 | 1 | 0 | — | notStarted (generated) |
+| `ADM-272` | Channel Allocation & Rebalancing Operations | B | 16 | 18 | 6 | 9 | 1 | 0 | — | notStarted (generated) |
 | `ADM-273` | Channel Exceptions, Incidents & Recovery | B | 16 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-274` | Channel Performance & Commercial Analytics | B | 2 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-275` | Channel Audit, Logs & Transaction Traceability | B | 2 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |

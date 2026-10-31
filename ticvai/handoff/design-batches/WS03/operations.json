@@ -8,7 +8,13 @@
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "beaconId",
+    "in": "query",
+    "required": true
+   }
+  ],
   "requestBody": null,
   "responds": "BleBeaconGeofenceConfigurationView"
  },

@@ -907,6 +907,14 @@
    "name"
   ],
   "properties": {
+   "channel": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/WorkstationChannel"
+     }
+    ],
+    "description": "`kiosk` for a self-service kiosk a guest operates, `pos` for a staffed till (ADAM CR-384; CHG-CR384-001). **Unlike the other fields of this PUT, a channel left out keeps the stored value**, so a client that does not know the field never turns a kiosk into a till. A new workstation's channel is `pos`.\n"
+   },
    "cashierInputMode": {
     "type": "string",
     "enum": [
@@ -6894,7 +6902,8 @@
    "saleBoard",
    "currency",
    "currencyScale",
-   "timeZone"
+   "timeZone",
+   "channel"
   ],
   "properties": {
    "id": {
@@ -6908,6 +6917,15 @@
    "name": {
     "type": "string",
     "maxLength": 200
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "pos",
+     "kiosk"
+    ],
+    "default": "pos",
+    "description": "**Who operates this workstation** (ADAM CR-384, Chinmay, 31 October 2026; CHG-CR384-001; the values are catalogue's `Channel`, so the workstation and a sale from it use the same word). `kiosk` is a self-service kiosk a guest operates; `pos` is a staffed till, including a staffed stand in an outlet of kind `kiosk`. Stored as `platform.workstation.channel` (not null, default `pos`), set by `configureWorkstation`, which keeps the stored value when the field is left out. White Label's kiosk operations ask it through `workstationRecords` (XDR-027): a venue's kiosks are its active workstations with channel `kiosk`.\n"
    },
    "venueId": {
     "type": "string",
@@ -7071,5 +7089,13 @@
     "type": "boolean"
    }
   }
+ },
+ "WorkstationChannel": {
+  "type": "string",
+  "enum": [
+   "pos",
+   "kiosk"
+  ],
+  "description": "**Who operates a workstation** (ADAM CR-384, Chinmay, 31 October 2026; CHG-CR384-001), named as catalogue's `Channel` values: `pos` a staffed till (a staffed stand in an outlet of kind `kiosk` included), `kiosk` a self-service kiosk a guest operates. A board's goods are `SaleBoardKind`; this is a different fact.\n"
  }
 }

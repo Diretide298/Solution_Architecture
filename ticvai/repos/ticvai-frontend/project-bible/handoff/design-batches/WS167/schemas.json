@@ -695,6 +695,33 @@
    }
   }
  },
+ "SeatAttribute": {
+  "type": "string",
+  "description": "BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n",
+  "enum": [
+   "standard",
+   "accessible",
+   "companion",
+   "obstructedView",
+   "restrictedLegroom",
+   "premium",
+   "houseSeat",
+   "buffer",
+   "aisle",
+   "endOfRow",
+   "extraLegroom",
+   "powerOutlet",
+   "tableService",
+   "shaded",
+   "covered",
+   "nearExit",
+   "nearAccessibleWc",
+   "wheelchairTransfer",
+   "limitedRecline",
+   "sofa",
+   "beanbag"
+  ]
+ },
  "SeatHoldPool": {
   "type": "object",
   "x-ticvai-persistence": "seating.hold_pool",
@@ -1005,14 +1032,136 @@
  },
  "SeatMapTemplate": {
   "x-ticvai-persistence": "seating.seat_map_template",
+  "x-ticvai-rls": "read-beneath",
+  "description": "**A reusable layout with its own copy of the structure** (ADAM CR-403, decided 31 October 2026). createSeatMapTemplate copies the source map's structure when the template is saved; createSeatMap with `templateId` writes a new map from it. The source map is kept for lineage only.",
   "type": "object",
   "required": [
    "id",
    "name",
    "seatCount",
-   "sectionCount"
+   "sectionCount",
+   "structure",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "**The region the template is saved at** (ADR-0005; ADAM CR-403). Row security is read-beneath, so the venues under that region read the template."
+   },
+   "sourceSeatMapId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "nullable": true,
+    "x-ticvai-references": "seating.seat_map",
+    "description": "The map the template was copied from, for lineage only (ADAM CR-403)."
+   },
+   "structure": {
+    "readOnly": true,
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "type": "array",
+    "description": "The copied structure (ADAM CR-403): the sections, each with its rows and their seats, as they were on the source map when the template was saved. View photos are not kept.",
+    "items": {
+     "type": "object",
+     "required": [
+      "code",
+      "name"
+     ],
+     "properties": {
+      "code": {
+       "type": "string"
+      },
+      "name": {
+       "type": "string"
+      },
+      "boundary": {
+       "type": "array",
+       "items": {
+        "$ref": "#/components/schemas/Point"
+       }
+      },
+      "rows": {
+       "type": "array",
+       "items": {
+        "type": "object",
+        "required": [
+         "label"
+        ],
+        "properties": {
+         "label": {
+          "type": "string"
+         },
+         "numberingDirection": {
+          "type": "string",
+          "enum": [
+           "leftToRight",
+           "rightToLeft"
+          ]
+         },
+         "seats": {
+          "type": "array",
+          "items": {
+           "type": "object",
+           "required": [
+            "seatNumber"
+           ],
+           "properties": {
+            "seatNumber": {
+             "type": "string"
+            },
+            "displayLabel": {
+             "type": "string"
+            },
+            "position": {
+             "$ref": "#/components/schemas/Point"
+            },
+            "attribute": {
+             "$ref": "#/components/schemas/SeatAttribute"
+            },
+            "categoryCode": {
+             "type": "string",
+             "nullable": true,
+             "description": "The seat category's code on the source map; matched by code in the new map's venue."
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "viewBox": {
+    "readOnly": true,
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "type": "object",
+    "nullable": true,
+    "description": "The source map's coordinate space, copied (ADAM CR-403).",
+    "properties": {
+     "width": {
+      "type": "number"
+     },
+     "height": {
+      "type": "number"
+     }
+    }
+   },
+   "stagePosition": {
+    "readOnly": true,
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/Point"
+     }
+    ],
+    "nullable": true,
+    "description": "The source map's stage position, copied (ADAM CR-403)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -1041,16 +1190,31 @@
  },
  "Section": {
   "x-ticvai-persistence": "seating.section",
+  "x-ticvai-unique-together": [
+   [
+    "seatMapId",
+    "code"
+   ]
+  ],
   "type": "object",
   "required": [
+   "seatMapId",
    "code",
    "name",
    "rowCount",
    "seatCount"
   ],
   "properties": {
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "seating.seat_map",
+    "description": "**The map the section belongs to** (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into: createSeatMap, editSeatMapStructure addSections, cloneSeatMap, copySeatMapSection, and the imports when committed. A map's codes are unique on it, matched exactly (`section_seat_map_id_code_uniq`)."
+   },
    "code": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique-compare": "exact"
    },
    "name": {
     "type": "string"

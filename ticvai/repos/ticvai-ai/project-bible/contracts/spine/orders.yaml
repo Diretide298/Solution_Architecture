@@ -4687,6 +4687,13 @@ paths:
         details belongs to the checkout page — `WEB-011`, `GST-041` — and this call refuses until one
         of them has completed, keeping the cart so the guest resumes rather than restarts.
 
+        **Where a guest checkout''s proven contact comes from** (ADAM CR-432, decided 31 October 2026, Chinmay;
+        CHG-CR432-001). Under the cart''s anonymous guest session (`Cart.anonymousSessionToken`) this takes
+        `verifiedContactRef` from the session, where identity `verifyGuestOtp` recorded it when the guest''s purpose
+        `verify` code was proved, and answers 403 `contactNotConfirmed` when the session holds none. It writes the
+        order with `subjectId` null and that `verifiedContactRef`, and `order.created` carries it. No profile and no
+        account are made: `linkGuestCheckout` attaches the order once the guest creates an account (ADAM CR-361).
+
         **A verified contact that matches an existing profile attaches the order to it automatically**
         (ADR-0045 section 4; decided 28 September, audit R120 (b)). The guest is not asked, and gets no
         session on that profile: they see this order and nothing else of its history until they sign in
@@ -4857,7 +4864,8 @@ paths:
         '403':
           description: 'The contact the tickets would go to is not proven — an unverified session
             (`sessionNotVerified`), or a guest checkout with no confirmed one-time code
-            (`contactNotConfirmed`). **The client sends the guest to sign-in or to the code step and
+            (`contactNotConfirmed`: the cart''s anonymous guest session holds no `verifiedContactRef`, ADAM
+            CR-432). **The client sends the guest to sign-in or to the code step and
             keeps the cart**; nothing is released.
 
             '
@@ -6688,7 +6696,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Refund'
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: '`forbidden` as the shared answer says; or the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: 'The refund is not waiting for approval (`notPendingApproval`) — it was already
             approved, declined, completed or failed. Only a `pendingApproval` refund is approved

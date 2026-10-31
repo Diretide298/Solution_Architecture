@@ -1597,7 +1597,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Wristband replacement (secondary button) | navigation or local | — | — | — | — |
 | Wallet replacement (secondary button) | navigation or local | — | — | — | — |
 | Incorrect assignment (secondary button) | navigation or local | — | — | — | — |
-| Replace credential (primary button) | `replaceCredential` POST `/credentials/{credentialId}/replace` | CredentialReplacementInput | CredentialOperationsCommandCenterView | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 replacement-limit, or approval-required, or the credential is revoked | step-up: mfa (Moves a paid ticket onto new media; the old one stops working.); gated `ORDER_EXCHANGE` |
+| Replace credential (primary button) | `replaceCredential` POST `/credentials/{credentialId}/replace` | CredentialReplacementInput | CredentialOperationsCommandCenterView | 403 A step-up refusal: the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 …; 404 The resource does not exist, or is outside the … | step-up: mfa (Moves a paid ticket onto new media; the old one stops working.); gated `ORDER_EXCHANGE` |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1690,7 +1690,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (404, 409).
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (403, 404, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-359?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Customer changed phone, Wristband replacement, Wallet replacement, Incorrect assignment, Replace credential.

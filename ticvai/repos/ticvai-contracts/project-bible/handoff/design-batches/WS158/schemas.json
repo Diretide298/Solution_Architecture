@@ -602,7 +602,8 @@
     "type": "array",
     "items": {
      "type": "string"
-    }
+    },
+    "description": "**What a claimant must hold** (ADAM CR-380, Chinmay, 31 October 2026; CHG-CR380-001). Each value is held when it matches the `courseName` of one of the person's `workforce.training_record` rows (same text, ignoring case) with state `passed` and `expiresAt` empty or after the shift's `to`. Empty: no record is needed. `claimOpenShift` refuses `409 shift-claimant-not-eligible` otherwise."
    },
    "eligiblePrincipalCount": {
     "type": "integer",

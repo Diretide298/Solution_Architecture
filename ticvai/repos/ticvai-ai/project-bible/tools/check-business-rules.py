@@ -65,7 +65,9 @@ And one rule per decision:
   BR-PRESET-READONLY (r10, ADAM CR-176, CHG-R10ID-005) setCapabilityTemplate refuses a preset's id with 409
                    capability-template-is-preset.
   BR-END-SESSIONS  (r10, ADAM CR-180, CHG-R10ID-006) updatePrincipal ends a principal's sessions and refresh tokens through
-                   identity.end_principal_sessions, which tools/derive-ddl.py writes.
+                   identity.end_principal_sessions, which tools/derive-ddl.py writes; since r12 (ADAM CR-377,
+                   CHG-CR377-001) resetPrincipalCredential does too, with end reason credential-reset, which
+                   ActiveSession.endReason names.
   BR-PLATFORM-TOKEN (r10, ADAM CR-175, CHG-R10ID-007) ADR-0072 defines the platform token; the Control Plane holds the
                    operator, its platform session and its second factors; openPlatformStaffGrant cites the ADR.
   BR-GUEST-TOKENS  (r10, ADAM CR-100, CHG-R10ID-009) getGuestSession answers GuestSessionView, which has no tokens;
@@ -188,6 +190,20 @@ And one rule per decision:
   BR-PRODUCT-FROM-PRICE (r12, ADAM CR-358 option (a), CHG-CR358-001) Product.fromPrice is a nullable, readOnly,
                    unstored Money; listProducts takes channel and asks tenancy#venueSettingsRecords; WEB-035's and
                    GST-044's price cards bind Product.fromPrice.
+  BR-BEACON-GEOFENCE (r12, ADAM CR-389, CHG-CR389-001) a beacon's geofence is access.device_placement.activation_zone,
+                   each input field names its column, health and lastDetected are not stored, and both beacon
+                   operations ask tenancy#deviceRecords in process and answer 404 for a beaconId with no beacon.
+  BR-FACE-TAG-PROFILE (r12, ADAM CR-390, CHG-CR390-001) setFaceTagTemporaryEnrollment creates on its path id (201,
+                   no 404), lists both 422 types, stores consentFormId, and reads the venue's settings in process.
+  BR-FACE-PASS-REVOKE (r12, ADAM CR-391, CHG-CR391-001) revokeFacePass declares its 404 and reads the enrolment on
+                   Identity's service route (listSubjectBiometricRecords), never in process; Identity's consumer
+                   deletes the row on revoked.
+  BR-POLICY-VERSIONS (r12, ADAM CR-392, CHG-CR392-001) a policy version is the next integer per kind, unique with
+                   kind; an effectiveFrom in the past is 400; the current version is the latest in force (UTC).
+  BR-CONTENT-PAGE-SWITCH (r12, ADAM CR-393, CHG-CR393-001) a published page takes an isEnabled switch, which
+                   invalidates the storefront pages cache.
+  BR-GUIDED-CHOICE-TARGETS (r12, ADAM CR-394, CHG-CR394-001) the three guided-choice writes ask Catalogue in process,
+                   publish states the on-sale rule per kind, and its 422 is GuidedChoiceAnswerProblem.
   BR-BOOKING-FLOW-MISSING (r12, ADAM CR-343, CHG-CR343-001) bookingFlowMissing counts a venue's sellable bookable
                    products of a kind some flow type books, against that venue's own enabled flows (no tenant-wide
                    flow), and validateTenantConfig and publishTenantConfig ask catalogue#productRecords and
@@ -198,6 +214,156 @@ And one rule per decision:
   BR-RESTORE-MISSING-PAGE (r12, ADAM CR-350, CHG-CR350-001) restoreConfigVersion restores a section or navigation item
                    whose content page is gone hidden (contentPageId null, isVisible false), never refuses for it, and
                    keeps content_page.is_referenced.
+  BR-DASHBOARD-COST (r12, ADAM CR-372, CHG-CR372-001) Dashboard.aggregateCost states its rule (60 / refreshSeconds per
+                   tile, a share of the refresh budget, bands 0.5 and 0.8) and createDashboard and updateDashboard store
+                   it on every save.
+  BR-DASHBOARD-ENTITLEMENT (r12, ADAM CR-373, CHG-CR373-001) createDashboard, updateDashboard, listDashboards and
+                   getCommandCentre ask the three Subscription licence reads in process; the rule is stated on
+                   CreateDashboardRequest.module (x-ticvai-permission-modules and the session); both writes refuse 409
+                   module-not-licensed or module-permission-not-held, and module-not-entitled is gone.
+  BR-TILE-MARKS    (r12, ADAM CR-374, CHG-CR374-001) every DashboardTile.visualisation mark has its row in the mark
+                   table, and "as their names" is gone.
+  BR-AUDIT-REASON  (r12, ADAM CR-376, CHG-CR376-001) AuditRecord.reason (platform.audit_record.reason, 3 to 500
+                   characters) exists, resetPrincipalCredential writes its reason there, and every request field
+                   that says it is "recorded in the audit" says it is the audit row's reason.
+  BR-PRIVACY-CONSENT (r12, ADAM CR-378, CHG-CR378-001) listPrivacyConsent states every count's source, every warning
+                   code's rule, every directory type's source and status map and every filter's reach, and declares
+                   the nine Marketing tables it reads; each count on the view says what it counts.
+  BR-GUEST-BROADCAST (r12, ADAM CR-379, CHG-CR379-001) broadcastToGuests names its venue, writes
+                   workforce.guest_broadcast and emits workforce.guestBroadcastAccepted (critical consumer
+                   marketing-crm sendGuestBroadcast), asks access#liveEntitlementSubjects, signs an evacuation with
+                   supervisorStepUp (403 supervisor-step-up-refused), and no longer writes through
+                   sendTransactionalMessage; the operations host's read of access.entitlement is an XDR entry.
+  BR-OPEN-SHIFT-CLAIM (r12, ADAM CR-380, CHG-CR380-001) claimOpenShift reads the training records, staffing rules and
+                   rota it checks, asks the role and overlap queries, writes the open shift and the rota assignment, and
+                   answers 409 rota-assignment-overlap; OpenShift.requiredQualifications states the courseName match.
+  BR-KIOSK-LISTS   (r12, ADAM CR-381, CHG-CR381-001) updateKioskConfig takes attractSlides (at most 40) and startTiles
+                   (at most 8), each replacing its whole list when given.
+  BR-KIOSK-DELETE  (r12, ADAM CR-382, CHG-CR382-001) KioskConfig.deletedAt; deleteKioskConfig writes only kiosk_config
+                   and removes nothing; every kiosk-configuration operation says what a deleted one does.
+  BR-KIOSK-COUNT   (r12, ADAM CR-383, CHG-CR383-001) listKioskConfigs, getKioskConfig and listKioskAssignments ask
+                   tenancy#workstationRecords in process for the venue's kiosks; KioskAssignment answers a kiosk with
+                   no row.
+  BR-KIOSK-CHANNEL (r12, ADAM CR-384, CHG-CR384-001) Workstation.channel [pos, kiosk], not null default pos, kept when
+                   configureWorkstation leaves it out; listWorkstations filters by it; assignKiosk refuses from it.
+  BR-KIOSK-FINDINGS (r12, ADAM CR-385, CHG-CR385-001) every KioskConfigFindingKind has a severity and rule row; the
+                   validation and the publish ask the media, products and payment methods in process.
+  BR-KIOSK-RESTORE (r12, ADAM CR-386, CHG-CR386-001) a restore of an older version sets hasUnpublishedChanges.
+  BR-BANNER-OUTSIDE-DRAFT (r12, ADAM CR-387, CHG-CR387-001; general) a table white-label's header lists outside the
+                   draft has no NOT NULL key to whitelabel.tenant_config, and no banner operation reads or writes it.
+  BR-BANNER-STATE  (r12, ADAM CR-388, CHG-CR388-001) a banner returns to draft by isActive false, never by clearing
+                   startsAt (the promo block's move); updateBanner lists its 400.
+  BR-GATE-MODE-POLICY (r12, ADAM CR-396, CHG-CR396-001) whoCanActivate holds identity.role ids (format uuid);
+                   setTurnstileMode asks identity#principalHoldsRoleAtVenue in process, answers 403
+                   gate-mode-role-required and 400 reason-required, states the policy precedence and the incident's type
+                   and team; a scheduled change keeps its turnstile mode (AccessGateModeChange.targetTurnstileMode).
+  BR-ACCESS-POINT-ACTIVE (r12, ADAM CR-397, CHG-CR397-001) createAccessPoint says a new access point is created active,
+                   and setAccessPointDirection names no device status AccessPoint does not have.
+  BR-WHITELIST-APPROVAL (r12, ADAM CR-399, CHG-CR399-001) addBlacklistEntry raises its whitelist request through
+                   x-ticvai-write-via createApprovalRequest, passes 422 no-approval-route on, and an access consumer of
+                   approval.granted writes access.blacklist.
+  BR-ADMISSION-CREATE (r12, ADAM CR-400, CHG-CR400-001) createAdmissionRules answers update's three 422 problem types,
+                   asks tenancy#scopeRecords for the working venue's path and answers 403 working-venue-required;
+                   updateAdmissionRules asks no scope read.
+  BR-PRICING-QUEUE-MEMBERS (r12, ADAM CR-416, CHG-CR416-001) the recommendation queue and explainability reads declare
+                   catalogue.pricing_simulation, catalogue.price_category and tenancy#scopeRecords, state each member's
+                   rule, answer actualRevenueResultPercent null (nullable, LO-CR416-001) and confidence times 100.
+  BR-PRICING-AUTOMATION-LEVEL (r12, ADAM CR-417, CHG-CR417-001) both automation views answer automationLevel and no
+                   automationMode; the policy view's scopeLevel and listDynamicPricingAutomation's filter list every
+                   level DynamicPricingControl stores; the orchestrator reads pricing_market and sales_channel for
+                   market and channel, and channel is nullable.
+  BR-PRICING-SCORECARD (r12, ADAM CR-418, CHG-CR418-001) listLearningModelPerformance waits on the price outcome
+                   measure and is assembled from three sources, with no catalogue.model_scorecard anywhere.
+  BR-PRICE-SIMULATION (r12, ADAM CR-419, CHG-CR419-001) simulatePriceBreakdownCalculation is no singleton, takes productVariantId,
+                   reads tax through finance#taxCodeRecords and the live price from price_execution, declares 400
+                   validation and 422 no-selected-rate / no-calculation-profile, and answers aiInsights empty.
+  BR-CALC-PROFILE-VERSION (r12, ADAM CR-420, CHG-CR420-001) CalculationProfile is unique on (scopePath, code, version),
+                   setPriceCalculationPolicy finds its record by the path id, numbers versions on the server and
+                   answers a second active default 409 default-profile-exists; dependsOn names sequence numbers.
+  BR-ROLLBACK-CANCEL (r12, ADAM CR-421, CHG-CR421-001) cancelPricingRollback cancels its waiting approval request in
+                   process (IApprovalRequests.CancelAsync), writes no outbox row, and cancelApprovalRequest names the
+                   in-process move.
+  BR-LIVE-PRICE    (r12, ADAM CR-422, CHG-CR422-001) createLiveDynamicPrice never writes catalogue.price, emits
+                   catalogue.priceExecuted (an event file with a consumer), reads its approval through
+                   approvals#requestRecords, and declares 400 validation and 422 approval-required / guardrail-breached.
+  BR-STRATEGY-FIGURES (r12, ADAM CR-423, CHG-CR423-001) listDynamicPricingStrategy reads price_execution and
+                   price_ladder, names venue and owner through tenancy#scopeRecords and identity#principalRecords, gives
+                   each figure its rule, answers and filters automationLevel (no automationMode) and offers no testing
+                   status (LO-CR423-001).
+  BR-PRICE-BAND-ORDER (r12, ADAM CR-424, CHG-CR424-001) listDynamicPriceBand sorts by ladderId only, a member of its
+                   view; a sort on `code`, which a price ladder lacks, fails.
+  BR-GUARDRAIL-SCOPE (r12, ADAM CR-425, CHG-CR425-001) setDynamicPricingGuardrailPolicy is keyed by [scopeLevel, scopeId],
+                   declares 400 validation and 422 scope-id-required / scope-not-found / no-approval-route, keeps a raise
+                   in pendingAutomationLevel and pendingApprovalRequestId (readOnly), types its three lists as arrays,
+                   and Catalogue consumes the four approval outcomes for subjectType dynamicPricingControl.
+  BR-SEAT-MAP-SECTIONS (r12, ADAM CR-402, CHG-CR402-001) Section carries a required, read-only seatMapId referencing
+                   seating.seat_map, unique with code (matched exactly); getSeatMap answers the map's sections by it, the
+                   five writers say they set it, and editSeatMapStructure and copySeatMapSection answer a taken code 409
+                   seat-label-taken.
+  BR-SEAT-TEMPLATE-COPY (r12, ADAM CR-403, CHG-CR403-001) SeatMapTemplate keeps its own structure at its region's
+                   scope_path, read-beneath, with a read-only sourceSeatMapId; createSeatMapTemplate persists the source;
+                   createSeatMap reads the template, writes seating.seat, answers 422 unknown-reference and copies no
+                   view photo.
+  BR-SEAT-MAP-UPDATE (r12, ADAM CR-404, CHG-CR404-001) updateSeatMap declares no 409 its body cannot cause and does
+                   declare the 404 a sectionViews code off the map answers (CR-402).
+  BR-FORECAST-CURVE (r12, ADAM CR-405, CHG-CR405-001) listDemandBookingCurve reads the venue currency through
+                   tenancy#venueSettingsRecords, nothing from Orders, answers confidence x 100 and a venue with no
+                   currency 500, never a left-out revenue.
+  BR-ELASTICITY-CONTEXT (r12, ADAM CR-406, CHG-CR406-001) DemandForecast stores the five context columns;
+                   listPriceElasticityRevenue reads the venue currency (not Orders) and states the filters, the
+                   latest-run rule, the confidence bands, the item and the full order.
+  BR-PRICING-PERFORMANCE (r12, ADAM CR-407, CHG-CR407-001) listDynamicPricingPerformance reads the venue currency and
+                   the strategies (not Orders), orders by label then key (not a nested `at`), refuses what it cannot
+                   compare 400, and keeps every view member with the left-out KPIs on LO-CR407-001.
+  BR-REVENUE-ROW   (r12, ADAM CR-408, CHG-CR408-001) listRevenue declares its demand_forecast read, defines the row,
+                   the status mappings and the control in force, orders by rankBy and lists the five left-out figures
+                   (LO-CR408-001).
+  BR-COMPETITOR-OBSERVATION (r12, ADAM CR-409, CHG-CR409-001) a competitor price observation is a row of
+                   catalogue.competitor_price_observation (its own currencyCode, keyed to its demand_signal registry
+                   row); listCompetitorPricingMarket reads it and states the median, position and movement rules, and
+                   the view's computed figures are nullable.
+  BR-CONTEXTUAL-RULE (r12, ADAM CR-410, CHG-CR410-001) a contextual rule is a pricing.dynamic_price_rule row with its
+                   dimension columns; channelId keys catalogue.sales_channel; setDynamicPriceRule answers 422
+                   contextual-rule-incomplete; listChannelCustomerSegment reads the rule table only.
+  BR-SALE-SCHEDULE-SUMMARY (r12, ADAM CR-411, CHG-CR411-001) every figure of the schedule summary states its rule,
+                   blackouts come from blackoutDates, and listChannelSaleSchedule reads product_channel_assignment for
+                   every-product windows.
+  BR-CHANNEL-ALLOCATION-COUNTS (r12, ADAM CR-412, CHG-CR412-001) channel_envelope keeps allocationPercent and the
+                   released and returned units; setChannelAllocations refuses a percentage with no percent (400
+                   validation); relinquishChannelAllocation writes returned_units; the product filter is the event
+                   path and the order is total.
+  BR-CHANNEL-CODE-UNIQUE (r12, ADAM CR-413, CHG-CR413-001) a channel code is unique per tenant (x-ticvai-unique) and
+                   createChannelProfile answers 409 DuplicateCode and 400 for a bad scope; scopeId is a uuid; kiosk
+                   maps to kiosk.
+  BR-SALE-RULE-INSTANTS (r12, ADAM CR-414, CHG-CR414-001) listChannelSaleRule answers effectiveFrom and effectiveTo as
+                   nullable instants, ordered nulls last with id last.
+  BR-PRICING-APPROVAL (r12, ADAM CR-415, CHG-CR415-001) sendForApproval always raises an approvals request in process
+                   (x-ticvai-writes approvals.request, both in commerce), passes 422 no-approval-route through,
+                   writes no outbox or audit_entry, and Catalogue consumes the four approval events for it.
+  BR-BOOKING-FLOW-RESOLVE (r12, ADAM CR-426 and CR-427, CHG-CR426-001, CHG-CR427-001) deleteBookingFlow and
+                   getPublishedBookingFlow ask catalogue#productRecords and #productCategoryRecords in process (XDR-051);
+                   deleteBookingFlow states its two 409 cases and the on-sale rule, getPublishedBookingFlow the four
+                   steps, the kind tie rule (productKinds position, then catalogue position), the fall-through and 400.
+  BR-FLOW-TYPE-CATALOGUE (r12, ADAM CR-428, CHG-CR428-001) every catalogue type has name and description {en, ar} (the
+                   15 English names CMS-103 shows, in catalogue order), every condition is {en, ar}, and
+                   listBookingFlowTypes answers in catalogue order (never by name) with the condition and defaultSortOrder
+                   rules.
+  BR-BOOKING-FLOW-WRITES (r12, ADAM CR-429, CHG-CR429-001) both flow writes read consentQuestionRecords in process (served
+                   so), never guestMatchPolicyRecords, name their 400s step-not-in-flow-type, duplicate-flow-step and
+                   consent-question-not-active, and add a left-out step at its index; listBookingFlows states one order.
+  BR-GUEST-CONTACT-FIELDS (r12, ADAM CR-430, CHG-CR430-001) setBookingFlowConfig checks each active venue (in process,
+                   XDR-022) against the marketing-crm GuestMatchPolicy in force there, the default matchBy email with no row.
+  BR-GUEST-CODE-UNKNOWN (r12, ADAM CR-431, CHG-CR431-001) an unknown login, passwordReset or stepUp identifier gets a
+                   never-sent otp_challenge row, so the 429 answers alike, and verifyGuestOtp refuses any code against it.
+  BR-GUEST-CHECKOUT-PROOF (r12, ADAM CR-432, CHG-CR432-001) a guest-checkout code is proved under the cart's anonymous
+                   session (security none or guestAuth, 204, no subject, no GuestSession), the session holds
+                   verifiedContactRef, checkoutCart writes a subject-less order with it, and no route makes a profile.
+  BR-DELEGATION-CYCLE (r12, ADAM CR-433, CHG-CR433-001) identity#delegationReaches is a yes/no rule question under
+                   ITenantRootGrant that grantDelegation asks in process, under one transaction advisory lock.
+  BR-WEBHOOK-REPLAY-TENANT (r12, ADAM CR-434, CHG-CR434-001) WebhookReplayJob.tenantId states the backfill from the
+                   subscription's API client, the stop on rows left, and SET NOT NULL.
+  BR-OUTBOX-REPUBLISH-READS (r12, ADAM CR-435, CHG-CR435-001) republishOutbox declares no read of outbox rows (neither
+                   read-via nor lineage read) and names its partition-catalogue bound.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -920,6 +1086,13 @@ def main() -> int:
     need("BR-END-SESSIONS", "FUNCTION identity.end_principal_sessions" in
          (ROOT / "tools" / "derive-ddl.py").read_text(encoding="utf-8"),
          "tools/derive-ddl.py does not write identity.end_principal_sessions")
+    rpc = op("resetPrincipalCredential")[3]
+    need("BR-END-SESSIONS", "identity.end_principal_sessions" in text(rpc) and "credential-reset" in text(rpc),
+         "resetPrincipalCredential does not end sessions through identity.end_principal_sessions with end reason "
+         "credential-reset (CR-377)")
+    aser = ((isch.get("ActiveSession") or {}).get("properties") or {}).get("endReason") or {}
+    need("BR-END-SESSIONS", "credential-reset" in str(aser.get("description") or ""),
+         "ActiveSession.endReason does not name credential-reset (CR-377)")
     # BR-PLATFORM-TOKEN (ADAM CR-175, CHG-R10ID-007)
     need("BR-PLATFORM-TOKEN", any((ROOT / "docs" / "adr").glob("0072-*.md")), "ADR-0072 (the platform token) is missing")
     need("BR-PLATFORM-TOKEN", "ADR-0072" in text(op("openPlatformStaffGrant")[3]),
@@ -1180,6 +1353,137 @@ def main() -> int:
     gm = spc.get("groupMappings") or {}
     need("BR-GUEST-SSO", "minItems" not in gm and "guest" in str(gm.get("description") or ""),
          "SsoProviderConfig.groupMappings still requires a mapping on a guest row (CHG-CR327-002)")
+
+    # BR-KIOSK-* and BR-BANNER-* (r12, ADAM CR-381 to CR-388, decided 31 October 2026, Chinmay; the lead: "for each
+    # one actually check if they hold and if not then find out the best way keeping in mind what client needs", and
+    # "Include them in r12"). Each fails on the r12 candidate before these CRs (8535bc29) and passes on the decisions.
+    def kwords(x):
+        return " ".join(str(x or "").split())
+
+    def kvias(o_):
+        return {(str(v.get("query")), str(v.get("route"))) for v in o_.get("x-ticvai-read-via") or []
+                if isinstance(v, dict)}
+
+    wlk = load("contracts/satellite/white-label.yaml")
+    wls = (wlk.get("components") or {}).get("schemas") or {}
+    # BR-KIOSK-LISTS (CR-381): updateKioskConfig takes the slides and the tiles as parts of their own.
+    ukc = op("updateKioskConfig")[3]
+    ukb = props(op("updateKioskConfig")[4], body_schema(ukc))
+    for part, mx in (("attractSlides", 40), ("startTiles", 8)):
+        need("BR-KIOSK-LISTS", (ukb.get(part) or {}).get("type") == "array" and (ukb.get(part) or {}).get("maxItems") == mx,
+             f"updateKioskConfig's body has no {part} array of at most {mx} (CR-381)")
+    need("BR-KIOSK-LISTS", "`attractLoop` with its `slides`" not in kwords(ukc.get("description"))
+         and "an empty list clears it" in kwords(ukc.get("description")),
+         "updateKioskConfig does not name attractSlides and startTiles as parts that replace the whole list (CR-381)")
+    # BR-KIOSK-DELETE (CR-382): a removal sets deleted_at and removes nothing.
+    kcp = (wls.get("KioskConfig") or {}).get("properties") or {}
+    da = kcp.get("deletedAt") or {}
+    need("BR-KIOSK-DELETE", da.get("readOnly") is True and da.get("nullable") is True and da.get("format") == "date-time",
+         "KioskConfig has no readOnly, nullable deletedAt (whitelabel.kiosk_config.deleted_at; CR-382)")
+    dkc = op("deleteKioskConfig")[3]
+    dw = {str((w or {}).get("table")) for w in dkc.get("x-ticvai-writes") or [] if isinstance(w, dict)}
+    need("BR-KIOSK-DELETE", dw == {"whitelabel.kiosk_config"} and "removes nothing" in kwords(dkc.get("description")),
+         f"deleteKioskConfig does not write only whitelabel.kiosk_config and remove nothing ({sorted(dw)}; CR-382)")
+    need("BR-KIOSK-DELETE", "`deletedAt` is null" in kwords((kcp.get("name") or {}).get("description")),
+         "KioskConfig.name's uniqueness does not leave deleted configurations out (CR-382)")
+    for oid_ in ("listKioskConfigs", "getKioskConfig", "updateKioskConfig", "getKioskConfigValidation",
+                 "setKioskOutOfService", "restoreKioskConfigVersion", "getPublishedKioskConfig",
+                 "publishKioskConfigs", "listKioskConfigVersions", "assignKiosk"):
+        need("BR-KIOSK-DELETE", "deletedAt" in kwords(op(oid_)[3].get("description")),
+             f"{oid_} does not say what it does with a deleted configuration (deletedAt; CR-382)")
+    # BR-KIOSK-COUNT and BR-KIOSK-CHANNEL (CR-383, CR-384): a kiosk is a workstation whose channel is kiosk, read in
+    # process; the venue's kiosks are listed and counted from it.
+    tsch = (load("contracts/spine/tenancy.yaml").get("components") or {}).get("schemas") or {}
+    need("BR-KIOSK-CHANNEL", (tsch.get("WorkstationChannel") or {}).get("enum") == ["pos", "kiosk"],
+         "tenancy has no WorkstationChannel [pos, kiosk] (CR-384)")
+    wst = tsch.get("Workstation") or {}
+    wch = (wst.get("properties") or {}).get("channel") or {}
+    need("BR-KIOSK-CHANNEL", "channel" in (wst.get("required") or []) and wch.get("default") == "pos",
+         "Workstation.channel is not stored not null with default pos (CR-384)")
+    cwr = ((tsch.get("ConfigureWorkstationRequest") or {}).get("properties") or {}).get("channel") or {}
+    need("BR-KIOSK-CHANNEL", bool(cwr) and "default" not in cwr and "keeps the stored value" in kwords(cwr.get("description")),
+         "ConfigureWorkstationRequest.channel does not keep the stored value when left out (CR-384)")
+    need("BR-KIOSK-CHANNEL", any(isinstance(p_, dict) and p_.get("name") == "channel"
+                                 for p_ in op("listWorkstations")[3].get("parameters") or []),
+         "listWorkstations takes no channel filter (CR-384)")
+    ak = op("assignKiosk")[3]
+    need("BR-KIOSK-CHANNEL", ("tenancy#workstationRecords", "in-process") in kvias(ak)
+         and "kiosk enrolment" not in kwords(ak.get("description")) and "`channel` is" in kwords(ak.get("description")),
+         "assignKiosk does not refuse not-a-kiosk from Workstation.channel, read in process (CR-384)")
+    for oid_ in ("listKioskConfigs", "getKioskConfig", "listKioskAssignments"):
+        need("BR-KIOSK-COUNT", ("tenancy#workstationRecords", "in-process") in kvias(op(oid_)[3]),
+             f"{oid_} does not ask tenancy#workstationRecords in process for the venue's kiosks (CR-383)")
+    need("BR-KIOSK-COUNT", "`channel` `kiosk`" in kwords((kcp.get("assignedKioskCount") or {}).get("description")),
+         "KioskConfig.assignedKioskCount does not count the venue's kiosks by channel (CR-383)")
+    kap = (wls.get("KioskAssignment") or {}).get("properties") or {}
+    need("BR-KIOSK-COUNT", all((kap.get(f_) or {}).get("nullable") is True
+                               for f_ in ("id", "kioskConfigId", "assignedAt", "assignedByPrincipalId")),
+         "KioskAssignment cannot answer a kiosk with no row (id, kioskConfigId, assignedAt, assignedByPrincipalId "
+         "nullable; CR-383)")
+    # BR-KIOSK-FINDINGS (CR-385): a severity and a rule for every kind, and every read declared, in process.
+    fk = wls.get("KioskConfigFindingKind") or {}
+    fkt = kwords(fk.get("description"))
+    for k_ in fk.get("enum") or []:
+        need("BR-KIOSK-FINDINGS", f"| {k_} | error" in fkt,
+             f"KioskConfigFindingKind has no severity and rule row for {k_} (CR-385)")
+    for oid_ in ("getKioskConfigValidation", "publishKioskConfigs"):
+        for q_ in ("assets#mediaAssetRecords", "catalogue#productRecords", "payments#paymentMethodRecords"):
+            need("BR-KIOSK-FINDINGS", (q_, "in-process") in kvias(op(oid_)[3]),
+                 f"{oid_} does not ask {q_} in process (CR-385)")
+    need("BR-KIOSK-FINDINGS", "paymentMethodRecords" in (load("contracts/satellite/payments.yaml")
+                                                         .get("x-ticvai-queries") or {}),
+         "payments declares no paymentMethodRecords query (CR-385)")
+    # BR-KIOSK-RESTORE (CR-386): a restore of an older version leaves something to publish.
+    need("BR-KIOSK-RESTORE", "after a restore of a version other than the current" in
+         kwords((kcp.get("hasUnpublishedChanges") or {}).get("description")),
+         "KioskConfig.hasUnpublishedChanges is not set by a restore of an older version (CR-386)")
+    need("BR-KIOSK-RESTORE", "is not the configuration's current published version" in
+         kwords(op("restoreKioskConfigVersion")[3].get("description")),
+         "restoreKioskConfigVersion does not say when it sets hasUnpublishedChanges (CR-386)")
+    # BR-BANNER-OUTSIDE-DRAFT (CR-387; general): a table white-label's header lists outside the draft has no NOT NULL
+    # key to the draft row (whitelabel.tenant_config), and no banner operation reads or writes the draft. A table named
+    # outside the draft joins the list below; the phrase check fails if the header stops naming one.
+    outside = kwords((wlk.get("info") or {}).get("description"))
+    outside = outside[outside.find("**Outside the draft:**"):][:600]
+    sref = json.loads((ROOT / "handoff" / "schema-reference.json").read_text(encoding="utf-8")).get("cols") or {}
+    for phrase, table in (("banners", "whitelabel.banner"), ("content blocks", "whitelabel.content_block")):
+        need("BR-BANNER-OUTSIDE-DRAFT", phrase in outside,
+             f"white-label's header no longer lists {phrase} outside the draft; review BR-BANNER-OUTSIDE-DRAFT (CR-387)")
+        for c_ in sref.get(table) or []:
+            need("BR-BANNER-OUTSIDE-DRAFT", not (c_.get("references") == "whitelabel.tenant_config"
+                                                 and c_.get("required") == "yes"),
+                 f"{table}.{c_.get('column')} is a NOT NULL key to the working draft, though the table is outside the "
+                 f"draft (retire it, x-ticvai-retired-columns; CR-387)")
+    need("BR-BANNER-OUTSIDE-DRAFT", "tenant_config_id" in ((wls.get("Banner") or {}).get("x-ticvai-retired-columns") or []),
+         "Banner does not retire tenant_config_id (CR-387)")
+    lin_ = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
+    for oid_ in ("createBanner", "updateBanner", "deleteBanner", "listBanners"):
+        o_ = op(oid_)[3]
+        decl = {str((x or {}).get("table")) for k_ in ("x-ticvai-reads", "x-ticvai-writes")
+                for x in o_.get(k_) or [] if isinstance(x, dict)}
+        lt = set((lin_.get(oid_) or {}).get("reads") or []) | set((lin_.get(oid_) or {}).get("writes") or [])
+        need("BR-BANNER-OUTSIDE-DRAFT", "whitelabel.tenant_config" not in decl | lt,
+             f"{oid_} reads or writes whitelabel.tenant_config, though a banner is outside the draft (CR-387)")
+    need("BR-BANNER-OUTSIDE-DRAFT", "whitelabel.banner" in {str((x or {}).get("table")) for x in
+                                                           op("createBanner")[3].get("x-ticvai-writes") or []
+                                                           if isinstance(x, dict)},
+         "createBanner declares no write of whitelabel.banner (CR-387)")
+    # BR-BANNER-STATE (CR-388): a banner returns to draft by isActive false, never by clearing startsAt.
+    sch_ = load("states/schedule.yaml")
+    bmoves = {(t.get("from"), t.get("to"), t.get("operation")): kwords(t.get("guard"))
+              for t in sch_.get("transitions") or []}
+    need("BR-BANNER-STATE", "isActive false" in bmoves.get(("scheduled", "draft", "updateBanner"), "")
+         and "isActive not false" in bmoves.get(("draft", "scheduled", "updateBanner"), "")
+         and ("scheduled", "draft", "updatePromoBlock") in bmoves,
+         "states/schedule.yaml still moves a banner to draft by clearing startsAt (CR-388)")
+    bst = kwords((((wls.get("Banner") or {}).get("properties") or {}).get("state") or {}).get("description"))
+    need("BR-BANNER-STATE", "sets `draft` again when a later update clears `startsAt`" not in bst
+         and "`isActive` false puts a `draft`, `scheduled` or `active` banner in `draft`" in bst,
+         "Banner.state does not state the isActive rule of every updateBanner save (CR-388)")
+    ub = op("updateBanner")[3]
+    need("BR-BANNER-STATE", "validation-failed" in set(((ub.get("responses") or {}).get("400") or {})
+                                                       .get("x-ticvai-problem-types") or []),
+         "updateBanner lists no 400 validation-failed for startsAt null (CR-388)")
 
     # BR-UAEPASS-ENDPOINTS .. BR-CONTENT-PUBLISH (r12, ADAM CR-360 to CR-365, decided 30 October 2026, Chinmay; the
     # lead: "for each one actually check if they hold and if not then find out the best way keeping in mind what client
@@ -1517,6 +1821,111 @@ def main() -> int:
                  if isinstance(c, dict) and c.get("label") == "Prices in your currency"]
         need("BR-PRODUCT-FROM-PRICE", bool(cards) and all("Product.fromPrice" in (c.get("columns") or []) for c in cards),
              f"{sid}'s price card does not bind Product.fromPrice (CR-358)")
+    # BR-BEACON-GEOFENCE, BR-FACE-TAG-PROFILE, BR-FACE-PASS-REVOKE, BR-POLICY-VERSIONS, BR-CONTENT-PAGE-SWITCH,
+    # BR-GUIDED-CHOICE-TARGETS (r12, ADAM CR-389 to CR-394; the lead's review, 31 October 2026, "for each one actually
+    # check if they hold"). Each fails on the r12 candidate (8535bc29) and passes on the decision.
+    acc = op("setBleBeaconGeofence")[4]
+    asch = (acc.get("components") or {}).get("schemas") or {}
+
+    def inproc(oid, q):
+        return any(isinstance(v, dict) and v.get("query") == q and v.get("route") == "in-process"
+                   for v in op(oid)[3].get("x-ticvai-read-via") or [])
+
+    az = ((asch.get("AccessDevicePlacement") or {}).get("properties") or {}).get("activationZone") or {}
+    need("BR-BEACON-GEOFENCE", az.get("type") == "object" and {"centre", "radiusMeters", "boundary"}
+         <= set((az.get("properties") or {})),
+         "AccessDevicePlacement has no activationZone {centre, radiusMeters, boundary} for the beacon geofence (CR-389)")
+    bin_ = (asch.get("BleBeaconGeofenceConfigurationInput") or {}).get("properties") or {}
+    want = {"beaconName": "name", "beaconId": "device_id", "venue": "venue_id", "gate": "access_point_id",
+            "park": "access_area_id", "zone": "access_area_id", "attraction": "access_area_id",
+            "proximityThreshold": "proximity_threshold_meters", "activeInactive": "is_active",
+            "geofenceRadiusMeters": "activation_zone", "geofenceCentre": "activation_zone",
+            "geofenceBoundary": "activation_zone"}
+    got = {k: str((bin_.get(k) or {}).get("x-ticvai-stored-as") or "").replace("access.device_placement.", "")
+           for k in want}
+    need("BR-BEACON-GEOFENCE", got == want, f"BleBeaconGeofenceConfigurationInput's columns are not CR-389's: {got}")
+    need("BR-BEACON-GEOFENCE", all((bin_.get(k) or {}).get("x-ticvai-persisted") is False
+                                   for k in ("health", "lastDetected")),
+         "BleBeaconGeofenceConfigurationInput keeps health or lastDetected, which are ignored on input (CR-389)")
+    for oid in ("setBleBeaconGeofence", "getBleBeaconGeofence"):
+        need("BR-BEACON-GEOFENCE", inproc(oid, "tenancy#deviceRecords"),
+             f"{oid} does not ask tenancy#deviceRecords in process (CR-389, XDR-031)")
+        need("BR-BEACON-GEOFENCE", "404" in {str(k) for k in op(oid)[3].get("responses") or {}},
+             f"{oid} declares no 404 for a beaconId with no beacon (CR-389)")
+    need("BR-BEACON-GEOFENCE", any(isinstance(p, dict) and p.get("name") == "beaconId" and p.get("required") is True
+                                   for p in op("getBleBeaconGeofence")[3].get("parameters") or []),
+         "getBleBeaconGeofence takes no required beaconId (CR-389)")
+    need("BR-BEACON-GEOFENCE", "this write does not touch `access.access_point`" in flat(op("setBleBeaconGeofence")[3]),
+         "setBleBeaconGeofence does not say it leaves access.access_point to setAccessPointGeofence (CR-389)")
+
+    ft = op("setFaceTagTemporaryEnrollment")[3]
+    fcodes = {str(k) for k in ft.get("responses") or {}}
+    need("BR-FACE-TAG-PROFILE", "201" in fcodes and "404" not in fcodes,
+         "setFaceTagTemporaryEnrollment does not create on the path id (201, no 404; CR-390, CR-245)")
+    need("BR-FACE-TAG-PROFILE", ((ft.get("responses") or {}).get("422") or {}).get("x-ticvai-problem-types")
+         == ["retention-threshold-required", "consent-form-required"],
+         "setFaceTagTemporaryEnrollment's 422 does not list its two types (CR-390)")
+    need("BR-FACE-TAG-PROFILE", "consentFormId" in ((asch.get("AccessBiometricProfile") or {}).get("properties") or {}),
+         "AccessBiometricProfile has no consentFormId (access.biometric_profile.consent_form_id; CR-390)")
+    for oid in ("setFaceTagTemporaryEnrollment", "listFaceTagTemporary"):
+        need("BR-FACE-TAG-PROFILE", inproc(oid, "tenancy#venueSettingsRecords"),
+             f"{oid} does not ask tenancy#venueSettingsRecords in process (CR-390, XDR-032)")
+
+    rv = op("revokeFacePass")[3]
+    need("BR-FACE-PASS-REVOKE", "404" in {str(k) for k in rv.get("responses") or {}},
+         "revokeFacePass declares no 404 for an unknown or another guest's enrolment (CR-391)")
+    need("BR-FACE-PASS-REVOKE", not inproc("revokeFacePass", "identity#subjectBiometricRecords"),
+         "revokeFacePass reads pii.subject_biometric in process: biometric records stay off the access role (CR-391)")
+    sv = op("listSubjectBiometricRecords")
+    need("BR-FACE-PASS-REVOKE", sv[1] == "/internal/subject-biometrics"
+         and {"serviceAuth": []} in (sv[3].get("security") or []),
+         "identity#subjectBiometricRecords has no service operation (listSubjectBiometricRecords, serviceAuth; CR-391)")
+    ev = load("events/biometric-enrolmentChanged.yaml")
+    idc = next((c for c in ev.get("consumers") or [] if isinstance(c, dict) and c.get("context") == "identity"), {})
+    purpose = " ".join(str(idc.get("purpose") or "").split())
+    need("BR-FACE-PASS-REVOKE", "delete the row on revoked" in purpose and "or deactivate the enrolment" not in purpose,
+         "biometric.enrolmentChanged: Identity's consumer does not delete the row on revoked (CR-391)")
+    xdr = load("docs/active/cross-deployable-writes.yaml")
+    need("BR-FACE-PASS-REVOKE", not any(r.get("reader") == "access" and "pii.subject_biometric" in (r.get("tables") or [])
+                                        for r in xdr.get("reads") or [] if isinstance(r, dict)),
+         "a reads entry grants the access role pii.subject_biometric (CR-391: wait for service sign-in)")
+
+    wls = (op("setPolicy")[4].get("components") or {}).get("schemas") or {}
+    need("BR-POLICY-VERSIONS", ["kind", "version"] in ((wls.get("Policy") or {}).get("x-ticvai-unique-together") or []),
+         "Policy is not unique on (kind, version) (CR-392)")
+    sp = op("setPolicy")[3]
+    need("BR-POLICY-VERSIONS", "effective-from-in-past" in problem_types(sp) and "409" in {str(k) for k in sp.get("responses") or {}},
+         "setPolicy declares no 400 effective-from-in-past or no 409 for a concurrent version (CR-392)")
+    need("BR-POLICY-VERSIONS", "one more than the highest stored for that kind" in flat(sp),
+         "setPolicy does not say how a version is numbered (CR-392)")
+    for oid in ("listPolicies", "listPublishedPolicies"):
+        need("BR-POLICY-VERSIONS", "latest `effectiveFrom` on or before today (UTC)" in flat(op(oid)[3]),
+             f"{oid} does not state the current-version rule (CR-392)")
+    need("BR-POLICY-VERSIONS", "next scheduled `effectiveFrom`" in flat(op("listPublishedPolicies")[3]),
+         "listPublishedPolicies' cache does not expire at the next scheduled effectiveFrom (CR-392)")
+
+    need("BR-CONTENT-PAGE-SWITCH", "a change to `isEnabled`" in flat(op("updateContentPage")[3]),
+         "updateContentPage refuses an isEnabled switch on a published page (CR-393)")
+    need("BR-CONTENT-PAGE-SWITCH", "by `updateContentPage`" in flat(op("listPublishedContentPages")[3]),
+         "listPublishedContentPages' cache is not invalidated by an isEnabled switch (CR-393)")
+
+    for oid in ("createGuidedChoice", "proposeGuidedChoice", "publishGuidedChoice"):
+        for q in ("catalogue#productRecords", "catalogue#productCategoryRecords", "catalogue#eventRecords"):
+            need("BR-GUIDED-CHOICE-TARGETS", inproc(oid, q), f"{oid} does not ask {q} in process (CR-394, XDR-033)")
+    pg = op("publishGuidedChoice")[3]
+    need("BR-GUIDED-CHOICE-TARGETS", str(((((pg.get("responses") or {}).get("422") or {}).get("content") or {})
+                                          .get("application/problem+json") or {}).get("schema", {}).get("$ref", ""))
+         .endswith("/GuidedChoiceAnswerProblem"),
+         "publishGuidedChoice's 422 is not GuidedChoiceAnswerProblem (CR-394)")
+    gap = props(op("publishGuidedChoice")[4], {"$ref": "#/components/schemas/GuidedChoiceAnswerProblem"})
+    need("BR-GUIDED-CHOICE-TARGETS", {"questionId", "answerId"} <= set(gap),
+         "GuidedChoiceAnswerProblem carries no questionId and answerId (CR-394)")
+    ptext = flat(pg)
+    for word in ("`guest_listing` `bookable`", "`lifecycle_state` `onSale` or `live`", "at least one such product",
+                 "enabled in the published configuration"):
+        need("BR-GUIDED-CHOICE-TARGETS", word in ptext, f"publishGuidedChoice does not state {word!r} (CR-394)")
+    need("BR-GUIDED-CHOICE-TARGETS", "questions/i/answers/j/target" in flat(op("createGuidedChoice")[3]),
+         "createGuidedChoice's 400 does not name the failing target by its pointer (CR-394)")
     # BR-BOOKING-FLOW-MISSING, BR-CALL-DISPOSITION, BR-RESTORE-MISSING-PAGE (r12, ADAM CR-343, CR-346, CR-350; the
     # lead, 30 October 2026). Each fails on the r11 package and passes on the decision.
     wl = load("contracts/satellite/white-label.yaml")
@@ -1554,6 +1963,688 @@ def main() -> int:
     for word in ("`contentPageId` null and `isVisible` false", "never causes a refusal", "`content_page.is_referenced`"):
         need("BR-RESTORE-MISSING-PAGE", word in rtext,
              f"restoreConfigVersion does not say {word!r} for a page deleted since the version (CR-350)")
+    access_rules_r12(need, op)
+
+    # ---------------------------------------------------------------- r12 CR lane F (31 October 2026; the lead: "for
+    # each one actually check if they hold and if not then find out the best way keeping in mind what client needs").
+    def writes_of(oid):
+        return {str(r.get("table")) for r in op(oid)[3].get("x-ticvai-writes") or [] if isinstance(r, dict)}
+
+    def ptypes_of_id(oid, code):
+        return set((((op(oid)[3].get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types")) or [])
+
+    rdoc_ = load("contracts/satellite/reporting.yaml")
+    rsch_ = (rdoc_.get("components") or {}).get("schemas") or {}
+    # BR-DASHBOARD-COST (ADAM CR-372; CHG-CR372-001)
+    acost = flat(props(rdoc_, rsch_.get("Dashboard") or {}).get("aggregateCost") or {})
+    for frag in ("60 / `refreshSeconds`", "adds 0", "dashboardRefreshBudgetPerMinute", "below 0.5",
+                 "from 0.5 to below 0.8", "from 0.8", "refresh-budget-exceeded", "reporting.dashboard.aggregate_cost"):
+        need("BR-DASHBOARD-COST", frag in acost, f"Dashboard.aggregateCost does not state {frag!r} (CR-372)")
+    for oid in ("createDashboard", "updateDashboard"):
+        need("BR-DASHBOARD-COST", "`aggregateCost` is worked out" in flat(op(oid)[3].get("description") or ""),
+             f"{oid} does not say it works out and stores aggregateCost on save (CR-372)")
+    # BR-DASHBOARD-ENTITLEMENT (ADAM CR-373; CHG-CR373-001)
+    lic = {"subscription#contractRecords", "subscription#licenceAddOnRecords", "subscription#planRecords"}
+    for oid in ("createDashboard", "updateDashboard", "listDashboards", "getCommandCentre"):
+        miss = lic - vias_of(oid)
+        need("BR-DASHBOARD-ENTITLEMENT", not miss, f"{oid} does not ask {', '.join(sorted(miss))} in process (CR-373)")
+    for oid in ("createDashboard", "updateDashboard"):
+        need("BR-DASHBOARD-ENTITLEMENT", {"module-not-licensed", "module-permission-not-held"} <= ptypes_of_id(oid, "409"),
+             f"{oid}'s 409 does not name module-not-licensed and module-permission-not-held (CR-373)")
+    for oid_, (f_, _p, _m, o_, _d) in sorted(ops.items()):
+        if f_.name == "reporting.yaml":
+            need("BR-DASHBOARD-ENTITLEMENT", "module-not-entitled" not in problem_types(o_),
+                 f"{oid_} still answers module-not-entitled for the entitlement guard (CR-373)")
+    cdr = flat(rsch_.get("CreateDashboardRequest") or {})
+    for frag in ("x-ticvai-permission-modules", "permissionsByScope", "`core` is always", "empty list"):
+        need("BR-DASHBOARD-ENTITLEMENT", frag in cdr,
+             f"CreateDashboardRequest.module's entitlement rule does not state {frag!r} (CR-373)")
+    # BR-TILE-MARKS (ADAM CR-374; CHG-CR374-001)
+    dtv = props(rdoc_, rsch_.get("DashboardTile") or {}).get("visualisation") or {}
+    marks = list(dtv.get("enum") or [])
+    if not marks and isinstance(dtv.get("$ref"), str):
+        marks = list((rsch_.get(dtv["$ref"].rsplit("/", 1)[1]) or {}).get("enum") or [])
+    note = str(dtv.get("x-ticvai-note") or dtv.get("description") or "")
+    table_rows = [ln for ln in note.splitlines() if ln.strip().startswith("|")]
+    need("BR-TILE-MARKS", bool(marks), "DashboardTile.visualisation lists no marks (CR-374)")
+    for m in marks:
+        need("BR-TILE-MARKS", any(f"`{m}`" in r for r in table_rows) or f"`{m}` one measure" in note
+             or m in ("line", "area", "bar") or m.startswith("stacked"),
+             f"DashboardTile.visualisation mark {m} has no row saying what it binds (CR-374)")
+    need("BR-TILE-MARKS", "as their names" not in note, "DashboardTile.visualisation still says 'as their names' (CR-374)")
+    # BR-AUDIT-REASON (ADAM CR-376; CHG-CR376-001)
+    tsch_ = (load("contracts/spine/tenancy.yaml").get("components") or {}).get("schemas") or {}
+    arr = ((tsch_.get("AuditRecord") or {}).get("properties") or {}).get("reason") or {}
+    need("BR-AUDIT-REASON", arr.get("nullable") is True and arr.get("minLength") == 3 and arr.get("maxLength") == 500,
+         "AuditRecord.reason is missing, or not nullable with 3 to 500 characters (CR-376)")
+    need("BR-AUDIT-REASON", "audit row's `reason`" in text(rpc),
+         "resetPrincipalCredential does not write its reason to the audit row's reason (CR-376)")
+    for f in sorted((ROOT / "contracts").rglob("*.yaml")):
+        if "frozen" in f.parts:
+            continue
+        raw = f.read_text(encoding="utf-8")
+        for m in re.finditer(r"description: '?(Reason, recorded in the audit[^\n]*(?:\n {12,}[^\n]*)*)", raw):
+            need("BR-AUDIT-REASON", "audit row''s `reason`" in m.group(1),
+                 f"{f.relative_to(ROOT)}: a reason 'recorded in the audit' does not say it is the audit row's reason (CR-376)")
+    # BR-PRIVACY-CONSENT (ADAM CR-378; CHG-CR378-001)
+    lpc = op("listPrivacyConsent")[3]
+    lpc_t = flat(lpc.get("description") or "")
+    miss = {"marketing.consent_purpose", "marketing.consent_purpose_channel", "marketing.communication_preference_type",
+            "marketing.consent_capture_point", "marketing.tracking_technology", "marketing.cookie_banner_design",
+            "marketing.minor_privacy_rule", "marketing.privacy_notice_governance",
+            "marketing.processing_purpose"} - reads_of("listPrivacyConsent")
+    need("BR-PRIVACY-CONSENT", not miss, f"listPrivacyConsent does not declare its reads of {', '.join(sorted(miss))} (CR-378)")
+    need("BR-PRIVACY-CONSENT", "white-label#policyRecords" in vias_of("listPrivacyConsent"),
+         "listPrivacyConsent does not read whitelabel.policy through white-label#policyRecords (CR-378)")
+    pv = (op("listPrivacyConsent")[4].get("components") or {}).get("schemas", {}).get(
+        "PrivacyConsentConfigurationCommandCenterView") or {}
+    pvp = pv.get("properties") or {}
+    for k, v in pvp.items():
+        if (v or {}).get("type") == "integer":
+            need("BR-PRIVACY-CONSENT", bool((v or {}).get("description")), f"PrivacyConsent view count {k} says nothing of what it counts (CR-378)")
+            need("BR-PRIVACY-CONSENT", f"`{k}` =" in lpc_t or f"`{k}`" in lpc_t,
+                 f"listPrivacyConsent states no rule for {k} (CR-378)")
+    codes = ((((pvp.get("configurationWarnings") or {}).get("items") or {}).get("properties") or {}).get("code") or {}).get("enum") or []
+    for c in codes:
+        need("BR-PRIVACY-CONSENT", (f"`{c}`:" in lpc_t) or (c == "other" and "`other` is not raised" in lpc_t),
+             f"listPrivacyConsent states no rule for the warning {c} (CR-378)")
+    types_ = (((((pvp.get("configurationDirectory") or {}).get("items") or {}).get("properties") or {})
+               .get("configurationType") or {}).get("enum") or [])
+    for c in types_:
+        need("BR-PRIVACY-CONSENT", f"`{c}` from" in lpc_t, f"listPrivacyConsent states no source for directory type {c} (CR-378)")
+    for prm in lpc.get("parameters") or []:
+        nm = (prm or {}).get("name")
+        if nm and nm not in ("pageSize",):
+            need("BR-PRIVACY-CONSENT", f"`{nm}`" in lpc_t.split("**Filters.**", 1)[-1],
+                 f"listPrivacyConsent does not say what the {nm} filter narrows (CR-378)")
+    need("BR-PRIVACY-CONSENT", "newest `effectiveFrom` first" not in json.dumps(op("listPrivacyConsent")[4], default=str),
+         "the privacy command centre still orders its directory by newest effectiveFrom (CR-378)")
+    # BR-GUEST-BROADCAST (ADAM CR-379; CHG-CR379-001)
+    btg = op("broadcastToGuests")[3]
+    bb = schema_of(op("broadcastToGuests")[4], body_schema(btg))
+    need("BR-GUEST-BROADCAST", "venueId" in (bb.get("required") or []), "broadcastToGuests' body does not require venueId (CR-379)")
+    need("BR-GUEST-BROADCAST", "supervisorStepUp" in (bb.get("properties") or {}) and btg.get("x-ticvai-step-up") == "pin"
+         and btg.get("x-ticvai-step-up-carrier") == "body:supervisorStepUp",
+         "broadcastToGuests does not sign an evacuation with supervisorStepUp (x-ticvai-step-up pin, CR-379)")
+    need("BR-GUEST-BROADCAST", "supervisor-step-up-refused" in ptypes_of_id("broadcastToGuests", "403"),
+         "broadcastToGuests' 403 does not name supervisor-step-up-refused (CR-379)")
+    need("BR-GUEST-BROADCAST", not any((w or {}).get("operation") == "sendTransactionalMessage"
+                                       for w in btg.get("x-ticvai-write-via") or []),
+         "broadcastToGuests still writes marketing.message_dispatch through sendTransactionalMessage (CR-379)")
+    need("BR-GUEST-BROADCAST", "workforce.guest_broadcast" in writes_of("broadcastToGuests")
+         and "workforce.guestBroadcastAccepted" in (btg.get("x-ticvai-emits") or []),
+         "broadcastToGuests does not write workforce.guest_broadcast and emit workforce.guestBroadcastAccepted (CR-379)")
+    for oid in ("broadcastToGuests", "sendGuestBroadcast"):
+        need("BR-GUEST-BROADCAST", "access#liveEntitlementSubjects" in vias_of(oid),
+             f"{oid} does not ask access#liveEntitlementSubjects (CR-379)")
+    need("BR-GUEST-BROADCAST", "liveEntitlementSubjects" in (load("contracts/spine/access.yaml").get("x-ticvai-queries") or {}),
+         "access declares no liveEntitlementSubjects query (CR-379)")
+    need("BR-GUEST-BROADCAST", "workforce.guestBroadcastAccepted" in (op("sendGuestBroadcast")[3].get("x-ticvai-consumes") or []),
+         "marketing-crm sendGuestBroadcast does not consume workforce.guestBroadcastAccepted (CR-379)")
+    ev = ROOT / "events" / "workforce-guestBroadcastAccepted.yaml"
+    evd = load("events/workforce-guestBroadcastAccepted.yaml") if ev.exists() else {}
+    need("BR-GUEST-BROADCAST", any((c or {}).get("operation") == "marketing-crm.sendGuestBroadcast" and (c or {}).get("isCritical")
+                                   for c in evd.get("consumers") or []),
+         "workforce.guestBroadcastAccepted has no critical consumer marketing-crm.sendGuestBroadcast (CR-379)")
+    xdr = load("docs/active/cross-deployable-writes.yaml").get("reads") or []
+    need("BR-GUEST-BROADCAST", any((x or {}).get("reader") == "operations" and "access.entitlement" in (x.get("tables") or [])
+                                   and "sendGuestBroadcast" in (x.get("operations") or []) for x in xdr),
+         "no XDR entry lets the operations role read access.entitlement for sendGuestBroadcast (CR-379)")
+    need("BR-GUEST-BROADCAST", any((x or {}).get("reader") == "commerce" and "broadcastToGuests" in (x.get("operations") or [])
+                                   and "access#liveEntitlementSubjects" in (x.get("queries") or []) for x in xdr),
+         "commerce's XDR entry does not cover broadcastToGuests' access#liveEntitlementSubjects (CR-379)")
+    msd = (((load("contracts/satellite/marketing-crm.yaml").get("components") or {}).get("schemas") or {})
+           .get("MessageDispatch") or {})
+    need("BR-GUEST-BROADCAST", "sourceRef" in (msd.get("properties") or {}),
+         "MessageDispatch has no sourceRef, which listMessageDispatches filters on (CR-379)")
+    # BR-OPEN-SHIFT-CLAIM (ADAM CR-380; CHG-CR380-001)
+    miss = {"workforce.training_record", "workforce.staffing_rules", "workforce.rota_assignment"} - reads_of("claimOpenShift")
+    need("BR-OPEN-SHIFT-CLAIM", not miss, f"claimOpenShift does not declare its reads of {', '.join(sorted(miss))} (CR-380)")
+    miss = {"workforce.open_shift", "workforce.rota_assignment"} - writes_of("claimOpenShift")
+    need("BR-OPEN-SHIFT-CLAIM", not miss, f"claimOpenShift does not declare its writes of {', '.join(sorted(miss))} (CR-380)")
+    miss = {"identity#principalHoldsRoleAtVenue", "workforce#principalHasOverlappingAssignment"} - vias_of("claimOpenShift")
+    need("BR-OPEN-SHIFT-CLAIM", not miss, f"claimOpenShift does not ask {', '.join(sorted(miss))} (CR-380)")
+    need("BR-OPEN-SHIFT-CLAIM", {"shift-claimant-not-eligible", "working-hour-rule-breach", "rota-assignment-overlap"}
+         <= ptypes_of_id("claimOpenShift", "409"), "claimOpenShift's 409 does not name all three refusals (CR-380)")
+    wsch_ = (load("contracts/satellite/workforce.yaml").get("components") or {}).get("schemas") or {}
+    rq = flat(((wsch_.get("OpenShift") or {}).get("properties") or {}).get("requiredQualifications") or {})
+    need("BR-OPEN-SHIFT-CLAIM", "`courseName`" in rq and "ignoring case" in rq and "`passed`" in rq,
+         "OpenShift.requiredQualifications does not state the training-record match (CR-380)")
+
+    # ---------------------------------------------------------------- r12 CR lane L, pricing (ADAM CR-416 to CR-425;
+    # the lead, 31 October 2026: "Include them in r12"). Each rule fails on the r12 candidate before the posted decision
+    # (8535bc29) and passes once the decision is in the package.
+    cat_s = ((load("contracts/spine/catalogue.yaml").get("components") or {}).get("schemas") or {})
+
+    def sprops(name):
+        return (cat_s.get(name) or {}).get("properties") or {}
+
+    def descr(oid):
+        return " ".join(str(op(oid)[3].get("description") or "").split())
+
+    def codes_of(oid, code):
+        return set(((op(oid)[3].get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def param_enum(oid, name):
+        for p_ in op(oid)[3].get("parameters") or []:
+            if isinstance(p_, dict) and p_.get("name") == name:
+                return list((p_.get("schema") or {}).get("enum") or [])
+        return None
+
+    lo_ids = {str(i.get("id")) for i in (load("docs/active/left-out.yaml").get("items") or []) if isinstance(i, dict)}
+    # BR-PRICING-QUEUE-MEMBERS (ADAM CR-416; CHG-CR416-001)
+    for oid in ("listRecommendationReviewDecision", "listPricingRecommendationExplainability"):
+        miss = {"catalogue.pricing_simulation", "catalogue.price_category"} - reads_of(oid)
+        need("BR-PRICING-QUEUE-MEMBERS", not miss, f"{oid} does not declare the read of {', '.join(sorted(miss))} (CR-416)")
+        need("BR-PRICING-QUEUE-MEMBERS", "tenancy#scopeRecords" in vias_of(oid),
+             f"{oid} does not read the venue's name through tenancy#scopeRecords (CR-416)")
+        d_ = descr(oid)
+        for frag in ("`expected_revenue` minus `baseline_revenue`", "newest by `created_at`, ties broken by `id`",
+                     "no title column is stored", "multiplied by 100", "`catalogue.price_category.name`"):
+            need("BR-PRICING-QUEUE-MEMBERS", frag in d_, f"{oid} does not state {frag!r} (CR-416)")
+    arr = sprops("AiRecommendationReviewDecisionQueueView").get("actualRevenueResultPercent") or {}
+    need("BR-PRICING-QUEUE-MEMBERS", arr.get("nullable") is True and "LO-CR416-001" in lo_ids,
+         "actualRevenueResultPercent is not nullable, or not on the left-out list as LO-CR416-001 (CR-416)")
+    # BR-PRICING-AUTOMATION-LEVEL (ADAM CR-417; CHG-CR417-001)
+    levels = (sprops("DynamicPricingControl").get("scopeLevel") or {}).get("enum") or []
+    for vn in ("DynamicPricingAutomationPolicyControlView", "AutomationPolicyAutonomousPricingOrchestratorView"):
+        pr = sprops(vn)
+        need("BR-PRICING-AUTOMATION-LEVEL", "automationMode" not in pr and "automationLevel" in pr,
+             f"{vn} answers automationMode, or no automationLevel (CR-417)")
+    need("BR-PRICING-AUTOMATION-LEVEL", set((sprops("DynamicPricingAutomationPolicyControlView").get("scopeLevel") or {})
+                                            .get("enum") or []) == set(levels),
+         "DynamicPricingAutomationPolicyControlView.scopeLevel does not list every level dynamic_pricing_control stores (CR-417)")
+    need("BR-PRICING-AUTOMATION-LEVEL", set(param_enum("listDynamicPricingAutomation", "scopeLevel") or []) == set(levels)
+         and param_enum("listDynamicPricingAutomation", "automationMode") is None
+         and param_enum("listDynamicPricingAutomation", "automationLevel"),
+         "listDynamicPricingAutomation does not filter all eight scope levels and automationLevel, or still filters "
+         "automationMode (CR-417)")
+    need("BR-PRICING-AUTOMATION-LEVEL", {"catalogue.pricing_market", "catalogue.sales_channel"}
+         <= reads_of("listAutomationPolicyAutonomous")
+         and (sprops("AutomationPolicyAutonomousPricingOrchestratorView").get("channel") or {}).get("nullable") is True,
+         "listAutomationPolicyAutonomous does not read pricing_market and sales_channel, or channel is not nullable (CR-417)")
+    need("BR-PRICING-AUTOMATION-LEVEL", "effectiveFrom" in descr("listDynamicPricingAutomation")
+         and "`start`" not in descr("listDynamicPricingAutomation"),
+         "listDynamicPricingAutomation still orders by `start` (CR-417)")
+    # BR-PRICING-SCORECARD (ADAM CR-418; CHG-CR418-001)
+    lmp = descr("listLearningModelPerformance")
+    for frag in ("price outcome measure", "No `catalogue.model_scorecard` table", "`getForecastAccuracy`",
+                 "capability maturity stages", "modified decisions divided by all decisions"):
+        need("BR-PRICING-SCORECARD", frag in lmp, f"listLearningModelPerformance does not state {frag!r} (CR-418)")
+    need("BR-PRICING-SCORECARD", not any(str((s or {}).get("x-ticvai-persistence") or "").startswith("catalogue.model_scorecard")
+                                         for s in cat_s.values() if isinstance(s, dict)),
+         "a schema persists to catalogue.model_scorecard, which CR-418 ruled out")
+    # BR-PRICE-SIMULATION (ADAM CR-419; CHG-CR419-001)
+    sim = op("simulatePriceBreakdownCalculation")[3]
+    need("BR-PRICE-SIMULATION", not sim.get("x-ticvai-singleton") and not sim.get("x-ticvai-singleton-note"),
+         "simulatePriceBreakdownCalculation is still flagged a singleton though it stores nothing (CR-419)")
+    need("BR-PRICE-SIMULATION", "productVariantId" in sprops("PriceBreakdownCalculationSimulationExplainabilityInput"),
+         "PriceBreakdownCalculationSimulationExplainabilityInput has no productVariantId (CR-419)")
+    need("BR-PRICE-SIMULATION", "finance#taxCodeRecords" in vias_of("simulatePriceBreakdownCalculation")
+         and {"catalogue.price_execution", "catalogue.membership_programme"} <= reads_of("simulatePriceBreakdownCalculation"),
+         "simulatePriceBreakdownCalculation does not read tax through finance#taxCodeRecords, or the live price and the "
+         "membership programme (CR-419)")
+    need("BR-PRICE-SIMULATION", "validation" in codes_of("simulatePriceBreakdownCalculation", "400")
+         and {"no-selected-rate", "no-calculation-profile"} <= codes_of("simulatePriceBreakdownCalculation", "422"),
+         "simulatePriceBreakdownCalculation does not declare 400 validation and 422 no-selected-rate / "
+         "no-calculation-profile (CR-419)")
+    need("BR-PRICE-SIMULATION", "evaluatePromotions" in descr("simulatePriceBreakdownCalculation")
+         and "LO-CR419-001" in lo_ids,
+         "simulatePriceBreakdownCalculation names no promotion rule, or aiInsights is not on the left-out list (CR-419)")
+    # BR-CALC-PROFILE-VERSION (ADAM CR-420; CHG-CR420-001)
+    cp = cat_s.get("CalculationProfile") or {}
+    need("BR-CALC-PROFILE-VERSION", ["scopePath", "code", "version"] in (cp.get("x-ticvai-unique-together") or []),
+         "CalculationProfile is not unique on (scopePath, code, version), so two saves can take one number (CR-420)")
+    need("BR-CALC-PROFILE-VERSION", "default-profile-exists" in codes_of("setPriceCalculationPolicy", "409")
+         and "validation" in codes_of("setPriceCalculationPolicy", "400"),
+         "setPriceCalculationPolicy does not answer a second default 409 default-profile-exists, or a step's profile id "
+         "400 validation (CR-420)")
+    spc = descr("setPriceCalculationPolicy")
+    need("BR-CALC-PROFILE-VERSION", "keyed by `code`" not in spc and "numbered by the server" in spc
+         and "`sequence` number" in spc,
+         "setPriceCalculationPolicy still keys on code and version, or does not say the server numbers versions and "
+         "dependsOn names sequence numbers (CR-420)")
+    # BR-ROLLBACK-CANCEL (ADAM CR-421; CHG-CR421-001)
+    cpr = descr("cancelPricingRollback")
+    need("BR-ROLLBACK-CANCEL", "IApprovalRequests.CancelAsync" in cpr and "is withdrawn" not in cpr
+         and "no outbox row is written" in cpr,
+         "cancelPricingRollback does not cancel its waiting request in process through IApprovalRequests.CancelAsync, "
+         "or still withdraws it (CR-421)")
+    ov = (json.loads((ROOT / "handoff" / "api-data-lineage-overrides.json").read_text(encoding="utf-8"))
+          .get("operations") or {})
+    need("BR-ROLLBACK-CANCEL", "platform.outbox" not in ((ov.get("cancelPricingRollback") or {}).get("writes") or []),
+         "the lineage still has cancelPricingRollback write platform.outbox (CR-421)")
+    need("BR-ROLLBACK-CANCEL", "CancelAsync" in descr("cancelApprovalRequest"),
+         "cancelApprovalRequest does not name the in-process move IApprovalRequests.CancelAsync (CR-421)")
+    # BR-LIVE-PRICE (ADAM CR-422; CHG-CR422-001)
+    clp = op("createLiveDynamicPrice")[3]
+    need("BR-LIVE-PRICE", "catalogue.price" not in ((ov.get("createLiveDynamicPrice") or {}).get("writes") or []),
+         "the lineage still has createLiveDynamicPrice write catalogue.price, the base (CR-422)")
+    lin_in = sprops("LiveDynamicPriceExecutionDeploymentMonitorInput")
+    need("BR-LIVE-PRICE", "applied to `catalogue.price`" not in str((cat_s.get("LiveDynamicPriceExecutionDeploymentMonitorInput")
+                                                                       or {}).get("x-ticvai-persistence") or "")
+         and "strategy" in lin_in,
+         "LiveDynamicPriceExecutionDeploymentMonitorInput is still applied to catalogue.price (CR-422)")
+    ev = ROOT / "events" / "catalogue-priceExecuted.yaml"
+    evd = load("events/catalogue-priceExecuted.yaml") if ev.exists() else {}
+    need("BR-LIVE-PRICE", "catalogue.priceExecuted" in (clp.get("x-ticvai-emits") or [])
+         and "createLiveDynamicPrice" in (evd.get("emittedBy") or []) and bool(evd.get("consumers")),
+         "createLiveDynamicPrice does not emit catalogue.priceExecuted, or the event has no file or consumer (CR-422)")
+    need("BR-LIVE-PRICE", "approvals#requestRecords" in vias_of("createLiveDynamicPrice")
+         and "validation" in codes_of("createLiveDynamicPrice", "400")
+         and {"approval-required", "guardrail-breached"} <= codes_of("createLiveDynamicPrice", "422"),
+         "createLiveDynamicPrice does not read its approval through approvals#requestRecords, or declare 400 validation "
+         "and 422 approval-required / guardrail-breached (CR-422)")
+    # BR-STRATEGY-FIGURES (ADAM CR-423; CHG-CR423-001)
+    need("BR-STRATEGY-FIGURES", {"catalogue.price_execution", "catalogue.price_ladder"} <= reads_of("listDynamicPricingStrategy")
+         and {"tenancy#scopeRecords", "identity#principalRecords"} <= vias_of("listDynamicPricingStrategy"),
+         "listDynamicPricingStrategy does not read price_execution and price_ladder, or the venue and owner names (CR-423)")
+    need("BR-STRATEGY-FIGURES", "automationMode" not in sprops("DynamicPricingStrategyCommandCenterView")
+         and "automationLevel" in sprops("DynamicPricingStrategyCommandCenterView")
+         and param_enum("listDynamicPricingStrategy", "automationMode") is None
+         and param_enum("listDynamicPricingStrategy", "automationLevel"),
+         "the strategy row still answers or filters automationMode instead of automationLevel (CR-423, CR-417)")
+    need("BR-STRATEGY-FIGURES", "testing" not in (param_enum("listDynamicPricingStrategy", "status") or [])
+         and "LO-CR423-001" in lo_ids,
+         "listDynamicPricingStrategy still offers testing, or it is not on the left-out list (CR-423)")
+    lds = descr("listDynamicPricingStrategy")
+    for frag in ("`currentPriceAdjustments` counts", "`pricesAtMaximumGuardrail` counts", "seven open-conflict counts",
+                 "`pricesAtUpperBand`", "a draft with a ladder and at least one rule"):
+        need("BR-STRATEGY-FIGURES", frag in lds, f"listDynamicPricingStrategy does not state {frag!r} (CR-423)")
+    # BR-PRICE-BAND-ORDER (ADAM CR-424; CHG-CR424-001)
+    ldb = descr("listDynamicPriceBand")
+    need("BR-PRICE-BAND-ORDER", "Sorted by `ladderId` ascending" in ldb and "Sorted by `code`" not in ldb
+         and "ladderId" in sprops("DynamicPriceBandsLaddersAdjustmentMatrixView"),
+         "listDynamicPriceBand does not sort by ladderId alone, a member of its view (CR-424)")
+    # BR-GUARDRAIL-SCOPE (ADAM CR-425; CHG-CR425-001)
+    gp = op("setDynamicPricingGuardrailPolicy")[3]
+    need("BR-GUARDRAIL-SCOPE", gp.get("x-ticvai-body-key") == ["scopeLevel", "scopeId"]
+         and "400 validation" in str(gp.get("x-ticvai-body-key-note") or "")
+         and "is refused `400 validation`" not in str(gp.get("x-ticvai-body-key-note") or ""),
+         "setDynamicPricingGuardrailPolicy is not keyed by [scopeLevel, scopeId], or still answers a missing scopeId "
+         "400 (CR-425)")
+    need("BR-GUARDRAIL-SCOPE", "validation" in codes_of("setDynamicPricingGuardrailPolicy", "400")
+         and {"scope-id-required", "scope-not-found", "no-approval-route"} <= codes_of("setDynamicPricingGuardrailPolicy", "422"),
+         "setDynamicPricingGuardrailPolicy does not declare 400 validation and 422 scope-id-required / scope-not-found / "
+         "no-approval-route (CR-425)")
+    dpc = sprops("DynamicPricingControl")
+    need("BR-GUARDRAIL-SCOPE", all((dpc.get(k) or {}).get("readOnly") is True
+                                   for k in ("pendingAutomationLevel", "pendingApprovalRequestId")),
+         "DynamicPricingControl has no readOnly pendingAutomationLevel and pendingApprovalRequestId (CR-425)")
+    for k in ("authorityTiers", "noChangeWindows", "circuitBreakers"):
+        need("BR-GUARDRAIL-SCOPE", (dpc.get(k) or {}).get("type") == "array",
+             f"DynamicPricingControl.{k} is not an array of the objects its description lists (CR-425)")
+    for evn in ("granted", "rejected", "withdrawn", "expired"):
+        cons = load(f"events/approval-{evn}.yaml").get("consumers") or []
+        need("BR-GUARDRAIL-SCOPE", any(isinstance(c, dict) and c.get("context") == "catalogue"
+                                       and "dynamicPricingControl" in str(c.get("purpose") or "") for c in cons),
+             f"events/approval-{evn}.yaml has no catalogue consumer for subjectType dynamicPricingControl (CR-425)")
+
+    # ---------------------------------------------------------------- r12 CR lane J, seat maps and revenue reads (ADAM
+    # CR-402 to CR-408; the lead, 31 October 2026: "Include them in r12"). Each rule fails on the r12 candidate before
+    # the posted decision (28bc5f7b) and passes once the decision is in the package.
+    seat_doc = load("contracts/satellite/seating.yaml")
+    seat_s = ((seat_doc.get("components") or {}).get("schemas") or {})
+
+    def seat_props(name):
+        return (seat_s.get(name) or {}).get("properties") or {}
+
+    def writes_of(oid):
+        return {str(r.get("table")) for r in op(oid)[3].get("x-ticvai-writes") or [] if isinstance(r, dict)}
+
+    ov_j = (json.loads((ROOT / "handoff" / "api-data-lineage-overrides.json").read_text(encoding="utf-8"))
+            .get("operations") or {})
+    lo_j = {str(i.get("id")) for i in (load("docs/active/left-out.yaml").get("items") or []) if isinstance(i, dict)}
+    # BR-SEAT-MAP-SECTIONS (ADAM CR-402; CHG-CR402-001)
+    sec = seat_s.get("Section") or {}
+    smi = seat_props("Section").get("seatMapId") or {}
+    need("BR-SEAT-MAP-SECTIONS", smi.get("readOnly") is True and smi.get("x-ticvai-references") == "seating.seat_map"
+         and "seatMapId" in (sec.get("required") or []),
+         "Section has no required, read-only seatMapId referencing seating.seat_map, so no section belongs to a map (CR-402)")
+    need("BR-SEAT-MAP-SECTIONS", ["seatMapId", "code"] in (sec.get("x-ticvai-unique-together") or [])
+         and (seat_props("Section").get("code") or {}).get("x-ticvai-unique-compare") == "exact",
+         "Section is not unique on (seatMapId, code) with code matched exactly, as Seat's key matches it (CR-402)")
+    need("BR-SEAT-MAP-SECTIONS", "`seat_map_id` is `seatMapId`" in descr("getSeatMap"),
+         "getSeatMap does not answer the map's sections by seat_map_id (CR-402)")
+    for oid in ("createSeatMap", "editSeatMapStructure", "cloneSeatMap", "copySeatMapSection", "commitImportJob"):
+        need("BR-SEAT-MAP-SECTIONS", "seat_map_id" in descr(oid),
+             f"{oid} does not say the sections it writes take seat_map_id (CR-402)")
+    for oid in ("editSeatMapStructure", "copySeatMapSection"):
+        need("BR-SEAT-MAP-SECTIONS", "seat-label-taken" in codes_of(oid, "409"),
+             f"{oid} does not answer a section code already on the map 409 seat-label-taken (CR-402)")
+    # BR-SEAT-TEMPLATE-COPY (ADAM CR-403; CHG-CR403-001)
+    tpl = seat_s.get("SeatMapTemplate") or {}
+    tp = seat_props("SeatMapTemplate")
+    need("BR-SEAT-TEMPLATE-COPY", tpl.get("x-ticvai-rls") == "read-beneath" and "scopePath" in tp
+         and {"structure", "scopePath"} <= set(tpl.get("required") or []),
+         "SeatMapTemplate keeps no structure, or is not read-beneath at its region's scope_path (CR-403)")
+    need("BR-SEAT-TEMPLATE-COPY", (tp.get("sourceSeatMapId") or {}).get("readOnly") is True
+         and (tp.get("sourceSeatMapId") or {}).get("x-ticvai-references") == "seating.seat_map",
+         "SeatMapTemplate has no read-only sourceSeatMapId for lineage (CR-403)")
+    cst = (((((op("createSeatMapTemplate")[3].get("requestBody") or {}).get("content") or {}).get("application/json")
+            or {}).get("schema") or {}).get("properties") or {}).get("sourceSeatMapId") or {}
+    need("BR-SEAT-TEMPLATE-COPY", cst and cst.get("x-ticvai-persisted") is not False,
+         "createSeatMapTemplate's sourceSeatMapId is still not persisted (CR-403)")
+    need("BR-SEAT-TEMPLATE-COPY", "seating.seat_map_template" in reads_of("createSeatMap")
+         and "seating.seat" in writes_of("createSeatMap")
+         and "unknown-reference" in codes_of("createSeatMap", "422"),
+         "createSeatMap does not declare the read of seating.seat_map_template, the write of seating.seat, or 422 "
+         "unknown-reference for a template it cannot use (CR-403)")
+    need("BR-SEAT-TEMPLATE-COPY", "View photos are not copied" in descr("createSeatMap"),
+         "createSeatMap does not say a template's copy carries no view photos (CR-403)")
+    # BR-SEAT-MAP-UPDATE (ADAM CR-404; CHG-CR404-001)
+    usm = op("updateSeatMap")[3]
+    need("BR-SEAT-MAP-UPDATE", "409" not in (usm.get("responses") or {})
+         and "Structural changes to a published map are rejected" not in descr("updateSeatMap"),
+         "updateSeatMap still declares a 409 its body cannot cause, or still says structural changes are rejected (CR-404)")
+    need("BR-SEAT-MAP-UPDATE", "404" in (usm.get("responses") or {}),
+         "updateSeatMap does not declare the 404 a sectionViews code off the map answers (CR-402)")
+    # BR-FORECAST-CURVE (ADAM CR-405; CHG-CR405-001)
+    ldc = descr("listDemandBookingCurve")
+    need("BR-FORECAST-CURVE", "tenancy#venueSettingsRecords" in vias_of("listDemandBookingCurve")
+         and "orders#salesOrderRecords" not in vias_of("listDemandBookingCurve")
+         and "orders.sales_order" not in ((ov_j.get("listDemandBookingCurve") or {}).get("reads") or []),
+         "listDemandBookingCurve does not read the venue currency through tenancy#venueSettingsRecords, or still reads "
+         "Orders (CR-405)")
+    for frag in ("stored 0-1 value times 100", "the answer is 500", "`revenue` is never left out"):
+        need("BR-FORECAST-CURVE", frag in ldc, f"listDemandBookingCurve does not state {frag!r} (CR-405)")
+    # BR-ELASTICITY-CONTEXT (ADAM CR-406; CHG-CR406-001)
+    dfp = sprops("DemandForecast")
+    miss = {"dayType", "peakPeriod", "season", "eventProximityFromDays", "eventProximityToDays"} - set(dfp)
+    need("BR-ELASTICITY-CONTEXT", not miss,
+         f"DemandForecast does not store the elasticity context {', '.join(sorted(miss))} (CR-406)")
+    need("BR-ELASTICITY-CONTEXT", "tenancy#venueSettingsRecords" in vias_of("listPriceElasticityRevenue")
+         and "orders#salesOrderRecords" not in vias_of("listPriceElasticityRevenue")
+         and "orders.sales_order" not in ((ov_j.get("listPriceElasticityRevenue") or {}).get("reads") or []),
+         "listPriceElasticityRevenue does not read the venue currency through tenancy#venueSettingsRecords, or still "
+         "reads Orders (CR-406)")
+    lpe = descr("listPriceElasticityRevenue")
+    for frag in ("`weekdayWeekend` matches `day_type`", "latest run of each slice", "below 0.5 is `low`",
+                 "one point of `response_curve`", "Sorted by `product` ascending with nulls last"):
+        need("BR-ELASTICITY-CONTEXT", frag in lpe, f"listPriceElasticityRevenue does not state {frag!r} (CR-406)")
+    # BR-PRICING-PERFORMANCE (ADAM CR-407; CHG-CR407-001)
+    ldp = descr("listDynamicPricingPerformance")
+    need("BR-PRICING-PERFORMANCE", "tenancy#venueSettingsRecords" in vias_of("listDynamicPricingPerformance")
+         and "orders#salesOrderRecords" not in vias_of("listDynamicPricingPerformance")
+         and "catalogue.dynamic_pricing_strategy" in reads_of("listDynamicPricingPerformance")
+         and "orders.sales_order" not in ((ov_j.get("listDynamicPricingPerformance") or {}).get("reads") or []),
+         "listDynamicPricingPerformance does not read the venue currency and the strategies, or still reads Orders (CR-407)")
+    need("BR-PRICING-PERFORMANCE", "by `at`" not in ldp and "By `label`, then by `key`" in ldp,
+         "listDynamicPricingPerformance orders by a member its row does not have, not by label then key (CR-407)")
+    need("BR-PRICING-PERFORMANCE", "400" in (op("listDynamicPricingPerformance")[3].get("responses") or {})
+         and "`400 validation` naming the parameter" in ldp,
+         "listDynamicPricingPerformance does not refuse the comparisons and the market level it cannot answer (CR-407)")
+    need("BR-PRICING-PERFORMANCE", "LO-CR407-001" in lo_j and "absent, not zero" in ldp
+         and "incrementalRevenue" in sprops("DynamicPricingPerformanceOptimizationAnalyticsView"),
+         "the KPIs CR-407 leaves out are not absent and on the left-out list, or the view lost an approved member")
+    # BR-REVENUE-ROW (ADAM CR-408; CHG-CR408-001)
+    lrv = descr("listRevenue")
+    need("BR-REVENUE-ROW", "catalogue.demand_forecast" in reads_of("listRevenue"),
+         "listRevenue does not declare its read of catalogue.demand_forecast (CR-408)")
+    for frag in ("whose status is not `ignored`", "scheduled is `queued`", "most specific scope that matches",
+                 "By `rankBy` (default `revenueOpportunity`)", "LO-CR408-001"):
+        need("BR-REVENUE-ROW", frag in lrv, f"listRevenue does not state {frag!r} (CR-408)")
+    need("BR-REVENUE-ROW", "Sorted by `optimizationId` descending" not in lrv and "LO-CR408-001" in lo_j,
+         "listRevenue still orders by optimizationId against its rankBy, or the left-out figures are not listed (CR-408)")
+
+    # ---------------------------------------------------------------- r12 CR lane K (CR-409 to CR-415; the lead, 31
+    # October 2026: "Include them in r12"). Each rule fails on the r12 candidate (8535bc29) and passes on the decision.
+    csch = ((op("listCompetitorPricingMarket")[4].get("components") or {}).get("schemas") or {})
+
+    def cprops(name):
+        return (csch.get(name) or {}).get("properties") or {}
+
+    def desc(oid):
+        return " ".join(str(op(oid)[3].get("description") or "").split())
+
+    # BR-COMPETITOR-OBSERVATION (ADAM CR-409; CHG-CR409-001)
+    cpo = csch.get("CompetitorPriceObservation") or {}
+    need("BR-COMPETITOR-OBSERVATION", cpo.get("x-ticvai-persistence") == "catalogue.competitor_price_observation"
+         and (cprops("CompetitorPriceObservation").get("demandSignalId") or {}).get("x-ticvai-references") == "catalogue.demand_signal"
+         and "currencyCode" in (cpo.get("required") or []),
+         "no catalogue.competitor_price_observation with its own currencyCode, keyed to catalogue.demand_signal (CR-409)")
+    need("BR-COMPETITOR-OBSERVATION", {"catalogue.competitor_price_observation", "catalogue.demand_signal"} <= reads_of("listCompetitorPricingMarket"),
+         "listCompetitorPricingMarket does not read the observations and their registry rows (CR-409)")
+    lcp = desc("listCompetitorPricingMarket")
+    for frag in ("median published price over the latest observation of each mapping", "never converted",
+                 "previous observation of the same mapping", "Only observations in the venue's trading currency count"):
+        need("BR-COMPETITOR-OBSERVATION", frag in lcp, f"listCompetitorPricingMarket does not state {frag!r} (CR-409)")
+    vw = cprops("CompetitorPricingMarketPositionIntelligenceView")
+    for p in ("marketMedianPrice", "positionVsMedian", "movementPercent", "historicalCorrelation"):
+        need("BR-COMPETITOR-OBSERVATION", (vw.get(p) or {}).get("nullable") is True,
+             f"CompetitorPricingMarketPositionIntelligenceView.{p} is not nullable, though it is null when missing (CR-409)")
+    # BR-CONTEXTUAL-RULE (ADAM CR-410; CHG-CR410-001)
+    dpr = cprops("PricingDynamicPriceRule")
+    miss = {"dimension", "salesChannel", "customerSegment", "segmentRef", "locationLevel", "locationId",
+            "dynamicPricingEnabled"} - set(dpr)
+    need("BR-CONTEXTUAL-RULE", not miss, f"PricingDynamicPriceRule has no {sorted(miss)} (CR-410)")
+    need("BR-CONTEXTUAL-RULE", (dpr.get("channelId") or {}).get("x-ticvai-references") == "catalogue.sales_channel",
+         "PricingDynamicPriceRule.channelId does not key catalogue.sales_channel (CR-410)")
+    need("BR-CONTEXTUAL-RULE", "contextual-rule-incomplete" in problem_types(op("setDynamicPriceRule")[3]),
+         "setDynamicPriceRule does not answer 422 contextual-rule-incomplete (CR-410)")
+    need("BR-CONTEXTUAL-RULE", reads_of("listChannelCustomerSegment") == {"pricing.dynamic_price_rule"}
+         and "`rule_type` `contextual`" in desc("listChannelCustomerSegment"),
+         "listChannelCustomerSegment does not list the rule_type contextual rows of pricing.dynamic_price_rule only (CR-410)")
+    # BR-SALE-SCHEDULE-SUMMARY (ADAM CR-411; CHG-CR411-001)
+    sms = cprops("ChannelSalesScheduleAvailabilityWindowsSummary")
+    for p, v in sms.items():
+        need("BR-SALE-SCHEDULE-SUMMARY", "CR-411" in str((v or {}).get("description") or ""),
+             f"ChannelSalesScheduleAvailabilityWindowsSummary.{p} states no rule (CR-411)")
+    need("BR-SALE-SCHEDULE-SUMMARY", "blackoutDates" in str((sms.get("blackouts") or {}).get("description")),
+         "the blackouts figure is not counted from blackoutDates (CR-411)")
+    need("BR-SALE-SCHEDULE-SUMMARY", "catalogue.product_channel_assignment" in reads_of("listChannelSaleSchedule"),
+         "listChannelSaleSchedule does not read catalogue.product_channel_assignment for every-product windows (CR-411)")
+    # BR-CHANNEL-ALLOCATION-COUNTS (ADAM CR-412; CHG-CR412-001)
+    cal = cprops("ChannelAllocation")
+    need("BR-CHANNEL-ALLOCATION-COUNTS", "allocationPercent" in cal and all((cal.get(p) or {}).get("readOnly") is True
+         for p in ("releasedUnits", "returnedUnits")),
+         "ChannelAllocation has no allocationPercent, or no readOnly releasedUnits and returnedUnits (CR-412)")
+    need("BR-CHANNEL-ALLOCATION-COUNTS", "validation" in ((((op("setChannelAllocations")[3].get("responses") or {}).get("400") or {})
+         .get("x-ticvai-problem-types")) or []), "setChannelAllocations' 400 does not list validation (CR-412)")
+    need("BR-CHANNEL-ALLOCATION-COUNTS", "returned_units" in text(op("relinquishChannelAllocation")[3].get("x-ticvai-writes") or []),
+         "relinquishChannelAllocation does not write returned_units (CR-412)")
+    lic = desc("listInventoryCapacityChannel")
+    need("BR-CHANNEL-ALLOCATION-COUNTS", "gives an empty page, not 400" in lic and "then by `id`" in lic
+         and "catalogue.product" in reads_of("listInventoryCapacityChannel"),
+         "listInventoryCapacityChannel does not state the product path, the empty page and a total order (CR-412)")
+    # BR-CHANNEL-CODE-UNIQUE (ADAM CR-413; CHG-CR413-001)
+    need("BR-CHANNEL-CODE-UNIQUE", (cprops("SalesChannelProfile").get("code") or {}).get("x-ticvai-unique") == "tenant",
+         "SalesChannelProfile.code is not x-ticvai-unique: tenant (CR-413)")
+    ccp = (op("createChannelProfile")[3].get("responses") or {})
+    need("BR-CHANNEL-CODE-UNIQUE", "DuplicateCode" in text(ccp.get("409") or {}) and "validation" in text(ccp.get("400") or {}),
+         "createChannelProfile does not answer 409 DuplicateCode and 400 validation (CR-413)")
+    need("BR-CHANNEL-CODE-UNIQUE", (cprops("ChannelCreationProfileConfigurationInput").get("scopeId") or {}).get("format") == "uuid",
+         "ChannelCreationProfileConfigurationInput.scopeId is not a uuid (CR-413)")
+    need("BR-CHANNEL-CODE-UNIQUE", "kiosk -> kiosk" in " ".join(str((cprops("SalesChannelCommandCenterView").get("salesChannel") or {}).get("description")).split()),
+         "the channelType -> salesChannel mapping has no kiosk -> kiosk (CR-413)")
+    # BR-SALE-RULE-INSTANTS (ADAM CR-414; CHG-CR414-001)
+    srv = cprops("ChannelSalesRulesLimitsRestrictionsView")
+    for p in ("effectiveFrom", "effectiveTo"):
+        need("BR-SALE-RULE-INSTANTS", (srv.get(p) or {}).get("format") == "date-time" and (srv.get(p) or {}).get("nullable") is True,
+             f"ChannelSalesRulesLimitsRestrictionsView.{p} is not a nullable date-time (CR-414)")
+    lsr = desc("listChannelSaleRule")
+    need("BR-SALE-RULE-INSTANTS", "NULLS LAST" in lsr and "then by `id`" in lsr,
+         "listChannelSaleRule's order puts no place for a null effectiveFrom or has no id last (CR-414)")
+    # BR-PRICING-APPROVAL (ADAM CR-415; CHG-CR415-001)
+    dpo = op("decidePricingRecommendation")[3]
+    need("BR-PRICING-APPROVAL", "approvals.request" in {str(w.get("table")) for w in dpo.get("x-ticvai-writes") or []
+                                                         if isinstance(w, dict)}
+         and "approvals.createApprovalRequest` in process" in desc("decidePricingRecommendation"),
+         "decidePricingRecommendation does not raise the request in process through createApprovalRequest (CR-415)")
+    need("BR-PRICING-APPROVAL", "no-approval-route" in problem_types(dpo),
+         "decidePricingRecommendation does not pass 422 no-approval-route through (CR-415)")
+    dtx = desc("decidePricingRecommendation")
+    need("BR-PRICING-APPROVAL", "always opens a request" in dtx and "above the caller" not in dtx
+         and "writes no outbox event and no" in dtx,
+         "decidePricingRecommendation still makes sendForApproval conditional, or writes an outbox event (CR-415)")
+    st = load("states/pricing-recommendation.yaml")
+    need("BR-PRICING-APPROVAL", not any("above the caller" in str(t.get("guard")) for t in st.get("transitions") or []),
+         "states/pricing-recommendation.yaml still guards sendForApproval on the caller's level (CR-415)")
+    for ev in ("approval-granted", "approval-rejected", "approval-expired", "approval-withdrawn"):
+        cons = [c for c in load(f"events/{ev}.yaml").get("consumers") or [] if isinstance(c, dict)
+                and c.get("context") == "catalogue" and "pricingRecommendation" in str(c.get("purpose"))]
+        need("BR-PRICING-APPROVAL", bool(cons) and all("catalogue.pricing_recommendation" in (c.get("writes") or [])
+             and c.get("idempotencyKey") == "requestId" for c in cons),
+             f"events/{ev}.yaml has no catalogue consumer for subjectType pricingRecommendation (CR-415)")
+
+    # ---------------------------------------------------------------- r12 CR lane M (the lead, 31 October 2026: "for
+    # each one actually check if they hold and if not then find out the best way keeping in mind what client needs";
+    # "Include them in r12"). Each rule fails on the r12 candidate before the posted decision and passes on it.
+    def routes(o_):
+        return {(str((v or {}).get("query")), str((v or {}).get("route"))) for v in o_.get("x-ticvai-read-via") or []
+                if isinstance(v, dict)}
+
+    xdr = load("docs/active/cross-deployable-writes.yaml")
+    xdr_reads = {str((r or {}).get("id")): r for r in xdr.get("reads") or [] if isinstance(r, dict)}
+    wsch = (wl.get("components") or {}).get("schemas") or {}
+
+    # BR-BOOKING-FLOW-RESOLVE (ADAM CR-426, CR-427; CHG-CR426-001, CHG-CR427-001)
+    dbf, gpb = op("deleteBookingFlow")[3], op("getPublishedBookingFlow")[3]
+    for oid_, o_ in (("deleteBookingFlow", dbf), ("getPublishedBookingFlow", gpb)):
+        for q in ("catalogue#productRecords", "catalogue#productCategoryRecords"):
+            need("BR-BOOKING-FLOW-RESOLVE", (q, "in-process") in routes(o_),
+                 f"{oid_} does not ask {q} in process from the operations host (CR-426/CR-427, XDR-051)")
+    x51 = xdr_reads.get("XDR-051") or {}
+    need("BR-BOOKING-FLOW-RESOLVE", {"deleteBookingFlow", "getPublishedBookingFlow"} <= set(x51.get("operations") or [])
+         and {"catalogue#productRecords", "catalogue#productCategoryRecords"} <= set(x51.get("queries") or []),
+         "docs/active/cross-deployable-writes.yaml XDR-051 does not grant deleteBookingFlow's and getPublishedBookingFlow's "
+         "two Catalogue reads (CR-426/CR-427)")
+    dd = words(dbf.get("description"))
+    for frag in ("no other enabled default flow of the venue has a type that lists the same kind",
+                 "`isSellable` true, `guestListing` `bookable`", "`onSaleFrom` and `onSaleTo` where they are set",
+                 "neither it nor its category names a flow"):
+        need("BR-BOOKING-FLOW-RESOLVE", frag in dd, f"deleteBookingFlow does not say {frag!r} (CR-426)")
+    gd = words(gpb.get("description"))
+    for frag in ("lists the kind earliest", "comes first in `x-ticvai-system-catalogue`",
+                 "falls through to the next step", "the answer is 400 `validation`", "most recently updated flow decides nothing"):
+        need("BR-BOOKING-FLOW-RESOLVE", frag in gd, f"getPublishedBookingFlow does not say {frag!r} (CR-427)")
+    need("BR-BOOKING-FLOW-RESOLVE", "400" in {str(k) for k in (gpb.get("responses") or {})},
+         "getPublishedBookingFlow declares no 400 for a call with none of productId, productCategoryId and flowTypeKey (CR-427)")
+
+    # BR-FLOW-TYPE-CATALOGUE (ADAM CR-428; CHG-CR428-001)
+    bft = wsch.get("BookingFlowType") or {}
+    cat = bft.get("x-ticvai-system-catalogue") or {}
+    names_en = ["Dated day pass", "Timed entry", "Open-dated", "Seated fixed performance",
+                "Seated date, time and seat map", "Experience or workshop", "Surf or session",
+                "Meeting room by the hour", "Cabana on a map", "Guided tour by language", "Transport",
+                "Table reservation", "Membership", "Gift card", "Several locations"]
+
+    def loc(v):
+        return isinstance(v, dict) and bool(str(v.get("en") or "").strip()) and bool(str(v.get("ar") or "").strip())
+
+    types_ = cat.get("types") or []
+    need("BR-FLOW-TYPE-CATALOGUE", [(t or {}).get("name", {}).get("en") if isinstance((t or {}).get("name"), dict)
+                                    else None for t in types_] == names_en,
+         "the system catalogue's type names are not the 15 English names CMS-103 shows, in catalogue order (CR-428)")
+    for t in types_:
+        k = (t or {}).get("key")
+        need("BR-FLOW-TYPE-CATALOGUE", loc(t.get("name")) and loc(t.get("description")),
+             f"catalogue type {k} has no name and description as {{en, ar}} (CR-428)")
+        for s in t.get("steps") or []:
+            if "condition" in (s or {}):
+                need("BR-FLOW-TYPE-CATALOGUE", loc(s.get("condition")),
+                     f"catalogue type {k} step {s.get('stepKey')}: condition is not {{en, ar}} (CR-428)")
+    for k, v in (cat.get("commonConditions") or {}).items():
+        need("BR-FLOW-TYPE-CATALOGUE", loc(v), f"commonConditions.{k} is not {{en, ar}} (CR-428)")
+    lbt = words(op("listBookingFlowTypes")[3].get("description"))
+    need("BR-FLOW-TYPE-CATALOGUE", "Sorted by `name`" not in lbt and "**Order.** Catalogue order" in lbt
+         and "`commonConditions[stepKey]`" in lbt and "counting from 0" in lbt,
+         "listBookingFlowTypes does not answer in catalogue order with the condition and defaultSortOrder rules (CR-428)")
+
+    # BR-BOOKING-FLOW-WRITES (ADAM CR-429; CHG-CR429-001)
+    for oid_ in ("createBookingFlowDefinition", "updateBookingFlowDefinition"):
+        o_ = op(oid_)[3]
+        need("BR-BOOKING-FLOW-WRITES", ("marketing-crm#consentQuestionRecords", "in-process") in routes(o_)
+             and "marketing-crm#guestMatchPolicyRecords" not in {q for q, _r in routes(o_)},
+             f"{oid_} does not read consentQuestionRecords in process, or still reads guestMatchPolicyRecords (CR-429)")
+        p400 = ptypes(o_, "400")
+        need("BR-BOOKING-FLOW-WRITES", {"step-not-in-flow-type", "duplicate-flow-step", "consent-question-not-active"} <= p400
+             and not ({"step-not-in-type", "step-given-twice"} & p400),
+             f"{oid_}'s 400 does not name step-not-in-flow-type, duplicate-flow-step and consent-question-not-active "
+             f"only ({sorted(p400)}; CR-429)")
+        need("BR-BOOKING-FLOW-WRITES", "added at its index in the type" in words(o_.get("description")),
+             f"{oid_} does not say a step left out is added at its index with the type's defaultEnabled (CR-429)")
+    mq = (load("contracts/satellite/marketing-crm.yaml").get("x-ticvai-queries") or {}).get("consentQuestionRecords") or {}
+    need("BR-BOOKING-FLOW-WRITES", "in-process" in (mq.get("served") or []),
+         "marketing-crm#consentQuestionRecords is not served in process (CR-429)")
+    lbf200 = words(((op("listBookingFlows")[3].get("responses") or {}).get("200") or {}).get("description"))
+    need("BR-BOOKING-FLOW-WRITES", "defaults first" not in lbf200,
+         "listBookingFlows' 200 still says 'defaults first' beside its Order paragraph (CR-429)")
+
+    # BR-GUEST-CONTACT-FIELDS (ADAM CR-430; CHG-CR430-001)
+    sbc = op("setBookingFlowConfig")[3]
+    need("BR-GUEST-CONTACT-FIELDS", ("tenancy#activeVenues", "in-process") in routes(sbc)
+         and ("marketing-crm#guestMatchPolicyRecords", "in-process") in routes(sbc),
+         "setBookingFlowConfig does not ask tenancy#activeVenues and guestMatchPolicyRecords in process (CR-430)")
+    sbd = words(sbc.get("description"))
+    for frag in ("with no row it is the default, `matchBy` `email`", "`email` or `mobile` for `emailOrMobile`",
+                 "else the tenant's, else `[email]`"):
+        need("BR-GUEST-CONTACT-FIELDS", frag in sbd, f"setBookingFlowConfig does not say {frag!r} (CR-430)")
+    gcf = words((((wsch.get("BookingFlowSettings") or {}).get("properties") or {}).get("guestContactFields") or {})
+                .get("description"))
+    need("BR-GUEST-CONTACT-FIELDS", "identity `GuestMatchPolicy" not in gcf and "marketing-crm `GuestMatchPolicy`" in gcf,
+         "BookingFlowSettings.guestContactFields still calls the match policy identity's (it is marketing-crm's; CR-430)")
+    need("BR-GUEST-CONTACT-FIELDS", "setBookingFlowConfig" in ((xdr_reads.get("XDR-022") or {}).get("operations") or []),
+         "XDR-022 does not list setBookingFlowConfig's in-process tenancy#activeVenues (CR-430)")
+
+    # BR-GUEST-CODE-UNKNOWN (ADAM CR-431, changing one point of CR-370's follow-up; CHG-CR431-001)
+    rgo, vgo = op("requestGuestOtp")[3], op("verifyGuestOtp")[3]
+    rgd_ = words(rgo.get("description"))
+    need("BR-GUEST-CODE-UNKNOWN", "nothing is written for the code" not in rgd_
+         and "generated and never sent" in rgd_ and "whether or not the identifier has an account" in rgd_,
+         "requestGuestOtp does not write the never-sent otp_challenge row for an unknown login, passwordReset or stepUp "
+         "identifier, or does not say the 429 answers alike (CR-431)")
+    v401 = words(((vgo.get("responses") or {}).get("401") or {}).get("description"))
+    need("BR-GUEST-CODE-UNKNOWN", "subject-null `login`, `passwordReset` or `stepUp` row" in v401,
+         "verifyGuestOtp's 401 does not refuse a code against a subject-null login, passwordReset or stepUp row (CR-431)")
+
+    # BR-GUEST-CHECKOUT-PROOF (ADAM CR-432, with the lead's answer of 31 October 2026; CHG-CR432-001)
+    sec = vgo.get("security")
+    need("BR-GUEST-CHECKOUT-PROOF", isinstance(sec, list) and {} in sec and {"guestAuth": []} in sec,
+         "verifyGuestOtp's security is not none beside guestAuth (the cart's anonymous session, CR-432)")
+    need("BR-GUEST-CHECKOUT-PROOF", "204" in {str(k) for k in (vgo.get("responses") or {})}
+         and "no subject is created and no `GuestSession` is issued" in words(vgo.get("description")),
+         "verifyGuestOtp does not answer a guest-checkout code 204 with no subject and no GuestSession (CR-432)")
+    oags = words(((load("contracts/spine/identity.yaml").get("x-ticvai-queries") or {}).get("openAnonymousGuestSession")
+                  or {}).get("rule"))
+    need("BR-GUEST-CHECKOUT-PROOF", "verifiedContactRef" in oags,
+         "openAnonymousGuestSession does not say the session holds the proved verifiedContactRef (CR-432)")
+    cco = words(op("checkoutCart")[3].get("description"))
+    need("BR-GUEST-CHECKOUT-PROOF", "takes `verifiedContactRef` from the session" in cco
+         and "`subjectId` null" in cco,
+         "checkoutCart does not take verifiedContactRef from the anonymous session and write a subject-less order (CR-432)")
+    need("BR-GUEST-CHECKOUT-PROOF", "Both routes produce a guest profile" not in words(op("verifyGuestEmail")[3]
+                                                                                       .get("description")),
+         "verifyGuestEmail still says both routes produce a guest profile (a profile is made only with an account; "
+         "CR-432, the lead's answer)")
+
+    # BR-DELEGATION-CYCLE (ADAM CR-433, item (6) beside CR-362's (1) to (5); CHG-CR433-001)
+    drq = (load("contracts/spine/identity.yaml").get("x-ticvai-queries") or {}).get("delegationReaches") or {}
+    need("BR-DELEGATION-CYCLE", "ITenantRootGrant" in str(drq.get("rule") or "") and "recursive" in str(drq.get("rule") or "")
+         and set(((drq.get("returns") or {}).get("properties") or {})) == {"reaches"}
+         and set(drq.get("inputs") or {}) == {"fromSubjectId", "toSubjectId"} and drq.get("served") == ["in-process"],
+         "identity#delegationReaches is not a yes/no rule question (fromSubjectId, toSubjectId -> reaches) answered under "
+         "ITenantRootGrant in process (CR-433)")
+    gdo2 = op("grantDelegation")[3]
+    need("BR-DELEGATION-CYCLE", ("identity#delegationReaches", "in-process") in routes(gdo2),
+         "grantDelegation does not ask identity#delegationReaches in process (CR-433)")
+    need("BR-DELEGATION-CYCLE", "transaction advisory lock" in words(gdo2.get("description")),
+         "grantDelegation does not run the cycle check and the insert under one transaction advisory lock (CR-433)")
+
+    # BR-WEBHOOK-REPLAY-TENANT (ADAM CR-434; CHG-CR434-001)
+    wrj = ((load("contracts/satellite/public-api.yaml").get("components") or {}).get("schemas") or {}).get("WebhookReplayJob") or {}
+    wtd = words(((wrj.get("properties") or {}).get("tenantId") or {}).get("description"))
+    need("BR-WEBHOOK-REPLAY-TENANT", "tenantId" in (wrj.get("required") or [])
+         and "allowed_tenant_ids holds exactly one tenant" in wtd and "delete nothing" in wtd and "SET NOT NULL" in wtd,
+         "WebhookReplayJob.tenantId does not state CR-434's backfill, stop and SET NOT NULL steps")
+
+    # BR-OUTBOX-REPUBLISH-READS (ADAM CR-435; CHG-CR435-001)
+    rpo = op("republishOutbox")[3]
+    need("BR-OUTBOX-REPUBLISH-READS", not rpo.get("x-ticvai-read-via")
+         and "partition catalogue" in words(rpo.get("description")),
+         "republishOutbox declares a read it does not make, or does not name the partition-catalogue bound (CR-435)")
+    need("BR-OUTBOX-REPUBLISH-READS", "platform.outbox" not in ((lin.get("republishOutbox") or {}).get("reads") or []),
+         "the lineage has republishOutbox reading platform.outbox rows (handoff/api-data-lineage-overrides.json; CR-435)")
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -1570,13 +2661,29 @@ def main() -> int:
              "BR-ROTA-ROLE-DENY", "BR-FORM-VERSION-KEY",
              "BR-PLANNER-QUESTIONS", "BR-ROTA-HOUR-LIMIT", "BR-ROTA-CROSS-VENUE",
              "BR-CREDIT-ACCOUNT-CURRENCY", "BR-PLATFORM-APPROVAL-RULE", "BR-WALLET-ETAG-VERSION", "BR-GUEST-SSO",
+             "BR-KIOSK-LISTS", "BR-KIOSK-DELETE", "BR-KIOSK-COUNT", "BR-KIOSK-CHANNEL", "BR-KIOSK-FINDINGS",
+             "BR-KIOSK-RESTORE", "BR-BANNER-OUTSIDE-DRAFT", "BR-BANNER-STATE",
              "BR-UAEPASS-ENDPOINTS", "BR-LINK-CHECKOUT", "BR-DELEGATION-READS", "BR-GUEST-POLICY-CURRENCY",
              "BR-CONTENT-PAGE-KEY", "BR-CONTENT-PUBLISH",
              "BR-CONTENT-BLOCK", "BR-SCOPE-LOOKUP", "BR-ID-RESUBMIT", "BR-DOC-NUMBER-ENC", "BR-REGISTER-SOURCE",
-             "BR-GUEST-CODE-DELIVERY",
+             "BR-GUEST-CODE-DELIVERY", "BR-BEACON-GEOFENCE", "BR-FACE-TAG-PROFILE", "BR-FACE-PASS-REVOKE",
+             "BR-POLICY-VERSIONS", "BR-CONTENT-PAGE-SWITCH", "BR-GUIDED-CHOICE-TARGETS",
              "BR-GUEST-SETTINGS", "BR-BILLING-LINES", "BR-SHOP-DROP-COLLECT", "BR-DELEGATION-KEY", "BR-FOREIGN-TENDER",
              "BR-PRODUCT-FROM-PRICE",
-             "BR-BOOKING-FLOW-MISSING", "BR-CALL-DISPOSITION", "BR-RESTORE-MISSING-PAGE"]
+             "BR-BOOKING-FLOW-MISSING", "BR-CALL-DISPOSITION", "BR-RESTORE-MISSING-PAGE",
+             "BR-DASHBOARD-COST", "BR-DASHBOARD-ENTITLEMENT", "BR-TILE-MARKS", "BR-AUDIT-REASON",
+             "BR-PRIVACY-CONSENT", "BR-GUEST-BROADCAST", "BR-OPEN-SHIFT-CLAIM",
+             "BR-GATE-MODE-POLICY", "BR-ACCESS-POINT-ACTIVE", "BR-WHITELIST-APPROVAL", "BR-ADMISSION-CREATE",
+             "BR-PRICING-QUEUE-MEMBERS", "BR-PRICING-AUTOMATION-LEVEL", "BR-PRICING-SCORECARD", "BR-PRICE-SIMULATION",
+             "BR-CALC-PROFILE-VERSION", "BR-ROLLBACK-CANCEL", "BR-LIVE-PRICE", "BR-STRATEGY-FIGURES",
+             "BR-PRICE-BAND-ORDER", "BR-GUARDRAIL-SCOPE",
+             "BR-SEAT-MAP-SECTIONS", "BR-SEAT-TEMPLATE-COPY", "BR-SEAT-MAP-UPDATE", "BR-FORECAST-CURVE",
+             "BR-ELASTICITY-CONTEXT", "BR-PRICING-PERFORMANCE", "BR-REVENUE-ROW",
+             "BR-COMPETITOR-OBSERVATION", "BR-CONTEXTUAL-RULE", "BR-SALE-SCHEDULE-SUMMARY",
+             "BR-CHANNEL-ALLOCATION-COUNTS", "BR-CHANNEL-CODE-UNIQUE", "BR-SALE-RULE-INSTANTS", "BR-PRICING-APPROVAL",
+             "BR-BOOKING-FLOW-RESOLVE", "BR-FLOW-TYPE-CATALOGUE", "BR-BOOKING-FLOW-WRITES", "BR-GUEST-CONTACT-FIELDS",
+             "BR-GUEST-CODE-UNKNOWN", "BR-GUEST-CHECKOUT-PROOF", "BR-DELEGATION-CYCLE", "BR-WEBHOOK-REPLAY-TENANT",
+             "BR-OUTBOX-REPUBLISH-READS"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -1584,6 +2691,71 @@ def main() -> int:
     print(f"  {len(PAIR_EXEMPT)} create/update pair(s) exempt with a reason")
     print(f"\n{'FAIL' if total else 'PASS'} - {total} finding(s) against the 3 October business rules")
     return 1 if total else 0
+
+
+def access_rules_r12(need, op):
+    """BR-GATE-MODE-POLICY, BR-ACCESS-POINT-ACTIVE, BR-WHITELIST-APPROVAL, BR-ADMISSION-CREATE (r12; ADAM CR-396, CR-397,
+    CR-399, CR-400, decided 31 October 2026, after the lead's review of every CR). Each fails on the r11 contract."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def vias(o_):
+        return {(str((v or {}).get("query")), str((v or {}).get("route")))
+                for v in o_.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    acc = load("contracts/spine/access.yaml")
+    sch = (acc.get("components") or {}).get("schemas") or {}
+
+    # BR-GATE-MODE-POLICY (CR-396)
+    tsm = op("setTurnstileMode")[3]
+    need("BR-GATE-MODE-POLICY", ("identity#principalHoldsRoleAtVenue", "in-process") in vias(tsm),
+         "setTurnstileMode does not ask identity#principalHoldsRoleAtVenue in process for whoCanActivate (CR-396)")
+    need("BR-GATE-MODE-POLICY", "gate-mode-role-required" in ptypes(tsm, "403")
+         and "reason-required" in ptypes(tsm, "400"),
+         "setTurnstileMode does not answer 403 gate-mode-role-required and 400 reason-required (CR-396)")
+    td = words(tsm.get("description"))
+    for frag in ("beats the venue default", "must pass every one of them", "`emergencyAccessEvent` for `dropArm`",
+                 "`securityEvent` for `freeFlow`", "`assignedTeam` `accessSupervisor`", "a cancelled one opens none"):
+        need("BR-GATE-MODE-POLICY", frag in td, f"setTurnstileMode does not say {frag!r} (CR-396)")
+    who = ((sch.get("AccessGateModePolicy") or {}).get("properties") or {}).get("whoCanActivate") or {}
+    need("BR-GATE-MODE-POLICY", (who.get("items") or {}).get("format") == "uuid",
+         "AccessGateModePolicy.whoCanActivate is not a list of identity.role ids (format uuid; CR-396)")
+    need("BR-GATE-MODE-POLICY", "targetTurnstileMode" in ((sch.get("AccessGateModeChange") or {}).get("properties") or {}),
+         "AccessGateModeChange has no targetTurnstileMode, so a scheduled turnstile mode has nowhere to wait (CR-396)")
+
+    # BR-ACCESS-POINT-ACTIVE (CR-397)
+    need("BR-ACCESS-POINT-ACTIVE", "created active" in words(op("createAccessPoint")[3].get("description")),
+         "createAccessPoint does not say a new access point is created active (CR-397)")
+    need("BR-ACCESS-POINT-ACTIVE", "device status AccessPoint" not in words(op("setAccessPointDirection")[3].get("description"))
+         and "says so through its device status" not in words(op("setAccessPointDirection")[3].get("description")),
+         "setAccessPointDirection promises a device status AccessPoint does not have (CR-397)")
+
+    # BR-WHITELIST-APPROVAL (CR-399)
+    abe = op("addBlacklistEntry")[3]
+    need("BR-WHITELIST-APPROVAL", any((w or {}).get("operation") == "createApprovalRequest"
+                                      for w in abe.get("x-ticvai-write-via") or [] if isinstance(w, dict)),
+         "addBlacklistEntry raises its whitelist approval request with no x-ticvai-write-via createApprovalRequest (CR-399)")
+    need("BR-WHITELIST-APPROVAL", "no-approval-route" in ptypes(abe, "422"),
+         "addBlacklistEntry does not pass approvals' 422 no-approval-route on (CR-399)")
+    ev = load("events/approval-granted.yaml")
+    need("BR-WHITELIST-APPROVAL", any((c or {}).get("context") == "access" and "access.blacklist" in ((c or {}).get("writes") or [])
+                                      for c in ev.get("consumers") or []),
+         "events/approval-granted.yaml names no access consumer that writes the approved whitelist entry (CR-399)")
+
+    # BR-ADMISSION-CREATE (CR-400)
+    car, uar = op("createAdmissionRules")[3], op("updateAdmissionRules")[3]
+    need("BR-ADMISSION-CREATE", ptypes(car, "422") >= {"entry-count-required", "validity-days-required",
+                                                       "validity-ends-before-start"},
+         "createAdmissionRules does not answer updateAdmissionRules' three 422 problem types (CR-400)")
+    need("BR-ADMISSION-CREATE", "tenancy#scopeRecords" in {q for q, _ in vias(car)}
+         and "working-venue-required" in ptypes(car, "403"),
+         "createAdmissionRules does not read the working venue's path (tenancy#scopeRecords) or answer 403 "
+         "working-venue-required (CR-400, CR-217)")
+    need("BR-ADMISSION-CREATE", "tenancy#scopeRecords" not in {q for q, _ in vias(uar)},
+         "updateAdmissionRules re-derives scope_path from the editor's working venue (CR-400)")
 
 
 if __name__ == "__main__":

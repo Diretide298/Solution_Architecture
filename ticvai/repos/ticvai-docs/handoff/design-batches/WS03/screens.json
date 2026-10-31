@@ -1049,7 +1049,7 @@
     "id": "formSetBleBeaconGeofence",
     "component": "modal",
     "trigger": "Save beacon",
-    "body": "**Collects what `setBleBeaconGeofence` sends before it is called.** Required: `beaconId`, `venue`. Optional: `beaconName`, `zone`, `gate`, `proximityThreshold`, `activeInactive`, `health`, `lastDetected`, `park`, `attraction`, `geofenceRadiusMeters`, `geofenceBoundary`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setBleBeaconGeofence` sends before it is called.** Required: `beaconId`, `venue`. Optional: `beaconName`, `zone`, `gate`, `proximityThreshold`, `activeInactive`, `health`, `lastDetected`, `park`, `attraction`, `geofenceRadiusMeters`, `geofenceCentre`, `geofenceBoundary` (a radius needs its centre; ADAM CR-389). Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
      "label": "Save beacon",
      "operation": "setBleBeaconGeofence"
@@ -1069,6 +1069,7 @@
       "park",
       "attraction",
       "geofenceRadiusMeters",
+      "geofenceCentre",
       "geofenceBoundary"
      ]
     },

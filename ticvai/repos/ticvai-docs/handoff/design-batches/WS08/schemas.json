@@ -1053,7 +1053,7 @@
    "ruleId": {
     "type": "string",
     "format": "uuid",
-    "description": "Absent creates a rule"
+    "description": "The record's id, when sent; it must equal the path's `ruleId` (ADAM CR-245, CR-395). A path id no record has creates one with that id."
    },
    "venueId": {
     "type": "string"

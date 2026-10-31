@@ -504,6 +504,8 @@ Definitions are versioned. Historic executions keep the version they ran against
 Tiles reference report definitions. Each tile carries its own refresh interval, and the response reports the aggregate query cost — a dashboard of twelve tiles refreshing every thirty seconds is a load problem disguised as a convenience.
 **The budget is `VenueSettings.reporting.dashboardRefreshBudgetPerMinute`**, a venue setting with a tenant default (decided 28 September, audit R094); a tenant-wide dashboard uses the tenant default. The dashboard's tile refreshes per minute, summed over its tiles, may not exceed it. **Proposed default 24 refreshes per minute, client to correct (audit R094).**
 
+**`aggregateCost` is worked out on save and stored** (ADAM CR-372, 31 October 2026; CHG-CR372-001): the load as a share of that budget, banded `low`, `medium` or `high` as `Dashboard.aggregateCost` states, and written to `reporting.dashboard.aggregate_cost` with the dashboard.
+
 |  |  |
 |---|---|
 | Permission | `REPORT_MANAGE` |
@@ -568,7 +570,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | tiles[].position.height | integer | yes |  |
 | id | string (uuid) | yes |  |
 | ownerPrincipalId | string (uuid) | yes |  |
-| aggregateCost | enum (low, medium, high) | yes | Combined refresh load of every tile. |
+| aggregateCost | enum (low, medium, high) | yes | Combined refresh load of every tile, as a share of the refresh budget (ADAM CR-372, Chinmay, 31 October 2026; CHG-CR372-001). |
 | archivedAt | string (date-time) |  | Set by deleteDashboard, which archives rather than removes. (read-only; nullable) |
 | createdAt | string (date-time) | yes |  |
 
@@ -629,7 +631,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | tiles[].position.height | integer | yes |  |
 | id | string (uuid) | yes |  |
 | ownerPrincipalId | string (uuid) | yes |  |
-| aggregateCost | enum (low, medium, high) | yes | Combined refresh load of every tile. |
+| aggregateCost | enum (low, medium, high) | yes | Combined refresh load of every tile, as a share of the refresh budget (ADAM CR-372, Chinmay, 31 October 2026; CHG-CR372-001). |
 | archivedAt | string (date-time) |  | Set by deleteDashboard, which archives rather than removes. (read-only; nullable) |
 | createdAt | string (date-time) | yes |  |
 | tileData | array of object |  |  |
@@ -733,6 +735,8 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 
 **The first Save creates, every later Save updates, and the refresh budget is checked on both** (Chinmay, 3 October 2026, Block A business rules, ANL-023; CHG-RUL-008). A canvas with no `dashboardId` yet calls `createDashboard`; from then on it calls this. The tiles' refreshes per minute, summed, may not exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (the tenant default for a tenant-wide dashboard; proposed 24, audit R094), exactly as on create: otherwise `400` and nothing is saved, so an update is not the way round the budget.
 
+**`aggregateCost` is worked out again on every save and stored** (ADAM CR-372, 31 October 2026; CHG-CR372-001), by the rule on `Dashboard.aggregateCost`, exactly as on create.
+
 |  |  |
 |---|---|
 | Permission | `REPORT_MANAGE` |
@@ -798,7 +802,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | tiles[].position.height | integer | yes |  |
 | id | string (uuid) | yes |  |
 | ownerPrincipalId | string (uuid) | yes |  |
-| aggregateCost | enum (low, medium, high) | yes | Combined refresh load of every tile. |
+| aggregateCost | enum (low, medium, high) | yes | Combined refresh load of every tile, as a share of the refresh budget (ADAM CR-372, Chinmay, 31 October 2026; CHG-CR372-001). |
 | archivedAt | string (date-time) |  | Set by deleteDashboard, which archives rather than removes. (read-only; nullable) |
 | createdAt | string (date-time) | yes |  |
 
@@ -1423,7 +1427,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_shared | boolean | no |  |
 | id | uuid | yes |  |
 | owner_principal_id | uuid | yes |  |
-| aggregate_cost | text | yes | Combined refresh load of every tile. |
+| aggregate_cost | text | yes | Combined refresh load of every tile, as a share of the refresh budget (ADAM CR-372, Chinmay, 31 October 2026; CHG-CR372-001). |
 | archived_at | timestamptz | no | Set by deleteDashboard, which archives rather than removes. |
 | created_at | timestamptz | yes |  |
 

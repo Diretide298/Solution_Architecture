@@ -183,7 +183,6 @@ operations:
   - cache:idempotency
   - catalogue.audit_entry
   - catalogue.rollback_action
-  - platform.outbox
 - operation: checkBookingEligibility
   verb: POST
   path: /eligibility-checks
@@ -394,11 +393,11 @@ operations:
   - catalogue.price_ladder
   - catalogue.pricing_recommendation
   - catalogue.pricing_recommendation_decision
+  - catalogue.product_channel_assignment
   - pricing.dynamic_price_rule
   writes:
   - cache:idempotency
   - catalogue.audit_entry
-  - catalogue.price
   - catalogue.price_execution
   - catalogue.pricing_recommendation_decision
   - platform.outbox
@@ -493,11 +492,10 @@ operations:
   - catalogue.pricing_recommendation
   - catalogue.pricing_recommendation_decision
   writes:
+  - approvals.request
   - cache:idempotency
-  - catalogue.audit_entry
   - catalogue.pricing_recommendation
   - catalogue.pricing_recommendation_decision
-  - platform.outbox
 - operation: enterWaitingRoom
   verb: POST
   path: /performances/{performanceId}/waiting-room/entries
@@ -934,6 +932,8 @@ operations:
   offline: false
   reads:
   - catalogue.dynamic_pricing_control
+  - catalogue.pricing_market
+  - catalogue.sales_channel
   writes: []
 - operation: listBulkPricingUpdate
   verb: GET
@@ -1108,8 +1108,6 @@ operations:
   - staff
   offline: false
   reads:
-  - pricing.dynamic_price_action
-  - pricing.dynamic_price_condition
   - pricing.dynamic_price_rule
   writes: []
 - operation: listChannelExceptionIncident
@@ -1191,6 +1189,7 @@ operations:
   - catalogue.event
   - catalogue.performance
   - catalogue.product
+  - catalogue.product_channel_assignment
   - catalogue.sales_channel
   writes: []
 - operation: listCommercialPricing
@@ -1239,8 +1238,13 @@ operations:
   - staff
   offline: false
   reads:
+  - catalogue.competitor_price_observation
   - catalogue.demand_signal
+  - catalogue.price
+  - catalogue.price_assignment
+  - catalogue.price_list
   - catalogue.product
+  - catalogue.variant
   writes: []
 - operation: listCurrencyPrecisionRounding
   verb: GET
@@ -1291,7 +1295,6 @@ operations:
   - catalogue.channel_capacity
   - catalogue.demand_forecast
   - catalogue.performance
-  - orders.sales_order
   writes: []
 - operation: listDonationCampaigns
   verb: GET
@@ -1337,6 +1340,8 @@ operations:
   offline: false
   reads:
   - catalogue.dynamic_pricing_control
+  - catalogue.pricing_market
+  - catalogue.sales_channel
   writes: []
 - operation: listDynamicPricingGuardrail
   verb: GET
@@ -1359,13 +1364,13 @@ operations:
   offline: false
   reads:
   - catalogue.channel_capacity
+  - catalogue.dynamic_pricing_strategy
   - catalogue.event
   - catalogue.performance
   - catalogue.price_execution
   - catalogue.pricing_recommendation
   - catalogue.pricing_recommendation_decision
   - catalogue.product
-  - orders.sales_order
   writes: []
 - operation: listDynamicPricingStrategy
   verb: GET
@@ -1380,6 +1385,8 @@ operations:
   - catalogue.dynamic_pricing_strategy
   - catalogue.event
   - catalogue.price
+  - catalogue.price_execution
+  - catalogue.price_ladder
   - catalogue.product
   - pricing.dynamic_price_rule
   writes: []
@@ -1523,6 +1530,7 @@ operations:
   - catalogue.channel_envelope
   - catalogue.inventory_reservation
   - catalogue.performance
+  - catalogue.product
   - catalogue.sales_channel
   - catalogue.waitlist_entry
   writes: []
@@ -1725,7 +1733,6 @@ operations:
   reads:
   - catalogue.demand_forecast
   - catalogue.price
-  - orders.sales_order
   writes: []
 - operation: listPriceListTemplate
   verb: GET
@@ -1858,8 +1865,10 @@ operations:
   reads:
   - catalogue.event
   - catalogue.price
+  - catalogue.price_category
   - catalogue.pricing_recommendation
   - catalogue.pricing_recommendation_decision
+  - catalogue.pricing_simulation
   - catalogue.product
   writes: []
 - operation: listPricingRollbackEmergency
@@ -2156,8 +2165,10 @@ operations:
   reads:
   - catalogue.event
   - catalogue.price
+  - catalogue.price_category
   - catalogue.pricing_recommendation
   - catalogue.pricing_recommendation_decision
+  - catalogue.pricing_simulation
   - catalogue.product
   writes: []
 - operation: listResidencyNationalityMarket
@@ -2184,6 +2195,7 @@ operations:
   offline: false
   reads:
   - catalogue.channel_capacity
+  - catalogue.demand_forecast
   - catalogue.dynamic_pricing_control
   - catalogue.event
   - catalogue.performance
@@ -2947,12 +2959,16 @@ operations:
   - cache:idempotency
   - catalogue.dynamic_pricing_control
   - catalogue.dynamic_pricing_strategy
+  - catalogue.event
+  - catalogue.performance
+  - catalogue.pricing_market
+  - catalogue.product
+  - catalogue.sales_channel
   writes:
   - cache:idempotency
   - catalogue.audit_entry
   - catalogue.dynamic_pricing_control
   - catalogue.dynamic_pricing_strategy
-  - platform.outbox
 - operation: setDynamicPricingStrategy
   verb: PUT
   path: /dynamic-pricing-strategy-2
@@ -3721,8 +3737,10 @@ operations:
   - catalogue.calculation_step
   - catalogue.fee
   - catalogue.fee_rule
+  - catalogue.membership_programme
   - catalogue.price
   - catalogue.price_assignment
+  - catalogue.price_execution
   - catalogue.price_list
   - catalogue.price_resolution_policy
   - catalogue.product

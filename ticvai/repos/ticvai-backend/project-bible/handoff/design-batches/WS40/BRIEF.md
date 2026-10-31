@@ -112,7 +112,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-111` | A/B Pricing Experiment Studio | B | 0 | 8 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
 | `ADM-112` | Revenue & Demand Impact Forecasting | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
 | `ADM-113` | AI Recommendation Review & Decision Queue | B | 5 | 22 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-114` | Automation Policy & Autonomous Pricing Orchestrator | B | 47 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
+| `ADM-114` | Automation Policy & Autonomous Pricing Orchestrator | B | 59 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `ADM-115` | Live Dynamic Price Execution & Deployment Monitor | A | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-116` | Dynamic Pricing Performance & Optimization Analytics | B | 0 | 36 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 | `ADM-117` | AI Learning, Model Performance & Optimization Feedback | B | 18 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |

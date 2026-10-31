@@ -269,7 +269,7 @@
    "policyId": {
     "type": "string",
     "format": "uuid",
-    "description": "Absent creates a retention rule"
+    "description": "The record's id, when sent; it must equal the path's `retentionSettingId` (ADAM CR-245, CR-395). A path id no record has creates one with that id."
    },
    "venueId": {
     "type": "string"
@@ -741,7 +741,7 @@
    "profileId": {
     "type": "string",
     "format": "uuid",
-    "description": "Absent creates a threshold profile"
+    "description": "The record's id, when sent; it must equal the path's `profileId` (ADAM CR-245, CR-395). A path id no record has creates one with that id."
    },
    "venueId": {
     "type": "string"
@@ -1028,7 +1028,7 @@
    "profileId": {
     "type": "string",
     "format": "uuid",
-    "description": "Absent creates a Face Tag profile"
+    "description": "The profile's id, when sent; it must equal the path's `profileId` (ADAM CR-245, CR-390). A path id no profile has creates one with that id."
    },
    "venueId": {
     "type": "string"
@@ -1080,7 +1080,8 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "**The venue's own consent form a Face Tag is captured on** (decided 2 October 2026, Chinmay, batch 4, BO-188: \"consent first, using a consent form from the venue\"; DEC-128, DEC-549; CHG-CSP-018). Null uses the venue's biometric consent form (`tenancy.VenueSettings.biometrics.consentFormId`); either way the form comes from the one consent-form builder in Venue Management. With neither, the profile is refused `422 consent-form-required`."
+    "description": "**The venue's own consent form a Face Tag is captured on** (decided 2 October 2026, Chinmay, batch 4, BO-188: \"consent first, using a consent form from the venue\"; DEC-128, DEC-549; CHG-CSP-018). Null uses the venue's biometric consent form (`tenancy.VenueSettings.biometrics.consentFormId`); either way the form comes from the one consent-form builder in Venue Management. With neither, the profile is refused `422 consent-form-required`. Stored as `access.biometric_profile.consent_form_id`; the form's version is not kept on the profile, each capture records the one the guest accepted (ADAM CR-390).",
+    "x-ticvai-stored-as": "access.biometric_profile.consent_form_id"
    },
    "consentCapture": {
     "type": "string",

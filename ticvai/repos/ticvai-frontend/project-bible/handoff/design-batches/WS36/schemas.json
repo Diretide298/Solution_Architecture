@@ -2,7 +2,14 @@
  "CalculationProfile": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.calculation_profile + catalogue.calculation_step",
-  "description": "**The ordered sequence that turns a rate into a payable amount** (29 September, data model DM3). ADM-074: base rate, contextual rate, dynamic adjustment, promotion, package adjustment, fees, tax, rounding, final amount. Versioned; a calculation records the version it used (`calculationVersion`), so history is reproducible.",
+  "x-ticvai-unique-together": [
+   [
+    "scopePath",
+    "code",
+    "version"
+   ]
+  ],
+  "description": "**The ordered sequence that turns a rate into a payable amount** (29 September, data model DM3). ADM-074: base rate, contextual rate, dynamic adjustment, promotion, package adjustment, fees, tax, rounding, final amount. Versioned; a calculation records the version it used (`calculationVersion`), so history is reproducible. The `dynamicPricingAdjustment` step takes the live dynamic price, the newest `deployed` or `partiallyDeployed` `catalogue.price_execution` for the target, in place of the strategy's base rate (ADAM CR-422).",
   "required": [
    "id",
    "scopePath",
@@ -33,7 +40,8 @@
    "version": {
     "readOnly": true,
     "type": "integer",
-    "minimum": 1
+    "minimum": 1,
+    "description": "Numbered by the server: a new id is one above its code's highest version at the venue (1 for a new code), and an existing id keeps its version; a body version is ignored. Unique with scopePath and code (ADAM CR-420)."
    },
    "isDefault": {
     "type": "boolean",
@@ -78,7 +86,7 @@
  "CalculationStep": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.calculation_step",
-  "description": "**One step of a calculation profile** (29 September, data model DM3). `dependsOn` names earlier steps; a cycle or a step depending on a later one is refused (`422 circularDependency` / `invalidSequence`).",
+  "description": "**One step of a calculation profile** (29 September, data model DM3). `dependsOn` names earlier steps of the profile by their `sequence` number, written as a string (\"1\", \"2\") (ADAM CR-420); a cycle or a step depending on a later or unknown one is refused (`422 circularDependency` / `invalidSequence`).",
   "required": [
    "id",
    "calculationProfileId",
@@ -141,7 +149,8 @@
     "type": "array",
     "items": {
      "type": "string"
-    }
+    },
+    "description": "The earlier steps of the profile this step depends on, each by its `sequence` number as a string (\"1\", \"2\"). One that names no earlier step is 422 invalid-sequence; a cycle is 422 circular-dependency (ADAM CR-420)."
    },
    "output": {
     "type": "string",
@@ -1444,11 +1453,17 @@
    "customerId": {
     "type": "string",
     "nullable": true,
-    "description": "Customer"
+    "description": "Customer. Not read: a simulation never looks up a real guest (ADAM CR-419)"
    },
    "productId": {
     "type": "string",
     "description": "Product"
+   },
+   "productVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The variant priced; a variant of productId, required when the product has more than one sellable variant, else 400 validation on productVariantId (ADAM CR-419)"
    },
    "quantity": {
     "type": "integer",
@@ -1482,12 +1497,12 @@
    "membershipId": {
     "type": "string",
     "nullable": true,
-    "description": "Membership"
+    "description": "Membership, the catalogue.membership_programme the simulated customer holds; its membership pricing rules choose the rate at the contextualRateSelection step (ADAM CR-419)"
    },
    "promotionCode": {
     "type": "string",
     "nullable": true,
-    "description": "Promotion"
+    "description": "Promotion, evaluated by Promotions' evaluatePromotions in process without orderId, so nothing is stored (ADAM CR-419)"
    },
    "paymentMethod": {
     "type": "string",
@@ -1610,7 +1625,7 @@
    },
    "calculationVersion": {
     "type": "string",
-    "description": "Calculation version used"
+    "description": "Calculation version used, the calculation profile's code and version (ADAM CR-419)"
    },
    "channelComparison": {
     "type": "array",
@@ -1636,7 +1651,7 @@
     "items": {
      "type": "string"
     },
-    "description": "AI observations for this screen; advisory only, never applied automatically"
+    "description": "AI observations for this screen; advisory only, never applied automatically. Answered as an empty list until an AI producer exists (ADAM CR-419; LO-CR419-001)"
    }
   }
  },

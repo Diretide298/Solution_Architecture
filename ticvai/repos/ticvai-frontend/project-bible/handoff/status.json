@@ -1,18 +1,18 @@
 {
  "scope": "platform",
- "generated": "2026-10-31",
+ "generated": "2026-11-01",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 2860,
+  "operations": 2862,
   "contracts": 33,
-  "tables": 1169,
+  "tables": 1171,
   "stores": 10,
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3311,
+  "relationships": 3318,
   "states": 210,
-  "events": 108,
+  "events": 110,
   "flows": 98,
   "flowsDerived": 193,
   "adrs": 72,
@@ -26,15 +26,15 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 2828,
-    "total": 2860,
+    "done": 2830,
+    "total": 2862,
     "percent": 99,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 2860,
-    "total": 2860,
+    "done": 2862,
+    "total": 2862,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
@@ -75,8 +75,8 @@
    },
    {
     "name": "Tables with a relationship",
-    "done": 1070,
-    "total": 1183,
+    "done": 1071,
+    "total": 1185,
     "percent": 90,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
@@ -104,7 +104,7 @@
    {
     "name": "Operations reaching a screen",
     "done": 2572,
-    "total": 2860,
+    "total": 2862,
     "percent": 90,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
@@ -127,7 +127,7 @@
    {
     "name": "Tables written",
     "done": 1123,
-    "total": 1169,
+    "total": 1171,
     "percent": 96,
     "note": "Counted from backend/. ADR-0024 said DDL waits for the design to settle; ADR-0038 and ADR-0039 settled it."
    },

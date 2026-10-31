@@ -467,7 +467,7 @@ Errors to draw in the form: 403 A guest enrolling a subject who is neither thems
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Enrol face pass (primary button) | `enrolFacePass` POST `/face-pass/enrolments` | inline | FacePassEnrolment | 403 A guest enrolling a subject who is neither themselves nor a child linked to them by a `familyMember` or `primaryHolder` delegation (audit R205).; 409 This face is already on another annual pass. Returned with the … | opens modal first |
-| Revoke face pass (destructive button) | `revokeFacePass` DELETE `/face-pass/enrolments/{enrolmentId}` | — | — | — | — |
+| Revoke face pass (destructive button) | `revokeFacePass` DELETE `/face-pass/enrolments/{enrolmentId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -586,8 +586,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-069` · status **notStarted** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking Mobile v2.dc.html`, view *Account → All screens → Wave 2 → Face Pass (also Account → Face Pass)*
-- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0063 *Encryption and keys, and biometric templates stay with the biometric vendor* (`docs/adr/0063-encryption-keys-and-biometric-templates.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0030 *A deep link is a pointer, not authorisation* (`docs/adr/0030-deep-link-cold-entry.md`)
 
 #### Acceptance for the design

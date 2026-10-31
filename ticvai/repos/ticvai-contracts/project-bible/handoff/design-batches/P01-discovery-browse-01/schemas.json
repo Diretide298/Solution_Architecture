@@ -107,7 +107,7 @@
  "BookingFlow": {
   "x-ticvai-persistence": "whitelabel.booking_flow",
   "type": "object",
-  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies, chosen by `getPublishedBookingFlow`'s kind rule where several do (ADAM CR-427).\n",
   "required": [
    "flowTypeKey",
    "name"
@@ -246,7 +246,7 @@
     "maxItems": 10,
     "uniqueItems": true,
     "default": [],
-    "description": "**The flow's own consent questions (rev 3 REV3-26).** Asked on every booking through this flow, together with those of each product in the cart, each question once. Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400. A Help me choose answer may pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.\n",
+    "description": "**The flow's own consent questions (rev 3 REV3-26).** Asked on every booking through this flow, together with those of each product in the cart, each question once. Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400 `consent-question-not-active`, naming the ids: `createBookingFlowDefinition` and `updateBookingFlowDefinition` read them with `marketing-crm#consentQuestionRecords` in process (ADAM CR-429). A Help me choose answer may pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.\n",
     "items": {
      "type": "string",
      "format": "uuid"
@@ -1680,7 +1680,7 @@
  "GuidedChoiceTarget": {
   "x-ticvai-persistence": "none — embedded",
   "type": "object",
-  "description": "**What an answer opens (decided 29 September, rev 3 REV3-11).** A product (its kind picks the booking flow), a product category (its tickets, as `ticketCategories` shows them), an event, or a module such as `membership`. Each id must belong to the choice's venue and be on sale or enabled when the choice is published, or `publishGuidedChoice` refuses it.\n",
+  "description": "**What an answer opens (decided 29 September, rev 3 REV3-11).** A product (its kind picks the booking flow), a product category (its tickets, as `ticketCategories` shows them), an event, or a module such as `membership`. Each id must belong to the choice's venue and be on sale or enabled when the choice is published, or `publishGuidedChoice` refuses it.\n\n**The rules, per kind** (ADAM CR-394, Chinmay, 31 October 2026). In the venue (checked by `createGuidedChoice` and `proposeGuidedChoice`, else `400 target-not-in-venue`): a product or event whose `venue_id` is the choice's venue, or a category whose `scope_path` is the venue's or an ancestor of it. On sale (checked by `publishGuidedChoice`, else `422 answer-target-not-on-sale`): a product with `isSellable` true, `guestListing` `bookable`, and the current time inside `onSaleFrom` and `onSaleTo` where they are set; a category with `isActive` true and at least one such product of this venue in it; an event with `isActive` true and `lifecycleState` `onSale` or `live`. A module must be enabled in the published configuration (`422 answer-target-not-enabled`); a booking flow must be one of the venue's enabled flows.\n",
   "required": [
    "kind"
   ],
@@ -2476,7 +2476,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
+    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`, as white-label `getPublishedBookingFlow`'s kind rule picks it where several of the venue's enabled defaults list the kind (ADAM CR-427, 31 October 2026). A venue that wants a different flow for a product sets this or the category's `bookingFlowId`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
     "x-ticvai-persistence-column": "jsonb",
@@ -2669,7 +2669,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "**The booking flow for every product filed here** that names none of its own (decided 29 September, W12, BO-115). Null means the venue's flow for each product's `kind`. A white-label `BookingFlow` of the venue; `setProductCategories` refuses any other id with `422`.\n"
+    "description": "**The booking flow for every product filed here** that names none of its own (decided 29 September, W12, BO-115). Null means the venue's flow for each product's `kind`, as white-label `getPublishedBookingFlow`'s kind rule picks it (ADAM CR-427). A white-label `BookingFlow` of the venue; `setProductCategories` refuses any other id with `422`.\n"
    },
    "isActive": {
     "type": "boolean",

@@ -14,7 +14,9 @@ the derived database could not keep. Each is a rule here, read against `handoff/
   SP-DUPLICATE-409     (CR-068, CR-074) a create or update answers 409 because a code, SKU, number or name is
                        "already in use" and the request field carries no `x-ticvai-unique`, or carries one at a
                        level other than the one the 409 names ("in this venue" is `venue`); without the unique
-                       index two concurrent requests both pass the handler's look-up.
+                       index two concurrent requests both pass the handler's look-up. A field kept by an
+                       `x-ticvai-unique-together` on the resource, or on a child it nests (`sectionCode` is
+                       `Section.code`, unique with `seatMapId`; ADAM CR-402), is kept.
   SP-REQUEST-NOT-NULL  (CR-065) a NOT NULL column whose only source is a `*Request` schema persisted beside the
                        table's own schema: the row exists before that request is made, so the column cannot be
                        required (`orders.pos_shift.cashier_reason` from `ShiftVarianceReasonRequest.reason`).
@@ -305,6 +307,21 @@ def main() -> int:
                 rnode, _ = deref(n, f["contract"], by)
                 together = {str(x) for grp in ((rnode or {}).get("x-ticvai-unique-together") or [])
                             if isinstance(grp, list) for x in grp}
+                # **A child the resource nests, unique together with its parent key** (ADAM CR-402, 31 October 2026,
+                # CHG-CR402-001): copySeatMapSection answers a SeatMap and refuses a section code already used on the
+                # target map; the promise is kept by `Section`'s `[seatMapId, code]`, which the request names as
+                # `sectionCode` (the child's name and its member, as every seating operation names it). A request
+                # field named `<child><Member>` is that child's member.
+                for cspec in props_of(n, f["contract"], by).values():
+                    items = cspec.get("items") if isinstance(cspec, dict) and cspec.get("type") == "array" else None
+                    if not (isinstance(items, dict) and items.get("$ref")):
+                        continue
+                    cnode, _ = deref(items, f["contract"], by)
+                    child = g.ref_name(str(items["$ref"]))
+                    for grp in ((cnode or {}).get("x-ticvai-unique-together") or []):
+                        if isinstance(grp, list):
+                            together |= {child[:1].lower() + child[1:] + str(x)[:1].upper() + str(x)[1:]
+                                         for x in grp}
                 break
         if "$ref" in r409:
             # the shared `DuplicateCode` 409 is a uniqueness promise too: some field must carry the marker

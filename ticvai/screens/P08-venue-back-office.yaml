@@ -172734,55 +172734,68 @@ screens:
       - kind: textField
         label: Rule name
         bindsTo: PricingDynamicPriceRule.name
-        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields Save rule sends'
+        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields
+          Save rule sends'
       - kind: selectField
         label: Dimension
         bindsTo: PricingDynamicPriceRule.dimension
-        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields Save rule sends'
+        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields
+          Save rule sends'
       - kind: selectField
         label: Sales channel
         bindsTo: PricingDynamicPriceRule.salesChannel
-        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields Save rule sends'
+        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields
+          Save rule sends'
       - kind: selectField
         label: Customer segment
         bindsTo: PricingDynamicPriceRule.customerSegment
-        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields Save rule sends'
+        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields
+          Save rule sends'
       - kind: textField
         label: Segment reference
         bindsTo: PricingDynamicPriceRule.segmentRef
-        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields Save rule sends'
+        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields
+          Save rule sends'
       - kind: selectField
         label: Location level
         bindsTo: PricingDynamicPriceRule.locationLevel
-        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields Save rule sends'
+        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields
+          Save rule sends'
       - kind: textField
         label: Location
         bindsTo: PricingDynamicPriceRule.locationId
-        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields Save rule sends'
+        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields
+          Save rule sends'
       - kind: numberField
         label: Lowest adjustment (%)
         bindsTo: PricingDynamicPriceRule.rangeMinPercent
-        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields Save rule sends'
+        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields
+          Save rule sends'
       - kind: numberField
         label: Highest adjustment (%)
         bindsTo: PricingDynamicPriceRule.rangeMaxPercent
-        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields Save rule sends'
+        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields
+          Save rule sends'
       - kind: toggle
         label: Protected
         bindsTo: PricingDynamicPriceRule.isProtected
-        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields Save rule sends'
+        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields
+          Save rule sends'
       - kind: toggle
         label: Dynamic pricing on
         bindsTo: PricingDynamicPriceRule.dynamicPricingEnabled
-        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields Save rule sends'
+        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields
+          Save rule sends'
       - kind: numberField
         label: Priority
         bindsTo: PricingDynamicPriceRule.priority
-        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields Save rule sends'
+        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields
+          Save rule sends'
       - kind: toggle
         label: Active
         bindsTo: PricingDynamicPriceRule.isActive
-        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields Save rule sends'
+        provenance: 'decision ADAM CR-410 (the lead, 1 November 2026: "Add a save button"): the fields
+          Save rule sends'
   states:
     loading: The channel customer segment list.
     error: Could not load. Names which read failed and leaves the channel customer segment untouched.

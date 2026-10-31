@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 32,
-  "ofTotalOperations": 2860,
-  "tables": 66,
-  "ofTotalTables": 1169
+  "ofTotalOperations": 2862,
+  "tables": 67,
+  "ofTotalTables": 1171
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2828,
-    "tables": 1169,
+    "operations": 2830,
+    "tables": 1171,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -27,7 +27,7 @@
     "target": "burst environment",
     "services": 3,
     "operations": 32,
-    "tables": 66,
+    "tables": 67,
     "exampleLoad": "same stadium on-sale: 1.25M requests in 2h = 1,045 RPS at a 6x burst; compressed to 20 minutes, 6,270",
     "description": "**The on-sale only.** Provisioned before it opens, torn down after, and **its orders reconcile back into the shared cell** (ADR-0035) — which is the single point the two paths touch."
    }
@@ -692,7 +692,7 @@
   {
    "table": "catalogue.channel_envelope",
    "schema": "catalogue",
-   "columns": 19,
+   "columns": 22,
    "burstOperations": 1,
    "written": true,
    "contention": null,
@@ -868,7 +868,7 @@
   {
    "table": "platform.workstation",
    "schema": "platform",
-   "columns": 22,
+   "columns": 23,
    "burstOperations": 1,
    "written": false,
    "contention": null,
@@ -956,13 +956,24 @@
   {
    "table": "seating.section",
    "schema": "seating",
-   "columns": 8,
+   "columns": 9,
    "burstOperations": 1,
    "written": false,
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
    "note": "**A named part of a room**, holding rows"
+  },
+  {
+   "table": "seating.section_row",
+   "schema": "seating",
+   "columns": 5,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**A row within a section**, carrying its own numbering scheme"
   }
  ],
  "operations": [
@@ -1118,7 +1129,8 @@
    "callsPerBuyer": 2,
    "reads": [
     "seating.seat_map",
-    "seating.section"
+    "seating.section",
+    "seating.section_row"
    ],
    "writes": [],
    "lock": null

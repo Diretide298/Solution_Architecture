@@ -1507,6 +1507,19 @@ paths:
       operationId: getCommandCentre
       x-ticvai-consumed-by:
         - "P16 ANL-001 Executive Command Center"
+      x-ticvai-read-via:
+      - query: subscription#contractRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373), as getModuleEnablement reads control.contract, Platform''s data'
+      - query: subscription#licenceAddOnRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373), as getModuleEnablement reads control.licence_add_on, Platform''s data'
+      - query: subscription#planRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373), as getModuleEnablement reads control.plan, Platform''s data'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -1517,8 +1530,11 @@ paths:
         dashboards inside it.
 
         **A module appears when both halves of the entitlement hold** — the tenant has licensed it
-        (`subscription`), and the principal holds at least one permission grouped under it in the
-        module tree (`identity.listModules`, `listPermissions?moduleId`). `core` always appears.
+        (`subscription`), and the principal holds at least one permission grouped under it. `core` always
+        appears. **Both halves are worked out by the rule on `CreateDashboardRequest.module`** (ADAM CR-373,
+        31 October 2026; CHG-CR373-001): the licence in process through the three Subscription reads below, the
+        permission from the caller''s session and `x-ticvai-permission-modules`; a dashboard whose module fails
+        either is left out.
         **Resolved here, on the server, per request** — a client that filters a full list has already
         been sent the dashboards it should not see.
 
@@ -1553,6 +1569,19 @@ paths:
         - "P15 KIT-010 Kitchen Performance, AI & Operational Optimization"
         - "P16 ANL-021 Dashboard Library"
         - "P16 ANL-068 Embedded BI, Workspace & Tenant Administration"
+      x-ticvai-read-via:
+      - query: subscription#contractRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373), as getModuleEnablement reads control.contract, Platform''s data'
+      - query: subscription#licenceAddOnRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373), as getModuleEnablement reads control.licence_add_on, Platform''s data'
+      - query: subscription#planRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373), as getModuleEnablement reads control.plan, Platform''s data'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -1570,7 +1599,9 @@ paths:
         schema:
           $ref: ../shared/common.yaml#/components/schemas/ModuleKey
         description: '**Narrows the library to one module.** Entitlement still applies — asking for a
-          module the caller cannot see returns an empty list, not the module''s dashboards.'
+          module the caller cannot see returns an empty list, not the module''s dashboards. Every dashboard whose
+          module fails the rule on `CreateDashboardRequest.module` (licensed, and a permission of it held) is left
+          out, filter or none (ADAM CR-373; CHG-CR373-001).'
       - name: includeArchived
         in: query
         required: false
@@ -1601,6 +1632,18 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'what its text calls "VenueSettings.reporting": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
+      - query: subscription#contractRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373), as getModuleEnablement reads control.contract, Platform''s data'
+      - query: subscription#licenceAddOnRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373), as getModuleEnablement reads control.licence_add_on, Platform''s data'
+      - query: subscription#planRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373), as getModuleEnablement reads control.plan, Platform''s data'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -1613,6 +1656,11 @@ paths:
         tenant default (decided 28 September, audit R094); a tenant-wide dashboard uses the tenant default.
         The dashboard''s tile refreshes per minute, summed over its tiles, may not exceed it. **Proposed
         default 24 refreshes per minute, client to correct (audit R094).**
+
+
+        **`aggregateCost` is worked out on save and stored** (ADAM CR-372, 31 October 2026; CHG-CR372-001): the
+        load as a share of that budget, banded `low`, `medium` or `high` as `Dashboard.aggregateCost` states, and
+        written to `reporting.dashboard.aggregate_cost` with the dashboard.
 
         '
       tags:
@@ -1737,6 +1785,18 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'what its text calls "VenueSettings.reporting": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
+      - query: subscription#contractRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373), as getModuleEnablement reads control.contract, Platform''s data'
+      - query: subscription#licenceAddOnRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373), as getModuleEnablement reads control.licence_add_on, Platform''s data'
+      - query: subscription#planRecords
+        route: in-process
+        for: 'the tenant''s LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module
+          (ADAM CR-373), as getModuleEnablement reads control.plan, Platform''s data'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -1754,6 +1814,10 @@ paths:
         not exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (the tenant default for a
         tenant-wide dashboard; proposed 24, audit R094), exactly as on create: otherwise `400` and nothing is
         saved, so an update is not the way round the budget.
+
+
+        **`aggregateCost` is worked out again on every save and stored** (ADAM CR-372, 31 October 2026;
+        CHG-CR372-001), by the rule on `Dashboard.aggregateCost`, exactly as on create.
 
         '
       tags:
@@ -1791,10 +1855,12 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
-          x-ticvai-problem-types: [module-not-entitled]
+          x-ticvai-problem-types: [module-not-licensed, module-permission-not-held]
           description: '**Moving a dashboard to a module the caller is not entitled to.** The same
             guard as `createDashboard` — without it, an update would be the way round the create
-            check.
+            check. `module-not-licensed` when the tenant has not licensed the module, else
+            `module-permission-not-held`, by the rule on `CreateDashboardRequest.module`; nothing is written
+            (ADAM CR-373, 31 October 2026; these two replace the single type it named before, CHG-CR373-001).
 
             '
           content:
@@ -5323,11 +5389,16 @@ components:
             | `map` | one `location` dimension (venue, zone or venue-map point), one `value` measure |
             | `ribbon` | an `x` dimension (period), a `series` dimension, one `value` measure (rank flow) |
             | `decompositionTree` | one `value` measure and two or more dimensions with `hierarchyLevel` |
+            | `pie`, `donut` | one dimension with encoding `category`, one measure with encoding `value` (ADAM CR-374) |
+            | `gauge` | one measure with encoding `value`, and optionally one measure with encoding `target`; its bands and status are tile parameters (ADAM CR-374) |
+            | `heatmap` | one dimension with encoding `x`, one dimension with encoding `y`, one measure with encoding `value` (ADAM CR-374) |
+            | `table` | at least one column and nothing more; a column with no role is shown as is (ADAM CR-374) |
 
 
-            The other eleven marks bind as before (`number` one measure; `line`, `area`, `bar` and the
-            stacked bars an `x` dimension, optional `series`, one or more `y` measures; `pie`, `donut`,
-            `gauge`, `heatmap`, `table` as their names). **Unchanged**: at most 24 tiles a dashboard, and every
+            The other six marks bind as before (`number` one measure; `line`, `area`, `bar` and the
+            stacked bars an `x` dimension, optional `series`, one or more `y` measures). **Pie, donut, gauge,
+            heatmap and table** are the rows above (Chinmay, 31 October 2026, ADAM CR-374; CHG-CR374-001), in place
+            of the bare mark names that stood here. **Extra columns are allowed on every mark.** **Unchanged**: at most 24 tiles a dashboard, and every
             tile shows its as-of time and goes stale past its refresh (`KpiValue.asOf`, `stale`;
             BOARDREQ MOM-2713/2714).
 
@@ -5392,6 +5463,21 @@ components:
             permission in. The server refuses with `409`; a client that hides the option has not
             enforced anything.
 
+
+            **The module rule, stated once here and used by `createDashboard`, `updateDashboard`,
+            `listDashboards` and `getCommandCentre`** (ADAM CR-373, Chinmay, 31 October 2026; CHG-CR373-001).
+            **Licensed**: the module is in the tenant''s `LicencePosition.licensedModules`, read in process through
+            `subscription#contractRecords`, `subscription#licenceAddOnRecords` and `subscription#planRecords`,
+            exactly as `validateTenantConfig` and `getModuleEnablement` read it (ADAM CR-320); `core` is always
+            licensed. **Permission held**: a module''s permissions are the list under that `ModuleKey` in
+            `x-ticvai-permission-modules` (contracts/shared/permissions.yaml); the caller holds the module when its
+            session (`Session.permissionsByScope`) holds at least one of them at the dashboard''s venue, or anywhere
+            in its scope for a tenant-wide dashboard. No other query is asked. `createDashboard` and
+            `updateDashboard` refuse `409 module-not-licensed` when the module is not licensed, else `409
+            module-permission-not-held`, and write nothing. `listDashboards` and `getCommandCentre` leave out every
+            dashboard whose module fails either check, and a `module` filter naming such a module answers `200`
+            with an empty list.
+
             '
         description:
           type: string
@@ -5436,7 +5522,16 @@ components:
             - low
             - medium
             - high
-            description: Combined refresh load of every tile.
+            description: '**Combined refresh load of every tile, as a share of the refresh budget** (ADAM CR-372,
+              Chinmay, 31 October 2026; CHG-CR372-001). The load is the sum over the tiles of 60 / `refreshSeconds`
+              (refreshes per minute); a tile with no `refreshSeconds` adds 0. The share is the load divided by the
+              budget `createDashboard` already checks: `VenueSettings.reporting.dashboardRefreshBudgetPerMinute`
+              for the dashboard''s `venueId`, the tenant default when `venueId` is absent. `low` below 0.5,
+              `medium` from 0.5 to below 0.8, `high` from 0.8; a share above 1 is still refused `400
+              refresh-budget-exceeded` before the band is worked out. `createDashboard` and `updateDashboard`
+              work it out and store it in `reporting.dashboard.aggregate_cost` on every save; a later change to
+              the budget does not rewrite stored dashboards. **The bands 0.5 and 0.8 are proposed defaults for
+              the client to correct**, like the budget itself (configured-limits-proposal.md).'
           archivedAt:
             type: string
             format: date-time

@@ -460,10 +460,29 @@ paths:
       description: 'Created in `draft`. A draft map cannot be attached to a performance — only a published
         map can be sold from.
 
+        **Every section it writes belongs to the new map** (ADAM CR-402, decided 31 October 2026):
+        `seating.section.seat_map_id` is the new map''s id.
+
+        **From a template** (ADAM CR-403, decided 31 October 2026; CHG-CR403-001). With `templateId`, the call
+        reads the template (`seating.seat_map_template`) and writes the new draft map''s sections, rows and seats
+        from its stored `structure`, with new ids: `seat_map_id` is the new map; seat categories are matched by
+        code in the new map''s venue, and a seat whose category code the venue does not have gets a null category;
+        `seat_count`, `section_count` and `has_geometry` are taken from the copy, and so are `view_box` and
+        `stage_position`. View photos are not copied, because they show another venue. A `templateId` the caller
+        cannot read, or one outside the venue''s region, answers `422 unknown-reference` naming `templateId`, and
+        nothing is written.
+
         **Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the
         would-be result without writing, for the AI executor''s plan validation.
 
         '
+      x-ticvai-reads:
+      - table: seating.seat_map_template
+        for: 'templateId: the template whose stored structure the new map is written from (ADAM CR-403; CHG-CR403-001)'
+      x-ticvai-writes:
+      - table: seating.seat
+        for: 'the seats of a map created from a template, copied from its structure with new ids (ADAM CR-403;
+          CHG-CR403-001)'
       tags:
       - seatMap
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -497,6 +516,14 @@ paths:
                 $ref: '#/components/schemas/SeatMap'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '422':
+          x-ticvai-problem-types: [unknown-reference]
+          description: '`templateId` names a template the caller cannot read, or one outside the venue''s region; the
+            problem names `templateId` and nothing is written (ADAM CR-403)'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /seat-maps/{seatMapId}:
@@ -529,6 +556,9 @@ paths:
       description: 'Returns sections, rows and seat counts. Individual seats come from `/seat-maps/{id}/seats`
         — a large venue map is tens of thousands of seats and should not be returned inline.
 
+        **The map''s sections** (ADAM CR-402, decided 31 October 2026; CHG-CR402-001): `sections` are the
+        `seating.section` rows whose `seat_map_id` is `seatMapId`, each with its rows from `seating.section_row`.
+
         '
       tags:
       - seatMap
@@ -555,8 +585,11 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Rename or amend a seat map
-      description: 'Structural changes to a published map are rejected. Clone it, amend the clone, and
-        publish that — a map with tickets sold against it cannot change shape underneath them.
+      description: 'Saves the name, description, `isActive` and section views of a map. None of them is a
+        structural change, so each is accepted on a published map. Sections, rows and seats change through
+        `editSeatMapStructure`, and a published map is changed by cloning it, amending the clone and publishing
+        that — a map with tickets sold against it cannot change shape underneath them (ADAM CR-404, decided 31
+        October 2026; CHG-CR404-001).
 
         **Accepts `Prefer: validate-only`** (29 September, build): validates and answers 200 with the
         would-be result without writing, for the AI executor''s plan validation.
@@ -593,7 +626,9 @@ paths:
                   description: 'Set or clear the view photo of one or more sections (`Section.viewAssetId`,
                     decided 29 September, rev 3 23SEP-14). **Not a structural change**, so it is accepted
                     on a published map. A null `viewAssetId` clears the photo and the client falls back to
-                    rendering the view from geometry. A `sectionCode` not on this map returns 404.
+                    rendering the view from geometry. A `sectionCode` that is not one of this map''s sections
+                    (`seating.section` with this `seat_map_id` and that `code`, ADAM CR-402) answers `404 not-found`
+                    and nothing is written.
 
                     '
                   items:
@@ -619,13 +654,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatMap'
-        '409':
-          x-ticvai-problem-types: [seat-map-published]
-          description: Structural change attempted on a published map
-          content:
-            application/problem+json:
-              schema:
-                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /seat-maps/{seatMapId}/publish:
@@ -694,6 +724,9 @@ paths:
       - staff
       summary: Clone a map, optionally into another venue
       description: 'The practical route to a refit, and to rolling a proven layout out across venues.
+
+        **The copied sections belong to the new map** (ADAM CR-402, decided 31 October 2026): each
+        `seating.section` it writes has `seat_map_id` the clone''s id.
 
         **Accepts `Prefer: validate-only`** (29 September, build pass, group G2, from group G1''s handoff):
         validates and answers 200 with the would-be result without writing, so the clone step of an
@@ -898,7 +931,13 @@ paths:
         row label or a seat number changed). A label already taken in the map, or a removal of a seat on a
         published map, is refused `409` with the conflicting labels; nothing is applied. **Accepts `Prefer:
         validate-only`**, as `updateSeats` does, for the AI executor''s plan validation
-        (`proposeSeatMapChanges`, kind `numbering`).'
+        (`proposeSeatMapChanges`, kind `numbering`).
+
+
+        **Sections belong to this map** (ADAM CR-402, decided 31 October 2026; CHG-CR402-001). `addSections`
+        writes each section with `seat_map_id` this map, and every `sectionCode` (in `addRows`, `addSeats` and
+        `relabel`) is resolved within this map''s sections, matched exactly. A section code already used on this
+        map is refused `409 seat-label-taken`.'
       tags:
       - seatMap
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -1243,7 +1282,14 @@ paths:
         it. A venue operator should see *"3,142 seats, 4 rows with no geometry, 2 duplicate numbers"*
         before anything is written.
 
+        **Committed sections belong to the map** (ADAM CR-402, decided 31 October 2026): each `seating.section`
+        written has `seat_map_id` the map the import commits into, and a section code already used on that map is
+        refused.
+
         '
+      x-ticvai-writes:
+      - table: seating.section
+        for: 'the committed sections, each with seat_map_id the map the import commits into (ADAM CR-402; CHG-CR402-001)'
       tags:
       - import
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -1292,6 +1338,11 @@ paths:
       x-ticvai-read-routing: replica
       summary: List reusable layout templates
       description: >-
+        **A region's templates, read from beneath it** (ADAM CR-403, decided 31 October 2026; CHG-CR403-001). A
+        template is saved at a region (its `scopePath`), and row security on `seating.seat_map_template` is
+        read-beneath, so the venues under that region read it.
+
+
         **Order.** Sorted by `name` ascending, then by `id`. (r10 default ruling, CHG-R10GEN-004)
       tags:
       - seatMap
@@ -1319,6 +1370,22 @@ paths:
       - staff
       x-ticvai-config-scope: region
       summary: Save a map as a reusable template
+      description: '**The template keeps its own copy** (ADAM CR-403, decided 31 October 2026; CHG-CR403-001). A
+        template is a region''s and the map it came from is a venue''s: under row security another venue cannot read
+        the source map, and the source may later change or be archived. So the call copies the source map''s
+        structure into the template when it is saved: `view_box`, `stage_position` and `structure` (jsonb), a list
+        of sections (code, name, boundary), each with its rows (label, numberingDirection) and their seats
+        (seatNumber, displayLabel, position, attribute, the seat category''s code). It also stores
+        `source_seat_map_id`, for lineage only: nothing reads the source map through it. The template''s
+        `scope_path` is the region it is saved at, with read-beneath row security, so venues under that region can
+        read it.'
+      x-ticvai-reads:
+      - table: seating.seat_map
+        for: 'sourceSeatMapId: the map whose structure is copied when the template is saved (ADAM CR-403)'
+      - table: seating.section
+        for: 'the source map''s sections, copied into the template''s structure (ADAM CR-403)'
+      - table: seating.seat
+        for: 'the source map''s seats, copied into the template''s structure (ADAM CR-403)'
       tags:
       - seatMap
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -1341,9 +1408,10 @@ paths:
                   type: string
                   maxLength: 200
                 sourceSeatMapId:
-                  x-ticvai-persisted: false
                   type: string
                   format: uuid
+                  description: The map whose structure is copied into the template; kept as `source_seat_map_id` for
+                    lineage only (ADAM CR-403).
                 description:
                   type: string
                   maxLength: 1000
@@ -2356,7 +2424,13 @@ paths:
         reuses a stand from last season and rebuilds the rest.
 
 
-        **Lands unpublished.** A section arriving in a live map is seats on sale that nobody checked.'
+        **Lands unpublished.** A section arriving in a live map is seats on sale that nobody checked.
+
+
+        **The copy belongs to the target map** (ADAM CR-402, decided 31 October 2026; CHG-CR402-001): the
+        section is written with `seat_map_id` the map in the path, and `sectionCode` is resolved within the
+        `fromSeatMapId` map''s sections. A code (`asSectionCode`, else `sectionCode`) already used on the target map
+        is refused `409 seat-label-taken` and nothing is written.'
       tags:
       - seating
       x-ticvai-permission: CAPACITY_CONFIGURE
@@ -2377,6 +2451,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatMap'
+        '409':
+          x-ticvai-problem-types: [seat-label-taken]
+          description: The section code is already used on the target map (ADAM CR-402)
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       requestBody:
@@ -4337,15 +4418,29 @@ components:
             type: boolean
     Section:
       x-ticvai-persistence: seating.section
+      # One code per map, matched exactly as Seat's key and every sectionCode match it (ADAM CR-402; CHG-CR402-001).
+      x-ticvai-unique-together:
+      - [seatMapId, code]
       type: object
       required:
+      - seatMapId
       - code
       - name
       - rowCount
       - seatCount
       properties:
+        seatMapId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: seating.seat_map
+          description: '**The map the section belongs to** (ADAM CR-402, decided 31 October 2026). Set by every
+            writer of a section to the map it writes into: createSeatMap, editSeatMapStructure addSections,
+            cloneSeatMap, copySeatMapSection, and the imports when committed. A map''s codes are unique on it,
+            matched exactly (`section_seat_map_id_code_uniq`).'
         code:
           type: string
+          x-ticvai-unique-compare: exact
         name:
           type: string
         rowCount:
@@ -4422,9 +4517,11 @@ components:
           type: string
           maxLength: 1000
         templateId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
-          description: Create from a template rather than empty.
+          description: Create from a template rather than empty. The new draft's sections, rows and seats are written
+            from the template's stored structure (ADAM CR-403; see `createSeatMap`).
     Seat:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by allocateGroupSeats, assignSeats, generateConfiguration, getSeatAvailability and others
       x-ticvai-persistence: seating.seat
@@ -4610,13 +4707,107 @@ components:
           description: Null means open-ended.
     SeatMapTemplate:
       x-ticvai-persistence: seating.seat_map_template
+      # A region's template, read by the venues beneath it (ADAM CR-403; CHG-CR403-001).
+      x-ticvai-rls: read-beneath
+      description: '**A reusable layout with its own copy of the structure** (ADAM CR-403, decided 31 October 2026).
+        createSeatMapTemplate copies the source map''s structure when the template is saved; createSeatMap with
+        `templateId` writes a new map from it. The source map is kept for lineage only.'
       type: object
       required:
       - id
       - name
       - seatCount
       - sectionCount
+      - structure
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: '**The region the template is saved at** (ADR-0005; ADAM CR-403). Row security is read-beneath,
+            so the venues under that region read the template.'
+        sourceSeatMapId:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+          x-ticvai-references: seating.seat_map
+          description: The map the template was copied from, for lineage only (ADAM CR-403).
+        structure:
+          readOnly: true
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          type: array
+          description: 'The copied structure (ADAM CR-403): the sections, each with its rows and their seats, as they
+            were on the source map when the template was saved. View photos are not kept.'
+          items:
+            type: object
+            required:
+            - code
+            - name
+            properties:
+              code:
+                type: string
+              name:
+                type: string
+              boundary:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Point'
+              rows:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - label
+                  properties:
+                    label:
+                      type: string
+                    numberingDirection:
+                      type: string
+                      enum:
+                      - leftToRight
+                      - rightToLeft
+                    seats:
+                      type: array
+                      items:
+                        type: object
+                        required:
+                        - seatNumber
+                        properties:
+                          seatNumber:
+                            type: string
+                          displayLabel:
+                            type: string
+                          position:
+                            $ref: '#/components/schemas/Point'
+                          attribute:
+                            $ref: '#/components/schemas/SeatAttribute'
+                          categoryCode:
+                            type: string
+                            nullable: true
+                            description: The seat category's code on the source map; matched by code in the new
+                              map's venue.
+        viewBox:
+          readOnly: true
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          type: object
+          nullable: true
+          description: The source map's coordinate space, copied (ADAM CR-403).
+          properties:
+            width:
+              type: number
+            height:
+              type: number
+        stagePosition:
+          readOnly: true
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
+          allOf:
+          - $ref: '#/components/schemas/Point'
+          nullable: true
+          description: The source map's stage position, copied (ADAM CR-403).
         id:
           type: string
           format: uuid

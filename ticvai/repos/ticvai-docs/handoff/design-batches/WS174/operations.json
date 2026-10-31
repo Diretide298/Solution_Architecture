@@ -137,7 +137,7 @@
     "required": false
    },
    {
-    "name": "automationMode",
+    "name": "automationLevel",
     "in": "query",
     "required": false
    },

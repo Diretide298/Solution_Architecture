@@ -1018,7 +1018,7 @@ Errors to draw in the form: 409 The version is not `current` (still `preview`, o
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
 
 #### Outputs: what the screen shows and produces
 
@@ -1059,7 +1059,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 |  (publish gate) | navigation or local | — | — | — | — |
 | Publish support notice (primary button) | `publishSupportNotice` POST `/support-notices` | SupportNotice | SupportNotice | — | opens modal first |
 | Deprecate API version (secondary button) | `deprecateApiVersion` POST `/api-versions/{version}/deprecate` | inline | ApiVersion | 409 The version is not `current` (still `preview`, or already `deprecated` or `sunset`); only the current version is deprecated. | opens modal first |
@@ -1604,7 +1604,7 @@ Asks for the authentication code before the package is applied.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Action `action` | text field | required | — | — | — | What the step-up is for. Recorded in the audit trail. | `createMfaChallenge` body |
+| Action `action` | text field | required | — | For a step-up it is the `operationId` of the operation that demands it (for example `resetPrincipalCredential`; ADAM CR-375, CHG-CR375-001), and the step-up counts only for that operation. | — | What the step-up is for. Recorded in the audit trail. | `createMfaChallenge` body |
 | Method `methodId` | picker: choose a method | optional | — | — | shows names, sends the id | — | `createMfaChallenge` body |
 | Venue `venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | For a guest, the venue whose `VenueSettings.identity.guestTwoStep` applies (sign-in venue, or the venue of the booking being acted on). | `createMfaChallenge` body |
 

@@ -259,7 +259,7 @@ offer it where the instance is the client's.
 **Before POS-005 is built (sprint 2 at the latest)**
 
 3. [ ] The client's yes on template location and the retention floor; the facial-reader vendor named.
-4. [ ] Package: `vendor` and `vendor_template_ref` on `pii.subject_biometric`; the vendor delete call in the erasure path; classify sensitive fields. Re-derive, mirrors, check. (3 pts, the finding's estimate)
+4. [ ] Package: `vendor` and `vendor_template_ref` on `pii.subject_biometric`; the vendor delete call in the erasure path, and in Identity's `biometric.enrolmentChanged` consumer on `revoked`, which deletes the row today (ADAM CR-391, 31 October 2026), once items 6 and 10 above are decided; classify sensitive fields. Re-derive, mirrors, check. (3 pts, the finding's estimate)
 5. [ ] **BIO-ADAPTER**: vendor adapter interface and mock; enrol and delete with receipt. (3 pts)
 6. [ ] **KERNEL-FIELD-ENC**: per-tenant data keys wrapped in Key Vault; blind index helper. (5 pts)
 

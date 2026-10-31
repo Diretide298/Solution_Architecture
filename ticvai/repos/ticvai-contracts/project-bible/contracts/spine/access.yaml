@@ -126,6 +126,26 @@ x-ticvai-queries:
         partiallyConsumed->expired:timer: as issued->expired
         issued->cancelled:cancelPerformance: every holder is made whole by createRefund (F09), whose order.refunded
           the projection consumes; until then the guest is owed money and the entitlement rightly blocks
+  # **Who is on site now, for a venue-wide guest broadcast** (ADAM CR-379, Chinmay, 31 October 2026; CHG-CR379-001).
+  liveEntitlementSubjects:
+    module: access
+    table: access.entitlement
+    inputs:
+      venueId: {type: string, format: uuid, description: 'The venue whose guests are asked for (Entitlement.venueId).'}
+      at: {type: string, format: date-time, description: 'The moment asked about: now, as the asker reads its clock.'}
+    returns:
+      type: object
+      required: [subjectIds]
+      properties:
+        subjectIds: {type: array, items: {type: string, format: uuid}, description: 'The distinct guests with a live entitlement at the venue; empty when none.'}
+    rule: >-
+      A rule question (ADAM CR-379, Chinmay, 31 October 2026). The distinct subjectId of the access.entitlement rows
+      at venueId that have a subject, a status of issued or partiallyConsumed, and validFrom and validTo (where set)
+      around at (validFrom at or before at, validTo after at). Access answers it in the caller's transaction under
+      the caller's row-level security. It is asked in process from commerce by workforce broadcastToGuests for its
+      recipientCount (docs/active/cross-deployable-writes.yaml XDR-001), and from operations by marketing-crm
+      sendGuestBroadcast for the guests to send to (XDR-023), through the C# query interface Access implements.
+    served: [in-process]
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October). Rule questions keep queries of their own, above.
@@ -1347,7 +1367,7 @@ paths:
       x-ticvai-read-via:
       - query: identity#subjectBiometricRecords
         route: service
-        for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
+        for: 'the enrolment it revokes (pii.subject_biometric, Identity''s data; CHG-MOD-001), on Identity''s service route listSubjectBiometricRecords, connected when the kernel''s service sign-in (#37051) is ready (ADAM CR-391)'
       x-ticvai-write-via:
       - table: pii.subject_biometric
         event: biometric.enrolmentChanged
@@ -1372,6 +1392,17 @@ paths:
         FacePass enrolment; another guest''s enrolment is refused exactly as one that does not exist, never
         returned. `GUEST_MANAGE` is what a staff caller must hold to act for any guest (ADR-0025).
 
+
+        **How the row is destroyed** (ADAM CR-391, Chinmay, 31 October 2026). The operation reads the enrolment
+        through `identity#subjectBiometricRecords` on Identity''s service route (`listSubjectBiometricRecords`,
+        `serviceAuth`); the access role gets no grant on `pii`. If the `enrolmentId` is unknown, is not a
+        `facePass`, or belongs to another guest (for a guest caller), the answer is `404 not-found`. Otherwise it
+        publishes `biometric.enrolmentChanged` with `change` `revoked` and the row''s fields, and answers `204`. On
+        `revoked`, Identity''s consumer deletes the `pii.subject_biometric` row; it never deactivates it. The
+        vendor''s delete and its receipt join that consumer once ADR-0063 is settled; until then TICVAI holds no
+        template and the row is the whole record. The read needs service sign-in (#37051, ADAM CR-281): the
+        operation and the consumer change are built now, and the read is connected when #37051 is Ready for QA.
+
         '
       tags:
       - access
@@ -1387,7 +1418,9 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Destroyed
+          description: Revoked; Identity deletes the row from the event (ADAM CR-391)
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /parking-facilities:
@@ -1501,11 +1534,12 @@ paths:
         A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs on the parking
         system''s own POS (14 August).
 
-        **PUT semantics — an upsert of one facility, keyed on the body''s `id`.** The collection path
-        carries no id, so the body names the target. **No `id`** creates a facility: the server assigns
-        the id and answers `201`. **An `id` that exists** replaces that facility whole and answers
-        `200`: a field left out takes its default or null, it does not keep its stored value. **An `id`
-        that does not exist** is a `404`, never a create with a client-chosen id. `takesPayment` and
+        **PUT semantics: the path `parkingFacilityId` is the facility''s id** (ADAM CR-245''s rule; ADAM CR-398,
+        decided 31 October 2026; CHG-CR398-001). **No facility has that id**: one is created with it (a client
+        UUIDv7; BO-006 mints it for a new facility) and the answer is `201`. **A facility the caller can see has
+        it**: the body replaces it whole and the answer is `200`: a field left out takes its default or null, it
+        does not keep its stored value. **The id is held by a facility the caller cannot see**: `404`, and nothing
+        is written. A body `id`, when sent, must equal the path id, else `400 validation`. `takesPayment` and
         `vendorSwapTargetDays` are read-only and ignored in a body.
 
         '
@@ -1523,7 +1557,9 @@ paths:
       - name: parkingFacilityId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        description: 'The facility''s id (ADAM CR-245; CR-398). Where no facility has it, the new facility takes it
+          (a client UUIDv7); where one the caller can see has it, that facility is replaced; where one the caller
+          cannot see holds it, `404`. The body''s `id`, when sent, must equal it, else `400 validation`.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -2443,6 +2479,12 @@ paths:
         - "P07 SCN-016 Gate mode"
         - "P08 BO-230 Live Gate Mode & Lane Control"
       x-ticvai-names-for-context: [access.configuration_change]
+      x-ticvai-read-via:
+      - query: identity#principalHoldsRoleAtVenue
+        route: in-process
+        for: 'whether the caller holds one of the governing gate mode policy''s whoCanActivate roles at the access
+          point''s venue or above it, as a yes or no answered under the tenant root grant (ADAM CR-396, decided 31
+          October 2026; CHG-CR396-001; XDR-035): identity.delegated_access, Identity''s data'
       x-ticvai-audience:
       - staff
       summary: Set the operating mode of an access point
@@ -2463,9 +2505,32 @@ paths:
         is operational, so it is not also logged in `access.configuration_change`.
 
 
-        **The gate mode policy is enforced here** (`setGateModePolicy`): for `freeFlow` or `dropArm`, a caller whose role
-        is not in the policy''s `whoCanActivate` is refused `403`, a missing reason where `reasonRequired` is `400`, and
-        an activation whose policy says `createsIncident` opens an access incident.
+        **The gate mode policy is enforced here** (`setGateModePolicy`; ADAM CR-396, decided 31 October 2026;
+        CHG-CR396-001). For `operatingMode` `freeFlow` or `dropArm`:
+
+
+        - **Which policy governs.** A policy on a group that lists the access point beats a policy on that group''s
+        parent group, which beats the venue default (`accessPointGroupId` null). When two or more policies are equally
+        specific, the call must pass every one of them, and an incident is opened if any of them sets
+        `createsIncident`.
+
+        - **Who may activate.** `whoCanActivate` holds role ids (`Role.id`). For a governing policy that lists roles,
+        Access asks `identity#principalHoldsRoleAtVenue` in process with the caller''s `principalId`, each role id in
+        turn, and the access point''s venue path; no role held is `403 gate-mode-role-required`, and nothing is
+        written. A policy with no roles, or no policy, adds no check beyond `TURNSTILE_MODE_SET`.
+
+        - **Reason.** A missing `reason` where a governing policy has `reasonRequired` is `400 reason-required`.
+
+        - **Incident.** Where a governing policy sets `createsIncident`, the transaction that applies the mode writes
+        one `access.access_incident`: `incidentType` `emergencyAccessEvent` for `dropArm` and `securityEvent` for
+        `freeFlow`, `assignedTeam` `accessSupervisor`, `status` `open`, `createdByPrincipalId` the operator,
+        `venueId` and `scopePath` the access point''s, and a `description` naming the mode, the access point''s
+        `code` and the reason.
+
+        - **A scheduled change** (a future `effectiveAt`) is checked when it is scheduled, and opens its incident when
+        the timer applies it; a cancelled one opens none. It keeps its turnstile mode in
+        `AccessGateModeChange.targetTurnstileMode`, and the timer sets both the operating mode and the turnstile mode;
+        a scheduled change that carries a turnstile mode is not refused.
 
 
         **R221 amended 2 October 2026** (Chinmay, critical set 1, BO-230; DEC-255; CHG-CSP-032): the direction can now be
@@ -2521,9 +2586,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccessPoint'
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          description: 'The request breaks a schema rule, or sends a turnstile mode with an operating mode other than
+            `normal` or `podium` (`validation`); or a governing gate mode policy has `reasonRequired` and no `reason` was
+            sent (`reason-required`; ADAM CR-396). Nothing is written.'
+          x-ticvai-problem-types: [validation, reason-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: 'The caller lacks `TURNSTILE_MODE_SET` at the venue; or, for `freeFlow` or `dropArm`, a governing
+            gate mode policy lists roles in `whoCanActivate` and the caller holds none of them at the access point''s
+            venue (`gate-mode-role-required`; ADAM CR-396). Nothing is written.'
+          x-ticvai-problem-types: [gate-mode-role-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '202':
@@ -2590,6 +2669,11 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Create an access point
+      description: '**A new access point is created active** (ADAM CR-397, decided 31 October 2026; CHG-CR397-001):
+        the row is written with `isActive` true, and the request carries no active flag (the approved BO-064 create
+        form sends none). A gate is taken out of use afterwards with `updateAccessPoint` and `isActive` false.
+
+        '
       tags:
       - accessPoint
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
@@ -2653,7 +2737,9 @@ paths:
         operator, reason, effective time), which Live Gate Mode & Lane Control and the shift handover read, and one
         `access.configuration_change` row. Takes effect at once, or at a future `effectiveAt` (then `202`,
         cancelled with `cancelGateModeChange`). Devices pick it up from the next push; an offline device keeps its
-        old direction until it reconnects, and the response''s `AccessPoint` says so through its device status.
+        old direction until it reconnects, and the response''s `AccessPoint` shows that through `lastHeartbeatAt`
+        (and `directionEffectiveAt` for a pending switch); it has no device status (ADAM CR-397, decided 31 October
+        2026; CHG-CR397-001).
 
         '
       tags:
@@ -2884,6 +2970,10 @@ paths:
         - "P08 BO-154 Access Rule Command Center"
         - "P08 BO-222 Special Event, Free View & Alternative Admission"
       x-ticvai-read-via:
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the caller''s working venue''s path (platform.scope, by id), written as the profile''s scope_path,
+          Tenancy''s data (ADAM CR-400, decided 31 October 2026, CR-217''s rule; CHG-CR400-001; XDR-036)'
       - query: tenancy#regionSettingsRecords
         route: service
         for: 'what its text calls "RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
@@ -2894,6 +2984,17 @@ paths:
       - staff
       x-ticvai-config-scope: venue
       summary: Create an admission profile
+      description: '**Where the profile is written** (ADAM CR-400, decided 31 October 2026, CR-217''s rule;
+        CHG-CR400-001). `access.admission_rules.scope_path` is set by the server, never taken from the body: it is the
+        path of the session''s working venue, read with `tenancy#scopeRecords` by id. **A session with no working
+        venue** is `403 working-venue-required`, and nothing is written.
+
+
+        **The same rules as `updateAdmissionRules`** (CR-400): a count missing for an `n*` entry mode
+        (`entry-count-required`), `days` missing for a relative validity anchor (`validity-days-required`), or
+        `validity.to` before `validity.from` (`validity-ends-before-start`) is a `422`, and nothing is written.
+
+        '
       tags:
       - accessPoint
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
@@ -2921,8 +3022,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdmissionRules'
+        '403':
+          description: 'The session has no working venue, so the profile has no venue to be written under
+            (`working-venue-required`; ADAM CR-400); or the caller lacks ACCESS_POINT_CONFIGURE at the venue. Nothing
+            is written.'
+          x-ticvai-problem-types: [working-venue-required]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
+        '422':
+          x-ticvai-problem-types: [entry-count-required, validity-days-required, validity-ends-before-start]
+          description: A count missing for an n* entry mode, days missing for a relative validity anchor, or
+            validity.to before validity.from (ADAM CR-400, as updateAdmissionRules). Nothing is written.
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /admission-rules/{profileId}:
@@ -2961,6 +3079,8 @@ paths:
         default or null; it does not keep its stored value. `perProductRules` is replaced as one
         list, never merged product by product. The body''s `id` is read-only and ignored — the path
         decides which profile is written — and an unknown `profileId` is a `404`, never a create.
+        **Where the profile lives does not move** (ADAM CR-400, decided 31 October 2026; CHG-CR400-001): its
+        `scope_path` is kept as stored, never re-derived from the editor''s working venue, so no scope read is asked.
 
         **Entry limits, re-entry, validity and crossover are blocks of the same profile (decided 29 September,
         VM close-out).** `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly` and
@@ -3050,6 +3170,9 @@ paths:
       operationId: addBlacklistEntry
       x-ticvai-consumed-by:
         - "P08 BO-033 Blacklist Management"
+      x-ticvai-write-via:
+      - table: approvals.request
+        operation: createApprovalRequest
       x-ticvai-read-via:
       - query: approvals#requestRecords
         route: service
@@ -3068,6 +3191,26 @@ paths:
         `accessPermissionChange`, subject type `whitelistEntry`) and the entry is written when a second person
         approves; the requester cannot approve their own. Until 2 October this write could only blacklist; `listType`
         and `disableScope` are optional and default to the blacklist behaviour.
+
+
+        **How a whitelist entry is raised** (ADAM CR-399, decided 31 October 2026; CHG-CR399-001; the pattern of
+        `suspendTenant`, CR-172). A code already on either list is refused `409 duplicate-code` at once. Otherwise the
+        entry''s id is minted now (a UUIDv7) and this calls approvals'' `createApprovalRequest` (`x-ticvai-write-via`,
+        service route) with kind `accessPermissionChange`, `subjectContract` `access`, `subjectType`
+        `whitelistEntry`, `subjectId` that id, and `attributes` `{mediaCode, reason, expiresAt, disableScope}` as sent,
+        and answers `202` `AccessPendingSecondApproval` with the request''s id and that `subjectId`. **The approval
+        request is all this call writes.** Where approvals refuses `422 no-approval-route`, this call passes it on,
+        and nothing is written.
+
+
+        **The grant writes the entry** (events/approval-granted.yaml, context `access`). Access''s consumer of
+        `approval.granted` takes the events whose `subjectContract` is `access` and `subjectType` `whitelistEntry`
+        (idempotency key `requestId`), reads the request through `approvals#requestRecords` for its `attributes`, and
+        writes the `access.blacklist` row with the request''s `subjectId` as its id, `listType` `whitelist`, the
+        attributes, `addedByPrincipalId` the requester and `addedAt` now. It records the outcome with approvals''
+        `recordApprovedActionOutcome`: `applied`; `notApplied` with `duplicate-code` if the code was listed while the
+        request waited, or `entry-expired` if `expiresAt` has passed, writing nothing in either case.
+        `approval.rejected`, `approval.withdrawn` or `approval.expired` writes nothing.
 
         **One entry per media code in the tenant** (decided 28 September, audit R108). A media code is
         honoured at every venue of the tenant, so a second entry for the same code is refused `409`
@@ -3131,13 +3274,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/BlacklistEntry'
         '202':
-          description: 'A whitelist entry, held for a second approver (DEC-254; CHG-CSP-031). Written when approved.'
+          description: 'A whitelist entry, held for a second approver (DEC-254; CHG-CSP-031). Written when approved;
+            `subjectId` is the id the entry will take (ADAM CR-399).'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccessPendingSecondApproval'
         '409':
           $ref: ../shared/common.yaml#/components/responses/DuplicateCode
+        '422':
+          description: 'A whitelist entry for which approvals finds no active approval rule (`no-approval-route`,
+            passed on from `createApprovalRequest`; ADAM CR-399). Nothing is written.'
+          x-ticvai-problem-types: [no-approval-route]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /blacklist/{mediaCode}:
@@ -6650,9 +6802,11 @@ paths:
         which entitlement a scan consumes, in what order and how many units.
 
 
-        **Upsert keyed by `ruleId`.** A body without `ruleId` creates one and the response carries the new key;
-        a body with one replaces that record whole (PUT semantics: a field left out takes its default or null);
-        an unknown `ruleId` is a `404`, never a create.
+        **Upsert keyed on the path''s `ruleId`, the record''s id** (ADAM CR-245''s rule, as ADAM CR-395 applied
+        it, 31 October 2026). Where no record has that id, one is created with it (a client UUIDv7) and the
+        answer is `201`; where one does, the body replaces it whole and the answer is `200` (PUT semantics: a
+        field left out takes its default or null). A `ruleId` sent in the body must equal the path''s, else
+        `400 validation`.
 
 
         The engine applies rules at the next offline package refresh, like every admission rule; units already
@@ -6679,7 +6833,7 @@ paths:
       - name: ruleId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces. The body''s `ruleId`, when sent, must equal it.'
+        description: 'Addresses the item this write creates or replaces: its `id` (ADAM CR-245, CR-395). No record has it: one is created with it (a client UUIDv7), `201`. The body''s `ruleId`, when sent, must equal it, else `400 validation`.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
@@ -6692,6 +6846,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EntitlementConsumptionEngineView'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new record, created with the path's `ruleId` (ADAM CR-245, CR-395)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementConsumptionEngineView'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
@@ -6812,9 +6977,11 @@ paths:
         who must enter with whom, checked at admission, at exit or at an attraction.
 
 
-        **Upsert keyed by `ruleId`.** A body without `ruleId` creates one and the response carries the new key;
-        a body with one replaces that record whole (PUT semantics: a field left out takes its default or null);
-        an unknown `ruleId` is a `404`, never a create.
+        **Upsert keyed on the path''s `ruleId`, the record''s id** (ADAM CR-245''s rule, as ADAM CR-395 applied
+        it, 31 October 2026). Where no record has that id, one is created with it (a client UUIDv7) and the
+        answer is `201`; where one does, the body replaces it whole and the answer is `200` (PUT semantics: a
+        field left out takes its default or null). A `ruleId` sent in the body must equal the path''s, else
+        `400 validation`.
 
 
         At the gate a rule that fails denies with the rule''s reason, never silently.
@@ -6840,7 +7007,7 @@ paths:
       - name: ruleId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces. The body''s `ruleId`, when sent, must equal it.'
+        description: 'Addresses the item this write creates or replaces: its `id` (ADAM CR-245, CR-395). No record has it: one is created with it (a client UUIDv7), `201`. The body''s `ruleId`, when sent, must equal it, else `400 validation`.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
@@ -6853,6 +7020,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestCompanionEligibilityRulesView'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new record, created with the path's `ruleId` (ADAM CR-245, CR-395)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestCompanionEligibilityRulesView'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
@@ -7155,9 +7333,11 @@ paths:
         `listCredentialActivationDisplay` read these rules and nothing wrote them.
 
 
-        **Upsert keyed by `ruleId`.** A body without `ruleId` creates one and the response carries the new key;
-        a body with one replaces that record whole (PUT semantics: a field left out takes its default or null);
-        an unknown `ruleId` is a `404`, never a create.
+        **Upsert keyed on the path''s `credentialPolicyId`, the record''s id** (ADAM CR-245''s rule, as ADAM CR-395 applied
+        it, 31 October 2026). Where no record has that id, one is created with it (a client UUIDv7) and the
+        answer is `201`; where one does, the body replaces it whole and the answer is `200` (PUT semantics: a
+        field left out takes its default or null). A `ruleId` sent in the body must equal the path''s, else
+        `400 validation`.
 
 
         A rule takes effect for credentials rendered after the save; a QR already shown is not re-rendered until
@@ -7184,7 +7364,7 @@ paths:
       - name: credentialPolicyId
         in: path
         required: true
-        description: 'Addresses the activation and display rule this write creates or replaces. The body''s `ruleId`, when sent, must equal it.'
+        description: 'Addresses the item this write creates or replaces: its `id` (ADAM CR-245, CR-395). No record has it: one is created with it (a client UUIDv7), `201`. The body''s `ruleId`, when sent, must equal it, else `400 validation`.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
@@ -7197,6 +7377,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CredentialActivationDisplayRulesView'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new record, created with the path's `credentialPolicyId` (ADAM CR-245, CR-395)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialActivationDisplayRulesView'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
@@ -7291,11 +7482,29 @@ paths:
         - "P08 BO-168 BLE Beacon & Geofence Configuration"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
+      x-ticvai-read-via:
+      - query: tenancy#deviceRecords
+        route: in-process
+        for: 'the beacon''s health and lastDetected (platform.device.health and last_heartbeat_at), Tenancy''s data, asked in process through Tenancy''s own query class under the caller''s row security (ADAM CR-389; XDR-031)'
       summary: The BLE beacon and geofence configuration as saved
       description: >
         **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
         BO-168 saves it with `setBleBeaconGeofence` and read nothing back. Returns what the write stores, in
         the write's own shape.
+
+
+        **One beacon, by `beaconId`** (ADAM CR-389, Chinmay, 31 October 2026). The required `beaconId` names the
+        beacon's `access.device_placement` row (role `proximity`, `device_id` = `beaconId`); the answer is that
+        beacon, or `404` when no placement has it. `health` and `lastDetected` are `platform.device.health` and
+        `last_heartbeat_at`, read through `tenancy#deviceRecords`, in process, through Tenancy's own query class
+        and under the caller's row security (XDR-031).
+      parameters:
+      - name: beaconId
+        in: query
+        required: true
+        description: The beacon's registered device id (`platform.device.id`, the placement's `device_id`; ADAM CR-389).
+        x-ticvai-column: access.device_placement.device_id
+        schema: { type: string, format: uuid }
       x-ticvai-permission: ACCESS_POINT_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7315,8 +7524,14 @@ paths:
       operationId: setBleBeaconGeofence
       x-ticvai-consumed-by:
         - "P08 BO-168 BLE Beacon & Geofence Configuration"
+      # access.access_point is named only to say this write leaves it to setAccessPointGeofence (ADAM CR-389).
+      x-ticvai-names-for-context: [access.access_point]
+      x-ticvai-read-via:
+      - query: tenancy#deviceRecords
+        route: in-process
+        for: 'whether beaconId is a registered device (404 when not), and the view''s health and lastDetected (platform.device.health and last_heartbeat_at), Tenancy''s data, asked in process through Tenancy''s own query class under the caller''s row security (ADAM CR-389; XDR-031)'
       x-ticvai-body-key: [beaconId]
-      x-ticvai-body-key-note: 'Keyed by the body''s `beaconId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per beacon within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
+      x-ticvai-body-key-note: 'Keyed by the body''s `beaconId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per beacon within the caller''s venue, the `access.device_placement` row (role `proximity`) whose `device_id` is `beaconId` (ADAM CR-389); a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.34 [Configure], [Support], [Example]
@@ -7339,8 +7554,19 @@ paths:
         not written.
 
 
-        **Overlaps `setAccessPointGeofence`,** which stays the operation of record for that write; this one
-        serves the screen''s composite view of it.
+        **A beacon''s activation zone, not a gate''s validation fence** (ADAM CR-389, Chinmay, 31 October 2026).
+        Each beacon is one `access.device_placement` row (role `proximity`), found by `device_id` = `beaconId`,
+        where `beaconId` is a registered `platform.device` id; a `beaconId` that names no registered device is
+        `404`. The fields map as follows: `beaconName` to `name`; `venue` to `venue_id`; `gate` to
+        `access_point_id`; `park`, `zone` and `attraction` to `access_area_id` (send the most specific; two that
+        do not nest are `400 validation`); `proximityThreshold` to `proximity_threshold_meters`; `activeInactive`
+        to `is_active`. The geofence goes in `access.device_placement.activation_zone`: `{centre, radiusMeters}`
+        for a circle or `{boundary}` for a polygon. `geofenceRadiusMeters` (5 to 5000) needs `geofenceCentre`,
+        `geofenceBoundary` needs at least three points, and a body with both a radius and a boundary is
+        `400 validation`. `health` and `lastDetected` are ignored on input; the view reads them from
+        `platform.device.health` and `last_heartbeat_at` through `tenancy#deviceRecords`, in process, through
+        Tenancy''s own query class and under the caller''s row security (XDR-031). `setAccessPointGeofence` stays
+        the gate''s validation fence; this write does not touch `access.access_point`.
 
         '
       tags:
@@ -7371,6 +7597,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BleBeaconGeofenceConfigurationView'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /credential-transfer-rebinding:
@@ -7806,9 +8036,11 @@ paths:
         The library was read-only.
 
 
-        **Upsert keyed by `mediaTypeId`.** A body without `mediaTypeId` creates one and the response carries the
-        new key; a body with one replaces that record whole (PUT semantics: a field left out takes its default
-        or null); an unknown `mediaTypeId` is a `404`, never a create.
+        **Upsert keyed on the path''s `mediaTypeId`, the record''s id** (ADAM CR-245''s rule, as ADAM CR-395 applied
+        it, 31 October 2026). Where no record has that id, one is created with it (a client UUIDv7) and the
+        answer is `201`; where one does, the body replaces it whole and the answer is `200` (PUT semantics: a
+        field left out takes its default or null). A `mediaTypeId` sent in the body must equal the path''s, else
+        `400 validation`.
 
 
         **Retiring is `active: false`, never a delete**: issued credentials reference the media type and must still
@@ -7835,7 +8067,7 @@ paths:
       - name: mediaTypeId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces. The body''s `mediaTypeId`, when sent, must equal it.'
+        description: 'Addresses the item this write creates or replaces: its `id` (ADAM CR-245, CR-395). No record has it: one is created with it (a client UUIDv7), `201`. The body''s `mediaTypeId`, when sent, must equal it, else `400 validation`.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
@@ -7848,6 +8080,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MediaTypeTechnologyLibraryView'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new record, created with the path's `mediaTypeId` (ADAM CR-245, CR-395)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaTypeTechnologyLibraryView'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
@@ -8036,9 +8279,11 @@ paths:
       description: '**The write behind Media Issuance & Encoding Profile** (decided 29 September, VM close-out).
 
 
-        **Upsert keyed by `encodingProfileId`.** A body without `encodingProfileId` creates one and the response
-        carries the new key; a body with one replaces that record whole (PUT semantics: a field left out takes
-        its default or null); an unknown `encodingProfileId` is a `404`, never a create.
+        **Upsert keyed on the path''s `encodingProfileId`, the record''s id** (ADAM CR-245''s rule, as ADAM CR-395 applied
+        it, 31 October 2026). Where no record has that id, one is created with it (a client UUIDv7) and the
+        answer is `201`; where one does, the body replaces it whole and the answer is `200` (PUT semantics: a
+        field left out takes its default or null). A `encodingProfileId` sent in the body must equal the path''s, else
+        `400 validation`.
 
 
         A changed profile applies to media issued after the save; media already encoded keep the profile they were
@@ -8065,7 +8310,7 @@ paths:
       - name: encodingProfileId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces. The body''s `encodingProfileId`, when sent, must equal it.'
+        description: 'Addresses the item this write creates or replaces: its `id` (ADAM CR-245, CR-395). No record has it: one is created with it (a client UUIDv7), `201`. The body''s `encodingProfileId`, when sent, must equal it, else `400 validation`.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
@@ -8078,6 +8323,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MediaIssuanceEncodingProfileView'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new record, created with the path's `encodingProfileId` (ADAM CR-245, CR-395)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaIssuanceEncodingProfileView'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
@@ -8319,9 +8575,11 @@ paths:
       description: '**The write behind Hotel, Wallet & External Media Integration** (decided 29 September, VM close-out).
 
 
-        **Upsert keyed by `integrationId`.** A body without `integrationId` creates one and the response carries
-        the new key; a body with one replaces that record whole (PUT semantics: a field left out takes its default
-        or null); an unknown `integrationId` is a `404`, never a create.
+        **Upsert keyed on the path''s `integrationId`, the record''s id** (ADAM CR-245''s rule, as ADAM CR-395 applied
+        it, 31 October 2026). Where no record has that id, one is created with it (a client UUIDv7) and the
+        answer is `201`; where one does, the body replaces it whole and the answer is `200` (PUT semantics: a
+        field left out takes its default or null). A `integrationId` sent in the body must equal the path''s, else
+        `400 validation`.
 
 
         **The shape is ours; the credentials are the client''s.** The account and keys of the hotel or wallet system
@@ -8349,7 +8607,7 @@ paths:
       - name: integrationId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces. The body''s `integrationId`, when sent, must equal it.'
+        description: 'Addresses the item this write creates or replaces: its `id` (ADAM CR-245, CR-395). No record has it: one is created with it (a client UUIDv7), `201`. The body''s `integrationId`, when sent, must equal it, else `400 validation`.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
@@ -8362,6 +8620,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HotelWalletExternalMediaIntegrationView'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new record, created with the path's `integrationId` (ADAM CR-245, CR-395)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HotelWalletExternalMediaIntegrationView'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
@@ -8786,8 +9055,8 @@ paths:
         - "P08 BO-188 Face Tag Temporary Enrollment"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
-        for: 'what its text calls "tenancy.VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
+        route: in-process
+        for: 'the venue''s biometrics settings, templatesHeldByTicvai for the view: platform.venue_settings, Tenancy''s data, asked in process through Tenancy''s own query class under the caller''s row security (ADAM CR-390; XDR-032)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -8838,8 +9107,8 @@ paths:
         - "P08 BO-188 Face Tag Temporary Enrollment"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
-        for: 'what its text calls "tenancy.VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
+        route: in-process
+        for: 'the venue''s biometrics settings, consentFormId for the fallback and templatesHeldByTicvai for the view: platform.venue_settings, Tenancy''s data, asked in process through Tenancy''s own query class under the caller''s row security (ADAM CR-390; XDR-032)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: VM close-out; pack ''Access Control Module'' p.61 (BO-188); MoM 2 Sep 2026
@@ -8853,13 +9122,16 @@ paths:
         a Face Tag may be captured, what it binds to and when it is deleted.
 
 
-        **Upsert keyed by `profileId`.** A body without `profileId` creates one and the response carries the new
-        key; a body with one replaces that record whole (PUT semantics: a field left out takes its default or null);
-        an unknown `profileId` is a `404`, never a create.
+        **PUT semantics: an upsert keyed on the path''s `profileId`, the profile''s id** (ADAM CR-245''s rule,
+        applied by ADAM CR-390, Chinmay, 31 October 2026). Where no `faceTagEnrolment` profile has that id, one is
+        created with it (a client UUIDv7) and the answer is `201`. Where one does, the body replaces it whole and
+        the answer is `200`: a field left out takes its default or null. A `profileId` sent in the body must equal
+        the path''s, else `400 validation`.
 
 
         **Face Tags are kept apart from Face Pass records and deleted automatically at the trigger.** A trigger
-        of `operationalRetentionThreshold` needs `retentionThresholdHours` (`422` without it). That number has
+        of `operationalRetentionThreshold` needs `retentionThresholdHours` (`422 retention-threshold-required`
+        without it). That number has
         no default: it is the one make-or-break value on this screen, and until the client''s counsel names it
         a venue can use every other trigger.
 
@@ -8869,6 +9141,15 @@ paths:
         taken on (`consentFormId`); where TICVAI stores the templates the response says so
         (`FaceTagTemporaryEnrollmentView.templatesHeldByTicvai`) and the screen warns the venue. How long a Face
         Tag may be kept past its trigger is still for counsel (DEC-240, research pending).
+
+
+        **The profile names the form, not a version** (ADAM CR-390). `consentFormId` is stored on the profile
+        (`access.biometric_profile.consent_form_id`) and read back on the view. The form''s version is not kept on
+        the profile: each capture records the version the guest accepted on its own enrolment record (CHG-CSP-018).
+        The venue''s biometrics settings (`consentFormId` for the
+        fallback, `templatesHeldByTicvai` for the view) are read through `tenancy#venueSettingsRecords`, in process,
+        through Tenancy''s own query class and under the caller''s row security (XDR-032). No `consentFormId` on the
+        profile and none on the venue is `422 consent-form-required`.
 
         '
       tags:
@@ -8891,7 +9172,7 @@ paths:
       - name: profileId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces. The body''s `profileId`, when sent, must equal it.'
+        description: 'Addresses the item this write creates or replaces: its `id` (ADAM CR-245, CR-390). No `faceTagEnrolment` profile has it: one is created with it (a client UUIDv7), `201`. The body''s `profileId`, when sent, must equal it, else `400 validation`.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
@@ -8899,17 +9180,28 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Saved
+          description: An existing profile, replaced
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FaceTagTemporaryEnrollmentView'
-        '404':
-          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new profile, created with the path's `profileId`
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaceTagTemporaryEnrollmentView'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
-          description: operationalRetentionThreshold chosen with no retentionThresholdHours, or no consent form
-            on the profile or the venue (`consent-form-required`; CHG-CSP-018)
+          description: '`retention-threshold-required`: `deletionTrigger` is `operationalRetentionThreshold` and no
+            `retentionThresholdHours` is sent. `consent-form-required`: no `consentFormId` on the profile and none
+            on the venue (CHG-CSP-018; ADAM CR-390).'
           x-ticvai-problem-types:
+          - retention-threshold-required
           - consent-form-required
           content:
             application/problem+json:
@@ -8977,9 +9269,11 @@ paths:
       description: '**The write behind Face Matching & Verification Thresholds** (decided 29 September, VM close-out).
 
 
-        **Upsert keyed by `profileId`.** A body without `profileId` creates one and the response carries the new
-        key; a body with one replaces that record whole (PUT semantics: a field left out takes its default or null);
-        an unknown `profileId` is a `404`, never a create.
+        **Upsert keyed on the path''s `profileId`, the record''s id** (ADAM CR-245''s rule, as ADAM CR-395 applied
+        it, 31 October 2026). Where no record has that id, one is created with it (a client UUIDv7) and the
+        answer is `201`; where one does, the body replaces it whole and the answer is `200` (PUT semantics: a
+        field left out takes its default or null). A `profileId` sent in the body must equal the path''s, else
+        `400 validation`.
 
 
         `reviewRangeMin` must be below `highConfidenceMin` (`422`). A change applies to the next match; a decision
@@ -9006,7 +9300,7 @@ paths:
       - name: profileId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces. The body''s `profileId`, when sent, must equal it.'
+        description: 'Addresses the item this write creates or replaces: its `id` (ADAM CR-245, CR-395). No record has it: one is created with it (a client UUIDv7), `201`. The body''s `profileId`, when sent, must equal it, else `400 validation`.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
@@ -9019,6 +9313,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FaceMatchingVerificationThresholdsView'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new record, created with the path's `profileId` (ADAM CR-245, CR-395)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaceMatchingVerificationThresholdsView'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
@@ -9221,9 +9526,11 @@ paths:
         category and venue.
 
 
-        **Upsert keyed by `policyId`.** A body without `policyId` creates one and the response carries the new
-        key; a body with one replaces that record whole (PUT semantics: a field left out takes its default or null);
-        an unknown `policyId` is a `404`, never a create.
+        **Upsert keyed on the path''s `retentionSettingId`, the record''s id** (ADAM CR-245''s rule, as ADAM CR-395 applied
+        it, 31 October 2026). Where no record has that id, one is created with it (a client UUIDv7) and the
+        answer is `201`; where one does, the body replaces it whole and the answer is `200` (PUT semantics: a
+        field left out takes its default or null). A `policyId` sent in the body must equal the path''s, else
+        `400 validation`.
 
 
         **`retentionDays` is required and has no default.** The number is the client counsel''s; the package ships
@@ -9256,7 +9563,7 @@ paths:
       - name: retentionSettingId
         in: path
         required: true
-        description: 'Addresses the retention rule this write creates or replaces. The body''s `policyId`, when sent, must equal it.'
+        description: 'Addresses the item this write creates or replaces: its `id` (ADAM CR-245, CR-395). No record has it: one is created with it (a client UUIDv7), `201`. The body''s `policyId`, when sent, must equal it, else `400 validation`.'
         schema: { type: string }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
@@ -9269,6 +9576,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BiometricLifecycleRetentionDeletionView'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new record, created with the path's `retentionSettingId` (ADAM CR-245, CR-395)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiometricLifecycleRetentionDeletionView'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
@@ -9282,6 +9600,13 @@ paths:
           x-ticvai-problem-types: [retention-exceeds-tenant-period]
           description: '`retentionDays` longer than the tenant''s effective `faceTagBiometric` or
             `facePassBiometric` period (tenancy `setDataRetentionSetting`); a rule here may only shorten it'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
           content:
             application/problem+json:
               schema:
@@ -11358,6 +11683,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -12428,9 +12760,11 @@ paths:
         Access fraud, not payment fraud: `orders.setFraudRules` is the payment one.
 
 
-        **Upsert keyed by `ruleId`.** A body without `ruleId` creates one and the response carries the new key;
-        a body with one replaces that record whole (PUT semantics: a field left out takes its default or null);
-        an unknown `ruleId` is a `404`, never a create.
+        **Upsert keyed on the path''s `ruleId`, the record''s id** (ADAM CR-245''s rule, as ADAM CR-395 applied
+        it, 31 October 2026). Where no record has that id, one is created with it (a client UUIDv7) and the
+        answer is `201`; where one does, the body replaces it whole and the answer is `200` (PUT semantics: a
+        field left out takes its default or null). A `ruleId` sent in the body must equal the path''s, else
+        `400 validation`.
 
 
         A new rule defaults to `alertOnly`, so switching one on cannot lock a guest out before somebody has seen
@@ -12464,7 +12798,7 @@ paths:
       - name: ruleId
         in: path
         required: true
-        description: 'Addresses the item this write creates or replaces. The body''s `ruleId`, when sent, must equal it.'
+        description: 'Addresses the item this write creates or replaces: its `id` (ADAM CR-245, CR-395). No record has it: one is created with it (a client UUIDv7), `201`. The body''s `ruleId`, when sent, must equal it, else `400 validation`.'
         schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
@@ -12477,6 +12811,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FraudDetectionRuleSignalLibraryView'
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: A new record, created with the path's `ruleId` (ADAM CR-245, CR-395)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FraudDetectionRuleSignalLibraryView'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
@@ -14441,6 +14786,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -14514,11 +14866,12 @@ paths:
         venue (e.g. Main Entrance), optionally nested under another group, whose counts roll up to a common occupancy.
 
 
-        **PUT semantics: an upsert of one row, keyed on the body''s `id`** (the pattern of `setParkingFacility`).
-        No `id` creates it: the server assigns the id and answers `201`. An `id` that exists replaces the row whole
-        and answers `200`: a field left out takes its default or null, it does not keep its stored value. An `id`
-        that does not exist is a `404`, never a create with a client-chosen id. `scopePath`, `createdAt` and `updatedAt`
-        are the server''s and are ignored in a body.
+        **PUT semantics: an upsert of one row, keyed on the path''s `groupId`, the group''s id** (ADAM CR-245''s
+        rule, applied by ADAM CR-395, Chinmay, 31 October 2026). Where no group has that id, one is created with it
+        (a client UUIDv7, which BO-151 creates for a new group) and the answer is `201`. Where one does, the body
+        replaces it whole and the answer is `200`: a field left out takes its default or null, it does not keep its
+        stored value. An `id` sent in the body must equal the path''s, else `400 validation`. This PUT never answers
+        `404`. `scopePath`, `createdAt` and `updatedAt` are the server''s and are ignored in a body.
 
 
         A group may not be its own ancestor (`409 group-cycle`), and every member access point must belong to the
@@ -14536,6 +14889,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: groupId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id` (ADAM CR-245, CR-395). No group has it: one is created with it (a client UUIDv7), `201`. The body''s `id`, when sent, must equal it, else `400 validation`.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -14557,7 +14915,7 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: ../shared/common.yaml#/components/headers/ConsistencyToken
-          description: A new group, created
+          description: A new group, created with the path's `groupId`
           content:
             application/json:
               schema:
@@ -14566,8 +14924,6 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
-        '404':
-          $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           x-ticvai-problem-types: [group-cycle]
           description: '`group-cycle`: the parent named would make the group its own ancestor.'
@@ -14741,11 +15097,12 @@ paths:
         type.
 
 
-        **PUT semantics: an upsert of one row, keyed on the body''s `id`** (the pattern of `setParkingFacility`).
-        No `id` creates it: the server assigns the id and answers `201`. An `id` that exists replaces the row whole
-        and answers `200`: a field left out takes its default or null, it does not keep its stored value. An `id`
-        that does not exist is a `404`, never a create with a client-chosen id. `scopePath`, `createdAt` and `updatedAt`
-        are the server''s and are ignored in a body.
+        **PUT semantics: an upsert of one row, keyed on the path''s `entryId`, the row''s id** (ADAM CR-245''s rule,
+        as ADAM CR-395 applied it, 31 October 2026). Where no row has that id, one is created with it (a client
+        UUIDv7) and the answer is `201`. Where one does, the body replaces it whole and the answer is `200`: a
+        field left out takes its default or null, it does not keep its stored value. An `id` sent in the body
+        must equal the path''s, else `400 validation`. `scopePath`, `createdAt` and `updatedAt` are the
+        server''s and are ignored in a body.
 
 
         `endsAt` must be after `startsAt` (`422`). Overlapping entries are allowed (a private event on a holiday)
@@ -14828,11 +15185,12 @@ paths:
         deployed. The library is the tenant''s, so every venue registers devices against the same models.
 
 
-        **PUT semantics: an upsert of one row, keyed on the body''s `id`** (the pattern of `setParkingFacility`).
-        No `id` creates it: the server assigns the id and answers `201`. An `id` that exists replaces the row whole
-        and answers `200`: a field left out takes its default or null, it does not keep its stored value. An `id`
-        that does not exist is a `404`, never a create with a client-chosen id. `scopePath`, `createdAt` and `updatedAt`
-        are the server''s and are ignored in a body.
+        **PUT semantics: an upsert of one row, keyed on the path''s `modelId`, the row''s id** (ADAM CR-245''s rule,
+        as ADAM CR-395 applied it, 31 October 2026). Where no row has that id, one is created with it (a client
+        UUIDv7) and the answer is `201`. Where one does, the body replaces it whole and the answer is `200`: a
+        field left out takes its default or null, it does not keep its stored value. An `id` sent in the body
+        must equal the path''s, else `400 validation`. `scopePath`, `createdAt` and `updatedAt` are the
+        server''s and are ignored in a body.
 
 
         There is no delete: a model that devices name (`platform.device.hardwareModelId`, ADR-0067) stays in the
@@ -15159,8 +15517,11 @@ paths:
       summary: Set a policy for a non-standard gate mode
       description: '**The write behind Gate Modes, Free Spin & Emergency Controls** (BO-201): for `freeFlow` or `dropArm`
         (R221 vocabulary), who may activate it, on which gate group, whether a reason is required, the emergency code,
-        notification and whether activation opens an incident. `setTurnstileMode` enforces it: a caller whose role
-        is not in `whoCanActivate` is refused, and a missing reason where `reasonRequired` is refused.
+        notification and whether activation opens an incident. `setTurnstileMode` enforces it (ADAM CR-396, decided
+        31 October 2026; CHG-CR396-001): a caller who holds none of the `whoCanActivate` roles at the access point''s
+        venue is refused `403 gate-mode-role-required`, a missing reason where `reasonRequired` is `400
+        reason-required`, and `createsIncident` opens an access incident. **`whoCanActivate` holds role
+        ids** (`Role.id`, uuid strings, the roles BO-201 picks from `listRoles`); a malformed one is `400 validation`.
 
 
         **PUT semantics: an upsert keyed on `mode` and `accessPointGroupId` (one policy per mode per gate group; a
@@ -15369,11 +15730,12 @@ paths:
         points it controls; the podium''s buttons call the agreed access operations and define no rules of their own.
 
 
-        **PUT semantics: an upsert of one row, keyed on the body''s `id`** (the pattern of `setParkingFacility`).
-        No `id` creates it: the server assigns the id and answers `201`. An `id` that exists replaces the row whole
-        and answers `200`: a field left out takes its default or null, it does not keep its stored value. An `id`
-        that does not exist is a `404`, never a create with a client-chosen id. `scopePath`, `createdAt` and `updatedAt`
-        are the server''s and are ignored in a body.
+        **PUT semantics: an upsert of one row, keyed on the path''s `podiumId`, the row''s id** (ADAM CR-245''s rule,
+        as ADAM CR-395 applied it, 31 October 2026). Where no row has that id, one is created with it (a client
+        UUIDv7) and the answer is `201`. Where one does, the body replaces it whole and the answer is `200`: a
+        field left out takes its default or null, it does not keep its stored value. An `id` sent in the body
+        must equal the path''s, else `400 validation`. `scopePath`, `createdAt` and `updatedAt` are the
+        server''s and are ignored in a body.
 
 
         Every access point named must be in the podium''s venue (`422`).
@@ -15642,11 +16004,12 @@ paths:
         hint. A null `venueId` makes it a tenant-wide code a venue may override with its own row of the same `code`.
 
 
-        **PUT semantics: an upsert of one row, keyed on the body''s `id`** (the pattern of `setParkingFacility`).
-        No `id` creates it: the server assigns the id and answers `201`. An `id` that exists replaces the row whole
-        and answers `200`: a field left out takes its default or null, it does not keep its stored value. An `id`
-        that does not exist is a `404`, never a create with a client-chosen id. `scopePath`, `createdAt` and `updatedAt`
-        are the server''s and are ignored in a body.
+        **PUT semantics: an upsert of one row, keyed on the path''s `reasonCodeId`, the row''s id** (ADAM CR-245''s rule,
+        as ADAM CR-395 applied it, 31 October 2026). Where no row has that id, one is created with it (a client
+        UUIDv7) and the answer is `201`. Where one does, the body replaces it whole and the answer is `200`: a
+        field left out takes its default or null, it does not keep its stored value. An `id` sent in the body
+        must equal the path''s, else `400 validation`. `scopePath`, `createdAt` and `updatedAt` are the
+        server''s and are ignored in a body.
 
 
         `code` is unique within its scope: a second row with the same code at the same scope is refused `409` (`DuplicateCode`).
@@ -15838,11 +16201,12 @@ paths:
         conditions name. `setMediaBindingActivation` reads the rule that matches a ticket before it binds a medium.
 
 
-        **PUT semantics: an upsert of one row, keyed on the body''s `id`** (the pattern of `setParkingFacility`).
-        No `id` creates it: the server assigns the id and answers `201`. An `id` that exists replaces the row whole
-        and answers `200`: a field left out takes its default or null, it does not keep its stored value. An `id`
-        that does not exist is a `404`, never a create with a client-chosen id. `scopePath`, `createdAt` and `updatedAt`
-        are the server''s and are ignored in a body.
+        **PUT semantics: an upsert of one row, keyed on the path''s `ruleId`, the row''s id** (ADAM CR-245''s rule,
+        as ADAM CR-395 applied it, 31 October 2026). Where no row has that id, one is created with it (a client
+        UUIDv7) and the answer is `201`. Where one does, the body replaces it whole and the answer is `200`: a
+        field left out takes its default or null, it does not keep its stored value. An `id` sent in the body
+        must equal the path''s, else `400 validation`. `scopePath`, `createdAt` and `updatedAt` are the
+        server''s and are ignored in a body.
 
 
         `minimumMediaRequired` may not exceed `maximumActiveMedia` (`422`), and every media type named must exist
@@ -16329,11 +16693,12 @@ paths:
         to. Validation reads it with the admission rules.
 
 
-        **PUT semantics: an upsert of one row, keyed on the body''s `id`** (the pattern of `setParkingFacility`).
-        No `id` creates it: the server assigns the id and answers `201`. An `id` that exists replaces the row whole
-        and answers `200`: a field left out takes its default or null, it does not keep its stored value. An `id`
-        that does not exist is a `404`, never a create with a client-chosen id. `scopePath`, `createdAt` and `updatedAt`
-        are the server''s and are ignored in a body.
+        **PUT semantics: an upsert of one row, keyed on the path''s `ruleId`, the row''s id** (ADAM CR-245''s rule,
+        as ADAM CR-395 applied it, 31 October 2026). Where no row has that id, one is created with it (a client
+        UUIDv7) and the answer is `201`. Where one does, the body replaces it whole and the answer is `200`: a
+        field left out takes its default or null, it does not keep its stored value. An `id` sent in the body
+        must equal the path''s, else `400 validation`. `scopePath`, `createdAt` and `updatedAt` are the
+        server''s and are ignored in a body.
 
         '
       tags:
@@ -16397,11 +16762,12 @@ paths:
         set `status: inactive`, so past simulations still name the profile.
 
 
-        **PUT semantics: an upsert of one row, keyed on the body''s `id`** (the pattern of `setParkingFacility`).
-        No `id` creates it: the server assigns the id and answers `201`. An `id` that exists replaces the row whole
-        and answers `200`: a field left out takes its default or null, it does not keep its stored value. An `id`
-        that does not exist is a `404`, never a create with a client-chosen id. `scopePath`, `createdAt` and `updatedAt`
-        are the server''s and are ignored in a body.
+        **PUT semantics: an upsert of one row, keyed on the path''s `journeyProfileId`, the row''s id** (ADAM CR-245''s rule,
+        as ADAM CR-395 applied it, 31 October 2026). Where no row has that id, one is created with it (a client
+        UUIDv7) and the answer is `201`. Where one does, the body replaces it whole and the answer is `200`: a
+        field left out takes its default or null, it does not keep its stored value. An `id` sent in the body
+        must equal the path''s, else `400 validation`. `scopePath`, `createdAt` and `updatedAt` are the
+        server''s and are ignored in a body.
 
         '
       tags:
@@ -16469,11 +16835,12 @@ paths:
         and the eligible attraction categories.
 
 
-        **PUT semantics: an upsert of one row, keyed on the body''s `id`** (the pattern of `setParkingFacility`).
-        No `id` creates it: the server assigns the id and answers `201`. An `id` that exists replaces the row whole
-        and answers `200`: a field left out takes its default or null, it does not keep its stored value. An `id`
-        that does not exist is a `404`, never a create with a client-chosen id. `scopePath`, `createdAt` and `updatedAt`
-        are the server''s and are ignored in a body.
+        **PUT semantics: an upsert of one row, keyed on the path''s `fastPassProfileId`, the row''s id** (ADAM CR-245''s rule,
+        as ADAM CR-395 applied it, 31 October 2026). Where no row has that id, one is created with it (a client
+        UUIDv7) and the answer is `201`. Where one does, the body replaces it whole and the answer is `200`: a
+        field left out takes its default or null, it does not keep its stored value. An `id` sent in the body
+        must equal the path''s, else `400 validation`. `scopePath`, `createdAt` and `updatedAt` are the
+        server''s and are ignored in a body.
 
 
         `totalUses` is required unless `unlimited` (`422`).
@@ -17101,7 +17468,12 @@ paths:
                     type: string
                     format: date-time
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: '`forbidden` as the shared answer says; or the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
@@ -20806,6 +21178,27 @@ components:
           minimum: 0
           nullable: true
           description: 'Beacons only: activation distance in metres'
+        activationZone:
+          type: object
+          nullable: true
+          description: '**Beacons only: the drawn activation zone** (ADAM CR-389, Chinmay, 31 October 2026), written by
+            `setBleBeaconGeofence`: `{centre, radiusMeters}` for a circle or `{boundary}` for a polygon, points as
+            lat,lng. Null when none is drawn. Not a gate''s validation fence, which is `access.access_point.geofence`
+            (`setAccessPointGeofence`).'
+          properties:
+            centre:
+              type: string
+              description: lat,lng of a circle's centre
+            radiusMeters:
+              type: integer
+              minimum: 5
+              maximum: 5000
+            boundary:
+              type: array
+              minItems: 3
+              items:
+                type: string
+              description: A polygon's points as lat,lng
         installationDate:
           type: string
           format: date
@@ -21783,7 +22176,10 @@ components:
           type: array
           items:
             type: string
-          description: Roles allowed to activate this mode
+            format: uuid
+          description: 'The roles allowed to activate this mode, as role ids (`Role.id`; ADAM CR-396; CHG-CR396-001).
+            `setTurnstileMode` asks `identity#principalHoldsRoleAtVenue` for each; empty or absent adds no check
+            beyond `TURNSTILE_MODE_SET`.'
         accessPointGroupId:
           type: string
           format: uuid
@@ -22077,7 +22473,8 @@ components:
       description: 'One gate mode change on an access point, pending or applied: from and target mode, operator, reason
         and effective time. Append-only history (declared 29 September, data-model close-out DM1) Written by setTurnstileMode
         (applied at once, or pending until a future effectiveAt) and cancelGateModeChange; a timer applies a pending change
-        at its effective time (decided 29 September, writers pass).'
+        at its effective time (decided 29 September, writers pass), setting the access point''s operating mode to
+        targetMode and its turnstile mode to targetTurnstileMode (ADAM CR-396; CHG-CR396-001).'
       required:
       - id
       - venueId
@@ -22106,6 +22503,13 @@ components:
         targetMode:
           allOf:
           - $ref: '#/components/schemas/AccessPointOperatingMode'
+        targetTurnstileMode:
+          allOf:
+          - $ref: '#/components/schemas/TurnstileMode'
+          nullable: true
+          description: 'The turnstile mode (`mode`) a `setTurnstileMode` change sets with `targetMode`: `freeRotation`
+            or `closed`, or null for none (ADAM CR-396, decided 31 October 2026; CHG-CR396-001). A pending change
+            keeps it until the timer applies both. Null on a direction switch.'
         fromDirection:
           allOf:
           - $ref: '#/components/schemas/Direction'
@@ -22488,6 +22892,14 @@ components:
           - signedForm
           nullable: true
           description: faceTagEnrolment rows. How consent is taken at capture; onScreenAcknowledgement unless set, which needs no signed form (3.2.44; added 29 September, build pass)
+        consentFormId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'faceTagEnrolment rows. The venue''s consent form this profile''s captures are taken on (DEC-128;
+            ADAM CR-390, 31 October 2026); null falls back to the venue''s biometric consent form. No foreign key: the
+            form lives outside Access. The form''s version is not kept here: each capture records the version the
+            guest accepted on its own enrolment record (CHG-CSP-018).'
         accessContext:
           type: string
           maxLength: 100
@@ -24337,7 +24749,8 @@ components:
         ruleId:
           type: string
           format: uuid
-          description: Absent creates a rule
+          description: The record's id, when sent; it must equal the path's `credentialPolicyId` (ADAM CR-245,
+            CR-395). A path id no record has creates one with that id.
         venueId:
           type: string
           description: Venue the rule applies to
@@ -24387,7 +24800,8 @@ components:
         mediaTypeId:
           type: string
           format: uuid
-          description: Absent adds a media type
+          description: The record's id, when sent; it must equal the path's `mediaTypeId` (ADAM CR-245,
+            CR-395). A path id no record has creates one with that id.
         name:
           type: string
           maxLength: 200
@@ -24476,7 +24890,8 @@ components:
         encodingProfileId:
           type: string
           format: uuid
-          description: Absent creates a profile
+          description: The record's id, when sent; it must equal the path's `encodingProfileId` (ADAM CR-245,
+            CR-395). A path id no record has creates one with that id.
         name:
           type: string
           maxLength: 200
@@ -24517,7 +24932,8 @@ components:
         integrationId:
           type: string
           format: uuid
-          description: Absent creates an integration
+          description: The record's id, when sent; it must equal the path's `integrationId` (ADAM CR-245,
+            CR-395). A path id no record has creates one with that id.
         name:
           type: string
           maxLength: 200
@@ -24568,7 +24984,8 @@ components:
         profileId:
           type: string
           format: uuid
-          description: Absent creates a Face Tag profile
+          description: The profile's id, when sent; it must equal the path's `profileId` (ADAM CR-245, CR-390). A
+            path id no profile has creates one with that id.
         venueId:
           type: string
         name:
@@ -24616,7 +25033,9 @@ components:
             batch 4, BO-188: "consent first, using a consent form from the venue"; DEC-128, DEC-549; CHG-CSP-018).
             Null uses the venue''s biometric consent form (`tenancy.VenueSettings.biometrics.consentFormId`); either
             way the form comes from the one consent-form builder in Venue Management. With neither, the profile is
-            refused `422 consent-form-required`.'
+            refused `422 consent-form-required`. Stored as `access.biometric_profile.consent_form_id`; the form''s
+            version is not kept on the profile, each capture records the one the guest accepted (ADAM CR-390).'
+          x-ticvai-stored-as: access.biometric_profile.consent_form_id
         consentCapture:
           type: string
           enum:
@@ -24652,7 +25071,8 @@ components:
         profileId:
           type: string
           format: uuid
-          description: Absent creates a threshold profile
+          description: The record's id, when sent; it must equal the path's `profileId` (ADAM CR-245,
+            CR-395). A path id no record has creates one with that id.
         venueId:
           type: string
         accessContext:
@@ -24730,7 +25150,8 @@ components:
         policyId:
           type: string
           format: uuid
-          description: Absent creates a retention rule
+          description: The record's id, when sent; it must equal the path's `retentionSettingId` (ADAM CR-245,
+            CR-395). A path id no record has creates one with that id.
         venueId:
           type: string
         dataCategory:
@@ -24775,7 +25196,8 @@ components:
         ruleId:
           type: string
           format: uuid
-          description: Absent creates a rule
+          description: The record's id, when sent; it must equal the path's `ruleId` (ADAM CR-245,
+            CR-395). A path id no record has creates one with that id.
         venueId:
           type: string
         name:
@@ -24947,7 +25369,8 @@ components:
         ruleId:
           type: string
           format: uuid
-          description: Absent creates a rule
+          description: The record's id, when sent; it must equal the path's `ruleId` (ADAM CR-245,
+            CR-395). A path id no record has creates one with that id.
         signal:
           type: string
           enum:
@@ -25052,7 +25475,8 @@ components:
         ruleId:
           type: string
           format: uuid
-          description: Absent creates a rule
+          description: The record's id, when sent; it must equal the path's `ruleId` (ADAM CR-245,
+            CR-395). A path id no record has creates one with that id.
         name:
           type: string
           maxLength: 200
@@ -26421,8 +26845,8 @@ components:
         id:
           type: string
           format: uuid
-          description: '**Server-assigned, and the upsert key of `setParkingFacility`.** Absent in a body,
-            it creates; present, it names the facility being replaced. A client never mints one.
+          description: '**The record''s id, and the path id of `setParkingFacility`** (ADAM CR-245; CR-398): a new
+            facility takes the path id, a client UUIDv7. A body `id`, when sent, must equal the path id.
 
             '
         name:
@@ -26900,7 +27324,8 @@ components:
           type: string
           format: uuid
           nullable: true
-          description: The lock being released; null for a lock or an entry not yet written.
+          description: 'The lock being released; for `whitelistEntry`, the id the entry will take (minted when the
+            request is raised; ADAM CR-399); null for a lock not yet written.'
     BlacklistEntry:
       x-ticvai-persistence: access.blacklist
       type: object
@@ -33266,6 +33691,11 @@ components:
         geofenceRadiusMeters:
           type: integer
           description: Radius of a circular activation zone
+        geofenceCentre:
+          type: string
+          nullable: true
+          description: 'Centre of a circular activation zone, as lat,lng like the boundary points (ADAM CR-389);
+            from `access.device_placement.activation_zone`'
         geofenceBoundary:
           type: array
           items:
@@ -33277,60 +33707,85 @@ components:
     BleBeaconGeofenceConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: 'none — request only; applied to `access.access_point` (with `access.configuration_change`, `access.device_placement`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
+      x-ticvai-persistence: 'none — request only; applied to `access.device_placement` (with `access.configuration_change`), the table its operation writes (ADAM CR-389; CHG-STO-021); each field names its column, and `health` and `lastDetected` are ignored on input'
       description: '**What BLE Beacon & Geofence Configuration submits.** The configurable fields from the
         pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
-        a figure the system computed is not a figure a client may send back.'
+        a figure the system computed is not a figure a client may send back. One beacon''s
+        `access.device_placement` row (role `proximity`), each field stored as it says (ADAM CR-389).'
       properties:
         beaconName:
           type: string
           description: Beacon Name
+          x-ticvai-stored-as: access.device_placement.name
         beaconId:
           type: string
-          description: Beacon ID
+          description: Beacon ID, a registered `platform.device` id; one that names no registered device is `404`
+          x-ticvai-stored-as: access.device_placement.device_id
         venue:
           type: string
           description: Venue
+          x-ticvai-stored-as: access.device_placement.venue_id
         zone:
           type: string
-          description: Zone
+          description: Zone. `park`, `zone` and `attraction` are one `access_area_id`, the most specific sent; two
+            that do not nest are `400 validation`
+          x-ticvai-stored-as: access.device_placement.access_area_id
         gate:
           type: string
           description: Gate
+          x-ticvai-stored-as: access.device_placement.access_point_id
         proximityThreshold:
           type: integer
           description: Metres
+          x-ticvai-stored-as: access.device_placement.proximity_threshold_meters
         activeInactive:
           type: string
           enum:
           - active
           - inactive
           description: Active/Inactive
+          x-ticvai-stored-as: access.device_placement.is_active
         health:
           type: string
           enum:
           - healthy
           - degraded
           - offline
-          description: Read-only, reported by the beacon
+          description: 'Reported by the beacon: ignored on input; the view reads `platform.device.health` (ADAM
+            CR-389)'
+          x-ticvai-persisted: false
         lastDetected:
           type: string
           format: date-time
-          description: Last detected
+          description: 'Last detected: ignored on input; the view reads `platform.device.last_heartbeat_at` (ADAM
+            CR-389)'
+          x-ticvai-persisted: false
         park:
           type: string
-          description: Park
+          description: Park (see `zone`)
+          x-ticvai-stored-as: access.device_placement.access_area_id
         attraction:
           type: string
-          description: Attraction
+          description: Attraction (see `zone`)
+          x-ticvai-stored-as: access.device_placement.access_area_id
         geofenceRadiusMeters:
           type: integer
-          description: Radius of a circular activation zone
+          minimum: 5
+          maximum: 5000
+          description: Radius of a circular activation zone, 5 to 5000 metres; needs `geofenceCentre`. A body with
+            both a radius and a boundary is `400 validation`
+          x-ticvai-stored-as: access.device_placement.activation_zone
+        geofenceCentre:
+          type: string
+          nullable: true
+          description: Centre of a circular activation zone, as lat,lng like the boundary points (ADAM CR-389)
+          x-ticvai-stored-as: access.device_placement.activation_zone
         geofenceBoundary:
           type: array
           items:
             type: string
-          description: Polygon points as lat,lng when the zone is drawn
+          description: Polygon points as lat,lng when the zone is drawn; at least three
+          x-ticvai-stored-as: access.device_placement.activation_zone
       required:
       - beaconId
       - venue

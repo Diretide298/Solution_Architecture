@@ -567,6 +567,28 @@
     "type": "boolean",
     "default": false,
     "description": "Excluded from rebalancing."
+   },
+   "allocationPercent": {
+    "x-ticvai-column": "envelope_percent",
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "A `percentage` allocation's share of the capacity, 0 to 100 (ADAM CR-412; the column is envelope_percent, naming-and-style 3: Envelope, not Allocation, in DDL): required there, and `setChannelAllocations` sets `allocatedUnits` to the floor of capacity x percent / 100. Null for the other types."
+   },
+   "releasedUnits": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0,
+    "readOnly": true,
+    "description": "Units the allocation release job gave back to the general pool, added in the same transaction as each release (ADAM CR-412)."
+   },
+   "returnedUnits": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0,
+    "readOnly": true,
+    "description": "Units `relinquishChannelAllocation` returned to the general pool, added in the same transaction as each release (ADAM CR-412)."
    }
   }
  },
@@ -4245,7 +4267,8 @@
    "saleBoard",
    "currency",
    "currencyScale",
-   "timeZone"
+   "timeZone",
+   "channel"
   ],
   "properties": {
    "id": {
@@ -4259,6 +4282,15 @@
    "name": {
     "type": "string",
     "maxLength": 200
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "pos",
+     "kiosk"
+    ],
+    "default": "pos",
+    "description": "**Who operates this workstation** (ADAM CR-384, Chinmay, 31 October 2026; CHG-CR384-001; the values are catalogue's `Channel`, so the workstation and a sale from it use the same word). `kiosk` is a self-service kiosk a guest operates; `pos` is a staffed till, including a staffed stand in an outlet of kind `kiosk`. Stored as `platform.workstation.channel` (not null, default `pos`), set by `configureWorkstation`, which keeps the stored value when the field is left out. White Label's kiosk operations ask it through `workstationRecords` (XDR-027): a venue's kiosks are its active workstations with channel `kiosk`.\n"
    },
    "venueId": {
     "type": "string",

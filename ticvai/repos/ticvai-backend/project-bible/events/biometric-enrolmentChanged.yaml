@@ -59,8 +59,10 @@ payload:
   type: timestamp
 consumers:
 - context: identity
-  purpose: Write, re-enrol or deactivate the enrolment on pii.subject_biometric, which Identity owns with the rest of
-    the pii schema, within the ADR-0047 retention ceiling the payload's expiresAt carries
+  purpose: Write the enrolment on enrolled, re-enrol it on reenrolled, or delete the row on revoked (never
+    deactivate it; ADAM CR-391, 31 October 2026), on pii.subject_biometric, which Identity owns with the rest of
+    the pii schema, within the ADR-0047 retention ceiling the payload's expiresAt carries. The vendor's delete and
+    its receipt join the revoked case once ADR-0063 is settled
   writes:
   - pii.subject_biometric
   idempotencyKey: enrolmentId + change

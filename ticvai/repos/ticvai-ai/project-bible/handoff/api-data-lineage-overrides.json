@@ -1,6 +1,6 @@
 {
  "about": "What the contracts cannot state about an operation's tables, one entry per operation, each with its reason. tools/derive-lineage.py adds `reads`/`writes` to what the contract derives and takes `notReads`/`notWrites` away. Authored by hand: nothing in the refresh writes it. An entry marked `carried` was copied from the hand-kept lineage when it became derived (20 October 2026, CHG-R8GEN-001); their number may only fall (carriedCeiling, check-lineage LN-OVERRIDE). To change an operation's tables, change its contract (a persisted schema, x-ticvai-read-via, x-ticvai-write-via, x-ticvai-config-change-log); add an override only for what no contract fact can say, with a reason, and without `carried`.",
- "carriedCeiling": 1614,
+ "carriedCeiling": 1611,
  "operations": {
   "abandonCart": {
    "reads": [
@@ -864,16 +864,13 @@
   },
   "broadcastToGuests": {
    "reads": [
-    "access.entitlement",
     "identity.principal",
-    "marketing.guest_profile",
     "venuemap.point"
    ],
    "writes": [
-    "marketing.message_dispatch",
     "workforce.announcement"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); access.entitlement now through access#liveEntitlementSubjects, marketing.guest_profile and marketing.message_dispatch dropped: the broadcast reaches Marketing by workforce.guestBroadcastAccepted and sendGuestBroadcast reads and writes its own rows (ADAM CR-379, CHG-CR379-001)",
    "carried": true
   },
   "buildConfigurationPlan": {
@@ -1022,10 +1019,9 @@
   },
   "cancelPricingRollback": {
    "writes": [
-    "catalogue.audit_entry",
-    "platform.outbox"
+    "catalogue.audit_entry"
    ],
-   "reason": "W-WE (new, writers pass): requested/scheduled -> cancelled; open approval request withdrawn via outbox (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "W-WE (new, writers pass): requested/scheduled -> cancelled; a waiting approval request is cancelled in process through IApprovalRequests.CancelAsync, and no outbox row is written (ADAM CR-421, CHG-CR421-001) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "cancelPurchaseOrder": {
@@ -2014,19 +2010,16 @@
     "catalogue.dynamic_pricing_control",
     "catalogue.dynamic_pricing_strategy",
     "catalogue.price",
-    "catalogue.price_ladder",
     "catalogue.pricing_recommendation",
     "catalogue.pricing_recommendation_decision",
     "pricing.dynamic_price_rule"
    ],
    "writes": [
     "catalogue.audit_entry",
-    "catalogue.price",
     "catalogue.price_execution",
-    "catalogue.pricing_recommendation_decision",
-    "platform.outbox"
+    "catalogue.pricing_recommendation_decision"
    ],
-   "reason": "DM3: writes catalogue.price_execution (states/price-execution.yaml) and the new catalogue.price; stamps executionId on the decision | L2: executes one approved change: approval from pricing_recommendation_decision or automation policy; updates catalogue.price and emits channel deployment via platform.outbox; execution record needs pricing.price_execution (missing) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "DM3: writes catalogue.price_execution (states/price-execution.yaml), the live dynamic price, and never catalogue.price, the base (ADAM CR-422, CHG-CR422-001); stamps executionId on the decision | L2: executes one approved change: approval from an approvals request (approvals#requestRecords) or automation policy; emits catalogue.priceExecuted via platform.outbox; execution record needs pricing.price_execution (missing) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "createMessageTemplate": {
@@ -2414,6 +2407,12 @@
    "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
+  "createSeatMapTemplate": {
+   "reads": [
+    "seating.section_row"
+   ],
+   "reason": "ADAM CR-403 (CHG-CR403-001): the source map's rows are copied into the template's structure when it is saved; seating.section_row is the child table derive-schema makes of Section.rows, which no schema persists to by name, so x-ticvai-reads cannot name it"
+  },
   "createShopAndDrop": {
    "reads": [
     "retail.sale",
@@ -2634,19 +2633,6 @@
    "reason": "DM3: moves catalogue.change_request per decision; the decision itself lands on the approvals request | L2: decision recorded on the approvals request via the approvals service (platform.outbox event); change request status updated (pricing.change_request, missing) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "decidePricingRecommendation": {
-   "reads": [
-    "catalogue.dynamic_pricing_control",
-    "catalogue.pricing_recommendation"
-   ],
-   "writes": [
-    "catalogue.audit_entry",
-    "catalogue.pricing_recommendation",
-    "platform.outbox"
-   ],
-   "reason": "W-WE (changed): writes the decision row and sets catalogue.pricing_recommendation.status (states/pricing-recommendation.yaml); guardrail check reads dynamic_pricing_control; sendForApproval opens an approval via outbox; description and 409 updated (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "decideProductionAccess": {
    "reads": [
     "control.integration_listing"
@@ -2791,19 +2777,6 @@
     "access.journey_sequence_rule"
    ],
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "deleteKioskConfig": {
-   "reads": [
-    "whitelabel.kiosk_assignment",
-    "whitelabel.kiosk_config"
-   ],
-   "writes": [
-    "whitelabel.kiosk_config",
-    "whitelabel.kiosk_config_attract_slide",
-    "whitelabel.kiosk_config_start_tile"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
   "deleteMediaAsset": {
@@ -3499,11 +3472,9 @@
   },
   "getBleBeaconGeofence": {
    "reads": [
-    "access.access_point",
     "access.device_placement"
    ],
-   "reason": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
+   "reason": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none); 31 October 2026 (ADAM CR-389, CHG-CR389-001): the beacon's access.device_placement row, not access.access_point, and platform.device through tenancy#deviceRecords (x-ticvai-read-via)"
   },
   "getBookingFlowConfig": {
    "reads": [
@@ -3913,9 +3884,10 @@
     "whitelabel.config_version",
     "whitelabel.kiosk_config",
     "whitelabel.kiosk_config_attract_slide",
-    "whitelabel.kiosk_config_start_tile"
+    "whitelabel.kiosk_config_start_tile",
+    "whitelabel.module_enablement"
    ],
-   "reason": "Reads the published tenant configuration (fonts, languages), the venue's booking flows and its products on sale. Writes nothing. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "Reads the published tenant configuration (fonts, languages), the venue's booking flows and its products on sale. Writes nothing. (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)) Adds whitelabel.module_enablement, White Label's own table, which the tileWithoutProducts check reads for each enabled tile's module (ADAM CR-385, 31 October 2026; CHG-R12INT-004).",
    "carried": true
   },
   "getKpiValues": {
@@ -4446,6 +4418,12 @@
    ],
    "reason": "one-read state of every seat: holds, blocks, hold pools, killed/out-of-service seats; sold state via seat_hold status (orders not read directly) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
+  },
+  "getSeatMap": {
+   "reads": [
+    "seating.section_row"
+   ],
+   "reason": "ADAM CR-402 (CHG-CR402-001): getSeatMap answers the map's sections with their rows from seating.section_row, the child table derive-schema makes of Section.rows, which no schema persists to by name, so no contract fact can name it"
   },
   "getSeatMapImport": {
    "reads": [
@@ -6003,15 +5981,6 @@
    "reason": "DM3: catalogue.channel_connection | L2: no existing tenant table holds connector/endpoint/auth/test log (control.integration_listing is the control-plane marketplace); needs catalogue.channel_connection (missing) — no existing table read (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "listChannelCustomerSegment": {
-   "reads": [
-    "pricing.dynamic_price_action",
-    "pricing.dynamic_price_condition",
-    "pricing.dynamic_price_rule"
-   ],
-   "reason": "contextual dynamic rules: channel_id on dynamic_price_rule, segment/location as conditions, range as action min/max (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "listChannelExceptionIncident": {
    "reads": [
     "catalogue.channel_incident",
@@ -6229,14 +6198,6 @@
     "marketing.message_trigger"
    ],
    "reason": "KPIs over message_dispatch; latency, provider availability and retries from message_dispatch_attempt; byModule via message_dispatch.message_trigger_id -> message_trigger.event -> business_event.source_module (campaign sends count as crm) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "listCompetitorPricingMarket": {
-   "reads": [
-    "catalogue.demand_signal",
-    "catalogue.product"
-   ],
-   "reason": "DM3: catalogue.demand_signal with signalKind competitorPrice | L2: competitor observations need pricing.external_signal (missing); comparable TICVAI product from catalogue.product (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "listComplianceEvidenceWaiver": {
@@ -6686,10 +6647,9 @@
    "reads": [
     "catalogue.channel_capacity",
     "catalogue.demand_forecast",
-    "catalogue.performance",
-    "orders.sales_order"
+    "catalogue.performance"
    ],
-   "reason": "DM3: catalogue.demand_forecast with forecastKind demand | L2: forecasts need pricing.demand_forecast (missing); actual booking curve and remaining inventory from orders.sales_order and channel_capacity/performance (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "DM3: catalogue.demand_forecast with forecastKind demand; every member, the booking curve's actuals included, comes from the forecast row the forecasting job writes, and nothing is read from Orders (ADAM CR-405, CHG-CR405-001) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "listDenominations": {
@@ -6901,9 +6861,11 @@
   },
   "listDynamicPricingAutomation": {
    "reads": [
-    "catalogue.dynamic_pricing_control"
+    "catalogue.dynamic_pricing_control",
+    "catalogue.pricing_market",
+    "catalogue.sales_channel"
    ],
-   "reason": "DM3: automation columns of catalogue.dynamic_pricing_control | L2: automation policies need pricing.automation_policy (missing) — no existing table read (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "DM3: automation columns of catalogue.dynamic_pricing_control | L2: automation policies need pricing.automation_policy (missing) — no existing table read (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)) Adds catalogue.pricing_market and catalogue.sales_channel, read for the view's market code and channel at the market and channel scope levels (ADAM CR-417, 31 October 2026; CHG-R12INT-004).",
    "carried": true
   },
   "listDynamicPricingGuardrail": {
@@ -6921,10 +6883,9 @@
     "catalogue.price_execution",
     "catalogue.pricing_recommendation",
     "catalogue.pricing_recommendation_decision",
-    "catalogue.product",
-    "orders.sales_order"
+    "catalogue.product"
    ],
-   "reason": "DM3: executions and recommendation outcomes | L2: KPIs from orders.sales_order and channel_capacity; recommendation outcomes from pricing_recommendation_decision; price timeline needs pricing.price_execution (missing) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "DM3: executions and recommendation outcomes; counts from pricing_recommendation and price_execution, sell-through from channel_capacity, opportunity lost from rejected recommendations' revenue_opportunity; the KPIs that need sales by node wait (LO-CR407-001) and nothing is read from Orders (ADAM CR-407, CHG-CR407-001) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "listDynamicPricingStrategy": {
@@ -8505,10 +8466,9 @@
   "listPriceElasticityRevenue": {
    "reads": [
     "catalogue.demand_forecast",
-    "catalogue.price",
-    "orders.sales_order"
+    "catalogue.price"
    ],
-   "reason": "DM3: catalogue.demand_forecast with forecastKind elasticity | L2: response-curve points need pricing.elasticity_estimate (missing); observed demand at price from orders.sales_order and catalogue.price (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "DM3: catalogue.demand_forecast with forecastKind elasticity; each item is one point of the latest run's response_curve for its slice and context, and nothing is read from Orders (ADAM CR-406, CHG-CR406-001) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "listPriceListTemplate": {
@@ -9312,7 +9272,7 @@
     "catalogue.pricing_simulation",
     "catalogue.product"
    ],
-   "reason": "DM3: command centre over recommendations, executions, automation, simulations and experiments | L2: optimisation portfolio over recommendations/executions/policies (missing tables); approval status from pricing_recommendation_decision, inventory position from channel_capacity/performance (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "DM3: command centre over recommendations, executions, automation, simulations and experiments; one row per pricing_recommendation not ignored, its latest price_execution, the dynamic_pricing_control in force and its demand_forecast row (ADAM CR-408, CHG-CR408-001); inventory position from channel_capacity/performance (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "listRevenueAllocationCost": {
@@ -12028,13 +11988,10 @@
    "carried": true
   },
   "republishOutbox": {
-   "reads": [
-    "platform.outbox"
-   ],
    "writes": [
     "platform.audit_record"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001). Its carried read of platform.outbox is removed: the operation reads no outbox rows, only the tenant database's partition catalogue for its 422 bound, and the workers relay reads the rows (ADAM CR-435, 31 October 2026; CHG-CR435-001)",
    "carried": true
   },
   "requestAppBuild": {
@@ -12192,18 +12149,20 @@
   },
   "resetPrincipalCredential": {
    "reads": [
+    "identity.mfa_challenge",
     "identity.password_policy",
     "identity.principal",
     "identity.principal_credential"
    ],
    "writes": [
+    "identity.mfa_challenge",
     "identity.principal",
     "identity.principal_credential",
     "identity.principal_credential_history",
     "identity.session",
     "platform.outbox"
    ],
-   "reason": "adds platform.outbox (identity.credentialResetRequested); 14 October 2026 (CHG-CRD-001, ADAM CR-078): the PIN length and policy; the replaced hash is kept; mustChangeCredential is set (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "adds platform.outbox (identity.credentialResetRequested); 14 October 2026 (CHG-CRD-001, ADAM CR-078): the PIN length and policy; the replaced hash is kept; mustChangeCredential is set (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)) Adds identity.mfa_challenge: the reset reads the caller's verified, unconsumed step-up for its action (ADAM CR-375, 31 October 2026; CHG-R12INT-004). and writes its consumedAt in the reset's transaction.",
    "carried": true
   },
   "resolveBookingConflict": {
@@ -13220,15 +13179,12 @@
   },
   "setBleBeaconGeofence": {
    "reads": [
-    "access.access_point",
     "access.device_placement"
    ],
    "writes": [
-    "access.access_point",
     "access.device_placement"
    ],
-   "reason": "beacon is an access.device_placement row (hardwareType beacon, proximityThresholdMeters); the geofence itself stays on access.access_point.geofence; health and lastDetected are device-reported, not written (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
+   "reason": "31 October 2026 (ADAM CR-389, CHG-CR389-001): a beacon is one access.device_placement row (role proximity) found by device_id = beaconId, and its geofence is the placement's activation_zone; this write does not touch access.access_point (setAccessPointGeofence stays the gate's validation fence). health and lastDetected are read from platform.device through tenancy#deviceRecords (x-ticvai-read-via), not written"
   },
   "setBookingFlowConfig": {
    "reads": [
@@ -13651,10 +13607,9 @@
    ],
    "writes": [
     "catalogue.audit_entry",
-    "catalogue.dynamic_pricing_strategy",
-    "platform.outbox"
+    "catalogue.dynamic_pricing_strategy"
    ],
-   "reason": "W-WE (new, writers pass): upsert by scopeLevel+scopeId; freeze/kill switch cascades strategies to frozen; raising automation opens a pricingChange approval via outbox (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "W-WE (new, writers pass): upsert by scopeLevel+scopeId; freeze/kill switch cascades strategies to frozen; raising automation opens a pricingChange approval in process through IApprovalRequests and keeps it pending on the row, no outbox row (ADAM CR-425, CHG-CR425-001) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "setDynamicPricingStrategy": {

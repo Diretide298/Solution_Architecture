@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 39 of 103 |
+| Operations in the slice | 39 of 104 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -378,7 +378,7 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 |---|---|---|
 | 201 |  | Open. |
 | 400 | BadRequest | Validation failed |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 403 |  | forbidden as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (step-up-token-missing), or the newest one is older than 5 minutes (step-up-tok… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setCapabilityTemplate
@@ -1088,7 +1088,7 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 
 **How the code reaches the guest** (decided 30 October 2026, Chinmay, ADAM CR-370, with its follow-up of 31 October; CHG-CR370-001). Identity and Marketing are in different deployables, so no in-process call: in the same transaction as the `identity.otp_challenge` row this writes `identity.guestCodeIssued` v1 to the outbox, carrying `subjectId`, `challengeId`, `channel`, `purpose`, `locale`, `expiresAt`, and `destination` and `code`, both field-encrypted through the kernel's field encryption (#37050, `x-ticvai-secret: field-encrypted`), never in clear. Marketing's `sendGuestOneTimeCode`, invoked by the relay, decrypts at send time and sends it. Until #37050 is Ready for QA the delivery seam (`IGuestCodeDelivery`) keeps its log-only default and no code is put in the outbox.
 
-**An identifier that resolves to nobody** (the CR-370 follow-up, 31 October 2026). With purpose `login`, `passwordReset` or `stepUp` nothing is written for the code (no `otp_challenge` row, no `identity.guestCodeIssued`) and the answer is the same `202`; `passwordReset` still publishes `identity.credentialResetRequested`, as above. With purpose `register` or `verify` an identifier with no account still gets a code: the `otp_challenge` row and `identity.guestCodeIssued` are written with `subjectId` null.
+**An identifier that resolves to nobody** (the CR-370 follow-up, 31 October 2026, changed in one point by ADAM CR-431 the same day; CHG-CR431-001). With purpose `login`, `passwordReset` or `stepUp` it gets its `identity.otp_challenge` row: `subject_id` null, the `code_hash` of a random code that is generated and never sent, and `expires_at` and `resend_after` as for any code. There is still no `identity.guestCodeIssued`, no delivery and no message, and the answer is the same `202`. The per-identifier limit and the resend interval read these rows like any other, so a second request inside `resend_after` answers the same `429` `rate-limited` with `Retry-After`, whether or not the identifier has an account; `verifyGuestOtp` refuses any code against such a row. `passwordReset` still publishes `identity.credentialResetRequested`, as above. With purpose `register` or `verify` an identifier with no account still gets a code: the `otp_challenge` row and `identity.guestCodeIssued` are written with `subjectId` null.
 
 **Lifetime and resend interval** (ADAM CR-370). `VenueSettings.identity.guestOtpLifetimeSeconds` (default 600) and `guestOtpResendSeconds` (default 60), read from the tenant default as `guestOtpMaxAttempts` is, are written to `otp_challenge.expires_at` and `resend_after` and answered as `expiresInSeconds` and `resendAfterSeconds`.
 
@@ -1135,6 +1135,10 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 ### verifyGuestOtp
 
 **`POST /auth/guest/otp/verify`**: Verify a one-time code and issue a session
+
+**A guest-checkout code proves the contact for this cart and opens no account** (ADAM CR-432, decided 31 October 2026, Chinmay; CHG-CR432-001; the lead, the same day: a guest profile is created only when the guest later makes an account). A correct code of purpose `verify` is taken only under the cart's anonymous guest session (the token `openAnonymousGuestSession` minted for the cart, ADAM CR-183), whether or not an account holds the contact. It consumes the challenge and records on that anonymous session, in Identity's session registry, the challenge's `identifier_hash` as `verifiedContactRef` and the channel, then answers `204 No Content`: no subject is created and no `GuestSession` is issued. A purpose `verify` code sent without that session is refused `401 otp-code-invalid` and counts as a wrong attempt. `checkoutCart` then takes `verifiedContactRef` from the session and writes the order with no subject; `linkGuestCheckout` attaches it once the guest makes an account (ADAM CR-361), and a returning contact attaches as ADR-0045 section 4 says, never with a session on that profile. Codes of the other purposes answer as before: `200` with the `GuestSession`.
+
+**A row written for nobody** (ADAM CR-431, decided 31 October 2026; CHG-CR431-001). Any code against an `otp_challenge` row with no subject of purpose `login`, `passwordReset` or `stepUp` (written by `requestGuestOtp` for an identifier that resolves to nobody, its code never sent) is refused `401 otp-code-invalid` and counts as a wrong attempt, as a wrong code does.
 
 |  |  |
 |---|---|
@@ -1200,6 +1204,7 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Verified |
+| 204 |  | A guest-checkout code (purpose verify) proved under the cart's anonymous guest session: the session now holds verifiedContactRef and the channel; no subject, no GuestSession (ADAM CR-432). |
 | 401 |  | Code invalid or expired. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1512,7 +1517,7 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 **Built with a configurable age** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C19, option A; CHG-R8SPN-024; R205 still open with counsel): a subject is a minor below `tenancy.RegionSettings.minorAgeThreshold` (18 by default, set per country), or with no date of birth. **When the 409 `minor-grants-adult-authority` happens**: the holder the grant is for (the path's `subjectId`) is a minor and `overSubjectId` is an adult, whoever calls, a guest or staff on the guest's behalf. **How the first adult link over a minor is made**: the adult enrols the child from GST-069 (R205), which writes a `familyMember` or `primaryHolder` grant held by the adult over the child, with the adult as grantor; this operation is how later grants are added.
 **What a guest-made grant stores** (R8 blocker IDENTITY-C42, the lead's answer A; CHG-R8MIG-021): `grantedByKind` `subject` and `grantedBySubjectId` the granting guest (no principal); `scopePath` the tenant root (a guest account is tenant-wide); `effect` ALLOW; `permission` one of the guest-delegable list for its `delegationKind` (proposed, client to confirm): `primaryHolder` and `familyMember` ORDER_VIEW, ORDER_CREATE, WALLET_VIEW; `carer` and `attendee` ORDER_VIEW; `groupLeader` ORDER_VIEW, ORDER_CREATE; `corporateAdmin` ORDER_VIEW, ORDER_CREATE, WALLET_VIEW, WALLET_OPERATE; `corporateMember` ORDER_VIEW. Any other permission from a guest is refused 403. A revocation by a guest is recorded the same way. Staff recording a grant on the holder's behalf store `grantedByKind` `principal`; the SSO callback's group-to-role grants store `system`.
 
-**What it reads beyond the caller's row security, and the linked adult's write** (ADAM CR-362, decided 30 October 2026, Chinmay; CHG-CR362-001). (1) Whether the path's `subjectId` is a minor is asked of `identity#subjectMinorStatus`, where `unknown` counts as a minor (409 `minor-grants-adult-authority` as now). (2) The tenant root's scope id and path come from `tenancy#scopeRecords` (level `tenant`) under `ITenantRootGrant`, one statement; it is constant per tenant database, so it may be cached for the process. (3) The write check on `identity.delegated_access` also admits a guest session whose subject holds an active ALLOW `familyMember` or `primaryHolder` grant over `over_subject_id` (not revoked, inside its validity). That check is a plain function reading only the guest's own held grants, which the read policy already shows the guest. This operation still allows that grant only when `overSubjectId` is a minor. (4) The minor age is the `minorAgeThreshold` of the region of the venue the session is in; with no venue, the highest threshold among the tenant's regions; with no region settings, 18. (5) Staff need `GUEST_MANAGE` at the tenant root; a venue-scoped grant answers 403.
+**What it reads beyond the caller's row security, and the linked adult's write** (ADAM CR-362, decided 30 October 2026, Chinmay; CHG-CR362-001). (1) Whether the path's `subjectId` is a minor is asked of `identity#subjectMinorStatus`, where `unknown` counts as a minor (409 `minor-grants-adult-authority` as now). (2) The tenant root's scope id and path come from `tenancy#scopeRecords` (level `tenant`) under `ITenantRootGrant`, one statement; it is constant per tenant database, so it may be cached for the process. (3) The write check on `identity.delegated_access` also admits a guest session whose subject holds an active ALLOW `familyMember` or `primaryHolder` grant over `over_subject_id` (not revoked, inside its validity). That check is a plain function reading only the guest's own held grants, which the read policy already shows the guest. This operation still allows that grant only when `overSubjectId` is a minor. (4) The minor age is the `minorAgeThreshold` of the region of the venue the session is in; with no venue, the highest threshold among the tenant's regions; with no region settings, 18. (5) Staff need `GUEST_MANAGE` at the tenant root; a venue-scoped grant answers 403. (6) (ADAM CR-433, decided 31 October 2026, Chinmay; CHG-CR433-001; it changes none of (1) to (5)) The cycle check asks `identity#delegationReaches` with `fromSubjectId` = `overSubjectId` and `toSubjectId` = the path's `subjectId`: one recursive statement under `ITenantRootGrant` over `identity.delegated_access`, following live grants from holder (`subject_id`) to `over_subject_id` (effect ALLOW, not revoked, not past `validTo`, both subjects set, whoever recorded them), and nothing but the boolean leaves it. The answer is 409 `delegation-cycle` when it is true or the two are the same subject, for guests and staff alike. The check and the insert run in one transaction that holds a transaction advisory lock on the tenant's delegation graph, so two grants made at once cannot close a loop between them.
 
 |  |  |
 |---|---|
@@ -2156,7 +2161,7 @@ Two modes on one operation: **`send` issues a single-use token; `confirm` consum
 **The gate is the checkout page, not the cart** ([ADR-0045](../../docs/adr/0045-every-order-carries-a-proven-contact.md), 18 September 2026, matrix 2.6.1 §2.4: *"On the check out page, users can log in or manually fill in the following details"*). The cart is open to anyone; `checkoutCart` refuses until one of the two routes has completed.
 - **Off:** the guest signs in, verified, at checkout. `WEB-011` and `GST-041` carry the fork.
 - **On:** the guest may check out without an account, and proves the email or mobile the tickets go to with a one-time code at checkout (`requestGuestOtp`, purpose `verify`) — the *dual OTP validation* of the reference checkout the client walked through.
-**Both routes produce a guest profile**, because the tickets have to go somewhere and the order has to belong to something. **A one-time checkout profile carries no credential** — recalling previous transactions needs access set up separately (matrix 2.6.29), which is what `linkGuestCheckout` does from the other direction.
+**A guest checkout opens no account and creates no profile** (ADAM CR-432, decided 31 October 2026; the lead, the same day: "a guest profile is created only when the guest later makes an account"). The code proves the contact for this cart: `verifyGuestOtp` takes the purpose `verify` code under the cart's anonymous guest session and records the proved contact on it, and `checkoutCart` writes the order with no subject and that `verifiedContactRef`, which `order.created` carries, so the tickets go to a proven address. Recalling previous transactions needs an account (matrix 2.6.29): `linkGuestCheckout` attaches those subject-less orders once the guest makes one (ADAM CR-361).
 **A returning verified contact attaches to the profile already held** (matrix 22.2.8) — the new order, its tickets and its history, automatically, with no duplicate record. **It does not open that profile.** The guest sees the order just placed and nothing earlier until they authenticate as its owner: a code proves someone controls the mailbox today, which is enough to route a ticket there and not enough to hand over a history. **Any match that is not a verified contact** — passport, national id, an unproved phone, a similar name — **is a suggestion for the staff review of matrix 7.3.7**, with its audit log and rollback. A merge takes the narrower of two consents (CF-160).
 **The kiosk is exempt.** A walk-up pays at the kiosk and takes printed tickets, so there is no address to prove (matrix 2.1.10). An unverified account also cannot *receive a transfer* or *reset a password*, for the same reason.
 
@@ -2346,6 +2351,8 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 
 **How an MFA step-up reaches the operation that demands it: the session** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-020). A successful step-up is also recorded against the caller's own session, bound to the challenge's `action` and to that session, for the token's short life. Every operation that declares `x-ticvai-step-up: mfa` declares `x-ticvai-step-up-carrier: session` and reads the step-up from the session that calls it: the client sends no token field and no header, and a step-up made on another session or for another action does not count. It is single-use: the operation that consumes it clears it. Without a fresh step-up the operation is refused 403, and the client runs `createMfaChallenge` and this operation, then retries. A call with no session (`{}`) cannot carry an MFA step-up; a supervisor PIN step-up travels in the body or a header instead (`SupervisorStepUp`, CHG-RUL-014). The returned `stepUpToken` stays for clients built at r1.
 
+**The action, the lifetime and the refusals, for every operation that declares `x-ticvai-step-up: mfa`** (ADAM CR-375, Chinmay, 31 October 2026; CHG-CR375-001). The step-up action is the operation's `operationId`: the client calls `createMfaChallenge` with that `action`, then this operation. A verified step-up counts for 5 minutes from `verifiedAt`, which is the `expiresAt` this operation returns. The operation looks on the caller's own session for an `identity.mfa_challenge` row with that action, status `verified` and no `consumedAt`, and sets `consumedAt` in its own transaction. With no such row it answers `403 step-up-token-missing`; when the newest one is older than 5 minutes it answers `403 step-up-token-expired`; nothing is written in either case.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -2376,7 +2383,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | stepUpToken | string |  | Null for a signIn challenge. (nullable) |
-| expiresAt | string (date-time) |  |  |
+| expiresAt | string (date-time) |  | For a step-up, verifiedAt plus 5 minutes, after which the step-up no longer counts and the operation answers 403 step-up-token-expired (ADAM CR-375). |
 | session | object |  | Only for a signIn challenge, and only where no role selection is still owed. (nullable) |
 | session.sessionId | string (uuid) | yes |  |
 | session.principalId | string (uuid) | yes |  |
@@ -2533,7 +2540,7 @@ Who is logged in, on which workstation, since when. There was previously no way 
 | items[].principalName | string |  | Read from identity.principal with the row. |
 | items[].endedAt | string (date-time) |  | When the session ended; null exactly while active, and set on every other status (R8 blocker IDENTITY-C46, CHG-R8MIG-015; a table CHECK since ADAM CR-242, 26 October 2026). (read-only; nullable) |
 | items[].endedByPrincipalId | string (uuid) |  | Who ended it (forceLogout's caller or supervisor; the principal itself when changeOwnCredential ended its other sessions); null when the principal signed out or it expired. (read-only; nullable) |
-| items[].endReason | string |  | Why it was ended, as forceLogout was given it (or supervisor-takeover from the till door, or credential-changed when changeOwnCredential ended it; ADAM CR-242). (min length 3; max length 500; read-only; nullable) |
+| items[].endReason | string |  | Why it was ended, as forceLogout was given it (or supervisor-takeover from the till door, or credential-changed when changeOwnCredential ended it; ADAM CR-242; or credential-reset when resetPrincipal… (min length 3; max length 500; read-only; nullable) |
 | items[].roleId | string (uuid) |  | (nullable) |
 | items[].roleName | string |  | Read from identity.role with the row. (nullable) |
 | items[].workstationId | string (uuid) |  | (nullable) |
@@ -2926,7 +2933,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | principal_id | uuid | yes |  |
 | ended_at | timestamptz | no | When the session ended; null exactly while active, and set on every other status (R8 blocker IDENTITY-C46, CHG-R8MIG-015; a table CHECK since ADAM CR-242, 26 October 2026). |
 | ended_by_principal_id | uuid | no | Who ended it (forceLogout's caller or supervisor; the principal itself when changeOwnCredential ended its other sessions); null when the principal signed out or it expired. |
-| end_reason | text | no | Why it was ended, as forceLogout was given it (or supervisor-takeover from the till door, or credential-changed when changeOwnCredential ended it; ADAM CR-242). |
+| end_reason | text | no | Why it was ended, as forceLogout was given it (or supervisor-takeover from the till door, or credential-changed when changeOwnCredential ended it; ADAM CR-242; or credential-reset when resetPrincipal… |
 | role_id | uuid | no |  |
 | workstation_id | uuid | no |  |
 | venue_id | uuid | no |  |
@@ -3079,13 +3086,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-64 operations, added to this service in later releases without changing any of the above.
+65 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
 | guestAuth | `getMyIdentityVerification`, `submitGuestIdentityDocument` |
-| identity | `decideGuestIdentityVerification`, `endGuestDeviceSessions`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `getSessionVenue`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `listStepUpSupervisors`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `setGuestVerificationPolicy`, `setSessionVenue`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
+| identity | `decideGuestIdentityVerification`, `endGuestDeviceSessions`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `getSessionVenue`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `listStepUpSupervisors`, `listSubjectBiometricRecords`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `setGuestVerificationPolicy`, `setSessionVenue`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
 | mfa | `removeMfaMethod` |
 | prospectAuth | `startProspectSignup`, `verifyProspectSignupCode` |
 | session | `endOwnSession`, `listOwnSessions`, `revokeAllSessions` |

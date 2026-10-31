@@ -136,7 +136,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ANL-067` | Data Refresh, Pipeline & Data Health Monitor | D | 0 | 98 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-068` | Embedded BI, Workspace & Tenant Administration | D | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-069` | Analytics Performance, Usage & Cost Monitor | D | 0 | 124 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-070` | Analytics Governance, Security & Audit Center | D | 20 | 91 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `ANL-070` | Analytics Governance, Security & Audit Center | D | 20 | 92 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

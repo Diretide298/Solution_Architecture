@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 75 of 283 |
+| Operations in the slice | 75 of 284 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -5950,6 +5950,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | clicked_at | timestamptz | no |  |
 | complained_at | timestamptz | no |  |
 | unsubscribed_at | timestamptz | no |  |
+| source_ref | text | no | The id of the record whose business event triggered the message (a performance id, a guest broadcast id), which listMessageDispatches filters on (ADAM CR-379; CHG-CR379-001). |
 
 ### `marketing.message_template`
 
@@ -6268,7 +6269,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-208 operations, added to this service in later releases without changing any of the above.
+209 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -6281,5 +6282,5 @@ Every table this service owns that the slice reads or writes, with its columns a
 | guests | `activateAudience`, `checkGuestCheckoutMatch`, `decideDuplicateCandidate`, `decideGuestCheckoutMatch`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestMatchPolicy`, `setGuestRelationships`, `setIdentityResolutionRules` |
 | loyalty | `adjustLoyaltyPoints`, `getLoyaltyRules`, `issueReward`, `listBadges`, `listLoyaltyCampaigns`, `listLoyaltyPointEntries`, `listRewardAssignments`, `setBadge`, `setLoyaltyCampaign` |
 | marketing | `accrueLoyaltyPoints`, `activateChallenge`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `endKioskAssist`, `getChallenge`, `getConversation`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `listChallenges`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageDispatches`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordPrivacyIncident`, `recordSaleOwnerAnswers`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `transferConversation` |
-| message | `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `notifyPerformanceHolders`, `sendGuestOneTimeCode`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
+| message | `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `notifyPerformanceHolders`, `sendGuestBroadcast`, `sendGuestOneTimeCode`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
 | segment | `listSegmentMembers`, `listSegments`, `previewSegment`, `previewSegmentDraft` |

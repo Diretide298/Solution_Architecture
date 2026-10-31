@@ -2,7 +2,7 @@
  "AccessGateModeChange": {
   "type": "object",
   "x-ticvai-persistence": "access.gate_mode_change",
-  "description": "One gate mode change on an access point, pending or applied: from and target mode, operator, reason and effective time. Append-only history (declared 29 September, data-model close-out DM1) Written by setTurnstileMode (applied at once, or pending until a future effectiveAt) and cancelGateModeChange; a timer applies a pending change at its effective time (decided 29 September, writers pass).",
+  "description": "One gate mode change on an access point, pending or applied: from and target mode, operator, reason and effective time. Append-only history (declared 29 September, data-model close-out DM1) Written by setTurnstileMode (applied at once, or pending until a future effectiveAt) and cancelGateModeChange; a timer applies a pending change at its effective time (decided 29 September, writers pass), setting the access point's operating mode to targetMode and its turnstile mode to targetTurnstileMode (ADAM CR-396; CHG-CR396-001).",
   "required": [
    "id",
    "venueId",
@@ -42,6 +42,15 @@
       "$ref": "#/components/schemas/AccessPointOperatingMode"
      }
     ]
+   },
+   "targetTurnstileMode": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TurnstileMode"
+     }
+    ],
+    "nullable": true,
+    "description": "The turnstile mode (`mode`) a `setTurnstileMode` change sets with `targetMode`: `freeRotation` or `closed`, or null for none (ADAM CR-396, decided 31 October 2026; CHG-CR396-001). A pending change keeps it until the timer applies both. Null on a direction switch."
    },
    "fromDirection": {
     "allOf": [

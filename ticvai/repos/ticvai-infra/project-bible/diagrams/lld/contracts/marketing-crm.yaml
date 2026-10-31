@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 283 operations
+title: marketing-crm — 284 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -2001,6 +2001,11 @@ operations:
   - marketing.communication_preference_type
   - marketing.consent_capture_point
   - marketing.consent_purpose
+  - marketing.consent_purpose_channel
+  - marketing.cookie_banner_design
+  - marketing.minor_privacy_rule
+  - marketing.privacy_notice_governance
+  - marketing.processing_purpose
   - marketing.tracking_technology
   writes: []
 - operation: listPrivacyEvidenceCompliance
@@ -2873,6 +2878,22 @@ operations:
   - marketing.conversation
   - marketing.conversation_message
   - marketing.conversation_message_attachment
+- operation: sendGuestBroadcast
+  verb: POST
+  path: /guest-broadcasts
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.communication_provider
+  - marketing.guest_device
+  - marketing.guest_profile
+  writes:
+  - cache:idempotency
+  - marketing.message_dispatch
 - operation: sendGuestConversationMessage
   verb: POST
   path: /my/conversations/{conversationId}/messages

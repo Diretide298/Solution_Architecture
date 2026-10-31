@@ -446,6 +446,15 @@
   },
   {
    "frm": "seating.section",
+   "col": "seat_map_id",
+   "to": "seating.seat_map",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "seating.section",
    "col": "view_asset_id",
    "to": "assets.media_asset",
    "how": "declared",
@@ -460,6 +469,15 @@
    "how": "declared",
    "cross": "",
    "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "seating.seat_map_template",
+   "col": "source_seat_map_id",
+   "to": "seating.seat_map",
+   "how": "declared",
+   "cross": "",
+   "required": "",
    "edgeKind": "foreignKey"
   },
   {
@@ -2449,6 +2467,15 @@
    "how": "declared",
    "cross": "",
    "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "pricing.dynamic_price_rule",
+   "col": "channel_id",
+   "to": "catalogue.sales_channel",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
    "edgeKind": "foreignKey"
   },
   {
@@ -7087,6 +7114,42 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "catalogue.competitor_price_observation",
+   "col": "demand_signal_id",
+   "to": "catalogue.demand_signal",
+   "how": "declared",
+   "cross": "",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "workforce.guest_broadcast",
+   "col": "venue_id",
+   "to": "platform.scope",
+   "how": "declared",
+   "cross": "yes",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "workforce.guest_broadcast",
+   "col": "sent_by_principal_id",
+   "to": "identity.principal",
+   "how": "declared",
+   "cross": "yes",
+   "required": "yes",
+   "edgeKind": "foreignKey"
+  },
+  {
+   "frm": "workforce.guest_broadcast",
+   "col": "second_principal_id",
+   "to": "identity.principal",
+   "how": "declared",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "assets.media_asset",
    "col": "venue_id",
    "to": "platform.scope",
@@ -8866,15 +8929,6 @@
    "how": "declared",
    "cross": "yes",
    "required": "",
-   "edgeKind": "foreignKey"
-  },
-  {
-   "frm": "whitelabel.banner",
-   "col": "tenant_config_id",
-   "to": "whitelabel.tenant_config",
-   "how": "declared",
-   "cross": "",
-   "required": "yes",
    "edgeKind": "foreignKey"
   },
   {
@@ -18427,6 +18481,15 @@
    "edgeKind": "foreignKey"
   },
   {
+   "frm": "catalogue.dynamic_pricing_control",
+   "col": "pending_approval_request_id",
+   "to": "approvals.request",
+   "how": "convention",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "foreignKey"
+  },
+  {
    "frm": "catalogue.dynamic_pricing_strategy",
    "col": "venue_id",
    "to": "platform.scope",
@@ -21775,6 +21838,15 @@
    "edgeKind": "ambient"
   },
   {
+   "frm": "access.blacklist",
+   "col": "via addBlacklistEntry",
+   "to": "approvals.request",
+   "how": "lineage",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
    "frm": "access.access_point",
    "col": "via setAccessPointGeofence",
    "to": "access.configuration_change",
@@ -22531,7 +22603,16 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "seating.seat_map",
+   "frm": "seating.seat",
+   "col": "via createSeatMap",
+   "to": "seating.seat_map",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "seating.seat",
    "col": "via createSeatMap",
    "to": "seating.section",
    "how": "lineage",
@@ -22540,7 +22621,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "seating.seat_map",
+   "frm": "seating.seat",
    "col": "via createSeatMap",
    "to": "seating.section_row",
    "how": "lineage",
@@ -22587,6 +22668,15 @@
   {
    "frm": "seating.seat_map",
    "col": "via cloneSeatMap",
+   "to": "seating.section",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "seating.import_job",
+   "col": "via commitImportJob",
    "to": "seating.section",
    "how": "lineage",
    "cross": "",
@@ -23344,15 +23434,6 @@
    "frm": "whitelabel.homepage_layout",
    "col": "via setHomepageLayout",
    "to": "whitelabel.homepage_section",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "whitelabel.banner",
-   "col": "via deleteBanner",
-   "to": "whitelabel.tenant_config",
    "how": "lineage",
    "cross": "",
    "required": "",
@@ -24484,9 +24565,18 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "marketing.message_dispatch",
+   "frm": "platform.outbox",
    "col": "via broadcastToGuests",
    "to": "workforce.announcement",
+   "how": "lineage",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "platform.outbox",
+   "col": "via broadcastToGuests",
+   "to": "workforce.guest_broadcast",
    "how": "lineage",
    "cross": "yes",
    "required": "",
@@ -24980,6 +25070,33 @@
   },
   {
    "frm": "catalogue.audit_entry",
+   "col": "via createLiveDynamicPrice",
+   "to": "catalogue.price_execution",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "catalogue.audit_entry",
+   "col": "via createLiveDynamicPrice",
+   "to": "catalogue.pricing_recommendation_decision",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "catalogue.audit_entry",
+   "col": "via createLiveDynamicPrice",
+   "to": "platform.outbox",
+   "how": "lineage",
+   "cross": "yes",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
+   "frm": "catalogue.audit_entry",
    "col": "via publishActivationScheduler",
    "to": "catalogue.lifecycle_action",
    "how": "lineage",
@@ -25105,16 +25222,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "access.access_point",
-   "col": "via setBleBeaconGeofence",
-   "to": "access.configuration_change",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "access.access_point",
+   "frm": "access.configuration_change",
    "col": "via setBleBeaconGeofence",
    "to": "access.device_placement",
    "how": "lineage",
@@ -25852,6 +25960,15 @@
    "edgeKind": "ambient"
   },
   {
+   "frm": "workforce.open_shift",
+   "col": "via claimOpenShift",
+   "to": "workforce.rota_assignment",
+   "how": "lineage",
+   "cross": "",
+   "required": "",
+   "edgeKind": "ambient"
+  },
+  {
    "frm": "platform.outbox",
    "col": "via concludeRecommendationExperiment",
    "to": "promotions.recommendation_experiment",
@@ -26491,27 +26608,18 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "catalogue.audit_entry",
+   "frm": "approvals.request",
    "col": "via decidePricingRecommendation",
    "to": "catalogue.pricing_recommendation",
    "how": "lineage",
-   "cross": "",
+   "cross": "yes",
    "required": "",
    "edgeKind": "ambient"
   },
   {
-   "frm": "catalogue.audit_entry",
+   "frm": "approvals.request",
    "col": "via decidePricingRecommendation",
    "to": "catalogue.pricing_recommendation_decision",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "catalogue.audit_entry",
-   "col": "via decidePricingRecommendation",
-   "to": "platform.outbox",
    "how": "lineage",
    "cross": "yes",
    "required": "",
@@ -26914,15 +27022,6 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "catalogue.audit_entry",
-   "col": "via cancelPricingRollback",
-   "to": "platform.outbox",
-   "how": "lineage",
-   "cross": "yes",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
    "frm": "promotions.campaign",
    "col": "via createCommercialCampaign",
    "to": "promotions.campaign_budget",
@@ -27243,15 +27342,6 @@
    "to": "catalogue.dynamic_pricing_strategy",
    "how": "lineage",
    "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "catalogue.audit_entry",
-   "col": "via setDynamicPricingGuardrailPolicy",
-   "to": "platform.outbox",
-   "how": "lineage",
-   "cross": "yes",
    "required": "",
    "edgeKind": "ambient"
   },
@@ -28931,24 +29021,6 @@
   },
   {
    "frm": "whitelabel.kiosk_config",
-   "col": "via deleteKioskConfig",
-   "to": "whitelabel.kiosk_config_attract_slide",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "whitelabel.kiosk_config",
-   "col": "via deleteKioskConfig",
-   "to": "whitelabel.kiosk_config_start_tile",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "whitelabel.kiosk_config",
    "col": "via publishKioskConfigs",
    "to": "whitelabel.kiosk_config_version",
    "how": "lineage",
@@ -28975,16 +29047,7 @@
    "edgeKind": "ambient"
   },
   {
-   "frm": "whitelabel.kiosk_config",
-   "col": "via updateKioskConfig",
-   "to": "whitelabel.kiosk_config_attract_slide",
-   "how": "lineage",
-   "cross": "",
-   "required": "",
-   "edgeKind": "ambient"
-  },
-  {
-   "frm": "whitelabel.kiosk_config",
+   "frm": "whitelabel.kiosk_config_attract_slide",
    "col": "via updateKioskConfig",
    "to": "whitelabel.kiosk_config_start_tile",
    "how": "lineage",
@@ -29875,6 +29938,7 @@
    "listGovernanceRiskMonitoring",
    "listGroupLeaderFast",
    "listInternalDemandBooking",
+   "listInventoryCapacityChannel",
    "listMember",
    "listMembershipActivationCredential",
    "listMembershipAnnualPass",
@@ -29944,6 +30008,7 @@
    "createPartnerChangeRequest",
    "setChannelSalesRule",
    "setConfigurationTemplate",
+   "setDynamicPricingGuardrailPolicy",
    "setMembershipCommercialConfig",
    "setPackagePricingDefinition",
    "setPartnerAllocations",
@@ -30085,6 +30150,7 @@
    "listChangePropagationDependency",
    "listCommercialPricing",
    "listCommercialPricingStructure",
+   "listCompetitorPricingMarket",
    "listPackageBundleAdd",
    "listPricingRulePriority",
    "setProductServicePrice",
@@ -30119,6 +30185,7 @@
    "listCommercialPricing",
    "listCommercialPricingStructure",
    "listCommissionMarginIncentive",
+   "listCompetitorPricingMarket",
    "listCustomerSegmentProfile",
    "listEffectiveDateSeason",
    "listLocationVenueEvent",
@@ -30182,6 +30249,7 @@
    "listCampaignFinancialCommercial",
    "listCommercialPricing",
    "listCommercialPricingStructure",
+   "listCompetitorPricingMarket",
    "listConflict",
    "listDiscountMarginProfitability",
    "listDynamicBundle2",
@@ -30242,6 +30310,7 @@
    "cloneEvent",
    "setEventLifecycleState",
    "estimateEventResourceCost",
+   "setDynamicPricingGuardrailPolicy",
    "setPartnerAllocations",
    "setPartnerCapabilityGrants",
    "setPartnerCommissionRules",
@@ -30291,6 +30360,7 @@
    "setEventLifecycleState",
    "assignPerformanceMedia",
    "createPartnerChangeRequest",
+   "setDynamicPricingGuardrailPolicy",
    "bookVisitPlan",
    "generateVisitPlan",
    "listVisitPlanAlternatives",
@@ -30460,7 +30530,6 @@
    "pushWalletPassUpdate",
    "reissueEntitlement",
    "shareEntitlement",
-   "broadcastToGuests",
    "listMyEntitlements",
    "getEntitlement",
    "getEntitlementCredential",
@@ -30638,6 +30707,7 @@
    "exportSubjectData",
    "reissueEntitlement",
    "shareEntitlement",
+   "broadcastToGuests",
    "verifyGuestEmail",
    "payByLink",
    "claimCustomDomain",
@@ -30674,10 +30744,8 @@
    "guestPasswordLogin",
    "submitApprovalRequest",
    "decidePricingChangeRequest",
-   "decidePricingRecommendation",
    "submitPricingChangeRequest",
    "voidEntitlement",
-   "cancelPricingRollback",
    "holdResaleSettlement",
    "mergeOrders",
    "releaseResaleSettlementHold",
@@ -30685,7 +30753,6 @@
    "resolveIdentityConflict",
    "retryChannelIncident",
    "reviewFaceReenrolment",
-   "setDynamicPricingGuardrailPolicy",
    "createInstalmentPlan",
    "issueCreditMemo",
    "issueTaxInvoice",
@@ -30706,7 +30773,6 @@
    "releaseWalletHold",
    "requestAppBuild",
    "setTenantDomainMapping",
-   "republishOutbox",
    "submitShiftCount",
    "assignApprovalRequest",
    "exportSitePackage",
@@ -31156,11 +31222,9 @@
    "listCommissionCalculationSettlement",
    "listCreditLimitExposure",
    "listCustomerSegmentChannel",
-   "listDemandBookingCurve",
    "listDepositGuaranteeFinancial",
    "listDepositPartialPayment",
    "listDiscountMarginProfitability",
-   "listDynamicPricingPerformance",
    "listExecutivePromotionReporting",
    "listExternalPaymentPartner",
    "listFinancialTraceability",
@@ -31195,7 +31259,6 @@
    "listPartnerStatementAccount",
    "listPaymentOrderFinancial",
    "listPaymentReconciliationException",
-   "listPriceElasticityRevenue",
    "listPricingChangeImpact",
    "listPricingCompliance",
    "listPricingRollbackEmergency",
@@ -31810,7 +31873,6 @@
    "publishTopologyValidation",
    "setAttractionAccess",
    "setBiometricVerificationProfile",
-   "setBleBeaconGeofence",
    "setGateLane",
    "setReaderScannerPeripheral",
    "setRfidNfc",
@@ -31822,8 +31884,7 @@
    "placeAccessDevice",
    "setAccessPointGroup",
    "setPodium",
-   "setAccessPointDirection",
-   "getBleBeaconGeofence"
+   "setAccessPointDirection"
   ],
   "access.accreditation_credential": [
    "validateAccess",
@@ -32104,6 +32165,66 @@
    "setAccessPointDirection",
    "setHardwareModelCertification",
    "setAccessAreaCapacity"
+  ],
+  "approvals.request": [
+   "addBlacklistEntry",
+   "deleteGuestAccount",
+   "reopenPeriod",
+   "closeFiscalPeriod",
+   "suspendTenant",
+   "reactivateTenant",
+   "publishTenantConfig",
+   "listApprovalRequests",
+   "createApprovalRequest",
+   "decideApprovalRequest",
+   "withdrawApprovalRequest",
+   "escalateApprovalRequest",
+   "resubmitApprovalRequest",
+   "getApprovalAnalytics",
+   "requestShiftSwap",
+   "createPartnerAgreement",
+   "registerPartner",
+   "publishContentBlock",
+   "exportSubjectData",
+   "approveBookingLimitCommercial",
+   "approveMembershipProductValidation",
+   "approvePartnerStatuLifecycle",
+   "approveUnifiedDecision",
+   "approveVersioningGovernance",
+   "listCommercialAgreement",
+   "listCommercialAgreementHealth",
+   "listMemberExceptionOverride",
+   "listMemberLifecycleCase",
+   "listMembershipAnnualPass",
+   "listMembershipFreezeSuspension",
+   "listPartnerAccessRole",
+   "listPartnerCancellationRefund",
+   "listPartnerOnboardingApplication",
+   "listPartnerProfileReadiness",
+   "listProcessAutomationOpportunity",
+   "listSlaEscalationBottleneck",
+   "listWorkflow",
+   "listWorkflowInstanceProcess",
+   "listWorkflowProcessPerformance",
+   "setAgreementContractTerm",
+   "setPartnerRateNet",
+   "setPaymentTermBilling",
+   "simulateWorkflowTestingImpact",
+   "submitApprovalRequest",
+   "decidePricingRecommendation",
+   "actOnPartnerApplicationReview",
+   "actOnWorkflowInstance",
+   "createPartnerChangeRequest",
+   "setPartnerAllocations",
+   "setPartnerCommissionRules",
+   "setPartnerCreditProfile",
+   "recordExternalApprovalDecision",
+   "scoreApprovalRequest",
+   "assignApprovalRequest",
+   "cancelApprovalRequest",
+   "reopenApprovalRequest",
+   "getMembershipProductValidation",
+   "getApprovalRequest"
   ],
   "orders.pos_shift_approval": [
    "listShifts",
@@ -32449,64 +32570,6 @@
    "deleteGuestAccount",
    "exportSubjectData"
   ],
-  "approvals.request": [
-   "deleteGuestAccount",
-   "reopenPeriod",
-   "closeFiscalPeriod",
-   "suspendTenant",
-   "reactivateTenant",
-   "publishTenantConfig",
-   "listApprovalRequests",
-   "createApprovalRequest",
-   "decideApprovalRequest",
-   "withdrawApprovalRequest",
-   "escalateApprovalRequest",
-   "resubmitApprovalRequest",
-   "getApprovalAnalytics",
-   "requestShiftSwap",
-   "createPartnerAgreement",
-   "registerPartner",
-   "publishContentBlock",
-   "exportSubjectData",
-   "approveBookingLimitCommercial",
-   "approveMembershipProductValidation",
-   "approvePartnerStatuLifecycle",
-   "approveUnifiedDecision",
-   "approveVersioningGovernance",
-   "listCommercialAgreement",
-   "listCommercialAgreementHealth",
-   "listMemberExceptionOverride",
-   "listMemberLifecycleCase",
-   "listMembershipAnnualPass",
-   "listMembershipFreezeSuspension",
-   "listPartnerAccessRole",
-   "listPartnerCancellationRefund",
-   "listPartnerOnboardingApplication",
-   "listPartnerProfileReadiness",
-   "listProcessAutomationOpportunity",
-   "listSlaEscalationBottleneck",
-   "listWorkflow",
-   "listWorkflowInstanceProcess",
-   "listWorkflowProcessPerformance",
-   "setAgreementContractTerm",
-   "setPartnerRateNet",
-   "setPaymentTermBilling",
-   "simulateWorkflowTestingImpact",
-   "submitApprovalRequest",
-   "actOnPartnerApplicationReview",
-   "actOnWorkflowInstance",
-   "createPartnerChangeRequest",
-   "setPartnerAllocations",
-   "setPartnerCommissionRules",
-   "setPartnerCreditProfile",
-   "recordExternalApprovalDecision",
-   "scoreApprovalRequest",
-   "assignApprovalRequest",
-   "cancelApprovalRequest",
-   "reopenApprovalRequest",
-   "getMembershipProductValidation",
-   "getApprovalRequest"
-  ],
   "identity.subject_data_export": [
    "deleteGuestAccount",
    "exportSubjectData",
@@ -32526,7 +32589,8 @@
   ],
   "identity.mfa_challenge": [
    "createMfaChallenge",
-   "verifyMfaChallenge"
+   "verifyMfaChallenge",
+   "resetPrincipalCredential"
   ],
   "ledger.account": [
    "listAccounts",
@@ -33268,6 +33332,7 @@
    "cloneSeatMap",
    "updateSeats",
    "validateSeatMap",
+   "createSeatMapTemplate",
    "generateConfiguration",
    "setMapZones",
    "copySeatMapSection",
@@ -33278,29 +33343,10 @@
    "proposeSeatMapChanges",
    "editSeatMapStructure"
   ],
-  "seating.section": [
-   "createSeatMap",
-   "getSeatMap",
-   "updateSeatMap",
-   "publishSeatMap",
-   "cloneSeatMap",
-   "generateConfiguration",
-   "copySeatMapSection",
-   "diffSeatMapVersions",
-   "importSeatMap",
-   "allocateGroupSeats",
-   "proposeSeatMapChanges",
-   "editSeatMapStructure"
-  ],
-  "seating.section_row": [
-   "createSeatMap",
-   "updateSeatMap",
-   "importSeatMap",
-   "allocateGroupSeats",
-   "getSeatInventory"
-  ],
   "seating.seat": [
+   "createSeatMap",
    "listSeats",
+   "createSeatMapTemplate",
    "getSeatAvailability",
    "recommendSeats",
    "generateConfiguration",
@@ -33313,17 +33359,43 @@
    "proposeSeatMapChanges",
    "editSeatMapStructure"
   ],
+  "seating.seat_map_template": [
+   "createSeatMap",
+   "listSeatMapTemplates",
+   "createSeatMapTemplate",
+   "importSeatMap"
+  ],
+  "seating.section": [
+   "createSeatMap",
+   "getSeatMap",
+   "updateSeatMap",
+   "publishSeatMap",
+   "cloneSeatMap",
+   "commitImportJob",
+   "createSeatMapTemplate",
+   "generateConfiguration",
+   "copySeatMapSection",
+   "diffSeatMapVersions",
+   "importSeatMap",
+   "allocateGroupSeats",
+   "proposeSeatMapChanges",
+   "editSeatMapStructure"
+  ],
+  "seating.section_row": [
+   "createSeatMap",
+   "getSeatMap",
+   "updateSeatMap",
+   "createSeatMapTemplate",
+   "importSeatMap",
+   "allocateGroupSeats",
+   "getSeatInventory"
+  ],
   "seating.import_job": [
    "importSeatManifest",
    "importSeatGeometry",
    "getImportJob",
    "commitImportJob",
    "getSeatMapImport"
-  ],
-  "seating.seat_map_template": [
-   "listSeatMapTemplates",
-   "createSeatMapTemplate",
-   "importSeatMap"
   ],
   "seating.seat_category": [
    "listSeatCategories",
@@ -34757,7 +34829,8 @@
    "setModuleEnablement",
    "validateTenantConfig",
    "publishTenantConfig",
-   "restoreConfigVersion"
+   "restoreConfigVersion",
+   "getKioskConfigValidation"
   ],
   "whitelabel.navigation_config": [
    "getTenantConfig",
@@ -34790,7 +34863,6 @@
    "getFonts",
    "setFonts",
    "setHeader",
-   "deleteBanner",
    "deleteContentPage",
    "setModuleEnablement",
    "setLanguages",
@@ -35075,6 +35147,7 @@
   ],
   "marketing.privacy_notice_governance": [
    "decideApprovalRequest",
+   "listPrivacyConsent",
    "listPrivacyNoticePolicy",
    "setPrivacyNoticePolicyGovernance"
   ],
@@ -35112,6 +35185,7 @@
    "listAttendance",
    "recordAttendance",
    "getAnnouncementReach",
+   "claimOpenShift",
    "getLabourCost",
    "getStaffingCoverage",
    "validateWorkforceCompliance"
@@ -35119,6 +35193,7 @@
   "workforce.staffing_rules": [
    "createRotaAssignment",
    "updateRotaAssignment",
+   "claimOpenShift",
    "getStaffingCoverage",
    "setStaffingRules",
    "validateWorkforceCompliance",
@@ -35393,7 +35468,8 @@
    "setMediaBindingActivation",
    "enrolFaceTag",
    "verifyIdentity",
-   "reviewFaceReenrolment"
+   "reviewFaceReenrolment",
+   "listSubjectBiometricRecords"
   ],
   "orders.stored_value_authorisation": [
    "authoriseStoredValue",
@@ -35436,7 +35512,6 @@
    "setTaxRuleTreatment",
    "relinquishChannelAllocation",
    "decidePricingChangeRequest",
-   "decidePricingRecommendation",
    "setRulePriorityConflict",
    "submitPricingChangeRequest",
    "cancelPricingRollback",
@@ -35678,7 +35753,6 @@
   "marketing.message_dispatch": [
    "createPaymentLink",
    "deprecateApiVersion",
-   "broadcastToGuests",
    "resendPaymentLink",
    "notifyWaitlistParty",
    "notifyServer",
@@ -35706,7 +35780,8 @@
    "getGuestTimeline",
    "listMyNotifications",
    "markMyNotificationsRead",
-   "sendGuestOneTimeCode"
+   "sendGuestOneTimeCode",
+   "sendGuestBroadcast"
   ],
   "orders.payment_link": [
    "createPaymentLink",
@@ -35884,7 +35959,6 @@
   ],
   "marketing.guest_profile": [
    "getRecommendations",
-   "broadcastToGuests",
    "listAudienceDiscoveryTargeting",
    "listAudiencePreviewReach",
    "listBehavioralTransactionTargeting",
@@ -35917,7 +35991,8 @@
    "runDataRetention",
    "getAudienceOverlap",
    "claimDeviceConsent",
-   "writeSubjectDataExportPart"
+   "writeSubjectDataExportPart",
+   "sendGuestBroadcast"
   ],
   "orders.order_relationship": [
    "splitOrder",
@@ -36040,6 +36115,9 @@
    "createMessageTemplate",
    "listSystemTransactionalTemplate",
    "updateMessageTemplate"
+  ],
+  "workforce.guest_broadcast": [
+   "broadcastToGuests"
   ],
   "platform.configuration_profile": [
    "getWorkstationHealth",
@@ -36336,6 +36414,7 @@
   ],
   "workforce.training_record": [
    "listTrainingRecords",
+   "claimOpenShift",
    "getStaffingCoverage",
    "validateWorkforceCompliance"
   ],
@@ -36617,11 +36696,13 @@
   ],
   "catalogue.sales_channel": [
    "createChannelProfile",
+   "listAutomationPolicyAutonomous",
    "listChannelConnectionIntegration",
    "listChannelExceptionIncident",
    "listChannelGovernanceSla",
    "listChannelPerformanceCommercial",
    "listChannelSaleSchedule",
+   "listDynamicPricingAutomation",
    "listInventoryCapacityChannel",
    "listSaleChannel",
    "publishChannelAvailability",
@@ -36633,6 +36714,7 @@
    "setChannelConnectionConfiguration",
    "setChannelSalesRule",
    "setChannelSyncSetting",
+   "setDynamicPricingGuardrailPolicy",
    "testChannelConnection",
    "listSalePermissionTargets"
   ],
@@ -36674,6 +36756,7 @@
   ],
   "catalogue.dynamic_pricing_strategy": [
    "createLiveDynamicPrice",
+   "listDynamicPricingPerformance",
    "listSeasonalCalendarDay",
    "setBookingVelocityTime",
    "setDemandOccupancyAvailability",
@@ -36686,12 +36769,15 @@
   "catalogue.price_execution": [
    "createLiveDynamicPrice",
    "listDynamicPricingPerformance",
-   "listRevenue"
+   "listRevenue",
+   "simulatePriceBreakdownCalculation",
+   "listDynamicPricingStrategy"
   ],
   "catalogue.price_ladder": [
    "createLiveDynamicPrice",
    "listDynamicPriceBand",
    "setPricing",
+   "listDynamicPricingStrategy",
    "setPriceLadderMatrix",
    "transitionDynamicPricingStrategy"
   ],
@@ -36716,6 +36802,17 @@
    "listRevenue",
    "listPricing",
    "decidePricingRecommendation"
+  ],
+  "catalogue.product_channel_assignment": [
+   "createLiveDynamicPrice",
+   "listChangeImpactAnalysis",
+   "listChannelSaleSchedule",
+   "listProductLifecycle",
+   "listProductRetirementSuspension",
+   "listSaleChannel",
+   "publishChannelAvailability",
+   "publishChannelReadinessValidation",
+   "setProductCatalogue"
   ],
   "pricing.dynamic_price_rule": [
    "createLiveDynamicPrice",
@@ -36839,6 +36936,15 @@
    "deleteJourneySequenceRule",
    "setJourneySequenceRule"
   ],
+  "catalogue.pricing_market": [
+   "listAutomationPolicyAutonomous",
+   "listCommercialPricing",
+   "listCommercialPricingStructure",
+   "listDynamicPricingAutomation",
+   "listMarketVenueCurrency",
+   "setDynamicPricingGuardrailPolicy",
+   "setMarketPricingConfiguration"
+  ],
   "tenancy.data_retention_setting": [
    "listBiometricLifecycleRetention",
    "setBiometricLifecycleRetention",
@@ -36938,15 +37044,6 @@
    "listCommercialCampaigns",
    "updateCommercialCampaign"
   ],
-  "catalogue.product_channel_assignment": [
-   "listChangeImpactAnalysis",
-   "listProductLifecycle",
-   "listProductRetirementSuspension",
-   "listSaleChannel",
-   "publishChannelAvailability",
-   "publishChannelReadinessValidation",
-   "setProductCatalogue"
-  ],
   "catalogue.product_link": [
    "listChangeImpactAnalysis",
    "listChangePropagationDependency",
@@ -36960,7 +37057,6 @@
   ],
   "pricing.dynamic_price_action": [
    "listChannelBasedPricing",
-   "listChannelCustomerSegment",
    "listCustomerSegmentProfile",
    "listEffectiveDateSeason",
    "listLocationVenueEvent",
@@ -36982,7 +37078,6 @@
   ],
   "pricing.dynamic_price_condition": [
    "listChannelBasedPricing",
-   "listChannelCustomerSegment",
    "listCustomerSegmentProfile",
    "listEffectiveDateSeason",
    "listLocationVenueEvent",
@@ -37078,13 +37173,9 @@
    "listCommercialPricing",
    "listCommercialPricingStructure",
    "listPriceCategoryRate",
+   "listPricingRecommendationExplainability",
+   "listRecommendationReviewDecision",
    "setPriceCategoryRateType"
-  ],
-  "catalogue.pricing_market": [
-   "listCommercialPricing",
-   "listCommercialPricingStructure",
-   "listMarketVenueCurrency",
-   "setMarketPricingConfiguration"
   ],
   "catalogue.rate": [
    "listCommercialPricing",
@@ -37103,6 +37194,7 @@
   ],
   "catalogue.price_assignment": [
    "listCommercialPricingStructure",
+   "listCompetitorPricingMarket",
    "listPricingChangeImpact",
    "publishChannelReadinessValidation",
    "setChannelPricingCommercial",
@@ -37146,6 +37238,9 @@
    "setPartnerAllocations",
    "setPartnerCommissionRules",
    "setPartnerCreditProfile"
+  ],
+  "catalogue.competitor_price_observation": [
+   "listCompetitorPricingMarket"
   ],
   "catalogue.demand_signal": [
    "listCompetitorPricingMarket",
@@ -37328,6 +37423,7 @@
    "listDemandBookingCurve",
    "listLearningModelPerformance",
    "listPriceElasticityRevenue",
+   "listRevenue",
    "setPricing",
    "listPricing"
   ],
@@ -37541,6 +37637,7 @@
    "listMembershipLoyaltyPricing",
    "listPricingChangeImpact",
    "setPricingExperiment",
+   "simulatePriceBreakdownCalculation",
    "listMembershipProgrammes",
    "setMembershipProgramme"
   ],
@@ -37668,6 +37765,14 @@
    "listPricingDistributionSynchronization",
    "publishPricingEffectiveDate"
   ],
+  "catalogue.pricing_simulation": [
+   "listPricingRecommendationExplainability",
+   "listRecommendationReviewDecision",
+   "listRevenue",
+   "listRevenueDemandImpact",
+   "listScenarioModelingWhat",
+   "setPricing"
+  ],
   "catalogue.price_list_version": [
    "listPricingVersionBaseline",
    "publishPricingEffectiveDate",
@@ -37703,12 +37808,6 @@
   "catalogue.pricing_experiment": [
    "listRevenue",
    "setPricingExperiment"
-  ],
-  "catalogue.pricing_simulation": [
-   "listRevenue",
-   "listRevenueDemandImpact",
-   "listScenarioModelingWhat",
-   "setPricing"
   ],
   "approvals.business_rule": [
    "listRuleWorkflow",
@@ -39507,7 +39606,6 @@
   ],
   "whitelabel.kiosk_config_attract_slide": [
    "createKioskConfig",
-   "deleteKioskConfig",
    "getKioskConfig",
    "getKioskConfigValidation",
    "getPublishedKioskConfig",
@@ -39518,7 +39616,6 @@
   ],
   "whitelabel.kiosk_config_start_tile": [
    "createKioskConfig",
-   "deleteKioskConfig",
    "getKioskConfig",
    "getKioskConfigValidation",
    "getPublishedKioskConfig",
@@ -39803,7 +39900,8 @@
   ],
   "marketing.consent_purpose_channel": [
    "listConsentPurposes",
-   "setConsentPurposes"
+   "setConsentPurposes",
+   "listPrivacyConsent"
   ],
   "marketing.wishlist_item": [
    "getWishlist",
@@ -39813,7 +39911,8 @@
   "marketing.guest_device": [
    "listGuestDevices",
    "registerGuestDevice",
-   "revokeGuestDevice"
+   "revokeGuestDevice",
+   "sendGuestBroadcast"
   ],
   "marketing.campaign_variant": [
    "listCampaigns",
@@ -39885,7 +39984,8 @@
    "listDeliveryQueueFailure",
    "listProviderHealthUsage",
    "listDeliveryCommunicationPlatform",
-   "sendGuestOneTimeCode"
+   "sendGuestOneTimeCode",
+   "sendGuestBroadcast"
   ],
   "marketing.sender_identity": [
    "setSenderIdentityDomain"
@@ -39908,6 +40008,23 @@
    "setConsentCapturePoint",
    "listConsentEvidenceWithdrawal"
   ],
+  "marketing.cookie_banner_design": [
+   "listPrivacyConsent",
+   "listCookieBannerPreference",
+   "setCookieBannerDesign",
+   "approvePrivacyTesting",
+   "recordDeviceConsent",
+   "getCookieConsentRuntime"
+  ],
+  "marketing.minor_privacy_rule": [
+   "listPrivacyConsent",
+   "setMinorGuardianAge"
+  ],
+  "marketing.processing_purpose": [
+   "listPrivacyConsent",
+   "listDataProcessingPurpose",
+   "setDataProcessingPurpose"
+  ],
   "marketing.tracking_technology": [
    "listPrivacyConsent",
    "listCookieTrackingDigital",
@@ -39918,20 +40035,6 @@
    "getCookieConsentRuntime",
    "listPublishedTrackingTechnologies",
    "recordCookieScan"
-  ],
-  "marketing.processing_purpose": [
-   "listDataProcessingPurpose",
-   "setDataProcessingPurpose"
-  ],
-  "marketing.cookie_banner_design": [
-   "listCookieBannerPreference",
-   "setCookieBannerDesign",
-   "approvePrivacyTesting",
-   "recordDeviceConsent",
-   "getCookieConsentRuntime"
-  ],
-  "marketing.minor_privacy_rule": [
-   "setMinorGuardianAge"
   ],
   "marketing.privacy_change_set": [
    "approvePrivacyTesting",
@@ -40483,12 +40586,15 @@
    "ADM-082",
    "ADM-088",
    "ADM-089",
+   "ADM-095",
+   "ADM-096",
    "ADM-098",
    "ADM-099",
    "ADM-106",
    "ADM-108",
    "ADM-110",
    "ADM-113",
+   "ADM-114",
    "ADM-116",
    "ADM-258",
    "ADM-263",
@@ -40679,6 +40785,8 @@
    "ADM-082",
    "ADM-088",
    "ADM-089",
+   "ADM-095",
+   "ADM-096",
    "ADM-098",
    "ADM-099",
    "ADM-102",
@@ -40686,6 +40794,7 @@
    "ADM-108",
    "ADM-111",
    "ADM-113",
+   "ADM-114",
    "ADM-116",
    "ADM-118",
    "ADM-119",
@@ -40705,6 +40814,7 @@
    "ADM-137",
    "ADM-258",
    "ADM-260",
+   "ADM-262",
    "ADM-263",
    "ADM-264",
    "ADM-265",
@@ -41000,6 +41110,7 @@
    "ADM-067",
    "ADM-076",
    "ADM-079",
+   "ADM-102",
    "ADM-134",
    "PTR-006",
    "PTR-010"
@@ -41060,6 +41171,7 @@
   "marketing.cookie_banner_design": [
    "WEB-001",
    "GST-001",
+   "CMS-021",
    "CMS-026",
    "CMS-030"
   ],
@@ -41278,11 +41390,6 @@
    "ADM-079",
    "ADM-084",
    "ADM-086",
-   "ADM-095",
-   "ADM-096",
-   "ADM-106",
-   "ADM-113",
-   "ADM-114",
    "ADM-115",
    "ADM-132",
    "ADM-141",
@@ -41668,7 +41775,8 @@
    "CMS-014",
    "CMS-015",
    "CMS-102",
-   "CMS-103"
+   "CMS-103",
+   "CMS-105"
   ],
   "whitelabel.navigation_config": [
    "WEB-001",
@@ -41782,7 +41890,6 @@
    "CMS-005",
    "CMS-006",
    "CMS-007",
-   "CMS-008",
    "CMS-009",
    "CMS-011",
    "CMS-012",
@@ -41878,10 +41985,13 @@
    "BO-1187",
    "ADM-066",
    "ADM-082",
+   "ADM-095",
+   "ADM-096",
    "ADM-099",
    "ADM-104",
    "ADM-108",
    "ADM-109",
+   "ADM-114",
    "ADM-116",
    "ADM-258",
    "ADM-262",
@@ -42293,6 +42403,7 @@
    "ADM-086",
    "ADM-087",
    "ADM-089",
+   "ADM-102",
    "ADM-126",
    "ADM-132",
    "ADM-133",
@@ -42964,8 +43075,10 @@
    "BO-959",
    "BO-960",
    "BO-961",
+   "BO-962",
    "BO-969",
    "BO-970",
+   "BO-974",
    "BO-975",
    "BO-982",
    "BO-983",
@@ -43384,6 +43497,7 @@
    "ADM-089",
    "ADM-094",
    "ADM-098",
+   "ADM-102",
    "ADM-105",
    "ADM-106",
    "ADM-108",
@@ -43425,6 +43539,7 @@
    "ADM-057",
    "ADM-076",
    "ADM-082",
+   "ADM-102",
    "ADM-261",
    "ADM-267"
   ],
@@ -44132,7 +44247,6 @@
    "BO-333",
    "BO-334",
    "BO-358",
-   "BO-591",
    "BO-737",
    "BO-738",
    "BO-739",
@@ -44143,21 +44257,14 @@
    "BO-810",
    "BO-823",
    "BO-832",
-   "BO-946",
    "BO-1029",
-   "BO-1046",
-   "BO-1047",
-   "BO-1058",
    "BO-1147",
    "ADM-082",
    "ADM-086",
    "ADM-087",
    "ADM-099",
-   "ADM-104",
-   "ADM-105",
    "ADM-109",
    "ADM-112",
-   "ADM-116",
    "ADM-130",
    "ADM-133",
    "ADM-135",
@@ -44331,6 +44438,7 @@
    "GST-071",
    "BO-747",
    "CMS-018",
+   "CMS-021",
    "CMS-023"
   ],
   "marketing.guest_preference": [
@@ -45688,6 +45796,7 @@
    "EMP-021",
    "EMP-022",
    "EMP-023",
+   "BO-033",
    "BO-045",
    "BO-055",
    "BO-084",
@@ -45736,6 +45845,8 @@
    "BO-1080",
    "BO-1172",
    "BO-1181",
+   "ADM-106",
+   "ADM-113",
    "ADM-130",
    "ADM-145",
    "ADM-224",
@@ -49238,7 +49349,6 @@
    "BO-157",
    "BO-163",
    "BO-164",
-   "BO-168",
    "BO-173",
    "BO-180",
    "BO-181",
@@ -49564,6 +49674,7 @@
    "BO-378",
    "BO-940",
    "ADM-145",
+   "CMS-021",
    "CMS-028",
    "CMS-030"
   ],
@@ -49969,10 +50080,8 @@
    "ADM-101",
    "ADM-102",
    "ADM-103",
-   "ADM-106",
    "ADM-107",
    "ADM-111",
-   "ADM-113",
    "ADM-114",
    "ADM-115",
    "ADM-117",
@@ -52313,6 +52422,7 @@
    "BO-971",
    "BO-972",
    "BO-973",
+   "BO-974",
    "BO-975",
    "BO-976",
    "BO-977",
@@ -52350,6 +52460,7 @@
    "BO-964",
    "BO-970",
    "BO-972",
+   "BO-974",
    "BO-975",
    "BO-976",
    "BO-977",
@@ -52794,7 +52905,9 @@
   ],
   "catalogue.membership_programme": [
    "BO-285",
+   "BO-1049",
    "ADM-060",
+   "ADM-076",
    "ADM-082",
    "ADM-111"
   ],
@@ -52814,17 +52927,22 @@
    "BO-291",
    "BO-601",
    "ADM-082",
+   "ADM-115",
    "ADM-118",
    "ADM-124",
    "ADM-133",
    "ADM-135",
    "ADM-258",
    "ADM-260",
+   "ADM-263",
    "ADM-267"
   ],
   "catalogue.sales_channel": [
    "BO-291",
    "BO-601",
+   "ADM-095",
+   "ADM-096",
+   "ADM-114",
    "ADM-124",
    "ADM-258",
    "ADM-259",
@@ -53570,12 +53688,15 @@
   "catalogue.demand_forecast": [
    "BO-591",
    "BO-946",
+   "BO-1043",
    "BO-1046",
    "BO-1047",
+   "BO-1050",
    "BO-1058",
    "ADM-098",
    "ADM-104",
    "ADM-105",
+   "ADM-108",
    "ADM-109",
    "ADM-117"
   ],
@@ -54510,6 +54631,7 @@
   ],
   "seating.seat_map_template": [
    "BO-953",
+   "BO-954",
    "BO-962",
    "BO-964",
    "BO-974"
@@ -54517,7 +54639,18 @@
   "seating.section_row": [
    "BO-954",
    "BO-955",
+   "BO-957",
+   "BO-958",
+   "BO-959",
+   "BO-960",
+   "BO-961",
+   "BO-962",
    "BO-964",
+   "BO-972",
+   "BO-974",
+   "BO-975",
+   "BO-976",
+   "BO-982",
    "BO-983",
    "BO-984",
    "BO-988",
@@ -54525,7 +54658,8 @@
    "BO-997",
    "BO-1026",
    "BO-1027",
-   "BO-1059"
+   "BO-1059",
+   "BO-1070"
   ],
   "seating.zone": [
    "BO-955",
@@ -54623,7 +54757,12 @@
   ],
   "catalogue.price_execution": [
    "BO-1043",
+   "BO-1044",
+   "BO-1049",
    "BO-1050",
+   "ADM-076",
+   "ADM-088",
+   "ADM-089",
    "ADM-108",
    "ADM-115",
    "ADM-116"
@@ -54661,10 +54800,12 @@
   "catalogue.pricing_simulation": [
    "BO-1043",
    "BO-1050",
+   "ADM-106",
    "ADM-108",
    "ADM-109",
    "ADM-110",
-   "ADM-112"
+   "ADM-112",
+   "ADM-113"
   ],
   "catalogue.dynamic_pricing_strategy": [
    "BO-1044",
@@ -54677,6 +54818,15 @@
    "ADM-095",
    "ADM-096",
    "ADM-114",
+   "ADM-115",
+   "ADM-116"
+  ],
+  "catalogue.price_ladder": [
+   "BO-1044",
+   "ADM-088",
+   "ADM-089",
+   "ADM-094",
+   "ADM-109",
    "ADM-115"
   ],
   "catalogue.calculation_profile": [
@@ -55040,12 +55190,17 @@
   "catalogue.price_category": [
    "ADM-048",
    "ADM-050",
-   "ADM-057"
+   "ADM-057",
+   "ADM-106",
+   "ADM-113"
   ],
   "catalogue.pricing_market": [
    "ADM-048",
    "ADM-054",
-   "ADM-057"
+   "ADM-057",
+   "ADM-095",
+   "ADM-096",
+   "ADM-114"
   ],
   "catalogue.configuration_template": [
    "ADM-056",
@@ -55060,13 +55215,6 @@
    "ADM-133",
    "ADM-134"
   ],
-  "catalogue.price_ladder": [
-   "ADM-088",
-   "ADM-089",
-   "ADM-094",
-   "ADM-109",
-   "ADM-115"
-  ],
   "catalogue.demand_signal": [
    "ADM-092",
    "ADM-098",
@@ -55079,6 +55227,9 @@
    "ADM-098",
    "ADM-107",
    "ADM-117"
+  ],
+  "catalogue.competitor_price_observation": [
+   "ADM-102"
   ],
   "catalogue.lifecycle_action": [
    "ADM-118",
@@ -56437,7 +56588,12 @@
    "CMS-027",
    "CMS-033"
   ],
+  "marketing.minor_privacy_rule": [
+   "CMS-021",
+   "CMS-029"
+  ],
   "marketing.processing_purpose": [
+   "CMS-021",
    "CMS-022"
   ],
   "marketing.cookie_scan_finding": [
@@ -56451,9 +56607,6 @@
   ],
   "marketing.tracking_technology_catalogue": [
    "CMS-025"
-  ],
-  "marketing.minor_privacy_rule": [
-   "CMS-029"
   ],
   "marketing.privacy_change_set": [
    "CMS-030"

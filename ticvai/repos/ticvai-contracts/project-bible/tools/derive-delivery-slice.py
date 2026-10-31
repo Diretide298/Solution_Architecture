@@ -119,6 +119,10 @@ ALSO_FOR = {"listAuditRecords": "PLATFORM-AUDIT",
 LATER_BLOCK_OPERATIONS = {
     "updateEntitlementTemplate": "edits a template on BO-1192, Block B (CHG-R6-040)",
     "archiveEntitlementTemplate": "retires a template on BO-1192, Block B (CHG-R6-040)",
+    # ADAM CR-403 (31 October 2026): createSeatMap copies a template's structure only when it is given a templateId, so
+    # its read of seating.seat_map_template needs no template made first; the slice keeps templates where r11 had
+    # them (BO-962, wave 3) instead of pulling BO-962 into Block A behind BO-953 (CHG-R12INT-004)
+    "createSeatMapTemplate": "makes an optional template on BO-962, wave 3: createSeatMap needs none (ADAM CR-403; CHG-R12INT-004)",
 }
 LATER_BLOCK_SCREENS = {
     "BO-1191": "Organisation, Block B (CHG-R6-040)",

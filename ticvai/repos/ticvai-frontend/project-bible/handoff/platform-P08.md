@@ -163,7 +163,7 @@
 | `ADM-090` | Demand, Occupancy & Availability Rule Builder | Commercial | 3 | 2 | yes |
 | `ADM-091` | Booking Velocity & Time-to-Event Rule Builder | Commercial | 3 | 2 | yes |
 | `ADM-092` | Seasonal, Calendar, Day & Timeslot Dynamic Rules | Commercial | 3 | 2 | yes |
-| `ADM-093` | Channel, Customer Segment & Location Dynamic Rules | Commercial | 3 | 1 | yes |
+| `ADM-093` | Channel, Customer Segment & Location Dynamic Rules | Commercial | 3 | 2 | yes |
 | `ADM-094` | Dynamic Price Bands, Ladders & Adjustment Matrix | Commercial | 3 | 2 | yes |
 | `ADM-095` | Dynamic Pricing Guardrails & Commercial Protection | Commercial | 3 | 2 | yes |
 | `ADM-096` | Dynamic Pricing Automation Policy & Control | Commercial | 3 | 2 | yes |

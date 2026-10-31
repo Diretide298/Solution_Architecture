@@ -1064,7 +1064,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Action `action` | text field | required | — | — | — | What the step-up is for. Recorded in the audit trail. | `createMfaChallenge` body |
+| Action `action` | text field | required | — | For a step-up it is the `operationId` of the operation that demands it (for example `resetPrincipalCredential`; ADAM CR-375, CHG-CR375-001), and the step-up counts only for that operation. | — | What the step-up is for. Recorded in the audit trail. | `createMfaChallenge` body |
 | Method `methodId` | picker: choose a method | optional | — | — | shows names, sends the id | — | `createMfaChallenge` body |
 | Venue `venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | For a guest, the venue whose `VenueSettings.identity.guestTwoStep` applies (sign-in venue, or the venue of the booking being acted on). | `createMfaChallenge` body |
 

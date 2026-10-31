@@ -339,12 +339,14 @@
  "KioskAssignment": {
   "x-ticvai-persistence": "whitelabel.kiosk_assignment",
   "type": "object",
-  "description": "**Which kiosk group a kiosk is in** (`assignKiosk`; decided 5 October 2026 by Chinmay, CHG-R4-001). One row per assigned kiosk; a kiosk with no row takes the venue's default configuration.",
+  "description": "**Which kiosk group a kiosk is in** (`assignKiosk`; decided 5 October 2026 by Chinmay, CHG-R4-001). One row per assigned kiosk; a kiosk with no row takes the venue's default configuration. `listKioskAssignments` answers one item per kiosk of the venue (ADAM CR-383, Chinmay, 31 October 2026; CHG-CR383-001): its row when it has one, otherwise `workstationId` and `venueId` with `id`, `kioskConfigId`, `assignedAt` and `assignedByPrincipalId` null (it is on the default). Nothing writes a row from enrolment or `configureWorkstation`; only `assignKiosk` does.",
   "properties": {
    "id": {
     "type": "string",
     "format": "uuid",
-    "readOnly": true
+    "readOnly": true,
+    "nullable": true,
+    "description": "The assignment row's id; null on a `listKioskAssignments` item for a kiosk with no row (ADAM CR-383)."
    },
    "workstationId": {
     "type": "string",
@@ -367,12 +369,16 @@
    "assignedAt": {
     "type": "string",
     "format": "date-time",
-    "readOnly": true
+    "readOnly": true,
+    "nullable": true,
+    "description": "Null on a `listKioskAssignments` item for a kiosk with no row (ADAM CR-383)."
    },
    "assignedByPrincipalId": {
     "type": "string",
     "format": "uuid",
-    "readOnly": true
+    "readOnly": true,
+    "nullable": true,
+    "description": "Null on a `listKioskAssignments` item for a kiosk with no row (ADAM CR-383)."
    },
    "scopePath": {
     "type": "string",
@@ -582,7 +588,7 @@
    "name": {
     "type": "string",
     "maxLength": 80,
-    "description": "Staff-facing, e.g. \"North gate kiosks\". Unique in the venue. Not shown to guests."
+    "description": "Staff-facing, e.g. \"North gate kiosks\". Unique in the venue among the configurations whose `deletedAt` is null (a deleted configuration's name is free again; ADAM CR-382). Not shown to guests."
    },
    "isDefault": {
     "type": "boolean",
@@ -607,7 +613,7 @@
    "attractSlides": {
     "type": "array",
     "maxItems": 40,
-    "description": "The attract loop's slides, in `sortOrder` (child rows, `whitelabel.kiosk_config_attract_slide`). Given on a write, it replaces the whole list.",
+    "description": "The attract loop's slides, in `sortOrder` (child rows, `whitelabel.kiosk_config_attract_slide`). Given on a write (`createKioskConfig`, or `updateKioskConfig` as a part of its own, ADAM CR-381), it replaces the whole list.",
     "items": {
      "$ref": "#/components/schemas/KioskAttractSlide"
     }
@@ -666,7 +672,7 @@
     "type": "integer",
     "readOnly": true,
     "x-ticvai-derived": "onRead",
-    "description": "How many kiosks `assignKiosk` put in this group; for the default, the venue's kiosks in no group."
+    "description": "How many of the venue's kiosks are in this group (ADAM CR-383, Chinmay, 31 October 2026; CHG-CR383-001). The venue's kiosks are its active workstations with `channel` `kiosk` (`tenancy#workstationRecords` where `{venueId, channel: kiosk, isActive: true}`, in process). A group's count is its `whitelabel.kiosk_assignment` rows whose workstation is one of those kiosks; the default's is the venue's kiosks with no assignment row, or with a row naming null or the default. An assignment row for a workstation that is no longer a kiosk is not counted."
    },
    "publishedVersion": {
     "type": "integer",
@@ -679,7 +685,14 @@
     "type": "boolean",
     "readOnly": true,
     "x-ticvai-derived": "onWrite",
-    "description": "True after any write to the draft since the last publish or restore; false once published."
+    "description": "True after any write to the draft, and after a restore of a version other than the current one, until published; false once published, and after a restore of the current version (ADAM CR-386, CHG-CR386-001: `restoreKioskConfigVersion`)."
+   },
+   "deletedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**When `deleteKioskConfig` removed the configuration; null while it exists** (ADAM CR-382, Chinmay, 31 October 2026; CHG-CR382-001; `whitelabel.kiosk_config.deleted_at`). A removal sets it and removes nothing: the slides, tiles and versions stay. A deleted configuration is left out of `listKioskConfigs` and answers 404 to the operations that name it, except `listKioskConfigVersions`, which still answers its versions, and `assignKiosk`, which answers 409 `kiosk-config-deleted`."
    },
    "scopePath": {
     "type": "string",

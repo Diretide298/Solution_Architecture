@@ -163,7 +163,7 @@
  "BookingFlow": {
   "x-ticvai-persistence": "whitelabel.booking_flow",
   "type": "object",
-  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies.\n",
+  "description": "**A venue's booking flow (decided 29 September, W12: operators pick their flows, see which steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft and reaches guests with `publishTenantConfig`, which copies the venue's flows into the version's snapshot. A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue's default for the type serving its kind applies, chosen by `getPublishedBookingFlow`'s kind rule where several do (ADAM CR-427).\n",
   "required": [
    "flowTypeKey",
    "name"
@@ -279,7 +279,7 @@
     "maxItems": 10,
     "uniqueItems": true,
     "default": [],
-    "description": "**The flow's own consent questions (rev 3 REV3-26).** Asked on every booking through this flow, together with those of each product in the cart, each question once. Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400. A Help me choose answer may pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.\n",
+    "description": "**The flow's own consent questions (rev 3 REV3-26).** Asked on every booking through this flow, together with those of each product in the cart, each question once. Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400 `consent-question-not-active`, naming the ids: `createBookingFlowDefinition` and `updateBookingFlowDefinition` read them with `marketing-crm#consentQuestionRecords` in process (ADAM CR-429). A Help me choose answer may pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.\n",
     "items": {
      "type": "string",
      "format": "uuid"
@@ -2282,7 +2282,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
+    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`, as white-label `getPublishedBookingFlow`'s kind rule picks it where several of the venue's enabled defaults list the kind (ADAM CR-427, 31 October 2026). A venue that wants a different flow for a product sets this or the category's `bookingFlowId`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
     "x-ticvai-persistence-column": "jsonb",
@@ -2475,7 +2475,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "**The booking flow for every product filed here** that names none of its own (decided 29 September, W12, BO-115). Null means the venue's flow for each product's `kind`. A white-label `BookingFlow` of the venue; `setProductCategories` refuses any other id with `422`.\n"
+    "description": "**The booking flow for every product filed here** that names none of its own (decided 29 September, W12, BO-115). Null means the venue's flow for each product's `kind`, as white-label `getPublishedBookingFlow`'s kind rule picks it (ADAM CR-427). A white-label `BookingFlow` of the venue; `setProductCategories` refuses any other id with `422`.\n"
    },
    "isActive": {
     "type": "boolean",
@@ -3377,7 +3377,8 @@
    "saleBoard",
    "currency",
    "currencyScale",
-   "timeZone"
+   "timeZone",
+   "channel"
   ],
   "properties": {
    "id": {
@@ -3391,6 +3392,15 @@
    "name": {
     "type": "string",
     "maxLength": 200
+   },
+   "channel": {
+    "type": "string",
+    "enum": [
+     "pos",
+     "kiosk"
+    ],
+    "default": "pos",
+    "description": "**Who operates this workstation** (ADAM CR-384, Chinmay, 31 October 2026; CHG-CR384-001; the values are catalogue's `Channel`, so the workstation and a sale from it use the same word). `kiosk` is a self-service kiosk a guest operates; `pos` is a staffed till, including a staffed stand in an outlet of kind `kiosk`. Stored as `platform.workstation.channel` (not null, default `pos`), set by `configureWorkstation`, which keeps the stored value when the field is left out. White Label's kiosk operations ask it through `workstationRecords` (XDR-027): a venue's kiosks are its active workstations with channel `kiosk`.\n"
    },
    "venueId": {
     "type": "string",

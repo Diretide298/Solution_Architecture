@@ -1438,7 +1438,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Action `action` | text field | required | — | — | — | What the step-up is for. Recorded in the audit trail. | `createMfaChallenge` body |
+| Action `action` | text field | required | — | For a step-up it is the `operationId` of the operation that demands it (for example `resetPrincipalCredential`; ADAM CR-375, CHG-CR375-001), and the step-up counts only for that operation. | — | What the step-up is for. Recorded in the audit trail. | `createMfaChallenge` body |
 | Method `methodId` | picker: choose a method | optional | — | — | shows names, sends the id | — | `createMfaChallenge` body |
 | Venue `venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | For a guest, the venue whose `VenueSettings.identity.guestTwoStep` applies (sign-in venue, or the venue of the booking being acted on). | `createMfaChallenge` body |
 
@@ -1452,7 +1452,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Approve (primary button) | `approvePartnerStatuLifecycle` PUT `/partner-statu-lifecycle` | PartnerApprovalStatusLifecycleManagementInput | PartnerApprovalStatusLifecycleManagementView | — | step-up: mfa (Makes a partner able to trade, or stops them.); gated `Approve` |
+| Approve (primary button) | `approvePartnerStatuLifecycle` PUT `/partner-statu-lifecycle` | PartnerApprovalStatusLifecycleManagementInput | PartnerApprovalStatusLifecycleManagementView | 403 A step-up refusal: the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 … | step-up: mfa (Makes a partner able to trade, or stops them.); gated `Approve` |
 | Email me a code instead (secondary button) | `createMfaChallenge` POST `/auth/mfa/challenge` | inline | inline | 403 A guest caller while no venue of the tenant has guest two-step verification on (rev 3 GAP-B1, per venue).; 409 A guest who signed in with an email code asks for `emailOtp` as the second factor, because the same … | — |
 
 **What each action does** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)

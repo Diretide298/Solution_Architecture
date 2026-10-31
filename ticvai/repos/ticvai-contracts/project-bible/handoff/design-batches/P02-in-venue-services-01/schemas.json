@@ -2712,7 +2712,7 @@
    "id": {
     "type": "string",
     "format": "uuid",
-    "description": "**Server-assigned, and the upsert key of `setParkingFacility`.** Absent in a body, it creates; present, it names the facility being replaced. A client never mints one.\n"
+    "description": "**The record's id, and the path id of `setParkingFacility`** (ADAM CR-245; CR-398): a new facility takes the path id, a client UUIDv7. A body `id`, when sent, must equal the path id.\n"
    },
    "name": {
     "type": "string"
@@ -3295,7 +3295,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
+    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`, as white-label `getPublishedBookingFlow`'s kind rule picks it where several of the venue's enabled defaults list the kind (ADAM CR-427, 31 October 2026). A venue that wants a different flow for a product sets this or the category's `bookingFlowId`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
     "x-ticvai-persistence-column": "jsonb",

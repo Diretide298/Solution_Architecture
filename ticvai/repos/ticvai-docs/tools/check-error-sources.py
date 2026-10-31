@@ -133,7 +133,11 @@ NOT_ENTITY = re.compile(r"\b(?:in order (?:to|for)|sort order|display order|orde
                         r"tile order|in one order|out-of-order|converted (?:to|for) (?:an|another) order|"
                         r"layout variants?|product kinds?|card or wallet|card payments?|wallet pass(?:es)?|"
                         r"(?:apple|google) wallet|wallet auto-reload|times a shift|needs-promotion|"
-                        r"on a registered workstation|taking payment)\b|`order`|`cart` hold", re.I)
+                        r"on a registered workstation|taking payment)\b|`order`|`cart` hold"
+                        # a backticked module key or product kind, a code and not the record (ADAM CR-385, r12
+                        # integration, CHG-R12INT-004): the kiosk publish checks list White Label's modules
+                        # (`membership` `membership`, `walletTopUp` `wallet`) and catalogue's product kinds
+                        r"|`membership`|`wallet`", re.I)
 
 
 # **Refusals the r6 batches fix, which may never be baselined** (E-SCHEMA-READ-VIA): the operation and its status.

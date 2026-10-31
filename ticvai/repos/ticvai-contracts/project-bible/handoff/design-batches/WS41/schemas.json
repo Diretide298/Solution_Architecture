@@ -1809,8 +1809,8 @@
  },
  "PrivacyConsentConfigurationCommandCenterView": {
   "type": "object",
-  "x-ticvai-persistence": "none — projection over marketing.consent_purpose, marketing.consent_capture_point (new), marketing.communication_preference_type (new), the cookie categories and white-label's whitelabel.policy (read through listPolicies)",
-  "description": "The privacy command centre's figures for the filters given, and the latest configuration changes. Counts are of items currently in force unless the name says otherwise.",
+  "x-ticvai-persistence": "none — projection over marketing.consent_purpose, marketing.consent_purpose_channel, marketing.consent_capture_point, marketing.communication_preference_type, marketing.tracking_technology, marketing.cookie_banner_design, marketing.minor_privacy_rule, marketing.privacy_notice_governance, marketing.processing_purpose and white-label's whitelabel.policy (read through white-label#policyRecords in process; ADAM CR-378)",
+  "description": "The privacy command centre's figures for the filters given, and the latest configuration changes. Counts are of items currently in force unless the name says otherwise. **Each figure's source and rule is stated on `listPrivacyConsent`** (ADAM CR-378, Chinmay, 31 October 2026; CHG-CR378-001).",
   "required": [
    "activeConsentPurposes",
    "activePrivacyPolicies",
@@ -1821,46 +1821,53 @@
   "properties": {
    "activeConsentPurposes": {
     "type": "integer",
-    "minimum": 0
+    "minimum": 0,
+    "description": "`marketing.consent_purpose` rows (ADAM CR-378)."
    },
    "activePrivacyPolicies": {
     "type": "integer",
-    "minimum": 0
+    "minimum": 0,
+    "description": "In-force policies of kind `privacy` or `cookie`, as `listPrivacyConsent` defines in force (ADAM CR-378)."
    },
    "communicationPreferenceTypes": {
     "type": "integer",
-    "minimum": 0
+    "minimum": 0,
+    "description": "Preference types with status `active` (ADAM CR-378)."
    },
    "cookieCategories": {
     "type": "integer",
-    "minimum": 0
+    "minimum": 0,
+    "description": "Distinct `category` of `marketing.tracking_technology` rows with status `approved` (ADAM CR-378)."
    },
    "activeConsentCapturePoints": {
     "type": "integer",
-    "minimum": 0
+    "minimum": 0,
+    "description": "Capture points with status `active` and `publicationStatus` `published` (ADAM CR-378)."
    },
    "supportedLanguages": {
     "type": "integer",
-    "minimum": 0
+    "minimum": 0,
+    "description": "Distinct languages over the capture points `activeConsentCapturePoints` counts (ADAM CR-378)."
    },
    "pendingPolicyApprovals": {
     "type": "integer",
-    "minimum": 0
+    "minimum": 0,
+    "description": "`marketing.privacy_notice_governance` rows with status `review` (ADAM CR-378)."
    },
    "scheduledPolicyChanges": {
     "type": "integer",
     "minimum": 0,
-    "description": "Published items with an `effectiveFrom` still in the future."
+    "description": "Published `privacy` or `cookie` policies whose `effectiveFrom` is after today (ADAM CR-378)."
    },
    "consentConfigurationsRequiringReview": {
     "type": "integer",
     "minimum": 0,
-    "description": "Items in `review`, or whose reconfirmation interval has passed."
+    "description": "Capture points with `publicationStatus` `review`, plus consent purposes whose `noticeVersion` is not the in-force privacy policy's version (ADAM CR-378)."
    },
    "configurationWarnings": {
     "type": "array",
     "maxItems": 100,
-    "description": "Configuration checks that failed, most severe first.",
+    "description": "Configuration checks that failed, most severe first, then by `configurationId`, at most 100; each code's rule is stated on `listPrivacyConsent`, and `other` is not raised (ADAM CR-378).",
     "items": {
      "type": "object",
      "required": [
@@ -1897,7 +1904,7 @@
    "configurationDirectory": {
     "type": "array",
     "maxItems": 50,
-    "description": "The 50 most recently changed configuration items, newest `effectiveFrom` first.",
+    "description": "The 50 most recently changed configuration items, most recently changed first (by `effectiveFrom` on policies, else `updatedAt`); each type's source and status map is stated on `listPrivacyConsent` (ADAM CR-378).",
     "items": {
      "type": "object",
      "required": [

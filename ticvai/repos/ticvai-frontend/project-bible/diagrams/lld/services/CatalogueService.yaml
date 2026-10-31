@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 470 operations, 143 tables
+title: CatalogueService — 470 operations, 144 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
@@ -23,7 +23,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: catalogue
-  tables: 87
+  tables: 88
   stores:
   - postgres
   largestTable: catalogue.channel_sales_rule
@@ -133,7 +133,7 @@ operationsByContract:
     permission: PRICE_CONFIGURE
     offline: false
     reads: 2
-    writes: 4
+    writes: 3
   - operation: checkBookingEligibility
     verb: POST
     path: /eligibility-checks
@@ -236,8 +236,8 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 8
-    writes: 6
+    reads: 9
+    writes: 5
   - operation: createPerformances
     verb: POST
     path: /events/{eventId}/performances
@@ -285,7 +285,7 @@ operationsByContract:
     permission: AI_APPROVE
     offline: false
     reads: 4
-    writes: 5
+    writes: 4
   - operation: enterWaitingRoom
     verb: POST
     path: /performances/{performanceId}/waiting-room/entries
@@ -572,7 +572,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 3
     writes: 0
   - operation: listBulkPricingUpdate
     verb: GET
@@ -668,7 +668,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 3
+    reads: 1
     writes: 0
   - operation: listChannelExceptionIncident
     verb: GET
@@ -716,7 +716,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 5
+    reads: 6
     writes: 0
   - operation: listCommercialPricing
     verb: GET
@@ -740,7 +740,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 2
+    reads: 7
     writes: 0
   - operation: listCurrencyPrecisionRounding
     verb: GET
@@ -772,7 +772,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 4
+    reads: 3
     writes: 0
   - operation: listDonationCampaigns
     verb: GET
@@ -804,7 +804,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 3
     writes: 0
   - operation: listDynamicPricingGuardrail
     verb: GET
@@ -828,7 +828,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 6
+    reads: 8
     writes: 0
   - operation: listEffectiveDateSeason
     verb: GET
@@ -916,7 +916,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 6
+    reads: 7
     writes: 0
   - operation: listInventoryHolds
     verb: GET
@@ -1044,7 +1044,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 3
+    reads: 2
     writes: 0
   - operation: listPriceListTemplate
     verb: GET
@@ -1116,7 +1116,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 5
+    reads: 7
     writes: 0
   - operation: listPricingRollbackEmergency
     verb: GET
@@ -1292,7 +1292,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 5
+    reads: 7
     writes: 0
   - operation: listResidencyNationalityMarket
     verb: GET
@@ -1308,7 +1308,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 11
+    reads: 12
     writes: 0
   - operation: listRevenueDemandImpact
     verb: GET
@@ -1692,8 +1692,8 @@ operationsByContract:
     scope: venue
     permission: PRICE_CONFIGURE
     offline: false
-    reads: 3
-    writes: 5
+    reads: 8
+    writes: 4
   - operation: setDynamicPricingStrategy
     verb: PUT
     path: /dynamic-pricing-strategy-2
@@ -2076,7 +2076,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 18
+    reads: 20
     writes: 1
   - operation: submitPricingChangeRequest
     verb: POST
@@ -3403,7 +3403,7 @@ operationsByContract:
     permission: CAPACITY_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: copySeatMapSection
     verb: POST
     path: /seat-maps/{seatMapId}/sections/copy
@@ -3458,15 +3458,15 @@ operationsByContract:
     scope: venue
     permission: CAPACITY_CONFIGURE
     offline: false
-    reads: 3
-    writes: 4
+    reads: 4
+    writes: 5
   - operation: createSeatMapTemplate
     verb: POST
     path: /seat-map-templates
     scope: region
     permission: CAPACITY_CONFIGURE
     offline: false
-    reads: 2
+    reads: 6
     writes: 2
   - operation: diffSeatMapVersions
     verb: GET
@@ -3538,7 +3538,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 2
+    reads: 3
     writes: 0
   - operation: getSeatMapImport
     verb: GET
@@ -4364,7 +4364,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.channel_envelope
-  columns: 19
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
@@ -4391,6 +4391,12 @@ tables:
   writtenBy:
   - catalogue
   foreignWriters: null
+- table: catalogue.competitor_price_observation
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: catalogue.configuration_template
   columns: 17
   store: postgres
@@ -4399,7 +4405,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.demand_forecast
-  columns: 27
+  columns: 32
   store: postgres
   parent: null
   writtenBy: []
@@ -4419,7 +4425,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.dynamic_pricing_control
-  columns: 39
+  columns: 41
   store: postgres
   parent: null
   writtenBy:
@@ -4611,7 +4617,6 @@ tables:
   store: postgres
   parent: null
   writtenBy:
-  - catalogue
   - inventory
   foreignWriters:
   - inventory
@@ -4913,7 +4918,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: pricing.dynamic_price_rule
-  columns: 21
+  columns: 28
   store: postgres
   parent: null
   writtenBy:
@@ -5226,9 +5231,9 @@ tables:
   - seating
   foreignWriters: null
 - table: seating.seat_map_template
-  columns: 8
+  columns: 13
   store: postgres
-  parent: null
+  parent: seating.seat_map
   writtenBy:
   - seating
   foreignWriters: null
@@ -5270,9 +5275,9 @@ tables:
   - seating
   foreignWriters: null
 - table: seating.section
-  columns: 8
+  columns: 9
   store: postgres
-  parent: null
+  parent: seating.seat_map
   writtenBy:
   - seating
   foreignWriters: null
@@ -5292,7 +5297,7 @@ tables:
   foreignWriters: null
 readsFrom:
 - service: OrderService
-  operations: 53
+  operations: 50
 - service: AccessService
   operations: 10
 - service: MarketingService
@@ -5309,7 +5314,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 29
+  operations: 27
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -5317,9 +5322,6 @@ writesOutside:
     against ADR-0028.'
   writes:
   - operation: cancelPerformance
-    tables:
-    - platform.outbox
-  - operation: cancelPricingRollback
     tables:
     - platform.outbox
   - operation: concludeRecommendationExperiment
@@ -5345,7 +5347,7 @@ writesOutside:
     - platform.outbox
   - operation: decidePricingRecommendation
     tables:
-    - platform.outbox
+    - approvals.request
   - operation: endPromotion
     tables:
     - platform.outbox
@@ -5377,9 +5379,6 @@ writesOutside:
     tables:
     - platform.outbox
   - operation: retryChannelIncident
-    tables:
-    - platform.outbox
-  - operation: setDynamicPricingGuardrailPolicy
     tables:
     - platform.outbox
   - operation: setEventLifecycleState

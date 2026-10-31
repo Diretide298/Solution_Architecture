@@ -99,7 +99,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-194` | Device & Gate Command Center | C | 0 | 294 | 6 | 0 | 6 | 0 | — | notStarted (generated) |
 | `BO-195` | Device Type & Hardware Library | C | 13 | 0 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-196` | Physical Device Registration & Provisioning | C | 70 | 0 | 5 | 45 | 5 | 0 | — | notStarted (generated) |
+| `BO-196` | Physical Device Registration & Provisioning | C | 78 | 0 | 5 | 45 | 5 | 0 | — | notStarted (generated) |
 | `BO-197` | Turnstile & Lane Behavior Configuration | C | 14 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-198` | Validation Outcome & Guest Feedback Designer | C | 11 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-199` | Reader, Scanner & Peripheral Configuration | C | 1 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |

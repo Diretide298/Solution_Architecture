@@ -2135,10 +2135,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/JournalEntry'
         '403':
-          description: Approver is the poster, or lacks LEDGER_APPROVE
+          description: 'Approver is the poster, or lacks LEDGER_APPROVE; or the caller''s session has no verified,
+            unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5
+            minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375;
+            CHG-CR375-001). Nothing is written.'
           x-ticvai-problem-types:
           - approver-is-preparer
           - forbidden
+          - step-up-token-missing
+          - step-up-token-expired
           content:
             application/problem+json:
               schema:

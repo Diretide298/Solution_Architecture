@@ -1376,7 +1376,7 @@
   "identity": {
    "title": "19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth",
    "capabilityCount": 12,
-   "unguardedOperations": 40,
+   "unguardedOperations": 41,
    "capabilities": [
     {
      "key": "AUDIT_VIEW",
@@ -1872,7 +1872,7 @@
   "marketing-crm": {
    "title": "22 — Marketing & CRM",
    "capabilityCount": 16,
-   "unguardedOperations": 32,
+   "unguardedOperations": 33,
    "capabilities": [
     {
      "key": "AI_CONFIGURE",
@@ -4150,7 +4150,7 @@
       "broadcastToGuests",
       "publishAnnouncement"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {

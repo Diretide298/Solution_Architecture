@@ -78,6 +78,30 @@
     "nullable": true,
     "description": "Beacons only: activation distance in metres"
    },
+   "activationZone": {
+    "type": "object",
+    "nullable": true,
+    "description": "**Beacons only: the drawn activation zone** (ADAM CR-389, Chinmay, 31 October 2026), written by `setBleBeaconGeofence`: `{centre, radiusMeters}` for a circle or `{boundary}` for a polygon, points as lat,lng. Null when none is drawn. Not a gate's validation fence, which is `access.access_point.geofence` (`setAccessPointGeofence`).",
+    "properties": {
+     "centre": {
+      "type": "string",
+      "description": "lat,lng of a circle's centre"
+     },
+     "radiusMeters": {
+      "type": "integer",
+      "minimum": 5,
+      "maximum": 5000
+     },
+     "boundary": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+       "type": "string"
+      },
+      "description": "A polygon's points as lat,lng"
+     }
+    }
+   },
    "installationDate": {
     "type": "string",
     "format": "date",
@@ -173,9 +197,10 @@
    "whoCanActivate": {
     "type": "array",
     "items": {
-     "type": "string"
+     "type": "string",
+     "format": "uuid"
     },
-    "description": "Roles allowed to activate this mode"
+    "description": "The roles allowed to activate this mode, as role ids (`Role.id`; ADAM CR-396; CHG-CR396-001). `setTurnstileMode` asks `identity#principalHoldsRoleAtVenue` for each; empty or absent adds no check beyond `TURNSTILE_MODE_SET`."
    },
    "accessPointGroupId": {
     "type": "string",

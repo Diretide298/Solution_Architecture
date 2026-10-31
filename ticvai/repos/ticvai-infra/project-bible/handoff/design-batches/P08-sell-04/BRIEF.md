@@ -159,7 +159,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-123` | POS Profile Management | B | 9 | 12 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
 | `BO-124` | Layout & Journey Builder | B | 42 | 24 | 6 | 9 | 2 | 6 | — | notStarted (generated) |
 | `BO-125` | Product & Category Button Configuration | B | 21 | 6 | 6 | 14 | 3 | 0 | — | notStarted (generated) |
-| `BO-126` | Deployment, Preview & Audit | B | 25 | 49 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
+| `BO-126` | Deployment, Preview & Audit | B | 25 | 50 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
 | `BO-142` | Store Rules, Controls & Permissions | B–D | 10 | 5 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
 | `BO-143` | Retail Global Settings & Controls | C | 9 | 9 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 

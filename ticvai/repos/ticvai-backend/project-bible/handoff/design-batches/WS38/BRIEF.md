@@ -1,6 +1,6 @@
 # WS38 — Pricing   Revenue Management board 5
 
-**10 screens · 14 operations · 19 schemas · 4 permissions**
+**10 screens · 15 operations · 22 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -111,15 +111,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-090` | Demand, Occupancy & Availability Rule Builder | A | 0 | 20 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
 | `ADM-091` | Booking Velocity & Time-to-Event Rule Builder | A | 0 | 20 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 | `ADM-092` | Seasonal, Calendar, Day & Timeslot Dynamic Rules | B | 26 | 20 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-093` | Channel, Customer Segment & Location Dynamic Rules | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-093` | Channel, Customer Segment & Location Dynamic Rules | B | 56 | 0 | 6 | 10 | 0 | 6 | — | notStarted (generated) |
 | `ADM-094` | Dynamic Price Bands, Ladders & Adjustment Matrix | A | 27 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-095` | Dynamic Pricing Guardrails & Commercial Protection | A | 47 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
-| `ADM-096` | Dynamic Pricing Automation Policy & Control | B | 50 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
+| `ADM-095` | Dynamic Pricing Guardrails & Commercial Protection | A | 59 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
+| `ADM-096` | Dynamic Pricing Automation Policy & Control | B | 62 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `ADM-097` | Rule Priority, Conflict Resolution & Dynamic Pricing Test Console | B–D | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
-**ADM-090, ADM-093 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**ADM-090 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

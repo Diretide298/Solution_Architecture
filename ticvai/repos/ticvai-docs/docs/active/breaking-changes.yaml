@@ -1670,3 +1670,168 @@ changes:
     tag: r12
     producer-tickets: ['30784']
     consumer-tickets: ['31152', '31153', '31154']
+  - id: BC-500
+    contract: workforce
+    operation: broadcastToGuests
+    change: "new required request `venueId`"
+    reason: 'ADAM CR-379 (CHG-CR379-001): the body had no venue, so nothing said whose guests are told or where
+      ANNOUNCEMENT_PUBLISH and ANNOUNCEMENT_EMERGENCY are checked; the venue cannot be inferred from a staff session
+      that holds several venues. A new required field cannot be additive.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-379 posted on #37101: "The body gains a required venueId")'
+    tag: r12
+    producer-tickets: ['37101']
+    consumer-tickets: [none-linked]
+  - id: BC-501
+    contract: workforce
+    operation: broadcastToGuests
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-379 (CHG-CR379-001): the broadcast reaches Marketing''s sender by the outbox event
+      workforce.guestBroadcastAccepted, because Workforce (commerce) and Marketing (operations) are different
+      deployables, in place of a write through sendTransactionalMessage. No response changes; an emitted event added
+      to an operation is breaking by the compat rule.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-379 posted on #37101: "a workforce.guestBroadcastAccepted v1 event to
+      the outbox")'
+    tag: r12
+    producer-tickets: ['37101']
+    consumer-tickets: [none-linked]
+  - id: BC-520
+    contract: access
+    operation: getBleBeaconGeofence
+    change: "new required params `query:beaconId`"
+    reason: 'ADAM CR-389 (CHG-CR389-001): setBleBeaconGeofence keeps one access.device_placement row per beacon
+      (CHG-R8WFC-001), so the read must say which beacon it answers for: a required beaconId, the beacon''s registered
+      platform.device id, or 404. A read with no key had no record to answer from; it cannot be made additive.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-389 posted on #30955: "getBleBeaconGeofence takes a required beaconId
+      query parameter and answers for that beacon, or 404")'
+    tag: r12
+    producer-tickets: ['32505']
+    consumer-tickets: ['32508', '32509', '32510']
+  - id: BC-530
+    contract: access
+    operation: setGateModePolicy
+    change: "`whoCanActivate` type array<string> -> array<string:uuid>"
+    reason: 'ADAM CR-396 (CHG-CR396-001): whoCanActivate holds identity.role ids, which setTurnstileMode asks
+      identity#principalHoldsRoleAtVenue about one by one; a malformed id is 400 validation. The roles BO-201 picks
+      come from listRoles, so the values are role ids; the declared format now says so (the column stays text[]). A
+      type change cannot be additive.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-396 posted on 30967: "whoCanActivate holds identity.role ids (uuid
+      strings; setGateModePolicy refuses a malformed one 400 validation)")'
+    tag: r12
+    producer-tickets: ['30957', '30967']
+    consumer-tickets: ['32388', '32502']
+  - id: BC-560
+    contract: catalogue
+    operation: listDynamicPricingAutomation
+    reason: 'ADAM CR-417 (CHG-CR417-001): the automation view answers automationLevel, the one vocabulary
+      dynamic_pricing_control stores, and automationMode (which had no value for autonomous and could not be read back)
+      is retired with its filter; scopeLevel answers and filters all eight levels the table holds, global and
+      performance included. A removed field and parameter and a response enum that gains values are breaking by the
+      compat rule. ADM-096 has not started.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-417 posted on #35184: "automationMode is retired from
+      DynamicPricingAutomationPolicyControlView, and listDynamicPricingAutomation''s automationMode filter becomes an
+      automationLevel filter")'
+    tag: r12
+    producer-tickets: ['35329']
+    consumer-tickets: ['29836']
+  - id: BC-561
+    contract: catalogue
+    operation: listAutomationPolicyAutonomous
+    reason: 'ADAM CR-417 (CHG-CR417-001): channel is the sales_channel of the catalogue.sales_channel row a
+      channel-level control names, mapped to Channel as GPS-C39 maps it, and null at every other level and for api and
+      backOffice; a response field that becomes nullable (written allOf Channel, nullable) is breaking. ADM-114 has not
+      started.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-417 posted on #35184: "The view''s channel is that row''s sales_channel,
+      mapped to Channel as GPS-C39 maps it ... It is null for api and backOffice. At every other level, market and
+      channel are null")'
+    tag: r12
+    producer-tickets: ['35184']
+    consumer-tickets: ['29747']
+  - id: BC-562
+    contract: catalogue
+    operation: listDynamicPricingStrategy
+    change: "params `query:status` lost enum value(s) ['testing']"
+    reason: 'ADAM CR-423 (CHG-CR423-001): a saved test case names no strategy, so no stored fact says a strategy is
+      being tested; testing leaves the status filter and waits on the left-out list (LO-CR423-001), while ready and
+      scheduled are derived. Removing a request enum value is breaking by the compat rule.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-423 posted on #35286: "testing leaves the filter")'
+    tag: r12
+    producer-tickets: ['35286']
+    consumer-tickets: ['29840', '29841', '29801']
+  - id: BC-563
+    contract: catalogue
+    operation: createLiveDynamicPrice
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-422 (CHG-CR422-001): the live dynamic price is the catalogue.price_execution the call writes, never
+      catalogue.price, and it publishes catalogue.priceExecuted (executionId, strategyId, target, newPrice, channels)
+      through the outbox for the channel deployment job and the caches. An emitted event added to an operation is
+      breaking by the compat rule.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-422 posted on #35182: "Publish catalogue.priceExecuted (executionId,
+      strategyId, target, newPrice, channels) through the outbox")'
+    tag: r12
+    producer-tickets: ['35182']
+    consumer-tickets: ['29748']
+  - id: BC-564
+    contract: catalogue
+    operation: setDynamicPricingGuardrailPolicy
+    reason: 'ADAM CR-425 (CHG-CR425-001): authorityTiers, noChangeWindows and circuitBreakers were typed object while
+      their descriptions and every view list them; they become arrays of the objects their descriptions list, stored as
+      the jsonb lists they were (the price ladder bands precedent, BC-392). A type change cannot be additive.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-425 posted on #35172: "authorityTiers, noChangeWindows and
+      circuitBreakers are arrays of the objects their descriptions list")'
+    tag: r12
+    producer-tickets: ['35172']
+    consumer-tickets: ['29742', '35710', '29836', '29747']
+  - id: BC-565
+    contract: catalogue
+    operation: listDynamicPricingStrategy
+    change: "automationMode"
+    reason: 'ADAM CR-423 (CHG-CR423-001), with CR-417: the strategy row answers automationLevel from the most specific
+      dynamic_pricing_control covering the strategy, or advisory, and automationMode (which could not say autonomous) is
+      retired with its filter, which becomes an automationLevel filter. A removed response field and parameter are
+      breaking by the compat rule.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-423 posted on #35286: "automationMode is retired (CR-417). The row
+      answers automationLevel ... The filter is automationLevel"; and on the ADM-088 panel: "Panel shows the level")'
+    tag: r12
+    producer-tickets: ['35286']
+    consumer-tickets: ['29840', '29841', '29801']
+  - id: BC-550
+    contract: catalogue
+    operation: createChannelProfile
+    change: "request `scopeId` type string -> string:uuid"
+    reason: 'ADAM CR-413 (CHG-CR413-001): scopeId is the uuid of the region, venue, attraction, event, location or
+      business unit the channel is scoped to, as catalogue.sales_channel.scope_id already is; a country channel names its
+      country in country, and a scopeId that is not a uuid, or one sent for global or country, is 400 validation. A type
+      change cannot be additive.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-413 posted on #35181: "scopeId is a uuid ... A scopeId that is not a
+      uuid, or one sent for global or country, is 400 validation on scopeId")'
+    tag: r12
+    producer-tickets: ['35181']
+    consumer-tickets: ['29749', '35833']
+  - id: BC-551
+    contract: catalogue
+    operation: listChannelSaleRule
+    change: "type string:date -> string:date-time"
+    reason: 'ADAM CR-414 (CHG-CR414-001): ChannelSalesRulesLimitsRestrictionsView.effectiveFrom and effectiveTo answer the
+      instants as stored (catalogue.channel_sales_rule.effective_from and effective_to, timestamptz) and as
+      setChannelSalesRule takes them, instead of a UTC date, and are nullable; the screen shows the day in the venue''s
+      time zone. A type change cannot be additive.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-414 posted on #35239: "effectiveFrom and effectiveTo become format
+      date-time: the instants as stored and as setChannelSalesRule takes them")'
+    tag: r12
+    producer-tickets: ['35239']
+    consumer-tickets: ['29777', '36744']
+  - id: BC-570
+    contract: identity
+    operation: verifyGuestOtp
+    change: 'security changed [] -> [{}, {"guestAuth": []}]'
+    reason: 'ADAM CR-432 (CHG-CR432-001): a guest-checkout code (purpose verify) proves the contact for the cart and
+      opens no account, so it is taken under the cart''s anonymous guest session (Cart.anonymousSessionToken, CR-183),
+      which records verifiedContactRef for checkoutCart, and answered 204 with no GuestSession. A call with no session
+      is still accepted for every other purpose, so the change only adds an alternative; the compat rule counts a
+      security change as breaking. The new 204 travels with it.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-432 posted on #30661: "a guest-checkout code proves the contact for this
+      cart and opens no account ... its security gains guestAuth beside none"), with the lead''s answer of the same day
+      ("a guest profile is created only when the guest later makes an account")'
+    tag: r12
+    producer-tickets: ['30661', '31129']
+    consumer-tickets: ['30697', '30703']

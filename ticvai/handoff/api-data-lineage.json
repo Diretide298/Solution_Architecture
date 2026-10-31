@@ -1032,6 +1032,7 @@
     "channel",
     "channel_capacity_id",
     "contractual_units",
+    "envelope_percent",
     "envelope_type",
     "id",
     "is_frozen",
@@ -1042,8 +1043,10 @@
     "release_at",
     "release_hours_before_event",
     "release_threshold_units",
+    "released_units",
     "remaining_units",
     "replenishment_rule",
+    "returned_units",
     "sales_channel_id",
     "sold_units",
     "waitlist_behavior"
@@ -1082,6 +1085,7 @@
     "channel",
     "channel_capacity_id",
     "contractual_units",
+    "envelope_percent",
     "envelope_type",
     "id",
     "is_frozen",
@@ -1092,8 +1096,10 @@
     "release_at",
     "release_hours_before_event",
     "release_threshold_units",
+    "released_units",
     "remaining_units",
     "replenishment_rule",
+    "returned_units",
     "sales_channel_id",
     "sold_units",
     "waitlist_behavior"
@@ -2717,6 +2723,7 @@
    "platform.workstation": [
     "access_point_id",
     "cashier_input_mode",
+    "channel",
     "code",
     "configuration_profile_id",
     "configuration_profile_version",
@@ -2790,6 +2797,7 @@
    "platform.workstation": [
     "access_point_id",
     "cashier_input_mode",
+    "channel",
     "code",
     "configuration_profile_id",
     "configuration_profile_version",
@@ -2891,6 +2899,7 @@
    "platform.workstation": [
     "access_point_id",
     "cashier_input_mode",
+    "channel",
     "code",
     "configuration_profile_id",
     "configuration_profile_version",
@@ -6883,10 +6892,21 @@
     "scope_path",
     "status",
     "target_mode",
+    "target_turnstile_mode",
     "to_direction",
     "venue_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "identity#principalHoldsRoleAtVenue",
+    "route": "in-process",
+    "for": "whether the caller holds one of the governing gate mode policy's whoCanActivate roles at the access point's venue or above it, as a yes or no answered under the tenant root grant (ADAM CR-396, decided 31 October 2026; CHG-CR396-001; XDR-035): identity.delegated_access, Identity's data"
+   }
+  ],
+  "readsInProcess": [
+   "identity.delegated_access"
+  ]
  },
  "listAccessPoints": {
   "contract": "access",
@@ -7197,10 +7217,18 @@
     "for": "what its text calls \"RegionSettings.minorAgeThreshold\": platform.region_settings, Tenancy's data (CHG-R10GEN-001)"
    },
    {
+    "query": "tenancy#scopeRecords",
+    "route": "in-process",
+    "for": "the caller's working venue's path (platform.scope, by id), written as the profile's scope_path, Tenancy's data (ADAM CR-400, decided 31 October 2026, CR-217's rule; CHG-CR400-001; XDR-036)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "service",
     "for": "what its text calls \"VenueSettings.biometrics\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope"
   ]
  },
  "updateAdmissionRules": {
@@ -7315,6 +7343,7 @@
   ],
   "writes": [
    "access.blacklist",
+   "approvals.request",
    "cache:idempotency"
   ],
   "routing": "",
@@ -7350,6 +7379,12 @@
     "query": "approvals#requestRecords",
     "route": "service",
     "for": "what its text calls \"approvals.request\": approvals.request, Tenancy's data (CHG-R10GEN-001)"
+   }
+  ],
+  "writeVia": [
+   {
+    "table": "approvals.request",
+    "operation": "createApprovalRequest"
    }
   ]
  },
@@ -18379,10 +18414,12 @@
   "reads": [
    "cache:idempotency",
    "seating.seat_map",
+   "seating.seat_map_template",
    "seating.section"
   ],
   "writes": [
    "cache:idempotency",
+   "seating.seat",
    "seating.seat_map",
    "seating.section",
    "seating.section_row"
@@ -18424,6 +18461,7 @@
     "row_count",
     "scope_path",
     "seat_count",
+    "seat_map_id",
     "view_asset_id"
    ]
   }
@@ -18434,7 +18472,8 @@
   "path": "/seat-maps/{seatMapId}",
   "reads": [
    "seating.seat_map",
-   "seating.section"
+   "seating.section",
+   "seating.section_row"
   ],
   "writes": [],
   "routing": "replica",
@@ -18473,7 +18512,15 @@
     "row_count",
     "scope_path",
     "seat_count",
+    "seat_map_id",
     "view_asset_id"
+   ],
+   "seating.section_row": [
+    "id",
+    "label",
+    "numbering_direction",
+    "seat_count",
+    "section_id"
    ]
   }
  },
@@ -18529,6 +18576,7 @@
     "row_count",
     "scope_path",
     "seat_count",
+    "seat_map_id",
     "view_asset_id"
    ]
   }
@@ -18586,6 +18634,7 @@
     "row_count",
     "scope_path",
     "seat_count",
+    "seat_map_id",
     "view_asset_id"
    ]
   }
@@ -18641,6 +18690,7 @@
     "row_count",
     "scope_path",
     "seat_count",
+    "seat_map_id",
     "view_asset_id"
    ]
   }
@@ -18868,7 +18918,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "seating.import_job"
+   "seating.import_job",
+   "seating.section"
   ],
   "routing": "",
   "scope": "venue",
@@ -18928,8 +18979,13 @@
     "has_geometry",
     "id",
     "name",
+    "scope_path",
     "seat_count",
-    "section_count"
+    "section_count",
+    "source_seat_map_id",
+    "stage_position",
+    "structure",
+    "view_box"
    ]
   }
  },
@@ -18939,7 +18995,11 @@
   "path": "/seat-map-templates",
   "reads": [
    "cache:idempotency",
-   "seating.seat_map_template"
+   "seating.seat",
+   "seating.seat_map",
+   "seating.seat_map_template",
+   "seating.section",
+   "seating.section_row"
   ],
   "writes": [
    "cache:idempotency",
@@ -18966,8 +19026,13 @@
     "has_geometry",
     "id",
     "name",
+    "scope_path",
     "seat_count",
-    "section_count"
+    "section_count",
+    "source_seat_map_id",
+    "stage_position",
+    "structure",
+    "view_box"
    ]
   }
  },
@@ -26864,7 +26929,29 @@
     "title",
     "visualisation"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "subscription#contractRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373), as getModuleEnablement reads control.contract, Platform's data"
+   },
+   {
+    "query": "subscription#licenceAddOnRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373), as getModuleEnablement reads control.licence_add_on, Platform's data"
+   },
+   {
+    "query": "subscription#planRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373), as getModuleEnablement reads control.plan, Platform's data"
+   }
+  ],
+  "readsInProcess": [
+   "control.contract",
+   "control.licence_add_on",
+   "control.plan"
+  ]
  },
  "createDashboard": {
   "contract": "reporting",
@@ -26920,12 +27007,30 @@
   },
   "readVia": [
    {
+    "query": "subscription#contractRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373), as getModuleEnablement reads control.contract, Platform's data"
+   },
+   {
+    "query": "subscription#licenceAddOnRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373), as getModuleEnablement reads control.licence_add_on, Platform's data"
+   },
+   {
+    "query": "subscription#planRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373), as getModuleEnablement reads control.plan, Platform's data"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "what its text calls \"VenueSettings.reporting\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
   ],
   "readsInProcess": [
+   "control.contract",
+   "control.licence_add_on",
+   "control.plan",
    "platform.venue_settings"
   ]
  },
@@ -27030,12 +27135,30 @@
   },
   "readVia": [
    {
+    "query": "subscription#contractRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373), as getModuleEnablement reads control.contract, Platform's data"
+   },
+   {
+    "query": "subscription#licenceAddOnRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373), as getModuleEnablement reads control.licence_add_on, Platform's data"
+   },
+   {
+    "query": "subscription#planRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373), as getModuleEnablement reads control.plan, Platform's data"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "what its text calls \"VenueSettings.reporting\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
    }
   ],
   "readsInProcess": [
+   "control.contract",
+   "control.licence_add_on",
+   "control.plan",
    "platform.venue_settings"
   ]
  },
@@ -33536,12 +33659,11 @@
   "path": "/tenant-config/banners/{bannerId}",
   "reads": [
    "cache:idempotency",
-   "whitelabel.tenant_config"
+   "whitelabel.banner"
   ],
   "writes": [
    "cache:idempotency",
-   "whitelabel.banner",
-   "whitelabel.tenant_config"
+   "whitelabel.banner"
   ],
   "routing": "",
   "scope": "tenant",
@@ -41472,7 +41594,7 @@
    {
     "query": "identity#subjectBiometricRecords",
     "route": "service",
-    "for": "its read of pii.subject_biometric, Identity's data (CHG-MOD-001)"
+    "for": "the enrolment it revokes (pii.subject_biometric, Identity's data; CHG-MOD-001), on Identity's service route listSubjectBiometricRecords, connected when the kernel's service sign-in (#37051) is ready (ADAM CR-391)"
    }
   ]
  },
@@ -46204,6 +46326,11 @@
   },
   "readVia": [
    {
+    "query": "identity#delegationReaches",
+    "route": "in-process",
+    "for": "the 409 delegation-cycle: whether overSubjectId already reaches the path's subjectId through live ALLOW grants, one recursive statement under ITenantRootGrant over identity.delegated_access, for guests and staff alike (ADAM CR-433; CHG-CR433-001)"
+   },
+   {
     "query": "identity#subjectMinorStatus",
     "route": "in-process",
     "for": "whether the path's subjectId is a minor (unknown counts as a minor), beyond the caller's own pii.subject row (ADAM CR-362; CHG-CR362-001)"
@@ -46220,6 +46347,7 @@
    }
   ],
   "readsInProcess": [
+   "identity.delegated_access",
    "platform.region_settings",
    "platform.scope"
   ]
@@ -47906,16 +48034,15 @@
   "verb": "POST",
   "path": "/guest-broadcast",
   "reads": [
-   "access.entitlement",
    "cache:idempotency",
    "identity.principal",
-   "marketing.guest_profile",
    "venuemap.point"
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.message_dispatch",
-   "workforce.announcement"
+   "platform.outbox",
+   "workforce.announcement",
+   "workforce.guest_broadcast"
   ],
   "routing": "",
   "scope": "venue",
@@ -47931,17 +48058,11 @@
   "audience": [
    "staff"
   ],
-  "writeVia": [
-   {
-    "table": "marketing.message_dispatch",
-    "operation": "sendTransactionalMessage"
-   }
-  ],
   "readVia": [
    {
-    "query": "access#entitlementRecords",
-    "route": "service",
-    "for": "its read of access.entitlement, Access's data (CHG-MOD-001)"
+    "query": "access#liveEntitlementSubjects",
+    "route": "in-process",
+    "for": "recipientCount: the guests with a live entitlement at the body's venue now (ADAM CR-379; CHG-CR379-001), Access's data, read in process by commerce under XDR-001"
    },
    {
     "query": "identity#principalRecords",
@@ -47949,9 +48070,9 @@
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    },
    {
-    "query": "marketing-crm#guestProfileRecords",
-    "route": "service",
-    "for": "its read of marketing.guest_profile, Marketing's data (CHG-MOD-001)"
+    "query": "identity#verifySupervisorStepUp",
+    "route": "in-process",
+    "for": "the second person's PIN in `supervisorStepUp` for an evacuation is checked by Identity (ADAM CR-379, SupervisorStepUp); same deployable (commerce)"
    },
    {
     "query": "venue-map#pointRecords",
@@ -47960,6 +48081,7 @@
    }
   ],
   "readsInProcess": [
+   "access.entitlement",
    "identity.principal"
   ]
  },
@@ -52430,6 +52552,7 @@
     "org_unit_id",
     "platform_staff_grant_id",
     "principal_id",
+    "reason",
     "subject_ref",
     "workstation_id"
    ]
@@ -53225,6 +53348,7 @@
     "row_count",
     "scope_path",
     "seat_count",
+    "seat_map_id",
     "view_asset_id"
    ]
   }
@@ -55680,12 +55804,12 @@
    "catalogue.price_ladder",
    "catalogue.pricing_recommendation",
    "catalogue.pricing_recommendation_decision",
+   "catalogue.product_channel_assignment",
    "pricing.dynamic_price_rule"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.audit_entry",
-   "catalogue.price",
    "catalogue.price_execution",
    "catalogue.pricing_recommendation_decision",
    "platform.outbox"
@@ -55707,12 +55831,18 @@
   "lineageNote": "DM3: writes catalogue.price_execution (states/price-execution.yaml) and the new catalogue.price; stamps executionId on the decision | L2: executes one approved change: approval from pricing_recommendation_decision or automation policy; updates catalogue.price and emits channel deployment via platform.outbox; execution record needs pricing.price_execution (missing)",
   "readVia": [
    {
+    "query": "approvals#requestRecords",
+    "route": "in-process",
+    "for": "the approval reference: an approvals.request of kind pricingChange, approved; for a recommendation, the request decidePricingRecommendation's sendForApproval raised for it (ADAM CR-415, CR-422; CHG-CR422-001)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: LiveDynamicPriceExecutionDeploymentMonitorInput.newPrice, LiveDynamicPriceExecutionDeploymentMonitorView.newPrice, LiveDynamicPriceExecutionDeploymentMonitorView.previousPrice, LiveDynamicPriceExecutionDeploymentMonitorView.price (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
   "readsInProcess": [
+   "approvals.request",
    "platform.venue_settings"
   ]
  },
@@ -56356,7 +56486,9 @@
   "verb": "GET",
   "path": "/automation-policy-autonomou",
   "reads": [
-   "catalogue.dynamic_pricing_control"
+   "catalogue.dynamic_pricing_control",
+   "catalogue.pricing_market",
+   "catalogue.sales_channel"
   ],
   "writes": [],
   "routing": "replica",
@@ -57775,8 +57907,6 @@
   "verb": "GET",
   "path": "/channel-customer-segment",
   "reads": [
-   "pricing.dynamic_price_action",
-   "pricing.dynamic_price_condition",
    "pricing.dynamic_price_rule"
   ],
   "writes": [],
@@ -57972,6 +58102,7 @@
    "catalogue.event",
    "catalogue.performance",
    "catalogue.product",
+   "catalogue.product_channel_assignment",
    "catalogue.sales_channel"
   ],
   "writes": [],
@@ -58578,8 +58709,13 @@
   "verb": "GET",
   "path": "/competitor-pricing-market",
   "reads": [
+   "catalogue.competitor_price_observation",
    "catalogue.demand_signal",
-   "catalogue.product"
+   "catalogue.price",
+   "catalogue.price_assignment",
+   "catalogue.price_list",
+   "catalogue.product",
+   "catalogue.variant"
   ],
   "writes": [],
   "routing": "replica",
@@ -58601,7 +58737,7 @@
    {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
-    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: CompetitorPricingMarketPositionIntelligenceView.marketMedianPrice, CompetitorPricingMarketPositionIntelligenceView.memberPriceWherePubliclyAvailable, CompetitorPricingMarketPositionIntelligenceView.peakPrice, CompetitorPricingMarketPositionIntelligenceView.promotionalPrice and 3 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
+    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for CompetitorPricingMarketPositionIntelligenceView.marketMedianPrice and the comparable product's fromPrice, and to count only observations in that currency; the six observed prices are in each observation's own currency_code (ADAM CR-409; naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
   "readsInProcess": [
@@ -59602,6 +59738,7 @@
   "lineageNote": "segment dimension is a condition; rule rows (price list, channel, priority, validity, active) are pricing.dynamic_price_rule with dimension conditions and rate actions, as listDynamicPriceRules/getDynamicPriceRule read them; customer's segments come via marketing ops",
   "readColumns": {
    "pricing.dynamic_price_rule": [
+    "dimension",
     "id",
     "name"
    ]
@@ -59614,8 +59751,7 @@
   "reads": [
    "catalogue.channel_capacity",
    "catalogue.demand_forecast",
-   "catalogue.performance",
-   "orders.sales_order"
+   "catalogue.performance"
   ],
   "writes": [],
   "routing": "replica",
@@ -59635,13 +59771,13 @@
   "lineageNote": "DM3: catalogue.demand_forecast with forecastKind demand | L2: forecasts need pricing.demand_forecast (missing); actual booking curve and remaining inventory from orders.sales_order and channel_capacity/performance",
   "readVia": [
    {
-    "query": "orders#salesOrderRecords",
+    "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
-    "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
+    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiDemandForecastingBookingCurveStudioView.revenue, in the currency of the row's venue (naming-and-style 5.1, ADR-0018; ADAM CR-405, CHG-CR405-001)"
    }
   ],
   "readsInProcess": [
-   "orders.sales_order"
+   "platform.venue_settings"
   ]
  },
  "listDepositGuaranteeFinancial": {
@@ -60178,7 +60314,9 @@
   "verb": "GET",
   "path": "/dynamic-pricing-automation",
   "reads": [
-   "catalogue.dynamic_pricing_control"
+   "catalogue.dynamic_pricing_control",
+   "catalogue.pricing_market",
+   "catalogue.sales_channel"
   ],
   "writes": [],
   "routing": "replica",
@@ -60259,13 +60397,13 @@
   "path": "/dynamic-pricing-performance",
   "reads": [
    "catalogue.channel_capacity",
+   "catalogue.dynamic_pricing_strategy",
    "catalogue.event",
    "catalogue.performance",
    "catalogue.price_execution",
    "catalogue.pricing_recommendation",
    "catalogue.pricing_recommendation_decision",
-   "catalogue.product",
-   "orders.sales_order"
+   "catalogue.product"
   ],
   "writes": [],
   "routing": "replica",
@@ -60285,13 +60423,13 @@
   "lineageNote": "DM3: executions and recommendation outcomes | L2: KPIs from orders.sales_order and channel_capacity; recommendation outcomes from pricing_recommendation_decision; price timeline needs pricing.price_execution (missing)",
   "readVia": [
    {
-    "query": "orders#salesOrderRecords",
+    "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
-    "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
+    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DynamicPricingPerformanceOptimizationAnalyticsView.opportunityLost and priceTimeline.price, and the venue's time zone for the period (naming-and-style 5.1, ADR-0018; ADAM CR-407, CHG-CR407-001)"
    }
   ],
   "readsInProcess": [
-   "orders.sales_order"
+   "platform.venue_settings"
   ]
  },
  "listEdgePackageData": {
@@ -60711,9 +60849,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
-    "for": "what its text calls \"tenancy.VenueSettings.biometrics\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
+    "route": "in-process",
+    "for": "the venue's biometrics settings, templatesHeldByTicvai for the view: platform.venue_settings, Tenancy's data, asked in process through Tenancy's own query class under the caller's row security (ADAM CR-390; XDR-032)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listFailedGenerationDelivery": {
@@ -61953,6 +62094,7 @@
    "catalogue.channel_envelope",
    "catalogue.inventory_reservation",
    "catalogue.performance",
+   "catalogue.product",
    "catalogue.sales_channel",
    "catalogue.waitlist_entry"
   ],
@@ -62003,7 +62145,8 @@
    "catalogue.demand_forecast": [
     "channel",
     "horizon",
-    "id"
+    "id",
+    "season"
    ]
   }
  },
@@ -62845,6 +62988,7 @@
   "lineageNote": "membership/loyalty conditions validated against membership_programme; rule rows (price list, channel, priority, validity, active) are pricing.dynamic_price_rule with dimension conditions and rate actions, as listDynamicPriceRules/getDynamicPriceRule read them",
   "readColumns": {
    "pricing.dynamic_price_rule": [
+    "dimension",
     "id",
     "name"
    ]
@@ -64967,8 +65111,7 @@
   "path": "/price-elasticity-revenue",
   "reads": [
    "catalogue.demand_forecast",
-   "catalogue.price",
-   "orders.sales_order"
+   "catalogue.price"
   ],
   "writes": [],
   "routing": "replica",
@@ -64988,13 +65131,13 @@
   "lineageNote": "DM3: catalogue.demand_forecast with forecastKind elasticity | L2: response-curve points need pricing.elasticity_estimate (missing); observed demand at price from orders.sales_order and catalogue.price",
   "readVia": [
    {
-    "query": "orders#salesOrderRecords",
+    "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
-    "for": "its read of orders.sales_order, Orders's data (CHG-MOD-001)"
+    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: PriceElasticityRevenueResponseIntelligenceView.price, revenue, margin, revenueZoneMin and revenueZoneMax (naming-and-style 5.1, ADR-0018; ADAM CR-406, CHG-CR406-001)"
    }
   ],
   "readsInProcess": [
-   "orders.sales_order"
+   "platform.venue_settings"
   ]
  },
  "listPriceListTemplate": {
@@ -65178,8 +65321,10 @@
   "reads": [
    "catalogue.event",
    "catalogue.price",
+   "catalogue.price_category",
    "catalogue.pricing_recommendation",
    "catalogue.pricing_recommendation_decision",
+   "catalogue.pricing_simulation",
    "catalogue.product"
   ],
   "writes": [],
@@ -65207,12 +65352,18 @@
   },
   "readVia": [
    {
+    "query": "tenancy#scopeRecords",
+    "route": "in-process",
+    "for": "venue: the venue's name, by the recommendation's venue_id (ADAM CR-416; CHG-CR416-001)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiPricingRecommendationExplainabilityCenterView.currentPrice, AiPricingRecommendationExplainabilityCenterView.expectedRevenueImpact, AiPricingRecommendationExplainabilityCenterView.recommendedPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
   "readsInProcess": [
+   "platform.scope",
    "platform.venue_settings"
   ]
  },
@@ -66179,8 +66330,10 @@
   "reads": [
    "catalogue.event",
    "catalogue.price",
+   "catalogue.price_category",
    "catalogue.pricing_recommendation",
    "catalogue.pricing_recommendation_decision",
+   "catalogue.pricing_simulation",
    "catalogue.product"
   ],
   "writes": [],
@@ -66201,12 +66354,18 @@
   "lineageNote": "DM3: catalogue.pricing_recommendation joined to its decision | L2: decision record fields (decision, rejectionReason, humanSelectedPrice, scheduledFor, decidedBy/At) are catalogue.pricing_recommendation_decision; queue item needs pricing.pricing_recommendation (missing)",
   "readVia": [
    {
+    "query": "tenancy#scopeRecords",
+    "route": "in-process",
+    "for": "venue: the venue's name, by the recommendation's venue_id (ADAM CR-416; CHG-CR416-001)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: AiRecommendationReviewDecisionQueueView.currentPrice, AiRecommendationReviewDecisionQueueView.humanSelectedPrice, AiRecommendationReviewDecisionQueueView.recommendedPrice, AiRecommendationReviewDecisionQueueView.revenueOpportunity and 1 more (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
   "readsInProcess": [
+   "platform.scope",
    "platform.venue_settings"
   ]
  },
@@ -67206,6 +67365,7 @@
   "path": "/revenue",
   "reads": [
    "catalogue.channel_capacity",
+   "catalogue.demand_forecast",
    "catalogue.dynamic_pricing_control",
    "catalogue.event",
    "catalogue.performance",
@@ -67590,6 +67750,7 @@
   "lineageNote": "DM3: special calendar entries are catalogue.demand_signal rows with signalKind calendar | L2: temporal rules are dynamic_price_rule + conditions/actions; special calendar entries need pricing.special_calendar_entry (missing)",
   "readColumns": {
    "pricing.dynamic_price_rule": [
+    "dimension",
     "id",
     "name"
    ]
@@ -69878,12 +70039,10 @@
   "verb": "PUT",
   "path": "/ble-beacon-geofence",
   "reads": [
-   "access.access_point",
    "access.device_placement",
    "cache:idempotency"
   ],
   "writes": [
-   "access.access_point",
    "access.configuration_change",
    "access.device_placement",
    "cache:idempotency"
@@ -69902,7 +70061,17 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "beacon is an access.device_placement row (hardwareType beacon, proximityThresholdMeters); the geofence itself stays on access.access_point.geofence; health and lastDetected are device-reported, not written"
+  "lineageNote": "beacon is an access.device_placement row (hardwareType beacon, proximityThresholdMeters); the geofence itself stays on access.access_point.geofence; health and lastDetected are device-reported, not written",
+  "readVia": [
+   {
+    "query": "tenancy#deviceRecords",
+    "route": "in-process",
+    "for": "whether beaconId is a registered device (404 when not), and the view's health and lastDetected (platform.device.health and last_heartbeat_at), Tenancy's data, asked in process through Tenancy's own query class under the caller's row security (ADAM CR-389; XDR-031)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.device"
+  ]
  },
  "setBookingVelocityTime": {
   "contract": "catalogue",
@@ -73056,8 +73225,10 @@
    "catalogue.calculation_step",
    "catalogue.fee",
    "catalogue.fee_rule",
+   "catalogue.membership_programme",
    "catalogue.price",
    "catalogue.price_assignment",
+   "catalogue.price_execution",
    "catalogue.price_list",
    "catalogue.price_resolution_policy",
    "catalogue.product",
@@ -73088,7 +73259,23 @@
    "redis"
   ],
   "lineageNote": "DM3: runs the calculation profile over rates, fees, taxes and rounding; stores nothing | L2: a simulation never creates an order: reads base price (price/price_list/variant) and rules (pricing.dynamic_price_*); only the idempotency record is written",
-  "pure": "a simulation: computes what would happen and stores nothing"
+  "pure": "a simulation: computes what would happen and stores nothing",
+  "readVia": [
+   {
+    "query": "finance#taxCodeRecords",
+    "route": "in-process",
+    "for": "the tax step: the ledger.tax_code the tax profile's taxCodeId names, Ledger's data (ADAM CR-110, CR-419; CHG-CR419-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers and the rounding profile of that currency (ADAM CR-419; CHG-CR419-001)"
+   }
+  ],
+  "readsInProcess": [
+   "ledger.tax_code",
+   "platform.venue_settings"
+  ]
  },
  "simulateWorkflowTestingImpact": {
   "contract": "approvals",
@@ -73275,6 +73462,8 @@
    "catalogue.dynamic_pricing_strategy",
    "catalogue.event",
    "catalogue.price",
+   "catalogue.price_execution",
+   "catalogue.price_ladder",
    "catalogue.product",
    "pricing.dynamic_price_rule"
   ],
@@ -73304,12 +73493,24 @@
   },
   "readVia": [
    {
+    "query": "identity#principalRecords",
+    "route": "in-process",
+    "for": "owner: the owner principal's display name, by owner_principal_id (ADAM CR-423; CHG-CR423-001)"
+   },
+   {
+    "query": "tenancy#scopeRecords",
+    "route": "in-process",
+    "for": "venue: the strategy's venue's name, by venue_id (ADAM CR-423; CHG-CR423-001)"
+   },
+   {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
     "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: DynamicPricingStrategyCommandCenterView.currentPrice (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
    }
   ],
   "readsInProcess": [
+   "identity.principal",
+   "platform.scope",
    "platform.venue_settings"
   ]
  },
@@ -73867,6 +74068,7 @@
     "channel",
     "channel_capacity_id",
     "contractual_units",
+    "envelope_percent",
     "envelope_type",
     "id",
     "is_frozen",
@@ -73877,8 +74079,10 @@
     "release_at",
     "release_hours_before_event",
     "release_threshold_units",
+    "released_units",
     "remaining_units",
     "replenishment_rule",
+    "returned_units",
     "sales_channel_id",
     "sold_units",
     "waitlist_behavior"
@@ -74446,11 +74650,15 @@
   "path": "/shift-marketplace",
   "reads": [
    "cache:idempotency",
-   "workforce.open_shift"
+   "workforce.open_shift",
+   "workforce.rota_assignment",
+   "workforce.staffing_rules",
+   "workforce.training_record"
   ],
   "writes": [
    "cache:idempotency",
-   "workforce.open_shift"
+   "workforce.open_shift",
+   "workforce.rota_assignment"
   ],
   "routing": null,
   "scope": "venue",
@@ -74486,7 +74694,23 @@
     "valid_to",
     "venue_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "identity#principalHoldsRoleAtVenue",
+    "route": "in-process",
+    "for": "whether the claimant holds the requiredRoleId of the shift's rota assignment at the venue or above it, as createRotaAssignment asks it (ADAM CR-380; CHG-CR380-001): identity.delegated_access, Identity's data"
+   },
+   {
+    "query": "workforce#principalHasOverlappingAssignment",
+    "route": "in-process",
+    "for": "whether the claimant already holds an overlapping assignment at any venue, as a yes or no answered under the tenant root grant (ADAM CR-380; CHG-CR380-001)"
+   }
+  ],
+  "readsInProcess": [
+   "identity.delegated_access",
+   "workforce.rota_assignment"
+  ]
  },
  "cloneEvent": {
   "contract": "catalogue",
@@ -89953,12 +90177,17 @@
     "channel_id",
     "condition_logic",
     "cooldown_minutes",
+    "customer_segment",
+    "dimension",
     "dynamic_pricing_strategy_id",
     "exit_threshold_offset",
     "id",
     "input_metric",
     "is_active",
+    "is_dynamic_pricing_enabled",
     "is_protected",
+    "location_id",
+    "location_level",
     "minimum_duration_minutes",
     "name",
     "price_list_id",
@@ -89968,7 +90197,9 @@
     "range_max_percent",
     "range_min_percent",
     "rule_type",
+    "sales_channel",
     "scope_path",
+    "segment_ref",
     "valid_from",
     "valid_to"
    ]
@@ -90458,12 +90689,17 @@
     "channel_id",
     "condition_logic",
     "cooldown_minutes",
+    "customer_segment",
+    "dimension",
     "dynamic_pricing_strategy_id",
     "exit_threshold_offset",
     "id",
     "input_metric",
     "is_active",
+    "is_dynamic_pricing_enabled",
     "is_protected",
+    "location_id",
+    "location_level",
     "minimum_duration_minutes",
     "name",
     "price_list_id",
@@ -90473,7 +90709,9 @@
     "range_max_percent",
     "range_min_percent",
     "rule_type",
+    "sales_channel",
     "scope_path",
+    "segment_ref",
     "valid_from",
     "valid_to"
    ]
@@ -90968,12 +91206,17 @@
     "channel_id",
     "condition_logic",
     "cooldown_minutes",
+    "customer_segment",
+    "dimension",
     "dynamic_pricing_strategy_id",
     "exit_threshold_offset",
     "id",
     "input_metric",
     "is_active",
+    "is_dynamic_pricing_enabled",
     "is_protected",
+    "location_id",
+    "location_level",
     "minimum_duration_minutes",
     "name",
     "price_list_id",
@@ -90983,7 +91226,9 @@
     "range_max_percent",
     "range_min_percent",
     "rule_type",
+    "sales_channel",
     "scope_path",
+    "segment_ref",
     "valid_from",
     "valid_to"
    ]
@@ -92304,7 +92549,29 @@
     "title",
     "visualisation"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "subscription#contractRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373), as getModuleEnablement reads control.contract, Platform's data"
+   },
+   {
+    "query": "subscription#licenceAddOnRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373), as getModuleEnablement reads control.licence_add_on, Platform's data"
+   },
+   {
+    "query": "subscription#planRecords",
+    "route": "in-process",
+    "for": "the tenant's LicencePosition.licensedModules, for the module entitlement on CreateDashboardRequest.module (ADAM CR-373), as getModuleEnablement reads control.plan, Platform's data"
+   }
+  ],
+  "readsInProcess": [
+   "control.contract",
+   "control.licence_add_on",
+   "control.plan"
+  ]
  },
  "getFnbReservationPolicy": {
   "contract": "fnb",
@@ -92589,12 +92856,14 @@
   "path": "/principals/{principalId}/credential-reset",
   "reads": [
    "cache:idempotency",
+   "identity.mfa_challenge",
    "identity.password_policy",
    "identity.principal",
    "identity.principal_credential"
   ],
   "writes": [
    "cache:idempotency",
+   "identity.mfa_challenge",
    "identity.principal",
    "identity.principal_credential",
    "identity.principal_credential_history",
@@ -93453,16 +93722,17 @@
    {
     "query": "marketing-crm#guestMatchPolicyRecords",
     "route": "in-process",
-    "for": "what its text calls \"GuestMatchPolicy.matchBy\": marketing.guest_match_policy, Marketing's data (CHG-R10GEN-001)"
+    "for": "the GuestMatchPolicy in force at each active venue (the row whose scope_path is the venue's; none means the default, matchBy email), marketing.guest_match_policy, Marketing's data (ADAM CR-430; CHG-CR430-001)"
    },
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
-    "for": "what its text calls \"active venues\": platform.scope, Tenancy's data (CHG-RTE-001)"
+    "route": "in-process",
+    "for": "the tenant's active venues, each checked against the GuestMatchPolicy in force there and for the venueOverrides venueId rule, platform.scope, Tenancy's data, asked in process as CR-343 did for validateTenantConfig (ADAM CR-430; XDR-022; CHG-CR430-001)"
    }
   ],
   "readsInProcess": [
-   "marketing.guest_match_policy"
+   "marketing.guest_match_policy",
+   "platform.scope"
   ]
  },
  "setDepositPolicy": {
@@ -95853,7 +96123,29 @@
     "sort_order",
     "title"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "catalogue#eventRecords",
+    "route": "in-process",
+    "for": "an event target's venue_id (catalogue.event, Catalogue's data), in process (ADAM CR-394; XDR-033)"
+   },
+   {
+    "query": "catalogue#productCategoryRecords",
+    "route": "in-process",
+    "for": "a category target's scope_path (catalogue.product_category, Catalogue's data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants)"
+   },
+   {
+    "query": "catalogue#productRecords",
+    "route": "in-process",
+    "for": "a product target's venue_id (catalogue.product, Catalogue's data), asked in process through Catalogue's own query class under the caller's row security (ADAM CR-394; XDR-033, on the SELECT XDR-008 and XDR-022 already grant)"
+   }
+  ],
+  "readsInProcess": [
+   "catalogue.event",
+   "catalogue.product",
+   "catalogue.product_category"
+  ]
  },
  "createMemberException": {
   "contract": "orders",
@@ -96224,11 +96516,10 @@
    "catalogue.pricing_recommendation_decision"
   ],
   "writes": [
+   "approvals.request",
    "cache:idempotency",
-   "catalogue.audit_entry",
    "catalogue.pricing_recommendation",
-   "catalogue.pricing_recommendation_decision",
-   "platform.outbox"
+   "catalogue.pricing_recommendation_decision"
   ],
   "routing": "primary",
   "scope": "venue",
@@ -97828,7 +98119,29 @@
     "sort_order",
     "title"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "catalogue#eventRecords",
+    "route": "in-process",
+    "for": "an event target's venue_id (catalogue.event, Catalogue's data), in process (ADAM CR-394; XDR-033)"
+   },
+   {
+    "query": "catalogue#productCategoryRecords",
+    "route": "in-process",
+    "for": "a category target's scope_path (catalogue.product_category, Catalogue's data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants)"
+   },
+   {
+    "query": "catalogue#productRecords",
+    "route": "in-process",
+    "for": "a product target's venue_id (catalogue.product, Catalogue's data), asked in process through Catalogue's own query class under the caller's row security (ADAM CR-394; XDR-033, on the SELECT XDR-008 and XDR-022 already grant)"
+   }
+  ],
+  "readsInProcess": [
+   "catalogue.event",
+   "catalogue.product",
+   "catalogue.product_category"
+  ]
  },
  "publishGuidedChoice": {
   "contract": "white-label",
@@ -97897,7 +98210,29 @@
     "sort_order",
     "title"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "catalogue#eventRecords",
+    "route": "in-process",
+    "for": "an event target's venue_id, is_active and lifecycle_state (catalogue.event, Catalogue's data), in process (ADAM CR-394; XDR-033)"
+   },
+   {
+    "query": "catalogue#productCategoryRecords",
+    "route": "in-process",
+    "for": "a category target's scope_path, is_active, and its products on sale (catalogue.product_category, Catalogue's data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants)"
+   },
+   {
+    "query": "catalogue#productRecords",
+    "route": "in-process",
+    "for": "a product target's venue_id, is_sellable, guest_listing, on_sale_from and on_sale_to (catalogue.product, Catalogue's data), asked in process through Catalogue's own query class under the caller's row security (ADAM CR-394; XDR-033, on the SELECT XDR-008 and XDR-022 already grant)"
+   }
+  ],
+  "readsInProcess": [
+   "catalogue.event",
+   "catalogue.product",
+   "catalogue.product_category"
+  ]
  },
  "publishHardwareDeployment": {
   "contract": "access",
@@ -98913,9 +99248,12 @@
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
-    "route": "service",
-    "for": "what its text calls \"tenancy.VenueSettings.biometrics\": platform.venue_settings, Tenancy's data (CHG-R10GEN-001)"
+    "route": "in-process",
+    "for": "the venue's biometrics settings, consentFormId for the fallback and templatesHeldByTicvai for the view: platform.venue_settings, Tenancy's data, asked in process through Tenancy's own query class under the caller's row security (ADAM CR-390; XDR-032)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setFraudDetectionRule": {
@@ -101385,6 +101723,7 @@
     "scope_path",
     "status",
     "target_mode",
+    "target_turnstile_mode",
     "to_direction",
     "venue_id"
    ]
@@ -101401,8 +101740,7 @@
   "writes": [
    "cache:idempotency",
    "catalogue.audit_entry",
-   "catalogue.rollback_action",
-   "platform.outbox"
+   "catalogue.rollback_action"
   ],
   "routing": "primary",
   "scope": "venue",
@@ -102956,6 +103294,7 @@
    "access.device_placement": [
     "access_area_id",
     "access_point_id",
+    "activation_zone",
     "controller_reference",
     "created_at",
     "device_group_id",
@@ -104121,14 +104460,18 @@
   "reads": [
    "cache:idempotency",
    "catalogue.dynamic_pricing_control",
-   "catalogue.dynamic_pricing_strategy"
+   "catalogue.dynamic_pricing_strategy",
+   "catalogue.event",
+   "catalogue.performance",
+   "catalogue.pricing_market",
+   "catalogue.product",
+   "catalogue.sales_channel"
   ],
   "writes": [
    "cache:idempotency",
    "catalogue.audit_entry",
    "catalogue.dynamic_pricing_control",
-   "catalogue.dynamic_pricing_strategy",
-   "platform.outbox"
+   "catalogue.dynamic_pricing_strategy"
   ],
   "routing": "primary",
   "scope": "venue",
@@ -104177,6 +104520,8 @@
     "minimum_inventory",
     "minimum_margin_percent",
     "no_change_windows",
+    "pending_approval_request_id",
+    "pending_automation_level",
     "protected_rate_types",
     "quiet_period_minutes",
     "require_guardrails_passed",
@@ -106398,6 +106743,7 @@
    "access.device_placement": [
     "access_area_id",
     "access_point_id",
+    "activation_zone",
     "controller_reference",
     "created_at",
     "device_group_id",
@@ -117110,13 +117456,13 @@
   },
   "readVia": [
    {
-    "query": "marketing-crm#guestMatchPolicyRecords",
+    "query": "marketing-crm#consentQuestionRecords",
     "route": "in-process",
-    "for": "what its text calls \"GuestMatchPolicy.matchBy\": marketing.guest_match_policy, Marketing's data (CHG-R10GEN-001)"
+    "for": "whether each of settings.consentQuestionIds is an active ConsentQuestion of the tenant (ids = settings.consentQuestionIds), marketing.consent_question, Marketing's data; Marketing runs in the operations host (ADAM CR-429; CHG-CR429-001)"
    }
   ],
   "readsInProcess": [
-   "marketing.guest_match_policy"
+   "marketing.consent_question"
   ]
  },
  "createStockReservation": {
@@ -117309,14 +117655,18 @@
   "readVia": [
    {
     "query": "catalogue#productCategoryRecords",
-    "route": "service",
-    "for": "its read of catalogue.product_category, Catalogue's data (CHG-MOD-001)"
+    "route": "in-process",
+    "for": "the categories that name the flow (where {bookingFlowId}) and the categories of the products that would fall back to it, catalogue.product_category, Catalogue's data, asked in process from the operations host (ADAM CR-426; XDR-051; CHG-CR426-001)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
-    "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
+    "route": "in-process",
+    "for": "the products that name the flow (where {bookingFlowId}) and the venue's products on sale that would fall back to it, catalogue.product, Catalogue's data, asked in process from the operations host (ADAM CR-426; XDR-051; CHG-CR426-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product",
+   "catalogue.product_category"
   ]
  },
  "generateVisitPlan": {
@@ -117629,14 +117979,18 @@
   "readVia": [
    {
     "query": "catalogue#productCategoryRecords",
-    "route": "service",
-    "for": "its read of catalogue.product_category, Catalogue's data (CHG-MOD-001)"
+    "route": "in-process",
+    "for": "the category's bookingFlowId (the product's categoryId, or productCategoryId), catalogue.product_category, Catalogue's data, asked in process from the operations host (ADAM CR-427; XDR-051; CHG-CR427-001)"
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
-    "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
+    "route": "in-process",
+    "for": "the product's bookingFlowId, categoryId and kind (ids [productId] where {venueId}), catalogue.product, Catalogue's data, asked in process from the operations host (ADAM CR-427; XDR-051; CHG-CR427-001)"
    }
+  ],
+  "readsInProcess": [
+   "catalogue.product",
+   "catalogue.product_category"
   ]
  },
  "getSiteSetupProgress": {
@@ -119389,13 +119743,13 @@
   },
   "readVia": [
    {
-    "query": "marketing-crm#guestMatchPolicyRecords",
+    "query": "marketing-crm#consentQuestionRecords",
     "route": "in-process",
-    "for": "what its text calls \"GuestMatchPolicy.matchBy\": marketing.guest_match_policy, Marketing's data (CHG-R10GEN-001)"
+    "for": "whether each of settings.consentQuestionIds is an active ConsentQuestion of the tenant (ids = settings.consentQuestionIds), marketing.consent_question, Marketing's data; Marketing runs in the operations host (ADAM CR-429; CHG-CR429-001)"
    }
   ],
   "readsInProcess": [
-   "marketing.guest_match_policy"
+   "marketing.consent_question"
   ]
  },
  "updateVendorServiceRequest": {
@@ -119595,8 +119949,7 @@
   "path": "/outbox-republishes",
   "reads": [
    "cache:idempotency",
-   "control.outbox_republish",
-   "platform.outbox"
+   "control.outbox_republish"
   ],
   "writes": [
    "cache:idempotency",
@@ -119634,14 +119987,7 @@
     "status",
     "tenant_id"
    ]
-  },
-  "readVia": [
-   {
-    "query": "tenancy#outboxRecords",
-    "route": "service",
-    "for": "its read of platform.outbox, Tenancy's data (CHG-MOD-001)"
-   }
-  ]
+  }
  },
  "listOutboxRepublishes": {
   "contract": "platform-ops",
@@ -120095,7 +120441,6 @@
     "placement",
     "sort_order",
     "subtitle",
-    "tenant_config_id",
     "title"
    ],
    "whitelabel.footer_config": [
@@ -122319,6 +122664,7 @@
     "scope_path",
     "status",
     "target_mode",
+    "target_turnstile_mode",
     "to_direction",
     "venue_id"
    ]
@@ -123456,7 +123802,6 @@
   "verb": "GET",
   "path": "/ble-beacon-geofence",
   "reads": [
-   "access.access_point",
    "access.device_placement"
   ],
   "writes": [],
@@ -123474,7 +123819,17 @@
    "postgres",
    "redis"
   ],
-  "fixNote": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none)"
+  "fixNote": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none)",
+  "readVia": [
+   {
+    "query": "tenancy#deviceRecords",
+    "route": "in-process",
+    "for": "the beacon's health and lastDetected (platform.device.health and last_heartbeat_at), Tenancy's data, asked in process through Tenancy's own query class under the caller's row security (ADAM CR-389; XDR-031)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.device"
+  ]
  },
  "getDeveloperAccount": {
   "contract": "public-api",
@@ -124895,9 +125250,12 @@
   "readVia": [
    {
     "query": "tenancy#workstationRecords",
-    "route": "service",
-    "for": "its read of platform.workstation, Tenancy's data (CHG-MOD-001)"
+    "route": "in-process",
+    "for": "the workstation in the path: 404 when it is not in the venue, 409 not-a-kiosk when its channel is not kiosk (platform.workstation, Tenancy's data; CHG-MOD-001; in process since ADAM CR-384, XDR-027)"
    }
+  ],
+  "readsInProcess": [
+   "platform.workstation"
   ]
  },
  "createKioskConfig": {
@@ -124934,6 +125292,7 @@
    "whitelabel.kiosk_config": [
     "assigned_kiosk_count",
     "attract_loop",
+    "deleted_at",
     "display",
     "enabled_functions",
     "has_unpublished_changes",
@@ -124991,9 +125350,7 @@
   ],
   "writes": [
    "cache:idempotency",
-   "whitelabel.kiosk_config",
-   "whitelabel.kiosk_config_attract_slide",
-   "whitelabel.kiosk_config_start_tile"
+   "whitelabel.kiosk_config"
   ],
   "routing": null,
   "scope": "venue",
@@ -125038,6 +125395,7 @@
    "whitelabel.kiosk_config": [
     "assigned_kiosk_count",
     "attract_loop",
+    "deleted_at",
     "display",
     "enabled_functions",
     "has_unpublished_changes",
@@ -125082,7 +125440,17 @@
     "sort_order",
     "tile_size"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#workstationRecords",
+    "route": "in-process",
+    "for": "assignedKioskCount: the venue's kiosks, its active workstations with channel kiosk, where {venueId, channel: kiosk, isActive: true} (ADAM CR-383, CHG-CR383-001; XDR-027)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.workstation"
+  ]
  },
  "getKioskConfigValidation": {
   "contract": "white-label",
@@ -125095,7 +125463,8 @@
    "whitelabel.config_version",
    "whitelabel.kiosk_config",
    "whitelabel.kiosk_config_attract_slide",
-   "whitelabel.kiosk_config_start_tile"
+   "whitelabel.kiosk_config_start_tile",
+   "whitelabel.module_enablement"
   ],
   "writes": [],
   "routing": "primary",
@@ -125115,10 +125484,25 @@
   "note": "Reads the published tenant configuration (fonts, languages), the venue's booking flows and its products on sale. Writes nothing.",
   "readVia": [
    {
+    "query": "assets#mediaAssetRecords",
+    "route": "in-process",
+    "for": "mediaDoesNotFit: each slide's mediaAssetRef, by ids (assets.media_asset, same host; ADAM CR-385, CHG-CR385-001)"
+   },
+   {
     "query": "catalogue#productRecords",
-    "route": "service",
-    "for": "its read of catalogue.product, Catalogue's data (CHG-MOD-001)"
+    "route": "in-process",
+    "for": "tileWithoutProducts: the venue's products, where {venueId} (catalogue.product, Catalogue's data; CHG-MOD-001; in process since ADAM CR-385, as CR-343 ruled; XDR-028)"
+   },
+   {
+    "query": "payments#paymentMethodRecords",
+    "route": "in-process",
+    "for": "paymentMethodUnavailable: the accepted methods' payments.method rows (Orders' data; ADAM CR-385, XDR-028)"
    }
+  ],
+  "readsInProcess": [
+   "assets.media_asset",
+   "catalogue.product",
+   "payments.method"
   ]
  },
  "getPublishedKioskConfig": {
@@ -125238,7 +125622,17 @@
     "venue_id",
     "workstation_id"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#workstationRecords",
+    "route": "in-process",
+    "for": "the venue's kiosks, its active workstations with channel kiosk, where {venueId, channel: kiosk, isActive: true} (ADAM CR-383, CHG-CR383-001; XDR-027)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.workstation"
+  ]
  },
  "listKioskConfigVersions": {
   "contract": "white-label",
@@ -125306,6 +125700,7 @@
    "whitelabel.kiosk_config": [
     "assigned_kiosk_count",
     "attract_loop",
+    "deleted_at",
     "display",
     "enabled_functions",
     "has_unpublished_changes",
@@ -125350,7 +125745,17 @@
     "sort_order",
     "tile_size"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "tenancy#workstationRecords",
+    "route": "in-process",
+    "for": "assignedKioskCount: the venue's kiosks, its active workstations with channel kiosk, where {venueId, channel: kiosk, isActive: true} (ADAM CR-383, CHG-CR383-001; XDR-027)"
+   }
+  ],
+  "readsInProcess": [
+   "platform.workstation"
+  ]
  },
  "publishKioskConfigs": {
   "contract": "white-label",
@@ -125396,7 +125801,29 @@
     "snapshot",
     "version_number"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "assets#mediaAssetRecords",
+    "route": "in-process",
+    "for": "mediaDoesNotFit: each slide's mediaAssetRef, by ids (assets.media_asset, same host; ADAM CR-385, CHG-CR385-001)"
+   },
+   {
+    "query": "catalogue#productRecords",
+    "route": "in-process",
+    "for": "tileWithoutProducts: the venue's products, where {venueId} (catalogue.product, Catalogue's data; ADAM CR-385, as CR-343 ruled; XDR-028)"
+   },
+   {
+    "query": "payments#paymentMethodRecords",
+    "route": "in-process",
+    "for": "paymentMethodUnavailable: the accepted methods' payments.method rows (Orders' data; ADAM CR-385, XDR-028)"
+   }
+  ],
+  "readsInProcess": [
+   "assets.media_asset",
+   "catalogue.product",
+   "payments.method"
+  ]
  },
  "restoreKioskConfigVersion": {
   "contract": "white-label",
@@ -125433,6 +125860,7 @@
    "whitelabel.kiosk_config": [
     "assigned_kiosk_count",
     "attract_loop",
+    "deleted_at",
     "display",
     "enabled_functions",
     "has_unpublished_changes",
@@ -125518,7 +125946,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "whitelabel.kiosk_config",
    "whitelabel.kiosk_config_attract_slide",
    "whitelabel.kiosk_config_start_tile"
   ],
@@ -125540,6 +125967,7 @@
    "whitelabel.kiosk_config": [
     "assigned_kiosk_count",
     "attract_loop",
+    "deleted_at",
     "display",
     "enabled_functions",
     "has_unpublished_changes",
@@ -129828,6 +130256,7 @@
     "planned_send_at",
     "provider_reference",
     "queued_at",
+    "source_ref",
     "status",
     "subject_id",
     "template_id",
@@ -129879,6 +130308,7 @@
     "planned_send_at",
     "provider_reference",
     "queued_at",
+    "source_ref",
     "status",
     "subject_id",
     "template_id",
@@ -132830,6 +133260,7 @@
     "planned_send_at",
     "provider_reference",
     "queued_at",
+    "source_ref",
     "status",
     "subject_id",
     "template_id",
@@ -132876,6 +133307,7 @@
     "planned_send_at",
     "provider_reference",
     "queued_at",
+    "source_ref",
     "status",
     "subject_id",
     "template_id",
@@ -134296,6 +134728,11 @@
    "marketing.communication_preference_type",
    "marketing.consent_capture_point",
    "marketing.consent_purpose",
+   "marketing.consent_purpose_channel",
+   "marketing.cookie_banner_design",
+   "marketing.minor_privacy_rule",
+   "marketing.privacy_notice_governance",
+   "marketing.processing_purpose",
    "marketing.tracking_technology"
   ],
   "writes": [],
@@ -134317,7 +134754,7 @@
    {
     "query": "white-label#policyRecords",
     "route": "in-process",
-    "for": "what its text calls \"whitelabel.policy\": whitelabel.policy, WhiteLabel's data (CHG-R10GEN-001)"
+    "for": "what its text calls \"whitelabel.policy\": whitelabel.policy, WhiteLabel's data (CHG-R10GEN-001), served in process within the operations host; the policies in force, scheduled and in the directory (ADAM CR-378)"
    }
   ],
   "readsInProcess": [
@@ -142036,6 +142473,86 @@
     "minimum_rest_hours",
     "overtime",
     "scope_path"
+   ]
+  }
+ },
+ "sendGuestBroadcast": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/guest-broadcasts",
+  "reads": [
+   "cache:idempotency",
+   "marketing.communication_provider",
+   "marketing.guest_device",
+   "marketing.guest_profile"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.message_dispatch"
+  ],
+  "routing": null,
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Send a venue-wide broadcast to every guest on site",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres"
+  ],
+  "readVia": [
+   {
+    "query": "access#liveEntitlementSubjects",
+    "route": "in-process",
+    "for": "the guests with a live entitlement at the venue, to send to (ADAM CR-379; CHG-CR379-001), Access's data, read in process by operations under XDR-023"
+   }
+  ],
+  "readsInProcess": [
+   "access.entitlement"
+  ]
+ },
+ "listSubjectBiometricRecords": {
+  "contract": "identity",
+  "verb": "GET",
+  "path": "/internal/subject-biometrics",
+  "reads": [
+   "pii.subject_biometric"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "Read biometric enrolment rows for another deployable",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "IdentityService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "pii.subject_biometric": [
+    "captured_at",
+    "consent_form_id",
+    "consent_form_version",
+    "consent_given_at",
+    "consent_purpose_id",
+    "enrolment_channel",
+    "entitlement_id",
+    "expires_at",
+    "guardian_subject_id",
+    "id",
+    "is_active",
+    "kind",
+    "retention_anchor",
+    "source",
+    "subject_id"
    ]
   }
  }

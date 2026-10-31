@@ -2198,7 +2198,7 @@
    },
    "reason": {
     "type": "string",
-    "description": "Reason, recorded in the audit",
+    "description": "Reason, recorded in the audit: the operation puts it on the request's audit context and the audit interceptor writes it to the audit row's `reason`, which `listAuditRecords` returns (ADAM CR-376; CHG-CR376-001).",
     "nullable": true
    }
   }

@@ -84,11 +84,12 @@ reads:
   reader: commerce
   tables: [access.entitlement, access.scan_event]
   privileges: [SELECT]
-  queries: [access#entitlementRecords, access#scanEventRecords]
-  operations: [getMediaEntitlements, listDeviceAuditRecords]
+  queries: [access#entitlementRecords, access#scanEventRecords, access#liveEntitlementSubjects]
+  operations: [getMediaEntitlements, listDeviceAuditRecords, broadcastToGuests]
   added: '2026-10-21'
   decision_ref: ADAM CR-196, option B, Chinmay, 21 October 2026; listDeviceAuditRecords added by ADAM CR-232, option A,
-    Chinmay, 25 October 2026 (CHG-R10TEN-005)
+    Chinmay, 25 October 2026 (CHG-R10TEN-005); access#liveEntitlementSubjects and workforce broadcastToGuests (its
+    recipientCount) added by ADAM CR-379, Chinmay, 31 October 2026 (CHG-CR379-001), on the same SELECT
   why: 'orders getMediaEntitlements (commerce) answers from Access''s entitlements on a media code and their scans. The
     service route between deployables (serviceAuth inside a cell) is not built and has no ticket (CR-174), and a call
     on it would run at the tenant root and lose the caller''s scope, so a venue cashier would see every venue''s
@@ -354,7 +355,7 @@ reads:
   privileges: [SELECT]
   queries: [catalogue#productRecords, tenancy#activeVenues]
   operations: [validateTenantConfig, publishTenantConfig, restoreConfigVersion, setAnalyticsProvider,
-    setMaintenanceMode]
+    setMaintenanceMode, setBookingFlowConfig]
   added: '2026-10-30'
   decision_ref: ADAM CR-343, Chinmay, 30 October 2026 (A's sellable rule and in-process read, narrowed, and with the
     venue read in process too)
@@ -369,6 +370,166 @@ reads:
     XDR-008), and tenancy#activeVenues, whose platform.scope is a kernel table every host may read (CR-002), as
     CR-296 ruled for Tenancy''s other reads, so no grant is added for it. restoreConfigVersion,
     setAnalyticsProvider (#30765) and setMaintenanceMode (#30766) ask tenancy#activeVenues in process under the same
-    ruling; the two tickets CR-281 left waiting for service sign-in waited only for this read. Not covered:
-    publishTenantConfig and restoreConfigVersion still ask orders#venueChargeCurrencies over the service route, and
-    getTenantConfig and setBookingFlowConfig still ask tenancy#activeVenues over it.'
+    ruling; the two tickets CR-281 left waiting for service sign-in waited only for this read. setBookingFlowConfig
+    (#31043) asks tenancy#activeVenues in process under the same ruling, to check each active venue''s guest contact
+    fields against the GuestMatchPolicy in force there (ADAM CR-430, Chinmay, 31 October 2026; CHG-CR430-001). Not
+    covered: publishTenantConfig and restoreConfigVersion still ask orders#venueChargeCurrencies over the service
+    route, and getTenantConfig still asks tenancy#activeVenues over it.'
+- id: XDR-023
+  reader: operations
+  tables: [access.entitlement]
+  privileges: [SELECT]
+  queries: [access#liveEntitlementSubjects]
+  operations: [sendGuestBroadcast]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-379, Chinmay, 31 October 2026 ("as you recommended", with the audience query, the venue and the
+    second-principal rule stated; CHG-CR379-001)
+  why: 'marketing-crm sendGuestBroadcast (operations host), the relay-invoked consumer of workforce.guestBroadcastAccepted,
+    sends a venue-wide broadcast to every guest with a live entitlement at the venue, and the entitlements are
+    access.entitlement rows, Access''s data in its own deployable. The service route between deployables is not built
+    (CR-174, CR-281). The operations host asks access#liveEntitlementSubjects in process, through Access''s own query
+    class, in the caller''s transaction under the caller''s row-level security, as commerce does under XDR-001. SELECT
+    only, on the one table.'
+- id: XDR-027
+  reader: operations
+  tables: [platform.workstation]
+  privileges: [SELECT]
+  queries: [tenancy#workstationRecords]
+  operations: [assignKiosk, listKioskConfigs, getKioskConfig, listKioskAssignments]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-383 (not as recommended, A on CR-384's channel) and ADAM CR-384 (as recommended, the values
+    named as catalogue's Channel), Chinmay, 31 October 2026
+  why: 'White Label''s kiosk operations (operations host) need to know which workstations are kiosks. CR-384 marks one:
+    platform.workstation.channel, pos or kiosk, Tenancy''s data in commerce. assignKiosk (#35614) reads the workstation
+    in the path for its 404 (not in the venue) and 409 not-a-kiosk (channel not kiosk); listKioskConfigs (#35618) and
+    getKioskConfig (#35617) count assignedKioskCount from the venue''s kiosks, and listKioskAssignments (#35625)
+    answers one item per kiosk of the venue (CR-383), all asking tenancy#workstationRecords where {venueId, channel:
+    kiosk, isActive: true}. The service route between deployables is not built (CR-281; #37051). The operations host
+    asks the query in process, through Tenancy''s own query class, in the caller''s transaction under the caller''s
+    row-level security. SELECT only, on the one table, which V0118 already grants the operations role (as for
+    createFnbOrder under XDR-009), so no grant is new. Recorded as its own entry beside XDR-009, so XDR-009 is not
+    edited by two changes at once. Nothing writes a whitelabel.kiosk_assignment row from enrolment or
+    configureWorkstation (CR-383 option B was not chosen).'
+- id: XDR-028
+  reader: operations
+  tables: [catalogue.product, catalogue.product_media, payments.method]
+  privileges: [SELECT]
+  queries: [catalogue#productRecords, payments#paymentMethodRecords]
+  operations: [getKioskConfigValidation, publishKioskConfigs]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-385, Chinmay, 31 October 2026 (as recommended)
+  why: 'White Label''s getKioskConfigValidation (#35623) and publishKioskConfigs (#35619) run the kiosk publish checks.
+    tileWithoutProducts needs the venue''s sellable bookable products (catalogue.product, with catalogue.product_media
+    for Product.media[], Catalogue''s data in commerce), asked of catalogue#productRecords where {venueId} in process
+    as CR-343 ruled for the tenant configuration (XDR-022), on the SELECT V0118 already grants. paymentMethodUnavailable
+    needs the accepted methods'' payments.method rows (Orders'' data in commerce), which no query served and no grant
+    reached: Orders declares payments#paymentMethodRecords, and the operations host asks it in process through
+    Orders'' own query class, in the caller''s transaction under the caller''s row-level security. SELECT only; the
+    grant on payments.method is new (with USAGE on schema payments where the role lacks it). The service route between
+    deployables is not built (CR-281; #37051). The media check''s assets#mediaAssetRecords is served in the same host
+    (Assets runs in operations with White Label) and needs no entry. Recorded as its own entry, so XDR-022 is not
+    edited by two changes at once.'
+- id: XDR-031
+  reader: access
+  tables: [platform.device]
+  privileges: [SELECT]
+  queries: [tenancy#deviceRecords]
+  operations: [setBleBeaconGeofence, getBleBeaconGeofence]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-389, Chinmay, 31 October 2026 (not as recommended - A, with a centre for the circle and the
+    reads named)
+  why: 'access setBleBeaconGeofence (#30955) keeps one access.device_placement row (role proximity) per beacon, found by
+    device_id = beaconId, and a beaconId that names no registered platform.device is 404; its view and
+    getBleBeaconGeofence answer health and lastDetected, which are platform.device.health and last_heartbeat_at,
+    Tenancy''s register (ADR-0067) in commerce. The service route between deployables is not built (CR-281; the
+    kernel''s service sign-in, #37051), and the access role had no SELECT on platform.device. The access host asks
+    tenancy#deviceRecords in process, through Tenancy''s own query class, in the caller''s transaction under the
+    caller''s row-level security: a narrow read, as XDR-003 is. SELECT only, on the one table; the access role
+    already has USAGE on platform.'
+- id: XDR-032
+  reader: access
+  tables: [platform.venue_settings]
+  privileges: [SELECT]
+  queries: [tenancy#venueSettingsRecords]
+  operations: [setFaceTagTemporaryEnrollment, listFaceTagTemporary]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-390, Chinmay, 31 October 2026 (not as recommended - A, without a form version on the profile)
+  why: 'access setFaceTagTemporaryEnrollment (#30956) falls back to the venue''s biometric consent form
+    (VenueSettings.biometrics.consentFormId) when the profile names none, else 422 consent-form-required, and its view
+    and listFaceTagTemporary answer templatesHeldByTicvai from the same settings: platform.venue_settings, Tenancy''s
+    data in commerce. Both read it over the service route between deployables, which is not built (CR-281; #37051),
+    and the access role had no SELECT on platform.venue_settings. The access host asks tenancy#venueSettingsRecords
+    in process, through Tenancy''s own query class, in the caller''s transaction under the caller''s row-level
+    security: a narrow read, as XDR-003 is. SELECT only. Not covered by this decision: seven other access operations
+    (enrolFaceTag, enrolFacePass, createAdmissionRules, updateAdmissionRules, setRfidNfcCard,
+    listBiometricConsentGuardian, listSecurityDetectionGovernance) still ask venueSettingsRecords over the service
+    route.'
+- id: XDR-033
+  reader: operations
+  tables: [catalogue.event, catalogue.product, catalogue.product_media, catalogue.product_category]
+  privileges: [SELECT]
+  queries: [catalogue#productRecords, catalogue#productCategoryRecords, catalogue#eventRecords]
+  operations: [createGuidedChoice, proposeGuidedChoice, publishGuidedChoice]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-394, Chinmay, 31 October 2026 (not as recommended - A, on the queries that already exist, with
+    a rule stated for each kind)
+  why: 'white-label createGuidedChoice (#30924) and proposeGuidedChoice (#30931) refuse a target not in the choice''s
+    venue (400 target-not-in-venue), and publishGuidedChoice (#30932) refuses a target not on sale (422
+    answer-target-not-on-sale). Product, category and event targets are Catalogue''s rows in commerce, and none of the
+    three operations declared a read of them. The operations host asks catalogue#productRecords,
+    catalogue#productCategoryRecords and catalogue#eventRecords in process, through Catalogue''s own query classes,
+    in the caller''s transaction under the caller''s row-level security. The SELECT on catalogue.product,
+    catalogue.product_media and catalogue.product_category is the one V0118 already grants the operations role
+    (XDR-008, XDR-022); SELECT on catalogue.event is new, and the operations role already has USAGE on schema
+    catalogue.'
+- id: XDR-035
+  reader: access
+  tables: [identity.delegated_access]
+  privileges: [SELECT]
+  queries: [identity#principalHoldsRoleAtVenue]
+  operations: [setTurnstileMode]
+  added: '2026-10-31'
+  decision_ref: 'ADAM CR-396, Chinmay, 31 October 2026 (posted on 30967: "not as recommended", keep whoCanActivate and
+    ask identity#principalHoldsRoleAtVenue in process)'
+  why: 'access setTurnstileMode (Access, access host, #30967) refuses freeFlow or dropArm to a caller who holds none of
+    the governing gate mode policy''s whoCanActivate roles at the access point''s venue (403 gate-mode-role-required).
+    Whether a person holds a role at a venue is identity.delegated_access, Identity''s data in commerce, and
+    identity#principalHoldsRoleAtVenue already answers it as a yes or no (ADAM CR-336, CR-344; built by #32338). The
+    lead chose to ask it in process, as the access host already asks identity#subjectRecords (XDR-010): through
+    Identity''s own query class, which answers the one statement under the routed tenant''s root grant and returns only
+    `holds`, never which grant or where. The service route between deployables is not built (CR-281; #37051). SELECT
+    only, on the one table; no grant, role or scope is returned to Access.'
+- id: XDR-036
+  reader: access
+  tables: [platform.scope]
+  privileges: [SELECT]
+  queries: [tenancy#scopeRecords]
+  operations: [createAdmissionRules]
+  added: '2026-10-31'
+  decision_ref: 'ADAM CR-400, Chinmay, 31 October 2026 (posted on 30964: createAdmissionRules sets scope_path by
+    CR-217''s rule, the path of the session''s working venue read with tenancy#scopeRecords by id)'
+  why: 'access createAdmissionRules (Access, access host, #30964) writes access.admission_rules.scope_path as the path
+    of the session''s working venue, which the session carries only as a venue id. CR-217''s rule reads that path with
+    tenancy#scopeRecords by id, in process, through Tenancy''s own query class, in the caller''s transaction under the
+    caller''s row-level security, as XDR-003 does for the access host''s other Tenancy read and CR-296 ruled for the
+    operations host (XDR-004). platform.scope is a kernel table every host may already SELECT (CR-002), so the grant
+    derive-ddl writes for it adds no privilege. The service route between deployables is not built (CR-281; #37051).'
+- id: XDR-051
+  reader: operations
+  tables: [catalogue.product, catalogue.product_media, catalogue.product_category]
+  privileges: [SELECT]
+  queries: [catalogue#productRecords, catalogue#productCategoryRecords]
+  operations: [deleteBookingFlow, getPublishedBookingFlow]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-426 (as recommended) and CR-427 (the reads and the 400 as recommended, the tie rule not),
+    Chinmay, 31 October 2026
+  why: 'white-label deleteBookingFlow (operations host, #31031) refuses 409 flow-in-use while a product or category
+    names the flow, or while it is the venue''s default for its type and a product on sale would fall back to it;
+    getPublishedBookingFlow (#31033) resolves a product''s or category''s flow. Both need Catalogue''s products
+    (catalogue.product, with catalogue.product_media for Product.media[]) and categories (catalogue.product_category),
+    Catalogue''s data in commerce, and both were declared on the service route between deployables, which is not
+    built (CR-174; the kernel''s service sign-in, #37051). The operations host asks catalogue#productRecords and
+    catalogue#productCategoryRecords in process, through Catalogue''s own query classes registered in the
+    operations host, in the caller''s transaction under the caller''s row-level security, with their where input,
+    as createFnbOrder does under XDR-008 and validateTenantConfig under XDR-022. The SELECT on the three tables is
+    the one V0118 already grants the operations role (XDR-008); no grant or migration is added.'

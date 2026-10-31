@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-31",
+ "generated": "2026-11-01",
  "note": "Derived from `x-ticvai-audience` on every operation. **One field, eight values** \u2014 `x-ticvai-guest-callable` and `x-ticvai-auth` were two vocabularies answering the same question differently and were collapsed on 18 August (ADR-0025).",
  "field": "x-ticvai-audience",
  "values": [
@@ -111,7 +111,7 @@
   }
  },
  "totals": {
-  "operations": 2860,
+  "operations": 2862,
   "screens": 2453,
   "flows": 291
  },
@@ -1803,6 +1803,7 @@
     "issueCreditMemo",
     "issueOrderEntitlements",
     "issueTaxInvoice",
+    "listSubjectBiometricRecords",
     "notifyPerformanceHolders",
     "postOrderRevenue",
     "propagateCrossRegionEntitlement",
@@ -1839,6 +1840,7 @@
     "runSemanticQuery",
     "scoreApprovalRequest",
     "scoreTransactionRisk",
+    "sendGuestBroadcast",
     "sendGuestOneTimeCode",
     "sendTransactionalMessage",
     "setTenantDomainMapping",
@@ -1951,6 +1953,7 @@
     "marketing.customer_badge",
     "marketing.form_submission",
     "marketing.form_submission_sale_link",
+    "marketing.guest_device",
     "marketing.guest_document",
     "marketing.guest_match_policy",
     "marketing.guest_profile",
@@ -1983,6 +1986,7 @@
     "payments.token",
     "pii.consent_identifier",
     "pii.subject",
+    "pii.subject_biometric",
     "platform.audit_record",
     "platform.dead_letter",
     "platform.idempotency_record",
@@ -2017,11 +2021,11 @@
     "whitelabel.guided_choice_question"
    ],
    "counts": {
-    "operations": 69,
+    "operations": 71,
     "screens": 0,
     "flows": 5,
     "contracts": 18,
-    "tables": 137
+    "tables": 139
    }
   },
   "staff": {
@@ -7265,6 +7269,7 @@
     "catalogue.channel_incident",
     "catalogue.channel_sales_rule",
     "catalogue.channel_sync",
+    "catalogue.competitor_price_observation",
     "catalogue.configuration_template",
     "catalogue.demand_forecast",
     "catalogue.demand_signal",
@@ -8144,6 +8149,7 @@
     "workforce.employment",
     "workforce.field_ownership",
     "workforce.forecast_requirement",
+    "workforce.guest_broadcast",
     "workforce.integration_source",
     "workforce.job_title",
     "workforce.labour_budget",
@@ -8170,7 +8176,7 @@
     "screens": 2164,
     "flows": 138,
     "contracts": 33,
-    "tables": 1136
+    "tables": 1138
    }
   }
  }

@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/build-white-label-map.py",
- "generated": "2026-10-31",
+ "generated": "2026-11-01",
  "note": "Derived from the configuring operations' request schemas and the screens. Never edit; rerun the tool.",
  "elements": [
   {
@@ -3981,7 +3981,7 @@
    "mask": "",
    "required": false,
    "default": "Email",
-   "allowed": "Email · Mobile · Name; at least 1; at most 3; no duplicates; Must include the contact the guest's code is sent to and matched on (identity `GuestMatchPolicy.; matchBy`), or 400.",
+   "allowed": "Email · Mobile · Name; at least 1; at most 3; no duplicates; Must include the contact the guest's code is sent to and matched on at every active venue, by the marketing-crm `GuestMatchPolicy` in force there (the venue's row, else the default `matchBy` …; Read …",
    "help": "What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1).",
    "effect": "",
    "configuredOn": [
@@ -5250,7 +5250,7 @@
    "mask": "",
    "required": false,
    "default": "Email",
-   "allowed": "Email · Mobile · Name; at least 1; at most 3; no duplicates; Must include the contact the guest's code is sent to and matched on (identity `GuestMatchPolicy.; matchBy`), or 400.",
+   "allowed": "Email · Mobile · Name; at least 1; at most 3; no duplicates; Must include the contact the guest's code is sent to and matched on at every active venue, by the marketing-crm `GuestMatchPolicy` in force there (the venue's row, else the default `matchBy` …; Read …",
    "help": "What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1).",
    "effect": "",
    "configuredOn": [
@@ -6008,7 +6008,7 @@
    "mask": "",
    "required": false,
    "default": "—",
-   "allowed": "at most 10; no duplicates; Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400.",
+   "allowed": "at most 10; no duplicates; Each id names an active `ConsentQuestion` of the tenant in marketing-crm, or 400 `consent-question-not-active`, naming the ids: `createBookingFlowDefinition` and `updateBookingFlowDefinition` read …",
    "help": "The flow's own consent questions (rev 3 REV3-26). Asked on every booking through this flow, together with those of each product in the cart, each question once.",
    "effect": "",
    "configuredOn": [
@@ -6792,7 +6792,7 @@
    "required": false,
    "default": "—",
    "allowed": "—",
-   "help": "",
+   "help": "Stored. `false` holds the banner in `draft` through later edits until an update sends `true` (ADAM CR-388, CHG-CR388-001); it is how staff take a banner back to `draft`.",
    "effect": "",
    "configuredOn": [
     {
@@ -7914,8 +7914,8 @@
    "mask": "English and Arabic (Arabic right to left)",
    "required": true,
    "default": "—",
-   "allowed": "English and Arabic (Arabic right to left)",
-   "help": "Keyed by language code. Values are sanitised HTML.",
+   "allowed": "- URL schemes: https, mailto and tel for href; https only for src.",
+   "help": "Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001).",
    "effect": "",
    "configuredOn": [
     {
@@ -8078,8 +8078,8 @@
    "mask": "English and Arabic (Arabic right to left)",
    "required": true,
    "default": "—",
-   "allowed": "English and Arabic (Arabic right to left)",
-   "help": "Keyed by language code. Values are sanitised HTML.",
+   "allowed": "- URL schemes: https, mailto and tel for href; https only for src.",
+   "help": "Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001).",
    "effect": "",
    "configuredOn": [
     {
@@ -8133,7 +8133,7 @@
    "required": false,
    "default": "—",
    "allowed": "1 Oct 2026 (dd MMM yyyy)",
-   "help": "",
+   "help": "The day the version takes effect, UTC. Missing is the publish day (UTC); before today (UTC) is `400 effective-from-in-past` (ADAM CR-392).",
    "effect": "",
    "configuredOn": [
     {
@@ -8306,8 +8306,8 @@
    "mask": "English and Arabic (Arabic right to left)",
    "required": true,
    "default": "—",
-   "allowed": "English and Arabic (Arabic right to left)",
-   "help": "Keyed by language code. Values are sanitised HTML.",
+   "allowed": "- URL schemes: https, mailto and tel for href; https only for src.",
+   "help": "Keyed by language code. Values are HTML, sanitised on write by the server (ADAM CR-401, decided 31 October 2026; CHG-CR401-001).",
    "effect": "",
    "configuredOn": [],
    "reach": "faqs",

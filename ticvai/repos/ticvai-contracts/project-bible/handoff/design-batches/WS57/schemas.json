@@ -12,6 +12,7 @@
    },
    "channelCode": {
     "type": "string",
+    "x-ticvai-unique": "tenant",
     "description": "Channel Code: unique within the tenant, 2-20 upper-case letters, digits or hyphens (decided 29 September, readiness close-out)",
     "pattern": "^[A-Z0-9-]{2,20}$"
    },
@@ -64,7 +65,7 @@
    },
    "currency": {
     "type": "string",
-    "description": "Currency: ISO 4217 code",
+    "description": "Currency: ISO 4217 code. Not stored; the currency the venue trades in applies (ADR-0018). Kept only so older clients validate: it is checked against its pattern and dropped (ADAM CR-413).",
     "pattern": "^[A-Z]{3}$"
    },
    "timeZone": {
@@ -155,7 +156,8 @@
    },
    "scopeId": {
     "type": "string",
-    "description": "ID of the scoped item (country code, region, venue, attraction, event, location or business unit); empty for global",
+    "format": "uuid",
+    "description": "ID of the scoped item: the region, venue, attraction, event, location or business unit; empty for global and country, a country channel naming its country in `country` (ADAM CR-413). Not a uuid, or sent for global or country, is 400 validation.",
     "nullable": true
    },
    "salesChannel": {
@@ -1408,13 +1410,14 @@
    },
    "effectiveFrom": {
     "type": "string",
-    "format": "date",
-    "description": "Effective From"
+    "format": "date-time",
+    "nullable": true,
+    "description": "Effective From: the instant as stored and as setChannelSalesRule takes it; null means in effect from when the rule was saved. The screen shows the day in the venue's time zone (ADAM CR-414)."
    },
    "effectiveTo": {
     "type": "string",
-    "format": "date",
-    "description": "Effective To; empty for open-ended",
+    "format": "date-time",
+    "description": "Effective To: the instant as stored and as setChannelSalesRule takes it; null means open-ended. The screen shows the day in the venue's time zone (ADAM CR-414).",
     "nullable": true
    }
   }
@@ -1423,31 +1426,31 @@
   "type": "object",
   "x-ticvai-drafted-shape": true,
   "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
-  "description": "**The headline figures on Channel Sales Schedule & Availability Windows.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
+  "description": "**The headline figures on Channel Sales Schedule & Availability Windows.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.\n\n**What each figure counts** (ADAM CR-411, decided 31 October 2026, Chinmay). The summary covers every row the filters return, not just the page: the active `salesWindow` rules whose effective period overlaps `from` to `to` (`from` defaults to today; `to` is open-ended when not sent). Dates and times are local to the row's `timeZone`, else its channel's `time_zone`. A **covered performance** is a performance, not cancelled, of the event of the row's product; for a row with no product, a performance of any product its channel sells (an enabled, not excluded `catalogue.product_channel_assignment` for that sales channel); under the `event` filter, only that event's performances count.",
   "properties": {
    "activeSellingPeriods": {
     "type": "integer",
-    "description": "Active selling periods"
+    "description": "Active selling periods: rows selling today: today is within salesStartDate to salesEndDate (an empty end is open), today is in daysOfWeek (empty means every day), and today is not one of its blackoutDates. An event-relative row counts when now is inside its window for a covered performance (ADAM CR-411)."
    },
    "scheduledOpenings": {
     "type": "integer",
-    "description": "Scheduled openings"
+    "description": "Scheduled openings: rows whose salesStartDate falls in the range, plus, for each event-relative row, each covered performance whose opening (the anchor minus opensMinutesBefore) falls in it (ADAM CR-411)."
    },
    "scheduledClosures": {
     "type": "integer",
-    "description": "Scheduled closures"
+    "description": "Scheduled closures: rows whose salesEndDate falls in the range, plus, for each event-relative row, each covered performance whose closing (the anchor minus closesMinutesBefore) falls in it (ADAM CR-411)."
    },
    "blackouts": {
     "type": "integer",
-    "description": "Blackouts"
+    "description": "Blackouts: distinct (channel, date) pairs from the blackoutDates of the rows within the range; there is no separate blackout row (ADAM CR-411)."
    },
    "conflicts": {
     "type": "integer",
-    "description": "Conflicts"
+    "description": "Conflicts: rows whose dates and days overlap another counted row on the same channel for the same product; a row with no product overlaps every product of its channel, unless the product row has overridesProductRule (ADAM CR-411)."
    },
    "eventDates": {
     "type": "integer",
-    "description": "Event dates"
+    "description": "Event dates: the distinct dates in the range on which a covered performance starts (ADAM CR-411)."
    }
   }
  },
@@ -1567,7 +1570,7 @@
     "items": {
      "type": "string"
     },
-    "description": "Unusual schedule configurations AI detects (pack p.12, e.g. OTA closing after admission has ended). Advisory only: nothing is changed until a user acts."
+    "description": "Unusual schedule configurations AI detects (pack p.12, e.g. OTA closing after admission has ended). Advisory only: nothing is changed until a user acts. Always an empty list until an insight source is declared (ADAM CR-411; docs/active/left-out.yaml LO-CR411-001)."
    }
   }
  },
@@ -1690,7 +1693,7 @@
    },
    "allocation": {
     "type": "number",
-    "description": "Allocation: units for dedicated, percent of the pool for percentage; empty for sharedPool",
+    "description": "Allocation: allocationPercent (envelope_percent) for percentage, allocated_units for dedicated and dynamic (a dynamic envelope's current size); empty for sharedPool (ADAM CR-412)",
     "minimum": 0,
     "nullable": true
    },
@@ -1774,11 +1777,11 @@
    },
    "released": {
     "type": "integer",
-    "description": "Released: units given back to the shared pool by a release rule"
+    "description": "Released: units given back to the shared pool by the allocation release job (channel_envelope.released_units; ADAM CR-412)"
    },
    "returned": {
     "type": "integer",
-    "description": "Returned: units returned manually"
+    "description": "Returned: units returned manually by relinquishChannelAllocation (channel_envelope.returned_units; ADAM CR-412)"
    },
    "allocationType": {
     "type": "string",
@@ -1811,7 +1814,7 @@
     "items": {
      "type": "string"
     },
-    "description": "AI reallocation suggestions (pack p.11). Advisory only: nothing is changed until a user acts."
+    "description": "AI reallocation suggestions (pack p.11). Advisory only: nothing is changed until a user acts. An empty list until an insight source is declared (ADAM CR-412; docs/active/left-out.yaml LO-CR412-001)."
    }
   }
  },
@@ -2143,7 +2146,7 @@
    },
    "salesChannel": {
     "$ref": "../shared/common.yaml#/components/schemas/SalesChannel",
-    "description": "The shared reporting dimension this channel's sales are attributed to (b2cWeb -> guestWeb, b2cMobileApp -> guestApp, the POS types -> pos, callCentre, b2bPortal -> b2b, ota and marketplace -> ota, api, reseller/partnerPortal/thirdPartyChannel -> partner; a custom channel picks one) (decided 29 September, readiness close-out)"
+    "description": "The shared reporting dimension this channel's sales are attributed to (b2cWeb -> guestWeb, b2cMobileApp -> guestApp, the POS types -> pos, kiosk -> kiosk (ADAM CR-413), callCentre, b2bPortal -> b2b, ota and marketplace -> ota, api, reseller/partnerPortal/thirdPartyChannel -> partner; a custom channel picks one) (decided 29 September, readiness close-out)"
    },
    "aiInsights": {
     "type": "array",

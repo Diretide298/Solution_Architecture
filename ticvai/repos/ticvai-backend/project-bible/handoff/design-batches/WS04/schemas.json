@@ -158,7 +158,7 @@
    "integrationId": {
     "type": "string",
     "format": "uuid",
-    "description": "Absent creates an integration"
+    "description": "The record's id, when sent; it must equal the path's `integrationId` (ADAM CR-245, CR-395). A path id no record has creates one with that id."
    },
    "name": {
     "type": "string",
@@ -474,7 +474,7 @@
    "encodingProfileId": {
     "type": "string",
     "format": "uuid",
-    "description": "Absent creates a profile"
+    "description": "The record's id, when sent; it must equal the path's `encodingProfileId` (ADAM CR-245, CR-395). A path id no record has creates one with that id."
    },
    "name": {
     "type": "string",
@@ -637,7 +637,7 @@
    "mediaTypeId": {
     "type": "string",
     "format": "uuid",
-    "description": "Absent adds a media type"
+    "description": "The record's id, when sent; it must equal the path's `mediaTypeId` (ADAM CR-245, CR-395). A path id no record has creates one with that id."
    },
    "name": {
     "type": "string",

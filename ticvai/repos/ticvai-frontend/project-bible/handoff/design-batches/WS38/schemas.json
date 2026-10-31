@@ -724,7 +724,7 @@
  "DemandSignal": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.demand_signal",
-  "description": "**An external or calendar signal that moves demand** (29 September, data model DM3). Merges weather (ADM-101), nearby events (ADM-102), competitor prices (ADM-103), tourism, holiday and market signals (ADM-104) and the tenant's special calendar (Ramadan, Eid, school breaks) used by temporal rules. `signalKind` says which; the readings specific to a kind are in `reading`, and a venue's sensitivity settings in `configuration`. A signal informs forecasts and recommendations; it never sets a price.",
+  "description": "**An external or calendar signal that moves demand** (29 September, data model DM3). Merges weather (ADM-100), nearby events (ADM-101), competitor prices (ADM-102), tourism, holiday and market signals (ADM-103) and the tenant's special calendar (Ramadan, Eid, school breaks) used by temporal rules. `signalKind` says which; the readings specific to a kind are in `reading`, and a venue's sensitivity settings in `configuration`. A signal informs forecasts and recommendations; it never sets a price.\n\n**A `competitorPrice` row is the competitor registry** (ADAM CR-409, decided 31 October 2026, Chinmay): one competitor product mapped to one TICVAI product. `name` is the competitor, `marketCode` the market, `productId` the comparable TICVAI product, with `source`, `refreshFrequency` and `reliability` (stored 0 to 1, answered by `listCompetitorPricingMarket` as a percent). `isApproved` is the view's `sourceApproved`, and `configuration` holds `{venueProduct, currency, collectionMethod, comparabilityApproved}`. Its price observations are rows of `catalogue.competitor_price_observation` (`CompetitorPriceObservation`).",
   "required": [
    "id",
    "scopePath",
@@ -779,7 +779,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Competitor observations: the comparable TICVAI product."
+    "description": "A `competitorPrice` registry row: the comparable TICVAI product (ADAM CR-409)."
    },
    "geography": {
     "type": "string",
@@ -814,13 +814,13 @@
     "type": "object",
     "additionalProperties": true,
     "nullable": true,
-    "description": "Kind-specific values: weather conditions and forecasts, event attendance and distance, competitor prices."
+    "description": "Kind-specific values: weather conditions and forecasts, event attendance and distance. A `competitorPrice` row's prices are not here but in `catalogue.competitor_price_observation`; its reading holds `{historicalCorrelation: {demand, conversion, priceSensitivity}}` (each -1 to 1), written by the AI layer, and absent until it does (ADAM CR-409)."
    },
    "configuration": {
     "type": "object",
     "additionalProperties": true,
     "nullable": true,
-    "description": "Weather: `{venueExposure, weatherSensitivity, conditionImpacts, forecastHorizon, dataFailurePolicy}`; events: `{monitoringRadiusKm}`."
+    "description": "Weather: `{venueExposure, weatherSensitivity, conditionImpacts, forecastHorizon, dataFailurePolicy}`; events: `{monitoringRadiusKm}`; competitor prices: `{venueProduct, currency, collectionMethod, comparabilityApproved}` (`collectionMethod` one of manualEntry, dataFeed, publishedWebsite, partnerSupplied; `currency` ISO 4217; ADAM CR-409)."
    },
    "weight": {
     "type": "number",
@@ -865,7 +865,7 @@
    "isApproved": {
     "type": "boolean",
     "default": false,
-    "description": "Competitor sources and comparability approved for use."
+    "description": "A competitor source approved as legally permissible for use (the view's `sourceApproved`; comparability is `configuration.comparabilityApproved`; ADAM CR-409)."
    },
    "isActive": {
     "type": "boolean",
@@ -1069,6 +1069,31 @@
    }
   }
  },
+ "DynamicPriceRuleDetail": {
+  "type": "object",
+  "x-ticvai-persistence": "none — composed from a rule, its conditions and its actions",
+  "description": "**A rule is unreadable without both halves.** The conditions say when it fires, the actions say what it does to the price, and `minPrice`/`maxPrice` on the action are the guard rails a reviewer looks for first.\n",
+  "required": [
+   "rule"
+  ],
+  "properties": {
+   "rule": {
+    "$ref": "#/components/schemas/PricingDynamicPriceRule"
+   },
+   "conditions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/PricingDynamicPriceCondition"
+    }
+   },
+   "actions": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/PricingDynamicPriceAction"
+    }
+   }
+  }
+ },
  "DynamicPricingAutomationPolicyControlView": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
@@ -1129,28 +1154,31 @@
    "scopeLevel": {
     "type": "string",
     "enum": [
-     "product",
-     "event",
+     "global",
+     "market",
      "venue",
      "strategy",
-     "channel",
-     "market"
+     "product",
+     "event",
+     "performance",
+     "channel"
     ],
-    "description": "Automation Scope (pack p.88)"
+    "description": "Automation Scope (pack p.88), all eight levels of dynamic_pricing_control (ADAM CR-417)"
    },
    "scopeId": {
     "type": "string",
-    "description": "ID of the product, event, venue, strategy, channel or market"
+    "nullable": true,
+    "description": "ID of the scope: null at global; a catalogue.pricing_market id at market; a catalogue.sales_channel id at channel (the CR-410 key); otherwise the venue, strategy, product, event or performance id (ADAM CR-417)"
    },
-   "automationMode": {
+   "automationLevel": {
     "type": "string",
     "enum": [
-     "monitor",
-     "recommend",
-     "prepareChange",
-     "autoExecuteWithinGuardrails"
+     "advisory",
+     "humanInTheLoop",
+     "conditionalAutonomous",
+     "autonomous"
     ],
-    "description": "Automation mode; defaults to recommend (decided 29 September, readiness close-out)"
+    "description": "Automation level, straight from automation_level; defaults to advisory (replaces automationMode; ADAM CR-417)"
    },
    "authorityTiers": {
     "type": "array",
@@ -1276,7 +1304,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Null at `global`."
+    "description": "Null at `global`. At `market` a `catalogue.pricing_market` id; at `channel` a `catalogue.sales_channel` id, the key `pricing.dynamic_price_rule.channel_id` uses (ADAM CR-410); at `venue`, `strategy`, `product`, `event` and `performance` that row's id (ADAM CR-417, CR-425)."
    },
    "absoluteMinimumPrice": {
     "allOf": [
@@ -1377,11 +1405,55 @@
     ],
     "default": "advisory"
    },
-   "authorityTiers": {
-    "type": "object",
-    "additionalProperties": true,
+   "pendingAutomationLevel": {
+    "type": "string",
+    "readOnly": true,
     "nullable": true,
-    "description": "`[{maxAdjustmentPercent, action, confidenceThreshold}]`."
+    "enum": [
+     "advisory",
+     "humanInTheLoop",
+     "conditionalAutonomous",
+     "autonomous",
+     null
+    ],
+    "description": "A raise to `conditionalAutonomous` or `autonomous` waiting for its approval; `automationLevel` keeps the current level until approval.granted, and approval.rejected, withdrawn or expired clears it (ADAM CR-425)."
+   },
+   "pendingApprovalRequestId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "nullable": true,
+    "description": "The approvals request the pending raise waits on (kind pricingChange, subjectType dynamicPricingControl); cleared with pendingAutomationLevel (ADAM CR-425)."
+   },
+   "authorityTiers": {
+    "type": "array",
+    "nullable": true,
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "description": "The authority tiers, smallest adjustment first, stored as the jsonb list it always was (typed as an array, ADAM CR-425).",
+    "items": {
+     "type": "object",
+     "properties": {
+      "maxAdjustmentPercent": {
+       "type": "number",
+       "nullable": true
+      },
+      "action": {
+       "type": "string",
+       "enum": [
+        "autoExecute",
+        "autoExecuteIfConfident",
+        "revenueManager",
+        "commercialDirector",
+        "board4Governance"
+       ]
+      },
+      "confidenceThreshold": {
+       "type": "number",
+       "nullable": true
+      }
+     }
+    }
    },
    "maxAdjustmentPercent": {
     "type": "number",
@@ -1414,16 +1486,72 @@
     "minimum": 0
    },
    "noChangeWindows": {
-    "type": "object",
-    "additionalProperties": true,
+    "type": "array",
     "nullable": true,
-    "description": "`[{anchor, minutesBefore, minutesAfter, clockFrom, clockTo}]`."
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "description": "The no-change windows, stored as the jsonb list it always was (typed as an array, ADAM CR-425).",
+    "items": {
+     "type": "object",
+     "properties": {
+      "anchor": {
+       "type": "string",
+       "enum": [
+        "gatesOpening",
+        "eventStart",
+        "clockTime"
+       ]
+      },
+      "minutesBefore": {
+       "type": "integer",
+       "nullable": true
+      },
+      "minutesAfter": {
+       "type": "integer",
+       "nullable": true
+      },
+      "clockFrom": {
+       "type": "string",
+       "nullable": true
+      },
+      "clockTo": {
+       "type": "string",
+       "nullable": true
+      }
+     }
+    }
    },
    "circuitBreakers": {
-    "type": "object",
-    "additionalProperties": true,
+    "type": "array",
     "nullable": true,
-    "description": "`[{trigger, threshold, enabled, tripped}]`."
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
+    "description": "The circuit breakers, stored as the jsonb list it always was (typed as an array, ADAM CR-425).",
+    "items": {
+     "type": "object",
+     "properties": {
+      "trigger": {
+       "type": "string",
+       "enum": [
+        "dataQualityFalls",
+        "modelConfidenceDrops",
+        "conversionDropsAbnormally",
+        "priceVolatilityExceedsThreshold",
+        "revenueFalls",
+        "integrationFails"
+       ]
+      },
+      "threshold": {
+       "type": "number"
+      },
+      "enabled": {
+       "type": "boolean"
+      },
+      "tripped": {
+       "type": "boolean"
+      }
+     }
+    }
    },
    "requireGuardrailsPassed": {
     "type": "boolean",
@@ -2107,19 +2235,19 @@
    },
    "currentPriceAdjustments": {
     "type": "integer",
-    "description": "Current Price Adjustments"
+    "description": "Current Price Adjustments, the targets of the listed strategies whose newest price_execution is deployed or partiallyDeployed (ADAM CR-423)"
    },
    "pricesAtMaximumGuardrail": {
     "type": "integer",
-    "description": "Prices at Maximum Guardrail"
+    "description": "Prices at Maximum Guardrail, those targets whose newPrice is at or above the governing dynamic_pricing_control's absoluteMaximumPrice, or the ladder's maximumPrice where no control sets one (ADAM CR-423)"
    },
    "pricesAtMinimumGuardrail": {
     "type": "integer",
-    "description": "Prices at Minimum Guardrail"
+    "description": "Prices at Minimum Guardrail, those targets whose newPrice is at or below the governing control's absoluteMinimumPrice, or the ladder's minimumPrice where no control sets one (ADAM CR-423)"
    },
    "ruleConflicts": {
     "type": "integer",
-    "description": "Rule Conflicts"
+    "description": "Rule Conflicts, the sum of the seven open-conflict counts listRulePriorityConflict's summary gives for the venue (ADAM CR-423)"
    },
    "frozenStrategies": {
     "type": "integer",
@@ -2134,7 +2262,7 @@
     "items": {
      "type": "string"
     },
-    "description": "Operational Alerts (pack p.76), e.g. performances at their upper band, strategies with unresolved conflicts, strategies activating within 48 hours"
+    "description": "Operational Alerts (pack p.76): a code for each condition that holds, pricesAtUpperBand, unresolvedRuleConflicts or activatingWithin48Hours; the screen words them (ADAM CR-423)"
    }
   }
  },
@@ -2177,7 +2305,7 @@
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue's name, through tenancy#scopeRecords by venue_id (ADAM CR-423)"
    },
    "basePriceSource": {
     "type": "string",
@@ -2189,7 +2317,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "Current resolved dynamic price (for a single-price scope)",
+    "description": "Current resolved dynamic price: the newPrice of the strategy's newest deployed or partiallyDeployed price_execution where the strategy prices one target (singleProduct, or an event with at most one performance); otherwise null (ADAM CR-423)",
     "nullable": true
    },
    "adjustmentRange": {
@@ -2227,23 +2355,23 @@
     },
     "description": "Effective period"
    },
-   "automationMode": {
+   "automationLevel": {
     "type": "string",
     "enum": [
-     "monitor",
-     "recommend",
-     "prepareChange",
-     "autoExecuteWithinGuardrails"
+     "advisory",
+     "humanInTheLoop",
+     "conditionalAutonomous",
+     "autonomous"
     ],
-    "description": "Automation mode from the automation policy (listDynamicPricingAutomation); recommend by default"
+    "description": "Automation level, from the most specific dynamic_pricing_control covering the strategy (strategy, product, event, venue, market, global); advisory where there is none (replaces automationMode; ADAM CR-423, CR-417)"
    },
    "status": {
     "type": "string",
-    "description": "Status: draft, testing, ready, scheduled, active, paused, frozen, expired or retired"
+    "description": "Status: draft, ready (a draft with a ladder and at least one rule, whose scope is not frozen), scheduled (active, with effectiveFrom after now), active, paused, frozen, expired or retired; ready and scheduled are derived, the rest as stored, and testing is not answered (ADAM CR-423; LO-CR423-001)"
    },
    "owner": {
     "type": "string",
-    "description": "Owner"
+    "description": "Owner, the owner principal's display name through identity#principalRecords (ADAM CR-423)"
    }
   }
  },
@@ -2436,10 +2564,84 @@
    }
   }
  },
+ "PricingDynamicPriceAction": {
+  "type": "object",
+  "x-ticvai-persistence": "pricing.dynamic_price_action",
+  "description": "**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price action.",
+  "required": [
+   "dynamicPriceRuleId",
+   "type",
+   "value"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dynamicPriceRuleId": {
+    "x-ticvai-references": "pricing.dynamic_price_rule",
+    "type": "string",
+    "format": "uuid"
+   },
+   "type": {
+    "type": "string",
+    "maxLength": 30
+   },
+   "value": {
+    "type": "number"
+   },
+   "minPrice": {
+    "type": "number",
+    "nullable": true
+   },
+   "maxPrice": {
+    "type": "number",
+    "nullable": true
+   }
+  }
+ },
+ "PricingDynamicPriceCondition": {
+  "type": "object",
+  "x-ticvai-persistence": "pricing.dynamic_price_condition",
+  "description": "**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule condition.",
+  "required": [
+   "actionId",
+   "dynamicPriceRuleId",
+   "type",
+   "ruleOperator",
+   "valueJson",
+   "sequenceNo"
+  ],
+  "properties": {
+   "actionId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "dynamicPriceRuleId": {
+    "x-ticvai-references": "pricing.dynamic_price_rule",
+    "type": "string",
+    "format": "uuid"
+   },
+   "type": {
+    "type": "string",
+    "maxLength": 50
+   },
+   "ruleOperator": {
+    "type": "string",
+    "maxLength": 20
+   },
+   "valueJson": {
+    "type": "string"
+   },
+   "sequenceNo": {
+    "type": "integer"
+   }
+  }
+ },
  "PricingDynamicPriceRule": {
   "type": "object",
   "x-ticvai-persistence": "pricing.dynamic_price_rule",
-  "description": "**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule.",
+  "description": "**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule.\n\n**A contextual rule** (ADAM CR-410, decided 31 October 2026, Chinmay: option A, with the channel as its own column) is a row with `ruleType` `contextual`: it carries its `dimension` (channel, customerSegment or location) and that dimension's fields, and no other dimension's: `channel` needs `salesChannel`; `customerSegment` needs `customerSegment`, plus `segmentRef` for `loyaltyTier` or `customSegment`; `location` needs `locationLevel` and `locationId`. `rangeMinPercent`, `rangeMaxPercent` and `isProtected` are its range and protection, and `dynamicPricingEnabled` switches dynamic pricing off in that context. A contextual rule has no conditions or actions and leaves `channelId` null. `listChannelCustomerSegment` lists these rows.",
   "required": [
    "pricingRuleCode",
    "name",
@@ -2476,7 +2678,9 @@
    "channelId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "x-ticvai-references": "catalogue.sales_channel",
+    "description": "One configured channel profile (`catalogue.sales_channel`) the rule is limited to; null means every channel (ADAM CR-410). A contextual rule leaves it null and names its channel type in `salesChannel`."
    },
    "priority": {
     "type": "integer"
@@ -2504,7 +2708,7 @@
     "type": "string",
     "maxLength": 40,
     "nullable": true,
-    "description": "Static rules: `PricingRuleCommandCenterView.ruleType`; dynamic rules: the builder's `ruleKind`."
+    "description": "Static rules: `PricingRuleCommandCenterView.ruleType`; dynamic rules: the builder's `ruleKind`; `contextual` for a channel, customer-segment or location rule (ADAM CR-410)."
    },
    "inputMetric": {
     "type": "string",
@@ -2545,6 +2749,72 @@
     "type": "boolean",
     "default": false,
     "description": "A protected segment or channel: dynamic adjustments never apply."
+   },
+   "dimension": {
+    "type": "string",
+    "enum": [
+     "channel",
+     "customerSegment",
+     "location"
+    ],
+    "nullable": true,
+    "description": "A contextual rule's dimension (ADAM CR-410); null for every other rule."
+   },
+   "salesChannel": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/SalesChannel"
+     }
+    ],
+    "nullable": true,
+    "description": "A `channel` contextual rule's channel type (B2C = guestWeb, Mobile App = guestApp, Reseller = partner), the pack's channel dimension rather than one configured profile (ADAM CR-410)."
+   },
+   "customerSegment": {
+    "type": "string",
+    "enum": [
+     "standardCustomer",
+     "member",
+     "loyaltyTier",
+     "resident",
+     "vip",
+     "corporate",
+     "group",
+     "b2b",
+     "customSegment"
+    ],
+    "nullable": true,
+    "description": "A `customerSegment` contextual rule's segment (pack p.83; ADAM CR-410)."
+   },
+   "segmentRef": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "The loyalty tier or custom segment id, required for `loyaltyTier` and `customSegment` (ADAM CR-410)."
+   },
+   "locationLevel": {
+    "type": "string",
+    "enum": [
+     "country",
+     "market",
+     "venue",
+     "attraction",
+     "zone",
+     "eventLocation"
+    ],
+    "nullable": true,
+    "description": "A `location` contextual rule's level (pack pp.83-84; ADAM CR-410)."
+   },
+   "locationId": {
+    "type": "string",
+    "maxLength": 100,
+    "x-ticvai-references": "none",
+    "nullable": true,
+    "description": "A `location` contextual rule's place, as text, a country code or an id (ADAM CR-410)."
+   },
+   "dynamicPricingEnabled": {
+    "type": "boolean",
+    "default": true,
+    "description": "Whether dynamic pricing applies in this context; a contextual rule with it false switches it off there (ADAM CR-410)."
    }
   }
  },

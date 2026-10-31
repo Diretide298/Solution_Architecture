@@ -172,7 +172,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
 
 #### Outputs: what the screen shows and produces
 
@@ -433,7 +433,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
@@ -617,7 +617,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
 
 **Sent by **** (`configureAnomalyDetector`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -684,7 +684,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 |  (primary button) | `configureAnomalyDetector` PUT `/anomaly-detectors/{detectorKey}` | AiAnomalyDetector | AiAnomalyDetector | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
@@ -846,7 +846,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
 
 **Sent by **** (`requestSuggestion`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -896,7 +896,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 |  (primary button) | `requestSuggestion` POST `/ai/suggestions` | inline | Suggestion | 422 A setting the answer cannot do without is missing (29 September, AI functions review). (AiMissingSettingProblem) | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
@@ -1065,7 +1065,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
 
 #### Outputs: what the screen shows and produces
 
@@ -1106,7 +1106,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
@@ -1258,7 +1258,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
 
 #### Outputs: what the screen shows and produces
 
@@ -1307,7 +1307,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
@@ -1453,7 +1453,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
 
 #### Outputs: what the screen shows and produces
 
@@ -1500,7 +1500,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
@@ -1642,7 +1642,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
 
 #### Outputs: what the screen shows and produces
 
@@ -1683,7 +1683,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
@@ -1841,7 +1841,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
 
 #### Outputs: what the screen shows and produces
 
@@ -1882,7 +1882,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
@@ -2035,7 +2035,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
 
 #### Outputs: what the screen shows and produces
 
@@ -2136,7 +2136,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
@@ -2295,7 +2295,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ticket ref `ticketRef` | text field | optional | — | max length 100 | — | The support case this access serves, where there is one. | `openPlatformStaffGrant` body |
 | Expires at `expiresAt` | date and time picker | required | — | At most 8 hours after opening (proposed, client to correct). | 1 Oct 2026, 14:30 (venue time zone) | At most 8 hours after opening (proposed, client to correct). | `openPlatformStaffGrant` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
+Errors to draw in the form: 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the …
 
 #### Outputs: what the screen shows and produces
 
@@ -2324,7 +2324,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | ├── Product Demand (secondary button) | navigation or local | — | — | — | — |
 | ├── Timeslot Demand (secondary button) | navigation or local | — | — | — | — |
 | ├── Channel Demand (secondary button) | navigation or local | — | — | — | — |
-| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
+| Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 `forbidden` as the shared answer says; or the caller's session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the … | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 

@@ -3070,10 +3070,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createBanner
-      x-ticvai-names-for-context:
-        - whitelabel.tenant_config
       x-ticvai-consumed-by:
         - "P13 CMS-008 Content Blocks"
+      x-ticvai-names-for-context:
+        - whitelabel.tenant_config
       x-ticvai-writes:
       - table: whitelabel.banner
         for: 'the banner, and nothing else: tenant_config_id is retired and written null (ADAM CR-387, CHG-CR387-001)'
@@ -3129,10 +3129,10 @@ paths:
         format: uuid
     patch:
       operationId: updateBanner
-      x-ticvai-names-for-context:
-        - whitelabel.tenant_config
       x-ticvai-consumed-by:
         - "P13 CMS-008 Content Blocks"
+      x-ticvai-names-for-context:
+        - whitelabel.tenant_config
       x-ticvai-audience:
       - staff
       summary: Amend or activate a banner
@@ -3218,10 +3218,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: deleteBanner
-      x-ticvai-names-for-context:
-        - whitelabel.tenant_config
       x-ticvai-consumed-by:
         - "P13 CMS-008 Content Blocks"
+      x-ticvai-names-for-context:
+        - whitelabel.tenant_config
       x-ticvai-writes:
       - table: whitelabel.banner
         for: 'deletes the banner row only (r8 walk fix, CHG-R8WFC-004; the tenant_config read and write it once declared

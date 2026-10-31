@@ -17,12 +17,20 @@ transitions:
   to: scheduled
   operation: updateBanner
   trigger: operation
-  guard: 'startsAt is set. endsAt null means no end: it runs until switched off; when endsAt is set it follows startsAt'
+  guard: 'isActive not false (ADAM CR-388): after every save the server sets the state from the stored banner, and
+    startsAt is always set. endsAt null means no end: it runs until switched off; when endsAt is set it follows startsAt'
 - from: scheduled
   to: draft
   operation: updateBanner
   trigger: operation
-  guard: Clearing startsAt before it starts returns it to draft
+  guard: 'isActive false (ADAM CR-388): held in draft through later edits until an update sends isActive true.
+    startsAt cannot be cleared on a banner (it is required; null is 400)'
+- from: scheduled
+  to: draft
+  operation: updatePromoBlock
+  trigger: operation
+  guard: 'Clearing startsAt before it starts returns a promo block to draft (ADAM CR-388: this move is the promo
+    block''s only; a banner returns to draft by isActive false)'
 - from: scheduled
   to: active
   trigger: timer
@@ -38,10 +46,16 @@ transitions:
   to: draft
   operation: updateBanner
   trigger: operation
-  guard: Pulled early
+  guard: 'Pulled early: isActive false (ADAM CR-388)'
   isReversal: true
 notes: 'Timezone is a region setting. Every scheduling bug in a platform like this is the same bug.
 
   **A promo block is not pulled back to `draft` (decided 28 September, audit R163).** Once `active` or
   `expired` it may only be withdrawn with `deletePromoBlock`; the `active` to `draft` pull above is the
-  banner''s. For both, an end must follow the start.'
+  banner''s. For both, an end must follow the start.
+
+  **A banner''s state follows the stored banner after every `updateBanner` save** (ADAM CR-388, Chinmay, 31 October
+  2026; CHG-CR388-001): `isActive` false puts a draft, scheduled or active banner in `draft`; otherwise a draft or
+  scheduled banner becomes `scheduled` and an active one stays `active`; an expired banner does not change.
+  `startsAt` stays required on a banner, so the move from `scheduled` to `draft` by clearing `startsAt` is the promo
+  block''s only.'

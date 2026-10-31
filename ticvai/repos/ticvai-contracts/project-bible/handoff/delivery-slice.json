@@ -221,13 +221,13 @@
  "deferredScreens": [],
  "counts": {
   "core": 519,
-  "setup": 274,
-  "allOperations": 2860
+  "setup": 264,
+  "allOperations": 2862
  },
  "services": {
   "AccessService": {
    "core": 13,
-   "setup": 22,
+   "setup": 21,
    "total": 259
   },
   "AiService": {
@@ -237,7 +237,7 @@
   },
   "CatalogueService": {
    "core": 36,
-   "setup": 59,
+   "setup": 49,
    "total": 470
   },
   "FnbService": {
@@ -248,7 +248,7 @@
   "IdentityService": {
    "core": 33,
    "setup": 6,
-   "total": 103
+   "total": 104
   },
   "InventoryService": {
    "core": 1,
@@ -263,7 +263,7 @@
   "MarketingService": {
    "core": 53,
    "setup": 22,
-   "total": 283
+   "total": 284
   },
   "OrderService": {
    "core": 90,
@@ -287,7 +287,7 @@
   },
   "TenancyService": {
    "core": 17,
-   "setup": 21,
+   "setup": 22,
    "total": 215
   },
   "VenueOpsService": {
@@ -1011,6 +1011,19 @@
     "WEB-036"
    ],
    "enables": []
+  },
+  "claimOpenShift": {
+   "part": "setup",
+   "service": "TenancyService",
+   "contract": "workforce",
+   "verb": "POST",
+   "path": "/shift-marketplace",
+   "perm": "WORKFORCE_VIEW",
+   "platforms": [],
+   "screens": [],
+   "enables": [
+    "workforce.rota_assignment"
+   ]
   },
   "claimTicketTransfer": {
    "part": "core",
@@ -1945,21 +1958,6 @@
     "ledger.legal_entity"
    ]
   },
-  "createLiveDynamicPrice": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "POST",
-   "path": "/live-dynamic-price",
-   "perm": "PRODUCT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-115"
-   ],
-   "enables": [
-    "catalogue.price"
-   ]
-  },
   "createLoyaltyProgramme": {
    "part": "setup",
    "service": "MarketingService",
@@ -2614,6 +2612,21 @@
    ],
    "enables": []
   },
+  "createSeatMap": {
+   "part": "setup",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "verb": "POST",
+   "path": "/seat-maps",
+   "perm": "CAPACITY_CONFIGURE",
+   "platforms": [],
+   "screens": [
+    "BO-954"
+   ],
+   "enables": [
+    "seating.seat"
+   ]
+  },
   "createSegment": {
    "part": "setup",
    "service": "MarketingService",
@@ -2901,22 +2914,6 @@
    ],
    "enables": [
     "ai.operational_requirement"
-   ]
-  },
-  "decidePricingRecommendation": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "POST",
-   "path": "/recommendation-review-decision/{recommendationId}/decision",
-   "perm": "AI_APPROVE",
-   "platforms": [],
-   "screens": [
-    "ADM-106",
-    "ADM-113"
-   ],
-   "enables": [
-    "catalogue.pricing_recommendation"
    ]
   },
   "decideProductionAccess": {
@@ -11341,21 +11338,6 @@
     "access.biometric_profile"
    ]
   },
-  "setBleBeaconGeofence": {
-   "part": "setup",
-   "service": "AccessService",
-   "contract": "access",
-   "verb": "PUT",
-   "path": "/ble-beacon-geofence",
-   "perm": "ACCESS_POINT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "BO-168"
-   ],
-   "enables": [
-    "access.access_point"
-   ]
-  },
   "setBookingFlowConfig": {
    "part": "core",
    "service": "WhiteLabelService",
@@ -11370,21 +11352,6 @@
     "CMS-016"
    ],
    "enables": []
-  },
-  "setBookingVelocityTime": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/booking-velocity-time",
-   "perm": "PRODUCT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-091"
-   ],
-   "enables": [
-    "pricing.dynamic_price_rule"
-   ]
   },
   "setBrandIdentity": {
    "part": "core",
@@ -11589,21 +11556,6 @@
     "fnb.delivery_location_outlet"
    ]
   },
-  "setDemandOccupancyAvailability": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/demand-occupancy-availability",
-   "perm": "PRODUCT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-090"
-   ],
-   "enables": [
-    "pricing.dynamic_price_rule"
-   ]
-  },
   "setDenominations": {
    "part": "setup",
    "service": "OrderService",
@@ -11707,55 +11659,6 @@
    "screens": [],
    "enables": [
     "marketing.form_definition_field"
-   ]
-  },
-  "setDynamicPriceRule": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/pricing/dynamic-rules/{ruleId}",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "BO-009",
-    "BO-443"
-   ],
-   "enables": [
-    "pricing.dynamic_price_rule"
-   ]
-  },
-  "setDynamicPricingGuardrailPolicy": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/dynamic-pricing-controls",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-095",
-    "ADM-096",
-    "ADM-114"
-   ],
-   "enables": [
-    "catalogue.dynamic_pricing_control",
-    "catalogue.dynamic_pricing_strategy"
-   ]
-  },
-  "setDynamicPricingStrategy": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/dynamic-pricing-strategy-2",
-   "perm": "PRODUCT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-089"
-   ],
-   "enables": [
-    "catalogue.dynamic_pricing_strategy"
    ]
   },
   "setEInvoicingProvider": {
@@ -12389,21 +12292,6 @@
    ],
    "enables": []
   },
-  "setPriceLadderMatrix": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/dynamic-pricing-strategies/{strategyId}/price-ladder",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-094"
-   ],
-   "enables": [
-    "catalogue.price_ladder"
-   ]
-  },
   "setPrices": {
    "part": "setup",
    "service": "CatalogueService",
@@ -12419,21 +12307,6 @@
    ],
    "enables": [
     "catalogue.price_list"
-   ]
-  },
-  "setPricing": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/pricing-2",
-   "perm": "PRODUCT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-109"
-   ],
-   "enables": [
-    "catalogue.pricing_recommendation"
    ]
   },
   "setPrimaryDomain": {
@@ -12694,21 +12567,6 @@
    ],
    "enables": [
     "identity.role_permission"
-   ]
-  },
-  "setRulePriorityConflict": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "PUT",
-   "path": "/rule-priority-conflict",
-   "perm": "PRODUCT_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "BO-441"
-   ],
-   "enables": [
-    "pricing.dynamic_price_rule"
    ]
   },
   "setSeatRecommendationRules": {
@@ -13491,22 +13349,6 @@
     "WEB-021"
    ],
    "enables": []
-  },
-  "transitionDynamicPricingStrategy": {
-   "part": "setup",
-   "service": "CatalogueService",
-   "contract": "catalogue",
-   "verb": "POST",
-   "path": "/dynamic-pricing-strategies/{strategyId}/lifecycle",
-   "perm": "PRICE_CONFIGURE",
-   "platforms": [],
-   "screens": [
-    "ADM-088",
-    "ADM-089"
-   ],
-   "enables": [
-    "catalogue.dynamic_pricing_strategy"
-   ]
   },
   "transmitEInvoices": {
    "part": "setup",
@@ -14692,6 +14534,9 @@
    "setResourceBookingProgress",
    "updateResourceBooking"
   ],
+  "seating.seat_map_template": [
+   "createSeatMapTemplate"
+  ],
   "tenancy.device_telemetry": [
    "recordDeviceHeartbeat"
   ],
@@ -14706,7 +14551,6 @@
   "ai.eval_suite",
   "ai.forecast_accuracy",
   "ai.training_run",
-  "catalogue.demand_forecast",
   "catalogue.rate",
   "identity.redirect_host",
   "identity.subject_holding",
@@ -14722,7 +14566,8 @@
   "seating.seat_block_item",
   "whitelabel.received_release",
   "whitelabel.ui_string_pack",
-  "workforce.attendance_amendment"
+  "workforce.attendance_amendment",
+  "workforce.training_record"
  ],
  "missingFromLineage": []
 }

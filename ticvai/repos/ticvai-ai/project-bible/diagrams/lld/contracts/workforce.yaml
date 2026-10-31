@@ -43,15 +43,14 @@ operations:
   - staff
   offline: false
   reads:
-  - access.entitlement
   - cache:idempotency
   - identity.principal
-  - marketing.guest_profile
   - venuemap.point
   writes:
   - cache:idempotency
-  - marketing.message_dispatch
+  - platform.outbox
   - workforce.announcement
+  - workforce.guest_broadcast
 - operation: claimOpenShift
   verb: POST
   path: /shift-marketplace
@@ -63,9 +62,13 @@ operations:
   reads:
   - cache:idempotency
   - workforce.open_shift
+  - workforce.rota_assignment
+  - workforce.staffing_rules
+  - workforce.training_record
   writes:
   - cache:idempotency
   - workforce.open_shift
+  - workforce.rota_assignment
 - operation: createRotaAssignment
   verb: POST
   path: /rota-assignments

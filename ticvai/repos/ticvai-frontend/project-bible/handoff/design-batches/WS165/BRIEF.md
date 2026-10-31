@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-959` | Stage & Focal Point | C | 0 | 20 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-960` | Entrances, Exits & Aisles | C | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-961` | Amenities & Obstructions | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-962` | Templates, Validation & Publish | C | 0 | 6 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-962` | Templates, Validation & Publish | C | 0 | 20 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

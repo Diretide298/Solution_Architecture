@@ -107,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-258` | Sales Channel Command Center | B | 0 | 24 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-259` | Channel Creation & Profile Configuration | A | 14 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-259` | Channel Creation & Profile Configuration | A | 13 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-260` | Product & Catalogue Assignment | A | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-261` | Channel Pricing & Commercial Profile Assignment | A | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-262` | Inventory, Capacity & Channel Allocation | B | 0 | 14 | 6 | 0 | 2 | 4 | — | notStarted (generated) |

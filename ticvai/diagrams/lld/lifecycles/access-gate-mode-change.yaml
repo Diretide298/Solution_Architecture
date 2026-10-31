@@ -27,8 +27,10 @@ transitions:
 - from: pending
   to: applied
   trigger: timer
-  guard: '`effectiveAt` has come; the access point''s operating mode becomes the target mode, or for
-    a live direction switch its direction becomes `toDirection` (CHG-CSP-032)'
+  guard: '`effectiveAt` has come; the access point''s operating mode becomes the target mode and its
+    turnstile mode becomes `targetTurnstileMode` (ADAM CR-396; CHG-CR396-001), or for a live direction
+    switch its direction becomes `toDirection` (CHG-CSP-032). Where a governing gate mode policy sets
+    `createsIncident`, the access incident is opened in this transaction (CR-396).'
 - from: pending
   to: cancelled
   operation: cancelGateModeChange

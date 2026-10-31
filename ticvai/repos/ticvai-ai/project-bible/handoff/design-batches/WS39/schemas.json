@@ -50,7 +50,7 @@
    },
    "confidence": {
     "type": "number",
-    "description": "Forecast Confidence, percent"
+    "description": "Forecast Confidence, percent (`DemandForecast.confidence` x 100; ADAM CR-405)"
    },
    "forecastFinalOccupancy": {
     "type": "number",
@@ -374,7 +374,7 @@
   "properties": {
    "expectedRevenueImpact": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Expected Revenue Impact"
+    "description": "Expected Revenue Impact, the recommendation's revenue_opportunity (ADAM CR-416)"
    },
    "expectedOccupancy": {
     "type": "number",
@@ -382,7 +382,7 @@
    },
    "confidence": {
     "type": "number",
-    "description": "Overall confidence, percent"
+    "description": "Overall confidence, percent (stored 0 to 1, answered multiplied by 100; ADAM CR-416)"
    },
    "recommendationId": {
     "type": "string",
@@ -390,11 +390,11 @@
    },
    "productEvent": {
     "type": "string",
-    "description": "Product/event/performance the card applies to"
+    "description": "Product/event the card applies to: the product name and the event name joined by \" / \", without the event part when there is none (ADAM CR-416)"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue's name, through tenancy#scopeRecords by venue_id (ADAM CR-416)"
    },
    "currentPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
@@ -487,7 +487,7 @@
       "description": "External Signal Confidence, percent"
      }
     },
-    "description": "Confidence Breakdown"
+    "description": "Confidence Breakdown; each member is stored 0 to 1 and answered multiplied by 100 (ADAM CR-416)"
    },
    "explanation": {
     "type": "string",
@@ -525,7 +525,7 @@
    "priceCategory": {
     "type": "string",
     "nullable": true,
-    "description": "The price category's name, for the card"
+    "description": "The price category's name, catalogue.price_category.name by price_category_id; null where there is none (ADAM CR-416)"
    },
    "recommendationType": {
     "type": "string",
@@ -854,31 +854,31 @@
    },
    "reliability": {
     "type": "number",
-    "description": "Reliability of the source, percent"
+    "description": "Reliability of the source, percent (the registry row's reliability, stored 0 to 1, x 100; ADAM CR-409)"
    },
    "publishedPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Published Price"
+    "description": "Published Price, in the observation's own currency at its ISO 4217 scale, never converted (ADAM CR-409)"
    },
    "promotionalPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Promotional Price"
+    "description": "Promotional Price, in the observation's own currency at its ISO 4217 scale, never converted (ADAM CR-409)"
    },
    "weekendPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Weekend Price"
+    "description": "Weekend Price, in the observation's own currency at its ISO 4217 scale, never converted (ADAM CR-409)"
    },
    "peakPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Peak Price"
+    "description": "Peak Price, in the observation's own currency at its ISO 4217 scale, never converted (ADAM CR-409)"
    },
    "residentPrice": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Resident Price"
+    "description": "Resident Price, in the observation's own currency at its ISO 4217 scale, never converted (ADAM CR-409)"
    },
    "memberPriceWherePubliclyAvailable": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Member Price where publicly available"
+    "description": "Member Price where publicly available, in the observation's own currency at its ISO 4217 scale, never converted (ADAM CR-409)"
    },
    "availability": {
     "type": "string",
@@ -902,7 +902,7 @@
    },
    "observationId": {
     "type": "string",
-    "description": "Observation id"
+    "description": "Observation id (`catalogue.competitor_price_observation.id`, ADAM CR-409)"
    },
    "observedAt": {
     "type": "string",
@@ -910,19 +910,27 @@
     "format": "date-time"
    },
    "marketMedianPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Market median price for the comparable set"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "description": "Market median price for the comparable set, in the venue's trading currency; null when no approved observation in that currency counts (listCompetitorPricingMarket states the rule; ADAM CR-409)"
    },
    "positionVsMedian": {
     "type": "number",
-    "description": "TICVAI position against the market median (-9.1 = below), percent"
+    "nullable": true,
+    "description": "TICVAI position against the market median (-9.1 = below), percent to one decimal; null when the fromPrice or the median is missing (ADAM CR-409)"
    },
    "movementPercent": {
     "type": "number",
-    "description": "Competitor Movement: change against the previous observation, percent"
+    "nullable": true,
+    "description": "Competitor Movement: change against the previous observation of the same mapping, date and timeslot, percent; null when there is none or the currency differs (ADAM CR-409)"
    },
    "historicalCorrelation": {
     "type": "object",
+    "nullable": true,
     "properties": {
      "demand": {
       "type": "number",
@@ -937,7 +945,7 @@
       "description": "Correlation with TICVAI price sensitivity, -1..1"
      }
     },
-    "description": "Historical Correlation of competitor changes with TICVAI outcomes"
+    "description": "Historical Correlation of competitor changes with TICVAI outcomes, from the registry row's reading.historicalCorrelation; null until the AI layer writes it (ADAM CR-409)"
    },
    "comparabilityApproved": {
     "type": "boolean",
@@ -952,7 +960,7 @@
  "DemandSignal": {
   "type": "object",
   "x-ticvai-persistence": "catalogue.demand_signal",
-  "description": "**An external or calendar signal that moves demand** (29 September, data model DM3). Merges weather (ADM-101), nearby events (ADM-102), competitor prices (ADM-103), tourism, holiday and market signals (ADM-104) and the tenant's special calendar (Ramadan, Eid, school breaks) used by temporal rules. `signalKind` says which; the readings specific to a kind are in `reading`, and a venue's sensitivity settings in `configuration`. A signal informs forecasts and recommendations; it never sets a price.",
+  "description": "**An external or calendar signal that moves demand** (29 September, data model DM3). Merges weather (ADM-100), nearby events (ADM-101), competitor prices (ADM-102), tourism, holiday and market signals (ADM-103) and the tenant's special calendar (Ramadan, Eid, school breaks) used by temporal rules. `signalKind` says which; the readings specific to a kind are in `reading`, and a venue's sensitivity settings in `configuration`. A signal informs forecasts and recommendations; it never sets a price.\n\n**A `competitorPrice` row is the competitor registry** (ADAM CR-409, decided 31 October 2026, Chinmay): one competitor product mapped to one TICVAI product. `name` is the competitor, `marketCode` the market, `productId` the comparable TICVAI product, with `source`, `refreshFrequency` and `reliability` (stored 0 to 1, answered by `listCompetitorPricingMarket` as a percent). `isApproved` is the view's `sourceApproved`, and `configuration` holds `{venueProduct, currency, collectionMethod, comparabilityApproved}`. Its price observations are rows of `catalogue.competitor_price_observation` (`CompetitorPriceObservation`).",
   "required": [
    "id",
    "scopePath",
@@ -1007,7 +1015,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "Competitor observations: the comparable TICVAI product."
+    "description": "A `competitorPrice` registry row: the comparable TICVAI product (ADAM CR-409)."
    },
    "geography": {
     "type": "string",
@@ -1042,13 +1050,13 @@
     "type": "object",
     "additionalProperties": true,
     "nullable": true,
-    "description": "Kind-specific values: weather conditions and forecasts, event attendance and distance, competitor prices."
+    "description": "Kind-specific values: weather conditions and forecasts, event attendance and distance. A `competitorPrice` row's prices are not here but in `catalogue.competitor_price_observation`; its reading holds `{historicalCorrelation: {demand, conversion, priceSensitivity}}` (each -1 to 1), written by the AI layer, and absent until it does (ADAM CR-409)."
    },
    "configuration": {
     "type": "object",
     "additionalProperties": true,
     "nullable": true,
-    "description": "Weather: `{venueExposure, weatherSensitivity, conditionImpacts, forecastHorizon, dataFailurePolicy}`; events: `{monitoringRadiusKm}`."
+    "description": "Weather: `{venueExposure, weatherSensitivity, conditionImpacts, forecastHorizon, dataFailurePolicy}`; events: `{monitoringRadiusKm}`; competitor prices: `{venueProduct, currency, collectionMethod, comparabilityApproved}` (`collectionMethod` one of manualEntry, dataFeed, publishedWebsite, partnerSupplied; `currency` ISO 4217; ADAM CR-409)."
    },
    "weight": {
     "type": "number",
@@ -1093,7 +1101,7 @@
    "isApproved": {
     "type": "boolean",
     "default": false,
-    "description": "Competitor sources and comparability approved for use."
+    "description": "A competitor source approved as legally permissible for use (the view's `sourceApproved`; comparability is `configuration.comparabilityApproved`; ADAM CR-409)."
    },
    "isActive": {
     "type": "boolean",
@@ -1662,7 +1670,7 @@
    },
    "time": {
     "type": "string",
-    "description": "Time context of the curve: weekday/weekend, peak/off-peak or season label"
+    "description": "Time context of the curve: the non-null parts of day type, peak period, season and event proximity ('{from}-{to} days'), joined by ', ' in that order; absent when all are null (ADAM CR-406)"
    },
    "product": {
     "type": "string",
@@ -1688,7 +1696,7 @@
    },
    "elasticityConfidence": {
     "type": "string",
-    "description": "Elasticity Confidence",
+    "description": "Elasticity Confidence, banded from `DemandForecast.confidence`: below 0.5 `low`, 0.5 up to 0.8 `medium`, 0.8 and above `high`; absent when it is null (ADAM CR-406)",
     "enum": [
      "low",
      "medium",

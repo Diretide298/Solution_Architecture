@@ -94,6 +94,7 @@ operations:
   writes:
   - cache:idempotency
   - seating.import_job
+  - seating.section
 - operation: copySeatMapSection
   verb: POST
   path: /seat-maps/{seatMapId}/sections/copy
@@ -196,9 +197,11 @@ operations:
   reads:
   - cache:idempotency
   - seating.seat_map
+  - seating.seat_map_template
   - seating.section
   writes:
   - cache:idempotency
+  - seating.seat
   - seating.seat_map
   - seating.section
   - seating.section_row
@@ -212,7 +215,11 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - seating.seat
+  - seating.seat_map
   - seating.seat_map_template
+  - seating.section
+  - seating.section_row
   writes:
   - cache:idempotency
   - seating.seat_map_template
@@ -337,6 +344,7 @@ operations:
   reads:
   - seating.seat_map
   - seating.section
+  - seating.section_row
   writes: []
 - operation: getSeatMapImport
   verb: GET

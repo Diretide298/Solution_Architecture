@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 103 operations
+title: identity — 104 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -953,6 +953,17 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: listSubjectBiometricRecords
+  verb: GET
+  path: /internal/subject-biometrics
+  scope: venue
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - pii.subject_biometric
+  writes: []
 - operation: login
   verb: POST
   path: /auth/login
@@ -1129,11 +1140,13 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - identity.mfa_challenge
   - identity.password_policy
   - identity.principal
   - identity.principal_credential
   writes:
   - cache:idempotency
+  - identity.mfa_challenge
   - identity.principal
   - identity.principal_credential
   - identity.principal_credential_history

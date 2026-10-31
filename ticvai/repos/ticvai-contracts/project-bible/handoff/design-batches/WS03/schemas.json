@@ -547,32 +547,38 @@
  "BleBeaconGeofenceConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; applied to `access.access_point` (with `access.configuration_change`, `access.device_placement`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
-  "description": "**What BLE Beacon & Geofence Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
+  "x-ticvai-persistence": "none — request only; applied to `access.device_placement` (with `access.configuration_change`), the table its operation writes (ADAM CR-389; CHG-STO-021); each field names its column, and `health` and `lastDetected` are ignored on input",
+  "description": "**What BLE Beacon & Geofence Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back. One beacon's `access.device_placement` row (role `proximity`), each field stored as it says (ADAM CR-389).",
   "properties": {
    "beaconName": {
     "type": "string",
-    "description": "Beacon Name"
+    "description": "Beacon Name",
+    "x-ticvai-stored-as": "access.device_placement.name"
    },
    "beaconId": {
     "type": "string",
-    "description": "Beacon ID"
+    "description": "Beacon ID, a registered `platform.device` id; one that names no registered device is `404`",
+    "x-ticvai-stored-as": "access.device_placement.device_id"
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue",
+    "x-ticvai-stored-as": "access.device_placement.venue_id"
    },
    "zone": {
     "type": "string",
-    "description": "Zone"
+    "description": "Zone. `park`, `zone` and `attraction` are one `access_area_id`, the most specific sent; two that do not nest are `400 validation`",
+    "x-ticvai-stored-as": "access.device_placement.access_area_id"
    },
    "gate": {
     "type": "string",
-    "description": "Gate"
+    "description": "Gate",
+    "x-ticvai-stored-as": "access.device_placement.access_point_id"
    },
    "proximityThreshold": {
     "type": "integer",
-    "description": "Metres"
+    "description": "Metres",
+    "x-ticvai-stored-as": "access.device_placement.proximity_threshold_meters"
    },
    "activeInactive": {
     "type": "string",
@@ -580,7 +586,8 @@
      "active",
      "inactive"
     ],
-    "description": "Active/Inactive"
+    "description": "Active/Inactive",
+    "x-ticvai-stored-as": "access.device_placement.is_active"
    },
    "health": {
     "type": "string",
@@ -589,31 +596,45 @@
      "degraded",
      "offline"
     ],
-    "description": "Read-only, reported by the beacon"
+    "description": "Reported by the beacon: ignored on input; the view reads `platform.device.health` (ADAM CR-389)",
+    "x-ticvai-persisted": false
    },
    "lastDetected": {
     "type": "string",
     "format": "date-time",
-    "description": "Last detected"
+    "description": "Last detected: ignored on input; the view reads `platform.device.last_heartbeat_at` (ADAM CR-389)",
+    "x-ticvai-persisted": false
    },
    "park": {
     "type": "string",
-    "description": "Park"
+    "description": "Park (see `zone`)",
+    "x-ticvai-stored-as": "access.device_placement.access_area_id"
    },
    "attraction": {
     "type": "string",
-    "description": "Attraction"
+    "description": "Attraction (see `zone`)",
+    "x-ticvai-stored-as": "access.device_placement.access_area_id"
    },
    "geofenceRadiusMeters": {
     "type": "integer",
-    "description": "Radius of a circular activation zone"
+    "minimum": 5,
+    "maximum": 5000,
+    "description": "Radius of a circular activation zone, 5 to 5000 metres; needs `geofenceCentre`. A body with both a radius and a boundary is `400 validation`",
+    "x-ticvai-stored-as": "access.device_placement.activation_zone"
+   },
+   "geofenceCentre": {
+    "type": "string",
+    "nullable": true,
+    "description": "Centre of a circular activation zone, as lat,lng like the boundary points (ADAM CR-389)",
+    "x-ticvai-stored-as": "access.device_placement.activation_zone"
    },
    "geofenceBoundary": {
     "type": "array",
     "items": {
      "type": "string"
     },
-    "description": "Polygon points as lat,lng when the zone is drawn"
+    "description": "Polygon points as lat,lng when the zone is drawn; at least three",
+    "x-ticvai-stored-as": "access.device_placement.activation_zone"
    }
   },
   "required": [
@@ -685,6 +706,11 @@
     "type": "integer",
     "description": "Radius of a circular activation zone"
    },
+   "geofenceCentre": {
+    "type": "string",
+    "nullable": true,
+    "description": "Centre of a circular activation zone, as lat,lng like the boundary points (ADAM CR-389); from `access.device_placement.activation_zone`"
+   },
    "geofenceBoundary": {
     "type": "array",
     "items": {
@@ -713,7 +739,7 @@
    "ruleId": {
     "type": "string",
     "format": "uuid",
-    "description": "Absent creates a rule"
+    "description": "The record's id, when sent; it must equal the path's `credentialPolicyId` (ADAM CR-245, CR-395). A path id no record has creates one with that id."
    },
    "venueId": {
     "type": "string",

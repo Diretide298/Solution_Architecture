@@ -1919,8 +1919,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 | Setting | Allowed values | Default | What it changes here |
 |---|---|---|---|
-| Guest contact fields (`bookingFlow.guestContactFields`) | Email · Mobile · Name; at least 1; at most 3; no duplicates; Must include the contact the guest's code is sent to and matched on (identity `GuestMatchPolicy.; matchBy`), or 400. | Email | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). |
-| Settings: guest contact fields (`bookingFlow.venueOverrides[].settings.guestContactFields`) | Email · Mobile · Name; at least 1; at most 3; no duplicates; Must include the contact the guest's code is sent to and matched on (identity `GuestMatchPolicy.; matchBy`), or 400. | Email | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). |
+| Guest contact fields (`bookingFlow.guestContactFields`) | Email · Mobile · Name; at least 1; at most 3; no duplicates; Must include the contact the guest's code is sent to and matched on at every active venue, by the marketing-crm `GuestMatchPolicy` in … | Email | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). |
+| Settings: guest contact fields (`bookingFlow.venueOverrides[].settings.guestContactFields`) | Email · Mobile · Name; at least 1; at most 3; no duplicates; Must include the contact the guest's code is sent to and matched on at every active venue, by the marketing-crm `GuestMatchPolicy` in … | Email | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). |
 
 #### References
 

@@ -1597,16 +1597,31 @@
  },
  "Section": {
   "x-ticvai-persistence": "seating.section",
+  "x-ticvai-unique-together": [
+   [
+    "seatMapId",
+    "code"
+   ]
+  ],
   "type": "object",
   "required": [
+   "seatMapId",
    "code",
    "name",
    "rowCount",
    "seatCount"
   ],
   "properties": {
+   "seatMapId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "seating.seat_map",
+    "description": "**The map the section belongs to** (ADAM CR-402, decided 31 October 2026). Set by every writer of a section to the map it writes into: createSeatMap, editSeatMapStructure addSections, cloneSeatMap, copySeatMapSection, and the imports when committed. A map's codes are unique on it, matched exactly (`section_seat_map_id_code_uniq`)."
+   },
    "code": {
-    "type": "string"
+    "type": "string",
+    "x-ticvai-unique-compare": "exact"
    },
    "name": {
     "type": "string"

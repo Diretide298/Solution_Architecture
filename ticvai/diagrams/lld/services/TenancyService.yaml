@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 215 operations, 110 tables
+title: TenancyService — 215 operations, 111 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -33,7 +33,7 @@ schemas:
   - postgres
   largestTable: platform.device
 - schema: workforce
-  tables: 28
+  tables: 29
   stores:
   - postgres
   largestTable: workforce.rota_assignment
@@ -1025,16 +1025,16 @@ operationsByContract:
     scope: venue
     permission: ANNOUNCEMENT_PUBLISH
     offline: false
-    reads: 5
-    writes: 3
+    reads: 3
+    writes: 4
   - operation: claimOpenShift
     verb: POST
     path: /shift-marketplace
     scope: venue
     permission: WORKFORCE_VIEW
     offline: false
-    reads: 2
-    writes: 2
+    reads: 5
+    writes: 3
   - operation: createRotaAssignment
     verb: POST
     path: /rota-assignments
@@ -2457,13 +2457,17 @@ tables:
   store: postgres
   parent: null
   writtenBy:
+  - access
   - approvals
+  - catalogue
   - finance
   - identity
   - subscription
   - white-label
   - workforce
   foreignWriters:
+  - access
+  - catalogue
   - finance
   - identity
   - subscription
@@ -2573,7 +2577,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.audit_record
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -2689,6 +2693,7 @@ tables:
   - tenancy
   - wallet
   - white-label
+  - workforce
   foreignWriters:
   - access
   - assets
@@ -2799,7 +2804,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.workstation
-  columns: 22
+  columns: 23
   store: postgres
   parent: null
   writtenBy:
@@ -2915,6 +2920,13 @@ tables:
   store: postgres
   parent: null
   writtenBy: []
+  foreignWriters: null
+- table: workforce.guest_broadcast
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - workforce
   foreignWriters: null
 - table: workforce.integration_source
   columns: 9
@@ -3060,30 +3072,14 @@ readsFrom:
 - service: PlatformService
   operations: 4
 - service: AccessService
-  operations: 3
+  operations: 2
 - service: CatalogueService
   operations: 2
-- service: MarketingService
-  operations: 1
 - service: OrderService
   operations: 1
 - service: VenueOpsService
   operations: 1
 writesOutside:
-- service: MarketingService
-  operations: 2
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event MarketingService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: broadcastToGuests
-    tables:
-    - marketing.message_dispatch
-  - operation: decideApprovalRequest
-    tables:
-    - marketing.privacy_notice_governance
 - service: PlatformService
   operations: 2
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
@@ -3111,6 +3107,17 @@ writesOutside:
   - operation: setRolePermissions
     tables:
     - identity.role_permission
+- service: MarketingService
+  operations: 1
+  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
+    published.'
+  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
+    each inserts or updates, or which operation or event MarketingService published for it — check each
+    against ADR-0028.'
+  writes:
+  - operation: decideApprovalRequest
+    tables:
+    - marketing.privacy_notice_governance
 screens:
 - P04:POS-001 Begin Shift
 - P04:POS-002 Sell — Ticket Catalogue

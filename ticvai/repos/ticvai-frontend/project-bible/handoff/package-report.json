@@ -1,17 +1,17 @@
 {
- "generated": "2026-10-31",
+ "generated": "2026-11-01",
  "note": "The package measured in one pass. Derived by tools/build-package-report.py from the files the refresh writes -- never from prose.",
  "counts": {
-  "operations": 2860,
+  "operations": 2862,
   "contracts": 33,
-  "tables": 1169,
+  "tables": 1171,
   "stores": 10,
   "foreignKeys": 815,
   "indexes": 2924,
   "tablesWritten": 1123,
-  "relationships": 3311,
+  "relationships": 3318,
   "states": 210,
-  "events": 108,
+  "events": 110,
   "flows": 98,
   "flowsDerived": 193,
   "adrs": 72,
@@ -38,29 +38,29 @@
   },
   {
    "link": "Operations declaring a service",
-   "done": 2860,
-   "total": 2860,
+   "done": 2862,
+   "total": 2862,
    "percent": 100,
    "note": "the operation is owned by one of the seventeen deployables"
   },
   {
    "link": "Operations declaring a permission",
    "done": 2663,
-   "total": 2860,
+   "total": 2862,
    "percent": 93,
    "note": "the checklist a grant screen renders is built from these"
   },
   {
    "link": "Operations with resolved lineage",
-   "done": 2829,
-   "total": 2860,
+   "done": 2831,
+   "total": 2862,
    "percent": 99,
    "note": "names the tables it reads and writes -- the join the DDL cannot make itself"
   },
   {
    "link": "Operations reaching a screen",
    "done": 2572,
-   "total": 2860,
+   "total": 2862,
    "percent": 90,
    "note": "sync, webhook and job operations legitimately have none"
   },
@@ -73,30 +73,30 @@
   },
   {
    "link": "Tables reached by an operation",
-   "done": 1151,
-   "total": 1169,
+   "done": 1153,
+   "total": 1171,
    "percent": 98,
    "note": "a table nothing reaches is a missing operation or a table that should not exist"
   },
   {
    "link": "Tables carrying a relationship",
-   "done": 1069,
-   "total": 1169,
+   "done": 1070,
+   "total": 1171,
    "percent": 91,
    "note": "either end of a declared reference"
   }
  ],
  "boundaries": {
-  "edgesTotal": 3311,
-  "insideOneService": 2049,
-  "crossingTwoServices": 1262,
+  "edgesTotal": 3318,
+  "insideOneService": 2053,
+  "crossingTwoServices": 1265,
   "endpointNotOwned": 0,
   "note": "A reference inside one service is a foreign key the database enforces. A reference across two is a distributed read somebody has to design.",
   "heaviest": [
    {
     "from": "AccessService",
     "to": "TenancyService",
-    "edges": 86
+    "edges": 87
    },
    {
     "from": "MarketingService",
@@ -106,7 +106,7 @@
    {
     "from": "CatalogueService",
     "to": "TenancyService",
-    "edges": 69
+    "edges": 68
    },
    {
     "from": "OrderService",
@@ -116,7 +116,7 @@
    {
     "from": "TenancyService",
     "to": "IdentityService",
-    "edges": 59
+    "edges": 61
    },
    {
     "from": "CatalogueService",
@@ -157,7 +157,7 @@
   "topTargets": [
    {
     "table": "identity.principal",
-    "edges": 367
+    "edges": 369
    },
    {
     "table": "platform.scope",
@@ -169,11 +169,11 @@
    },
    {
     "table": "platform.outbox",
-    "edges": 63
+    "edges": 61
    },
    {
     "table": "approvals.request",
-    "edges": 39
+    "edges": 41
    },
    {
     "table": "platform.outlet",
@@ -196,7 +196,7 @@
     "edges": 19
    }
   ],
-  "inTopThreeTargets": 656
+  "inTopThreeTargets": 658
  },
  "services": [
   {
@@ -205,11 +205,11 @@
    "contracts": 3,
    "schemas": 4,
    "operations": 470,
-   "tables": 143,
+   "tables": 144,
    "screens": 73,
    "operationsOnAScreen": 429,
-   "edgesOut": 161,
-   "edgesIn": 106
+   "edgesOut": 160,
+   "edgesIn": 108
   },
   {
    "service": "OrderService",
@@ -240,11 +240,11 @@
    "tier": "engagement",
    "contracts": 1,
    "schemas": 1,
-   "operations": 283,
+   "operations": 284,
    "tables": 133,
    "screens": 40,
    "operationsOnAScreen": 234,
-   "edgesOut": 150,
+   "edgesOut": 149,
    "edgesIn": 14
   },
   {
@@ -256,7 +256,7 @@
    "tables": 77,
    "screens": 29,
    "operationsOnAScreen": 248,
-   "edgesOut": 144,
+   "edgesOut": 145,
    "edgesIn": 18
   },
   {
@@ -277,11 +277,11 @@
    "contracts": 4,
    "schemas": 6,
    "operations": 215,
-   "tables": 109,
+   "tables": 110,
    "screens": 71,
    "operationsOnAScreen": 190,
-   "edgesOut": 130,
-   "edgesIn": 378
+   "edgesOut": 134,
+   "edgesIn": 377
   },
   {
    "service": "AiService",
@@ -324,12 +324,12 @@
    "tier": "foundation",
    "contracts": 1,
    "schemas": 2,
-   "operations": 103,
+   "operations": 104,
    "tables": 48,
    "screens": 36,
    "operationsOnAScreen": 80,
    "edgesOut": 27,
-   "edgesIn": 482
+   "edgesIn": 484
   },
   {
    "service": "LedgerService",
@@ -487,11 +487,11 @@
   },
   {
    "contract": "identity",
-   "operations": 103,
+   "operations": 104,
    "onAScreen": 80,
-   "withLineage": 102,
+   "withLineage": 103,
    "withPermission": 63,
-   "percentOnAScreen": 78
+   "percentOnAScreen": 77
   },
   {
    "contract": "inventory",
@@ -511,11 +511,11 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 283,
+   "operations": 284,
    "onAScreen": 234,
-   "withLineage": 282,
+   "withLineage": 283,
    "withPermission": 251,
-   "percentOnAScreen": 83
+   "percentOnAScreen": 82
   },
   {
    "contract": "orders",
@@ -854,7 +854,7 @@
   "requirementsGapContract": 0,
   "requirementsGapDecision": 0,
   "requirementsPartial": 12,
-  "operationsNoScreen": 288,
+  "operationsNoScreen": 290,
   "screensNoOperation": 67,
   "operationsNoLineage": 31,
   "tablesNotReached": 18,

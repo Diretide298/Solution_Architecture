@@ -1,6 +1,6 @@
 # P08-venue-operations-01 — P08 · Venue Operations (1 of 2)
 
-**10 screens · 77 operations · 110 schemas · 28 permissions**
+**10 screens · 77 operations · 111 schemas · 28 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -178,7 +178,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-036` | Device Registry | B | 32 | 41 | 6 | 66 | 10 | 0 | — | notStarted (generated) |
+| `BO-036` | Device Registry | B | 33 | 41 | 6 | 66 | 10 | 0 | — | notStarted (generated) |
 | `BO-044` | F&B Outlets | A | 74 | 47 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 | `BO-058` | Reporting Home | D | 91 | 26 | 6 | 100 | 2 | 0 | — | notStarted (generated) |
 | `BO-060` | Attendance & Footfall | D | 111 | 38 | 6 | 153 | 1 | 0 | — | notStarted (generated) |

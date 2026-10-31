@@ -183,6 +183,28 @@
     "type": "boolean",
     "default": false,
     "description": "Excluded from rebalancing."
+   },
+   "allocationPercent": {
+    "x-ticvai-column": "envelope_percent",
+    "type": "number",
+    "minimum": 0,
+    "maximum": 100,
+    "nullable": true,
+    "description": "A `percentage` allocation's share of the capacity, 0 to 100 (ADAM CR-412; the column is envelope_percent, naming-and-style 3: Envelope, not Allocation, in DDL): required there, and `setChannelAllocations` sets `allocatedUnits` to the floor of capacity x percent / 100. Null for the other types."
+   },
+   "releasedUnits": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0,
+    "readOnly": true,
+    "description": "Units the allocation release job gave back to the general pool, added in the same transaction as each release (ADAM CR-412)."
+   },
+   "returnedUnits": {
+    "type": "integer",
+    "minimum": 0,
+    "default": 0,
+    "readOnly": true,
+    "description": "Units `relinquishChannelAllocation` returned to the general pool, added in the same transaction as each release (ADAM CR-412)."
    }
   }
  },
@@ -1521,7 +1543,7 @@
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
+    "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`, as white-label `getPublishedBookingFlow`'s kind rule picks it where several of the venue's enabled defaults list the kind (ADAM CR-427, 31 October 2026). A venue that wants a different flow for a product sets this or the category's `bookingFlowId`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
     "x-ticvai-persistence-column": "jsonb",

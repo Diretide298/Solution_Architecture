@@ -348,6 +348,11 @@
  "MessageDispatch": {
   "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-append-only": "queuedAt",
+  "x-ticvai-index": [
+   [
+    "sourceRef"
+   ]
+  ],
   "x-ticvai-persistence": "marketing.message_dispatch",
   "type": "object",
   "required": [
@@ -451,6 +456,11 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "sourceRef": {
+    "type": "string",
+    "nullable": true,
+    "description": "The id of the record whose business event triggered the message (a performance id, a guest broadcast id), which `listMessageDispatches` filters on (ADAM CR-379; CHG-CR379-001). Null for a campaign."
    }
   }
  },

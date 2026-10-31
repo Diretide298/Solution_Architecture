@@ -385,6 +385,7 @@
  },
  "ModuleEnablement": {
   "x-ticvai-persistence": "whitelabel.module_enablement",
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "required": [
    "moduleKey",

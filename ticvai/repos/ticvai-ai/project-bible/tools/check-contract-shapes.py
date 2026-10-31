@@ -37,17 +37,29 @@ same kind that nothing held:
                            required fields (`kind`, `text`, ...) are what a PATCH must not require.
   C-PAGED-STATUS           a cursor-paged list whose items' status can end (revoked, cancelled, expired ...) that
                            says neither which statuses it returns nor takes a status filter (ADAM CR-088, CHG-MKT-003)
+  C-PUT-CREATE             a PUT on a required path id whose text still promises the create of a body without the
+                           id: "keyed on the body's `id`", "No `id` creates", "A body without `ruleId` creates", or a
+                           body key field "Absent creates ...". The path id is always sent, so that create can never
+                           happen (ADAM CR-390 and CR-395, CHG-CR395-001: setFaceTagTemporaryEnrollment's and
+                           setAccessPointGroup's 201 were unreachable). CR-245's rule: the path id is the record's id,
+                           a create takes it (201), and a body id must equal it.
   C-PUT-KEY                a PUT whose path id carries the stock "Addresses the item this write creates or
                            replaces" text while its description keys the write on something else (`code`, `kind`
                            and the scope, a selector set); a path parameter promising `409 <noun>-id-mismatch` on an
                            operation whose 409 does not list it; or a PUT with a path id whose description still says
-                           "there is no id in the path" (ADAM CR-245, CHG-R10CRF-005). The rule CR-245 decided: the
+                           "there is no id in the path" or "the path carries no id" (ADAM CR-245, CHG-R10CRF-005;
+                           CR-398, CHG-CR398-001). The rule CR-245 decided: the
                            path id is the record's id, a create takes it, and a mismatch with the record the natural
                            key finds is 409 and changes nothing.
   C-REFUSAL-UNDECLARED     an operation's own text promises a refusal by status, "(409 when the batch has fewer
                            left)", "is refused (422)", "refused with 404", and its responses declare no such status,
                            so the refusal has no problem type and QA cannot test it (ADAM CR-316, CHG-CR316-001:
                            setCodeDistributionManager's 409 was described and not declared)
+  C-HTML-SANITISED         a schema or property whose description says its values are HTML and does not say they are
+                           "sanitised on write" (a schema also states its "Allowed tags"), or a write whose body reaches
+                           such a schema or property and whose description does not say it sanitises (ADAM CR-401,
+                           CHG-CR401-001: LocalisedRichText said "Values are sanitised HTML" and no operation sanitised,
+                           so content pages were stored and served to guest browsers as sent)
   C-FINDING-RULE           a validation's finding-kind enum (a schema named `*FindingKind`) whose description tables
                            its kinds (`| kind | ... |`) without a `reported when` column, or a kind with no row or an
                            empty `reported when` cell: a publish gate that blocks on a kind no rule defines
@@ -80,7 +92,8 @@ RULES = {
     "C-PROSE-SPLIT": "a word split in contract prose (R138)",
     "C-TWO-IDEMPOTENCY": "a body idempotency key beside the Idempotency-Key header (R153)",
     "C-SEARCH-PARAM": "a search/q parameter that says nothing about what it matches (R182)",
-    "C-NO-ADDRESS": "a PUT/PATCH/DELETE with no path key and no x-ticvai-singleton or x-ticvai-body-key (R162 R103)",
+    "C-NO-ADDRESS": "a PUT/PATCH/DELETE with no path key and no x-ticvai-singleton or x-ticvai-body-key (R162 R103); "
+                    "an operation the lineage marks pure stores nothing and is not asked (ADAM CR-419, CHG-CR419-001)",
     "C-SINGLETON-KEYED": "a write flagged x-ticvai-singleton whose body picks the record (its note names the body's key, "
                          "or the body requires a record id other than venueId or tenantId): it is x-ticvai-body-key "
                          "(r8 walk, CHG-R8WFC-001)",
@@ -99,6 +112,8 @@ RULES = {
     "C-PATCH-FULL-BODY": "a PATCH body is the full resource schema with its required list (ADAM CR-089, CHG-CNS-001)",
     "C-PAGED-STATUS": "a paged list of items whose status can end (revoked, cancelled ...) that says neither which "
                       "statuses it returns nor takes a status filter (ADAM CR-088, CHG-MKT-003)",
+    "C-PUT-CREATE": "a PUT on a required path id that promises the create of a body without the id, which can never "
+                    "happen (ADAM CR-390, CR-395; CHG-CR395-001)",
     "C-PUT-KEY": "a PUT keyed on a natural key whose path id carries the stock 'creates or replaces' text, a promised "
                  "409 <noun>-id-mismatch its 409 does not list, or 'no id in the path' beside a path id (ADAM CR-245, "
                  "CHG-R10CRF-005)",
@@ -106,6 +121,8 @@ RULES = {
                             "that its responses do not declare (ADAM CR-316, CHG-CR316-001)",
     "C-FINDING-RULE": "a finding-kind enum whose kind table gives a kind no 'reported when' rule (ADAM CR-320, "
                       "CHG-CR320-001)",
+    "C-HTML-SANITISED": "a schema documented as HTML that names no sanitising on write, or a write reaching it that "
+                        "does not say it sanitises (ADAM CR-401, CHG-CR401-001)",
 }
 # ADAM CR-316 (CHG-CR316-001): a refusal the operation's own text promises by status. Only the forms that say
 # this operation refuses: "(409 when|if|once|while ...)", "refused (409)", "refused with 409", "refused `409 ...`".
@@ -132,6 +149,26 @@ def finding_rule_gaps(schema: dict) -> list:
 def promised_statuses(text: str) -> set:
     """The refusal statuses an operation's own description or body-key note promises (C-REFUSAL-UNDECLARED)."""
     return {a or b for a, b in PROMISED_STATUS.findall(text or "")}
+# ADAM CR-390 and CR-395 (CHG-CR395-001): a PUT on a required path id that promises the create of a body without the
+# id. The operation's text ("keyed on the body's `id`", "No `id` creates", "A body without `ruleId` creates") or the
+# body key field's ("Absent creates a rule", "Absent in a body, it creates").
+UNREACHABLE_CREATE = re.compile(r"\bkeyed (?:on|by) the body's `id`|\b(?:a body without|no) `[A-Za-z]+`\**"
+                                r"(?: in the body)? creates", re.I)
+ABSENT_CREATES = re.compile(r"\babsent(?: in a body)?,? (?:it )?(?:creates|adds)\b", re.I)
+
+
+def put_create_unreachable(text: str, key_descriptions: dict) -> list:
+    """What promises an unreachable create (C-PUT-CREATE): the operation text's phrase, and each body key field
+    (`id`, or a field named for the path parameter) whose description says its absence creates."""
+    out = []
+    hit = UNREACHABLE_CREATE.search(" ".join(str(text or "").split()))
+    if hit:
+        out.append(hit.group(0))
+    out += [f"{k}: {str(d).strip()[:60]}" for k, d in sorted(key_descriptions.items())
+            if ABSENT_CREATES.search(str(d or "").replace("*", ""))]
+    return out
+
+
 # ADAM CR-245 (CHG-R10CRF-005): the text the 14 October shapes pass stamped on every PUT path id it added
 # (tools/applied/shp-contract-shapes-14-october/apply_noaddr.py), right only for a PUT keyed on that id.
 STOCK_ADDRESS = "Addresses the item this write creates or replaces"
@@ -351,8 +388,22 @@ def walk_enums(node, where, out, depth=0):
         walk_enums(v, f"{where}.{k}" if k not in ("properties", "items") else where, out, depth + 1)
 
 
+def pure_operations() -> dict:
+    """The operations the lineage marks `pure` (they compute and write no table), with the reason it gives."""
+    p = g.ROOT / "handoff" / "api-data-lineage.json"
+    try:
+        lin = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return {o: str(e.get("pure")) for o, e in lin.items() if isinstance(e, dict) and e.get("pure")}
+
+
+PURE_OPS: dict = {}
+
+
 def main() -> int:
     g.force_utf8()
+    PURE_OPS.update(pure_operations())
     guard = g.Guard("check-contract-shapes", RULES)
     ops = g.operations()
     docs = {stem: doc for stem, _, doc in g.contracts()}
@@ -544,7 +595,72 @@ def main() -> int:
                 guard.add("C-PROSE-SPLIT", f"{where}:{a} {b}", f"{where}: '{a} {b}' reads as a split '{a + b}'")
     extra_rules(guard, ops, docs)
     segregation_rules(guard, ops, docs)
+    html_rules(guard, ops, docs)
     return guard.finish()
+
+
+# ADAM CR-401 (CHG-CR401-001): a description that says the values are HTML ("Values are HTML", "is HTML").
+HTML_VALUES = re.compile(r"\b(?:values?|text`?)\s+(?:is|are)\s+(?:sanitised\s+)?HTML\b", re.I)
+SCHEMA_REF = re.compile(r"^(?:(?:\.\./)?(?:[\w-]+/)?([\w-]+)\.yaml)?#/components/schemas/(\w+)$")
+
+
+def html_rules(guard, ops, docs):
+    """**HTML a guest browser renders is sanitised where it is written** (ADAM CR-401, decided 31 October 2026;
+    CHG-CR401-001). `LocalisedRichText` said "Values are sanitised HTML" and nothing said who sanitised it, so content
+    pages, FAQs and policies were stored as sent: a stored cross-site scripting hole. A schema (or a property) whose
+    description says its values are HTML must say they are "sanitised on write", and a schema states its "Allowed
+    tags"; every write whose request body reaches it says in its own description that it sanitises."""
+    by, _ = g.schemas()
+    html = {}
+    for (stem, name), sch in sorted(by.items()):
+        d = str(sch.get("description") or "")
+        if HTML_VALUES.search(d):
+            html[(stem, name)] = name
+            if not re.search(r"sanitised on write", d, re.I) or "Allowed tags" not in d:
+                guard.add("C-HTML-SANITISED", f"{stem}:{name}",
+                          f"{name}: says its values are HTML and does not state that they are sanitised on write "
+                          f"and against which allowed tags")
+        for prop, ps in (sch.get("properties") or {}).items():
+            pd = str((ps or {}).get("description") or "") if isinstance(ps, dict) else ""
+            if HTML_VALUES.search(pd):
+                html[(stem, name)] = f"{name}.{prop}"
+                if not re.search(r"sanitised on write", pd, re.I):
+                    guard.add("C-HTML-SANITISED", f"{stem}:{name}.{prop}",
+                              f"{name}.{prop}: says its text is HTML and does not state that it is sanitised on write")
+
+    def reaches(node, stem, seen, depth=0):
+        if depth > 12:
+            return None
+        if isinstance(node, dict):
+            m = SCHEMA_REF.match(str(node.get("$ref", ""))) if "$ref" in node else None
+            if m:
+                key = (m.group(1) or stem, m.group(2))
+                if key in html:
+                    return html[key]
+                if key in seen:
+                    return None
+                seen.add(key)
+                return reaches(by.get(key), key[0], seen, depth + 1)
+            for v in node.values():
+                hit = reaches(v, stem, seen, depth + 1)
+                if hit:
+                    return hit
+        elif isinstance(node, list):
+            for v in node:
+                hit = reaches(v, stem, seen, depth + 1)
+                if hit:
+                    return hit
+        return None
+
+    for oid, f in sorted(ops.items()):
+        op = f["op"]
+        if f["method"] not in ("post", "put", "patch") or not op.get("requestBody"):
+            continue
+        hit = reaches(op.get("requestBody"), f["contract"], set())
+        if hit and not re.search(r"sanitis", str(op.get("description") or ""), re.I):
+            guard.add("C-HTML-SANITISED", oid,
+                      f"{oid}: its body carries {hit}, which is HTML, and its description does not say it sanitises "
+                      f"it on write")
 
 
 def segregation_rules(guard, ops, docs):
@@ -626,7 +742,24 @@ def extra_rules(guard, ops, docs):
                           f"{oid}: flagged a singleton, but its body picks the record ({', '.join(named or ids)}): "
                           f"declare x-ticvai-body-key")
         if m in ("put", "patch", "delete") and not path_params and not op.get("x-ticvai-singleton")                 and not (f["item"] or {}).get("x-ticvai-singleton") and not (body_key and not missing_key):
-            guard.add("C-NO-ADDRESS", oid, f"{oid}: {m.upper()} {path} has no path key and is not a singleton")
+            # **A write that stores nothing has no record to address** (ADAM CR-419, 31 October 2026, CHG-CR419-001).
+            # simulatePriceBreakdownCalculation carried `x-ticvai-singleton` ("one per venue, a PUT replaces it
+            # whole") only to pass this rule, while it stores nothing. An operation the lineage marks `pure` (it
+            # computes and writes no table; handoff/api-data-lineage.json) answers the question this rule asks, and
+            # is printed every run instead of found.
+            if oid in PURE_OPS:
+                guard.note(f"C-NO-ADDRESS not asked of {oid}: it stores nothing ({PURE_OPS[oid][:100]})")
+            else:
+                guard.add("C-NO-ADDRESS", oid, f"{oid}: {m.upper()} {path} has no path key and is not a singleton")
+        # C-PUT-CREATE (ADAM CR-390, CR-395; CHG-CR395-001): a PUT on a required path id promises no create that
+        # only a body without the id could reach.
+        if m == "put" and path_params:
+            keys = {k: (v or {}).get("description") for k, v in (body_props or {}).items()
+                    if isinstance(v, dict) and (k == "id" or k in path_params)}
+            for why in put_create_unreachable(op.get("description"), keys):
+                guard.add("C-PUT-CREATE", f"{oid}:{why.split(':')[0][:40]}",
+                          f"{oid}: PUT {path} promises a create without the id ({why[:80]!r}), but the path id is "
+                          f"always sent: say the path id is the record's id and a create takes it (201; ADAM CR-245)")
         # C-PUT-KEY (ADAM CR-245, CHG-R10CRF-005): a PUT path id says what it is against the write's key.
         if m == "put" and path_params:
             ptext = " ".join(str(op.get(k) or "") for k in ("description", "summary"))
@@ -645,7 +778,8 @@ def extra_rules(guard, ops, docs):
                     if t not in listed:
                         guard.add("C-PUT-KEY", f"{oid}:{t}",
                                   f"{oid}: path {{{n.get('name')}}} promises 409 {t}, which its 409 does not list")
-            if re.search(r"there is no id in the path", ptext, re.I):
+            # "The collection path carries no id" said the same of setParkingFacility's path id (ADAM CR-398).
+            if re.search(r"there is no id in the path|\bpath carries no id", ptext, re.I):
                 guard.add("C-PUT-KEY", f"{oid}:no-id", f"{oid}: says there is no id in the path, and {path} has one")
         if m in ("put", "patch", "delete") and body_name and (f["contract"], body_name) in append_only:
             guard.add("C-APPEND-ONLY", oid, f"{oid}: {m.upper()} writes {body_name}, declared append-only")

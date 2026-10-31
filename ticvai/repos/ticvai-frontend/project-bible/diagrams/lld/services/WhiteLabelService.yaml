@@ -120,7 +120,7 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 2
-    writes: 3
+    writes: 2
   - operation: deleteBookingFlow
     verb: DELETE
     path: /booking-flows/{bookingFlowId}
@@ -152,7 +152,7 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 3
-    writes: 4
+    writes: 2
   - operation: deletePromoBlock
     verb: DELETE
     path: /tenant-config/promo-blocks/{promoBlockId}
@@ -263,7 +263,7 @@ operationsByContract:
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
-    reads: 7
+    reads: 8
     writes: 0
   - operation: getModuleEnablement
     verb: GET
@@ -872,7 +872,7 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 4
-    writes: 4
+    writes: 3
   - operation: updatePromoBlock
     verb: PATCH
     path: /tenant-config/promo-blocks/{promoBlockId}
@@ -1231,7 +1231,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.banner
-  columns: 12
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -1364,7 +1364,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.kiosk_config
-  columns: 23
+  columns: 24
   store: postgres
   parent: null
   writtenBy:

@@ -50,7 +50,7 @@
    },
    "confidence": {
     "type": "number",
-    "description": "Forecast Confidence, percent"
+    "description": "Forecast Confidence, percent (`DemandForecast.confidence` x 100; ADAM CR-405)"
    },
    "forecastFinalOccupancy": {
     "type": "number",
@@ -408,19 +408,19 @@
    },
    "currentPriceAdjustments": {
     "type": "integer",
-    "description": "Current Price Adjustments"
+    "description": "Current Price Adjustments, the targets of the listed strategies whose newest price_execution is deployed or partiallyDeployed (ADAM CR-423)"
    },
    "pricesAtMaximumGuardrail": {
     "type": "integer",
-    "description": "Prices at Maximum Guardrail"
+    "description": "Prices at Maximum Guardrail, those targets whose newPrice is at or above the governing dynamic_pricing_control's absoluteMaximumPrice, or the ladder's maximumPrice where no control sets one (ADAM CR-423)"
    },
    "pricesAtMinimumGuardrail": {
     "type": "integer",
-    "description": "Prices at Minimum Guardrail"
+    "description": "Prices at Minimum Guardrail, those targets whose newPrice is at or below the governing control's absoluteMinimumPrice, or the ladder's minimumPrice where no control sets one (ADAM CR-423)"
    },
    "ruleConflicts": {
     "type": "integer",
-    "description": "Rule Conflicts"
+    "description": "Rule Conflicts, the sum of the seven open-conflict counts listRulePriorityConflict's summary gives for the venue (ADAM CR-423)"
    },
    "frozenStrategies": {
     "type": "integer",
@@ -435,7 +435,7 @@
     "items": {
      "type": "string"
     },
-    "description": "Operational Alerts (pack p.76), e.g. performances at their upper band, strategies with unresolved conflicts, strategies activating within 48 hours"
+    "description": "Operational Alerts (pack p.76): a code for each condition that holds, pricesAtUpperBand, unresolvedRuleConflicts or activatingWithin48Hours; the screen words them (ADAM CR-423)"
    }
   }
  },
@@ -478,7 +478,7 @@
    },
    "venue": {
     "type": "string",
-    "description": "Venue"
+    "description": "Venue's name, through tenancy#scopeRecords by venue_id (ADAM CR-423)"
    },
    "basePriceSource": {
     "type": "string",
@@ -490,7 +490,7 @@
       "$ref": "../shared/common.yaml#/components/schemas/Money"
      }
     ],
-    "description": "Current resolved dynamic price (for a single-price scope)",
+    "description": "Current resolved dynamic price: the newPrice of the strategy's newest deployed or partiallyDeployed price_execution where the strategy prices one target (singleProduct, or an event with at most one performance); otherwise null (ADAM CR-423)",
     "nullable": true
    },
    "adjustmentRange": {
@@ -528,23 +528,23 @@
     },
     "description": "Effective period"
    },
-   "automationMode": {
+   "automationLevel": {
     "type": "string",
     "enum": [
-     "monitor",
-     "recommend",
-     "prepareChange",
-     "autoExecuteWithinGuardrails"
+     "advisory",
+     "humanInTheLoop",
+     "conditionalAutonomous",
+     "autonomous"
     ],
-    "description": "Automation mode from the automation policy (listDynamicPricingAutomation); recommend by default"
+    "description": "Automation level, from the most specific dynamic_pricing_control covering the strategy (strategy, product, event, venue, market, global); advisory where there is none (replaces automationMode; ADAM CR-423, CR-417)"
    },
    "status": {
     "type": "string",
-    "description": "Status: draft, testing, ready, scheduled, active, paused, frozen, expired or retired"
+    "description": "Status: draft, ready (a draft with a ladder and at least one rule, whose scope is not frozen), scheduled (active, with effectiveFrom after now), active, paused, frozen, expired or retired; ready and scheduled are derived, the rest as stored, and testing is not answered (ADAM CR-423; LO-CR423-001)"
    },
    "owner": {
     "type": "string",
-    "description": "Owner"
+    "description": "Owner, the owner principal's display name through identity#principalRecords (ADAM CR-423)"
    }
   }
  },
@@ -576,11 +576,17 @@
    "customerId": {
     "type": "string",
     "nullable": true,
-    "description": "Customer"
+    "description": "Customer. Not read: a simulation never looks up a real guest (ADAM CR-419)"
    },
    "productId": {
     "type": "string",
     "description": "Product"
+   },
+   "productVariantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The variant priced; a variant of productId, required when the product has more than one sellable variant, else 400 validation on productVariantId (ADAM CR-419)"
    },
    "quantity": {
     "type": "integer",
@@ -614,12 +620,12 @@
    "membershipId": {
     "type": "string",
     "nullable": true,
-    "description": "Membership"
+    "description": "Membership, the catalogue.membership_programme the simulated customer holds; its membership pricing rules choose the rate at the contextualRateSelection step (ADAM CR-419)"
    },
    "promotionCode": {
     "type": "string",
     "nullable": true,
-    "description": "Promotion"
+    "description": "Promotion, evaluated by Promotions' evaluatePromotions in process without orderId, so nothing is stored (ADAM CR-419)"
    },
    "paymentMethod": {
     "type": "string",
@@ -742,7 +748,7 @@
    },
    "calculationVersion": {
     "type": "string",
-    "description": "Calculation version used"
+    "description": "Calculation version used, the calculation profile's code and version (ADAM CR-419)"
    },
    "channelComparison": {
     "type": "array",
@@ -768,7 +774,7 @@
     "items": {
      "type": "string"
     },
-    "description": "AI observations for this screen; advisory only, never applied automatically"
+    "description": "AI observations for this screen; advisory only, never applied automatically. Answered as an empty list until an AI producer exists (ADAM CR-419; LO-CR419-001)"
    }
   }
  },
@@ -886,11 +892,11 @@
    },
    "approvalStatus": {
     "type": "string",
-    "description": "Approval Status: notRequired, pending, approved or rejected"
+    "description": "Approval Status: notRequired, pending, approved or rejected. notRequired where the latest execution's source is conditionalAutonomous or autonomous; else pending for pending, sentToSimulation or sentForApproval, approved for accepted or modified, rejected for rejected (ADAM CR-408)"
    },
    "executionStatus": {
     "type": "string",
-    "description": "Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack"
+    "description": "Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack, from the latest price_execution: scheduled queued, executing processing, deployed live, partiallyDeployed partial, failed failed, reverted rolledBack, none notStarted (ADAM CR-408)"
    },
    "revenueRisk": {
     "$ref": "../shared/common.yaml#/components/schemas/Money",
