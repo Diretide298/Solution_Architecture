@@ -20,7 +20,9 @@ summary: 'Where r12''s CR lanes F to M (CR-372 to CR-435) and the plan lane each
   rewritten from the routes. (8) The Block A slice keeps the scope r11 had: createSeatMapTemplate is held out of the
   slice (a template is optional for createSeatMap, CR-403), so BO-962 stays in wave 3; BO-168 leaves Block A with its
   operations (CR-389 moved the geofence to the placement; its two tickets are On hold, never started); and
-  workforce.field_ownership and workforce.integration_source, built by #28946, carry their reason in departures.'
+  workforce.field_ownership and workforce.integration_source, built by #28946, carry their reason in departures. (9)
+  whitelabel.module_enablement is grant-holder-read, so the venue-level kiosk checks can read which modules are
+  enabled (check-rls-scope-fit RF-TENANT-ROOT once the lineage listed the read).'
 decision:
   what: 'The lead, 1 November 2026: "Lets ship r12 first"; fix findings at the source. The slice keeps Block A as
     approved: nothing joins it and only what no started ticket builds leaves it.'

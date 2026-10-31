@@ -21957,7 +21957,7 @@ components:
         productId:
           type: string
           format: uuid
-        productVariantId:
+        variantId:
           type: string
           format: uuid
           nullable: true
@@ -24091,7 +24091,7 @@ components:
           format: uuid
         partnerName:
           type: string
-        productVariantId:
+        variantId:
           type: string
           format: uuid
         note:
@@ -24762,7 +24762,7 @@ components:
         performanceId:
           type: string
           format: uuid
-        productVariantId:
+        variantId:
           type: string
           format: uuid
           nullable: true
@@ -26174,7 +26174,7 @@ components:
         priceListId:
           type: string
           format: uuid
-        productVariantId:
+        variantId:
           type: string
           format: uuid
         amount:
@@ -26190,7 +26190,7 @@ components:
       - variantId
       - amount
       properties:
-        productVariantId:
+        variantId:
           type: string
           format: uuid
         amount:

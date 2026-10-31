@@ -12608,6 +12608,7 @@ components:
           description: The partition key (ADR-0005). Written at `venue` scope.
     ModuleEnablement:
       x-ticvai-persistence: whitelabel.module_enablement
+      x-ticvai-rls: grant-holder-read   # ADAM CR-385, CHG-R12INT-004: read below the tenant by getKioskConfigValidation and publishKioskConfigs (tileWithoutProducts), at the venue
       type: object
       required:
       - moduleKey
