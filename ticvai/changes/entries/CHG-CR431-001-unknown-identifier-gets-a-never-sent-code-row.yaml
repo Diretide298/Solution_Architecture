@@ -1,0 +1,52 @@
+id: CHG-CR431-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'Changes one point of CHG-CR370-001 (the CR-370 follow-up of 31 October): for purposes login, passwordReset
+  and stepUp an identifier that resolves to nobody now gets its identity.otp_challenge row (subject_id null, the
+  code_hash of a random code generated and never sent, expires_at and resend_after as for any code), still with no
+  identity.guestCodeIssued, no delivery and no message. The per-identifier limit and resend interval read these rows,
+  so the 429 answers alike for known and unknown identifiers; verifyGuestOtp refuses any code against such a row 401
+  otp-code-invalid, counting the attempt. The rest of CHG-CR370-001 stands.'
+decision:
+  what: 'Posted on #30659 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction "Include them in r12": "as you recommended. This changes one point of the
+    CR-370 follow-up of 31 October. For purposes login, passwordReset and stepUp, an identifier that resolves to nobody
+    now gets its identity.otp_challenge row. The row has subject_id null, the code_hash of a random code that is
+    generated and never sent, and expires_at and resend_after as for any code. There is still no
+    identity.guestCodeIssued, no delivery and no message ... a second request inside resend_after answers the same 429
+    rate-limited with Retry-After, whether or not the identifier has an account. verifyGuestOtp refuses any code against
+    such a row with 401 otp-code-invalid and counts the attempt ... The rest of CR-370 and its follow-up stands."'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-431 (Hrushikant Patkar, #30659 requestGuestOtp): CHG-CR370-001''s "nothing is written (no otp_challenge
+  row)" for an unknown identifier let the per-identifier resend 429 reveal who holds an account, against the
+  operation''s own promise that the response never reveals whether the identifier exists. otp_challenge.subject_id is
+  already nullable.'
+keys_touched:
+  operations: [requestGuestOtp, verifyGuestOtp]
+  schemas: [OtpChallenge]
+  tables: [identity.otp_challenge]
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'supersedes in one point CHG-CR370-001 (its summary''s "gets nothing for purposes login, passwordReset and stepUp")'
+root_class: 'a non-disclosure promise broken by a rate limit that reads rows only known identifiers have'
+tickets:
+  started:
+  - '30659 (requestGuestOtp, Hrushikant): keep what you built.'
+  - '30661 (verifyGuestOtp, Hrushikant): refuse any code against a subject-null login, passwordReset or stepUp row with
+    401 otp-code-invalid, counting the attempt.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-431
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUEST-CODE-UNKNOWN
+status: open
+notes: 'CHG-CR370-001 is left as written (it records what was posted on 30 and 31 October); this entry names the point
+  it changes. BR-GUEST-CODE-DELIVERY still holds: requestGuestOtp emits identity.guestCodeIssued for every code it
+  sends. Not done here: the lead''s r12 tracking notes (outside git) should list CR-370 as corrected again by CR-431
+  under Posted corrections.'

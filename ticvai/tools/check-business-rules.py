@@ -340,6 +340,30 @@ And one rule per decision:
   BR-PRICING-APPROVAL (r12, ADAM CR-415, CHG-CR415-001) sendForApproval always raises an approvals request in process
                    (x-ticvai-writes approvals.request, both in commerce), passes 422 no-approval-route through,
                    writes no outbox or audit_entry, and Catalogue consumes the four approval events for it.
+  BR-BOOKING-FLOW-RESOLVE (r12, ADAM CR-426 and CR-427, CHG-CR426-001, CHG-CR427-001) deleteBookingFlow and
+                   getPublishedBookingFlow ask catalogue#productRecords and #productCategoryRecords in process (XDR-051);
+                   deleteBookingFlow states its two 409 cases and the on-sale rule, getPublishedBookingFlow the four
+                   steps, the kind tie rule (productKinds position, then catalogue position), the fall-through and 400.
+  BR-FLOW-TYPE-CATALOGUE (r12, ADAM CR-428, CHG-CR428-001) every catalogue type has name and description {en, ar} (the
+                   15 English names CMS-103 shows, in catalogue order), every condition is {en, ar}, and
+                   listBookingFlowTypes answers in catalogue order (never by name) with the condition and defaultSortOrder
+                   rules.
+  BR-BOOKING-FLOW-WRITES (r12, ADAM CR-429, CHG-CR429-001) both flow writes read consentQuestionRecords in process (served
+                   so), never guestMatchPolicyRecords, name their 400s step-not-in-flow-type, duplicate-flow-step and
+                   consent-question-not-active, and add a left-out step at its index; listBookingFlows states one order.
+  BR-GUEST-CONTACT-FIELDS (r12, ADAM CR-430, CHG-CR430-001) setBookingFlowConfig checks each active venue (in process,
+                   XDR-022) against the marketing-crm GuestMatchPolicy in force there, the default matchBy email with no row.
+  BR-GUEST-CODE-UNKNOWN (r12, ADAM CR-431, CHG-CR431-001) an unknown login, passwordReset or stepUp identifier gets a
+                   never-sent otp_challenge row, so the 429 answers alike, and verifyGuestOtp refuses any code against it.
+  BR-GUEST-CHECKOUT-PROOF (r12, ADAM CR-432, CHG-CR432-001) a guest-checkout code is proved under the cart's anonymous
+                   session (security none or guestAuth, 204, no subject, no GuestSession), the session holds
+                   verifiedContactRef, checkoutCart writes a subject-less order with it, and no route makes a profile.
+  BR-DELEGATION-CYCLE (r12, ADAM CR-433, CHG-CR433-001) identity#delegationReaches is a yes/no rule question under
+                   ITenantRootGrant that grantDelegation asks in process, under one transaction advisory lock.
+  BR-WEBHOOK-REPLAY-TENANT (r12, ADAM CR-434, CHG-CR434-001) WebhookReplayJob.tenantId states the backfill from the
+                   subscription's API client, the stop on rows left, and SET NOT NULL.
+  BR-OUTBOX-REPUBLISH-READS (r12, ADAM CR-435, CHG-CR435-001) republishOutbox declares no read of outbox rows (neither
+                   read-via nor lineage read) and names its partition-catalogue bound.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -2463,6 +2487,165 @@ def main() -> int:
              and c.get("idempotencyKey") == "requestId" for c in cons),
              f"events/{ev}.yaml has no catalogue consumer for subjectType pricingRecommendation (CR-415)")
 
+    # ---------------------------------------------------------------- r12 CR lane M (the lead, 31 October 2026: "for
+    # each one actually check if they hold and if not then find out the best way keeping in mind what client needs";
+    # "Include them in r12"). Each rule fails on the r12 candidate before the posted decision and passes on it.
+    def routes(o_):
+        return {(str((v or {}).get("query")), str((v or {}).get("route"))) for v in o_.get("x-ticvai-read-via") or []
+                if isinstance(v, dict)}
+
+    xdr = load("docs/active/cross-deployable-writes.yaml")
+    xdr_reads = {str((r or {}).get("id")): r for r in xdr.get("reads") or [] if isinstance(r, dict)}
+    wsch = (wl.get("components") or {}).get("schemas") or {}
+
+    # BR-BOOKING-FLOW-RESOLVE (ADAM CR-426, CR-427; CHG-CR426-001, CHG-CR427-001)
+    dbf, gpb = op("deleteBookingFlow")[3], op("getPublishedBookingFlow")[3]
+    for oid_, o_ in (("deleteBookingFlow", dbf), ("getPublishedBookingFlow", gpb)):
+        for q in ("catalogue#productRecords", "catalogue#productCategoryRecords"):
+            need("BR-BOOKING-FLOW-RESOLVE", (q, "in-process") in routes(o_),
+                 f"{oid_} does not ask {q} in process from the operations host (CR-426/CR-427, XDR-051)")
+    x51 = xdr_reads.get("XDR-051") or {}
+    need("BR-BOOKING-FLOW-RESOLVE", {"deleteBookingFlow", "getPublishedBookingFlow"} <= set(x51.get("operations") or [])
+         and {"catalogue#productRecords", "catalogue#productCategoryRecords"} <= set(x51.get("queries") or []),
+         "docs/active/cross-deployable-writes.yaml XDR-051 does not grant deleteBookingFlow's and getPublishedBookingFlow's "
+         "two Catalogue reads (CR-426/CR-427)")
+    dd = words(dbf.get("description"))
+    for frag in ("no other enabled default flow of the venue has a type that lists the same kind",
+                 "`isSellable` true, `guestListing` `bookable`", "`onSaleFrom` and `onSaleTo` where they are set",
+                 "neither it nor its category names a flow"):
+        need("BR-BOOKING-FLOW-RESOLVE", frag in dd, f"deleteBookingFlow does not say {frag!r} (CR-426)")
+    gd = words(gpb.get("description"))
+    for frag in ("lists the kind earliest", "comes first in `x-ticvai-system-catalogue`",
+                 "falls through to the next step", "the answer is 400 `validation`", "most recently updated flow decides nothing"):
+        need("BR-BOOKING-FLOW-RESOLVE", frag in gd, f"getPublishedBookingFlow does not say {frag!r} (CR-427)")
+    need("BR-BOOKING-FLOW-RESOLVE", "400" in {str(k) for k in (gpb.get("responses") or {})},
+         "getPublishedBookingFlow declares no 400 for a call with none of productId, productCategoryId and flowTypeKey (CR-427)")
+
+    # BR-FLOW-TYPE-CATALOGUE (ADAM CR-428; CHG-CR428-001)
+    bft = wsch.get("BookingFlowType") or {}
+    cat = bft.get("x-ticvai-system-catalogue") or {}
+    names_en = ["Dated day pass", "Timed entry", "Open-dated", "Seated fixed performance",
+                "Seated date, time and seat map", "Experience or workshop", "Surf or session",
+                "Meeting room by the hour", "Cabana on a map", "Guided tour by language", "Transport",
+                "Table reservation", "Membership", "Gift card", "Several locations"]
+
+    def loc(v):
+        return isinstance(v, dict) and bool(str(v.get("en") or "").strip()) and bool(str(v.get("ar") or "").strip())
+
+    types_ = cat.get("types") or []
+    need("BR-FLOW-TYPE-CATALOGUE", [(t or {}).get("name", {}).get("en") if isinstance((t or {}).get("name"), dict)
+                                    else None for t in types_] == names_en,
+         "the system catalogue's type names are not the 15 English names CMS-103 shows, in catalogue order (CR-428)")
+    for t in types_:
+        k = (t or {}).get("key")
+        need("BR-FLOW-TYPE-CATALOGUE", loc(t.get("name")) and loc(t.get("description")),
+             f"catalogue type {k} has no name and description as {{en, ar}} (CR-428)")
+        for s in t.get("steps") or []:
+            if "condition" in (s or {}):
+                need("BR-FLOW-TYPE-CATALOGUE", loc(s.get("condition")),
+                     f"catalogue type {k} step {s.get('stepKey')}: condition is not {{en, ar}} (CR-428)")
+    for k, v in (cat.get("commonConditions") or {}).items():
+        need("BR-FLOW-TYPE-CATALOGUE", loc(v), f"commonConditions.{k} is not {{en, ar}} (CR-428)")
+    lbt = words(op("listBookingFlowTypes")[3].get("description"))
+    need("BR-FLOW-TYPE-CATALOGUE", "Sorted by `name`" not in lbt and "**Order.** Catalogue order" in lbt
+         and "`commonConditions[stepKey]`" in lbt and "counting from 0" in lbt,
+         "listBookingFlowTypes does not answer in catalogue order with the condition and defaultSortOrder rules (CR-428)")
+
+    # BR-BOOKING-FLOW-WRITES (ADAM CR-429; CHG-CR429-001)
+    for oid_ in ("createBookingFlowDefinition", "updateBookingFlowDefinition"):
+        o_ = op(oid_)[3]
+        need("BR-BOOKING-FLOW-WRITES", ("marketing-crm#consentQuestionRecords", "in-process") in routes(o_)
+             and "marketing-crm#guestMatchPolicyRecords" not in {q for q, _r in routes(o_)},
+             f"{oid_} does not read consentQuestionRecords in process, or still reads guestMatchPolicyRecords (CR-429)")
+        p400 = ptypes(o_, "400")
+        need("BR-BOOKING-FLOW-WRITES", {"step-not-in-flow-type", "duplicate-flow-step", "consent-question-not-active"} <= p400
+             and not ({"step-not-in-type", "step-given-twice"} & p400),
+             f"{oid_}'s 400 does not name step-not-in-flow-type, duplicate-flow-step and consent-question-not-active "
+             f"only ({sorted(p400)}; CR-429)")
+        need("BR-BOOKING-FLOW-WRITES", "added at its index in the type" in words(o_.get("description")),
+             f"{oid_} does not say a step left out is added at its index with the type's defaultEnabled (CR-429)")
+    mq = (load("contracts/satellite/marketing-crm.yaml").get("x-ticvai-queries") or {}).get("consentQuestionRecords") or {}
+    need("BR-BOOKING-FLOW-WRITES", "in-process" in (mq.get("served") or []),
+         "marketing-crm#consentQuestionRecords is not served in process (CR-429)")
+    lbf200 = words(((op("listBookingFlows")[3].get("responses") or {}).get("200") or {}).get("description"))
+    need("BR-BOOKING-FLOW-WRITES", "defaults first" not in lbf200,
+         "listBookingFlows' 200 still says 'defaults first' beside its Order paragraph (CR-429)")
+
+    # BR-GUEST-CONTACT-FIELDS (ADAM CR-430; CHG-CR430-001)
+    sbc = op("setBookingFlowConfig")[3]
+    need("BR-GUEST-CONTACT-FIELDS", ("tenancy#activeVenues", "in-process") in routes(sbc)
+         and ("marketing-crm#guestMatchPolicyRecords", "in-process") in routes(sbc),
+         "setBookingFlowConfig does not ask tenancy#activeVenues and guestMatchPolicyRecords in process (CR-430)")
+    sbd = words(sbc.get("description"))
+    for frag in ("with no row it is the default, `matchBy` `email`", "`email` or `mobile` for `emailOrMobile`",
+                 "else the tenant's, else `[email]`"):
+        need("BR-GUEST-CONTACT-FIELDS", frag in sbd, f"setBookingFlowConfig does not say {frag!r} (CR-430)")
+    gcf = words((((wsch.get("BookingFlowSettings") or {}).get("properties") or {}).get("guestContactFields") or {})
+                .get("description"))
+    need("BR-GUEST-CONTACT-FIELDS", "identity `GuestMatchPolicy" not in gcf and "marketing-crm `GuestMatchPolicy`" in gcf,
+         "BookingFlowSettings.guestContactFields still calls the match policy identity's (it is marketing-crm's; CR-430)")
+    need("BR-GUEST-CONTACT-FIELDS", "setBookingFlowConfig" in ((xdr_reads.get("XDR-022") or {}).get("operations") or []),
+         "XDR-022 does not list setBookingFlowConfig's in-process tenancy#activeVenues (CR-430)")
+
+    # BR-GUEST-CODE-UNKNOWN (ADAM CR-431, changing one point of CR-370's follow-up; CHG-CR431-001)
+    rgo, vgo = op("requestGuestOtp")[3], op("verifyGuestOtp")[3]
+    rgd_ = words(rgo.get("description"))
+    need("BR-GUEST-CODE-UNKNOWN", "nothing is written for the code" not in rgd_
+         and "generated and never sent" in rgd_ and "whether or not the identifier has an account" in rgd_,
+         "requestGuestOtp does not write the never-sent otp_challenge row for an unknown login, passwordReset or stepUp "
+         "identifier, or does not say the 429 answers alike (CR-431)")
+    v401 = words(((vgo.get("responses") or {}).get("401") or {}).get("description"))
+    need("BR-GUEST-CODE-UNKNOWN", "subject-null `login`, `passwordReset` or `stepUp` row" in v401,
+         "verifyGuestOtp's 401 does not refuse a code against a subject-null login, passwordReset or stepUp row (CR-431)")
+
+    # BR-GUEST-CHECKOUT-PROOF (ADAM CR-432, with the lead's answer of 31 October 2026; CHG-CR432-001)
+    sec = vgo.get("security")
+    need("BR-GUEST-CHECKOUT-PROOF", isinstance(sec, list) and {} in sec and {"guestAuth": []} in sec,
+         "verifyGuestOtp's security is not none beside guestAuth (the cart's anonymous session, CR-432)")
+    need("BR-GUEST-CHECKOUT-PROOF", "204" in {str(k) for k in (vgo.get("responses") or {})}
+         and "no subject is created and no `GuestSession` is issued" in words(vgo.get("description")),
+         "verifyGuestOtp does not answer a guest-checkout code 204 with no subject and no GuestSession (CR-432)")
+    oags = words(((load("contracts/spine/identity.yaml").get("x-ticvai-queries") or {}).get("openAnonymousGuestSession")
+                  or {}).get("rule"))
+    need("BR-GUEST-CHECKOUT-PROOF", "verifiedContactRef" in oags,
+         "openAnonymousGuestSession does not say the session holds the proved verifiedContactRef (CR-432)")
+    cco = words(op("checkoutCart")[3].get("description"))
+    need("BR-GUEST-CHECKOUT-PROOF", "takes `verifiedContactRef` from the session" in cco
+         and "`subjectId` null" in cco,
+         "checkoutCart does not take verifiedContactRef from the anonymous session and write a subject-less order (CR-432)")
+    need("BR-GUEST-CHECKOUT-PROOF", "Both routes produce a guest profile" not in words(op("verifyGuestEmail")[3]
+                                                                                       .get("description")),
+         "verifyGuestEmail still says both routes produce a guest profile (a profile is made only with an account; "
+         "CR-432, the lead's answer)")
+
+    # BR-DELEGATION-CYCLE (ADAM CR-433, item (6) beside CR-362's (1) to (5); CHG-CR433-001)
+    drq = (load("contracts/spine/identity.yaml").get("x-ticvai-queries") or {}).get("delegationReaches") or {}
+    need("BR-DELEGATION-CYCLE", "ITenantRootGrant" in str(drq.get("rule") or "") and "recursive" in str(drq.get("rule") or "")
+         and set(((drq.get("returns") or {}).get("properties") or {})) == {"reaches"}
+         and set(drq.get("inputs") or {}) == {"fromSubjectId", "toSubjectId"} and drq.get("served") == ["in-process"],
+         "identity#delegationReaches is not a yes/no rule question (fromSubjectId, toSubjectId -> reaches) answered under "
+         "ITenantRootGrant in process (CR-433)")
+    gdo2 = op("grantDelegation")[3]
+    need("BR-DELEGATION-CYCLE", ("identity#delegationReaches", "in-process") in routes(gdo2),
+         "grantDelegation does not ask identity#delegationReaches in process (CR-433)")
+    need("BR-DELEGATION-CYCLE", "transaction advisory lock" in words(gdo2.get("description")),
+         "grantDelegation does not run the cycle check and the insert under one transaction advisory lock (CR-433)")
+
+    # BR-WEBHOOK-REPLAY-TENANT (ADAM CR-434; CHG-CR434-001)
+    wrj = ((load("contracts/satellite/public-api.yaml").get("components") or {}).get("schemas") or {}).get("WebhookReplayJob") or {}
+    wtd = words(((wrj.get("properties") or {}).get("tenantId") or {}).get("description"))
+    need("BR-WEBHOOK-REPLAY-TENANT", "tenantId" in (wrj.get("required") or [])
+         and "allowed_tenant_ids holds exactly one tenant" in wtd and "delete nothing" in wtd and "SET NOT NULL" in wtd,
+         "WebhookReplayJob.tenantId does not state CR-434's backfill, stop and SET NOT NULL steps")
+
+    # BR-OUTBOX-REPUBLISH-READS (ADAM CR-435; CHG-CR435-001)
+    rpo = op("republishOutbox")[3]
+    need("BR-OUTBOX-REPUBLISH-READS", not rpo.get("x-ticvai-read-via")
+         and "partition catalogue" in words(rpo.get("description")),
+         "republishOutbox declares a read it does not make, or does not name the partition-catalogue bound (CR-435)")
+    need("BR-OUTBOX-REPUBLISH-READS", "platform.outbox" not in ((lin.get("republishOutbox") or {}).get("reads") or []),
+         "the lineage has republishOutbox reading platform.outbox rows (handoff/api-data-lineage-overrides.json; CR-435)")
+
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
@@ -2497,7 +2680,10 @@ def main() -> int:
              "BR-SEAT-MAP-SECTIONS", "BR-SEAT-TEMPLATE-COPY", "BR-SEAT-MAP-UPDATE", "BR-FORECAST-CURVE",
              "BR-ELASTICITY-CONTEXT", "BR-PRICING-PERFORMANCE", "BR-REVENUE-ROW",
              "BR-COMPETITOR-OBSERVATION", "BR-CONTEXTUAL-RULE", "BR-SALE-SCHEDULE-SUMMARY",
-             "BR-CHANNEL-ALLOCATION-COUNTS", "BR-CHANNEL-CODE-UNIQUE", "BR-SALE-RULE-INSTANTS", "BR-PRICING-APPROVAL"]
+             "BR-CHANNEL-ALLOCATION-COUNTS", "BR-CHANNEL-CODE-UNIQUE", "BR-SALE-RULE-INSTANTS", "BR-PRICING-APPROVAL",
+             "BR-BOOKING-FLOW-RESOLVE", "BR-FLOW-TYPE-CATALOGUE", "BR-BOOKING-FLOW-WRITES", "BR-GUEST-CONTACT-FIELDS",
+             "BR-GUEST-CODE-UNKNOWN", "BR-GUEST-CHECKOUT-PROOF", "BR-DELEGATION-CYCLE", "BR-WEBHOOK-REPLAY-TENANT",
+             "BR-OUTBOX-REPUBLISH-READS"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

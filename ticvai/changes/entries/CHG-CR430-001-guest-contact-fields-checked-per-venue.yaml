@@ -1,0 +1,51 @@
+id: CHG-CR430-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'setBookingFlowConfig checks every active venue (tenancy#activeVenues, now in process, XDR-022) against the
+  marketing-crm GuestMatchPolicy in force there (the row whose scope_path is the venue''s; none means the default,
+  matchBy email). The fields in force are the venue''s venueOverrides guestContactFields, else the tenant''s, else
+  [email]; they must include email for email, mobile for mobile, email or mobile for emailOrMobile, else 400 validation
+  naming the venue and the field. The policy is marketing-crm''s, not identity''s.'
+decision:
+  what: 'Posted on #31043 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction "Include them in r12": "not as recommended: your per-venue check holds, but
+    a venue with no policy row still has the default policy. setBookingFlowConfig checks every active venue against the
+    GuestMatchPolicy in force there. Read the venues from tenancy#activeVenues in process, as CR-343 did for
+    validateTenantConfig. The policy in force is the row whose scope_path is the venue''s (guestMatchPolicyRecords, in
+    process); with no row it is the default, matchBy email. The fields in force at the venue are its venueOverrides
+    entry''s guestContactFields, else the tenant''s, else [email]. They must include email for email, mobile for
+    mobile, and email or mobile for emailOrMobile. Otherwise answer 400 validation naming the venue and
+    guestContactFields or venueOverrides[i].settings.guestContactFields. The policy is marketing-crm''s, not
+    identity''s."'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-430 (Hrushikant Patkar, #31043 setBookingFlowConfig): guestContactFields is per tenant with a per-venue
+  override while GuestMatchPolicy is one per venue, emailOrMobile was not ruled, and "no policy, no rule" would let a
+  venue with no row match on an email its pop-up never collected. activeVenues was still on the unbuilt service route
+  (XDR-022''s "Not covered").'
+keys_touched:
+  operations: [setBookingFlowConfig]
+  schemas: [BookingFlowSettings]
+  tables: [marketing.guest_match_policy, platform.scope]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/tenancy.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+root_class: 'a per-tenant setting checked against a per-venue rule, with no rule for the venue that has no row'
+tickets:
+  started:
+  - '31043 (setBookingFlowConfig, Hrushikant): read activeVenues in process and check a venue with no policy row against
+    matchBy email.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-430
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUEST-CONTACT-FIELDS
+status: open
+notes: 'XDR-022 now lists setBookingFlowConfig (its "Not covered" keeps getTenantConfig only). Left out:
+  setGuestMatchPolicy changing matchBy later is not re-checked against guestContactFields (LO-CR430-001).'

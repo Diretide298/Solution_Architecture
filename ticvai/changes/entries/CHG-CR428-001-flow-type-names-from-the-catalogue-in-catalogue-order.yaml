@@ -1,0 +1,55 @@
+id: CHG-CR428-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'Each of the 15 types in BookingFlowType x-ticvai-system-catalogue gains name and description as {en, ar}
+  (the English names CMS-103 shows), every step condition and commonConditions entry is {en, ar}, and
+  listBookingFlowTypes serves them verbatim: a step with no condition of its own takes commonConditions[stepKey],
+  defaultSortOrder is the step''s index from 0, defaultEnabled is true unless the catalogue says otherwise. The list
+  answers in catalogue order (the type''s position, then key); "Sorted by name ascending" is dropped.'
+decision:
+  what: 'Posted on #31034 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction "Include them in r12": "not as recommended: the names go into the
+    catalogue as you recommended, but the list keeps the catalogue''s own order. Each type in x-ticvai-system-catalogue
+    gains name and description as {en, ar}. The English names are the ones CMS-103 shows: Dated day pass, Timed entry,
+    Open-dated, Seated fixed performance, Seated date, time and seat map, Experience or workshop, Surf or session,
+    Meeting room by the hour, Cabana on a map, Guided tour by language, Transport, Table reservation, Membership, Gift
+    card, Several locations. Serve them verbatim. Every condition is served as {en, ar}, and a step with no condition of
+    its own takes commonConditions[stepKey]. defaultSortOrder is the step''s index ... defaultEnabled is true unless the
+    catalogue says otherwise. listBookingFlowTypes answers in catalogue order ... ''Sorted by name ascending'' is
+    dropped. Until you pull r12, serve en only; the ar text comes with the package."'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-428 (Hrushikant Patkar, #31034 listBookingFlowTypes, blocking): BookingFlowType requires name, yet the
+  catalogue gave its types none, conditions were plain English, and the list said both "in catalogue order" (its 200)
+  and "Sorted by name ascending" (the generic order CHG-SHP-002 wrote). Sorting by name would not match CMS-103''s
+  order.'
+keys_touched:
+  operations: [listBookingFlowTypes]
+  schemas: [BookingFlowType]
+  screens: [CMS-103]
+  files:
+  - contracts/satellite/white-label.yaml
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+root_class: 'a catalogue a required field reads from that carries no value for it, and an order stated twice'
+tickets:
+  started:
+  - '31034 (listBookingFlowTypes, Hrushikant): serve the catalogue''s names, descriptions and conditions verbatim in
+    catalogue order; defaultSortOrder is the index.'
+  - '32183 (CMS-103 connect to API): show FlowType.name and description from the response in the order served; no
+    visible change.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-428
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-FLOW-TYPE-CATALOGUE
+status: open
+notes: 'Beyond the posted words: the English descriptions of the 15 types and every Arabic text (names, descriptions,
+  conditions) are this lane''s wording, for the lead or the client to correct; the English conditions are the
+  catalogue''s, unchanged. CHG-SHP-002''s order was written once by tools/applied/ (not re-run by a refresh), and the
+  live fixer (tools/fix-order-and-refusals.py) writes an order only where none is stated, so nothing writes "by name"
+  back; BR-FLOW-TYPE-CATALOGUE fails if it returns. Left out: CMS-103''s notes and design notes name 16 types with
+  "cabana by size" (W6), the catalogue 15 (LO-CR428-001).'

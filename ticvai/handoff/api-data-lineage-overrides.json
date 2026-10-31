@@ -11985,13 +11985,10 @@
    "carried": true
   },
   "republishOutbox": {
-   "reads": [
-    "platform.outbox"
-   ],
    "writes": [
     "platform.audit_record"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001). Its carried read of platform.outbox is removed: the operation reads no outbox rows, only the tenant database's partition catalogue for its 422 bound, and the workers relay reads the rows (ADAM CR-435, 31 October 2026; CHG-CR435-001)",
    "carried": true
   },
   "requestAppBuild": {

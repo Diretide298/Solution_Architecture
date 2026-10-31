@@ -369,6 +369,11 @@ NOT_READ_FOR: tuple = tuple((re.compile(p, re.I | re.S), frozenset(o)) for p, o 
     # a dispatch's attribution window belongs to the campaign's performance figures, not to sending one message
     (r"The\s+window\s+these\s+figures\s+were\s+attributed\s+over,\s+from\s+`VenueSettings\.marketing\."
      r"attributionWindowDays`", {"retryMessageDispatch", "sendTransactionalMessage", "testSendCampaign"}),
+    # the booking-flow settings say which match policy the guest contact fields must meet; setBookingFlowConfig checks
+    # it (ADAM CR-430), and the flow writes, which reach BookingFlowSettings only by a schema named in their text, do
+    # not read it (ADAM CR-429, 31 October 2026; CHG-CR429-001: the read-via this match added is removed)
+    (r"by\s+the\s+marketing-crm\s+`GuestMatchPolicy`\s+in\s+force\s+there",
+     {"createBookingFlowDefinition", "updateBookingFlowDefinition"}),
 ))
 
 

@@ -1,0 +1,54 @@
+id: CHG-CR427-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'getPublishedBookingFlow asks catalogue#productRecords and catalogue#productCategoryRecords in process (XDR-051)
+  and resolves against the published snapshot''s enabled flows of the path''s venue: (1) the product''s own
+  bookingFlowId (ids [productId] where {venueId}; no such product is 404), (2) the category''s, (3) the venue''s enabled
+  default whose type lists the product''s kind, ties to the type whose productKinds lists the kind earliest, then the
+  type first in x-ticvai-system-catalogue, (4) with flowTypeKey, that type''s enabled default; then 404. A step naming
+  a missing or disabled flow falls through; no parameter is 400 validation; the most recently updated flow decides
+  nothing.'
+decision:
+  what: 'Posted on #31033 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction "Include them in r12": "not as recommended: the reads and the 400 are as
+    you recommended, the tie rule is not ... (3) With a product, the venue''s enabled default flow whose type lists the
+    product''s kind. When several do, take the type whose productKinds lists the kind earliest, then the type that comes
+    first in x-ticvai-system-catalogue ... A step whose flow id names a missing or disabled flow falls through to the
+    next step. With none of productId, productCategoryId and flowTypeKey the answer is 400 validation. A venue that
+    wants a different flow for a product sets the product''s or the category''s bookingFlowId. Do not use the most
+    recently updated flow: editing a flow would change which flow guests get."'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-427 (Hrushikant Patkar, #31033 getPublishedBookingFlow, blocking): the Catalogue reads were on the
+  unbuilt service route, several types list one kind (admission: datedDayPass, openDated, experienceWorkshop,
+  transport, multiLocation) while isDefaultForType is per venue and type, and a call with no parameter was not
+  described. The CR''s "most recently updated" tie would move every fallback product when an operator edits a flow.'
+keys_touched:
+  operations: [getPublishedBookingFlow, createBookingFlowDefinition]
+  schemas: [BookingFlowType, BookingFlow, Product, ProductCategory]
+  tables: [catalogue.product, catalogue.product_category, whitelabel.config_version]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/catalogue.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'XDR-051 (shared with CR-426)'
+root_class: 'storage-route gap, and a resolution rule with no tie-break where several rows can answer'
+tickets:
+  started:
+  - '31033 (getPublishedBookingFlow, Hrushikant): build the four-step resolution with the tie rule, the in-process reads
+    and the 400.'
+  - '32183 (CMS-103 connect to API): no change; a product with no flow of its own shows the flow the rule picks.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-427
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-BOOKING-FLOW-RESOLVE
+status: open
+notes: 'Beyond the posted words, wording only: BookingFlowType.productKinds, BookingFlow, createBookingFlowDefinition''s
+  isDefaultForType sentence and catalogue Product.bookingFlowId / ProductCategory.bookingFlowId now point to the kind
+  rule instead of saying a default serves "every product of these kinds".'

@@ -1820,3 +1820,18 @@ changes:
     tag: r12
     producer-tickets: ['35239']
     consumer-tickets: ['29777', '36744']
+  - id: BC-570
+    contract: identity
+    operation: verifyGuestOtp
+    change: 'security changed [] -> [{}, {"guestAuth": []}]'
+    reason: 'ADAM CR-432 (CHG-CR432-001): a guest-checkout code (purpose verify) proves the contact for the cart and
+      opens no account, so it is taken under the cart''s anonymous guest session (Cart.anonymousSessionToken, CR-183),
+      which records verifiedContactRef for checkoutCart, and answered 204 with no GuestSession. A call with no session
+      is still accepted for every other purpose, so the change only adds an alternative; the compat rule counts a
+      security change as breaking. The new 204 travels with it.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-432 posted on #30661: "a guest-checkout code proves the contact for this
+      cart and opens no account ... its security gains guestAuth beside none"), with the lead''s answer of the same day
+      ("a guest profile is created only when the guest later makes an account")'
+    tag: r12
+    producer-tickets: ['30661', '31129']
+    consumer-tickets: ['30697', '30703']

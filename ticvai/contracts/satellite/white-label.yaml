@@ -2439,11 +2439,15 @@ paths:
         - "P13 CMS-016 Site Settings"
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
-        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
+        route: in-process
+        for: 'the tenant''s active venues, each checked against the GuestMatchPolicy in force there and for the
+          venueOverrides venueId rule, platform.scope, Tenancy''s data, asked in process as CR-343 did for
+          validateTenantConfig (ADAM CR-430; XDR-022; CHG-CR430-001)'
       - query: marketing-crm#guestMatchPolicyRecords
         route: in-process
-        for: 'what its text calls "GuestMatchPolicy.matchBy": marketing.guest_match_policy, Marketing''s data (CHG-R10GEN-001)'
+        for: 'the GuestMatchPolicy in force at each active venue (the row whose scope_path is the venue''s; none
+          means the default, matchBy email), marketing.guest_match_policy, Marketing''s data (ADAM CR-430;
+          CHG-CR430-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Set how the guest booking flow looks and steps
@@ -2469,6 +2473,17 @@ paths:
         **Per tenant, with a per-venue override (decided 29 September, rev 3 CFG-11).** `venueOverrides`
         holds the fields a venue changes; everything else it inherits. A `venueId` not among the tenant''s
         active venues, or one given twice, is refused with 400.
+
+
+        **The guest contact fields, checked per venue** (ADAM CR-430, decided 31 October 2026, Chinmay;
+        CHG-CR430-001). Every active venue (`tenancy#activeVenues`, asked in process as CR-343 did for
+        `validateTenantConfig`) is checked against the `GuestMatchPolicy` in force there: the row whose
+        `scope_path` is the venue''s (`marketing-crm#guestMatchPolicyRecords`, in process); with no row it is the
+        default, `matchBy` `email`. The fields in force at the venue are its `venueOverrides` entry''s
+        `guestContactFields`, else the tenant''s, else `[email]`. They must include `email` for `email`, `mobile`
+        for `mobile`, and `email` or `mobile` for `emailOrMobile`. Otherwise the answer is 400 `validation`
+        naming the venue and `guestContactFields` or `venueOverrides[i].settings.guestContactFields`. The policy is
+        marketing-crm''s, not identity''s.
 
         '
       tags:
@@ -6542,9 +6557,16 @@ paths:
         comes after date and time), and the settings each step owns. The full catalogue is `x-ticvai-system-catalogue`
         on `BookingFlowType`.
 
-        
 
-        **Order.** Sorted by `name` ascending.'
+        **Served verbatim from the catalogue** (ADAM CR-428, decided 31 October 2026, Chinmay; CHG-CR428-001). Each
+        type''s `name` and `description` are the catalogue''s, `{en, ar}`, and every step''s `condition` is served as
+        `{en, ar}`: the step''s own where the catalogue gives one, else `commonConditions[stepKey]`, else none.
+        `defaultSortOrder` is the step''s index in the type''s `steps`, counting from 0. `defaultEnabled` is true unless
+        the catalogue says otherwise.
+
+
+        **Order.** Catalogue order: by the type''s position in `x-ticvai-system-catalogue`, then by `key` (ADAM CR-428;
+        not by `name`, which would not match the order CMS-103 shows).'
       tags:
       - bookingFlows
       x-ticvai-permission: TENANT_CONFIGURE
@@ -6624,7 +6646,7 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
-          description: The venue's flows, defaults first
+          description: The venue's flows, in the order the description states
           content:
             application/json:
               schema:
@@ -6646,9 +6668,11 @@ paths:
         - "P13 CMS-102 Site Builder"
         - "P13 CMS-103 Booking Flows"
       x-ticvai-read-via:
-      - query: marketing-crm#guestMatchPolicyRecords
+      - query: marketing-crm#consentQuestionRecords
         route: in-process
-        for: 'what its text calls "GuestMatchPolicy.matchBy": marketing.guest_match_policy, Marketing''s data (CHG-R10GEN-001)'
+        for: 'whether each of settings.consentQuestionIds is an active ConsentQuestion of the tenant (ids =
+          settings.consentQuestionIds), marketing.consent_question, Marketing''s data; Marketing runs in the
+          operations host (ADAM CR-429; CHG-CR429-001)'
       x-ticvai-agreed: '29 September: W12 (pick flows from the catalogue); agreed as `createBookingFlow`, named
         `createBookingFlowDefinition` so check-config-scope IS_CONFIG reaches it (a flow is a definition every
         booking at the venue resolves against); shape follows createGuidedChoice'
@@ -6661,9 +6685,18 @@ paths:
         own settings. **Saved even when it does not validate**, so an operator can work step by step; `isValid`
         says whether it does and `validateBookingFlow` says why. `publishTenantConfig` refuses a draft holding
         an invalid flow. **A step the type does not have**, or a step given twice, is refused with 400.
-        `isDefaultForType` true makes this the venue''s flow for every product of the type''s kinds that
-        names no flow (catalogue `Product.bookingFlowId`); the venue''s previous default for the type loses
-        the flag in the same transaction.
+        `isDefaultForType` true makes this the venue''s default for the type: it serves the products of the
+        type''s kinds that name no flow (catalogue `Product.bookingFlowId`), where it wins the kind rule of
+        `getPublishedBookingFlow` (ADAM CR-427); the venue''s previous default for the type loses the flag in the
+        same transaction.
+
+
+        **Consent questions, and the steps left out** (ADAM CR-429, decided 31 October 2026, Chinmay;
+        CHG-CR429-001). `settings.consentQuestionIds` are read with `marketing-crm#consentQuestionRecords` in
+        process (ids = `settings.consentQuestionIds`): Marketing runs in the operations host. An id with no row,
+        or a `status` other than `active`, is refused 400 `consent-question-not-active`, naming the ids. Every
+        step of the type that the body leaves out is added at its index in the type with the type''s
+        `defaultEnabled`, so a saved flow holds every step of its type.
 
         '
       tags:
@@ -6692,8 +6725,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/BookingFlow'
         '400':
-          x-ticvai-problem-types: [unknown-flow-type, step-not-in-flow-type, duplicate-flow-step]
-          description: An unknown flow type, a step the type does not have, or a step given twice
+          x-ticvai-problem-types: [unknown-flow-type, step-not-in-flow-type, duplicate-flow-step,
+            consent-question-not-active]
+          description: An unknown flow type, a step the type does not have, a step given twice, or a consent
+            question id with no row or not `active` (`consent-question-not-active`, naming the ids; ADAM CR-429)
           content:
             application/problem+json:
               schema:
@@ -6728,11 +6763,13 @@ paths:
         - "P13 CMS-103 Booking Flows"
       x-ticvai-read-via:
       - query: catalogue#productCategoryRecords
-        route: service
-        for: 'its read of catalogue.product_category, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'the category''s bookingFlowId (the product''s categoryId, or productCategoryId), catalogue.product_category,
+          Catalogue''s data, asked in process from the operations host (ADAM CR-427; XDR-051; CHG-CR427-001)'
       - query: catalogue#productRecords
-        route: service
-        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'the product''s bookingFlowId, categoryId and kind (ids [productId] where {venueId}), catalogue.product,
+          Catalogue''s data, asked in process from the operations host (ADAM CR-427; XDR-051; CHG-CR427-001)'
       x-ticvai-agreed: '29 September: W12 (guest screens WEB-005..012, GST-007..009, GST-041 order their steps
         from the published flow); shape follows getPublishedGuidedChoice'
       x-ticvai-audience:
@@ -6742,12 +6779,26 @@ paths:
       summary: The published booking flow a product or category books through
       description: '**What the guest booking screens read to order their steps (decided 29 September, W12).**
         Public and cacheable, like the rest of the published app; reads the current `ConfigVersion`, never
-        the draft. Resolved in this order: the product''s own `bookingFlowId` (catalogue), then its category''s,
-        then the venue''s default flow for the type serving the product''s kind. With `flowTypeKey` alone,
-        the venue''s default for that type. Only enabled flows resolve: the snapshot holds the disabled ones too, and
+        the draft. Only enabled flows resolve: the snapshot holds the disabled ones too, and
         they are skipped (ADAM CR-324, A3; CHG-CR324-001). Returns only the enabled steps, in order, with their settings and
-        the flow-level settings; `name` is left out of this view. 404 when nothing resolves, and the guest
-        screens use the type''s default order.
+        the flow-level settings; `name` is left out of this view.
+
+
+        **How a flow is resolved** (ADAM CR-427, decided 31 October 2026, Chinmay; CHG-CR427-001). Catalogue''s
+        `catalogue#productRecords` and `catalogue#productCategoryRecords` are asked in process from the operations
+        host (XDR-051). Against the published snapshot''s enabled flows of the path''s venue, in this order:
+        (1) with `productId`, the product''s own `bookingFlowId`; the product is `productRecords` ids [`productId`]
+        where {`venueId`}, and no such product is 404; (2) the category''s `bookingFlowId`: the product''s
+        `categoryId`, or `productCategoryId` when no `productId` is sent; (3) with a product, the venue''s enabled
+        default flow whose type lists the product''s `kind` in its `productKinds`; when several do, the type whose
+        `productKinds` lists the kind earliest, then the type that comes first in `x-ticvai-system-catalogue`, so
+        `admission` resolves to `datedDayPass` before `transport` or `multiLocation`, and `rental` to
+        `meetingRoomHourly` before `cabanaMap` or `surfSession`; (4) with `flowTypeKey`, the venue''s enabled
+        default for that type. Then 404 `not-found`, and the guest screens use the type''s default order. A step
+        whose flow id names a missing or disabled flow falls through to the next step. With none of `productId`,
+        `productCategoryId` and `flowTypeKey` the answer is 400 `validation`. A venue that wants a different flow
+        for a product sets the product''s or the category''s `bookingFlowId`. The most recently updated flow
+        decides nothing: editing a flow never changes which flow guests get.
 
         '
       tags:
@@ -6787,6 +6838,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookingFlow'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
@@ -6914,9 +6967,11 @@ paths:
       x-ticvai-consumed-by:
         - "P13 CMS-103 Booking Flows"
       x-ticvai-read-via:
-      - query: marketing-crm#guestMatchPolicyRecords
+      - query: marketing-crm#consentQuestionRecords
         route: in-process
-        for: 'what its text calls "GuestMatchPolicy.matchBy": marketing.guest_match_policy, Marketing''s data (CHG-R10GEN-001)'
+        for: 'whether each of settings.consentQuestionIds is an active ConsentQuestion of the tenant (ids =
+          settings.consentQuestionIds), marketing.consent_question, Marketing''s data; Marketing runs in the
+          operations host (ADAM CR-429; CHG-CR429-001)'
       x-ticvai-agreed: '29 September: W12 (set their own step order within the constraints); agreed as `updateBookingFlow`,
         named `updateBookingFlowDefinition` so check-config-scope IS_CONFIG reaches it; shape follows updateGuidedChoice'
       x-ticvai-audience:
@@ -6926,6 +6981,15 @@ paths:
         replaces the whole step list (same rules as on create: a step the type does not have, or given twice,
         is 400). Saved even when the order breaks a constraint; `isValid` turns false and the publish refuses
         it until it is fixed.
+
+
+        **The same checks and names as create** (ADAM CR-429, decided 31 October 2026, Chinmay; CHG-CR429-001).
+        `settings.consentQuestionIds` are read with `marketing-crm#consentQuestionRecords` in process (ids =
+        `settings.consentQuestionIds`); an id with no row, or a `status` other than `active`, is refused 400
+        `consent-question-not-active`, naming the ids. A step the type does not have is `step-not-in-flow-type`
+        and a step given twice `duplicate-flow-step`, as on create (`step-not-in-type` and `step-given-twice` are
+        retired). When `steps` is sent, every step of the type that it leaves out is added at its index in the
+        type with the type''s `defaultEnabled`, so a saved flow holds every step of its type.
 
         '
       tags:
@@ -6971,8 +7035,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/BookingFlow'
         '400':
-          x-ticvai-problem-types: [step-not-in-type, step-given-twice]
-          description: A step the type does not have, or a step given twice
+          x-ticvai-problem-types: [step-not-in-flow-type, duplicate-flow-step, consent-question-not-active]
+          description: A step the type does not have, a step given twice, or a consent question id with no row or
+            not `active` (`consent-question-not-active`, naming the ids; ADAM CR-429)
           content:
             application/problem+json:
               schema:
@@ -6987,11 +7052,15 @@ paths:
         - "P13 CMS-103 Booking Flows"
       x-ticvai-read-via:
       - query: catalogue#productCategoryRecords
-        route: service
-        for: 'its read of catalogue.product_category, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'the categories that name the flow (where {bookingFlowId}) and the categories of the products that
+          would fall back to it, catalogue.product_category, Catalogue''s data, asked in process from the operations
+          host (ADAM CR-426; XDR-051; CHG-CR426-001)'
       - query: catalogue#productRecords
-        route: service
-        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'the products that name the flow (where {bookingFlowId}) and the venue''s products on sale that would
+          fall back to it, catalogue.product, Catalogue''s data, asked in process from the operations host (ADAM
+          CR-426; XDR-051; CHG-CR426-001)'
       x-ticvai-agreed: '29 September: W12; shape follows deleteGuidedChoice'
       x-ticvai-audience:
       - staff
@@ -7000,6 +7069,18 @@ paths:
         **Refused with 409 while a product or category names it** (catalogue `bookingFlowId`) or while it
         is the venue''s default for its type and products of that kind are on sale: reassign them first,
         so no product is left without a way to book.
+
+
+        **When it is in use** (ADAM CR-426, decided 31 October 2026, Chinmay; CHG-CR426-001). Catalogue''s
+        `catalogue#productRecords` and `catalogue#productCategoryRecords` are asked in process from the operations
+        host (XDR-051), with their `where` input. `409 flow-in-use`, naming the products and categories, in two
+        cases. (1) A product or category names the flow: `productRecords` or `productCategoryRecords` where
+        {`bookingFlowId`} finds a row. (2) The flow is the venue''s default for its type, no other enabled default
+        flow of the venue has a type that lists the same kind, and the venue has a product on sale that would fall
+        back to this flow: a product with that `venueId` and a `kind` the type lists, where neither it nor its
+        category names a flow. On sale means `isSellable` true, `guestListing` `bookable`, and the current time
+        inside `onSaleFrom` and `onSaleTo` where they are set, the rule CR-394 uses. Otherwise the flow is removed
+        from the draft with 204.
 
         '
       tags:
@@ -8433,13 +8514,24 @@ components:
         - {kind: before, stepKey: tickets, otherStepKey: consent}
         - {kind: before, stepKey: review, otherStepKey: payment}
         commonConditions:
-          location: the tenant has more than one active venue and `locationSwitcher` is on
-          helpMeChoose: the venue has a published `GuidedChoice`
-          consent: the flow's `consentQuestionIds` or a product in the cart asks a consent question (REV3-26);
-            cannot be turned off while either does
-          attendees: a product in the cart asks attendee details
+          location:
+            en: 'the tenant has more than one active venue and `locationSwitcher` is on'
+            ar: 'لدى الجهة أكثر من موقع نشط، ومبدّل الموقع (locationSwitcher) مفعّل'
+          helpMeChoose:
+            en: 'the venue has a published `GuidedChoice`'
+            ar: 'للموقع دليل «ساعدني في الاختيار» (GuidedChoice) منشور'
+          consent:
+            en: 'the flow''s `consentQuestionIds` or a product in the cart asks a consent question (REV3-26); cannot be turned off while either does'
+            ar: 'يطرح المسار (consentQuestionIds) أو منتج في السلة سؤال موافقة؛ ولا يمكن إيقاف الخطوة ما دام أحدهما يطرحه'
+          attendees:
+            en: 'a product in the cart asks attendee details'
+            ar: 'يطلب منتج في السلة بيانات الحضور'
         types:
         - key: datedDayPass
+          name: {en: 'Dated day pass', ar: 'تذكرة يوم بتاريخ محدد'}
+          description:
+            en: 'Admission for one chosen day: the guest picks a date, then tickets.'
+            ar: 'دخول ليوم واحد يختاره الضيف: يختار التاريخ ثم التذاكر.'
           productKinds: [admission, datedAdmission]
           steps:
           - {stepKey: location, requirement: conditional}
@@ -8451,6 +8543,10 @@ components:
           - {stepKey: review, requirement: optional}
           - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
         - key: timedEntry
+          name: {en: 'Timed entry', ar: 'دخول بموعد محدد'}
+          description:
+            en: 'Admission at a set time: the guest picks a date, a time, then tickets.'
+            ar: 'دخول في موعد محدد: يختار الضيف التاريخ ثم الوقت ثم التذاكر.'
           productKinds: [timedAdmission]
           steps:
           - {stepKey: location, requirement: conditional}
@@ -8465,6 +8561,10 @@ components:
           orderConstraints:
           - {kind: before, stepKey: date, otherStepKey: time}
         - key: openDated
+          name: {en: 'Open-dated', ar: 'تذكرة مفتوحة التاريخ'}
+          description:
+            en: 'Tickets with no date to pick, used on any day they are valid.'
+            ar: 'تذاكر بلا تاريخ يُختار، تُستخدم في أي يوم تكون صالحة فيه.'
           productKinds: [openDated, admission]
           steps:
           - {stepKey: location, requirement: conditional}
@@ -8475,12 +8575,16 @@ components:
           - {stepKey: review, requirement: optional}
           - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
         - key: seatedFixedPerformance
+          name: {en: 'Seated fixed performance', ar: 'عرض بمقاعد في موعد ثابت'}
+          description:
+            en: 'A seated event with set performances: the guest picks a performance, then seats on the map.'
+            ar: 'فعالية بمقاعد وعروض محددة: يختار الضيف العرض ثم المقاعد على الخريطة.'
           productKinds: [seated]
           steps:
           - {stepKey: location, requirement: conditional}
-          - {stepKey: performance, requirement: required, condition: skipped for the guest when the event has one on-sale performance}
+          - {stepKey: performance, requirement: required, condition: {en: 'skipped for the guest when the event has one on-sale performance', ar: 'تُتخطى للضيف عندما يكون للفعالية عرض واحد معروض للبيع'}}
           - {stepKey: seatMap, requirement: required, settingsOwned: [seatPicker, seatViewPosition, seatTimeBar, mapView]}
-          - {stepKey: tickets, requirement: conditional, condition: "the seat's price category has more than one ticket type (adult or child)"}
+          - {stepKey: tickets, requirement: conditional, condition: {en: 'the seat''s price category has more than one ticket type (adult or child)', ar: 'لفئة سعر المقعد أكثر من نوع تذكرة (بالغ أو طفل)'}}
           - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
           - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
           - {stepKey: review, requirement: optional}
@@ -8488,13 +8592,17 @@ components:
           orderConstraints:
           - {kind: before, stepKey: performance, otherStepKey: seatMap}
         - key: seatedDateTimeSeatMap
+          name: {en: 'Seated date, time and seat map', ar: 'مقاعد بالتاريخ والوقت وخريطة المقاعد'}
+          description:
+            en: 'A seated event by date and time: the guest picks a date, a time, then seats on the map.'
+            ar: 'فعالية بمقاعد حسب التاريخ والوقت: يختار الضيف التاريخ ثم الوقت ثم المقاعد على الخريطة.'
           productKinds: [seated]
           steps:
           - {stepKey: location, requirement: conditional}
           - {stepKey: date, requirement: required, settingsOwned: [dateStripDays, seatEventDateMode]}
           - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries, seatEventDateMode]}
           - {stepKey: seatMap, requirement: required, settingsOwned: [seatPicker, seatViewPosition, seatTimeBar, mapView, seatEventDateMode]}
-          - {stepKey: tickets, requirement: conditional, condition: the seat's price category has more than one ticket type}
+          - {stepKey: tickets, requirement: conditional, condition: {en: 'the seat''s price category has more than one ticket type', ar: 'لفئة سعر المقعد أكثر من نوع تذكرة'}}
           - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
           - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
           - {stepKey: review, requirement: optional}
@@ -8503,6 +8611,10 @@ components:
           - {kind: before, stepKey: date, otherStepKey: time}
           - {kind: before, stepKey: time, otherStepKey: seatMap}
         - key: experienceWorkshop
+          name: {en: 'Experience or workshop', ar: 'تجربة أو ورشة عمل'}
+          description:
+            en: 'An experience or workshop: the guest picks the product first, then a date and a time.'
+            ar: 'تجربة أو ورشة عمل: يختار الضيف المنتج أولاً ثم التاريخ والوقت.'
           productKinds: [timedAdmission, admission]
           steps:
           - {stepKey: location, requirement: conditional}
@@ -8520,6 +8632,10 @@ components:
           - {kind: before, stepKey: product, otherStepKey: date}
           - {kind: before, stepKey: date, otherStepKey: time}
         - key: surfSession
+          name: {en: 'Surf or session', ar: 'ركوب الأمواج أو جلسة'}
+          description:
+            en: 'A session by level: the guest picks a date, a time, then a level.'
+            ar: 'جلسة حسب المستوى: يختار الضيف التاريخ ثم الوقت ثم المستوى.'
           productKinds: [timedAdmission, rental]
           steps:
           - {stepKey: location, requirement: conditional}
@@ -8535,6 +8651,10 @@ components:
           - {kind: before, stepKey: date, otherStepKey: time}
           - {kind: before, stepKey: time, otherStepKey: level}
         - key: meetingRoomHourly
+          name: {en: 'Meeting room by the hour', ar: 'قاعة اجتماعات بالساعة'}
+          description:
+            en: 'A room by the hour: the guest picks a date, the length, then a start time.'
+            ar: 'قاعة بالساعة: يختار الضيف التاريخ ثم المدة ثم وقت البدء.'
           productKinds: [rental]
           steps:
           - {stepKey: location, requirement: conditional}
@@ -8552,11 +8672,15 @@ components:
           - {kind: before, stepKey: date, otherStepKey: duration}
           - {kind: before, stepKey: duration, otherStepKey: time}
         - key: cabanaMap
+          name: {en: 'Cabana on a map', ar: 'كابانا على الخريطة'}
+          description:
+            en: 'A cabana or other resource, picked on a map for a chosen date.'
+            ar: 'كابانا أو مورد آخر يُختار على الخريطة لتاريخ محدد.'
           productKinds: [rental]
           steps:
           - {stepKey: location, requirement: conditional}
           - {stepKey: date, requirement: required, settingsOwned: [dateStripDays]}
-          - {stepKey: resourceMap, requirement: required, condition: "the venue's resource selection policy lets the guest choose (resources setResourceSelectionPolicy guestMayChoose; REV3-15)", settingsOwned: [mapView]}
+          - {stepKey: resourceMap, requirement: required, condition: {en: 'the venue''s resource selection policy lets the guest choose (resources setResourceSelectionPolicy guestMayChoose; REV3-15)', ar: 'تسمح سياسة اختيار الموارد في الموقع للضيف بالاختيار'}, settingsOwned: [mapView]}
           - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
           - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
           - {stepKey: review, requirement: optional}
@@ -8564,6 +8688,10 @@ components:
           orderConstraints:
           - {kind: before, stepKey: date, otherStepKey: resourceMap}
         - key: guidedTourByLanguage
+          name: {en: 'Guided tour by language', ar: 'جولة إرشادية حسب اللغة'}
+          description:
+            en: 'A guided tour: the guest picks a date, a language, then a time.'
+            ar: 'جولة إرشادية: يختار الضيف التاريخ ثم اللغة ثم الوقت.'
           productKinds: [timedAdmission]
           steps:
           - {stepKey: location, requirement: conditional}
@@ -8578,6 +8706,10 @@ components:
           - {kind: before, stepKey: date, otherStepKey: time}
           - {kind: before, stepKey: language, otherStepKey: time}
         - key: transport
+          name: {en: 'Transport', ar: 'النقل'}
+          description:
+            en: 'A ride on a route: the guest picks the route, a date, a time, then tickets.'
+            ar: 'رحلة على مسار: يختار الضيف المسار ثم التاريخ ثم الوقت ثم التذاكر.'
           productKinds: [admission, timedAdmission]
           steps:
           - {stepKey: route, requirement: required}
@@ -8591,6 +8723,10 @@ components:
           - {kind: before, stepKey: route, otherStepKey: time}
           - {kind: before, stepKey: date, otherStepKey: time}
         - key: tableReservation
+          name: {en: 'Table reservation', ar: 'حجز طاولة'}
+          description:
+            en: 'A table at an outlet: the guest picks a date, the party size, then a time.'
+            ar: 'طاولة في منفذ: يختار الضيف التاريخ ثم عدد الأشخاص ثم الوقت.'
           productKinds: [fnb]
           steps:
           - {stepKey: location, requirement: conditional}
@@ -8599,11 +8735,15 @@ components:
           - {stepKey: time, requirement: required, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
           - {stepKey: extras, requirement: optional, note: pre-order, settingsOwned: [extrasStep]}
           - {stepKey: review, requirement: optional}
-          - {stepKey: payment, requirement: conditional, condition: the venue takes a deposit or pre-order for the table, settingsOwned: [signInAt]}
+          - {stepKey: payment, requirement: conditional, condition: {en: 'the venue takes a deposit or pre-order for the table', ar: 'يأخذ الموقع عربوناً أو طلباً مسبقاً للطاولة'}, settingsOwned: [signInAt]}
           orderConstraints:
           - {kind: before, stepKey: date, otherStepKey: time}
           - {kind: before, stepKey: partySize, otherStepKey: time}
         - key: membership
+          name: {en: 'Membership', ar: 'العضوية'}
+          description:
+            en: 'A membership: the guest picks a plan, then gives each members details.'
+            ar: 'عضوية: يختار الضيف الخطة ثم يُدخل بيانات كل عضو.'
           productKinds: [membership]
           steps:
           - {stepKey: membershipPlan, requirement: required}
@@ -8614,6 +8754,10 @@ components:
           orderConstraints:
           - {kind: before, stepKey: membershipPlan, otherStepKey: attendees}
         - key: giftCard
+          name: {en: 'Gift card', ar: 'بطاقة هدية'}
+          description:
+            en: 'A gift card: the guest picks a value and a recipient.'
+            ar: 'بطاقة هدية: يختار الضيف القيمة والمستلم.'
           productKinds: [giftCard]
           steps:
           - {stepKey: giftCardValue, requirement: required}
@@ -8621,13 +8765,17 @@ components:
           - {stepKey: review, requirement: optional}
           - {stepKey: payment, requirement: required, settingsOwned: [signInAt]}
         - key: multiLocation
+          name: {en: 'Several locations', ar: 'مواقع متعددة'}
+          description:
+            en: 'Products across several venues: the guest picks a location, then a product.'
+            ar: 'منتجات في عدة مواقع: يختار الضيف الموقع ثم المنتج.'
           productKinds: [admission, timedAdmission, datedAdmission]
           steps:
           - {stepKey: location, requirement: required, settingsOwned: [locationSwitcher]}
           - {stepKey: helpMeChoose, requirement: conditional}
           - {stepKey: product, requirement: required, settingsOwned: [cardLayout, cardSize, cardInfo]}
-          - {stepKey: date, requirement: conditional, condition: the product is dated or timed, settingsOwned: [dateStripDays, performanceReveal]}
-          - {stepKey: time, requirement: conditional, condition: the product is timed, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
+          - {stepKey: date, requirement: conditional, condition: {en: 'the product is dated or timed', ar: 'المنتج بتاريخ أو بموعد محدد'}, settingsOwned: [dateStripDays, performanceReveal]}
+          - {stepKey: time, requirement: conditional, condition: {en: 'the product is timed', ar: 'المنتج بموعد محدد'}, settingsOwned: [timesPerPage, dayPartFilter, dayPartBoundaries]}
           - {stepKey: tickets, requirement: required, settingsOwned: [ticketCategories, ticketTags]}
           - {stepKey: consent, requirement: conditional, settingsOwned: [consentQuestionIds]}
           - {stepKey: extras, requirement: optional, settingsOwned: [extrasStep, quantitiesOnAddOns]}
@@ -8651,8 +8799,11 @@ components:
           $ref: '#/components/schemas/LocalisedText'
         productKinds:
           type: array
-          description: The catalogue `ProductKind` values this type books. A venue's default flow for a type
-            serves every product of these kinds that names no flow of its own.
+          description: The catalogue `ProductKind` values this type books, in the order the kind rule reads
+            them. A venue's default flow for a type serves a product of these kinds that names no flow of its own
+            only where the type wins `getPublishedBookingFlow`'s kind rule among the venue's enabled defaults (the
+            type whose `productKinds` lists the kind earliest, then the type that comes first in the catalogue;
+            ADAM CR-427, CHG-CR427-001).
           items:
             type: string
         steps:
@@ -8677,13 +8828,16 @@ components:
                 allOf:
                 - $ref: '#/components/schemas/LocalisedText'
                 nullable: true
-                description: For `conditional`, when a guest meets the step.
+                description: For `conditional`, when a guest meets the step, as `{en, ar}`. The catalogue's
+                  condition for the step, else `commonConditions[stepKey]` (ADAM CR-428, CHG-CR428-001).
               defaultEnabled:
                 type: boolean
                 default: true
+                description: True unless the catalogue says otherwise (ADAM CR-428).
               defaultSortOrder:
                 type: integer
                 minimum: 0
+                description: The step's index in the type's `steps`, counting from 0 (ADAM CR-428).
               settingsOwned:
                 type: array
                 description: Names of `BookingFlowSettings` (venue-wide) or `BookingFlowLevelSettings` (this
@@ -8794,7 +8948,9 @@ components:
           default: []
           description: '**The flow''s own consent questions (rev 3 REV3-26).** Asked on every booking through
             this flow, together with those of each product in the cart, each question once. Each id names
-            an active `ConsentQuestion` of the tenant in marketing-crm, or 400. A Help me choose answer may
+            an active `ConsentQuestion` of the tenant in marketing-crm, or 400 `consent-question-not-active`,
+            naming the ids: `createBookingFlowDefinition` and `updateBookingFlowDefinition` read them with
+            `marketing-crm#consentQuestionRecords` in process (ADAM CR-429). A Help me choose answer may
             pre-fill one (`GuidedChoice` `consentPrefill`); the guest still confirms it.
 
             '
@@ -8863,7 +9019,8 @@ components:
         steps are required, set their own order).** Made from a `BookingFlowType`; lives in the working draft
         and reaches guests with `publishTenantConfig`, which copies the venue''s flows into the version''s snapshot.
         A product or category names its flow (catalogue `bookingFlowId`); otherwise the venue''s default for
-        the type serving its kind applies.
+        the type serving its kind applies, chosen by `getPublishedBookingFlow`''s kind rule where several do
+        (ADAM CR-427).
 
         '
       required:
@@ -11102,7 +11259,11 @@ components:
             - name
           description: '**What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1).**
             The prototype''s Email only, + name and + mobile. Must include the contact the guest''s code is sent
-            to and matched on (identity `GuestMatchPolicy.matchBy`), or 400. After the code is verified the
+            to and matched on at every active venue, by the marketing-crm `GuestMatchPolicy` in force there (the
+            venue''s row, else the default `matchBy` `email`), on the fields in force at that venue (its
+            `venueOverrides` entry''s, else the tenant''s, else `[email]`): `email` for `email`, `mobile` for
+            `mobile`, `email` or `mobile` for `emailOrMobile`; or 400 (ADAM CR-430, `setBookingFlowConfig`). After
+            the code is verified the
             guest is not asked for these again: the flow goes to the terms and payment, and the profile is
             completed later (WEB-020, GST-039). Read only where the `guestCheckout` feature is on.
 

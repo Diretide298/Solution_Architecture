@@ -1,0 +1,60 @@
+id: CHG-CR429-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'createBookingFlowDefinition and updateBookingFlowDefinition read marketing-crm#consentQuestionRecords in
+  process (ids = settings.consentQuestionIds; served [in-process, service] now) and refuse an id with no row or not
+  active 400 consent-question-not-active, naming the ids; their guestMatchPolicyRecords read is dropped. The update''s
+  400 uses create''s names, step-not-in-flow-type and duplicate-flow-step (step-not-in-type and step-given-twice
+  retired). A step the body leaves out is added at its index with the type''s defaultEnabled. listBookingFlows''s 200
+  no longer says "defaults first".'
+decision:
+  what: 'Posted on #31030 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction "Include them in r12": "as you recommended. (1) createBookingFlowDefinition
+    and updateBookingFlowDefinition read marketing-crm#consentQuestionRecords in process, with ids =
+    settings.consentQuestionIds ... An id with no row, or a status other than active, is refused 400
+    consent-question-not-active, naming the ids. Drop the guestMatchPolicyRecords read from both. (2)
+    updateBookingFlowDefinition''s 400 uses create''s names, step-not-in-flow-type and duplicate-flow-step;
+    step-not-in-type and step-given-twice are retired. (3) Keep what you built ... every step of the type that the body
+    leaves out is added at its index in the type with the type''s defaultEnabled ... (4) listBookingFlows keeps its
+    Order paragraph (updatedAt descending, then id), and ''defaults first'' is removed from its 200."'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-429 (Hrushikant Patkar, #31030 createBookingFlowDefinition, with #31035 and #31036):
+  BookingFlowLevelSettings.consentQuestionIds promises "active or 400" with no read declared, while both writes
+  declared a guestMatchPolicyRecords read an automatic text match added (CHG-R10GEN-001); the two writes named the same
+  400s differently; listBookingFlows stated two orders.'
+keys_touched:
+  operations: [createBookingFlowDefinition, updateBookingFlowDefinition, listBookingFlows]
+  schemas: [BookingFlowLevelSettings]
+  tables: [marketing.consent_question]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - tools/check-cross-module-reads.py
+  - tools/check-business-rules.py
+  other:
+  - 'problem type consent-question-not-active on the two flow writes (catalogue already uses it)'
+root_class: 'a read added by matching words in a schema the operation only names, and one refusal named two ways'
+tickets:
+  started:
+  - '31030 (createBookingFlowDefinition, Hrushikant): add the in-process consent question check and 400
+    consent-question-not-active.'
+  - '31036 (updateBookingFlowDefinition, Hrushikant): the same check; answer step-not-in-flow-type and
+    duplicate-flow-step.'
+  - '31035 (listBookingFlows): no change.'
+  - '32183 (CMS-103 connect to API): handle one pair of slugs, step-not-in-flow-type and duplicate-flow-step, plus
+    consent-question-not-active.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-429
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-BOOKING-FLOW-WRITES
+status: open
+notes: 'The generator side: check-cross-module-reads XR-FACT read BookingFlowSettings.guestContactFields''s
+  "GuestMatchPolicy" (reached through a schema the two writes name) as a read, and tools/fix-read-routes.py wrote the
+  read-via from it. NOT_READ_FOR in tools/check-cross-module-reads.py now scopes that sentence away from the two
+  writes, so neither the check nor the fixer re-adds it. No breaking-changes entry: check-contract-compat does not
+  compare problem types, and the renamed slugs were never in r1 (the class is in the lane report).'

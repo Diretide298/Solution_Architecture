@@ -1,0 +1,51 @@
+id: CHG-CR434-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'control.webhook_replay.tenant_id stays NOT NULL as CR-201 decided, reached by a backfill, not by failing
+  rows: WebhookReplayJob.tenantId (and so the schema reference''s column note) states the contract migration of #36203:
+  (1) set tenant_id from the subscription''s API client (control.webhook_subscription.client_id) where that client''s
+  allowed_tenant_ids holds exactly one tenant; (2) stop with the count of rows still without a tenant, deleting
+  nothing, and tell the lead; (3) ALTER TABLE control.webhook_replay ALTER COLUMN tenant_id SET NOT NULL.'
+decision:
+  what: 'Posted on #36203 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction "Include them in r12": "not as recommended: NOT NULL, as CR-201 decided,
+    but backfilled rather than failed. The schema reference already says required, and handoff/migration-review.md
+    already lists this column as a hand change (backfill, then SET NOT NULL) ... replayEvents always sets tenant_id.
+    The contract migration on #36203 has three steps. (1) Set tenant_id on every row that has none, from its
+    subscription''s API client (control.webhook_subscription.client_id), when that client''s allowed_tenant_ids holds
+    exactly one tenant. (2) If any row is still without a tenant, stop with an error that says how many, delete
+    nothing, and tell the lead. (3) ALTER TABLE control.webhook_replay ALTER COLUMN tenant_id SET NOT NULL. Compare
+    against notNull true. Build and test it, but do not apply it to the server databases yourself."'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-434 (Hrushikant Patkar, #36203 [DB] control): CR-201 and WebhookReplayJob say NOT NULL while V0116 adds
+  the column nullable (derive-ddl writes additive changes only). The package lacked what fills the column; failing
+  queued rows (the CR''s option A) would leave finished rows with no tenant, and deleting rows would break
+  webhook_delivery.replay_id''s key.'
+keys_touched:
+  schemas: [WebhookReplayJob]
+  tables: [control.webhook_replay, control.webhook_subscription, control.api_client]
+  files:
+  - contracts/satellite/public-api.yaml
+  - tools/check-business-rules.py
+root_class: 'a NOT NULL column added nullable by an additive migration, with no stated backfill'
+tickets:
+  started:
+  - '36203 ([DB] control, Hrushikant): write the backfill and SET NOT NULL as above; expected tenant_id notNull true; do
+    not apply it to the server databases.'
+  - '31358 (replayEvents): no change; it always sets tenant_id.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-434
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-WEBHOOK-REPLAY-TENANT
+status: open
+notes: '**Not generated here: the migration-review row.** handoff/migration-review.md''s row for this column still
+  reads the generic "backfill, then ALTER COLUMN ... SET NOT NULL", because tools/ddl_forward.py writes it and the
+  package has no contract mark for a NOT NULL backfill on an existing column (x-ticvai-backfill is for a column being
+  added); the DDL generator is the DDL lane''s, so this lane did not change it. The live tenant-less rows need the same
+  three steps on live (the column is nullable there too). ADAM side, outside the package: a ticket''s expected schema
+  should apply the listed hand changes, not only the DDL.'

@@ -4168,7 +4168,10 @@ screens:
           returns the `GuestSession`. **After *Create an account* the code `registerGuest` sent goes to
           `verifyGuestEmail` with `mode` `code`**, under the `GuestSession` `registerGuest` returned (a
           wrong code is 422 with `attemptsRemaining`), never to `verifyGuestOtp` (ADAM CR-177 and CR-222,
-          settled 21 and 25 October 2026).'
+          settled 21 and 25 October 2026). **At a guest checkout** (purpose `verify`; ADAM CR-432, decided
+          31 October 2026) the code goes to `verifyGuestOtp` under the cart''s anonymous session token
+          (`Cart.anonymousSessionToken`), and `204` means the contact is proved: back to the cart and
+          on to payment, with no account made.'
         provenance: contract identity.yaml POST /auth/guest/otp/verify
       - kind: primaryButton
         label: Sign in with the code
