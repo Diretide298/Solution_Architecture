@@ -118,9 +118,9 @@ x-ticvai-queries:
     module: identity
     table: identity.delegated_access
     inputs:
-      principalId: {type: string, format: uuid, description: 'The person rostered (RotaAssignment.principalId).'}
-      roleId: {type: string, format: uuid, description: 'The role the position requires (RotaAssignment.requiredRoleId).'}
-      venueScopePath: {type: string, description: 'The scope path of the assignment''s venue (platform.scope.path of RotaAssignment.venueId), which the asker holds: the venue is within the caller''s own scope.'}
+      principalId: {type: string, format: uuid, description: 'The person rostered (RotaAssignment.principalId), or the caller of access setTurnstileMode (ADAM CR-396).'}
+      roleId: {type: string, format: uuid, description: 'The role the position requires (RotaAssignment.requiredRoleId), or one role id of a gate mode policy''s whoCanActivate (ADAM CR-396).'}
+      venueScopePath: {type: string, description: 'The scope path of the assignment''s venue (platform.scope.path of RotaAssignment.venueId), or of the access point''s venue for setTurnstileMode, which the asker holds: the venue is within the caller''s own scope.'}
     returns:
       type: object
       required: [holds]
@@ -138,7 +138,9 @@ x-ticvai-queries:
       `holds`;
       the caller's own grant is in force again for every other statement of its transaction. It is asked in
       process by createRotaAssignment and updateRotaAssignment, which refuse 409 person-lacks-required-role when
-      it is false. Built inside the Identity module, behind its query interface, by the createRotaAssignment ticket
+      it is false, and by access setTurnstileMode from the access host (ADAM CR-396, decided 31 October 2026;
+      CHG-CR396-001; XDR-035), once per role of the governing gate mode policy's whoCanActivate, which refuses
+      403 gate-mode-role-required when it is false for every one. Built inside the Identity module, behind its query interface, by the createRotaAssignment ticket
       (#32338, ADAM CR-344); no other ticket builds it.
     served: [in-process]
   # **Whether a guest is a minor, and its name, beyond the caller's own row** (ADAM CR-362, decided 30 October 2026;

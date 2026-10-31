@@ -1,0 +1,80 @@
+id: CHG-CR396-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'setTurnstileMode enforces the gate mode policy for freeFlow and dropArm: whoCanActivate holds identity.role
+  ids, asked one by one through identity#principalHoldsRoleAtVenue in process (403 gate-mode-role-required; XDR-035);
+  a missing reason where reasonRequired is 400 reason-required; a group policy beats its parent group''s, which beats
+  the venue default, and equally specific policies must all pass; createsIncident writes one access.access_incident
+  (emergencyAccessEvent for dropArm, securityEvent for freeFlow, team accessSupervisor). A scheduled change keeps its
+  turnstile mode in the new nullable access.gate_mode_change.target_turnstile_mode and the timer applies both.'
+decision:
+  what: 'ADAM CR-396 (Chinmay, 31 October 2026, posted on #30967: "not as recommended: keep whoCanActivate, because the
+    client sets ''Who can activate'' per policy and the approved BO-201 picks roles from the role list"; (1) role ids
+    asked through identity#principalHoldsRoleAtVenue in process, 403 gate-mode-role-required, 400 reason-required; (2)
+    the most specific policy governs, ties must all pass; (3) the incident mapping; (4) a new nullable
+    gate_mode_change.target_turnstile_mode, "Stop refusing it 400"), after the lead''s review of every CR ("for each one
+    actually check if they hold and if not then find out the best way keeping in mind what client needs") and his
+    instruction "Include them in r12". contracts/spine/access.yaml: setTurnstileMode''s read-via, description and its
+    400 and 403 (problem types); setGateModePolicy''s description; AccessGateModePolicy.whoCanActivate items format uuid;
+    AccessGateModeChange.targetTurnstileMode (TurnstileMode, nullable) and its description. contracts/spine/identity.yaml
+    principalHoldsRoleAtVenue: setTurnstileMode joins its askers. states/access-gate-mode-change.yaml pending -> applied
+    sets the turnstile mode and opens the incident. docs/active/cross-deployable-writes.yaml XDR-035 (reader access,
+    SELECT on identity.delegated_access, the one query, setTurnstileMode). docs/active/breaking-changes.yaml BC-530
+    (whoCanActivate string -> string:uuid). docs/active/left-out.yaml LO-CR396-001 (the emergency code and
+    automaticNotification are not enforced). derive-ddl writes the column into the next access migration.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-396 (Hrushikant Patkar, #30967 setTurnstileMode): the 403 for a role not in whoCanActivate and the
+  createsIncident incident were promised with an untyped role list, no Identity read, no incident type or team, and no
+  column for a scheduled change''s turnstile mode; the policy precedence was unstated. The raiser''s option B (a
+  permission in place of whoCanActivate) would drop the "Who can activate" multi-select the client asked for (workshop
+  pack board 6.8) from the approved BO-201; identity#principalHoldsRoleAtVenue already answers the role question
+  (CR-336, CR-344).'
+keys_touched:
+  screens: [BO-201, BO-230, SCN-016]
+  operations: [setTurnstileMode, setGateModePolicy]
+  schemas: [AccessGateModePolicy, AccessGateModeChange]
+  tables: [access.gate_mode_change, access.gate_mode_policy, access.access_incident, identity.delegated_access]
+  files:
+  - contracts/spine/access.yaml
+  - contracts/spine/identity.yaml
+  - states/access-gate-mode-change.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - docs/active/breaking-changes.yaml
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+  - tools/check-contract-compat.py
+  other:
+  - 'XDR-035 (granted read: access SELECT on identity.delegated_access)'
+  - 'BC-530 (whoCanActivate string -> string:uuid, approved by the posted decision)'
+  - 'LO-CR396-001'
+root_class: 'a policy rule promised in prose with an untyped carrier, no declared read, no stated precedence, no
+  incident mapping and no storage for one of the values it schedules'
+tickets:
+  started:
+  - '30967 (setTurnstileMode, Hrushikant Patkar): add the role check through identity#principalHoldsRoleAtVenue, the
+    policy precedence and the incident as decided; store target_turnstile_mode on a pending change and apply it in the
+    timer; drop the interim 400 for a scheduled turnstile mode.'
+  - '30957 (setGateModePolicy), if started: validate whoCanActivate entries as uuids (role ids); nothing else changes.'
+  - '32338 (createRotaAssignment): no change; it already builds identity#principalHoldsRoleAtVenue, which
+    setTurnstileMode now asks too.'
+  - '32388 / 32502 (BO-201 wire), if started: send the selected roles'' ids from listRoles, not their names or codes.'
+  unstarted:
+  - 'A [DB] child task of MIG-ACCESS#access.gate_mode_change (#30506) for Hrushikant: ADD COLUMN target_turnstile_mode
+    text with its CHECK (freeRotation, closed), nullable, applied to the live tenant databases too (filed by the plan
+    lane, fix/r12-plan2). who_can_activate stays text[].'
+  - 'The access role''s SELECT on identity.delegated_access (XDR-035) and USAGE on identity, which derive-ddl writes into
+    the next forward migration; the live tenant databases need it before the role check works there.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-396
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GATE-MODE-POLICY
+status: open
+notes: 'tools/check-cross-module-reads.py XR-ROUTE holds the in-process read to XDR-035. Class gap found on the way:
+  check-contract-compat let the whoCanActivate type change through under BC-340, a 14 October entry that names no
+  `change` and so approves every breaking change to setGateModePolicy forever; the check now prefers an entry that names
+  the change (BC-530 is the one reported), but a blanket entry still approves an unrecorded later change.'

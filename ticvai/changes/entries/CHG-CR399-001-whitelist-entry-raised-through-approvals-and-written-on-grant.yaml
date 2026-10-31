@@ -1,0 +1,63 @@
+id: CHG-CR399-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'addBlacklistEntry raises a whitelist entry''s second approval through x-ticvai-write-via createApprovalRequest
+  (kind accessPermissionChange, subjectContract access, subjectType whitelistEntry, subjectId the entry''s id minted now,
+  attributes {mediaCode, reason, expiresAt, disableScope}); a code on either list is 409 duplicate-code at once; 422
+  no-approval-route is passed on; the 202 carries that subjectId. An access consumer of approval.granted writes the
+  access.blacklist row and records the outcome with recordApprovedActionOutcome (notApplied duplicate-code or
+  entry-expired when it cannot). No migration.'
+decision:
+  what: 'ADAM CR-399 (Chinmay, 31 October 2026, posted on #30962: "as you recommended. A whitelist entry: refuse 409
+    duplicate-code at once if the code is already on either list. Otherwise mint the entry''s id now (UUIDv7) and call
+    approvals'' createApprovalRequest (x-ticvai-write-via, service route) ... An Access consumer of approval.granted
+    ... writes the access.blacklist row with that id ... approval.rejected, withdrawn or expired writes nothing"), after
+    the lead''s review of every CR ("for each one actually check if they hold and if not then find out the best way
+    keeping in mind what client needs") and his instruction "Include them in r12". contracts/spine/access.yaml
+    addBlacklistEntry: x-ticvai-write-via approvals.request createApprovalRequest, the raise and the grant described,
+    the 202''s text and a 422 no-approval-route; AccessPendingSecondApproval.subjectId names the whitelist entry''s id.
+    events/approval-granted.yaml: the access consumer (writes access.blacklist; retryThenDeadLetter; critical).
+    docs/active/left-out.yaml LO-CR399-001 (lockIdentity and releaseIdentityLock have the same gap; not decided here).'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-399 (Hrushikant Patkar, #30962 addBlacklistEntry): the whitelist 202 promised an approval request with no
+  declared write of approvals.request, no subject id for an entry not yet written, nowhere for the entry''s fields to
+  wait and no consumer to write it on approval (DEC-254; critical set 1, BO-229). suspendTenant''s raise-through-approvals
+  pattern (CR-172) settles all four with approvals.request.attributes, which exists since V0108 (CR-329).'
+keys_touched:
+  screens: [BO-033]
+  operations: [addBlacklistEntry, createApprovalRequest, recordApprovedActionOutcome]
+  schemas: [AccessPendingSecondApproval]
+  tables: [access.blacklist, approvals.request]
+  files:
+  - contracts/spine/access.yaml
+  - events/approval-granted.yaml
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+  - tools/derive-lineage.py
+  other:
+  - 'LO-CR399-001'
+root_class: 'an act held for approval with no declared write of the request, no carrier for its parameters and no
+  consumer that applies the grant'
+tickets:
+  started:
+  - '30962 (addBlacklistEntry, Hrushikant Patkar): build the whitelist branch and the approval.granted consumer as
+    decided; replace the interim 500. Done when it runs end to end on #30848''s createApprovalRequest.'
+  - '30848 (createApprovalRequest): the access host must be able to call it over the service route; the whitelist path
+    cannot be tested end to end until it is in.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-399
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-WHITELIST-APPROVAL
+status: open
+notes: 'The write of approvals.request is routed by operation, so tools/check-cross-deployable-writes.py holds it
+  (routed through createApprovalRequest, as suspendTenant''s). Generator gap found on the way: derive-lineage copied
+  x-ticvai-write-via as writeVia but never put its table in `writes`, so the new route read as stale (X-STALE); only the
+  overrides of suspendTenant and publishContentBlock had added it by hand. derive-lineage now adds every write-via
+  table to `writes` (one entry changes: addBlacklistEntry). The class (a 202 held for approval with no write-via
+  and no consumer) stands on lockIdentity and releaseIdentityLock; LO-CR399-001 records it until a CR decides them.'

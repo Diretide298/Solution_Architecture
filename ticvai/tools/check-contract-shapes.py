@@ -41,13 +41,19 @@ same kind that nothing held:
                            replaces" text while its description keys the write on something else (`code`, `kind`
                            and the scope, a selector set); a path parameter promising `409 <noun>-id-mismatch` on an
                            operation whose 409 does not list it; or a PUT with a path id whose description still says
-                           "there is no id in the path" (ADAM CR-245, CHG-R10CRF-005). The rule CR-245 decided: the
+                           "there is no id in the path" or "the path carries no id" (ADAM CR-245, CHG-R10CRF-005;
+                           CR-398, CHG-CR398-001). The rule CR-245 decided: the
                            path id is the record's id, a create takes it, and a mismatch with the record the natural
                            key finds is 409 and changes nothing.
   C-REFUSAL-UNDECLARED     an operation's own text promises a refusal by status, "(409 when the batch has fewer
                            left)", "is refused (422)", "refused with 404", and its responses declare no such status,
                            so the refusal has no problem type and QA cannot test it (ADAM CR-316, CHG-CR316-001:
                            setCodeDistributionManager's 409 was described and not declared)
+  C-HTML-SANITISED         a schema or property whose description says its values are HTML and does not say they are
+                           "sanitised on write" (a schema also states its "Allowed tags"), or a write whose body reaches
+                           such a schema or property and whose description does not say it sanitises (ADAM CR-401,
+                           CHG-CR401-001: LocalisedRichText said "Values are sanitised HTML" and no operation sanitised,
+                           so content pages were stored and served to guest browsers as sent)
   C-FINDING-RULE           a validation's finding-kind enum (a schema named `*FindingKind`) whose description tables
                            its kinds (`| kind | ... |`) without a `reported when` column, or a kind with no row or an
                            empty `reported when` cell: a publish gate that blocks on a kind no rule defines
@@ -106,6 +112,8 @@ RULES = {
                             "that its responses do not declare (ADAM CR-316, CHG-CR316-001)",
     "C-FINDING-RULE": "a finding-kind enum whose kind table gives a kind no 'reported when' rule (ADAM CR-320, "
                       "CHG-CR320-001)",
+    "C-HTML-SANITISED": "a schema documented as HTML that names no sanitising on write, or a write reaching it that "
+                        "does not say it sanitises (ADAM CR-401, CHG-CR401-001)",
 }
 # ADAM CR-316 (CHG-CR316-001): a refusal the operation's own text promises by status. Only the forms that say
 # this operation refuses: "(409 when|if|once|while ...)", "refused (409)", "refused with 409", "refused `409 ...`".
@@ -544,7 +552,72 @@ def main() -> int:
                 guard.add("C-PROSE-SPLIT", f"{where}:{a} {b}", f"{where}: '{a} {b}' reads as a split '{a + b}'")
     extra_rules(guard, ops, docs)
     segregation_rules(guard, ops, docs)
+    html_rules(guard, ops, docs)
     return guard.finish()
+
+
+# ADAM CR-401 (CHG-CR401-001): a description that says the values are HTML ("Values are HTML", "is HTML").
+HTML_VALUES = re.compile(r"\b(?:values?|text`?)\s+(?:is|are)\s+(?:sanitised\s+)?HTML\b", re.I)
+SCHEMA_REF = re.compile(r"^(?:(?:\.\./)?(?:[\w-]+/)?([\w-]+)\.yaml)?#/components/schemas/(\w+)$")
+
+
+def html_rules(guard, ops, docs):
+    """**HTML a guest browser renders is sanitised where it is written** (ADAM CR-401, decided 31 October 2026;
+    CHG-CR401-001). `LocalisedRichText` said "Values are sanitised HTML" and nothing said who sanitised it, so content
+    pages, FAQs and policies were stored as sent: a stored cross-site scripting hole. A schema (or a property) whose
+    description says its values are HTML must say they are "sanitised on write", and a schema states its "Allowed
+    tags"; every write whose request body reaches it says in its own description that it sanitises."""
+    by, _ = g.schemas()
+    html = {}
+    for (stem, name), sch in sorted(by.items()):
+        d = str(sch.get("description") or "")
+        if HTML_VALUES.search(d):
+            html[(stem, name)] = name
+            if not re.search(r"sanitised on write", d, re.I) or "Allowed tags" not in d:
+                guard.add("C-HTML-SANITISED", f"{stem}:{name}",
+                          f"{name}: says its values are HTML and does not state that they are sanitised on write "
+                          f"and against which allowed tags")
+        for prop, ps in (sch.get("properties") or {}).items():
+            pd = str((ps or {}).get("description") or "") if isinstance(ps, dict) else ""
+            if HTML_VALUES.search(pd):
+                html[(stem, name)] = f"{name}.{prop}"
+                if not re.search(r"sanitised on write", pd, re.I):
+                    guard.add("C-HTML-SANITISED", f"{stem}:{name}.{prop}",
+                              f"{name}.{prop}: says its text is HTML and does not state that it is sanitised on write")
+
+    def reaches(node, stem, seen, depth=0):
+        if depth > 12:
+            return None
+        if isinstance(node, dict):
+            m = SCHEMA_REF.match(str(node.get("$ref", ""))) if "$ref" in node else None
+            if m:
+                key = (m.group(1) or stem, m.group(2))
+                if key in html:
+                    return html[key]
+                if key in seen:
+                    return None
+                seen.add(key)
+                return reaches(by.get(key), key[0], seen, depth + 1)
+            for v in node.values():
+                hit = reaches(v, stem, seen, depth + 1)
+                if hit:
+                    return hit
+        elif isinstance(node, list):
+            for v in node:
+                hit = reaches(v, stem, seen, depth + 1)
+                if hit:
+                    return hit
+        return None
+
+    for oid, f in sorted(ops.items()):
+        op = f["op"]
+        if f["method"] not in ("post", "put", "patch") or not op.get("requestBody"):
+            continue
+        hit = reaches(op.get("requestBody"), f["contract"], set())
+        if hit and not re.search(r"sanitis", str(op.get("description") or ""), re.I):
+            guard.add("C-HTML-SANITISED", oid,
+                      f"{oid}: its body carries {hit}, which is HTML, and its description does not say it sanitises "
+                      f"it on write")
 
 
 def segregation_rules(guard, ops, docs):
@@ -645,7 +718,8 @@ def extra_rules(guard, ops, docs):
                     if t not in listed:
                         guard.add("C-PUT-KEY", f"{oid}:{t}",
                                   f"{oid}: path {{{n.get('name')}}} promises 409 {t}, which its 409 does not list")
-            if re.search(r"there is no id in the path", ptext, re.I):
+            # "The collection path carries no id" said the same of setParkingFacility's path id (ADAM CR-398).
+            if re.search(r"there is no id in the path|\bpath carries no id", ptext, re.I):
                 guard.add("C-PUT-KEY", f"{oid}:no-id", f"{oid}: says there is no id in the path, and {path} has one")
         if m in ("put", "patch", "delete") and body_name and (f["contract"], body_name) in append_only:
             guard.add("C-APPEND-ONLY", oid, f"{oid}: {m.upper()} writes {body_name}, declared append-only")

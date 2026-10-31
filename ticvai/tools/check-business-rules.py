@@ -198,6 +198,18 @@ And one rule per decision:
   BR-RESTORE-MISSING-PAGE (r12, ADAM CR-350, CHG-CR350-001) restoreConfigVersion restores a section or navigation item
                    whose content page is gone hidden (contentPageId null, isVisible false), never refuses for it, and
                    keeps content_page.is_referenced.
+  BR-GATE-MODE-POLICY (r12, ADAM CR-396, CHG-CR396-001) whoCanActivate holds identity.role ids (format uuid);
+                   setTurnstileMode asks identity#principalHoldsRoleAtVenue in process, answers 403
+                   gate-mode-role-required and 400 reason-required, states the policy precedence and the incident's type
+                   and team; a scheduled change keeps its turnstile mode (AccessGateModeChange.targetTurnstileMode).
+  BR-ACCESS-POINT-ACTIVE (r12, ADAM CR-397, CHG-CR397-001) createAccessPoint says a new access point is created active,
+                   and setAccessPointDirection names no device status AccessPoint does not have.
+  BR-WHITELIST-APPROVAL (r12, ADAM CR-399, CHG-CR399-001) addBlacklistEntry raises its whitelist request through
+                   x-ticvai-write-via createApprovalRequest, passes 422 no-approval-route on, and an access consumer of
+                   approval.granted writes access.blacklist.
+  BR-ADMISSION-CREATE (r12, ADAM CR-400, CHG-CR400-001) createAdmissionRules answers update's three 422 problem types,
+                   asks tenancy#scopeRecords for the working venue's path and answers 403 working-venue-required;
+                   updateAdmissionRules asks no scope read.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -1554,6 +1566,7 @@ def main() -> int:
     for word in ("`contentPageId` null and `isVisible` false", "never causes a refusal", "`content_page.is_referenced`"):
         need("BR-RESTORE-MISSING-PAGE", word in rtext,
              f"restoreConfigVersion does not say {word!r} for a page deleted since the version (CR-350)")
+    access_rules_r12(need, op)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -1576,7 +1589,8 @@ def main() -> int:
              "BR-GUEST-CODE-DELIVERY",
              "BR-GUEST-SETTINGS", "BR-BILLING-LINES", "BR-SHOP-DROP-COLLECT", "BR-DELEGATION-KEY", "BR-FOREIGN-TENDER",
              "BR-PRODUCT-FROM-PRICE",
-             "BR-BOOKING-FLOW-MISSING", "BR-CALL-DISPOSITION", "BR-RESTORE-MISSING-PAGE"]
+             "BR-BOOKING-FLOW-MISSING", "BR-CALL-DISPOSITION", "BR-RESTORE-MISSING-PAGE",
+             "BR-GATE-MODE-POLICY", "BR-ACCESS-POINT-ACTIVE", "BR-WHITELIST-APPROVAL", "BR-ADMISSION-CREATE"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -1584,6 +1598,71 @@ def main() -> int:
     print(f"  {len(PAIR_EXEMPT)} create/update pair(s) exempt with a reason")
     print(f"\n{'FAIL' if total else 'PASS'} - {total} finding(s) against the 3 October business rules")
     return 1 if total else 0
+
+
+def access_rules_r12(need, op):
+    """BR-GATE-MODE-POLICY, BR-ACCESS-POINT-ACTIVE, BR-WHITELIST-APPROVAL, BR-ADMISSION-CREATE (r12; ADAM CR-396, CR-397,
+    CR-399, CR-400, decided 31 October 2026, after the lead's review of every CR). Each fails on the r11 contract."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def vias(o_):
+        return {(str((v or {}).get("query")), str((v or {}).get("route")))
+                for v in o_.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    acc = load("contracts/spine/access.yaml")
+    sch = (acc.get("components") or {}).get("schemas") or {}
+
+    # BR-GATE-MODE-POLICY (CR-396)
+    tsm = op("setTurnstileMode")[3]
+    need("BR-GATE-MODE-POLICY", ("identity#principalHoldsRoleAtVenue", "in-process") in vias(tsm),
+         "setTurnstileMode does not ask identity#principalHoldsRoleAtVenue in process for whoCanActivate (CR-396)")
+    need("BR-GATE-MODE-POLICY", "gate-mode-role-required" in ptypes(tsm, "403")
+         and "reason-required" in ptypes(tsm, "400"),
+         "setTurnstileMode does not answer 403 gate-mode-role-required and 400 reason-required (CR-396)")
+    td = words(tsm.get("description"))
+    for frag in ("beats the venue default", "must pass every one of them", "`emergencyAccessEvent` for `dropArm`",
+                 "`securityEvent` for `freeFlow`", "`assignedTeam` `accessSupervisor`", "a cancelled one opens none"):
+        need("BR-GATE-MODE-POLICY", frag in td, f"setTurnstileMode does not say {frag!r} (CR-396)")
+    who = ((sch.get("AccessGateModePolicy") or {}).get("properties") or {}).get("whoCanActivate") or {}
+    need("BR-GATE-MODE-POLICY", (who.get("items") or {}).get("format") == "uuid",
+         "AccessGateModePolicy.whoCanActivate is not a list of identity.role ids (format uuid; CR-396)")
+    need("BR-GATE-MODE-POLICY", "targetTurnstileMode" in ((sch.get("AccessGateModeChange") or {}).get("properties") or {}),
+         "AccessGateModeChange has no targetTurnstileMode, so a scheduled turnstile mode has nowhere to wait (CR-396)")
+
+    # BR-ACCESS-POINT-ACTIVE (CR-397)
+    need("BR-ACCESS-POINT-ACTIVE", "created active" in words(op("createAccessPoint")[3].get("description")),
+         "createAccessPoint does not say a new access point is created active (CR-397)")
+    need("BR-ACCESS-POINT-ACTIVE", "device status AccessPoint" not in words(op("setAccessPointDirection")[3].get("description"))
+         and "says so through its device status" not in words(op("setAccessPointDirection")[3].get("description")),
+         "setAccessPointDirection promises a device status AccessPoint does not have (CR-397)")
+
+    # BR-WHITELIST-APPROVAL (CR-399)
+    abe = op("addBlacklistEntry")[3]
+    need("BR-WHITELIST-APPROVAL", any((w or {}).get("operation") == "createApprovalRequest"
+                                      for w in abe.get("x-ticvai-write-via") or [] if isinstance(w, dict)),
+         "addBlacklistEntry raises its whitelist approval request with no x-ticvai-write-via createApprovalRequest (CR-399)")
+    need("BR-WHITELIST-APPROVAL", "no-approval-route" in ptypes(abe, "422"),
+         "addBlacklistEntry does not pass approvals' 422 no-approval-route on (CR-399)")
+    ev = load("events/approval-granted.yaml")
+    need("BR-WHITELIST-APPROVAL", any((c or {}).get("context") == "access" and "access.blacklist" in ((c or {}).get("writes") or [])
+                                      for c in ev.get("consumers") or []),
+         "events/approval-granted.yaml names no access consumer that writes the approved whitelist entry (CR-399)")
+
+    # BR-ADMISSION-CREATE (CR-400)
+    car, uar = op("createAdmissionRules")[3], op("updateAdmissionRules")[3]
+    need("BR-ADMISSION-CREATE", ptypes(car, "422") >= {"entry-count-required", "validity-days-required",
+                                                       "validity-ends-before-start"},
+         "createAdmissionRules does not answer updateAdmissionRules' three 422 problem types (CR-400)")
+    need("BR-ADMISSION-CREATE", "tenancy#scopeRecords" in {q for q, _ in vias(car)}
+         and "working-venue-required" in ptypes(car, "403"),
+         "createAdmissionRules does not read the working venue's path (tenancy#scopeRecords) or answer 403 "
+         "working-venue-required (CR-400, CR-217)")
+    need("BR-ADMISSION-CREATE", "tenancy#scopeRecords" not in {q for q, _ in vias(uar)},
+         "updateAdmissionRules re-derives scope_path from the editor's working venue (CR-400)")
 
 
 if __name__ == "__main__":

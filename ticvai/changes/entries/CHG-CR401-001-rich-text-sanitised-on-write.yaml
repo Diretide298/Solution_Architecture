@@ -1,0 +1,53 @@
+id: CHG-CR401-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'White-label HTML is sanitised on write by the server: createContentPage, updateContentPage, setFaqs and
+  setPolicy run every LocalisedRichText language value, and createContentBlock and updateContentBlock a richText block''s
+  text (body and each localeVariants entry), through one shared sanitiser (Ganss.Xss HtmlSanitizer) against the stated
+  allow-list of tags, attributes and URL schemes. Disallowed markup is stripped, never refused; the sanitised HTML is
+  stored and returned. Other block text keys are plain text, escaped on render.'
+decision:
+  what: 'ADAM CR-401 (Chinmay, 31 October 2026, posted on #30923: "as you recommended. The server sanitises on write;
+    nothing else changes for the caller ... Use Ganss.Xss (HtmlSanitizer, MIT). Allowed tags: ... Everything else is
+    stripped, never refused ... No new error"), after the lead''s review of every CR ("for each one actually check if
+    they hold and if not then find out the best way keeping in mind what client needs") and his instruction "Include
+    them in r12". contracts/satellite/white-label.yaml: LocalisedRichText''s description states the rule and the
+    allow-list; the six writing operations say they sanitise; ContentBlock.body says a richText block''s text is HTML,
+    sanitised on write, and every other text key is plain text. tools/check-contract-shapes.py C-HTML-SANITISED.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-401 (Hrushikant Patkar, #30923 createContentPage): LocalisedRichText said "Values are sanitised HTML" and
+  no operation said who sanitised it or against what, so content pages, FAQs and policies were stored and served to
+  guest browsers as sent, a stored cross-site scripting hole the client''s pre-go-live penetration test (MoM 24 August
+  2026) would find.'
+keys_touched:
+  screens: [CMS-007]
+  operations: [createContentPage, updateContentPage, setFaqs, setPolicy, createContentBlock, updateContentBlock]
+  schemas: [LocalisedRichText, ContentBlock]
+  tables: [whitelabel.content_page, whitelabel.faq_entry, whitelabel.policy, whitelabel.content_block]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-contract-shapes.py
+root_class: 'a safety property promised on a schema ("sanitised HTML") with nothing that enforces it'
+tickets:
+  started:
+  - '30923 (createContentPage, Hrushikant Patkar): add the shared sanitiser (one class in the White-label module) and
+    call it before the write. Rows already stored in test are re-saved through the same path.'
+  - '30937 (updateContentPage): call the same sanitiser.'
+  - '30783 (createContentBlock): sanitise a richText block''s text, body and localeVariants.'
+  - '31084 (updateContentBlock), if started: the same as 30783.'
+  unstarted:
+  - 'setFaqs and setPolicy (not among the started tickets the CR named): the same sanitiser, picked up from the
+    contract at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-401
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-shapes.py
+status: open
+notes: 'C-HTML-SANITISED fails a schema or property documented as HTML that does not say it is sanitised on write
+  (a schema also its allowed tags), and a write whose body reaches one without saying it sanitises; on the r11 text it
+  fails LocalisedRichText and the four page, FAQ and policy writes.'
