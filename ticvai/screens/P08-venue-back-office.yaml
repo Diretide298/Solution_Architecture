@@ -35438,8 +35438,9 @@ screens:
         - KitchenSla.targets
         - KitchenSla.priorityWeights
         operation: getKitchenSla
-        notes: How long a ticket may sit per service mode, and the weights that push it up the rail, for the
-          outlet chosen in Outlet id, as `setKitchenSla` stored them. A 404 is an outlet with no targets yet.
+        notes: How long a ticket may sit per service mode, and the weights that push it up the rail, for
+          the outlet chosen in Outlet id, as `setKitchenSla` stored them. A 404 is an outlet with no targets
+          yet.
         provenance: contract fnb.yaml GET /outlets/{outletId}/kitchen-sla (CHG-R12GT-001)
     - name: contextPanel
       slot: selection
@@ -35582,8 +35583,8 @@ screens:
   - id: formSetKitchenSla
     component: modal
     trigger: Save ticket targets
-    body: '**Collects what `setKitchenSla` sends before it is called**, opened on the outlet''s targets as
-      `getKitchenSla` returns them. Required: `targets` (a service mode and its minutes each). Optional:
+    body: '**Collects what `setKitchenSla` sends before it is called**, opened on the outlet''s targets
+      as `getKitchenSla` returns them. Required: `targets` (a service mode and its minutes each). Optional:
       `priorityWeights`. The targets and weights are replaced whole. Dismissing sends nothing; the screen
       behind is unchanged.'
     confirm:
@@ -124985,7 +124986,6 @@ screens:
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here. **Pack actions reconciled 29 September (VM close-out):** Approval required are choices
     sent by `setStaffingRules` (overtime.requiresApproval).
-
 - id: BO-882
   name: Workforce Integration & Synchronization Center
   module: Rentals
