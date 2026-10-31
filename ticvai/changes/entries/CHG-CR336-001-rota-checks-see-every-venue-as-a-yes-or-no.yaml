@@ -66,5 +66,6 @@ notes: 'Also held by tools/check-business-rules.py BR-ROTA-CROSS-VENUE (the quer
   a review row). Beyond the comment''s words: "not cancelled" is the overlap rule (as CR-334''s option counts
   assignments); a range is half-open, so back-to-back shifts do not overlap; no role check when requiredRoleId is
   null; a role grant counts when ALLOW, not revoked and within validFrom/validTo. Identity''s
-  principalHoldsRoleAtVenue is a new Identity query class with no ticket of its own: the lead decides whether
-  #32338 builds it or a ticket is filed. No XDR: both queries are in process within one deployable.'
+  principalHoldsRoleAtVenue is a new Identity query class with no ticket of its own: #32338 builds it, inside the
+  Identity module behind its query interface (ADAM CR-344, CHG-CR344-001), and a live DENY of the role at or above
+  the venue makes it false. No XDR: both queries are in process within one deployable.'

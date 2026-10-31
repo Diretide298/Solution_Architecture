@@ -266,7 +266,9 @@ paths:
         overlap also holds under races**: the exclusion constraint on `workforce.rota_assignment` (one
         person, overlapping times, not `cancelled`; RotaAssignment `x-ticvai-exclude`) refuses the second of
         two writes that pass the check at the same moment, and that refusal is the same `409
-        rota-assignment-overlap`.
+        rota-assignment-overlap` (SQLSTATE 23P01 on `rota_assignment_principal_id_overlap_excl`; ADAM CR-344). The
+        constraint is added by hand once any overlapping rows are settled (handoff/migration-review.md); until it is on
+        the databases, a per-person advisory lock holds the overlap check under races.
 
         **The working-hour limit is flagged, not refused** (ADAM CR-334, option A, decided 29 October 2026):
         the venue's `workforce.staffing_rules` row is read and `breachesWorkingHourLimit` is set as that field
@@ -436,7 +438,9 @@ paths:
         is checked against the same two rules `createRotaAssignment` applies, asked of the same two queries
         (ADAM CR-336, option B): the person has no other assignment overlapping it at any venue of the
         tenant (`workforce#principalHasOverlappingAssignment` with this assignment as `exceptAssignmentId`;
-        `409 rota-assignment-overlap`, which the exclusion constraint also gives under races), and the person
+        `409 rota-assignment-overlap`, which the exclusion constraint also gives under races: SQLSTATE 23P01 on
+        `rota_assignment_principal_id_overlap_excl`, ADAM CR-344, with create's per-person advisory lock until the
+        constraint is on the databases), and the person
         holds the required role at the venue or above it (`identity#principalHoldsRoleAtVenue`; `409
         person-lacks-required-role`). Each answers only true or false. So a move cannot do what a create is
         refused. An assignment outside the caller's scope is the shared `404`.

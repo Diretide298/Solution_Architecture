@@ -10,7 +10,7 @@
 # This file holds the three things that are not routed:
 #
 #   kernel       the shared-kernel tables every host needs, granted to every deployable role directly. Exactly
-#                these five; tools/check-cross-deployable-writes.py fails on any other entry or privilege.
+#                these seven (the two key-store tables since ADAM CR-339, 30 October 2026); tools/check-cross-deployable-writes.py fails on any other entry or privilege.
 #   exceptions   writes that cannot route yet, each with its reason, the date it was added and the release that
 #                removes it. The check fails on an unrouted write that is not here, on an entry here for a write
 #                that is not cross-deployable or that is also routed, and on an entry whose removal release has
@@ -57,6 +57,17 @@ kernel:
     row (INSERT ... ON CONFLICT DO UPDATE ... RETURNING), so a sequence survives the outbox''s monthly partitions
     leaving (ADAM CR-166, 18 October 2026; CHG-CRA-005; ADR-0057 and ADR-0058 as amended). DB-ROLES grants it to
     commerce, access, operations and workers.'
+- table: platform.tenant_field_key
+  privileges: [SELECT, INSERT, UPDATE]
+  why: 'The kernel in every host encrypts, decrypts and blind-indexes for the current tenant (KERNEL-FIELD-ENC), so every
+    host reads the tenant''s wrapped keys, creates a missing one on first use (INSERT ... ON CONFLICT DO NOTHING) and
+    moves a rotated one to decryptOnly; never deleted (ADAM CR-339, 30 October 2026; CHG-CR339-001; ADR-0063 as amended
+    that day). DB-ROLES grants it to commerce, access, operations and workers.'
+- table: platform.blind_index_rehash
+  privileges: [SELECT, INSERT, UPDATE]
+  why: 'A lookup on a re-hashable blind index, in whichever host makes it, reads whether its column''s re-hash is
+    finished, and the kernel''s re-hash job records its progress (ADAM CR-339, 30 October 2026; CHG-CR339-001). DB-ROLES
+    grants it to commerce, access, operations and workers.'
 
 
 # The 17 exceptions CR-002 dated for removal at r5 (XDW-001 to XDW-017) were removed on 14 October 2026, in r6, when

@@ -1553,8 +1553,9 @@ paths:
         - "P08 BO-618 Accreditation Form Builder"
         - "P08 BO-747 Consent Policy Configuration"
       summary: Waivers, surveys and capture forms
-      description: 'The builder''s list. **The latest version of each form**; older versions stay readable
-        through `getForm` with `version`.
+      description: 'The builder''s list. **The latest version of each form**, the highest `version` per `id`
+        (ADAM CR-359: a form''s versions share its `id`); older versions stay readable through `getForm` with
+        `version`.
 
         
 
@@ -1619,6 +1620,15 @@ paths:
         Published as a version. **A change creates a new version and the old one stays readable forever**
         — 2.15.13 requires the exact accepted version retained.
 
+
+        **A new form, or the next version of one** (ADAM CR-359, decided 31 October 2026; the CR-228 rule for
+        configuration profiles). Without `formId` the body is a new form: a new `id`, `version` 1, as before. With
+        `formId` it is the next version of that form: a row with `id` = `formId` and `version` = the form''s highest
+        version + 1, saved as a draft from the body alone; nothing is copied implicitly from an earlier version (its
+        fields and layout are whatever this body and the later field and layout writes give it). No form with that
+        id is `404`. The next version takes the same permission and scope as an update of that form: `MARKETING_MANAGE`
+        at the form''s node or above, and a form outside the caller''s scope is the same `404`.
+
         '
       tags:
       - marketing
@@ -1630,6 +1640,15 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - name: formId
+        in: query
+        required: false
+        description: 'The form this is the next version of (`FormDefinition.id`; ADAM CR-359, decided 31 October 2026).
+          Absent: a new form, version 1. Present: the next version of that form, its highest version + 1; no form with
+          that id in the caller''s scope is `404`.'
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
@@ -1641,11 +1660,13 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Created as a draft version
+          description: Created as a draft version (version 1 of a new form, or the next version of `formId`)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FormDefinition'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forms/{formId}:
@@ -9635,6 +9656,12 @@ paths:
         against with `recordDeviceConsent`. (decided 29 September, readiness close-out)
 
 
+        **The strictly necessary description is required in every language** (ADAM CR-347, decided 30 October
+        2026): a design whose `categories` has no `strictlyNecessary` entry, or whose `strictlyNecessary` entry's
+        `description` has no non-empty text for one of the codes in `languages`, is refused `422
+        strictly-necessary-description-missing`. Nothing is stored.
+
+
         **Written at its brand's node** (ADAM CR-314, option C, one decision with `setTrackingTechnology`,
         29 October 2026): a design's row is at the path of the brand `brandId` names, and the corporate
         design (`brandId` null) at the tenant root, so the upsert key holds once per brand and channel;
@@ -9683,8 +9710,8 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          x-ticvai-problem-types: [reject-harder-than-accept, non-essential-pre-ticked, do-not-sell-button-missing]
-          description: A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button.
+          x-ticvai-problem-types: [reject-harder-than-accept, non-essential-pre-ticked, do-not-sell-button-missing, strictly-necessary-description-missing]
+          description: A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button; or, `strictly-necessary-description-missing` (ADAM CR-347), one whose `categories` has no `strictlyNecessary` entry or whose `strictlyNecessary` entry's `description` has no non-empty text for one of the codes in `languages`. Nothing is stored.
           content:
             application/problem+json:
               schema:
@@ -13996,6 +14023,10 @@ paths:
   /dynamic-field-question/{formId}/{key}:
     put:
       operationId: setDynamicFieldQuestion
+      x-ticvai-reads:
+      - table: marketing.form_definition
+        for: 'the version row (id = formId, version = formVersion): none is 404, a status other than draft is 409
+          form-version-not-draft (ADAM CR-359)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.11-12 (11.1.4 Field Types, Required Fields, Validation, Data Mapping); the field list needs its write'
@@ -14003,7 +14034,13 @@ paths:
       description: >
         **An upsert keyed on `formId` + `formVersion` + `key`, on a `draft` version only** (409 once
         published: a change is a new version through `createForm`). Writes the `FormField` row and its
-        rule row together. `deleted: true` removes the field, refused (409) while a layout block
+        rule row together.
+
+        **The version is the `marketing.form_definition` row with `id` = `formId` and `version` =
+        `formVersion`** (ADAM CR-359, decided 30 October 2026): no such row is `404 not-found`, and a
+        `status` other than `draft` is `409 form-version-not-draft`. The field row is written with
+        `form_id` = `formId` and `form_version` = `formVersion`, and `form_definition_id` is also set to
+        `formId` until that column is retired. `deleted: true` removes the field, refused (409) while a layout block
         (`setDigitalWaiverForm`) still points at it. A condition naming a field that does not exist, a
         cycle between conditions, or validation that contradicts the type is refused (422).
         (decided 29 September, readiness close-out)
@@ -22014,6 +22051,7 @@ components:
       description: '**Taken from the backend workbook, 20 September.** Stores the auditable signature of a customer/guardian against an exact immutable waiver-template version.'
       required:
       - templateId
+      - formVersion
       - subjectName
       - signedName
       - signerType
@@ -22027,8 +22065,17 @@ components:
         templateId:
           x-ticvai-column: form_definition_id
           x-ticvai-references: marketing.form_definition
+          x-ticvai-references-version: formVersion
           type: string
           format: uuid
+          description: The waiver form signed (`FormDefinition.id`, the form); with `formVersion`, the exact version
+            row (ADAM CR-359).
+        formVersion:
+          type: integer
+          minimum: 1
+          readOnly: true
+          description: '**The exact version signed** (ADAM CR-359, decided 30 October 2026), which the row could not
+            record before: with `templateId`, the key of the `FormDefinition` version row the signature binds to.'
         customerId:
           type: string
           format: uuid
@@ -22883,6 +22930,7 @@ components:
           description: Where the opt-in happened, because a regulator asks.
         unsubscribeToken:
           x-ticvai-secret: blind-index
+          x-ticvai-blind-index-of: none   # hashes a token the server never keeps: kept key versions, not a re-hash (ADAM CR-339, ADR-0063 30 October)
           writeOnly: true
           type: string
           description: '**Unsubscribe must work without a login.** The link in a message carries the token
@@ -23147,6 +23195,12 @@ components:
     FormDefinition:
       type: object
       x-ticvai-persistence: marketing.form_definition + marketing.form_definition_field
+      # Each version is a row with the form's id, so the key is (id, version) (ADAM CR-359, decided 30 October 2026;
+      # the rule CR-228 set for configuration profiles, CHG-R8MIG-019; CHG-CR359-001).
+      x-ticvai-primary-key: [id, version]
+      # form_definition_field names its version row by (form_id, form_version) (DynamicFieldsQuestionsConditionalLogicView);
+      # form_definition_id, which held the same id, is withdrawn (ADAM CR-359): writers set it to formId until it is dropped.
+      x-ticvai-retired-columns: [marketing.form_definition_field.form_definition_id]
       description: 'CF-129, CL-04. **A waiver, a survey and a data-capture form are one mechanism.**
 
         A waiver is this form with a signature. A survey is this form with a scale. A demographic capture
@@ -23170,6 +23224,10 @@ components:
           readOnly: true
           type: string
           format: uuid
+          description: '**The form, not one version of it** (ADAM CR-359, decided 30 October 2026): every version of a
+            form is a row with this same id, and (`id`, `version`) is the row''s key, as CR-228 made it for
+            configuration profiles. It is the `formId` every path and body names, with `formVersion` for one
+            version, and the id `setWaiverTemplateMaster` and `WaiverRequirement.formDefinitionId` name the form by.'
         name:
           type: string
         kind:
@@ -23202,6 +23260,9 @@ components:
             once anything is submitted against it.** A change creates a new version,
             and the old one stays readable forever — 2.15.13 requires the exact accepted version retained,
             which is legal evidence rather than a nicety.
+
+            **One row per version, under the form''s `id`** (ADAM CR-359): (`id`, `version`) is the key, so version
+            N of form X is the row with `id` X and `version` N.
 
             '
         fields:
@@ -25577,6 +25638,7 @@ components:
           maxLength: 64
           x-ticvai-unique-compare: exact
           x-ticvai-secret: blind-index
+          x-ticvai-blind-index-of: tokenRef   # re-hashed from token_ciphertext when the key rotates (ADAM CR-339)
           description: '**A keyed hash of the token, not the token** (decided 14 October 2026, CHG-MKT-001; ADR-0063
             section 4 as amended): HMAC-SHA-256 of the token under the tenant''s blind-index key, written as 64
             lowercase hex characters. Keyed, so a token somebody holds cannot be checked against the table. It is
@@ -29494,6 +29556,9 @@ components:
           x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
+          description: 'A `strictlyNecessary` entry is required, with a `description` that has non-empty text for
+            every code in `languages`; `setCookieBannerDesign` refuses a design without it (`422
+            strictly-necessary-description-missing`, ADAM CR-347).'
           items:
             type: object
             required:
@@ -35854,6 +35919,10 @@ components:
         formId:
           type: string
           format: uuid
+          x-ticvai-references: marketing.form_definition
+          x-ticvai-references-version: formVersion
+          description: The form (`FormDefinition.id`); with `formVersion`, the draft version row the field belongs to
+            (ADAM CR-359).
         formVersion:
           type: integer
           minimum: 1
@@ -39582,13 +39651,18 @@ components:
           nullable: true
         formDefinitionId:
           x-ticvai-references: marketing.form_definition
+          x-ticvai-references-version: formVersion
           type: string
           format: uuid
+          description: The form required (`FormDefinition.id`, the form; ADAM CR-359). With `formVersion`, the version
+            row it references.
         formVersion:
           type: integer
           minimum: 1
           nullable: true
-          description: The version assigned, or signed once completed.
+          description: 'The version assigned, or signed once completed. With `formDefinitionId`, a reference to that
+            `FormDefinition` version row (ADAM CR-359). While it is null the key checks nothing (a composite key matches
+            simply), so the writer checks that the form exists.'
         isMandatory:
           type: boolean
           description: False for an optional consent (e.g. media), which never blocks readiness.

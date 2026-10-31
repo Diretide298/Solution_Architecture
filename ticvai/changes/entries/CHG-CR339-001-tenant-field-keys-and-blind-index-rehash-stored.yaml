@@ -1,0 +1,85 @@
+id: CHG-CR339-001
+date: '2026-10-30'
+source: cr
+kind: contract
+summary: 'A tenant''s wrapped field-encryption keys are rows of platform.tenant_field_key in its own database (purpose,
+  key_version, wrapped_key bytea, wrapping_key_id, state active|decryptOnly|retired), and a blind-index rotation''s
+  progress is platform.blind_index_rehash; only a blind index the server can decrypt (guest_device.token_fingerprint) is
+  re-hashed, and the four over tokens the server never keeps look up under every non-retired key version, as API
+  client secrets do. ADR-0063 amended 30 October 2026; each tenant blind index says which kind it is.'
+decision:
+  what: 'The lead''s review, 30 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs". Posted to #37050: "as you recommended for the keys, with one change to
+    rotation. Keys live in a tenant-database table platform.tenant_field_key (id uuid, purpose dataKey|blindIndexKey,
+    key_version integer, wrapped_key bytea, wrapping_key_id text ..., state active|decryptOnly|retired, created_at,
+    rotated_at), with unique keys ... (purpose, key_version) and ... (purpose) WHERE state = ''active''. Only the
+    kernel reads or writes it ... Rotating the blind-index key: only a blind index the server can decrypt is
+    re-hashed, which today is marketing.guest_device.token_fingerprint ... platform.blind_index_rehash (column_name
+    text as schema.table.column, from_version, to_version, last_id uuid, started_at, finished_at; unique (column_name,
+    to_version)) ... For them the old version stays decryptOnly, and a lookup tries the active version and then each
+    decryptOnly one, newest first ... The kernel''s list of blind-index columns is the contract''s x-ticvai-secret:
+    blind-index columns in the tenant database; tenancy.device_credential.fingerprint is not one. Hrushikant creates
+    both tables (a [DB] child task of MIG-PLATFORM)." docs/adr/0063 amendment of 30 October 2026;
+    contracts/spine/tenancy.yaml TenantFieldKey, WrappedKeyBytes and BlindIndexRehash; x-ticvai-blind-index-of on the
+    five tenant blind indexes (marketing-crm.yaml, orders.yaml); the two tables in the kernel grants
+    (docs/active/cross-deployable-writes.yaml, tools/check-cross-deployable-writes.py).'
+  by: Chinmay
+  date: '2026-10-30'
+why: 'ADAM CR-339 (Pranay Shinde, #37050 KERNEL-FIELD-ENC, blocking): ADR-0063 section 5 and its 14 October amendment
+  wrap a per-tenant data key and blind-index key in the tenant''s HSM-backed Key Vault key, but no table held a wrapped
+  key or its version, and the re-hash job had no list of columns and no progress record. Four of the five tenant
+  blind indexes hash a token the server never keeps, so "never by keeping two" could not hold for them; ADR-0063''s 25
+  October amendment already settles that case for API client secrets (CR-098).'
+keys_touched:
+  schemas:
+  - TenantFieldKey
+  - BlindIndexRehash
+  - GuestDevice
+  - MarketingSubscription
+  - PaymentLink
+  - WalletPass
+  - TicketTransfer
+  tables:
+  - platform.tenant_field_key
+  - platform.blind_index_rehash
+  files:
+  - docs/adr/0063-encryption-keys-and-biometric-templates.md
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/spine/orders.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-cross-deployable-writes.py
+  - tools/check-contract-storage.py
+root_class: 'a kernel component whose ticket names stored state (wrapped keys, key versions, re-hash progress) that no
+  table holds, and a rotation rule stated for every blind index that holds only for those over a value the server keeps'
+tickets:
+  started:
+  - '37050 (KERNEL-FIELD-ENC, Pranay Shinde): build the key store on platform.tenant_field_key and the re-hash on
+    platform.blind_index_rehash as decided; the re-hash job walks guest_device.token_fingerprint only; lookups on the
+    four one-way columns try every non-retired version, newest first. Told through the lead''s comment, its text is not
+    rewritten.'
+  - '30708: no change; stays On hold until #37050 is Ready for QA (CR-271).'
+  - '27665 (MIG-PLATFORM, [DB] V0017 platform, Ready for QA, Hrushikant Patkar): both tables, in every tenant database,
+    as a [DB] child task (to be filed); DB-ROLES grants them to the four host roles as the kernel list now says.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-339
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: open
+notes: 'check-contract-storage ST-BLIND-INDEX-REHASH (with an in-memory self-test that runs every time) fails on a
+  tenant-database blind index that does not say whether a rotation can re-hash it (x-ticvai-blind-index-of: its
+  field-encrypted sibling, or none), so a new one cannot join the kernel''s list without saying which; it fails on the
+  r11 contracts (five unmarked) and passes now. ST-TABLE-MISSING holds the two tables. Beyond the comment''s words: (1)
+  both tables take no scope (x-ticvai-scope: none, no scope_path) and any connection holding a grant reads, inserts and
+  updates and none deletes (x-ticvai-rls: any-grant-no-delete, as platform.outbox_sequence), since the kernel runs in
+  every host for every caller; (2) both are added to the kernel grants (SELECT, INSERT, UPDATE to commerce, access,
+  operations and workers), since the platform schema is commerce''s and Marketing (operations) and the push sender
+  (workers) need the keys; (3) the generated index names follow naming-and-style 6.1:
+  tenant_field_key_purpose_key_version_uniq and tenant_field_key_purpose_uniq (partial, WHERE state = ''active'')
+  where the comment says tenant_field_key_purpose_version_uniq and tenant_field_key_active_uniq, and
+  blind_index_rehash_column_name_to_version_uniq. The KERNEL-FIELD-ENC detail in docs/active/block-a-extra-tasks.json
+  is a plan file and is not changed here.'

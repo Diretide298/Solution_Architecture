@@ -125,16 +125,21 @@ x-ticvai-queries:
       type: object
       required: [holds]
       properties:
-        holds: {type: boolean, description: 'True when the person holds the role at the venue or at a scope above it. Which grant, where it was made and by whom are never returned.'}
+        holds: {type: boolean, description: 'True when the person holds the role at the venue or at a scope above it and no live DENY of that role at the venue or above it suppresses it. Which grant, where it was made and by whom are never returned.'}
     rule: >-
       A rule question (ADAM CR-336, option B; Chinmay, 29 October 2026: "All as recommended"). True when an
       identity.delegated_access row has principal_id = principalId and role_id = roleId, effect `ALLOW`, no
       revoked_at, valid_from absent or not after now, valid_to absent or after now, and a scope_path at or above
-      the venue (scope_path @> venueScopePath). Identity answers it with one statement under the routed tenant's
-      root grant (ITenantRootGrant), so a grant made above the caller's scope is seen, and returns only `holds`;
+      the venue (scope_path @> venueScopePath). **A live DENY wins** (ADAM CR-344, decided 30 October 2026;
+      deny-overrides-allow, as createDelegatedAccess says): a row with principal_id = principalId and role_id =
+      roleId, effect `DENY`, live by the same revoked_at, valid_from and valid_to tests, and a scope_path at or above
+      the venue makes `holds` false, whatever ALLOW exists. Identity answers it with one statement under the routed
+      tenant's root grant (ITenantRootGrant), so a grant made above the caller's scope is seen, and returns only
+      `holds`;
       the caller's own grant is in force again for every other statement of its transaction. It is asked in
       process by createRotaAssignment and updateRotaAssignment, which refuse 409 person-lacks-required-role when
-      it is false.
+      it is false. Built inside the Identity module, behind its query interface, by the createRotaAssignment ticket
+      (#32338, ADAM CR-344); no other ticket builds it.
     served: [in-process]
   # **Whether a guest is a minor, and its name, beyond the caller's own row** (ADAM CR-362, decided 30 October 2026;
   # CHG-CR362-001). grantDelegation and listDelegations read pii.subject under subject row security, which shows a

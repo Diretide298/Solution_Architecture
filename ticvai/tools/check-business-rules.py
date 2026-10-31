@@ -96,6 +96,22 @@ And one rule per decision:
                    configuration_version row and answers the draft with version null; its 409 unpublished-changes
                    compares the area tables with the latest published snapshot as diffWalletConfigurationVersion does;
                    listWalletConfigurationVersions lists no restored draft.
+  BR-WALLET-RESTORE-FINDINGS (r12, ADAM CR-355, CHG-CR355-001) restoreWalletConfigurationVersion lists its own two
+                   codes, restore-credit-type-retired-since-version and restore-left-newer-rows, both warnings, and never
+                   sets a credit type's is_active from false to true.
+  BR-WALLET-TOPUP-CREDIT-TYPE (r12, ADAM CR-357, CHG-CR357-001) topUpWallet names each lot's credit type (the one
+                   active cash type for the paid lot, the applying bonus rule's bonusCreditTypeId for the bonus), reads
+                   wallet.credit_type and wallet.funding_rule, and refuses a bonus the venue did not set (422
+                   bonus-not-applicable).
+  BR-COOKIE-STRICTLY-NECESSARY (r12, ADAM CR-347, CHG-CR347-001) setCookieBannerDesign's 422 names
+                   strictly-necessary-description-missing: no strictlyNecessary category, or its description missing
+                   in a language of `languages`.
+  BR-ROTA-ROLE-DENY (r12, ADAM CR-344, CHG-CR344-001) identity#principalHoldsRoleAtVenue answers false on a live DENY
+                   of the role at or above the venue (deny-overrides-allow), and names #32338 as its builder.
+  BR-FORM-VERSION-KEY (r12, ADAM CR-359, CHG-CR359-001) FormDefinition is keyed (id, version), id the form, and the
+                   field, requirement and signature rows reference the version row by (form id, version);
+                   MarketingWaiverSignature records formVersion; createForm's optional formId makes the next version
+                   of an existing form (highest version + 1, 404 when there is none).
   BR-CREDIT-ACCOUNT-CURRENCY (r11, ADAM CR-322 option A, CHG-CR322-001) a B2B credit account stores the currency
                    its limit is agreed in: B2bCreditAccount.currencyCode (required, readOnly; payments.credit_account.
                    currency_code), set by createB2bCreditAccount from creditLimit.currency and never changed after, and
@@ -968,6 +984,59 @@ def main() -> int:
     need("BR-WALLET-RESTORE-DRAFT", "drafts created by" not in lst,
          "listWalletConfigurationVersions still lists drafts created by the restore (CR-312: no draft row)")
 
+    # BR-WALLET-RESTORE-FINDINGS, BR-WALLET-TOPUP-CREDIT-TYPE, BR-COOKIE-STRICTLY-NECESSARY, BR-ROTA-ROLE-DENY,
+    # BR-FORM-VERSION-KEY (r12; the lead, 30 October 2026, "for each one actually check if they hold"; ADAM CR-355,
+    # CR-357, CR-347, CR-344, CR-359). Each fails on the r11 contract and passes on the posted decision.
+    for code in ("restore-credit-type-retired-since-version", "restore-left-newer-rows"):
+        need("BR-WALLET-RESTORE-FINDINGS", re.search(r"`" + code + r"` \(warning", rdesc) is not None,
+             f"restoreWalletConfigurationVersion does not list its finding `{code}` as a warning (CR-355)")
+    need("BR-WALLET-RESTORE-FINDINGS", "never sets a credit type's `is_active` from false to true" in rdesc
+         and "rather than silently revived" not in rdesc,
+         "restoreWalletConfigurationVersion does not say a retired credit type stays retired (CR-355)")
+    fcode = " ".join(str((((((wcv.get("properties") or {}).get("findings") or {}).get("items") or {})
+                           .get("properties") or {}).get("code") or {}).get("description") or "").split())
+    need("BR-WALLET-RESTORE-FINDINGS", "restoreWalletConfigurationVersion" in fcode,
+         "WalletConfigurationVersion.findings[].code does not say where the restore's own codes are listed (CR-355)")
+    tdesc = " ".join(str(top.get("description") or "").split())
+    need("BR-WALLET-TOPUP-CREDIT-TYPE", "category `cash`" in tdesc and "bonusCreditTypeId" in tdesc
+         and "`bonusAmount` is not paid for and is not compared" not in tdesc,
+         "topUpWallet does not name each lot's credit type (the cash type, the bonus rule's bonusCreditTypeId) or "
+         "still credits an unchecked bonusAmount (CR-357)")
+    treads = text(top.get("x-ticvai-reads") or [])
+    need("BR-WALLET-TOPUP-CREDIT-TYPE", "wallet.credit_type" in treads and "wallet.funding_rule" in treads,
+         "topUpWallet does not declare its reads of wallet.credit_type and wallet.funding_rule (CR-357)")
+    need("BR-WALLET-TOPUP-CREDIT-TYPE", "bonus-not-applicable" in str(((top.get("responses") or {}).get("422") or {})
+                                                                     .get("x-ticvai-problem-types") or []),
+         "topUpWallet's 422 does not name bonus-not-applicable (CR-357)")
+    mdoc = load("contracts/satellite/marketing-crm.yaml")
+    c422 = ((op("setCookieBannerDesign")[3].get("responses") or {}).get("422") or {})
+    need("BR-COOKIE-STRICTLY-NECESSARY", "strictly-necessary-description-missing"
+         in (c422.get("x-ticvai-problem-types") or []) and "`languages`" in str(c422.get("description") or ""),
+         "setCookieBannerDesign's 422 does not name strictly-necessary-description-missing for a missing "
+         "strictlyNecessary category or description in a language of `languages` (CR-347)")
+    hq = (load("contracts/spine/identity.yaml").get("x-ticvai-queries") or {}).get("principalHoldsRoleAtVenue") or {}
+    hrule = " ".join(str(hq.get("rule") or "").split())
+    need("BR-ROTA-ROLE-DENY", "effect `DENY`" in hrule and "makes `holds` false" in hrule and "#32338" in hrule,
+         "identity#principalHoldsRoleAtVenue does not let a live DENY of the role at or above the venue make holds "
+         "false, or does not name #32338 as its builder (CR-344)")
+    msch = (mdoc.get("components") or {}).get("schemas") or {}
+    need("BR-FORM-VERSION-KEY", (msch.get("FormDefinition") or {}).get("x-ticvai-primary-key") == ["id", "version"],
+         "FormDefinition is not keyed (id, version), so (formId, formVersion) names no row (CR-359)")
+    for sname, prop, vprop in (("DynamicFieldsQuestionsConditionalLogicView", "formId", "formVersion"),
+                               ("WaiverRequirement", "formDefinitionId", "formVersion"),
+                               ("MarketingWaiverSignature", "templateId", "formVersion")):
+        pp = (msch.get(sname) or {}).get("properties") or {}
+        need("BR-FORM-VERSION-KEY", (pp.get(prop) or {}).get("x-ticvai-references") == "marketing.form_definition"
+             and (pp.get(prop) or {}).get("x-ticvai-references-version") == vprop and vprop in pp,
+             f"{sname}.{prop} does not reference marketing.form_definition by ({prop}, {vprop}) (CR-359)")
+    cf = op("createForm")[3]
+    cfq = [x for x in cf.get("parameters") or [] if isinstance(x, dict) and x.get("name") == "formId"]
+    need("BR-FORM-VERSION-KEY", len(cfq) == 1 and cfq[0].get("in") == "query" and not cfq[0].get("required")
+         and "404" in {str(k) for k in (cf.get("responses") or {})}
+         and "highest version + 1" in " ".join(str(cf.get("description") or "").split()),
+         "createForm takes no optional formId making the next version of an existing form (highest version + 1, "
+         "404 when no form has that id) (CR-359, decided 31 October 2026)")
+
     # BR-PLANNER-QUESTIONS, BR-ROTA-HOUR-LIMIT, BR-ROTA-CROSS-VENUE (r11, ADAM CR-321, CR-334, CR-336; the lead, 29
     # October 2026, "As recommended", then "Include those in today as well"). Each fails on the r10 contract.
     vdoc = load("contracts/satellite/venue-map.yaml")
@@ -1327,6 +1396,8 @@ def main() -> int:
              "BR-SCOPE-AUTHZ", "BR-SSO-ACTIVE", "BR-PERMISSION-FINDINGS", "BR-ENTITLEMENT-SHARE",
              "BR-PRESET-READONLY", "BR-END-SESSIONS", "BR-PLATFORM-TOKEN", "BR-GUEST-TOKENS", "BR-GUEST-VENUE",
              "BR-PLATFORM-INVOICE", "BR-WALLET-TOPUP-ONCE", "BR-WALLET-PUBLISH-CHECKS", "BR-WALLET-RESTORE-DRAFT",
+             "BR-WALLET-RESTORE-FINDINGS", "BR-WALLET-TOPUP-CREDIT-TYPE", "BR-COOKIE-STRICTLY-NECESSARY",
+             "BR-ROTA-ROLE-DENY", "BR-FORM-VERSION-KEY",
              "BR-PLANNER-QUESTIONS", "BR-ROTA-HOUR-LIMIT", "BR-ROTA-CROSS-VENUE",
              "BR-CREDIT-ACCOUNT-CURRENCY", "BR-PLATFORM-APPROVAL-RULE", "BR-WALLET-ETAG-VERSION", "BR-GUEST-SSO",
              "BR-UAEPASS-ENDPOINTS", "BR-LINK-CHECKOUT", "BR-DELEGATION-READS", "BR-GUEST-POLICY-CURRENCY",

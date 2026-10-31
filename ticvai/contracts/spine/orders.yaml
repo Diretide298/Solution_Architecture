@@ -20916,6 +20916,7 @@ components:
             '
         token:
           x-ticvai-secret: blind-index
+          x-ticvai-blind-index-of: none   # hashes a token the server never keeps: kept key versions, not a re-hash (ADAM CR-339, ADR-0063 30 October)
           x-ticvai-unique: tenant
           x-ticvai-unique-compare: exact
           type: string
@@ -21615,6 +21616,7 @@ components:
             valid for 15 minutes (proposed, client to confirm), after which a read of the pass gives a new one.'
         authenticationToken:
           x-ticvai-secret: blind-index
+          x-ticvai-blind-index-of: none   # hashes a token the server never keeps: kept key versions, not a re-hash (ADAM CR-339, ADR-0063 30 October)
           type: string
           format: password
           writeOnly: true
@@ -23327,6 +23329,7 @@ components:
             the rows the caller sent; IDENTITY-C26, CHG-R8SPN-025).'
         claimToken:
           x-ticvai-secret: blind-index
+          x-ticvai-blind-index-of: none   # hashes a token the server never keeps: kept key versions, not a re-hash (ADAM CR-339, ADR-0063 30 October)
           type: string
           format: password
           writeOnly: true
