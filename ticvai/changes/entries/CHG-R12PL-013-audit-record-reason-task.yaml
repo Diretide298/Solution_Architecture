@@ -1,0 +1,53 @@
+id: CHG-R12PL-013
+date: '2026-10-31'
+source: cr
+kind: plan
+proposed: '2026-10-31'
+summary: 'A [DB] task for CR-376: platform.audit_record gains a nullable reason (3 to 500 characters), added on the partitioned
+  parent.'
+decision:
+  what: 'The lead, 31 October 2026, on the 64 settled CRs (CR-372 to CR-435): "Include them in r12". docs/active/block-a-extra-tasks.json:
+    a new [DB] task CR376-DB-AUDIT-RECORD-REASON (Hrushikant Patkar, epic PLATFORM, not before 2 November 2026), the database
+    work of #27665 (MIG-PLATFORM), following MIG-PLATFORM and MIG-PARTITIONS: ADD COLUMN reason text with its length check,
+    on the parent of the monthly partitions; no backfill. Its text carries the decision''s statements and names the release''s
+    forward migration as its Source DDL after r1. Plan change waived from the cooling-off by the lead ("Waive for r12").'
+  by: Chinmay
+  date: '2026-10-31'
+why: ADAM CR-376; the lead's decision of 31 October 2026, posted on the ticket. The ticket the work belongs to has started
+  or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the release apply makes (no
+  ticket is made through the API).
+keys_touched:
+  tickets:
+  - CR376-DB-AUDIT-RECORD-REASON (new)
+  tables:
+  - platform.audit_record
+  operations:
+  - listAuditRecords
+  - resetPrincipalCredential
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started:
+  - '27665 (MIG-PLATFORM, [DB] V0017__platform.sql, Ready for QA, Hrushikant Patkar): not rewritten; the column is CR376-DB-AUDIT-RECORD-REASON''s'
+  - '30327 (MIG-PLATFORM#platform.audit_record, [DB] platform.audit_record, Ready for QA, Hrushikant Patkar): not rewritten'
+  unstarted:
+  - '#31238: write the reason through the audit context once the column is migrated. [status: #31238 New]'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-376
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the verdict names as parent is recorded in the task''s
+  text; its OpenProject parent is the app-module the plan places it in, and it follows the migration that creates its table(s).
+  It changes tables another migration creates, so it is marked `area: database` (a [DB] ticket) and its key does not end
+  in -DB (a -DB task''s `table` builds count as created by it: CHG-R8MIG-016, CHG-R12PL-008). A started migration it would
+  come after is not made to wait on it (tools/build-service-docs.py, CHG-R12PL-008).'

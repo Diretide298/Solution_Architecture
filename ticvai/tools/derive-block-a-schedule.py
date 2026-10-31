@@ -110,6 +110,14 @@ def main():
             if sp.is_migration_of(mig_rx, r["key"]):
                 pins.pop(r["key"], None)
                 r["assignee"] = mig_owner
+    # **Everything on the AI server is the AI engineers'** (team.json `aiServer`, CHG-R12PL-034; the lead, 31 October
+    # 2026: "All to the AI engineers"): the plan placed each AI server task (on an AI engineer, nobody past 2 April, or
+    # the owner a started ticket keeps), and the pin of the back-end developer the last release gave it does not take it
+    # back.
+    ai_srv = sp.ai_server(team)
+    for r in rows:
+        if ai_srv(r["key"], r["service"], r["track"]):
+            pins.pop(r["key"], None)
     # the lead's owner moves (block-a-extra-tasks.json `ownerMoves`, CHG-R5-003): the plan applied them; the pin of the
     # owner a task leaves does not take it back
     for k_, (from_, to_) in sp.owner_moves(extra).items():
@@ -133,6 +141,8 @@ def main():
     def pool_of(r):
         if r["track"] == "AI":
             return "ai"
+        if ai_srv(r["key"], r["service"], r["track"]):
+            return sp.ai_server_pool(team)
         if r["track"] == "Frontend":
             return {"POS": "pos", "MOB": "mob", "P05": "mob", "P06": "mob", "P07": "mob"}.get(r["area"], "web")
         return "web" if r["track"] == "Onboarding" else "be"
@@ -162,8 +172,8 @@ def main():
                       open_blocks=settings["fixed"], pace_at=pace_at)
     # **AI engine tasks past 2 April stay unassigned** (Chinmay, 1 October): they are timed here like any task,
     # but the plan left them without an owner, so the schedule gives them none either
-    unowned_ai = {r["key"] for r in rows if r["track"] == "AI" and not r["assignee"] and not pins.get(r["key"])} \
-        | phase2_keys
+    unowned_ai = {r["key"] for r in rows if (r["track"] == "AI" or ai_srv(r["key"], r["service"], r["track"]))
+                  and not r["assignee"] and not pins.get(r["key"])} | phase2_keys
     block = {r["key"]: r.get("block") or "A" for r in rows}
     ai_engine = {r["key"] for r in rows if r["track"] == "AI" and r["block"] != "A"}
     placed = {k: v for k, v in res.items() if v["who"]}

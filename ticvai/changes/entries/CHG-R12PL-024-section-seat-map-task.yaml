@@ -1,0 +1,65 @@
+id: CHG-R12PL-024
+date: '2026-10-31'
+source: cr
+kind: plan
+proposed: '2026-10-31'
+summary: 'A [DB] task for CR-402: seating.section belongs to one seat map, its code unique on it.'
+decision:
+  what: 'The lead, 31 October 2026, on the 64 settled CRs (CR-372 to CR-435): "Include them in r12". docs/active/block-a-extra-tasks.json:
+    a new [DB] task CR402-DB-SECTION-SEAT-MAP (Hrushikant Patkar, epic PLATFORM, not before 2 November 2026), the database
+    work of #35653 ([DB] seating.section, under MIG-SEATING, #27668), following MIG-SEATING: the empty-table check, seat_map_id
+    NOT NULL with its key to seating.seat_map, and the unique index on (seat_map_id, code). Its text carries the decision''s
+    statements and names the release''s forward migration as its Source DDL after r1. Plan change waived from the cooling-off
+    by the lead ("Waive for r12").'
+  by: Chinmay
+  date: '2026-10-31'
+why: ADAM CR-402; the lead's decision of 31 October 2026, posted on the ticket. The ticket the work belongs to has started
+  or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the release apply makes (no
+  ticket is made through the API).
+keys_touched:
+  tickets:
+  - CR402-DB-SECTION-SEAT-MAP (new)
+  tables:
+  - seating.section
+  operations:
+  - getSeatMap
+  - updateSeatMap
+  - createSeatMap
+  - editSeatMapStructure
+  - cloneSeatMap
+  - copySeatMapSection
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started:
+  - '27668 (MIG-SEATING, [DB] V0015__seating.sql, Ready for QA, Hrushikant Patkar): not rewritten'
+  - '35653 (MIG-SEATING#seating.section, [DB] seating.section, Ready for QA, Hrushikant Patkar): not rewritten'
+  unstarted:
+  - '#35674 (getSeatMap, Hrushikant): read the map''s sections by seat_map_id instead of answering sections: []. [status:
+    #35674 New]'
+  - '#35675 (updateSeatMap, Hrushikant): 404 only for a sectionCode not among the map''s sections; write view_asset_id on
+    the matching row. [status: #35675 New]'
+  - '#35673 (createSeatMap, Hrushikant): set seat_map_id on every section it writes (see CR-403). [status: #35673 New]'
+  - '#35668 (editSeatMapStructure, Sanket Keluskar): set seat_map_id on addSections and resolve sectionCode within the map;
+    a taken code is 409 seat-label-taken. [status: #35668 New]'
+  - 'cloneSeatMap, copySeatMapSection, importSeatMap and commitImportJob back-end tickets, when picked: write seat_map_id
+    = the target map. (no ticket yet)'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-402
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the verdict names as parent is recorded in the task''s
+  text; its OpenProject parent is the app-module the plan places it in, and it follows the migration that creates its table(s).
+  It changes tables another migration creates, so it is marked `area: database` (a [DB] ticket) and its key does not end
+  in -DB (a -DB task''s `table` builds count as created by it: CHG-R8MIG-016, CHG-R12PL-008). A started migration it would
+  come after is not made to wait on it (tools/build-service-docs.py, CHG-R12PL-008).'

@@ -461,7 +461,43 @@ def migration_owner(team):
     m = team.get("migrations") or {}
     if not m.get("owner"):
         return None, None
-    return m["owner"], re.compile(m.get("keys") or r"^MIG-")
+    return m["owner"], _KeyRule(m.get("keys") or r"^MIG-", m.get("exceptKeys"))
+
+
+class _KeyRule:
+    """A key pattern with its exceptions (team.json `migrations.exceptKeys`): matches what `keys` matches and
+    `exceptKeys` does not. **The ai schema is the exception** (CHG-R12PL-034; the lead, 31 October 2026: "All to the AI
+    engineers"): its migrations are the AI server's Postgres, the AI engineers' (`aiServer`), not the migration
+    owner's."""
+
+    def __init__(self, keys, except_keys=None):
+        self._rx = re.compile(keys)
+        self._ex = re.compile(except_keys) if except_keys else None
+        self.pattern = keys + (f" except {except_keys}" if except_keys else "")
+
+    def search(self, s):
+        m = self._rx.search(s)
+        return None if m and self._ex and self._ex.search(s) else m
+
+
+def ai_server(team):
+    """**Everything on the AI server is the AI engineers'** (team.json `aiServer`, CHG-R12PL-034; the lead, 31 October
+    2026: "All to the AI engineers", then "The tasks that are for qdrant or postgre. And than api. From ai server that
+    will be undertaken by AI engineer"). Returns is_ai_server(key, service, track): true for a `tracks` task of a
+    `services` service (the AiService back end and its Database tasks, the ai schema's migrations) and for a task
+    `keys` names (SETUP-QDRANT); a sub-task (KEY#...) by its task's key. Always false when team.json has no rule."""
+    a = team.get("aiServer") or {}
+    services, tracks, keys = set(a.get("services") or ()), set(a.get("tracks") or ()), set(a.get("keys") or ())
+
+    def is_ai_server(key, service, track):
+        base = str(key or "").partition("#")[0]
+        return bool(a) and (base in keys or (service in services and track in tracks))
+    return is_ai_server
+
+
+def ai_server_pool(team):
+    """The pool the AI server's tasks go to (team.json `aiServer.pool`, "ai")."""
+    return (team.get("aiServer") or {}).get("pool") or "ai"
 
 
 def never_testers(team):

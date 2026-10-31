@@ -1,0 +1,56 @@
+id: CHG-R12PL-028
+date: '2026-10-31'
+source: cr
+kind: plan
+proposed: '2026-10-31'
+summary: 'A [DB] task for CR-410: pricing.dynamic_price_rule carries a contextual rule''s dimension and fields.'
+decision:
+  what: 'The lead, 31 October 2026, on the 64 settled CRs (CR-372 to CR-435): "Include them in r12". docs/active/block-a-extra-tasks.json:
+    a new [DB] task CR410-DB-CONTEXTUAL-PRICE-RULE (Hrushikant Patkar, epic PLATFORM, not before 2 November 2026), the database
+    work of #31607 ([DB] pricing.dynamic_price_rule, under MIG-PRICING-2, #28091), following MIG-PRICING-2 and MIG-CATALOGUE:
+    seven columns for a contextual rule and channel_id declared as a key to catalogue.sales_channel (NOT VALID where enforced)
+    with its index. Its text carries the decision''s statements and names the release''s forward migration as its Source
+    DDL after r1. Plan change waived from the cooling-off by the lead ("Waive for r12").'
+  by: Chinmay
+  date: '2026-10-31'
+why: ADAM CR-410; the lead's decision of 31 October 2026, posted on the ticket. The ticket the work belongs to has started
+  or is a sub-task, so the plan carries the database part as a new [DB] task of its own, which the release apply makes (no
+  ticket is made through the API).
+keys_touched:
+  tickets:
+  - CR410-DB-CONTEXTUAL-PRICE-RULE (new)
+  tables:
+  - pricing.dynamic_price_rule
+  operations:
+  - setDynamicPriceRule
+  - listChannelCustomerSegment
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled CR whose database work belongs to a started or sub-task ticket, carried by no plan task
+tickets:
+  started:
+  - '28091 (MIG-PRICING-2, [DB] V1112__pricing.sql, Ready for QA, Hrushikant Patkar): not rewritten'
+  unstarted:
+  - '31607 (MIG-PRICING-2#pricing.dynamic_price_rule, [DB] pricing.dynamic_price_rule, New, Hrushikant Patkar): the columns
+    are CR410-DB-CONTEXTUAL-PRICE-RULE''s'
+  - '#35326: not built. Build the read on the new columns once the migration lands. [status: #35326 New]'
+  - '#31638 (setDynamicPriceRule): accept and store the seven fields, apply the contextual-rule check and its 422 contextual-rule-incomplete.
+    [status: #31638 New]'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-410
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'The plan has no task under a task or sub-task, so the ticket the verdict names as parent is recorded in the task''s
+  text; its OpenProject parent is the app-module the plan places it in, and it follows the migration that creates its table(s).
+  It changes tables another migration creates, so it is marked `area: database` (a [DB] ticket) and its key does not end
+  in -DB (a -DB task''s `table` builds count as created by it: CHG-R8MIG-016, CHG-R12PL-008). A started migration it would
+  come after is not made to wait on it (tools/build-service-docs.py, CHG-R12PL-008).'

@@ -1,0 +1,90 @@
+id: CHG-R12PL-034
+date: '2026-10-31'
+source: cr
+kind: plan
+proposed: '2026-10-31'
+summary: 'Everything on the AI server is the AI engineers'': the AiService back end (its API), the ai schema''s migrations
+  (its Postgres) and SETUP-QDRANT (its Qdrant), by a rule in team.json, with AiService reviewed by Kalpita Mejari.'
+decision:
+  what: 'The lead, 31 October 2026, on the 64 settled CRs (CR-372 to CR-435): "Include them in r12". docs/active/team.json:
+    a new `aiServer` rule (pool ai; services AiService; tracks Backend and Database; keys SETUP-QDRANT) with the lead''s
+    words; `migrations.exceptKeys` ^(VM-)?MIG-AI(-[0-9]+)?$, the ai schema''s exception to the migration owner; the AI server''s
+    tasks reviewed by Kalpita Mejari, the first AI engineer (not through `serviceOwners`, which would move app-modules between
+    blocks); the `ai` note no longer says the AI endpoints are the developers'' (the AI screens stay the frontend developers'').
+    tools/sprint_plan.py (ai_server, the exception), tools/build-service-docs.py and tools/derive-block-a-schedule.py: an
+    AI server task whose ticket has not started goes to the AI pool after the pins and is placed on whichever AI engineer
+    can start it first; a started one keeps its owner; one not ticketed and past 2 April is created unassigned, as the AI
+    engine''s are; each says "Built on the AI server: ..." (carried to its ticket, ticket_done.CARRY); one whose operations
+    read or write Qdrant waits on SETUP-QDRANT and AI-ENGINE-QDRANT; the helper pass leaves them alone; an AI engine task
+    with no named owner is the schedule''s to place. tools/check-plan-owners.py: O-AI-SERVER. docs/active/block-a-extra-tasks.json:
+    SETUP-QDRANT names no owner; the AI-ENGINE epic''s text; the seven `ownerMoves` that gave AiService tasks to back-end
+    developers (SVC-AI-AI-1, -FORECAST-1, -GOVERNANCE-1, -KNOWLEDGE-2, -MODELS-1, -MODELS-2, -MONITORING-1; CHG-R5-003,
+    CHG-R6-056) are removed, superseded by the lead''s rule. tools/build-service-docs.py: the AI review''s back-end tasks
+    (AI-BE-*) say a change an owning service needs is a change request on that service. '
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM: the lead, 31 October 2026, answering Hrushikant Patkar''s note that #27716 SVC-AI-FORECAST-2 and #27841 SVC-AI-RETRIEVAL-1
+  belong to the AI team: "All to the AI engineers", then "The tasks that are for qdrant or postgre. And than api. From ai
+  server that will be undertaken by AI engineer". AiService is the separate Python deployable ticvai-ai (ADR-0055, ADR-0020),
+  kept out of every .NET host by the architecture tests, and #27841 also needs the Qdrant cluster. ADR-0055 rule 1 (a module
+  owns its schemas and only the owner migrates them) makes the ai schema''s migrations the AI module''s.'
+keys_touched:
+  tickets:
+  - SETUP-QDRANT (27644)
+  - SVC-AI-FORECAST-2 (27716)
+  - SVC-AI-RETRIEVAL-1 (27841)
+  - MIG-AI (27664)
+  files:
+  - docs/active/team.json
+  - docs/active/block-a-extra-tasks.json
+  - tools/sprint_plan.py
+  - tools/build-service-docs.py
+  - tools/derive-block-a-schedule.py
+  - tools/check-plan-owners.py
+  - tools/ticket_done.py
+root_class: a plan rule that gave the AI server's API, Postgres and Qdrant to the back-end developers
+tickets:
+  started:
+  - '27664 (MIG-AI, [DB] V0014__ai.sql, Ready for QA, Hrushikant Patkar): started, so it keeps its owner and its text; the
+    rule counts it (O-AI-SERVER) and the release leaves it alone'
+  - '28088 (MIG-AI-2, [DB] V1010__ai.sql, Ready for QA, Hrushikant Patkar): started, so it keeps its owner and its text;
+    the rule counts it (O-AI-SERVER) and the release leaves it alone'
+  - '28089 (MIG-AI-3, [DB] V1011__ai.sql, Ready for QA, Hrushikant Patkar): started, so it keeps its owner and its text;
+    the rule counts it (O-AI-SERVER) and the release leaves it alone'
+  - '28945 (MIG-AI-10, [DB] V1184__ai.sql, Ready for QA, Hrushikant Patkar): started, so it keeps its owner and its text;
+    the rule counts it (O-AI-SERVER) and the release leaves it alone'
+  unstarted:
+  - '27644 (SETUP-QDRANT, New, Hrushikant Patkar): to the AI engineers (Kalpita Mejari in this plan); its text says it is
+    the AI server''s Qdrant cluster'
+  - '27716 (SVC-AI-FORECAST-2, New, Hrushikant Patkar): to the AI engineers (the second AI engineer in this plan)'
+  - '27841 (SVC-AI-RETRIEVAL-1, New, Hrushikant Patkar): to the AI engineers (Kalpita Mejari in this plan); now also waits
+    on SETUP-QDRANT (#27644) and AI-ENGINE-QDRANT (#27720)'
+  - '105 AI server tasks in all leave the owner the pin or the plan gave them (nobody 57, Sanket Keluskar 11, Narayan Gaonkar
+    10, Hrushikant Patkar 6, Chinmay Patkar 6, Pranay Shinde 6, Deep Khanvilkar 5, Pallavi Sawant 3, Surendra 1): 98 AiService
+    back-end tasks, 7 ai-schema migrations not started (MIG-AI-4, -6, -7, -8, -9, -11, -12) and SETUP-QDRANT; the release
+    moves the New ones'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s answer of 31 October 2026 to Hrushikant Patkar''s note (#27716, #27841), relayed in the r12
+  plan lane brief'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-31'
+    quote: Waive for r12
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
+notes: 'Measured on this tree (handoff/service-docs/block-a-schedule.json, 130 working days to 2 April 2027 per AI engineer,
+  26 weeks): before, Kalpita Mejari 21.9 weeks and the second AI engineer 22.6; after, 25.8 and 23.9 (84 and 21 of the 105
+  tasks; the schedule places each on whichever can start it first). Nothing more lands past 2 April unassigned (the seven
+  phase 2 units, 107.5 engineer-days, as before; no AI server task), but AI-ENGINE-MARKETING-AI''s module test now ends
+  after 2 April (check AI phase 1 completion) and Block A''s last work moves from 1 to 15 December (two Block A AiService
+  tasks, SVC-AI-INSIGHTS-4 and SVC-AI-MODELS-3, end 30 November). The move is applied after the pins, as the migration rule
+  is: done before the balancing and the block passes it took three more Block A app-modules into A2, so AiService is not
+  named in `serviceOwners` and its accountable comes from the AI server rule. The AI review''s 27 AI-BE-* back-end tasks
+  are AiService''s too and move; their text named work in the owning services as well, now a change request on that service.
+  AI-ENGINE-QDRANT (ADR-0049) still has the Qdrant token issuer and the collection, alias, snapshot and offboarding work
+  run by the .NET workers host: that is an ADR''s placement, not changed here.'
