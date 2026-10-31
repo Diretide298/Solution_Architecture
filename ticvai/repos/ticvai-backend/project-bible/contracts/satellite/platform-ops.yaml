@@ -343,6 +343,7 @@ paths:
       required: true
       schema:
         type: string
+        format: uuid
     post:
       operationId: rejectRelease
       x-ticvai-consumed-by:
@@ -353,6 +354,14 @@ paths:
       summary: Reject a release back a stage
       description: 'Staging promotion is where a bad release is stopped, and stopping it needs to be as
         easy as promoting it.
+
+
+        **The reason is kept** (ADAM CR-356, 30 October 2026; CHG-CR356-001). The rejection writes `reason`,
+        the caller and the time to `control.release` (`status_reason`, `status_changed_by_principal_id`,
+        `status_changed_at`; `Release.statusReason`, `statusChangedByPrincipalId`, `statusChangedAt`), and
+        puts `{reason}` in the control audit row''s details beside the before and after, so an earlier
+        rejection keeps its reason when a later move overwrites the release''s own. `releaseId` is a uuid;
+        any other value is `400` `validation`. The `200` has no body.
 
         '
       tags:
@@ -374,12 +383,17 @@ paths:
               properties:
                 reason:
                   type: string
+                  x-ticvai-stored-as: control.release.status_reason
+                  description: Kept on the release as statusReason, and in the control audit row's details (ADAM
+                    CR-356).
       responses:
         '200':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
           x-ticvai-problem-types: [release-not-in-staging]
           description: Not in a state that permits this
@@ -396,6 +410,7 @@ paths:
       required: true
       schema:
         type: string
+        format: uuid
     post:
       operationId: withdrawRelease
       x-ticvai-consumed-by:
@@ -405,6 +420,22 @@ paths:
       summary: Withdraw a release
       description: 'Distinct from a rollback. The rollout state handles the mechanics of reversing a deployment;
         this records the decision that the artefact should never ship again.
+
+
+        **The reason, who and when are kept** (ADAM CR-356, 30 October 2026; CHG-CR356-001). The withdrawal
+        writes `reason`, the caller and the time to `control.release` (`status_reason`,
+        `status_changed_by_principal_id`, `status_changed_at`), and puts `{reason}` in the control audit row''s
+        details beside the before and after.
+
+
+        **Withdrawing from `inStaging` or `inProduction` needs a second person, as `promoteRelease` does**:
+        `approverPrincipalId` and `stepUpToken` in the body. A missing `approverPrincipalId` is `400`
+        `validation` on `approverPrincipalId`; an approver who is the caller is `403` `approver-is-requester`;
+        an absent or expired token is `403` `step-up-token-missing` or `step-up-token-expired`. The approver is
+        stored in `withdrawal_approved_by_principal_id` (`Release.withdrawalApprovedByPrincipalId`).
+        Withdrawing from `inDev` needs neither. There is no `approvalRequestId` and no `409`
+        `approval-required`. `releaseId` is a uuid; any other value is `400` `validation`. The `200` has no
+        body.
 
         '
       tags:
@@ -426,12 +457,36 @@ paths:
               properties:
                 reason:
                   type: string
+                  x-ticvai-stored-as: control.release.status_reason
+                  description: Kept on the release as statusReason, and in the control audit row's details (ADAM
+                    CR-356).
+                approverPrincipalId:
+                  type: string
+                  format: uuid
+                  description: Required when the release is `inStaging` or `inProduction` (`400` `validation`
+                    when absent); may not be the caller (`403` `approver-is-requester`). Stored as
+                    `withdrawalApprovedByPrincipalId`. Not needed from `inDev` (ADAM CR-356).
+                  x-ticvai-stored-as: control.release.withdrawal_approved_by_principal_id
+                stepUpToken:
+                  type: string
+                  description: Required when the release is `inStaging` or `inProduction`. Proves a factor was
+                    presented just now (`403` `step-up-token-missing` or `step-up-token-expired`; ADAM CR-356).
       responses:
         '200':
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '403':
+          x-ticvai-problem-types: [approver-is-requester, step-up-token-missing, step-up-token-expired]
+          description: Leaving `inStaging` or `inProduction`, the approver is the caller, or the step-up token is
+            absent or expired (ADAM CR-356)
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           x-ticvai-problem-types: [release-transition-not-allowed]
           description: Not in a state that permits this
@@ -2514,6 +2569,31 @@ components:
             type: string
             format: date-time
             nullable: true
+          statusReason:
+            type: string
+            nullable: true
+            readOnly: true
+            description: The reason given by the last `rejectRelease` or `withdrawRelease` (ADAM CR-356). The
+              control audit row keeps each move's reason, so an earlier one is not lost.
+          statusChangedByPrincipalId:
+            type: string
+            format: uuid
+            nullable: true
+            readOnly: true
+            description: Who made the last `rejectRelease` or `withdrawRelease` (ADAM CR-356).
+          statusChangedAt:
+            type: string
+            format: date-time
+            nullable: true
+            readOnly: true
+            description: When the last `rejectRelease` or `withdrawRelease` was made (ADAM CR-356).
+          withdrawalApprovedByPrincipalId:
+            type: string
+            format: uuid
+            nullable: true
+            readOnly: true
+            description: The second person who approved a withdrawal from `inStaging` or `inProduction`
+              (`withdrawRelease`'s `approverPrincipalId`); null for a withdrawal from `inDev` (ADAM CR-356).
     ReleaseDetail:
       allOf:
       - $ref: '#/components/schemas/Release'

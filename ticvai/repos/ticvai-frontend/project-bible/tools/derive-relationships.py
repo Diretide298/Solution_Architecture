@@ -723,9 +723,12 @@ def main() -> int:
         for other in writes[1:]:
             add(anchor, f"via {oid}", other, "lineage", "ambient")
 
+    # **Sorted, not a set's order** (CHG-R12GT-004, 31 October 2026): a set of table names iterates in the order of the
+    # run's string hashes, so the graph's keys came out in a new order every run and the chain (check-regenerate-twice)
+    # could not tell a second regeneration from the first.
     tab_ops: dict[str, list[str]] = {}
     for oid, v in lineage.items():
-        for t in set(v.get("reads", [])) | set(v.get("writes", [])):
+        for t in sorted(set(v.get("reads", [])) | set(v.get("writes", []))):
             if t in tables:
                 tab_ops.setdefault(t, []).append(oid)
 
@@ -734,7 +737,7 @@ def main() -> int:
     if idx_path.exists():
         idx = json.loads(idx_path.read_text(encoding="utf-8"))
         for sid, s in idx.items():
-            for t in set(s.get("reads", [])) | set(s.get("writes", [])):
+            for t in sorted(set(s.get("reads", [])) | set(s.get("writes", []))):
                 if t in tables:
                     tab_screens.setdefault(t, []).append(sid)
 

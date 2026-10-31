@@ -1470,7 +1470,9 @@ paths:
         - "P13 CMS-007 Page Builder"
       summary: The content blocks of a page
       description: |-
-        **Added 4 October 2026 (CHG-FXC-011; CMS-007: the builder could create and publish a block and not load one).** The blocks of one page (`pageKey`, a content page's id or a homepage section key), ordered by `position`, drafts and published alike.
+        **Added 4 October 2026 (CHG-FXC-011; CMS-007: the builder could create and publish a block and not load one).** The blocks of one page (`pageKey`, a content page's id), ordered by `position`, drafts and published alike.
+
+        **`pageKey` is a content page's id only** (ADAM CR-364, decided 30 October 2026, Chinmay: "as you recommended"; CHG-CR364-001). A value that is not a uuid answers 400 `validation`, not an empty page; an unknown page id answers an empty page. A homepage section's blocks are the blocks of the content page its `contentPageId` names (`HomepageLayout.sections[].contentPageId`), so CMS-007 sends that id. A section with no page yet gets one first (`createContentPage`, then `setHomepageLayout` setting `contentPageId`), and `createContentBlock`'s `pageId` is always a content page id.
 
         **Statuses.** Every `status` is returned, ended ones included (`archived`, `expired`); a screen that shows only live rows filters on `status` itself.
 
@@ -1488,8 +1490,11 @@ paths:
       - name: pageKey
         in: query
         required: true
+        description: 'A content page''s id (ADAM CR-364; CHG-CR364-001). A homepage section is asked by the
+          `contentPageId` it names; a value that is not a uuid is refused 400.'
         schema:
           type: string
+          format: uuid
 
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
@@ -1507,6 +1512,14 @@ paths:
                       type: array
                       items:
                         $ref: '#/components/schemas/ContentBlock'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: '`pageKey` is not a uuid (ADAM CR-364, CHG-CR364-001; `errors[]` names `pageKey`). An unknown
+            page id is not refused: it answers an empty page.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
@@ -1517,13 +1530,28 @@ paths:
       x-ticvai-read-via:
       - query: marketing-crm#segmentRecords
         route: in-process
-        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001): whether audienceSegmentId is a segment
+          the caller''s scope sees (ADAM CR-366)'
       summary: Author a block of content
       description: 'BL-172. **The CMS modelled configuration and not authoring** — a marketer could choose
         between things a developer had built and could not write something new.
 
         **Scheduled, localised and optionally personalised.** The page builder is a frontend over this,
         the same way the venue map''s canvas is a frontend over its graph.
+
+
+        **The segment is checked** (decided 30 October 2026, Chinmay, ADAM CR-366; CHG-CR366-001). An
+        `audienceSegmentId` that `marketing-crm#segmentRecords` (in process) does not return under the caller''s
+        scope is refused `422` `unknown-reference`, naming `audienceSegmentId`, and nothing is written; null means
+        everybody, as before. This is the package''s code for a reference the caller cannot use (ADAM CR-103), not
+        `400`.
+
+
+        **The body is checked only as far as the contract defines it** (ADAM CR-366). `body` and each
+        `localeVariants.<locale>` must be JSON objects; where present, the text keys `ContentBlock.body` lists for
+        the block''s `kind` must be strings, and an `items[]` or `fields[]` must be an array of objects. A failure is
+        `400` `validation`, with `errors[]` naming the field (for example `body.items[2].answer`). Other keys are not
+        checked: the full schema per kind is not defined now and is on the left-out list (LO-CR366-001).
 
         '
       tags:
@@ -1552,6 +1580,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContentBlock'
+        '400':
+          description: '`body` or a `localeVariants.<locale>` entry is not a JSON object, a text key `ContentBlock.body` lists for the
+            kind is not a string, or an `items[]` or `fields[]` is not an array of objects (`validation`, ADAM CR-366);
+            `errors[]` names each field.'
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`audienceSegmentId` names no segment `marketing-crm#segmentRecords` returns under the caller''s
+            scope (`unknown-reference`, ADAM CR-366, CR-103); the problem names the field, and nothing is written.'
+          x-ticvai-problem-types: [unknown-reference]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /content-blocks/{blockId}/publish:
@@ -1569,7 +1614,8 @@ paths:
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+        for: 'approvedByPrincipalId: the publisher on a single publish, the approver from approval.granted
+          (identity.principal, Identity''s data; CHG-MOD-001; ADAM CR-365, CHG-CR365-001)'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -1585,6 +1631,13 @@ paths:
         **`expireAt` must follow `publishAt`** when both are sent (decided 28 September, audit R163), or
         400. A scheduled job makes the publish and the expiry at those times (audit R163).
 
+        **Which blocks it publishes** (ADAM CR-365, decided 30 October 2026, Chinmay: "as you recommended, with one
+        rule added"; CHG-CR365-001; `states/content-block.yaml`). A `draft` block is published or scheduled as
+        before. A `scheduled` block may be published now (no `publishAt`) or rescheduled (a new `publishAt`). An
+        `expired` block may be published now or scheduled again. `published` and `archived` are still refused 409.
+        **The block''s `expireAt`, whether sent or already stored, must be after the moment it goes live**, or 400
+        on `expireAt`; to republish an expired block, send a later `expireAt`, or `expireAt` null to clear it.
+
         **The review path, as `publishTenantConfig` has it** (r8 walk of ticket 27919; ADAM CR-154). With the
         tenant''s publish-review policy off, the block is published or scheduled at once (200). With it on, this
         calls approvals'' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, the same matrix
@@ -1593,7 +1646,9 @@ paths:
         then publishes or schedules the block (`reviewStatus` `approved`); its consumer of `approval.rejected`
         sets `reviewStatus` `rejected` and the block stays a draft. While `pending`, a second publish of the block
         is refused with 409 `content-block-awaiting-review`. CMS-007 reads `getPublishReviewPolicy` to say whether
-        review applies and shows `reviewStatus` on the block.
+        review applies and shows `reviewStatus` on the block. **Until the request is approved the block keeps its
+        current status and schedule** (ADAM CR-365). **When approvals refuses `422 no-approval-route`**, this call
+        passes it on as 422 `no-approval-route`, leaves `status` and `reviewStatus` unchanged, and writes nothing.
 
         '
       tags:
@@ -1631,6 +1686,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContentBlock'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: '`expireAt` (sent, or already stored) is not after the moment the block goes live, or does not
+            follow a sent `publishAt` (audit R163; ADAM CR-365, CHG-CR365-001; `errors[]` names `expireAt`). Nothing
+            changes.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '202':
           description: Submitted for review; the tenant's publish-review policy is on. The block keeps its `status`,
             carries `reviewStatus` `pending`, and is published or scheduled when the
@@ -1646,6 +1710,15 @@ paths:
             application/problem+json:
               schema:
                 $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '422':
+          x-ticvai-problem-types: [no-approval-route]
+          description: 'No approval route (`no-approval-route`; ADAM CR-365, CHG-CR365-001): with review on,
+            approvals'' `createApprovalRequest` matched no active rule, so it raised nothing and this call passes its
+            refusal on. `status` and `reviewStatus` are unchanged and nothing is written.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenant-config:
@@ -1842,8 +1915,9 @@ paths:
         for: 'the TenantAppStatus it answers: recentChanges (ADAM CR-338, recentChanges (a))'
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
-        for: 'TenantAppStatus.venues: only the active venues are listed (ADAM CR-096)'
+        route: in-process
+        for: 'TenantAppStatus.venues: only the active venues are listed (ADAM CR-096); in process since ADAM CR-343
+          (XDR-022)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'the TenantAppStatus it answers: each venue''s contact, city and openingHours (ADAM CR-338):
@@ -4279,13 +4353,14 @@ paths:
         for: 'the steps validateBookingFlow checks (bookingFlowInvalid; W12)'
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
-        for: 'each active catalogue product''s ProductKind at an active venue, for bookingFlowMissing (ADAM CR-320), as
-          the booking-flow operations read catalogue.product, Catalogue''s data'
+        route: in-process
+        for: 'each active venue''s products, where {venueId}: their ProductKind, isSellable and guestListing, for
+          bookingFlowMissing (ADAM CR-320; in process since ADAM CR-343, XDR-022): catalogue.product, Catalogue''s
+          data'
       - query: tenancy#activeVenues
-        route: service
-        for: 'the active venues bookingFlowMissing is checked at (ADAM CR-320), as publishTenantConfig asks it:
-          platform.scope, Tenancy''s data'
+        route: in-process
+        for: 'the active venues bookingFlowMissing is checked at (ADAM CR-320; in process since ADAM CR-343,
+          XDR-022): platform.scope, Tenancy''s data'
       - query: assets#mediaAssetRecords
         route: in-process
         for: 'whether brand.logoAssetRef and appIcons.sourceAssetRef are ready assets, for missingRequiredAsset (ADAM
@@ -4310,6 +4385,13 @@ paths:
 
         **And the booking flows (decided 29 September, W12):** an enabled flow that fails `validateBookingFlow`
         is `bookingFlowInvalid`; a venue with bookable products and no flow serving their kind is `bookingFlowMissing`.
+
+        **`bookingFlowMissing`, narrowed and asked in process** (ADAM CR-343, 30 October 2026; CHG-CR343-001): the rule
+        is on `ConfigFindingKind`. Both of its reads are asked in process from the operations host, through the owning
+        module''s own query class and under the caller''s row-level security (XDR-022): `catalogue#productRecords`
+        where `{venueId}` for each active venue (the operations role''s SELECT on Catalogue''s product tables comes
+        from V0118, as for `createFnbOrder` under XDR-008), and `tenancy#activeVenues`
+        (`platform.scope` is a kernel table every host may read, as ADAM CR-296 ruled for Tenancy''s other reads).
 
         **What each kind checks** (ADAM CR-320, option A, both parts, 29 October 2026; CHG-CR320-001): the rule of
         every kind is on `ConfigFindingKind`, and `publishTenantConfig` runs the same rules. To decide them this reads
@@ -4350,8 +4432,9 @@ paths:
         - "P13 CMS-103 Booking Flows"
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
-        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
+        route: in-process
+        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001); in process since
+          ADAM CR-343 (XDR-022)'
       - query: assets#mediaAssetRecords
         route: in-process
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
@@ -4362,9 +4445,9 @@ paths:
         route: service
         for: 'what its text calls "orders.PaymentProvider.supportedMethods": payments.provider, Order''s data (CHG-R10GEN-001)'
       - query: catalogue#productRecords
-        route: service
-        for: 'the validation it runs, as validateTenantConfig asks it: each active product''s ProductKind, for
-          bookingFlowMissing (ADAM CR-320)'
+        route: in-process
+        for: 'the validation it runs, as validateTenantConfig asks it: each active venue''s products where {venueId},
+          for bookingFlowMissing (ADAM CR-320; the same rule and in-process read since ADAM CR-343, XDR-022)'
       - query: subscription#contractRecords
         route: in-process
         for: 'the validation it runs, as validateTenantConfig asks it: LicencePosition.licensedModules, for
@@ -4739,8 +4822,9 @@ paths:
         - "P13 CMS-015 Version History"
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
-        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001)'
+        route: in-process
+        for: 'what its text calls "active venues": platform.scope, Tenancy''s data (CHG-RTE-001); in process since
+          ADAM CR-343 (XDR-022)'
       - query: assets#mediaAssetRecords
         route: in-process
         for: 'what its text calls "MediaAsset": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'
@@ -4763,6 +4847,18 @@ paths:
         published, unless the request sends `discardDraftChanges` true, as `restoreKioskConfigVersion` does. The
         CMS-015 dialog says the unpublished changes are replaced, and sends true after the user confirms. The
         discarded draft is stored nowhere (the loss is intended, and the dialog is the only confirmation).
+
+
+        **A page deleted since the version was published** (ADAM CR-350, 30 October 2026; CHG-CR350-001). Content
+        pages are not in the snapshot, so a section or item may name a page that no longer exists. The restore
+        restores everything and hides whatever points at a missing page. A homepage section whose `contentPageId`
+        names no content page comes back with `contentPageId` null and `isVisible` false; the rest of the section is
+        as the snapshot has it. A navigation item whose target names a content page that no longer exists comes back
+        with `isVisible` false. A missing page never causes a refusal or a `500`: refusing would block that version
+        for good, because a recreated page gets a new id. In the same transaction the restore sets
+        `content_page.is_referenced` for the pages the restored homepage and navigation link, as `setHomepageLayout`
+        and `setNavigation` do. The review on CMS-015 shows those sections and items as hidden, and the user can point
+        them at a page before publishing. No new response field or problem type.
 
         '
       tags:
@@ -5562,8 +5658,9 @@ paths:
         - "P13 CMS-016 Site Settings"
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
-        for: '422: a venueId not among the tenant''s active venues (ADAM CR-096)'
+        route: in-process
+        for: '422: a venueId not among the tenant''s active venues (ADAM CR-096); in process since ADAM CR-343
+          (XDR-022)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: matrix 22.10.29; Chinmay''s brief for the build (venue configuration: provider, measurement id, the consent category it waits on); BL-073 design §4a; shape follows setBookingFlowConfig'
@@ -7121,12 +7218,23 @@ paths:
       operationId: updateContentBlock
       x-ticvai-consumed-by:
         - "P13 CMS-007 Page Builder"
+      x-ticvai-read-via:
+      - query: marketing-crm#segmentRecords
+        route: in-process
+        for: 'whether a sent audienceSegmentId is a segment the caller''s scope sees, Marketing''s data (ADAM CR-366)'
       summary: Change a draft content block
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; CMS-007).** Changes a block's `body`, `localeVariants`, `position`,
         `publishAt`, `expireAt` or `audienceSegmentId`. A published block is not edited in place: it is refused with 409
         (`content-block-published`) and changed by creating a new draft and publishing it, so what a guest saw stays on
         record.
+
+        **The same two checks as `createContentBlock`** (decided 30 October 2026, Chinmay, ADAM CR-366; CHG-CR366-001), on
+        a change that sends the field. A sent `audienceSegmentId` that `marketing-crm#segmentRecords` (in process) does not
+        return under the caller's scope is refused `422` `unknown-reference`, naming `audienceSegmentId`, and nothing is
+        written; null means everybody. A sent `body` or `localeVariants` is checked as `createContentBlock` states, for the
+        block's `kind`: JSON objects, the kind's listed text keys strings where present, an `items[]` or `fields[]` an
+        array of objects; a failure is `400` `validation` with `errors[]` naming the field.
       tags:
       - whiteLabel
       x-ticvai-permission: TENANT_CONFIGURE
@@ -7183,8 +7291,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContentBlock'
+        '400':
+          description: A sent `body` or `localeVariants.<locale>` entry fails the body check `createContentBlock` states (`validation`,
+            ADAM CR-366); `errors[]` names each field.
+          x-ticvai-problem-types: [validation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '422':
+          description: A sent `audienceSegmentId` names no segment `marketing-crm#segmentRecords` returns under the
+            caller's scope (`unknown-reference`, ADAM CR-366, CR-103); the problem names the field, and nothing is
+            written.
+          x-ticvai-problem-types: [unknown-reference]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: The block is published (`content-block-published`).
           x-ticvai-problem-types:
@@ -9657,6 +9782,9 @@ components:
           type: string
           format: uuid
           nullable: true
+          description: '**A content page''s id, always** (ADAM CR-364, 30 October 2026; CHG-CR364-001). A homepage
+            section reaches its blocks through the content page its `contentPageId` names; a section with no page
+            yet gets one first (`createContentPage`, then `setHomepageLayout`).'
         kind:
           type: string
           enum:
@@ -9676,7 +9804,11 @@ components:
         body:
           type: object
           additionalProperties: true
-          description: 'Typed by `kind`, and validated against the block''s own schema at save. **The text a
+          description: 'Typed by `kind`. **Checked at save only as far as this description defines it** (ADAM CR-366,
+            CHG-CR366-001): the body and each `localeVariants.<locale>` entry are JSON objects, the text keys listed below for the
+            block''s kind are strings where present, and an `items[]` or `fields[]` is an array of objects (`400`
+            `validation`); other keys are not checked, and the full schema per kind is on the left-out list
+            (LO-CR366-001). **The text a
             translation may fill** (R8 blocker FOUNDATION-AI-C40; the keys a body of each kind uses for its words, and
             the `fieldPath` a translation draft names, under `localeVariants.<locale>.`): richText `text`; image
             `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta
@@ -10059,10 +10191,12 @@ components:
           format: uuid
           readOnly: true
         releaseId:
+          x-ticvai-references: none
           type: string
           format: uuid
           description: The release received (`platform-ops.Release.id`). Its id in the control plane, kept as a value,
-            not a key, because the copy lives in the tenant's database.
+            not a key, because the copy lives in the tenant's database (ADAM CR-338). Declared not a key (CHG-R12GT-003), since
+            the name rule pointed `release_id` at `ai.release`, an AI table that is not the platform's release.
         version:
           type: string
           description: The release version (`platform-ops.Release.version`).
@@ -12271,7 +12405,7 @@ components:
 
         | bookingFlowInvalid | error | an enabled flow fails `validateBookingFlow` |
 
-        | bookingFlowMissing | error | an active venue (`tenancy#activeVenues`) has an active catalogue product (`catalogue#productRecords`) of a `ProductKind` that no enabled flow''s type serves (`BookingFlowType.productKinds`) |
+        | bookingFlowMissing | error | once per venue and `ProductKind` when all of these hold (ADAM CR-343, 30 October 2026): the venue is active (`tenancy#activeVenues`); it has a catalogue product with that `venueId`, `isSellable` true, `guestListing` `bookable` and that kind (`catalogue#productRecords` where `{venueId}`); the kind is in at least one `BookingFlowType`''s `productKinds`; and no enabled flow of that venue (`booking_flow.venue_id` the venue, `is_enabled` true) has a type whose `productKinds` include the kind. Kinds no flow type books (`retail`, `addOn`, `bundle`, `walletTopUp`) and `infoOnly` or `hidden` products are never reported. There is no tenant-wide flow: `createBookingFlowDefinition` always sets `venue_id` from its path, so a row with `venue_id` null serves no venue. The finding names the venue and the kind |
 
         '
       enum:

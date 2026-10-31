@@ -2826,7 +2826,7 @@ tables:
   - public-api
   foreignWriters: null
 - table: control.release
-  columns: 11
+  columns: 15
   store: postgres
   parent: null
   writtenBy:

@@ -874,6 +874,7 @@ The clone starts as a draft with a new code. **Variants come with it; orders do 
 | familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
+| fromPrice | Money |  | The lowest list price on the caller's channel now (ADAM CR-358, option (a); CHG-CR358-001): the lowest listPrice among the product's sellable variants on the caller's channel, in the same currency as… (read-only; nullable) |
 | nameLocalised | object |  | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. (nullable) |
 | descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -5613,6 +5614,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
+| fromPrice | Money |  | The lowest list price on the caller's channel now (ADAM CR-358, option (a); CHG-CR358-001): the lowest listPrice among the product's sellable variants on the caller's channel, in the same currency as… (read-only; nullable) |
 | nameLocalised | object |  | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. (nullable) |
 | descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -5906,6 +5908,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 **Help me choose filters the list** (decided 29 September, W4). `guidedAnswerIds` applies the filter of each chosen answer on the server; the guest screen offers *Show everything*, which is the same call without it. **A partner caller reads here** what is assigned to its channel (M17-04): partners never write products, prices or performances.
 **Only published answers filter here; a draft is previewed elsewhere** (decided 20 October 2026, Chinmay, R8 blocker cause WHITE-C26, server option; CHG-R8SPN-036). CMS-101's live preview of a draft guided choice calls white-label's `previewGuidedChoice` with the draft answers, which runs this operation's own answer filter (the same code: age ranges, certification, swimmer, segment tags) over the venue's published products and returns what is left for each combination; the browser never re-implements the filter.
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets products that are published and on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**Each product carries its lowest list price** (ADAM CR-358, Chinmay, 30 October 2026, option (a); CHG-CR358-001). `fromPrice` is the lowest `listPrice` among the product's sellable variants on the caller's channel now, in the venue's trading currency (read through `tenancy#venueSettingsRecords`), by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`; null where no price list prices it on that channel. The channel is the caller's: a credential names it, a visitor sends `channel` (`web` or `mobile`), and absent with no credential it is `web`. Other operations that answer `Product` leave `fromPrice` null for now. WEB-035 and GST-044 show it as the price charged, and converted at the selected rate as the price shown, marked approx. where the currency is not chargeable.
 
 
 **Order.** Sorted by `displayOrder` ascending, then by `id`.
@@ -5936,6 +5939,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | entitlementTemplateId | query |  | string (uuid) | Products using this template (client feedback of 6 October 2026, N32; CHG-R6-040): only products whose entitlementTemplateId is this one. |
 | segmentTag | query |  | string | Only products carrying this tag in segmentTags, or a tag below it (level matches level/beginner; level/beginner matches only itself). |
 | guidedAnswerIds | query |  | array of string (uuid) | Help me choose answers, as filters (decided 29 September, W4). |
+| channel | query |  | Channel: enum (pos, kiosk, web, mobile, b2b, ota, callCentre) | The channel Product.fromPrice is priced for (ADAM CR-358, option (a); CHG-CR358-001), as listProductVariants' channel. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 | X-Venue-Id | header |  | string (uuid) | The venue a guest app or site is browsing, named on every public read of venue data (decided 25 October 2026, Chinmay, ADAM CR-198 option A; CHG-R10ID-010; the rule is on guestAuth). |
@@ -5950,6 +5954,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | items[].familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | items[].name | string | yes | (max length 200) |
 | items[].description | string |  |  |
+| items[].fromPrice | Money |  | The lowest list price on the caller's channel now (ADAM CR-358, option (a); CHG-CR358-001): the lowest listPrice among the product's sellable variants on the caller's channel, in the same currency as… (read-only; nullable) |
 | items[].nameLocalised | object |  | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. (nullable) |
 | items[].descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | items[].kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |
@@ -6568,6 +6573,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | familyKey | string |  | The same product at another location (decided 29 September, rev 3 REV3-18). (max length 64; pattern ^[A-Za-z0-9_-]+$; nullable) |
 | name | string | yes | (max length 200) |
 | description | string |  |  |
+| fromPrice | Money |  | The lowest list price on the caller's channel now (ADAM CR-358, option (a); CHG-CR358-001): the lowest listPrice among the product's sellable variants on the caller's channel, in the same currency as… (read-only; nullable) |
 | nameLocalised | object |  | The product's name in each of the tenant's enabled languages (6 October 2026, CHG-R4-011; the tenant's languages, not the venue's: CHG-R8PRD-009, ADAM CR-213), keyed by ISO 639-1 code, e.g. (nullable) |
 | descriptionLocalised | object |  | The product's description in each language, as nameLocalised; falls back to description (6 October 2026, CHG-R4-011). (nullable) |
 | kind | ProductKind: enum (admission, timedAdmission, datedAdmission, openDated, seated, membership, bundle, fnb, …) | yes | openDated added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: valid on any date within an eligible range, rather than fo… |

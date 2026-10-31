@@ -2522,6 +2522,13 @@ paths:
       - query: catalogue#productRecords
         route: in-process
         for: 'that product: its kind must be walletTopUp (422 payment-not-for-top-up) (CHG-R8RW-009)'
+      x-ticvai-reads:
+      - table: wallet.credit_type
+        for: 'the paid lot''s credit type: the one active credit type of category cash, for the lot''s expiry and
+          terms (ADAM CR-357)'
+      - table: wallet.funding_rule
+        for: 'the venue''s default funding rules (walletTypeId null): the applying bonus rule, its bonus and its
+          bonusCreditTypeId (ADAM CR-357)'
       x-ticvai-note: >-
         **Through the one balance writer** (system-design review SD-027, 29 September): the `wallet.balance` row is
         locked for one guarded statement and every movement is a `wallet.wallet_transaction` with its `walletId`,
@@ -2559,8 +2566,25 @@ paths:
         (`order_line_id`, one lot per line; `source_kind` `topUp`, `source_reference` the payment's id). **The unique
         index `credit_lot_order_line_id_uniq` decides it** (ADAM CR-310, option A): a unique violation on that index
         when the lot is inserted is `409 payment-already-used`, so two tills crediting one line at the same moment
-        cannot both succeed.
-        `bonusAmount` is not paid for and is not compared. `tender` stays the receipt's label.
+        cannot both succeed. `tender` stays the receipt's label.
+
+        **Each lot's credit type** (ADAM CR-357, decided 30 October 2026). The paid lot takes the one active credit
+        type of category `cash` (`wallet.credit_type`, `is_active` true; credit types are tenant configuration). None,
+        or more than one, is a misconfiguration: the answer is 500, nothing is credited, and the tenant and venue are
+        logged, as for a venue with no trading currency. The line stays uncredited, and the same call credits it once
+        the configuration is fixed (`credit_lot_order_line_id_uniq` still allows it only once). The lot's
+        `expires_at` (`issued_at` plus `validityDays`, where `expires` is true) and `terms_snapshot` come from that
+        credit type.
+
+        **The bonus is the venue's, never the caller's** (ADAM CR-357). It is taken from the venue's default funding
+        rules (`wallet.funding_rule` with `walletTypeId` null, since a wallet carries no wallet type). Of the
+        `bonusRules` in force on `recordedAt` (`validFrom` to `validTo`) whose `minimumAmount` `amount` reaches, the
+        one with the highest `minimumAmount` applies; its bonus is its `bonusAmount`, or `bonusPercent` of `amount`.
+        It is written as a second lot, in the same transaction, of that rule's `bonusCreditTypeId`, with
+        `source_kind` `promotion`, `source_reference` the payment's id and `order_line_id` null. A body whose
+        `bonusAmount` differs from the rule's bonus, or that sends one when no rule applies, is refused
+        `422 bonus-not-applicable` and nothing is credited, so no caller, the guest app included, can credit a bonus
+        the venue did not set. No migration.
       tags: [wallet]
       x-ticvai-permission: WALLET_OPERATE
       x-ticvai-scope-level: workstation
@@ -2601,7 +2625,12 @@ paths:
                     - $ref: '../shared/common.yaml#/components/schemas/Money'
                   description: >
                     Promotional bonus on top of the paid amount. Tracked separately because
-                    bonus value is typically non-refundable.
+                    bonus value is typically non-refundable. **It must equal the bonus the venue's
+                    default funding rules give for `amount` on `recordedAt`** (ADAM CR-357): the
+                    applying `bonusRules` entry's `bonusAmount`, or its `bonusPercent` of `amount`.
+                    Any other value, or a bonus when no rule applies, is `422 bonus-not-applicable`
+                    and nothing is credited. It is credited as a lot of that rule's
+                    `bonusCreditTypeId`.
                 recordedAt: { type: string, format: date-time }
       responses:
         '201':
@@ -2619,10 +2648,12 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
-          x-ticvai-problem-types: [payment-not-for-top-up]
+          x-ticvai-problem-types: [payment-not-for-top-up, bonus-not-applicable]
           description: 'The body''s `orderLineId` and `paymentId` are not a paid top-up: the payment is not of the
             line''s order, the order is for another subject or not paid in full, or the line is not a `walletTopUp`
-            line of quantity 1 for `amount`. Nothing is credited (r8 re-walk, CHG-R8RW-001; CHG-R8RW-009).'
+            line of quantity 1 for `amount`. Nothing is credited (r8 re-walk, CHG-R8RW-001; CHG-R8RW-009).
+            `bonus-not-applicable` (ADAM CR-357): the body''s `bonusAmount` differs from the bonus of the venue''s
+            applying bonus rule, or it sends one when no rule applies; nothing is credited.'
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -3714,8 +3745,11 @@ paths:
         returns that draft with its validation findings. **It does not publish**:
         restore, review with `diffWalletConfigurationVersion`, then `publishWalletConfiguration`, so a
         rollback is as deliberate as the change that caused it (same rule as `restoreConfigVersion`,
-        audit R139). A credit type retired since that version is reported as a blocking finding rather
-        than silently revived.
+        audit R139). **A credit type retired since that version stays retired** (ADAM CR-355, decided 30
+        October 2026): the restore never sets a credit type''s `is_active` from false to true. When the
+        snapshot holds a credit type as active and `wallet.credit_type` now holds it as inactive, the restore
+        writes every other column, keeps `is_active` false, and reports it as a warning finding (below).
+        Whoever wants the type back reactivates it on purpose with `updateCreditType`.
 
         **It reads the version''s `wallet.configuration_version_snapshot` rows and writes their values
         back into the area tables** (wallet types, credit types, funding, consumption, transfer, refund,
@@ -3725,6 +3759,14 @@ paths:
         deactivated (`is_active` false: wallet and credit types), never deleted**; in an area with no
         `is_active` they are left as they are and named in a `warning` finding, so nothing that other
         records point at disappears (R8 blocker APPROVALS-TENANCY-C32).
+
+        **The restore''s own findings** (ADAM CR-355), beside validation''s: `restore-credit-type-retired-since-version`
+        (warning; the message names the credit type''s code and id), for a credit type kept retired as above, and
+        `restore-left-newer-rows` (warning; the message names the area and the ids), for rows of an area with no
+        `is_active` that the restore leaves as they are. The first is a warning because publish does not run it
+        again: whatever relies on the retired type is stopped by the validation the restore already runs on its
+        draft, and `publishWalletConfiguration` runs it again, so a restored consumption policy naming it gets
+        `consumption-policy-names-retired-type` (blocking, CR-311).
 
         **Unpublished changes, and what the answer is** (ADAM CR-312, option A, decided 29 October 2026; settled
         with CR-311). Before it writes, the restore compares the area tables with the snapshot of the latest
@@ -5188,6 +5230,9 @@ components:
           x-ticvai-references: wallet.credit_type
           type: string
           format: uuid
+          description: 'The credit type this lot holds, whose terms it copies at issue (`termsSnapshot`). A top-up''s
+            paid lot takes the tenant''s one active credit type of category `cash`, and its bonus lot the applying
+            bonus rule''s `bonusCreditTypeId` (`topUpWallet`, ADAM CR-357).'
         issuedAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         remainingAmount:
@@ -6290,7 +6335,8 @@ components:
               code:
                 type: string
                 description: The check that found it. Validation's codes are listed on `publishWalletConfiguration`
-                  (ADAM CR-311).
+                  (ADAM CR-311); the restore's own two, `restore-credit-type-retired-since-version` and
+                  `restore-left-newer-rows`, on `restoreWalletConfigurationVersion` (ADAM CR-355).
               message:
                 type: string
         scopePath:

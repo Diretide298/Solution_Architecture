@@ -845,7 +845,8 @@ operations:
   - ledger.tax_invoice_line
   - orders.membership_renewal
   - orders.order_line
-  - orders.payment
+  - orders.order_line_discount
+  - orders.refund
   - orders.sales_order
   - payments.dunning_case
   writes: []
@@ -1228,7 +1229,8 @@ operations:
   reads:
   - orders.membership_renewal
   - orders.order_line
-  - orders.payment
+  - orders.order_line_discount
+  - orders.refund
   - orders.sales_order
   - payments.dunning_case
   writes: []

@@ -187,6 +187,19 @@
    "prototypeFile": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
    "frame": null
   },
+  "P02/mascot-loader": {
+   "name": "the mascot-only loader (GST-008 as built)",
+   "prototype": "app",
+   "where": "lines 1582-1590 (the splash's mascot, \"{{ splash.mascot }}\", and its message line), drawn without the tile and the venue name on GST-008's frame",
+   "find": [
+    "{{ splash.mascot }}",
+    "{{ splash.msg }}"
+   ],
+   "frame": "wireframes/P02 Guest App.dc.html#gst-008",
+   "draws": "The venue's hero photo under a dark overlay with only the mascot, bobbing, and the message line (\"Loading...\"); no venue initial tile and no venue name.",
+   "platform": "P02",
+   "prototypeFile": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html"
+  },
   "P02/dashed-note": {
    "name": "the dashed empty note",
    "prototype": "app",
@@ -5134,12 +5147,12 @@
    ],
    "states": {
     "loading": {
-     "pattern": "P02/venue-loader",
-     "name": "the venue loader (splash)",
+     "pattern": "P02/mascot-loader",
+     "name": "the mascot-only loader (GST-008 as built)",
      "prototype": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
-     "where": "lines 1582-1590 (\"{{ splash.on }}\"; the message at 2774, \"Loading your venue...\")",
-     "frame": null,
-     "pulled": null
+     "where": "lines 1582-1590 (the splash's mascot, \"{{ splash.mascot }}\", and its message line), drawn without the tile and the venue name on GST-008's frame",
+     "frame": "wireframes/P02 Guest App.dc.html#gst-008",
+     "pulled": "wireframe-gst-008.html"
     },
     "error": {
      "pattern": "P02/state-error",

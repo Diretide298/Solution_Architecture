@@ -62,10 +62,26 @@ python3 tools/derive-read-columns.py --apply
 # 678 tables against 683 and check-authored-inputs failed on the arithmetic. Nothing earlier
 # in this script reads this file.
 python3 tools/derive-service-counts.py --apply
+# **The screen index before the relationships** (31 October 2026, CHG-R12INT-001). derive-relationships reads which
+# screens use each table from handoff/screen-index.json, which the end of this script writes; read from the previous
+# refresh, a screen's new operation or a lineage change reached the graph one refresh late. It reads only the screens
+# and the lineage, both final for this purpose here; it runs again at the end for the screens the derivers finish.
+python3 tools/build-screen-index.py
 python3 tools/derive-relationships.py
+# **derive-schema again, on the graph just derived** (31 October 2026, CHG-R12INT-001). derive-schema takes a column's
+# convention reference (a `..._principal_id` naming identity.principal) from relationship-graph.json, which
+# derive-relationships builds from the columns derive-schema wrote. A column added this run got its reference, and
+# derive-ddl its index, only on the next refresh: r12's CR-356 control.release columns would have shipped in one
+# forward migration and their indexes in the next. A second pass is a fixed point (check-regenerate-twice --chain).
+python3 tools/derive-schema.py
 python3 tools/derive-ddl.py --apply
 python3 tools/derive-burst-scope.py --apply
 python3 tools/derive-sizing.py --apply
+# **The roots before the notes too** (31 October 2026, CHG-R12INT-001). derive-table-notes writes a table's
+# "Hangs off" from the `schemaRoot` derive-schema-roots writes, so a table added this run got the line only on the
+# next refresh (r12's CR-339 platform.tenant_field_key and blind_index_rehash). derive-schema-roots reads only which
+# tables exist, not the notes; it runs again after them because it writes the file in its final (compact) form.
+python3 tools/derive-schema-roots.py
 python3 tools/derive-table-notes.py --apply
 python3 tools/derive-schema-roots.py
 # **The table question, asked once per drafted write, against the columns that now exist.**
@@ -256,44 +272,7 @@ python3 tools/audit-screen-estate.py
 python3 tools/list-undrawn.py
 python3 tools/build-thin-screens-workbook.py 2>/dev/null || true
 
-python3 - <<'PY'
-import yaml, glob, json
-# **Every open in this block names its encoding.** Windows defaults to cp1252, and the moment a
-# note in the lineage carried a curly quote the whole refresh died here — after the screens had
-# been rewritten and before anything downstream ran, which is the worst place to stop.
-lin = json.load(open('handoff/api-data-lineage.json', encoding='utf-8'))
-idx = {}
-for f in sorted(glob.glob('screens/P*.yaml')):
-    d = yaml.safe_load(open(f, encoding='utf-8')); p = d['platform']
-    for s in d['screens']:
-        ops = [a.get('operationId') for a in (s.get('apis') or []) if a.get('operationId')]
-        reads, writes, svcs, stores = set(), set(), set(), set()
-        for o in ops:
-            v = lin.get(o)
-            if not v: continue
-            reads |= set(v['reads']); writes |= set(v['writes'])
-            if v.get('service'): svcs.add(v['service'])
-            stores |= set(v.get('stores') or [])
-        nav = s.get('navigation') or {}
-        # **A destination id is not a transition.** Until 9 September this index carried `exits`
-        # and nothing else about behaviour, so whoever built from it got a list of screen ids and
-        # had to invent every trigger, every carried value and every drawer for themselves. The
-        # fields below are the ones a builder cannot guess: how the move is made, what state
-        # travels with it, what the screen holds mid-process, and what closing an overlay does.
-        idx[s['id']] = dict(name=s['name'], platform=p['code'], platformName=p['shortName'],
-            operator=p.get('operator'), app=p['app'], route=s['implementation']['route'],
-            operations=ops, services=sorted(svcs),
-            stores=sorted(stores), reads=sorted(reads), writes=sorted(writes), storedProcedures=[],
-            wave=s['wave'], offline=bool((s.get('states') or {}).get('offline')), specified=True,
-            exits=nav.get('exitTo') or [],
-            pattern=s.get('pattern'), entryFrom=nav.get('entryFrom') or [],
-            transitions=nav.get('transitions') or [],
-            machine=s.get('machine') or None,
-            states=s.get('states') or {},
-            overlays=s.get('overlays') or [])
-json.dump(idx, open('handoff/screen-index.json', 'w', encoding='utf-8'), indent=1)
-print(f"screen-index: {len(idx)}")
-PY
+python3 tools/build-screen-index.py
 
 for d in ai; do
   python3 tools/derive-domain.py "$d" --quiet

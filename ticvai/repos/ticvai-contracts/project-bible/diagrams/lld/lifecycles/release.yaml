@@ -37,7 +37,7 @@ transitions:
   to: inDev
   operation: rejectRelease
   trigger: operation
-  guard: Rejected back
+  guard: Rejected back, with its reason kept on the release and in the control audit row (ADAM CR-356)
   isReversal: true
 - from: inProduction
   to: superseded
@@ -47,19 +47,22 @@ transitions:
   to: withdrawn
   operation: withdrawRelease
   trigger: operation
-  guard: Abandoned
+  guard: Abandoned. Needs no approver and no step-up (ADAM CR-356)
 - from: inStaging
   to: withdrawn
   operation: withdrawRelease
   trigger: operation
-  guard: Abandoned in staging
+  guard: 'Abandoned in staging. **A second person, as `promoteRelease` asks**: `approverPrincipalId`
+    (not the caller, `403 approver-is-requester`) and a fresh `stepUpToken` in the body, no approval
+    request (ADAM CR-356)'
   requiresApproval: true
 - from: inProduction
   to: withdrawn
   operation: withdrawRelease
   trigger: operation
   guard: '**Pulled from production.** Distinct from rolled back — the rollout state handles the mechanics;
-    this records the decision'
+    this records the decision. Needs `approverPrincipalId` (not the caller) and a fresh `stepUpToken`,
+    as `promoteRelease` does, so an emergency pull does not wait on an approval request (ADAM CR-356)'
   requiresApproval: true
 notes: A release moves forward only. There is no path from production back to staging, because the artefact
   in production is the one that was tested — re-promoting a modified build under the same version is

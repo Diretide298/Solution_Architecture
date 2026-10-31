@@ -85,6 +85,11 @@ properties:
         type: { type: string }
         required: { type: boolean, default: true }
         notes: { type: string }
+        x-ticvai-secret:
+          type: string
+          enum: [field-encrypted]
+          description: A field that carries a per-guest secret (a code, an address) travels encrypted under the tenant's
+            data key, never in clear (ADR-0063 as amended 14 October 2026; ADAM CR-370, identity.guestCodeIssued).
   consumers:
     type: array
     minItems: 1

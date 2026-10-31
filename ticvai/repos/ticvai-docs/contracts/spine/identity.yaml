@@ -125,16 +125,49 @@ x-ticvai-queries:
       type: object
       required: [holds]
       properties:
-        holds: {type: boolean, description: 'True when the person holds the role at the venue or at a scope above it. Which grant, where it was made and by whom are never returned.'}
+        holds: {type: boolean, description: 'True when the person holds the role at the venue or at a scope above it and no live DENY of that role at the venue or above it suppresses it. Which grant, where it was made and by whom are never returned.'}
     rule: >-
       A rule question (ADAM CR-336, option B; Chinmay, 29 October 2026: "All as recommended"). True when an
       identity.delegated_access row has principal_id = principalId and role_id = roleId, effect `ALLOW`, no
       revoked_at, valid_from absent or not after now, valid_to absent or after now, and a scope_path at or above
-      the venue (scope_path @> venueScopePath). Identity answers it with one statement under the routed tenant's
-      root grant (ITenantRootGrant), so a grant made above the caller's scope is seen, and returns only `holds`;
+      the venue (scope_path @> venueScopePath). **A live DENY wins** (ADAM CR-344, decided 30 October 2026;
+      deny-overrides-allow, as createDelegatedAccess says): a row with principal_id = principalId and role_id =
+      roleId, effect `DENY`, live by the same revoked_at, valid_from and valid_to tests, and a scope_path at or above
+      the venue makes `holds` false, whatever ALLOW exists. Identity answers it with one statement under the routed
+      tenant's root grant (ITenantRootGrant), so a grant made above the caller's scope is seen, and returns only
+      `holds`;
       the caller's own grant is in force again for every other statement of its transaction. It is asked in
       process by createRotaAssignment and updateRotaAssignment, which refuse 409 person-lacks-required-role when
-      it is false.
+      it is false. Built inside the Identity module, behind its query interface, by the createRotaAssignment ticket
+      (#32338, ADAM CR-344); no other ticket builds it.
+    served: [in-process]
+  # **Whether a guest is a minor, and its name, beyond the caller's own row** (ADAM CR-362, decided 30 October 2026;
+  # CHG-CR362-001). grantDelegation and listDelegations read pii.subject under subject row security, which shows a
+  # guest its own row only, so another guest's date of birth was hidden and every adult-to-adult grant was refused.
+  subjectMinorStatus:
+    module: identity
+    table: pii.subject
+    inputs:
+      subjectIds: {type: array, items: {type: string, format: uuid}, description: 'The guests asked about: grantDelegation''s path subjectId, or the other party of the delegations listDelegations answers (rows the caller can already see).'}
+    returns:
+      type: array
+      items:
+        type: object
+        required: [subjectId, minorStatus]
+        properties:
+          subjectId: {type: string, format: uuid}
+          displayName: {type: string, nullable: true, description: 'pii.subject.display_name.'}
+          minorStatus: {type: string, enum: [minor, adult, unknown], description: 'minor below the minor age, adult at or above it, unknown when no date of birth is held. The date of birth is never returned.'}
+    rule: >-
+      A rule question (ADAM CR-362, decided 30 October 2026, Chinmay: "not as recommended: keep A's outcome, but
+      use the package's settled pattern for the reads (CR-336), not a new SECURITY DEFINER function"). Identity
+      answers it with one statement under the routed tenant's root grant (ITenantRootGrant) over pii.subject and
+      returns, per id, only displayName and minorStatus; the date of birth never leaves that statement, and the
+      caller's own grant is in force again for every other statement of its transaction. The minor age is the
+      minorAgeThreshold of the region of the venue the session is in; with no venue, the highest threshold among
+      the tenant's regions; with no region settings, 18. An id with no row is absent. Asked in process by
+      grantDelegation, for the path's subjectId (unknown counts as a minor), and by listDelegations, only for the
+      other party of rows the caller can already see (overSubjectName, and overSubjectIsMinor, null when unknown).
     served: [in-process]
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
@@ -723,10 +756,9 @@ paths:
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
-        for: 'the venue''s guest code attempt limit (VenueSettings.identity), Tenancy''s data (r8 integration, CHG-R8INT-014)'
-      x-ticvai-write-via:
-      - table: marketing.message_dispatch
-        operation: sendTransactionalMessage
+        for: 'the venue''s guest code attempt limit and the code''s lifetime and resend interval (VenueSettings.identity: guestOtpMaxAttempts, guestOtpLifetimeSeconds, guestOtpResendSeconds), Tenancy''s data (r8 integration, CHG-R8INT-014; ADAM CR-370)'
+      x-ticvai-emits:
+      - identity.guestCodeIssued
       security:
       - guestAuth: []
       - {}
@@ -738,6 +770,12 @@ paths:
         `attemptsRemaining`, as `verifyMfaChallenge` answers, and the last wrong one voids the code (`410
         verification-token-expired`; ask for a new `send`). The session is the guest''s own (`guestAuth`), so the code needs no
         address. The link path (`send` an emailed single-use link, `confirm` its `token`) stays for emailed links.
+
+        **`mode` `send` emits `identity.guestCodeIssued`** (decided 30 October 2026, Chinmay, ADAM CR-370;
+        CHG-CR370-001) in the same transaction as its `otp_challenge` row, as `requestGuestOtp` does, instead of
+        calling Marketing''s `sendTransactionalMessage`: Identity and Marketing are in different deployables, so there is
+        no in-process write. Destination and code travel field-encrypted, and Marketing''s `sendGuestOneTimeCode` sends
+        them.
 
         **Raised in review by Deep.** `registerGuest` creates an account and nothing verifies
         the address on it — and **a guest account with an unverified email can receive somebody else''s
@@ -1713,6 +1751,10 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'minorAgeThreshold, for overSubjectIsMinor (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)'
+      - query: identity#subjectMinorStatus
+        route: in-process
+        for: 'overSubjectName and overSubjectIsMinor of the other party of the rows the caller can already see, beyond
+          its own pii.subject row (ADAM CR-362; CHG-CR362-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1723,6 +1765,11 @@ paths:
         **Ordered by `createdAt` descending, `id` as the tiebreak** (decided 14 October 2026, ADAM CR-077;
         CHG-IDR-002): the cursor pages the grants, and each of the two arrays keeps that order, so the newest
         delegation is first in either direction.
+
+        **Names and minor flags** (ADAM CR-362, decided 30 October 2026, Chinmay; CHG-CR362-001):
+        `overSubjectName` and `overSubjectIsMinor` come from `identity#subjectMinorStatus`, asked only for the other
+        party of rows the caller can already see; `overSubjectIsMinor` is null when the status is unknown. **Staff
+        need `GUEST_VIEW` at the tenant root**; a venue-scoped grant answers 403.
 
         '
       tags:
@@ -1735,7 +1782,7 @@ paths:
       x-ticvai-audience:
       - staff
       - guest
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1760,6 +1807,8 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/DelegatedAccess'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
@@ -1770,6 +1819,15 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'the minor age, RegionSettings.minorAgeThreshold in platform.region_settings, Tenancy''s data (IDENTITY-C19; CHG-R8SPN-024)'
+      - query: identity#subjectMinorStatus
+        route: in-process
+        for: 'whether the path''s subjectId is a minor (unknown counts as a minor), beyond the caller''s own pii.subject
+          row (ADAM CR-362; CHG-CR362-001)'
+      - query: tenancy#scopeRecords
+        route: in-process
+        for: 'the tenant root''s scope id and path (level tenant) a grant is stored at, one statement under
+          ITenantRootGrant; constant per tenant database, so it may be cached for the process (ADAM CR-362;
+          CHG-CR362-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1814,6 +1872,20 @@ paths:
         guest is refused 403. A revocation by a guest is recorded the same way. Staff recording a grant on the holder''s
         behalf store `grantedByKind` `principal`; the SSO callback''s group-to-role grants store `system`.
 
+
+        **What it reads beyond the caller''s row security, and the linked adult''s write** (ADAM CR-362, decided 30
+        October 2026, Chinmay; CHG-CR362-001). (1) Whether the path''s `subjectId` is a minor is asked of
+        `identity#subjectMinorStatus`, where `unknown` counts as a minor (409 `minor-grants-adult-authority` as
+        now). (2) The tenant root''s scope id and path come from `tenancy#scopeRecords` (level `tenant`) under
+        `ITenantRootGrant`, one statement; it is constant per tenant database, so it may be cached for the process.
+        (3) The write check on `identity.delegated_access` also admits a guest session whose subject holds an
+        active ALLOW `familyMember` or `primaryHolder` grant over `over_subject_id` (not revoked, inside its
+        validity). That check is a plain function reading only the guest''s own held grants, which the read policy
+        already shows the guest. This operation still allows that grant only when `overSubjectId` is a minor.
+        (4) The minor age is the `minorAgeThreshold` of the region of the venue the session is in; with no venue,
+        the highest threshold among the tenant''s regions; with no region settings, 18. (5) Staff need
+        `GUEST_MANAGE` at the tenant root; a venue-scoped grant answers 403.
+
         '
       tags:
       - identity
@@ -1822,7 +1894,7 @@ paths:
       x-ticvai-audience:
       - staff
       - guest
-      x-ticvai-scope-level: venue
+      x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -1876,6 +1948,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DelegatedAccess'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
           x-ticvai-problem-types: [delegation-cycle, minor-grants-adult-authority]
           description: '**A cycle, or a minor granting authority over an adult.** Both are refused — a
@@ -2489,7 +2563,8 @@ paths:
 
         **The reach is read from the per-scope set, never the flat one** (decided 25 October 2026, Chinmay,
         ADAM CR-189 option A; CHG-R10ID-001; the rule on `Session.permissionsByScope`): the reach is the scope
-        paths at which `USER_MANAGE` holds after deny resolution, not the session''s scope paths. A caller with
+        paths whose deepest listed entry holds `USER_MANAGE` (the lookup rule as ADAM CR-367 corrected it, 30
+        October 2026; CHG-CR367-001), not the session''s scope paths. A caller with
         `USER_MANAGE` at venue A and any other permission (for example `POS_SELL`) at venue B lists A''s
         principals only, and a `scopePath` under B is `403`.
 
@@ -2934,7 +3009,8 @@ paths:
 
 
         **`ROLE_MANAGE` must hold at the tenant root** (decided 25 October 2026, Chinmay, ADAM CR-189 option A;
-        CHG-R10ID-001; the rule on `Session.permissionsByScope`), read from the per-scope set: a caller holding
+        CHG-R10ID-001; the rule on `Session.permissionsByScope`), read from the per-scope set (the root''s own
+        entry, by the lookup rule ADAM CR-367 corrected; CHG-CR367-001): a caller holding
         `ROLE_MANAGE` only below the root is `403`, even when it holds another permission (for example
         `REPORT_VIEW`) at the root, which puts the root among its scope paths. Nothing is written.
 
@@ -3306,6 +3382,9 @@ paths:
                 properties:
                   permissionsByScope:
                     type: array
+                    description: 'As `Session.permissionsByScope` would carry it for this principal and role (ADAM
+                      CR-367): one entry per scope path where the role holds a grant, allow or deny, each the full
+                      section 2 result at that path; a node takes the entry of the deepest listed path containing it.'
                     items:
                       $ref: ../shared/permissions.yaml#/components/schemas/ScopedPermissions
                   suppressedByDeny:
@@ -3358,7 +3437,7 @@ paths:
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
-        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts; guestOtpLifetimeSeconds and guestOtpResendSeconds, ADAM CR-370) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
       x-ticvai-audience:
       - anonymous
       summary: Create a guest account
@@ -3373,13 +3452,21 @@ paths:
         IDENTITY-C38): an `identity.otp_challenge` row with purpose `emailVerification`, channel `email`, and the venue''s
         attempt limit, which the guest enters through `verifyGuestEmail` with `mode` `code`. The `GuestSession` returned
         here is the session the guest continues in; it becomes verified when the code is confirmed, and
-        `linkGuestCheckout` then runs under that same session.
+        `linkGuestCheckout` then runs under that same session. **The code is carried as `requestGuestOtp` carries
+        it** (ADAM CR-370; CHG-CR370-001): `identity.guestCodeIssued` in the same transaction as the
+        `otp_challenge` row, destination and code field-encrypted, sent by Marketing''s `sendGuestOneTimeCode`; its
+        lifetime and resend interval are `guestOtpLifetimeSeconds` and `guestOtpResendSeconds`.
 
         **The consents given at registration are recorded by Marketing, which owns consent** (20 October 2026, R8
         blocker cause IDENTITY-C55; CHG-R8SPN-029). Identity stores none of them: in the same transaction as the
         account it writes `identity.guestRegistered` to the outbox carrying the new `subjectId`, the channel and
         each `consents[]` item (purpose, granted, noticeVersion), and Marketing''s consumer records one consent per
-        item through its own `recordConsent` rules (source `registration`, idempotent on the event id and purpose).
+        item through its own `recordConsent` rules (idempotent on the event id and purpose). **The event''s `channel`
+        is where the guest registered**, the request''s `source` (decided 30 October 2026, Chinmay, ADAM CR-371;
+        CHG-CR371-001): `guestWeb`, `guestApp` or `kiosk`, `guestWeb` when left out. The code''s delivery `channel`
+        stays on the request and is not on the event. The consumer records each consent with the matching
+        `ConsentSource` (`guestWeb` is `website`, `guestApp` is `guestApp`, `kiosk` is `kiosk`), never
+        `registration`, which the source check constraint refuses.
         A registration with no `consents` still emits the event, with an empty list. Later changes of mind go
         through `recordConsent` directly (F56 step 5).
 
@@ -3388,6 +3475,7 @@ paths:
       - guestAuth
       x-ticvai-emits:
       - identity.guestRegistered
+      - identity.guestCodeIssued
       x-ticvai-permission: null
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3432,7 +3520,9 @@ paths:
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
         route: in-process
-        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
+        for: 'the venue''s two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts; guestOtpLifetimeSeconds and guestOtpResendSeconds, ADAM CR-370) in platform venue settings, Tenancy''s data (CHG-MOD-001; R8 IDENTITY-C08)'
+      x-ticvai-emits:
+      - identity.guestCodeIssued
       x-ticvai-audience:
       - anonymous
       summary: Request a one-time code
@@ -3445,6 +3535,28 @@ paths:
         `guestSelfService`, the identifier hashed with the tenant key) whether or not the identifier exists
         (29 September, build pass, group G2; 8.3.34): a burst of resets against identifiers that resolve to
         nobody is the pattern worth seeing, and the answer to the caller stays the same.
+
+
+        **How the code reaches the guest** (decided 30 October 2026, Chinmay, ADAM CR-370, with its follow-up of 31
+        October; CHG-CR370-001). Identity and Marketing are in different deployables, so no in-process call: in the same
+        transaction as the `identity.otp_challenge` row this writes `identity.guestCodeIssued` v1 to the outbox, carrying
+        `subjectId`, `challengeId`, `channel`, `purpose`, `locale`, `expiresAt`, and `destination` and `code`, both
+        field-encrypted through the kernel''s field encryption (#37050, `x-ticvai-secret: field-encrypted`), never in
+        clear. Marketing''s `sendGuestOneTimeCode`, invoked by the relay, decrypts at send time and sends it. Until #37050
+        is Ready for QA the delivery seam (`IGuestCodeDelivery`) keeps its log-only default and no code is put in the
+        outbox.
+
+
+        **An identifier that resolves to nobody** (the CR-370 follow-up, 31 October 2026). With purpose `login`,
+        `passwordReset` or `stepUp` nothing is written for the code (no `otp_challenge` row, no
+        `identity.guestCodeIssued`) and the answer is the same `202`; `passwordReset` still publishes
+        `identity.credentialResetRequested`, as above. With purpose `register` or `verify` an identifier with no account
+        still gets a code: the `otp_challenge` row and `identity.guestCodeIssued` are written with `subjectId` null.
+
+
+        **Lifetime and resend interval** (ADAM CR-370). `VenueSettings.identity.guestOtpLifetimeSeconds` (default 600)
+        and `guestOtpResendSeconds` (default 60), read from the tenant default as `guestOtpMaxAttempts` is, are written
+        to `otp_challenge.expires_at` and `resend_after` and answered as `expiresInSeconds` and `resendAfterSeconds`.
 
         '
       tags:
@@ -3500,8 +3612,14 @@ paths:
                 properties:
                   expiresInSeconds:
                     type: integer
+                    description: '`VenueSettings.identity.guestOtpLifetimeSeconds` of the tenant default (600 unless the
+                      tenant sets it), as written to `otp_challenge.expires_at` (ADAM CR-370). The screens drive the
+                      code''s expiry from it.'
                   resendAfterSeconds:
                     type: integer
+                    description: '`VenueSettings.identity.guestOtpResendSeconds` of the tenant default (60 unless the
+                      tenant sets it), as written to `otp_challenge.resend_after` (ADAM CR-370). The screens drive the
+                      resend countdown from it, never a fixed number.'
         '429':
           $ref: ../shared/common.yaml#/components/responses/TooManyRequests
   /auth/guest/otp/verify:
@@ -3788,7 +3906,8 @@ paths:
       x-ticvai-reads:
       - table: identity.sso_provider
         for: 'the tenant''s guest provider row, audience guest and its guestProvider: client id and
-          client_secret_ref (ADAM CR-327, part (1))'
+          client_secret_ref (ADAM CR-327, part (1)), and the issuer the token and userinfo endpoints are built from
+          (ADAM CR-360, CHG-CR360-001)'
       - table: pii.subject_identity
         for: 'the UAE Pass user id a returning guest is found by (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003;
           check-parameter-columns P-NAMED-TABLE)'
@@ -3797,7 +3916,13 @@ paths:
           ADR-0028; CHG-R10ID-018)'
       x-ticvai-writes:
       - table: pii.subject_identity
-        for: 'the uaePass identity row of a new link (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003)'
+        for: 'the uaePass identity row of a new link (R8 blocker IDENTITY-C54) (r8 gate, CHG-R8GT2-003), with the UAE
+          Pass email as email_at_link (ADAM CR-360, CHG-CR360-001)'
+      - table: pii.subject_contact
+        for: 'on a new account, the UAE Pass email with is_verified false (ADAM CR-360, CHG-CR360-001)'
+      - table: pii.subject_document
+        for: 'on a new account, the emiratesId document, only when the identity-number claim is present (ADAM CR-360,
+          CHG-CR360-001)'
       x-ticvai-read-via:
       - query: white-label#customDomainRedirectHosts
         route: projection
@@ -3822,6 +3947,22 @@ paths:
         OAuth authorisation-code exchange. Returns a verified identity, so an account created
         this way needs no further verification.
 
+
+        **How the exchange runs** (ADAM CR-360, decided 30 October 2026, Chinmay; CHG-CR360-001). UAE Pass is plain
+        OAuth 2.0: it publishes no discovery document and issues no ID token. For the guest `uaePass` row
+        `metadataUrl` is not used and may be null; the endpoints come from the row''s `issuer`: the token endpoint
+        is `issuer` followed by `/token`, and the userinfo endpoint is `issuer` followed by `/userinfo`. These are
+        UAE Pass''s documented paths (`issuer` `https://stg-id.uaepass.ae/idshub` in staging,
+        `https://id.uaepass.ae/idshub` in production), and `authorizationUrl` already sits beside them. The code is
+        exchanged with HTTP Basic client authentication (`clientId`, plus the secret behind `clientSecretRef`), then
+        the claims are read from userinfo. `providerSubject` is the userinfo `sub`. The Emirates ID number is the
+        claim the setting `SignIn:GuestProviders:UaePassIdentityNumberClaim` names, which defaults to `idn`.
+
+        **The UAE Pass email never matches or links an existing account.** It is stored as
+        `pii.subject_identity.email_at_link` (`SubjectIdentity.emailAtLink`) and, on a new account, written to
+        `pii.subject_contact` with `is_verified` false. Before the first production sign-in, the client''s sandbox
+        run confirms `sub` and `idn`.
+
         Government onboarding has lead time and should be started before it becomes the critical path.
 
 
@@ -3837,10 +3978,13 @@ paths:
         exchange (401) and nothing is exchanged.
 
 
-        **What it stores** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): a `pii.subject_identity` row (`provider`
-        `uaePass`, the UAE Pass user id as `providerSubject`), and on a new account a `pii.subject_document` of kind
-        `emiratesId` with the number from the UAE Pass identity-number claim (the claim''s name to be confirmed with the
-        client''s UAE Pass sandbox).
+        **What it stores** (R8 blocker IDENTITY-C54, CHG-R8MIG-015; ADAM CR-360, CHG-CR360-001): a
+        `pii.subject_identity` row (`provider` `uaePass`, the userinfo `sub` as `providerSubject`), and on a new
+        account a `pii.subject_document` of kind `emiratesId` with the number from the identity-number claim (`idn` by
+        default). The document is written only when that claim is present: a visitor profile has none, and that
+        guest is still signed in, with no document written. **The number is stored as `submitGuestIdentityDocument`
+        stores it** (ADAM CR-369; CHG-CR369-001): encrypted into `number_ciphertext` through the kernel''s field
+        encryption (#37050), the last four in clear, and no hash.
 
         '
       tags:
@@ -3996,13 +4140,23 @@ paths:
       - guest
       summary: Attach a guest checkout to an account
       description: 'A guest who bought without an account, then registered. **The guest names one booking**
-        (`orderReference`, with `verificationCode` from its confirmation); it is attached only when its
-        contact detail matches the caller''s verified identifier, and 403 otherwise. Other guest-checkout
-        orders carrying the same verified contact detail are attached in the same call, and
-        `attachedOrderCount` counts every order attached.
+        (`orderReference`); it is attached only when its contact detail matches the caller''s verified
+        identifier, and 403 otherwise. Other guest-checkout orders carrying the same verified contact detail are
+        attached in the same call, and `attachedOrderCount` counts every order attached.
 
         **Only orders whose contact detail matches the now-verified identifier.** Attaching on an unverified
         claim would hand someone else''s booking history to whoever asked for it.
+
+
+        **The proof, and what is refused** (ADAM CR-361, decided 30 October 2026, Chinmay; CHG-CR361-001). The proof
+        is the order''s `verifiedContactRef` matching the keyed hash of one of the caller''s verified contacts.
+        `verificationCode` stays in the request because the approved WEB-016 form shows it; it is optional and
+        ignored: not checked, not stored, and not used to spot a retry (the `Idempotency-Key` does that). An
+        `orderReference` with no `identity.subject_holding` row, one whose contact does not match, and one already
+        attached to another account all answer the same 403 `contact-mismatch`, emit nothing, and take the same
+        time. A booking already attached to the caller is not refused: the call still attaches any other
+        subject-less orders with the same `verifiedContactRef` and answers 200, with `attachedOrderCount` counting
+        those (0 if there are none).
 
 
         **Read from Identity''s own projection, attached by Orders** (r10, the lead''s ruling on the ADR-0028 tiers,
@@ -4042,7 +4196,8 @@ paths:
                   type: string
                 verificationCode:
                   type: string
-                  description: From the booking confirmation. Proves possession of the booking.
+                  description: 'Optional and ignored (ADAM CR-361, CHG-CR361-001): kept because the approved WEB-016
+                    form shows it; not checked, not stored, and not used to spot a retry (the Idempotency-Key does).'
       responses:
         '200':
           headers:
@@ -4056,10 +4211,14 @@ paths:
                 properties:
                   attachedOrderCount:
                     type: integer
-                    description: The named booking plus any other orders with the same verified contact detail.
+                    description: 'The named booking plus any other orders with the same verified contact detail.
+                      When the named booking is already attached to the caller, only those other orders (0 if
+                      there are none; ADAM CR-361).'
         '403':
           x-ticvai-problem-types: [contact-mismatch]
-          description: Contact detail on the order does not match the verified identifier
+          description: 'The same answer for three cases (ADAM CR-361, CHG-CR361-001): the `orderReference` has no
+            `identity.subject_holding` row, its contact detail does not match the verified identifier, or it is
+            already attached to another account. Nothing is emitted, and each case takes the same time.'
           content:
             application/problem+json:
               schema:
@@ -4507,7 +4666,9 @@ paths:
                 $ref: '#/components/schemas/SsoProviderConfig'
         '400':
           x-ticvai-problem-types: [sso-metadata-unreachable, group-mappings-required]
-          description: Metadata unreachable, or no group mappings supplied
+          description: 'Metadata unreachable (`sso-metadata-unreachable`), for a staff row or a guest `apple` or
+            `google` row; a guest `uaePass` row is not refused for an absent or unreachable `metadataUrl`, which it
+            does not use (ADAM CR-360, CHG-CR360-001). Or no group mappings supplied.'
           content:
             application/problem+json:
               schema:
@@ -7039,8 +7200,12 @@ paths:
         (an age-restricted purchase, a resident rate, a high-value account).
 
 
-        **The number is hashed on arrival and never returned**; only the last four characters are kept in clear,
-        in `pii.subject_document`, as they are for every document in the package. The scan is the guest''s own
+        **The number is encrypted on arrival and never returned** (decided 30 October 2026, Chinmay, ADAM CR-369;
+        CHG-CR369-001; ADR-0063 section 5): it is stored in `pii.subject_document.number_ciphertext` through the
+        kernel''s field encryption (KERNEL-FIELD-ENC, #37050), as one string naming the key version, and only the
+        last four characters are kept in clear, as they are for every document in the package. No hash is written:
+        never Argon2id or any unkeyed hash, and no blind index until an operation needs a lookup by number
+        (`number_hash` is no longer written). The scan is the guest''s own
         upload (`createGuestUpload`, `completeGuestUpload`, in assets) and is deleted when the verification is
         decided, unless the policy keeps it (`documentImageRetention`).
 
@@ -7060,6 +7225,15 @@ paths:
         has expired or its kind is not one the tenant accepts. A guest verified through UAE Pass where the policy
         counts it (`uaePassSatisfiesIdDocument`) is never asked.
 
+
+        **The policy''s `maxResubmissions` is applied here** (decided 30 October 2026, Chinmay, ADAM CR-368;
+        CHG-CR368-001). The operation counts the guest''s `identity.guest_identity_verification` rows with status
+        `rejected` or `resubmissionRequested` decided after their latest `verified` one (all of them if never
+        verified). When that count is greater than `maxResubmissions` it refuses `422` `resubmission-limit-reached`,
+        and nothing is written; the problem''s `detail` tells the guest to contact the venue. With the default 3 a
+        guest has the first submission and three resubmissions; with 0, only the first. The count is computed,
+        never stored, so a tenant that raises `maxResubmissions` lets the guest submit again.
+
         '
       tags:
       - guestAuth
@@ -7071,8 +7245,11 @@ paths:
         for: 'whether documentAssetId and selfieAssetId are the caller''s own uploaded files of their purpose,
           Identity''s projection of assets.guest_upload (r11 gate, CHG-R11FXV-001; ADR-0028)'
       - table: identity.guest_verification_policy
-        for: 'the tenant''s accepted document kinds, selfieRequired and documentImageRetention (was carried in the
-          lineage overrides, CHG-R8GEN-001; stated here, CHG-R11FXV-001)'
+        for: 'the tenant''s accepted document kinds, selfieRequired, documentImageRetention and maxResubmissions (was
+          carried in the lineage overrides, CHG-R8GEN-001; stated here, CHG-R11FXV-001; maxResubmissions, ADAM CR-368)'
+      - table: identity.guest_identity_verification
+        for: 'the guest''s rejected and resubmissionRequested verifications decided after their latest verified one,
+          counted against maxResubmissions (ADAM CR-368, CHG-CR368-001)'
       x-ticvai-read-via:
       - query: assets#guestUploadsForIdentity
         route: projection
@@ -7113,11 +7290,13 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           x-ticvai-problem-types: [identity-document-expired, document-kind-not-accepted, selfie-required,
-            guest-upload-not-usable]
+            guest-upload-not-usable, resubmission-limit-reached]
           description: The document has expired, or its kind is not accepted by the tenant's policy, or the policy
             asks for a selfie and none was sent (`selfie-required`, CHG-R8MIG-027), or `documentAssetId` or
             `selfieAssetId` is not the caller's own uploaded file of its purpose in Identity's projection
-            (`guest-upload-not-usable`, CHG-R11FXV-001)
+            (`guest-upload-not-usable`, CHG-R11FXV-001), or the guest's refusals since their latest verified
+            verification are more than the policy's `maxResubmissions` (`resubmission-limit-reached`, ADAM CR-368;
+            the detail tells the guest to contact the venue)
           content:
             application/problem+json:
               schema:
@@ -7232,7 +7411,8 @@ paths:
         stamps `pii.subject_document.verified_at` and makes the guest ''ID verified'' for everything the policy
         gates; `rejected` and `resubmissionRequested` carry a reason the guest sees. The document scan is deleted
         now unless the policy keeps it. **Decided once**: a second decision is a `409`, and a guest who was
-        refused submits again.
+        refused submits again, up to the policy''s `maxResubmissions` (`submitGuestIdentityDocument` counts them;
+        ADAM CR-368).
 
         '
       tags:
@@ -7308,16 +7488,12 @@ paths:
       operationId: getGuestVerificationPolicy
       x-ticvai-consumed-by:
         - "P08 ADM-342 Authentication & MFA Policy Manager"
-      x-ticvai-read-via:
-      - query: tenancy#scopeRecords
-        route: in-process
-        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-agreed: '29 September: our build plan (5.3.21 "configurable identity workflows"); shape follows
         getPasswordPolicy'
       summary: The tenant's guest identity-verification workflow
+      description: '**`walletTopUpLimit` is answered in the row''s own `currency_code`** (ADAM CR-363, decided 30
+        October 2026, Chinmay; CHG-CR363-001): the policy is one row at the tenant root, which names no venue to
+        resolve a currency from, so nothing is read from Tenancy for it.'
       tags:
       - identity
       x-ticvai-permission: TENANT_CONFIGURE
@@ -7338,13 +7514,6 @@ paths:
       operationId: setGuestVerificationPolicy
       x-ticvai-consumed-by:
         - "P08 ADM-342 Authentication & MFA Policy Manager"
-      x-ticvai-read-via:
-      - query: tenancy#scopeRecords
-        route: in-process
-        for: 'the venue its row''s scope_path names, whose settings give the currency for the Money it accepts or answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
-      - query: tenancy#venueSettingsRecords
-        route: in-process
-        for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-agreed: '29 September: our build plan (5.3.21 "configurable identity workflows"); shape follows
@@ -7364,6 +7533,13 @@ paths:
         `provider` and `providerThenManual`, and a UAE Pass sign-in satisfies the document requirement. Both
         need the client''s access to the providers; until it exists a policy naming `icp` is refused `422
         provider-not-connected` and manual review is what runs.
+
+
+        **The wallet top-up limit is stored in its own currency** (ADAM CR-363, decided 30 October 2026, Chinmay:
+        "as you recommended"; CHG-CR363-001). `identity.guest_verification_policy.currency_code` is set from
+        `walletTopUpLimit.currency`, and the amount is checked against that currency''s ISO 4217 scale (CR-192): an
+        amount that does not fit answers 400 on `walletTopUpLimit`. With no `walletTopUpLimit`, both the column and
+        `currency_code` are null. No currency is read from Tenancy.
 
         '
       tags:
@@ -7393,6 +7569,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IdentityGuestVerificationPolicy'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: '`walletTopUpLimit.amount` does not fit the ISO 4217 scale of `walletTopUpLimit.currency`
+            (ADAM CR-363, CHG-CR363-001; `errors[]` names `walletTopUpLimit`), or another field breaks a schema rule.'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: '`verificationProvider` names a provider the tenant has no connection to yet
             (`provider-not-connected`; CHG-CSP-034).'
@@ -8663,7 +8847,13 @@ components:
           format: password
           writeOnly: true
           maxLength: 64
-          description: '**Write-only, never returned.** Hashed on arrival; only the last four are kept in clear.'
+          x-ticvai-secret: field-encrypted
+          x-ticvai-stored-as: pii.subject_document.number_ciphertext
+          description: '**Write-only, never returned.** Encrypted on arrival (decided 30 October 2026, Chinmay, ADAM
+            CR-369; CHG-CR369-001; ADR-0063 section 5): AES-256-GCM under the tenant''s data key through the kernel''s
+            field encryption (KERNEL-FIELD-ENC, #37050), stored in `pii.subject_document.number_ciphertext` as one
+            string naming the key version; only the last four are kept in clear. Never hashed: no Argon2id, no
+            unkeyed hash, and no blind index until an operation needs a lookup by number.'
         issuingCountry:
           type: string
           pattern: ^[A-Z]{2}$
@@ -8828,6 +9018,18 @@ components:
             - walletTopUpAboveLimit
         walletTopUpLimit:
           $ref: ../shared/common.yaml#/components/schemas/Money
+        currencyCode:
+          type: string
+          minLength: 3
+          maxLength: 3
+          pattern: '^[A-Z]{3}$'
+          nullable: true
+          readOnly: true
+          description: '**The ISO 4217 currency `walletTopUpLimit` is stored in** (ADAM CR-363, "as you recommended",
+            Chinmay, 30 October 2026; CHG-CR363-001). The policy is one row at the tenant root, where no venue or
+            region sits above it to resolve a currency from (naming-and-style 5.1: a table whose currency genuinely
+            differs from its venue stores one). Set by `setGuestVerificationPolicy` from `walletTopUpLimit.currency`;
+            null exactly when `walletTopUpLimit` is null. `getGuestVerificationPolicy` answers the Money in it.'
         acceptedDocumentKinds:
           type: array
           description: Proposed default passport, emiratesId, nationalId.
@@ -8877,12 +9079,18 @@ components:
           - deleteOnDecision
           - keepUntilDocumentExpiry
           default: deleteOnDecision
-          description: How long the scan is kept. The outcome and the hashed number are kept either way.
+          description: How long the scan is kept. The outcome and the encrypted number are kept either way.
         maxResubmissions:
           type: integer
           minimum: 0
           maximum: 10
           default: 3
+          description: '**How many times a refused guest may submit again** (decided 30 October 2026, Chinmay, ADAM
+            CR-368; CHG-CR368-001). `submitGuestIdentityDocument` counts the guest''s verifications with status
+            `rejected` or `resubmissionRequested` decided after their latest `verified` one (all of them if never
+            verified) and refuses `422` `resubmission-limit-reached` when the count is greater than this. With 3 a
+            guest has the first submission and three resubmissions; with 0, only the first. Computed, never stored:
+            raising it lets a guest past the old limit submit again with no staff reset.'
         updatedAt:
           type: string
           format: date-time
@@ -9635,9 +9843,11 @@ components:
         writes one per send (a newer one for the same identifier and purpose invalidates the older); `verifyGuestOtp`
         reads it by `identifierHash`, counts wrong codes in `failedAttempts` up to `attemptLimit` and sets `consumedAt`
         on success; `verifyGuestEmail` writes the `send` half''s token and consumes it on `confirm`. **`subjectId` is
-        null where no account exists yet** (purpose `register`, or an identifier that resolves to nobody, which is sent
-        nothing and answered the same): under the subject policy (920) such a row is reachable only in the tenant-root
-        context.'
+        null where no account exists yet**: purpose `register` or `verify` to an identifier with no account, which
+        still gets a code (ADAM CR-370 follow-up, 31 October 2026). With purpose `login`, `passwordReset` or `stepUp`
+        an identifier that resolves to nobody gets no row and no code, and the same answer. Under the subject policy
+        (920) a row with no subject is reachable only in the tenant-root context. **Each row is sent by
+        `identity.guestCodeIssued`** (ADAM CR-370), written in the same transaction.'
       required: [identifierHash, channel, purpose, codeHash, expiresAt, failedAttempts, attemptLimit]
       properties:
         subjectId:
@@ -9666,8 +9876,15 @@ components:
           maximum: 10
           description: '`VenueSettings.identity.guestOtpMaxAttempts` when the code was sent (audit R094); reaching it
             invalidates the code.'
-        expiresAt: { type: string, format: date-time }
-        resendAfter: { type: string, format: date-time, nullable: true }
+        expiresAt:
+          type: string
+          format: date-time
+          description: The send time plus `VenueSettings.identity.guestOtpLifetimeSeconds` (ADAM CR-370).
+        resendAfter:
+          type: string
+          format: date-time
+          nullable: true
+          description: The send time plus `VenueSettings.identity.guestOtpResendSeconds` (ADAM CR-370).
         consumedAt: { type: string, format: date-time, nullable: true }
         invalidatedAt:
           type: string
@@ -11158,6 +11375,19 @@ components:
           description: '**Optional for a mobile number** (ADAM CR-222, 25 October 2026): left out, the server picks
             WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant''s configured delivery (DI-209), as `requestGuestOtp` does; an email
             identifier sends email. A caller that sends `channel` still gets it (additive).'
+        source:
+          type: string
+          enum:
+          - guestWeb
+          - guestApp
+          - kiosk
+          default: guestWeb
+          x-ticvai-persisted: false
+          description: '**Where the guest is registering** (decided 30 October 2026, Chinmay, ADAM CR-371;
+            CHG-CR371-001). Optional, additive. Not stored by Identity: `registerGuest` carries it on
+            `identity.guestRegistered` as `channel`, and Marketing records each consent with the matching
+            `ConsentSource`. The guest web (WEB-013, WEB-016) sends `guestWeb`, the guest app (GST-010, GST-042)
+            `guestApp`. Not the code''s delivery `channel` above.'
         displayName:
           type: string
           maxLength: 200
@@ -11344,9 +11574,16 @@ components:
         metadataUrl:
           type: string
           nullable: true
+          description: 'The provider''s metadata or discovery document. **Not used for a guest `uaePass` row, and may
+            be null there** (ADAM CR-360, 30 October 2026; CHG-CR360-001): UAE Pass publishes no discovery document,
+            so its endpoints come from `issuer`.'
         issuer:
           type: string
           nullable: true
+          description: 'The provider''s issuer. **For a guest `uaePass` row it is the base of the endpoints**
+            (ADAM CR-360; CHG-CR360-001): the token endpoint is `issuer` followed by `/token` and the userinfo endpoint
+            `issuer` followed by `/userinfo` (`https://stg-id.uaepass.ae/idshub` in staging,
+            `https://id.uaepass.ae/idshub` in production).'
         clientId:
           type: string
           nullable: true
@@ -11961,6 +12198,10 @@ components:
       # Who granted it: a principal, a guest or the system, and the matching column set (R8 blocker IDENTITY-C42,
       # CHG-R8MIG-021).
       # A guest reads the grants it is party to and the account holder writes them (CHG-R8MIG-021; IDENTITY-C48).
+      # **The linked adult writes one over a minor too** (ADAM CR-362, decided 30 October 2026; CHG-CR362-001): the
+      # write check also admits a guest session whose subject holds an active ALLOW familyMember or primaryHolder grant
+      # over over_subject_id (not revoked, inside valid_from/valid_to), through a plain STABLE function reading only the
+      # guest's own held grants (not SECURITY DEFINER). grantDelegation allows that grant only over a minor.
       x-ticvai-rls: scope-or-subject
       x-ticvai-required-when:
         grantedByPrincipalId: {grantedByKind: principal}
@@ -12046,7 +12287,8 @@ components:
           readOnly: true
           x-ticvai-persisted: false
           description: The display name of the guest acted for (`pii.subject.display_name`), read with the grant;
-            null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009).
+            null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009). listDelegations
+            reads it with `identity#subjectMinorStatus` (ADAM CR-362).
         overSubjectIsMinor:
           type: boolean
           nullable: true
@@ -12478,11 +12720,21 @@ components:
             navigation on this and never compute permissions themselves.
 
 
+            **One entry per grant path, and the deepest one decides** (decided 30 October 2026, Chinmay, ADAM
+            CR-367; CHG-CR367-001; corrects CR-189''s "the node acted on or one of its ancestors"). There is one
+            entry for every scope path where the selected role holds a grant, allow or deny (a wildcard deny
+            included), and each entry''s permissions are the full section 2 result at that path: the allows
+            inherited from it and its ancestors, minus every deny that contains it. A permission holds at a node
+            when it is in the entry of the deepest listed path that contains the node (the node''s own entry, else
+            its nearest listed ancestor''s); entries are never combined. No deny list travels on the wire.
+
+
             **The server keeps the same set and authorises from it** (decided 25 October 2026, Chinmay, ADAM
             CR-189 option A; CHG-R10ID-001). The rule for every operation: `x-ticvai-permission` is evaluated
-            at the scope the operation acts on, from the per-scope set (the node acted on or one of its
-            ancestors); `effectivePermissions` is for coarse checks only. A list''s reach is the scope paths
-            where its permission holds, and a filter outside it is `403`; a tenant-level operation needs its
+            at the scope the operation acts on, from the per-scope set by the lookup above; on the server it is
+            decided with section 2''s algorithm over the session''s resolved grants, which gives the same answer
+            (ADAM CR-367); `effectivePermissions` is for coarse checks only. A list''s reach is the scope paths
+            whose deepest listed entry holds its permission, and a filter outside it is `403`; a tenant-level operation needs its
             permission at the tenant root. The request kernel''s seam carries this set beside the flat one
             (#27692 owns the field) and sign-in (#27666) fills it from the same resolution that fills this
             property; tests fill the seam until sign-in lands. The full statement is

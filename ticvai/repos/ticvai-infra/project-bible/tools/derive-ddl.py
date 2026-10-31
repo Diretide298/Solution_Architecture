@@ -208,7 +208,7 @@ then
   exit 1
 fi
 createdb "$SLUG"
-
+__FROZEN_TYPES__
 # 2. The template, in the order the files are numbered: schemas, tables, constraints, indexes.
 #    Every tenant database gets the same set, which is what makes two hundred migrations one job
 #    rather than two hundred schemas.
@@ -251,6 +251,134 @@ fi
 
 echo "provisioned $SLUG"
 """
+
+# **The types the frozen baseline names and no file creates are made before it runs** (CHG-R12DB-001; the live
+# comparison of 30 October 2026). r1's 010-pii.sql types pii.subject.kind `pii.subject_kind` and
+# pii.subject_contact.kind `pii.contact_kind`, enum types nothing creates, so provision-tenant.sh stopped at that file
+# and the package could not provision a tenant as shipped. CHG-R6-001 decided both are text NOT NULL with a CHECK
+# (subject_kind_chk, subject_contact_kind_chk), and the baseline cannot be edited (frozen at r1). So frozen mode reads
+# the baseline at the tag (`ddl_forward.undefined_types`): for each such column, provisioning first creates the type
+# as a domain over the column's decided type with its decided CHECK (VALUE for the column), the baseline then applies
+# as written, and the forward migration converts the column to the decided definition and drops the domain
+# (`ddl_forward.type_fix_block`), guarded, so a database whose column already has it (live: the developers' MIG-PII
+# made it text with the check) is left as it is. The marker below is replaced in the script; nothing is written there
+# outside frozen mode, where the baseline itself is regenerated with the decided type.
+FROZEN_TYPES_MARK = "__FROZEN_TYPES__\n"
+
+
+def frozen_types_step(domains: list) -> str:
+    """provision-tenant.sh's step 2a: `domains` is `(type, CREATE DOMAIN statement)` in type order."""
+    if not domains:
+        return ""
+    schemas = sorted({t.split(".", 1)[0] for t, _ in domains})
+    lines = ["",
+             "# 2a. **The types the frozen r1 baseline names and no file creates** (CHG-R12DB-001; CHG-R6-001, ADAM CR-001).",
+             "#     Created as domains over the type CHG-R6-001 decided, with its CHECK, so the baseline applies as written;",
+             "#     the forward migration then makes each column that type with its named CHECK and drops the domain.",
+             "#     Derived from the baseline at r1 (tools/derive-ddl.py FROZEN_TYPES_MARK); check-ddl-conventions",
+             "#     D-PROVISION-TYPE fails on a type a provisioned file uses before a step creates it.",
+             "psql -v ON_ERROR_STOP=1 -d \"$SLUG\" <<'SQL' >/dev/null"]
+    lines += [f"CREATE SCHEMA IF NOT EXISTS {s};" for s in schemas]
+    lines += [d.rstrip(";") + ";" for _, d in domains]
+    lines += ["SQL", ""]
+    return "\n".join(lines) + "\n"
+
+
+# **What live has that the package did not record, recorded** (the lead, 30 October 2026: "Record all";
+# CHG-R12DB-002 to CHG-R12DB-006). docs/active/recorded-ddl/<db>.sql is authored: functions, triggers and CHECKs
+# copied verbatim from live's schema dump. Each is written into the generated file its `-- @beside <nnn>` line names,
+# so the forward migration carries it: a function as it is (CREATE OR REPLACE runs twice, and its text is live's, so
+# pg_get_functiondef is the same on both); a trigger and a CHECK as one guarded `DO $recorded$` block
+# (`ddl_forward.RECORDED`), which does nothing where its table, a column it names or its function is missing, and
+# a CHECK nothing where a constraint of its name is already there.
+RECORDED_DDL = ROOT / "docs" / "active" / "recorded-ddl"
+RECORDED_TRIGGER = re.compile(r"^CREATE (?:OR REPLACE )?TRIGGER (\w+) (BEFORE|AFTER|INSTEAD OF) (.*?) ON ([\w.]+) (.*)"
+                              r"EXECUTE (?:FUNCTION|PROCEDURE) ([\w.]+)\(\)$", re.I | re.S)
+RECORDED_CHECK = re.compile(r"^ALTER TABLE (?:ONLY )?([\w.]+) ADD CONSTRAINT (\w+) (CHECK \((.*)\))$", re.I | re.S)
+RECORDED_FUNCTION = re.compile(r"^CREATE (?:OR REPLACE )?FUNCTION ([\w.]+)\s*\(", re.I)
+
+
+def _col_guard(t: str, col: str) -> str:
+    sch, name = t.split(".", 1)
+    return (f"EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = {sql_literal(sch)} AND "
+            f"table_name = {sql_literal(name)} AND column_name = {sql_literal(col)})")
+
+
+def recorded_ddl(db: str, cols: dict) -> dict:
+    """{generated file prefix ("920", "930"): SQL} from docs/active/recorded-ddl/<db>.sql (CHG-R12DB-002..006).
+
+    Refuses (SystemExit) a statement it does not know, so a recorded object is never dropped without a word."""
+    path = RECORDED_DDL / f"{db}.sql"
+    if not path.exists():
+        return {}
+    text = path.read_text(encoding="utf-8")
+    parts = re.split(r"^-- @beside (\d{3})[ \t]*$", text, flags=re.M)
+    known = {t: {str(c.get("column")) for c in cs} for t, cs in cols.items()}
+    functions: dict = {}
+    out: dict = defaultdict(list)
+    for i in range(1, len(parts), 2):
+        beside, chunk = parts[i], parts[i + 1]
+        comment = "\n".join(l for l in chunk.strip("\n").splitlines() if l.startswith("--"))
+        for st in ddl_forward.split_statements(chunk):
+            body = st.strip()
+            mf = RECORDED_FUNCTION.match(body)
+            if mf:
+                body = re.sub(r"^CREATE (?:OR REPLACE )?FUNCTION", "CREATE OR REPLACE FUNCTION", body, count=1, flags=re.I)
+                functions[mf.group(1).lower()] = body
+                # **Created where it is missing or its text differs, else left alone** (CHG-R12DB-002): live's copies
+                # of these functions were applied from Windows checkouts, so their text has CRLF line endings, which a
+                # file in git cannot keep. The text is compared with carriage returns taken out, so on live, where it
+                # is the same, nothing is replaced and pg_get_functiondef stays live's.
+                sig = re.match(r"^CREATE OR REPLACE FUNCTION ([\w.]+)\s*\(([^)]*)\)", body, re.I)
+                args = [x.split() for x in sig.group(2).split(",") if x.strip()]
+                regproc = f"{sig.group(1)}({', '.join(' '.join(x[1:]) if len(x) > 1 else x[0] for x in args)})"
+                src = re.search(r"\bAS\s+(\$\w*\$)(.*?)\1", body, re.S)
+                if not src:
+                    raise SystemExit(f"derive-ddl: {path.relative_to(ROOT).as_posix()}: {sig.group(1)} has no "
+                                     "dollar-quoted body to record")
+                digest = hashlib.md5(src.group(2).replace("\r", "").encode("utf-8")).hexdigest()
+                out[beside].append((comment + "\n" if comment else "")
+                                   + f"DO $recorded$ BEGIN IF to_regprocedure({sql_literal(regproc)}) IS NULL OR NOT "
+                                     f"EXISTS (SELECT 1 FROM pg_proc WHERE oid = to_regprocedure({sql_literal(regproc)}) "
+                                     f"AND md5(replace(prosrc, chr(13), '')) = '{digest}') THEN\n"
+                                   + body.rstrip(";") + ";\nEND IF; END $recorded$;")
+                continue
+            mt = RECORDED_TRIGGER.match(ddl_forward.norm(body))
+            if mt:
+                name, when, events, table, rest, fn = mt.groups()
+                need = set(re.findall(r"\bUPDATE OF ([\w, ]+?)(?: OR | ON |$)", events, re.I))
+                need = {c.strip() for grp in need for c in grp.split(",")}
+                fbody = functions.get(fn.lower(), "")
+                need |= {c.lower() for c in re.findall(r"\b(?:new|old)\.(\w+)", rest + " " + fbody, re.I)}
+                others = sorted({f"{a}.{b}" for a, b in re.findall(r"\b([a-z_]+)\.([a-z_][a-z0-9_]*)\b", fbody)
+                                 if f"{a}.{b}" in known and f"{a}.{b}" != table})
+                guard = " AND ".join([f"to_regclass({sql_literal(table)}) IS NOT NULL"]
+                                     + [_col_guard(table, c) for c in sorted(need)]
+                                     + [f"to_regclass({sql_literal(o)}) IS NOT NULL" for o in others]
+                                     + [f"to_regprocedure({sql_literal(fn + '()')}) IS NOT NULL"])
+                stmt = re.sub(r"^CREATE (?:OR REPLACE )?TRIGGER", "CREATE OR REPLACE TRIGGER", ddl_forward.norm(body),
+                              count=1, flags=re.I).rstrip(";")
+                out[beside].append((comment + "\n" if comment else "")
+                                   + f"DO $recorded$ BEGIN IF {guard} THEN\n{stmt};\nEND IF; END $recorded$;")
+                continue
+            mc = RECORDED_CHECK.match(ddl_forward.norm(body).rstrip(";"))
+            if mc:
+                table, name, clause, expr = mc.groups()
+                need = sorted({w for w in re.findall(r"\b([a-z_][a-z0-9_]*)\b", expr) if w in known.get(table, ())})
+                guard = " AND ".join([f"to_regclass({sql_literal(table)}) IS NOT NULL"]
+                                     + [_col_guard(table, c) for c in need]
+                                     + [f"NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = {sql_literal(name)} "
+                                        f"AND conrelid = to_regclass({sql_literal(table)}))"])
+                out[beside].append((comment + "\n" if comment else "")
+                                   + f"DO $recorded$ BEGIN IF {guard} THEN\n"
+                                     f"ALTER TABLE {table} ADD CONSTRAINT {name} {clause} NOT VALID;\n"
+                                     f"ALTER TABLE {table} VALIDATE CONSTRAINT {name};\n"
+                                     "END IF; END $recorded$;")
+                continue
+            raise SystemExit(f"derive-ddl: {path.relative_to(ROOT).as_posix()}: not a function, trigger or CHECK it "
+                             f"can record: {ddl_forward.norm(body)[:120]}")
+    return {k: ("\n-- **Recorded from live** (docs/active/recorded-ddl/" + db + ".sql; the lead, 30 October 2026: "
+                "\"Record all\"; CHG-R12DB-002..006).\n\n" + "\n\n".join(v) + "\n") for k, v in out.items()}
 
 
 try:
@@ -756,7 +884,9 @@ $$;
 #     to. Staff read and write by `scope_path`, as the scope rule; a guest reads a row naming its subject in
 #     `subject_id`, `over_subject_id` or `granted_by_subject_id`, and writes one whose `over_subject_id` (else
 #     `subject_id`) is its own: the account holder grants and revokes. identity.delegated_access, guest to guest.
-#     Since ADAM CR-295 (29 October 2026) the staff scope test admits only a session with no guest subject.
+#     Since ADAM CR-295 (29 October 2026) the staff scope test admits only a session with no guest subject. Since ADAM
+#     CR-362 (30 October 2026) a guest also writes a grant over a subject its own active household grant is over
+#     (HOUSEHOLD_GRANT, CHG-R12DB-007).
 #   * `x-ticvai-rls: any-grant-no-delete` (CHG-R9MIG-001; ADAM CR-166 as the lead ruled it, 21 October 2026): any
 #     connection holding a grant (a scope path set) reads, inserts and updates a row, and no policy lets one be deleted.
 #     For a row that belongs to no scope (`x-ticvai-scope: none`): platform.outbox_sequence, the per-aggregate counter
@@ -773,7 +903,12 @@ $$;
 #     the rows whose parent it names by a declared reference is the guest's own (`orders.order_line` and
 #     `orders.order_event` through `orders.sales_order`). The scope-path rule is written in the per-statement shape of
 #     our team's repository migration 225 (`scope_path <@ ANY ((SELECT platform.current_scope_paths())::ltree[])`,
-#     evaluated once per statement on these hot tables), and the guest's subject the same way.
+#     evaluated once per statement on these hot tables), and the guest's subject the same way. `x-ticvai-guest-subject:
+#     <property>` beside it names the guest's column where it is not `subject_id` (ledger.tax_invoice's
+#     buyerSubjectId; ADAM CR-342, CHG-R12DB-009).
+#   * `x-ticvai-guest-read: true`, a modifier beside the base rule or read-beneath (ADAM CR-341, CHG-R12DB-008): the
+#     table's own read, or any session with a guest subject set; its writes unchanged (GUEST_SET). The venue and
+#     region settings.
 #   * **The staff branch of both admits only a session with no guest subject** (CHG-R11GST-001; ADAM CR-295, option A,
 #     decided 29 October 2026). CR-198 gives a guest request a read-only scope of its venue's path, so a staff branch
 #     that tests the scope alone opened every order and cart at the venue to any guest there. The read check is
@@ -804,6 +939,12 @@ STATEMENT_SCOPE = ("{a}scope_path IS NOT NULL AND {a}scope_path <@ ANY ((SELECT 
 GUEST_SUBJECT = "{a}subject_id = (SELECT NULLIF(current_setting('ticvai.subject_id', true), '')::uuid)"
 # A session with no guest subject: the condition a staff branch beside a guest branch carries (CHG-R11GST-001, CR-295).
 NO_GUEST = "NULLIF(current_setting('ticvai.subject_id', true), '') IS NULL"
+# **Any guest reads** (ADAM CR-341, settled by the lead 30 October 2026; CHG-R12DB-008): `x-ticvai-guest-read: true` on
+# a contract schema keeps the table's own policy for writes, and reads by it or by any session with a guest subject set
+# (an anonymous session gains nothing). For the settings a guest's reads need whatever venue they name: a venue's
+# currency, time zone and region rules (platform.venue_settings, by venue_in_scope; platform.region_settings,
+# read-beneath). Defined for a table under its base rule (scope_path or venue_id) or marked read-beneath.
+GUEST_SET = "NULLIF(current_setting('ticvai.subject_id', true), '') IS NOT NULL"
 
 # The check apply_split_rls gets for `any-grant-no-delete`: a scope path set, the WITH CHECK the append-only trail's
 # INSERT has (CHG-R6-002).
@@ -984,6 +1125,41 @@ BEGIN
     PERFORM platform.apply_split_rls(target,
         format('EXISTS (SELECT 1 FROM %s parent_row WHERE %s)', parent, link),
         format('EXISTS (SELECT 1 FROM %s parent_row WHERE %s AND (%s))', parent, link, parent_write));
+END
+$$;
+"""
+
+# **A guest acts for the household it holds a grant over** (ADAM CR-362, settled by the lead 30 October 2026, posted on
+# #30672; CHG-R12DB-007). The write check of `x-ticvai-rls: scope-or-subject` (identity.delegated_access) admitted a
+# guest only for a grant over itself, so the linked adult's grant over a minor the contract allows (grantDelegation;
+# audit R126) was refused. It also admits a guest whose subject holds an active ALLOW familyMember or primaryHolder
+# grant over the row's `over_subject_id`. Not SECURITY DEFINER: it reads only the guest's own held grants, which the
+# table's read rule already shows it (`own_row(NULL, subject_id)`), and plpgsql, so the planner never inlines a read of
+# the table into the table's own write rule.
+HOUSEHOLD_GRANT = "platform.subject_holds_household_grant_over"
+HOUSEHOLD_GRANT_SQL = """
+-- `x-ticvai-rls: scope-or-subject`'s household rule (ADAM CR-362; CHG-R12DB-007): the session's guest holds an active
+-- ALLOW familyMember or primaryHolder grant over `target_subject_id` (not revoked, now inside its validity window).
+CREATE OR REPLACE FUNCTION platform.subject_holds_household_grant_over(target_subject_id uuid)
+    RETURNS boolean
+    LANGUAGE plpgsql
+    STABLE
+AS $$
+DECLARE
+    me uuid := NULLIF(current_setting('ticvai.subject_id', true), '')::uuid;
+BEGIN
+    IF me IS NULL OR target_subject_id IS NULL THEN
+        RETURN false;
+    END IF;
+    RETURN EXISTS (
+        SELECT 1 FROM identity.delegated_access held
+         WHERE held.subject_id = me
+           AND held.over_subject_id = target_subject_id
+           AND held.delegation_kind IN ('familyMember', 'primaryHolder')
+           AND held.effect = 'ALLOW'
+           AND held.revoked_at IS NULL
+           AND (held.valid_from IS NULL OR held.valid_from <= now())
+           AND (held.valid_to IS NULL OR now() < held.valid_to));
 END
 $$;
 """
@@ -1410,6 +1586,8 @@ def rls_file(db: str, scoped: list, by_venue: list, by_parent: list, unscoped: l
         body.append(RLS_APPEND_AUDIT)
     if split or any(len(e) > 4 for e in by_parent):
         body.append(RLS_SPLIT)
+    if db == "tenant" and any(HOUSEHOLD_GRANT in str(e) for e in split):
+        body.append(HOUSEHOLD_GRANT_SQL)   # ADAM CR-362 (CHG-R12DB-007), before the calls that name it
     n_venue = len(by_venue) if db == "tenant" else 0
     # **Counted, not asserted.** The line this replaced called every table with neither column
     # "reference data, a registry, or the migration log", and the audit of 26 September found
@@ -2059,6 +2237,16 @@ def table_marks(cols: dict, tables) -> dict:
         rls = marks.get("x-ticvai-rls")
         if rls is not None:
             entry["rls"] = str(rls).strip()
+        # **Any guest reads** (ADAM CR-341; CHG-R12DB-008): `x-ticvai-guest-read: true` keeps the table's policy for
+        # writes and reads it, or any session with a guest subject set. See GUEST_SET.
+        if marks.get("x-ticvai-guest-read") is True:
+            entry["guest_read"] = True
+        # **The guest's own rows, by a named column** (ADAM CR-342; CHG-R12DB-009): `x-ticvai-guest-subject: <property>`
+        # beside `x-ticvai-rls: guest-reads-own` names the column holding the row's guest (ledger.tax_invoice's
+        # buyerSubjectId) where it is not `subject_id`.
+        gs = marks.get("x-ticvai-guest-subject")
+        if isinstance(gs, str) and gs.strip():
+            entry["guest_subject"] = column_of(gs.strip()) or f"?{gs.strip()}"
         # **A table that takes no scope** (CHG-R9MIG-001, CR-166): `x-ticvai-scope: none`; see DESCOPED.
         sc = marks.get("x-ticvai-scope")
         if sc is not None:
@@ -2454,10 +2642,37 @@ def frozen_mode(files: dict, tag: str, commit: str, apply: bool) -> None:
                 # folded into the old side for the next pass; written with its final header below
                 early_files[area_dir][name] = ddl_forward.render_recon(
                     ddl_forward.early_plan(area_dir, its), ev, baseline, stamp, before=nxt or "", rest="")
+    # **The types the frozen baseline names and nothing creates** (CHG-R12DB-001): read from the baseline at the tag
+    # alone, since that is what provisioning applies before any forward migration. Provisioning creates each as a
+    # domain (frozen_types_step); the forward migration converts the column to its decided definition.
+    type_fixes = {CONTROL: {}, "tenant": {}}
+    domains = []
+    for area_dir in (CONTROL, "tenant"):
+        base = ddl_forward.Model()
+        for path in sorted(ls_tree(commit, f"backend/{area_dir}")):
+            name = path.rsplit("/", 1)[-1]
+            if path.endswith(".sql") and not FORWARD_FILE.match(name):
+                base.add_file((show(commit, path) or b"").decode("utf-8"))
+        for (t, c), typ in sorted(ddl_forward.undefined_types(base).items()):
+            want = (news[area_dir].tables.get(t) or ddl_forward.Table()).cols.get(c)
+            dom = ddl_forward.domain_for(typ, c, want) if want else None
+            if not dom:
+                print(f"  ! {area_dir}: {t}.{c} is typed {typ} in the baseline, which no file creates, and the schema "
+                      "reference gives no built-in type to make it: provisioning stops at that file")
+                continue
+            if area_dir != "tenant":
+                print(f"  ! {area_dir}: {t}.{c} is typed {typ}, which no file creates; only provision-tenant.sh "
+                      "creates such types (check-ddl-conventions D-PROVISION-TYPE)")
+                continue
+            type_fixes[area_dir][(t, c)] = typ
+            if typ not in {d[0] for d in domains}:
+                domains.append((typ, dom))
+    files["provision-tenant.sh"] = files["provision-tenant.sh"].replace(FROZEN_TYPES_MARK,
+                                                                        frozen_types_step(sorted(domains)))
     for area_dir in (CONTROL, "tenant"):
         old, _fwd = old_model(area_dir)
         plans.append(ddl_forward.diff(area_dir, old, news[area_dir], renames, retired=RETIRED, descoped=DESCOPED,
-                                      backfill=BACKFILL))
+                                      backfill=BACKFILL, type_fixes=type_fixes[area_dir]))
     # **Root-level files are documentation of references that are not constraints** (990): nothing
     # applies them, so a change is listed rather than migrated.
     for name in sorted(n for n in files if "/" not in n and n.endswith(".sql")):
@@ -3350,6 +3565,30 @@ def main() -> int:
     parent_of = {p[0]: p for p in by_parent}
     for t in sorted(real):
         mark = (marks.get(t) or {}).get("rls") or TABLE_RLS.get(t)
+        guest_read = bool((marks.get(t) or {}).get("guest_read"))
+        plain = (t in set(scoped) | set(venue_only) and t not in shared_scope and t not in parent_of
+                 and t not in APPEND_AUDIT and t != SCOPE_TABLE and area(t.split(".")[0]) == "tenant")
+        if guest_read and plain and mark in (None, "read-beneath"):
+            # ADAM CR-341 (CHG-R12DB-008): the table's own read and write, and any guest reads (GUEST_SET)
+            if mark == "read-beneath" and t in scoped:
+                rd = "platform.in_scope(scope_path) OR platform.above_scope(scope_path)"
+                wr = "platform.in_scope({a}scope_path)"
+            elif t in scoped:
+                rd, wr = "platform.in_scope(scope_path)", "platform.in_scope({a}scope_path)"
+            else:
+                rd, wr = "platform.venue_in_scope(venue_id)", "platform.venue_in_scope({a}venue_id)"
+            call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(f'{rd} OR {GUEST_SET}')}, "
+                    f"{sql_literal(wr.format(a=''))});")
+            split_mark[t] = ((mark + "+" if mark else "") + "guest-read", "scope_path" if t in scoped else "venue_id")
+            split_calls[t] = (call, f"x-ticvai-guest-read{' with x-ticvai-rls: ' + mark if mark else ''}: any guest "
+                                    f"reads; written by its {'scope_path' if t in scoped else 'venue_id'} "
+                                    f"({(marks.get(t) or {}).get('schema')}; ADAM CR-341)")
+            split_write[t] = wr.format(a="{a}.")
+            split_depth[t] = 0
+            continue
+        if guest_read:
+            print(f"  ! {t}: x-ticvai-guest-read is defined for a scope_path or venue_id table under its base rule or "
+                  f"read-beneath (found {mark or 'its base rule'}); not applied (check-ddl-conventions D-GUEST-BRANCH)")
         if not mark:
             continue
         if t in APPEND_AUDIT and mark in APPEND_AUDIT_MARKS:
@@ -3385,7 +3624,15 @@ def main() -> int:
                 print(f"  ! {t}: x-ticvai-rls {mark} needs a scope_path or venue_id for staff; the base rule stands")
                 continue
             staff = STATEMENT_SCOPE if base == "scope_path" else "platform.venue_in_scope({a}venue_id)"
-            if "subject_id" in has:
+            gcol = (marks.get(t) or {}).get("guest_subject")
+            if gcol and (gcol.startswith("?") or gcol not in has):
+                print(f"  ! {t}: x-ticvai-guest-subject names {gcol.lstrip('?')}, which is not one of its columns; the "
+                      "base rule stands")
+                continue
+            if gcol and mark == "guest-reads-own":
+                # ADAM CR-342 (CHG-R12DB-009): the guest's column is named (ledger.tax_invoice.buyer_subject_id)
+                guest = GUEST_SUBJECT.replace("{a}subject_id", "{a}" + gcol)
+            elif "subject_id" in has:
                 guest = GUEST_SUBJECT
             elif mark == "guest-reads-own":
                 # the guest's own parent: the one declared reference to a table that carries the guest's subject and
@@ -3444,7 +3691,11 @@ def main() -> int:
             read = " OR ".join([f"({NO_GUEST} AND platform.in_scope(scope_path))"]
                                + [f"platform.own_row(NULL::uuid, {x})" for x in subs])
             write = (f"(({NO_GUEST} AND platform.in_scope({{a}}scope_path)) OR platform.own_row(NULL::uuid, {{a}}"
-                     + holder + "))")
+                     + holder + ")"
+                     # ADAM CR-362 (settled 30 October 2026; CHG-R12DB-007): a guest also writes the grants over a
+                     # subject its own active household grant (familyMember or primaryHolder) is over.
+                     + (f" OR {HOUSEHOLD_GRANT}({{a}}over_subject_id)" if holder == "over_subject_id" else "")
+                     + ")")
             call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(read)}, "
                     f"{sql_literal(write.format(a=''))});")
             base = "its scope, or the guest account it is about"
@@ -3561,7 +3812,8 @@ def main() -> int:
         # venue_id) a child is read by staff where the parent is visible, by a guest only for its own subject
         # (customer_id or subject_id), and written where the parent may be written.
         pm = split_mark.get(par)
-        if pm and (pm[0] == "signed-in-read" or (pm[0] == "read-beneath" and pm[1] == "venue_id")):
+        if pm and (pm[0] == "signed-in-read" or (pm[0] == "read-beneath" and pm[1] == "venue_id")
+                   or pm[0].endswith("guest-read")):   # any guest reads the parent (CR-341), not its children
             ccols = {c_["column"] for c_ in cols.get(t, [])}
             subj = "customer_id" if "customer_id" in ccols else ("subject_id" if "subject_id" in ccols else None)
             link = f"pr.{q(key)} = {tq(t)}.{q(col)}"
@@ -3679,6 +3931,16 @@ def main() -> int:
     # are created; this file holds each one's DEFAULT partition and the months ahead.
     files["tenant/930-partitioning.sql"] = partition_file(partitioned, declined)
 
+    # What live has that the package did not record (the lead, 30 October 2026: "Record all"; CHG-R12DB-002..006):
+    # docs/active/recorded-ddl/<db>.sql, beside the generated helpers, so the forward migration carries them.
+    for rec_db in ("tenant", CONTROL):
+        for prefix, sql in sorted(recorded_ddl(rec_db, cols).items()):
+            key = next((n for n in sorted(files) if n.startswith(f"{rec_db}/{prefix}-") and n.endswith(".sql")), None)
+            if key is None:
+                raise SystemExit(f"derive-ddl: docs/active/recorded-ddl/{rec_db}.sql names @beside {prefix}, which "
+                                 f"no generated {rec_db} file is")
+            files[key] = files[key].rstrip("\n") + "\n" + sql
+
     files["provision-tenant.sh"] = PROVISION
 
     # **The compose entry point.** provision-tenant.sh takes one tenant; a cell has several, and
@@ -3689,7 +3951,10 @@ def main() -> int:
     frozen_at = baseline_commit(a.baseline)
     if frozen_at:
         frozen_mode(files, a.baseline or "r1", frozen_at, a.apply)
-    elif a.apply:
+    else:
+        # not frozen: the baseline is regenerated with the decided types, so provisioning creates none (CHG-R12DB-001)
+        files["provision-tenant.sh"] = files["provision-tenant.sh"].replace(FROZEN_TYPES_MARK, "")
+    if not frozen_at and a.apply:
         # **The flat layout is removed, not left beside the new one.** The deploy configs mount
         # `backend/<area>` into initdb, and a stale `backend/010-orders.sql` sitting next to
         # `backend/tenant/010-orders.sql` is two answers to what a tenant database contains —

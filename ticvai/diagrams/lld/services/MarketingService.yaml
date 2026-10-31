@@ -1,10 +1,10 @@
 id: LLD-MarketingService
-title: MarketingService — 281 operations, 133 tables
+title: MarketingService — 283 operations, 133 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**281 operations and 133 tables — the biggest thing in the package, and probably two services
+why: '**283 operations and 133 tables — the biggest thing in the package, and probably two services
   eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly
   and written rarely; a campaign send is a burst of millions of rows nobody reads again.
 
@@ -13,9 +13,9 @@ why: '**281 operations and 133 tables — the biggest thing in the package, and 
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 281
+  operations: 283
   inAFlow: 103
-  percent: 37%
+  percent: 36%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -26,7 +26,7 @@ schemas:
   largestTable: marketing.privacy_request
 operationsByContract:
 - contract: marketing-crm
-  count: 281
+  count: 283
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -1148,6 +1148,14 @@ operationsByContract:
     offline: false
     reads: 8
     writes: 0
+  - operation: listPrivacyChangeSets
+    verb: GET
+    path: /privacy-testing
+    scope: brand
+    permission: GUEST_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listPrivacyCompliance
     verb: GET
     path: /privacy-compliance
@@ -1660,6 +1668,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 2
+  - operation: sendGuestOneTimeCode
+    verb: POST
+    path: /guest-one-time-codes
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 3
+    writes: 2
   - operation: sendTransactionalMessage
     verb: POST
     path: /messages
@@ -1850,7 +1866,7 @@ operationsByContract:
     scope: venue
     permission: GUEST_MANAGE
     offline: false
-    reads: 3
+    reads: 4
     writes: 3
   - operation: setGuestAttributeModel
     verb: PUT
@@ -2358,6 +2374,7 @@ tables:
   - runDataRetention
   - sendConversationMessage
   - sendGuestConversationMessage
+  - sendGuestOneTimeCode
   - sendTransactionalMessage
   - setAgentAvailability
   - setAgentServiceProfile
@@ -2505,6 +2522,7 @@ tables:
   - runDataRetention
   - sendConversationMessage
   - sendGuestConversationMessage
+  - sendGuestOneTimeCode
   - sendTransactionalMessage
   - setAgentAvailability
   - setAgentServiceProfile
@@ -2908,7 +2926,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.conversation
-  columns: 21
+  columns: 25
   store: postgres
   parent: null
   writtenBy:
@@ -2998,7 +3016,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.form_definition_field
-  columns: 25
+  columns: 24
   store: postgres
   parent: marketing.form_definition
   writtenBy:
@@ -3205,14 +3223,12 @@ tables:
   parent: null
   writtenBy:
   - fnb
-  - identity
   - marketing-crm
   - orders
   - public-api
   - workforce
   foreignWriters:
   - fnb
-  - identity
   - orders
   - public-api
   - workforce
@@ -3561,7 +3577,7 @@ tables:
   - marketing-crm
   foreignWriters: null
 - table: marketing.waiver_signature
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy: []

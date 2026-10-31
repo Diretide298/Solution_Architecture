@@ -212,7 +212,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `GST-019` | Order History | A | 11 | 69 | 6 | 6 | 0 | 0 | guest | approved (client-verified) |
 | `GST-020` | Saved Items / Wishlist | A | 0 | 16 | 4 | 1 | 1 | 0 | guest | notStarted (client-verified) |
 | `GST-039` | Profile | A | 9 | 48 | 5 | 14 | 1 | 0 | guest | approved (client-verified) |
-| `GST-042` | Simple Registration & OTP | A | 35 | 5 | 6 | 13 | 8 | 0 | guest | approved (client-verified) |
+| `GST-042` | Simple Registration & OTP | A | 36 | 5 | 6 | 13 | 8 | 0 | guest | approved (client-verified) |
 | `GST-045` | Ticket Delivery & Sharing | A | 7 | 7 | 5 | 7 | 3 | 0 | guest | notStarted (client-verified) |
 | `GST-055` | Dynamic QR Ticket | A | 5 | 20 | 5 | 2 | 10 | 0 | guest | notStarted (client-verified) |
 | `GST-066` | Privacy & My Data | A | 3 | 13 | 6 | 15 | 2 | 4 | guest | approved (client-verified) |

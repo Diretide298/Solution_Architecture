@@ -1,0 +1,70 @@
+# identity.guestCodeIssued v1 — published by identity
+# Added 31 October 2026 (ADAM CR-370, settled by Chinmay on 30 October 2026 with the follow-up of 31 October;
+# CHG-CR370-001): the carrier of a guest one-time code. Identity (commerce) and Marketing (operations) are different
+# deployables (ADR-0028 as amended by ADR-0055), so the code reaches Marketing's sender by the outbox, never by an
+# in-process call. The destination and the code travel field-encrypted (ADR-0063, 14 October amendment), never in clear.
+
+name: identity.guestCodeIssued
+version: 1
+publisher: identity
+description: A one-time code was minted for a guest's email, SMS or WhatsApp address and is to be sent.
+aggregate: otpChallenge
+emittedWhen: requestGuestOtp, registerGuest (channel email) or verifyGuestEmail (mode send) writes an
+  identity.otp_challenge row; requestGuestOtp writes nothing for an identifier that resolves to nobody with purpose
+  login, passwordReset or stepUp
+emittedBy:
+- identity.requestGuestOtp
+- identity.registerGuest
+- identity.verifyGuestEmail
+payload:
+- field: subjectId
+  type: uuid
+  required: false
+  notes: The guest the code is for. Null for requestGuestOtp with purpose register or verify to an identifier with no
+    account, which still gets a code (the CR-370 follow-up of 31 October 2026)
+- field: challengeId
+  type: uuid
+  notes: The identity.otp_challenge row. The consumer's idempotency key
+- field: channel
+  type: string
+  notes: email, sms or whatsapp, as the server picked it (ADAM CR-222)
+- field: purpose
+  type: string
+  notes: login, register, verify, passwordReset, stepUp or emailVerification (OtpChallenge.purpose)
+- field: locale
+  type: string
+  notes: The guest's language, which the system template is sent in
+- field: expiresAt
+  type: timestamp
+  notes: otp_challenge.expires_at. After it the consumer stops retrying and does not dead-letter the event
+- field: destination
+  type: string
+  x-ticvai-secret: field-encrypted
+  notes: The full email address or phone number, encrypted through the kernel's field encryption (KERNEL-FIELD-ENC,
+    #37050) under the tenant's data key, one string naming the key version. Never in clear
+- field: code
+  type: string
+  x-ticvai-secret: field-encrypted
+  notes: The code itself, encrypted the same way. Never in clear; identity.otp_challenge keeps only its hash
+consumers:
+- context: marketing
+  purpose: 'Send the code: decrypt destination and code at send time, send on the channel through the tenant''s
+    configured provider with the system template guestOneTimeCode in the guest''s language, and record a transactional
+    marketing.message_dispatch row without the code'
+  operation: marketing-crm.sendGuestOneTimeCode
+  writes:
+  - marketing.message_dispatch
+  idempotencyKey: challengeId
+  onFailure: retry
+  isCritical: true
+retention: 1 day after publication
+notes: '**A code nobody receives is a sign-in nobody can finish**, so the consumer is critical. It retries until
+  expiresAt and then stops: an expired code is worthless, so the event is not dead-lettered for replay.
+
+
+  **Nothing in clear.** The outbox row and the broker carry only the ciphertexts; Marketing decrypts at send time, as
+  the push sender decrypts a guest''s push token. Until the kernel''s field encryption (#37050) is Ready for QA,
+  Identity''s delivery seam (IGuestCodeDelivery) keeps its log-only default and writes no code to the outbox.
+
+
+  **Not offered to webhooks**: it carries a credential.'

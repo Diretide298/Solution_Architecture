@@ -15,7 +15,9 @@ payload:
   type: uuid
 - field: channel
   type: string
-  notes: Where the guest registered (guestWeb, guestApp, kiosk)
+  notes: 'Where the guest registered (guestWeb, guestApp, kiosk): registerGuest''s RegisterGuestRequest.source,
+    guestWeb when it is left out (ADAM CR-371, CHG-CR371-001). Never the code''s delivery channel (email, sms,
+    whatsapp), which is not on the event'
 - field: consents
   type: array
   notes: 'One per consent purpose shown on the form: purpose, granted (boolean), noticeVersion'
@@ -23,8 +25,10 @@ payload:
   type: timestamp
 consumers:
 - context: marketing
-  purpose: 'Record each consent through recordConsent''s rules, source registration: a granted purpose becomes a
-    consent record at its notice version, a refused one is recorded as refused, never skipped'
+  purpose: 'Record each consent through recordConsent''s rules, with the ConsentSource channel maps to (guestWeb is
+    website, guestApp is guestApp, kiosk is kiosk; ADAM CR-371, never registration, which the source check refuses): a
+    granted purpose becomes a consent record at its notice version, a refused one is recorded as refused, never
+    skipped'
   writes:
   - marketing.consent_record
   idempotencyKey: eventId + purpose

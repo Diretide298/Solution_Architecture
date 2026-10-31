@@ -520,7 +520,7 @@ operations:
 - operation: grantDelegation
   verb: POST
   path: /guests/{subjectId}/delegations
-  scope: venue
+  scope: tenant
   permission: GUEST_MANAGE
   audience:
   - staff
@@ -757,7 +757,7 @@ operations:
 - operation: listDelegations
   verb: GET
   path: /guests/{subjectId}/delegations
-  scope: venue
+  scope: tenant
   permission: GUEST_VIEW
   audience:
   - staff
@@ -1476,8 +1476,8 @@ operations:
   writes:
   - cache:idempotency
   - identity.otp_challenge
-  - marketing.message_dispatch
   - pii.subject
+  - platform.outbox
 - operation: verifyGuestOtp
   verb: POST
   path: /auth/guest/otp/verify

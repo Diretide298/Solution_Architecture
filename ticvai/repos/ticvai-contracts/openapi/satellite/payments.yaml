@@ -2958,6 +2958,10 @@ components:
             Required after a hard decline.
     DunningCase:
       x-ticvai-persistence: payments.dunning_case
+      # ADAM CR-342 (Chinmay, 30 October 2026; CHG-CR342-001), the CR-295 pattern: staff read and write by scope_path for a
+      # session with no guest subject, and a guest reads (never writes) the cases of its own subject_id, so its billing
+      # statement and listMyPaymentIssues show its failed attempts under any venue scope and never another guest's.
+      x-ticvai-rls: guest-reads-own
       type: object
       description: >
         BL-100. **One recurring charge being chased**, and the row a venue works from.

@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `tenancy`, `workforce`, `approvals`, `accreditation` |
 | Schemas owned | `platform`, `workforce`, `approvals`, `accreditation`, `tenancy`, `kernel` |
-| Operations in the slice | 38 of 214 |
+| Operations in the slice | 38 of 215 |
 | Scale | Read-heavy and highly cacheable. Config changes are rare. |
 | If it is down | Same as identity — nothing runs without a scope. |
 
@@ -219,6 +219,12 @@ matrices; both write the same rows, so neither overwrites the other's rules.
 | `requiredRole` (and `role`, `position`) | `requiredRoleId`: the delegate must hold it (`409 delegateLacksRequiredRole` otherwise); `role` and `position` are display only |
 
 Authority limits of a role stay in `setApprovalMatrix`; this sets the limit of one delegation.
+
+**Keyed by delegator and delegate, not a singleton** (ADAM CR-352, Chinmay, 30 October 2026; CHG-CR352-001). The
+PUT is an upsert of the one active delegation between the body's `delegator` and `delegate` at the caller's
+venue (`x-ticvai-body-key-note`); no other delegation at the venue is touched. The `200` stays
+`RolesAuthorityDelegationApprovalLimitsView`, filled from the row written; it does not become
+`ApprovalDelegation`. The `400`, `403` and `409` and their problem types are unchanged.
 
 |  |  |
 |---|---|
@@ -1729,7 +1735,7 @@ Who is expected where, and when
 **`POST /rota-assignments`**: Put someone on the rota
 
 Refused where the person already has an overlapping assignment, or lacks the role the position requires. **A rota that lets one person be in two places is a rota that gets ignored.**
-**Both checks look beyond the caller's venue, as a yes or no** (ADAM CR-336, option B, decided 29 October 2026). The overlap is asked of `workforce#principalHasOverlappingAssignment`: any other assignment of the person, at any venue of the tenant, that is not `cancelled` and overlaps the new one's times (`409 rota-assignment-overlap`). The role is asked of `identity#principalHoldsRoleAtVenue`: a live grant of `requiredRoleId` to the person at the venue or at a scope above it, a tenant-root grant included (`409 person-lacks-required-role`; no check when `requiredRoleId` is null). Each is answered under the tenant root grant and returns only true or false, so the caller learns nothing of another venue's rota or of where a role was granted. **The overlap also holds under races**: the exclusion constraint on `workforce.rota_assignment` (one person, overlapping times, not `cancelled`; RotaAssignment `x-ticvai-exclude`) refuses the second of two writes that pass the check at the same moment, and that refusal is the same `409 rota-assignment-overlap`.
+**Both checks look beyond the caller's venue, as a yes or no** (ADAM CR-336, option B, decided 29 October 2026). The overlap is asked of `workforce#principalHasOverlappingAssignment`: any other assignment of the person, at any venue of the tenant, that is not `cancelled` and overlaps the new one's times (`409 rota-assignment-overlap`). The role is asked of `identity#principalHoldsRoleAtVenue`: a live grant of `requiredRoleId` to the person at the venue or at a scope above it, a tenant-root grant included (`409 person-lacks-required-role`; no check when `requiredRoleId` is null). Each is answered under the tenant root grant and returns only true or false, so the caller learns nothing of another venue's rota or of where a role was granted. **The overlap also holds under races**: the exclusion constraint on `workforce.rota_assignment` (one person, overlapping times, not `cancelled`; RotaAssignment `x-ticvai-exclude`) refuses the second of two writes that pass the check at the same moment, and that refusal is the same `409 rota-assignment-overlap` (SQLSTATE 23P01 on `rota_assignment_principal_id_overlap_excl`; ADAM CR-344). The constraint is added by hand once any overlapping rows are settled (handoff/migration-review.md); until it is on the databases, a per-person advisory lock holds the overlap check under races.
 **The working-hour limit is flagged, not refused** (ADAM CR-334, option A, decided 29 October 2026): the venue's `workforce.staffing_rules` row is read and `breachesWorkingHourLimit` is set as that field says. The assignment is stored either way.
 Where the position needs a till, the assignment names the workstation their shift will open on — the link between a rota and a cash session, without merging the two.
 
@@ -1881,7 +1887,7 @@ Where the position needs a till, the assignment names the workstation their shif
 
 **`PATCH /rota-assignments/{assignmentId}`**: Move or cancel an assignment
 
-**A move is checked as a new assignment is** (ADAM CR-315, option A). Whenever the PATCH changes `principalId`, `venueId`, `startsAt`, `endsAt` or `requiredRoleId`, the assignment as it would stand is checked against the same two rules `createRotaAssignment` applies, asked of the same two queries (ADAM CR-336, option B): the person has no other assignment overlapping it at any venue of the tenant (`workforce#principalHasOverlappingAssignment` with this assignment as `exceptAssignmentId`; `409 rota-assignment-overlap`, which the exclusion constraint also gives under races), and the person holds the required role at the venue or above it (`identity#principalHoldsRoleAtVenue`; `409 person-lacks-required-role`). Each answers only true or false. So a move cannot do what a create is refused. An assignment outside the caller's scope is the shared `404`.
+**A move is checked as a new assignment is** (ADAM CR-315, option A). Whenever the PATCH changes `principalId`, `venueId`, `startsAt`, `endsAt` or `requiredRoleId`, the assignment as it would stand is checked against the same two rules `createRotaAssignment` applies, asked of the same two queries (ADAM CR-336, option B): the person has no other assignment overlapping it at any venue of the tenant (`workforce#principalHasOverlappingAssignment` with this assignment as `exceptAssignmentId`; `409 rota-assignment-overlap`, which the exclusion constraint also gives under races: SQLSTATE 23P01 on `rota_assignment_principal_id_overlap_excl`, ADAM CR-344, with create's per-person advisory lock until the constraint is on the databases), and the person holds the required role at the venue or above it (`identity#principalHoldsRoleAtVenue`; `409 person-lacks-required-role`). Each answers only true or false. So a move cannot do what a create is refused. An assignment outside the caller's scope is the shared `404`.
 
 **The working-hour flag is set again on a move** (ADAM CR-334, option A): whenever the PATCH changes `principalId`, `venueId`, `startsAt`, `endsAt` or `breakMinutes`, `breachesWorkingHourLimit` is worked out as on create, from the venue's `workforce.staffing_rules`.
 
@@ -2494,6 +2500,8 @@ Support hours were an open conflict for eleven days and were never a design ques
 | marketing.attributionWindowDays | integer |  | Days after a campaign touch within which a booking is attributed to it (getCampaignPerformance). (min 1; max 30; default 7; nullable) |
 | identity | object |  | (nullable) |
 | identity.guestOtpMaxAttempts | integer |  | Wrong entries allowed per guest one-time code before verifyGuestOtp invalidates it. (min 3; max 10; default 5; nullable) |
+| identity.guestOtpLifetimeSeconds | integer |  | How long a guest one-time code works (decided 30 October 2026, Chinmay, ADAM CR-370; CHG-CR370-001): requestGuestOtp, registerGuest and verifyGuestEmail set the code's expiry from it and answer it as… (min 60; max 900; default 600; nullable) |
+| identity.guestOtpResendSeconds | integer |  | How long a guest waits before asking for another code (ADAM CR-370; CHG-CR370-001): Identity sets the code's resend time from it and answers it as resendAfterSeconds, which drives the screens' resend… (min 30; max 300; default 60; nullable) |
 | identity.guestTwoStep | object |  | Guest two-step verification: a venue option, off unless the venue enables it in Venue Management (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, "no guest M… (nullable) |
 | identity.guestTwoStep.enabled | boolean |  | Off unless the venue enables it. (default False) |
 | identity.guestTwoStep.stepUpActions | array of enum (changeContactDetails, changePassword, managePaymentMethods, transferTickets, deleteAccount) |  | The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. (default ['changeContactDetails', 'changePassword', 'managePaymentMethods', 'deleteAccount']) |
@@ -2631,6 +2639,8 @@ Support hours were an open conflict for eleven days and were never a design ques
 | marketing.attributionWindowDays | integer |  | Days after a campaign touch within which a booking is attributed to it (getCampaignPerformance). (min 1; max 30; default 7; nullable) |
 | identity | object |  | (nullable) |
 | identity.guestOtpMaxAttempts | integer |  | Wrong entries allowed per guest one-time code before verifyGuestOtp invalidates it. (min 3; max 10; default 5; nullable) |
+| identity.guestOtpLifetimeSeconds | integer |  | How long a guest one-time code works (decided 30 October 2026, Chinmay, ADAM CR-370; CHG-CR370-001): requestGuestOtp, registerGuest and verifyGuestEmail set the code's expiry from it and answer it as… (min 60; max 900; default 600; nullable) |
+| identity.guestOtpResendSeconds | integer |  | How long a guest waits before asking for another code (ADAM CR-370; CHG-CR370-001): Identity sets the code's resend time from it and answers it as resendAfterSeconds, which drives the screens' resend… (min 30; max 300; default 60; nullable) |
 | identity.guestTwoStep | object |  | Guest two-step verification: a venue option, off unless the venue enables it in Venue Management (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, "no guest M… (nullable) |
 | identity.guestTwoStep.enabled | boolean |  | Off unless the venue enables it. (default False) |
 | identity.guestTwoStep.stepUpActions | array of enum (changeContactDetails, changePassword, managePaymentMethods, transferTickets, deleteAccount) |  | The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. (default ['changeContactDetails', 'changePassword', 'managePaymentMethods', 'deleteAccount']) |
@@ -2804,6 +2814,8 @@ Support hours were an open conflict for eleven days and were never a design ques
 | marketing.attributionWindowDays | integer |  | Days after a campaign touch within which a booking is attributed to it (getCampaignPerformance). (min 1; max 30; default 7; nullable) |
 | identity | object |  | (nullable) |
 | identity.guestOtpMaxAttempts | integer |  | Wrong entries allowed per guest one-time code before verifyGuestOtp invalidates it. (min 3; max 10; default 5; nullable) |
+| identity.guestOtpLifetimeSeconds | integer |  | How long a guest one-time code works (decided 30 October 2026, Chinmay, ADAM CR-370; CHG-CR370-001): requestGuestOtp, registerGuest and verifyGuestEmail set the code's expiry from it and answer it as… (min 60; max 900; default 600; nullable) |
+| identity.guestOtpResendSeconds | integer |  | How long a guest waits before asking for another code (ADAM CR-370; CHG-CR370-001): Identity sets the code's resend time from it and answers it as resendAfterSeconds, which drives the screens' resend… (min 30; max 300; default 60; nullable) |
 | identity.guestTwoStep | object |  | Guest two-step verification: a venue option, off unless the venue enables it in Venue Management (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, "no guest M… (nullable) |
 | identity.guestTwoStep.enabled | boolean |  | Off unless the venue enables it. (default False) |
 | identity.guestTwoStep.stepUpActions | array of enum (changeContactDetails, changePassword, managePaymentMethods, transferTickets, deleteAccount) |  | The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. (default ['changeContactDetails', 'changePassword', 'managePaymentMethods', 'deleteAccount']) |
@@ -2941,6 +2953,8 @@ Support hours were an open conflict for eleven days and were never a design ques
 | marketing.attributionWindowDays | integer |  | Days after a campaign touch within which a booking is attributed to it (getCampaignPerformance). (min 1; max 30; default 7; nullable) |
 | identity | object |  | (nullable) |
 | identity.guestOtpMaxAttempts | integer |  | Wrong entries allowed per guest one-time code before verifyGuestOtp invalidates it. (min 3; max 10; default 5; nullable) |
+| identity.guestOtpLifetimeSeconds | integer |  | How long a guest one-time code works (decided 30 October 2026, Chinmay, ADAM CR-370; CHG-CR370-001): requestGuestOtp, registerGuest and verifyGuestEmail set the code's expiry from it and answer it as… (min 60; max 900; default 600; nullable) |
+| identity.guestOtpResendSeconds | integer |  | How long a guest waits before asking for another code (ADAM CR-370; CHG-CR370-001): Identity sets the code's resend time from it and answers it as resendAfterSeconds, which drives the screens' resend… (min 30; max 300; default 60; nullable) |
 | identity.guestTwoStep | object |  | Guest two-step verification: a venue option, off unless the venue enables it in Venue Management (decided 29 September, rev 3 GAP-B1, per venue, superseding the second part of audit R167, "no guest M… (nullable) |
 | identity.guestTwoStep.enabled | boolean |  | Off unless the venue enables it. (default False) |
 | identity.guestTwoStep.stepUpActions | array of enum (changeContactDetails, changePassword, managePaymentMethods, transferTickets, deleteAccount) |  | The guest actions in this venue that ask an enrolled guest for the factor again, whatever the age of the session. (default ['changeContactDetails', 'changePassword', 'managePaymentMethods', 'deleteAccount']) |
@@ -4411,7 +4425,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-176 operations, added to this service in later releases without changing any of the above.
+177 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -4427,5 +4441,5 @@ Every table this service owns that the slice reads or writes, with its columns a
 | rota | `requestShiftSwap` |
 | scope | `getOrgUnit` |
 | tenancy | `deployConfigurationProfile`, `getConfigurationProfile`, `getConnectivityPolicy`, `getOfflinePolicy`, `getVenueSettings`, `getVenueSettingsDefaults`, `listCellEndpoints`, `listConfigurationProfiles`, `listDataRetentionSettings`, `listProfileDeployments`, `requeueDeadLetter`, `resolveTenantHost`, `setConnectivityThresholds`, `setDataRetentionSetting`, `setOfflinePolicy`, `setTenantDomainMapping` |
-| workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
+| workforce | `broadcastToGuests`, `claimOpenShift`, `getEmployee`, `getFieldOwnership`, `getLabourCost`, `getStaffingCoverage`, `getStaffingRules`, `listEmployees`, `listIntegrationSources`, `listJobTitles`, `listLabourBudgets`, `listLeaveBalances`, `listLeaveRequests`, `listLeaveTypes`, `listOpenShifts`, `listShiftPatterns`, `listShiftSwapRequests`, `listShiftTemplates`, `listSyncConflicts`, `listSyncRuns`, `listTrainingRecords`, `listWorkAssignments`, `requestLeave`, `resolveSyncConflict`, `setFieldOwnership`, `setIntegrationSource`, `setJobTitle`, `setLabourBudget`, `setLeaveType`, `setShiftPattern`, `setShiftTemplate`, `setWorkAssignment`, `startSync`, `validateWorkforceCompliance` |
 | workstation | `getDevice`, `listOutlets`, `listWorkstations`, `recordDeviceHeartbeat`, `registerDevice` |

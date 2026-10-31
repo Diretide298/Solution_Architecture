@@ -873,7 +873,7 @@
   "name": "Product Availability, 86 & Operational Food Safety",
   "module": "Stock & Supply",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",

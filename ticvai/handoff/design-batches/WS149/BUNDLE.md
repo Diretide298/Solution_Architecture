@@ -512,7 +512,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The transition is not allowed from the current state, or the move to `active` comes before the device is approved (`device-approval-required`; CHG-CSP-011).; 422 Status `active` for a terminal whose model has no current Level 3 certification for its acquirer (`recordPaymentTerminalCertification`), or `dccEnabled` with …; 422 The enrolment code is wrong, already used or expired … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The move to `active` comes before the device is approved (`device-approval-required`; CHG-CSP-011), or the move is not one states/device-enrolment.yaml allows …; 422 Status `active` for a terminal whose model has no current Level 3 certification for its acquirer (`recordPaymentTerminalCertification`), or `dccEnabled` with …; 422 The enrolment code is wrong, already used or expired … |
 
 #### Edge cases to draw
 

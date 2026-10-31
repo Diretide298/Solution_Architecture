@@ -219,7 +219,8 @@
    "creditTypeId": {
     "x-ticvai-references": "wallet.credit_type",
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "The credit type this lot holds, whose terms it copies at issue (`termsSnapshot`). A top-up's paid lot takes the tenant's one active credit type of category `cash`, and its bonus lot the applying bonus rule's `bonusCreditTypeId` (`topUpWallet`, ADAM CR-357)."
    },
    "issuedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -450,7 +451,7 @@
       },
       "code": {
        "type": "string",
-       "description": "The check that found it. Validation's codes are listed on `publishWalletConfiguration` (ADAM CR-311)."
+       "description": "The check that found it. Validation's codes are listed on `publishWalletConfiguration` (ADAM CR-311); the restore's own two, `restore-credit-type-retired-since-version` and `restore-left-newer-rows`, on `restoreWalletConfigurationVersion` (ADAM CR-355)."
       },
       "message": {
        "type": "string"

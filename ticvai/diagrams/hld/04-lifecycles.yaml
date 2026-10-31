@@ -1,13 +1,13 @@
 id: HLD-LIFECYCLES
 sourceFiles:
   folder: states/
-  files: 210
-  drawn: 209
+  files: 211
+  drawn: 210
   skipped:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 209 state models and 107 events
+title: 210 state models and 108 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -1081,13 +1081,13 @@ stateModels:
   owner: white-label
   service: null
   states: null
-  transitions: 7
+  transitions: 10
   initial:
   - draft
   terminal:
   - archived
   operations: []
-  guarded: 7
+  guarded: 10
   ref: diagrams/lld/lifecycles/content-block.yaml
 - entity: White-label content
   contract: white-label
@@ -1109,7 +1109,7 @@ stateModels:
   owner: marketing-crm
   service: MarketingService
   states: null
-  transitions: 13
+  transitions: 15
   initial:
   - withAssistant
   - queued
@@ -1123,8 +1123,9 @@ stateModels:
   - escalateCase
   - handoverToAgent
   - sendConversationMessage
+  - setCallDisposition
   - transferConversation
-  guarded: 13
+  guarded: 15
   ref: diagrams/lld/lifecycles/conversation.yaml
 - entity: CorrectiveAction
   contract: fnb
@@ -1260,6 +1261,20 @@ stateModels:
   - verifyDeveloper
   guarded: 6
   ref: diagrams/lld/lifecycles/developer-account.yaml
+- entity: Registered device enrolment
+  contract: tenancy
+  owner: tenancy
+  service: TenancyService
+  states: null
+  transitions: 10
+  initial:
+  - registered
+  terminal:
+  - retired
+  operations:
+  - enrolDevice
+  guarded: 10
+  ref: diagrams/lld/lifecycles/device-enrolment.yaml
 - entity: Device firmware release
   contract: tenancy
   owner: tenancy
@@ -3533,6 +3548,9 @@ events:
 - event: identity-guestCheckoutLinked
   description: A signed-in guest proved a guest-checkout booking was theirs; the matched orders are
     to be attached to them.
+- event: identity-guestCodeIssued
+  description: A one-time code was minted for a guest's email, SMS or WhatsApp address and is to be
+    sent.
 - event: identity-guestRegistered
   description: A guest registered an account, with the consents they gave on the form.
 - event: identity-loginRecorded

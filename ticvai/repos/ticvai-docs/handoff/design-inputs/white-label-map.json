@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/build-white-label-map.py",
- "generated": "2026-10-29",
+ "generated": "2026-10-31",
  "note": "Derived from the configuring operations' request schemas and the screens. Never edit; rerun the tool.",
  "elements": [
   {
@@ -10016,7 +10016,7 @@
    "required": true,
    "default": "—",
    "allowed": "at least 1",
-   "help": "",
+   "help": "A `strictlyNecessary` entry is required, with a `description` that has non-empty text for every code in `languages`; `setCookieBannerDesign` refuses a design without it (`422 strictly-necessary-description-missing` …",
    "effect": "",
    "configuredOn": [
     {

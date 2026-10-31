@@ -1979,6 +1979,8 @@
  },
  "FinTaxInvoice": {
   "x-ticvai-persistence": "ledger.tax_invoice + ledger.tax_invoice_line",
+  "x-ticvai-rls": "guest-reads-own",
+  "x-ticvai-guest-subject": "buyerSubjectId",
   "type": "object",
   "description": "5.7.93, 5.10.3. **A guest tax invoice, as issued, never edited.** Corrections are credit memos. The supplier block is a snapshot of the legal entity at issue, so a later change of address does not change a document already given to a guest.",
   "required": [

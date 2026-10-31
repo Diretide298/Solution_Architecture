@@ -1,6 +1,6 @@
 # WS75 — Digital Asset Management DAM board 2
 
-**10 screens · 11 operations · 10 schemas · 2 permissions**
+**10 screens · 12 operations · 11 schemas · 2 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-073` | Semantic & Natural-Language Asset Search | B | 0 | 14 | 6 | 5 | 1 | 0 | — | notStarted (—) |
 | `CMS-074` | Visual Similarity & Related Asset Discovery | B | 2 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-075` | Duplicate & Near-Duplicate Management | B | 19 | 0 | 6 | 0 | 1 | 2 | — | notStarted (—) |
-| `CMS-076` | Asset Version Control & Revision History | B | 0 | 14 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `CMS-076` | Asset Version Control & Revision History | B | 3 | 14 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `CMS-077` | Version Comparison & Replacement Impact | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-078` | Transformation & Rendition Management | B | 11 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-079` | Rendition Processing & Delivery Readiness | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -134,7 +134,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ## Thin screens in this batch
 
-**CMS-073, CMS-076, CMS-077 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
+**CMS-073, CMS-077 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ## Design inputs from the client meetings
 

@@ -42,6 +42,10 @@ Checks:
      (a), CHG-CRA-005): it takes no `approvalRequestId` (parameter or body), has no `approval-required`
      refusal, routes `approvals.request` through `createApprovalRequest` (`x-ticvai-write-via`), and answers
      202, not 200 or 201, with the request's id (`approvalRequestId`, required). Its self-tests run first.
+ 17. An operation whose second person signs in the call keeps that shape (APPROVER_IN_BODY; ADAM CR-356,
+     CHG-CR356-001): `promoteRelease` and `withdrawRelease` meet their requiresApproval moves with
+     `approverPrincipalId` and `stepUpToken` in the body and a `403` listing `approver-is-requester`,
+     `step-up-token-missing` and `step-up-token-expired`, and take no `approvalRequestId`.
 
 Run: python tools/check-states.py [--self-test]
 """
@@ -93,8 +97,6 @@ APPROVAL_ENTRY_KNOWN = {
     "lease:active->forceReleased:forceReleaseInventoryHold",
     "operator-session:active->terminated:forceLogout",
     "period:closing->open:abandonPeriodClose",
-    "release:inStaging->withdrawn:withdrawRelease",
-    "release:inProduction->withdrawn:withdrawRelease",
     "seat-map:validated->published:publishSeatMap",
     "seat-map:archived->published:publishSeatMap",
     "settlement:hasExceptions->resolved:resolveSettlementException",
@@ -138,6 +140,12 @@ APPROVAL_RAISED = {
     "reactivateTenant": "ADAM CR-172 option (a)",
 }
 APPROVAL_ROUTE = {"table": "approvals.request", "operation": "createApprovalRequest"}
+# Rule 17: the approver signs in the call, with a step-up, and no approval request is raised (ADAM CR-356).
+APPROVER_IN_BODY = {
+    "promoteRelease": "states/release.yaml, inDev->inStaging and inStaging->inProduction",
+    "withdrawRelease": "ADAM CR-356, inStaging->withdrawn and inProduction->withdrawn",
+}
+APPROVER_403 = ["approver-is-requester", "step-up-token-missing", "step-up-token-expired"]
 
 
 def _local(doc: dict, node, depth: int = 0):
@@ -161,6 +169,24 @@ def _props(doc: dict, sch) -> tuple[set, set]:
         props |= p
         req |= r
     return props, req
+
+
+def approver_in_body_shape(op: dict, doc: dict) -> list[str]:
+    """What breaks rule 17 on one operation; empty when the approver and step-up travel in its body."""
+    bad = []
+    body = (((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema")
+    props = _props(doc, body)[0] if body is not None else {}
+    for k in ("approverPrincipalId", "stepUpToken"):
+        if k not in props:
+            bad.append(f"takes no {k} in its body")
+    if "approvalRequestId" in props:
+        bad.append("takes approvalRequestId in its body")
+    r403 = _local(doc, {str(k): v for k, v in (op.get("responses") or {}).items()}.get("403"))
+    have = (r403.get("x-ticvai-problem-types") or []) if isinstance(r403, dict) else []
+    for t in APPROVER_403:
+        if t not in have:
+            bad.append(f"has no 403 {t}")
+    return bad
 
 
 def approval_raised_shape(op: dict, doc: dict) -> list[str]:
@@ -257,6 +283,7 @@ def check_duplicate_paths() -> None:
 OP_VERBS: dict[str, str] = {}
 OP_TEXT: dict = {}   # operationId -> (its text, its response codes, its description), for rule 14
 OP_RAW: dict = {}    # operationId -> (the operation, its contract document), for rule 16
+ANCHORS: dict = {}   # contract.Schema.property -> an inline enum any state model may anchor on (CR-354)
 
 
 def load_contracts() -> tuple[dict[str, list[str]], set[str], dict[str, set[str]]]:
@@ -287,6 +314,12 @@ def load_contracts() -> tuple[dict[str, list[str]], set[str], dict[str, set[str]
                 if (isinstance(prop, dict) and "enum" in prop
                         and pname.lower() in ("status", "state")):
                     enums[f"{ctx}.{name}.{pname}"] = prop["enum"]
+                # **A lifecycle under another name anchors too** (ADAM CR-354, CHG-CR354-001):
+                # `RegisteredDevice.enrolmentState` is a lifecycle that is not called status or state, so a
+                # model of it found no enum. Any inline enum property a state model names is its anchor;
+                # only status and state are warned about when no model exists.
+                if isinstance(prop, dict) and "enum" in prop:
+                    ANCHORS[f"{ctx}.{name}.{pname}"] = prop["enum"]
         for item in (doc.get("paths") or {}).values():
             if isinstance(item, dict):
                 for verb, op in item.items():
@@ -321,6 +354,14 @@ def main() -> int:
         for b in approval_raised_shape(*OP_RAW[o]):
             ERRORS.append(f"{o} {b}: it raises its own approval request and answers 202 with it ({why}, "
                           "CHG-CRA-005; rule 16)")
+    # 17. an operation whose second person signs in the call keeps that shape (ADAM CR-356; CHG-CR356-001)
+    for o, why in sorted(APPROVER_IN_BODY.items()):
+        if o not in OP_RAW:
+            ERRORS.append(f"{o} is in no contract ({why}; rule 17)")
+            continue
+        for b in approver_in_body_shape(*OP_RAW[o]):
+            ERRORS.append(f"{o} {b}: its approver signs in the call with a step-up, as promoteRelease does "
+                          f"({why}, CHG-CR356-001; rule 17)")
     state_files = sorted(f for f in STATES.glob("*.yaml") if f.name != "_schema.yaml")
     event_files = sorted(f for f in EVENTS.glob("*.yaml") if f.name != "_schema.yaml")
 
@@ -348,8 +389,8 @@ def main() -> int:
         states |= set(d["initial"]) | set(d["terminal"])
 
         # 1. against the contract enum
-        if key in enums:
-            declared = set(enums[key])
+        if key in enums or key in ANCHORS:
+            declared = set(enums.get(key) or ANCHORS[key])
             for s in sorted(declared - states):
                 ERRORS.append(f"{name}: '{s}' is in the contract enum and not in the model — "
                               "a state nobody has thought about")

@@ -2019,8 +2019,13 @@ paths:
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-body-key: [delegator, delegate]
+      x-ticvai-body-key-note: 'Keyed by the body''s `delegator` and `delegate`, not a singleton (ADAM CR-352, Chinmay, 30
+        October 2026; CHG-CR352-001): one delegation per pair of people at the caller''s venue. The PUT finds the active
+        `approvals.delegation` between those two people (`is_active` true, `valid_to` after now, `scope_path` at or under
+        the caller''s venue): found, it replaces that row whole from the body, field by field as the description''s table
+        says; not found, it creates one as `createApprovalDelegation` does. No other delegation at the venue is touched.
+        There is no key in the path, so the key travels in the body.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.6 p.13; MoM 8 Sep (delegation/substitute approver, segregation
@@ -2050,6 +2055,12 @@ paths:
         | `requiredRole` (and `role`, `position`) | `requiredRoleId`: the delegate must hold it (`409 delegateLacksRequiredRole` otherwise); `role` and `position` are display only |
 
         Authority limits of a role stay in `setApprovalMatrix`; this sets the limit of one delegation.
+
+        **Keyed by delegator and delegate, not a singleton** (ADAM CR-352, Chinmay, 30 October 2026; CHG-CR352-001). The
+        PUT is an upsert of the one active delegation between the body's `delegator` and `delegate` at the caller's
+        venue (`x-ticvai-body-key-note`); no other delegation at the venue is touched. The `200` stays
+        `RolesAuthorityDelegationApprovalLimitsView`, filled from the row written; it does not become
+        `ApprovalDelegation`. The `400`, `403` and `409` and their problem types are unchanged.
       tags:
       - approvals
       x-ticvai-permission: APPROVAL_CONFIGURE

@@ -5103,6 +5103,8 @@ The response names any build-time change in the draft that will **not** reach gu
 Copies the chosen version's `snapshot` into the working draft. **It does not publish** — restore then review then publish, so a rollback is as deliberate as the change that caused it. **Not a one-click rollback (confirmed 28 September, audit R139)**: flow F22 is corrected to match.
 **Unpublished changes** (r8 walk of ticket 27901; lead decision of 20 October 2026). A restore overwrites the working draft, so it is refused with 409 `unpublished-changes` while the draft holds changes not yet published, unless the request sends `discardDraftChanges` true, as `restoreKioskConfigVersion` does. The CMS-015 dialog says the unpublished changes are replaced, and sends true after the user confirms. The discarded draft is stored nowhere (the loss is intended, and the dialog is the only confirmation).
 
+**A page deleted since the version was published** (ADAM CR-350, 30 October 2026; CHG-CR350-001). Content pages are not in the snapshot, so a section or item may name a page that no longer exists. The restore restores everything and hides whatever points at a missing page. A homepage section whose `contentPageId` names no content page comes back with `contentPageId` null and `isVisible` false; the rest of the section is as the snapshot has it. A navigation item whose target names a content page that no longer exists comes back with `isVisible` false. A missing page never causes a refusal or a `500`: refusing would block that version for good, because a recreated page gets a new id. In the same transaction the restore sets `content_page.is_referenced` for the pages the restored homepage and navigation link, as `setHomepageLayout` and `setNavigation` do. The review on CMS-015 shows those sections and items as hidden, and the user can point them at a page before publishing. No new response field or problem type.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_PUBLISH` |
@@ -5485,6 +5487,7 @@ Records the preset and which steps are done, skipped or in progress, so the buil
 
 Run before publishing. Reports missing translations, navigation pointing at disabled modules, unset required assets, contrast failures, and policies without a current version.
 **And the booking flows (decided 29 September, W12):** an enabled flow that fails `validateBookingFlow` is `bookingFlowInvalid`; a venue with bookable products and no flow serving their kind is `bookingFlowMissing`.
+**`bookingFlowMissing`, narrowed and asked in process** (ADAM CR-343, 30 October 2026; CHG-CR343-001): the rule is on `ConfigFindingKind`. Both of its reads are asked in process from the operations host, through the owning module's own query class and under the caller's row-level security (XDR-022): `catalogue#productRecords` where `{venueId}` for each active venue (the operations role's SELECT on Catalogue's product tables comes from V0118, as for `createFnbOrder` under XDR-008), and `tenancy#activeVenues` (`platform.scope` is a kernel table every host may read, as ADAM CR-296 ruled for Tenancy's other reads).
 **What each kind checks** (ADAM CR-320, option A, both parts, 29 October 2026; CHG-CR320-001): the rule of every kind is on `ConfigFindingKind`, and `publishTenantConfig` runs the same rules. To decide them this reads the draft's own tables (`x-ticvai-reads`) and asks, as `publishTenantConfig` and `getModuleEnablement` / `setModuleEnablement` ask them: `catalogue#productRecords` and `tenancy#activeVenues` (`bookingFlowMissing`), `assets#mediaAssetRecords` (`missingRequiredAsset`), and `subscription#contractRecords`, `subscription#licenceAddOnRecords` and `subscription#planRecords`, which give the tenant's `LicencePosition.licensedModules` (`unlicensedModuleEnabled`).
 
 |  |  |
@@ -6218,6 +6221,10 @@ The state model (`states/custom-domain.yaml`) credits these transitions to the j
 BL-172. **The CMS modelled configuration and not authoring** — a marketer could choose between things a developer had built and could not write something new.
 **Scheduled, localised and optionally personalised.** The page builder is a frontend over this, the same way the venue map's canvas is a frontend over its graph.
 
+**The segment is checked** (decided 30 October 2026, Chinmay, ADAM CR-366; CHG-CR366-001). An `audienceSegmentId` that `marketing-crm#segmentRecords` (in process) does not return under the caller's scope is refused `422` `unknown-reference`, naming `audienceSegmentId`, and nothing is written; null means everybody, as before. This is the package's code for a reference the caller cannot use (ADAM CR-103), not `400`.
+
+**The body is checked only as far as the contract defines it** (ADAM CR-366). `body` and each `localeVariants.<locale>` must be JSON objects; where present, the text keys `ContentBlock.body` lists for the block's `kind` must be strings, and an `items[]` or `fields[]` must be an array of objects. A failure is `400` `validation`, with `errors[]` naming the field (for example `body.items[2].answer`). Other keys are not checked: the full schema per kind is not defined now and is on the left-out list (LO-CR366-001).
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -6242,10 +6249,10 @@ BL-172. **The CMS modelled configuration and not authoring** — a marketer coul
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
-| pageId | string (uuid) |  | (nullable) |
+| pageId | string (uuid) |  | A content page's id, always (ADAM CR-364, 30 October 2026; CHG-CR364-001). (nullable) |
 | kind | enum (richText, image, video, gallery, cta, faq, form, embed, …) | yes |  |
 | position | integer |  |  |
-| body | object |  | Typed by kind, and validated against the block's own schema at save. |
+| body | object |  | Typed by kind. |
 | localeVariants | object |  | Per-locale bodies, not per-locale pages. |
 | status | enum (draft, scheduled, published, expired, archived) | yes | Created as draft; moved by publishContentBlock and the publishAt/expireAt timer (states/content-block.yaml), never by the body of a create. (read-only) |
 | publishAt | string (date-time) |  | Content scheduling, which the configuration model had no room for. (nullable) |
@@ -6260,10 +6267,10 @@ BL-172. **The CMS modelled configuration and not authoring** — a marketer coul
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
-| pageId | string (uuid) |  | (nullable) |
+| pageId | string (uuid) |  | A content page's id, always (ADAM CR-364, 30 October 2026; CHG-CR364-001). (nullable) |
 | kind | enum (richText, image, video, gallery, cta, faq, form, embed, …) | yes |  |
 | position | integer |  |  |
-| body | object |  | Typed by kind, and validated against the block's own schema at save. |
+| body | object |  | Typed by kind. |
 | localeVariants | object |  | Per-locale bodies, not per-locale pages. |
 | status | enum (draft, scheduled, published, expired, archived) | yes | Created as draft; moved by publishContentBlock and the publishAt/expireAt timer (states/content-block.yaml), never by the body of a create. (read-only) |
 | publishAt | string (date-time) |  | Content scheduling, which the configuration model had no room for. (nullable) |
@@ -6278,13 +6285,17 @@ BL-172. **The CMS modelled configuration and not authoring** — a marketer coul
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created as a draft |
+| 400 |  | body or a localeVariants.<locale> entry is not a JSON object, a text key ContentBlock.body lists for the kind is not a string, or an items[] or fields[] is not an array of objects (validation, ADAM C… |
+| 422 |  | audienceSegmentId names no segment marketing-crm#segmentRecords returns under the caller's scope (unknown-reference, ADAM CR-366, CR-103); the problem names the field, and nothing is written. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listContentBlocks
 
 **`GET /content-blocks`**: The content blocks of a page
 
-**Added 4 October 2026 (CHG-FXC-011; CMS-007: the builder could create and publish a block and not load one).** The blocks of one page (`pageKey`, a content page's id or a homepage section key), ordered by `position`, drafts and published alike.
+**Added 4 October 2026 (CHG-FXC-011; CMS-007: the builder could create and publish a block and not load one).** The blocks of one page (`pageKey`, a content page's id), ordered by `position`, drafts and published alike.
+
+**`pageKey` is a content page's id only** (ADAM CR-364, decided 30 October 2026, Chinmay: "as you recommended"; CHG-CR364-001). A value that is not a uuid answers 400 `validation`, not an empty page; an unknown page id answers an empty page. A homepage section's blocks are the blocks of the content page its `contentPageId` names (`HomepageLayout.sections[].contentPageId`), so CMS-007 sends that id. A section with no page yet gets one first (`createContentPage`, then `setHomepageLayout` setting `contentPageId`), and `createContentBlock`'s `pageId` is always a content page id.
 
 **Statuses.** Every `status` is returned, ended ones included (`archived`, `expired`); a screen that shows only live rows filters on `status` itself.
 
@@ -6307,7 +6318,7 @@ Where `position` is null the row sorts after the rows that have it (NULLS LAST),
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| pageKey | query | yes | string |  |
+| pageKey | query | yes | string (uuid) | A content page's id (ADAM CR-364; CHG-CR364-001). |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -6317,10 +6328,10 @@ Where `position` is null the row sorts after the rows that have it (NULLS LAST),
 |---|---|---|---|
 | items | array of ContentBlock | yes |  |
 | items[].id | string (uuid) | yes | (read-only) |
-| items[].pageId | string (uuid) |  | (nullable) |
+| items[].pageId | string (uuid) |  | A content page's id, always (ADAM CR-364, 30 October 2026; CHG-CR364-001). (nullable) |
 | items[].kind | enum (richText, image, video, gallery, cta, faq, form, embed, …) | yes |  |
 | items[].position | integer |  |  |
-| items[].body | object |  | Typed by kind, and validated against the block's own schema at save. |
+| items[].body | object |  | Typed by kind. |
 | items[].localeVariants | object |  | Per-locale bodies, not per-locale pages. |
 | items[].status | enum (draft, scheduled, published, expired, archived) | yes | Created as draft; moved by publishContentBlock and the publishAt/expireAt timer (states/content-block.yaml), never by the body of a create. (read-only) |
 | items[].publishAt | string (date-time) |  | Content scheduling, which the configuration model had no room for. (nullable) |
@@ -6337,6 +6348,7 @@ Where `position` is null the row sorts after the rows that have it (NULLS LAST),
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | The content blocks of a page |
+| 400 |  | pageKey is not a uuid (ADAM CR-364, CHG-CR364-001; errors[] names pageKey). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishContentBlock
@@ -6346,7 +6358,8 @@ Where `position` is null the row sorts after the rows that have it (NULLS LAST),
 **A seasonal banner needing somebody awake at midnight is the same defect `Product.onSaleFrom` fixed**, and the answer is the same: a date on the object rather than a person with an alarm.
 Approval is separate from authoring where the tenant requires it — **the approver may not be the author**, following the rule already enforced on products. **Whether it is required is the tenant's publish-review policy** (`getPublishReviewPolicy`; Chinmay, 2 October, workbook Q156; CHG-CSA-042), off by default: a single publish by a `TENANT_PUBLISH` holder.
 **`expireAt` must follow `publishAt`** when both are sent (decided 28 September, audit R163), or 400. A scheduled job makes the publish and the expiry at those times (audit R163).
-**The review path, as `publishTenantConfig` has it** (r8 walk of ticket 27919; ADAM CR-154). With the tenant's publish-review policy off, the block is published or scheduled at once (200). With it on, this calls approvals' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, the same matrix subject `whiteLabelPublication`, `subjectId` the block id; the request points at the block, and the block keeps no link back), leaves `status` as it is and sets `reviewStatus` `pending`, and answers 202. White-label's consumer of `approval.granted` then publishes or schedules the block (`reviewStatus` `approved`); its consumer of `approval.rejected` sets `reviewStatus` `rejected` and the block stays a draft. While `pending`, a second publish of the block is refused with 409 `content-block-awaiting-review`. CMS-007 reads `getPublishReviewPolicy` to say whether review applies and shows `reviewStatus` on the block.
+**Which blocks it publishes** (ADAM CR-365, decided 30 October 2026, Chinmay: "as you recommended, with one rule added"; CHG-CR365-001; `states/content-block.yaml`). A `draft` block is published or scheduled as before. A `scheduled` block may be published now (no `publishAt`) or rescheduled (a new `publishAt`). An `expired` block may be published now or scheduled again. `published` and `archived` are still refused 409. **The block's `expireAt`, whether sent or already stored, must be after the moment it goes live**, or 400 on `expireAt`; to republish an expired block, send a later `expireAt`, or `expireAt` null to clear it.
+**The review path, as `publishTenantConfig` has it** (r8 walk of ticket 27919; ADAM CR-154). With the tenant's publish-review policy off, the block is published or scheduled at once (200). With it on, this calls approvals' `createApprovalRequest` (`x-ticvai-write-via`; kind `configurationChange`, the same matrix subject `whiteLabelPublication`, `subjectId` the block id; the request points at the block, and the block keeps no link back), leaves `status` as it is and sets `reviewStatus` `pending`, and answers 202. White-label's consumer of `approval.granted` then publishes or schedules the block (`reviewStatus` `approved`); its consumer of `approval.rejected` sets `reviewStatus` `rejected` and the block stays a draft. While `pending`, a second publish of the block is refused with 409 `content-block-awaiting-review`. CMS-007 reads `getPublishReviewPolicy` to say whether review applies and shows `reviewStatus` on the block. **Until the request is approved the block keeps its current status and schedule** (ADAM CR-365). **When approvals refuses `422 no-approval-route`**, this call passes it on as 422 `no-approval-route`, leaves `status` and `reviewStatus` unchanged, and writes nothing.
 
 |  |  |
 |---|---|
@@ -6379,10 +6392,10 @@ Approval is separate from authoring where the tenant requires it — **the appro
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
-| pageId | string (uuid) |  | (nullable) |
+| pageId | string (uuid) |  | A content page's id, always (ADAM CR-364, 30 October 2026; CHG-CR364-001). (nullable) |
 | kind | enum (richText, image, video, gallery, cta, faq, form, embed, …) | yes |  |
 | position | integer |  |  |
-| body | object |  | Typed by kind, and validated against the block's own schema at save. |
+| body | object |  | Typed by kind. |
 | localeVariants | object |  | Per-locale bodies, not per-locale pages. |
 | status | enum (draft, scheduled, published, expired, archived) | yes | Created as draft; moved by publishContentBlock and the publishAt/expireAt timer (states/content-block.yaml), never by the body of a create. (read-only) |
 | publishAt | string (date-time) |  | Content scheduling, which the configuration model had no room for. (nullable) |
@@ -6397,8 +6410,10 @@ Approval is separate from authoring where the tenant requires it — **the appro
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Published or scheduled |
+| 400 |  | expireAt (sent, or already stored) is not after the moment the block goes live, or does not follow a sent publishAt (audit R163; ADAM CR-365, CHG-CR365-001; errors[] names expireAt). |
 | 202 |  | Submitted for review; the tenant's publish-review policy is on. |
 | 409 |  | The block is already published (content-block-published; a change goes through a new draft), is archived (content-block-archived), or is already waiting for review (content-block-awaiting-review). |
+| 422 |  | No approval route (no-approval-route; ADAM CR-365, CHG-CR365-001): with review on, approvals' createApprovalRequest matched no active rule, so it raised nothing and this call passes its refusal on. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFooter
@@ -6492,6 +6507,13 @@ BL-002. **A header is chrome and a footer is a link surface**, which is why this
 (`content-block-published`) and changed by creating a new draft and publishing it, so what a guest saw stays on
 record.
 
+**The same two checks as `createContentBlock`** (decided 30 October 2026, Chinmay, ADAM CR-366; CHG-CR366-001), on
+a change that sends the field. A sent `audienceSegmentId` that `marketing-crm#segmentRecords` (in process) does not
+return under the caller's scope is refused `422` `unknown-reference`, naming `audienceSegmentId`, and nothing is
+written; null means everybody. A sent `body` or `localeVariants` is checked as `createContentBlock` states, for the
+block's `kind`: JSON objects, the kind's listed text keys strings where present, an `items[]` or `fields[]` an
+array of objects; a failure is `400` `validation` with `errors[]` naming the field.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -6527,10 +6549,10 @@ record.
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) | yes | (read-only) |
-| pageId | string (uuid) |  | (nullable) |
+| pageId | string (uuid) |  | A content page's id, always (ADAM CR-364, 30 October 2026; CHG-CR364-001). (nullable) |
 | kind | enum (richText, image, video, gallery, cta, faq, form, embed, …) | yes |  |
 | position | integer |  |  |
-| body | object |  | Typed by kind, and validated against the block's own schema at save. |
+| body | object |  | Typed by kind. |
 | localeVariants | object |  | Per-locale bodies, not per-locale pages. |
 | status | enum (draft, scheduled, published, expired, archived) | yes | Created as draft; moved by publishContentBlock and the publishAt/expireAt timer (states/content-block.yaml), never by the body of a create. (read-only) |
 | publishAt | string (date-time) |  | Content scheduling, which the configuration model had no room for. (nullable) |
@@ -6545,7 +6567,9 @@ record.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Changed |
+| 400 |  | A sent body or localeVariants.<locale> entry fails the body check createContentBlock states (validation, ADAM CR-366); errors[] names each field. |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 422 |  | A sent audienceSegmentId names no segment marketing-crm#segmentRecords returns under the caller's scope (unknown-reference, ADAM CR-366, CR-103); the problem names the field, and nothing is written. |
 | 409 |  | The block is published (content-block-published). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -6662,10 +6686,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| page_id | uuid | no |  |
+| page_id | uuid | no | A content page's id, always (ADAM CR-364, 30 October 2026; CHG-CR364-001). |
 | kind | text | yes |  |
 | position | integer | no |  |
-| body | jsonb | no | Typed by kind, and validated against the block's own schema at save. |
+| body | jsonb | no | Typed by kind. |
 | locale_variants | jsonb | no | Per-locale bodies, not per-locale pages. |
 | status | text | yes | Created as draft; moved by publishContentBlock and the publishAt/expireAt timer (states/content-block.yaml), never by the body of a create. |
 | publish_at | timestamptz | no | Content scheduling, which the configuration model had no room for. |

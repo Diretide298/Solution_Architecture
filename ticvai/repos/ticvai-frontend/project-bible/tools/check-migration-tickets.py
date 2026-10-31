@@ -181,8 +181,11 @@ def main() -> int:
                                              f"{', '.join(sorted(reached.get(t, ()))[:3]) or 'it'} reads or writes it")
     # M-REVIEW-ROW (CHG-R8MIG-013, IDENTITY-C43): every change derive-ddl leaves for a person is on the migration ticket
     # of its table (build-service-docs, ticket_done.review_sentence), so a row no ticket carries is a change nobody writes.
+    # The ticket a row belongs on is the one build-service-docs puts it on: the MIG- migration whose "Tables:" creates the
+    # table, before a hand-written [DB] task that only changes it (r12: CR359-DB-FORM-VERSION-KEY names
+    # marketing.waiver_signature, which MIG-MARKETING-2 creates; CHG-R12INT-003).
     made_by = {}
-    for k, r in migs.items():
+    for k, r in sorted(migs.items(), key=lambda kr: not td.MIGRATION_KEY.match(kr[0])):
         for t in td.built_tables(r["description"], k):
             made_by.setdefault(t.strip(), k)
     moves = td.declared_moves(g.ROOT)

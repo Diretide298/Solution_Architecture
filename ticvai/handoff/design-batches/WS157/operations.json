@@ -108,6 +108,19 @@
   "requestBody": null,
   "responds": "ResourceSchedule"
  },
+ "getStaffingRules": {
+  "method": "GET",
+  "path": "/staffing-rules",
+  "contract": "workforce",
+  "summary": "Minimum cover, working-hour limits and overtime (read)",
+  "permission": "WORKFORCE_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "StaffingRules"
+ },
  "listIntegrationSources": {
   "method": "GET",
   "path": "/integration-sources",
@@ -268,6 +281,11 @@
     "name": "guidedAnswerIds",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
    },
    {
     "name": null,

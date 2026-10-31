@@ -7,20 +7,20 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-29",
+ "generated": "2026-10-31",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1663,
-  "operations": 1892,
+  "operations": 1894,
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
   "operationsWithNoScreen": 212
  },
  "waves": {
-  "wave1": 144,
-  "wave2": 57,
-  "wave3": 1462
+  "wave1": 148,
+  "wave2": 55,
+  "wave3": 1460
  },
  "modules": [
   {
@@ -199,14 +199,14 @@
   },
   {
    "contract": "fnb",
-   "operations": 77
-  },
-  {
-   "contract": "finance",
-   "operations": 62
+   "operations": 78
   },
   {
    "contract": "wallet",
+   "operations": 62
+  },
+  {
+   "contract": "finance",
    "operations": 62
   },
   {
@@ -218,11 +218,11 @@
    "operations": 56
   },
   {
-   "contract": "inventory",
+   "contract": "seating",
    "operations": 53
   },
   {
-   "contract": "seating",
+   "contract": "inventory",
    "operations": 53
   },
   {
@@ -246,11 +246,11 @@
    "operations": 44
   },
   {
-   "contract": "identity",
-   "operations": 41
+   "contract": "workforce",
+   "operations": 42
   },
   {
-   "contract": "workforce",
+   "contract": "identity",
    "operations": 41
   },
   {
@@ -7435,9 +7435,9 @@
    "id": "BO-134",
    "name": "Kitchen & Preparation Stations",
    "module": "Food & Beverage",
-   "wave": 2,
+   "wave": 1,
    "route": "/food-beverage/kitchen-preparation-stations",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -7489,7 +7489,7 @@
    "id": "BO-140",
    "name": "Product Availability, 86 & Operational Food Safety",
    "module": "Stock & Supply",
-   "wave": 2,
+   "wave": 1,
    "route": "/stock-supply/product-availability-86-operational-food-safet",
    "operations": 7,
    "drawn": true
@@ -14059,7 +14059,7 @@
    "id": "BO-873",
    "name": "Staff Resource Directory",
    "module": "Rentals",
-   "wave": 3,
+   "wave": 1,
    "route": "/rentals/staff-resource-directory-bo-873",
    "operations": 3,
    "drawn": true
@@ -14131,9 +14131,9 @@
    "id": "BO-881",
    "name": "Overtime & Working-Hour Rules",
    "module": "Rentals",
-   "wave": 3,
+   "wave": 1,
    "route": "/rentals/overtime-working-hour-rules-bo-881",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {

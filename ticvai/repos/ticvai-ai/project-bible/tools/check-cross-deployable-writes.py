@@ -18,7 +18,8 @@ The kernel tables every host needs, and the writes that cannot route yet, are in
 
     X-KERNEL     the kernel grants are exactly platform.outbox INSERT, platform.scope SELECT,
                  platform.audit_record INSERT, platform.idempotency_record SELECT/INSERT/UPDATE and
-                 platform.outbox_sequence SELECT/INSERT/UPDATE (CR-166)
+                 platform.outbox_sequence SELECT/INSERT/UPDATE (CR-166), platform.tenant_field_key and
+                 platform.blind_index_rehash SELECT/INSERT/UPDATE (CR-339)
     X-UNROUTED   a write into another deployable's table (a kernel table only where the kernel grants a write)
                  has neither a route nor an exception
     X-EVENT      an event route names an event that is not catalogued, that the operation does not emit
@@ -64,6 +65,10 @@ KERNEL = {
     # ADAM CR-166, 18 October 2026 (CHG-CRA-005): every host allocates its outbox sequence from the counter in the
     # transaction that writes the outbox row, so access and operations allocate like commerce.
     "platform.outbox_sequence": ("SELECT", "INSERT", "UPDATE"),
+    # ADAM CR-339, 30 October 2026 (CHG-CR339-001; ADR-0063 as amended that day): the kernel in every host reads and
+    # writes the tenant's wrapped field-encryption keys and the blind-index re-hash progress; nothing deletes them.
+    "platform.tenant_field_key": ("SELECT", "INSERT", "UPDATE"),
+    "platform.blind_index_rehash": ("SELECT", "INSERT", "UPDATE"),
 }
 WRITE_PRIVS = {"INSERT", "UPDATE", "DELETE"}
 EXC_FIELDS = ("id", "operation", "table", "kind", "reason", "added", "removal_release")
@@ -138,7 +143,7 @@ def analyse():
     want = {t: tuple(sorted(p)) for t, p in KERNEL.items()}
     for t in sorted(set(kern) | set(want)):
         if t not in want:
-            bad.append(("X-KERNEL", t, "is granted to every deployable in the kernel list, and only the five agreed "
+            bad.append(("X-KERNEL", t, "is granted to every deployable in the kernel list, and only the seven agreed "
                                        "tables may be (ADAM CR-002)"))
         elif t not in kern:
             bad.append(("X-KERNEL", t, "is missing from the kernel list"))
@@ -339,7 +344,7 @@ def main() -> int:
         print("FAIL %d finding(s): %s" % (len(bad), ", ".join("%s %d" % kv for kv in sorted(by.items()))))
         return 1
     print("ok: every cross-deployable write is routed by event or by the owner's operation, or is a dated "
-          "exception; the kernel grants are the five agreed")
+          "exception; the kernel grants are the seven agreed")
     return 0
 
 

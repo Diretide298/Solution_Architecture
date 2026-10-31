@@ -1,6 +1,6 @@
 {
  "BillingStatement": {
-  "x-ticvai-persistence": "none — computed from orders.membership_renewal, the cycle's order (orders.sales_order, orders.order_line, orders.payment) and payments.dunning_case",
+  "x-ticvai-persistence": "none — computed from orders.membership_renewal, the cycle's order (orders.sales_order, orders.order_line, orders.order_line_discount, orders.refund), payments.dunning_case and ledger.tax_invoice_line (ADAM CR-342)",
   "type": "object",
   "description": "2.14.19-2.14.23, 5.7.96, BL-100. **What a guest was charged over a period, and deliberately not a tax document.**\n**Computed rather than stored**, because a statement assembled at read time cannot disagree with the ledger it describes. A stored statement is a second source of truth about money, and the package already has one of those.\n",
   "required": [
@@ -45,13 +45,28 @@
     }
    },
    "total": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The cycle's order's `gross_amount` less its completed refunds (ADAM CR-342)."
    },
    "taxTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The cycle's order's `tax_amount` (ADAM CR-342)."
    },
    "discountTotal": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "The charge lines' `discountAmount` summed (ADAM CR-342)."
    },
    "pdfUrl": {
     "type": "string",
@@ -79,10 +94,12 @@
   "properties": {
    "occurredAt": {
     "type": "string",
-    "format": "date-time"
+    "format": "date-time",
+    "description": "A `charge`: the order's `created_at`; a `refund`: the refund's `completed_at`; a `failedAttempt`: the dunning case's `first_failed_at` (ADAM CR-342). Lines run oldest first by it."
    },
    "kind": {
     "type": "string",
+    "description": "One `charge` per orders.order_line of the cycle's order, one `refund` per orders.refund row of it with status completed, one `failedAttempt` per payments.dunning_case on it; no `adjustment` until a source is named (ADAM CR-342).",
     "enum": [
      "charge",
      "refund",
@@ -91,35 +108,56 @@
     ]
    },
    "amount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "A `charge`: the line's `gross_amount`; a `refund`: `refunded_amount`; a `failedAttempt`: the case's `overdue_amount`, or the order's `gross_amount` when that is null (ADAM CR-342). In the trading currency of the order's venue."
    },
    "description": {
-    "type": "string"
+    "type": "string",
+    "description": "A `charge`: the `description` of the ledger.tax_invoice_line issued for its order line, null where none is visible (ADAM CR-342)."
    },
    "netAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "A `charge`'s order line `net_amount` (ADAM CR-342)."
    },
    "discountAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "A `charge`'s order line discounts summed, its orders.order_line_discount amounts (ADAM CR-342)."
    },
    "taxAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "A `charge`'s order line `tax_amount` (ADAM CR-342)."
    },
    "taxRate": {
     "type": "number",
     "nullable": true,
-    "description": "2.14.23. The VAT rate the charge was posted with; `amount` is the gross."
+    "description": "2.14.23. The VAT rate the charge was posted with; `amount` is the gross. The `tax_rate` of the ledger.tax_invoice_line issued for the charge's order line (finance#taxInvoiceLineRecords, by order_line_id), null where none is visible (ADAM CR-342)."
    },
    "taxInvoiceId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "description": "The finance tax invoice issued for this charge, where one was (`issueTaxInvoice`); the guest downloads it with `getTaxDocumentRendition`."
+    "description": "The finance tax invoice issued for this charge, where one was (`issueTaxInvoice`); the guest downloads it with `getTaxDocumentRendition`. The `tax_invoice_id` of the ledger.tax_invoice_line issued for the charge's order line, null where none is visible (ADAM CR-342)."
    },
    "declineClass": {
     "type": "string",
     "nullable": true,
-    "description": "**Present on `failedAttempt` only**, and it is what turns *\"your payment failed\"* into something a guest can act on: a soft decline means try again, a hard one means the card needs replacing.\n"
+    "description": "**Present on `failedAttempt` only**, and it is what turns *\"your payment failed\"* into something a guest can act on: a soft decline means try again, a hard one means the card needs replacing. The dunning case's `decline_class` (ADAM CR-342).\n"
    }
   }
  },
@@ -371,7 +409,7 @@
     "nullable": true,
     "readOnly": true,
     "x-ticvai-persisted": false,
-    "description": "The display name of the guest acted for (`pii.subject.display_name`), read with the grant; null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)."
+    "description": "The display name of the guest acted for (`pii.subject.display_name`), read with the grant; null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009). listDelegations reads it with `identity#subjectMinorStatus` (ADAM CR-362)."
    },
    "overSubjectIsMinor": {
     "type": "boolean",
@@ -556,6 +594,7 @@
  },
  "DunningCase": {
   "x-ticvai-persistence": "payments.dunning_case",
+  "x-ticvai-rls": "guest-reads-own",
   "type": "object",
   "description": "BL-100. **One recurring charge being chased**, and the row a venue works from.\n",
   "required": [
@@ -1417,6 +1456,17 @@
    },
    "description": {
     "type": "string"
+   },
+   "fromPrice": {
+    "oneOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "**The lowest list price on the caller's channel now** (ADAM CR-358, option (a); CHG-CR358-001): the lowest `listPrice` among the product's sellable variants on the caller's channel, in the same currency as `ProductVariant.listPrice`, by the same price-list rule as `searchCatalogue`'s `fromPrice` and `ProductVariant.listPrice`. Set by `listProducts` (its description says how); not stored and ignored on input. Null where no price list prices it on that channel, and null from every other operation that answers `Product` for now."
    },
    "nameLocalised": {
     "allOf": [

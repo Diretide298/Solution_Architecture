@@ -2630,6 +2630,17 @@
     ],
     "description": "**Optional for a mobile number** (ADAM CR-222, 25 October 2026): left out, the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delivery (DI-209), as `requestGuestOtp` does; an email identifier sends email. A caller that sends `channel` still gets it (additive)."
    },
+   "source": {
+    "type": "string",
+    "enum": [
+     "guestWeb",
+     "guestApp",
+     "kiosk"
+    ],
+    "default": "guestWeb",
+    "x-ticvai-persisted": false,
+    "description": "**Where the guest is registering** (decided 30 October 2026, Chinmay, ADAM CR-371; CHG-CR371-001). Optional, additive. Not stored by Identity: `registerGuest` carries it on `identity.guestRegistered` as `channel`, and Marketing records each consent with the matching `ConsentSource`. The guest web (WEB-013, WEB-016) sends `guestWeb`, the guest app (GST-010, GST-042) `guestApp`. Not the code's delivery `channel` above."
+   },
    "displayName": {
     "type": "string",
     "maxLength": 200

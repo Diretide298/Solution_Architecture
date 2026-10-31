@@ -41,7 +41,7 @@
 | fnb | [`fireCourse`](#firecourse) | POST | `/kitchen-tickets/{ticketId}/fire` | core | 1 | EMP-058, KIT-003 |
 | fnb | [`getCourseRules`](#getcourserules) | GET | `/outlets/{outletId}/course-rules` | core | 1 | BO-136, KIT-009 |
 | fnb | [`getHaccpStatus`](#gethaccpstatus) | GET | `/food-safety/status` | core | 1 | BO-044, BO-140, EMP-067, KIT-008 |
-| fnb | [`getKitchenSla`](#getkitchensla) | GET | `/outlets/{outletId}/kitchen-sla` | core | 1 | KIT-009 |
+| fnb | [`getKitchenSla`](#getkitchensla) | GET | `/outlets/{outletId}/kitchen-sla` | core | 1 | BO-134, KIT-009 |
 | fnb | [`holdCourse`](#holdcourse) | POST | `/kitchen-tickets/{ticketId}/hold` | core | 1 | EMP-058, KIT-003 |
 | fnb | [`joinRestaurantWaitlist`](#joinrestaurantwaitlist) | POST | `/waitlist` | core | 1 | EMP-056, GST-070, WEB-036 |
 | fnb | [`leaveRestaurantWaitlist`](#leaverestaurantwaitlist) | POST | `/waitlist/{entryId}/leave` | core | 1 | EMP-056, GST-070, WEB-036 |
@@ -1010,7 +1010,7 @@ The outlet's ticket targets and priority weights as `setKitchenSla` stored them 
 | Read routing | replica |
 | Reads | `fnb.kitchen_sla` |
 | Writes | - |
-| Called by | KIT-009 |
+| Called by | BO-134, KIT-009 |
 
 **Parameters**
 

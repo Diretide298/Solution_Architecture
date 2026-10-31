@@ -1844,6 +1844,7 @@ paths:
     get:
       operationId: getKitchenSla
       x-ticvai-consumed-by:
+        - "P08 BO-134 Kitchen & Preparation Stations"
         - "P15 KIT-009 SLA, Priority & Service Rules"
       x-ticvai-audience:
       - staff

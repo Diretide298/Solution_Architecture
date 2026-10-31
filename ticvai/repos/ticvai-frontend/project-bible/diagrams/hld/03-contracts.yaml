@@ -17,12 +17,12 @@ tiers:
 contracts:
 - contract: marketing-crm
   tier: satellite
-  operations: 281
+  operations: 283
   holds: null
   service: MarketingService
   verbs:
-    GET: 134
-    POST: 78
+    GET: 135
+    POST: 79
     PUT: 60
     PATCH: 7
     DELETE: 2
@@ -211,6 +211,7 @@ contracts:
   events:
   - identity-credentialResetRequested
   - identity-guestCheckoutLinked
+  - identity-guestCodeIssued
   - identity-guestRegistered
   - identity-loginRecorded
   - identity-privacyRequestRaised
@@ -355,6 +356,20 @@ contracts:
   - reporting-definitionPublished
   - reporting-questionAnswered
   ref: diagrams/lld/contracts/reporting.yaml
+- contract: workforce
+  tier: satellite
+  operations: 50
+  holds: null
+  service: TenancyService
+  verbs:
+    GET: 27
+    POST: 13
+    PUT: 9
+    PATCH: 1
+  guestCallable: 0
+  offlineCapable: 10
+  events: null
+  ref: diagrams/lld/contracts/workforce.yaml
 - contract: payments
   tier: satellite
   operations: 49
@@ -369,20 +384,6 @@ contracts:
   events:
   - payment-attemptFailed
   ref: diagrams/lld/contracts/payments.yaml
-- contract: workforce
-  tier: satellite
-  operations: 49
-  holds: null
-  service: TenancyService
-  verbs:
-    GET: 26
-    POST: 13
-    PUT: 9
-    PATCH: 1
-  guestCallable: 0
-  offlineCapable: 10
-  events: null
-  ref: diagrams/lld/contracts/workforce.yaml
 - contract: accreditation
   tier: satellite
   operations: 48

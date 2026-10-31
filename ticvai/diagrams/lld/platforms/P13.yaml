@@ -25,9 +25,9 @@ servicesCalled:
 - service: WhiteLabelService
   operationCalls: 122
 - service: MarketingService
-  operationCalls: 73
+  operationCalls: 75
 - service: VenueOpsService
-  operationCalls: 66
+  operationCalls: 67
 - service: AiService
   operationCalls: 14
 - service: CatalogueService
@@ -643,7 +643,7 @@ screens:
   name: Privacy & Consent Configuration Command Center
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listPrivacyConsent
@@ -871,10 +871,12 @@ screens:
   name: Privacy Configuration Testing, Approval & Publication
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - approvePrivacyTesting
+  - listPrivacyChangeSets
+  - listPrivacyNoticePolicy
   - setPrivacyNoticePolicyGovernance
   states:
   - emptyFirstRun
@@ -1958,6 +1960,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - createUpload
   - listMediaAssetVersions
   - replaceMediaAsset
   states:

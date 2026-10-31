@@ -1747,6 +1747,13 @@ paths:
         programme a template: it never opens for applications (`409` on `status: open`) and is what
         `cloneAccreditationProgramme` copies from.
 
+
+        **`code` stays unique in the tenant on amendment** (ADAM CR-340, option A; CHG-CR340-001). When the
+        body''s `code`, compared case-insensitively, is held by another programme of the tenant, the answer is
+        `409` `duplicate-code` and nothing changes. A PUT that keeps the programme''s own code is never a clash.
+        The check runs before writing, and a unique violation on `programme_code_uniq` (a race) maps to the
+        same `409`, never a `500`.
+
         '
       tags:
       - accreditation
@@ -1774,8 +1781,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationProgramme'
         '409':
-          x-ticvai-problem-types: [programme-is-template]
-          description: A template cannot be opened for applications
+          x-ticvai-problem-types: [programme-is-template, duplicate-code]
+          description: A template cannot be opened for applications (`programme-is-template`), or another programme
+            of the tenant already holds the body's `code`, compared case-insensitively (`duplicate-code`; ADAM
+            CR-340)
           content:
             application/problem+json:
               schema:

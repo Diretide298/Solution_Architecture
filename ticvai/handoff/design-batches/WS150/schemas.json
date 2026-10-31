@@ -659,6 +659,7 @@
    },
    "token": {
     "x-ticvai-secret": "blind-index",
+    "x-ticvai-blind-index-of": "none",
     "x-ticvai-unique": "tenant",
     "x-ticvai-unique-compare": "exact",
     "type": "string",

@@ -81,7 +81,8 @@
    "creditTypeId": {
     "x-ticvai-references": "wallet.credit_type",
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "The credit type this lot holds, whose terms it copies at issue (`termsSnapshot`). A top-up's paid lot takes the tenant's one active credit type of category `cash`, and its bonus lot the applying bonus rule's `bonusCreditTypeId` (`topUpWallet`, ADAM CR-357)."
    },
    "issuedAmount": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"

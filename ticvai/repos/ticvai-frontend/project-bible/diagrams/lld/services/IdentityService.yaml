@@ -290,7 +290,7 @@ operationsByContract:
   - operation: grantDelegation
     verb: POST
     path: /guests/{subjectId}/delegations
-    scope: venue
+    scope: tenant
     permission: GUEST_MANAGE
     offline: false
     reads: 3
@@ -426,7 +426,7 @@ operationsByContract:
   - operation: listDelegations
     verb: GET
     path: /guests/{subjectId}/delegations
-    scope: venue
+    scope: tenant
     permission: GUEST_VIEW
     offline: false
     reads: 2
@@ -1216,7 +1216,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: identity.guest_verification_policy
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -1434,7 +1434,7 @@ tables:
   - identity
   foreignWriters: null
 - table: pii.subject_document
-  columns: 10
+  columns: 11
   store: postgres
   parent: pii.subject
   writtenBy:
@@ -1452,7 +1452,7 @@ readsFrom:
   operations: 7
 writesOutside:
 - service: TenancyService
-  operations: 14
+  operations: 15
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -1497,23 +1497,15 @@ writesOutside:
   - operation: resetPrincipalCredential
     tables:
     - platform.outbox
+  - operation: verifyGuestEmail
+    tables:
+    - platform.outbox
   - operation: verifyGuestOtp
     tables:
     - platform.outbox
   - operation: verifyMfaChallenge
     tables:
     - platform.outbox
-- service: MarketingService
-  operations: 1
-  rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
-    published.'
-  why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
-    each inserts or updates, or which operation or event MarketingService published for it — check each
-    against ADR-0028.'
-  writes:
-  - operation: verifyGuestEmail
-    tables:
-    - marketing.message_dispatch
 screens:
 - P01:WEB-013 Booking Confirmation
 - P01:WEB-016 Login / Register

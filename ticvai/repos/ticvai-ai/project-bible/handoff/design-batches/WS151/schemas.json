@@ -175,6 +175,7 @@
  },
  "DunningCase": {
   "x-ticvai-persistence": "payments.dunning_case",
+  "x-ticvai-rls": "guest-reads-own",
   "type": "object",
   "description": "BL-100. **One recurring charge being chased**, and the row a venue works from.\n",
   "required": [

@@ -1808,7 +1808,6 @@
    "identity.guest_credential",
    "identity.guest_session",
    "identity.otp_challenge",
-   "marketing.message_dispatch",
    "orders.order_event",
    "orders.order_line",
    "orders.sales_order",
@@ -2137,7 +2136,6 @@
    "marketing.consent_propagation",
    "marketing.consent_record",
    "marketing.device_consent",
-   "marketing.message_dispatch",
    "orders.cart",
    "orders.cart_line",
    "pii.subject",
@@ -2228,7 +2226,7 @@
     "id": "formRegisterGuest",
     "component": "modal",
     "trigger": "Create an account",
-    "body": "**Collects what `registerGuest` sends before it is called.** Required: `identifier`. The guest never picks a channel: an email address is sent with `channel` `email`; a mobile number is sent with none, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delivery (ADAM CR-222). Optional: `displayName`, `password`, `preferredLanguage`, `consents`. The code it sends is typed in the Code field and confirmed with `verifyGuestEmail` (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `registerGuest` sends before it is called.** Required: `identifier`. The guest never picks a channel: an email address is sent with `channel` `email`; a mobile number is sent with none, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delivery (ADAM CR-222). Optional: `displayName`, `password`, `preferredLanguage`, `consents`. The client sends `source` `guestWeb`, not typed (where the guest registers; ADAM CR-371). The code it sends is typed in the Code field and confirmed with `verifyGuestEmail` (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RegisterGuestRequest",
     "confirm": {
      "label": "Register guest",
@@ -2795,8 +2793,8 @@
    "marketing.consent_record",
    "marketing.guest_preference",
    "marketing.guest_profile",
-   "marketing.message_dispatch",
-   "pii.subject"
+   "pii.subject",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -3159,7 +3157,9 @@
    "marketing.loyalty_position",
    "orders.membership_renewal",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.payment",
+   "orders.refund",
    "orders.sales_order",
    "payments.dunning_case",
    "payments.dunning_policy",
@@ -7198,7 +7198,7 @@
   ],
   "machine": null,
   "states": {
-   "loading": "The ticket types of the product, with prices.",
+   "loading": "The mascot and Loading..., on the venue's hero photo, with no venue tile or venue name, until the ticket types of the product and their prices arrive.",
    "error": "Could not load. Names which read failed; nothing is added.",
    "emptyFirstRun": "**This product has no ticket types on sale.** Says so and offers the product page.",
    "emptyNoAccess": "**There is no permission to name \u2014 a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** \u2014 that reads as *there is no data* and sends somebody to support with the wrong question.",
@@ -7399,7 +7399,6 @@
    "identity.guest_credential",
    "identity.guest_session",
    "identity.otp_challenge",
-   "marketing.message_dispatch",
    "orders.order_event",
    "orders.order_line",
    "orders.sales_order",
@@ -7927,7 +7926,9 @@
    "marketing.loyalty_position",
    "orders.membership_renewal",
    "orders.order_line",
+   "orders.order_line_discount",
    "orders.payment",
+   "orders.refund",
    "orders.sales_order",
    "payments.dunning_case",
    "payments.dunning_policy",
@@ -10758,7 +10759,6 @@
    "marketing.consent_propagation",
    "marketing.consent_record",
    "marketing.device_consent",
-   "marketing.message_dispatch",
    "pii.subject",
    "pii.subject_contact",
    "pii.subject_document",
@@ -10825,7 +10825,7 @@
     "id": "formRegisterGuest",
     "component": "modal",
     "trigger": "Create an account",
-    "body": "**Collects what `registerGuest` sends before it is called.** Required: `identifier`. The guest never picks a channel: an email address is sent with `channel` `email`; a mobile number is sent with none, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delivery (ADAM CR-222). Optional: `displayName`, `password`, `preferredLanguage`, `consents`. The code it sends is typed in the Code field and confirmed with `verifyGuestEmail` (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `registerGuest` sends before it is called.** Required: `identifier`. The guest never picks a channel: an email address is sent with `channel` `email`; a mobile number is sent with none, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delivery (ADAM CR-222). Optional: `displayName`, `password`, `preferredLanguage`, `consents`. The client sends `source` `guestApp`, not typed (where the guest registers; ADAM CR-371). The code it sends is typed in the Code field and confirmed with `verifyGuestEmail` (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.",
     "bindsTo": "RegisterGuestRequest",
     "confirm": {
      "label": "Register guest",
@@ -13703,8 +13703,8 @@
    "identity.mfa_recovery_code",
    "identity.otp_challenge",
    "marketing.guest_device",
-   "marketing.message_dispatch",
-   "pii.subject"
+   "pii.subject",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -15918,6 +15918,8 @@
    "retail.shop_and_drop_line",
    "wallet.balance",
    "wallet.credit_lot",
+   "wallet.credit_type",
+   "wallet.funding_rule",
    "wallet.wallet"
   ],
   "writes": [
@@ -53007,6 +53009,7 @@
    "listKitchenStations",
    "setKitchenStations",
    "setKitchenSla",
+   "getKitchenSla",
    "listOutlets",
    "printPrepSheet"
   ],
@@ -53034,7 +53037,7 @@
    "fnb.kitchen_station"
   ],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -53094,6 +53097,27 @@
      ]
     },
     "provenance": "contract fnb.yaml POST /production-plans/{planId}/prep-sheet"
+   },
+   {
+    "id": "formSetKitchenSla",
+    "component": "modal",
+    "trigger": "Save ticket targets",
+    "body": "**Collects what `setKitchenSla` sends before it is called**, opened on the outlet's targets as `getKitchenSla` returns them. Required: `targets` (a service mode and its minutes each). Optional: `priorityWeights`. The targets and weights are replaced whole. Dismissing sends nothing; the screen behind is unchanged.",
+    "confirm": {
+     "label": "Save ticket targets",
+     "operation": "setKitchenSla"
+    },
+    "dismiss": {
+     "label": "Cancel",
+     "discards": [
+      "targets",
+      "priorityWeights"
+     ]
+    },
+    "reads": [
+     "getKitchenSla"
+    ],
+    "provenance": "contract fnb.yaml PUT /outlets/{outletId}/kitchen-sla (CHG-R12GT-001)"
    }
   ]
  },
@@ -53530,7 +53554,7 @@
    "fnb.temperature_checkpoint"
   ],
   "storedProcedures": [],
-  "wave": 2,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -77808,6 +77832,8 @@
    "cache:idempotency",
    "wallet.balance",
    "wallet.credit_lot",
+   "wallet.credit_type",
+   "wallet.funding_rule",
    "wallet.wallet"
   ],
   "writes": [
@@ -102729,7 +102755,7 @@
   ],
   "writes": [],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -103279,7 +103305,8 @@
   "app": "venue-management-web",
   "route": "/rentals/overtime-working-hour-rules-bo-881",
   "operations": [
-   "setStaffingRules"
+   "setStaffingRules",
+   "getStaffingRules"
   ],
   "services": [
    "TenancyService"
@@ -103299,7 +103326,7 @@
    "workforce.staffing_rules"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -159827,7 +159854,7 @@
     "id": "confirmWithdrawRelease",
     "component": "confirmDialog",
     "trigger": "Withdraw release",
-    "body": "**Names what `withdrawRelease` changes and what it leaves alone**, in the consequence rather than the verb. A release version this affects should be identified in the dialog, not just counted. **Collects what `withdrawRelease` sends before it is called.** Required: `reason`.",
+    "body": "**Names what `withdrawRelease` changes and what it leaves alone**, in the consequence rather than the verb. A release version this affects should be identified in the dialog, not just counted. **Collects what `withdrawRelease` sends before it is called.** Required: `reason`; for a release `inStaging` or `inProduction` also `approverPrincipalId` (a second person, not the caller) and `stepUpToken`, as `formPromoteRelease` collects them (ADAM CR-356). A release `inDev` needs neither.",
     "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/withdraw"
    },
    {
@@ -187196,7 +187223,7 @@
   ],
   "writes": [],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -187840,7 +187867,9 @@
   "route": "/policy/privacy-configuration-testing-approval-publication-cms-030",
   "operations": [
    "approvePrivacyTesting",
-   "setPrivacyNoticePolicyGovernance"
+   "setPrivacyNoticePolicyGovernance",
+   "listPrivacyChangeSets",
+   "listPrivacyNoticePolicy"
   ],
   "services": [
    "MarketingService"
@@ -187850,6 +187879,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "marketing.consent_record",
    "marketing.privacy_change_set",
    "marketing.privacy_notice_governance",
    "whitelabel.policy"
@@ -187861,7 +187891,7 @@
    "marketing.privacy_notice_governance"
   ],
   "storedProcedures": [],
-  "wave": 3,
+  "wave": 1,
   "offline": false,
   "specified": true,
   "exits": [
@@ -187904,6 +187934,9 @@
       "approvedAt"
      ]
     },
+    "reads": [
+     "listPrivacyNoticePolicy"
+    ],
     "provenance": "contract marketing-crm.yaml PUT /privacy-notice-policy"
    }
   ]
@@ -190809,6 +190842,7 @@
   "route": "/media-library/asset-version-control-revision-history-cms-076",
   "operations": [
    "listMediaAssetVersions",
+   "createUpload",
    "replaceMediaAsset"
   ],
   "services": [

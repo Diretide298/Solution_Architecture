@@ -2052,7 +2052,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `listFxRates` | [LedgerService](../backend/LedgerService.md#listfxrates) | onLoad | The currencies the venue shows, each marked chargeable or approximate — called with `venueId` (audit R120 (a)) and `chargeable` (CHG-FIN-001) | `LEDGER_VIEW` |
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | The venue's products, each with `fromPrice`, its lowest list price on the caller's channel in the venue's trading currency, for the price card (ADAM CR-358, CHG-CR358-001) | `PRODUCT_VIEW` |
 
 **States**
 

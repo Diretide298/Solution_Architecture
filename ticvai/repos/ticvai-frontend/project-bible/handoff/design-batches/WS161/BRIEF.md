@@ -158,7 +158,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-914` | Event Resource Requirement Builder | B | 0 | 40 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-915` | Venue & Space Allocation | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-916` | Equipment & Asset Allocation | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-917` | Event Staff & Personnel Allocation | D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-917` | Event Staff & Personnel Allocation | B | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-918` | Event Resource Template Library | D | 37 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-919` | AI Event Resource Forecasting | A | 10 | 19 | 6 | 49 | 0 | 0 | — | notStarted (—) |
 | `BO-920` | Event Resource Cost Estimator | B | 2 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |

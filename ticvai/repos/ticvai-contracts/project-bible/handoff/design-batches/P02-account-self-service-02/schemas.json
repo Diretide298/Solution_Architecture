@@ -410,7 +410,7 @@
     "nullable": true,
     "readOnly": true,
     "x-ticvai-persisted": false,
-    "description": "The display name of the guest acted for (`pii.subject.display_name`), read with the grant; null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)."
+    "description": "The display name of the guest acted for (`pii.subject.display_name`), read with the grant; null for a staff grant. Not stored (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009). listDelegations reads it with `identity#subjectMinorStatus` (ADAM CR-362)."
    },
    "overSubjectIsMinor": {
     "type": "boolean",
@@ -1192,6 +1192,7 @@
     "maxLength": 64,
     "x-ticvai-unique-compare": "exact",
     "x-ticvai-secret": "blind-index",
+    "x-ticvai-blind-index-of": "tokenRef",
     "description": "**A keyed hash of the token, not the token** (decided 14 October 2026, CHG-MKT-001; ADR-0063 section 4 as amended): HMAC-SHA-256 of the token under the tenant's blind-index key, written as 64 lowercase hex characters. Keyed, so a token somebody holds cannot be checked against the table. It is how a re-registration without an `installationId` finds its row. Cleared when the device is revoked. The token itself is write-only — returning it would put a push credential in every response a support agent can read.\n"
    },
    "tokenRef": {

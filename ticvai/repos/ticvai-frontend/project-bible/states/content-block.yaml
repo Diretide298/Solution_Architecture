@@ -21,6 +21,14 @@ transitions:
   to: published
   trigger: timer
   guard: '`publishAt` reached'
+- from: scheduled
+  to: published
+  trigger: operation
+  guard: '`publishContentBlock` with no `publishAt`: published now, before its time (ADAM CR-365, CHG-CR365-001)'
+- from: scheduled
+  to: scheduled
+  trigger: operation
+  guard: '`publishContentBlock` with a new `publishAt`: rescheduled (ADAM CR-365, CHG-CR365-001)'
 - from: draft
   to: published
   trigger: operation
@@ -33,6 +41,12 @@ transitions:
   to: scheduled
   trigger: operation
   guard: Rescheduled for the next season
+  isReversal: true
+- from: expired
+  to: published
+  trigger: operation
+  guard: '`publishContentBlock` with no `publishAt`: brought back now; its `expireAt`, sent or stored, must be
+    after now, so a later `expireAt` or null is sent (ADAM CR-365, CHG-CR365-001)'
   isReversal: true
 - from: published
   to: archived

@@ -1018,7 +1018,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Passed `testResult.passed` | toggle | optional | — | — | — | Whether the device passed; always sent with `testResult` (422 otherwise). | `enrolDevice` body |
 | Notes `testResult.notes` | text area | optional | — | max length 1000 | — | — | `enrolDevice` body |
 
-Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The transition is not allowed from the current state, or the move to `active` comes before the device is approved (`device-approval-required`; CHG-CSP-011).; 422 The enrolment code is wrong, already used or expired (`enrolment-code-invalid`; CHG-CSP-011).
+Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The move to `active` comes before the device is approved (`device-approval-required`; CHG-CSP-011), or the move is not one states/device-enrolment.yaml allows …; 422 The enrolment code is wrong, already used or expired (`enrolment-code-invalid`; CHG-CSP-011).
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1035,7 +1035,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Register device (secondary button) | `registerDevice` POST `/devices` | RegisteredDevice | RegisteredDevice | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Identifier already bound to another workstation, or `serialNumber` already registered in the tenant (`duplicate-serial`, moved here … | gated `DEVICE_CONFIGURE`; opens modal first |
 | Register access device (primary button) | `placeAccessDevice` POST `/device-placements` | AccessDevicePlacement | AccessDevicePlacement | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 `device-already-placed`: the device already has an active placement. Move it with `updateAccessDevicePlacement`, or set that … | gated `DEVICE_CONFIGURE`; opens modal first |
 | Save access device (secondary button) | `updateAccessDevicePlacement` PUT `/device-placements/{placementId}` | AccessDevicePlacement | AccessDevicePlacement | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | gated `DEVICE_CONFIGURE`; opens modal first |
-| Enrol with code (secondary button) | `enrolDevice` POST `/devices/{deviceId}/enrolment` | DeviceEnrolment | RegisteredDevice | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The transition is not allowed from the current state, or the move to `active` comes before the device is … | opens modal first |
+| Enrol with code (secondary button) | `enrolDevice` POST `/devices/{deviceId}/enrolment` | DeviceEnrolment | RegisteredDevice | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The move to `active` comes before the device is approved (`device-approval-required`; CHG-CSP-011), or the move … | opens modal first |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1063,7 +1063,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Empty, first run (`?state=emptyFirstRun`) | No physical device registration configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Identifier already bound to another workstation, or `serialNumber` already registered in the tenant (`duplicate-serial`, moved here from access with the …; 409 The transition is not allowed from the current state, or the move to `active` comes before the device is approved (`device-approval-required`; CHG-CSP-011).; 409 `device-already-placed`: the device already has an … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Identifier already bound to another workstation, or `serialNumber` already registered in the tenant (`duplicate-serial`, moved here from access with the …; 409 The move to `active` comes before the device is approved (`device-approval-required`; CHG-CSP-011), or the move is not one states/device-enrolment.yaml allows …; 409 `device-already-placed`: the device already … |
 
 #### Edge cases to draw
 

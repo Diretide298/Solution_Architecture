@@ -1,7 +1,7 @@
 id: HLD
 title: TICVAI — seventeen modules in five tiers, five deployables
 generatedBy: tools/derive-diagrams.py
-about: '**What ships together.** 2,857 operations and 1,171 tables resolve into seventeen modules, deployed
+about: '**What ships together.** 2,860 operations and 1,173 tables resolve into seventeen modules, deployed
   as five units (ADR-0055), and **the data boundary decides where they split**: a module owns and migrates
   its schemas; another module reads them through published views and writes them only through the owner''s
   in-process API.
@@ -17,8 +17,8 @@ tiers:
     Identity and 289 tables anchor on `platform.scope`.
   services:
   - service: TenancyService
-    operations: 214
-    tables: 108
+    operations: 215
+    tables: 110
     schemas:
     - platform
     - workforce
@@ -187,13 +187,13 @@ tiers:
     property and one that should be tested rather than assumed.
   services:
   - service: MarketingService
-    operations: 281
+    operations: 283
     tables: 133
     schemas:
     - marketing
     contracts:
     - marketing-crm
-    flowCoverage: 37%
+    flowCoverage: 36%
     scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
     ifDown: Down stops campaigns and guest lookup. Neither stops trading.
     ref: diagrams/lld/services/MarketingService.yaml
@@ -318,7 +318,7 @@ crossServiceWrites:
   kind: strong
 - from: IdentityService
   to: TenancyService
-  writes: 16
+  writes: 17
   reads: 9
   kind: strong
 - from: LedgerService
@@ -485,11 +485,6 @@ crossServiceWrites:
   to: OrderService
   writes: 1
   reads: 3
-  kind: ordinary
-- from: IdentityService
-  to: MarketingService
-  writes: 1
-  reads: 0
   kind: ordinary
 - from: LedgerService
   to: OrderService

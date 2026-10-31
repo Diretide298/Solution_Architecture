@@ -23,9 +23,9 @@ tables**, and the distribution is the honest shape of the package:
 
 | Terminal table | Tables that reach it |
 |---|---:|
-| `platform.scope` | 901 |
-| `identity.role` | 765 |
-| `control.partner` | 744 |
+| `platform.scope` | 900 |
+| `identity.role` | 764 |
+| `control.partner` | 743 |
 | `approvals.matrix` | 362 |
 | `ledger.legal_entity` | 335 |
 | `access.admission_rules` | 240 |
@@ -133,7 +133,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `identity` — 42 tables
 
-**Root: `identity.principal`**  ·  own 25 · reach 389 · out 3
+**Root: `identity.principal`**  ·  own 25 · reach 392 · out 3
 
 - **1 step from the root** — `access_decision`, `access_override`, `access_review_campaign`, `access_review_item`, `authz_audit`, `delegated_access`, `guest_identity_verification`, `membership_history`, `mfa_challenge`, `mfa_method`, `mfa_recovery_code`, `module_access`, `principal_credential`, `principal_external_identity`, `refresh_token`, `role_permission`, `session`
 - **2 steps from the root** — `principal_credential_history`
@@ -218,6 +218,18 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
+## `platform` — 25 tables
+
+**Root: `platform.scope`**  ·  own 12 · reach 213 · out 1
+
+- **1 step from the root** — `audit_read`, `audit_record`, `outlet`, `region_settings`, `sale_board`, `tenant`, `venue_settings`, `workstation`
+- **2 steps from the root** — `device`, `outlet_opening_hour`, `sale_board_page`
+- **3 steps from the root** — `sale_board_tile`
+
+- **Reaches the root through nothing** — `blind_index_rehash`, `configuration_profile`, `connectivity_policy`, `dead_letter`, `denomination`, `idempotency_record`, `offline_policy`, `outbox`, `outbox_sequence`, `profile_deployment`, `schema_version`, `tenant_field_key`
+
+  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
+
 ## `reporting` — 25 tables
 
 **Root: `reporting.report_definition`**  ·  own 9 · reach 9 · out 1
@@ -241,16 +253,6 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `inventory` — 23 tables
-
-**Root: `inventory.inventory_item`**  ·  own 13 · reach 20 · out 2
-
-- **1 step from the root** — `count_line`, `goods_receipt_line`, `kit_component`, `movement`, `purchase_order_line`, `quotation_line`, `requisition_line`, `serialised_item`, `stock_batch`, `stock_earmark`, `stock_level`, `transfer_line`
-
-- **Reaches the root through nothing** — `count`, `daily_count_list`, `goods_receipt`, `location`, `purchase_order`, `quotation`, `requisition`, `supplier`, `supplier_contract`, `transfer`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
 ## `games` — 23 tables
 
 **Root: `games.game`**  ·  own 6 · reach 6 · out 3
@@ -262,15 +264,13 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `platform` — 23 tables
+## `inventory` — 23 tables
 
-**Root: `platform.scope`**  ·  own 12 · reach 213 · out 1
+**Root: `inventory.inventory_item`**  ·  own 13 · reach 20 · out 2
 
-- **1 step from the root** — `audit_read`, `audit_record`, `outlet`, `region_settings`, `sale_board`, `tenant`, `venue_settings`, `workstation`
-- **2 steps from the root** — `device`, `outlet_opening_hour`, `sale_board_page`
-- **3 steps from the root** — `sale_board_tile`
+- **1 step from the root** — `count_line`, `goods_receipt_line`, `kit_component`, `movement`, `purchase_order_line`, `quotation_line`, `requisition_line`, `serialised_item`, `stock_batch`, `stock_earmark`, `stock_level`, `transfer_line`
 
-- **Reaches the root through nothing** — `configuration_profile`, `connectivity_policy`, `dead_letter`, `denomination`, `idempotency_record`, `offline_policy`, `outbox`, `outbox_sequence`, `profile_deployment`, `schema_version`
+- **Reaches the root through nothing** — `count`, `daily_count_list`, `goods_receipt`, `location`, `purchase_order`, `quotation`, `requisition`, `supplier`, `supplier_contract`, `transfer`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 

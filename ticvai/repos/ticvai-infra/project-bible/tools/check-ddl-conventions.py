@@ -19,6 +19,8 @@ import re
 import sys
 from pathlib import Path
 
+import yaml
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
 
@@ -38,6 +40,16 @@ RULES = {
     "D-JSONB-TWIN": "a jsonb column and a child table holding the same data (R111)",
     "D-RENAME-RESIDUE": "a DDL comment or contract description naming a table by its pre-rename name (R160)",
     "D-UNDEFINED-TYPE": "a column typed with a schema-qualified type that no DDL file creates (CHG-R6-001, CR-001)",
+    "D-PROVISION-TYPE": "a type a provisioned file uses before provision-tenant.sh or an earlier file creates it, in "
+                        "provisioning's own order (CHG-R12DB-001)",
+    "D-RECORDED": "a function, trigger or CHECK docs/active/recorded-ddl records that no migration carries "
+                  "(CHG-R12DB-002..006)",
+    "D-GUEST-BRANCH": "a contract schema states a guest branch (x-ticvai-guest-read, guest-reads-own, guest-owns) and "
+                      "the policy the migrations last apply to its table has none (CHG-R12DB-008, CHG-R12DB-009)",
+    "D-HOUSEHOLD-WRITE": "identity.delegated_access's write check, as the migrations last apply it, without the "
+                         "household grant rule ADAM CR-362 settled, or the rule's function not created (CHG-R12DB-007)",
+    "D-RECORDED-GRANTS": "the recorded apply_deployable_grants() owners or kernel grants differ from "
+                         "service-decomposition.json and cross-deployable-writes.yaml (CHG-R12DB-004)",
     "D-CHILD-PARENT": "an item, line, amendment or media table whose key to its parent is not a NOT NULL declared "
                       "reference (CHG-R6-004..006, CR-007 CR-009 CR-010)",
     "D-SCOPE-TREE": "the scope tree without its declared parent key, one tenant root or unique paths (CHG-R6-003, CR-006)",
@@ -482,6 +494,220 @@ def reads_as_assertion(column: str) -> bool:
     return bool(BOOL_OK.search(column)) or fn(column)
 
 
+# ---- CHG-R12DB-001: provisioning, in its own order -------------------------------------------------------------
+# provision-tenant.sh stopped at r1's 010-pii.sql, which types two columns `pii.subject_kind` and `pii.contact_kind`:
+# D-UNDEFINED-TYPE read the schema reference, which CHG-R6-001 had already made right, while the frozen file that
+# provisioning runs still named the types. So this reads what provisioning applies, in its order: the SQL
+# provision-tenant.sh runs before its file loop, then tenant/*.sql by name (control: control/*.sql, initdb's order),
+# and fails on a schema-qualified type a statement uses before any earlier step created it.
+PROVISION_LOOP = re.compile(r'^for f in "\$HERE"/\w+/\*\.sql; do$', re.M)
+QTYPE = r"([a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*)(?:\[\])?"
+TYPE_USES = (re.compile(rf"\bADD COLUMN (?:IF NOT EXISTS )?\"?\w+\"? {QTYPE}", re.I),
+             re.compile(rf"\bALTER COLUMN \"?\w+\"? (?:SET DATA )?TYPE {QTYPE}", re.I),
+             re.compile(rf"\bCREATE DOMAIN \S+ AS {QTYPE}", re.I))
+TYPE_MAKES = re.compile(r"\bCREATE (?:TYPE|DOMAIN|TABLE(?: IF NOT EXISTS)?) ([a-z_][a-z0-9_]*\.\"?[a-z_][a-z0-9_]*\"?)",
+                        re.I)
+TYPE_DROPS = re.compile(r"\bDROP (?:TYPE|DOMAIN) (?:IF EXISTS )?([a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*)", re.I)
+BUILTIN_SCHEMAS = ("public", "pg_catalog", "information_schema")
+
+
+def provision_steps(backend: Path) -> dict:
+    """{database: [(label, SQL)]}, what a new database is given, in order."""
+    out = {"tenant": [], "control": []}
+    script = backend / "provision-tenant.sh"
+    if script.exists():
+        text = script.read_text(encoding="utf-8").replace("\r\n", "\n")
+        loop = PROVISION_LOOP.search(text)
+        pre = text[:loop.start()] if loop else ""
+        docs = re.findall(r"<<'?(\w+)'?[^\n]*\n(.*?)^\1$", pre, re.S | re.M)
+        out["tenant"].append(("provision-tenant.sh, before the file loop", "\n".join(b for _, b in docs)))
+    for db in out:
+        out[db] += [(f"backend/{db}/{f.name}", f.read_text(encoding="utf-8"))
+                    for f in sorted((backend / db).glob("*.sql"), key=lambda p: p.name)]
+    return out
+
+
+def provision_type_findings(steps: list) -> list:
+    """[(label, type, column or use)] for each schema-qualified type a step uses before an earlier step made it."""
+    import ddl_forward as df
+    made, out = set(), []
+
+    def uses(stmt: str) -> list:
+        found = []
+        m = re.match(r"CREATE TABLE (?:IF NOT EXISTS )?\S+\s*\(", df.norm(stmt), re.I)
+        if m:
+            for c, d in df.parse_table(stmt).cols.items():
+                t = df.coldef_type(d).replace('"', "").removesuffix("[]")
+                if re.fullmatch(QTYPE, t):
+                    found.append((t, c))
+        for rx in TYPE_USES:
+            found += [(t, rx.pattern.split("\\b")[1].split(" ")[0]) for t in rx.findall(stmt)]
+        return found
+
+    for label, text in steps:
+        for stmt in df.split_statements(text):
+            for t, where in uses(stmt):
+                if t.split(".", 1)[0] not in BUILTIN_SCHEMAS and t not in made:
+                    out.append((label, t, where))
+            made |= {x.replace('"', "") for x in TYPE_MAKES.findall(stmt)}
+            made -= set(TYPE_DROPS.findall(stmt))
+    return out
+
+
+def self_test_provision_types() -> list:
+    """The rule on made-up provisioning, run before every check (CHG-R12DB-001)."""
+    cases = [
+        ("a type no step creates", [("pre", ""), ("010", "CREATE TABLE a.t (id uuid, k a.kind NOT NULL);")], 1),
+        ("created before, by the script", [("pre", "CREATE DOMAIN a.kind AS text CHECK (VALUE IN ('x'));"),
+                                           ("010", "CREATE TABLE a.t (id uuid, k a.kind NOT NULL);")], 0),
+        ("created after its use", [("010", "CREATE TABLE a.t (id uuid, k a.kind);"),
+                                   ("020", "CREATE TYPE a.kind AS ENUM ('x');")], 1),
+        ("a column added in a guarded block", [("V1", "DO $$ BEGIN IF true THEN ALTER TABLE a.t ADD COLUMN IF NOT "
+                                                      "EXISTS k a.kind; END IF; END $$;")], 1),
+        ("a table's own row type", [("010", "CREATE TABLE a.p (id uuid); CREATE TABLE a.t (id uuid, p a.p);")], 0),
+        ("used after it was dropped", [("pre", "CREATE DOMAIN a.kind AS text;"),
+                                       ("V1", "DROP DOMAIN a.kind;"), ("V2", "ALTER TABLE a.t ADD COLUMN k a.kind;")], 1),
+        ("a built-in schema's type", [("010", "CREATE TABLE a.t (id uuid, p public.ltree);")], 0),
+    ]
+    return [f"D-PROVISION-TYPE self-test '{name}': {len(got)} finding(s), expected {want}"
+            for name, steps, want in cases for got in [provision_type_findings(steps)] if len(got) != want]
+
+
+# ---- CHG-R12DB-002..006: what live has, recorded -----------------------------------------------------------------
+RECORDED_DIR = "docs/active/recorded-ddl"
+
+
+def check_recorded(guard, backend: Path) -> None:
+    """D-RECORDED: every function, trigger and CHECK docs/active/recorded-ddl/<db>.sql records is carried by the
+    database's baseline or forward migrations (derive-ddl writes them into the next one). D-RECORDED-GRANTS: the
+    recorded apply_deployable_grants() gives each deployable the schemas handoff/service-decomposition.json says it
+    owns, and the kernel grants docs/active/cross-deployable-writes.yaml lists, exactly."""
+    import ddl_forward as df
+    for db in ("tenant", "control"):
+        src = g.ROOT / RECORDED_DIR / f"{db}.sql"
+        if not src.exists():
+            continue
+        series = "\n".join(f.read_text(encoding="utf-8") for f in sorted((backend / db).glob("*.sql"))).replace("\r", "")
+        flat = df.norm(series)
+        for st in df.split_statements(src.read_text(encoding="utf-8")):
+            s = df.norm(st)
+            m = re.match(r"CREATE (?:OR REPLACE )?FUNCTION ([\w.]+)\s*\(", s, re.I)
+            if m:
+                body = re.search(r"\bAS\s+(\$\w*\$)(.*?)\1", st, re.S)
+                if not body or body.group(2).replace("\r", "") not in series:
+                    guard.add("D-RECORDED", f"{db}:{m.group(1)}", f"{src.relative_to(g.ROOT).as_posix()} records "
+                              f"{m.group(1)}, and no {db} migration carries its text: run tools/derive-ddl.py --apply")
+                if m.group(1) == "platform.apply_deployable_grants" and body:
+                    check_recorded_grants(guard, db, body.group(2))
+                continue
+            m = re.match(r"CREATE (?:OR REPLACE )?TRIGGER (\w+) .*? ON ([\w.]+) ", s, re.I)
+            if m:
+                if not re.search(rf"CREATE (?:OR REPLACE )?TRIGGER {m.group(1)} .*? ON {re.escape(m.group(2))} ", flat):
+                    guard.add("D-RECORDED", f"{db}:{m.group(2)}.{m.group(1)}", f"the trigger {m.group(1)} on "
+                              f"{m.group(2)} is recorded and no {db} migration carries it")
+                continue
+            m = re.match(r"ALTER TABLE ([\w.]+) ADD CONSTRAINT (\w+) CHECK", s, re.I)
+            if m:
+                if not re.search(rf"ALTER TABLE {re.escape(m.group(1))} ADD CONSTRAINT {m.group(2)} CHECK", flat):
+                    guard.add("D-RECORDED", f"{db}:{m.group(1)}.{m.group(2)}", f"the CHECK {m.group(2)} on "
+                              f"{m.group(1)} is recorded and no {db} migration carries it")
+
+
+# What a policy's guest branch looks like: any session with a guest subject (GUEST_SET), the row's own subject
+# compared per statement (GUEST_SUBJECT), or the subject helpers.
+GUEST_BRANCH = re.compile(r"current_setting\('ticvai\.subject_id', true\), ''\) IS NOT NULL"
+                          r"|\w+ = \(SELECT NULLIF\(current_setting\('ticvai\.subject_id', true\), ''\)::uuid\)"
+                          r"|platform\.subject_in_scope\(|platform\.own_row\(")
+
+
+def last_policy_calls(backend: Path) -> dict:
+    """{table: the last platform.apply_*_rls call the tenant migrations make for it, as applied}, quotes unescaped."""
+    out = {}
+    for f in sorted((backend / "tenant").glob("*.sql"), key=lambda p: p.name):
+        for line in f.read_text(encoding="utf-8").splitlines():
+            if line.lstrip().startswith("--"):
+                continue
+            m = re.search(r"platform\.apply_\w+_rls\('([\w.]+)'::regclass", line)
+            if m:
+                out[m.group(1)] = line.replace("''", "'")
+    return out
+
+
+def check_guest_branch(guard, backend: Path, marks: dict) -> None:
+    """D-GUEST-BRANCH (ADAM CR-341, CR-342; CHG-R12DB-008, CHG-R12DB-009): a contract schema that states a guest branch
+    (`x-ticvai-guest-read`, or `x-ticvai-rls` guest-reads-own or guest-owns) has one in the policy the tenant
+    migrations last apply to its table. lane D's CR-341 and CR-342 stated guest reads the generator had no mark for, so
+    a rebuild from the package would have refused the guest."""
+    calls = last_policy_calls(backend)
+    for t, mk in sorted(marks.items()):
+        stated = ("x-ticvai-guest-read" if mk.get("guest_read") else
+                  f"x-ticvai-rls {mk.get('rls')}" if mk.get("rls") in ("guest-reads-own", "guest-owns") else None)
+        if not stated or t.split(".", 1)[0] == "control":
+            continue
+        call = calls.get(t)
+        if call is None:
+            continue   # a table no migration gives a policy of its own (a child under its parent): its parent's rule
+        if not GUEST_BRANCH.search(call):
+            guard.add("D-GUEST-BRANCH", t, f"{mk.get('schema')} states a guest branch ({stated}) and the policy the "
+                      f"tenant migrations last apply to {t} has none: run tools/derive-ddl.py --apply, or the mark is "
+                      "not one derive-ddl defines for the table (its run prints why)")
+
+
+def check_household_write(guard, backend: Path) -> None:
+    """D-HOUSEHOLD-WRITE (ADAM CR-362; CHG-R12DB-007): the last policy call the tenant migrations make for
+    identity.delegated_access carries platform.subject_holds_household_grant_over(over_subject_id) in its write check,
+    and a migration creates that function."""
+    series = "\n".join(f.read_text(encoding="utf-8") for f in sorted((backend / "tenant").glob("*.sql"),
+                                                                       key=lambda p: p.name))
+    # the calls as applied, in order: a commented-out line (a ROLLBACK section) applies nothing
+    calls = [line for line in series.splitlines() if not line.lstrip().startswith("--")
+             and re.search(r"platform\.apply_\w+_rls\('identity\.delegated_access'::regclass", line)]
+    last = calls[-1] if calls else ""
+    if "subject_holds_household_grant_over(over_subject_id)" not in last:
+        guard.add("D-HOUSEHOLD-WRITE", "identity.delegated_access:write",
+                  "the tenant migrations' last policy for identity.delegated_access does not admit a guest's household "
+                  "grant (ADAM CR-362): run tools/derive-ddl.py --apply")
+    if not re.search(r"CREATE OR REPLACE FUNCTION platform\.subject_holds_household_grant_over\(", series):
+        guard.add("D-HOUSEHOLD-WRITE", "platform.subject_holds_household_grant_over",
+                  "no tenant migration creates platform.subject_holds_household_grant_over (ADAM CR-362)")
+
+
+def check_recorded_grants(guard, db: str, body: str) -> None:
+    dec = g.load_json(g.ROOT / "handoff" / "service-decomposition.json", {}) or {}
+    owns: dict = {}
+    for svc in (dec.get("services") or {}).values():
+        role = str(svc.get("deployable") or "").replace("-", "_")
+        for s in svc.get("schemas") or []:
+            owns.setdefault(role, set()).add(s)
+    if db == "tenant":
+        tenant_schemas = {s for ss in owns.values() for s in ss} - {"control", "qdrant"}
+        recorded = {r: set(re.findall(r"'([a-z_]+)'", arr))
+                    for r, arr in re.findall(r"'(\w+)',\s*jsonb_build_array\(([^)]*)\)", body)}
+        package = {r: ss & tenant_schemas for r, ss in owns.items() if ss & tenant_schemas}
+        for r in sorted(set(recorded) | set(package)):
+            if recorded.get(r, set()) != package.get(r, set()):
+                guard.add("D-RECORDED-GRANTS", f"{db}:owners:{r}",
+                          f"apply_deployable_grants gives {r} {sorted(recorded.get(r, set()))}; "
+                          f"handoff/service-decomposition.json gives it {sorted(package.get(r, set()))}")
+        kernel = yaml.safe_load((g.ROOT / "docs" / "active" / "cross-deployable-writes.yaml").read_text(
+            encoding="utf-8")).get("kernel") or []
+        want = {str(k.get("table")): {str(p).upper() for p in k.get("privileges") or []} for k in kernel}
+        got = {t: {p.strip().upper() for p in privs.split(",")}
+               for privs, t in re.findall(r"GRANT ([A-Z, ]+) ON (platform\.\w+) TO %I", body)}
+        for t in sorted(set(want) | set(got)):
+            if want.get(t) != got.get(t):
+                guard.add("D-RECORDED-GRANTS", f"{db}:kernel:{t}",
+                          f"apply_deployable_grants grants {sorted(got.get(t, set()))} on {t}; the kernel list in "
+                          f"docs/active/cross-deployable-writes.yaml grants {sorted(want.get(t, set()))}")
+    else:
+        recorded = set(re.findall(r"grant_schema_to_role\('control', '(\w+)', true\)", body))
+        package = {r for r, ss in owns.items() if "control" in ss} | {"workers"}
+        if recorded != package:
+            guard.add("D-RECORDED-GRANTS", f"{db}:owners:control",
+                      f"apply_deployable_grants gives control to {sorted(recorded)}; the package's owners are "
+                      f"{sorted(package)} (handoff/service-decomposition.json, and workers)")
+
+
 _cache: dict = {}
 # A key may name its target's concept rather than its table (ADR-0056 venue keys, principal actors).
 FK_ALIASES = {"venue": "scope", "region": "scope", "department": "scope", "org_unit": "scope",
@@ -508,6 +734,18 @@ def main() -> int:
     g.force_utf8()
     guard = g.Guard("check-ddl-conventions", RULES)
     backend = g.ROOT / "backend"
+    fails = self_test_provision_types()
+    if fails:
+        print("\n".join(fails))
+        print(f"FAIL - {len(fails)} self-test(s) of D-PROVISION-TYPE failed")
+        return 1
+    # CHG-R12DB-001: what provisioning applies, in its order, uses no type an earlier step has not made.
+    for db, steps in provision_steps(backend).items():
+        for label, typ, where in provision_type_findings(steps):
+            guard.add("D-PROVISION-TYPE", f"{db}:{label}:{typ}", f"{label} uses {typ} ({where}) before any earlier "
+                      "provisioning step creates it: provision-tenant.sh stops there")
+    check_recorded(guard, backend)
+    check_household_write(guard, backend)
     tables = {}          # table -> {col: line}
     pk = {}
     for db in ("tenant", "control"):
@@ -863,6 +1101,7 @@ def main() -> int:
     props = dd.load_contract_props({stem: doc for stem, _rel, doc in g.contracts()})
     real = [t for t in ref_cols if "." in t and ":" not in t
             and ref_store.get(t, "postgres") in ("postgres", "postgres-analytical")]
+    check_guest_branch(guard, backend, dd.table_marks(ref_cols, real))
     derived = {}
     for t, mk in dd.table_marks(ref_cols, real).items():
         short = t.split(".", 1)[1]

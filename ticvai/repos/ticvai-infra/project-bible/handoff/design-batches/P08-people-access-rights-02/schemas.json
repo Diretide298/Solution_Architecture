@@ -272,6 +272,7 @@
   "x-ticvai-retired-columns": [
    "org_unit_id"
   ],
+  "x-ticvai-guest-read": true,
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
@@ -917,6 +918,22 @@
       "maximum": 10,
       "default": 5,
       "description": "Wrong entries allowed per guest one-time code before `verifyGuestOtp` invalidates it. A guest code is tenant-scoped, so the tenant default is the value used. Proposed, client to correct (audit R094).\n"
+     },
+     "guestOtpLifetimeSeconds": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 60,
+      "maximum": 900,
+      "default": 600,
+      "description": "How long a guest one-time code works (decided 30 October 2026, Chinmay, ADAM CR-370; CHG-CR370-001): `requestGuestOtp`, `registerGuest` and `verifyGuestEmail` set the code's expiry from it and answer it as `expiresInSeconds`. A guest code is tenant-scoped, so the tenant default is the value used. Proposed, client to correct.\n"
+     },
+     "guestOtpResendSeconds": {
+      "type": "integer",
+      "nullable": true,
+      "minimum": 30,
+      "maximum": 300,
+      "default": 60,
+      "description": "How long a guest waits before asking for another code (ADAM CR-370; CHG-CR370-001): Identity sets the code's resend time from it and answers it as `resendAfterSeconds`, which drives the screens' resend countdown. The tenant default is the value used. Proposed, client to correct.\n"
      },
      "guestTwoStep": {
       "type": "object",

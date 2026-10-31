@@ -4,7 +4,7 @@
   "name": "Staff Resource Directory",
   "module": "Rentals",
   "requiresModule": "resources",
-  "wave": 3,
+  "wave": 1,
   "permission": "USER_MANAGE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
@@ -1600,7 +1600,7 @@
   "name": "Overtime & Working-Hour Rules",
   "module": "Rentals",
   "requiresModule": "resources",
-  "wave": 3,
+  "wave": 1,
   "permission": "WORKFORCE_MANAGE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
@@ -1645,36 +1645,43 @@
       {
        "kind": "selectField",
        "label": "Standard daily hours",
+       "operation": "getStaffingRules",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
       },
       {
        "kind": "selectField",
        "label": "Standard weekly hours",
+       "operation": "getStaffingRules",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
       },
       {
        "kind": "selectField",
        "label": "Maximum daily hours",
+       "operation": "getStaffingRules",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
       },
       {
        "kind": "selectField",
        "label": "Maximum weekly hours",
+       "operation": "getStaffingRules",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
       },
       {
        "kind": "selectField",
        "label": "Minimum rest period",
+       "operation": "getStaffingRules",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
       },
       {
        "kind": "textField",
        "label": "Maximum consecutive working days",
+       "operation": "getStaffingRules",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
       },
       {
        "kind": "selectField",
        "label": "Overtime threshold",
+       "operation": "getStaffingRules",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall configure"
       }
      ]
@@ -1708,8 +1715,16 @@
     "provenance": "board reading, 19 September 2026",
     "invalidates": [
      "getStaffingCoverage",
-     "validateWorkforceCompliance"
+     "validateWorkforceCompliance",
+     "getStaffingRules"
     ]
+   },
+   {
+    "operationId": "getStaffingRules",
+    "contract": "workforce",
+    "purpose": "The venue's staffing rules as saved, which the fields open on",
+    "trigger": "onLoad",
+    "provenance": "r12 gate, 31 October 2026 (CHG-R12GT-001; closes the contract gap CHG-WIR-004 recorded)"
    }
   ],
   "wireframe": {
@@ -1718,13 +1733,6 @@
    "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-881"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 44. 0 of 0 labels bound to a contract property; 8 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Approval required are choices sent by `setStaffingRules` (overtime.requiresApproval).",
-  "gaps": [
-   {
-    "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-004): No read of staffing rules (no getStaffingRules); affects BO-881 and BO-885.",
-    "source": "contracts/satellite/workforce.yaml#setStaffingRules"
-   }
-  ],
   "_platform": {
    "code": "P08",
    "audience": "staff",

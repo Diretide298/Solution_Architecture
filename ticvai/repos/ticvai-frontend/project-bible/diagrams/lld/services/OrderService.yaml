@@ -406,7 +406,7 @@ operationsByContract:
     scope: tenant
     permission: ORDER_VIEW
     offline: false
-    reads: 6
+    reads: 7
     writes: 0
   - operation: getCart
     verb: GET
@@ -606,7 +606,7 @@ operationsByContract:
     scope: tenant
     permission: ORDER_VIEW
     offline: false
-    reads: 5
+    reads: 6
     writes: 0
   - operation: listBulkGroupAssisted
     verb: GET

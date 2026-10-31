@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/derive-design-manifest.py",
- "generated": "2026-10-29",
+ "generated": "2026-10-31",
  "note": "The Claude Design work list. Status is read off wireframes/frames/ every run and never stored, so a batch cannot claim to be finished and not be. Batches with thin screens sort last: a screen with fewer than 4 components cannot be drawn from what it declares, and drawing it invents requirements.",
  "batchSize": 10,
  "drawableAt": 4,
@@ -2108,6 +2108,28 @@
    "status": "pending"
   },
   {
+   "id": "WS75",
+   "kind": "workshop",
+   "label": "Digital Asset Management DAM board 2",
+   "platform": "P13",
+   "screens": [
+    "CMS-071",
+    "CMS-072",
+    "CMS-073",
+    "CMS-074",
+    "CMS-075",
+    "CMS-076",
+    "CMS-077",
+    "CMS-078",
+    "CMS-079",
+    "CMS-080"
+   ],
+   "drawable": 8,
+   "thin": 2,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
    "id": "WS98",
    "kind": "workshop",
    "label": "Subscription Licensing AI Self Service board 1",
@@ -2580,28 +2602,6 @@
     "CMS-058",
     "CMS-059",
     "CMS-060"
-   ],
-   "drawable": 7,
-   "thin": 3,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "WS75",
-   "kind": "workshop",
-   "label": "Digital Asset Management DAM board 2",
-   "platform": "P13",
-   "screens": [
-    "CMS-071",
-    "CMS-072",
-    "CMS-073",
-    "CMS-074",
-    "CMS-075",
-    "CMS-076",
-    "CMS-077",
-    "CMS-078",
-    "CMS-079",
-    "CMS-080"
    ],
    "drawable": 7,
    "thin": 3,

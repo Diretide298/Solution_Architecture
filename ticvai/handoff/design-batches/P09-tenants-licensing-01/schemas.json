@@ -1618,11 +1618,13 @@
    },
    "metadataUrl": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's metadata or discovery document. **Not used for a guest `uaePass` row, and may be null there** (ADAM CR-360, 30 October 2026; CHG-CR360-001): UAE Pass publishes no discovery document, so its endpoints come from `issuer`."
    },
    "issuer": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "description": "The provider's issuer. **For a guest `uaePass` row it is the base of the endpoints** (ADAM CR-360; CHG-CR360-001): the token endpoint is `issuer` followed by `/token` and the userinfo endpoint `issuer` followed by `/userinfo` (`https://stg-id.uaepass.ae/idshub` in staging, `https://id.uaepass.ae/idshub` in production)."
    },
    "clientId": {
     "type": "string",

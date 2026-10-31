@@ -44,7 +44,7 @@
     }
    ]
   },
-  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.\n\n**Design change, logged (ADAM CR-351, raised by Chitrangi Mestry on #32125, 29 October 2026; the lead's rule of 28 October that frontend developers change a screen's design on their own and log it).** The guest-web build changes the look and nothing behind it; the frame `wireframes/P01 Guest Web.dc.html#web-021` draws it and is the look to build to. (1) The page runs the full width with a margin each side, not the frame's centred column. (2) **The wallet card**: a dark card in the theme's ink with a brand glow, the wallet icon, title and lead, the wallet's status as a pill, Available credit over a large balance, and the credit kinds as chips (`getWallet`: `balance`, `credits`, `status`). (3) **Saved cards are drawn as payment cards** in a grid on Payment methods: chip and contactless marks, the masked number, the MM/YY expiry, the scheme's logo and the default card in the brand colour, with **Add a card** as a dashed last tile and a small lift on hover. They show only what `listPaymentTokens` returns (`method`, `maskedIdentifier`, `expiresAt`, `isDefault`): no holder name, tier, make-default or remove. The scheme logo reads the brand from `maskedIdentifier`, and a plain card mark shows when no brand is recognised. (4) A row's details slide open and shut instead of appearing at once. Every colour is a theme token (the Mastercard symbol keeps the scheme's own colours) and the page mirrors in Arabic. The operations, fields, errors and states are the ones above.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listWalletTransactions` reads the population and `getWallet` reads one of them — list, select, act",
@@ -83,7 +83,7 @@
        ],
        "operation": "listPaymentTokens",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
-       "notes": "Was the generated table 'Every payment token'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3))."
+       "notes": "Was the generated table 'Every payment token'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)). Drawn as payment cards in a grid (ADAM CR-351, 29 October 2026): chip and contactless marks, the masked number, the MM/YY expiry, the scheme's logo read from `maskedIdentifier` (a plain card mark when no brand is recognised) and the default card in the brand colour; Add a card is the dashed last tile."
       }
      ]
     },
@@ -143,7 +143,8 @@
         "Wallet.lastActivityAt"
        ],
        "operation": "getWallet",
-       "provenance": "contract wallet.yaml GET /wallets/{subjectId}"
+       "provenance": "contract wallet.yaml GET /wallets/{subjectId}",
+       "notes": "Drawn as the wallet card (ADAM CR-351, 29 October 2026): a dark card in the theme's ink with a brand glow, the wallet icon, title and lead, `status` as a pill, Available credit over the large `balance`, and the `credits` kinds as chips."
       }
      ]
     },
@@ -155,7 +156,8 @@
        "kind": "primaryButton",
        "label": "Add a card",
        "operation": "storePaymentToken",
-       "provenance": "contract orders.yaml POST /payment-tokens"
+       "provenance": "contract orders.yaml POST /payment-tokens",
+       "notes": "The dashed last tile of the saved cards grid (ADAM CR-351, 29 October 2026)."
       },
       {
        "kind": "secondaryButton",
@@ -279,7 +281,7 @@
     "verified": "2026-09-28",
     "match": "partial",
     "view": "Account → 'Wallet & gift cards' (and 'Payment methods')",
-    "differences": "Rows with toast actions; no transaction list, no gift-card balance lookup. Auto top-up is a prototype addition with no YAML operation. Saved payment tokens are a separate pane."
+    "differences": "Rows with toast actions; no transaction list, no gift-card balance lookup. Auto top-up is a prototype addition with no YAML operation. Saved payment tokens are a separate pane. **Since 30 October 2026 the look is the frame on the board, not this view** (ADAM CR-351, a design change logged by Chitrangi Mestry on #32125): the frame draws the build's full-width page, dark wallet card with its status pill, balance and credit chips, saved cards as payment cards with Add a card as the last tile, and row details that slide open, where this view draws a centred column, the title and balance on the white pane, and saved cards as rows."
    },
    "stateViews": {
     "loading": "P01/turnstile-loader",

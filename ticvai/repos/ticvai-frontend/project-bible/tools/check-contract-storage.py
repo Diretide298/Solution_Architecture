@@ -24,7 +24,9 @@ a table with no `recorded_at`. ST-PROPERTY-PERSISTENCE and ST-STALE-COLUMN (CHG-
 persistence tag on a property, which derive-schema never reads, and a column the contract names or types otherwise
 (the table kept an older run's columns: `marketing.wishlist_item.price text` against `list_price` Money).
 ST-SECRET-FORM (CHG-MKT-001, CR-086) -- a stored write-only secret that does not say how it is stored
-(`x-ticvai-secret`, ADR-0063 as amended 14 October 2026, ADR-0071).
+(`x-ticvai-secret`, ADR-0063 as amended 14 October 2026, ADR-0071). ST-BLIND-INDEX-REHASH (CHG-CR339-001, CR-339) -- a
+tenant-database blind index that does not say whether a key rotation can re-hash it (`x-ticvai-blind-index-of`, ADR-0063
+as amended 30 October 2026).
 
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
@@ -49,6 +51,9 @@ RULES = {
                        "column: the table kept an older run's columns (CHG-MKT-002, CR-087)",
     "ST-SECRET-FORM": "a stored write-only token, secret, credential, password or PIN that does not say how it is "
                       "stored (x-ticvai-secret; ADR-0063, ADR-0071) (CHG-MKT-001, CR-086)",
+    "ST-BLIND-INDEX-REHASH": "a tenant-database blind index (x-ticvai-secret: blind-index) that does not say whether a "
+                             "key rotation can re-hash it: x-ticvai-blind-index-of names its field-encrypted sibling, "
+                             "or none (ADR-0063, 30 October 2026; CHG-CR339-001, CR-339)",
     "ST-GRAPH-TARGET-GONE": "a column the relationship graph adds points at a table the package no longer has "
                             "(CR-145, CHG-CRA-002)",
     "ST-DEFAULT-DESCRIBED": "a stored enum's description names its starting value (`x` until ...) and the contract "
@@ -342,6 +347,9 @@ def main() -> int:
                           f"{stem}.{name} is written offline by {written_offline[(stem, name)][0]} and "
                           f"{', '.join(present)} has no recorded_at")
     check_stale_and_secrets(guard, cols, by)
+    blind_self_test()
+    for key, msg in blind_index_findings(by):
+        guard.add("ST-BLIND-INDEX-REHASH", key, msg)
     check_described_shape(guard, cols, by)
     check_cross_database(guard, cols)
     return guard.finish()
@@ -422,6 +430,58 @@ def _field_spec(src: str, by: dict):
         else:
             return p
     return None
+
+
+def blind_index_findings(by: dict) -> list:
+    """ST-BLIND-INDEX-REHASH (ADAM CR-339, decided 30 October 2026; ADR-0063 as amended that day; CHG-CR339-001).
+
+    **The kernel's list of blind-index columns is the contract's `x-ticvai-secret: blind-index` columns in the tenant
+    database**, and a rotation of the tenant's blind-index key treats the two kinds differently: a blind index over a
+    value the server can decrypt is re-hashed from it (`platform.blind_index_rehash`), and one over a token the server
+    never keeps cannot be, so its old key version stays for lookup. `#37050` had no way to tell them apart, so each
+    such property names its kind: `x-ticvai-blind-index-of: <the sibling property it hashes>`, which must be
+    `x-ticvai-secret: field-encrypted`, or `x-ticvai-blind-index-of: none`. A control-database table (`control.*`) has
+    no tenant key and is out of scope (API client secrets keep their key version, ADR-0063 25 October)."""
+    out = []
+    for (stem, name), s in sorted(by.items()):
+        persist = str(s.get("x-ticvai-persistence") or "").strip()
+        if not persist or persist.lower().startswith("none") or persist.startswith("control."):
+            continue
+        ps_all = s.get("properties") or {}
+        for p, ps in sorted(ps_all.items()):
+            if not isinstance(ps, dict) or str(ps.get("x-ticvai-secret") or "") != "blind-index":
+                continue
+            of = ps.get("x-ticvai-blind-index-of")
+            key = f"{stem}.{name}.{p}"
+            if of is None:
+                out.append((key, f"{key} is a tenant blind index and does not say whether a key rotation can re-hash "
+                                 f"it: x-ticvai-blind-index-of: <its field-encrypted sibling> or none (ADR-0063, 30 "
+                                 f"October 2026)"))
+            elif str(of) != "none":
+                sib = ps_all.get(str(of))
+                if not isinstance(sib, dict) or str(sib.get("x-ticvai-secret") or "") != "field-encrypted":
+                    out.append((key, f"{key} says it hashes {of}, which is not a field-encrypted property of {name} "
+                                     f"(x-ticvai-secret: field-encrypted), so nothing can re-hash it"))
+    return out
+
+
+def blind_self_test() -> None:
+    """Built in memory: an unmarked tenant blind index fails, a mark naming a non-encrypted sibling fails, `none` and a
+    field-encrypted sibling pass, and a control table is not asked."""
+    by = {
+        ("t", "A"): {"x-ticvai-persistence": "m.a", "properties": {
+            "fp": {"x-ticvai-secret": "blind-index"}}},
+        ("t", "B"): {"x-ticvai-persistence": "m.b", "properties": {
+            "fp": {"x-ticvai-secret": "blind-index", "x-ticvai-blind-index-of": "plain"}, "plain": {"type": "string"}}},
+        ("t", "C"): {"x-ticvai-persistence": "m.c", "properties": {
+            "fp": {"x-ticvai-secret": "blind-index", "x-ticvai-blind-index-of": "enc"},
+            "enc": {"x-ticvai-secret": "field-encrypted"},
+            "tok": {"x-ticvai-secret": "blind-index", "x-ticvai-blind-index-of": "none"}}},
+        ("t", "D"): {"x-ticvai-persistence": "control.d", "properties": {"h": {"x-ticvai-secret": "blind-index"}}},
+    }
+    got = sorted(k for k, _ in blind_index_findings(by))
+    if got != ["t.A.fp", "t.B.fp"]:
+        raise SystemExit(f"ST-BLIND-INDEX-REHASH self-test failed: {got}")
 
 
 def check_stale_and_secrets(guard, cols: dict, by: dict) -> None:

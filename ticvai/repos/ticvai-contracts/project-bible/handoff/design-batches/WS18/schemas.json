@@ -382,6 +382,15 @@
    "walletTopUpLimit": {
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
+   "currencyCode": {
+    "type": "string",
+    "minLength": 3,
+    "maxLength": 3,
+    "pattern": "^[A-Z]{3}$",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**The ISO 4217 currency `walletTopUpLimit` is stored in** (ADAM CR-363, \"as you recommended\", Chinmay, 30 October 2026; CHG-CR363-001). The policy is one row at the tenant root, where no venue or region sits above it to resolve a currency from (naming-and-style 5.1: a table whose currency genuinely differs from its venue stores one). Set by `setGuestVerificationPolicy` from `walletTopUpLimit.currency`; null exactly when `walletTopUpLimit` is null. `getGuestVerificationPolicy` answers the Money in it."
+   },
    "acceptedDocumentKinds": {
     "type": "array",
     "description": "Proposed default passport, emiratesId, nationalId.",
@@ -435,13 +444,14 @@
      "keepUntilDocumentExpiry"
     ],
     "default": "deleteOnDecision",
-    "description": "How long the scan is kept. The outcome and the hashed number are kept either way."
+    "description": "How long the scan is kept. The outcome and the encrypted number are kept either way."
    },
    "maxResubmissions": {
     "type": "integer",
     "minimum": 0,
     "maximum": 10,
-    "default": 3
+    "default": 3,
+    "description": "**How many times a refused guest may submit again** (decided 30 October 2026, Chinmay, ADAM CR-368; CHG-CR368-001). `submitGuestIdentityDocument` counts the guest's verifications with status `rejected` or `resubmissionRequested` decided after their latest `verified` one (all of them if never verified) and refuses `422` `resubmission-limit-reached` when the count is greater than this. With 3 a guest has the first submission and three resubmissions; with 0, only the first. Computed, never stored: raising it lets a guest past the old limit submit again with no staff reset."
    },
    "updatedAt": {
     "type": "string",

@@ -1,6 +1,6 @@
 # WS157 — Resource Management Configuration board 3
 
-**10 screens · 34 operations · 37 schemas · 7 permissions**
+**10 screens · 35 operations · 37 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -121,7 +121,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-873` | Staff Resource Directory | D | 3 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-873` | Staff Resource Directory | A | 3 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-874` | Staff Resource Profile | D | 11 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-875` | Skills & Competency Management | D | 0 | 7 | 6 | 9 | 1 | 0 | — | notStarted (—) |
 | `BO-876` | Certification & Expiry Management | D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -129,7 +129,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-878` | Staff Availability & Working Pattern | D | 21 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-879` | Shift Template & Assignment Configuration | D | 6 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-880` | Break, Leave & Absence Configuration | D | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-881` | Overtime & Working-Hour Rules | D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-881` | Overtime & Working-Hour Rules | A | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-882` | Workforce Integration & Synchronization Center | D | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

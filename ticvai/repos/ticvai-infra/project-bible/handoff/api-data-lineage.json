@@ -96,6 +96,11 @@
     "for": "a guest read's ProductMedia url and thumbnailUrl: the asset's stable CDN address when it is public and ready (assets.media_asset), Assets' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)"
    },
    {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: Product.fromPrice (ADAM CR-358, option (a); CHG-CR358-001; ADR-0018)"
+   },
+   {
     "query": "white-label#guidedChoiceAnswerRecords",
     "route": "service",
     "for": "its read of whitelabel.guided_choice_answer, WhiteLabel's data (CHG-MOD-001)"
@@ -107,7 +112,8 @@
    }
   ],
   "readsInProcess": [
-   "assets.media_asset"
+   "assets.media_asset",
+   "platform.venue_settings"
   ]
  },
  "createProduct": {
@@ -209,10 +215,18 @@
     "for": "what its text calls \"MediaAsset\": assets.media_asset, VenueOps's data (CHG-R10GEN-001)"
    },
    {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for Product.fromPrice, should this operation fill it; it answers fromPrice null for now (ADAM CR-358, option (a); CHG-CR358-001; check-money-currency, ADR-0018), so the read is not asked until it does"
+   },
+   {
     "query": "white-label#bookingFlowRecords",
     "route": "service",
     "for": "its read of whitelabel.booking_flow, WhiteLabel's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "getProduct": {
@@ -306,10 +320,16 @@
     "query": "assets#mediaAssetRecords",
     "route": "in-process",
     "for": "a guest read's ProductMedia url and thumbnailUrl: the asset's stable CDN address when it is public and ready (assets.media_asset), Assets' data, read in process from commerce as a granted read (XDR-005; ADAM CR-221, option A; CHG-R10CAT-014, CHG-R10CAT-015)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for Product.fromPrice, should this operation fill it; it answers fromPrice null for now (ADAM CR-358, option (a); CHG-CR358-001; check-money-currency, ADR-0018), so the read is not asked until it does"
    }
   ],
   "readsInProcess": [
-   "assets.media_asset"
+   "assets.media_asset",
+   "platform.venue_settings"
   ]
  },
  "updateProduct": {
@@ -415,10 +435,18 @@
     "for": "what its text calls \"MediaAsset\": assets.media_asset, VenueOps's data (CHG-R10GEN-001)"
    },
    {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for Product.fromPrice, should this operation fill it; it answers fromPrice null for now (ADAM CR-358, option (a); CHG-CR358-001; check-money-currency, ADR-0018), so the read is not asked until it does"
+   },
+   {
     "query": "white-label#bookingFlowRecords",
     "route": "service",
     "for": "its read of whitelabel.booking_flow, WhiteLabel's data (CHG-MOD-001)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "setProductAttributes": {
@@ -1580,7 +1608,15 @@
     "query": "assets#mediaAssetRecords",
     "route": "service",
     "for": "what its text calls \"MediaAsset\": assets.media_asset, VenueOps's data (CHG-R10GEN-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for Product.fromPrice, should this operation fill it; it answers fromPrice null for now (ADAM CR-358, option (a); CHG-CR358-001; check-money-currency, ADR-0018), so the read is not asked until it does"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listAlternativeCodes": {
@@ -10089,7 +10125,7 @@
    {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
-    "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
+    "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts; guestOtpLifetimeSeconds and guestOtpResendSeconds, ADAM CR-370) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
   ],
   "readsInProcess": [
@@ -10130,7 +10166,7 @@
    {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
-    "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
+    "for": "the venue's two-step, step-up and one-time-code settings (guestTwoStep, stepUpActions, guestOtpMaxAttempts; guestOtpLifetimeSeconds and guestOtpResendSeconds, ADAM CR-370) in platform venue settings, Tenancy's data (CHG-MOD-001; R8 IDENTITY-C08)"
    }
   ],
   "readsInProcess": [
@@ -12420,9 +12456,19 @@
   ],
   "readVia": [
    {
+    "query": "identity#principalRecords",
+    "route": "in-process",
+    "for": "principalName: the shift principal's display_name (identity.principal), Identity's data (ADAM CR-353; CHG-CR353-001)"
+   },
+   {
     "query": "orders#paymentRecords",
     "route": "in-process",
     "for": "its read of orders.payment, Orders's data (CHG-MOD-001)"
+   },
+   {
+    "query": "orders#salesOrderRecords",
+    "route": "in-process",
+    "for": "a payment's shift: its order's shift_id (orders.sales_order), since orders.payment has no shift column (ADAM CR-353; CHG-CR353-001)"
    },
    {
     "query": "shift#posShiftRecords",
@@ -12433,12 +12479,20 @@
     "query": "tenancy#regionSettingsRecords",
     "route": "in-process",
     "for": "what its text calls \"region's time zone\": platform.region_settings, Tenancy's data (CHG-RTE-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the trading currency and scale of the shift's venue (platform.venue_settings currency_code, currency_scale): which tenders are foreign, and baseAmount's currency and scale (ADAM CR-353; CHG-CR353-001; ADR-0018)"
    }
   ],
   "readsInProcess": [
+   "identity.principal",
    "orders.payment",
    "orders.pos_shift",
-   "platform.region_settings"
+   "orders.sales_order",
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "listInterEntityObligations": {
@@ -22908,6 +22962,8 @@
    "cache:idempotency",
    "wallet.balance",
    "wallet.credit_lot",
+   "wallet.credit_type",
+   "wallet.funding_rule",
    "wallet.wallet"
   ],
   "writes": [
@@ -27231,7 +27287,11 @@
     "promoted_to_staging_at",
     "required_migrations",
     "status",
-    "version"
+    "status_changed_at",
+    "status_changed_by_principal_id",
+    "status_reason",
+    "version",
+    "withdrawal_approved_by_principal_id"
    ],
    "control.release_component": [
     "component",
@@ -27281,7 +27341,11 @@
     "promoted_to_staging_at",
     "required_migrations",
     "status",
-    "version"
+    "status_changed_at",
+    "status_changed_by_principal_id",
+    "status_reason",
+    "version",
+    "withdrawal_approved_by_principal_id"
    ]
   }
  },
@@ -32828,8 +32892,8 @@
   "readVia": [
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
-    "for": "TenantAppStatus.venues: only the active venues are listed (ADAM CR-096)"
+    "route": "in-process",
+    "for": "TenantAppStatus.venues: only the active venues are listed (ADAM CR-096); in process since ADAM CR-343 (XDR-022)"
    },
    {
     "query": "tenancy#regionSettingsRecords",
@@ -32844,6 +32908,7 @@
   ],
   "readsInProcess": [
    "platform.region_settings",
+   "platform.scope",
    "platform.venue_settings"
   ]
  },
@@ -34325,8 +34390,8 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
-    "for": "each active catalogue product's ProductKind at an active venue, for bookingFlowMissing (ADAM CR-320), as the booking-flow operations read catalogue.product, Catalogue's data"
+    "route": "in-process",
+    "for": "each active venue's products, where {venueId}: their ProductKind, isSellable and guestListing, for bookingFlowMissing (ADAM CR-320; in process since ADAM CR-343, XDR-022): catalogue.product, Catalogue's data"
    },
    {
     "query": "subscription#contractRecords",
@@ -34345,15 +34410,17 @@
    },
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
-    "for": "the active venues bookingFlowMissing is checked at (ADAM CR-320), as publishTenantConfig asks it: platform.scope, Tenancy's data"
+    "route": "in-process",
+    "for": "the active venues bookingFlowMissing is checked at (ADAM CR-320; in process since ADAM CR-343, XDR-022): platform.scope, Tenancy's data"
    }
   ],
   "readsInProcess": [
    "assets.media_asset",
+   "catalogue.product",
    "control.contract",
    "control.licence_add_on",
-   "control.plan"
+   "control.plan",
+   "platform.scope"
   ]
  },
  "publishTenantConfig": {
@@ -34428,8 +34495,8 @@
    },
    {
     "query": "catalogue#productRecords",
-    "route": "service",
-    "for": "the validation it runs, as validateTenantConfig asks it: each active product's ProductKind, for bookingFlowMissing (ADAM CR-320)"
+    "route": "in-process",
+    "for": "the validation it runs, as validateTenantConfig asks it: each active venue's products where {venueId}, for bookingFlowMissing (ADAM CR-320; the same rule and in-process read since ADAM CR-343, XDR-022)"
    },
    {
     "query": "marketing-crm#guestMatchPolicyRecords",
@@ -34458,8 +34525,8 @@
    },
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
-    "for": "what its text calls \"active venues\": platform.scope, Tenancy's data (CHG-RTE-001)"
+    "route": "in-process",
+    "for": "what its text calls \"active venues\": platform.scope, Tenancy's data (CHG-RTE-001); in process since ADAM CR-343 (XDR-022)"
    }
   ],
   "fixNote": "18 October 2026: CHG-CRA-004 (ADAM CR-154): the review request, through createApprovalRequest (writeVia)",
@@ -34471,10 +34538,12 @@
   ],
   "readsInProcess": [
    "assets.media_asset",
+   "catalogue.product",
    "control.contract",
    "control.licence_add_on",
    "control.plan",
-   "marketing.guest_match_policy"
+   "marketing.guest_match_policy",
+   "platform.scope"
   ]
  },
  "listConfigVersions": {
@@ -34716,13 +34785,14 @@
    },
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
-    "for": "what its text calls \"active venues\": platform.scope, Tenancy's data (CHG-RTE-001)"
+    "route": "in-process",
+    "for": "what its text calls \"active venues\": platform.scope, Tenancy's data (CHG-RTE-001); in process since ADAM CR-343 (XDR-022)"
    }
   ],
   "readsInProcess": [
    "assets.media_asset",
-   "marketing.guest_match_policy"
+   "marketing.guest_match_policy",
+   "platform.scope"
   ]
  },
  "diffConfigVersion": {
@@ -41664,7 +41734,15 @@
     "query": "assets#mediaAssetRecords",
     "route": "service",
     "for": "what its text calls \"MediaAsset\": assets.media_asset, VenueOps's data (CHG-R10GEN-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for Product.fromPrice, should this operation fill it; it answers fromPrice null for now (ADAM CR-358, option (a); CHG-CR358-001; check-money-currency, ADR-0018), so the read is not asked until it does"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "authoriseStoredValue": {
@@ -41943,7 +42021,15 @@
     "query": "assets#mediaAssetRecords",
     "route": "service",
     "for": "what its text calls \"MediaAsset\": assets.media_asset, VenueOps's data (CHG-R10GEN-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for Product.fromPrice, should this operation fill it; it answers fromPrice null for now (ADAM CR-358, option (a); CHG-CR358-001; check-money-currency, ADR-0018), so the read is not asked until it does"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "assessProductChange": {
@@ -45640,7 +45726,7 @@
    {
     "query": "marketing-crm#segmentRecords",
     "route": "in-process",
-    "for": "its read of marketing.segment, Marketing's data (CHG-MOD-001)"
+    "for": "its read of marketing.segment, Marketing's data (CHG-MOD-001): whether audienceSegmentId is a segment the caller's scope sees (ADAM CR-366)"
    }
   ],
   "readColumns": {
@@ -45709,7 +45795,7 @@
    {
     "query": "identity#principalRecords",
     "route": "service",
-    "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
+    "for": "approvedByPrincipalId: the publisher on a single publish, the approver from approval.granted (identity.principal, Identity's data; CHG-MOD-001; ADAM CR-365, CHG-CR365-001)"
    }
   ],
   "writeVia": [
@@ -45996,7 +46082,7 @@
   ],
   "writes": [],
   "routing": "replica",
-  "scope": "venue",
+  "scope": "tenant",
   "perm": "GUEST_VIEW",
   "offline": false,
   "summary": "Who may act for this guest, and for whom they may act",
@@ -46043,6 +46129,11 @@
   "fixNote": "14 October 2026: marketing.guest_profile no longer read (CHG-MOD-002: Identity reads nothing above it (ADR-0028); the names are the guests' own in pii.subject)",
   "readVia": [
    {
+    "query": "identity#subjectMinorStatus",
+    "route": "in-process",
+    "for": "overSubjectName and overSubjectIsMinor of the other party of the rows the caller can already see, beyond its own pii.subject row (ADAM CR-362; CHG-CR362-001)"
+   },
+   {
     "query": "tenancy#regionSettingsRecords",
     "route": "in-process",
     "for": "minorAgeThreshold, for overSubjectIsMinor (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)"
@@ -46066,7 +46157,7 @@
    "identity.delegated_access"
   ],
   "routing": "",
-  "scope": "venue",
+  "scope": "tenant",
   "perm": "GUEST_MANAGE",
   "offline": false,
   "summary": "Let one guest act for another",
@@ -46113,13 +46204,24 @@
   },
   "readVia": [
    {
+    "query": "identity#subjectMinorStatus",
+    "route": "in-process",
+    "for": "whether the path's subjectId is a minor (unknown counts as a minor), beyond the caller's own pii.subject row (ADAM CR-362; CHG-CR362-001)"
+   },
+   {
     "query": "tenancy#regionSettingsRecords",
     "route": "in-process",
     "for": "the minor age, RegionSettings.minorAgeThreshold in platform.region_settings, Tenancy's data (IDENTITY-C19; CHG-R8SPN-024)"
+   },
+   {
+    "query": "tenancy#scopeRecords",
+    "route": "in-process",
+    "for": "the tenant root's scope id and path (level tenant) a grant is stored at, one statement under ITenantRootGrant; constant per tenant database, so it may be cached for the process (ADAM CR-362; CHG-CR362-001)"
    }
   ],
   "readsInProcess": [
-   "platform.region_settings"
+   "platform.region_settings",
+   "platform.scope"
   ]
  },
  "setPasswordPolicy": {
@@ -48179,8 +48281,8 @@
   "writes": [
    "cache:idempotency",
    "identity.otp_challenge",
-   "marketing.message_dispatch",
-   "pii.subject"
+   "pii.subject",
+   "platform.outbox"
   ],
   "routing": "",
   "scope": "tenant",
@@ -48198,17 +48300,11 @@
    "anonymous"
   ],
   "guestCallable": true,
-  "writeVia": [
-   {
-    "table": "marketing.message_dispatch",
-    "operation": "sendTransactionalMessage"
-   }
-  ],
   "readVia": [
    {
     "query": "tenancy#venueSettingsRecords",
     "route": "in-process",
-    "for": "the venue's guest code attempt limit (VenueSettings.identity), Tenancy's data (r8 integration, CHG-R8INT-014)"
+    "for": "the venue's guest code attempt limit and the code's lifetime and resend interval (VenueSettings.identity: guestOtpMaxAttempts, guestOtpLifetimeSeconds, guestOtpResendSeconds), Tenancy's data (r8 integration, CHG-R8INT-014; ADAM CR-370)"
    }
   ],
   "readsInProcess": [
@@ -52831,7 +52927,15 @@
     "query": "identity#subjectRecords",
     "route": "in-process",
     "for": "its read of pii.subject, Identity's data (CHG-MOD-001)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "each order's currency and currencyScale: the trading currency and scale of the order's venue (the venue's row of platform.venue_settings, else the tenant's default row where a value is null), read through the guest read branch of platform.venue_settings (ADAM CR-341, option B for the settings tables; CHG-CR341-001; ADR-0018); same deployable (commerce)"
    }
+  ],
+  "readsInProcess": [
+   "platform.venue_settings"
   ]
  },
  "listEntitlements": {
@@ -91210,7 +91314,8 @@
    "ledger.tax_invoice_line",
    "orders.membership_renewal",
    "orders.order_line",
-   "orders.payment",
+   "orders.order_line_discount",
+   "orders.refund",
    "orders.sales_order",
    "payments.dunning_case"
   ],
@@ -91232,6 +91337,10 @@
   ],
   "lineageNote": "tax, discount and taxInvoiceId per line; format=pdf renders to object storage and returns pdfUrl",
   "readColumns": {
+   "ledger.tax_invoice_line": [
+    "id",
+    "order_line_id"
+   ],
    "orders.membership_renewal": [
     "id",
     "order_id"
@@ -91240,7 +91349,11 @@
     "id",
     "sales_order_id"
    ],
-   "orders.payment": [
+   "orders.order_line_discount": [
+    "id",
+    "order_line_id"
+   ],
+   "orders.refund": [
     "id",
     "order_id"
    ],
@@ -91258,7 +91371,7 @@
    {
     "query": "finance#taxInvoiceLineRecords",
     "route": "in-process",
-    "for": "its read of ledger.tax_invoice_line, Ledger's data (CHG-MOD-001)"
+    "for": "its read of ledger.tax_invoice_line, Ledger's data (CHG-MOD-001): a charge line's taxRate, description and taxInvoiceId, the line issued for its order line, by order_line_id (ADAM CR-342)"
    },
    {
     "query": "identity#customerMembershipRecords",
@@ -91269,12 +91382,18 @@
     "query": "tenancy#regionSettingsRecords",
     "route": "in-process",
     "for": "the time zone the cycle's dates are in: the region settings at or above the scope_path of the cycle's order (RegionSettingsAtOrAbove), in the read's transaction (ADAM CR-303, option A); same deployable (commerce)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the trading currency and scale of the order's venue, which every Money of the statement is in (ADAM CR-342; ADR-0018); same deployable (commerce)"
    }
   ],
   "readsInProcess": [
    "identity.customer_membership",
    "ledger.tax_invoice_line",
-   "platform.region_settings"
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "getDunningPolicy": {
@@ -91318,7 +91437,8 @@
   "reads": [
    "orders.membership_renewal",
    "orders.order_line",
-   "orders.payment",
+   "orders.order_line_discount",
+   "orders.refund",
    "orders.sales_order",
    "payments.dunning_case"
   ],
@@ -91347,7 +91467,11 @@
     "id",
     "sales_order_id"
    ],
-   "orders.payment": [
+   "orders.order_line_discount": [
+    "id",
+    "order_line_id"
+   ],
+   "orders.refund": [
     "id",
     "order_id"
    ],
@@ -91363,6 +91487,11 @@
   },
   "readVia": [
    {
+    "query": "finance#taxInvoiceLineRecords",
+    "route": "in-process",
+    "for": "a charge line's taxRate, description and taxInvoiceId: the ledger.tax_invoice_line issued for its order line, by order_line_id, Ledger's data (ADAM CR-342); same deployable (commerce)"
+   },
+   {
     "query": "identity#customerMembershipRecords",
     "route": "in-process",
     "for": "the membership agreements whose billing cycles the statements are, identity.customer_membership, Identity's data (ADAM CR-099); same deployable (commerce)"
@@ -91371,11 +91500,18 @@
     "query": "tenancy#regionSettingsRecords",
     "route": "in-process",
     "for": "the time zone the cycle's dates are in: the region settings at or above the scope_path of the cycle's order (RegionSettingsAtOrAbove), in the read's transaction (ADAM CR-303, option A); same deployable (commerce)"
+   },
+   {
+    "query": "tenancy#venueSettingsRecords",
+    "route": "in-process",
+    "for": "the trading currency and scale of the order's venue, which every Money of the statement is in (ADAM CR-342; ADR-0018); same deployable (commerce)"
    }
   ],
   "readsInProcess": [
    "identity.customer_membership",
-   "platform.region_settings"
+   "ledger.tax_invoice_line",
+   "platform.region_settings",
+   "platform.venue_settings"
   ]
  },
  "listDunningCases": {
@@ -109655,6 +109791,7 @@
    "identity.guest_verification_policy": [
     "accepted_document_kinds",
     "accepts_uae_pass_as_id_document",
+    "currency_code",
     "document_image_retention",
     "id",
     "id_document_required_for",
@@ -109668,23 +109805,7 @@
     "verification_provider",
     "wallet_top_up_limit"
    ]
-  },
-  "readVia": [
-   {
-    "query": "tenancy#scopeRecords",
-    "route": "in-process",
-    "for": "the venue its row's scope_path names, whose settings give the currency for the Money it answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   },
-   {
-    "query": "tenancy#venueSettingsRecords",
-    "route": "in-process",
-    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   }
-  ],
-  "readsInProcess": [
-   "platform.scope",
-   "platform.venue_settings"
-  ]
+  }
  },
  "getGuidedChoiceSuggestion": {
   "contract": "ai",
@@ -115264,9 +115385,12 @@
   "readVia": [
    {
     "query": "tenancy#activeVenues",
-    "route": "service",
-    "for": "422: a venueId not among the tenant's active venues (ADAM CR-096)"
+    "route": "in-process",
+    "for": "422: a venueId not among the tenant's active venues (ADAM CR-096); in process since ADAM CR-343 (XDR-022)"
    }
+  ],
+  "readsInProcess": [
+   "platform.scope"
   ]
  },
  "setApprovalExternalProvider": {
@@ -115635,6 +115759,7 @@
    "identity.guest_verification_policy": [
     "accepted_document_kinds",
     "accepts_uae_pass_as_id_document",
+    "currency_code",
     "document_image_retention",
     "id",
     "id_document_required_for",
@@ -115648,23 +115773,7 @@
     "verification_provider",
     "wallet_top_up_limit"
    ]
-  },
-  "readVia": [
-   {
-    "query": "tenancy#scopeRecords",
-    "route": "in-process",
-    "for": "the venue its row's scope_path names, whose settings give the currency for the Money it accepts or answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   },
-   {
-    "query": "tenancy#venueSettingsRecords",
-    "route": "in-process",
-    "for": "the venue's frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: IdentityGuestVerificationPolicy.walletTopUpLimit (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)"
-   }
-  ],
-  "readsInProcess": [
-   "platform.scope",
-   "platform.venue_settings"
-  ]
+  }
  },
  "setInstalmentPolicy": {
   "contract": "payments",
@@ -124696,7 +124805,17 @@
     "scope_path",
     "status"
    ]
-  }
+  },
+  "readVia": [
+   {
+    "query": "marketing-crm#segmentRecords",
+    "route": "in-process",
+    "for": "whether a sent audienceSegmentId is a segment the caller's scope sees, Marketing's data (ADAM CR-366)"
+   }
+  ],
+  "readsInProcess": [
+   "marketing.segment"
+  ]
  },
  "listTableCombinations": {
   "contract": "fnb",
@@ -128291,7 +128410,7 @@
    ],
    "marketing.form_definition_field": [
     "consent_purpose_id",
-    "form_definition_id",
+    "form_id",
     "id",
     "is_personal_data",
     "is_required",
@@ -128361,7 +128480,7 @@
    ],
    "marketing.form_definition_field": [
     "consent_purpose_id",
-    "form_definition_id",
+    "form_id",
     "id",
     "is_personal_data",
     "is_required",
@@ -128419,7 +128538,6 @@
    ],
    "marketing.form_definition_field": [
     "consent_purpose_id",
-    "form_definition_id",
     "form_id",
     "id",
     "is_personal_data",
@@ -129302,7 +129420,16 @@
   "service": "MarketingService",
   "stores": [
    "postgres"
-  ]
+  ],
+  "readColumns": {
+   "marketing.conversation": [
+    "callback_assigned_to_principal_id",
+    "callback_at",
+    "disposition_note",
+    "disposition_outcome",
+    "id"
+   ]
+  }
  },
  "matchLostItem": {
   "contract": "marketing-crm",
@@ -137143,6 +137270,7 @@
   "path": "/dynamic-field-question/{formId}/{key}",
   "reads": [
    "cache:idempotency",
+   "marketing.form_definition",
    "marketing.form_definition_field",
    "marketing.waiver_field_rule"
   ],
@@ -138338,6 +138466,7 @@
    ],
    "marketing.waiver_signature": [
     "document_hash",
+    "form_version",
     "id"
    ],
    "marketing.waiver_verification": [
@@ -139936,6 +140065,7 @@
     "device_info",
     "document_hash",
     "form_definition_id",
+    "form_version",
     "guardian_name",
     "id",
     "ip_address",
@@ -141790,6 +141920,122 @@
     "scope_path",
     "sort_order",
     "updated_at"
+   ]
+  }
+ },
+ "sendGuestOneTimeCode": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/guest-one-time-codes",
+  "reads": [
+   "cache:idempotency",
+   "marketing.communication_provider",
+   "marketing.message_template"
+  ],
+  "writes": [
+   "cache:idempotency",
+   "marketing.message_dispatch"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Send a guest the one-time code Identity minted",
+  "source": "derived",
+  "audience": [
+   "service"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres"
+  ]
+ },
+ "listPrivacyChangeSets": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/privacy-testing",
+  "reads": [
+   "marketing.privacy_change_set"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "brand",
+  "perm": "GUEST_VIEW",
+  "offline": false,
+  "summary": "Privacy change sets and where each stands",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres"
+  ],
+  "readColumns": {
+   "marketing.privacy_change_set": [
+    "approval_request_id",
+    "change_set_id",
+    "id",
+    "items",
+    "publish_at",
+    "published_at",
+    "scope_path",
+    "status",
+    "updated_at"
+   ]
+  }
+ },
+ "getStaffingRules": {
+  "contract": "workforce",
+  "verb": "GET",
+  "path": "/staffing-rules",
+  "reads": [
+   "workforce.position_requirement",
+   "workforce.staffing_rules"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "WORKFORCE_VIEW",
+  "offline": false,
+  "summary": "Minimum cover, working-hour limits and overtime (read)",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ],
+  "readColumns": {
+   "workforce.position_requirement": [
+    "applies_when_open",
+    "attraction_id",
+    "blocks_operation",
+    "days_of_week",
+    "ends_at",
+    "id",
+    "label",
+    "minimum_headcount",
+    "position_code",
+    "required_qualifications",
+    "staffing_rules_id",
+    "starts_at",
+    "venue_id"
+   ],
+   "workforce.staffing_rules": [
+    "default_incentive_rate_multiplier",
+    "id",
+    "incentive_approval_above",
+    "maximum_consecutive_days",
+    "maximum_hours_per_day",
+    "maximum_hours_per_week",
+    "maximum_incentive_rate_multiplier",
+    "minimum_age_for_night_shift",
+    "minimum_rest_hours",
+    "overtime",
+    "scope_path"
    ]
   }
  }

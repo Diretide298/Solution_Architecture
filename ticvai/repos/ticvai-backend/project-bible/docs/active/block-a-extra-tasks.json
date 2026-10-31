@@ -810,7 +810,7 @@
    ],
    "notBefore": "2026-10-29",
    "subject": "Field encryption in the kernel: per-tenant data and blind-index keys behind one interface (ADR-0063 action 6)",
-   "detail": "ADR-0063 action 6 (ADAM CR-271, CR-283; the lead, 29 October 2026): one Application abstraction in the kernel that encrypts, decrypts and blind-indexes a value for the current tenant (ITenantContext), so no module calls Key Vault itself. Interface: Encrypt(plaintext) returns the stored string, Decrypt(stored) returns the plaintext, BlindIndex(value) returns 64 lowercase hex characters (HMAC-SHA-256); all three act for the current tenant only. Keys: per tenant, a data key (AES-256-GCM) and a blind-index key (HMAC-SHA-256), created when the tenant is provisioned (or on first use) and wrapped by the tenant's HSM-backed Key Vault key (ADR-0063 section 5, amended 14 October 2026); unwrapped keys live only in memory, cached per tenant, and are never logged or stored unwrapped. The stored form names the key version, enc:v<version>:<base64url(nonce | ciphertext | tag)>, so a value written under an older key still decrypts after rotation. Rotation: a new key version is used for new writes and older versions still decrypt; when the blind-index key rotates, a job re-hashes the stored indexes, and until it finishes a lookup tries both versions. One tenant's keys never decrypt or match another tenant's values. Key Vault unreachable with no cached key: the call fails with the shared 503 problem, never a fall back to plaintext or an unkeyed hash. TOTP secrets (CR-173) use the same per-tenant data key: ADR-0063's per-tenant key is the rule, and CR-173's per-cell key wording is superseded. Infrastructure (Hrushikant Patkar): the HSM-backed Key Vault per cell and the hosts' managed identity access to it. The operations that wait for it: registerGuestDevice (push token, CR-086), enrolMfaMethod, verifyMfaChallenge and verifyMfaEnrolment (CR-173), recordStorefrontSessionEvents (CR-107). Done when: round-trip tests pass; two tenants cannot decrypt or blind-index-match each other's values; a rotation test decrypts old values and re-hashes indexes; a blind index is stable within a tenant and different across tenants; no module outside the kernel references the Key Vault client.",
+   "detail": "ADR-0063 action 6 (ADAM CR-271, CR-283; the lead, 29 October 2026): one Application abstraction in the kernel that encrypts, decrypts and blind-indexes a value for the current tenant (ITenantContext), so no module calls Key Vault itself. Interface: Encrypt(plaintext) returns the stored string, Decrypt(stored) returns the plaintext, BlindIndex(value) returns 64 lowercase hex characters (HMAC-SHA-256); all three act for the current tenant only. Keys: per tenant, a data key (AES-256-GCM) and a blind-index key (HMAC-SHA-256), created when the tenant is provisioned (or on first use) and wrapped by the tenant's HSM-backed Key Vault key (ADR-0063 section 5, amended 14 October 2026); unwrapped keys live only in memory, cached per tenant, and are never logged or stored unwrapped. Where the wrapped keys are kept (ADAM CR-339; the lead, 30 October 2026): the tenant database's platform.tenant_field_key (purpose dataKey or blindIndexKey, key_version, wrapped_key, wrapping_key_id naming the Key Vault key and its version, state active, decryptOnly or retired, created_at, rotated_at; one row per purpose and version, one active row per purpose), read and written by the kernel alone, which the architecture test covers as it covers the Key Vault client. A missing key is created at provisioning or on first use with INSERT ... ON CONFLICT DO NOTHING and then read again, so two hosts creating it at once end up with one key; it is unwrapped with the key version its wrapping_key_id names. The two tables are CR339-FIELD-KEY-TABLES-DB's (Hrushikant Patkar); until that lands, build behind the key-store abstraction. The stored form names the key version, enc:v<version>:<base64url(nonce | ciphertext | tag)>, so a value written under an older key still decrypts after rotation. Rotation (CR-339): rotating the data key adds a new active row and moves the old one to decryptOnly, and enc:v<version> says which row decrypts. Rotating the blind-index key re-hashes only a blind index the server can decrypt, today marketing.guest_device.token_fingerprint (from token_ciphertext): its progress is a row of platform.blind_index_rehash (column_name as schema.table.column, from_version, to_version, last_id, started_at, finished_at; one row per column and target version), and a lookup on that column tries both versions only while its row is unfinished. The other tenant blind indexes hash a token the server never keeps (marketing.subscription.unsubscribe_token, orders.payment_link.token, orders.wallet_pass.authentication_token, orders.ticket_transfer.claim_token), so they cannot be re-hashed: their old version stays decryptOnly, and a lookup tries the active version and then each decryptOnly one, newest first, for as long as a token made under it can still be presented, the rule ADR-0063 already gives API client secrets. The kernel's list of blind-index columns is the contracts' x-ticvai-secret: blind-index columns of the tenant database; tenancy.device_credential.fingerprint is not one. One tenant's keys never decrypt or match another tenant's values. Key Vault unreachable with no cached key: the call fails with the shared 503 problem, never a fall back to plaintext or an unkeyed hash. TOTP secrets (CR-173) use the same per-tenant data key: ADR-0063's per-tenant key is the rule, and CR-173's per-cell key wording is superseded. Infrastructure (Hrushikant Patkar): the HSM-backed Key Vault per cell and the hosts' managed identity access to it, with soft-delete and purge protection on, so a key version that a row names, a row in a restored backup included, is never purged (CR-339). The operations that wait for it: registerGuestDevice (push token, CR-086), enrolMfaMethod, verifyMfaChallenge and verifyMfaEnrolment (CR-173), recordStorefrontSessionEvents (CR-107). Done when: round-trip tests pass; two tenants cannot decrypt or blind-index-match each other's values; a data-key rotation test decrypts old values; a blind-index rotation re-hashes guest_device.token_fingerprint with its lookup trying both versions until its platform.blind_index_rehash row is finished, and a one-way index still matches a token made under a decryptOnly version; a blind index is stable within a tenant and different across tenants; no module outside the kernel references the Key Vault client.",
    "builds": [
     "adr ADR-0063",
     "table marketing.guest_device",
@@ -832,16 +832,14 @@
    ],
    "notBefore": "2026-10-29",
    "subject": "Service sign-in between deployables inside a cell: workload identity, token validation, the caller's context (ADR-0073)",
-   "detail": "The serviceAuth scheme the contracts name (ADAM CR-281; the lead, 29 October 2026), so one deployable (commerce, access, operations, workers, ticvai-ai; ADR-0055) can call another's operation or service query inside a cell; nothing built it before (CR-174, CR-241, CR-281). 1. ADR-0073 first, for the lead's approval: how each deployable proves who it is (its own workload identity), mTLS between them inside the cell, and how the callee validates the call. 2. Validation: the callee accepts a call only with a valid token for itself (issuer the cell's identity, audience the callee deployable, not expired); anything else is 401 with the shared problem. 3. The caller's context: the caller sends the tenant, scope and subject of the request it acts for, and the callee sets ITenantContext from them only after the token is valid; a caller acting for no person (a job, a consumer) runs at the scope the route's contract names. 4. Client side: one shared kernel client that every x-ticvai-read-via query with route service, and every serviceAuth call, goes through, so no module builds its own. The operations that wait for it: endGuestDeviceSessions, recordConsentIdentifier, updateGuestSubjectDetails, requeueDeadLetter, listCellEndpoints, setAnalyticsProvider and setMaintenanceMode (CR-281), the follow-ups CR-174, CR-241, CR-275 and CR-277 left for after service sign-in, and the operations that read another deployable's data over the service route. Done when: in a test with two deployables, a valid call succeeds with the caller's tenant and scope in the callee's context; a missing, expired or wrong-audience token is 401; no shared SQL is used between them (ADR-0055 rule 4).",
+   "detail": "The serviceAuth scheme the contracts name (ADAM CR-281; the lead, 29 October 2026), so one deployable (commerce, access, operations, workers, ticvai-ai; ADR-0055) can call another's operation or service query inside a cell; nothing built it before (CR-174, CR-241, CR-281). 1. ADR-0073 first, for the lead's approval: how each deployable proves who it is (its own workload identity), mTLS between them inside the cell, and how the callee validates the call. 2. Validation: the callee accepts a call only with a valid token for itself (issuer the cell's identity, audience the callee deployable, not expired); anything else is 401 with the shared problem. 3. The caller's context: the caller sends the tenant, scope and subject of the request it acts for, and the callee sets ITenantContext from them only after the token is valid; a caller acting for no person (a job, a consumer) runs at the scope the route's contract names. 4. Client side: one shared kernel client that every x-ticvai-read-via query with route service, and every serviceAuth call, goes through, so no module builds its own. The operations that wait for it: endGuestDeviceSessions, recordConsentIdentifier, updateGuestSubjectDetails, requeueDeadLetter and listCellEndpoints (CR-281), not setAnalyticsProvider or setMaintenanceMode, which waited only for tenancy#activeVenues and now ask it in process (ADAM CR-343; the lead, 30 October 2026), the follow-ups CR-174, CR-241, CR-275 and CR-277 left for after service sign-in, and the operations that read another deployable's data over the service route. Done when: in a test with two deployables, a valid call succeeds with the caller's tenant and scope in the callee's context; a missing, expired or wrong-audience token is 401; no shared SQL is used between them (ADR-0055 rule 4).",
    "builds": [
     "adr ADR-0055",
     "operation endGuestDeviceSessions",
     "operation recordConsentIdentifier",
     "operation updateGuestSubjectDetails",
     "operation requeueDeadLetter",
-    "operation listCellEndpoints",
-    "operation setAnalyticsProvider",
-    "operation setMaintenanceMode"
+    "operation listCellEndpoints"
    ]
   },
   {
@@ -1473,6 +1471,195 @@
     "file backend/control/V0110__after_r1_20261020.sql",
     "file backend/control/V0112__after_r1_20261021.sql"
    ]
+  },
+  {
+   "key": "CR362-DB-DELEGATED-ACCESS",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 2,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-IDENTITY"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "identity.delegated_access: a guest's household grant passes the write check (CR-362)",
+   "detail": "Spec: ADAM CR-362, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #30672 (grantDelegation), carried by this task. One forward migration in the tenant database. (1) A new function platform.subject_holds_household_grant_over(over_subject_id uuid) returns boolean: STABLE, plpgsql (so it is not inlined), not SECURITY DEFINER; true when an identity.delegated_access row exists with subject_id = current_setting('ticvai.subject_id'), over_subject_id = the argument, delegation_kind familyMember or primaryHolder, effect ALLOW, revoked_at null and now inside valid_from/valid_to. It reads only the guest's own held grants, which the read policy already shows the guest. (2) Re-apply identity.delegated_access's split policy (platform.apply_split_rls) with the read predicate as it is and a write check widened with OR platform.subject_holds_household_grant_over(over_subject_id). grantDelegation still allows that grant only when over_subject_id is a minor (the handler's rule). Source DDL after r1: the statements on identity.delegated_access in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Test: a guest session holding an active familyMember grant over a child writes a grant over that child; a guest with no such grant, an expired or revoked one, or one over another subject is refused by the policy; staff writes are unchanged. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table identity.delegated_access"
+   ]
+  },
+  {
+   "key": "CR363-DB-GUEST-VERIFICATION-CURRENCY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-IDENTITY-2"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "identity.guest_verification_policy stores the top-up limit's currency (CR-363)",
+   "detail": "Spec: ADAM CR-363, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #30716 (setGuestVerificationPolicy), carried by this task. One forward migration in the tenant database: ALTER TABLE identity.guest_verification_policy ADD COLUMN currency_code text, with CHECK ((wallet_top_up_limit IS NULL) = (currency_code IS NULL)) and a check that currency_code is three capital letters (^[A-Z]{3}$). No backfill: the build never wrote wallet_top_up_limit. setGuestVerificationPolicy writes it from walletTopUpLimit.currency and getGuestVerificationPolicy answers the Money from it. Source DDL after r1: the statements on identity.guest_verification_policy in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table identity.guest_verification_policy"
+   ]
+  },
+  {
+   "key": "CR369-DB-SUBJECT-DOCUMENT-NUMBER",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-PII"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "pii.subject_document keeps the document number encrypted, not hashed (CR-369)",
+   "detail": "Spec: ADAM CR-369, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #27650 (MIG-PII, V0007__pii.sql, whose migration creates pii.subject_document): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database: ALTER TABLE pii.subject_document ADD COLUMN number_ciphertext text (the number encrypted through KERNEL-FIELD-ENC's Encrypt, one string naming the key version, ADR-0063 section 5); ALTER COLUMN number_hash DROP NOT NULL (no longer written; dropped at a later release). The last four digits stay in clear as now. No backfill. Source DDL after r1: the statements on pii.subject_document in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table pii.subject_document",
+    "adr ADR-0063"
+   ]
+  },
+  {
+   "key": "CR370-GUEST-ONE-TIME-CODE",
+   "epic": "PLATFORM",
+   "points": 3,
+   "pool": "backend",
+   "depends": [
+    "PLATFORM-KERNEL",
+    "PLATFORM-OUTBOX",
+    "KERNEL-FIELD-ENC",
+    "MIG-MARKETING"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "Marketing sends a guest's one-time code: sendGuestOneTimeCode and the guestOneTimeCode system template (CR-370)",
+   "detail": "Spec: ADAM CR-370, the lead's decision of 30 October 2026, in the contracts at the release tag in ADAM (contracts/satellite/marketing-crm.yaml sendGuestOneTimeCode; the event identity.guestCodeIssued v1). Identity and Marketing are in different deployables, so the code reaches Marketing by an outbox event: requestGuestOtp, registerGuest (channel email) and verifyGuestEmail (mode send) write identity.guestCodeIssued in the transaction that writes the identity.otp_challenge row, with the destination and the code field-encrypted (KERNEL-FIELD-ENC). This task is Marketing's side. sendGuestOneTimeCode is invoked by the relay, as notifyPerformanceHolders is: it decrypts the destination and code at send time, sends on the event's channel through the tenant's configured provider with the system template guestOneTimeCode in the guest's language (the template carries its own subject), and writes a transactional marketing.message_dispatch row without the code. It is idempotent on challengeId; once expiresAt has passed it stops retrying and is not dead-lettered for replay. Seed the system template guestOneTimeCode (English and Arabic) with the other system templates. Until KERNEL-FIELD-ENC is Ready for QA, Identity keeps IGuestCodeDelivery's log-only default, and a code is never in clear in the outbox. Done when: an event for an email and an SMS challenge each sends one message in the guest's language and writes one dispatch row without the code; a second delivery of the same event sends nothing; an event past expiresAt is dropped without a dead letter; no log line or stored row holds the code or the destination in clear.",
+   "operations": [
+    "sendGuestOneTimeCode"
+   ],
+   "builds": [
+    "table marketing.message_dispatch",
+    "adr ADR-0063"
+   ]
+  },
+  {
+   "key": "CR341-DB-SETTINGS-GUEST-READ",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-PLATFORM"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "platform.venue_settings and platform.region_settings: a signed-in guest reads them at any venue (CR-341)",
+   "detail": "Spec: ADAM CR-341, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #27665 (MIG-PLATFORM): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, two policies re-applied: SELECT platform.apply_split_rls('platform.venue_settings'::regclass, 'platform.venue_in_scope(venue_id) OR NULLIF(current_setting(''ticvai.subject_id'', true), '''') IS NOT NULL', 'platform.venue_in_scope(venue_id)'); and platform.region_settings with read 'platform.in_scope(scope_path) OR platform.above_scope(scope_path) OR NULLIF(current_setting(''ticvai.subject_id'', true), '''') IS NOT NULL' and write 'platform.in_scope(scope_path)'. Writes stay scoped; an anonymous session gains nothing. Rollback: platform.drop_rls_policies, then apply_venue_rls / apply_read_beneath_rls as now. Source DDL after r1: the statements on platform.venue_settings and platform.region_settings in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Test: a guest under one venue's request scope reads another venue's venue_settings and region_settings rows and writes neither; anonymous and staff sessions see no change. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table platform.venue_settings",
+    "table platform.region_settings"
+   ]
+  },
+  {
+   "key": "CR342-DB-TAX-INVOICE-GUEST-READ",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-LEDGER"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "ledger.tax_invoice: a guest reads its own invoices by buyer_subject_id (CR-342)",
+   "detail": "Spec: ADAM CR-342, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #27672 (MIG-LEDGER): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, the CR-295 pattern: ledger.tax_invoice's policy re-applied split, read '(NULLIF(current_setting(''ticvai.subject_id'', true), '''') IS NULL AND platform.in_scope(scope_path)) OR buyer_subject_id = (SELECT NULLIF(current_setting(''ticvai.subject_id'', true), '''')::uuid)', write 'platform.in_scope(scope_path)'. ledger.tax_invoice_line already follows its parent. Rollback to apply_scope_rls. Source DDL after r1: the statements on ledger.tax_invoice in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Test: a guest under a venue scope sees only its own invoices, at every venue; staff see no change. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table ledger.tax_invoice"
+   ]
+  },
+  {
+   "key": "CR342-DB-DUNNING-CASE-GUEST-READ",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-PAYMENTS"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "payments.dunning_case: a guest reads its own cases by subject_id (CR-342)",
+   "detail": "Spec: ADAM CR-342, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #27679 (MIG-PAYMENTS): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, the CR-295 pattern: payments.dunning_case's policy re-applied split, read '(NULLIF(current_setting(''ticvai.subject_id'', true), '''') IS NULL AND platform.in_scope(scope_path)) OR subject_id = (SELECT NULLIF(current_setting(''ticvai.subject_id'', true), '''')::uuid)', write 'platform.in_scope(scope_path)'. Rollback to apply_scope_rls. Source DDL after r1: the statements on payments.dunning_case in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Test: a guest under a venue scope sees only its own dunning cases, at every venue; staff see no change. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table payments.dunning_case"
+   ]
+  },
+  {
+   "key": "CR339-FIELD-KEY-TABLES-DB",
+   "epic": "PLATFORM",
+   "points": 3,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-PLATFORM"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "platform.tenant_field_key and platform.blind_index_rehash: where field-encryption keys and re-hash progress are kept (CR-339)",
+   "detail": "Spec: ADAM CR-339, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #27665 (MIG-PLATFORM): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration, additive, in every tenant database: two new tables only the kernel reads and writes (KERNEL-FIELD-ENC). (1) platform.tenant_field_key: id uuid primary key, purpose text CHECK in (dataKey, blindIndexKey), key_version integer NOT NULL, wrapped_key bytea NOT NULL, wrapping_key_id text NOT NULL (the Key Vault key and its version), state text CHECK in (active, decryptOnly, retired), created_at timestamptz NOT NULL, rotated_at timestamptz; UNIQUE tenant_field_key_purpose_version_uniq (purpose, key_version); UNIQUE INDEX tenant_field_key_active_uniq (purpose) WHERE state = 'active'. (2) platform.blind_index_rehash: id uuid primary key, column_name text NOT NULL (schema.table.column), from_version integer NOT NULL, to_version integer NOT NULL, last_id uuid, started_at timestamptz NOT NULL, finished_at timestamptz; UNIQUE (column_name, to_version). Row security on both as the contract gives it: any grant of the tenant may read, insert and update, and no one deletes (no DELETE policy). Grants: SELECT, INSERT and UPDATE to the commerce, access, operations and workers roles (DB-ROLES), no DELETE. Infrastructure, already on KERNEL-FIELD-ENC: Key Vault soft-delete and purge protection on. Source DDL after r1: the statements on the two tables in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table platform.tenant_field_key",
+    "table platform.blind_index_rehash",
+    "adr ADR-0063"
+   ]
+  },
+  {
+   "key": "CR359-DB-FORM-VERSION-KEY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 3,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-MARKETING",
+    "MIG-MARKETING-2"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "marketing.form_definition keyed by (id, version), and the waiver signature names the version signed (CR-359)",
+   "detail": "Spec: ADAM CR-359, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #27677 (MIG-MARKETING): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. By hand, not additive (a key change), in the tenant database, in this order: (1) drop the foreign keys on form_definition(id): form_definition_field_form_definition_id_fkey, waiver_requirement_form_definition_id_fkey and waiver_signature_form_definition_id_fkey; (2) ALTER TABLE marketing.form_definition DROP CONSTRAINT form_definition_pkey, ADD PRIMARY KEY (id, version): formId is the form, and each version is a row with the same id; (3) ALTER TABLE marketing.waiver_signature ADD COLUMN form_version integer, backfilled from form_definition, then SET NOT NULL; (4) the composite foreign keys form_definition_field (form_id, form_version), waiver_requirement (form_definition_id, form_version) and waiver_signature (form_definition_id, form_version), each REFERENCES marketing.form_definition (id, version). Under MATCH SIMPLE a waiver_requirement row whose form_version is null is not checked, so its writer checks the form exists. (5) Later, once nothing writes it: drop form_definition_field.form_definition_id (writers set it to formId until it is retired). Source DDL after r1: the statements on marketing.form_definition, form_definition_field, waiver_requirement and waiver_signature in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table marketing.form_definition",
+    "table marketing.form_definition_field",
+    "table marketing.waiver_requirement",
+    "table marketing.waiver_signature"
+   ]
+  },
+  {
+   "key": "CR346-DB-CONVERSATION-DISPOSITION",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-MARKETING"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "marketing.conversation stores the call disposition (CR-346)",
+   "detail": "Spec: ADAM CR-346, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #30527 (MIG-MARKETING#marketing.conversation): that ticket has started, so its text is not rewritten, and this task carries the database part of the decision. One forward migration in the tenant database, additive: marketing.conversation gains disposition_outcome text null with a CHECK on information, resolved, noSale, saleCompleted, callbackScheduled, escalated, wrongNumber, abandoned, unreachable (CallDisposition.outcome's nine values); callback_at timestamptz null; callback_assigned_to_principal_id uuid null REFERENCES identity.principal; disposition_note text null. setCallDisposition writes them; a later call replaces them. Source DDL after r1: the statements on marketing.conversation in the forward migration the release derives for it (backend/tenant/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table marketing.conversation"
+   ]
+  },
+  {
+   "key": "CR356-DB-RELEASE-STATUS",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-CONTROL-5"
+   ],
+   "notBefore": "2026-11-02",
+   "subject": "control.release records why, by whom and when its status changed, and who approved a withdrawal (CR-356)",
+   "detail": "Spec: ADAM CR-356, the lead's decision of 30 October 2026 (posted on its ticket), in the contracts at the release tag in ADAM. The [DB] work of #34047 (MIG-CONTROL-5#control.release), carried by this task. One forward migration in the control database, additive: control.release gains status_reason text null, status_changed_by_principal_id uuid null, status_changed_at timestamptz null and withdrawal_approved_by_principal_id uuid null (the principal references unenforced, as created_by_principal_id is). rejectRelease and withdrawRelease write them. Source DDL after r1: the statements on control.release in the forward migration the release derives for it (backend/control/V01nn__after_r1_<date>.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table control.release"
+   ]
   }
  ],
  "blockA1Operations": {
@@ -1809,7 +1996,7 @@
  "readViaBuiltWith": {
   "wallet#periodCloseChecks": ["getWalletPreCloseChecks", "getWalletMovementSummary"]
  },
- "operationWaitsNote": "operation -> the hand-written plan tasks its task waits for: an operation whose ticket needs work that no screen, operation or query of the plan implies (a kernel scheme or client it runs on). tools/build-service-docs.py makes the task that builds the operation wait on each task named, so the release links the two tasks; a key must be a task of this file (a generated key, such as a migration's, is only settled at the key reconcile, and the build stops on one). Added 29 October 2026 (CHG-R11PLN-001; ADAM CR-271, CR-281 to CR-284): the lead made the four kernel tickets that day and linked each of these operations' tickets to the kernel tickets it waits for by hand in OpenProject; this is the plan's record of those waits.",
+ "operationWaitsNote": "operation -> the hand-written plan tasks its task waits for: an operation whose ticket needs work that no screen, operation or query of the plan implies (a kernel scheme or client it runs on). tools/build-service-docs.py makes the task that builds the operation wait on each task named, so the release links the two tasks; a key must be a task of this file (a generated key, such as a migration's, is only settled at the key reconcile, and the build stops on one). Added 29 October 2026 (CHG-R11PLN-001; ADAM CR-271, CR-281 to CR-284): the lead made the four kernel tickets that day and linked each of these operations' tickets to the kernel tickets it waits for by hand in OpenProject; this is the plan's record of those waits. 31 October 2026 (CHG-R12PL-012; ADAM CR-343): setAnalyticsProvider and setMaintenanceMode no longer wait on KERNEL-SERVICE-AUTH: the only read they needed the service route for, tenancy#activeVenues, is asked in process from the operations host.",
  "operationWaits": {
   "registerGuestDevice": ["KERNEL-FIELD-ENC"],
   "enrolMfaMethod": ["KERNEL-FIELD-ENC"],
@@ -1821,8 +2008,6 @@
   "updateGuestSubjectDetails": ["KERNEL-SERVICE-AUTH"],
   "requeueDeadLetter": ["KERNEL-SERVICE-AUTH"],
   "listCellEndpoints": ["KERNEL-SERVICE-AUTH"],
-  "setAnalyticsProvider": ["KERNEL-SERVICE-AUTH"],
-  "setMaintenanceMode": ["KERNEL-SERVICE-AUTH"],
   "startSsoAuthorization": ["KERNEL-REDIS"],
   "completeSsoAuthorization": ["KERNEL-REDIS"],
   "recordDeviceHeartbeat": ["KERNEL-DEVICE-AUTH"]

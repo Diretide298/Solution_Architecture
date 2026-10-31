@@ -900,7 +900,12 @@ components:
       type: object
       description: >
         Permissions effective at a given scope path, after deny resolution. Clients filter
-        navigation on this and never compute permissions themselves.
+        navigation on this and never compute permissions themselves. **One entry per scope path
+        where the selected role holds a grant, allow or deny** (a wildcard deny included), holding
+        the full section 2 result at that path: the allows inherited from it and its ancestors, minus
+        every deny that contains it. A permission holds at a node when it is in the entry of the
+        deepest listed path that contains the node; entries are never combined (decided 30 October
+        2026, Chinmay, ADAM CR-367; CHG-CR367-001; permission-resolution.md section 7.2).
       required: [scopePath, permissions]
       properties:
         scopePath:

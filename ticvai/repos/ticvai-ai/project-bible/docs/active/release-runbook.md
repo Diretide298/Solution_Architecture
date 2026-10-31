@@ -195,6 +195,32 @@ minutes from the merge to the last settled request.
   `r<N>`. If it names an older release, ADAM has not fetched the tag (on the box: `git fetch --tags`, then
   deploy) and the release is not out yet (PROCESS-LOG P-20; CHG-GTE-006).
 
+## 6a. The database check, after every deploy (CHG-R12LV-001)
+Live can drift from the package either way: live gets the package's forward files applied directly, the developers'
+repository `db/` folder only gets what someone copies across, and live can carry objects the package never recorded.
+A tool finds that, not a developer (the live comparison of 30 October; the lead: "Yes, both").
+1. **The database owner sends two pairs of schema-only dumps** once the release's migrations are deployed:
+   `pg_dump --schema-only` (plain or `-Fc`) of live's tenant and control databases, and of a tenant and a control
+   database the Migrator has just built from the repository's `db/` folder alone. Data never travels: schema only.
+2. **The release runs the tool on each pair** (Docker; the container is the dumps' Postgres major, read from them):
+   `python tools/check-schema-drift.py run --label live --tenant-dump <live tenant> --control-dump <live control> --out <dir>`,
+   then the same with `--label db` and the `db/` dumps, `--reference <dir>` reusing the first run's reference. Add
+   `--tickets <file>` for a fresher OpenProject status than `handoff/service-docs/adam-links.json`. It builds the
+   package's reference the way a cell is provisioned (control in initdb order, then `backend/provision-tenant.sh`),
+   restores each dump, snapshots both sides with one query, and writes `drift-<label>.md` and `drift-<label>.json`.
+3. **Both reports go to the lead**, whatever they say. Each sorts every difference into one bucket: the release's
+   objects still to add, change or drop; hand changes from `handoff/migration-review.md` still open or waiting on a
+   decision; objects on the database that the package never recorded; tables not built, by their ticket (a gap only
+   when the ticket is started or closed, or no task names the table); objects defined differently. Not gaps:
+   keys the database validated that the package creates NOT VALID, done hand changes and what rides on them, keys
+   waiting for their target table, objects on a table the package retires.
+4. **Its findings are never baselined.** There is no baseline, acknowledgement or exemption file: every run judges
+   its dumps from scratch. What the lead decides goes where it belongs: a CR for the database owner, a change entry
+   that records a live-only object in the package, or a migration ticket.
+
+The gate runs the tool's self-test and checks that the inputs it judges by still parse (`run-checks.py`); the dumps
+are a release step, not a refresh one.
+
 ## 7. Re-audit, every release
 - Every check is green.
 - Pull a **sample of 20 to 30 tickets** through ADAM at the new tag, across every developer's board. After a release

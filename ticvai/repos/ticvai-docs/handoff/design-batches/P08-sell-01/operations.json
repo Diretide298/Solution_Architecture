@@ -1343,6 +1343,11 @@
     "required": null
    },
    {
+    "name": "channel",
+    "in": "query",
+    "required": false
+   },
+   {
     "name": null,
     "in": null,
     "required": null

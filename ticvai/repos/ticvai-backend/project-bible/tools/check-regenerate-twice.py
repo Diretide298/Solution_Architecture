@@ -58,10 +58,30 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Every file derive-diagrams writes (the README, the HLD and the four LLD sets).
 DIAGRAMS = ["diagrams/*.yaml", "diagrams/hld/*.yaml", "diagrams/lld/*/*.yaml"]
 
+# **What reaches a database is in the chain** (CHG-R12GT-004, 31 October 2026). derive-schema reads the relationship
+# graph and its own last output, and derive-relationships draws the graph from the schema reference after it, so a table
+# a refresh creates was derived from a graph that did not hold it yet: r11's full derive gave
+# whitelabel.received_release.release_id no key and the next refresh gave it a convention key to ai.release, with a
+# forward migration (V0120: an index) the released tree did not hold; identity.guest_upload_ref's surrogate key moved.
+# None of these steps writes an authored input, so the chain never ran them. It runs them now, in refresh order, on the
+# files that become DDL; a second regeneration that changes the schema reference, the graph, the column types or a
+# forward migration (a new backend/*/V*.sql) is RT-CHAIN. migration-review.md is left out: it carries the day it is
+# written, so a run that crosses midnight would change it with nothing else.
+SCHEMA = ["handoff/schema-reference.json"]
+DB_FILES = ["handoff/schema-reference.json", "handoff/relationship-graph.json", "handoff/relationships.csv",
+            "handoff/ddl-column-types.json", "backend/*/V*.sql", "backend/*.sh", "handoff/migration-review.md"]
+# Kept and put back like the rest, never compared: the dated header of the migration review.
+UNCOMPARED = {"handoff/migration-review.md"}
+
 WRITE_BACK = [
     ("derive-lineage", ["--apply"], ["handoff/api-data-lineage.json"]),
+    ("derive-schema", [], SCHEMA),
     ("derive-read-columns", ["--apply"], ["handoff/api-data-lineage.json"]),
     ("derive-service-counts", ["--apply"], ["handoff/service-decomposition.json"]),
+    ("derive-relationships", [], ["handoff/relationship-graph.json", "handoff/relationships.csv"]),
+    ("derive-ddl", ["--apply"], DB_FILES),
+    ("derive-table-notes", ["--apply"], SCHEMA),
+    ("derive-schema-roots", [], SCHEMA + ["handoff/schema-roots.md"]),
     ("derive-frontend", [], ["frontend/*.yaml"]),
     ("derive-board-flows", ["--apply"], ["flows/*.yaml", "screens/P*.yaml"]),
     ("derive-transitions-from-flows", ["--apply", "--adopt"], ["screens/P*.yaml"]),
@@ -112,6 +132,10 @@ def compare(a, b):
     return {p: (a.get(p), b.get(p)) for p in set(a) | set(b) if a.get(p) != b.get(p)}
 
 
+def rel(path, root=ROOT):
+    return os.path.relpath(path, root).replace("\\", "/")
+
+
 def first_lines(before, after, n=6):
     x = (before or b"").decode("utf-8", "replace").splitlines()
     y = (after or b"").decode("utf-8", "replace").splitlines()
@@ -158,6 +182,8 @@ def chain(steps, want=None, keep=False):
                 findings.append("RT-ERROR %s exited %d: %s" % (name, rc, " | ".join(out.strip().splitlines()[-3:])))
             prev = cur
         for pth, (x, y) in sorted(compare(s0, prev).items()):
+            if rel(pth) in UNCOMPARED:
+                continue
             findings.append("RT-CHAIN %s: the chain changed it (%s): %s"
                             % (os.path.relpath(pth, ROOT).replace("\\", "/"), ", ".join(touched.get(pth, [])),
                                " / ".join(first_lines(x, y))))
@@ -197,6 +223,20 @@ def self_test():
         restore(s0, ["*.yaml"], d)
         if compare(s0, snapshot(["*.yaml"], d)):
             fails.append("restore: the tree is not as it was")
+    # The schema loop is in the chain, in refresh order (CHG-R12GT-004): derive-schema before derive-relationships,
+    # and derive-ddl after both, on the files that become DDL, the forward migrations among them.
+    names = [n for n, _a, _g in WRITE_BACK]
+    for need in ("derive-schema", "derive-relationships", "derive-ddl"):
+        if need not in names:
+            fails.append("WRITE_BACK: %s is not in the chain, so a schema that needs a second refresh passes" % need)
+    if all(n in names for n in ("derive-schema", "derive-relationships", "derive-ddl")) and not (
+            names.index("derive-schema") < names.index("derive-relationships") < names.index("derive-ddl")):
+        fails.append("WRITE_BACK: derive-schema, derive-relationships and derive-ddl are not in refresh order")
+    ddl_globs = dict((n, g) for n, _a, g in WRITE_BACK).get("derive-ddl") or []
+    if "backend/*/V*.sql" not in ddl_globs:
+        fails.append("WRITE_BACK: derive-ddl's files leave out the forward migrations (backend/*/V*.sql)")
+    if rel(os.path.join(ROOT, "handoff", "migration-review.md")) not in UNCOMPARED:
+        fails.append("rel: the migration review is not matched by its relative path")
     return fails
 
 
@@ -262,6 +302,8 @@ def main():
             notes.append("%s: the first run changed %d file(s) (%s); the tree was not refreshed for this step"
                          % (name, len(first), ", ".join(sorted(os.path.relpath(p, ROOT) for p in first)[:4])))
         for p, (x, y) in sorted(second.items()):
+            if rel(p) in UNCOMPARED:
+                continue
             findings.append("RT-UNSTABLE %s: %s changed %s: %s"
                             % (name, "run after the refresh, it" if a.once else "a second run",
                                os.path.relpath(p, ROOT).replace("\\", "/"), " / ".join(first_lines(x, y))))

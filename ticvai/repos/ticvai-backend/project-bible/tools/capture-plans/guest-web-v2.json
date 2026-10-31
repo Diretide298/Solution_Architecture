@@ -99,11 +99,11 @@
 
   {"id": "WEB-018", "name": "My Tickets", "view": "Header 'My tickets' → a ticket → 'Manage' (ticket sheet)", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
 
-  {"id": "WEB-019", "name": "Order History", "view": "Account → 'Order history'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+  {"id": "WEB-019", "name": "Order History", "view": "Account → 'Order history'", "steps": [], "expect": [], "pending": "not captured: since ADAM CR-348 (30 October 2026) the frame wireframes/frames/web-019.html draws the guest-web build on #32306, not this view; a capture would overwrite it"},
 
   {"id": "WEB-020", "name": "Profile & Preferences", "view": "Account → 'Personal details', 'Notifications', 'Accessibility'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
 
-  {"id": "WEB-021", "name": "Wallet & Gift Cards", "view": "Account → 'Wallet & gift cards' (and 'Payment methods')", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
+  {"id": "WEB-021", "name": "Wallet & Gift Cards", "view": "Account → 'Wallet & gift cards' (and 'Payment methods')", "steps": [], "expect": [], "pending": "not captured: since ADAM CR-351 (29 October 2026) the frame wireframes/frames/web-021.html draws the guest-web build on #32125, not this view; a capture would overwrite it"},
 
   {"id": "WEB-022", "name": "Membership Plans", "view": "Summit Peaks → 'Annual pass / membership' flow; Kids Club → 'Membership pass'; Account → Membership → 'Other plans — Compare'", "steps": [], "expect": [], "pending": "the view is named (the screen's wireframe.prototype.view); its click path is not recorded yet"},
 

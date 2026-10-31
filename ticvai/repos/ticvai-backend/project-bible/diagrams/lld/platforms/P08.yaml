@@ -61,7 +61,7 @@ servicesCalled:
 - service: VenueOpsService
   operationCalls: 532
 - service: TenancyService
-  operationCalls: 490
+  operationCalls: 491
 - service: OrderService
   operationCalls: 423
 - service: AccessService
@@ -75,7 +75,7 @@ servicesCalled:
 - service: PlatformService
   operationCalls: 106
 - service: FnbService
-  operationCalls: 95
+  operationCalls: 96
 - service: ReportingService
   operationCalls: 91
 - service: LedgerService
@@ -4531,9 +4531,10 @@ screens:
   name: Kitchen & Preparation Stations
   module: Food & Beverage
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: compact
   operations:
+  - getKitchenSla
   - listKitchenStations
   - listOutlets
   - printPrepSheet
@@ -4693,7 +4694,7 @@ screens:
   name: Product Availability, 86 & Operational Food Safety
   module: Stock & Supply
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getHaccpStatus
@@ -22404,7 +22405,7 @@ screens:
   name: Staff Resource Directory
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listJobTitles
@@ -22622,9 +22623,10 @@ screens:
   name: Overtime & Working-Hour Rules
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: compact
   operations:
+  - getStaffingRules
   - setStaffingRules
   states:
   - emptyFirstRun

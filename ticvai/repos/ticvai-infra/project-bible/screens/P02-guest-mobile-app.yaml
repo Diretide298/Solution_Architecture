@@ -2287,7 +2287,23 @@ screens:
     size dropdown. The estimate reads *<ticket> · Guests × <n>*, and the request is `requestGroupBooking`
     with the group ticket as `packageProductId` and the headcount as `expectedSize`. Supervisors listed
     separately and free, and a water-park group choosing a session, are not in the contract yet (questions
-    of 1 October).'
+    of 1 October).
+
+
+    **Design change, logged (ADAM CR-349, raised by Chitrangi Mestry on #31775, 30 October 2026; the lead''s
+    rule of 28 October that frontend developers change a screen''s design on their own and log it), with
+    the lead''s condition.** The guest-app build changes the look and nothing behind it; the frame `wireframes/P02
+    Guest App.dc.html#gst-008` draws it and is the look to build to. (1) The screen sits on the venue''s
+    hero photo under a dark overlay. (2) Each ticket is a white rounded card: shut, the photo down its
+    leading side beside the category, name, tags, from-price and a chevron; open, the photo across the
+    top, the name, the price and the counters; no ticket-stub, perforation or notch shapes. (3) The header
+    shows *Choose your tickets* as the title, with *Step n of m* under it and the step line below. (4)
+    There is no "Expand a ticket to set guest numbers." hint. (5) The loader shows only the mascot and
+    *Loading...*, with no venue tile or venue name. **The condition: the screen still follows the published
+    booking-flow settings.** Every `cardLayout` (stackedRows, splitRows, cardsAcross, posterCards) and
+    `cardSize` is drawn with the white card; tags show only when `ticketTags` is on, and each ticket type''s
+    description only when `cardInfo` is on; the step line takes `stepIndicator`''s style, and `none` hides
+    it. The operations, fields, errors and permissions are the ones above.'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProductVariants` reads the ticket types of the product and a stepper sets each
@@ -2319,9 +2335,13 @@ screens:
         - ProductVariant.description
         - ProductVariant.axisValues
         - ProductVariant.isActive
-        notes: Each row with a stepper and a live price; `ProductVariant.description` behind the (i) when
-          `cardInfo` is on (23SEP-6); display tags when `ticketTags` is on (23SEP-3). Hidden until a time
-          is picked in the dated flow (`performanceReveal`).
+        notes: 'Each row with a stepper and a live price; `ProductVariant.description` behind the (i)
+          when `cardInfo` is on (23SEP-6); display tags when `ticketTags` is on (23SEP-3). Hidden until
+          a time is picked in the dated flow (`performanceReveal`). Drawn as white rounded cards (ADAM
+          CR-349, 30 October 2026): shut, the photo down the leading side beside the category, name, tags,
+          from-price and a chevron; open, the photo across the top, the name, the price and the counters.
+          Every `cardLayout` and `cardSize` is drawn with the white card, and the tags and description
+          still follow `ticketTags` and `cardInfo`.'
         operation: listProductVariants
         provenance: decided 29 September, rev 3 GAP-D3, REV3-2, 23SEP-6
       - kind: cardList
@@ -2350,7 +2370,8 @@ screens:
         notes: The steps of the published flow in their `sortOrder`, this one (tickets) highlighted. A
           step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the
           venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from
-          the same published settings (CMS-016) (CHG-SGU-022).
+          the same published settings (CMS-016) (CHG-SGU-022). Under the title Choose your tickets and
+          its Step n of m line (ADAM CR-349, 30 October 2026); `stepIndicator` `none` hides the line.
         provenance: decided 29 September 2026, W12; CMS-103 Booking Flows
       - kind: secondaryButton
         label: Show everything
@@ -2366,7 +2387,8 @@ screens:
         collectedBy: Ticket types
         provenance: decided 29 September, rev 3 GAP-D3
   states:
-    loading: The ticket types of the product, with prices.
+    loading: The mascot and Loading..., on the venue's hero photo, with no venue tile or venue name, until
+      the ticket types of the product and their prices arrive.
     error: Could not load. Names which read failed; nothing is added.
     emptyFirstRun: '**This product has no ticket types on sale.** Says so and offers the product page.'
     emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
@@ -2433,17 +2455,24 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-008
-    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-008.html, captured from the prototype view
-      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
+    note: 'Drawn frame: wireframes/frames/gst-008.html (and its copy wireframes/incoming/P02-mobile-v4/gst-008.html),
+      drawn from the guest-app build on #31775 since ADAM CR-349 (30 October 2026); it replaced the capture
+      of the prototype view below, and the capture plan no longer takes this view.'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
       verified: '2026-10-01'
       match: partial
       view: 'Buy tickets → Dated day pass → Book now → Fri 2 Oct (step 2: tickets; add-ons are step 3)'
-      differences: Booking in the app runs the website booking engine.
+      differences: 'Booking in the app runs the website booking engine. **Since 30 October 2026 the look
+        is the frame on the board, not this view** (ADAM CR-349, a design change logged by Chitrangi Mestry
+        on #31775): the frame draws the build''s hero photo under a dark overlay, white rounded ticket
+        cards, the Choose your tickets title over Step n of m and the step line, no expand hint and a
+        mascot-only loader, where this view draws a light canvas, ticket-shaped cards, the venue and step
+        over the title, the hint and the venue loader. The booking-flow settings still drive the cards
+        and the step line.'
     stateViews:
-      loading: P02/venue-loader
+      loading: P02/mascot-loader
       error: P02/state-error
       emptyFirstRun: P02/dashed-note
       emptyNoAccess: P02/sign-in-prompt
@@ -2862,7 +2891,8 @@ screens:
         label: Email for the account
         bindsTo: RegisterGuestRequest.identifier
         operation: registerGuest
-        notes: The order's email, prefilled; channel email.
+        notes: The order's email, prefilled; channel email. The client sends `source` `guestApp`, not
+          typed (ADAM CR-371).
         provenance: contract identity.yaml RegisterGuestRequest.identifier (defined 4 October 2026, CHG-FXS-003)
     - name: actionBar
       slot: rowActions
@@ -9443,8 +9473,9 @@ screens:
       never picks a channel: an email address is sent with `channel` `email`; a mobile number is sent
       with none, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026,
       r10 Q5), from the tenant''s configured delivery (ADAM CR-222). Optional: `displayName`, `password`,
-      `preferredLanguage`, `consents`. The code it sends is typed in the Code field and confirmed with
-      `verifyGuestEmail` (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.'
+      `preferredLanguage`, `consents`. The client sends `source` `guestApp`, not typed (where the guest
+      registers; ADAM CR-371). The code it sends is typed in the Code field and confirmed with `verifyGuestEmail`
+      (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: RegisterGuestRequest
     confirm:
       label: Register guest
@@ -9867,12 +9898,17 @@ screens:
         columns:
         - Product.name
         - Product.description
+        - Product.fromPrice
         operation: listProducts
-        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3); the price,
+          Product.fromPrice, ADAM CR-358 option (a), decided by Chinmay 30 October 2026 (CHG-CR358-001)
         notes: The venue's products with the price converted at the rate above; the venue's own currency
-          stays the price charged. The venue is the one the guest picked on Home (`venueId` from the session,
-          audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns
-          removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
+          stays the price charged. Each card shows `Product.name`, `Product.fromPrice` as the price charged,
+          and `fromPrice` converted at the selected rate as the price shown, marked approx. where the
+          selected currency is not chargeable (ADAM CR-358; the client-verified frame's Item / Charged
+          · Shown). The venue is the one the guest picked on Home (`venueId` from the session, audit R267),
+          never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided
+          by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
     - name: contextPanel
       slot: selection
       components:
@@ -9909,7 +9945,8 @@ screens:
     trigger: onLoad
   - operationId: listProducts
     contract: catalogue
-    purpose: List products
+    purpose: The venue's products, each with `fromPrice`, its lowest list price on the caller's channel
+      in the venue's trading currency, for the price card (ADAM CR-358, CHG-CR358-001)
     trigger: onLoad
   entryState:
     preloaded:

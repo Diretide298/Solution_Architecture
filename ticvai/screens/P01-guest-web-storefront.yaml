@@ -3644,8 +3644,8 @@ screens:
         label: Email for the account
         bindsTo: RegisterGuestRequest.identifier
         operation: registerGuest
-        notes: The order's email, prefilled; channel email. The client sends `source` `guestWeb`, not typed (ADAM
-          CR-371).
+        notes: The order's email, prefilled; channel email. The client sends `source` `guestWeb`, not
+          typed (ADAM CR-371).
         provenance: contract identity.yaml RegisterGuestRequest.identifier (defined 4 October 2026, CHG-FXS-003)
     - name: actionBar
       slot: rowActions
@@ -4253,9 +4253,9 @@ screens:
       never picks a channel: an email address is sent with `channel` `email`; a mobile number is sent
       with none, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026,
       r10 Q5), from the tenant''s configured delivery (ADAM CR-222). Optional: `displayName`, `password`,
-      `preferredLanguage`, `consents`. The client sends `source` `guestWeb`, not typed (where the guest registers;
-      ADAM CR-371). The code it sends is typed in the Code field and confirmed with
-      `verifyGuestEmail` (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.'
+      `preferredLanguage`, `consents`. The client sends `source` `guestWeb`, not typed (where the guest
+      registers; ADAM CR-371). The code it sends is typed in the Code field and confirmed with `verifyGuestEmail`
+      (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: RegisterGuestRequest
     confirm:
       label: Register guest
@@ -5155,18 +5155,19 @@ screens:
 
 
     **Design change, logged (ADAM CR-348, raised by Chitrangi Mestry on #32306, 30 October 2026; the lead''s
-    rule of 28 October that frontend developers change a screen''s design on their own and log it).** The
-    guest-web build changes the look and nothing behind it; the frame `wireframes/P01 Guest Web.dc.html#web-019`
-    draws it and is the look to build to. (1) **One PDF button when an order is open**: the open order''s row
-    hides its own Download PDF, so the tax invoice''s Download PDF under Tax invoices is the only one; a closed
-    row keeps its Download PDF. Both are the same document (`getTaxDocumentRendition`). (2) Every outline button
-    (Details or Hide, Download PDF, View, Ask for a refund, Get a tax invoice, View tickets, Try again, a dialog''s
-    Cancel) fills with the brand colour on hover, with on-brand text. (3) **There is no separate Request a refund
-    row**: a refund is asked from each open order''s Ask for a refund, whose form already collects `orderId`,
-    `reason` and the tickets to refund (`lineIds`). (4) The page runs the full width with a side margin (wider
-    from lg up), not a centred column, as WEB-021 does. (5) Order statuses and standings start with a capital
-    (Paid, Refunded in full). Every colour is a theme token and the page mirrors in Arabic. The operations,
-    fields, errors and states are the ones above.'
+    rule of 28 October that frontend developers change a screen''s design on their own and log it).**
+    The guest-web build changes the look and nothing behind it; the frame `wireframes/P01 Guest Web.dc.html#web-019`
+    draws it and is the look to build to. (1) **One PDF button when an order is open**: the open order''s
+    row hides its own Download PDF, so the tax invoice''s Download PDF under Tax invoices is the only
+    one; a closed row keeps its Download PDF. Both are the same document (`getTaxDocumentRendition`).
+    (2) Every outline button (Details or Hide, Download PDF, View, Ask for a refund, Get a tax invoice,
+    View tickets, Try again, a dialog''s Cancel) fills with the brand colour on hover, with on-brand text.
+    (3) **There is no separate Request a refund row**: a refund is asked from each open order''s Ask for
+    a refund, whose form already collects `orderId`, `reason` and the tickets to refund (`lineIds`). (4)
+    The page runs the full width with a side margin (wider from lg up), not a centred column, as WEB-021
+    does. (5) Order statuses and standings start with a capital (Paid, Refunded in full). Every colour
+    is a theme token and the page mirrors in Arabic. The operations, fields, errors and states are the
+    ones above.'
   density: compact
   pattern: listDetail
   patternReason: '`listMyOrders` reads the population and `getOrder` reads one of them — list, select,
@@ -5217,9 +5218,9 @@ screens:
       - kind: secondaryButton
         label: Download or email the PDF
         operation: getTaxDocumentRendition
-        notes: Opens or sends the PDF in the template's languages. When an order is open, its row's own Download
-          PDF is hidden and the tax invoice's Download PDF under Tax invoices is the only one; a closed row
-          keeps its Download PDF (ADAM CR-348, 30 October 2026).
+        notes: Opens or sends the PDF in the template's languages. When an order is open, its row's own
+          Download PDF is hidden and the tax invoice's Download PDF under Tax invoices is the only one;
+          a closed row keeps its Download PDF (ADAM CR-348, 30 October 2026).
         provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction finance-insights GST-019)
     - name: contextPanel
       slot: selection
@@ -5350,11 +5351,11 @@ screens:
       match: partial
       view: Account → 'Order history'
       differences: 'A list pane with toast-only actions; no order detail view. Refund request and transfer
-        are rows, not flows. **Since 30 October 2026 the look is the frame on the board, not this view** (ADAM
-        CR-348, a design change logged by Chitrangi Mestry on #32306): the frame draws the build''s one PDF
-        button on an open order, outline buttons that fill with the brand colour on hover, no Request a refund
-        row, a full-width page and capitalised statuses, where this view draws two PDF buttons, the Request a
-        refund row, a centred column and lower-case statuses.'
+        are rows, not flows. **Since 30 October 2026 the look is the frame on the board, not this view**
+        (ADAM CR-348, a design change logged by Chitrangi Mestry on #32306): the frame draws the build''s
+        one PDF button on an open order, outline buttons that fill with the brand colour on hover, no
+        Request a refund row, a full-width page and capitalised statuses, where this view draws two PDF
+        buttons, the Request a refund row, a centred column and lower-case statuses.'
     stateViews:
       loading: P01/turnstile-loader
       error: P01/status-card
@@ -5703,20 +5704,20 @@ screens:
 
 
     **Design change, logged (ADAM CR-351, raised by Chitrangi Mestry on #32125, 29 October 2026; the lead''s
-    rule of 28 October that frontend developers change a screen''s design on their own and log it).** The
-    guest-web build changes the look and nothing behind it; the frame `wireframes/P01 Guest Web.dc.html#web-021`
-    draws it and is the look to build to. (1) The page runs the full width with a margin each side, not the
-    frame''s centred column. (2) **The wallet card**: a dark card in the theme''s ink with a brand glow, the wallet
-    icon, title and lead, the wallet''s status as a pill, Available credit over a large balance, and the credit
-    kinds as chips (`getWallet`: `balance`, `credits`, `status`). (3) **Saved cards are drawn as payment cards**
-    in a grid on Payment methods: chip and contactless marks, the masked number, the MM/YY expiry, the scheme''s
-    logo and the default card in the brand colour, with **Add a card** as a dashed last tile and a small lift on
-    hover. They show only what `listPaymentTokens` returns (`method`, `maskedIdentifier`, `expiresAt`,
-    `isDefault`): no holder name, tier, make-default or remove. The scheme logo reads the brand from
-    `maskedIdentifier`, and a plain card mark shows when no brand is recognised. (4) A row''s details slide open
-    and shut instead of appearing at once. Every colour is a theme token (the Mastercard symbol keeps the
-    scheme''s own colours) and the page mirrors in Arabic. The operations, fields, errors and states are the
-    ones above.'
+    rule of 28 October that frontend developers change a screen''s design on their own and log it).**
+    The guest-web build changes the look and nothing behind it; the frame `wireframes/P01 Guest Web.dc.html#web-021`
+    draws it and is the look to build to. (1) The page runs the full width with a margin each side, not
+    the frame''s centred column. (2) **The wallet card**: a dark card in the theme''s ink with a brand
+    glow, the wallet icon, title and lead, the wallet''s status as a pill, Available credit over a large
+    balance, and the credit kinds as chips (`getWallet`: `balance`, `credits`, `status`). (3) **Saved
+    cards are drawn as payment cards** in a grid on Payment methods: chip and contactless marks, the masked
+    number, the MM/YY expiry, the scheme''s logo and the default card in the brand colour, with **Add
+    a card** as a dashed last tile and a small lift on hover. They show only what `listPaymentTokens`
+    returns (`method`, `maskedIdentifier`, `expiresAt`, `isDefault`): no holder name, tier, make-default
+    or remove. The scheme logo reads the brand from `maskedIdentifier`, and a plain card mark shows when
+    no brand is recognised. (4) A row''s details slide open and shut instead of appearing at once. Every
+    colour is a theme token (the Mastercard symbol keeps the scheme''s own colours) and the page mirrors
+    in Arabic. The operations, fields, errors and states are the ones above.'
   density: compact
   pattern: listDetail
   patternReason: '`listWalletTransactions` reads the population and `getWallet` reads one of them — list,
@@ -5753,10 +5754,10 @@ screens:
         operation: listPaymentTokens
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
         notes: 'Was the generated table ''Every payment token''; staff and plumbing columns removed (decided
-          by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)). Drawn as payment cards in a grid
-          (ADAM CR-351, 29 October 2026): chip and contactless marks, the masked number, the MM/YY expiry, the
-          scheme''s logo read from `maskedIdentifier` (a plain card mark when no brand is recognised) and the
-          default card in the brand colour; Add a card is the dashed last tile.'
+          by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)). Drawn as payment cards in a
+          grid (ADAM CR-351, 29 October 2026): chip and contactless marks, the masked number, the MM/YY
+          expiry, the scheme''s logo read from `maskedIdentifier` (a plain card mark when no brand is
+          recognised) and the default card in the brand colour; Add a card is the dashed last tile.'
     - name: contextPanel
       slot: selection
       components:
@@ -5805,9 +5806,9 @@ screens:
         - Wallet.lastActivityAt
         operation: getWallet
         provenance: contract wallet.yaml GET /wallets/{subjectId}
-        notes: 'Drawn as the wallet card (ADAM CR-351, 29 October 2026): a dark card in the theme''s ink with a
-          brand glow, the wallet icon, title and lead, `status` as a pill, Available credit over the large
-          `balance`, and the `credits` kinds as chips.'
+        notes: 'Drawn as the wallet card (ADAM CR-351, 29 October 2026): a dark card in the theme''s ink
+          with a brand glow, the wallet icon, title and lead, `status` as a pill, Available credit over
+          the large `balance`, and the `credits` kinds as chips.'
     - name: actionBar
       slot: rowActions
       components:
@@ -5930,12 +5931,12 @@ screens:
       match: partial
       view: Account → 'Wallet & gift cards' (and 'Payment methods')
       differences: 'Rows with toast actions; no transaction list, no gift-card balance lookup. Auto top-up
-        is a prototype addition with no YAML operation. Saved payment tokens are a separate pane. **Since 30
-        October 2026 the look is the frame on the board, not this view** (ADAM CR-351, a design change logged
-        by Chitrangi Mestry on #32125): the frame draws the build''s full-width page, dark wallet card with its
-        status pill, balance and credit chips, saved cards as payment cards with Add a card as the last tile,
-        and row details that slide open, where this view draws a centred column, the title and balance on the
-        white pane, and saved cards as rows.'
+        is a prototype addition with no YAML operation. Saved payment tokens are a separate pane. **Since
+        30 October 2026 the look is the frame on the board, not this view** (ADAM CR-351, a design change
+        logged by Chitrangi Mestry on #32125): the frame draws the build''s full-width page, dark wallet
+        card with its status pill, balance and credit chips, saved cards as payment cards with Add a card
+        as the last tile, and row details that slide open, where this view draws a centred column, the
+        title and balance on the white pane, and saved cards as rows.'
     stateViews:
       loading: P01/turnstile-loader
       error: P01/status-card

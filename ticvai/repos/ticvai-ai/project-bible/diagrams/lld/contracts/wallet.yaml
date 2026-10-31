@@ -999,6 +999,8 @@ operations:
   - cache:idempotency
   - wallet.balance
   - wallet.credit_lot
+  - wallet.credit_type
+  - wallet.funding_rule
   - wallet.wallet
   writes:
   - cache:idempotency

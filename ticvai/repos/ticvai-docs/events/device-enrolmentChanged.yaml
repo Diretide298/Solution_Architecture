@@ -7,6 +7,8 @@ publisher: tenancy
 description: A device moved through its lifecycle — enrolled, provisioned, activated, deactivated or retired.
 aggregate: device
 emittedWhen: enrolDevice succeeds (RegisteredDevice.enrolmentState changes)
+emittedBy:
+- enrolDevice
 payload:
 - field: deviceId
   type: uuid
@@ -39,6 +41,7 @@ notes: '**The access consumer is gone** (ADR-0067, accepted 1 October): there is
   person''s call while the public API offers it.
 
 
-  **Added 29 September (build pass, group RD).** No state model emits this yet: `enrolmentState` has no state model (check-states warns on
-  `tenancy.DeviceEnrolment.state`), so the emit sits on `enrolDevice`. The access consumer is the interim answer to the
-  duplicated device register listed in RD.json `open`.'
+  **Added 29 September (build pass, group RD).** Since 30 October (ADAM CR-354, CHG-CR354-001) the state model
+  states/device-enrolment.yaml emits it on every move `enrolDevice` makes, with `fromState` and `toState`. Before
+  that `enrolmentState` had no state model, so the emit sat on `enrolDevice` alone. The access consumer was the
+  interim answer to the duplicated device register listed in RD.json `open`.'

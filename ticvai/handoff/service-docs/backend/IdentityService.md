@@ -77,7 +77,7 @@
 
 **Tenant scope** (decided 14 October 2026, ADAM CR-076; CHG-IDR-001): roles are tenant-wide (`code` is unique per tenant, compared case-insensitively) and their rows are written only at the tenant root, so the operation is called at the tenant scope, as `setRolePermissions` always was (approved breaking change BC-076). A venue manager reads the roles (`listRoles`) and grants them; it does not create them.
 
-**`ROLE_MANAGE` must hold at the tenant root** (decided 25 October 2026, Chinmay, ADAM CR-189 option A; CHG-R10ID-001; the rule on `Session.permissionsByScope`), read from the per-scope set: a caller holding `ROLE_MANAGE` only below the root is `403`, even when it holds another permission (for example `REPORT_VIEW`) at the root, which puts the root among its scope paths. Nothing is written.
+**`ROLE_MANAGE` must hold at the tenant root** (decided 25 October 2026, Chinmay, ADAM CR-189 option A; CHG-R10ID-001; the rule on `Session.permissionsByScope`), read from the per-scope set (the root's own entry, by the lookup rule ADAM CR-367 corrected; CHG-CR367-001): a caller holding `ROLE_MANAGE` only below the root is `403`, even when it holds another permission (for example `REPORT_VIEW`) at the root, which puts the root among its scope paths. Nothing is written.
 
 |  |  |
 |---|---|
@@ -193,7 +193,7 @@
 
 **What a venue-scoped caller sees** (decided 14 October 2026, ADAM CR-076; CHG-IDR-001). `USER_MANAGE` is checked at the caller's scope, as before. Any staff grant may read `identity.principal` rows, so the database does not hide a venue's staff from a venue manager; the list is the principals whose home scope (`identity.principal.home_scope_id`, a `platform.scope` row) is at or beneath a node where the caller's `USER_MANAGE` holds, and `scopePath` narrows that further. A `scopePath` outside the caller's reach is `403`. A venue manager therefore lists the venue's people and those homed beneath it, never a sibling venue's.
 
-**The reach is read from the per-scope set, never the flat one** (decided 25 October 2026, Chinmay, ADAM CR-189 option A; CHG-R10ID-001; the rule on `Session.permissionsByScope`): the reach is the scope paths at which `USER_MANAGE` holds after deny resolution, not the session's scope paths. A caller with `USER_MANAGE` at venue A and any other permission (for example `POS_SELL`) at venue B lists A's principals only, and a `scopePath` under B is `403`.
+**The reach is read from the per-scope set, never the flat one** (decided 25 October 2026, Chinmay, ADAM CR-189 option A; CHG-R10ID-001; the rule on `Session.permissionsByScope`): the reach is the scope paths whose deepest listed entry holds `USER_MANAGE` (the lookup rule as ADAM CR-367 corrected it, 30 October 2026; CHG-CR367-001), not the session's scope paths. A caller with `USER_MANAGE` at venue A and any other permission (for example `POS_SELL`) at venue B lists A's principals only, and a `scopePath` under B is `403`.
 
 **Each item's `roles`** are read with it from the principal's live role grants (`identity.delegated_access` joined to `identity.role`; see `Principal.roles`).
 
@@ -870,11 +870,14 @@ Where the provider's verified email matches an existing account, the identities 
 
 **Where the app gets what it needs to start this sign-in** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C21, option A; CHG-R8SPN-025): white-label's published tenant config, which the app shell loads before sign-in, carries a read-only `guestSignIn` block with the public values only (Apple and Google client ids; the UAE Pass authorize URL and client id), derived on read from the tenant's provider rows. The client secret and the audience checks stay here, server-side, in the provider row (`identity.sso_provider.client_secret_ref`). The app mints `state`; this operation checks the redirect URI against the one registered (`DomainReadiness.uaePassRedirect`). **The provider row is the tenant's `identity.sso_provider` with `audience` `guest` and the matching `guestProvider`** (ADAM CR-327, part (1); CHG-CR327-001).
 OAuth authorisation-code exchange. Returns a verified identity, so an account created this way needs no further verification.
+
+**How the exchange runs** (ADAM CR-360, decided 30 October 2026, Chinmay; CHG-CR360-001). UAE Pass is plain OAuth 2.0: it publishes no discovery document and issues no ID token. For the guest `uaePass` row `metadataUrl` is not used and may be null; the endpoints come from the row's `issuer`: the token endpoint is `issuer` followed by `/token`, and the userinfo endpoint is `issuer` followed by `/userinfo`. These are UAE Pass's documented paths (`issuer` `https://stg-id.uaepass.ae/idshub` in staging, `https://id.uaepass.ae/idshub` in production), and `authorizationUrl` already sits beside them. The code is exchanged with HTTP Basic client authentication (`clientId`, plus the secret behind `clientSecretRef`), then the claims are read from userinfo. `providerSubject` is the userinfo `sub`. The Emirates ID number is the claim the setting `SignIn:GuestProviders:UaePassIdentityNumberClaim` names, which defaults to `idn`.
+**The UAE Pass email never matches or links an existing account.** It is stored as `pii.subject_identity.email_at_link` (`SubjectIdentity.emailAtLink`) and, on a new account, written to `pii.subject_contact` with `is_verified` false. Before the first production sign-in, the client's sandbox run confirms `sub` and `idn`.
 Government onboarding has lead time and should be started before it becomes the critical path.
 
 **UAE Pass is integrated in release 1, and so is the ICP identity check** (decided 2 October 2026, Chinmay, critical set 2, BO-627; DEC-457; CHG-CSP-034). Both need the client's access to the providers (UAE Pass onboarding and an ICP service agreement), which is an external dependency the client owns. A UAE Pass identity counts as ID-verified (`IdentityGuestVerificationPolicy.uaePassSatisfiesIdDocument`); the ICP check is a document verification, not a sign-in (`IdentityGuestVerificationPolicy.verificationProvider` `icp`). Each venue's own redirect URI is part of its domain setup (DEC-547). **The redirect URI's host is checked against Identity's projection of the tenant's domains** (`white-label#customDomainRedirectHosts`, route projection: `identity.redirect_host`, fed by `whitelabel.customDomainChanged`; r10 ruling on ADR-0028, CHG-R10ID-018): a host that is not an active domain with its UAE Pass redirect ready is refused as a failed exchange (401) and nothing is exchanged.
 
-**What it stores** (R8 blocker IDENTITY-C54, CHG-R8MIG-015): a `pii.subject_identity` row (`provider` `uaePass`, the UAE Pass user id as `providerSubject`), and on a new account a `pii.subject_document` of kind `emiratesId` with the number from the UAE Pass identity-number claim (the claim's name to be confirmed with the client's UAE Pass sandbox).
+**What it stores** (R8 blocker IDENTITY-C54, CHG-R8MIG-015; ADAM CR-360, CHG-CR360-001): a `pii.subject_identity` row (`provider` `uaePass`, the userinfo `sub` as `providerSubject`), and on a new account a `pii.subject_document` of kind `emiratesId` with the number from the identity-number claim (`idn` by default). The document is written only when that claim is present: a visitor profile has none, and that guest is still signed in, with no document written. **The number is stored as `submitGuestIdentityDocument` stores it** (ADAM CR-369; CHG-CR369-001): encrypted into `number_ciphertext` through the kernel's field encryption (#37050), the last four in clear, and no hash.
 
 |  |  |
 |---|---|
@@ -948,8 +951,10 @@ Government onboarding has lead time and should be started before it becomes the 
 
 **`POST /auth/guest/link-checkout`**: Attach a guest checkout to an account
 
-A guest who bought without an account, then registered. **The guest names one booking** (`orderReference`, with `verificationCode` from its confirmation); it is attached only when its contact detail matches the caller's verified identifier, and 403 otherwise. Other guest-checkout orders carrying the same verified contact detail are attached in the same call, and `attachedOrderCount` counts every order attached.
+A guest who bought without an account, then registered. **The guest names one booking** (`orderReference`); it is attached only when its contact detail matches the caller's verified identifier, and 403 otherwise. Other guest-checkout orders carrying the same verified contact detail are attached in the same call, and `attachedOrderCount` counts every order attached.
 **Only orders whose contact detail matches the now-verified identifier.** Attaching on an unverified claim would hand someone else's booking history to whoever asked for it.
+
+**The proof, and what is refused** (ADAM CR-361, decided 30 October 2026, Chinmay; CHG-CR361-001). The proof is the order's `verifiedContactRef` matching the keyed hash of one of the caller's verified contacts. `verificationCode` stays in the request because the approved WEB-016 form shows it; it is optional and ignored: not checked, not stored, and not used to spot a retry (the `Idempotency-Key` does that). An `orderReference` with no `identity.subject_holding` row, one whose contact does not match, and one already attached to another account all answer the same 403 `contact-mismatch`, emit nothing, and take the same time. A booking already attached to the caller is not refused: the call still attaches any other subject-less orders with the same `verifiedContactRef` and answers 200, with `attachedOrderCount` counting those (0 if there are none).
 
 **Read from Identity's own projection, attached by Orders** (r10, the lead's ruling on the ADR-0028 tiers, 25 October 2026; CHG-R10ID-018). Identity is Foundation and reads nothing above it but a projection, so it never reads or writes an Orders table. It finds the named booking in `identity.subject_holding` (an `order` row with no subject yet, by `orderNumber`, fed by `order.created`) and compares the row's `verifiedContactRef` with the keyed hash of the caller's verified identifier (ADR-0045); a mismatch is 403 and nothing is emitted. Every other subject-less order row with the same `verifiedContactRef` is attached with it. It then emits `identity.guestCheckoutLinked` (the subject and the order ids) to `platform.outbox` in its transaction (ADR-0033); Orders' consumer (`orders.attachGuestCheckoutOrders`) sets each order's subject and announces it as `order.linkedToGuest`, which sets the subject on the projection's order and entitlement rows, so an attached order and its tickets block `deleteGuestAccount` like any other the guest holds (ADAM CR-084, CHG-GDL-003). `attachedOrderCount` counts the orders sent to be attached.
 
@@ -976,7 +981,7 @@ A guest who bought without an account, then registered. **The guest names one bo
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | orderReference | string | yes |  |
-| verificationCode | string |  | From the booking confirmation. |
+| verificationCode | string |  | Optional and ignored (ADAM CR-361, CHG-CR361-001): kept because the approved WEB-016 form shows it; not checked, not stored, and not used to spot a retry (the Idempotency-Key does). |
 
 **Response**: `object`
 
@@ -989,7 +994,7 @@ A guest who bought without an account, then registered. **The guest names one bo
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Attached |
-| 403 |  | Contact detail on the order does not match the verified identifier |
+| 403 |  | The same answer for three cases (ADAM CR-361, CHG-CR361-001): the orderReference has no identity.subject_holding row, its contact detail does not match the verified identifier, or it is already attac… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### registerGuest
@@ -997,8 +1002,8 @@ A guest who bought without an account, then registered. **The guest names one bo
 **`POST /auth/guest/register`**: Create a guest account
 
 Email or mobile. Verification follows via OTP; the account exists but is unverified until then, and an unverified account may browse and fill a cart but not transact — the gate is the checkout page (`WEB-011`, `GST-041`), not the cart, and `checkoutCart` refuses until the guest is verified or has proved the contact by code. The full rule, including per-site guest checkout, is on `verifyGuestEmail` (decided 17 September 2026; gate moved to checkout by ADR-0045, 18 September 2026).
-**With `channel` `email` it sends the six-digit code** the approved screens ask for (R8 blocker fix, IDENTITY-C38): an `identity.otp_challenge` row with purpose `emailVerification`, channel `email`, and the venue's attempt limit, which the guest enters through `verifyGuestEmail` with `mode` `code`. The `GuestSession` returned here is the session the guest continues in; it becomes verified when the code is confirmed, and `linkGuestCheckout` then runs under that same session.
-**The consents given at registration are recorded by Marketing, which owns consent** (20 October 2026, R8 blocker cause IDENTITY-C55; CHG-R8SPN-029). Identity stores none of them: in the same transaction as the account it writes `identity.guestRegistered` to the outbox carrying the new `subjectId`, the channel and each `consents[]` item (purpose, granted, noticeVersion), and Marketing's consumer records one consent per item through its own `recordConsent` rules (source `registration`, idempotent on the event id and purpose). A registration with no `consents` still emits the event, with an empty list. Later changes of mind go through `recordConsent` directly (F56 step 5).
+**With `channel` `email` it sends the six-digit code** the approved screens ask for (R8 blocker fix, IDENTITY-C38): an `identity.otp_challenge` row with purpose `emailVerification`, channel `email`, and the venue's attempt limit, which the guest enters through `verifyGuestEmail` with `mode` `code`. The `GuestSession` returned here is the session the guest continues in; it becomes verified when the code is confirmed, and `linkGuestCheckout` then runs under that same session. **The code is carried as `requestGuestOtp` carries it** (ADAM CR-370; CHG-CR370-001): `identity.guestCodeIssued` in the same transaction as the `otp_challenge` row, destination and code field-encrypted, sent by Marketing's `sendGuestOneTimeCode`; its lifetime and resend interval are `guestOtpLifetimeSeconds` and `guestOtpResendSeconds`.
+**The consents given at registration are recorded by Marketing, which owns consent** (20 October 2026, R8 blocker cause IDENTITY-C55; CHG-R8SPN-029). Identity stores none of them: in the same transaction as the account it writes `identity.guestRegistered` to the outbox carrying the new `subjectId`, the channel and each `consents[]` item (purpose, granted, noticeVersion), and Marketing's consumer records one consent per item through its own `recordConsent` rules (idempotent on the event id and purpose). **The event's `channel` is where the guest registered**, the request's `source` (decided 30 October 2026, Chinmay, ADAM CR-371; CHG-CR371-001): `guestWeb`, `guestApp` or `kiosk`, `guestWeb` when left out. The code's delivery `channel` stays on the request and is not on the event. The consumer records each consent with the matching `ConsentSource` (`guestWeb` is `website`, `guestApp` is `guestApp`, `kiosk` is `kiosk`), never `registration`, which the source check constraint refuses. A registration with no `consents` still emits the event, with an empty list. Later changes of mind go through `recordConsent` directly (F56 step 5).
 
 |  |  |
 |---|---|
@@ -1024,6 +1029,7 @@ Email or mobile. Verification follows via OTP; the account exists but is unverif
 |---|---|---|---|
 | identifier | string | yes | Email address or mobile number in E.164. (max length 256) |
 | channel | enum (email, sms, whatsapp) |  | Optional for a mobile number (ADAM CR-222, 25 October 2026): left out, the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026, r10 Q5), from the tenant's configured delive… |
+| source | enum (guestWeb, guestApp, kiosk) |  | Where the guest is registering (decided 30 October 2026, Chinmay, ADAM CR-371; CHG-CR371-001). (default guestWeb) |
 | displayName | string |  | (max length 200) |
 | password | string |  | Optional. (min length 8; max length 256) |
 | preferredLanguage | string |  | (pattern ^[a-z]{2}$) |
@@ -1080,6 +1086,12 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 **The response never reveals whether the identifier exists.** It is the same either way; only the message differs, and only the owner receives it.
 **With `purpose` `passwordReset` it publishes `identity.credentialResetRequested`** (kind `guestSelfService`, the identifier hashed with the tenant key) whether or not the identifier exists (29 September, build pass, group G2; 8.3.34): a burst of resets against identifiers that resolve to nobody is the pattern worth seeing, and the answer to the caller stays the same.
 
+**How the code reaches the guest** (decided 30 October 2026, Chinmay, ADAM CR-370, with its follow-up of 31 October; CHG-CR370-001). Identity and Marketing are in different deployables, so no in-process call: in the same transaction as the `identity.otp_challenge` row this writes `identity.guestCodeIssued` v1 to the outbox, carrying `subjectId`, `challengeId`, `channel`, `purpose`, `locale`, `expiresAt`, and `destination` and `code`, both field-encrypted through the kernel's field encryption (#37050, `x-ticvai-secret: field-encrypted`), never in clear. Marketing's `sendGuestOneTimeCode`, invoked by the relay, decrypts at send time and sends it. Until #37050 is Ready for QA the delivery seam (`IGuestCodeDelivery`) keeps its log-only default and no code is put in the outbox.
+
+**An identifier that resolves to nobody** (the CR-370 follow-up, 31 October 2026). With purpose `login`, `passwordReset` or `stepUp` nothing is written for the code (no `otp_challenge` row, no `identity.guestCodeIssued`) and the answer is the same `202`; `passwordReset` still publishes `identity.credentialResetRequested`, as above. With purpose `register` or `verify` an identifier with no account still gets a code: the `otp_challenge` row and `identity.guestCodeIssued` are written with `subjectId` null.
+
+**Lifetime and resend interval** (ADAM CR-370). `VenueSettings.identity.guestOtpLifetimeSeconds` (default 600) and `guestOtpResendSeconds` (default 60), read from the tenant default as `guestOtpMaxAttempts` is, are written to `otp_challenge.expires_at` and `resend_after` and answered as `expiresInSeconds` and `resendAfterSeconds`.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -1110,8 +1122,8 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| expiresInSeconds | integer |  |  |
-| resendAfterSeconds | integer |  |  |
+| expiresInSeconds | integer |  | VenueSettings.identity.guestOtpLifetimeSeconds of the tenant default (600 unless the tenant sets it), as written to otp_challenge.expires_at (ADAM CR-370). |
+| resendAfterSeconds | integer |  | VenueSettings.identity.guestOtpResendSeconds of the tenant default (60 unless the tenant sets it), as written to otp_challenge.resend_after (ADAM CR-370). |
 
 **Responses**
 
@@ -1500,10 +1512,12 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 **Built with a configurable age** (decided 20 October 2026, Chinmay, R8 blocker cause IDENTITY-C19, option A; CHG-R8SPN-024; R205 still open with counsel): a subject is a minor below `tenancy.RegionSettings.minorAgeThreshold` (18 by default, set per country), or with no date of birth. **When the 409 `minor-grants-adult-authority` happens**: the holder the grant is for (the path's `subjectId`) is a minor and `overSubjectId` is an adult, whoever calls, a guest or staff on the guest's behalf. **How the first adult link over a minor is made**: the adult enrols the child from GST-069 (R205), which writes a `familyMember` or `primaryHolder` grant held by the adult over the child, with the adult as grantor; this operation is how later grants are added.
 **What a guest-made grant stores** (R8 blocker IDENTITY-C42, the lead's answer A; CHG-R8MIG-021): `grantedByKind` `subject` and `grantedBySubjectId` the granting guest (no principal); `scopePath` the tenant root (a guest account is tenant-wide); `effect` ALLOW; `permission` one of the guest-delegable list for its `delegationKind` (proposed, client to confirm): `primaryHolder` and `familyMember` ORDER_VIEW, ORDER_CREATE, WALLET_VIEW; `carer` and `attendee` ORDER_VIEW; `groupLeader` ORDER_VIEW, ORDER_CREATE; `corporateAdmin` ORDER_VIEW, ORDER_CREATE, WALLET_VIEW, WALLET_OPERATE; `corporateMember` ORDER_VIEW. Any other permission from a guest is refused 403. A revocation by a guest is recorded the same way. Staff recording a grant on the holder's behalf store `grantedByKind` `principal`; the SSO callback's group-to-role grants store `system`.
 
+**What it reads beyond the caller's row security, and the linked adult's write** (ADAM CR-362, decided 30 October 2026, Chinmay; CHG-CR362-001). (1) Whether the path's `subjectId` is a minor is asked of `identity#subjectMinorStatus`, where `unknown` counts as a minor (409 `minor-grants-adult-authority` as now). (2) The tenant root's scope id and path come from `tenancy#scopeRecords` (level `tenant`) under `ITenantRootGrant`, one statement; it is constant per tenant database, so it may be cached for the process. (3) The write check on `identity.delegated_access` also admits a guest session whose subject holds an active ALLOW `familyMember` or `primaryHolder` grant over `over_subject_id` (not revoked, inside its validity). That check is a plain function reading only the guest's own held grants, which the read policy already shows the guest. This operation still allows that grant only when `overSubjectId` is a minor. (4) The minor age is the `minorAgeThreshold` of the region of the venue the session is in; with no venue, the highest threshold among the tenant's regions; with no region settings, 18. (5) Staff need `GUEST_MANAGE` at the tenant root; a venue-scoped grant answers 403.
+
 |  |  |
 |---|---|
 | Permission | `GUEST_MANAGE` |
-| Scope level | venue |
+| Scope level | tenant |
 | Part of slice | core |
 | Wave | 1 |
 | Offline | no |
@@ -1567,6 +1581,7 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Granted |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 409 |  | A cycle, or a minor granting authority over an adult. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -1576,11 +1591,12 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 
 CF-132. **Both directions, because a guest is usually in both.** A parent holds authority over two children and is a member of a corporate account — one screen, one question.
 **Ordered by `createdAt` descending, `id` as the tiebreak** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the cursor pages the grants, and each of the two arrays keeps that order, so the newest delegation is first in either direction.
+**Names and minor flags** (ADAM CR-362, decided 30 October 2026, Chinmay; CHG-CR362-001): `overSubjectName` and `overSubjectIsMinor` come from `identity#subjectMinorStatus`, asked only for the other party of rows the caller can already see; `overSubjectIsMinor` is null when the status is unknown. **Staff need `GUEST_VIEW` at the tenant root**; a venue-scoped grant answers 403.
 
 |  |  |
 |---|---|
 | Permission | `GUEST_VIEW` |
-| Scope level | venue |
+| Scope level | tenant |
 | Part of slice | core |
 | Wave | 1 |
 | Offline | no |
@@ -1664,6 +1680,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Grants held and grants over |
+| 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### login
@@ -2131,6 +2148,7 @@ BL-147, 3.3.31. **Checked at grant time, not at use time** — discovering the c
 **`POST /auth/guest/verify-email`**: Send a verification link, or consume one
 
 **Two ways to prove the address, one operation** (R8 blocker fix, IDENTITY-C38). The approved screens (WEB-013, GST-010, GST-073) ask for a **six-digit code**, so `mode` `code` takes it in `code`: checked against the guest's `identity.otp_challenge` row with purpose `emailVerification` and channel `email`, within the venue's attempt limit (`VenueSettings.identity.guestOtpMaxAttempts`); a wrong code is `422 email-code-invalid` with `attemptsRemaining`, as `verifyMfaChallenge` answers, and the last wrong one voids the code (`410 verification-token-expired`; ask for a new `send`). The session is the guest's own (`guestAuth`), so the code needs no address. The link path (`send` an emailed single-use link, `confirm` its `token`) stays for emailed links.
+**`mode` `send` emits `identity.guestCodeIssued`** (decided 30 October 2026, Chinmay, ADAM CR-370; CHG-CR370-001) in the same transaction as its `otp_challenge` row, as `requestGuestOtp` does, instead of calling Marketing's `sendTransactionalMessage`: Identity and Marketing are in different deployables, so there is no in-process write. Destination and code travel field-encrypted, and Marketing's `sendGuestOneTimeCode` sends them.
 **Raised in review by Deep.** `registerGuest` creates an account and nothing verifies the address on it — and **a guest account with an unverified email can receive somebody else's tickets**, because a transfer is offered to an address.
 Two modes on one operation: **`send` issues a single-use token; `confirm` consumes it.** One operation because they are one act with two halves, and splitting them invites a `confirm` that works without a `send`.
 **An unverified account does not buy — decided 17 September 2026**, replacing *unverified accounts still buy*, which this description said while `registerGuest` and `GuestSession.isVerified` said the opposite. Tickets go to an address, and an unproven address is how somebody receives a stranger's tickets.
@@ -2151,7 +2169,7 @@ Two modes on one operation: **`send` issues a single-use token; `confirm` consum
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.otp_challenge`, `pii.subject`, `pii.subject_contact` |
-| Writes | `cache:idempotency`, `identity.otp_challenge`, `marketing.message_dispatch`, `pii.subject` |
+| Writes | `cache:idempotency`, `identity.otp_challenge`, `pii.subject`, `platform.outbox` |
 | Called by | GST-010, GST-042, GST-073, WEB-013, WEB-016, WEB-020 |
 
 **Parameters**
@@ -2573,8 +2591,8 @@ Per tenant. A tenant's Azure AD is theirs, not TICVAI's, and credentials are sto
 | id | string (uuid) | yes | (read-only) |
 | displayName | string | yes |  |
 | protocol | SsoProtocol: enum (oidc, saml2) | yes |  |
-| metadataUrl | string |  | (nullable) |
-| issuer | string |  | (nullable) |
+| metadataUrl | string |  | The provider's metadata or discovery document. (nullable) |
+| issuer | string |  | The provider's issuer. (nullable) |
 | clientId | string |  | (nullable) |
 | clientSecretRef | string |  | Key vault reference. (nullable) |
 | groupMappings | array of SsoGroupMapping | yes | A group with no mapping grants nothing. |
@@ -2601,8 +2619,8 @@ Per tenant. A tenant's Azure AD is theirs, not TICVAI's, and credentials are sto
 | id | string (uuid) | yes | (read-only) |
 | displayName | string | yes |  |
 | protocol | SsoProtocol: enum (oidc, saml2) | yes |  |
-| metadataUrl | string |  | (nullable) |
-| issuer | string |  | (nullable) |
+| metadataUrl | string |  | The provider's metadata or discovery document. (nullable) |
+| issuer | string |  | The provider's issuer. (nullable) |
 | clientId | string |  | (nullable) |
 | clientSecretRef | string |  | Key vault reference. (nullable) |
 | groupMappings | array of SsoGroupMapping | yes | A group with no mapping grants nothing. |
@@ -2627,7 +2645,7 @@ Per tenant. A tenant's Azure AD is theirs, not TICVAI's, and credentials are sto
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Configured |
-| 400 |  | Metadata unreachable, or no group mappings supplied |
+| 400 |  | Metadata unreachable (sso-metadata-unreachable), for a staff row or a guest apple or google row; a guest uaePass row is not refused for an absent or unreachable metadataUrl, which it does not use (AD… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
@@ -2754,8 +2772,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | code_hash | text | yes | The PHC hash of the code or link token (ADR-0071), never the code. |
 | failed_attempts | integer | yes |  |
 | attempt_limit | integer | yes | VenueSettings.identity.guestOtpMaxAttempts when the code was sent (audit R094); reaching it invalidates the code. |
-| expires_at | timestamptz | yes |  |
-| resend_after | timestamptz | no |  |
+| expires_at | timestamptz | yes | The send time plus VenueSettings.identity.guestOtpLifetimeSeconds (ADAM CR-370). |
+| resend_after | timestamptz | no | The send time plus VenueSettings.identity.guestOtpResendSeconds (ADAM CR-370). |
 | consumed_at | timestamptz | no |  |
 | invalidated_at | timestamptz | no | Set by the attempt limit or by a newer code for the same identifier and purpose. |
 | id | uuid | yes | Synthesised key. |
@@ -2940,8 +2958,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | display_name | text | yes |  |
 | protocol | text | yes |  |
-| metadata_url | text | no |  |
-| issuer | text | no |  |
+| metadata_url | text | no | The provider's metadata or discovery document. |
+| issuer | text | no | The provider's issuer. |
 | client_id | text | no |  |
 | client_secret_ref | text | no | Key vault reference. |
 | is_auto_provision_principals | boolean | no | Create a principal on first successful sign-in. |
@@ -3039,7 +3057,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | subject_id | uuid | yes | Parent. |
 | kind | text | yes | passport, emiratesId, nationalId, drivingLicence, residencePermit, other |
-| number_hash | text | yes | Hashed. |
+| number_hash | text |  | No longer written (ADAM CR-369, 30 October 2026; CHG-CR369-001): the number is encrypted into number_ciphertext (ADR-0063 section 5), never hashed. |
+| number_ciphertext | text |  | The document number, encrypted by the application (ADAM CR-369, 30 October 2026; CHG-CR369-001; ADR-0063 section 5): AES-256-GCM under the tenant's data key through KERNEL-FIELD-ENC (#37050), one str… |
 | number_last4 | char(4) |  | In clear, for a human to confirm against the card in front of them |
 | issuing_country | char(2) |  |  |
 | expires_on | date |  |  |

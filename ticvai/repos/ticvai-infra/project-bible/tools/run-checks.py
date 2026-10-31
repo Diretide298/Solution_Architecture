@@ -231,6 +231,11 @@ CHECKS = [
     # arguments in ARGS (--chain: the write-back steps once more, in refresh order; CHG-R8GEN-017); a few minutes since
     # CHG-R8GEN-016.
     "check-regenerate-twice",
+    # 30 October (the live database check; the lead: "Yes, both"; CHG-R12LV-001): a database's schema against the
+    # package's intended state is a release step (docs/active/release-runbook.md 6a), run on the dumps the database
+    # owner sends. Here it runs bare: its self-test (fixture snapshots, no Docker), and the package inputs it judges by
+    # (migration-review.md, MIGRATIONS.md, backend/) still parse and every review kind has a rule. Never baselined.
+    "check-schema-drift",
 ]
 
 # Arguments a checker is run with here, when its bare form is not the one a gate run needs (CHG-R8GEN-002).

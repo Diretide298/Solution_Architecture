@@ -66,6 +66,18 @@ transitions:
   guard: An agent handled it
 - from: withAgent
   to: resolved
+  operation: setCallDisposition
+  trigger: operation
+  guard: BO-799's End conversation. Sets `closed_at` and `outcome` resolved and records the disposition in the
+    same transaction (ADAM CR-346, option C)
+- from: waitingOnGuest
+  to: resolved
+  operation: setCallDisposition
+  trigger: operation
+  guard: BO-799's End conversation after the agent's last reply. Sets `closed_at` and `outcome` resolved and
+    records the disposition in the same transaction (ADAM CR-346, option C)
+- from: withAgent
+  to: resolved
   operation: escalateCase
   trigger: operation
   guard: Closed by raising a case. **The conversation ends; the problem does not**

@@ -416,7 +416,7 @@
        "label": "Email for the account",
        "bindsTo": "RegisterGuestRequest.identifier",
        "operation": "registerGuest",
-       "notes": "The order's email, prefilled; channel email.",
+       "notes": "The order's email, prefilled; channel email. The client sends `source` `guestApp`, not typed (ADAM CR-371).",
        "provenance": "contract identity.yaml RegisterGuestRequest.identifier (defined 4 October 2026, CHG-FXS-003)"
       }
      ]

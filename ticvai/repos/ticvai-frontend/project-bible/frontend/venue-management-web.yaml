@@ -80,9 +80,9 @@ deployment:
   releaseCadence: weekly
 screenCount: 1838
 byWave:
-  wave1: 174
-  wave2: 57
-  wave3: 1607
+  wave1: 180
+  wave2: 55
+  wave3: 1603
 screens:
 - id: BO-001
   name: Queue Directory
@@ -1146,7 +1146,7 @@ screens:
   route: /food-beverage/kitchen-preparation-stations
   repo: ticvai-venue-management
   path: src/routes/ops/KitchenPreparationStationsList.tsx
-  wave: 2
+  wave: 1
   status: notStarted
 - id: BO-135
   name: Order Routing & KDS/Printer Rules
@@ -1194,7 +1194,7 @@ screens:
   route: /stock-supply/product-availability-86-operational-food-safet
   repo: ticvai-venue-management
   path: src/routes/ops/ProductAvailability86OperationalFoodSaList.tsx
-  wave: 2
+  wave: 1
   status: notStarted
 - id: BO-141
   name: Operational Alerts, AI Replenishment & Action Center
@@ -7034,7 +7034,7 @@ screens:
   route: /rentals/staff-resource-directory-bo-873
   repo: ticvai-venue-management
   path: src/routes/rentals/StaffResourceDirectory.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: BO-874
   name: Staff Resource Profile
@@ -7098,7 +7098,7 @@ screens:
   route: /rentals/overtime-working-hour-rules-bo-881
   repo: ticvai-venue-management
   path: src/routes/rentals/OvertimeWorkingHourRules.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: BO-882
   name: Workforce Integration & Synchronization Center
@@ -13546,7 +13546,7 @@ screens:
   route: /policy/privacy-consent-configuration-command-center-cms-021
   repo: ticvai-venue-management
   path: src/routes/policy/PrivacyConsentConfigurationCommandCenter.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: CMS-022
   name: Data Processing Purpose & Lawful Basis Registry
@@ -13618,7 +13618,7 @@ screens:
   route: /policy/privacy-configuration-testing-approval-publication-cms-030
   repo: ticvai-venue-management
   path: src/routes/policy/PrivacyConfigurationTestingApprovalPublication.tsx
-  wave: 3
+  wave: 1
   status: notStarted
 - id: CMS-031
   name: Privacy Operations Command Center

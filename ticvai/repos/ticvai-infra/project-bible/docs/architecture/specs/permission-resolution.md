@@ -325,14 +325,30 @@ The server checks the permission before the handler runs, **at the scope the ope
 option A; CHG-R10ID-001). The server keeps permissions per scope: the request's resolved session carries,
 beside the flat `effectivePermissions`, the permissions held at each scope path after deny resolution (the
 server-side form of `Session.permissionsByScope`). An operation's `x-ticvai-permission` is evaluated at the
-scope the operation acts on, from that per-scope set: it holds when it is in the set of the node acted on or
-of one of its ancestors. `effectivePermissions` is for coarse checks only (a menu, a first gate) and never
-decides an operation by itself, because a permission held at venue A plus any other permission at venue B
-puts both paths in `ticvai.scope_paths` and the permission in the flat set. Two shapes follow, and no later
-operation needs to ask again:
+scope the operation acts on, by the lookup rule below. `effectivePermissions` is for coarse checks only (a menu,
+a first gate) and never decides an operation by itself, because a permission held at venue A plus any other
+permission at venue B puts both paths in `ticvai.scope_paths` and the permission in the flat set.
 
-- **A list's reach** is the scope paths where its permission holds; a filter (`scopePath` or a venue) outside
-  that reach is `403` (as `listPrincipals` states).
+**The published set and its lookup** (decided 30 October 2026, Chinmay, ADAM CR-367; CHG-CR367-001; this
+corrects the "node acted on or one of its ancestors" wording CR-189 settled, and nothing else in CR-189
+changes). An ancestor's set cannot carry a deny that sits below it (vectors V07, V08 and V12), so:
+
+- **One entry for every scope path where the selected role holds a grant, allow or deny** (a wildcard deny
+  included). Each entry's permissions are the full section 2 result at that path: the allows inherited from it
+  and its ancestors, minus every deny that contains it.
+- **A permission holds at a node when it is in the entry of the deepest listed path that contains the node**:
+  the node's own entry, else its nearest listed ancestor's. Entries are never combined. Every grant that
+  contains a node lies on its ancestor chain, and each has an entry, so this gives exactly section 2's answer
+  (R8 and R9 stay server-side checks).
+- **The server keeps deciding with section 2's algorithm** over the session's resolved grants
+  (`ResolvedAuthority`, #30674 and #30715); the kernel seam may keep the denies internally. A test runs every
+  vector of `permission-vectors.json` through the lookup on the published set and expects the vector's answer
+  (`tools/check-business-rules.py` BR-SCOPE-LOOKUP runs the same over this rule).
+
+Two shapes follow, and no later operation needs to ask again:
+
+- **A list's reach** is the scope paths whose deepest listed entry holds its permission; a filter (`scopePath`
+  or a venue) outside that reach is `403` (as `listPrincipals` states).
 - **A tenant-level operation** (`x-ticvai-scope-level: tenant`) needs its permission at the tenant root; held
   only below the root it is `403`, even when another permission is held at the root (as `createRole` states).
 
@@ -343,8 +359,10 @@ the seam. No wire shape changes.
 
 ### 7.3 Client — presentation only
 
-Clients consume `effectivePermissions` from the session and filter navigation on it.
-**Clients never compute permissions.** Client-side authorisation is both a security hole
+Clients consume `effectivePermissions` from the session for coarse filtering, and look a node up in
+`Session.permissionsByScope` by the rule of 7.2: the entry of the deepest listed path that contains the node
+(ADAM CR-367). That lookup is the whole of it: a client never unions ancestors' entries and never applies a
+deny itself. **Clients never compute permissions.** Client-side authorisation is both a security hole
 and a source of divergence from server truth.
 
 ---

@@ -1128,7 +1128,7 @@
       },
       "code": {
        "type": "string",
-       "description": "The check that found it. Validation's codes are listed on `publishWalletConfiguration` (ADAM CR-311)."
+       "description": "The check that found it. Validation's codes are listed on `publishWalletConfiguration` (ADAM CR-311); the restore's own two, `restore-credit-type-retired-since-version` and `restore-left-newer-rows`, on `restoreWalletConfigurationVersion` (ADAM CR-355)."
       },
       "message": {
        "type": "string"

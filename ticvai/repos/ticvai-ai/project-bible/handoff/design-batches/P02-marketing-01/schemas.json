@@ -182,6 +182,7 @@
    },
    "unsubscribeToken": {
     "x-ticvai-secret": "blind-index",
+    "x-ticvai-blind-index-of": "none",
     "writeOnly": true,
     "type": "string",
     "description": "**Unsubscribe must work without a login.** The link in a message carries the token and `setMarketingSubscription` accepts it in place of a session. **Write-only: never returned**, so a `MARKETING_VIEW` holder reading subscriptions cannot act as the guest."

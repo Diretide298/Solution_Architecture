@@ -428,6 +428,105 @@ def only_not_null_dropped(old_def: str, new_def: str) -> bool:
     return norm(re.sub(r"\s+NOT NULL\b", "", old_def, flags=re.I)) == norm(new_def)
 
 
+# ---- a type the frozen baseline names and nothing creates (CHG-R12DB-001) ---------------------------------------
+# r1's 010-pii.sql types two columns with enum types no file creates. Provisioning creates each as a domain first
+# (derive-ddl frozen_types_step); the forward migration converts the column to the definition CHG-R6-001 decided, in
+# one block (`type_fix_block`, tag `$type$`), and `apply_forward` folds that block into the column, so the next run
+# writes nothing.
+QUALIFIED_TYPE = re.compile(r"^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_]*$")
+CREATES_TYPE = re.compile(rf"^CREATE (?:TYPE|DOMAIN) (?:IF NOT EXISTS )?({QNAME})", re.I)
+TYPE_FIX = re.compile(rf"^DO \$type\$ BEGIN IF .*? THEN ALTER TABLE ({QNAME}) ALTER COLUMN ({NAME}) TYPE (\S+); END IF; "
+                      rf"IF .*? THEN ALTER TABLE {QNAME} ADD (CONSTRAINT {NAME} CHECK .*?); END IF; IF .*? END \$type\$$",
+                      re.I | re.S)
+
+
+def coldef_type(coldef: str) -> str:
+    """The type word of a column definition `name type ...` (an array's `[]` kept)."""
+    parts = norm(coldef).split(" ")
+    return parts[1] if len(parts) > 1 else ""
+
+
+def undefined_types(model: "Model") -> dict:
+    """{(table, column): type} for every column typed with a schema-qualified type that no statement of `model`
+    creates (CREATE TYPE, CREATE DOMAIN, or a table's own row type)."""
+    created = set(model.tables)
+    for k, st in model.stmts.items():
+        m = CREATES_TYPE.match(st)
+        if m:
+            created.add(unq(m.group(1)))
+    out = {}
+    for t, tab in model.tables.items():
+        for c, d in tab.cols.items():
+            typ = unq(coldef_type(d)).removesuffix("[]")
+            if QUALIFIED_TYPE.match(typ) and typ not in created:
+                out[(t, c)] = typ
+    return out
+
+
+def domain_for(typ: str, col: str, decided: str) -> str | None:
+    """`CREATE DOMAIN typ AS <the decided type> [CHECK (...)]` for a column the baseline types `typ`, from its decided
+    definition `decided` (the column's CHECK, `VALUE` for the column). None when the decided type is not built in."""
+    base = coldef_type(decided)
+    if not base or QUALIFIED_TYPE.match(unq(base).removesuffix("[]")):
+        return None
+    chk = _inline_check(decided)
+    expr = re.sub(r"(?<![\w.])" + re.escape(col) + r"(?![\w])", "VALUE", chk[2]) if chk else None
+    return f"CREATE DOMAIN {typ} AS {base}" + (f" CHECK ({expr})" if expr else "")
+
+
+# derive-ddl's guarded block for a trigger or a CHECK recorded from live (docs/active/recorded-ddl; CHG-R12DB-002..006).
+# Its own dollar tag, so GUARD and PERFORM_BLOCK never unwrap it: a model keeps it as one statement, and the next run
+# finds it there.
+RECORDED = re.compile(r"^DO \$recorded\$ BEGIN IF .* END IF; END \$recorded\$$", re.I | re.S)
+
+
+def recorded_rollback(block: str) -> str:
+    """The rollback of a RECORDED block: its function, its trigger or its CHECK dropped."""
+    s = norm(block)
+    m = re.match(r"^DO \$recorded\$ BEGIN IF to_regprocedure\('([^']+)'\) IS NULL OR NOT EXISTS", s, re.I)
+    if m:
+        return f"DROP FUNCTION IF EXISTS {m.group(1)};"
+    m = re.search(rf"CREATE OR REPLACE TRIGGER ({NAME}) .*? ON ({QNAME}) ", s, re.I)
+    if m:
+        return f"DROP TRIGGER IF EXISTS {m.group(1)} ON {m.group(2)};"
+    m = re.search(rf"ALTER TABLE ({QNAME}) ADD CONSTRAINT ({NAME}) ", s, re.I)
+    return f"ALTER TABLE {m.group(1)} DROP CONSTRAINT IF EXISTS {m.group(2)};" if m else ""
+
+
+def type_fix_fold(old_def: str, block: str) -> str | None:
+    """The column definition `old_def` becomes once `block` (a type_fix_block) has run, or None if it is not one."""
+    m = TYPE_FIX.match(norm(block))
+    if not m:
+        return None
+    name, _typ, rest = (norm(old_def).split(" ", 2) + ["", ""])[:3]
+    return norm(f"{name} {m.group(3)} {rest} {m.group(4)}")
+
+
+def type_fix_block(t: str, c: str, typ: str, old_def: str, new_def: str) -> tuple | None:
+    """(block, rollback) converting column `t.c`, typed `typ` by the frozen baseline, to `new_def`: the column becomes
+    the decided type where it still has `typ`, its CHECK is added where no constraint of that name is there yet, and
+    the domain is dropped once no column uses it. Guarded, so it applies twice and does nothing on a database whose
+    column already has the decided definition (CHG-R12DB-001). None when the fold would not give `new_def` (a person's
+    then, as before)."""
+    chk = _inline_check(new_def)
+    base = coldef_type(new_def)
+    if not chk or not base:
+        return None
+    sch, name = _split_t(t)
+    rel = f"to_regclass('{t}')"
+    block = (f"DO $type$ BEGIN IF EXISTS (SELECT 1 FROM pg_attribute WHERE attrelid = {rel} AND attname = '{unq(c)}' AND "
+             f"NOT attisdropped AND atttypid = to_regtype('{typ}')) THEN\n"
+             f"ALTER TABLE {t} ALTER COLUMN {c} TYPE {base};\nEND IF;\n"
+             f"IF {rel} IS NOT NULL AND {_col_exists(sch, name, unq(c))} AND NOT EXISTS (SELECT 1 FROM pg_constraint "
+             f"WHERE conname = '{chk[0]}' AND conrelid = {rel}) THEN\n"
+             f"ALTER TABLE {t} ADD {chk[1]};\nEND IF;\n"
+             f"IF to_regtype('{typ}') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM pg_attribute WHERE atttypid = "
+             f"to_regtype('{typ}') AND NOT attisdropped) THEN\nDROP DOMAIN {typ};\nEND IF; END $type$")
+    if type_fix_fold(old_def, block) != norm(new_def):
+        return None
+    return block, f"ALTER TABLE {t} DROP CONSTRAINT IF EXISTS {chk[0]};"
+
+
 class Model:
     """Every statement of one database's DDL, keyed so that the same object in two versions pairs up."""
 
@@ -547,6 +646,14 @@ class Model:
                 continue
             if BACKFILL_UPDATE.match(s):
                 continue   # a declared backfill's one-time UPDATE (CHG-R10OPN-002): data, not schema
+            tf = TYPE_FIX.match(s)
+            if tf:
+                # a column a frozen baseline typed with a type nothing creates, converted (CHG-R12DB-001)
+                t, c = unq(tf.group(1)), unq(tf.group(2))
+                tab = self.tables.get(t)
+                if tab is not None and c in tab.cols:
+                    tab.cols[c] = type_fix_fold(tab.cols[c], s) or tab.cols[c]
+                continue
             if POLICY_RENAME.match(s):
                 continue   # a renamed table's policies take its name (CHG-R8WFM-001): the model keys no policy name
             g = None if RETIRE_GUARD.match(s) else GUARD.match(s)
@@ -1359,7 +1466,7 @@ def _renamed_name(new_name: str, rc: dict, tables) -> str:
 
 
 def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired: dict | None = None,
-         descoped=None, backfill: dict | None = None) -> Plan:
+         descoped=None, backfill: dict | None = None, type_fixes: dict | None = None) -> Plan:
     """`renames`: {"tables": {old: new}, "columns": {(table as named now, old column): new column}}, the
     declared renames (CHG-R6-010). Only a table that exists on the old side under its old name and on the new
     side under its new one is treated as renamed; likewise a column. `retired`: {table: {column}}, the columns the
@@ -1367,8 +1474,11 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
     `x-ticvai-scope: none` (CHG-R9MIG-001); one the old side gave a scope_path loses it here (`descope_block`).
     `backfill`: {table: {column: SQL literal}}, the value the rows already there take when a new column arrives
     (`x-ticvai-backfill`, CHG-R10OPN-002; `backfill_block`); a column of a new table has no rows to fill.
+    `type_fixes`: {(table, column): type} for the columns the frozen baseline types with a type nothing creates
+    (CHG-R12DB-001); each is converted to its definition by `type_fix_block` rather than listed for a person.
     Every statement written is guarded at the end (`guard_statements`, CHG-R9MIG-002)."""
     p = Plan(area)
+    type_fixes = type_fixes or {}
     recon_cols, recon_names, recon_fk, recon_drop = [], [], [], []   # (statement, rollback), in the order they run
     recon_pk = []                                                    # widened primary keys (CHG-R9KEY-001)
     renames = renames or {}
@@ -1591,8 +1701,16 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                 elif a.cols[c] != d and (t, c) not in old.handled:
                     fill = (scope_path_backfill(t, b.cols, was_tenant_root(old, t), was_venue_rls(old, t))
                             if c == "scope_path" else None)
+                    fix = (type_fix_block(t, c, type_fixes[(t, c)], a.cols[c], d)
+                           if (t, c) in type_fixes and t not in rt else None)
                     if t in widened and c in widened[t][1] and nn_free(strip_inline_pk(a.cols[c])) == nn_free(d):
                         pass   # its inline PRIMARY KEY gives way to the widened key, written below (CHG-R9KEY-001)
+                    elif fix:
+                        # **A type the frozen baseline names and nothing creates** (CHG-R12DB-001; CHG-R6-001): the
+                        # column becomes its decided definition, guarded, and the domain provisioning made goes.
+                        p.statements.append(fix[0])
+                        p.rollback.append(fix[1])
+                        p.counts["other"] += 1
                     elif a.cols[c] == relaxed(d) and fill:
                         # **A scope_path an earlier forward migration added keeps its named backfill** (MOD audit,
                         # 14 October 2026, CHG-MOD-007). Once that migration is in the old side, the column is "still
@@ -1835,6 +1953,14 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None, retired
                        "write it into a forward migration by hand")
             continue
         s = new.stmts[k]
+        if RECORDED.match(s):
+            # **What live has that the package did not record, recorded** (CHG-R12DB-002..006): derive-ddl's guarded
+            # block for a trigger or a CHECK from docs/active/recorded-ddl. It does nothing where its objects are
+            # missing or the CHECK is there, and runs twice, so it is written as it is.
+            p.statements.append(stmt)
+            p.rollback.append(recorded_rollback(s))
+            p.counts["other"] += 1
+            continue
         m = re.match(rf"CREATE SCHEMA (?:IF NOT EXISTS )?({NAME})", s, re.I)
         if m:
             p.statements.append(stmt)

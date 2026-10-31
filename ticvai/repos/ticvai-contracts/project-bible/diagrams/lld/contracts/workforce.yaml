@@ -1,5 +1,5 @@
 id: LLD-workforce
-title: workforce — 49 operations
+title: workforce — 50 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -153,6 +153,18 @@ operations:
   - workforce.shift_template
   - workforce.staffing_rules
   - workforce.training_record
+  writes: []
+- operation: getStaffingRules
+  verb: GET
+  path: /staffing-rules
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.position_requirement
+  - workforce.staffing_rules
   writes: []
 - operation: listAnnouncements
   verb: GET

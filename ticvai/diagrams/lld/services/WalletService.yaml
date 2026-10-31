@@ -567,7 +567,7 @@ operationsByContract:
     scope: workstation
     permission: WALLET_OPERATE
     offline: false
-    reads: 4
+    reads: 6
     writes: 6
   - operation: transferWalletBalance
     verb: POST

@@ -88,6 +88,7 @@ TICVAI. The template location and the retention floor need the client's yes.**
 3. **Customer-managed key (optional):** only for a tenant on a pinned, dedicated instance. The key lives in the tenant's or our Key Vault in the region. This is part of what a dedicated client buys (ADR-0042).
 4. **The catalogue bundle signing key** (r8, FOUNDATION-AI-C14, 20 October 2026): an Ed25519 key per cell, held in the cell's Key Vault as a *key* (Key Vault signs with it; the private half never leaves); `catalogue.getBundleSigningKeys` serves the public keys, a retired one for a 7-day grace (ADR-0013 C102).
 5. **Field-level:** identity-document numbers (Emirates ID, passport) and any field classed as sensitive are encrypted by the application: a data key per tenant, wrapped by an HSM-backed Key Vault key. Where lookup is needed, a keyed hash (blind index) sits beside the ciphertext. **Not `pgcrypto`**: its keys pass through SQL text and logs (it is installed but called nowhere today).
+   **The first identity-document field is `pii.subject_document.number_ciphertext`** (decided 30 October 2026, Chinmay, ADAM CR-369; CHG-CR369-001): the number `submitGuestIdentityDocument` and `guestUaePassLogin` receive, encrypted through KERNEL-FIELD-ENC (#37050) as one string naming the key version (`x-ticvai-secret: field-encrypted`), with the last four in clear. No blind index until an operation needs a lookup by number, and never Argon2id or an unkeyed hash; the earlier `number_hash` is nullable and no longer written.
 6. **Secrets that sign rather than encrypt** (the Qdrant API key) are Key Vault secrets, read only by their issuer (ADR-0049).
 
 **Amended 14 October 2026 (Chinmay; ADAM CR-086, CHG-MKT-001): a secret held per guest is field-encrypted, never a
@@ -128,6 +129,43 @@ rule:
 - **A client secret cannot be re-hashed** (the server never keeps it), unlike a blind index over a field it can
   decrypt. So the row names the key version that made it (`hashKeyVersion`), and a retired key version stays in Key
   Vault, used only to verify, until the last row made with it has expired (at most `credentialTtlDays`, 730 days).
+
+**Amended 30 October 2026 (Chinmay; ADAM CR-339, CHG-CR339-001): where a tenant's wrapped keys live, and which blind
+indexes a rotation re-hashes.** KERNEL-FIELD-ENC (#37050) creates, per tenant, a data key and a blind-index key wrapped
+by the tenant's HSM-backed Key Vault key, versioned and rotated, but no table held a wrapped key, its version or
+which version is current; and "never by keeping two" cannot hold for a blind index over a token the server never
+keeps, since nothing can be re-hashed from it. The rule:
+
+- **The wrapped keys are rows of `platform.tenant_field_key` in the tenant's own database** (`TenantFieldKey`,
+  contracts/spine/tenancy.yaml): `purpose` `dataKey` or `blindIndexKey`, `key_version`, `wrapped_key` (bytea),
+  `wrapping_key_id` (the Key Vault key and its version that wrapped it), `state` `active`, `decryptOnly` or
+  `retired`, `created_at`, `rotated_at`. Unique on (`purpose`, `key_version`), and at most one `active` row per
+  purpose (a partial unique index). The tenant database is already one per tenant (ADR-0038), so a key row is never
+  read for the wrong tenant, and it travels with the tenant's backups; a wrapped key is useless without the Key Vault
+  key. Only the kernel reads or writes it; the kernel's architecture test covers it as it covers the Key Vault
+  client.
+- **A missing key is created at provisioning or on first use** with `INSERT ... ON CONFLICT DO NOTHING` and then read
+  again, so two hosts creating it at once end up with one key. A key is unwrapped with the Key Vault key version its
+  `wrapping_key_id` names.
+- **Rotating the data key** adds a new `active` row and moves the old one to `decryptOnly`; the stored form's
+  `enc:v<version>` says which row decrypts.
+- **Rotating the blind-index key re-hashes only a blind index the server can decrypt**, which today is
+  `marketing.guest_device.token_fingerprint` (from `token_ciphertext`). Its progress is a row of
+  `platform.blind_index_rehash` (`BlindIndexRehash`: `column_name` as `schema.table.column`, `from_version`,
+  `to_version`, `last_id`, `started_at`, `finished_at`; unique on (`column_name`, `to_version`)), and a lookup on
+  that column tries both versions only while its row is unfinished. "Never by keeping two" (14 October) holds for
+  these columns only.
+- **A blind index over a token the server never keeps cannot be re-hashed** (`marketing.subscription.unsubscribe_token`,
+  `orders.payment_link.token`, `orders.wallet_pass.authentication_token`, `orders.ticket_transfer.claim_token`). For
+  them the old key version stays `decryptOnly`, and a lookup tries the `active` version and then each `decryptOnly`
+  one, newest first, for as long as a token made under it can still be presented: the rule of the 25 October
+  amendment for API client secrets.
+- **The kernel's list of blind-index columns is the contract's `x-ticvai-secret: blind-index` columns in the tenant
+  database**, and each says which kind it is: `x-ticvai-blind-index-of: <the field-encrypted property it hashes>`
+  where it can be re-hashed, `x-ticvai-blind-index-of: none` where it hashes a token the server never keeps
+  (`check-contract-storage` ST-BLIND-INDEX-REHASH). `tenancy.device_credential.fingerprint` is not one.
+- Hrushikant Patkar creates both tables (a [DB] child task of MIG-PLATFORM); until then KERNEL-FIELD-ENC builds
+  behind its key-store abstraction.
 
 ### Biometric templates
 

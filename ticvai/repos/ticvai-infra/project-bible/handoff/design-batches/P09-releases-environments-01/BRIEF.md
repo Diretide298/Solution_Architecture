@@ -96,7 +96,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-022` | Release & Version Management | B | 17 | 25 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
+| `ADM-022` | Release & Version Management | B | 19 | 25 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
 | `ADM-023` | Staging Promotion & Approval | B | 7 | 23 | 6 | 1 | 2 | 5 | — | notStarted (generated) |
 | `ADM-024` | Release Notification Composer | B | 5 | 21 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `ADM-025` | Tenant Upgrade Scheduler | B | 7 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |

@@ -32,7 +32,9 @@ The rules live in `tools/screen_patterns.py`, shared with the generators and the
 
 **An exception is written here with its reason**, never skipped silently, and every exemption used
 is printed. P8 reads Block A from `handoff/service-docs/op-release.json` (what the tickets were cut
-from); when that file is absent it says so and the rule does not run.
+from) and from the plan this tree derives (`tasks.csv`; CHG-R12GT-001: the bundle is cut after the gate, so a
+screen the plan brings in is judged before it becomes a ticket); when both are absent it says so and the rule does
+not run.
 
     python tools/check-screen-patterns.py            # fail on any finding
     python tools/check-screen-patterns.py --list     # every finding, not the first 40
@@ -281,11 +283,36 @@ def run(only=None):
     return found, block_a
 
 
+def self_test() -> list:
+    """block_a_of on made-up tickets (CHG-R12GT-001): a Block A task's screen is in, through any depth of parents and
+    in either drop; a later block's is not; a feature's builds are not a task's; the plan's rows and the bundle's
+    tickets are read alike, so a screen the plan brought in after the bundle was cut is judged at the gate."""
+    rows = [{"key": "BLOCK-A", "type": "Epic", "parent": ""},
+            {"key": "BLOCK-A2", "type": "Epic", "parent": ""},
+            {"key": "BLOCK-B", "type": "Epic", "parent": ""},
+            {"key": "AM-X", "type": "Feature", "parent": "BLOCK-A", "b": ["screen BO-900"]},
+            {"key": "APP-SETUP-BO-134", "type": "Task", "parent": "AM-X", "b": ["screen BO-134"]},
+            {"key": "AM-Y", "type": "Feature", "parent": "BLOCK-A2"},
+            {"key": "APP-CMS-CMS-021", "type": "Task", "parent": "AM-Y", "b": ["screen CMS-021"]},
+            {"key": "AM-Z", "type": "Feature", "parent": "BLOCK-B"},
+            {"key": "APP-BO-777", "type": "Task", "parent": "AM-Z", "b": ["screen BO-777"]},
+            {"key": "SVC-1", "type": "Task", "parent": "AM-X", "b": ["operation fnb#getKitchenSla"]}]
+    got = sp.block_a_of(rows, lambda r: r.get("b"))
+    want = {"BO-134", "CMS-021"}
+    return [] if got == want else [f"block_a_of: expected {sorted(want)}, got {sorted(got)}"]
+
+
 def main() -> int:
     try:
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     except Exception:  # noqa: BLE001
         pass
+    bad_tests = self_test()
+    if bad_tests:
+        for b in bad_tests:
+            print(f"  self-test: {b}")
+        print(f"FAIL {len(bad_tests)} self-test(s)")
+        return 1
     args = sys.argv[1:]
     only = args[args.index("--only") + 1] if "--only" in args else None
     found, block_a = run(only)

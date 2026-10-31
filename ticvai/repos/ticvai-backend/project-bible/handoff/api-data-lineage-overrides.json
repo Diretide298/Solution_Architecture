@@ -3485,10 +3485,7 @@
   },
   "getBillingStatement": {
    "reads": [
-    "ledger.tax_invoice_line",
-    "orders.payment",
-    "orders.sales_order",
-    "payments.dunning_case"
+    "ledger.tax_invoice_line"
    ],
    "reason": "tax, discount and taxInvoiceId per line; format=pdf renders to object storage and returns pdfUrl (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
@@ -5570,15 +5567,6 @@
     "promotions.promotion"
    ],
    "reason": "Best-offer resolution computed from promotion.stacking_mode/precedence against prices (as evaluatePromotions) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "listBillingStatements": {
-   "reads": [
-    "orders.payment",
-    "orders.sales_order",
-    "payments.dunning_case"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
    "carried": true
   },
   "listBiometric": {
@@ -12092,10 +12080,9 @@
     "pii.subject_contact"
    ],
    "writes": [
-    "identity.otp_challenge",
-    "platform.outbox"
+    "identity.otp_challenge"
    ],
-   "reason": "adds platform.outbox for purpose passwordReset (identity.credentialResetRequested); 14 October 2026 (CHG-CRD-005, ADAM CR-078): a newer code invalidates the older one for the identifier and purpose; resendAfter (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
+   "reason": "platform.outbox now derived from x-ticvai-emits identity.guestCodeIssued (ADAM CR-370, CHG-CR370-001; it also carries identity.credentialResetRequested for purpose passwordReset); 14 October 2026 (CHG-CRD-005, ADAM CR-078): a newer code invalidates the older one for the identifier and purpose; resendAfter (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "requestPricingRollback": {
@@ -15783,7 +15770,7 @@
    "writes": [
     "pii.subject_document"
    ],
-   "reason": "r11 gate, CHG-R11FXV-001: the document row, its number hashed into number_hash with number_last4 kept; no contract schema persists pii.subject_document, so no x-ticvai-writes can state it. Reviewed: the carried entry's assets.media_asset read is gone (the uploads are checked against identity.guest_upload_ref, assets#guestUploadsForIdentity) and identity.guest_verification_policy is stated in the contract."
+   "reason": "r11 gate, CHG-R11FXV-001: the document row, its number encrypted into number_ciphertext with number_last4 kept (ADAM CR-369, CHG-CR369-001; was hashed into number_hash); no contract schema persists pii.subject_document, so no x-ticvai-writes can state it. Reviewed: the carried entry's assets.media_asset read is gone (the uploads are checked against identity.guest_upload_ref, assets#guestUploadsForIdentity) and identity.guest_verification_policy is stated in the contract."
   },
   "submitIntegrationListing": {
    "reads": [
@@ -16727,10 +16714,9 @@
    ],
    "writes": [
     "identity.otp_challenge",
-    "marketing.message_dispatch",
     "pii.subject"
    ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
+   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001); marketing.message_dispatch dropped: mode send emits identity.guestCodeIssued, Marketing writes its own row (ADAM CR-370, CHG-CR370-001)",
    "carried": true
   },
   "verifyGuestOtp": {

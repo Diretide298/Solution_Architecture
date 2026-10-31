@@ -33,6 +33,17 @@ then
 fi
 createdb "$SLUG"
 
+# 2a. **The types the frozen r1 baseline names and no file creates** (CHG-R12DB-001; CHG-R6-001, ADAM CR-001).
+#     Created as domains over the type CHG-R6-001 decided, with its CHECK, so the baseline applies as written;
+#     the forward migration then makes each column that type with its named CHECK and drops the domain.
+#     Derived from the baseline at r1 (tools/derive-ddl.py FROZEN_TYPES_MARK); check-ddl-conventions
+#     D-PROVISION-TYPE fails on a type a provisioned file uses before a step creates it.
+psql -v ON_ERROR_STOP=1 -d "$SLUG" <<'SQL' >/dev/null
+CREATE SCHEMA IF NOT EXISTS pii;
+CREATE DOMAIN pii.contact_kind AS text CHECK (VALUE IN ('email', 'mobile', 'phone', 'whatsapp', 'postal'));
+CREATE DOMAIN pii.subject_kind AS text CHECK (VALUE IN ('guest', 'employee', 'contact', 'applicant'));
+SQL
+
 # 2. The template, in the order the files are numbered: schemas, tables, constraints, indexes.
 #    Every tenant database gets the same set, which is what makes two hundred migrations one job
 #    rather than two hundred schemas.

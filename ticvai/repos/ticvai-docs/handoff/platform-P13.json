@@ -7,19 +7,19 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-29",
+ "generated": "2026-10-31",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 104,
-  "operations": 210,
+  "operations": 211,
   "contracts": 8,
   "modules": 4,
   "undrawn": 0,
   "operationsWithNoScreen": 114
  },
  "waves": {
-  "wave1": 26,
-  "wave3": 78
+  "wave1": 28,
+  "wave3": 76
  },
  "modules": [
   {
@@ -59,7 +59,7 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 66
+   "operations": 67
   },
   {
    "contract": "assets",
@@ -70,11 +70,11 @@
    "operations": 10
   },
   {
-   "contract": "catalogue",
+   "contract": "identity",
    "operations": 5
   },
   {
-   "contract": "identity",
+   "contract": "catalogue",
    "operations": 5
   },
   {
@@ -262,7 +262,7 @@
    "id": "CMS-021",
    "name": "Privacy & Consent Configuration Command Center",
    "module": "Policy",
-   "wave": 3,
+   "wave": 1,
    "route": "/policy/privacy-consent-configuration-command-center-cms-021",
    "operations": 1,
    "drawn": true
@@ -343,9 +343,9 @@
    "id": "CMS-030",
    "name": "Privacy Configuration Testing, Approval & Publication",
    "module": "Policy",
-   "wave": 3,
+   "wave": 1,
    "route": "/policy/privacy-configuration-testing-approval-publication-cms-030",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -759,7 +759,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/asset-version-control-revision-history-cms-076",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {

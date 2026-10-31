@@ -213,6 +213,19 @@
   "requestBody": null,
   "responds": "KitchenRoutingRules"
  },
+ "getKitchenSla": {
+  "method": "GET",
+  "path": "/outlets/{outletId}/kitchen-sla",
+  "contract": "fnb",
+  "summary": "How long a ticket may sit before it is late (read)",
+  "permission": "PRODUCT_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "KitchenSla"
+ },
  "getKpiValues": {
   "method": "GET",
   "path": "/kpi-values",

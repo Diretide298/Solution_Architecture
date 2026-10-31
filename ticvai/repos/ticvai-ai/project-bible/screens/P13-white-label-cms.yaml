@@ -1369,7 +1369,9 @@ screens:
         label: Blocks on this page
         bindsTo: ContentBlock
         operation: listContentBlocks
-        notes: In page order; drag to reorder (updateContentBlock position).
+        notes: In page order; drag to reorder (updateContentBlock position). For a homepage section, `pageKey`
+          is the content page the section's `contentPageId` names; a section with no page gets one first
+          (createContentPage, then setHomepageLayout) (ADAM CR-364, CHG-CR364-001).
         provenance: agreed operation `listContentBlocks`, runs/fix-s12/LEDGER.md (defined 4 October 2026,
           CHG-FXS-003)
       - kind: secondaryButton
@@ -1395,7 +1397,8 @@ screens:
       - kind: secondaryButton
         label: New content block
         operation: createContentBlock
-        notes: A block for a page section, scheduled or personalised (MATRIX 22.10.4).
+        notes: A block for a page section, scheduled or personalised (MATRIX 22.10.4). `pageId` is the
+          content page id; for a section, the section's `contentPageId` (ADAM CR-364, CHG-CR364-001).
         provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
       - kind: secondaryButton
         label: Publish block
@@ -4490,7 +4493,7 @@ screens:
   name: Privacy & Consent Configuration Command Center
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
@@ -5959,7 +5962,7 @@ screens:
   name: Privacy Configuration Testing, Approval & Publication
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   permission: GUEST_MANAGE
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
@@ -6049,52 +6052,52 @@ screens:
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Missing policy
-        operation: approvePrivacyTesting
+        operation: listPrivacyChangeSets
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Missing consent mapping
-        operation: approvePrivacyTesting
+        operation: listPrivacyChangeSets
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Missing language
-        operation: approvePrivacyTesting
+        operation: listPrivacyChangeSets
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Conflicting consent rules
-        operation: approvePrivacyTesting
+        operation: listPrivacyChangeSets
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Missing processing purpose
-        operation: approvePrivacyTesting
+        operation: listPrivacyChangeSets
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Invalid effective dates
-        operation: approvePrivacyTesting
+        operation: listPrivacyChangeSets
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Unmapped tracking technology
-        operation: approvePrivacyTesting
+        operation: listPrivacyChangeSets
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Missing guardian rule
-        operation: approvePrivacyTesting
+        operation: listPrivacyChangeSets
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Unpublished dependency
-        operation: approvePrivacyTesting
+        operation: listPrivacyChangeSets
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Circular configuration dependency
-        operation: approvePrivacyTesting
+        operation: listPrivacyChangeSets
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
@@ -6179,6 +6182,16 @@ screens:
     contract: marketing-crm
     purpose: Set the privacy governance of one version of a privacy document
     trigger: onAction
+  - operationId: listPrivacyChangeSets
+    contract: marketing-crm
+    purpose: The change sets and where each stands; the selected one's validation issues fill the checks
+    trigger: onLoad
+    provenance: r12 gate, 31 October 2026 (CHG-R12GT-001; check-screen-patterns READ)
+  - operationId: listPrivacyNoticePolicy
+    contract: marketing-crm
+    purpose: The privacy document versions, from which the governance form picks the one it sets
+    trigger: onAction
+    provenance: r12 gate, 31 October 2026 (CHG-R12GT-001; check-screen-patterns READ)
   wireframe:
     status: notStarted
     provenance: generated
@@ -6213,6 +6226,8 @@ screens:
       - ownerPrincipalId
       - approvedByPrincipalId
       - approvedAt
+    reads:
+    - listPrivacyNoticePolicy
     provenance: contract marketing-crm.yaml PUT /privacy-notice-policy
   entryState:
     params:
@@ -12272,10 +12287,20 @@ screens:
         impliedBy: listMediaAssetVersions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: fileUpload
+        label: Choose the new file
+        bindsTo: UploadTicket.uploadId
+        operation: createUpload
+        notes: Asks the platform for an upload (`createUpload`) and sends the file; the replace then names
+          that upload. It never calls `completeUpload`, which would make the file a new asset rather than
+          this one's next version.
+        provenance: contract assets.yaml POST /media/uploads (CHG-R12GT-002)
       - kind: primaryButton
-        derived: true
-        impliedBy: replaceMediaAsset
-        notes: The act the screen exists for.
+        label: Replace the current version
+        operation: replaceMediaAsset
+        notes: The act the screen exists for. Sends the chosen file's `uploadId` (and an optional `note`);
+          the file it replaces is kept as a version.
+        provenance: contract assets.yaml POST /media/{mediaId}/replace (CHG-R12GT-002)
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -12296,6 +12321,11 @@ screens:
     purpose: Revision history
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: createUpload
+    contract: assets
+    purpose: An upload for the new file
+    trigger: onAction
+    provenance: r12 gate, 31 October 2026 (CHG-R12GT-002; check-screen-wiring S-OP-UNREACHED)
   - operationId: replaceMediaAsset
     contract: assets
     purpose: Replace the current version

@@ -1620,3 +1620,53 @@ changes:
     tag: r11
     producer-tickets: [SVC-WHITELABEL-BOOKINGFLOWS-2]
     consumer-tickets: [APP-WL-CMS-103]
+  - id: BC-496
+    contract: identity
+    operation: requestGuestOtp
+    operations: [requestGuestOtp, verifyGuestEmail]
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-370 (CHG-CR370-001): a guest one-time code reaches Marketing''s sender by the outbox event
+      identity.guestCodeIssued, destination and code field-encrypted, because Identity and Marketing are in different
+      deployables; verifyGuestEmail''s mode send emits it in place of an in-process call to sendTransactionalMessage. No
+      response changes; an emitted event added to an operation is breaking by the compat rule.'
+    approved-by: 'Chinmay, 30 October 2026 (CR-370, posted on #30659: "Use an outbox event"), with the follow-up of 31
+      October 2026 on #30659'
+    tag: r12
+    producer-tickets: ['30659', '30676']
+    consumer-tickets: ['30690', '30697', '30700', '30703']
+  - id: BC-497
+    contract: platform-ops
+    operation: rejectRelease
+    change: "params `path:releaseId` type string -> string:uuid"
+    reason: 'ADAM CR-356 (CHG-CR356-001): releaseId is a release''s id, a uuid, as getRelease and promoteRelease
+      already declare (ADR-0056); a non-uuid is 400 validation. The value was always a release id; the declared format
+      now says so. A type change cannot be additive.'
+    approved-by: 'Chinmay, 30 October 2026 (CR-356 posted: "releaseId is format uuid on both operations, and a non-uuid is
+      400 validation")'
+    tag: r12
+    producer-tickets: [SVC-PLATFORM-RELEASE-2]
+    consumer-tickets: [APP-CONSOLE-ADM-022, APP-CONSOLE-ADM-023]
+  - id: BC-498
+    contract: platform-ops
+    operation: withdrawRelease
+    change: "params `path:releaseId` type string -> string:uuid"
+    reason: 'ADAM CR-356 (CHG-CR356-001): releaseId is a release''s id, a uuid, as getRelease and promoteRelease
+      already declare (ADR-0056); a non-uuid is 400 validation. The value was always a release id; the declared format
+      now says so. A type change cannot be additive.'
+    approved-by: 'Chinmay, 30 October 2026 (CR-356 posted: "releaseId is format uuid on both operations, and a non-uuid is
+      400 validation")'
+    tag: r12
+    producer-tickets: [SVC-PLATFORM-RELEASE-2]
+    consumer-tickets: [APP-CONSOLE-ADM-022]
+  - id: BC-499
+    contract: white-label
+    operation: listContentBlocks
+    change: "params `query:pageKey` type string -> string:uuid"
+    reason: 'ADAM CR-364 (CHG-CR364-001): pageKey is a content page''s id only; a homepage section is asked by its
+      contentPageId, and a value that is not a uuid answers 400 validation, not an empty page. A type change cannot be
+      additive.'
+    approved-by: 'Chinmay, 30 October 2026 (CR-364 posted on #30784: "pageKey is a content page''s id only (format
+      uuid)")'
+    tag: r12
+    producer-tickets: ['30784']
+    consumer-tickets: ['31152', '31153', '31154']

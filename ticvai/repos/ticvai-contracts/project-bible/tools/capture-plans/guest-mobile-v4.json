@@ -42,7 +42,8 @@
 
   {"id": "GST-008", "name": "Tickets & Add-ons", "view": "Buy tickets → Dated day pass → Book now → Fri 2 Oct (step 2: tickets; add-ons are step 3)",
    "steps": [{"click": "Buy tickets"}, {"clickContains": "Book now", "nth": 0}, {"wait": 2500}, {"click": "FRI"}, {"click": "Continue"}, {"click": "+", "nth": 0}, {"click": "+", "nth": 0}, {"click": "+", "nth": 1}],
-   "expect": ["Step 2 of 5", "Choose your ticket", "Two-day flexible", "AED 900"]},
+   "expect": ["Step 2 of 5", "Choose your ticket", "Two-day flexible", "AED 900"],
+   "pending": "not captured: since ADAM CR-349 (30 October 2026) the frame wireframes/frames/gst-008.html draws the guest-app build on #31775, not this view; a capture would overwrite it"},
 
   {"id": "GST-049", "name": "Interactive Seat Selection", "view": "Union Arena → Buy tickets → Direct seat map → 2D plan → section 104 (← Whole map)", "noSetup": true,
    "steps": [{"clickPage": "Home · Explore · Buy · Plan · Tickets"}, {"click": "Union Arena"}, {"wait": 1500}, {"click": "Skip introduction"}, {"clickContains": "Buy"}, {"clickContains": "Book now", "nth": 2}, {"wait": 4000}, {"click": "2D plan"}, {"wait": 1500}, {"scroll": 430}, {"wait": 800}, {"click": "104"}, {"wait": 4000}],

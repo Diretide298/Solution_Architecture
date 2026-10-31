@@ -4479,7 +4479,7 @@ The ticket the server issues carries `maxSizeBytes` (the row's limit) and expire
 | Conflict policy | serverWins |
 | Reads | `assets.media_upload`, `cache:idempotency` |
 | Writes | `assets.media_upload`, `cache:idempotency` |
-| Called by | ADM-016, BO-093, BO-094, BO-1189, BO-798, BO-955, CMS-002, CMS-004, CMS-010, CMS-063, SUP-013 |
+| Called by | ADM-016, BO-093, BO-094, BO-1189, BO-798, BO-955, CMS-002, CMS-004, CMS-010, CMS-063, CMS-076, SUP-013 |
 
 **Parameters**
 

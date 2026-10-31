@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 214 operations, 108 tables
+title: TenancyService — 215 operations, 110 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -21,14 +21,14 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 214
+  operations: 215
   inAFlow: 50
   percent: 23%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: platform
-  tables: 23
+  tables: 25
   stores:
   - postgres
   largestTable: platform.device
@@ -1001,7 +1001,7 @@ operationsByContract:
     reads: 6
     writes: 4
 - contract: workforce
-  count: 49
+  count: 50
   operations:
   - operation: acknowledgeAnnouncement
     verb: POST
@@ -1082,6 +1082,14 @@ operationsByContract:
     permission: WORKFORCE_VIEW
     offline: false
     reads: 7
+    writes: 0
+  - operation: getStaffingRules
+    verb: GET
+    path: /staffing-rules
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 2
     writes: 0
   - operation: listAnnouncements
     verb: GET
@@ -2583,6 +2591,12 @@ tables:
   - orders
   - payments
   - platform-ops
+- table: platform.blind_index_rehash
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
 - table: platform.configuration_profile
   columns: 9
   store: postgres
@@ -2767,6 +2781,12 @@ tables:
   foreignWriters: null
 - table: platform.tenant
   columns: 2
+  store: postgres
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: platform.tenant_field_key
+  columns: 8
   store: postgres
   parent: null
   writtenBy: []

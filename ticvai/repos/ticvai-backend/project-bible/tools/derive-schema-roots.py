@@ -65,8 +65,11 @@ def main() -> int:
 
     tables = {t for t in (set(schema.get("cols") or {}) | set(schema.get("storage") or {}))
               if "." in t and ":" not in t}
+    # **Sorted, not a set's order** (CHG-R12GT-004, 31 October 2026): every tie below (two schemas of one size, two tables
+    # scoring alike, two terminals reached as often) was broken by the run's string hashes, so the chosen root and the
+    # file's order moved between two runs on the same input.
     by_schema: dict[str, set] = defaultdict(set)
-    for t in tables:
+    for t in sorted(tables):
         by_schema[t.split(".")[0]].add(t)
 
     hard = [r for r in rows if r["edge_kind"] != "ambient"]
@@ -105,7 +108,7 @@ def main() -> int:
         term = sorted(terminals(t))
         anchors[t] = term
 
-    anchor_counts = Counter(a for t in tables for a in terminals(t))
+    anchor_counts = Counter(a for t in sorted(tables) for a in sorted(terminals(t)))
     spine = ["", "## The spine — where dependencies actually stop", "",
              "**Following every table's own outbound keys to a fixed point gives 42 terminal",
              "tables**, and the distribution is the honest shape of the package:", "",
@@ -139,9 +142,9 @@ def main() -> int:
            "operation, which is a fact about the code rather than about the data.",
            ""] + spine
 
-    for sch in sorted(by_schema, key=lambda x: -len(by_schema[x])):
+    for sch in sorted(by_schema, key=lambda x: (-len(by_schema[x]), x)):
         ts = by_schema[sch]
-        scored = sorted(ts, key=lambda t: (-inbound_own[t], -inbound_all[t], outbound[t]))
+        scored = sorted(ts, key=lambda t: (-inbound_own[t], -inbound_all[t], outbound[t], t))
         computed = scored[0]
         root, why = OVERRIDE.get(sch, (computed, None))
 
@@ -198,7 +201,7 @@ def main() -> int:
 
     lineage: dict = {}
     for sch, ts in by_schema.items():
-        scored = sorted(ts, key=lambda t: (-inbound_own[t], -inbound_all[t], outbound[t]))
+        scored = sorted(ts, key=lambda t: (-inbound_own[t], -inbound_all[t], outbound[t], t))
         root = OVERRIDE.get(sch, (scored[0], None))[0]
         depth = {root: 0}
         via: dict = {}

@@ -434,7 +434,8 @@
    "pageId": {
     "type": "string",
     "format": "uuid",
-    "nullable": true
+    "nullable": true,
+    "description": "**A content page's id, always** (ADAM CR-364, 30 October 2026; CHG-CR364-001). A homepage section reaches its blocks through the content page its `contentPageId` names; a section with no page yet gets one first (`createContentPage`, then `setHomepageLayout`)."
    },
    "kind": {
     "type": "string",
@@ -458,7 +459,7 @@
    "body": {
     "type": "object",
     "additionalProperties": true,
-    "description": "Typed by `kind`, and validated against the block's own schema at save. **The text a translation may fill** (R8 blocker FOUNDATION-AI-C40; the keys a body of each kind uses for its words, and the `fieldPath` a translation draft names, under `localeVariants.<locale>.`): richText `text`; image `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta `heading`, `text`, `label`; faq `items[].question`, `items[].answer`; form `title`, `fields[].label`, `submitLabel`; embed `title`; productGrid `heading`; countdown `heading`, `endedText`; testimonial `quote`, `author`. Every other key (links, ids, numbers, media references) is not translated."
+    "description": "Typed by `kind`. **Checked at save only as far as this description defines it** (ADAM CR-366, CHG-CR366-001): the body and each `localeVariants.<locale>` entry are JSON objects, the text keys listed below for the block's kind are strings where present, and an `items[]` or `fields[]` is an array of objects (`400` `validation`); other keys are not checked, and the full schema per kind is on the left-out list (LO-CR366-001). **The text a translation may fill** (R8 blocker FOUNDATION-AI-C40; the keys a body of each kind uses for its words, and the `fieldPath` a translation draft names, under `localeVariants.<locale>.`): richText `text`; image `altText`, `caption`; video `title`, `caption`; gallery `items[].altText`, `items[].caption`; cta `heading`, `text`, `label`; faq `items[].question`, `items[].answer`; form `title`, `fields[].label`, `submitLabel`; embed `title`; productGrid `heading`; countdown `heading`, `endedText`; testimonial `quote`, `author`. Every other key (links, ids, numbers, media references) is not translated."
    },
    "localeVariants": {
     "type": "object",

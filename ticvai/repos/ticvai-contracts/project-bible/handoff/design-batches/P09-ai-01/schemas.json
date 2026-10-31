@@ -1003,6 +1003,7 @@
  "RegionSettings": {
   "x-ticvai-persistence": "platform.region_settings",
   "x-ticvai-rls": "read-beneath",
+  "x-ticvai-guest-read": true,
   "type": "object",
   "required": [
    "scopePath",

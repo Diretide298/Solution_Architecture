@@ -1011,8 +1011,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Stock & Supply · wave 2 · needs the `fnb` module |
-| Block | Block A · task APP-SETUP-BO-140 |
+| Module | Stock & Supply · wave 1 · needs the `fnb` module |
+| Block | Block A · ticket #37064 (APP-SETUP-BO-140) |
 | Who uses it | venue staff holding `INCIDENT_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listExpiringBatches` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

@@ -199,7 +199,10 @@
   "properties": {
    "formId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "marketing.form_definition",
+    "x-ticvai-references-version": "formVersion",
+    "description": "The form (`FormDefinition.id`); with `formVersion`, the draft version row the field belongs to (ADAM CR-359)."
    },
    "formVersion": {
     "type": "integer",
@@ -402,6 +405,13 @@
  "FormDefinition": {
   "type": "object",
   "x-ticvai-persistence": "marketing.form_definition + marketing.form_definition_field",
+  "x-ticvai-primary-key": [
+   "id",
+   "version"
+  ],
+  "x-ticvai-retired-columns": [
+   "marketing.form_definition_field.form_definition_id"
+  ],
   "description": "CF-129, CL-04. **A waiver, a survey and a data-capture form are one mechanism.**\nA waiver is this form with a signature. A survey is this form with a scale. A demographic capture is this form at the point of sale. They were raised as three separate gaps and share every part: field configuration, conditional display, versioning, an acceptance record and a stored artefact.\n**Three implementations would drift on the version rule first.** A waiver signed against version 3 must stay bound to version 3, and that is the same requirement a survey has when question wording changes mid-campaign — **an NPS score means nothing if you cannot say which question produced it.**\n",
   "required": [
    "id",
@@ -414,7 +424,8 @@
    "id": {
     "readOnly": true,
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "description": "**The form, not one version of it** (ADAM CR-359, decided 30 October 2026): every version of a form is a row with this same id, and (`id`, `version`) is the row's key, as CR-228 made it for configuration profiles. It is the `formId` every path and body names, with `formVersion` for one version, and the id `setWaiverTemplateMaster` and `WaiverRequirement.formDefinitionId` name the form by."
    },
    "name": {
     "type": "string"
@@ -447,7 +458,7 @@
    "version": {
     "readOnly": true,
     "type": "integer",
-    "description": "**Set by the server** — 1 on `createForm`, the next number on every change. **Immutable once anything is submitted against it.** A change creates a new version, and the old one stays readable forever — 2.15.13 requires the exact accepted version retained, which is legal evidence rather than a nicety.\n"
+    "description": "**Set by the server** — 1 on `createForm`, the next number on every change. **Immutable once anything is submitted against it.** A change creates a new version, and the old one stays readable forever — 2.15.13 requires the exact accepted version retained, which is legal evidence rather than a nicety.\n**One row per version, under the form's `id`** (ADAM CR-359): (`id`, `version`) is the key, so version N of form X is the row with `id` X and `version` N.\n"
    },
    "fields": {
     "type": "array",

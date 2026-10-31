@@ -1007,6 +1007,10 @@ def main() -> int:
         # the tenant root or a brand, where no venue or region sits above it to resolve a currency from; the limit is a
         # contract term like ledger.account's or control.partner_agreement's currency.
         "payments.credit_account",
+        # **The guest verification policy's wallet top-up limit is stored in its own currency** (ADAM CR-363, "as you
+        # recommended", Chinmay, 30 October 2026; CHG-CR363-001). The policy is one row at the tenant root, where no
+        # venue or region sits above it; a threshold the tenant sets is a term stated in a currency, as CR-322's limit.
+        "identity.guest_verification_policy",
     }
     _schema = ROOT / "handoff" / "schema-reference.json"
     if _schema.exists():

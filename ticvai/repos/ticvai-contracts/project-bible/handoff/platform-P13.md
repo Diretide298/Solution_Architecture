@@ -5,12 +5,12 @@
 | | |
 |---|---|
 | Screens | 104 |
-| Operations | 210 |
+| Operations | 211 |
 | Contracts | 8 |
 | Modules | 4 |
 | Undrawn | 0 |
 | Operations with no screen | 114 |
-| Waves | wave1 26 · wave3 78 |
+| Waves | wave1 28 · wave3 76 |
 
 ## Gaps
 
@@ -100,7 +100,7 @@
 | `CMS-017` | Domain & Certificate | White Label | 1 | 7 | yes |
 | `CMS-018` | Consent & Legal | White Label | 1 | 8 | yes |
 | `CMS-019` | User Access | White Label | 1 | 3 | yes |
-| `CMS-021` | Privacy & Consent Configuration Command Center | Policy | 3 | 1 | yes |
+| `CMS-021` | Privacy & Consent Configuration Command Center | Policy | 1 | 1 | yes |
 | `CMS-022` | Data Processing Purpose & Lawful Basis Registry | Policy | 3 | 2 | yes |
 | `CMS-023` | Consent Purpose & Consent Type Builder | Policy | 3 | 2 | yes |
 | `CMS-024` | Communication Preference & Marketing Permission Configuration | Policy | 3 | 1 | yes |
@@ -109,7 +109,7 @@
 | `CMS-027` | Consent Capture Point & Customer Journey Configuration | Policy | 3 | 1 | yes |
 | `CMS-028` | Privacy Notice, Policy & Terms Version Management | Policy | 3 | 2 | yes |
 | `CMS-029` | Minor, Guardian & Age-Based Privacy Configuration | Policy | 3 | 1 | yes |
-| `CMS-030` | Privacy Configuration Testing, Approval & Publication | Policy | 3 | 2 | yes |
+| `CMS-030` | Privacy Configuration Testing, Approval & Publication | Policy | 1 | 4 | yes |
 | `CMS-031` | Privacy Operations Command Center | Policy | 3 | 1 | yes |
 | `CMS-032` | Customer Privacy, Consent & Preference 360° | Policy | 3 | 1 | yes |
 | `CMS-033` | Consent Evidence, History & Withdrawal Management | Policy | 3 | 2 | yes |
@@ -155,7 +155,7 @@
 | `CMS-073` | Semantic & Natural-Language Asset Search | Media Library | 3 | 1 | yes |
 | `CMS-074` | Visual Similarity & Related Asset Discovery | Media Library | 3 | 1 | yes |
 | `CMS-075` | Duplicate & Near-Duplicate Management | Media Library | 3 | 3 | yes |
-| `CMS-076` | Asset Version Control & Revision History | Media Library | 3 | 2 | yes |
+| `CMS-076` | Asset Version Control & Revision History | Media Library | 3 | 3 | yes |
 | `CMS-077` | Version Comparison & Replacement Impact | Media Library | 3 | 1 | yes |
 | `CMS-078` | Transformation & Rendition Management | Media Library | 3 | 2 | yes |
 | `CMS-079` | Rendition Processing & Delivery Readiness | Media Library | 3 | 1 | yes |

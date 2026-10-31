@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 233
+  x-ticvai-screen-count: 234
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -1553,8 +1553,9 @@ paths:
         - "P08 BO-618 Accreditation Form Builder"
         - "P08 BO-747 Consent Policy Configuration"
       summary: Waivers, surveys and capture forms
-      description: 'The builder''s list. **The latest version of each form**; older versions stay readable
-        through `getForm` with `version`.
+      description: 'The builder''s list. **The latest version of each form**, the highest `version` per `id`
+        (ADAM CR-359: a form''s versions share its `id`); older versions stay readable through `getForm` with
+        `version`.
 
         
 
@@ -1619,6 +1620,15 @@ paths:
         Published as a version. **A change creates a new version and the old one stays readable forever**
         — 2.15.13 requires the exact accepted version retained.
 
+
+        **A new form, or the next version of one** (ADAM CR-359, decided 31 October 2026; the CR-228 rule for
+        configuration profiles). Without `formId` the body is a new form: a new `id`, `version` 1, as before. With
+        `formId` it is the next version of that form: a row with `id` = `formId` and `version` = the form''s highest
+        version + 1, saved as a draft from the body alone; nothing is copied implicitly from an earlier version (its
+        fields and layout are whatever this body and the later field and layout writes give it). No form with that
+        id is `404`. The next version takes the same permission and scope as an update of that form: `MARKETING_MANAGE`
+        at the form''s node or above, and a form outside the caller''s scope is the same `404`.
+
         '
       tags:
       - marketing
@@ -1630,6 +1640,15 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - name: formId
+        in: query
+        required: false
+        description: 'The form this is the next version of (`FormDefinition.id`; ADAM CR-359, decided 31 October 2026).
+          Absent: a new form, version 1. Present: the next version of that form, its highest version + 1; no form with
+          that id in the caller''s scope is `404`.'
+        schema:
+          type: string
+          format: uuid
       requestBody:
         required: true
         content:
@@ -1641,11 +1660,13 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Created as a draft version
+          description: Created as a draft version (version 1 of a new form, or the next version of `formId`)
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/FormDefinition'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /forms/{formId}:
@@ -2535,6 +2556,21 @@ paths:
       description: 'BL-082. **A conversation could be closed and nothing recorded why**, so every one
         looked identical in a report — and a promise to ring back lived in somebody''s notebook.
 
+
+        **Stored on the conversation** (ADAM CR-346, options A and C, 30 October 2026; CHG-CR346-001): one
+        disposition per conversation, in `marketing.conversation`''s `disposition_outcome`, `callback_at`,
+        `callback_assigned_to_principal_id` and `disposition_note`. A later call replaces them (serverWins).
+        `Conversation.outcome` keeps its own meaning.
+
+
+        **It also ends the conversation**, because BO-799''s End conversation button is this call. From
+        `withAgent` or `waitingOnGuest` it moves the conversation to `resolved`, sets `closed_at` to now and
+        `Conversation.outcome` to `resolved`, and records the disposition, in the same transaction. On a
+        conversation already `resolved`, `abandoned` or `timedOut` it only records or replaces the
+        disposition. `withAssistant` or `queued` (no agent holds it) is `409` `conversation-not-ended`.
+        `outcome` `callbackScheduled` without `callbackAt` is `400` `validation` on `callbackAt`. A scheduled
+        callback changes nothing on the case. The answer is `200` with the `CallDisposition` as stored.
+
         '
       tags:
       - marketing
@@ -2562,8 +2598,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CallDisposition'
+        '400':
+          $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
-          description: 'The conversation has not ended (`withAssistant`, `queued`, `withAgent` or `waitingOnGuest`); a disposition records why it ended. Nothing is recorded.'
+          description: 'No agent holds the conversation (`withAssistant` or `queued`), so there is nothing to end
+            and no disposition to record (ADAM CR-346). Nothing is recorded.'
           x-ticvai-problem-types: [conversation-not-ended]
           content:
             application/problem+json:
@@ -4760,8 +4799,11 @@ paths:
 
         **A third path, with the same rules** (r8, IDENTITY-C55): the consents a guest gives on the registration
         form arrive as `identity.guestRegistered`, and Marketing''s consumer records each one through these
-        rules with source `registration` (idempotency: the event id and the purpose), so a registration never
-        leaves a consent unrecorded.
+        rules (idempotency: the event id and the purpose), so a registration never leaves a consent unrecorded.
+        **Its source is where the guest registered** (decided 30 October 2026, Chinmay, ADAM CR-371;
+        CHG-CR371-001): the event''s `channel` mapped to `ConsentSource`, `guestWeb` to `website`, `guestApp` to
+        `guestApp`, `kiosk` to `kiosk`. There is no `registration` source, and `consent_record_source_chk` refuses
+        one.
 
         **Two callers, two rules.** A guest recording their own consent uses a guest token and may only
         act on their own subject. An agent recording on a guest''s behalf uses a staff token, requires
@@ -5121,6 +5163,147 @@ paths:
                   noContact:
                     type: integer
                     description: Holders with no guest record to tell.
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /guest-one-time-codes:
+    post:
+      operationId: sendGuestOneTimeCode
+      security:
+      - serviceAuth: []
+      x-ticvai-audience:
+      - service
+      x-ticvai-auth: service
+      x-ticvai-agreed: '30 October 2026: ADAM CR-370 (Chinmay, with its follow-up of 31 October; CHG-CR370-001); the
+        identity.guestCodeIssued consumer, shaped as notifyPerformanceHolders'
+      summary: Send a guest the one-time code Identity minted
+      description: '**The `identity.guestCodeIssued` consumer that sends a guest''s one-time code** (decided 30 October
+        2026, Chinmay, ADAM CR-370; CHG-CR370-001). `requestGuestOtp`, `registerGuest` (channel email) and
+        `verifyGuestEmail` (mode send) mint the code in Identity, which is in another deployable, so the code reaches
+        Marketing by the outbox and this operation sends it. Invoked by the event relay, never by a screen, as
+        `notifyPerformanceHolders` is.
+
+
+        **What it does.** It decrypts `destination` and `code` at send time through the kernel''s field encryption
+        (#37050) and sends the code on `channel` through the tenant''s configured provider for that channel
+        (`marketing.communication_provider`), with the system template `guestOneTimeCode` in the guest''s `locale`. The
+        template carries its own subject line, so the message needs none. It writes a transactional
+        `marketing.message_dispatch` row for the send, without the code: sent under contract performance, not marketing
+        consent. The decrypted values are never logged or stored.
+
+
+        **Idempotent on `challengeId`**: a redelivered event finds the send already made and answers it. **Once
+        `expiresAt` has passed it stops retrying** and answers `expired`; the event is not dead-lettered for replay,
+        because an expired code is worthless.
+
+
+        **A code with no subject** (purpose `register` or `verify` to an identifier with no account, the CR-370
+        follow-up of 31 October 2026) is sent the same way; `marketing.message_dispatch` keys every row to a guest
+        (`subject_id` is required), so such a send writes no dispatch row.'
+      tags:
+      - message
+      x-ticvai-permission: null
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      x-ticvai-consumes:
+      - identity.guestCodeIssued
+      x-ticvai-reads:
+      - table: marketing.message_template
+        for: 'the system template guestOneTimeCode in the guest''s language (ADAM CR-370)'
+      - table: marketing.communication_provider
+        for: 'the tenant''s configured provider for the code''s channel (ADAM CR-370)'
+      x-ticvai-writes:
+      - table: marketing.message_dispatch
+        for: 'the transactional dispatch of the send, without the code (ADAM CR-370)'
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - eventId
+              - challengeId
+              - channel
+              - purpose
+              - expiresAt
+              - destination
+              - code
+              properties:
+                eventId:
+                  type: string
+                  description: The `identity.guestCodeIssued` event id, for the consumer's inbox record.
+                challengeId:
+                  type: string
+                  format: uuid
+                  x-ticvai-persisted: false
+                  description: The `identity.otp_challenge` row; the idempotency key.
+                subjectId:
+                  type: string
+                  format: uuid
+                  nullable: true
+                  description: The guest; null for a register or verify code to an identifier with no account.
+                channel:
+                  type: string
+                  enum:
+                  - email
+                  - sms
+                  - whatsapp
+                purpose:
+                  type: string
+                  x-ticvai-persisted: false
+                  enum: [login, register, verify, passwordReset, stepUp, emailVerification]
+                locale:
+                  type: string
+                  nullable: true
+                  x-ticvai-persisted: false
+                  description: The guest's language, which the template is sent in.
+                expiresAt:
+                  type: string
+                  format: date-time
+                  x-ticvai-persisted: false
+                  description: After it the code is not sent and the event is not retried.
+                destination:
+                  type: string
+                  writeOnly: true
+                  x-ticvai-secret: field-encrypted
+                  x-ticvai-persisted: false
+                  description: The address, field-encrypted (#37050); decrypted at send time, never stored here.
+                code:
+                  type: string
+                  writeOnly: true
+                  x-ticvai-secret: field-encrypted
+                  x-ticvai-persisted: false
+                  description: The code, field-encrypted (#37050); decrypted at send time, never stored or logged.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: The code was sent, now or already, or had expired.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - challengeId
+                - outcome
+                properties:
+                  challengeId:
+                    type: string
+                    format: uuid
+                  outcome:
+                    type: string
+                    enum:
+                    - sent
+                    - alreadySent
+                    - expired
+                  messageDispatchId:
+                    type: string
+                    nullable: true
+                    description: The dispatch row written; null when expired or for a code with no subject.
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/{subjectId}/consents/history:
@@ -9491,6 +9674,12 @@ paths:
         against with `recordDeviceConsent`. (decided 29 September, readiness close-out)
 
 
+        **The strictly necessary description is required in every language** (ADAM CR-347, decided 30 October
+        2026): a design whose `categories` has no `strictlyNecessary` entry, or whose `strictlyNecessary` entry's
+        `description` has no non-empty text for one of the codes in `languages`, is refused `422
+        strictly-necessary-description-missing`. Nothing is stored.
+
+
         **Written at its brand's node** (ADAM CR-314, option C, one decision with `setTrackingTechnology`,
         29 October 2026): a design's row is at the path of the brand `brandId` names, and the corporate
         design (`brandId` null) at the tenant root, so the upsert key holds once per brand and channel;
@@ -9539,8 +9728,8 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          x-ticvai-problem-types: [reject-harder-than-accept, non-essential-pre-ticked, do-not-sell-button-missing]
-          description: A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button.
+          x-ticvai-problem-types: [reject-harder-than-accept, non-essential-pre-ticked, do-not-sell-button-missing, strictly-necessary-description-missing]
+          description: A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button; or, `strictly-necessary-description-missing` (ADAM CR-347), one whose `categories` has no `strictlyNecessary` entry or whose `strictlyNecessary` entry's `description` has no non-empty text for one of the codes in `languages`. Nothing is stored.
           content:
             application/problem+json:
               schema:
@@ -9612,6 +9801,7 @@ paths:
       operationId: listPrivacyNoticePolicy
       x-ticvai-consumed-by:
         - "P13 CMS-028 Privacy Notice, Policy & Terms Version Management"
+        - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
       x-ticvai-read-via:
       - query: white-label#policyRecords
         route: in-process
@@ -9845,6 +10035,63 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /privacy-testing:
+    get:
+      operationId: listPrivacyChangeSets
+      x-ticvai-consumed-by:
+        - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
+      x-ticvai-audience:
+        - staff
+      x-ticvai-agreed: '31 October 2026: contract gap CHG-R12GT-001 (CMS-030 acts on a change set with approvePrivacyTesting and nothing read the change sets back); the rows approvePrivacyTesting returns, as listPrivacyNoticePolicy reads what setPrivacyNoticePolicyGovernance governs'
+      summary: Privacy change sets and where each stands
+      description: >
+        **The caller's brand's privacy change sets**, each as `approvePrivacyTesting` returns it after an
+        action: its status (draft, validated, submitted, approved, scheduled, published, rolled back,
+        rejected), the last validation's issues and simulation, its approval request, when it publishes or
+        published, and its audit trail. CMS-030 opens on this list and acts on the selected change set.
+        Filter by `status`. Ordered by `updatedAt` descending, `changeSetId` breaking every tie; where
+        `updatedAt` is null the row sorts last (NULLS LAST). Keyset cursor.
+      tags:
+        - consent
+      x-ticvai-permission: GUEST_VIEW
+      x-ticvai-scope-level: brand
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+            - draft
+            - validated
+            - submitted
+            - approved
+            - scheduled
+            - published
+            - rolledBack
+            - rejected
+        - $ref: ../shared/common.yaml#/components/parameters/PageSize
+        - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The change sets, newest change first
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/PrivacyConfigurationTestingApprovalPublicationView'
+        '403':
+          $ref: ../shared/common.yaml#/components/responses/Forbidden
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: approvePrivacyTesting
       x-ticvai-consumed-by:
@@ -13794,6 +14041,10 @@ paths:
   /dynamic-field-question/{formId}/{key}:
     put:
       operationId: setDynamicFieldQuestion
+      x-ticvai-reads:
+      - table: marketing.form_definition
+        for: 'the version row (id = formId, version = formVersion): none is 404, a status other than draft is 409
+          form-version-not-draft (ADAM CR-359)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.11-12 (11.1.4 Field Types, Required Fields, Validation, Data Mapping); the field list needs its write'
@@ -13801,7 +14052,13 @@ paths:
       description: >
         **An upsert keyed on `formId` + `formVersion` + `key`, on a `draft` version only** (409 once
         published: a change is a new version through `createForm`). Writes the `FormField` row and its
-        rule row together. `deleted: true` removes the field, refused (409) while a layout block
+        rule row together.
+
+        **The version is the `marketing.form_definition` row with `id` = `formId` and `version` =
+        `formVersion`** (ADAM CR-359, decided 30 October 2026): no such row is `404 not-found`, and a
+        `status` other than `draft` is `409 form-version-not-draft`. The field row is written with
+        `form_id` = `formId` and `form_version` = `formVersion`, and `form_definition_id` is also set to
+        `formId` until that column is retired. `deleted: true` removes the field, refused (409) while a layout block
         (`setDigitalWaiverForm`) still points at it. A condition naming a field that does not exist, a
         cycle between conditions, or validation that contradicts the type is refused (422).
         (decided 29 September, readiness close-out)
@@ -21812,6 +22069,7 @@ components:
       description: '**Taken from the backend workbook, 20 September.** Stores the auditable signature of a customer/guardian against an exact immutable waiver-template version.'
       required:
       - templateId
+      - formVersion
       - subjectName
       - signedName
       - signerType
@@ -21825,8 +22083,17 @@ components:
         templateId:
           x-ticvai-column: form_definition_id
           x-ticvai-references: marketing.form_definition
+          x-ticvai-references-version: formVersion
           type: string
           format: uuid
+          description: The waiver form signed (`FormDefinition.id`, the form); with `formVersion`, the exact version
+            row (ADAM CR-359).
+        formVersion:
+          type: integer
+          minimum: 1
+          readOnly: true
+          description: '**The exact version signed** (ADAM CR-359, decided 30 October 2026), which the row could not
+            record before: with `templateId`, the key of the `FormDefinition` version row the signature binds to.'
         customerId:
           type: string
           format: uuid
@@ -22681,6 +22948,7 @@ components:
           description: Where the opt-in happened, because a regulator asks.
         unsubscribeToken:
           x-ticvai-secret: blind-index
+          x-ticvai-blind-index-of: none   # hashes a token the server never keeps: kept key versions, not a re-hash (ADAM CR-339, ADR-0063 30 October)
           writeOnly: true
           type: string
           description: '**Unsubscribe must work without a login.** The link in a message carries the token
@@ -22945,6 +23213,12 @@ components:
     FormDefinition:
       type: object
       x-ticvai-persistence: marketing.form_definition + marketing.form_definition_field
+      # Each version is a row with the form's id, so the key is (id, version) (ADAM CR-359, decided 30 October 2026;
+      # the rule CR-228 set for configuration profiles, CHG-R8MIG-019; CHG-CR359-001).
+      x-ticvai-primary-key: [id, version]
+      # form_definition_field names its version row by (form_id, form_version) (DynamicFieldsQuestionsConditionalLogicView);
+      # form_definition_id, which held the same id, is withdrawn (ADAM CR-359): writers set it to formId until it is dropped.
+      x-ticvai-retired-columns: [marketing.form_definition_field.form_definition_id]
       description: 'CF-129, CL-04. **A waiver, a survey and a data-capture form are one mechanism.**
 
         A waiver is this form with a signature. A survey is this form with a scale. A demographic capture
@@ -22968,6 +23242,10 @@ components:
           readOnly: true
           type: string
           format: uuid
+          description: '**The form, not one version of it** (ADAM CR-359, decided 30 October 2026): every version of a
+            form is a row with this same id, and (`id`, `version`) is the row''s key, as CR-228 made it for
+            configuration profiles. It is the `formId` every path and body names, with `formVersion` for one
+            version, and the id `setWaiverTemplateMaster` and `WaiverRequirement.formDefinitionId` name the form by.'
         name:
           type: string
         kind:
@@ -23000,6 +23278,9 @@ components:
             once anything is submitted against it.** A change creates a new version,
             and the old one stays readable forever — 2.15.13 requires the exact accepted version retained,
             which is legal evidence rather than a nicety.
+
+            **One row per version, under the form''s `id`** (ADAM CR-359): (`id`, `version`) is the key, so version
+            N of form X is the row with `id` X and `version` N.
 
             '
         fields:
@@ -23956,12 +24237,22 @@ components:
         no sale, sale successful. **That is the measure a contact centre runs on**, and its absence makes
         every conversation look identical in a report.
 
+
+        **Stored on the conversation it describes** (ADAM CR-346, 30 October 2026; CHG-CR346-001): four
+        nullable columns of `marketing.conversation`, written by `setCallDisposition`; a later call replaces
+        them. `outcome` lands in `disposition_outcome`, never in the conversation''s own `outcome`.
+
         '
+      x-ticvai-persistence: marketing.conversation
       required:
       - outcome
       properties:
         outcome:
           type: string
+          x-ticvai-column: disposition_outcome
+          x-ticvai-column-nullable: true
+          description: The contact-centre result. Required on the call; stored nullable, because a conversation
+            has no disposition until `setCallDisposition` records one.
           enum:
           - information
           - resolved
@@ -23976,17 +24267,24 @@ components:
           type: string
           format: date-time
           nullable: true
+          x-ticvai-column: callback_at
           description: '**An agent could not schedule a callback with the case attached**, so a promise
             to ring back lived in somebody''s notebook.
+
+
+            Required when `outcome` is `callbackScheduled` (`400` `validation` on `callbackAt`; ADAM CR-346).
 
             '
         callbackAssignedToPrincipalId:
           type: string
           format: uuid
           nullable: true
+          x-ticvai-column: callback_assigned_to_principal_id
+          x-ticvai-references: identity.principal
         note:
           type: string
           nullable: true
+          x-ticvai-column: disposition_note
     TouchPoint:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestIntelligence, getGuestTimeline
       type: object
@@ -25375,6 +25673,7 @@ components:
           maxLength: 64
           x-ticvai-unique-compare: exact
           x-ticvai-secret: blind-index
+          x-ticvai-blind-index-of: tokenRef   # re-hashed from token_ciphertext when the key rotates (ADAM CR-339)
           description: '**A keyed hash of the token, not the token** (decided 14 October 2026, CHG-MKT-001; ADR-0063
             section 4 as amended): HMAC-SHA-256 of the token under the tenant''s blind-index key, written as 64
             lowercase hex characters. Keyed, so a token somebody holds cannot be checked against the table. It is
@@ -29292,6 +29591,9 @@ components:
           x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
+          description: 'A `strictlyNecessary` entry is required, with a `description` that has non-empty text for
+            every code in `languages`; `setCookieBannerDesign` refuses a design without it (`422
+            strictly-necessary-description-missing`, ADAM CR-347).'
           items:
             type: object
             required:
@@ -35652,6 +35954,10 @@ components:
         formId:
           type: string
           format: uuid
+          x-ticvai-references: marketing.form_definition
+          x-ticvai-references-version: formVersion
+          description: The form (`FormDefinition.id`); with `formVersion`, the draft version row the field belongs to
+            (ADAM CR-359).
         formVersion:
           type: integer
           minimum: 1
@@ -39380,13 +39686,18 @@ components:
           nullable: true
         formDefinitionId:
           x-ticvai-references: marketing.form_definition
+          x-ticvai-references-version: formVersion
           type: string
           format: uuid
+          description: The form required (`FormDefinition.id`, the form; ADAM CR-359). With `formVersion`, the version
+            row it references.
         formVersion:
           type: integer
           minimum: 1
           nullable: true
-          description: The version assigned, or signed once completed.
+          description: 'The version assigned, or signed once completed. With `formDefinitionId`, a reference to that
+            `FormDefinition` version row (ADAM CR-359). While it is null the key checks nothing (a composite key matches
+            simply), so the writer checks that the form exists.'
         isMandatory:
           type: boolean
           description: False for an optional consent (e.g. media), which never blocks readiness.

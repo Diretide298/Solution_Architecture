@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 75 of 281 |
+| Operations in the slice | 75 of 283 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -822,7 +822,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 | banner.links | array of object |  |  |
 | banner.links[].label | LocalisedText | yes | Text keyed by locale code, one entry per locale the venue publishes. |
 | banner.links[].policyKind | enum (privacy, cookie, termsAndConditions) | yes |  |
-| banner.categories | array of object | yes | (min items 1) |
+| banner.categories | array of object | yes | A strictlyNecessary entry is required, with a description that has non-empty text for every code in languages; setCookieBannerDesign refuses a design without it (422 strictly-necessary-description-mi… (min items 1) |
 | banner.categories[].category | enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes |  |
 | banner.categories[].description | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
 | banner.categories[].defaultOn | boolean | yes | True only for strictlyNecessary, which is always active. |
@@ -1106,7 +1106,7 @@ Where `updatedAt` is null the row sorts after the rows that have it (NULLS LAST)
 
 **Append-only.** A change of mind is a new record, never an edit — the history of what a guest agreed to and when is the evidence that matters if it is ever questioned.
 Every record captures the notice version, the channel, the purpose, the source and the timestamp.
-**A third path, with the same rules** (r8, IDENTITY-C55): the consents a guest gives on the registration form arrive as `identity.guestRegistered`, and Marketing's consumer records each one through these rules with source `registration` (idempotency: the event id and the purpose), so a registration never leaves a consent unrecorded.
+**A third path, with the same rules** (r8, IDENTITY-C55): the consents a guest gives on the registration form arrive as `identity.guestRegistered`, and Marketing's consumer records each one through these rules (idempotency: the event id and the purpose), so a registration never leaves a consent unrecorded. **Its source is where the guest registered** (decided 30 October 2026, Chinmay, ADAM CR-371; CHG-CR371-001): the event's `channel` mapped to `ConsentSource`, `guestWeb` to `website`, `guestApp` to `guestApp`, `kiosk` to `kiosk`. There is no `registration` source, and `consent_record_source_chk` refuses one.
 **Two callers, two rules.** A guest recording their own consent uses a guest token and may only act on their own subject. An agent recording on a guest's behalf uses a staff token, requires `GUEST_MANAGE`, and the resulting record names them in `recordedByPrincipalId` — consent captured by proxy has to be attributable. **The staff audience is declared** (contract gap CHG-WIR-007, POS-027; CHG-CSA-045): the till records the consent of a guest enrolled at the counter with source `agentRecorded`. Creating the guest's profile at the till is identity's (`registerGuest`, spine).
 **`GUEST_MANAGE` is declared** (Chinmay, 12 October 2026, approved breaking change BC-040, CHG-R6-044): a staff caller needs it to record a guest's consent, as the rule above always said; a guest caller still records their own with no permission (`x-ticvai-self-scoped: subject`), as `getGuestConsents` reads it.
 
@@ -1293,6 +1293,8 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 **An upsert keyed on `brandId` + `channel` that always writes a new version** (the pack: banner wording and configuration must be version controlled). Saved as `draft`; publishing goes through `approvePrivacyTesting`. `rejectIsOneClick: false`, a non-essential category with `defaultOn: true` or a missing `strictlyNecessary` description is refused (422), and so is a design whose `regulatoryRegimes` include `ccpaCpra` with no `doNotSellOrShare` button (29 September, build). The published version is what visitors get from `getCookieConsentRuntime` and decide against with `recordDeviceConsent`. (decided 29 September, readiness close-out)
 
+**The strictly necessary description is required in every language** (ADAM CR-347, decided 30 October 2026): a design whose `categories` has no `strictlyNecessary` entry, or whose `strictlyNecessary` entry's `description` has no non-empty text for one of the codes in `languages`, is refused `422 strictly-necessary-description-missing`. Nothing is stored.
+
 **Written at its brand's node** (ADAM CR-314, option C, one decision with `setTrackingTechnology`, 29 October 2026): a design's row is at the path of the brand `brandId` names, and the corporate design (`brandId` null) at the tenant root, so the upsert key holds once per brand and channel; writing it needs `GUEST_MANAGE` at that node or above (the tenant, for the corporate design). The table reads beneath (`x-ticvai-rls: read-beneath`), so every venue's staff and storefront read their brand's banner and the corporate one. A draft's `noticeVersion` is null; `approvePrivacyTesting` sets it when it publishes the version.
 
 |  |  |
@@ -1335,7 +1337,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 | links | array of object |  |  |
 | links[].label | LocalisedText | yes | Text keyed by locale code, one entry per locale the venue publishes. |
 | links[].policyKind | enum (privacy, cookie, termsAndConditions) | yes |  |
-| categories | array of object | yes | (min items 1) |
+| categories | array of object | yes | A strictlyNecessary entry is required, with a description that has non-empty text for every code in languages; setCookieBannerDesign refuses a design without it (422 strictly-necessary-description-mi… (min items 1) |
 | categories[].category | enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes |  |
 | categories[].description | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
 | categories[].defaultOn | boolean | yes | True only for strictlyNecessary, which is always active. |
@@ -1368,7 +1370,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 | links | array of object |  |  |
 | links[].label | LocalisedText | yes | Text keyed by locale code, one entry per locale the venue publishes. |
 | links[].policyKind | enum (privacy, cookie, termsAndConditions) | yes |  |
-| categories | array of object | yes | (min items 1) |
+| categories | array of object | yes | A strictlyNecessary entry is required, with a description that has non-empty text for every code in languages; setCookieBannerDesign refuses a design without it (422 strictly-necessary-description-mi… (min items 1) |
 | categories[].category | enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes |  |
 | categories[].description | LocalisedText |  | Text keyed by locale code, one entry per locale the venue publishes. |
 | categories[].defaultOn | boolean | yes | True only for strictlyNecessary, which is always active. |
@@ -1388,14 +1390,15 @@ Each purpose names the channels it covers, whether it is required for service, a
 | 200 |  | The new draft version |
 | 400 | BadRequest | Validation failed |
 | 409 |  | Refused, and nothing is stored. |
-| 422 |  | A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names ccpaCpra without a doNotSellOrShare button. |
+| 422 |  | A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names ccpaCpra without a doNotSellOrShare button; or, strictly-necessary-description-missing (ADAM CR-347),… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setDynamicFieldQuestion
 
 **`PUT /dynamic-field-question/{formId}/{key}`**: Create, change or remove one field of a draft waiver version
 
-**An upsert keyed on `formId` + `formVersion` + `key`, on a `draft` version only** (409 once published: a change is a new version through `createForm`). Writes the `FormField` row and its rule row together. `deleted: true` removes the field, refused (409) while a layout block (`setDigitalWaiverForm`) still points at it. A condition naming a field that does not exist, a cycle between conditions, or validation that contradicts the type is refused (422). (decided 29 September, readiness close-out)
+**An upsert keyed on `formId` + `formVersion` + `key`, on a `draft` version only** (409 once published: a change is a new version through `createForm`). Writes the `FormField` row and its rule row together.
+**The version is the `marketing.form_definition` row with `id` = `formId` and `version` = `formVersion`** (ADAM CR-359, decided 30 October 2026): no such row is `404 not-found`, and a `status` other than `draft` is `409 form-version-not-draft`. The field row is written with `form_id` = `formId` and `form_version` = `formVersion`, and `form_definition_id` is also set to `formId` until that column is retired. `deleted: true` removes the field, refused (409) while a layout block (`setDigitalWaiverForm`) still points at it. A condition naming a field that does not exist, a cycle between conditions, or validation that contradicts the type is refused (422). (decided 29 September, readiness close-out)
 
 |  |  |
 |---|---|
@@ -1406,7 +1409,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
-| Reads | `cache:idempotency`, `marketing.form_definition_field`, `marketing.waiver_field_rule` |
+| Reads | `cache:idempotency`, `marketing.form_definition`, `marketing.form_definition_field`, `marketing.waiver_field_rule` |
 | Writes | `cache:idempotency`, `marketing.form_definition_field`, `marketing.waiver_field_rule` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
@@ -1422,7 +1425,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| formId | string (uuid) | yes |  |
+| formId | string (uuid) | yes | The form (FormDefinition.id); with formVersion, the draft version row the field belongs to (ADAM CR-359). |
 | formVersion | integer | yes | (min 1) |
 | key | string | yes | (max length 60; pattern ^[a-zA-Z][a-zA-Z0-9_]*$) |
 | label | LocalisedText | yes | Text keyed by locale code, one entry per locale the venue publishes. |
@@ -1455,7 +1458,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| formId | string (uuid) | yes |  |
+| formId | string (uuid) | yes | The form (FormDefinition.id); with formVersion, the draft version row the field belongs to (ADAM CR-359). |
 | formVersion | integer | yes | (min 1) |
 | key | string | yes | (max length 60; pattern ^[a-zA-Z][a-zA-Z0-9_]*$) |
 | label | LocalisedText | yes | Text keyed by locale code, one entry per locale the venue publishes. |
@@ -3032,6 +3035,8 @@ under; the change applies to what is earned from now. Tiers are not changed here
 CF-129. **One mechanism, three uses.** A waiver is this with a signature, a survey is this with a scale, a capture is this at the point of sale.
 Published as a version. **A change creates a new version and the old one stays readable forever** — 2.15.13 requires the exact accepted version retained.
 
+**A new form, or the next version of one** (ADAM CR-359, decided 31 October 2026; the CR-228 rule for configuration profiles). Without `formId` the body is a new form: a new `id`, `version` 1, as before. With `formId` it is the next version of that form: a row with `id` = `formId` and `version` = the form's highest version + 1, saved as a draft from the body alone; nothing is copied implicitly from an earlier version (its fields and layout are whatever this body and the later field and layout writes give it). No form with that id is `404`. The next version takes the same permission and scope as an update of that form: `MARKETING_MANAGE` at the form's node or above, and a form outside the caller's scope is the same `404`.
+
 |  |  |
 |---|---|
 | Permission | `MARKETING_MANAGE` |
@@ -3050,12 +3055,13 @@ Published as a version. **A change creates a new version and the old one stays r
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+| formId | query |  | string (uuid) | The form this is the next version of (FormDefinition.id; ADAM CR-359, decided 31 October 2026). |
 
 **Request body**: `FormDefinition`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes | (read-only) |
+| id | string (uuid) | yes | The form, not one version of it (ADAM CR-359, decided 30 October 2026): every version of a form is a row with this same id, and (id, version) is the row's key, as CR-228 made it for configuration pro… (read-only) |
 | name | string | yes |  |
 | kind | enum (waiver, survey, dataCapture, consentForm, incidentReport, registration) | yes |  |
 | consentPurposes | array of enum (facePass, faceTag, marketing, photography, waiver) |  | What a consentForm consents to (Chinmay, 2 October, batch 4; follows BO-188: biometric capture needs consent on the venue's own form; CHG-CSA-026). |
@@ -3089,7 +3095,7 @@ Published as a version. **A change creates a new version and the old one stays r
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes | (read-only) |
+| id | string (uuid) | yes | The form, not one version of it (ADAM CR-359, decided 30 October 2026): every version of a form is a row with this same id, and (id, version) is the row's key, as CR-228 made it for configuration pro… (read-only) |
 | name | string | yes |  |
 | kind | enum (waiver, survey, dataCapture, consentForm, incidentReport, registration) | yes |  |
 | consentPurposes | array of enum (facePass, faceTag, marketing, photography, waiver) |  | What a consentForm consents to (Chinmay, 2 October, batch 4; follows BO-188: biometric capture needs consent on the venue's own form; CHG-CSA-026). |
@@ -3123,7 +3129,8 @@ Published as a version. **A change creates a new version and the old one stays r
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 201 |  | Created as a draft version |
+| 201 |  | Created as a draft version (version 1 of a new form, or the next version of formId) |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createInvitationCampaign
@@ -3346,7 +3353,7 @@ Absent `version` returns the `published` version to a guest and the latest to st
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes | (read-only) |
+| id | string (uuid) | yes | The form, not one version of it (ADAM CR-359, decided 30 October 2026): every version of a form is a row with this same id, and (id, version) is the row's key, as CR-228 made it for configuration pro… (read-only) |
 | name | string | yes |  |
 | kind | enum (waiver, survey, dataCapture, consentForm, incidentReport, registration) | yes |  |
 | consentPurposes | array of enum (facePass, faceTag, marketing, photography, waiver) |  | What a consentForm consents to (Chinmay, 2 October, batch 4; follows BO-188: biometric capture needs consent on the venue's own form; CHG-CSA-026). |
@@ -5553,6 +5560,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| disposition_outcome | text | no | The contact-centre result. |
+| callback_at | timestamptz | no | An agent could not schedule a callback with the case attached, so a promise to ring back lived in somebody's notebook. |
+| callback_assigned_to_principal_id | uuid | no |  |
+| disposition_note | text | no |  |
 | id | uuid | yes |  |
 | telephony | jsonb | no | BL-083. |
 | assist_session_id | uuid | no | BL-094. |
@@ -5613,7 +5624,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | buttons | jsonb | no |  |
 | is_reject_one_click | boolean | yes | Must be true. |
 | links | jsonb | no |  |
-| categories | jsonb | yes |  |
+| categories | jsonb | yes | A strictlyNecessary entry is required, with a description that has non-empty text for every code in languages; setCookieBannerDesign refuses a design without it (422 strictly-necessary-description-mi… |
 | languages | text[] | yes | Every language the storefront serves; Arabic renders right to left. |
 | regulatory_regimes | text[] | no | 2.6.60 (29 September, build). |
 | records_ip_address | boolean | no | 2.6.55, "if legally permitted" (29 September, build). |
@@ -5671,7 +5682,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes |  |
+| id | uuid | yes | The form, not one version of it (ADAM CR-359, decided 30 October 2026): every version of a form is a row with this same id, and (id, version) is the row's key, as CR-228 made it for configuration pro… |
 | name | text | yes |  |
 | kind | text | yes |  |
 | consent_purposes | text[] | no | What a consentForm consents to (Chinmay, 2 October, batch 4; follows BO-188: biometric capture needs consent on the venue's own form; CHG-CSA-026). |
@@ -5699,8 +5710,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | consent_purpose_id | uuid | no |  |
 | show_when | jsonb | no |  |
 | presentation | text | no | How a choice is drawn (products module, 16 October 2026 minutes 4.13: the data mask's field types are text, drop-down, radio and check box; CHG-R8PRD-009). |
-| form_definition_id | uuid | yes | The parent row. |
-| form_id | uuid | yes |  |
+| form_id | uuid | yes | The form (FormDefinition.id); with formVersion, the draft version row the field belongs to (ADAM CR-359). |
 | form_version | integer | yes |  |
 | key | text | yes |  |
 | label | jsonb | yes |  |
@@ -6202,7 +6212,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | performance_id | uuid | no |  |
 | group_booking_id | uuid | no |  |
 | venue_id | uuid | no |  |
-| form_definition_id | uuid | yes |  |
+| form_definition_id | uuid | yes | The form required (FormDefinition.id, the form; ADAM CR-359). |
 | form_version | integer | no | The version assigned, or signed once completed. |
 | is_mandatory | boolean | yes | False for an optional consent (e.g. |
 | status | text | yes |  |
@@ -6258,18 +6268,18 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-206 operations, added to this service in later releases without changing any of the above.
+208 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | campaign | `getCampaign`, `getCampaignPerformance`, `listCampaigns`, `pauseCampaign`, `testSendCampaign`, `unscheduleCampaign` |
 | case | `addCaseMessage`, `createCase`, `createCaseClassificationIntelligent`, `escalateCase`, `getCase`, `getCaseInvestigationResolution`, `listAgentWorkloadAvailability`, `listCaseCategories`, `listCaseResolutionClosure`, `listCases`, `listContact`, `listContactAutomation`, `listCustomerService`, `listCustomerServiceProfile`, `listEscalationCollaborationInternal`, `listEscalationCriticalCase`, `listIntelligentRoutingSkills`, `listQualityAgentEvaluation`, `listServiceQueues`, `listServiceRootCause`, `listSlaPolicyService`, `listUnifiedInteractionCommunication`, `reopenCase`, `setAgentServiceProfile`, `setCaseCategoryDefinition`, `setCaseInternalRequest`, `setCaseInvestigationResolution`, `setCaseResolution`, `setContactAutomation`, `setCustomerServiceCopilot`, `setIntelligentRoutingSkill`, `setOrderBookingTicket`, `setQualityEvaluation`, `setRefundCompensationService`, `setServiceQueueDefinition`, `updateCase` |
-| consent | `actOnWaiverRequirements`, `addSuppression`, `approveWaiverTesting`, `getConsentHistory`, `getDeviceConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanFindings`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listPublishedTrackingTechnologies`, `listSiteWaiverException`, `listTrackingTechnologyCatalogue`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCheckoutConsents`, `recordCookieScan`, `recordDeviceConsent`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnologyCatalogueEntry`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
+| consent | `actOnWaiverRequirements`, `addSuppression`, `approveWaiverTesting`, `getConsentHistory`, `getDeviceConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanFindings`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyChangeSets`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listPublishedTrackingTechnologies`, `listSiteWaiverException`, `listTrackingTechnologyCatalogue`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCheckoutConsents`, `recordCookieScan`, `recordDeviceConsent`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnologyCatalogueEntry`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
 | feedback | `listCustomerSatisfactionFeedback`, `listReviews`, `respondToReview` |
 | general | `getCustomerServiceCopilot` |
 | guest | `getGuestProfile`, `mergeGuestProfiles`, `updateGuestProfile` |
 | guests | `activateAudience`, `checkGuestCheckoutMatch`, `decideDuplicateCandidate`, `decideGuestCheckoutMatch`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestMatchPolicy`, `setGuestRelationships`, `setIdentityResolutionRules` |
 | loyalty | `adjustLoyaltyPoints`, `getLoyaltyRules`, `issueReward`, `listBadges`, `listLoyaltyCampaigns`, `listLoyaltyPointEntries`, `listRewardAssignments`, `setBadge`, `setLoyaltyCampaign` |
 | marketing | `accrueLoyaltyPoints`, `activateChallenge`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `endKioskAssist`, `getChallenge`, `getConversation`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `listChallenges`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageDispatches`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordPrivacyIncident`, `recordSaleOwnerAnswers`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `transferConversation` |
-| message | `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `notifyPerformanceHolders`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
+| message | `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `notifyPerformanceHolders`, `sendGuestOneTimeCode`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
 | segment | `listSegmentMembers`, `listSegments`, `previewSegment`, `previewSegmentDraft` |

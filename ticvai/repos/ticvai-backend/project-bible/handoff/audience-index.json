@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-29",
+ "generated": "2026-10-31",
  "note": "Derived from `x-ticvai-audience` on every operation. **One field, eight values** \u2014 `x-ticvai-guest-callable` and `x-ticvai-auth` were two vocabularies answering the same question differently and were collapsed on 18 August (ADR-0025).",
  "field": "x-ticvai-audience",
  "values": [
@@ -111,7 +111,7 @@
   }
  },
  "totals": {
-  "operations": 2857,
+  "operations": 2860,
   "screens": 2453,
   "flows": 291
  },
@@ -214,7 +214,6 @@
     "marketing.cookie_banner_design",
     "marketing.device_consent",
     "marketing.device_consent_category",
-    "marketing.message_dispatch",
     "marketing.tracking_technology",
     "orders.cart",
     "orders.cart_line",
@@ -257,7 +256,7 @@
     "screens": 0,
     "flows": 14,
     "contracts": 7,
-    "tables": 74
+    "tables": 73
    }
   },
   "device": {
@@ -1840,6 +1839,7 @@
     "runSemanticQuery",
     "scoreApprovalRequest",
     "scoreTransactionRisk",
+    "sendGuestOneTimeCode",
     "sendTransactionalMessage",
     "setTenantDomainMapping",
     "settleDeposit",
@@ -1942,6 +1942,7 @@
     "ledger.tax_invoice_template",
     "marketing.campaign",
     "marketing.communication_policy_decision",
+    "marketing.communication_provider",
     "marketing.consent_record",
     "marketing.consent_record_channel",
     "marketing.cookie_scan_finding",
@@ -1958,6 +1959,7 @@
     "marketing.loyalty_programme",
     "marketing.message_dispatch",
     "marketing.message_dispatch_attempt",
+    "marketing.message_template",
     "marketing.suppression",
     "marketing.touch_point",
     "marketing.tracking_technology",
@@ -2015,11 +2017,11 @@
     "whitelabel.guided_choice_question"
    ],
    "counts": {
-    "operations": 68,
+    "operations": 69,
     "screens": 0,
     "flows": 5,
     "contracts": 18,
-    "tables": 135
+    "tables": 137
    }
   },
   "staff": {
@@ -2767,6 +2769,7 @@
     "getSiteSetupProgress",
     "getSsoConfig",
     "getStaffingCoverage",
+    "getStaffingRules",
     "getStockPositions",
     "getStockTransfer",
     "getStockValuation",
@@ -3431,6 +3434,7 @@
     "listPricingVersionBaseline",
     "listPrincipals",
     "listPrivacy",
+    "listPrivacyChangeSets",
     "listPrivacyCompliance",
     "listPrivacyComplianceExceptions",
     "listPrivacyConsent",
@@ -8162,7 +8166,7 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 2646,
+    "operations": 2648,
     "screens": 2164,
     "flows": 138,
     "contracts": 33,

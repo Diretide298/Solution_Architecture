@@ -32,7 +32,8 @@ transitions:
   operation: approveDevice
   trigger: operation
   guard: The second person rejects it, with a reason. A rejected device never reaches `active`; it is
-    retired with `enrolDevice`
+    retired with `enrolDevice`, which retires from any enrolment state but `retired` (states/device-enrolment.yaml;
+    ADAM CR-354)
   requiresApproval: true
 notes: '**Both outcomes are terminal.** A rejected device that is fixed and offered again is registered
   again, with a new enrolment code, so the history shows each attempt and who decided it. MoM 15 September

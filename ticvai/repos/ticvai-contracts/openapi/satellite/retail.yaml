@@ -1484,6 +1484,14 @@ paths:
         `awaitingCollection` or `partiallyCollected` only. A drop that was never collected (the uncollected reversal
         has run) collects without it. The default `collectBy` is the close of the collection point's day (its
         `closesAt`, see `createShopAndDrop`).
+
+
+        **A partial take from `uncollected`, and the deadline's clock** (ADAM CR-345, Chinmay, 30 October 2026, as
+        recommended; CHG-CR345-001). A collection from `uncollected` that leaves something behind keeps the drop
+        `uncollected`, with its lines' `collectedQuantity` grown; the call that takes the last of it moves it to
+        `collected`. `pastCollectBy` never applies to an uncollected drop, and the state model is unchanged.
+        `pastCollectBy` compares `collect_by` with the server's clock when the call arrives; `recordedAt` is stored
+        as `collected_at` and decides nothing.
       tags: [floor]
       x-ticvai-permission: ORDER_MODIFY
       x-ticvai-scope-level: venue
@@ -1508,7 +1516,8 @@ paths:
                   description: '**What is handed over, per line** (R8 blocker APPROVALS-TENANCY-C34): each line''s
                     `collectedQuantity` grows by `quantity`, never past the line''s `quantity` (a larger one is 400).
                     Neither `lines` nor `lineIds` sent: every line''s remaining quantity is collected. The drop becomes
-                    `collected` when every line is fully collected, else `partiallyCollected`.'
+                    `collected` when every line is fully collected, else `partiallyCollected`; a drop that was
+                    `uncollected` stays `uncollected` until the call that takes the last of it (ADAM CR-345).'
                   items:
                     type: object
                     required: [lineId, quantity]
@@ -1527,7 +1536,8 @@ paths:
                   type: string
                   format: date-time
                   x-ticvai-stored-as: retail.shop_and_drop.collected_at
-                  description: When the device recorded the handover; kept as `collectedAt` (ADAM CR-104).
+                  description: 'When the device recorded the handover; kept as `collectedAt` (ADAM CR-104). It
+                    decides nothing: `pastCollectBy` is judged on the server''s clock when the call arrives (ADAM CR-345).'
       responses:
         '200':
           headers:
@@ -1555,7 +1565,12 @@ paths:
             Already collected (`alreadyCollected`), or past the collection deadline
             (`pastCollectBy`). `refusedReason` says which.
 
-            Also refused when the shop and drop is `disposed`; states/shop-and-drop.yaml moves this call only from `awaitingCollection`, `partiallyCollected` or `uncollected`. (r10 default ruling, CHG-R10GEN-005)
+            Also refused when the shop and drop is `disposed` (`disposed`); states/shop-and-drop.yaml moves this call only from `awaitingCollection`, `partiallyCollected` or `uncollected`. (r10 default ruling, CHG-R10GEN-005)
+
+            One problem type per reason (ADAM CR-345, CHG-CR345-001): `shop-and-drop-already-collected`
+            (`alreadyCollected`), `shop-and-drop-past-collect-by` (`pastCollectBy`) and `shop-and-drop-disposed`
+            (`disposed`).
+          x-ticvai-problem-types: [shop-and-drop-already-collected, shop-and-drop-past-collect-by, shop-and-drop-disposed]
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/ShopAndDropProblem' }
@@ -2687,6 +2702,8 @@ components:
                 - collectionPointClosed
                 - alreadyCollected
                 - pastCollectBy
+                - disposed
+              description: 'Which refusal. `disposed` (ADAM CR-345): collectShopAndDrop on a drop already disposed of.'
             lineIds:
               type: array
               description: For `itemNotDroppable`, the sale lines that cannot be dropped.

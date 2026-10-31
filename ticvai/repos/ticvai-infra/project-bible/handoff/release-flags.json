@@ -6,8 +6,8 @@
  },
  "counts": {
   "appModules": 303,
-  "operations": 2568,
-  "sharedOperations": 1411
+  "operations": 2570,
+  "sharedOperations": 1413
  },
  "appModules": {
   "AM-ACCREDITATION-P08": {
@@ -2024,9 +2024,7 @@
     "subscription#getPlan",
     "tenancy#listCellEndpoints",
     "tenancy#requeueDeadLetter",
-    "white-label#recordStorefrontSessionEvents",
-    "white-label#setAnalyticsProvider",
-    "white-label#setMaintenanceMode"
+    "white-label#recordStorefrontSessionEvents"
    ]
   },
   "AM-FOUNDATION-SETUP": {
@@ -6558,6 +6556,8 @@
     "marketing-crm#listCookieScanPolicies",
     "marketing-crm#listCookieScans",
     "marketing-crm#listCookieTrackingDigital",
+    "marketing-crm#listPrivacyChangeSets",
+    "marketing-crm#listPrivacyNoticePolicy",
     "marketing-crm#listTrackingTechnologyCatalogue",
     "marketing-crm#recordCookieScan",
     "marketing-crm#setCookieBannerDesign",
@@ -6579,6 +6579,8 @@
     "marketing-crm#listCookieScanPolicies",
     "marketing-crm#listCookieScans",
     "marketing-crm#listCookieTrackingDigital",
+    "marketing-crm#listPrivacyChangeSets",
+    "marketing-crm#listPrivacyNoticePolicy",
     "marketing-crm#listTrackingTechnologyCatalogue",
     "marketing-crm#recordCookieScan",
     "marketing-crm#setCookieBannerDesign",
@@ -6797,6 +6799,7 @@
     "fnb#getAllergenVerification",
     "fnb#getFnbDeliveryPolicy",
     "fnb#getHaccpStatus",
+    "fnb#getKitchenSla",
     "fnb#getMenu",
     "fnb#getProductionRun",
     "fnb#getTableMap",
@@ -6887,6 +6890,7 @@
     "fnb#createDeliveryLocation",
     "fnb#getHaccpStatus",
     "fnb#getKitchenRoutingRules",
+    "fnb#getKitchenSla",
     "fnb#getMenu",
     "fnb#getProductionRun",
     "fnb#list86Events",
@@ -7843,6 +7847,7 @@
     "tenancy#listOrgUnits",
     "tenancy#updateOrgUnit",
     "workforce#createRotaAssignment",
+    "workforce#getStaffingRules",
     "workforce#listRotaAssignments",
     "workforce#requestShiftSwap",
     "workforce#setStaffingRules",
@@ -7874,6 +7879,7 @@
     "BO-866",
     "BO-870",
     "BO-877",
+    "BO-881",
     "BO-911"
    ],
    "operations": [
@@ -7962,8 +7968,10 @@
     "tenancy#listOrgUnits",
     "tenancy#updateOrgUnit",
     "workforce#createRotaAssignment",
+    "workforce#getStaffingRules",
     "workforce#listRotaAssignments",
     "workforce#requestShiftSwap",
+    "workforce#setStaffingRules",
     "workforce#updateRotaAssignment"
    ]
   },

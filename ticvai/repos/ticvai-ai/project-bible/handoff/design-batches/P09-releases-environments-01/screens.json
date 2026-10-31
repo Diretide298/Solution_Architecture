@@ -196,7 +196,7 @@
     "id": "confirmWithdrawRelease",
     "component": "confirmDialog",
     "trigger": "Withdraw release",
-    "body": "**Names what `withdrawRelease` changes and what it leaves alone**, in the consequence rather than the verb. A release version this affects should be identified in the dialog, not just counted. **Collects what `withdrawRelease` sends before it is called.** Required: `reason`.",
+    "body": "**Names what `withdrawRelease` changes and what it leaves alone**, in the consequence rather than the verb. A release version this affects should be identified in the dialog, not just counted. **Collects what `withdrawRelease` sends before it is called.** Required: `reason`; for a release `inStaging` or `inProduction` also `approverPrincipalId` (a second person, not the caller) and `stepUpToken`, as `formPromoteRelease` collects them (ADAM CR-356). A release `inDev` needs neither.",
     "provenance": "contract platform-ops.yaml POST /releases/{releaseId}/withdraw"
    },
    {

@@ -222,7 +222,7 @@
  "counts": {
   "core": 519,
   "setup": 274,
-  "allOperations": 2857
+  "allOperations": 2860
  },
  "services": {
   "AccessService": {
@@ -263,7 +263,7 @@
   "MarketingService": {
    "core": 53,
    "setup": 22,
-   "total": 281
+   "total": 283
   },
   "OrderService": {
    "core": 90,
@@ -288,7 +288,7 @@
   "TenancyService": {
    "core": 17,
    "setup": 21,
-   "total": 214
+   "total": 215
   },
   "VenueOpsService": {
    "core": 45,
@@ -2811,6 +2811,7 @@
     "CMS-004",
     "CMS-010",
     "CMS-063",
+    "CMS-076",
     "SUP-013"
    ],
    "enables": []
@@ -4490,6 +4491,7 @@
     "POS"
    ],
    "screens": [
+    "BO-134",
     "KIT-009"
    ],
    "enables": []

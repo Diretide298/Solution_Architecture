@@ -1258,7 +1258,9 @@
   "identity.subject_data_export_part": "2026-10-29",
   "marketing.seo_metadata": "2026-10-29",
   "venuemap.visit_planner_question": "2026-10-29",
-  "whitelabel.received_release": "2026-10-29"
+  "whitelabel.received_release": "2026-10-29",
+  "platform.blind_index_rehash": "2026-10-31",
+  "platform.tenant_field_key": "2026-10-31"
  },
  "renames": [
   {
@@ -1674,5 +1676,5 @@
   "platform.device_heartbeat": "2026-10-14"
  },
  "baseline": "2026-09-19",
- "generated": "2026-10-29"
+ "generated": "2026-10-31"
 }

@@ -256,6 +256,35 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listPrivacyChangeSets": {
+  "method": "GET",
+  "path": "/privacy-testing",
+  "contract": "marketing-crm",
+  "summary": "Privacy change sets and where each stands",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "brand",
+  "parameters": [
+   {
+    "name": "status",
+    "in": "query",
+    "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listPrivacyConsent": {
   "method": "GET",
   "path": "/privacy-consent",

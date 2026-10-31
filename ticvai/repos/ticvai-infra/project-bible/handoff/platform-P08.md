@@ -5,12 +5,12 @@
 | | |
 |---|---|
 | Screens | 1663 |
-| Operations | 1892 |
+| Operations | 1894 |
 | Contracts | 31 |
 | Modules | 19 |
 | Undrawn | 0 |
 | Operations with no screen | 212 |
-| Waves | wave1 144 · wave2 57 · wave3 1462 |
+| Waves | wave1 148 · wave2 55 · wave3 1460 |
 
 ## Gaps
 
@@ -901,13 +901,13 @@
 | `BO-131` | Connectivity & Auto-Switch Settings | Venue Operations | 2 | 1 | yes |
 | `BO-132` | Offline Transaction Monitor & Sync Queue | Venue Operations | 2 | 2 | yes |
 | `BO-133` | Offline Alerts, Limits & Audit | Venue Operations | 1 | 8 | yes |
-| `BO-134` | Kitchen & Preparation Stations | Food & Beverage | 2 | 5 | yes |
+| `BO-134` | Kitchen & Preparation Stations | Food & Beverage | 1 | 6 | yes |
 | `BO-135` | Order Routing & KDS/Printer Rules | Food & Beverage | 2 | 2 | yes |
 | `BO-136` | F&B Global Settings & Controls | Food & Beverage | 1 | 4 | yes |
 | `BO-137` | Recipe Consumption & Theoretical Inventory | Stock & Supply | 2 | 4 | yes |
 | `BO-138` | Production Execution & Batch Management | Stock & Supply | 2 | 0 | yes |
 | `BO-139` | Wastage, Spoilage, Returns & Write-Off | Stock & Supply | 2 | 4 | yes |
-| `BO-140` | Product Availability, 86 & Operational Food Safety | Stock & Supply | 2 | 7 | yes |
+| `BO-140` | Product Availability, 86 & Operational Food Safety | Stock & Supply | 1 | 7 | yes |
 | `BO-141` | Operational Alerts, AI Replenishment & Action Center | Stock & Supply | 2 | 3 | yes |
 | `BO-142` | Store Rules, Controls & Permissions | Sell | 2 | 2 | yes |
 | `BO-143` | Retail Global Settings & Controls | Sell | 2 | 4 | yes |
@@ -1637,7 +1637,7 @@
 | `BO-870` | Operational Time & Resource Blocking | Rentals | 1 | 3 | yes |
 | `BO-871` | Multi-Event Resource Planning | Rentals | 3 | 2 | yes |
 | `BO-872` | Smart Assignment & Drag-and-Drop Reallocation | Rentals | 3 | 2 | yes |
-| `BO-873` | Staff Resource Directory | Rentals | 3 | 3 | yes |
+| `BO-873` | Staff Resource Directory | Rentals | 1 | 3 | yes |
 | `BO-874` | Staff Resource Profile | Rentals | 3 | 4 | yes |
 | `BO-875` | Skills & Competency Management | Rentals | 3 | 2 | yes |
 | `BO-876` | Certification & Expiry Management | Rentals | 3 | 2 | yes |
@@ -1645,7 +1645,7 @@
 | `BO-878` | Staff Availability & Working Pattern | Rentals | 3 | 4 | yes |
 | `BO-879` | Shift Template & Assignment Configuration | Rentals | 3 | 4 | yes |
 | `BO-880` | Break, Leave & Absence Configuration | Rentals | 3 | 6 | yes |
-| `BO-881` | Overtime & Working-Hour Rules | Rentals | 3 | 1 | yes |
+| `BO-881` | Overtime & Working-Hour Rules | Rentals | 1 | 2 | yes |
 | `BO-882` | Workforce Integration & Synchronization Center | Rentals | 3 | 8 | yes |
 | `BO-883` | Workforce Roster Command Center | Rentals | 3 | 2 | yes |
 | `BO-884` | Attraction & Operational Staffing Roster | Rentals | 3 | 3 | yes |

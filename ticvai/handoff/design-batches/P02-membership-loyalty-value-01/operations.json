@@ -138,7 +138,7 @@
   "permission": "GUEST_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -225,7 +225,7 @@
   "permission": "GUEST_VIEW",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
+  "scopeLevel": "tenant",
   "parameters": [
    {
     "name": null,
@@ -406,6 +406,11 @@
     "name": "guidedAnswerIds",
     "in": "query",
     "required": null
+   },
+   {
+    "name": "channel",
+    "in": "query",
+    "required": false
    },
    {
     "name": null,

@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 281 operations
+title: marketing-crm — 283 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -1947,6 +1947,17 @@ operations:
   - marketing.privacy_request
   - marketing.retention_policy
   writes: []
+- operation: listPrivacyChangeSets
+  verb: GET
+  path: /privacy-testing
+  scope: brand
+  permission: GUEST_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - marketing.privacy_change_set
+  writes: []
 - operation: listPrivacyCompliance
   verb: GET
   path: /privacy-compliance
@@ -2875,6 +2886,21 @@ operations:
   writes:
   - cache:idempotency
   - marketing.conversation_message
+- operation: sendGuestOneTimeCode
+  verb: POST
+  path: /guest-one-time-codes
+  scope: tenant
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - cache:idempotency
+  - marketing.communication_provider
+  - marketing.message_template
+  writes:
+  - cache:idempotency
+  - marketing.message_dispatch
 - operation: sendTransactionalMessage
   verb: POST
   path: /messages
@@ -3222,6 +3248,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
+  - marketing.form_definition
   - marketing.form_definition_field
   - marketing.waiver_field_rule
   writes:

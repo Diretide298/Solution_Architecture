@@ -51,6 +51,8 @@ Merchandise, wallets and gift cards. Modest at 35 operations, and separate becau
 Records who handed over and against what. Partial collection is permitted — a guest may take some and leave the rest for a later trip on the same ticket.
 **The collection deadline** (r8 walk of ticket 27820): `pastCollectBy` applies to a drop in `awaitingCollection` or `partiallyCollected` only. A drop that was never collected (the uncollected reversal has run) collects without it. The default `collectBy` is the close of the collection point's day (its `closesAt`, see `createShopAndDrop`).
 
+**A partial take from `uncollected`, and the deadline's clock** (ADAM CR-345, Chinmay, 30 October 2026, as recommended; CHG-CR345-001). A collection from `uncollected` that leaves something behind keeps the drop `uncollected`, with its lines' `collectedQuantity` grown; the call that takes the last of it moves it to `collected`. `pastCollectBy` never applies to an uncollected drop, and the state model is unchanged. `pastCollectBy` compares `collect_by` with the server's clock when the call arrives; `recordedAt` is stored as `collected_at` and decides nothing.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_MODIFY` |

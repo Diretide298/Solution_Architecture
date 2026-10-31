@@ -520,6 +520,7 @@ paths:
         - "P13 CMS-004 Logo & Assets"
         - "P13 CMS-010 Media Library"
         - "P13 CMS-063 Upload & Asset Ingestion Workspace"
+        - "P13 CMS-076 Asset Version Control & Revision History"
       x-ticvai-audience: [staff]
       summary: Request a signed upload URL
       description: >

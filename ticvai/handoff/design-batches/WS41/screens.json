@@ -4,7 +4,7 @@
   "name": "Privacy & Consent Configuration Command Center",
   "module": "Policy",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
@@ -2045,7 +2045,7 @@
   "name": "Privacy Configuration Testing, Approval & Publication",
   "module": "Policy",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "permission": "GUEST_MANAGE",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
@@ -2157,61 +2157,61 @@
       {
        "kind": "selectField",
        "label": "Missing policy",
-       "operation": "approvePrivacyTesting",
+       "operation": "listPrivacyChangeSets",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Missing consent mapping",
-       "operation": "approvePrivacyTesting",
+       "operation": "listPrivacyChangeSets",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Missing language",
-       "operation": "approvePrivacyTesting",
+       "operation": "listPrivacyChangeSets",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Conflicting consent rules",
-       "operation": "approvePrivacyTesting",
+       "operation": "listPrivacyChangeSets",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Missing processing purpose",
-       "operation": "approvePrivacyTesting",
+       "operation": "listPrivacyChangeSets",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Invalid effective dates",
-       "operation": "approvePrivacyTesting",
+       "operation": "listPrivacyChangeSets",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Unmapped tracking technology",
-       "operation": "approvePrivacyTesting",
+       "operation": "listPrivacyChangeSets",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Missing guardian rule",
-       "operation": "approvePrivacyTesting",
+       "operation": "listPrivacyChangeSets",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Unpublished dependency",
-       "operation": "approvePrivacyTesting",
+       "operation": "listPrivacyChangeSets",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Circular configuration dependency",
-       "operation": "approvePrivacyTesting",
+       "operation": "listPrivacyChangeSets",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
@@ -2334,6 +2334,20 @@
     "contract": "marketing-crm",
     "purpose": "Set the privacy governance of one version of a privacy document",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listPrivacyChangeSets",
+    "contract": "marketing-crm",
+    "purpose": "The change sets and where each stands; the selected one's validation issues fill the checks",
+    "trigger": "onLoad",
+    "provenance": "r12 gate, 31 October 2026 (CHG-R12GT-001; check-screen-patterns READ)"
+   },
+   {
+    "operationId": "listPrivacyNoticePolicy",
+    "contract": "marketing-crm",
+    "purpose": "The privacy document versions, from which the governance form picks the one it sets",
+    "trigger": "onAction",
+    "provenance": "r12 gate, 31 October 2026 (CHG-R12GT-001; check-screen-patterns READ)"
    }
   ],
   "wireframe": {
@@ -2368,6 +2382,9 @@
       "approvedAt"
      ]
     },
+    "reads": [
+     "listPrivacyNoticePolicy"
+    ],
     "provenance": "contract marketing-crm.yaml PUT /privacy-notice-policy"
    }
   ],

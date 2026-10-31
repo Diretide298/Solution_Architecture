@@ -723,7 +723,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Required `identityVerification.required` | toggle | optional | off | — | — | Whether an application is blocked from approval until a listed check passes. | `updateAccreditationProgramme` body |
 | Scope path `scopePath` | text field | optional | — | — | — | — | `updateAccreditationProgramme` body |
 
-Errors to draw in the form: 409 A template cannot be opened for applications
+Errors to draw in the form: 409 A template cannot be opened for applications (`programme-is-template`), or another programme of the tenant already holds the body's `code`, compared …
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -765,7 +765,7 @@ Errors to draw in the form: 409 A template cannot be opened for applications
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save scope (secondary button) | `updateAccreditationProgramme` PUT `/accreditation-programmes/{programmeId}` | AccreditationProgramme | AccreditationProgramme | 409 A template cannot be opened for applications | opens modal first |
+| Save scope (secondary button) | `updateAccreditationProgramme` PUT `/accreditation-programmes/{programmeId}` | AccreditationProgramme | AccreditationProgramme | 409 A template cannot be opened for applications (`programme-is-template`), or another programme of the tenant already holds the body's `code`, compared … | opens modal first |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -792,7 +792,7 @@ Errors to draw in the form: 409 A template cannot be opened for applications
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the event venue accreditation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 A programme with this code already exists at this scope; 409 A template cannot be opened for applications |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A programme with this code already exists at this scope; 409 A template cannot be opened for applications (`programme-is-template`), or another programme of the tenant already holds the body's `code`, compared … |
 
 #### Edge cases to draw
 

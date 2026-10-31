@@ -242,6 +242,10 @@ x-ticvai-queries:
       It is asked in process by the operations host too (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008;
       XDR-004), for every operation it serves that asks it since 29 October 2026 (ADAM CR-296, option A;
       CHG-R11RUL-001), and by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
+      **A signed-in guest reads every venue's settings** (ADAM CR-341, Chinmay, 30 October 2026, option B for the settings tables; CHG-CR341-001): platform.region_settings has a read branch for any
+      session with a guest subject (`ticvai.subject_id` set), so a signed-in guest's read above venue level (the time
+      zone of a billing statement's venue, CR-342) sees the region rows of every venue it has dealt with; writes stay
+      scoped and an anonymous session gains nothing.
     served: [in-process, service]
   tenantRecords:
     module: tenancy
@@ -283,6 +287,10 @@ x-ticvai-queries:
       (ADAM CR-234, option A, 25 October 2026; CHG-R10ORD-008; docs/active/cross-deployable-writes.yaml XDR-004) and,
       since 29 October 2026, for every operation it serves that asks it (ADAM CR-296, option A; CHG-R11RUL-001), and
       by the workers host for the consumers it runs (ADR-0055, amended 25 October 2026).
+      **A signed-in guest reads every venue's settings** (ADAM CR-341, Chinmay, 30 October 2026, option B for the settings tables; CHG-CR341-001): platform.venue_settings has a read branch for any
+      session with a guest subject (`ticvai.subject_id` set), so a signed-in guest's read above venue level
+      (listMyOrders pricing an order at a venue other than the request's) sees that venue's row and the tenant's
+      default row; writes stay scoped and an anonymous session gains nothing.
     served: [in-process, service]
   workstationRecords:
     module: tenancy
@@ -388,8 +396,12 @@ x-ticvai-queries:
       tree (platform.scope, level venue) has is_active true. Tenancy answers for the tenant whose database the caller
       is connected to, under the caller's scope. White Label refuses a venueId that is absent (setAnalyticsProvider,
       422) and lists only these venues in TenantAppStatus.venues. It is asked from another deployable through
-      Tenancy's service route (serviceAuth).
-    served: [service]
+      Tenancy's service route (serviceAuth). The operations host asks it in process, through Tenancy's own query
+      class and under the caller's row-level security, for validateTenantConfig, publishTenantConfig,
+      restoreConfigVersion, setAnalyticsProvider and setMaintenanceMode (ADAM CR-343, 30 October 2026; XDR-022;
+      CHG-CR343-001): platform.scope is a kernel table every host's role may read (CR-002), as CR-296 ruled for
+      Tenancy's other reads, so no grant is added.
+    served: [in-process, service]
 paths:
   /tenant-domains/{hostname}:
     parameters:
@@ -2800,9 +2812,15 @@ paths:
         unprovisioned is a device that will fail at the gate on its first morning, and the two states are
         never usefully apart.
 
-        The transitions are the matrix''s own: registered → enrolled → provisioned → active →
-        deactivated → retired. **Retirement revokes the credential** — a retired device whose certificate
-        still validates is a spare key in a drawer.
+        **The moves are one step at a time** (ADAM CR-354, option A, 30 October 2026; CHG-CR354-001;
+        states/device-enrolment.yaml). registered → enrolled (needs the enrolment code); enrolled →
+        provisioned (records `testResult`); provisioned → active (needs `approvalStatus` approved, else
+        `409 device-approval-required`); active → deactivated; deactivated → active (reactivation; the
+        approval still holds); and any state except retired → retired. `retired` is terminal. Any other
+        move is `409 device-transition-not-allowed`, including skipping a step and moving to the state the
+        device is already in. Each successful move emits `device.enrolmentChanged` with `fromState` and
+        `toState`. **Retirement revokes the credential and sets `retired_at`** — a retired device whose
+        certificate still validates is a spare key in a drawer.
 
 
         **The enrolment code and the approval gate** (decided 2 October 2026, Chinmay, critical set 1,
@@ -2840,10 +2858,12 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
-          description: The transition is not allowed from the current state, or the move to `active` comes
-            before the device is approved (`device-approval-required`; CHG-CSP-011).
+          description: The move to `active` comes before the device is approved (`device-approval-required`;
+            CHG-CSP-011), or the move is not one states/device-enrolment.yaml allows from the current state,
+            a skipped step or the current state included (`device-transition-not-allowed`; ADAM CR-354).
           x-ticvai-problem-types:
           - device-approval-required
+          - device-transition-not-allowed
           content:
             application/problem+json:
               schema:
@@ -4554,6 +4574,153 @@ components:
             the venue of the write, so a replay is found by whoever retries, including a caller with no grant (the
             payment webhook, a consumer, a job), and the row carries no venue data (the stored response is already
             what the caller was allowed to see). The partition key (ADR-0005).'
+    TenantFieldKey:
+      type: object
+      x-ticvai-persistence: platform.tenant_field_key
+      x-ticvai-agreed: '30 October 2026: ADAM CR-339 (Chinmay), ADR-0063 as amended 30 October 2026'
+      # Unique per purpose and version, and one active row per purpose (ADAM CR-339; CHG-CR339-001). No scope: the
+      # tenant database is the tenant's own (ADR-0038), as platform.tenant carries no scope_path either.
+      x-ticvai-unique-together: [[purpose, keyVersion]]
+      x-ticvai-unique-when:
+      - columns: [purpose]
+        when: {state: active}
+      x-ticvai-scope: none
+      x-ticvai-rls: any-grant-no-delete
+      description: '**A tenant''s wrapped field-encryption keys** (ADAM CR-339, decided 30 October 2026; ADR-0063 as
+        amended 30 October 2026; KERNEL-FIELD-ENC, #37050). One row per key version of the tenant''s data key
+        (AES-256-GCM) and blind-index key (HMAC-SHA-256), each wrapped by the tenant''s HSM-backed Key Vault key; the
+        unwrapped key lives only in the kernel''s memory. **Only the kernel reads or writes it**; the kernel''s
+        architecture test covers it as it covers the Key Vault client. Storage only: no operation returns it.
+
+
+        **A missing key is created at provisioning or on first use** with `INSERT ... ON CONFLICT DO NOTHING` and then
+        read again, so two hosts creating it at once end up with one key. A key is unwrapped with the Key Vault key
+        version `wrappingKeyId` names. **Rotating the data key** adds a new `active` row and moves the old one to
+        `decryptOnly`; the stored form `enc:v<version>:...` says which row decrypts. **Rotating the blind-index key**
+        does the same; only a blind index the server can decrypt is re-hashed (`BlindIndexRehash`), and a lookup on
+        one that hashes a token the server never keeps tries the `active` version and then each `decryptOnly` one,
+        newest first, for as long as a token made under it can still be presented (ADR-0063, 25 October and 30
+        October amendments).
+
+
+        **It takes no scope** (`x-ticvai-scope: none`): the tenant''s database is the tenant''s alone, so a key row
+        belongs to no node of it. Any connection holding a grant reads, inserts and updates a row and none deletes
+        one (`x-ticvai-rls: any-grant-no-delete`), since the kernel runs inside every host and every caller''s
+        request; a key that is no longer used is `retired`, never deleted.'
+      required:
+      - id
+      - purpose
+      - keyVersion
+      - wrappedKey
+      - wrappingKeyId
+      - state
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The row's own id, a UUIDv7 minted by the kernel.
+        purpose:
+          type: string
+          enum:
+          - dataKey
+          - blindIndexKey
+          x-ticvai-unique-compare: exact
+          description: '`dataKey`: the AES-256-GCM key that encrypts `x-ticvai-secret: field-encrypted` values.
+            `blindIndexKey`: the HMAC-SHA-256 key of `x-ticvai-secret: blind-index` values.'
+        keyVersion:
+          type: integer
+          minimum: 1
+          description: The key's version within its purpose, 1 for the first key and one more at each rotation. The
+            `<version>` of the stored form `enc:v<version>:...`. Unique with `purpose`.
+        wrappedKey:
+          $ref: '#/components/schemas/WrappedKeyBytes'
+        wrappingKeyId:
+          type: string
+          maxLength: 500
+          description: The Key Vault key that wrapped `wrappedKey`, with its version (the key's versioned identifier), so
+            the key is unwrapped with that version after the Key Vault key itself rotates.
+        state:
+          type: string
+          enum:
+          - active
+          - decryptOnly
+          - retired
+          description: '`active`: the version new writes use; at most one per purpose. `decryptOnly`: an older
+            version, still used to decrypt, and to look up a blind index that cannot be re-hashed. `retired`: no longer
+            used.'
+        createdAt:
+          type: string
+          format: date-time
+          description: When the key version was created.
+        rotatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When a rotation moved this version out of `active`; null while it is the active one.
+    WrappedKeyBytes:
+      type: string
+      format: byte
+      x-ticvai-persistence-column: bytea
+      description: A field-encryption key's bytes as Key Vault's wrap operation returned them (ADAM CR-339), stored as
+        bytea; never the unwrapped key.
+    BlindIndexRehash:
+      type: object
+      x-ticvai-persistence: platform.blind_index_rehash
+      x-ticvai-agreed: '30 October 2026: ADAM CR-339 (Chinmay), ADR-0063 as amended 30 October 2026'
+      x-ticvai-unique-together: [[columnName, toVersion]]
+      x-ticvai-scope: none
+      x-ticvai-rls: any-grant-no-delete
+      description: '**How far a blind-index re-hash has got, per column** (ADAM CR-339, decided 30 October 2026;
+        ADR-0063 as amended 30 October 2026). When the tenant''s blind-index key rotates, the kernel''s job re-hashes
+        only a blind index the server can decrypt (the contract marks it `x-ticvai-blind-index-of: <its
+        field-encrypted property>`), which today is `marketing.guest_device.token_fingerprint`, from
+        `token_ciphertext`. One row per column and target version, with the last row done in `lastId`. **A lookup on
+        that column tries both versions only while its row is unfinished.** A blind index over a token the server
+        never keeps (`x-ticvai-blind-index-of: none`) has no row here: it keeps its old key version for lookup
+        instead (`TenantFieldKey`). Only the kernel reads or writes it; storage only, no operation returns it. No
+        scope, as `TenantFieldKey`.'
+      required:
+      - id
+      - columnName
+      - fromVersion
+      - toVersion
+      - startedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The row's own id, a UUIDv7 minted by the kernel.
+        columnName:
+          type: string
+          maxLength: 190
+          x-ticvai-unique-compare: exact
+          description: The column re-hashed, as `schema.table.column` (`marketing.guest_device.token_fingerprint`).
+            Unique with `toVersion`.
+        fromVersion:
+          type: integer
+          minimum: 1
+          description: The blind-index key version the column's values were hashed under before the rotation.
+        toVersion:
+          type: integer
+          minimum: 1
+          description: The blind-index key version they are re-hashed under.
+        lastId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The id of the last row of the column's table re-hashed, so the job resumes after it; null before
+            the first batch.
+        startedAt:
+          type: string
+          format: date-time
+          description: When the re-hash began.
+        finishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: When every row was re-hashed; null while the job runs, and lookups try both versions until it
+            is set.
     ControlAuditRecord:
       type: object
       x-ticvai-persistence: control.audit_record
@@ -6184,8 +6351,15 @@ components:
 
     VenueSettings:
       x-ticvai-retired-columns: [org_unit_id]
+      # A guest reads every venue's settings (its orders' currency, time zone and rules, whatever venue they name);
+      # writes stay the venue's (ADAM CR-341, settled 30 October 2026; CHG-CR341-001, CHG-R12DB-008).
+      x-ticvai-guest-read: true
       type: object
       x-ticvai-persistence: "platform.venue_settings"
+      # ADAM CR-341 (Chinmay, 30 October 2026; CHG-CR341-001): read 'platform.venue_in_scope(venue_id) OR a guest subject
+      # is set (ticvai.subject_id)', write 'platform.venue_in_scope(venue_id)'. tools/derive-ddl.py has no x-ticvai-rls
+      # mark for that read yet (the DDL lane's), so the base venue rule is still what derive-ddl writes; the [DB] task
+      # carries the policy until the mark exists.
       description: >
         **Venue-level operational configuration that no other level can answer.**
 
@@ -6858,6 +7032,27 @@ components:
               description: >
                 Wrong entries allowed per guest one-time code before `verifyGuestOtp` invalidates it.
                 A guest code is tenant-scoped, so the tenant default is the value used. Proposed, client to correct (audit R094).
+            guestOtpLifetimeSeconds:
+              type: integer
+              nullable: true
+              minimum: 60
+              maximum: 900
+              default: 600
+              description: >
+                How long a guest one-time code works (decided 30 October 2026, Chinmay, ADAM CR-370; CHG-CR370-001):
+                `requestGuestOtp`, `registerGuest` and `verifyGuestEmail` set the code's expiry from it and answer it as
+                `expiresInSeconds`. A guest code is tenant-scoped, so the tenant default is the value
+                used. Proposed, client to correct.
+            guestOtpResendSeconds:
+              type: integer
+              nullable: true
+              minimum: 30
+              maximum: 300
+              default: 60
+              description: >
+                How long a guest waits before asking for another code (ADAM CR-370; CHG-CR370-001): Identity sets the
+                code's resend time from it and answers it as `resendAfterSeconds`, which drives the screens'
+                resend countdown. The tenant default is the value used. Proposed, client to correct.
             guestTwoStep:
               type: object
               nullable: true
@@ -6905,7 +7100,13 @@ components:
       x-ticvai-persistence: "platform.region_settings"
       # CHG-GEN-008 (ADAM CR-075): settings govern everything beneath their region, so everyone working at, above or
       # beneath it reads them; the region and the levels above it write them.
+      # ADAM CR-341 (Chinmay, 30 October 2026; CHG-CR341-001): and any session with a guest subject reads them (read
+      # 'in_scope OR above_scope OR a guest subject is set', write 'in_scope'). tools/derive-ddl.py has no mark for the
+      # guest branch yet (the DDL lane's); the [DB] task carries the policy until it exists.
       x-ticvai-rls: read-beneath
+      # and any guest reads them too: a guest's statement takes its venue's time zone (ADAM CR-341, CR-342;
+      # CHG-R12DB-008).
+      x-ticvai-guest-read: true
       type: object
       required: [scopePath, countryCode, currencyCode, currencyScale, timeZone, fiscalYearStartMonth]
       properties:

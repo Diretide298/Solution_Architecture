@@ -2891,8 +2891,8 @@ screens:
         label: Email for the account
         bindsTo: RegisterGuestRequest.identifier
         operation: registerGuest
-        notes: The order's email, prefilled; channel email. The client sends `source` `guestApp`, not typed (ADAM
-          CR-371).
+        notes: The order's email, prefilled; channel email. The client sends `source` `guestApp`, not
+          typed (ADAM CR-371).
         provenance: contract identity.yaml RegisterGuestRequest.identifier (defined 4 October 2026, CHG-FXS-003)
     - name: actionBar
       slot: rowActions
@@ -9473,9 +9473,9 @@ screens:
       never picks a channel: an email address is sent with `channel` `email`; a mobile number is sent
       with none, and the server picks WhatsApp first and SMS as the fallback (the lead, 25 October 2026,
       r10 Q5), from the tenant''s configured delivery (ADAM CR-222). Optional: `displayName`, `password`,
-      `preferredLanguage`, `consents`. The client sends `source` `guestApp`, not typed (where the guest registers;
-      ADAM CR-371). The code it sends is typed in the Code field and confirmed with
-      `verifyGuestEmail` (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.'
+      `preferredLanguage`, `consents`. The client sends `source` `guestApp`, not typed (where the guest
+      registers; ADAM CR-371). The code it sends is typed in the Code field and confirmed with `verifyGuestEmail`
+      (`mode` `code`). Dismissing sends nothing; the screen behind is unchanged.'
     bindsTo: RegisterGuestRequest
     confirm:
       label: Register guest

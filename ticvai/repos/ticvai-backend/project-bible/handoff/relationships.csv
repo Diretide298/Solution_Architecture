@@ -1289,7 +1289,9 @@ control.production_access_request,listing_id,control.integration_listing,referen
 control.production_access_request,production_client_id,control.api_client,reference,declared,,
 control.production_access_request,sandbox_client_id,control.api_client,reference,declared,,yes
 control.release,created_by_principal_id,identity.principal,reference,convention,yes,
+control.release,status_changed_by_principal_id,identity.principal,reference,convention,yes,
 control.release,via createRelease,control.release_component,ambient,lineage,,
+control.release,withdrawal_approved_by_principal_id,identity.principal,reference,convention,yes,
 control.release_component,release_id,control.release,child,declared,,yes
 control.rollout,approved_by_principal_id,identity.principal,reference,declared,yes,
 control.rollout,release_id,control.release,reference,declared,,yes
@@ -1607,8 +1609,8 @@ identity.module_access,principal_id,identity.principal,reference,convention,,
 identity.open_shift_marker,venue_id,platform.scope,reference,precedent,yes,
 identity.otp_challenge,subject_id,pii.subject,reference,declared,yes,
 identity.otp_challenge,via requestGuestOtp,platform.outbox,ambient,lineage,yes,
-identity.otp_challenge,via verifyGuestEmail,marketing.message_dispatch,ambient,lineage,yes,
 identity.otp_challenge,via verifyGuestEmail,pii.subject,ambient,lineage,yes,
+identity.otp_challenge,via verifyGuestEmail,platform.outbox,ambient,lineage,yes,
 identity.permission,module_id,identity.module,reference,declared,,yes
 identity.principal,home_scope_id,platform.scope,reference,declared,yes,
 identity.principal,primary_role_id,identity.role,reference,declared,,
@@ -2018,6 +2020,7 @@ marketing.contact_automation,approved_by_principal_id,identity.principal,referen
 marketing.contact_automation,owner_principal_id,identity.principal,reference,convention,yes,
 marketing.conversation,assigned_principal_id,identity.principal,reference,declared,yes,
 marketing.conversation,assist_session_id,marketing.kiosk_assist_session,reference,convention,,
+marketing.conversation,callback_assigned_to_principal_id,identity.principal,reference,declared,yes,
 marketing.conversation,case_id,marketing.case,reference,declared,,
 marketing.conversation,subject_id,pii.subject,reference,declared,yes,
 marketing.conversation,venue_id,platform.scope,reference,declared,yes,
@@ -2047,7 +2050,7 @@ marketing.feedback_classification,form_submission_id,marketing.form_submission,r
 marketing.feedback_classification,review_id,marketing.review,reference,convention,,
 marketing.form_definition,via createForm,marketing.form_definition_field,ambient,lineage,,
 marketing.form_definition_field,consent_purpose_id,marketing.consent_purpose,reference,convention,,
-marketing.form_definition_field,form_definition_id,marketing.form_definition,child,declared,,yes
+marketing.form_definition_field,form_id,marketing.form_definition,child,declared,,yes
 marketing.form_definition_field,via setDynamicFieldQuestion,marketing.waiver_field_rule,ambient,lineage,,
 marketing.form_submission,on_behalf_of_subject_id,pii.subject,reference,convention,yes,
 marketing.form_submission,signature_asset_id,assets.media_asset,reference,convention,yes,
@@ -3240,7 +3243,6 @@ whitelabel.navigation_config,via setNavigation,whitelabel.navigation_item,ambien
 whitelabel.navigation_item,navigation_config_id,whitelabel.navigation_config,reference,declared,,yes
 whitelabel.policy,published_by_principal_id,identity.principal,reference,declared,yes,
 whitelabel.promo_block,promotion_id,promotions.promotion,reference,declared,yes,
-whitelabel.received_release,release_id,ai.release,reference,convention,yes,
 whitelabel.site_package,platform_staff_grant_id,identity.platform_staff_grant,reference,convention,yes,
 whitelabel.site_package,requested_by_principal_id,identity.principal,reference,convention,yes,
 whitelabel.store_account,developer_account_id,control.developer_account,reference,convention,yes,

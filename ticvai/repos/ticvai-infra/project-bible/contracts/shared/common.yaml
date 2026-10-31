@@ -1129,6 +1129,14 @@ components:
         token gives its one-row reach, and `getWaitingRoomPosition`, which reads the waiting room''s own store
         (ADR-0066), not a venue table.
 
+
+        **A signed-in guest''s read above venue level reads venue and region settings by a guest branch** (ADAM
+        CR-341, Chinmay, 30 October 2026, option B for the settings tables; CHG-CR341-001). A tenant-level guest read
+        (`listMyOrders`, `listBillingStatements`) names no venue: its own rows are admitted by subject alone (CR-295),
+        and `platform.venue_settings` and `platform.region_settings` have a read branch for any session with a guest
+        subject (`ticvai.subject_id` set), so every venue''s trading currency and time zone are readable to it. Writes
+        stay scoped, and an anonymous session gains nothing.
+
         '
     serviceAuth:
       type: http

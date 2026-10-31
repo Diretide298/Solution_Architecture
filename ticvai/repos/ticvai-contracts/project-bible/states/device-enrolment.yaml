@@ -1,0 +1,103 @@
+# Registered device enrolment — state model
+# Contract: tenancy.RegisteredDevice.enrolmentState
+# Checked by tools/check-states.py.
+# Decided 30 October 2026, Chinmay: ADAM CR-354, option A (CHG-CR354-001).
+
+entity: Registered device enrolment
+contract: tenancy
+enum: RegisteredDevice.enrolmentState
+enumKind: inline
+enumSchema: RegisteredDevice
+enumProperty: enrolmentState
+owner: tenancy
+description: Where a registered device is in its life (`enrolmentState`), moved only by `enrolDevice`, one step
+  at a time. Separate from `approvalStatus` (whether a second person let it into production,
+  states/registered-device-approval.yaml) and from `status` (what it last reported). `registerDevice` creates
+  every device `registered`. Any move this model does not list, including skipping a step and moving to the
+  state the device is already in, is `409 device-transition-not-allowed`. Each successful move emits
+  `device.enrolmentChanged` with `fromState` and `toState`.
+initial:
+- registered
+terminal:
+- retired
+transitions:
+- from: registered
+  to: enrolled
+  operation: enrolDevice
+  trigger: operation
+  guard: Needs the one-time `enrolmentCode` `registerDevice` issued (`422 enrolment-code-invalid` when wrong,
+    spent or expired; CHG-CSP-011)
+  emits:
+  - device.enrolmentChanged
+- from: enrolled
+  to: provisioned
+  operation: enrolDevice
+  trigger: operation
+  guard: Records the acceptance test (`testResult`) and its tester
+  emits:
+  - device.enrolmentChanged
+- from: provisioned
+  to: active
+  operation: enrolDevice
+  trigger: operation
+  guard: Needs `approvalStatus` approved (`approveDevice`, a second person; DEC-245), else `409
+    device-approval-required`
+  emits:
+  - device.enrolmentChanged
+- from: active
+  to: deactivated
+  operation: enrolDevice
+  trigger: operation
+  guard: Taken out of service. The reason is recorded on the `tenancy.device_audit` row
+  emits:
+  - device.enrolmentChanged
+- from: deactivated
+  to: active
+  operation: enrolDevice
+  trigger: operation
+  guard: Reactivation. The approval still holds, so it is not asked again
+  isReversal: true
+  emits:
+  - device.enrolmentChanged
+- from: registered
+  to: retired
+  operation: enrolDevice
+  trigger: operation
+  guard: Retirement from any state but `retired` revokes the device's credential and sets `retired_at`. A
+    rejected device (states/registered-device-approval.yaml) is retired this way from wherever it stopped
+  emits:
+  - device.enrolmentChanged
+- from: enrolled
+  to: retired
+  operation: enrolDevice
+  trigger: operation
+  guard: Revokes the credential and sets `retired_at`
+  emits:
+  - device.enrolmentChanged
+- from: provisioned
+  to: retired
+  operation: enrolDevice
+  trigger: operation
+  guard: Revokes the credential and sets `retired_at`
+  emits:
+  - device.enrolmentChanged
+- from: active
+  to: retired
+  operation: enrolDevice
+  trigger: operation
+  guard: Revokes the credential and sets `retired_at`
+  emits:
+  - device.enrolmentChanged
+- from: deactivated
+  to: retired
+  operation: enrolDevice
+  trigger: operation
+  guard: Revokes the credential and sets `retired_at`
+  emits:
+  - device.enrolmentChanged
+notes: '**`retired` is terminal.** A retired device that is offered again is registered again, with a new
+  enrolment code. The 16.1.2 matrix (registered, enrolled, provisioned, active, deactivated, retired) gives the
+  order for going live; RFP 16.1.6 and the approval model (DEC-241, DEC-245) need retirement from any state, and
+  reactivation brings a deactivated device back into service. A true retry of a move is covered by
+  `Idempotency-Key`, so a move to the current state is a refusal, as `closeConversation` answers
+  `conversation-already-closed`.'

@@ -4399,6 +4399,7 @@ Check the artwork with `printTicketProof` before activating.
 
 BL-100. **The lines are the point.** A total with no breakdown is what a guest rings a call centre about, and the call centre has no more than they do.
 **A failed attempt appears as a line.** A statement that shows only successful charges cannot explain why a pass lapsed, which is the question somebody is reading it to answer.
+**The same lines as the list** (ADAM CR-342, Chinmay, 30 October 2026; CHG-CR342-001). The statement's lines and totals are built from the cycle's order by the line rule `listBillingStatements` states, through the one shared builder: charges from its `orders.order_line` rows (with `orders.order_line_discount` and the `ledger.tax_invoice_line` issued for each, `finance#taxInvoiceLineRecords`), refunds from its completed `orders.refund` rows, failed attempts from its `payments.dunning_case` rows, no adjustments, Money in the trading currency of the order's venue (`tenancy#venueSettingsRecords`). A cycle `listBillingStatements` does not list (no order, or an open-ended first period) is `404`.
 
 |  |  |
 |---|---|
@@ -4409,7 +4410,7 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `ledger.tax_invoice_line`, `orders.membership_renewal`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `payments.dunning_case` |
+| Reads | `ledger.tax_invoice_line`, `orders.membership_renewal`, `orders.order_line`, `orders.order_line_discount`, `orders.refund`, `orders.sales_order`, `payments.dunning_case` |
 | Writes | - |
 | Called by | GST-015, WEB-023 |
 
@@ -4431,37 +4432,37 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 | periodStart | string (date) | yes | The cycle's start as a date in the venue's time zone (listBillingStatements, ADAM CR-303). |
 | periodEnd | string (date) | yes | The cycle's end as a date in the venue's time zone (listBillingStatements, ADAM CR-303). |
 | lines | array of BillingStatementLine |  |  |
-| lines[].occurredAt | string (date-time) | yes |  |
-| lines[].kind | enum (charge, refund, failedAttempt, adjustment) | yes |  |
-| lines[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
+| lines[].occurredAt | string (date-time) | yes | A charge: the order's created_at; a refund: the refund's completed_at; a failedAttempt: the dunning case's first_failed_at (ADAM CR-342). |
+| lines[].kind | enum (charge, refund, failedAttempt, adjustment) | yes | One charge per orders.order_line of the cycle's order, one refund per orders.refund row of it with status completed, one failedAttempt per payments.dunning_case on it; no adjustment until a source is… |
+| lines[].amount | object | yes | A charge: the line's gross_amount; a refund: refunded_amount; a failedAttempt: the case's overdue_amount, or the order's gross_amount when that is null (ADAM CR-342). |
 | lines[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].description | string |  |  |
-| lines[].netAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].description | string |  | A charge: the description of the ledger.tax_invoice_line issued for its order line, null where none is visible (ADAM CR-342). |
+| lines[].netAmount | object |  | A charge's order line net_amount (ADAM CR-342). |
 | lines[].netAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].netAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].netAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].discountAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].discountAmount | object |  | A charge's order line discounts summed, its orders.order_line_discount amounts (ADAM CR-342). |
 | lines[].discountAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].discountAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].discountAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| lines[].taxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| lines[].taxAmount | object |  | A charge's order line tax_amount (ADAM CR-342). |
 | lines[].taxAmount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | lines[].taxAmount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | lines[].taxAmount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
 | lines[].taxRate | number |  | 2.14.23. (nullable) |
 | lines[].taxInvoiceId | string (uuid) |  | The finance tax invoice issued for this charge, where one was (issueTaxInvoice); the guest downloads it with getTaxDocumentRendition. (nullable) |
 | lines[].declineClass | string |  | Present on failedAttempt only, and it is what turns *"your payment failed"* into something a guest can act on: a soft decline means try again, a hard one means the card needs replacing. (nullable) |
-| total | Money | yes | On the wire this is three fields; in the database it is one column. |
+| total | object | yes | The cycle's order's gross_amount less its completed refunds (ADAM CR-342). |
 | total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| taxTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| taxTotal | object |  | The cycle's order's tax_amount (ADAM CR-342). |
 | taxTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | taxTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | taxTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| discountTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| discountTotal | object |  | The charge lines' discountAmount summed (ADAM CR-342). |
 | discountTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | discountTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | discountTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -4778,7 +4779,16 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 
 **What a statement is** (ADAM CR-099): one billing cycle of a membership agreement (`identity.customer_membership`, read through `identity#customerMembershipRecords`), named by `agreementId`. Its `id` is derived from the agreement and the period, a name-based UUID (v5) of `agreementId`, `periodStart` and `periodEnd`, so `getBillingStatement` finds the same statement again.
 
-**The cycles, their charges and the guest** (ADAM CR-303, option A, Chinmay, 29 October 2026). An agreement's statements are its first period and one per `orders.membership_renewal` row of it with `status` `completed`. The first period runs from the agreement's `start_at` to its first expiry (the `previous_expiry_at` of its earliest completed renewal, or its `expires_at` while none has completed); a renewal's period runs from its `previous_expiry_at` to its `new_expiry_at`. `periodStart` and `periodEnd` are those instants as dates in the venue's time zone (the venue of the cycle's order, its region settings read through `tenancy#regionSettingsRecords`). A cycle's charges are its order: the renewal row's `order_id`, and for the first period the agreement's `source_order_id`. The lines, `total`, `taxTotal` and `discountTotal` are worked out from that order's lines and payments, with any `payments.dunning_case` on that order as its failed attempts. The guest is the agreement's `customer_id`, which is the guest's subject id (the id `subjectId` names): a guest reads the agreements whose `customer_id` is its own subject, a staff `subjectId` is matched against `customer_id`, and `BillingStatement.subjectId` is it. The `id` is minted as `BillingStatement.id` states (namespace and name), the one rule `getBillingStatement` uses too.
+**The cycles, their charges and the guest** (ADAM CR-303, option A, Chinmay, 29 October 2026). An agreement's statements are its first period and one per `orders.membership_renewal` row of it with `status` `completed`. The first period runs from the agreement's `start_at` to its first expiry (the `previous_expiry_at` of its earliest completed renewal, or its `expires_at` while none has completed); a renewal's period runs from its `previous_expiry_at` to its `new_expiry_at`. `periodStart` and `periodEnd` are those instants as dates in the venue's time zone (the venue of the cycle's order, its region settings read through `tenancy#regionSettingsRecords`). A cycle's charges are its order: the renewal row's `order_id`, and for the first period the agreement's `source_order_id`. The lines, `total`, `taxTotal` and `discountTotal` are built from that order by the line rule below (ADAM CR-342). The guest is the agreement's `customer_id`, which is the guest's subject id (the id `subjectId` names): a guest reads the agreements whose `customer_id` is its own subject, a staff `subjectId` is matched against `customer_id`, and `BillingStatement.subjectId` is it. The `id` is minted as `BillingStatement.id` states (namespace and name), the one rule `getBillingStatement` uses too.
+
+**The lines and totals** (ADAM CR-342, Chinmay, 30 October 2026, option A with refunds taken from `orders.refund`; CHG-CR342-001). `listBillingStatements` and `getBillingStatement` build the same lines from the cycle's order, through one shared builder.
+- `charge`: one per `orders.order_line` of the order. `amount` = its `gross_amount`, `netAmount` = `net_amount`, `taxAmount` = `tax_amount`, `discountAmount` = the sum of its `orders.order_line_discount` amounts, `occurredAt` = the order's `created_at`. `taxRate`, `description` and `taxInvoiceId` come from the `ledger.tax_invoice_line` issued for that line (`finance#taxInvoiceLineRecords`, by `order_line_id`), null where none is visible.
+- `refund`: one per `orders.refund` row of the order with `status` `completed`. `amount` = `refunded_amount`, `occurredAt` = `completed_at`. A payment's status is not a line.
+- `failedAttempt`: one per `payments.dunning_case` on the order (CR-303). `amount` = `overdue_amount`, or the order's `gross_amount` when it is null; `occurredAt` = `first_failed_at`; `declineClass` = `decline_class`.
+- `adjustment`: none, until a source is named.
+Lines run oldest first by `occurredAt`. `total` = the order's `gross_amount` less its completed refunds; `taxTotal` = its `tax_amount`; `discountTotal` = the charge lines' `discountAmount` summed. Money is in the trading currency of the order's venue (`tenancy#venueSettingsRecords`).
+**Not listed** (ADAM CR-342): a cycle with no order, and an open-ended first period (no completed renewal and a null `expires_at`); `getBillingStatement` answers `404` for it.
+**A guest's dunning cases and tax invoices** (ADAM CR-342). A guest reads its dunning cases and tax invoices by its own subject once the database task that gives them a guest read lands; until then they are simply absent from its statement (no failed-attempt lines, no invoice on a charge), never another guest's.
 
 **Order.** Most recent period first: `periodStart` descending, then `id` (one order; ADAM CR-099).
 
@@ -4791,7 +4801,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `orders.membership_renewal`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `payments.dunning_case` |
+| Reads | `orders.membership_renewal`, `orders.order_line`, `orders.order_line_discount`, `orders.refund`, `orders.sales_order`, `payments.dunning_case` |
 | Writes | - |
 | Called by | GST-015, WEB-023 |
 
@@ -4816,25 +4826,25 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | items[].periodStart | string (date) | yes | The cycle's start as a date in the venue's time zone (listBillingStatements, ADAM CR-303). |
 | items[].periodEnd | string (date) | yes | The cycle's end as a date in the venue's time zone (listBillingStatements, ADAM CR-303). |
 | items[].lines | array of BillingStatementLine |  |  |
-| items[].lines[].occurredAt | string (date-time) | yes |  |
-| items[].lines[].kind | enum (charge, refund, failedAttempt, adjustment) | yes |  |
-| items[].lines[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
-| items[].lines[].description | string |  |  |
-| items[].lines[].netAmount | Money |  | On the wire this is three fields; in the database it is one column. |
-| items[].lines[].discountAmount | Money |  | On the wire this is three fields; in the database it is one column. |
-| items[].lines[].taxAmount | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].lines[].occurredAt | string (date-time) | yes | A charge: the order's created_at; a refund: the refund's completed_at; a failedAttempt: the dunning case's first_failed_at (ADAM CR-342). |
+| items[].lines[].kind | enum (charge, refund, failedAttempt, adjustment) | yes | One charge per orders.order_line of the cycle's order, one refund per orders.refund row of it with status completed, one failedAttempt per payments.dunning_case on it; no adjustment until a source is… |
+| items[].lines[].amount | object | yes | A charge: the line's gross_amount; a refund: refunded_amount; a failedAttempt: the case's overdue_amount, or the order's gross_amount when that is null (ADAM CR-342). |
+| items[].lines[].description | string |  | A charge: the description of the ledger.tax_invoice_line issued for its order line, null where none is visible (ADAM CR-342). |
+| items[].lines[].netAmount | object |  | A charge's order line net_amount (ADAM CR-342). |
+| items[].lines[].discountAmount | object |  | A charge's order line discounts summed, its orders.order_line_discount amounts (ADAM CR-342). |
+| items[].lines[].taxAmount | object |  | A charge's order line tax_amount (ADAM CR-342). |
 | items[].lines[].taxRate | number |  | 2.14.23. (nullable) |
 | items[].lines[].taxInvoiceId | string (uuid) |  | The finance tax invoice issued for this charge, where one was (issueTaxInvoice); the guest downloads it with getTaxDocumentRendition. (nullable) |
 | items[].lines[].declineClass | string |  | Present on failedAttempt only, and it is what turns *"your payment failed"* into something a guest can act on: a soft decline means try again, a hard one means the card needs replacing. (nullable) |
-| items[].total | Money | yes | On the wire this is three fields; in the database it is one column. |
+| items[].total | object | yes | The cycle's order's gross_amount less its completed refunds (ADAM CR-342). |
 | items[].total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| items[].taxTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].taxTotal | object |  | The cycle's order's tax_amount (ADAM CR-342). |
 | items[].taxTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].taxTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].taxTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| items[].discountTotal | Money |  | On the wire this is three fields; in the database it is one column. |
+| items[].discountTotal | object |  | The charge lines' discountAmount summed (ADAM CR-342). |
 | items[].discountTotal.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | items[].discountTotal.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | items[].discountTotal.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
@@ -4860,6 +4870,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 
 **Order.** Newest first, by `createdAt` descending, then by `id`.
 **Statuses.** Every `status` is returned, ended ones included (`failed`, `voided`); a screen that shows only live rows filters on `status` itself.
+**Every venue the guest bought at** (ADAM CR-341, Chinmay, 30 October 2026, option B for the settings tables only; CHG-CR341-001). `listMyOrders` names no venue (no `X-Venue-Id`) and needs none: the guest's own orders and lines are admitted by subject alone at every venue (CR-295). `orders.payment`, `orders.order_line_discount` and `orders.order_line_eligibility` need no change: their read policy admits a row whenever its parent order or line is visible (the scope path is their write check only), so a guest already reads them for every order of its own. Each order's venue settings are read through `tenancy#venueSettingsRecords`, in process, the venue's row first and the tenant's default row where a value is null, and `currency` and `currencyScale` are written from it; `platform.venue_settings` has a read branch for any session with a guest subject (guestAuth, CR-341). An order whose settings are still not visible is a fault to log, never a silent default currency.
 
 |  |  |
 |---|---|

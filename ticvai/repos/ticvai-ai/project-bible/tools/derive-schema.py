@@ -1540,7 +1540,11 @@ def main() -> int:
             continue
         if not _row or _own_key(_t, [c["column"] for c in _row]):
             continue
-        _row.insert(0, {
+        # **Appended, not put first** (CHG-R12GT-004, 31 October 2026). On the next run the merge above keeps a prior
+        # surrogate after the contract's columns (its source is not a contract), so a key put first on the run that
+        # creates the table moved last on the run after it: one refresh was not a fixed point for a new table
+        # (identity.guest_upload_ref, r11). Last is where the 223 earlier surrogates already sit.
+        _row.append({
             "column": "id", "type": "uuid", "required": "yes",
             "source": "derive-schema.py (surrogate)",
             "description": ("**Synthesised key.** No contract asserts an identity for this table — "
