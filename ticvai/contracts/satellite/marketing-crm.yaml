@@ -172,8 +172,11 @@ x-ticvai-queries:
       caller's scope lets it see them (the table's row-level security, under the caller's connection and
       transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
-      own. It is asked from another deployable through Marketing's service route (serviceAuth).
-    served: [service]
+      own. It is asked from another deployable through Marketing's service route (serviceAuth). It is asked in
+      process within operations, through the C# query interface Marketing implements, by white-label
+      createBookingFlowDefinition and updateBookingFlowDefinition (ids = settings.consentQuestionIds; an id with no
+      row or a status other than active is their 400 consent-question-not-active; ADAM CR-429, 31 October 2026).
+    served: [in-process, service]
   consentQuestionVersionRecords:
     module: marketing-crm
     table: marketing.consent_question_version

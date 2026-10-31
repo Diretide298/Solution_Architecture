@@ -178,3 +178,49 @@ items:
   owner: Chinmay
   added: '2026-10-30'
   change: CHG-CR346-001
+- id: LO-CR428-001
+  kind: deferred
+  platform: P13
+  screens: [CMS-103]
+  what: 'A sixteenth booking flow type, "cabana by size" (W6). CMS-103''s notes ("cabana on a map or by size") and its
+    design notes ("Cards for the 16 types", handoff/design-notes/white-label.yaml) name it; the system catalogue
+    (BookingFlowType x-ticvai-system-catalogue) has 15 types and no cabana-by-size type, so listBookingFlowTypes serves
+    15 cards.'
+  source: 'ADAM CR-428 (#31034 listBookingFlowTypes), decided 31 October 2026; screens/P13-white-label-cms.yaml CMS-103;
+    MoM 29 September W6; CHG-CR428-001'
+  reason: the decision names the 15 catalogue types and serves them verbatim; whether cabana by size is a type of its
+    own (its steps, its kinds) or a cabanaMap setting was not part of it, and inventing a type would be one nobody
+    decided
+  target: 'r13 or later: the lead decides whether the catalogue gains a cabana-by-size type or CMS-103''s notes drop it'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR428-001
+- id: LO-CR430-001
+  kind: deferred
+  platform: P13
+  screens: [CMS-016]
+  what: 'A later change of a venue''s GuestMatchPolicy.matchBy (marketing-crm setGuestMatchPolicy) is not checked
+    against the booking-flow guestContactFields in force at that venue, so a venue can come to match on a contact its
+    guest-checkout pop-up does not collect. setBookingFlowConfig checks the fields against the policy in force when the
+    fields are saved (ADAM CR-430).'
+  source: 'ADAM CR-430 (#31043 setBookingFlowConfig), decided 31 October 2026; CHG-CR430-001'
+  reason: the decision checks setBookingFlowConfig only; a check on setGuestMatchPolicy, which writes another module''s
+    row, was not part of it
+  target: 'r13 or later: the lead decides whether setGuestMatchPolicy refuses or warns'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR430-001
+- id: LO-CR435-001
+  kind: deferred
+  platform: P09
+  screens: [ADM-318]
+  what: 'listDeadLetters (platform-ops) still declares tenancy#outboxRecords over the service route between
+    deployables, which is not built, as republishOutbox did before ADAM CR-435.'
+  source: 'ADAM CR-435 (#27700 republish from the outbox), decided 31 October 2026; contracts/satellite/platform-ops.yaml
+    listDeadLetters; CHG-CR435-001'
+  reason: the decision settles republishOutbox only; whether listDeadLetters reads outbox rows at all, and by which
+    route, is a question of its own
+  target: 'r13 or later: its own CR or the lead''s ruling on the platform-ops reads of tenant outboxes'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR435-001

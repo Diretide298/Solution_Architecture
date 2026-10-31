@@ -1,0 +1,53 @@
+id: CHG-CR426-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'deleteBookingFlow asks catalogue#productRecords and catalogue#productCategoryRecords in process from the
+  operations host (XDR-051, on the SELECT V0118 already grants) and answers 409 flow-in-use, naming the products and
+  categories, in two cases: a product or category names the flow (where {bookingFlowId}), or the flow is the venue''s
+  default for its type, no other enabled default of the venue has a type listing the same kind, and a product on sale
+  (isSellable true, guestListing bookable, now inside onSaleFrom/onSaleTo where set: CR-394''s rule) would fall back to
+  it. Otherwise 204.'
+decision:
+  what: 'Posted on #31031 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction "Include them in r12": "as you recommended. Ask
+    catalogue#productRecords and catalogue#productCategoryRecords in process from the operations host, as createFnbOrder
+    (XDR-008) and validateTenantConfig (XDR-022) already do, on the SELECT grants V0118 already has ... register
+    Catalogue''s in-process query classes in the operations host. deleteBookingFlow answers 409 flow-in-use, naming the
+    products and categories, in two cases. (1) A product or category names the flow ... (2) The flow is the venue''s
+    default for its type, no other enabled default flow of the venue has a type that lists the same kind, and the venue
+    has a product on sale that would fall back to this flow ... On sale means isSellable true, guestListing bookable,
+    and the current time inside onSaleFrom and onSaleTo where they are set, the rule CR-394 uses. Otherwise the flow is
+    removed from the draft with 204. No grant or migration is needed."'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-426 (Hrushikant Patkar, #31031 deleteBookingFlow, blocking): both Catalogue reads were declared on the
+  service route between deployables, which is not built (CR-174), and "on sale" and "default for products on sale"
+  were not defined. The in-process route and grants already exist for these two queries (XDR-008, XDR-022, V0118).'
+keys_touched:
+  operations: [deleteBookingFlow]
+  tables: [catalogue.product, catalogue.product_media, catalogue.product_category, whitelabel.booking_flow]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/catalogue.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'XDR-051 (granted read; the grant is V0118''s, shared with CR-427)'
+root_class: 'storage-route gap: a cross-deployable read on a route that is not built, and a refusal rule that named no
+  product state'
+tickets:
+  started:
+  - '31031 (deleteBookingFlow, Hrushikant): build the 409 with the two in-process Catalogue reads and register
+    Catalogue''s query classes in OperationsModules.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-426
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-BOOKING-FLOW-RESOLVE
+status: open
+notes: 'tools/check-cross-module-reads.py XR-ROUTE holds the in-process reads to XDR-051. XDR-051 is this lane''s
+  own entry (lane H''s CR-394 adds its own for catalogue.event); it names catalogue.product_media because productRecords
+  reads it for Product.media[]. Beyond the posted words: none.'

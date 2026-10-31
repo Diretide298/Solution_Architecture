@@ -354,7 +354,7 @@ reads:
   privileges: [SELECT]
   queries: [catalogue#productRecords, tenancy#activeVenues]
   operations: [validateTenantConfig, publishTenantConfig, restoreConfigVersion, setAnalyticsProvider,
-    setMaintenanceMode]
+    setMaintenanceMode, setBookingFlowConfig]
   added: '2026-10-30'
   decision_ref: ADAM CR-343, Chinmay, 30 October 2026 (A's sellable rule and in-process read, narrowed, and with the
     venue read in process too)
@@ -369,6 +369,27 @@ reads:
     XDR-008), and tenancy#activeVenues, whose platform.scope is a kernel table every host may read (CR-002), as
     CR-296 ruled for Tenancy''s other reads, so no grant is added for it. restoreConfigVersion,
     setAnalyticsProvider (#30765) and setMaintenanceMode (#30766) ask tenancy#activeVenues in process under the same
-    ruling; the two tickets CR-281 left waiting for service sign-in waited only for this read. Not covered:
-    publishTenantConfig and restoreConfigVersion still ask orders#venueChargeCurrencies over the service route, and
-    getTenantConfig and setBookingFlowConfig still ask tenancy#activeVenues over it.'
+    ruling; the two tickets CR-281 left waiting for service sign-in waited only for this read. setBookingFlowConfig
+    (#31043) asks tenancy#activeVenues in process under the same ruling, to check each active venue''s guest contact
+    fields against the GuestMatchPolicy in force there (ADAM CR-430, Chinmay, 31 October 2026; CHG-CR430-001). Not
+    covered: publishTenantConfig and restoreConfigVersion still ask orders#venueChargeCurrencies over the service
+    route, and getTenantConfig still asks tenancy#activeVenues over it.'
+- id: XDR-051
+  reader: operations
+  tables: [catalogue.product, catalogue.product_media, catalogue.product_category]
+  privileges: [SELECT]
+  queries: [catalogue#productRecords, catalogue#productCategoryRecords]
+  operations: [deleteBookingFlow, getPublishedBookingFlow]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-426 (as recommended) and CR-427 (the reads and the 400 as recommended, the tie rule not),
+    Chinmay, 31 October 2026
+  why: 'white-label deleteBookingFlow (operations host, #31031) refuses 409 flow-in-use while a product or category
+    names the flow, or while it is the venue''s default for its type and a product on sale would fall back to it;
+    getPublishedBookingFlow (#31033) resolves a product''s or category''s flow. Both need Catalogue''s products
+    (catalogue.product, with catalogue.product_media for Product.media[]) and categories (catalogue.product_category),
+    Catalogue''s data in commerce, and both were declared on the service route between deployables, which is not
+    built (CR-174; the kernel''s service sign-in, #37051). The operations host asks catalogue#productRecords and
+    catalogue#productCategoryRecords in process, through Catalogue''s own query classes registered in the
+    operations host, in the caller''s transaction under the caller''s row-level security, with their where input,
+    as createFnbOrder does under XDR-008 and validateTenantConfig under XDR-022. The SELECT on the three tables is
+    the one V0118 already grants the operations role (XDR-008); no grant or migration is added.'

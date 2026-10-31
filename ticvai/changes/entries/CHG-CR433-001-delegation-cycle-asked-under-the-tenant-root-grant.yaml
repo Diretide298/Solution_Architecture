@@ -1,0 +1,52 @@
+id: CHG-CR433-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'Adds item (6) to CHG-CR362-001''s decision, changing none of (1) to (5): a new rule question
+  identity#delegationReaches (fromSubjectId, toSubjectId in; reaches out), one recursive statement under
+  ITenantRootGrant over identity.delegated_access following live ALLOW grants from subject_id to over_subject_id, both
+  subjects set, whoever recorded them. grantDelegation asks it with fromSubjectId = overSubjectId and toSubjectId = the
+  path''s subjectId and answers 409 delegation-cycle when it is true or the two are the same, for guests and staff; the
+  check and the insert hold one transaction advisory lock on the tenant''s delegation graph.'
+decision:
+  what: 'Posted on #30672 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction "Include them in r12": "as you recommended. Add the rule question
+    identity#delegationReaches. Its inputs are fromSubjectId and toSubjectId, and its output is reaches (true or false).
+    Identity answers it with one recursive statement under ITenantRootGrant over identity.delegated_access ... live
+    grants from holder (subject_id) to over_subject_id: effect ALLOW, not revoked, not past validTo, both subjects set,
+    whoever recorded them. Nothing but the boolean leaves the statement. grantDelegation asks it with fromSubjectId =
+    overSubjectId and toSubjectId = the path''s subjectId. It answers 409 delegation-cycle when the answer is true or the
+    two are the same subject, for guests and staff alike. Run the check and the insert in one transaction that holds a
+    transaction advisory lock on the tenant''s delegation graph ... This adds an item (6) to CR-362''s decision and
+    changes none of (1) to (5)."'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-433 (Hrushikant Patkar, #30672 grantDelegation): delegated_access''s read policy shows a guest only the
+  rows it holds, is over or granted, so the cycle walk under a guest''s grant could not see grants between two other
+  guests and the 409 delegation-cycle failed for guest callers. The yes/no question under ITenantRootGrant is the
+  settled pattern (CHG-CR336-001, CHG-CR362-001).'
+keys_touched:
+  operations: [grantDelegation]
+  tables: [identity.delegated_access]
+  files:
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'query identity#delegationReaches (new)'
+  - 'extends CHG-CR362-001 with item (6)'
+root_class: 'a rule check that must see beyond the caller''s scope, read under the caller''s row security'
+tickets:
+  started:
+  - '30672 (grantDelegation, Hrushikant): replace the walk under the caller''s grant with delegationReaches; take the
+    advisory lock around check and insert.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-433
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-DELEGATION-CYCLE
+status: open
+notes: 'No database object: a recursive query over the existing table. Built inside Identity behind its query
+  interface by the grantDelegation ticket (#30672); the lock key (a hash of the tenant and "delegation graph") is the
+  developer''s.'

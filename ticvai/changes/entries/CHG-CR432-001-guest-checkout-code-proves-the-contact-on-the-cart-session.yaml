@@ -1,0 +1,66 @@
+id: CHG-CR432-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'A guest-checkout code proves the contact for the cart and opens no account: verifyGuestOtp takes a correct
+  purpose verify code only under the cart''s anonymous guest session (security none or guestAuth), consumes the
+  challenge, records on that session the challenge''s identifier_hash as verifiedContactRef and the channel, and
+  answers 204 with no subject and no GuestSession; without the session it is 401 otp-code-invalid, a wrong attempt.
+  checkoutCart under the anonymous session takes verifiedContactRef from it (403 contactNotConfirmed when absent) and
+  writes the order with subjectId null and that verifiedContactRef, which order.created carries. No route makes a guest
+  profile: one is made only when the guest makes an account (the lead), and ADR-0045 section 3 is amended so.'
+decision:
+  what: 'Posted on #30661 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction "Include them in r12": "not as recommended: a guest-checkout code proves the
+    contact for this cart and opens no account, so no subject is created and no GuestSession is issued. verifyGuestOtp
+    takes a correct code of purpose verify only under the cart''s anonymous guest session (Cart.anonymousSessionToken,
+    CR-183) ... its security gains guestAuth beside none. It consumes the challenge and records on that anonymous
+    session ... verifiedContactRef and the channel. It then answers 204 No Content. A verify code sent without that
+    session is refused 401 otp-code-invalid and counts as a wrong attempt. checkoutCart under an anonymous session takes
+    verifiedContactRef from the verified session and answers 403 contactNotConfirmed when it is absent. It writes the
+    order with subjectId null and that verifiedContactRef ... Codes of the other purposes answer as now." The lead''s
+    answer to the CR''s question, 31 October 2026: "a guest profile is created only when the guest later makes an
+    account."'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-432 (Hrushikant Patkar, #30661 verifyGuestOtp): since the CR-370 follow-up a purpose verify code reaches a
+  contact with no account, but verifyGuestOtp answered only a GuestSession (which needs a subject) or 401, and nothing
+  said how checkoutCart learns the contact was proved. The CR''s option A (a pii.subject at the code step) would block
+  CR-361''s linkGuestCheckout with registerGuest''s 409, and ADR-0045 section 4 forbids a session on an existing
+  profile. The r10 subject-less order (CHG-R10ID-018) and the anonymous cart session (CR-183) already carry it.'
+keys_touched:
+  operations: [verifyGuestOtp, checkoutCart, verifyGuestEmail]
+  screens: [WEB-016, GST-042]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - docs/adr/0045-every-order-carries-a-proven-contact.md
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'query identity#openAnonymousGuestSession (the session holds verifiedContactRef and channel)'
+  - 'BC-570 (verifyGuestOtp security gains guestAuth beside none; the new 204)'
+root_class: 'an operation whose only success answer needs a record the decided model never makes'
+tickets:
+  started:
+  - '30661 (verifyGuestOtp, Hrushikant): accept a verify code only under the anonymous cart session, record
+    verifiedContactRef on it, answer 204.'
+  - '31129 (checkoutCart): read verifiedContactRef from the anonymous session, 403 contactNotConfirmed without it, write
+    it on the order and order.created.'
+  - '30697 (WEB-016 connect to API) and 30703 (GST-042 connect to API): send the cart''s anonymous session token with a
+    guest-checkout code and treat 204 as proved (back to the cart and on to payment); no visible change.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-432
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-GUEST-CHECKOUT-PROOF
+status: open
+notes: 'The WEB-016 and GST-042 Code-field notes are page info only; nothing visible changes. Beyond the posted words:
+  verifyGuestOtp''s summary ("... and issue a session") is kept, because the screens'' api purposes are written from it;
+  its description says a purpose verify code issues none. The contract cites the cart''s anonymous session as the token
+  openAnonymousGuestSession minted rather than by Cart.anonymousSessionToken, an orders field, so the text names no
+  other module''s field it does not read (check-cross-module-reads XR-FACT).'

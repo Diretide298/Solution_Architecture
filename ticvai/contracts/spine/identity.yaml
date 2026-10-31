@@ -97,7 +97,11 @@ x-ticvai-queries:
       (guestAuth); a call under it acts on its own cart only: Orders runs that cart''s statements under the routed
       tenant''s root grant once Identity has verified the token and its cart, as a verified order access token reads its
       one order (getOrder, ADAM CR-191). A second call for the same cart and device returns the session already open
-      (the createCart Idempotency-Key makes a retry return the first answer anyway).'
+      (the createCart Idempotency-Key makes a retry return the first answer anyway). **The session holds the proved
+      contact** (ADAM CR-432, decided 31 October 2026; CHG-CR432-001): once verifyGuestOtp has taken a correct
+      purpose `verify` code under it, the session records, beside its cart and device in the session registry, the
+      challenge''s identifier_hash as verifiedContactRef and the channel. checkoutCart under this session takes
+      verifiedContactRef from it; no subject is created and no GuestSession is issued.'
     served: [in-process]
   endAnonymousGuestSession:
     module: identity
@@ -168,6 +172,30 @@ x-ticvai-queries:
       the tenant's regions; with no region settings, 18. An id with no row is absent. Asked in process by
       grantDelegation, for the path's subjectId (unknown counts as a minor), and by listDelegations, only for the
       other party of rows the caller can already see (overSubjectName, and overSubjectIsMinor, null when unknown).
+    served: [in-process]
+  # **Whether one guest already reaches another through live delegations, as a yes or no** (ADAM CR-433, decided 31
+  # October 2026; CHG-CR433-001). grantDelegation walked identity.delegated_access under the guest's own read policy,
+  # which shows a guest only the rows it holds, is over or granted, so a loop through other guests' grants was not seen.
+  delegationReaches:
+    module: identity
+    table: identity.delegated_access
+    inputs:
+      fromSubjectId: {type: string, format: uuid, description: 'Where the walk starts: grantDelegation''s overSubjectId.'}
+      toSubjectId: {type: string, format: uuid, description: 'Where it must not arrive: grantDelegation''s path subjectId, the holder of the new grant.'}
+    returns:
+      type: object
+      required: [reaches]
+      properties:
+        reaches: {type: boolean, description: 'True when a chain of live grants leads from fromSubjectId to toSubjectId. Which grants, whose and how many are never returned.'}
+    rule: >-
+      A rule question (ADAM CR-433, Chinmay, 31 October 2026: "as you recommended"). Identity answers it with one
+      recursive statement under the routed tenant's root grant (ITenantRootGrant) over identity.delegated_access. The
+      statement follows live grants from holder (subject_id) to over_subject_id: effect `ALLOW`, revoked_at null,
+      valid_to absent or after now, both subject_id and over_subject_id set, whoever recorded them (a guest, staff on
+      a holder's behalf, or the system). Nothing but `reaches` leaves the statement, and the caller's own grant is
+      in force again for every other statement of its transaction. Asked in process by grantDelegation, with
+      fromSubjectId = overSubjectId and toSubjectId = the path's subjectId, for guests and staff alike; true is its
+      409 delegation-cycle.
     served: [in-process]
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
@@ -805,10 +833,13 @@ paths:
         go to with a one-time code at checkout (`requestGuestOtp`, purpose `verify`) — the *dual OTP
         validation* of the reference checkout the client walked through.
 
-        **Both routes produce a guest profile**, because the tickets have to go somewhere and the order
-        has to belong to something. **A one-time checkout profile carries no credential** — recalling
-        previous transactions needs access set up separately (matrix 2.6.29), which is what
-        `linkGuestCheckout` does from the other direction.
+        **A guest checkout opens no account and creates no profile** (ADAM CR-432, decided 31 October 2026; the
+        lead, the same day: "a guest profile is created only when the guest later makes an account"). The code
+        proves the contact for this cart: `verifyGuestOtp` takes the purpose `verify` code under the cart''s
+        anonymous guest session and records the proved contact on it, and `checkoutCart` writes the order with no
+        subject and that `verifiedContactRef`, which `order.created` carries, so the tickets go to a proven address.
+        Recalling previous transactions needs an account (matrix 2.6.29): `linkGuestCheckout` attaches those
+        subject-less orders once the guest makes one (ADAM CR-361).
 
         **A returning verified contact attaches to the profile already held** (matrix 22.2.8) — the new
         order, its tickets and its history, automatically, with no duplicate record. **It does not open
@@ -1828,6 +1859,11 @@ paths:
         for: 'the tenant root''s scope id and path (level tenant) a grant is stored at, one statement under
           ITenantRootGrant; constant per tenant database, so it may be cached for the process (ADAM CR-362;
           CHG-CR362-001)'
+      - query: identity#delegationReaches
+        route: in-process
+        for: 'the 409 delegation-cycle: whether overSubjectId already reaches the path''s subjectId through live
+          ALLOW grants, one recursive statement under ITenantRootGrant over identity.delegated_access, for guests
+          and staff alike (ADAM CR-433; CHG-CR433-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1884,7 +1920,15 @@ paths:
         already shows the guest. This operation still allows that grant only when `overSubjectId` is a minor.
         (4) The minor age is the `minorAgeThreshold` of the region of the venue the session is in; with no venue,
         the highest threshold among the tenant''s regions; with no region settings, 18. (5) Staff need
-        `GUEST_MANAGE` at the tenant root; a venue-scoped grant answers 403.
+        `GUEST_MANAGE` at the tenant root; a venue-scoped grant answers 403. (6) (ADAM CR-433, decided 31 October
+        2026, Chinmay; CHG-CR433-001; it changes none of (1) to (5)) The cycle check asks `identity#delegationReaches`
+        with `fromSubjectId` = `overSubjectId` and `toSubjectId` = the path''s `subjectId`: one recursive statement
+        under `ITenantRootGrant` over `identity.delegated_access`, following live grants from holder (`subject_id`) to
+        `over_subject_id` (effect ALLOW, not revoked, not past `validTo`, both subjects set, whoever recorded them),
+        and nothing but the boolean leaves it. The answer is 409 `delegation-cycle` when it is true or the two are
+        the same subject, for guests and staff alike. The check and the insert run in one transaction that holds a
+        transaction advisory lock on the tenant''s delegation graph, so two grants made at once cannot close a loop
+        between them.
 
         '
       tags:
@@ -1957,7 +2001,9 @@ paths:
             concern rather than a modelling one. A subject with no date of birth counts as a minor
             (audit R126). `minor-grants-adult-authority`: the path''s `subjectId` is a minor (below
             `RegionSettings.minorAgeThreshold`, or no date of birth) and `overSubjectId` is an adult
-            (IDENTITY-C19, CHG-R8SPN-024).
+            (IDENTITY-C19, CHG-R8SPN-024). `delegation-cycle`: `identity#delegationReaches` answers true from
+            `overSubjectId` to the path''s `subjectId`, or the two are the same subject, for guests and staff alike
+            (ADAM CR-433).
 
             '
           content:
@@ -3547,11 +3593,16 @@ paths:
         outbox.
 
 
-        **An identifier that resolves to nobody** (the CR-370 follow-up, 31 October 2026). With purpose `login`,
-        `passwordReset` or `stepUp` nothing is written for the code (no `otp_challenge` row, no
-        `identity.guestCodeIssued`) and the answer is the same `202`; `passwordReset` still publishes
-        `identity.credentialResetRequested`, as above. With purpose `register` or `verify` an identifier with no account
-        still gets a code: the `otp_challenge` row and `identity.guestCodeIssued` are written with `subjectId` null.
+        **An identifier that resolves to nobody** (the CR-370 follow-up, 31 October 2026, changed in one point by ADAM
+        CR-431 the same day; CHG-CR431-001). With purpose `login`, `passwordReset` or `stepUp` it gets its
+        `identity.otp_challenge` row: `subject_id` null, the `code_hash` of a random code that is generated and never
+        sent, and `expires_at` and `resend_after` as for any code. There is still no `identity.guestCodeIssued`, no
+        delivery and no message, and the answer is the same `202`. The per-identifier limit and the resend interval
+        read these rows like any other, so a second request inside `resend_after` answers the same `429`
+        `rate-limited` with `Retry-After`, whether or not the identifier has an account; `verifyGuestOtp` refuses any
+        code against such a row. `passwordReset` still publishes `identity.credentialResetRequested`, as above. With
+        purpose `register` or `verify` an identifier with no account still gets a code: the `otp_challenge` row and
+        `identity.guestCodeIssued` are written with `subjectId` null.
 
 
         **Lifetime and resend interval** (ADAM CR-370). `VenueSettings.identity.guestOtpLifetimeSeconds` (default 600)
@@ -3635,6 +3686,25 @@ paths:
       x-ticvai-audience:
       - anonymous
       summary: Verify a one-time code and issue a session
+      description: '**A guest-checkout code proves the contact for this cart and opens no account** (ADAM CR-432,
+        decided 31 October 2026, Chinmay; CHG-CR432-001; the lead, the same day: a guest profile is created only when
+        the guest later makes an account). A correct code of purpose `verify` is taken only under the cart''s
+        anonymous guest session (the token `openAnonymousGuestSession` minted for the cart, ADAM CR-183), whether or
+        not an account holds the contact. It consumes the challenge and records on that anonymous session, in Identity''s session registry,
+        the challenge''s `identifier_hash` as `verifiedContactRef` and the channel, then answers `204 No Content`:
+        no subject is created and no `GuestSession` is issued. A purpose `verify` code sent without that session is
+        refused `401 otp-code-invalid` and counts as a wrong attempt. `checkoutCart` then takes `verifiedContactRef`
+        from the session and writes the order with no subject; `linkGuestCheckout` attaches it once the guest makes
+        an account (ADAM CR-361), and a returning contact attaches as ADR-0045 section 4 says, never with a session
+        on that profile. Codes of the other purposes answer as before: `200` with the `GuestSession`.
+
+
+        **A row written for nobody** (ADAM CR-431, decided 31 October 2026; CHG-CR431-001). Any code against an
+        `otp_challenge` row with no subject of purpose `login`, `passwordReset` or `stepUp` (written by
+        `requestGuestOtp` for an identifier that resolves to nobody, its code never sent) is refused `401
+        otp-code-invalid` and counts as a wrong attempt, as a wrong code does.
+
+        '
       tags:
       - guestAuth
       x-ticvai-permission: null
@@ -3643,7 +3713,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
-      security: []
+      # A guest-checkout code (purpose verify) is taken under the cart's anonymous guest session (ADAM CR-432); every
+      # other code needs no session, as before. Only an alternative was added.
+      security:
+      - {}
+      - guestAuth: []
       requestBody:
         required: true
         content:
@@ -3680,13 +3754,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestSession'
+        '204':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: 'A guest-checkout code (purpose `verify`) proved under the cart''s anonymous guest session: the
+            session now holds `verifiedContactRef` and the channel; no subject, no `GuestSession` (ADAM CR-432).'
         '401':
           x-ticvai-problem-types: [otp-code-invalid, otp-code-expired, otp-attempts-exceeded]
           description: 'Code invalid or expired. Attempts are counted; the code is invalidated after the
             configured limit rather than allowing indefinite guessing. **The limit is
             `VenueSettings.identity.guestOtpMaxAttempts`, read from the tenant default** (a guest code
             is tenant-scoped; decided 28 September, audit R094). **Proposed default 5 wrong entries,
-            bounds 3 to 10, client to correct (audit R094).**
+            bounds 3 to 10, client to correct (audit R094).** Also `otp-code-invalid`, counted as a wrong
+            attempt: any code against a subject-null `login`, `passwordReset` or `stepUp` row (ADAM CR-431), and a
+            purpose `verify` code sent without the anonymous guest session the checkout runs under (ADAM CR-432).
 
             '
           content:
@@ -9844,10 +9926,13 @@ components:
         reads it by `identifierHash`, counts wrong codes in `failedAttempts` up to `attemptLimit` and sets `consumedAt`
         on success; `verifyGuestEmail` writes the `send` half''s token and consumes it on `confirm`. **`subjectId` is
         null where no account exists yet**: purpose `register` or `verify` to an identifier with no account, which
-        still gets a code (ADAM CR-370 follow-up, 31 October 2026). With purpose `login`, `passwordReset` or `stepUp`
-        an identifier that resolves to nobody gets no row and no code, and the same answer. Under the subject policy
-        (920) a row with no subject is reachable only in the tenant-root context. **Each row is sent by
-        `identity.guestCodeIssued`** (ADAM CR-370), written in the same transaction.'
+        still gets a code (ADAM CR-370 follow-up, 31 October 2026), and with purpose `login`, `passwordReset` or
+        `stepUp` an identifier that resolves to nobody: that row''s `codeHash` is of a random code generated and never
+        sent, so the per-identifier limit and the resend interval answer alike for known and unknown identifiers, and
+        `verifyGuestOtp` refuses any code against it (ADAM CR-431, 31 October 2026; CHG-CR431-001). Under the subject
+        policy (920) a row with no subject is reachable only in the tenant-root context. **Each row is sent by
+        `identity.guestCodeIssued`** (ADAM CR-370), written in the same transaction, except a never-sent row of
+        CR-431, which has no event, no delivery and no message.'
       required: [identifierHash, channel, purpose, codeHash, expiresAt, failedAttempts, attemptLimit]
       properties:
         subjectId:

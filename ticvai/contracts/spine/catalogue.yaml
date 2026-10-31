@@ -388,7 +388,10 @@ x-ticvai-queries:
       CR-167; ADR-0055, amended 25 October 2026). It is asked in process by the operations host for
       createFnbOrder's productCategory routing match (ADAM CR-277, option A, 28 October 2026; XDR-008), and for
       validateTenantConfig's and publishTenantConfig's bookingFlowMissing, where {venueId} for each active venue
-      (ADAM CR-343, 30 October 2026; XDR-022).
+      (ADAM CR-343, 30 October 2026; XDR-022). It is asked in process by the operations host for white-label
+      deleteBookingFlow's 409 flow-in-use (where {bookingFlowId}, and the venue's products on sale that would fall
+      back to the flow; ADAM CR-426) and for getPublishedBookingFlow's resolution (ids [productId] where {venueId};
+      ADAM CR-427), 31 October 2026; XDR-051.
     served: [in-process, service]
   # **Which products list an asset** (ADAM CR-309, option (b), Chinmay, 29 October 2026; CHG-CR309-001). Assets'
   # deleteMediaAsset (operations host) refuses 409 in-use while a product lists the asset, and productRecords answers
@@ -468,7 +471,9 @@ x-ticvai-queries:
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked in process within commerce, through the C# query interface Catalogue implements, and
       asked from another deployable through Catalogue's service route (serviceAuth). It is asked in process by the
-      operations host for createFnbOrder's productCategory routing match (ADAM CR-277; XDR-008).
+      operations host for createFnbOrder's productCategory routing match (ADAM CR-277; XDR-008), and for white-label
+      deleteBookingFlow's 409 flow-in-use (where {bookingFlowId}; ADAM CR-426) and getPublishedBookingFlow's
+      category step (ADAM CR-427), 31 October 2026; XDR-051.
     served: [in-process, service]
   productEligibilityRuleRecords:
     module: catalogue
@@ -22924,7 +22929,8 @@ components:
           format: uuid
           nullable: true
           description: '**The booking flow for every product filed here** that names none of its own (decided 29
-            September, W12, BO-115). Null means the venue''s flow for each product''s `kind`. A white-label
+            September, W12, BO-115). Null means the venue''s flow for each product''s `kind`, as white-label
+            `getPublishedBookingFlow`''s kind rule picks it (ADAM CR-427). A white-label
             `BookingFlow` of the venue; `setProductCategories` refuses any other id with `422`.
 
             '
@@ -24611,7 +24617,10 @@ components:
           description: '**The booking flow this product is sold through** (decided 29 September, W8 and W12): a
             white-label `BookingFlow` of the venue, which orders the guest''s steps (for a workshop, the product
             first and then the date and time). Null means the category''s flow
-            (`ProductCategory.bookingFlowId`), and failing that the venue''s flow for the product''s `kind`.
+            (`ProductCategory.bookingFlowId`), and failing that the venue''s flow for the product''s `kind`, as
+            white-label `getPublishedBookingFlow`''s kind rule picks it where several of the venue''s enabled
+            defaults list the kind (ADAM CR-427, 31 October 2026). A venue that wants a different flow for a
+            product sets this or the category''s `bookingFlowId`.
             Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue
             with `422`.
 

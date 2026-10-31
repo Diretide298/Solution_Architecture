@@ -399,7 +399,8 @@ x-ticvai-queries:
       Tenancy's service route (serviceAuth). The operations host asks it in process, through Tenancy's own query
       class and under the caller's row-level security, for validateTenantConfig, publishTenantConfig,
       restoreConfigVersion, setAnalyticsProvider and setMaintenanceMode (ADAM CR-343, 30 October 2026; XDR-022;
-      CHG-CR343-001): platform.scope is a kernel table every host's role may read (CR-002), as CR-296 ruled for
+      CHG-CR343-001), and for setBookingFlowConfig's per-venue guest contact check (ADAM CR-430, 31 October 2026;
+      CHG-CR430-001): platform.scope is a kernel table every host's role may read (CR-002), as CR-296 ruled for
       Tenancy's other reads, so no grant is added.
     served: [in-process, service]
 paths:

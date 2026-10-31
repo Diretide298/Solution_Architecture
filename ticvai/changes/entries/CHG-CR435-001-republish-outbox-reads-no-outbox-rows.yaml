@@ -1,0 +1,48 @@
+id: CHG-CR435-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'republishOutbox declares no x-ticvai-read-via: it reads no outbox rows. Its 422 outbox-range-archived bound
+  comes from the tenant database''s partition catalogue (the lower bound of the oldest attached outbox partition, the
+  bound CR-201 gave the webhook replay dispatcher); it writes control.outbox_republish and the workers relay reads the
+  rows under the tenant''s lease (ADR-0058). Its carried lineage read of platform.outbox is removed from
+  handoff/api-data-lineage-overrides.json.'
+decision:
+  what: 'Posted on #27700 (Chinmay, 31 October 2026), after the lead''s review of 31 October 2026 ("for each one actually check if they hold and if not then find out the best way keeping in mind what client needs") and his instruction "Include them in r12": "as you recommended, with one correction:
+    tenancy#outboxRecords does exist (contracts/spine/tenancy.yaml, a plain data read served only on the service
+    route). So the declaration pointed at a read this operation does not make, not at nothing. Remove the
+    x-ticvai-read-via from republishOutbox. The operation reads no outbox rows. It takes the 422 outbox-range-archived
+    bound from the tenant database''s partition catalogue: the lower bound of the oldest attached platform.outbox
+    partition, the same bound the webhook replay dispatcher uses (CR-201). It writes control.outbox_republish, and the
+    workers relay reads the rows under the tenant''s lease (ADR-0058). Keep what you built in #27700."'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-435 (Hrushikant Patkar, #27700 republish from the outbox): the read-via named a read the operation does
+  not make, on the unbuilt service route. It came from a lineage read carried from the hand-kept lineage (CHG-R8GEN-001)
+  that CHG-MOD-001 then covered with a query; ADR-0058 section 3 has the relay read the rows.'
+keys_touched:
+  operations: [republishOutbox]
+  tables: [platform.outbox, control.outbox_republish]
+  files:
+  - contracts/satellite/platform-ops.yaml
+  - handoff/api-data-lineage-overrides.json
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+root_class: 'a carried lineage read the operation does not make, turned into a declared query read'
+tickets:
+  started:
+  - '27700 (republish from the outbox, Hrushikant): no change.'
+  - '34117 (republishOutbox): no change.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-435
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-OUTBOX-REPUBLISH-READS
+status: open
+notes: 'The source of the read was the override entry (carried), so removing it there is the fix at the source; the
+  description names the outbox without its table name so XR-FACT and P-NAMED-TABLE read no read into it. Left out, same
+  class: listDeadLetters still declares tenancy#outboxRecords over the service route (LO-CR435-001). ADAM side: search
+  did not find tenancy#outboxRecords (viewer/lib/search.mjs), as for CR-344.'
