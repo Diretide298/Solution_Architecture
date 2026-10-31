@@ -1,0 +1,52 @@
+id: CHG-CR372-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'Dashboard.aggregateCost states its rule: the load is the sum over the tiles of 60 / refreshSeconds (a tile
+  with no refreshSeconds adds 0), the share is the load divided by the refresh budget createDashboard already checks
+  (the venue''s, else the tenant default), and the band is low below 0.5, medium from 0.5 to below 0.8, high from 0.8;
+  a share above 1 is still refused 400 refresh-budget-exceeded first. createDashboard and updateDashboard work it out
+  and store it on every save; a later budget change does not rewrite stored dashboards. The bands are proposed
+  defaults on the configured-limits sheet.'
+decision:
+  what: 'The lead''s review, 31 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs", then "Include them in r12". Posted on #33107 (Chinmay, 31 October
+    2026), as recommended: the load is the sum over the tiles of 60 / refreshSeconds; a tile with no refreshSeconds
+    adds 0; the share is the load divided by VenueSettings.reporting.dashboardRefreshBudgetPerMinute for the
+    dashboard''s venueId, the tenant default when venueId is absent; low below 0.5, medium from 0.5 to below 0.8, high
+    from 0.8; a share above 1 is still refused 400 refresh-budget-exceeded before the band is worked out;
+    createDashboard and updateDashboard store it in reporting.dashboard.aggregate_cost on every save; a later change
+    to the budget does not rewrite stored dashboards; the bands 0.5 and 0.8 are proposed defaults for the client to
+    correct. Replace the 500 with this.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-372 (Hrushikant Patkar, #33107 createDashboard): Dashboard.aggregateCost was required with enum low,
+  medium and high and only the words "Combined refresh load of every tile", and reporting.dashboard.aggregate_cost is
+  NOT NULL, so no rule existed and the build answered 500. The only cost control the contract names is the refresh
+  budget (audit R094), so the band is measured against it. CF-169: the editor must warn of a heavy dashboard.'
+keys_touched:
+  operations: [createDashboard, updateDashboard]
+  schemas: [Dashboard]
+  tables: [reporting.dashboard]
+  files:
+  - contracts/satellite/reporting.yaml
+  - docs/active/configured-limits-proposal.md
+  - tools/check-business-rules.py
+root_class: 'a required computed enum whose bands nothing states'
+tickets:
+  started:
+  - '33107 (createDashboard and the dashboard writes): replace the unregistered cost-band rule (the 500) with the
+    share-of-budget bands and store the value on create and update. Told through the lead''s comment; its text is not
+    rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-372
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-DASHBOARD-COST
+status: open
+notes: 'docs/active/configured-limits-proposal.md gains row 30, "Dashboard cost bands": not a setting (the bands are
+  stated on Dashboard.aggregateCost), proposed medium from 0.5 and high from 0.8, client operations to correct. No
+  column added: reporting.dashboard.aggregate_cost exists and keeps its three values.'

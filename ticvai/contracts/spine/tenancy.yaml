@@ -4277,6 +4277,12 @@ components:
         this schema, so the interceptor's control variant runs on the control connection (ControlDbContext) and
         writes a `ControlAuditRecord` in the write's own transaction instead; these rows are the tenant
         database's only.
+
+
+        **A reason the request gave is kept on the row** (ADAM CR-376, Chinmay, 31 October 2026; CHG-CR376-001).
+        An operation whose request carries a reason the audit is to record puts it on the request's audit context,
+        and the audit interceptor writes it to `reason` in the same row as the other audit fields;
+        `resetPrincipalCredential` does this with the body's `reason`. Null where the request gave none.
       required: [id, action, occurredAt]
       properties:
         id: { type: string, format: uuid, readOnly: true }
@@ -4317,6 +4323,15 @@ components:
             (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the
             tenant's own staff. Every platform action in a tenant carries one, so the tenant can
             see all of them.
+        reason:
+          type: string
+          nullable: true
+          minLength: 3
+          maxLength: 500
+          description: >
+            **Why it was done, where the request said** (ADAM CR-376, 31 October 2026; CHG-CR376-001): the reason the
+            operation put on the request's audit context, written by the audit interceptor in this row;
+            `listAuditRecords` returns it. Null where the request gave none.
 
     VenueOpeningHours:
       type: object

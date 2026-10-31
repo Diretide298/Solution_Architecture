@@ -65,7 +65,9 @@ And one rule per decision:
   BR-PRESET-READONLY (r10, ADAM CR-176, CHG-R10ID-005) setCapabilityTemplate refuses a preset's id with 409
                    capability-template-is-preset.
   BR-END-SESSIONS  (r10, ADAM CR-180, CHG-R10ID-006) updatePrincipal ends a principal's sessions and refresh tokens through
-                   identity.end_principal_sessions, which tools/derive-ddl.py writes.
+                   identity.end_principal_sessions, which tools/derive-ddl.py writes; since r12 (ADAM CR-377,
+                   CHG-CR377-001) resetPrincipalCredential does too, with end reason credential-reset, which
+                   ActiveSession.endReason names.
   BR-PLATFORM-TOKEN (r10, ADAM CR-175, CHG-R10ID-007) ADR-0072 defines the platform token; the Control Plane holds the
                    operator, its platform session and its second factors; openPlatformStaffGrant cites the ADR.
   BR-GUEST-TOKENS  (r10, ADAM CR-100, CHG-R10ID-009) getGuestSession answers GuestSessionView, which has no tokens;
@@ -198,6 +200,29 @@ And one rule per decision:
   BR-RESTORE-MISSING-PAGE (r12, ADAM CR-350, CHG-CR350-001) restoreConfigVersion restores a section or navigation item
                    whose content page is gone hidden (contentPageId null, isVisible false), never refuses for it, and
                    keeps content_page.is_referenced.
+  BR-DASHBOARD-COST (r12, ADAM CR-372, CHG-CR372-001) Dashboard.aggregateCost states its rule (60 / refreshSeconds per
+                   tile, a share of the refresh budget, bands 0.5 and 0.8) and createDashboard and updateDashboard store
+                   it on every save.
+  BR-DASHBOARD-ENTITLEMENT (r12, ADAM CR-373, CHG-CR373-001) createDashboard, updateDashboard, listDashboards and
+                   getCommandCentre ask the three Subscription licence reads in process; the rule is stated on
+                   CreateDashboardRequest.module (x-ticvai-permission-modules and the session); both writes refuse 409
+                   module-not-licensed or module-permission-not-held, and module-not-entitled is gone.
+  BR-TILE-MARKS    (r12, ADAM CR-374, CHG-CR374-001) every DashboardTile.visualisation mark has its row in the mark
+                   table, and "as their names" is gone.
+  BR-AUDIT-REASON  (r12, ADAM CR-376, CHG-CR376-001) AuditRecord.reason (platform.audit_record.reason, 3 to 500
+                   characters) exists, resetPrincipalCredential writes its reason there, and every request field
+                   that says it is "recorded in the audit" says it is the audit row's reason.
+  BR-PRIVACY-CONSENT (r12, ADAM CR-378, CHG-CR378-001) listPrivacyConsent states every count's source, every warning
+                   code's rule, every directory type's source and status map and every filter's reach, and declares
+                   the nine Marketing tables it reads; each count on the view says what it counts.
+  BR-GUEST-BROADCAST (r12, ADAM CR-379, CHG-CR379-001) broadcastToGuests names its venue, writes
+                   workforce.guest_broadcast and emits workforce.guestBroadcastAccepted (critical consumer
+                   marketing-crm sendGuestBroadcast), asks access#liveEntitlementSubjects, signs an evacuation with
+                   supervisorStepUp (403 supervisor-step-up-refused), and no longer writes through
+                   sendTransactionalMessage; the operations host's read of access.entitlement is an XDR entry.
+  BR-OPEN-SHIFT-CLAIM (r12, ADAM CR-380, CHG-CR380-001) claimOpenShift reads the training records, staffing rules and
+                   rota it checks, asks the role and overlap queries, writes the open shift and the rota assignment, and
+                   answers 409 rota-assignment-overlap; OpenShift.requiredQualifications states the courseName match.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -920,6 +945,13 @@ def main() -> int:
     need("BR-END-SESSIONS", "FUNCTION identity.end_principal_sessions" in
          (ROOT / "tools" / "derive-ddl.py").read_text(encoding="utf-8"),
          "tools/derive-ddl.py does not write identity.end_principal_sessions")
+    rpc = op("resetPrincipalCredential")[3]
+    need("BR-END-SESSIONS", "identity.end_principal_sessions" in text(rpc) and "credential-reset" in text(rpc),
+         "resetPrincipalCredential does not end sessions through identity.end_principal_sessions with end reason "
+         "credential-reset (CR-377)")
+    aser = ((isch.get("ActiveSession") or {}).get("properties") or {}).get("endReason") or {}
+    need("BR-END-SESSIONS", "credential-reset" in str(aser.get("description") or ""),
+         "ActiveSession.endReason does not name credential-reset (CR-377)")
     # BR-PLATFORM-TOKEN (ADAM CR-175, CHG-R10ID-007)
     need("BR-PLATFORM-TOKEN", any((ROOT / "docs" / "adr").glob("0072-*.md")), "ADR-0072 (the platform token) is missing")
     need("BR-PLATFORM-TOKEN", "ADR-0072" in text(op("openPlatformStaffGrant")[3]),
@@ -1555,6 +1587,152 @@ def main() -> int:
         need("BR-RESTORE-MISSING-PAGE", word in rtext,
              f"restoreConfigVersion does not say {word!r} for a page deleted since the version (CR-350)")
 
+    # ---------------------------------------------------------------- r12 CR lane F (31 October 2026; the lead: "for
+    # each one actually check if they hold and if not then find out the best way keeping in mind what client needs").
+    def writes_of(oid):
+        return {str(r.get("table")) for r in op(oid)[3].get("x-ticvai-writes") or [] if isinstance(r, dict)}
+
+    def ptypes(oid, code):
+        return set((((op(oid)[3].get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types")) or [])
+
+    rdoc_ = load("contracts/satellite/reporting.yaml")
+    rsch_ = (rdoc_.get("components") or {}).get("schemas") or {}
+    # BR-DASHBOARD-COST (ADAM CR-372; CHG-CR372-001)
+    acost = flat(props(rdoc_, rsch_.get("Dashboard") or {}).get("aggregateCost") or {})
+    for frag in ("60 / `refreshSeconds`", "adds 0", "dashboardRefreshBudgetPerMinute", "below 0.5",
+                 "from 0.5 to below 0.8", "from 0.8", "refresh-budget-exceeded", "reporting.dashboard.aggregate_cost"):
+        need("BR-DASHBOARD-COST", frag in acost, f"Dashboard.aggregateCost does not state {frag!r} (CR-372)")
+    for oid in ("createDashboard", "updateDashboard"):
+        need("BR-DASHBOARD-COST", "`aggregateCost` is worked out" in flat(op(oid)[3].get("description") or ""),
+             f"{oid} does not say it works out and stores aggregateCost on save (CR-372)")
+    # BR-DASHBOARD-ENTITLEMENT (ADAM CR-373; CHG-CR373-001)
+    lic = {"subscription#contractRecords", "subscription#licenceAddOnRecords", "subscription#planRecords"}
+    for oid in ("createDashboard", "updateDashboard", "listDashboards", "getCommandCentre"):
+        miss = lic - vias_of(oid)
+        need("BR-DASHBOARD-ENTITLEMENT", not miss, f"{oid} does not ask {', '.join(sorted(miss))} in process (CR-373)")
+    for oid in ("createDashboard", "updateDashboard"):
+        need("BR-DASHBOARD-ENTITLEMENT", {"module-not-licensed", "module-permission-not-held"} <= ptypes(oid, "409"),
+             f"{oid}'s 409 does not name module-not-licensed and module-permission-not-held (CR-373)")
+    for oid_, (f_, _p, _m, o_, _d) in sorted(ops.items()):
+        if f_.name == "reporting.yaml":
+            need("BR-DASHBOARD-ENTITLEMENT", "module-not-entitled" not in problem_types(o_),
+                 f"{oid_} still answers module-not-entitled for the entitlement guard (CR-373)")
+    cdr = flat(rsch_.get("CreateDashboardRequest") or {})
+    for frag in ("x-ticvai-permission-modules", "permissionsByScope", "`core` is always", "empty list"):
+        need("BR-DASHBOARD-ENTITLEMENT", frag in cdr,
+             f"CreateDashboardRequest.module's entitlement rule does not state {frag!r} (CR-373)")
+    # BR-TILE-MARKS (ADAM CR-374; CHG-CR374-001)
+    dtv = props(rdoc_, rsch_.get("DashboardTile") or {}).get("visualisation") or {}
+    marks = list(dtv.get("enum") or [])
+    if not marks and isinstance(dtv.get("$ref"), str):
+        marks = list((rsch_.get(dtv["$ref"].rsplit("/", 1)[1]) or {}).get("enum") or [])
+    note = str(dtv.get("x-ticvai-note") or dtv.get("description") or "")
+    table_rows = [ln for ln in note.splitlines() if ln.strip().startswith("|")]
+    need("BR-TILE-MARKS", bool(marks), "DashboardTile.visualisation lists no marks (CR-374)")
+    for m in marks:
+        need("BR-TILE-MARKS", any(f"`{m}`" in r for r in table_rows) or f"`{m}` one measure" in note
+             or m in ("line", "area", "bar") or m.startswith("stacked"),
+             f"DashboardTile.visualisation mark {m} has no row saying what it binds (CR-374)")
+    need("BR-TILE-MARKS", "as their names" not in note, "DashboardTile.visualisation still says 'as their names' (CR-374)")
+    # BR-AUDIT-REASON (ADAM CR-376; CHG-CR376-001)
+    tsch_ = (load("contracts/spine/tenancy.yaml").get("components") or {}).get("schemas") or {}
+    arr = ((tsch_.get("AuditRecord") or {}).get("properties") or {}).get("reason") or {}
+    need("BR-AUDIT-REASON", arr.get("nullable") is True and arr.get("minLength") == 3 and arr.get("maxLength") == 500,
+         "AuditRecord.reason is missing, or not nullable with 3 to 500 characters (CR-376)")
+    need("BR-AUDIT-REASON", "audit row's `reason`" in text(rpc),
+         "resetPrincipalCredential does not write its reason to the audit row's reason (CR-376)")
+    for f in sorted((ROOT / "contracts").rglob("*.yaml")):
+        if "frozen" in f.parts:
+            continue
+        raw = f.read_text(encoding="utf-8")
+        for m in re.finditer(r"description: '?(Reason, recorded in the audit[^\n]*(?:\n {12,}[^\n]*)*)", raw):
+            need("BR-AUDIT-REASON", "audit row''s `reason`" in m.group(1),
+                 f"{f.relative_to(ROOT)}: a reason 'recorded in the audit' does not say it is the audit row's reason (CR-376)")
+    # BR-PRIVACY-CONSENT (ADAM CR-378; CHG-CR378-001)
+    lpc = op("listPrivacyConsent")[3]
+    lpc_t = flat(lpc.get("description") or "")
+    miss = {"marketing.consent_purpose", "marketing.consent_purpose_channel", "marketing.communication_preference_type",
+            "marketing.consent_capture_point", "marketing.tracking_technology", "marketing.cookie_banner_design",
+            "marketing.minor_privacy_rule", "marketing.privacy_notice_governance",
+            "marketing.processing_purpose"} - reads_of("listPrivacyConsent")
+    need("BR-PRIVACY-CONSENT", not miss, f"listPrivacyConsent does not declare its reads of {', '.join(sorted(miss))} (CR-378)")
+    need("BR-PRIVACY-CONSENT", "white-label#policyRecords" in vias_of("listPrivacyConsent"),
+         "listPrivacyConsent does not read whitelabel.policy through white-label#policyRecords (CR-378)")
+    pv = (op("listPrivacyConsent")[4].get("components") or {}).get("schemas", {}).get(
+        "PrivacyConsentConfigurationCommandCenterView") or {}
+    pvp = pv.get("properties") or {}
+    for k, v in pvp.items():
+        if (v or {}).get("type") == "integer":
+            need("BR-PRIVACY-CONSENT", bool((v or {}).get("description")), f"PrivacyConsent view count {k} says nothing of what it counts (CR-378)")
+            need("BR-PRIVACY-CONSENT", f"`{k}` =" in lpc_t or f"`{k}`" in lpc_t,
+                 f"listPrivacyConsent states no rule for {k} (CR-378)")
+    codes = ((((pvp.get("configurationWarnings") or {}).get("items") or {}).get("properties") or {}).get("code") or {}).get("enum") or []
+    for c in codes:
+        need("BR-PRIVACY-CONSENT", (f"`{c}`:" in lpc_t) or (c == "other" and "`other` is not raised" in lpc_t),
+             f"listPrivacyConsent states no rule for the warning {c} (CR-378)")
+    types_ = (((((pvp.get("configurationDirectory") or {}).get("items") or {}).get("properties") or {})
+               .get("configurationType") or {}).get("enum") or [])
+    for c in types_:
+        need("BR-PRIVACY-CONSENT", f"`{c}` from" in lpc_t, f"listPrivacyConsent states no source for directory type {c} (CR-378)")
+    for prm in lpc.get("parameters") or []:
+        nm = (prm or {}).get("name")
+        if nm and nm not in ("pageSize",):
+            need("BR-PRIVACY-CONSENT", f"`{nm}`" in lpc_t.split("**Filters.**", 1)[-1],
+                 f"listPrivacyConsent does not say what the {nm} filter narrows (CR-378)")
+    need("BR-PRIVACY-CONSENT", "newest `effectiveFrom` first" not in json.dumps(op("listPrivacyConsent")[4], default=str),
+         "the privacy command centre still orders its directory by newest effectiveFrom (CR-378)")
+    # BR-GUEST-BROADCAST (ADAM CR-379; CHG-CR379-001)
+    btg = op("broadcastToGuests")[3]
+    bb = schema_of(op("broadcastToGuests")[4], body_schema(btg))
+    need("BR-GUEST-BROADCAST", "venueId" in (bb.get("required") or []), "broadcastToGuests' body does not require venueId (CR-379)")
+    need("BR-GUEST-BROADCAST", "supervisorStepUp" in (bb.get("properties") or {}) and btg.get("x-ticvai-step-up") == "pin"
+         and btg.get("x-ticvai-step-up-carrier") == "body:supervisorStepUp",
+         "broadcastToGuests does not sign an evacuation with supervisorStepUp (x-ticvai-step-up pin, CR-379)")
+    need("BR-GUEST-BROADCAST", "supervisor-step-up-refused" in ptypes("broadcastToGuests", "403"),
+         "broadcastToGuests' 403 does not name supervisor-step-up-refused (CR-379)")
+    need("BR-GUEST-BROADCAST", not any((w or {}).get("operation") == "sendTransactionalMessage"
+                                       for w in btg.get("x-ticvai-write-via") or []),
+         "broadcastToGuests still writes marketing.message_dispatch through sendTransactionalMessage (CR-379)")
+    need("BR-GUEST-BROADCAST", "workforce.guest_broadcast" in writes_of("broadcastToGuests")
+         and "workforce.guestBroadcastAccepted" in (btg.get("x-ticvai-emits") or []),
+         "broadcastToGuests does not write workforce.guest_broadcast and emit workforce.guestBroadcastAccepted (CR-379)")
+    for oid in ("broadcastToGuests", "sendGuestBroadcast"):
+        need("BR-GUEST-BROADCAST", "access#liveEntitlementSubjects" in vias_of(oid),
+             f"{oid} does not ask access#liveEntitlementSubjects (CR-379)")
+    need("BR-GUEST-BROADCAST", "liveEntitlementSubjects" in (load("contracts/spine/access.yaml").get("x-ticvai-queries") or {}),
+         "access declares no liveEntitlementSubjects query (CR-379)")
+    need("BR-GUEST-BROADCAST", "workforce.guestBroadcastAccepted" in (op("sendGuestBroadcast")[3].get("x-ticvai-consumes") or []),
+         "marketing-crm sendGuestBroadcast does not consume workforce.guestBroadcastAccepted (CR-379)")
+    ev = ROOT / "events" / "workforce-guestBroadcastAccepted.yaml"
+    evd = load("events/workforce-guestBroadcastAccepted.yaml") if ev.exists() else {}
+    need("BR-GUEST-BROADCAST", any((c or {}).get("operation") == "marketing-crm.sendGuestBroadcast" and (c or {}).get("isCritical")
+                                   for c in evd.get("consumers") or []),
+         "workforce.guestBroadcastAccepted has no critical consumer marketing-crm.sendGuestBroadcast (CR-379)")
+    xdr = load("docs/active/cross-deployable-writes.yaml").get("reads") or []
+    need("BR-GUEST-BROADCAST", any((x or {}).get("reader") == "operations" and "access.entitlement" in (x.get("tables") or [])
+                                   and "sendGuestBroadcast" in (x.get("operations") or []) for x in xdr),
+         "no XDR entry lets the operations role read access.entitlement for sendGuestBroadcast (CR-379)")
+    need("BR-GUEST-BROADCAST", any((x or {}).get("reader") == "commerce" and "broadcastToGuests" in (x.get("operations") or [])
+                                   and "access#liveEntitlementSubjects" in (x.get("queries") or []) for x in xdr),
+         "commerce's XDR entry does not cover broadcastToGuests' access#liveEntitlementSubjects (CR-379)")
+    msd = (((load("contracts/satellite/marketing-crm.yaml").get("components") or {}).get("schemas") or {})
+           .get("MessageDispatch") or {})
+    need("BR-GUEST-BROADCAST", "sourceRef" in (msd.get("properties") or {}),
+         "MessageDispatch has no sourceRef, which listMessageDispatches filters on (CR-379)")
+    # BR-OPEN-SHIFT-CLAIM (ADAM CR-380; CHG-CR380-001)
+    miss = {"workforce.training_record", "workforce.staffing_rules", "workforce.rota_assignment"} - reads_of("claimOpenShift")
+    need("BR-OPEN-SHIFT-CLAIM", not miss, f"claimOpenShift does not declare its reads of {', '.join(sorted(miss))} (CR-380)")
+    miss = {"workforce.open_shift", "workforce.rota_assignment"} - writes_of("claimOpenShift")
+    need("BR-OPEN-SHIFT-CLAIM", not miss, f"claimOpenShift does not declare its writes of {', '.join(sorted(miss))} (CR-380)")
+    miss = {"identity#principalHoldsRoleAtVenue", "workforce#principalHasOverlappingAssignment"} - vias_of("claimOpenShift")
+    need("BR-OPEN-SHIFT-CLAIM", not miss, f"claimOpenShift does not ask {', '.join(sorted(miss))} (CR-380)")
+    need("BR-OPEN-SHIFT-CLAIM", {"shift-claimant-not-eligible", "working-hour-rule-breach", "rota-assignment-overlap"}
+         <= ptypes("claimOpenShift", "409"), "claimOpenShift's 409 does not name all three refusals (CR-380)")
+    wsch_ = (load("contracts/satellite/workforce.yaml").get("components") or {}).get("schemas") or {}
+    rq = flat(((wsch_.get("OpenShift") or {}).get("properties") or {}).get("requiredQualifications") or {})
+    need("BR-OPEN-SHIFT-CLAIM", "`courseName`" in rq and "ignoring case" in rq and "`passed`" in rq,
+         "OpenShift.requiredQualifications does not state the training-record match (CR-380)")
+
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
@@ -1576,7 +1754,9 @@ def main() -> int:
              "BR-GUEST-CODE-DELIVERY",
              "BR-GUEST-SETTINGS", "BR-BILLING-LINES", "BR-SHOP-DROP-COLLECT", "BR-DELEGATION-KEY", "BR-FOREIGN-TENDER",
              "BR-PRODUCT-FROM-PRICE",
-             "BR-BOOKING-FLOW-MISSING", "BR-CALL-DISPOSITION", "BR-RESTORE-MISSING-PAGE"]
+             "BR-BOOKING-FLOW-MISSING", "BR-CALL-DISPOSITION", "BR-RESTORE-MISSING-PAGE",
+             "BR-DASHBOARD-COST", "BR-DASHBOARD-ENTITLEMENT", "BR-TILE-MARKS", "BR-AUDIT-REASON",
+             "BR-PRIVACY-CONSENT", "BR-GUEST-BROADCAST", "BR-OPEN-SHIFT-CLAIM"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

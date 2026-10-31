@@ -1,0 +1,59 @@
+id: CHG-CR380-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'claimOpenShift states its checks and effect. Eligible: every requiredQualifications value matches the
+  courseName of a workforce.training_record row of the claimant (same text, ignoring case) with state passed and
+  expiresAt empty or after the shift''s to (the match stated once on OpenShift.requiredQualifications), and the
+  requiredRoleId of the shift''s rota assignment, where named, is held (identity#principalHoldsRoleAtVenue); else 409
+  shift-claimant-not-eligible. Working hours: the claimant''s rota with the shift added is measured against the
+  venue''s staffing_rules as breachesWorkingHourLimit is (CR-334) and a breach is refused 409
+  working-hour-rule-breach. Overlap: workforce#principalHasOverlappingAssignment, 409 rota-assignment-overlap. Effect,
+  in one transaction under the row lock: the assignment moves to the claimant (its flag worked out again) or a
+  published one is created; the open shift ends claimed with claimedBy and claimedAt; pendingApproval is not used.'
+decision:
+  what: 'The lead''s review, 31 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs", then "Include them in r12". Posted on #37102 (Chinmay, 31 October
+    2026), not as recommended in two points: eligibility from workforce.training_record (courseName, ignoring case,
+    state passed, expiresAt empty or after the shift''s to) and the rota assignment''s requiredRoleId through
+    identity#principalHoldsRoleAtVenue, else 409 shift-claimant-not-eligible, no record needed for a shift with no
+    requiredQualifications; working hours measured as breachesWorkingHourLimit is (ADAM CR-334) and refused 409
+    working-hour-rule-breach, a claim being the employee''s own act; workforce#principalHasOverlappingAssignment, 409
+    rota-assignment-overlap; in one transaction under the row lock, rotaAssignmentId set: that assignment''s
+    principalId becomes the claimant and its breachesWorkingHourLimit is worked out again, otherwise a rota
+    assignment is created with the claimant, venueId, position = positionCode, startsAt = from, endsAt = to and
+    status published and rotaAssignmentId set to it; the open shift ends claimed with claimedBy and claimedAt;
+    pendingApproval is not used until an approve operation exists.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-380 (Hrushikant Patkar, #37102 claimOpenShift): the operation listed 409 open-shift-already-taken,
+  shift-claimant-not-eligible and working-hour-rule-breach but declared no reads and no end state. The CR''s premise
+  that nothing records what a person holds was wrong: workforce.training_record is Workforce''s own record. A claim
+  is refused on a working-hour breach where CR-334 only flags, because no manager decides a claim (BO-887).
+  Requirement matrix 1.2.36, 1.2.80 and 1.2.83.'
+keys_touched:
+  operations: [claimOpenShift]
+  schemas: [OpenShift]
+  tables: [workforce.open_shift, workforce.rota_assignment, workforce.training_record, workforce.staffing_rules]
+  files:
+  - contracts/satellite/workforce.yaml
+  - tools/check-business-rules.py
+root_class: 'refusals with no declared data to check them, and a write with no stated effect'
+tickets:
+  started:
+  - '37102 (claimOpenShift): replace "any requiredQualifications fails closed" with the training-record match, add the
+    working-hour and overlap checks, and move or create the rota assignment as stated. Told through the lead''s
+    comment; its text is not rewritten.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-380
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-OPEN-SHIFT-CLAIM
+status: open
+notes: 'No database work: every table exists. Not done, though the review''s follow-up list suggested it: the
+  courseName match is not referenced from listOpenShifts'' eligiblePrincipalCount, getStaffingCoverage or
+  validateWorkforceCompliance, because the posted decision is about the claim only; if those should use the same
+  match, it is a follow-up comment for their tickets.'

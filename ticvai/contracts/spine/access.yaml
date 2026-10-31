@@ -126,6 +126,26 @@ x-ticvai-queries:
         partiallyConsumed->expired:timer: as issued->expired
         issued->cancelled:cancelPerformance: every holder is made whole by createRefund (F09), whose order.refunded
           the projection consumes; until then the guest is owed money and the entitlement rightly blocks
+  # **Who is on site now, for a venue-wide guest broadcast** (ADAM CR-379, Chinmay, 31 October 2026; CHG-CR379-001).
+  liveEntitlementSubjects:
+    module: access
+    table: access.entitlement
+    inputs:
+      venueId: {type: string, format: uuid, description: 'The venue whose guests are asked for (Entitlement.venueId).'}
+      at: {type: string, format: date-time, description: 'The moment asked about: now, as the asker reads its clock.'}
+    returns:
+      type: object
+      required: [subjectIds]
+      properties:
+        subjectIds: {type: array, items: {type: string, format: uuid}, description: 'The distinct guests with a live entitlement at the venue; empty when none.'}
+    rule: >-
+      A rule question (ADAM CR-379, Chinmay, 31 October 2026). The distinct subjectId of the access.entitlement rows
+      at venueId that have a subject, a status of issued or partiallyConsumed, and validFrom and validTo (where set)
+      around at (validFrom at or before at, validTo after at). Access answers it in the caller's transaction under
+      the caller's row-level security. It is asked in process from commerce by workforce broadcastToGuests for its
+      recipientCount (docs/active/cross-deployable-writes.yaml XDR-001), and from operations by marketing-crm
+      sendGuestBroadcast for the guests to send to (XDR-023), through the C# query interface Access implements.
+    served: [in-process]
   # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
   # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
   # 14 October). Rule questions keep queries of their own, above.
@@ -9286,6 +9306,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -11354,6 +11381,13 @@ paths:
           x-ticvai-problem-types: [scan-not-denied, scan-already-overridden]
           description: The body's `scanId` was not a denial (`scan-not-denied`), or has already been overridden
             (`scan-already-overridden`), exactly as `overrideAccess` refuses it (r8 walk fix, CHG-R8WFC-001).
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
           content:
             application/problem+json:
               schema:
@@ -14441,6 +14475,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '403':
+          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
@@ -17101,7 +17142,12 @@ paths:
                     type: string
                     format: date-time
         '403':
-          $ref: ../shared/common.yaml#/components/responses/Forbidden
+          description: '`forbidden` as the shared answer says; or the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':

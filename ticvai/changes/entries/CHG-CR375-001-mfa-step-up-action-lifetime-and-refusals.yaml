@@ -1,0 +1,65 @@
+id: CHG-CR375-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'An MFA step-up names its action and lifetime: the action is the operation''s operationId (createMfaChallenge
+  with that action, then verifyMfaChallenge); a verified step-up counts for 5 minutes from verifiedAt, which is the
+  expiresAt verifyMfaChallenge returns; the operation finds the verified, unconsumed identity.mfa_challenge row of
+  that action on the caller''s own session and sets consumedAt in its own transaction. No row is 403
+  step-up-token-missing, a newest row older than 5 minutes 403 step-up-token-expired, nothing written either way.
+  Every one of the 20 operations declaring x-ticvai-step-up: mfa lists both types on its 403. No new problem type.'
+decision:
+  what: 'The lead''s review, 31 October 2026: "for each one actually check if they hold and if not then find out the
+    best way keeping in mind what client needs", then "Include them in r12". Posted on #31238 (Chinmay, 31 October
+    2026), not as recommended in one point: no new problem type. The step-up action is the operation''s operationId;
+    a verified step-up counts for 5 minutes from verifiedAt, which is the expiresAt verifyMfaChallenge returns;
+    resetPrincipalCredential looks on the caller''s own session for an identity.mfa_challenge row with that action,
+    status verified and no consumedAt, and sets consumedAt in the reset''s own transaction; with no such row 403
+    step-up-token-missing, when the newest one is older than 5 minutes 403 step-up-token-expired, nothing written in
+    either case. The same rule applies to every operation that declares x-ticvai-step-up: mfa.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-375 (Hrushikant Patkar, #31238 resetPrincipalCredential): the operation declares an MFA step-up on the
+  session and verifyMfaChallenge binds a step-up to its action and session, but no action vocabulary, lifetime or 403
+  type was stated, and none of the MFA step-up operations named a step-up refusal. The CR''s new type
+  step-up-required would be a second name for the causes step-up-token-missing and step-up-token-expired already name
+  (revokeAllSessions; promoteRelease, rejectRelease and withdrawRelease since CR-356).'
+keys_touched:
+  operations: [resetPrincipalCredential, createMfaChallenge, verifyMfaChallenge, approveMembershipProductValidation,
+    approvePartnerStatuLifecycle, approveBookingLimitCommercial, setPartnerCapabilityGrants, setPartnerCommissionRules,
+    setPartnerCreditProfile, actOnPartnerSettlementBatch, setBiometricLifecycleRetention,
+    approveManualOverrideSupervisor, replaceCredential, getFaceReenrolmentImages, approveMatrixMultiLevel,
+    approveRoleAuthorityDelegation, approveVersioningGovernance, approveUnifiedDecision, approveJournalEntry,
+    endOwnSession, openPlatformStaffGrant, approveRefund]
+  schemas: [ApprovalRefusedProblem, DelegationRefusedProblem]
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/finance.yaml
+  - contracts/spine/orders.yaml
+  - tools/check-step-up.py
+root_class: 'a declared control whose check and refusal nothing states'
+tickets:
+  started:
+  - '31238 (resetPrincipalCredential): check and consume the step-up as decided. Until createMfaChallenge and
+    verifyMfaChallenge are built, tests seed a verified identity.mfa_challenge row. Told through the lead''s comment;
+    its text is not rewritten.'
+  unstarted:
+  - 'The other 19 MFA step-up operations pick the rule up from verifyMfaChallenge''s paragraph and their 403.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-375
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-step-up.py::SU-MFA-REFUSAL
+status: open
+notes: 'Beyond the comment''s words, for the lead to confirm: approveRoleAuthorityDelegation and approveUnifiedDecision
+  answer typed refusals whose refusedReason is required, so DelegationRefusedProblem and ApprovalRefusedProblem
+  gain refusedReason values stepUpTokenMissing and stepUpTokenExpired to carry the two types. approveUnifiedDecision
+  also keeps mfa-required (mfaRequired), the refusal it shares with decideApprovalRequest for a rule that demands a
+  step-up, though its own x-ticvai-step-up: mfa now answers the two new types for the same cause; whether it should
+  keep mfa-required is a question for the lead. The 403 where an operation had none, or the shared Forbidden, now
+  lists forbidden with the two types.'
