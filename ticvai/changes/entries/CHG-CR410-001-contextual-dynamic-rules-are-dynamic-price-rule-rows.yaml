@@ -1,0 +1,72 @@
+id: CHG-CR410-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'A channel, customer-segment or location dynamic rule is a pricing.dynamic_price_rule row with rule_type
+  contextual and seven new columns (dimension, sales_channel, customer_segment, segment_ref, location_level, location_id,
+  is_dynamic_pricing_enabled); setDynamicPriceRule writes them and answers 422 contextual-rule-incomplete for a rule
+  without its dimension''s fields or with another''s, conditions or actions; listChannelCustomerSegment lists the
+  contextual rows from that table alone. dynamic_price_rule.channel_id keys catalogue.sales_channel (one channel
+  profile; null for every channel).'
+decision:
+  what: 'ADAM CR-410, posted 31 October 2026: "Decided (Chinmay, 31 October 2026): not as recommended: option A, with the
+    channel as its own column. A contextual rule is a pricing.dynamic_price_rule row with rule_type ''contextual''. The
+    table gains dimension (channel, customerSegment or location), sales_channel (a SalesChannel value),
+    customer_segment, segment_ref, location_level, location_id (text: a country code or an id) and
+    is_dynamic_pricing_enabled (default true) ... Otherwise setDynamicPriceRule answers 422 contextual-rule-incomplete
+    and writes nothing. A contextual rule has no conditions or actions. listChannelCustomerSegment lists the rule_type
+    ''contextual'' rows the caller can see ... dynamic_price_rule.channel_id keys catalogue.sales_channel, one configured
+    channel profile, and null means every channel; contextual rules leave it null." The lead, 31 October 2026, on the
+    settled CRs: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-410 (Hrushikant Patkar, #35326 listChannelCustomerSegment, blocking): pricing.dynamic_price_rule and its
+  condition and action tables had no dimension, segment, location or on/off column, channel_id keyed nothing, and nothing
+  marked a rule contextual. The data model had already put range and protection on the rule (rangeMinPercent,
+  rangeMaxPercent, isProtected) and the engine, testPricingRule and the simulator read that table, so the missing fields
+  are columns beside them (pack p.83; MoM 1 Sep 2026 section 4.2).'
+keys_touched:
+  screens: [ADM-093]
+  operations: [setDynamicPriceRule, listChannelCustomerSegment]
+  schemas: [PricingDynamicPriceRule, DynamicPriceRuleDetail]
+  tables: [pricing.dynamic_price_rule]
+  files:
+  - contracts/spine/catalogue.yaml
+  - screens/P08-venue-back-office.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: 'a list drafted from the pack whose dimensions no table stores, while the table that holds the rest of the
+  rule is the one the engine reads'
+tickets:
+  started:
+  - '35326 (listChannelCustomerSegment, Hrushikant Patkar): not built; build the read on the new columns once the
+    migration lands (told through CR-410''s comment).'
+  - '31638 (setDynamicPriceRule): accept and store the seven fields, apply the contextual-rule check and its 422
+    contextual-rule-incomplete.'
+  - '28091 (MIG-PRICING-2, Hrushikant Patkar): the seven columns and the channel_id key as a [DB] child task (to be filed
+    by the plan lane).'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-410
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CONTEXTUAL-RULE
+status: open
+notes: 'Shared model with lanes J and L: channel_id is one catalogue.sales_channel profile and the SalesChannel value
+  is its own column, the key CR-417 and CR-425 use. Not built, because the posted text does not say it: the verdict''s
+  follow-up also put the engine''s use of a contextual rule (a matching rule with dynamicPricingEnabled false or
+  protected stops dynamic adjustment; otherwise the adjustment is clamped to its range) into testPricingRule and
+  simulatePriceBreakdownCalculation, and asked that PricingRuleCommandCenterView and ChannelBasedPricingRulesView read
+  their SalesChannel the same way; both are left for a follow-up comment. As generated, is_dynamic_pricing_enabled is
+  boolean DEFAULT true and nullable (the property is optional in the request so a client built at r1 still
+  validates), the enum columns carry CHECKs except sales_channel (a nullable SalesChannel through allOf, which the
+  generator does not follow; the SalesChannel values are the application''s to hold until it does), channel_id gets its
+  key and index from x-ticvai-references, and location_id is marked x-ticvai-references none (text, not a key: the
+  convention had guessed it a cross-module key to inventory.location). Not built either: the verdict''s
+  follow-up bound ADM-093''s save to setDynamicPriceRule, but ADM-093 has no save control (its approved regions hold
+  POS, Call Center and API buttons only), so binding it fails check-screen-wiring S-OP-UNREACHED and adding a control
+  would change the approved UI; the screen''s CHG-WIR-027 gap now says setDynamicPriceRule carries the rule and the
+  binding waits for a design change (a frontend "Design change:" CR). The carried lineage override for
+  listChannelCustomerSegment (condition and action tables) is replaced by the contract''s x-ticvai-reads.'

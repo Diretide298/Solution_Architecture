@@ -127,6 +127,17 @@ consumers:
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: catalogue
+  purpose: '**An AI pricing recommendation sent for approval** (`subjectContract` catalogue, `subjectType`
+    `pricingRecommendation`; ADAM CR-415, decided 31 October 2026). The request is the one decidePricingRecommendation
+    raised on `sendForApproval` (its decision row''s approval_request_id is `requestId`). A recommendation still
+    `sentForApproval` moves to `accepted`; any other state changes nothing. No price changes here: createLiveDynamicPrice
+    executes it, with this request as its approval reference'
+  writes:
+  - catalogue.pricing_recommendation
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: Retained with the request. This is an audit record, not an operational message
 notes: '**The event that replaces four bespoke callbacks.** Each owning contract consumed its own approval
   signal before this existed; now there is one, and adding a fifth approval kind means adding a consumer

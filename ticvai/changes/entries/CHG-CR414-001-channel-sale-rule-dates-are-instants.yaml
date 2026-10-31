@@ -1,0 +1,48 @@
+id: CHG-CR414-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'ChannelSalesRulesLimitsRestrictionsView.effectiveFrom and effectiveTo are nullable date-times, the instants as
+  stored and as setChannelSalesRule takes them (null from: in effect from when saved; null to: open-ended); the screen
+  shows the day in the venue''s time zone; listChannelSaleRule orders by effectiveFrom ascending, nulls last, then
+  channelId, then id.'
+decision:
+  what: 'ADAM CR-414, posted 31 October 2026: "Decided (Chinmay, 31 October 2026): as you recommended.
+    ChannelSalesRulesLimitsRestrictionsView.effectiveFrom and effectiveTo become format date-time: the instants as
+    stored and as setChannelSalesRule takes them. Both are nullable: a null effectiveFrom means in effect from when the
+    rule was saved, and a null effectiveTo means open-ended. The screen shows the day in the venue''s time zone. Order
+    by effectiveFrom ascending with nulls last, then channelId, then id." The lead, 31 October 2026, on the settled CRs:
+    "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-414 (Hrushikant Patkar, #35239 listChannelSaleRule): the view''s effectiveFrom and effectiveTo were format
+  date while the ChannelSalesRule setChannelSalesRule takes and the column effective_from are instants, so the build had
+  to pick UTC; naming-and-style 5.2 keeps instants in UTC and renders them at the edge. The order follows the r10
+  default ruling (CHG-R10GEN-004).'
+keys_touched:
+  screens: [ADM-265]
+  operations: [listChannelSaleRule]
+  schemas: [ChannelSalesRulesLimitsRestrictionsView]
+  files:
+  - contracts/spine/catalogue.yaml
+  - screens/P08-venue-back-office.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+root_class: 'a read that answers a different type (a day) from what its write takes and its column stores (an instant)'
+tickets:
+  started:
+  - '35239 (listChannelSaleRule, Hrushikant Patkar): answer the stored instants instead of the UTC date; the order stays
+    as built, with id as the last key (told through CR-414''s comment).'
+  unstarted:
+  - '29777 (VM-ADM-265) and its wire task 36744: the two fields are instants from r12 (BC-551); the screen shows the day
+    in the venue''s time zone.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-414
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SALE-RULE-INSTANTS
+status: open
+notes: 'The type change is breaking against r1 and is BC-551. ADM-265 says the rendering in its screen notes (not a
+  visible field; approved UI unchanged). No database change.'

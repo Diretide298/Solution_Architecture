@@ -1,0 +1,51 @@
+id: CHG-CR411-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'Each figure of listChannelSaleSchedule''s summary states its rule over every row the filters return (active
+  salesWindow rules overlapping from..to, from defaulting to today, times local to the row''s or its channel''s zone,
+  covered performances through catalogue.product_channel_assignment for a row with no product); blackouts are distinct
+  (channel, date) pairs from blackoutDates; the event filter includes every-product windows of channels that sell one
+  of the event''s products; aiInsights is an empty list until an insight source is declared (LO-CR411-001).'
+decision:
+  what: 'ADAM CR-411, posted 31 October 2026: "Decided (Chinmay, 31 October 2026): not as recommended: option A for the
+    summary, with blackouts and dates corrected, and every-product windows counted under the event filter. The summary
+    covers every row the filters return, not just the page ... blackouts counts distinct (channel, date) pairs from
+    blackoutDates within the range; there is no separate blackout row ... aiInsights is always an empty list until an
+    insight source is declared. Event filter: a row shows when its product belongs to the event, or when it has no
+    product and its channel sells one of the event''s products, by the assignment above. Add
+    catalogue.product_channel_assignment to the operation''s reads." The lead, 31 October 2026, on the settled CRs:
+    "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-411 (Hrushikant Patkar, #35240 listChannelSaleSchedule): ChannelSalesScheduleAvailabilityWindowsSummary had
+  six labelled integers and no rule, aiInsights no source, and the event filter did not say how a window with no product
+  is treated. Blackouts are the blackout_dates array on each salesWindow row, and the product-to-channel assignment
+  already exists in the module (pack p.11; MoM 31 Aug 2026 section 4.11).'
+keys_touched:
+  screens: [ADM-263]
+  operations: [listChannelSaleSchedule]
+  schemas: [ChannelSalesScheduleAvailabilityWindowsSummary, ChannelSalesScheduleAvailabilityWindowsView]
+  tables: [catalogue.channel_sales_rule, catalogue.product_channel_assignment]
+  files:
+  - contracts/spine/catalogue.yaml
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+root_class: 'a summary of headline counts drafted as labels, with no rule for what each counts'
+tickets:
+  started:
+  - '35240 (listChannelSaleSchedule, Hrushikant Patkar): the summary is built to the rules above; aiInsights stays an
+    empty list; change the event filter to include every-product windows of channels that sell one of the event''s
+    products (catalogue.product_channel_assignment). Told through CR-411''s comment.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-411
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SALE-SCHEDULE-SUMMARY
+status: open
+notes: 'No database change. The read of catalogue.product_channel_assignment is declared in the contract
+  (x-ticvai-reads); the carried override''s other reads stay. ADM-263 keeps the aiInsights member (approved UI
+  unchanged); LO-CR411-001 names it.'

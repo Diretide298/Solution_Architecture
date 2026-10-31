@@ -1,0 +1,75 @@
+id: CHG-CR409-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'A competitor price observation is a row of the new catalogue.competitor_price_observation (demand_signal_id,
+  price_date, timeslot, the six prices in the row''s own currency_code, availability, observed_at); the competitor
+  registry stays on catalogue.demand_signal (a competitorPrice row is one competitor product mapped to one TICVAI
+  product; configuration {venueProduct, currency, collectionMethod, comparabilityApproved}). listCompetitorPricingMarket
+  answers one row per observation, newest first, and states the median, position, movement, currency and filter rules;
+  the four computed figures are nullable. Nothing writes observations yet (LO-CR409-001).'
+decision:
+  what: 'ADAM CR-409, posted 31 October 2026: "Decided (Chinmay, 31 October 2026): not as recommended: option B, with the
+    competitor registry kept on catalogue.demand_signal. A competitorPrice demand_signal row is one competitor product
+    mapped to one TICVAI product ... Each price observation is a row of a new table,
+    catalogue.competitor_price_observation: demand_signal_id, price_date, timeslot, published_price, promotional_price,
+    weekend_price, peak_price, resident_price, member_price, currency_code, availability, observed_at.
+    listCompetitorPricingMarket answers one row per observation, newest first ... The six prices are Money in the
+    observation''s own currency ... and are never converted. marketMedianPrice is the median published price over the
+    latest observation of each mapping with sourceApproved and comparabilityApproved ... Nothing writes observations
+    yet, so until a writer exists the list is empty." The lead, 31 October 2026, on the settled CRs: "Include them in
+    r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-409 (Hrushikant Patkar, #35327 listCompetitorPricingMarket, blocking): DemandSignal.reading held "competitor
+  prices" with no keys, one isApproved flag and one historicalCorrelation number, while the view answers six prices, two
+  approval flags and a three-part correlation, and no rule stated the median, position or movement; the lineage itself
+  recorded the observation store as missing. One row per observation keeps the previous observation movementPercent
+  needs and the history (pack p.100), and approving a source changes one registry row. Foreign-currency Money follows
+  CR-192; the TICVAI price for the position is CR-358''s fromPrice (CHG-CR358-001).'
+keys_touched:
+  screens: [ADM-102]
+  operations: [listCompetitorPricingMarket, setDemandSignalConfiguration]
+  schemas: [CompetitorPriceObservation, DemandSignal, CompetitorPricingMarketPositionIntelligenceView]
+  tables: [catalogue.competitor_price_observation, catalogue.demand_signal]
+  files:
+  - contracts/spine/catalogue.yaml
+  - handoff/api-data-lineage-overrides.json
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+  - tools/check-package.py
+root_class: 'a list whose rows are observations over time stored as one jsonb reading per registry row, with no keys
+  and no rule for the figures computed from them'
+tickets:
+  started:
+  - '35327 (listCompetitorPricingMarket, Hrushikant Patkar): not built; build the read on
+    catalogue.competitor_price_observation and the rules above once the migration lands (told through CR-409''s comment;
+    its text is not rewritten).'
+  - '35171 (setDemandSignalConfiguration): accept and store the competitorPrice configuration keys {venueProduct,
+    currency, collectionMethod, comparabilityApproved}; isApproved is sourceApproved.'
+  - '27671 / 29711 (MIG-CATALOGUE, MIG-CATALOGUE-10, Hrushikant Patkar): the new table as a [DB] child task (to be filed
+    by the plan lane).'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-409
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-COMPETITOR-OBSERVATION
+status: open
+notes: 'Beyond the comment''s words: (1) marketMedianPrice, positionVsMedian and movementPercent are made nullable as
+  well as historicalCorrelation, since the posted rules answer each null when it is missing (additive against r1); (2)
+  the read declares catalogue.variant, catalogue.price_list, catalogue.price_assignment and catalogue.price for the
+  comparable product''s fromPrice, the CR-358 price-list rule; (3) the generated table follows the package''s
+  conventions where the posted column names and the db note differ: the six prices are the columns published_amount,
+  promotional_amount, weekend_amount, peak_amount, resident_amount and member_amount (naming-and-style 5.1: a bare
+  *_price money column is banned in DDL, check-ddl-conventions D-BANNED-NAME; the posted text says published_price ...
+  member_price), numeric(18,4); currency_code is text with a length check (the 3-letter pattern stays on the contract);
+  created_at with the row; the index
+  (demand_signal_id, price_date, timeslot, observed_at) ascending (a backward scan serves observed_at DESC), and
+  scope_path, GiST and row security as for every scoped table; (4) DemandSignal''s description gives every kind its
+  screen (weather ADM-100, nearby events ADM-101, competitor prices ADM-102, tourism/market ADM-103), all four having been
+  one off; (5) LO-CR409-002 records the AI writer of reading.historicalCorrelation. The carried lineage override for
+  listCompetitorPricingMarket is replaced by the contract''s x-ticvai-reads (carriedCeiling falls). The table stores its
+  currency, so it joins check-package''s CURRENCY_OK with the decision as its reason (as CR-322 and CR-363 did).'

@@ -1,6 +1,6 @@
 {
  "about": "What the contracts cannot state about an operation's tables, one entry per operation, each with its reason. tools/derive-lineage.py adds `reads`/`writes` to what the contract derives and takes `notReads`/`notWrites` away. Authored by hand: nothing in the refresh writes it. An entry marked `carried` was copied from the hand-kept lineage when it became derived (20 October 2026, CHG-R8GEN-001); their number may only fall (carriedCeiling, check-lineage LN-OVERRIDE). To change an operation's tables, change its contract (a persisted schema, x-ticvai-read-via, x-ticvai-write-via, x-ticvai-config-change-log); add an override only for what no contract fact can say, with a reason, and without `carried`.",
- "carriedCeiling": 1614,
+ "carriedCeiling": 1611,
  "operations": {
   "abandonCart": {
    "reads": [
@@ -2632,19 +2632,6 @@
     "platform.outbox"
    ],
    "reason": "DM3: moves catalogue.change_request per decision; the decision itself lands on the approvals request | L2: decision recorded on the approvals request via the approvals service (platform.outbox event); change request status updated (pricing.change_request, missing) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "decidePricingRecommendation": {
-   "reads": [
-    "catalogue.dynamic_pricing_control",
-    "catalogue.pricing_recommendation"
-   ],
-   "writes": [
-    "catalogue.audit_entry",
-    "catalogue.pricing_recommendation",
-    "platform.outbox"
-   ],
-   "reason": "W-WE (changed): writes the decision row and sets catalogue.pricing_recommendation.status (states/pricing-recommendation.yaml); guardrail check reads dynamic_pricing_control; sendForApproval opens an approval via outbox; description and 409 updated (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "decideProductionAccess": {
@@ -6003,15 +5990,6 @@
    "reason": "DM3: catalogue.channel_connection | L2: no existing tenant table holds connector/endpoint/auth/test log (control.integration_listing is the control-plane marketplace); needs catalogue.channel_connection (missing) — no existing table read (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "listChannelCustomerSegment": {
-   "reads": [
-    "pricing.dynamic_price_action",
-    "pricing.dynamic_price_condition",
-    "pricing.dynamic_price_rule"
-   ],
-   "reason": "contextual dynamic rules: channel_id on dynamic_price_rule, segment/location as conditions, range as action min/max (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
   "listChannelExceptionIncident": {
    "reads": [
     "catalogue.channel_incident",
@@ -6229,14 +6207,6 @@
     "marketing.message_trigger"
    ],
    "reason": "KPIs over message_dispatch; latency, provider availability and retries from message_dispatch_attempt; byModule via message_dispatch.message_trigger_id -> message_trigger.event -> business_event.source_module (campaign sends count as crm) (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
-   "carried": true
-  },
-  "listCompetitorPricingMarket": {
-   "reads": [
-    "catalogue.demand_signal",
-    "catalogue.product"
-   ],
-   "reason": "DM3: catalogue.demand_signal with signalKind competitorPrice | L2: competitor observations need pricing.external_signal (missing); comparable TICVAI product from catalogue.product (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
   "listComplianceEvidenceWaiver": {

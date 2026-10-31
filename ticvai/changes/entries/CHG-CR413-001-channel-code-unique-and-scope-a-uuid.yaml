@@ -1,0 +1,58 @@
+id: CHG-CR413-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'A sales channel''s code is unique per tenant (x-ticvai-unique, index sales_channel_code_uniq on lower(code)),
+  and createChannelProfile answers 409 duplicate-code (the shared DuplicateCode) by mapping its violation; scopeId is a
+  uuid (400 validation when it is not, when it is sent for global or country, or when country scope has no country);
+  the audit row''s values are stated; channelType kiosk maps to salesChannel kiosk; currency is not stored (checked
+  against its pattern and dropped, ADR-0018).'
+decision:
+  what: 'ADAM CR-413, posted 31 October 2026: "Decided (Chinmay, 31 October 2026): as you recommended. (1) Add a unique
+    index sales_channel_code_uniq on catalogue.sales_channel (lower(code)). createChannelProfile answers 409
+    duplicate-code (the shared DuplicateCode response) by mapping the unique violation on that index ... (2) scopeId is
+    a uuid ... A scopeId that is not a uuid, or one sent for global or country, is 400 validation on scopeId; country
+    scope without country is 400 validation on country. (3) The audit row is domain channel, action created,
+    entity_type salesChannel ... (4) channelType kiosk maps to salesChannel kiosk. (5) currency is not stored, because a
+    channel sells in the trading currency of its venue (ADR-0018). It stays in the input only so older clients
+    validate: it is checked against its pattern and dropped, and the screen does not ask for it." The lead, 31 October
+    2026, on the settled CRs: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-413 (Hrushikant Patkar, #35181 createChannelProfile): channelCode was "unique within the tenant" with no
+  unique index and no 409, scopeId was text that "may be a country code" while scope_id is a uuid, kiosk was missing
+  from the channelType mapping and currency had no column. One tenant root per database (V0102) makes a unique index the
+  tenant rule even where row security hides other venues'' channels; currency is a venue setting (ADR-0018); the
+  case-insensitive rule follows CR-340 (CHG-CR340-001).'
+keys_touched:
+  screens: [ADM-259]
+  operations: [createChannelProfile]
+  schemas: [SalesChannelProfile, ChannelCreationProfileConfigurationInput, SalesChannelCommandCenterView]
+  tables: [catalogue.sales_channel]
+  files:
+  - contracts/spine/catalogue.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+root_class: 'a uniqueness promised in prose with no index or refusal, and a request id typed looser than its column'
+tickets:
+  started:
+  - '35181 (createChannelProfile, Hrushikant Patkar): map a unique violation on sales_channel_code_uniq to 409
+    duplicate-code; add the country-scope and scopeId 400s; the rest stays as built (told through CR-413''s comment).'
+  - '29679 (MIG-CATALOGUE-7, Hrushikant Patkar): the unique index, after listing any duplicate codes, as a [DB] child
+    task (to be filed by the plan lane).'
+  unstarted:
+  - '29749 (VM-ADM-259) and its wire task 35833: scopeId is a uuid from r12 (BC-550).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-413
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CHANNEL-CODE-UNIQUE
+status: open
+notes: 'Not built, and stopped for the lead: "the screen does not ask for it" would drop the Currency field from
+  ADM-259''s approved region:fields (handoff/approved-ui.json), which a package change must not do without an approval
+  recorded in docs/active/approved-ui-changes.yaml; the screen still shows Currency and the server drops the value. The
+  scopeId type change is breaking against r1 and is BC-550. ChannelCreationProfileConfigurationInput.channelCode
+  carries x-ticvai-unique: tenant too, the request field the 409 names (check-storage-promises SP-DUPLICATE-409). createChannelProfile also declares the 400 the decision
+  names (it declared none).'

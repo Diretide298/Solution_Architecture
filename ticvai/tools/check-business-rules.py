@@ -198,6 +198,28 @@ And one rule per decision:
   BR-RESTORE-MISSING-PAGE (r12, ADAM CR-350, CHG-CR350-001) restoreConfigVersion restores a section or navigation item
                    whose content page is gone hidden (contentPageId null, isVisible false), never refuses for it, and
                    keeps content_page.is_referenced.
+  BR-COMPETITOR-OBSERVATION (r12, ADAM CR-409, CHG-CR409-001) a competitor price observation is a row of
+                   catalogue.competitor_price_observation (its own currencyCode, keyed to its demand_signal registry
+                   row); listCompetitorPricingMarket reads it and states the median, position and movement rules, and
+                   the view's computed figures are nullable.
+  BR-CONTEXTUAL-RULE (r12, ADAM CR-410, CHG-CR410-001) a contextual rule is a pricing.dynamic_price_rule row with its
+                   dimension columns; channelId keys catalogue.sales_channel; setDynamicPriceRule answers 422
+                   contextual-rule-incomplete; listChannelCustomerSegment reads the rule table only.
+  BR-SALE-SCHEDULE-SUMMARY (r12, ADAM CR-411, CHG-CR411-001) every figure of the schedule summary states its rule,
+                   blackouts come from blackoutDates, and listChannelSaleSchedule reads product_channel_assignment for
+                   every-product windows.
+  BR-CHANNEL-ALLOCATION-COUNTS (r12, ADAM CR-412, CHG-CR412-001) channel_envelope keeps allocationPercent and the
+                   released and returned units; setChannelAllocations refuses a percentage with no percent (400
+                   validation); relinquishChannelAllocation writes returned_units; the product filter is the event
+                   path and the order is total.
+  BR-CHANNEL-CODE-UNIQUE (r12, ADAM CR-413, CHG-CR413-001) a channel code is unique per tenant (x-ticvai-unique) and
+                   createChannelProfile answers 409 DuplicateCode and 400 for a bad scope; scopeId is a uuid; kiosk
+                   maps to kiosk.
+  BR-SALE-RULE-INSTANTS (r12, ADAM CR-414, CHG-CR414-001) listChannelSaleRule answers effectiveFrom and effectiveTo as
+                   nullable instants, ordered nulls last with id last.
+  BR-PRICING-APPROVAL (r12, ADAM CR-415, CHG-CR415-001) sendForApproval always raises an approvals request in process
+                   (x-ticvai-writes approvals.request, both in commerce), passes 422 no-approval-route through,
+                   writes no outbox or audit_entry, and Catalogue consumes the four approval events for it.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -1555,6 +1577,106 @@ def main() -> int:
         need("BR-RESTORE-MISSING-PAGE", word in rtext,
              f"restoreConfigVersion does not say {word!r} for a page deleted since the version (CR-350)")
 
+    # ---------------------------------------------------------------- r12 CR lane K (CR-409 to CR-415; the lead, 31
+    # October 2026: "Include them in r12"). Each rule fails on the r12 candidate (8535bc29) and passes on the decision.
+    csch = ((op("listCompetitorPricingMarket")[4].get("components") or {}).get("schemas") or {})
+
+    def cprops(name):
+        return (csch.get(name) or {}).get("properties") or {}
+
+    def desc(oid):
+        return " ".join(str(op(oid)[3].get("description") or "").split())
+
+    # BR-COMPETITOR-OBSERVATION (ADAM CR-409; CHG-CR409-001)
+    cpo = csch.get("CompetitorPriceObservation") or {}
+    need("BR-COMPETITOR-OBSERVATION", cpo.get("x-ticvai-persistence") == "catalogue.competitor_price_observation"
+         and (cprops("CompetitorPriceObservation").get("demandSignalId") or {}).get("x-ticvai-references") == "catalogue.demand_signal"
+         and "currencyCode" in (cpo.get("required") or []),
+         "no catalogue.competitor_price_observation with its own currencyCode, keyed to catalogue.demand_signal (CR-409)")
+    need("BR-COMPETITOR-OBSERVATION", {"catalogue.competitor_price_observation", "catalogue.demand_signal"} <= reads_of("listCompetitorPricingMarket"),
+         "listCompetitorPricingMarket does not read the observations and their registry rows (CR-409)")
+    lcp = desc("listCompetitorPricingMarket")
+    for frag in ("median published price over the latest observation of each mapping", "never converted",
+                 "previous observation of the same mapping", "Only observations in the venue's trading currency count"):
+        need("BR-COMPETITOR-OBSERVATION", frag in lcp, f"listCompetitorPricingMarket does not state {frag!r} (CR-409)")
+    vw = cprops("CompetitorPricingMarketPositionIntelligenceView")
+    for p in ("marketMedianPrice", "positionVsMedian", "movementPercent", "historicalCorrelation"):
+        need("BR-COMPETITOR-OBSERVATION", (vw.get(p) or {}).get("nullable") is True,
+             f"CompetitorPricingMarketPositionIntelligenceView.{p} is not nullable, though it is null when missing (CR-409)")
+    # BR-CONTEXTUAL-RULE (ADAM CR-410; CHG-CR410-001)
+    dpr = cprops("PricingDynamicPriceRule")
+    miss = {"dimension", "salesChannel", "customerSegment", "segmentRef", "locationLevel", "locationId",
+            "dynamicPricingEnabled"} - set(dpr)
+    need("BR-CONTEXTUAL-RULE", not miss, f"PricingDynamicPriceRule has no {sorted(miss)} (CR-410)")
+    need("BR-CONTEXTUAL-RULE", (dpr.get("channelId") or {}).get("x-ticvai-references") == "catalogue.sales_channel",
+         "PricingDynamicPriceRule.channelId does not key catalogue.sales_channel (CR-410)")
+    need("BR-CONTEXTUAL-RULE", "contextual-rule-incomplete" in problem_types(op("setDynamicPriceRule")[3]),
+         "setDynamicPriceRule does not answer 422 contextual-rule-incomplete (CR-410)")
+    need("BR-CONTEXTUAL-RULE", reads_of("listChannelCustomerSegment") == {"pricing.dynamic_price_rule"}
+         and "`rule_type` `contextual`" in desc("listChannelCustomerSegment"),
+         "listChannelCustomerSegment does not list the rule_type contextual rows of pricing.dynamic_price_rule only (CR-410)")
+    # BR-SALE-SCHEDULE-SUMMARY (ADAM CR-411; CHG-CR411-001)
+    sms = cprops("ChannelSalesScheduleAvailabilityWindowsSummary")
+    for p, v in sms.items():
+        need("BR-SALE-SCHEDULE-SUMMARY", "CR-411" in str((v or {}).get("description") or ""),
+             f"ChannelSalesScheduleAvailabilityWindowsSummary.{p} states no rule (CR-411)")
+    need("BR-SALE-SCHEDULE-SUMMARY", "blackoutDates" in str((sms.get("blackouts") or {}).get("description")),
+         "the blackouts figure is not counted from blackoutDates (CR-411)")
+    need("BR-SALE-SCHEDULE-SUMMARY", "catalogue.product_channel_assignment" in reads_of("listChannelSaleSchedule"),
+         "listChannelSaleSchedule does not read catalogue.product_channel_assignment for every-product windows (CR-411)")
+    # BR-CHANNEL-ALLOCATION-COUNTS (ADAM CR-412; CHG-CR412-001)
+    cal = cprops("ChannelAllocation")
+    need("BR-CHANNEL-ALLOCATION-COUNTS", "allocationPercent" in cal and all((cal.get(p) or {}).get("readOnly") is True
+         for p in ("releasedUnits", "returnedUnits")),
+         "ChannelAllocation has no allocationPercent, or no readOnly releasedUnits and returnedUnits (CR-412)")
+    need("BR-CHANNEL-ALLOCATION-COUNTS", "validation" in ((((op("setChannelAllocations")[3].get("responses") or {}).get("400") or {})
+         .get("x-ticvai-problem-types")) or []), "setChannelAllocations' 400 does not list validation (CR-412)")
+    need("BR-CHANNEL-ALLOCATION-COUNTS", "returned_units" in text(op("relinquishChannelAllocation")[3].get("x-ticvai-writes") or []),
+         "relinquishChannelAllocation does not write returned_units (CR-412)")
+    lic = desc("listInventoryCapacityChannel")
+    need("BR-CHANNEL-ALLOCATION-COUNTS", "gives an empty page, not 400" in lic and "then by `id`" in lic
+         and "catalogue.product" in reads_of("listInventoryCapacityChannel"),
+         "listInventoryCapacityChannel does not state the product path, the empty page and a total order (CR-412)")
+    # BR-CHANNEL-CODE-UNIQUE (ADAM CR-413; CHG-CR413-001)
+    need("BR-CHANNEL-CODE-UNIQUE", (cprops("SalesChannelProfile").get("code") or {}).get("x-ticvai-unique") == "tenant",
+         "SalesChannelProfile.code is not x-ticvai-unique: tenant (CR-413)")
+    ccp = (op("createChannelProfile")[3].get("responses") or {})
+    need("BR-CHANNEL-CODE-UNIQUE", "DuplicateCode" in text(ccp.get("409") or {}) and "validation" in text(ccp.get("400") or {}),
+         "createChannelProfile does not answer 409 DuplicateCode and 400 validation (CR-413)")
+    need("BR-CHANNEL-CODE-UNIQUE", (cprops("ChannelCreationProfileConfigurationInput").get("scopeId") or {}).get("format") == "uuid",
+         "ChannelCreationProfileConfigurationInput.scopeId is not a uuid (CR-413)")
+    need("BR-CHANNEL-CODE-UNIQUE", "kiosk -> kiosk" in " ".join(str((cprops("SalesChannelCommandCenterView").get("salesChannel") or {}).get("description")).split()),
+         "the channelType -> salesChannel mapping has no kiosk -> kiosk (CR-413)")
+    # BR-SALE-RULE-INSTANTS (ADAM CR-414; CHG-CR414-001)
+    srv = cprops("ChannelSalesRulesLimitsRestrictionsView")
+    for p in ("effectiveFrom", "effectiveTo"):
+        need("BR-SALE-RULE-INSTANTS", (srv.get(p) or {}).get("format") == "date-time" and (srv.get(p) or {}).get("nullable") is True,
+             f"ChannelSalesRulesLimitsRestrictionsView.{p} is not a nullable date-time (CR-414)")
+    lsr = desc("listChannelSaleRule")
+    need("BR-SALE-RULE-INSTANTS", "NULLS LAST" in lsr and "then by `id`" in lsr,
+         "listChannelSaleRule's order puts no place for a null effectiveFrom or has no id last (CR-414)")
+    # BR-PRICING-APPROVAL (ADAM CR-415; CHG-CR415-001)
+    dpo = op("decidePricingRecommendation")[3]
+    need("BR-PRICING-APPROVAL", "approvals.request" in {str(w.get("table")) for w in dpo.get("x-ticvai-writes") or []
+                                                         if isinstance(w, dict)}
+         and "approvals.createApprovalRequest` in process" in desc("decidePricingRecommendation"),
+         "decidePricingRecommendation does not raise the request in process through createApprovalRequest (CR-415)")
+    need("BR-PRICING-APPROVAL", "no-approval-route" in problem_types(dpo),
+         "decidePricingRecommendation does not pass 422 no-approval-route through (CR-415)")
+    dtx = desc("decidePricingRecommendation")
+    need("BR-PRICING-APPROVAL", "always opens a request" in dtx and "above the caller" not in dtx
+         and "writes no outbox event and no" in dtx,
+         "decidePricingRecommendation still makes sendForApproval conditional, or writes an outbox event (CR-415)")
+    st = load("states/pricing-recommendation.yaml")
+    need("BR-PRICING-APPROVAL", not any("above the caller" in str(t.get("guard")) for t in st.get("transitions") or []),
+         "states/pricing-recommendation.yaml still guards sendForApproval on the caller's level (CR-415)")
+    for ev in ("approval-granted", "approval-rejected", "approval-expired", "approval-withdrawn"):
+        cons = [c for c in load(f"events/{ev}.yaml").get("consumers") or [] if isinstance(c, dict)
+                and c.get("context") == "catalogue" and "pricingRecommendation" in str(c.get("purpose"))]
+        need("BR-PRICING-APPROVAL", bool(cons) and all("catalogue.pricing_recommendation" in (c.get("writes") or [])
+             and c.get("idempotencyKey") == "requestId" for c in cons),
+             f"events/{ev}.yaml has no catalogue consumer for subjectType pricingRecommendation (CR-415)")
+
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
@@ -1576,7 +1698,9 @@ def main() -> int:
              "BR-GUEST-CODE-DELIVERY",
              "BR-GUEST-SETTINGS", "BR-BILLING-LINES", "BR-SHOP-DROP-COLLECT", "BR-DELEGATION-KEY", "BR-FOREIGN-TENDER",
              "BR-PRODUCT-FROM-PRICE",
-             "BR-BOOKING-FLOW-MISSING", "BR-CALL-DISPOSITION", "BR-RESTORE-MISSING-PAGE"]
+             "BR-BOOKING-FLOW-MISSING", "BR-CALL-DISPOSITION", "BR-RESTORE-MISSING-PAGE",
+             "BR-COMPETITOR-OBSERVATION", "BR-CONTEXTUAL-RULE", "BR-SALE-SCHEDULE-SUMMARY",
+             "BR-CHANNEL-ALLOCATION-COUNTS", "BR-CHANNEL-CODE-UNIQUE", "BR-SALE-RULE-INSTANTS", "BR-PRICING-APPROVAL"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

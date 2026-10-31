@@ -49,4 +49,14 @@ consumers:
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
+- context: catalogue
+  purpose: '**An AI pricing recommendation sent for approval, withdrawn** (`subjectContract` catalogue, the request
+    decidePricingRecommendation raised on `sendForApproval` for `subjectType` `pricingRecommendation`; ADAM CR-415,
+    decided 31 October 2026). The recommendation is the one whose decision row''s approval_request_id is `requestId` (this payload carries no `subjectType`). A
+    recommendation still `sentForApproval` moves to `rejected`; any other state changes nothing'
+  writes:
+  - catalogue.pricing_recommendation
+  idempotencyKey: requestId
+  onFailure: retryThenDeadLetter
+  isCritical: true
 retention: 30 days after publication

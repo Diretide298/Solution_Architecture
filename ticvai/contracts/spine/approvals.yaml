@@ -5565,6 +5565,14 @@ components:
         `activate`, which are refused until it is approved. An existing kind narrowed by `subjectTypes`, so no kind is
         added.
 
+        **An AI pricing recommendation sent for approval** (ADAM CR-415, decided 31 October 2026, Chinmay;
+        CHG-CR415-001). `pricingChange`, subject `pricingRecommendation`, `subjectContract` `catalogue`, `subjectId` the
+        recommendation: raised by catalogue `decidePricingRecommendation` on `sendForApproval`, in process and in its own
+        transaction, with `amount` the recommended price and `attributes` `{productId, performanceId,
+        adjustmentPercent, governanceLevel}`. Catalogue consumes `approval.granted`, `approval.rejected`,
+        `approval.expired` and `approval.withdrawn` for it. An existing kind narrowed by `subjectTypes`, so no kind is
+        added.
+
         **A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request
         with no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the
         ShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.

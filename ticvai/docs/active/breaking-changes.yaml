@@ -1670,3 +1670,29 @@ changes:
     tag: r12
     producer-tickets: ['30784']
     consumer-tickets: ['31152', '31153', '31154']
+  - id: BC-550
+    contract: catalogue
+    operation: createChannelProfile
+    change: "request `scopeId` type string -> string:uuid"
+    reason: 'ADAM CR-413 (CHG-CR413-001): scopeId is the uuid of the region, venue, attraction, event, location or
+      business unit the channel is scoped to, as catalogue.sales_channel.scope_id already is; a country channel names its
+      country in country, and a scopeId that is not a uuid, or one sent for global or country, is 400 validation. A type
+      change cannot be additive.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-413 posted on #35181: "scopeId is a uuid ... A scopeId that is not a
+      uuid, or one sent for global or country, is 400 validation on scopeId")'
+    tag: r12
+    producer-tickets: ['35181']
+    consumer-tickets: ['29749', '35833']
+  - id: BC-551
+    contract: catalogue
+    operation: listChannelSaleRule
+    change: "type string:date -> string:date-time"
+    reason: 'ADAM CR-414 (CHG-CR414-001): ChannelSalesRulesLimitsRestrictionsView.effectiveFrom and effectiveTo answer the
+      instants as stored (catalogue.channel_sales_rule.effective_from and effective_to, timestamptz) and as
+      setChannelSalesRule takes them, instead of a UTC date, and are nullable; the screen shows the day in the venue''s
+      time zone. A type change cannot be additive.'
+    approved-by: 'Chinmay, 31 October 2026 (CR-414 posted on #35239: "effectiveFrom and effectiveTo become format
+      date-time: the instants as stored and as setChannelSalesRule takes them")'
+    tag: r12
+    producer-tickets: ['35239']
+    consumer-tickets: ['29777', '36744']
