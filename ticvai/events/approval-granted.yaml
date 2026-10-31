@@ -128,20 +128,31 @@ consumers:
   onFailure: retryThenDeadLetter
   isCritical: true
 - context: access
-  purpose: 'Write a whitelist entry a second person approved (`subjectContract` access, `subjectType` whitelistEntry;
-    ADAM CR-399, decided 31 October 2026; CHG-CR399-001), the way Subscription''s consumer applies a suspendTenant.
+  purpose: 'Write a whitelist entry a second person approved (`subjectContract` access, `subjectType` whitelistEntry; ADAM
+    CR-399, decided 31 October 2026; CHG-CR399-001), the way Subscription''s consumer applies a suspendTenant.
     addBlacklistEntry writes only the approval request, so the consumer reads it by `requestId` through
     approvals#requestRecords for its `attributes` (mediaCode, reason, expiresAt, disableScope) and writes the
     access.blacklist row with the request''s `subjectId` as its id, list_type whitelist, the attributes,
     added_by_principal_id the requester and added_at now, then records the outcome with approvals''
-    recordApprovedActionOutcome (applied). A code listed while the request waited writes nothing and records
-    notApplied duplicate-code; an expiresAt already passed writes nothing and records notApplied entry-expired'
+    recordApprovedActionOutcome (applied). A code listed while the request waited writes nothing and records notApplied
+    duplicate-code; an expiresAt already passed writes nothing and records notApplied entry-expired'
   writes:
   - access.blacklist
 - context: catalogue
-  purpose: '**Catalogue''s approval consumer, by `subjectType`** (the consumer ADAM CR-415 adds for `pricingRecommendation`). For `subjectType` `dynamicPricingControl` (ADAM CR-425, CHG-CR425-001): an automation raise setDynamicPricingGuardrailPolicy kept pending on the row whose `pending_approval_request_id` is `requestId` is applied, `automation_level` set to `pending_automation_level` and both pending columns cleared; a row whose pending request is another, or none, changes nothing. For `subjectType` `rollbackAction` (ADAM CR-421): an outcome for a pricing rollback that is no longer `requested` or `scheduled` (cancelled with cancelPricingRollback, which cancels its request in process) changes nothing.'
+  purpose: '**Catalogue''s approval consumer, by `subjectType`** (the consumer ADAM CR-415 adds for `pricingRecommendation`).
+    For `subjectType` `dynamicPricingControl` (ADAM CR-425, CHG-CR425-001): an automation raise
+    setDynamicPricingGuardrailPolicy kept pending on the row whose `pending_approval_request_id` is `requestId` is
+    applied, `automation_level` set to `pending_automation_level` and both pending columns cleared; a row whose pending
+    request is another, or none, changes nothing. For `subjectType` `rollbackAction` (ADAM CR-421): an outcome for a
+    pricing rollback that is no longer `requested` or `scheduled` (cancelled with cancelPricingRollback, which cancels
+    its request in process) changes nothing. For `subjectType` `pricingRecommendation` :
+    (CHG-CR415-001; `subjectContract` catalogue, `subjectType` `pricingRecommendation`; ADAM CR-415, decided 31 October 2026). The
+    request is the one decidePricingRecommendation raised on `sendForApproval` (its decision row''s approval_request_id
+    is `requestId`). A recommendation still `sentForApproval` moves to `accepted`; any other state changes nothing. No
+    price changes here: createLiveDynamicPrice executes it, with this request as its approval reference.'
   writes:
   - catalogue.dynamic_pricing_control
+  - catalogue.pricing_recommendation
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true

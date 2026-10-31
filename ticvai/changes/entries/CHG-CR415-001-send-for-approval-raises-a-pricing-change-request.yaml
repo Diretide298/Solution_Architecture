@@ -1,0 +1,72 @@
+id: CHG-CR415-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'decidePricingRecommendation''s sendForApproval always opens an approvals request in process
+  (createApprovalRequest: kind pricingChange, subjectContract catalogue, subjectType pricingRecommendation, the
+  recommendation''s scope, recommendedPrice and attributes), records it on the decision row and moves the
+  recommendation to sentForApproval; 422 no-approval-route passes through and writes nothing; no outbox event and no
+  catalogue.audit_entry. Catalogue consumes approval.granted (to accepted) and approval.rejected, approval.expired and
+  approval.withdrawn (to rejected) for a recommendation still sentForApproval, idempotent on requestId.'
+decision:
+  what: 'ADAM CR-415, posted 31 October 2026: "Decided (Chinmay, 31 October 2026): as you recommended, with the consumer
+    named. sendForApproval always opens a request. The condition ''above the caller''s'' is dropped, and governanceLevel
+    stays a label the recommendation engine writes. In one transaction, the call asks approvals.createApprovalRequest in
+    process, as publishChannelReadinessValidation does since CR-211, with: kind pricingChange, subjectContract
+    catalogue, subjectType pricingRecommendation ... When approvals refuses with 422 no-approval-route, answer 422
+    no-approval-route and write nothing. Catalogue consumes approval.granted for subjectType pricingRecommendation, with
+    idempotency key requestId: a recommendation still sentForApproval moves to accepted, and any other state changes
+    nothing. approval.rejected, approval.expired and approval.withdrawn move it to rejected in the same way ... The
+    operation writes no outbox event and no catalogue.audit_entry, because the decision row is the record. The branch
+    goes live with IApprovalRequests (#30848); until then it stays as built." The lead, 31 October 2026, on the settled
+    CRs: "Include them in r12".'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-415 (Hrushikant Patkar, #35183 decidePricingRecommendation, blocking): the sendForApproval sentence and the
+  state guard depended on a caller''s governance level nothing defines, and the sentForApproval -> accepted/rejected
+  moves were external events with no catalogue consumer of approval.granted or approval.rejected. Send for Approval is
+  an explicit human action (pack p.107; MoM 1 Sep 2026 section 4.8); pricingChange is the kind catalogue pricing
+  approvals use; raising in process follows CR-211 (CHG-R10CAT-003) under ADR-0055; a consumer per owning contract is
+  the approval events'' own design (CR-154, CHG-CRA-004).'
+keys_touched:
+  operations: [decidePricingRecommendation]
+  schemas: [ApprovalKind, PricingRecommendation]
+  tables: [catalogue.pricing_recommendation, catalogue.pricing_recommendation_decision, approvals.request]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/approvals.yaml
+  - states/pricing-recommendation.yaml
+  - events/approval-granted.yaml
+  - events/approval-rejected.yaml
+  - events/approval-expired.yaml
+  - events/approval-withdrawn.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: 'a state move waiting on another module''s decision with no consumer of the event that carries it, and a
+  raise condition on a value nothing defines'
+tickets:
+  started:
+  - '35183 (decidePricingRecommendation, Hrushikant Patkar): build sendForApproval as above against Approvals''
+    in-process API and stop writing outbox and audit_entry; build the catalogue consumer of the four approval events for
+    subjectType pricingRecommendation in a child task of this ticket (to be filed by the plan lane). Told through
+    CR-415''s comment.'
+  - '30848 (createApprovalRequest, On hold): no change; sendForApproval waits for it.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-415
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PRICING-APPROVAL
+status: open
+notes: 'Shared model with lanes J and L: this is the catalogue consumer CR-421 (rollbackAction) and CR-425
+  (dynamicPricingControl) extend by subjectType, and createLiveDynamicPrice''s approval reference (CR-422) is the
+  approvalRequestId recorded here. A fact the posted text does not cover: approval.rejected and approval.withdrawn carry
+  no subjectType in their payload (approval.granted and approval.expired do), so the consumer finds its recommendation
+  by the decision row whose approval_request_id is requestId; the event files say so. Lanes J and L dispatching those
+  two events on subjectType meet the same gap. The in-process raise is declared as x-ticvai-writes approvals.request (catalogue
+  and approvals both run in commerce, ADR-0055, so it is no cross-deployable route; reopenPeriod is the precedent); the
+  carried lineage override
+  (which wrote platform.outbox and catalogue.audit_entry) is replaced by the contract''s x-ticvai-reads and
+  x-ticvai-writes. No database change: pricing_recommendation_decision.approval_request_id already exists.'

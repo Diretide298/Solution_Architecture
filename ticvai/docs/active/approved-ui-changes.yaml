@@ -713,3 +713,19 @@ changes:
     DynamicPricingStrategyCommandCenterView.automationLevel, labelled "Automation level", in the same place, because
     automationMode is retired (CR-417); every other field of the panel is unchanged'
   change: CHG-CR423-001
+- screen: ADM-259
+  field: 'region:fields'
+  to: 1ed34b6d3380d5b5
+  approval: 'The lead''s decision of 1 November 2026 on ADAM CR-413 (raised by Hrushikant Patkar on #35181, settled 31
+    October 2026: "currency is not stored ... and the screen does not ask for it"): "Remove the field". The Currency
+    field leaves the channel creation form; a channel sells in the currency its venue trades in (ADR-0018) and the
+    server never stores the input''s currency.'
+  change: CHG-CR413-001
+- screen: ADM-093
+  field: 'region:rowActions'
+  to: 446cc503b3c53ad4
+  approval: 'The lead''s decision of 1 November 2026 on ADAM CR-410 (raised by Hrushikant Patkar on #35326, settled 31
+    October 2026: a contextual rule is a pricing.dynamic_price_rule row that setDynamicPriceRule writes): "Add a save
+    button". One primary button, Save rule, bound to setDynamicPriceRule, which closes the CHG-WIR-027 gap that the
+    screen had no write.'
+  change: CHG-CR410-001

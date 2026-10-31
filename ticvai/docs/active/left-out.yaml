@@ -288,3 +288,59 @@ items:
   owner: Chinmay
   added: '2026-10-31'
   change: CHG-CR408-001
+- id: LO-CR409-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-102]
+  what: 'The writer of competitor price observations (catalogue.competitor_price_observation): the signal ingestion job
+    for a feed source, and a manual-entry write for collectionMethod manualEntry. Until one exists the list is empty,
+    and ADM-102 keeps every member of CompetitorPricingMarketPositionIntelligenceView (the six prices, availability,
+    date, timeslot, observationId, observedAt, marketMedianPrice, positionVsMedian and movementPercent) with no row to
+    show.'
+  source: 'ADAM CR-409 (#35327 listCompetitorPricingMarket), decided 31 October 2026; pack Pricing___Revenue_Management_Reference.pdf p.100, 10.6.5 Track (sources/workshop/pack.json); CHG-CR409-001'
+  reason: no competitor data provider named by the client, so no feed to ingest; the decision stores and reads the
+    observations and names no writer
+  target: 'when the client names a competitor data provider or asks for manual entry (not scheduled; the lead decides
+    the release)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR409-001
+- id: LO-CR409-002
+  kind: deferred
+  platform: P08
+  screens: [ADM-102]
+  what: 'The writer of a competitor registry row''s reading.historicalCorrelation {demand, conversion, priceSensitivity}:
+    the AI layer''s correlation of competitor changes with TICVAI outcomes. Until it writes it, ADM-102 keeps the member
+    CompetitorPricingMarketPositionIntelligenceView.historicalCorrelation and answers it null.'
+  source: 'ADAM CR-409 (#35327), decided 31 October 2026 ("null until the AI layer writes it"); pack p.100 Historical
+    Correlation (sources/workshop/pack.json); CHG-CR409-001'
+  reason: the decision states where the figure is read from and that it is null until written; no AI job that computes
+    it is specified
+  target: 'with the AI pricing work that specifies the correlation job (not scheduled)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR409-001
+- id: LO-CR411-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-263]
+  what: 'ChannelSalesScheduleAvailabilityWindowsView.aiInsights (unusual schedule configurations AI detects, pack p.12):
+    always an empty list until an insight source is declared. ADM-263 keeps the member.'
+  source: 'ADAM CR-411 (#35240 listChannelSaleSchedule), decided 31 October 2026; pack Sales_Channel_Management_Reference.pdf p.12 AI Capability (sources/workshop/pack.json); CHG-CR411-001'
+  reason: no insight source is declared; the decision answers the list empty rather than invent one
+  target: 'when an insight source for channel schedules is decided (not scheduled)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR411-001
+- id: LO-CR412-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-262]
+  what: 'InventoryCapacityChannelAllocationView.aiInsights (AI reallocation suggestions, pack p.11): an empty list until
+    an insight source is declared. ADM-262 keeps the member.'
+  source: 'ADAM CR-412 (#35242 listInventoryCapacityChannel), decided 31 October 2026; pack Sales_Channel_Management_Reference.pdf p.11 AI Capability (sources/workshop/pack.json); CHG-CR412-001'
+  reason: no insight source is declared; the decision answers the list empty rather than invent one
+  target: 'when an insight source for channel allocation is decided (not scheduled)'
+  owner: Chinmay
+  added: '2026-10-31'
+  change: CHG-CR412-001

@@ -50,9 +50,20 @@ consumers:
   onFailure: retryThenDeadLetter
   isCritical: true
 - context: catalogue
-  purpose: '**Catalogue''s approval consumer, by `subjectType`** (the consumer ADAM CR-415 adds for `pricingRecommendation`). For `subjectType` `dynamicPricingControl` (ADAM CR-425, CHG-CR425-001): the withdrawn raise is dropped, `pending_automation_level` and `pending_approval_request_id` cleared on the row whose pending request is `requestId`, and `automation_level` keeps the current level; a row whose pending request is another, or none, changes nothing. For `subjectType` `rollbackAction` (ADAM CR-421): an outcome for a pricing rollback that is no longer `requested` or `scheduled` (cancelled with cancelPricingRollback, which cancels its request in process) changes nothing.'
+  purpose: '**Catalogue''s approval consumer, by `subjectType`** (the consumer ADAM CR-415 adds for `pricingRecommendation`).
+    For `subjectType` `dynamicPricingControl` (ADAM CR-425, CHG-CR425-001): the withdrawn raise is dropped,
+    `pending_automation_level` and `pending_approval_request_id` cleared on the row whose pending request is
+    `requestId`, and `automation_level` keeps the current level; a row whose pending request is another, or none,
+    changes nothing. For `subjectType` `rollbackAction` (ADAM CR-421): an outcome for a pricing rollback that is no
+    longer `requested` or `scheduled` (cancelled with cancelPricingRollback, which cancels its request in process)
+    changes nothing. For `subjectType` `pricingRecommendation` : (CHG-CR415-001; `subjectContract`
+    catalogue, the request decidePricingRecommendation raised on `sendForApproval` for `subjectType`
+    `pricingRecommendation`; ADAM CR-415, decided 31 October 2026). The recommendation is the one whose decision row''s
+    approval_request_id is `requestId` (this payload carries no `subjectType`). A recommendation still `sentForApproval`
+    moves to `rejected`; any other state changes nothing.'
   writes:
   - catalogue.dynamic_pricing_control
+  - catalogue.pricing_recommendation
   idempotencyKey: requestId
   onFailure: retryThenDeadLetter
   isCritical: true
