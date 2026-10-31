@@ -1,0 +1,64 @@
+id: CHG-CR382-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'whitelabel.kiosk_config gains deleted_at (KioskConfig.deletedAt, readOnly, nullable timestamptz, null while
+  the configuration exists). deleteKioskConfig sets it to now and removes nothing (slides, tiles and versions stay);
+  the 409s stand. A deleted configuration is left out of listKioskConfigs, answers 404 to getKioskConfig,
+  updateKioskConfig, deleteKioskConfig, getKioskConfigValidation, setKioskOutOfService, restoreKioskConfigVersion,
+  getPublishedKioskConfig by kioskConfigId and publishKioskConfigs naming it, is skipped by publishKioskConfigs
+  without kioskConfigIds, keeps its versions in listKioskConfigVersions, and is 409 kiosk-config-deleted to assignKiosk.
+  kiosk-config-name-taken compares only live configurations.'
+decision:
+  what: 'ADAM CR-382 (Chinmay, 31 October 2026, posted on #35616: "as you recommended. whitelabel.kiosk_config gains
+    deleted_at (timestamptz, null while the configuration exists). deleteKioskConfig sets it to now for any
+    configuration, published or not, and removes nothing: its slides, tiles and versions stay ... listKioskConfigVersions
+    still answers its versions (the read-only history). assignKiosk naming it answers 409 kiosk-config-deleted. Its
+    name is free again ... No 500 for a configuration with versions."), after the lead''s review of every CR ("for each
+    one actually check if they hold and if not then find out the best way keeping in mind what client needs") and his
+    instruction "Include them in r12". contracts/satellite/white-label.yaml: KioskConfig.deletedAt and the name rule;
+    deleteKioskConfig''s description and its declared reads and write (kiosk_config only, so the lineage no longer
+    says it deletes slides and tiles; the carried override in handoff/api-data-lineage-overrides.json is removed); the
+    deleted case in each kiosk-configuration operation named. The column reaches the forward migration through
+    derive-ddl. tools/check-business-rules.py BR-KIOSK-DELETE.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-382 (Hrushikant Patkar, #35616 deleteKioskConfig): the operation promised its published versions stay in
+  the history, and assignKiosk answers 409 kiosk-config-deleted, which needs a deleted row that still exists; but
+  kiosk_config_version_kiosk_config_id_fkey has no ON DELETE action (V0107) and kiosk_config had no column marking a
+  removal, so a configuration with versions could not be removed at all. The 5 October decision keeps versions and
+  roll back.'
+keys_touched:
+  operations: [deleteKioskConfig, listKioskConfigs, getKioskConfig, updateKioskConfig, getKioskConfigValidation,
+    setKioskOutOfService, restoreKioskConfigVersion, getPublishedKioskConfig, publishKioskConfigs,
+    listKioskConfigVersions, assignKiosk]
+  schemas: [KioskConfig]
+  tables: [whitelabel.kiosk_config]
+  files:
+  - contracts/satellite/white-label.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/check-business-rules.py
+root_class: 'a soft-delete promise (history kept, a deleted state refused) with no stored marker and a foreign key
+  that forbids the hard delete'
+tickets:
+  started:
+  - '35616 (deleteKioskConfig, Hrushikant Patkar, raiser): set deleted_at instead of deleting; drop the interim 500.'
+  - '35614 (assignKiosk, Hrushikant Patkar): 409 kiosk-config-deleted for a configuration whose deleted_at is set,
+    instead of the interim 404.'
+  - '35617, 35618, 35619, 35620, 35621, 35623, 35624 (the other kiosk-configuration operations, Hrushikant Patkar):
+    skip or 404 a deleted configuration as above; 35626 listKioskConfigVersions keeps answering its versions.'
+  unstarted:
+  - '[DB] child task of MIG-WHITELABEL-2 (#35610 [DB] whitelabel.kiosk_config), Hrushikant Patkar, filed by the plan
+    lane: ALTER TABLE whitelabel.kiosk_config ADD COLUMN IF NOT EXISTS deleted_at timestamptz in the next forward
+    migration, applied to the live tenant database too.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-382
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-KIOSK-DELETE fails on 8535bc29 (no deletedAt; deleteKioskConfig wrote the slide and tile tables) and passes
+  now. Additive: a readOnly response field and a nullable column. The forward migration is written by the integration
+  refresh. Beyond the comment''s words: none.'

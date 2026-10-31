@@ -1,0 +1,69 @@
+id: CHG-CR384-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'platform.workstation gains channel (text, not null, default pos, check pos or kiosk), returned as
+  Workstation.channel (WorkstationChannel [pos, kiosk], catalogue''s Channel words): kiosk is a self-service kiosk a
+  guest operates, pos a staffed till, a staffed stand in an outlet of kind kiosk included. configureWorkstation takes
+  channel as an optional field and, unlike its other fields, keeps the stored value when it is left out;
+  getWorkstation, listWorkstations (with a channel query filter) and tenancy#workstationRecords return it. assignKiosk
+  reads the workstation through tenancy#workstationRecords in process (XDR-027) and answers 409 not-a-kiosk when its
+  channel is not kiosk, 404 when it is not in the venue.'
+decision:
+  what: 'ADAM CR-384 (Chinmay, 31 October 2026, posted on #35614: "as you recommended, with the values named as
+    catalogue''s Channel. platform.workstation gains channel (text, not null, default pos, check pos or kiosk),
+    returned as Workstation.channel ... configureWorkstation takes channel as an optional field; unlike the other
+    fields of that PUT, a channel left out keeps the stored value ... getWorkstation, listWorkstations (with an
+    optional channel query filter) and tenancy#workstationRecords return it. assignKiosk reads the workstation
+    through tenancy#workstationRecords in process ... and answers 409 not-a-kiosk when its channel is not kiosk, 404
+    when it is not in the venue. The refusal''s text no longer speaks of a sale board or a kiosk enrolment."), after
+    the lead''s review of every CR ("for each one actually check if they hold and if not then find out the best way
+    keeping in mind what client needs") and his instruction "Include them in r12". contracts/spine/tenancy.yaml:
+    WorkstationChannel, Workstation.channel (required, default pos), ConfigureWorkstationRequest.channel (no default),
+    configureWorkstation''s description, listWorkstations'' channel parameter; contracts/satellite/white-label.yaml
+    assignKiosk''s refusal text and its read-via route in-process; docs/active/cross-deployable-writes.yaml XDR-027
+    (shared with CR-383). The column reaches the forward migration through derive-ddl.
+    tools/check-business-rules.py BR-KIOSK-CHANNEL.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-384 (Hrushikant Patkar, #35614 assignKiosk, blocking): assignKiosk refused 409 not-a-kiosk when the
+  workstation "is not a self-service kiosk (it has no kiosk enrolment)", but nothing marked one: SaleBoardKind is the
+  board''s goods, DeviceKind has no kiosk, DeviceEnrolment has nothing kiosk-specific, platform.workstation had no kind
+  or channel column, and OutletKind kiosk is a place that holds staffed tills too. Matrix 2.1.10 and 10.2.3 tell
+  self-service kiosks from operator kiosks.'
+keys_touched:
+  operations: [configureWorkstation, getWorkstation, listWorkstations, assignKiosk]
+  schemas: [Workstation, WorkstationChannel, ConfigureWorkstationRequest]
+  tables: [platform.workstation]
+  files:
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/white-label.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'XDR-027 (granted read; the SELECT on platform.workstation is V0118''s)'
+root_class: 'a refusal keyed on a fact (is this workstation a kiosk) no column stores'
+tickets:
+  started:
+  - '35614 (assignKiosk, Hrushikant Patkar, raiser): answer 409 not-a-kiosk from Workstation.channel as above; read the
+    workstation in process; no longer blocked.'
+  - '30794 (configureWorkstation, Pranay Shinde, Ready for QA): accept and store channel, keeping the stored value when
+    it is left out, and return it.'
+  unstarted:
+  - '32812 (getWorkstation) and 32814 (listWorkstations), Pranay Shinde, New: return channel; listWorkstations filters
+    by it.'
+  - '[DB] child task of MIG-PLATFORM (#30343 [DB] platform.workstation), Hrushikant Patkar, filed by the plan lane:
+    ALTER TABLE platform.workstation ADD COLUMN IF NOT EXISTS channel text NOT NULL DEFAULT ''pos'' with
+    workstation_channel_chk CHECK (channel IN (''pos'', ''kiosk'')), applied to the live tenant database too (existing
+    rows become pos).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-384
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-KIOSK-CHANNEL fails on 8535bc29 (no channel anywhere; assignKiosk on the service route and speaking of a
+  kiosk enrolment) and passes now. Additive: an optional request field, a query parameter, a response field and a
+  column with a default. Beyond the comment''s words: none.'

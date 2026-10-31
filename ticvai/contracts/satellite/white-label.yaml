@@ -817,6 +817,11 @@ paths:
         - "P13 CMS-105 Kiosk Builder"
       x-ticvai-agreed: '5 October 2026: decided by Chinmay, the kiosk is the builder''s third channel
         (docs/active/decisions/answers-5-october.md, CHG-R4-001); shape follows listBookingFlows'
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'assignedKioskCount: the venue''s kiosks, its active workstations with channel kiosk, where {venueId,
+          channel: kiosk, isActive: true} (ADAM CR-383, CHG-CR383-001; XDR-027)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -834,6 +839,16 @@ paths:
 
         **A venue with no kiosk configuration yet** returns an empty page; the first `createKioskConfig` of a venue
         makes the default.
+
+
+        **A deleted configuration is left out** (`deletedAt` set; ADAM CR-382, CHG-CR382-001).
+
+
+        **`assignedKioskCount` counts the venue''s kiosks** (ADAM CR-383, Chinmay, 31 October 2026; CHG-CR383-001):
+        the venue''s active workstations with `channel` `kiosk`, asked of `tenancy#workstationRecords` with where
+        `{venueId, channel: kiosk, isActive: true}` in process, through Tenancy''s query class under the caller''s
+        row-level security. A group''s count is its `kiosk_assignment` rows whose workstation is one of those kiosks;
+        the default''s is the venue''s kiosks with no assignment row, or with a row naming null or the default.
 
         '
       tags:
@@ -1376,6 +1391,19 @@ paths:
         - "P13 CMS-105 Kiosk Builder"
       x-ticvai-agreed: '5 October 2026: decided by Chinmay, publish to all kiosks or to one group, with versions and
         roll back (docs/active/decisions/answers-5-october.md, CHG-R4-001); shape follows publishTenantConfig'
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: in-process
+        for: 'mediaDoesNotFit: each slide''s mediaAssetRef, by ids (assets.media_asset, same host; ADAM CR-385,
+          CHG-CR385-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'tileWithoutProducts: the venue''s products, where {venueId} (catalogue.product, Catalogue''s data; ADAM
+          CR-385, as CR-343 ruled; XDR-028)'
+      - query: payments#paymentMethodRecords
+        route: in-process
+        for: 'paymentMethodUnavailable: the accepted methods'' payments.method rows (Orders'' data; ADAM CR-385,
+          XDR-028)'
       x-ticvai-audience:
       - staff
       summary: Publish the venue's kiosk configurations, to every kiosk or to one group
@@ -1398,6 +1426,15 @@ paths:
 
         **Permission:** `TENANT_PUBLISH` at the venue, the permission `publishTenantConfig` uses for the guest
         channels, held here at venue level because a kiosk configuration belongs to one venue.
+
+
+        **The checks and their reads** (ADAM CR-385, Chinmay, 31 October 2026; CHG-CR385-001): the same checks as
+        `getKioskConfigValidation`, by the rule and severity `KioskConfigFindingKind` gives each kind, with the same
+        in-process reads. It refuses only on an `error` finding; a `warning` publishes.
+
+
+        **A deleted configuration** (`deletedAt` set; ADAM CR-382, CHG-CR382-001): named in `kioskConfigIds` it
+        answers 404 `not-found`; without `kioskConfigIds` it is skipped.
 
         '
       tags:
@@ -2276,7 +2313,8 @@ paths:
         by the group:** `workstationId` (the kiosk''s workstation, from its enrolment) resolves through the kiosk''s
         assignment (`assignKiosk`) to its group''s configuration, and a kiosk in no group gets the venue''s default;
         `kioskConfigId` reads one group''s configuration directly (the builder''s preview, CMS-105). One of the two is
-        required (400 otherwise); a workstation that is not in this venue is 404.
+        required (400 otherwise); a workstation that is not in this venue is 404. A `kioskConfigId` naming a deleted
+        configuration (`deletedAt` set; ADAM CR-382, CHG-CR382-001) is 404 `not-found`.
 
 
         **Published, non-sensitive fields only.** Read from the configuration''s current `KioskConfigVersion` (never
@@ -2918,11 +2956,22 @@ paths:
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the venue''s kiosks, its active workstations with channel kiosk, where {venueId, channel: kiosk,
+          isActive: true} (ADAM CR-383, CHG-CR383-001; XDR-027)'
       summary: Which kiosk group each kiosk of the venue is in
-      description: '**One row per kiosk of the venue that has been assigned** (decided 5 October 2026 by Chinmay,
-        CHG-R4-001). A kiosk with no row takes the venue''s default configuration. **Ordered by** `kioskConfigId`
-        (the default''s kiosks first), then `workstationId`. With `kioskConfigId` only that group''s kiosks. An unknown
-        venue or configuration is an empty page.
+      description: '**One item per kiosk of the venue** (decided 5 October 2026 by Chinmay, CHG-R4-001; one per kiosk,
+        not per assignment row, since ADAM CR-383, Chinmay, 31 October 2026, CHG-CR383-001). The venue''s kiosks are its
+        active workstations with `channel` `kiosk`, asked of `tenancy#workstationRecords` with where `{venueId,
+        channel: kiosk, isActive: true}` in process, through Tenancy''s query class under the caller''s row-level
+        security. A kiosk with an assignment row answers that row; a kiosk with none answers `workstationId` and
+        `venueId` with `id`, `kioskConfigId`, `assignedAt` and `assignedByPrincipalId` null (it is on the venue''s
+        default). An assignment row for a workstation that is no longer a kiosk is neither counted nor listed.
+        **Ordered by** `kioskConfigId` (the default''s kiosks first), then `workstationId`. With `kioskConfigId` only
+        that group''s kiosks, and the default''s id gives the kiosks on the default. An unknown venue or configuration
+        is an empty page.
 
         '
       tags:
@@ -3001,11 +3050,23 @@ paths:
       operationId: createBanner
       x-ticvai-consumed-by:
         - "P13 CMS-008 Content Blocks"
+      x-ticvai-writes:
+      - table: whitelabel.banner
+        for: 'the banner, and nothing else: tenant_config_id is retired and written null (ADAM CR-387, CHG-CR387-001)'
       x-ticvai-audience:
       - staff
       summary: Create a banner
       description: 'Scheduled by date window. A campaign banner set to run through a religious or national
         period should not need someone awake at midnight to switch it on.
+
+
+        **A banner is not part of the working draft, so it does not point at it** (ADAM CR-387, Chinmay, 31 October
+        2026; CHG-CR387-001). `createBanner` writes the `whitelabel.banner` row with `tenant_config_id` null (the
+        column is retired) and never reads or creates the `whitelabel.tenant_config` row; `updateBanner` and
+        `deleteBanner` never read or write `tenant_config` either, and nothing joins or filters banners on
+        `tenant_config_id`. Banners stay tenant-wide rows under their existing row-level security; existing rows
+        keep their value, which nothing reads. A tenant that has made only banners still answers `getTenantConfig`
+        404 `not-configured`.
 
         '
       tags:
@@ -3049,6 +3110,16 @@ paths:
       x-ticvai-audience:
       - staff
       summary: Amend or activate a banner
+      description: '**The state after every save** (ADAM CR-388, Chinmay, 31 October 2026; CHG-CR388-001). `startsAt`
+        stays required: `startsAt` null is 400 `validation-failed`. After every `updateBanner` save the server sets
+        `state` from the stored banner: `isActive` false puts a `draft`, `scheduled` or `active` banner in `draft`;
+        otherwise a `draft` or `scheduled` banner becomes `scheduled` (the timer moves it to `active` at `startsAt`
+        and to `expired` at `endsAt`) and an `active` one stays `active`. An `expired` banner''s state does not change.
+        Because `isActive` is stored, a banner held in `draft` stays there through later edits until an update sends
+        `isActive` true. The move from `scheduled` to `draft` by clearing `startsAt` is the promo block''s only
+        (`states/schedule.yaml`). It never reads or writes `whitelabel.tenant_config` (ADAM CR-387).
+
+        '
       tags:
       - content
       x-ticvai-permission: TENANT_CONFIGURE
@@ -3096,6 +3167,8 @@ paths:
                   type: integer
                 isActive:
                   type: boolean
+                  description: Stored. False holds the banner in `draft` through later edits until an update sends true
+                    (ADAM CR-388).
       responses:
         '200':
           headers:
@@ -3106,6 +3179,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Banner'
+        '400':
+          description: '`startsAt` sent null (it stays required; ADAM CR-388), or `endsAt` not after `startsAt` (audit
+            R163)'
+          x-ticvai-problem-types:
+          - validation-failed
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
@@ -3114,15 +3196,18 @@ paths:
         - "P13 CMS-008 Content Blocks"
       x-ticvai-writes:
       - table: whitelabel.banner
-        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      - table: whitelabel.tenant_config
-        for: 'what this operation writes (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+        for: 'deletes the banner row only (r8 walk fix, CHG-R8WFC-004; the tenant_config read and write it once declared
+          were dropped by ADAM CR-387, CHG-CR387-001: a banner is outside the draft)'
       x-ticvai-reads:
-      - table: whitelabel.tenant_config
-        for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: whitelabel.banner
+        for: 'the banner to delete (404 when it is not there)'
       x-ticvai-audience:
       - staff
       summary: Delete a banner
+      description: 'Deletes the `whitelabel.banner` row only; it never reads or writes `whitelabel.tenant_config`, since a
+        banner is outside the working draft (ADAM CR-387, Chinmay, 31 October 2026; CHG-CR387-001).
+
+        '
       tags:
       - content
       x-ticvai-permission: TENANT_CONFIGURE
@@ -3278,8 +3363,9 @@ paths:
         - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
-        route: service
-        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'the workstation in the path: 404 when it is not in the venue, 409 not-a-kiosk when its channel is not
+          kiosk (platform.workstation, Tenancy''s data; CHG-MOD-001; in process since ADAM CR-384, XDR-027)'
       x-ticvai-agreed: '5 October 2026: decided by Chinmay, ADM-582 assigns a kiosk to a kiosk group
         (docs/active/decisions/answers-5-october.md, CHG-R4-001)'
       x-ticvai-audience:
@@ -3293,9 +3379,17 @@ paths:
 
         **Separate from tenancy''s `setDeviceAssignment`**, which records who owns, holds and placed a device and is
         unchanged: this records only which kiosk configuration a kiosk workstation shows. **Refused:** 404 when the
-        workstation or the configuration is not in this venue; 409 `not-a-kiosk` when the workstation''s sale board
-        is not a self-service kiosk (it has no kiosk enrolment), and 409 `kiosk-config-deleted` when the
-        configuration has been deleted.
+        workstation or the configuration is not in this venue; 409 `not-a-kiosk` when the workstation''s `channel` is
+        not `kiosk` (it is not a self-service kiosk a guest operates), and 409 `kiosk-config-deleted` when the
+        configuration has been deleted (its `deletedAt` is set).
+
+
+        **Which workstations are kiosks** (ADAM CR-384, Chinmay, 31 October 2026; CHG-CR384-001): a kiosk is a
+        workstation whose `Workstation.channel` is `kiosk` (tenancy `configureWorkstation` sets it). The workstation
+        is read through `tenancy#workstationRecords` in process, through Tenancy''s query class under the caller''s
+        row-level security (the operations role already has SELECT on `platform.workstation`, V0118; XDR-027).
+        **A deleted configuration** (ADAM CR-382, CHG-CR382-001) is one whose `deletedAt` is set; it still exists, so
+        naming it is 409 `kiosk-config-deleted`, not 404.
 
         '
       tags:
@@ -4613,10 +4707,22 @@ paths:
         - "P13 CMS-105 Kiosk Builder"
       x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
         shape follows getBookingFlow'
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'assignedKioskCount: the venue''s kiosks, its active workstations with channel kiosk, where {venueId,
+          channel: kiosk, isActive: true} (ADAM CR-383, CHG-CR383-001; XDR-027)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
       summary: Read one kiosk configuration from the working draft, every part included
+      description: '`assignedKioskCount` is counted from the venue''s kiosks as `KioskConfig.assignedKioskCount` says
+        (ADAM CR-383, Chinmay, 31 October 2026; CHG-CR383-001): the venue''s active workstations with `channel`
+        `kiosk`, asked of `tenancy#workstationRecords` with where `{venueId, channel: kiosk, isActive: true}` in
+        process, through Tenancy''s query class under the caller''s row-level security. A configuration whose
+        `deletedAt` is set answers 404 `not-found` (ADAM CR-382, CHG-CR382-001).
+
+        '
       tags:
       - kiosk
       x-ticvai-permission: TENANT_CONFIGURE
@@ -4645,11 +4751,25 @@ paths:
       - staff
       summary: Change a kiosk configuration in the working draft
       description: 'A partial update of the working draft; kiosks see it after `publishKioskConfigs`. Each part given
-        replaces that part whole (`display`, `attractLoop` with its `slides`, `startScreen` with its `tiles`,
+        replaces that part whole (`display`, `attractLoop`, `attractSlides`, `startScreen`, `startTiles`,
         `headerFooter`, `journey`, `session`, `paymentOutput`, `languages`, `messages`, `openingHours`); a part left
         out is unchanged. **Saved even when it would not publish**; `hasUnpublishedChanges` turns true. `isDefault`
         cannot be changed (400): the default stays the default. **Refused:** 400 as on create; 409
-        `kiosk-config-name-taken` for a name another configuration of the venue has.
+        `kiosk-config-name-taken` for a name another configuration of the venue has (only configurations whose
+        `deletedAt` is null are compared).
+
+
+        **The slides and the tiles are parts of their own** (ADAM CR-381, Chinmay, 31 October 2026; CHG-CR381-001).
+        `attractSlides` (`KioskAttractSlide` items, at most 40) and `startTiles` (`KioskStartTile` items, at most 8)
+        are each optional. Given, a list replaces that configuration''s whole list in the same transaction: the
+        `whitelabel.kiosk_config_attract_slide` or `whitelabel.kiosk_config_start_tile` rows not in it are removed and
+        the list is written in its `sortOrder`; an empty list clears it; left out, the list is unchanged. Refused 400
+        `validation-failed` as on create: a `sortOrder` given twice in a list, a start-tile `function` given twice, or
+        more items than the maximum. Writing either list sets `hasUnpublishedChanges` true. `attractLoop` and
+        `startScreen` keep only the loop''s and the screen''s own settings.
+
+
+        **A deleted configuration** (`deletedAt` set; ADAM CR-382, CHG-CR382-001) answers 404 `not-found`.
 
         '
       tags:
@@ -4682,8 +4802,24 @@ paths:
                   $ref: '#/components/schemas/KioskDisplaySettings'
                 attractLoop:
                   $ref: '#/components/schemas/KioskAttractLoop'
+                attractSlides:
+                  type: array
+                  maxItems: 40
+                  description: The attract loop's slides (ADAM CR-381). Given, it replaces the configuration's whole
+                    list of `whitelabel.kiosk_config_attract_slide` rows, written in `sortOrder`; empty clears it; left
+                    out, unchanged.
+                  items:
+                    $ref: '#/components/schemas/KioskAttractSlide'
                 startScreen:
                   $ref: '#/components/schemas/KioskStartScreen'
+                startTiles:
+                  type: array
+                  maxItems: 8
+                  description: The start screen's tiles (ADAM CR-381). Given, it replaces the configuration's whole list
+                    of `whitelabel.kiosk_config_start_tile` rows, written in `sortOrder`; empty clears it; left out,
+                    unchanged. A function given twice is refused 400.
+                  items:
+                    $ref: '#/components/schemas/KioskStartTile'
                 headerFooter:
                   $ref: '#/components/schemas/KioskHeaderFooter'
                 journey:
@@ -4709,7 +4845,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/KioskConfig'
         '400':
-          description: A malformed part, a repeated slide or tile order, or an attempt to change `isDefault`
+          description: A malformed part, a `sortOrder` given twice in `attractSlides` or `startTiles`, a start-tile
+            `function` given twice, more items than a list's maximum, or an attempt to change `isDefault`
           x-ticvai-problem-types:
           - validation-failed
           content:
@@ -4735,6 +4872,14 @@ paths:
         - "P13 CMS-105 Kiosk Builder"
       x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
         shape follows deleteBookingFlow'
+      x-ticvai-reads:
+      - table: whitelabel.kiosk_config
+        for: 'the configuration, its isDefault and deletedAt (ADAM CR-382, CHG-CR382-001)'
+      - table: whitelabel.kiosk_assignment
+        for: 'the 409 kiosk-config-in-use: a kiosk still assigned to it (ADAM CR-382)'
+      x-ticvai-writes:
+      - table: whitelabel.kiosk_config
+        for: 'sets deleted_at to now and removes nothing (ADAM CR-382, CHG-CR382-001)'
       x-ticvai-audience:
       - staff
       summary: Remove a kiosk group's configuration
@@ -4742,6 +4887,18 @@ paths:
         history, read-only. **Refused with 409** `default-kiosk-config` for the venue''s default (every kiosk in no
         group needs it) and `kiosk-config-in-use` while any kiosk is assigned to it (`assignKiosk` them elsewhere
         first, so no kiosk is left showing a configuration that no longer exists).
+
+
+        **A removal is a mark, not a delete** (ADAM CR-382, Chinmay, 31 October 2026; CHG-CR382-001). It sets
+        `whitelabel.kiosk_config.deleted_at` (`KioskConfig.deletedAt`) to now for any configuration, published or not,
+        and removes nothing: its slides, tiles and versions stay. The two 409s stand. A deleted configuration is then
+        left out of `listKioskConfigs`; `getKioskConfig`, `updateKioskConfig`, `deleteKioskConfig`,
+        `getKioskConfigValidation`, `setKioskOutOfService`, `restoreKioskConfigVersion`, `getPublishedKioskConfig` by
+        `kioskConfigId` and `publishKioskConfigs` naming it answer 404 `not-found`, and `publishKioskConfigs` without
+        `kioskConfigIds` skips it. `listKioskConfigVersions` still answers its versions (the read-only history).
+        `assignKiosk` naming it answers 409 `kiosk-config-deleted`. Its name is free again:
+        `kiosk-config-name-taken` compares only configurations whose `deletedAt` is null. A configuration with
+        versions is removed this way like any other, never a `500`.
 
         '
       tags:
@@ -4758,7 +4915,7 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Removed from the draft
+          description: Marked deleted (`deletedAt` set); nothing removed
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
@@ -4973,9 +5130,18 @@ paths:
       x-ticvai-consumed-by:
         - "P13 CMS-105 Kiosk Builder"
       x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: in-process
+        for: 'mediaDoesNotFit: each slide''s mediaAssetRef, by ids (assets.media_asset, same host; ADAM CR-385,
+          CHG-CR385-001)'
       - query: catalogue#productRecords
-        route: service
-        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+        route: in-process
+        for: 'tileWithoutProducts: the venue''s products, where {venueId} (catalogue.product, Catalogue''s data;
+          CHG-MOD-001; in process since ADAM CR-385, as CR-343 ruled; XDR-028)'
+      - query: payments#paymentMethodRecords
+        route: in-process
+        for: 'paymentMethodUnavailable: the accepted methods'' payments.method rows (Orders'' data; ADAM CR-385,
+          XDR-028)'
       x-ticvai-agreed: '5 October 2026: decided by Chinmay, the publish checks (docs/active/decisions/answers-5-october.md,
         CHG-R4-001); shape follows validateBookingFlow'
       x-ticvai-audience:
@@ -4993,6 +5159,15 @@ paths:
         (`languageNotPublished`); an accepted payment method is not configured for the venue
         (`paymentMethodUnavailable`); ticket printing is on and no ticket template is named (`ticketTemplateMissing`).
         `publishKioskConfigs` refuses a configuration with any `error`; a `warning` does not block.
+
+
+        **Severity and rule per kind** (ADAM CR-385, Chinmay, 31 October 2026; CHG-CR385-001): the table on
+        `KioskConfigFindingKind`; the finding''s `reference` names the slide, tile, flow, language or method. The
+        reads, all in process: `assets#mediaAssetRecords` by ids (the same host), `catalogue#productRecords` where
+        `{venueId}` (as CR-343 ruled; the V0118 grant), `whitelabel.module_enablement` (White Label''s own), and
+        `payments#paymentMethodRecords`, through Orders'' query class under the caller''s row-level security (SELECT on
+        `payments.method` granted to the operations role). A configuration whose `deletedAt` is set answers 404
+        `not-found` (ADAM CR-382).
 
         '
       tags:
@@ -5542,7 +5717,8 @@ paths:
         5 October 2026 by Chinmay, CHG-R4-001). With `active` true every kiosk of the group shows KSK-014 Out of
         service, with the group''s `outOfService` message (or `messageOverride`) and `expectedBackAt`, from its next
         read; a guest mid-session finishes first. `active` false returns them to the attract loop. **PUT semantics:**
-        the state is replaced whole. Refused 400 when `expectedBackAt` is in the past.
+        the state is replaced whole. Refused 400 when `expectedBackAt` is in the past. A configuration whose
+        `deletedAt` is set answers 404 `not-found` (ADAM CR-382, CHG-CR382-001).
 
         '
       tags:
@@ -6528,6 +6704,18 @@ paths:
         `unpublished-changes` when the draft holds changes not yet published and `discardDraftChanges` is not true,
         so nobody overwrites a colleague''s unpublished work by accident.
 
+
+        **What a restore leaves to publish** (ADAM CR-386, Chinmay, 31 October 2026; CHG-CR386-001). The restore sets
+        `hasUnpublishedChanges` true when the restored `versionNumber` is not the configuration''s current published
+        version (`publishedVersion`), and false when it is: restoring the current version, for example to discard
+        draft edits with `discardDraftChanges` true, leaves nothing to publish. `publishKioskConfigs` is unchanged: it
+        publishes a restored older version, and answers 409 `nothing-to-publish` only when nothing named has
+        unpublished changes. A second restore of the same configuration before that publish needs
+        `discardDraftChanges` true, as for any unpublished change.
+
+
+        **A deleted configuration** (`deletedAt` set; ADAM CR-382, CHG-CR382-001) answers 404 `not-found`.
+
         '
       tags:
       - kiosk
@@ -6744,7 +6932,8 @@ paths:
       x-ticvai-read-routing: replica
       summary: A kiosk configuration's published versions
       description: '**Order:** newest first (`versionNumber` descending). Each version''s `snapshot` is left out of the
-        items. An unknown configuration is an empty page.
+        items. An unknown configuration is an empty page. A deleted configuration (`deletedAt` set; ADAM CR-382,
+        CHG-CR382-001) still answers its versions: they are its read-only history.
 
         '
       tags:
@@ -11422,6 +11611,10 @@ components:
     Banner:
       x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by proposeMarketingContent
       x-ticvai-persistence: whitelabel.banner
+      # A banner is outside the working draft (info.description), so it does not point at it: tenant_config_id is
+      # retired and nullable, written null by createBanner and read by nothing (ADAM CR-387, Chinmay, 31 October 2026;
+      # CHG-CR387-001). The foreign key stays; existing rows keep their value.
+      x-ticvai-retired-columns: [tenant_config_id]
       type: object
       required:
       - id
@@ -11466,15 +11659,20 @@ components:
           description: 'Moved by `updateBanner` between `draft` and `scheduled`, and by the schedule timer
             from `scheduled` to `active` and `active` to `expired` at `startsAt` and `endsAt`, in the tenant''s
             timezone (`states/schedule.yaml`). **The rule, which no request field moves** (r8 walk of ticket
-            27920): a new banner is `draft`. The server sets `scheduled` when `updateBanner` leaves `startsAt`
-            set (`endsAt` null means no end, so the banner runs until switched off; when `endsAt` is set it must follow
-            `startsAt`), and sets `draft` again when a later update clears `startsAt`. Sending
-            `isActive` false on an `active` banner pulls it to `draft`. `state` is derived by the server on every
-            save and is never in a request.'
+            27920; ADAM CR-388, Chinmay, 31 October 2026, CHG-CR388-001): a new banner is `draft`. `startsAt` is
+            always set (it is required, and null on `updateBanner` is 400). After every `updateBanner` save the server
+            sets `state` from the stored banner: `isActive` false puts a `draft`, `scheduled` or `active` banner in
+            `draft`; otherwise a `draft` or `scheduled` banner becomes `scheduled` (`endsAt` null means no end, so the
+            banner runs until switched off; when `endsAt` is set it must follow `startsAt`) and an `active` one stays
+            `active`. An `expired` banner''s state does not change. A banner never returns to `draft` by clearing
+            `startsAt`; that move is the promo block''s only. `state` is derived by the server on every save and is
+            never in a request.'
         sortOrder:
           type: integer
         isActive:
           type: boolean
+          description: 'Stored. `false` holds the banner in `draft` through later edits until an update sends `true`
+            (ADAM CR-388, CHG-CR388-001); it is how staff take a banner back to `draft`.'
     PromoBlock:
       x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by proposeMarketingContent
       x-ticvai-persistence: whitelabel.promo_block
@@ -11569,7 +11767,8 @@ components:
         name:
           type: string
           maxLength: 80
-          description: Staff-facing, e.g. "North gate kiosks". Unique in the venue. Not shown to guests.
+          description: Staff-facing, e.g. "North gate kiosks". Unique in the venue among the configurations whose
+            `deletedAt` is null (a deleted configuration's name is free again; ADAM CR-382). Not shown to guests.
         isDefault:
           type: boolean
           default: false
@@ -11590,7 +11789,8 @@ components:
           type: array
           maxItems: 40
           description: The attract loop's slides, in `sortOrder` (child rows, `whitelabel.kiosk_config_attract_slide`). Given
-            on a write, it replaces the whole list.
+            on a write (`createKioskConfig`, or `updateKioskConfig` as a part of its own, ADAM CR-381), it replaces the
+            whole list.
           items:
             $ref: '#/components/schemas/KioskAttractSlide'
         startScreen:
@@ -11632,7 +11832,12 @@ components:
           type: integer
           readOnly: true
           x-ticvai-derived: onRead
-          description: How many kiosks `assignKiosk` put in this group; for the default, the venue's kiosks in no group.
+          description: 'How many of the venue''s kiosks are in this group (ADAM CR-383, Chinmay, 31 October 2026;
+            CHG-CR383-001). The venue''s kiosks are its active workstations with `channel` `kiosk`
+            (`tenancy#workstationRecords` where `{venueId, channel: kiosk, isActive: true}`, in process). A group''s
+            count is its `whitelabel.kiosk_assignment` rows whose workstation is one of those kiosks; the default''s is
+            the venue''s kiosks with no assignment row, or with a row naming null or the default. An assignment row for
+            a workstation that is no longer a kiosk is not counted.'
         publishedVersion:
           type: integer
           nullable: true
@@ -11644,7 +11849,19 @@ components:
           type: boolean
           readOnly: true
           x-ticvai-derived: onWrite
-          description: True after any write to the draft since the last publish or restore; false once published.
+          description: 'True after any write to the draft, and after a restore of a version other than the current
+            one, until published; false once published, and after a restore of the current version (ADAM CR-386,
+            CHG-CR386-001: `restoreKioskConfigVersion`).'
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: '**When `deleteKioskConfig` removed the configuration; null while it exists** (ADAM CR-382,
+            Chinmay, 31 October 2026; CHG-CR382-001; `whitelabel.kiosk_config.deleted_at`). A removal sets it and
+            removes nothing: the slides, tiles and versions stay. A deleted configuration is left out of
+            `listKioskConfigs` and answers 404 to the operations that name it, except `listKioskConfigVersions`,
+            which still answers its versions, and `assignKiosk`, which answers 409 `kiosk-config-deleted`.'
         scopePath:
           type: string
           readOnly: true
@@ -11993,12 +12210,19 @@ components:
       x-ticvai-persistence: whitelabel.kiosk_assignment
       type: object
       description: '**Which kiosk group a kiosk is in** (`assignKiosk`; decided 5 October 2026 by Chinmay, CHG-R4-001).
-        One row per assigned kiosk; a kiosk with no row takes the venue''s default configuration.'
+        One row per assigned kiosk; a kiosk with no row takes the venue''s default configuration.
+        `listKioskAssignments` answers one item per kiosk of the venue (ADAM CR-383, Chinmay, 31 October 2026;
+        CHG-CR383-001): its row when it has one, otherwise `workstationId` and `venueId` with `id`, `kioskConfigId`,
+        `assignedAt` and `assignedByPrincipalId` null (it is on the default). Nothing writes a row from enrolment or
+        `configureWorkstation`; only `assignKiosk` does.'
       properties:
         id:
           type: string
           format: uuid
           readOnly: true
+          nullable: true
+          description: The assignment row's id; null on a `listKioskAssignments` item for a kiosk with no row (ADAM
+            CR-383).
         workstationId:
           type: string
           format: uuid
@@ -12018,10 +12242,14 @@ components:
           type: string
           format: date-time
           readOnly: true
+          nullable: true
+          description: Null on a `listKioskAssignments` item for a kiosk with no row (ADAM CR-383).
         assignedByPrincipalId:
           type: string
           format: uuid
           readOnly: true
+          nullable: true
+          description: Null on a `listKioskAssignments` item for a kiosk with no row (ADAM CR-383).
         scopePath:
           type: string
           readOnly: true
@@ -12139,8 +12367,35 @@ components:
       - uaePassLogin
     KioskConfigFindingKind:
       type: string
-      description: The publish checks of a kiosk configuration (`getKioskConfigValidation`, decided 5 October 2026 by
+      description: 'The publish checks of a kiosk configuration (`getKioskConfigValidation`, decided 5 October 2026 by
         Chinmay, CHG-R4-001).
+
+
+        **Severity and rule per kind** (ADAM CR-385, Chinmay, 31 October 2026; CHG-CR385-001), read by
+        `getKioskConfigValidation` and `publishKioskConfigs` alike; `publishKioskConfigs` refuses only on an `error`.
+        The finding''s `reference` names the slide, tile, flow, language or method. Every read is in process.
+
+        | kind | severity | reported when |
+
+        |---|---|---|
+
+        | attractLoopEmpty | error | the attract loop has no slide with `playsWhen` `open` |
+
+        | mediaDoesNotFit | error, or warning as stated | error when a `video` or `photo` slide names no `mediaAssetRef`, or an asset not in the library, not `status` `ready`, or not of `kind` `video` (video slide) or `image` (photo slide); error when the asset''s `width` and `height` are known and its orientation differs from `display.orientation`; warning when it is smaller than `display.resolutionWidthPx` or `resolutionHeightPx`, or its size is unknown. Read: `assets#mediaAssetRecords` by ids (the same host) |
+
+        | tileWithoutProducts | error | for each enabled tile: its module is not enabled in `whitelabel.module_enablement` (`sellTickets` and `collectReservation` `ticketsAndBooking`, `orderFood` `diningAndFnb`, `shop` `shop`, `membership` `membership`, `walletTopUp` `wallet`, `map` `map`; `assistant` has no module and is never reported), or, for `sellTickets`, `orderFood`, `shop`, `membership` and `walletTopUp`, the venue has no catalogue product with `isSellable` true, `guestListing` `bookable` and a kind of that function (`sellTickets`: `admission`, `timedAdmission`, `datedAdmission`, `openDated`, `seated` or `bundle`; `orderFood` `fnb`; `shop` `retail`; `membership` `membership`; `walletTopUp` `walletTopUp`). Read: `catalogue#productRecords` where `{venueId}`, as CR-343 ruled (the V0118 grant) |
+
+        | arabicFontMissing | error | as built: Arabic is among the kiosk''s languages and the tenant''s published fonts have no Arabic pair |
+
+        | journeyInvalid | error | as built: a journey names a booking flow that fails `validateBookingFlow` or is not enabled |
+
+        | languageNotPublished | error | as built: a kiosk language or the default is not one the tenant has published |
+
+        | paymentMethodUnavailable | error | an accepted method (`paymentOutput.paymentMethodIds`) that is not an active `payments.method` row available at the venue (its `venueIds` contain the venue or are empty). Read: `payments#paymentMethodRecords`, through Orders'' query class under the caller''s row-level security (SELECT on `payments.method` granted to the operations role; XDR-028) |
+
+        | ticketTemplateMissing | error | as built: ticket printing is on (`ticketStock` set) and no ticket template is named |
+
+        '
       enum:
       - attractLoopEmpty
       - mediaDoesNotFit

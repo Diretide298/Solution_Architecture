@@ -1,0 +1,66 @@
+id: CHG-CR383-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'The venue''s kiosks are its active workstations with channel kiosk (CR-384), asked of tenancy#workstationRecords
+  where {venueId, channel: kiosk, isActive: true} in process from the operations host (XDR-027). A group''s
+  assignedKioskCount is its kiosk_assignment rows whose workstation is one of those kiosks; the default''s is the
+  venue''s kiosks with no row, or a row naming null or the default. listKioskAssignments answers one item per kiosk of
+  the venue, a kiosk with no row with id, kioskConfigId, assignedAt and assignedByPrincipalId null; a row for a
+  workstation that is no longer a kiosk is neither counted nor listed. Nothing writes a kiosk_assignment row from
+  enrolment or configureWorkstation.'
+decision:
+  what: 'ADAM CR-383 (Chinmay, 31 October 2026, posted on #35618: "not as recommended: A, on the channel CR-384 adds,
+    and no row written per kiosk. The venue''s kiosks are its active workstations with channel kiosk: ask
+    tenancy#workstationRecords with where {venueId, channel: kiosk, isActive: true} in process ... (recorded beside
+    XDR-009). A group''s assignedKioskCount is its kiosk_assignment rows whose workstation is one of those kiosks; the
+    default''s is the venue''s kiosks with no assignment row, or with a row naming null or the default.
+    listKioskAssignments answers one item per kiosk of the venue ... Nothing writes a kiosk_assignment row from
+    enrolment or configureWorkstation."), after the lead''s review of every CR ("for each one actually check if they
+    hold and if not then find out the best way keeping in mind what client needs") and his instruction "Include them
+    in r12". contracts/satellite/white-label.yaml: KioskConfig.assignedKioskCount, KioskAssignment (description; id,
+    assignedAt and assignedByPrincipalId nullable for a kiosk with no row), listKioskConfigs, getKioskConfig and
+    listKioskAssignments (descriptions and the in-process read-via); contracts/spine/tenancy.yaml workstationRecords''
+    rule names the kiosk reads; docs/active/cross-deployable-writes.yaml XDR-027 (with CR-384''s assignKiosk read);
+    tools/check-business-rules.py BR-KIOSK-COUNT.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-383 (Hrushikant Patkar, #35618 listKioskConfigs): the default configuration''s assignedKioskCount counted
+  "the venue''s kiosks in no group" and listKioskAssignments ordered "the default''s kiosks first", yet
+  whitelabel.kiosk_assignment holds a row only for a kiosk someone assigned and nothing said which workstations are
+  kiosks (CR-384). Writing a row per kiosk from Tenancy (option B) would be a cross-deployable write. Matrix 2.1.18
+  links kiosk devices to device management; ADM-582 shows each kiosk and its group.'
+keys_touched:
+  operations: [listKioskConfigs, getKioskConfig, listKioskAssignments]
+  schemas: [KioskConfig, KioskAssignment]
+  tables: [platform.workstation, whitelabel.kiosk_assignment]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/tenancy.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'XDR-027 (granted read; the SELECT on platform.workstation is V0118''s)'
+root_class: 'a derived count over a population (the venue''s kiosks) no table or query names'
+tickets:
+  started:
+  - '35618 (listKioskConfigs, Hrushikant Patkar, raiser) and 35617 (getKioskConfig): count as above from the kiosk
+    workstations; drop the interim count of assignment rows only.'
+  - '35625 (listKioskAssignments, Hrushikant Patkar): one item per kiosk of the venue, the unassigned ones with null
+    assignment fields.'
+  unstarted:
+  - '35603 and 36331 to 36333 (ADM-582, New): no screen change; the table now also shows kiosks never assigned.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-383
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-KIOSK-COUNT fails on 8535bc29 (no read of the venue''s kiosks; KioskAssignment could not answer a kiosk with
+  no row) and passes now; check-cross-module-reads XR-ROUTE holds the in-process reads to XDR-027. No table change
+  beyond CR-384''s platform.workstation.channel. Beyond the comment''s words: KioskAssignment.id, assignedAt and
+  assignedByPrincipalId are declared nullable (readOnly; the table''s columns are unchanged, id stays the primary key),
+  which the posted null fields need on the wire. check-contract-compat does not compare nullability, so it reports no
+  breaking change for it; a client of listKioskAssignments must accept the null fields (ADM-582''s tickets are New).'
