@@ -1,0 +1,72 @@
+id: CHG-CR385-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'Every KioskConfigFindingKind has a severity and a rule (a table on the enum): attractLoopEmpty, error;
+  mediaDoesNotFit, error for missing, unready or wrong-kind media and a wrong orientation, warning for a smaller or
+  unknown size, read through assets#mediaAssetRecords by ids; tileWithoutProducts, error for a tile whose module is not
+  enabled or whose function has no sellable bookable product of its kinds at the venue, read through
+  catalogue#productRecords where {venueId}; the four kinds as built, error; paymentMethodUnavailable, error for an
+  accepted method that is not an active payments.method row available at the venue, read through the new
+  payments#paymentMethodRecords. Every read is in process (XDR-028 for the catalogue and payments reads, with a new
+  SELECT grant on payments.method). publishKioskConfigs runs the same checks and refuses only on an error.'
+decision:
+  what: 'ADAM CR-385 (Chinmay, 31 October 2026, posted on #35623: "as you recommended. Severity and rule per kind (the
+    finding''s reference names the slide, tile, flow, language or method). attractLoopEmpty, error ... mediaDoesNotFit
+    ... Read assets#mediaAssetRecords by ids, in process (same host). tileWithoutProducts, error, for each enabled tile
+    ... Read catalogue#productRecords where {venueId} in process, as CR-343 ruled (V0118 grant). arabicFontMissing,
+    journeyInvalid, languageNotPublished and ticketTemplateMissing: error, as you built them.
+    paymentMethodUnavailable, error ... read the new data query payments#paymentMethodRecords in process, through
+    Orders'' query class under the caller''s row-level security (SELECT on payments.method granted to the operations
+    role). publishKioskConfigs runs the same checks and refuses only on an error."), after the lead''s review of every
+    CR ("for each one actually check if they hold and if not then find out the best way keeping in mind what client
+    needs") and his instruction "Include them in r12". contracts/satellite/white-label.yaml KioskConfigFindingKind''s
+    table, getKioskConfigValidation''s and publishKioskConfigs'' descriptions and three in-process read-vias;
+    contracts/satellite/payments.yaml paymentMethodRecords; contracts/spine/catalogue.yaml productRecords'' rule names
+    the two operations; docs/active/cross-deployable-writes.yaml XDR-028 (derive-ddl writes the payments.method grant
+    into the forward migration). tools/check-business-rules.py BR-KIOSK-FINDINGS.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-385 (Hrushikant Patkar, #35623 getKioskConfigValidation, blocking): KioskConfigFinding carries a severity
+  and publishKioskConfigs refuses any error, but no kind said which; the operation declared only catalogue#productRecords,
+  on the service route that is not built (CR-281), so the media and payment checks had no declared read. The 5 October
+  decision made these the kiosk''s publish checks. CR-343 (XDR-022) already reads the products in process for the tenant
+  configuration.'
+keys_touched:
+  operations: [getKioskConfigValidation, publishKioskConfigs]
+  schemas: [KioskConfigFindingKind, KioskConfigFinding, PaymentMethod]
+  tables: [assets.media_asset, catalogue.product, catalogue.product_media, payments.method,
+    whitelabel.module_enablement]
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/spine/catalogue.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'XDR-028 (granted read; SELECT on payments.method is new, catalogue''s is V0118''s)'
+  - 'query payments#paymentMethodRecords (new)'
+root_class: 'a finding kind with no rule or severity, and checks whose reads were undeclared or on an unbuilt route'
+tickets:
+  started:
+  - '35623 (getKioskConfigValidation, Hrushikant Patkar, raiser): give each finding the severity above and add the
+    three checks with their reads; drop the interim "every finding is an error"; no longer blocked once the grant is
+    applied.'
+  - '35619 (publishKioskConfigs, Hrushikant Patkar): refuse only on an error finding; warnings publish.'
+  unstarted:
+  - '[DB] child task of MIG-PAYMENTS (#30612 [DB] payments.method), Hrushikant Patkar, filed by the plan lane: GRANT
+    SELECT ON payments.method TO operations (and USAGE on schema payments), guarded, in the next forward migration;
+    applied to the live tenant database too.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-385
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-KIOSK-FINDINGS fails on 8535bc29 (no row for any kind; one read, on the service route) and passes now;
+  check-cross-module-reads XR-ROUTE holds the catalogue and payments reads to XDR-028. The catalogue reads are recorded
+  as XDR-028 rather than added to XDR-022, so two lanes never edit one entry. Beyond the comment''s words: the new
+  query is served in process only (no service route), and its rule names the two kiosk operations. Nobody serves a
+  payment-method read over HTTP to White Label otherwise.'

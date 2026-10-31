@@ -1,0 +1,60 @@
+id: CHG-CR387-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'whitelabel.banner.tenant_config_id is retired and nullable (Banner x-ticvai-retired-columns; the foreign key
+  stays, existing rows keep a value nothing reads). createBanner writes the banner with tenant_config_id null and never
+  reads or creates the tenant_config row; updateBanner and deleteBanner never read or write tenant_config; nothing joins
+  or filters banners on it. A tenant that has made only banners still answers getTenantConfig 404 not-configured.'
+decision:
+  what: 'ADAM CR-387 (Chinmay, 31 October 2026, posted on #30922: "not as recommended: B. A banner is not part of the
+    working draft, so it does not point at it. whitelabel.banner.tenant_config_id becomes nullable and retired:
+    createBanner writes the banner with tenant_config_id null and never reads or creates the tenant_config row;
+    updateBanner and deleteBanner never read or write tenant_config; nothing joins or filters banners on
+    tenant_config_id ... If you already create the draft row from createBanner, take that out"), after the lead''s
+    review of every CR ("for each one actually check if they hold and if not then find out the best way keeping in mind
+    what client needs") and his instruction "Include them in r12". contracts/satellite/white-label.yaml: Banner retires
+    tenant_config_id; createBanner declares its write of whitelabel.banner and says the rule; deleteBanner''s
+    tenant_config read and write removed (the banner read and write only); updateBanner says it. The guarded DROP NOT
+    NULL reaches the forward migration through derive-ddl. tools/check-business-rules.py BR-BANNER-OUTSIDE-DRAFT.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-387 (Hrushikant Patkar, #30922 createBanner): banners are "Outside the draft" (white-label''s header), yet
+  whitelabel.banner.tenant_config_id was NOT NULL with banner_tenant_config_id_fkey, createBanner declared no reads or
+  writes, and deleteBanner declared a tenant_config read and write it never described (path-inferred, CHG-R8WFC-004).
+  Creating the draft row from createBanner would turn getTenantConfig''s first-run 404 into an empty draft. Banner
+  row-level security does not use the column, and promo_block, the sibling outside-the-draft table, has none.'
+keys_touched:
+  operations: [createBanner, updateBanner, deleteBanner]
+  schemas: [Banner]
+  tables: [whitelabel.banner, whitelabel.tenant_config]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: 'a NOT NULL key from a table outside the draft to the draft row, carried from the relationship graph and
+  never stated in the contract'
+tickets:
+  started:
+  - '30922 (createBanner, Hrushikant Patkar, raiser): write tenant_config_id null; do not find or create the draft row.'
+  - '30926 (deleteBanner, Hrushikant Patkar): delete the banner row only; no tenant_config read or write.'
+  - '31086 (listBanners, Deep Khanvilkar, Ready for QA) and 31052 (getPublishedTenantConfig, Hrushikant Patkar, Ready
+    for QA): if either joins or filters banners on tenant_config_id, drop it, or a new banner is missed.'
+  unstarted:
+  - '[DB] child task of MIG-WHITELABEL (#30251 [DB] whitelabel.banner), Hrushikant Patkar, filed by the plan lane:
+    ALTER TABLE whitelabel.banner ALTER COLUMN tenant_config_id DROP NOT NULL as a guarded block (as V0105 did for
+    org_unit_id); the foreign key stays; applied to the live tenant database too.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-387
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-BANNER-OUTSIDE-DRAFT (general, with an in-check list of the tables white-label''s header names outside the
+  draft: banners and content blocks; it fails if the header stops naming one) fails on 8535bc29 (banner.tenant_config_id
+  NOT NULL in handoff/schema-reference.json; deleteBanner reading and writing tenant_config) and passes on the
+  regenerated tree. The column came from the relationship graph (source relationship-graph.json), not from the
+  Banner schema, so no contract check saw it: that class (a graph-carried NOT NULL key that crosses a lifecycle the
+  contract header states) is the lead''s to widen beyond white-label. Additive on the wire. Beyond the comment''s words:
+  deleteBanner now declares its read of whitelabel.banner (the 404).'

@@ -314,6 +314,10 @@ x-ticvai-queries:
       2026; CHG-R10ORD-009; XDR-003), by the operations host for createFnbOrder, whose till at the order's outlet is
       accepted at once (ADAM CR-293 (1), option A, 29 October 2026; XDR-009), and by the workers host for the
       consumers it runs (ADR-0055, amended 25 October 2026).
+      It is asked in process by the operations host for White Label's kiosk operations too (ADAM CR-383 and CR-384,
+      Chinmay, 31 October 2026; XDR-027): assignKiosk for the workstation in the path (404 outside the venue, 409
+      not-a-kiosk when its channel is not kiosk), and listKioskConfigs, getKioskConfig and listKioskAssignments for
+      the venue's kiosks, where {venueId, channel: kiosk, isActive: true}.
     served: [in-process, service]
   dataRetentionSettingRecords:
     module: tenancy
@@ -1941,6 +1945,11 @@ paths:
         - name: saleBoardKind
           in: query
           schema: { $ref: '#/components/schemas/SaleBoardKind' }
+        - name: channel
+          in: query
+          required: false
+          description: Only the workstations of this channel (`kiosk` for the venue's self-service kiosks; ADAM CR-384).
+          schema: { $ref: '#/components/schemas/WorkstationChannel' }
         - $ref: '../shared/common.yaml#/components/parameters/PageSize'
         - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
@@ -2035,6 +2044,11 @@ paths:
         that changes one setting sends back the configuration it read (`getWorkstation`) with that setting
         changed. `cashierInputMode` and `guestDisplayContent` are stored on the workstation and returned
         on `Workstation`.
+
+        **`channel` is the one exception** (ADAM CR-384, Chinmay, 31 October 2026; CHG-CR384-001): `kiosk` for a
+        self-service kiosk a guest operates, `pos` for a staffed till. Left out, it keeps the stored value instead of
+        taking a default, so a POS-016 or BO-036 client built before the field never turns a kiosk back into a till.
+        It is stored as `platform.workstation.channel` and returned on `Workstation`.
 
         **Refused while a shift is open on this workstation** (F73, pull audit R078). Changing
         the rules under an open shift means it closes against rules it did not open under, so
@@ -7357,6 +7371,14 @@ components:
       type: string
       enum: [ticketing, fnb, retail, mixed]
 
+    WorkstationChannel:
+      type: string
+      enum: [pos, kiosk]
+      description: >
+        **Who operates a workstation** (ADAM CR-384, Chinmay, 31 October 2026; CHG-CR384-001), named as catalogue's
+        `Channel` values: `pos` a staffed till (a staffed stand in an outlet of kind `kiosk` included), `kiosk` a
+        self-service kiosk a guest operates. A board's goods are `SaleBoardKind`; this is a different fact.
+
     DeviceKind:
       type: string
       enum:
@@ -7431,11 +7453,24 @@ components:
       x-ticvai-retired-columns: [org_unit_id]
       x-ticvai-persistence: "platform.workstation"
       type: object
-      required: [id, code, name, venueId, regionId, scopePath, saleBoard, currency, currencyScale, timeZone]
+      required: [id, code, name, venueId, regionId, scopePath, saleBoard, currency, currencyScale, timeZone, channel]
       properties:
         id: { type: string, format: uuid }
         code: { type: string, maxLength: 64 }
         name: { type: string, maxLength: 200 }
+        channel:
+          # Inline, as WorkstationChannel's values: derive-ddl takes the CHECK from an inline enum and keeps the default.
+          type: string
+          enum: [pos, kiosk]
+          default: pos
+          description: >
+            **Who operates this workstation** (ADAM CR-384, Chinmay, 31 October 2026; CHG-CR384-001; the values are
+            catalogue's `Channel`, so the workstation and a sale from it use the same word). `kiosk` is a
+            self-service kiosk a guest operates; `pos` is a staffed till, including a staffed stand in an outlet of
+            kind `kiosk`. Stored as `platform.workstation.channel` (not null, default `pos`), set by
+            `configureWorkstation`, which keeps the stored value when the field is left out. White Label's kiosk
+            operations ask it through `workstationRecords` (XDR-027): a venue's kiosks are its active workstations
+            with channel `kiosk`.
         venueId: { type: string, format: uuid }
         regionId: { type: string, format: uuid }
         departmentId: { type: string, format: uuid, nullable: true }
@@ -7609,6 +7644,13 @@ components:
       type: object
       required: [name]
       properties:
+        channel:
+          allOf:
+            - $ref: '#/components/schemas/WorkstationChannel'
+          description: >
+            `kiosk` for a self-service kiosk a guest operates, `pos` for a staffed till (ADAM CR-384; CHG-CR384-001).
+            **Unlike the other fields of this PUT, a channel left out keeps the stored value**, so a client that does
+            not know the field never turns a kiosk into a till. A new workstation's channel is `pos`.
         cashierInputMode:
           type: string
           enum: [keyboard, touch, scanner, hybrid]

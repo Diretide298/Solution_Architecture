@@ -223,6 +223,22 @@ And one rule per decision:
   BR-OPEN-SHIFT-CLAIM (r12, ADAM CR-380, CHG-CR380-001) claimOpenShift reads the training records, staffing rules and
                    rota it checks, asks the role and overlap queries, writes the open shift and the rota assignment, and
                    answers 409 rota-assignment-overlap; OpenShift.requiredQualifications states the courseName match.
+  BR-KIOSK-LISTS   (r12, ADAM CR-381, CHG-CR381-001) updateKioskConfig takes attractSlides (at most 40) and startTiles
+                   (at most 8), each replacing its whole list when given.
+  BR-KIOSK-DELETE  (r12, ADAM CR-382, CHG-CR382-001) KioskConfig.deletedAt; deleteKioskConfig writes only kiosk_config
+                   and removes nothing; every kiosk-configuration operation says what a deleted one does.
+  BR-KIOSK-COUNT   (r12, ADAM CR-383, CHG-CR383-001) listKioskConfigs, getKioskConfig and listKioskAssignments ask
+                   tenancy#workstationRecords in process for the venue's kiosks; KioskAssignment answers a kiosk with
+                   no row.
+  BR-KIOSK-CHANNEL (r12, ADAM CR-384, CHG-CR384-001) Workstation.channel [pos, kiosk], not null default pos, kept when
+                   configureWorkstation leaves it out; listWorkstations filters by it; assignKiosk refuses from it.
+  BR-KIOSK-FINDINGS (r12, ADAM CR-385, CHG-CR385-001) every KioskConfigFindingKind has a severity and rule row; the
+                   validation and the publish ask the media, products and payment methods in process.
+  BR-KIOSK-RESTORE (r12, ADAM CR-386, CHG-CR386-001) a restore of an older version sets hasUnpublishedChanges.
+  BR-BANNER-OUTSIDE-DRAFT (r12, ADAM CR-387, CHG-CR387-001; general) a table white-label's header lists outside the
+                   draft has no NOT NULL key to whitelabel.tenant_config, and no banner operation reads or writes it.
+  BR-BANNER-STATE  (r12, ADAM CR-388, CHG-CR388-001) a banner returns to draft by isActive false, never by clearing
+                   startsAt (the promo block's move); updateBanner lists its 400.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -1213,6 +1229,137 @@ def main() -> int:
     need("BR-GUEST-SSO", "minItems" not in gm and "guest" in str(gm.get("description") or ""),
          "SsoProviderConfig.groupMappings still requires a mapping on a guest row (CHG-CR327-002)")
 
+    # BR-KIOSK-* and BR-BANNER-* (r12, ADAM CR-381 to CR-388, decided 31 October 2026, Chinmay; the lead: "for each
+    # one actually check if they hold and if not then find out the best way keeping in mind what client needs", and
+    # "Include them in r12"). Each fails on the r12 candidate before these CRs (8535bc29) and passes on the decisions.
+    def kwords(x):
+        return " ".join(str(x or "").split())
+
+    def kvias(o_):
+        return {(str(v.get("query")), str(v.get("route"))) for v in o_.get("x-ticvai-read-via") or []
+                if isinstance(v, dict)}
+
+    wlk = load("contracts/satellite/white-label.yaml")
+    wls = (wlk.get("components") or {}).get("schemas") or {}
+    # BR-KIOSK-LISTS (CR-381): updateKioskConfig takes the slides and the tiles as parts of their own.
+    ukc = op("updateKioskConfig")[3]
+    ukb = props(op("updateKioskConfig")[4], body_schema(ukc))
+    for part, mx in (("attractSlides", 40), ("startTiles", 8)):
+        need("BR-KIOSK-LISTS", (ukb.get(part) or {}).get("type") == "array" and (ukb.get(part) or {}).get("maxItems") == mx,
+             f"updateKioskConfig's body has no {part} array of at most {mx} (CR-381)")
+    need("BR-KIOSK-LISTS", "`attractLoop` with its `slides`" not in kwords(ukc.get("description"))
+         and "an empty list clears it" in kwords(ukc.get("description")),
+         "updateKioskConfig does not name attractSlides and startTiles as parts that replace the whole list (CR-381)")
+    # BR-KIOSK-DELETE (CR-382): a removal sets deleted_at and removes nothing.
+    kcp = (wls.get("KioskConfig") or {}).get("properties") or {}
+    da = kcp.get("deletedAt") or {}
+    need("BR-KIOSK-DELETE", da.get("readOnly") is True and da.get("nullable") is True and da.get("format") == "date-time",
+         "KioskConfig has no readOnly, nullable deletedAt (whitelabel.kiosk_config.deleted_at; CR-382)")
+    dkc = op("deleteKioskConfig")[3]
+    dw = {str((w or {}).get("table")) for w in dkc.get("x-ticvai-writes") or [] if isinstance(w, dict)}
+    need("BR-KIOSK-DELETE", dw == {"whitelabel.kiosk_config"} and "removes nothing" in kwords(dkc.get("description")),
+         f"deleteKioskConfig does not write only whitelabel.kiosk_config and remove nothing ({sorted(dw)}; CR-382)")
+    need("BR-KIOSK-DELETE", "`deletedAt` is null" in kwords((kcp.get("name") or {}).get("description")),
+         "KioskConfig.name's uniqueness does not leave deleted configurations out (CR-382)")
+    for oid_ in ("listKioskConfigs", "getKioskConfig", "updateKioskConfig", "getKioskConfigValidation",
+                 "setKioskOutOfService", "restoreKioskConfigVersion", "getPublishedKioskConfig",
+                 "publishKioskConfigs", "listKioskConfigVersions", "assignKiosk"):
+        need("BR-KIOSK-DELETE", "deletedAt" in kwords(op(oid_)[3].get("description")),
+             f"{oid_} does not say what it does with a deleted configuration (deletedAt; CR-382)")
+    # BR-KIOSK-COUNT and BR-KIOSK-CHANNEL (CR-383, CR-384): a kiosk is a workstation whose channel is kiosk, read in
+    # process; the venue's kiosks are listed and counted from it.
+    tsch = (load("contracts/spine/tenancy.yaml").get("components") or {}).get("schemas") or {}
+    need("BR-KIOSK-CHANNEL", (tsch.get("WorkstationChannel") or {}).get("enum") == ["pos", "kiosk"],
+         "tenancy has no WorkstationChannel [pos, kiosk] (CR-384)")
+    wst = tsch.get("Workstation") or {}
+    wch = (wst.get("properties") or {}).get("channel") or {}
+    need("BR-KIOSK-CHANNEL", "channel" in (wst.get("required") or []) and wch.get("default") == "pos",
+         "Workstation.channel is not stored not null with default pos (CR-384)")
+    cwr = ((tsch.get("ConfigureWorkstationRequest") or {}).get("properties") or {}).get("channel") or {}
+    need("BR-KIOSK-CHANNEL", bool(cwr) and "default" not in cwr and "keeps the stored value" in kwords(cwr.get("description")),
+         "ConfigureWorkstationRequest.channel does not keep the stored value when left out (CR-384)")
+    need("BR-KIOSK-CHANNEL", any(isinstance(p_, dict) and p_.get("name") == "channel"
+                                 for p_ in op("listWorkstations")[3].get("parameters") or []),
+         "listWorkstations takes no channel filter (CR-384)")
+    ak = op("assignKiosk")[3]
+    need("BR-KIOSK-CHANNEL", ("tenancy#workstationRecords", "in-process") in kvias(ak)
+         and "kiosk enrolment" not in kwords(ak.get("description")) and "`channel` is" in kwords(ak.get("description")),
+         "assignKiosk does not refuse not-a-kiosk from Workstation.channel, read in process (CR-384)")
+    for oid_ in ("listKioskConfigs", "getKioskConfig", "listKioskAssignments"):
+        need("BR-KIOSK-COUNT", ("tenancy#workstationRecords", "in-process") in kvias(op(oid_)[3]),
+             f"{oid_} does not ask tenancy#workstationRecords in process for the venue's kiosks (CR-383)")
+    need("BR-KIOSK-COUNT", "`channel` `kiosk`" in kwords((kcp.get("assignedKioskCount") or {}).get("description")),
+         "KioskConfig.assignedKioskCount does not count the venue's kiosks by channel (CR-383)")
+    kap = (wls.get("KioskAssignment") or {}).get("properties") or {}
+    need("BR-KIOSK-COUNT", all((kap.get(f_) or {}).get("nullable") is True
+                               for f_ in ("id", "kioskConfigId", "assignedAt", "assignedByPrincipalId")),
+         "KioskAssignment cannot answer a kiosk with no row (id, kioskConfigId, assignedAt, assignedByPrincipalId "
+         "nullable; CR-383)")
+    # BR-KIOSK-FINDINGS (CR-385): a severity and a rule for every kind, and every read declared, in process.
+    fk = wls.get("KioskConfigFindingKind") or {}
+    fkt = kwords(fk.get("description"))
+    for k_ in fk.get("enum") or []:
+        need("BR-KIOSK-FINDINGS", f"| {k_} | error" in fkt,
+             f"KioskConfigFindingKind has no severity and rule row for {k_} (CR-385)")
+    for oid_ in ("getKioskConfigValidation", "publishKioskConfigs"):
+        for q_ in ("assets#mediaAssetRecords", "catalogue#productRecords", "payments#paymentMethodRecords"):
+            need("BR-KIOSK-FINDINGS", (q_, "in-process") in kvias(op(oid_)[3]),
+                 f"{oid_} does not ask {q_} in process (CR-385)")
+    need("BR-KIOSK-FINDINGS", "paymentMethodRecords" in (load("contracts/satellite/payments.yaml")
+                                                         .get("x-ticvai-queries") or {}),
+         "payments declares no paymentMethodRecords query (CR-385)")
+    # BR-KIOSK-RESTORE (CR-386): a restore of an older version leaves something to publish.
+    need("BR-KIOSK-RESTORE", "after a restore of a version other than the current" in
+         kwords((kcp.get("hasUnpublishedChanges") or {}).get("description")),
+         "KioskConfig.hasUnpublishedChanges is not set by a restore of an older version (CR-386)")
+    need("BR-KIOSK-RESTORE", "is not the configuration's current published version" in
+         kwords(op("restoreKioskConfigVersion")[3].get("description")),
+         "restoreKioskConfigVersion does not say when it sets hasUnpublishedChanges (CR-386)")
+    # BR-BANNER-OUTSIDE-DRAFT (CR-387; general): a table white-label's header lists outside the draft has no NOT NULL
+    # key to the draft row (whitelabel.tenant_config), and no banner operation reads or writes the draft. A table named
+    # outside the draft joins the list below; the phrase check fails if the header stops naming one.
+    outside = kwords((wlk.get("info") or {}).get("description"))
+    outside = outside[outside.find("**Outside the draft:**"):][:600]
+    sref = json.loads((ROOT / "handoff" / "schema-reference.json").read_text(encoding="utf-8")).get("cols") or {}
+    for phrase, table in (("banners", "whitelabel.banner"), ("content blocks", "whitelabel.content_block")):
+        need("BR-BANNER-OUTSIDE-DRAFT", phrase in outside,
+             f"white-label's header no longer lists {phrase} outside the draft; review BR-BANNER-OUTSIDE-DRAFT (CR-387)")
+        for c_ in sref.get(table) or []:
+            need("BR-BANNER-OUTSIDE-DRAFT", not (c_.get("references") == "whitelabel.tenant_config"
+                                                 and c_.get("required") == "yes"),
+                 f"{table}.{c_.get('column')} is a NOT NULL key to the working draft, though the table is outside the "
+                 f"draft (retire it, x-ticvai-retired-columns; CR-387)")
+    need("BR-BANNER-OUTSIDE-DRAFT", "tenant_config_id" in ((wls.get("Banner") or {}).get("x-ticvai-retired-columns") or []),
+         "Banner does not retire tenant_config_id (CR-387)")
+    lin_ = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
+    for oid_ in ("createBanner", "updateBanner", "deleteBanner", "listBanners"):
+        o_ = op(oid_)[3]
+        decl = {str((x or {}).get("table")) for k_ in ("x-ticvai-reads", "x-ticvai-writes")
+                for x in o_.get(k_) or [] if isinstance(x, dict)}
+        lt = set((lin_.get(oid_) or {}).get("reads") or []) | set((lin_.get(oid_) or {}).get("writes") or [])
+        need("BR-BANNER-OUTSIDE-DRAFT", "whitelabel.tenant_config" not in decl | lt,
+             f"{oid_} reads or writes whitelabel.tenant_config, though a banner is outside the draft (CR-387)")
+    need("BR-BANNER-OUTSIDE-DRAFT", "whitelabel.banner" in {str((x or {}).get("table")) for x in
+                                                           op("createBanner")[3].get("x-ticvai-writes") or []
+                                                           if isinstance(x, dict)},
+         "createBanner declares no write of whitelabel.banner (CR-387)")
+    # BR-BANNER-STATE (CR-388): a banner returns to draft by isActive false, never by clearing startsAt.
+    sch_ = load("states/schedule.yaml")
+    bmoves = {(t.get("from"), t.get("to"), t.get("operation")): kwords(t.get("guard"))
+              for t in sch_.get("transitions") or []}
+    need("BR-BANNER-STATE", "isActive false" in bmoves.get(("scheduled", "draft", "updateBanner"), "")
+         and "isActive not false" in bmoves.get(("draft", "scheduled", "updateBanner"), "")
+         and ("scheduled", "draft", "updatePromoBlock") in bmoves,
+         "states/schedule.yaml still moves a banner to draft by clearing startsAt (CR-388)")
+    bst = kwords((((wls.get("Banner") or {}).get("properties") or {}).get("state") or {}).get("description"))
+    need("BR-BANNER-STATE", "sets `draft` again when a later update clears `startsAt`" not in bst
+         and "`isActive` false puts a `draft`, `scheduled` or `active` banner in `draft`" in bst,
+         "Banner.state does not state the isActive rule of every updateBanner save (CR-388)")
+    ub = op("updateBanner")[3]
+    need("BR-BANNER-STATE", "validation-failed" in set(((ub.get("responses") or {}).get("400") or {})
+                                                       .get("x-ticvai-problem-types") or []),
+         "updateBanner lists no 400 validation-failed for startsAt null (CR-388)")
+
     # BR-UAEPASS-ENDPOINTS .. BR-CONTENT-PUBLISH (r12, ADAM CR-360 to CR-365, decided 30 October 2026, Chinmay; the
     # lead: "for each one actually check if they hold and if not then find out the best way keeping in mind what client
     # needs"). Each fails on the r11 contract.
@@ -1748,6 +1895,8 @@ def main() -> int:
              "BR-ROTA-ROLE-DENY", "BR-FORM-VERSION-KEY",
              "BR-PLANNER-QUESTIONS", "BR-ROTA-HOUR-LIMIT", "BR-ROTA-CROSS-VENUE",
              "BR-CREDIT-ACCOUNT-CURRENCY", "BR-PLATFORM-APPROVAL-RULE", "BR-WALLET-ETAG-VERSION", "BR-GUEST-SSO",
+             "BR-KIOSK-LISTS", "BR-KIOSK-DELETE", "BR-KIOSK-COUNT", "BR-KIOSK-CHANNEL", "BR-KIOSK-FINDINGS",
+             "BR-KIOSK-RESTORE", "BR-BANNER-OUTSIDE-DRAFT", "BR-BANNER-STATE",
              "BR-UAEPASS-ENDPOINTS", "BR-LINK-CHECKOUT", "BR-DELEGATION-READS", "BR-GUEST-POLICY-CURRENCY",
              "BR-CONTENT-PAGE-KEY", "BR-CONTENT-PUBLISH",
              "BR-CONTENT-BLOCK", "BR-SCOPE-LOOKUP", "BR-ID-RESUBMIT", "BR-DOC-NUMBER-ENC", "BR-REGISTER-SOURCE",

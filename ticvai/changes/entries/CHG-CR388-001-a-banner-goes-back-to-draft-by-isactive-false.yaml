@@ -1,0 +1,56 @@
+id: CHG-CR388-001
+date: '2026-10-31'
+source: cr
+kind: spec
+summary: 'A banner''s startsAt stays required (startsAt null on updateBanner is 400 validation-failed). After every
+  updateBanner save the server sets state from the stored banner: isActive false puts a draft, scheduled or active
+  banner in draft; otherwise a draft or scheduled banner becomes scheduled and an active one stays active; an expired
+  banner does not change. isActive is stored, so a banner held in draft stays there through later edits until an update
+  sends isActive true. The move from scheduled to draft by clearing startsAt is the promo block''s only
+  (states/schedule.yaml: updateBanner''s edges guarded on isActive, a new scheduled to draft by updatePromoBlock).'
+decision:
+  what: 'ADAM CR-388 (Chinmay, 31 October 2026, posted on #30936: "as you recommended (A, with C''s rule for isActive
+    false). startsAt stays required; startsAt null on updateBanner stays 400 validation-failed. After every
+    updateBanner save the server sets state from the stored banner: isActive false puts a draft, scheduled or active
+    banner in draft; otherwise a draft or scheduled banner becomes scheduled ... and an active one stays active. An
+    expired banner''s state does not change. Because isActive is stored, a banner held in draft stays there through
+    later edits until an update sends isActive true. The move from scheduled to draft by clearing startsAt is the promo
+    block''s only."), after the lead''s review of every CR ("for each one actually check if they hold and if not then
+    find out the best way keeping in mind what client needs") and his instruction "Include them in r12".
+    states/schedule.yaml (three updateBanner guards, the updatePromoBlock edge, the notes);
+    contracts/satellite/white-label.yaml Banner.state and Banner.isActive, updateBanner''s description, isActive and its
+    400 validation-failed. tools/check-business-rules.py BR-BANNER-STATE.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-388 (Hrushikant Patkar, #30936 updateBanner): states/schedule.yaml moved a banner from scheduled to draft
+  when "Clearing startsAt", and Banner.state said a later update that clears startsAt sets draft again, but
+  Banner.startsAt is required, updateBanner''s startsAt is not nullable and whitelabel.banner.starts_at is NOT NULL.
+  PromoBlock.startsAt is nullable, so the move is real for promo blocks only. CMS-008''s forms already carry isActive.'
+keys_touched:
+  operations: [updateBanner, updatePromoBlock]
+  schemas: [Banner, ScheduleState]
+  files:
+  - states/schedule.yaml
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: 'a state transition triggered by clearing a field the contract and the table require'
+tickets:
+  started:
+  - '30936 (updateBanner, Hrushikant Patkar, raiser): apply the rule above, including isActive false holding a draft or
+    scheduled banner in draft; keep the 400 for startsAt null.'
+  unstarted:
+  - '31155 and 31156 (CMS-008 Content Blocks, Chitrangi Mestry, New): nothing on the screen changes; isActive is how
+    staff take a banner back to draft.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-388
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-BANNER-STATE fails on 8535bc29 (the clear-startsAt edge on updateBanner; no 400 on updateBanner) and passes
+  now. No table change. Beyond the comment''s words: updateBanner now lists its 400 validation-failed response (the
+  posted text says it "stays", and the contract listed none). Open, not decided here: updatePromoBlock''s body declares
+  startsAt not nullable, so the promo block''s clear-startsAt move the model keeps (PromoBlock.state already said it)
+  cannot be sent as null; that is a question for the lead, not part of this CR.'

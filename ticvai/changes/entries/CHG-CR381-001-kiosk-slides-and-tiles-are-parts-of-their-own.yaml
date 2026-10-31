@@ -1,0 +1,54 @@
+id: CHG-CR381-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'updateKioskConfig''s body gains attractSlides (KioskAttractSlide items, at most 40) and startTiles
+  (KioskStartTile items, at most 8), each an optional part of its own. Given, a list replaces the configuration''s
+  whole list of whitelabel.kiosk_config_attract_slide or kiosk_config_start_tile rows, written in sortOrder; empty
+  clears it; left out, unchanged. A sortOrder given twice, a start-tile function given twice or too many items is 400
+  validation-failed as on create; writing either list sets hasUnpublishedChanges true. attractLoop and startScreen
+  keep only the loop''s and the screen''s own settings.'
+decision:
+  what: 'ADAM CR-381 (Chinmay, 31 October 2026, posted on #35622: "as you recommended. updateKioskConfig''s body
+    gains attractSlides (KioskAttractSlide items, at most 40) and startTiles (KioskStartTile items, at most 8), each
+    optional and a part of its own. Given, a list replaces that configuration''s whole list ... an empty list clears
+    it; left out, the list is unchanged. Refused 400 validation-failed as on create ... Writing either list sets
+    hasUnpublishedChanges true."), after the lead''s review of every CR ("for each one actually check if they hold and
+    if not then find out the best way keeping in mind what client needs") and his instruction "Include them in r12".
+    contracts/satellite/white-label.yaml updateKioskConfig: the two body fields, the description (the parts listed,
+    the replace rule) and the 400; KioskConfig.attractSlides names the PATCH. tools/check-business-rules.py
+    BR-KIOSK-LISTS.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-381 (Hrushikant Patkar, #35622 updateKioskConfig): the operation said each part given replaces that part
+  whole, naming "attractLoop with its slides, startScreen with its tiles", and its 400 spoke of a repeated slide or tile
+  order, but the PATCH body had neither list, and KioskAttractLoop and KioskStartScreen hold no slides or tiles: the
+  lists are KioskConfig.attractSlides and .startTiles (child tables since V0100). CMS-105 saves the loop and the tiles
+  with updateKioskConfig (the 5 October decision: the operator orders slides and tiles).'
+keys_touched:
+  operations: [updateKioskConfig]
+  schemas: [KioskConfig, KioskAttractSlide, KioskStartTile]
+  tables: [whitelabel.kiosk_config_attract_slide, whitelabel.kiosk_config_start_tile]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: 'a description that promises a request part the request schema does not carry'
+tickets:
+  started:
+  - '35622 (updateKioskConfig, Hrushikant Patkar, raiser, being built): accept attractSlides and startTiles as above,
+    replacing the child rows in the same transaction.'
+  unstarted:
+  - '35627 and 35628 (CMS-105 Kiosk Builder, Pradnya Yeram, New): Save of the attract loop or the start tiles sends the
+    whole list as attractSlides or startTiles; nothing on the screen changes.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-381
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-KIOSK-LISTS fails on 8535bc29 (no attractSlides or startTiles in the body) and passes now. Additive: two
+  optional request fields. No table change (the child tables exist). Beyond the comment''s words: the updateKioskConfig
+  description also says a deleted configuration answers 404 and the name rule compares only live configurations,
+  which are CR-382''s decision.'

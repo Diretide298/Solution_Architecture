@@ -1,0 +1,45 @@
+id: CHG-CR386-001
+date: '2026-10-31'
+source: cr
+kind: contract
+summary: 'restoreKioskConfigVersion sets hasUnpublishedChanges true when the restored versionNumber is not the
+  configuration''s current published version, and false when it is (restoring the current version, for example to
+  discard draft edits, leaves nothing to publish). publishKioskConfigs is unchanged: it publishes a restored older
+  version and answers 409 nothing-to-publish only when nothing named has unpublished changes. A second restore before
+  that publish needs discardDraftChanges true.'
+decision:
+  what: 'ADAM CR-386 (Chinmay, 31 October 2026, posted on #35619: "as you recommended. restoreKioskConfigVersion sets
+    hasUnpublishedChanges true when the restored versionNumber is not the configuration''s current published version,
+    and false when it is ... publishKioskConfigs is unchanged ... A second restore of the same configuration before
+    that publish needs discardDraftChanges true, as for any unpublished change."), after the lead''s review of every CR
+    ("for each one actually check if they hold and if not then find out the best way keeping in mind what client
+    needs") and his instruction "Include them in r12". contracts/satellite/white-label.yaml
+    KioskConfig.hasUnpublishedChanges and restoreKioskConfigVersion''s description. tools/check-business-rules.py
+    BR-KIOSK-RESTORE.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'ADAM CR-386 (Hrushikant Patkar, #35619 publishKioskConfigs): a roll back is restore, check, then publish, but
+  hasUnpublishedChanges was "true after any write to the draft since the last publish or restore", so a restore left it
+  false and publishKioskConfigs answered 409 nothing-to-publish: the roll back the 5 October decision asked for could not
+  finish.'
+keys_touched:
+  operations: [restoreKioskConfigVersion, publishKioskConfigs]
+  schemas: [KioskConfig]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: 'a derived flag whose rule leaves out the write that most needs it'
+tickets:
+  started:
+  - '35620 (restoreKioskConfigVersion, Hrushikant Patkar): set hasUnpublishedChanges as above.'
+  - '35619 (publishKioskConfigs, Hrushikant Patkar, raiser): nothing to change.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-386
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'BR-KIOSK-RESTORE fails on 8535bc29 and passes now. No table or wire change. Beyond the comment''s words: none.'

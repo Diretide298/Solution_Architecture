@@ -2790,19 +2790,6 @@
    "reason": "new, writers pass 29 September (hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001))",
    "carried": true
   },
-  "deleteKioskConfig": {
-   "reads": [
-    "whitelabel.kiosk_assignment",
-    "whitelabel.kiosk_config"
-   ],
-   "writes": [
-    "whitelabel.kiosk_config",
-    "whitelabel.kiosk_config_attract_slide",
-    "whitelabel.kiosk_config_start_tile"
-   ],
-   "reason": "hand-kept in the lineage before r8; no contract fact states it yet (carried 20 October 2026, CHG-R8GEN-001)",
-   "carried": true
-  },
   "deleteMediaAsset": {
    "reads": [
     "assets.media_asset"

@@ -388,3 +388,42 @@ reads:
     (CR-174, CR-281). The operations host asks access#liveEntitlementSubjects in process, through Access''s own query
     class, in the caller''s transaction under the caller''s row-level security, as commerce does under XDR-001. SELECT
     only, on the one table.'
+- id: XDR-027
+  reader: operations
+  tables: [platform.workstation]
+  privileges: [SELECT]
+  queries: [tenancy#workstationRecords]
+  operations: [assignKiosk, listKioskConfigs, getKioskConfig, listKioskAssignments]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-383 (not as recommended, A on CR-384's channel) and ADAM CR-384 (as recommended, the values
+    named as catalogue's Channel), Chinmay, 31 October 2026
+  why: 'White Label''s kiosk operations (operations host) need to know which workstations are kiosks. CR-384 marks one:
+    platform.workstation.channel, pos or kiosk, Tenancy''s data in commerce. assignKiosk (#35614) reads the workstation
+    in the path for its 404 (not in the venue) and 409 not-a-kiosk (channel not kiosk); listKioskConfigs (#35618) and
+    getKioskConfig (#35617) count assignedKioskCount from the venue''s kiosks, and listKioskAssignments (#35625)
+    answers one item per kiosk of the venue (CR-383), all asking tenancy#workstationRecords where {venueId, channel:
+    kiosk, isActive: true}. The service route between deployables is not built (CR-281; #37051). The operations host
+    asks the query in process, through Tenancy''s own query class, in the caller''s transaction under the caller''s
+    row-level security. SELECT only, on the one table, which V0118 already grants the operations role (as for
+    createFnbOrder under XDR-009), so no grant is new. Recorded as its own entry beside XDR-009, so XDR-009 is not
+    edited by two changes at once. Nothing writes a whitelabel.kiosk_assignment row from enrolment or
+    configureWorkstation (CR-383 option B was not chosen).'
+- id: XDR-028
+  reader: operations
+  tables: [catalogue.product, catalogue.product_media, payments.method]
+  privileges: [SELECT]
+  queries: [catalogue#productRecords, payments#paymentMethodRecords]
+  operations: [getKioskConfigValidation, publishKioskConfigs]
+  added: '2026-10-31'
+  decision_ref: ADAM CR-385, Chinmay, 31 October 2026 (as recommended)
+  why: 'White Label''s getKioskConfigValidation (#35623) and publishKioskConfigs (#35619) run the kiosk publish checks.
+    tileWithoutProducts needs the venue''s sellable bookable products (catalogue.product, with catalogue.product_media
+    for Product.media[], Catalogue''s data in commerce), asked of catalogue#productRecords where {venueId} in process
+    as CR-343 ruled for the tenant configuration (XDR-022), on the SELECT V0118 already grants. paymentMethodUnavailable
+    needs the accepted methods'' payments.method rows (Orders'' data in commerce), which no query served and no grant
+    reached: Orders declares payments#paymentMethodRecords, and the operations host asks it in process through
+    Orders'' own query class, in the caller''s transaction under the caller''s row-level security. SELECT only; the
+    grant on payments.method is new (with USAGE on schema payments where the role lacks it). The service route between
+    deployables is not built (CR-281; #37051). The media check''s assets#mediaAssetRecords is served in the same host
+    (Assets runs in operations with White Label) and needs no entry. Recorded as its own entry, so XDR-022 is not
+    edited by two changes at once.'
