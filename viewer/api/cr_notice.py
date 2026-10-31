@@ -97,10 +97,11 @@ def _release_line(status: str, ref: str, served: str, release: bool = True) -> s
                 "since your previous pull.")
     if ref:
         return (f"The package change comes in release `{ref}`"
-                f"{f', which is not out yet (ADAM serves `{served}`)' if served else ''}. Until it is out, the "
-                f"decision above is what to build to; your first pull after `{ref}` shows the change in spec-diff.md.")
-    return ("The package change lands in the next release. Until it does, the decision above is what to "
-            "build to; your next pull after that release shows the change in spec-diff.md.")
+                f"{f', which is not out yet (ADAM serves `{served}`)' if served else ''}. Do not wait for it: the "
+                f"decision above is what to build to now; your first pull after `{ref}` shows the package's files "
+                "brought into line in spec-diff.md.")
+    return ("The package's own files are brought into line in the next release. Do not wait for it: the decision "
+            "above is what to build to now, and your next pull after that release shows the files in spec-diff.md.")
 
 
 def comment_text(cr: str, title: str, status: str, resolution: str, ref: str, ticket: str,
@@ -124,13 +125,12 @@ def comment_text(cr: str, title: str, status: str, resolution: str, ref: str, ti
         todo = ("Build to the decision above, in this ticket. Where this ticket's description or the "
                 "package's contracts say otherwise, the decision wins (a started ticket's description is "
                 "never rewritten, and the package is not changed for this request).")
-    elif status == "accepted":
-        todo = ("Build to the decision above. Where this ticket's description says otherwise, the decision "
-                "wins (a started ticket's description is never rewritten). If the package change has not "
-                "reached a release yet, build the rest and leave the changed part to the release that "
-                "carries it.")
     else:
-        todo = ("Build to the decision above. Where this ticket's description says otherwise, the decision "
+        # **A settled decision is built now, never held for the release** (31 October 2026: developers' agents read
+        # "leave the changed part to the release that carries it", written on accepted requests, as "wait for the
+        # release" though the decision was clear). The release only brings the package's files into line with it.
+        todo = ("Build to the decision above now; do not wait for a release. Where this ticket's description says "
+                "otherwise, the decision "
                 "wins (a started ticket's description is never rewritten).")
     lines += ["", f"**What to do now:** pull the ticket again (`/ticket {ticket}`), then: {todo}"]
     return "\n".join(lines)

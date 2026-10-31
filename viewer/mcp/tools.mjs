@@ -389,11 +389,16 @@ function changeSection(changes) {
     + '**Read these before building.** A settled decision overrides this ticket\'s description where they '
     + 'differ (a started ticket\'s description is never rewritten); an open request is not decided yet.\n\n';
   for (const c of changes) {
-    const release = c.resolvedRef || (c.status === 'open' ? 'not settled yet'
-      : c.status === 'rejected' ? 'none (rejected)' : 'the next release');
+    // **A settled decision is built now, never held for the release** (31 October 2026): "Release that carries it:
+    // the next release" was read by developers' agents as "wait for the release" though the decision was clear. The
+    // release only brings the package's own files into line with the decision.
+    const release = c.resolvedRef ? `${c.resolvedRef} (the package's files say it from there)`
+      : c.status === 'open' ? 'not settled yet'
+      : c.status === 'rejected' ? 'none (rejected)'
+      : 'the next release; do not wait for it, the decision above is what to build to now';
     out += `### ${c.id} · ${c.status} - ${String(c.title ?? '').trim()}\n\n`
       + `- **Decision:** ${String(c.resolution ?? '').trim() || (c.status === 'open' ? '_none yet_' : '_no note given_')}\n`
-      + `- **Release that carries it:** ${release}\n`
+      + `- **Package files updated in:** ${release}\n`
       + (c.childTicket ? `- **Its own ticket:** #${c.childTicket}${c.childUrl ? ` (${c.childUrl})` : ''}\n` : '')
       + `- **What to do:** ${c.status === 'open' && c.blocking
         ? 'it blocks this ticket: do not build it or work around it; the ticket goes On hold naming it, and you '
@@ -404,7 +409,7 @@ function changeSection(changes) {
           ? 'build as the ticket and its linked files say; the request changes nothing'
           : c.childTicket
             ? `build it in #${c.childTicket}, not here`
-            : 'follow the decision above'}.\n\n`;
+            : 'build to the decision above now; it overrides the package files where they still differ'}.\n\n`;
   }
   return out;
 }
@@ -3635,7 +3640,7 @@ export const TOOLS = [
         const crs = one.changeRequests;
         if (crs) {
           next += ` README.md lists ${crs.total} change request${crs.total === 1 ? '' : 's'} raised from this ticket`
-            + ' under "Change requests on this ticket": follow the settled decisions'
+            + ' under "Change requests on this ticket": build to the settled decisions now, without waiting for a release'
             + `${crs.open.length ? `, and wait on the part ${crs.open.join(', ')} cover${crs.open.length === 1 ? 's' : ''}` : ''}.`;
         }
         if (typeof one.subtasks === 'number') {
