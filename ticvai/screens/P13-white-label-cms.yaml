@@ -12291,15 +12291,15 @@ screens:
         label: Choose the new file
         bindsTo: UploadTicket.uploadId
         operation: createUpload
-        notes: 'Asks the platform for an upload (`createUpload`) and sends the file; the replace then names that
-          upload. It never calls `completeUpload`, which would make the file a new asset rather than this one''s
-          next version.'
+        notes: Asks the platform for an upload (`createUpload`) and sends the file; the replace then names
+          that upload. It never calls `completeUpload`, which would make the file a new asset rather than
+          this one's next version.
         provenance: contract assets.yaml POST /media/uploads (CHG-R12GT-002)
       - kind: primaryButton
         label: Replace the current version
         operation: replaceMediaAsset
-        notes: The act the screen exists for. Sends the chosen file's `uploadId` (and an optional `note`); the
-          file it replaces is kept as a version.
+        notes: The act the screen exists for. Sends the chosen file's `uploadId` (and an optional `note`);
+          the file it replaces is kept as a version.
         provenance: contract assets.yaml POST /media/{mediaId}/replace (CHG-R12GT-002)
       - kind: secondaryButton
         label: Cancel
