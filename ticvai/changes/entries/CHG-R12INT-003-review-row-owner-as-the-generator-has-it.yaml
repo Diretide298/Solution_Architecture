@@ -1,0 +1,34 @@
+id: CHG-R12INT-003
+date: '2026-10-31'
+source: audit
+kind: process
+summary: 'check-migration-tickets M-REVIEW-ROW looks for a migration-review row on the ticket build-service-docs puts it
+  on: the MIG- migration whose "Tables:" sentence creates the table, before a hand-written [DB] task whose "Builds:"
+  only names it. It took the first Database task in plan order, so a hand-written task that changes an existing table
+  (r12: CR359-DB-FORM-VERSION-KEY and marketing.waiver_signature, which MIG-MARKETING-2 creates) made the check ask for
+  the row on a ticket the generator never writes it to.'
+decision:
+  what: 'The lead''s brief for r12 (30 October 2026): "finish up and we deploy"; fix findings at the source.'
+  by: Chinmay
+  date: '2026-10-31'
+why: 'Finding: the r12 integration refresh at 8285d008 (31 October) failed M-REVIEW-ROW on `not null
+  marketing.waiver_signature.form_version` (the row batch C''s CR-359 adds) once the plan lane''s CR-359 task joined
+  it; each lane passed alone. The generator''s rule is the right one: a review row is a change to the table its
+  creating migration carries, and the CR-359 task''s own text already says what it does to form_version.'
+keys_touched:
+  tables:
+  - marketing.waiver_signature
+  files:
+  - tools/check-migration-tickets.py
+root_class: 'a check and the generator it checks choosing the owning ticket by different rules'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the r12 integration gate, 31 October 2026'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-migration-tickets.py
+status: open

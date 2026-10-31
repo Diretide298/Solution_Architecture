@@ -318,6 +318,13 @@ def undefined_type_adjustments(files, rows):
     return out
 
 
+def provisioned_first(db, backend=BACKEND):
+    """[(name, text)] of what provisioning runs before a database's own files: provision-tenant.sh creates the types the
+    frozen tenant baseline names (CHG-R12DB-001), so a type it creates is created (CHG-R12INT-002)."""
+    sh = Path(backend) / "provision-tenant.sh"
+    return [(sh.name, sh.read_text(encoding="utf-8"))] if db == "tenant" and sh.exists() else []
+
+
 def stage_backend(dst, backend=BACKEND, rows=None):
     """Copy backend/ to dst (the files provisioning reads) and apply the adjustments. Returns them."""
     rows = rows if rows is not None else review_rows(REVIEW.read_text(encoding="utf-8"))
@@ -333,10 +340,7 @@ def stage_backend(dst, backend=BACKEND, rows=None):
     for db in DATABASES:
         files = [(n, (dst / db / n).read_text(encoding="utf-8")) for n in provision_order(
             p.name for p in (dst / db).glob("*.sql"))]
-        # provision-tenant.sh creates, before the tenant files, the types the frozen baseline names (CHG-R12DB-001):
-        # a type it creates is created, so no adjustment is made for it.
-        given = [("provision-tenant.sh", (dst / "provision-tenant.sh").read_text(encoding="utf-8"))] if db == "tenant" else []
-        for fname, before, after, obj in undefined_type_adjustments(given + files,
+        for fname, before, after, obj in undefined_type_adjustments(provisioned_first(db, dst) + files,
                                                                     [r for r in rows if r["db"] in (db, "both")]):
             p = dst / db / fname
             text = p.read_text(encoding="utf-8")
@@ -1262,7 +1266,8 @@ def check_package():
         if not files[db]:
             fails.append(f"backend/{db}: no SQL files")
         try:
-            adj += [a[3] for a in undefined_type_adjustments(files[db], [r for r in rows if r["db"] in (db, "both")])]
+            adj += [a[3] for a in undefined_type_adjustments(provisioned_first(db) + files[db],
+                                                             [r for r in rows if r["db"] in (db, "both")])]
         except ValueError as e:
             fails.append(f"backend/{db}: {e}")
     return fails, len(rows), len(tasks), adj
