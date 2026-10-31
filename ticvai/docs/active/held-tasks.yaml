@@ -161,7 +161,6 @@ holds:
     - APP-SETUP-BO-033-REST   # BO-033 Blacklist Management (the rest of the screen: 2 of its 3 operations) (Sanket Keluskar)
     - APP-SETUP-BO-167-REST   # BO-167 Device Binding & Session Security (the rest of the screen: 2 of its 3 operations) (Sanket Keluskar)
     - APP-SETUP-BO-032-REST   # BO-032 Admission Profiles (the rest of the screen: 3 of its 5 operations) (Sanket Keluskar)
-    - APP-SETUP-BO-168-REST   # BO-168 BLE Beacon & Geofence Configuration (the rest of the screen: 1 of its 2 operations) (Sanket Keluskar)
     - APP-SETUP-BO-335-REST   # BO-335 Virtual Ticket Identity & Master Record Configuration (the rest of the screen: 1 of its 2 operations) (Sanket Keluskar)
     - APP-SETUP-ADM-077   # ADM-077 Calculation Validation, Reconciliation & Service Interface (setup: 1 of its 5 operations) (Surendra)
     - APP-SETUP-BO-074   # BO-074 Chart of Accounts (setup: 1 of its 8 operations) (Pallavi Sawant)

@@ -100,6 +100,11 @@ OTHER = {
                                  "as one whole-screen task, so the rest of the screen is no longer a separate ticket "
                                  "(CHG-GT1-004)")
        for sid in ("ADM-603", "BO-1146")},
+    # ADAM CR-389 (31 October 2026) stores the beacon geofence on the device placement, so BO-168 is no setup screen of
+    # the slice and is one Block C task, APP-SETUP-BO-168, with both its operations; its rest-of-screen part, On hold
+    # and never started, is carried by it (r12 integration, 1 November 2026; CHG-R12PL-036).
+    "APP-SETUP-BO-168-REST": ("merge", "APP-SETUP-BO-168", "BO-168 is built whole by APP-SETUP-BO-168 in Block C since "
+                              "ADAM CR-389 put the beacon geofence on the device placement (CHG-R12PL-036)"),
 }
 # The day an OTHER retirement was decided, where it is not the 28 September of the first ones (its note says so).
 OTHER_DECIDED = {"APP-SETUP-ADM-603-REST": "14 October 2026", "APP-SETUP-BO-1146-REST": "14 October 2026"}

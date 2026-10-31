@@ -6,7 +6,11 @@ proposed: '2026-11-01'
 summary: 'The Block A slice keeps the scope r11 gave it after lanes F to M: createSeatMapTemplate is held out of the
   slice (tools/derive-delivery-slice.py LATER_BLOCK_OPERATIONS), so BO-962 stays in wave 3; BO-168 leaves Block A for
   Block C with its operations; workforce.field_ownership and workforce.integration_source, already built by #28946,
-  carry their reason in docs/active/block-a-extra-tasks.json departures.'
+  carry their reason in docs/active/block-a-extra-tasks.json departures. createLiveDynamicPrice is kept as a setup
+  operation (KEPT_SETUP): CR-422 stopped it writing catalogue.price, which had dropped it and every dynamic pricing
+  writer its reads pull in (ADM-089 to ADM-095, ADM-106, BO-441) from Block A to Block B; with it kept, its new reads
+  (CR-422) add ADM-054 and ADM-075''s setup parts to Block A2. APP-SETUP-BO-168-REST (On hold) merges into
+  APP-SETUP-BO-168 (tools/op-retire.py) and leaves docs/active/held-tasks.yaml.'
 decision:
   what: 'The lead, 1 November 2026: "Lets ship r12 first". Nothing joins Block A at this release and only what no started
     ticket builds leaves it. (1) ADAM CR-403 has createSeatMap copy a template''s structure when it is given a templateId,
@@ -22,7 +26,8 @@ decision:
   by: Chinmay
   date: '2026-11-01'
 why: 'Finding: the r12 integration gate of 1 November 2026 (run 20261101-011538): check-plan-closure C-REACH (BO-962) and C-UNTICKETED (screen BO-168,
-  tables workforce.field_ownership and workforce.integration_source), check-screen-patterns P8 (BO-962).'
+  tables workforce.field_ownership and workforce.integration_source), check-screen-patterns P8 (BO-962); then the rehearsal of 1 November 2026 (op-release.py refused 8 held -REST tasks
+  that had left the plan: the pricing screens'' and BO-168''s).'
 keys_touched:
   tickets:
   - APP-SETUP-BO-168
@@ -35,9 +40,14 @@ keys_touched:
   operations:
   - createSeatMapTemplate
   - setBleBeaconGeofence
+  - createLiveDynamicPrice
+  - setMarketPricingConfiguration
+  - setCurrencyRoundingRule
   files:
   - tools/derive-delivery-slice.py
   - docs/active/block-a-extra-tasks.json
+  - docs/active/held-tasks.yaml
+  - tools/op-retire.py
 root_class: 'a CR that changes which tables an operation reads or writes moves the slice''s setup closure, and the plan
   follows it with no one deciding'
 tickets:
