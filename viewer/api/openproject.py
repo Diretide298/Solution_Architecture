@@ -325,10 +325,37 @@ def summarise(work_package: dict, endpoint: str, token: Optional[str] = None) ->
 DESCRIPTION_LIMIT = 20_000
 
 
+def read_one(endpoint: str, token: str, key: str) -> dict:
+    """One work package as the collection answers it: the same fields and links, without the single read's
+    embedded watchers, relations, custom actions and attachments, which nothing here uses.
+
+    OpenProject 10 takes 23 seconds on its own read of a ticket most of the plan follows (MIG-BASELINE #27646,
+    SETUP-ENV #27627, 1 November 2026) and 0.8 through the collection, so a pull that read such a ticket two or
+    three times passed the proxy's 60 seconds and answered 502. Every status is asked for (the collection's
+    default is open work only). Nothing found falls back to the single read, so a missing ticket still raises
+    its 404 and one this token may not see its 403 (the id filter answers 400 for an id that does not exist)."""
+    try:
+        page = call(endpoint, token, "work_packages", {
+            "filters": json.dumps([
+                {"id": {"operator": "=", "values": [str(key)]}},
+                {"status": {"operator": "*", "values": []}},
+            ]),
+            "pageSize": 1,
+        })
+    except Refused as exc:
+        if exc.status not in (400, 422):
+            raise
+        page = {}
+    for raw in page.get("_embedded", {}).get("elements", []):
+        if str(raw.get("id")) == str(key):
+            return raw
+    return call(endpoint, token, f"work_packages/{key}")
+
+
 def work_package(endpoint: str, token: str, key: str) -> dict:
     """One, summarised, with its description — the part a developer works from.
     Lists leave the description out; one ticket keeps it."""
-    raw = call(endpoint, token, f"work_packages/{key}")
+    raw = read_one(endpoint, token, key)
     found = summarise(raw, endpoint, token)
     text = ((raw.get("description") or {}).get("raw") or "").strip()
     found["description"] = text[:DESCRIPTION_LIMIT]
@@ -502,7 +529,7 @@ def children(endpoint: str, token: str, key: str) -> list:
     task that exists although ADAM did not record it (made on the server with op-create.rb, or made
     by a create whose answer was lost behind the proxy; CHG-ADM-003).
     """
-    raw = call(endpoint, token, f"work_packages/{key}")
+    raw = read_one(endpoint, token, key)
     links = (raw.get("_links") or {}).get("children")
     if isinstance(links, list):
         return [{"key": str(_id_from_href(c.get("href")) or ""), "subject": c.get("title") or ""}
@@ -516,7 +543,7 @@ def children(endpoint: str, token: str, key: str) -> list:
 
 def summary(endpoint: str, token: str, key: str) -> dict:
     """One work package, summarised, without its description: what a line naming it needs (a pull's "Part of")."""
-    return summarise(call(endpoint, token, f"work_packages/{key}"), endpoint, token)
+    return summarise(read_one(endpoint, token, key), endpoint, token)
 
 
 # How far down a pull looks, and how many it lists. A ticket's sub-tasks are a handful; the bounds are for a parent
@@ -600,7 +627,7 @@ def is_closed(endpoint: str, token: str, key: str) -> bool:
     Never by the status's name. The status is embedded in a work package on current instances;
     where it is not, it is looked up in the instance's status list by the id in its link.
     """
-    raw = call(endpoint, token, f"work_packages/{key}")
+    raw = read_one(endpoint, token, key)
     embedded = ((raw.get("_embedded") or {}).get("status") or {})
     if "isClosed" in embedded:
         return bool(embedded["isClosed"])
