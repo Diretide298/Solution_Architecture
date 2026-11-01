@@ -105,6 +105,13 @@ OTHER = {
     # and never started, is carried by it (r12 integration, 1 November 2026; CHG-R12PL-036).
     "APP-SETUP-BO-168-REST": ("merge", "APP-SETUP-BO-168", "BO-168 is built whole by APP-SETUP-BO-168 in Block C since "
                               "ADAM CR-389 put the beacon geofence on the device placement (CHG-R12PL-036)"),
+    # ADAM CR-422 (31 October 2026) has createLiveDynamicPrice stop writing catalogue.price, which was the slice's reason
+    # for dynamic pricing in Block A; the lead, 1 November 2026: "Pricing to Block B, ship now". Each pricing setup
+    # screen is one whole-screen Block B task now, which carries its rest-of-screen part (On hold, never started).
+    **{f"APP-SETUP-{sid}-REST": ("merge", f"VM-{sid}", f"dynamic pricing is Block B since ADAM CR-422 (the lead, 1 "
+                                 f"November 2026: \"Pricing to Block B, ship now\"); {sid} is built whole by VM-{sid} "
+                                 "(CHG-R12PL-036)")
+       for sid in ("ADM-089", "ADM-090", "ADM-091", "ADM-094", "ADM-095", "ADM-106", "BO-441")},
 }
 # The day an OTHER retirement was decided, where it is not the 28 September of the first ones (its note says so).
 OTHER_DECIDED = {"APP-SETUP-ADM-603-REST": "14 October 2026", "APP-SETUP-BO-1146-REST": "14 October 2026"}

@@ -110,14 +110,6 @@ ALSO_FOR = {"listAuditRecords": "PLATFORM-AUDIT",
             "writeSubjectDataExportPart": "SVC-IDENTITY-IDENTITY-1",
             "recordSubjectDataExportPart": "SVC-IDENTITY-IDENTITY-1"}
 
-# **Setup operations Block A keeps when a CR moves the reason they were setup** (r12 integration, 1 November 2026, the
-# lead: "Lets ship r12 first"; CHG-R12PL-036), each with the table it is kept as setup for. ADAM CR-422 has
-# createLiveDynamicPrice stop writing catalogue.price (bulkUpdateProducts in the slice writes it), so the closure no
-# longer took it, and with it every dynamic pricing writer its reads pulled in (strategies, rules, ladders, guardrails,
-# recommendations): ADM-089 to ADM-095, ADM-106 and BO-441 fell from Block A's setup module to Block B with started
-# tickets in it. Kept as r11 planned it: it still makes a live price, now as catalogue.price_execution.
-KEPT_SETUP = {"createLiveDynamicPrice": "catalogue.price_execution"}
-
 
 # **Placed in a later block by the lead** (Chinmay, 12 October 2026, N32: the client's feedback of 6 October,
 # CHG-R6-040). A writer of a table a core operation reads becomes setup, and so Block A, by the fixpoint below, and a
@@ -209,10 +201,6 @@ def main() -> int:
             core.setdefault(o, set()).add(why)
     slice_ = set(core)
     setup_for: dict[str, set[str]] = defaultdict(set)  # setup op -> tables it makes non-empty
-    for o, t in KEPT_SETUP.items():
-        if o in lineage:
-            slice_.add(o)
-            setup_for[o].add(t)
     while True:
         read = {t for o in slice_ for t in (lineage.get(o, {}).get("reads") or [])
                 if not t.startswith("cache:")}
