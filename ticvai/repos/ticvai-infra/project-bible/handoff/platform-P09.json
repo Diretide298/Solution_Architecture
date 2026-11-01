@@ -175,15 +175,15 @@
    "operations": 1
   },
   {
+   "contract": "finance",
+   "operations": 1
+  },
+  {
    "contract": "payments",
    "operations": 1
   },
   {
    "contract": "catalogue",
-   "operations": 1
-  },
-  {
-   "contract": "finance",
    "operations": 1
   }
  ],

@@ -138,7 +138,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-438` | Pricing Calendar & Exception Dates | D | 8 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-439` | Normal & VIP Pricing Configuration | D | 21 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-440` | Retry Price Configuration | D | 0 | 2 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-441` | Price Priority & Conflict Rules | A | 20 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-441` | Price Priority & Conflict Rules | B | 20 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-442` | Effective Pricing & Reader Price Preview | D | 6 | 10 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-443` | Pricing Audit, Approval & Publication | B | 16 | 0 | 6 | 11 | 0 | 3 | — | notStarted (—) |
 

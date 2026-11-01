@@ -101,7 +101,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-165` | Dynamic QR Security Profile Builder | C | 13 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-166` | Credential Activation & Display Rules | A | 6 | 4 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-167` | Device Binding & Session Security | A | 5 | 16 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-168` | BLE Beacon & Geofence Configuration | A | 22 | 22 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-168` | BLE Beacon & Geofence Configuration | C | 22 | 22 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-169` | Credential Transfer & Rebinding | C | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-170` | Credential Revocation & Lifecycle Events | C | 5 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-171` | Offline Cryptographic Validation Profile | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |

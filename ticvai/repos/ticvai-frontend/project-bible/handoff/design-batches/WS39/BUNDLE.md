@@ -114,7 +114,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-103` | Market, Tourism, Holiday & Contextual Signal Hub | B | 24 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-104` | AI Demand Forecasting & Booking Curve Studio | B | 0 | 12 | 6 | 3 | 1 | 6 | — | notStarted (generated) |
 | `ADM-105` | Price Elasticity & Revenue Response Intelligence | B | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `ADM-106` | AI Pricing Recommendation & Explainability Center | A | 5 | 0 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `ADM-106` | AI Pricing Recommendation & Explainability Center | B | 5 | 0 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `ADM-107` | AI Signal Registry, Data Quality & Model Governance | B | 18 | 48 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -1434,7 +1434,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #29755 (VM-ADM-106) |
+| Block | Block B · ticket #29755 (VM-ADM-106) |
 | Who uses it | venue staff holding `AI_APPROVE`, `PRODUCT_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

@@ -68,15 +68,15 @@
    "operations": 13
   },
   {
-   "contract": "identity",
-   "operations": 8
-  },
-  {
    "contract": "catalogue",
    "operations": 8
   },
   {
    "contract": "tenancy",
+   "operations": 8
+  },
+  {
+   "contract": "identity",
    "operations": 8
   },
   {
@@ -108,15 +108,15 @@
    "operations": 2
   },
   {
+   "contract": "access",
+   "operations": 2
+  },
+  {
    "contract": "workforce",
    "operations": 2
   },
   {
    "contract": "queue",
-   "operations": 2
-  },
-  {
-   "contract": "access",
    "operations": 2
   },
   {

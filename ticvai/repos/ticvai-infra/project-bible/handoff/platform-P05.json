@@ -44,6 +44,10 @@
    "operations": 7
   },
   {
+   "contract": "catalogue",
+   "operations": 3
+  },
+  {
    "contract": "retail",
    "operations": 3
   },
@@ -52,15 +56,11 @@
    "operations": 3
   },
   {
-   "contract": "catalogue",
-   "operations": 3
-  },
-  {
-   "contract": "marketing-crm",
+   "contract": "fnb",
    "operations": 2
   },
   {
-   "contract": "fnb",
+   "contract": "marketing-crm",
    "operations": 2
   },
   {

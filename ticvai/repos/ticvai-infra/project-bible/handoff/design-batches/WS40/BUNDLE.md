@@ -107,13 +107,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-108` | Revenue Optimization Command Center | A | 0 | 262 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
-| `ADM-109` | Pricing Simulation Studio | A | 0 | 12 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
+| `ADM-109` | Pricing Simulation Studio | B | 0 | 12 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
 | `ADM-110` | Scenario Modeling & What-If Analysis | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `ADM-111` | A/B Pricing Experiment Studio | B | 0 | 8 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
 | `ADM-112` | Revenue & Demand Impact Forecasting | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
 | `ADM-113` | AI Recommendation Review & Decision Queue | B | 5 | 22 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-114` | Automation Policy & Autonomous Pricing Orchestrator | B | 59 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
-| `ADM-115` | Live Dynamic Price Execution & Deployment Monitor | A | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-115` | Live Dynamic Price Execution & Deployment Monitor | B | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-116` | Dynamic Pricing Performance & Optimization Analytics | B | 0 | 36 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 | `ADM-117` | AI Learning, Model Performance & Optimization Feedback | B | 18 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
@@ -620,7 +620,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #29750 (VM-ADM-109) |
+| Block | Block B · ticket #29750 (VM-ADM-109) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1554,7 +1554,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #29748 (VM-ADM-115) |
+| Block | Block B · ticket #29748 (VM-ADM-115) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Each execution shows) and no metric row |

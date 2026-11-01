@@ -101,7 +101,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-165` | Dynamic QR Security Profile Builder | C | 13 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-166` | Credential Activation & Display Rules | A | 6 | 4 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-167` | Device Binding & Session Security | A | 5 | 16 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-168` | BLE Beacon & Geofence Configuration | A | 22 | 22 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-168` | BLE Beacon & Geofence Configuration | C | 22 | 22 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-169` | Credential Transfer & Rebinding | C | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-170` | Credential Revocation & Lifecycle Events | C | 5 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-171` | Offline Cryptographic Validation Profile | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
@@ -884,7 +884,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `access` module |
-| Block | Block A · ticket #28427 (APP-SETUP-BO-168) |
+| Block | Block C · ticket #28427 (APP-SETUP-BO-168) |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Map-Based Configuration; Configure) and no display directory — it is settings, not a population |

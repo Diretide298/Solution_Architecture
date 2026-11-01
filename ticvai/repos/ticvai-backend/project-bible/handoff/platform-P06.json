@@ -118,19 +118,19 @@
    "operations": 5
   },
   {
-   "contract": "venue-map",
-   "operations": 2
-  },
-  {
    "contract": "tenancy",
    "operations": 2
   },
   {
-   "contract": "payments",
-   "operations": 1
+   "contract": "venue-map",
+   "operations": 2
   },
   {
    "contract": "approvals",
+   "operations": 1
+  },
+  {
+   "contract": "payments",
    "operations": 1
   }
  ],

@@ -218,11 +218,11 @@
    "operations": 56
   },
   {
-   "contract": "inventory",
+   "contract": "seating",
    "operations": 53
   },
   {
-   "contract": "seating",
+   "contract": "inventory",
    "operations": 53
   },
   {
@@ -230,11 +230,11 @@
    "operations": 47
   },
   {
-   "contract": "tenancy",
+   "contract": "payments",
    "operations": 46
   },
   {
-   "contract": "payments",
+   "contract": "tenancy",
    "operations": 46
   },
   {
@@ -250,11 +250,11 @@
    "operations": 42
   },
   {
-   "contract": "identity",
+   "contract": "maintenance",
    "operations": 41
   },
   {
-   "contract": "maintenance",
+   "contract": "identity",
    "operations": 41
   },
   {

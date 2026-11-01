@@ -166,11 +166,11 @@
    "operations": 6
   },
   {
-   "contract": "finance",
+   "contract": "resources",
    "operations": 6
   },
   {
-   "contract": "resources",
+   "contract": "finance",
    "operations": 6
   },
   {
