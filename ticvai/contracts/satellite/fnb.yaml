@@ -480,7 +480,9 @@ paths:
         are allowed.**
 
         **`requiresApproval` defaults true wherever the swap changes an allergen.** A chef may substitute
-        freely within a claim; changing the claim is somebody else''s decision.
+        freely within a claim; changing the claim is somebody else''s decision. The rule, on the field (r13 root
+        R41): a rule sent without `requiresApproval` whose `allergensAdded` or `allergensRemoved` is not empty is
+        stored with `requiresApproval` true; without either, false (the schema default).
 
         **A rule belongs to a recipe** (decided 28 September, audit R125 (10)): each rule names its `recipeId`,
         not a menu item and not the whole venue, because a swap that is safe in one dish is not safe in
@@ -8064,7 +8066,7 @@ paths:
         route: in-process
         for: 'the display workstations it assigns (400 workstation-on-two-stations) (CHG-MOD-003)'
       x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
+      x-ticvai-singleton-note: 'One set per outlet, the `outletId` the query names (r13 root R41: the note said per venue, against the required outletId): a PUT replaces that outlet''s whole set, and an entry of that outlet the body leaves out is removed; no other outlet''s stations change. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Configure stations and item routing
@@ -13192,6 +13194,10 @@ components:
     KitchenRoutingRules:
       type: object
       x-ticvai-persistence: fnb.kitchen_routing_rule
+      # **One row per outlet, held by the database** (r13 root R20, CHG-R13R20-001): a unique index on outlet_id, so
+      # two concurrent first saves cannot make two rows for getKitchenRoutingRules to choose between.
+      x-ticvai-unique-together:
+      - [outletId]
       description: '**Where a line goes when its item names no station** (Chinmay, 2 October, workbook Q189 and Q190;
         DI-323; CHG-CSA-015). Item rules are `KitchenStation.menuItemIds`; these are the category rules, the
         default station and the fallback station of one outlet. One row per outlet. `MenuItem.stationId` is not
@@ -13610,6 +13616,9 @@ components:
     CourseRules:
       type: object
       x-ticvai-persistence: fnb.course_rule
+      # **One row per outlet, held by the database** (r13 root R20, CHG-R13R20-001): a unique index on outlet_id.
+      x-ticvai-unique-together:
+      - [outletId]
       description: '**An outlet''s coursing default.** It was written to the resolution cache only, which
         the service model calls losable without consequence — an outlet''s default vanished on a cache
         flush. One row per outlet.

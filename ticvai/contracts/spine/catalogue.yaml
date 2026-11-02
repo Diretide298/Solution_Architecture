@@ -1797,6 +1797,12 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-reads:
+      - table: catalogue.price
+        for: 'the prices the selection reaches, each variant''s list_price on its price list (r13 root R21)'
+      x-ticvai-writes:
+      - table: catalogue.price
+        for: 'a real run''s new list_price per price reached (r13 root R21)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -2095,6 +2101,14 @@ paths:
         The clone starts as a draft with a new code. **Variants come with it; orders do not** — a clone
         has no history, which is the point of it being a clone rather than a version.
 
+
+        **What it writes, and what it refuses** (r13 root R21, CHG-R13R21-001). The new `catalogue.product`
+        row, its `catalogue.variant` rows (`includeVariants`) and `catalogue.product_media` rows, and, with
+        `includePrices`, one `catalogue.price` row per source price, on the same price list, for the matching new
+        variant. A `code` already used by a product of the tenant (`product_code_uniq`, compared case-insensitively)
+        is `409 duplicate-code` and nothing is written. The clone''s `familyKey` is null: the family key is unique
+        per venue (`product_venue_id_family_key_uniq`), so the source''s cannot be copied.
+
         '
       tags:
       - catalogue
@@ -2104,6 +2118,12 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-writes:
+      - table: catalogue.price
+        for: 'with includePrices, the source''s prices copied to the new variants (r13 root R21)'
+      x-ticvai-reads:
+      - table: catalogue.price
+        for: 'with includePrices, the source''s prices (r13 root R21)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -2136,6 +2156,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /search:
@@ -20093,7 +20115,7 @@ paths:
       operationId: setChannelSyncSetting
       x-ticvai-consumed-by:
         - "P08 ADM-270 Product, Price & Availability Synchronization"
-      x-ticvai-body-key: [salesChannelId]
+      x-ticvai-body-key: [salesChannelId, domain]
       x-ticvai-body-key-note: 'Keyed by the body''s `salesChannelId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per sales channel and data domain within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Set how one kind of data synchronises with a channel
       description: '**The person''s half of `catalogue.channel_sync`** (29 September, writers pass). Creates or
@@ -44154,6 +44176,11 @@ components:
     ChannelConnection:
       type: object
       x-ticvai-persistence: catalogue.channel_connection
+      # **The key setChannelConnectionConfiguration finds its record by, held by the database** (r13 root R20,
+      # CHG-R13R20-001): one row per sales channel, connector and environment, so a race cannot make two and
+      # `409 connection-id-mismatch` has one record to compare with.
+      x-ticvai-unique-together:
+      - [salesChannelId, connectorName, environment]
       description: >-
         **How TICVAI technically reaches a channel** (29 September, data model DM3). ADM-266. One row per connector
         and environment. **Credentials are never stored here**: `credentialsReference` names the secret in the vault.
@@ -44333,6 +44360,9 @@ components:
     ChannelSync:
       type: object
       x-ticvai-persistence: catalogue.channel_sync
+      # **One row per channel and domain, held by the database** (r13 root R20, CHG-R13R20-001).
+      x-ticvai-unique-together:
+      - [salesChannelId, domain]
       description: >-
         **The synchronisation state of one channel for one kind of data** (29 September, data model DM3). ADM-267. One
         row per channel and domain (product, price, availability ...); counts are the latest run's, overwritten by the
@@ -46467,6 +46497,10 @@ components:
     DynamicPricingStrategy:
       type: object
       x-ticvai-persistence: catalogue.dynamic_pricing_strategy
+      # **One strategy per code within the venue, held by the database** (r13 root R20, CHG-R13R20-001):
+      # setDynamicPricingStrategy creates or replaces by the body's strategyCode at the caller's venue path.
+      x-ticvai-unique-together:
+      - [scopePath, code]
       description: >-
         **A dynamic pricing strategy: what it prices, from which base and how often** (29 September, data model DM3).
         ADM-088 and ADM-089. Its rules are `pricing.dynamic_price_rule` rows naming it; its ladder `catalogue.price_ladder`;

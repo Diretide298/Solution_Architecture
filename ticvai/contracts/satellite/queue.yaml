@@ -842,6 +842,11 @@ paths:
 
         **The operator at the front of the queue**, with the permission that calls parties forward
         (`QUEUE_MANAGE`, as `callNextParties`). Offline-capable, as the other entry operations at the ride.
+
+
+        **What it records** (r13 root R40, CHG-R13R40-001): on the entry, `callResolvedAt` (the request's
+        `recordedAt`), `callResolutionReason` (its `reason`, or null) and `callResolvedByPrincipalId` (the caller),
+        beside the status, so the reason is kept and the no-show or return has a time.
       tags: [entry]
       x-ticvai-permission: QUEUE_MANAGE
       x-ticvai-scope-level: venue
@@ -866,7 +871,13 @@ paths:
                   maxLength: 500
                   nullable: true
                   description: Why, where the operator gives one (called in error, the guest asked for more time).
-                recordedAt: { type: string, format: date-time }
+                    Stored as the entry's `callResolutionReason` (r13 root R40).
+                  x-ticvai-stored-as: queue.entry.call_resolution_reason
+                recordedAt:
+                  type: string
+                  format: date-time
+                  description: When it happened, device time; stored as the entry's `callResolvedAt` (r13 root R40).
+                  x-ticvai-stored-as: queue.entry.call_resolved_at
       responses:
         '200':
           headers:
@@ -1965,6 +1976,27 @@ components:
           format: date-time
           nullable: true
           readOnly: true
+        callResolvedByPrincipalId:
+          x-ticvai-references: identity.principal
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**Who recorded the called party''s no-show or return to the queue** (`resolveCalledWaitingGuest`;
+            r13 root R40, CHG-R13R40-001), with `callResolutionReason` and `callResolvedAt`. Null until it is
+            resolved; a later resolution of the same entry replaces all three.'
+        callResolutionReason:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: The operator's reason, as `resolveCalledWaitingGuest` took it.
+        callResolvedAt:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the no-show or return happened, the request's `recordedAt` (device time, offline-capable).
 
     QueueRedemptionResult:
       x-ticvai-persistence: "none — computed, persisted as entry state"

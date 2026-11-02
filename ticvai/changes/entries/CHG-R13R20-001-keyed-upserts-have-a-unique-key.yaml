@@ -1,0 +1,64 @@
+id: CHG-R13R20-001
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: 'The six upserts the developer review named have a unique index behind their key: fnb.kitchen_routing_rule (outlet_id),
+  fnb.course_rule (outlet_id), catalogue.dynamic_pricing_strategy (scope_path, lower(code)), catalogue.channel_connection
+  (sales_channel_id, lower(connector_name), lower(environment)), catalogue.channel_sync (sales_channel_id, lower(domain))
+  and control.module_listing (lower(module_code)), each an x-ticvai-unique-together on the contract schema; setChannelSyncSetting
+  is keyed by [salesChannelId, domain], as its text says.'
+decision:
+  what: 'The lead, 2 November 2026, on the developer review''s root causes that r12 left unfixed: "lets see if we can do
+    something in parallel", then "yes" to fixing the mechanical ones at their source beside the r13 build lanes. Only what
+    needs no decision of the lead is done here; the rest is brought to the lead.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Developer review root R20 (findings 2.37066.3, 4.27808.4, 5.27943.2, 5.29713.2, 5.29760.2; tickets #37066, #27808,
+  #27943, #29713, #29760): a keyed upsert with no unique key lets a race make two rows, and the one-row-per-X reads had
+  no rule for them. Re-checked on r12 (e3e4082c): unchanged.'
+keys_touched:
+  schemas:
+  - KitchenRoutingRules
+  - CourseRules
+  - DynamicPricingStrategy
+  - ChannelConnection
+  - ChannelSync
+  - ModuleListing
+  operations:
+  - setChannelSyncSetting
+  tables:
+  - fnb.kitchen_routing_rule
+  - fnb.course_rule
+  - catalogue.dynamic_pricing_strategy
+  - catalogue.channel_connection
+  - catalogue.channel_sync
+  - control.module_listing
+  files:
+  - contracts/satellite/fnb.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: an upsert keyed by a field, with no unique index behind the key
+tickets:
+  started:
+  - '36291 [DB] fnb.kitchen_routing_rule, 30570 [DB] fnb.course_rule, 35178 [DB] catalogue.channel_connection, 35230 [DB]
+    catalogue.channel_sync (Ready for QA, Hrushikant Patkar): add the unique index the release''s forward migration carries;
+    check for duplicate rows first.'
+  - '36259 [DB] control.module_listing (Ready for QA, Hrushikant Patkar): the unique index on lower(module_code), control
+    database.'
+  unstarted:
+  - '32558 [DB] catalogue.dynamic_pricing_strategy: the unique index (scope_path, lower(code)).'
+  - '37066, 27808, 27943, 29713, 29760: the upsert finds its row by the key; no other change.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: developer review root R20 (r13 root-cause lane v)'
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-R13-UPSERT-KEY
+status: open
+notes: 'Database change (tenant): five unique indexes; (control): one. **The class is wider than the review''s six**: on
+  r12, 126 of the 127 operations with x-ticvai-body-key write a table with no unique index over their key (setFnbReservationPolicy,
+  setWalletFundingRules, setSeatRules ...). A generator rule deriving one from every body key would add about a hundred
+  indexes in one migration, and some keys are incomplete (setCaseInvestigationResolution''s ''per case and linked record''
+  is keyed by caseId alone), so it is brought to the lead rather than done or baselined here.'

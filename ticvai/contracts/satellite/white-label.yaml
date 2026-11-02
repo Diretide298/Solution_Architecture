@@ -1298,7 +1298,7 @@ paths:
         **The job** (R8 blocker IDENTITY-C63): it runs in the workers host, reads the version''s
         `whitelabel.config_version` snapshot, builds the package and stores it in the assets store; the package moves
         `building` -> `ready` (with its download link, which expires 24 hours after it is issued) or `failed` (with
-        the reason). Nothing else is stored.
+        the reason, `SitePackage.failureReason`; r13 root R40). Nothing else is stored.
 
 
         **Through an event, as an asset** (ADAM CR-106, option 1, accepted 15 October 2026; CHG-R10TEN-012): this call
@@ -5287,6 +5287,15 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-writes:
+      - table: whitelabel.content_page
+        for: 'is_referenced, set as CR-350 says for the pages the restored version links (r13 root R21)'
+      - table: whitelabel.booking_flow_step
+        for: 'the restored booking flows'' steps, restored with their flows (r13 root R21)'
+      - table: whitelabel.footer_config_column
+        for: 'the restored footer''s columns, restored with the footer (r13 root R21)'
+      - table: whitelabel.footer_config_social_link
+        for: 'the restored footer''s social links, restored with the footer (r13 root R21)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -7507,6 +7516,9 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-reads:
+      - table: whitelabel.booking_flow_step
+        for: 'minimumPathDone''s "valid" booking flow: validateBookingFlow''s rule over its steps (r13 root R39)'
       responses:
         '200':
           description: The progress
@@ -10318,6 +10330,14 @@ components:
           type: string
           nullable: true
           description: Short-lived; present when `ready`.
+        failureReason:
+          type: string
+          maxLength: 500
+          nullable: true
+          readOnly: true
+          description: 'Why the build failed, set by exportSitePackage''s job when it moves the package to `failed`;
+            null otherwise (r13 root R40, CHG-R13R40-001: the job''s "with the reason" had no column, so
+            getSitePackage could not answer it).'
         expiresAt:
           type: string
           format: date-time

@@ -1,0 +1,50 @@
+id: CHG-R13R41-001
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: 'Five contradictions resolved to the rule already in force: setKitchenStations'' singleton note says one set per
+  outlet; syncOrders and CreateOrderRequest.id say the Idempotency-Key is a fresh UUIDv7 per batch POST and an entry deduplicates
+  on its id; IndexSource.payloadFields drops the superseded 29 September sentence (ADR-0049); createShopAndDrop''s hours
+  rule is the point''s own opensAt and closesAt (the lead''s answer of 25 October 2026 to r10 question 16); setSubstitutionRules
+  states when requiresApproval is true.'
+decision:
+  what: 'The lead, 2 November 2026, on the developer review''s root causes that r12 left unfixed: "lets see if we can do
+    something in parallel", then "yes" to fixing the mechanical ones at their source beside the r13 build lanes. Only what
+    needs no decision of the lead is done here; the rest is brought to the lead.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Developer review root R41 (findings 2.37066.2, 2.27705.3, 4.27718.2, 3.27820.3, 5.27943.4; tickets #37066, #27705,
+  #27718, #27820, #27943): operations contradicted their own schema or another text (CHG-R10ORD-017 for the hours answer).'
+keys_touched:
+  operations:
+  - setKitchenStations
+  - syncOrders
+  - createShopAndDrop
+  - setSubstitutionRules
+  schemas:
+  - CreateOrderRequest
+  - IndexSource
+  files:
+  - contracts/satellite/fnb.yaml
+  - contracts/spine/orders.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/retail.yaml
+  - tools/check-business-rules.py
+root_class: an operation whose text contradicts its own schema or another text
+tickets:
+  started: []
+  unstarted:
+  - '37066, 27705, 27718, 27820, 27943: build to the one rule.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: developer review root R41 (r13 root-cause lane v)'
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-R13-ONE-RULE
+status: open
+notes: 'Left for the lead: listDelegations'' 200 (#27732, Ready for QA) and fnb listFulfilmentSlots, which no body can satisfy
+  (two shapes to choose from); holdOrder''s offline replay (journalled or not offline-capable); ''only cash'' against transferableCreditTypeIds;
+  the two substitution stores; whether the server adds scope_path to payloadFields or refuses a body without it; updateGuidedChoice''s
+  untyped questions (#27849): typing them as GuidedChoice''s question makes title, sortOrder and answers required, a breaking
+  change check-contract-compat holds for the lead''s approval. No database change.'

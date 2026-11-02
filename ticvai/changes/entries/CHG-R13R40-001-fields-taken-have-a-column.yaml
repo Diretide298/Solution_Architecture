@@ -1,0 +1,53 @@
+id: CHG-R13R40-001
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: 'Fields accepted and lost now have a column: queue.entry call_resolved_at, call_resolution_reason and call_resolved_by_principal_id
+  (resolveCalledWaitingGuest''s recordedAt and reason, WaitingGuest''s three readOnly fields); whitelabel.site_package.failure_reason
+  (the job''s ''with the reason''); recordSubjectDataExportPart takes the event''s writtenAt (required in fact) and states
+  owner is marketing-crm, the publisher.'
+decision:
+  what: 'The lead, 2 November 2026, on the developer review''s root causes that r12 left unfixed: "lets see if we can do
+    something in parallel", then "yes" to fixing the mechanical ones at their source beside the r13 build lanes. Only what
+    needs no decision of the lead is done here; the rest is brought to the lead.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Developer review root R40 (finding 2.37015.1, with 5.27779.1 and 4.37054.3; tickets #37015, #27779, #37054): fields
+  an operation takes or promises had no column. Each text already said the value is kept.'
+keys_touched:
+  operations:
+  - resolveCalledWaitingGuest
+  - exportSitePackage
+  - recordSubjectDataExportPart
+  schemas:
+  - WaitingGuest
+  - SitePackage
+  tables:
+  - queue.entry
+  - whitelabel.site_package
+  - identity.subject_data_export_part
+  files:
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/identity.yaml
+  - tools/check-business-rules.py
+root_class: a field an operation takes or promises with no column to keep it
+tickets:
+  started:
+  - '30619 [DB] queue.entry (Ready for QA, Hrushikant Patkar): three nullable columns, the reason''s length check and the
+    principal key and index.'
+  - '30274 [DB] whitelabel.site_package (Ready for QA, Hrushikant Patkar): failure_reason text, at most 500.'
+  unstarted:
+  - '37015 (resolveCalledWaitingGuest), 27779 (exportSitePackage''s job), 37054 (recordSubjectDataExportPart): write the
+    new fields.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: developer review root R40 (r13 root-cause lane v)'
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-R13-FIELDS-KEPT
+status: open
+notes: 'Left for the lead (each a design choice the text does not settle): the dynamic pricing rule builders'' schedule,
+  band and pace fields (#29713; CR-410''s jsonb definition column is the precedent); reassignServer''s assignment history
+  and splitGratuity (#28584: a new table or a plain edit); transferOrderItems'' paid, voided and comped line states (#28584).'

@@ -1,0 +1,44 @@
+id: CHG-R13R24-001
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: 'wallet.transfer_rule carries version (integer NOT NULL DEFAULT 1), 1 on create and bumped on every write; getWalletTransferRules
+  and setWalletTransferRules send it as ETag, and a stale If-Match is 412 with nothing changed: CR-332''s rule for the wallet''s
+  If-Match PUTs, which getWalletTransferRules already promised (''the version the PUT takes as If-Match'').'
+decision:
+  what: 'The lead, 2 November 2026, on the developer review''s root causes that r12 left unfixed: "lets see if we can do
+    something in parallel", then "yes" to fixing the mechanical ones at their source beside the r13 build lanes. Only what
+    needs no decision of the lead is done here; the rest is brought to the lead.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Developer review root R24 (findings 3.36201.2, 6.36207.3; tickets #36201, #36207 BO-1144): the GET promised an ETag
+  that is a version the row did not have. The wallet module has one rule for it, CR-332''s (CHG-CR332-001); the rest of
+  the root waits on question Q33.'
+keys_touched:
+  operations:
+  - getWalletTransferRules
+  - setWalletTransferRules
+  schemas:
+  - WalletTransferRules
+  tables:
+  - wallet.transfer_rule
+  files:
+  - contracts/satellite/wallet.yaml
+  - tools/check-business-rules.py
+root_class: a PUT that declares If-Match and 412 over a row that holds no version to compare
+tickets:
+  started:
+  - '30378 [DB] wallet.transfer_rules (On hold): the version column, from the release''s forward migration.'
+  unstarted:
+  - '36201 (setWalletTransferRules) and 36207 (BO-1144): bump, send and check the version.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: developer review root R24 (r13 root-cause lane v)'
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-R13-WALLET-TRANSFER-ETAG
+status: open
+notes: 'Database change: wallet.transfer_rule.version. **Left for the lead (Q33)**: updateCreditType and the four fnb PUTs
+  (course_rule, kitchen_sla, substitution_rule, table_combination) take If-Match with no version, and fnb also carries CR-294''s
+  representation hash; which rule applies there is the lead''s.'
