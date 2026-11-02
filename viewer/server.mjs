@@ -531,6 +531,44 @@ async function refreshIndex(pkg, reason = 'startup') {
   return pkg.indexing;
 }
 
+/** One release of `pkg` as `release-diff` compares it: the package itself for the tag being served, else a view of
+ *  that tag's export, built once and shared by every request that asks while it builds. */
+async function releaseView(pkg, tag) {
+  const release = pkg.release;
+  if (tag === release.tag && release.mode === 'tag') {
+    if (!pkg.index) await refreshIndex(pkg, 'on demand');
+    return pkg;
+  }
+  if (!pkg.views.has(tag)) {
+    pkg.views.set(tag, (async () => {
+      const root = await releaseRoot(release, pkg.sourceRoot, tag);
+      return root ? buildView(root, pkg.contracts) : null;
+    })().catch((error) => { pkg.views.delete(tag); throw error; }));
+    // One only: a view of the TICVAI package is a few hundred MB to hold, and pins cluster on the release before
+    // the one served, so the one kept is nearly always the one asked for.
+    while (pkg.views.size > 1) pkg.views.delete(pkg.views.keys().next().value);
+  }
+  return pkg.views.get(tag);
+}
+
+/**
+ * The release before the one served, built in the background once the package is up (2 November 2026). After a
+ * deploy every ticket's pin is on that release, so every first pull moves its pin and asks `release-diff` for it;
+ * the view was built by whichever pull asked first, 17 s on live ADAM (0.7 s once built), with the other pulls of
+ * that minute waiting on it. A failure here is logged and changes nothing: the first diff builds it as before.
+ */
+function warmPreviousRelease(pkg) {
+  const release = pkg.release;
+  const served = Number(/^r(\d+)$/.exec(String(release?.tag ?? ''))?.[1]);
+  if (release?.mode !== 'tag' || !served) return;
+  const previous = `r${served - 1}`;
+  if (!release.releases.some((r) => r.tag === previous)) return;
+  const started = Date.now();
+  releaseView(pkg, previous)
+    .then((view) => console.log(`[${pkg.id}] release-diff view of ${previous} ${view ? 'ready' : 'not available'} in ${Date.now() - started} ms`))
+    .catch((error) => console.warn(`[${pkg.id}] release-diff view of ${previous} not built: ${error.message}`));
+}
+
 /** Every registered package, built at once. A slow one does not hold up the rest. */
 const refreshAll = (reason) =>
   Promise.all([...packages.values()].map((pkg) => refreshIndex(pkg, reason)));
@@ -1276,24 +1314,7 @@ const server = http.createServer(async (req, res) => {
         const at = t.indexOf(':');
         return at > 0 ? { kind: t.slice(0, at).toLowerCase(), id: t.slice(at + 1) } : null;
       }).filter((t) => t && t.id);
-      const viewOf = async (tag) => {
-        if (tag === release.tag && release.mode === 'tag') {
-          if (!pkg.index) await refreshIndex(pkg, 'on demand');
-          return pkg;
-        }
-        if (!pkg.views.has(tag)) {
-          pkg.views.set(tag, (async () => {
-            const root = await releaseRoot(release, pkg.sourceRoot, tag);
-            return root ? buildView(root, pkg.contracts) : null;
-          })().catch((error) => { pkg.views.delete(tag); throw error; }));
-          // One only: a view of the TICVAI package is ~2.5 s to build and a few
-          // hundred MB to hold, and pins cluster on the release before the one
-          // served, so the one kept is nearly always the one asked for.
-          while (pkg.views.size > 1) pkg.views.delete(pkg.views.keys().next().value);
-        }
-        return pkg.views.get(tag);
-      };
-      const [older, newer] = await Promise.all([viewOf(from), viewOf(to)]);
+      const [older, newer] = await Promise.all([releaseView(pkg, from), releaseView(pkg, to)]);
       const gone = [[from, older], [to, newer]].filter(([, v]) => !v).map(([t]) => t);
       if (gone.length) {
         return bad(409, `${gone.join(' and ')} ${gone.length > 1 ? 'are' : 'is'} not available here: `
@@ -1916,6 +1937,7 @@ if (!packages.size) {
 }
 
 await refreshAll();
+for (const pkg of packages.values()) warmPreviousRelease(pkg);
 
 // every layer resolves against the contracts, so every layer is watched
 const WATCH_DIRS = [

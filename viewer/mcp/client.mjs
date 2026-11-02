@@ -83,6 +83,7 @@ export class ViewerClient {
   #signingIn = null;
   #defaultProject = null;
   #cache = new Map(); // key -> { etag, stamp, body }
+  #reading = new Map(); // key -> the read of it under way, shared by every caller (see #cached)
 
   constructor({ base, project, email, password } = {}) {
     this.base = (base ?? 'http://127.0.0.1:4173').replace(/\/+$/, '');
@@ -226,7 +227,21 @@ export class ViewerClient {
    * per read. Both are kept because a developer's MCP is pointed at whichever
    * viewer happens to be deployed, and that is not always this one.
    */
-  async #cached(key, build) {
+  #cached(key, build) {
+    // **One read per key at a time** (2 November 2026). A pull looks its artefacts up eight at a time, and every
+    // lookup of a screen or a table reads its layer: with nothing held yet, each of them downloaded the layer for
+    // itself. Pulling #27764 (89 links) fetched the 21.7 MB journeys layer five times and the 8.7 MB backend layer
+    // five times at once, about 150 MB for one ticket, and then revalidated journeys 70 times; that pull took 44 to
+    // 172 seconds. A read already on its way is shared by everyone who asks while it is; once it lands the next ask
+    // revalidates as before, so nothing is served without the server having been asked.
+    const busy = this.#reading.get(key);
+    if (busy) return busy;
+    const read = this.#read(key, build).finally(() => this.#reading.delete(key));
+    this.#reading.set(key, read);
+    return read;
+  }
+
+  async #read(key, build) {
     await this.#resolveProject();
     const held = this.#cache.get(key);
 

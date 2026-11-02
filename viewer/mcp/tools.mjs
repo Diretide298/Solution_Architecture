@@ -897,6 +897,9 @@ function createTable(model, stmt, file, notModelled) {
 
 function alterTable(model, stmt, file, notModelled) {
   const head = /^ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?(?:ONLY\s+)?([\w".]+)\s*/i.exec(stmt);
+  // A table named at run time (format('ALTER TABLE %I.%I ...') inside a guarded DO block) has no name
+  // to model: say so, as createTable does, rather than throw and lose every schema file after it.
+  if (!head) { notModelled.push({ file, statement: stmt.slice(0, 200) }); return; }
   const name = ident(head[1]);
   const schema = name.split('.')[0];
   const table = model.get(name);
@@ -1648,6 +1651,36 @@ async function packageText(client, file) {
   return answer.text;
 }
 
+/**
+ * Runs at most `size` of the tasks given to it at once, the rest in the order they were given; each call answers
+ * what its task answers. For reads that are independent of each other and would otherwise wait in turn.
+ */
+export function pool(size) {
+  let running = 0;
+  const waiting = [];
+  const next = () => {
+    if (running >= size || !waiting.length) return;
+    running += 1;
+    const { task, done, failed } = waiting.shift();
+    Promise.resolve().then(task).then(done, failed).finally(() => { running -= 1; next(); });
+  };
+  return (task) => new Promise((done, failed) => { waiting.push({ task, done, failed }); next(); });
+}
+
+/**
+ * The backend files `names` (`tenant/010-fnb.sql`, ...) as `{ name, text }`, in the order given, eight read at once.
+ * A [DB] baseline ticket reads about 90 of them; one after another that was 16 of #27646's 26 seconds (2 November
+ * 2026). Throws when one will not read, as the loop it replaces did.
+ */
+async function packageTexts(client, names) {
+  const gate = pool(8);
+  return Promise.all(names.map((f) => gate(async () => {
+    const text = await packageText(client, `backend/${f}`);
+    if (text === null) throw new Error(`backend/${f} would not read`);
+    return { name: f.split('/')[1], text };
+  })));
+}
+
 /** Forget the held package files (for the checks, which change what the stand-in serves). */
 export function forgetPackageFiles() {
   ddlCache.clear();
@@ -1675,12 +1708,7 @@ async function writeExpectedSchema(client, wp, touches, folder, release) {
       : [ticket.database ?? ticket.tables.map(dbOf).find(Boolean) ?? 'tenant'];
     // Roles belong to the server, not to one database (review 8): every check is held to the roles, memberships and
     // role settings the package files of every database make, the set --clean restores too. One source for both.
-    const everyFile = [];
-    for (const f of files.filter((x) => x.split('/')[1])) {
-      const text = await packageText(client, `backend/${f}`);
-      if (text === null) throw new Error(`backend/${f} would not read`);
-      everyFile.push({ name: f.split('/')[1], text });
-    }
+    const everyFile = await packageTexts(client, files.filter((x) => x.split('/')[1]));
     const server = serverAllowances(everyFile);
     const checks = [];
     for (const database of databases) {
@@ -1688,12 +1716,8 @@ async function writeExpectedSchema(client, wp, touches, folder, release) {
       // The baseline reads 000-002 and the helpers in 920, 930 and the V01nn files; the others read every file of their
       // database, since a table's statements are spread over its 010 file, 900-930 and the V01nn files.
       const wanted = ticket.kind === 'baseline' ? mine.filter((f) => /^((00[0-2]|9[23]0)-|V\d)/.test(f.split('/')[1])) : mine;
-      const texts = [];
-      for (const f of wanted) {
-        const text = await packageText(client, `backend/${f}`);
-        if (text === null) throw new Error(`backend/${f} would not read`);
-        texts.push({ name: f.split('/')[1], text });
-      }
+      // Read above already, so these come from what packageText holds.
+      const texts = await packageTexts(client, wanted);
       if (!texts.length) throw new Error(`no DDL for ${database} in this package`);
       const statements = ticketStatements(texts, ticket);
       const used = [...new Set(statements.map((s) => s.file))].map((f) => `backend/${database}/${f}`);
@@ -2041,7 +2065,7 @@ function stateView(state, view, frames, resolved) {
 }
 
 /** What the pull writes and says for one screen's look. Never throws: a failure is said in README.md. */
-async function screenLook(client, screen, folder, frames = null, written = new Map()) {
+async function screenLook(client, screen, folder, frames = null, written = new Map(), gate = (task) => task()) {
   const w = screen?.wireframe ?? {};
   const entry = frames?.screens?.[screen.id] ?? null;
   const look = {
@@ -2059,21 +2083,25 @@ async function screenLook(client, screen, folder, frames = null, written = new M
   };
   // One file per distinct frame, named by its anchor (`wireframe-web-029.html`, as the package's ticket text names
   // it); the same anchor on another board gets the board's name too, so neither overwrites the other.
-  const save = async (ref) => {
+  // The file is named when the frame is first asked for, before any wait, and the read is held as it runs: a frame
+  // two screens share is read once, and its name does not depend on which read finishes first.
+  const save = (ref) => {
     const key = `${ref.board.toLowerCase()}#${ref.anchor}`;
     if (!written.has(key)) {
       const taken = [...written.values()].some((x) => x.file === `wireframe-${safeName(ref.anchor)}.html`);
       const file = taken ? `wireframe-${safeName(ref.anchor)}-${safeName(ref.board.replace(/\.dc\.html?$|\.html?$/i, ''))}.html`
         : `wireframe-${safeName(ref.anchor)}.html`;
-      written.set(key, await saveFrame(client, ref, path.join(folder, file))
-        .then((saved) => ({ ...ref, file, ...saved }), (error) => ({ ...ref, error: error.message })));
+      written.set(key, { file, saved: gate(() => saveFrame(client, ref, path.join(folder, file)))
+        .then((saved) => ({ ...ref, file, ...saved }), (error) => ({ ...ref, error: error.message })) });
     }
-    return written.get(key);
+    return written.get(key).saved;
   };
   const ref = boardRef(w.board);
-  if (ref) look.frames.push(await save(ref));
-  for (const view of look.stateViews) {
-    if (view.frame) view.saved = await save(view.frame);
+  const own = ref ? save(ref) : null;
+  const views = look.stateViews.map((view) => (view.frame ? save(view.frame) : null));
+  if (own) look.frames.push(await own);
+  for (const [at, view] of look.stateViews.entries()) {
+    if (views[at]) view.saved = await views[at];
   }
   return look;
 }
@@ -2308,10 +2336,12 @@ async function pullOne(client, key, base, when) {
   if (!answer.ok) return { key, error: answer.data?.detail ?? `HTTP ${answer.status}` };
   // `subtasks` and `partOf` from an ADAM with CHG-ADM-006; an older one sends neither and the README has neither.
   const { workPackage: wp, touches = [], blockedBy = [], subtasks, partOf = null } = answer.data;
-  const release = await releaseFor(client, wp.key, touches)
-    .catch((error) => ({ available: false, why: error.message }));
-  const changes = await changesFor(client, wp.key).catch(() => null);
-  const text = await releaseTextFor(client, wp).catch(() => null);
+  // Three independent reads, asked side by side (each was waited for in turn).
+  const [release, changes, text] = await Promise.all([
+    releaseFor(client, wp.key, touches).catch((error) => ({ available: false, why: error.message })),
+    changesFor(client, wp.key).catch(() => null),
+    releaseTextFor(client, wp).catch(() => null),
+  ]);
 
   const folder = path.join(base, 'work', safeName(wp.key));
   await mkdir(folder, { recursive: true });
@@ -2376,7 +2406,11 @@ async function pullOne(client, key, base, when) {
   const looks = [];
   const frames = screens.length ? await designFrames(client) : null;
   const written = new Map();
-  for (const screen of screens) looks.push(await screenLook(client, screen, folder, frames, written));
+  // Six frames at a time (2 November 2026). One after another, #27764's 75 frames were 42 of its seconds. Each
+  // screenLook names its files before its first wait, in screen order, so the names are the ones a pull one by one
+  // gave; only the reads overlap.
+  const gate = pool(6);
+  looks.push(...await Promise.all(screens.map((screen) => screenLook(client, screen, folder, frames, written, gate))));
 
   if (release.previous && release.diff) {
     await writeFile(path.join(folder, 'spec-diff.md'), specDiff(wp, release, when));
