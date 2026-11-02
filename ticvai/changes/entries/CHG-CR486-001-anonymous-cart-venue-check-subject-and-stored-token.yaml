@@ -1,0 +1,45 @@
+id: CHG-CR486-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: createCart checks the venue for every caller with tenancy#activeVenues in process (404 when absent), refuses a subjectId
+  the caller may not name (403), stores a staff caller's known subject, writes an anonymous cart's one insert under ITenantRootGrant,
+  and mints Cart.token only for an anonymous cart, stored field-encrypted.
+decision:
+  what: 'Posted on the ticket (Chinmay, 3 November 2026), under the leads instruction ("Close the CRs and respond to devs",
+    and "get the NEw CRs in the r13", 3 November 2026): "#30682''s anonymous path stands in shape, with three corrections:
+    the venue check, the anonymous subjectId answer, and how the cart token is stored ... the single insert of the orders.cart
+    row runs under the routed tenant''s root grant (ITenantRootGrant) ... Ask tenancy#activeVenues in process with [body.venueId]
+    ... Stored field-encrypted with the tenant''s key ... never plain at rest and never hashed"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-486 (Pranay Shinde, #30682): the anonymous path had no grant to write the cart, an undeclared venue read (scopeRecords
+  answers inactive venues too), no rule for body.subjectId and no stored form for the token.'
+keys_touched:
+  operations:
+  - createCart
+  schemas:
+  - Cart
+  tables:
+  - orders.cart
+  files:
+  - contracts/spine/orders.yaml
+  - tools/check-business-rules.py
+root_class: a guest write with no grant that admits it, and a readable bearer token with no stored form
+tickets:
+  started: []
+  unstarted:
+  - '30682 (createCart, Pranay Shinde): the grant, the venue check, the subjectId rules, the token and the tests the decision
+    names.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-486
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CART-ANONYMOUS
+status: open
+notes: 'Beyond the posted words: the 403 and 404 are the shared Forbidden and NotFound responses. BR-GUEST-SELF-403 counts
+  createCart among guest self-scoped operations declaring 403 (the posted decision names 403 for a subject the caller may
+  not name; it is not another subject''s record). check-contract-storage ST-SECRET-FORM judges write-only secrets only, so
+  a readable token''s stored form has no class check beyond BR-CART-ANONYMOUS.'

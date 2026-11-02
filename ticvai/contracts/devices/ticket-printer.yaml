@@ -36,6 +36,36 @@ info:
     - The host keeps no secret.
 
 
+    **Where the host keeps its Idempotency-Keys** (ADAM CR-527, Chinmay, 3 November 2026: "the device host keeps its
+    Idempotency-Keys in files on its own disk, so they survive a restart for 24 hours. No database, no new package";
+    CHG-CR527-001). The host still registers no database, and its architecture test stays as it is.
+
+    - **A file store** behind the same interface as `InMemoryIdempotencyStore`, registered in its place in the device
+    host; the in-memory store is kept for unit tests only. Folder: `%ProgramData%\TICVAI\DeviceHost\idempotency` by
+    default, configurable, created at start and readable and writable only by the host's service account.
+
+    - **One file per operation and key**, named `<operation>.<key>.json`; a key that is not a UUIDv7 is refused (400
+    validation) before it becomes a filename. Each file holds the key, the operation, a SHA-256 hash of the request
+    body, a state (`claimed` or `completed`), the answer's status and body once there is one, the time it was created,
+    and `expiresAt` = created + 24 hours (`IdempotentAnswers.Window`).
+
+    - **The key is saved before printing**: the file is created with state `claimed` (create-new, so a second request
+    with the same key cannot claim it too) and flushed to disk before any FGL bytes go to the printer. When the print
+    is confirmed or fails, the answer is written to a temp file in the same folder, flushed, and renamed over the
+    claim. If the key cannot be saved (disk full, access denied), nothing is printed: the request fails with the error
+    the host already returns when it cannot print, and it is logged.
+
+    - **Replay, as the shared rule says**: the same key, operation and request hash with a completed answer returns
+    that stored status and body and prints nothing; the same key with a different request hash is `409
+    idempotency-conflict`; a key still claimed by a running request waits for its answer.
+
+    - **After a restart**, a claimed file with no answer, or one that cannot be read, is answered as print not
+    confirmed (the `504 print-not-confirmed` the host gives today) and is never sent to the printer again; the guest's
+    next step is the existing reprint path (`reprintOrder`, POS-026; KSK-010 on the kiosk), with no screen change.
+
+    - **Sweep** on start and every hour: the files past `expiresAt` are deleted; a file that has not expired never is.
+
+
     **Errors** are application/problem+json in the shared `Problem` shape (common.yaml): paper out, jam, offline,
     busy and fault are 503; `printer-rejected-ticket` is 502; `print-not-confirmed` is 504; `stock-not-configured`
     and the two RFID codes are 409; validation is 400. A 502, 503 or 504 takes the kiosk guest to KSK-010, which stays
@@ -73,12 +103,15 @@ paths:
       description: >
         The body is a filled `TicketLayout` (orders.yaml; each `field` content replaced by its value for the ticket),
         which the BOCA driver translates into its print job. A POST retried with the same Idempotency-Key answers
-        the first job's outcome and never prints again; keys are kept locally for at least 24 hours.
+        the first job's outcome and never prints again; keys are kept locally for at least 24 hours, in files on the
+        host's own disk that survive a restart, each saved before the printer is sent anything (ADAM CR-527; the
+        file store above).
       tags: [ticketPrinter]
       parameters:
         - name: Idempotency-Key
           in: header
           required: true
+          description: A UUIDv7, refused 400 otherwise before it becomes the key's filename (ADAM CR-527).
           schema: { type: string }
       requestBody:
         required: true
@@ -105,8 +138,9 @@ paths:
         '409':
           description: >
             The printer has no stock configured for the layout's stock (`stock-not-configured`), or one of the two
-            RFID refusals as built (their codes as the host's file names them).
-          x-ticvai-problem-types: [stock-not-configured]
+            RFID refusals as built (their codes as the host's file names them), or the Idempotency-Key was used for a
+            request with a different body (`idempotency-conflict`; ADAM CR-527).
+          x-ticvai-problem-types: [stock-not-configured, idempotency-conflict]
           content:
             application/problem+json:
               schema:
@@ -123,7 +157,9 @@ paths:
         '504':
           description: >
             The job was sent and the printer did not confirm it (`print-not-confirmed`). A retry with the same
-            Idempotency-Key answers this outcome again and never prints twice.
+            Idempotency-Key answers this outcome again and never prints twice. After a restart, a key claimed with no
+            answer, or whose file cannot be read, is answered this way and never sent to the printer again (ADAM
+            CR-527).
           x-ticvai-problem-types: [print-not-confirmed]
           content:
             application/problem+json:

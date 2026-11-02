@@ -21,17 +21,24 @@ payload:
   notes: What the device reported (enclosure opened, cable cut, and so on)
 - field: detectedAt
   type: timestamp
+  required: false
+  notes: Null when the device did not say when it detected the interference; recordedAt is when it reported
 consumers:
 - context: public-api
-  purpose: Deliver to webhook subscriptions taking device.tamperDetected (16.9.56)
+  purpose: Deliver to webhook subscriptions taking device.tamperDetected (16.9.56). A null detectedAt is 'not reported'
+    and is passed through unchanged; it never makes the event invalid (no retry, no dead letter on that account; ADAM
+    CR-492)
   idempotencyKey: tamperEventId
   onFailure: retryThenDeadLetter
   isCritical: false
 - context: reporting
-  purpose: Raise the tamper alert to the venue's security roles
+  purpose: Raise the tamper alert to the venue's security roles. A null detectedAt is 'not reported' and is passed
+    through unchanged; it never makes the event invalid (no retry, no dead letter on that account; ADAM CR-492)
   idempotencyKey: tamperEventId
   onFailure: retryThenDeadLetter
   isCritical: true
 retention: 1 year after publication
 notes: '**Added 29 September (build pass, group RD).** No state model emits this: a tamper report is a record,
-  not a status, so the emit sits on `recordDeviceTamperEvent`.'
+  not a status, so the emit sits on `recordDeviceTamperEvent`. **detectedAt may be null** (ADAM CR-492, Chinmay, 3
+  November 2026; CHG-CR492-001): the event carries it exactly as the device sent it, null when the body left it out,
+  never filled from recordedAt, the row''s creation time or the server clock.'

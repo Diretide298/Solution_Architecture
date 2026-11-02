@@ -1,0 +1,42 @@
+id: CHG-CR492-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'device.tamperDetected''s detectedAt is required: false with the note the decision gives; recordDeviceTamperEvent
+  stores and publishes it exactly as sent, never filled; the two consumers pass a null through.'
+decision:
+  what: 'Posted on the ticket (Chinmay, 3 November 2026), under the leads instruction ("Close the CRs and respond to devs",
+    and "get the NEw CRs in the r13", 3 November 2026): "detectedAt on device.tamperDetected may be null, as the request body
+    already allows ... store detectedAt exactly as the device sent it and publish device.tamperDetected with the same value,
+    null when the body left it out. Never fill it from recordedAt, from the row''s creation time or from the server clock
+    ... Consumers ... never treat the event as invalid because of it"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-492 (Pranay Shinde, #30830): the event listed detectedAt as required (events/_schema.yaml makes payload fields
+  required by default) while the request body and the column allow it to be absent.'
+keys_touched:
+  operations:
+  - recordDeviceTamperEvent
+  other:
+  - device.tamperDetected
+  tables:
+  - tenancy.device_tamper_event
+  files:
+  - events/device-tamperDetected.yaml
+  - contracts/spine/tenancy.yaml
+  - tools/check-business-rules.py
+root_class: an event publishes a field the source may leave out as if it were always there
+tickets:
+  started: []
+  unstarted:
+  - '30830 (recordDeviceTamperEvent, Pranay Shinde): store and publish as sent; the two tests.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-492
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-TAMPER-DETECTED-AT
+status: open
+notes: 'The class has no package-wide check: BR-TAMPER-DETECTED-AT holds this event against its operation''s body; a check
+  over every event field against its emitter''s optional body fields is the class check, not built here.'

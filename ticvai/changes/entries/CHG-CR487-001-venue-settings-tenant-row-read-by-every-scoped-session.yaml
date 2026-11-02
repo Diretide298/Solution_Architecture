@@ -1,0 +1,50 @@
+id: CHG-CR487-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: platform.venue_settings' read gains (venue_id IS NULL AND cardinality(platform.current_scope_paths()) > 0), so venue
+  staff and an anonymous guest session read the tenant's default row their fall-back names; writes stay platform.venue_in_scope(venue_id).
+  A new derive-ddl mark, x-ticvai-tenant-row-read.
+decision:
+  what: 'Posted on the ticket (Chinmay, 3 November 2026), under the leads instruction ("Close the CRs and respond to devs",
+    and "get the NEw CRs in the r13", 3 November 2026): "option A. Every reader of the venue settings that falls back to the
+    tenant''s default must be able to see the tenant''s own default row ... apply a split policy whose read is platform.venue_in_scope(venue_id)
+    OR (venue_id IS NULL AND cardinality(platform.current_scope_paths()) > 0) OR NULLIF(current_setting(''ticvai.subject_id'',
+    true), '''') IS NOT NULL, and whose write stays platform.venue_in_scope(venue_id) ... No screen, endpoint, permission
+    or response changes"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-487 (Pranay Shinde, #30682): createCart''s ''else the tenant default'' read nothing for venue staff or an anonymous
+  cart, because platform.venue_settings showed the tenant''s own row only to a tenant-root grant or a signed-in guest; they
+  fell through to 900 seconds and 1 extension.'
+keys_touched:
+  operations:
+  - createCart
+  - extendCart
+  schemas:
+  - VenueSettings
+  tables:
+  - platform.venue_settings
+  files:
+  - contracts/spine/tenancy.yaml
+  - tools/derive-ddl.py
+  - tools/check-business-rules.py
+root_class: a venue-level read that falls back to the tenant's default row it cannot see
+tickets:
+  started: []
+  unstarted:
+  - '30682 (createCart) and extendCart''s ticket: no new logic; the integration test the decision names.'
+  - 'New migration task for the migration owner under the platform migration: the guarded policy block in the next tenant
+    forward migration, its down step to V0120''s policy, the same policy in db/, and the database tests the decision names.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-487
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::TENANT_ROW_READ
+status: open
+notes: 'Database change: platform.venue_settings'' policy (tenant). Generator rule TENANT_ROW_READ (x-ticvai-tenant-row-read)
+  in tools/derive-ddl.py, held by tools/check-business-rules.py::BR-TENANT-ROW-READ. CR-445''s text (setFaceTagTemporaryEnrollment
+  reads the tenant row under the root grant ''since a venue grant cannot see the tenant''s row'') is left as decided; that
+  statement now still works but is no longer needed.'

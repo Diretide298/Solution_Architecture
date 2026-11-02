@@ -1,0 +1,47 @@
+id: CHG-CR519-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: redeemWaitingGuest and overrideWaitingGuest read queue.queue and tenancy#scopeRecords (in process) only when the
+  entry carries an entitlement, write queueEntry.redeemed with the queue's venue, access point and the venue's ScopePath,
+  record party_size when admittedCount is omitted and refuse a count above it 400.
+decision:
+  what: 'Posted on the ticket (Chinmay, 3 November 2026), under the leads instruction ("Close the CRs and respond to devs",
+    and "get the NEw CRs in the r13", 3 November 2026): "option A, for both overrideWaitingGuest (#33058) and redeemWaitingGuest
+    (#33059) ... Each operation reads ... queue.queue, by the entry''s queue_id, for venue_id and access_point_id; and Tenancy''s
+    scope records (tenancy#scopeRecords, in process) ... Omitted: record the entry''s party_size in admitted_count ... Above
+    party_size is 400 validation"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-519 (Surendra Loke, #33058): the two operations wrote queueEntry.redeemed with the queue''s venue, access point
+  and scope but declared reads of queue.entry only, and admittedCount had no default or upper bound.'
+keys_touched:
+  operations:
+  - redeemWaitingGuest
+  - overrideWaitingGuest
+  other:
+  - queueEntry.redeemed
+  tables:
+  - queue.entry
+  - queue.queue
+  - platform.scope
+  files:
+  - contracts/satellite/queue.yaml
+  - events/queueEntry-redeemed.yaml
+  - tools/check-business-rules.py
+root_class: an event's fields read from tables its emitter does not declare
+tickets:
+  started: []
+  unstarted:
+  - '33058 (overrideWaitingGuest) and 33059 (redeemWaitingGuest), Surendra Loke: the reads, the event, the count rule and
+    the tests the decision names.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-519
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-QUEUE-EVENT-READS
+status: open
+notes: 'queueEntry.redeemed''s admittedCount is now always present (the value recorded on the entry), so its required: false
+  is dropped.'

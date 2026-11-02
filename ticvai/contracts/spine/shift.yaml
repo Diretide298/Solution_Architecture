@@ -1583,6 +1583,26 @@ paths:
         `reopenShift` and `rejectShiftVariance`: `supervisorStepUp` carries the principal and PIN of the supervisor closing the shift, entered on the
         device making this call, verified as `common.yaml` `SupervisorStepUp` says. Optional in the schema so a
         client built at r1 still validates, **refused without it** (`403 supervisor-step-up-refused`).
+
+        **The expected cash** (ADAM CR-518, Chinmay, 3 November 2026: "the expected cash is the package's own
+        formula, in the venue's currency, and is the same figure for closeShift and submitShiftCount";
+        CHG-CR518-001): `submitShiftCount` states it once, and both write `orders.pos_shift.expected_cash_amount`.
+
+        **Open orders** (ADAM CR-518): before the count is written, the close is refused `409 open-orders-remain`
+        when an order whose `shift_id` is this shift is `pending`, `held` or `partiallyPaid`. `paid`, `completed`,
+        `voided`, `refunded`, `partiallyRefunded` and `failed` do not block.
+
+        **`releaseHeldLeases` changes nothing** (ADAM CR-517, Chinmay, 3 November 2026: "a till holds no standing
+        lease, so the close has nothing to give back and no path to Catalogue is added"; CHG-CR517-001). Since 20
+        October a till takes one inventory hold per sale while it is online, the hold is converted when the order
+        is paid, and the close already refuses while an unfinished order remains. The field is accepted as a
+        boolean (default true) and a value that is not a boolean is `400 validation`; nothing else is done with
+        it: no read or write of Catalogue's hold table, no Catalogue call, no new field on `shift.closed`, no new
+        event, and `orders.pos_shift.held_lease_count` stays null. A close with true, with false and with the field
+        missing behave the same. A stray hold left by an abandoned sale goes back when it expires, or the till
+        returns it with `relinquishInventoryHold`, or a supervisor reclaims it on BO-018 with
+        `forceReleaseInventoryHold`. If standing leases are brought in later, returning a till's leases at close
+        is Catalogue's job, triggered by the close's event, with its own ticket.
       tags: [shift]
       x-ticvai-permission: SHIFT_CLOSE
       x-ticvai-permission-escalated: SHIFT_CLOSE_OTHER   # where the shift belongs to somebody else
@@ -1594,12 +1614,23 @@ paths:
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
-      - query: finance#fxRateRecords
-        route: in-process
-        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'its read of platform.venue_settings, Tenancy''s data (CHG-MOD-001)'
+      x-ticvai-reads:
+      - table: orders.pos_shift
+        for: 'the shift, its opening float (A) and the expected cash it stores (expected_cash_amount; ADAM CR-518)'
+      - table: orders.payment
+        for: 'cash taken (B) and change given (C) on the shift''s orders (ADAM CR-518)'
+      - table: orders.cash_movement
+        for: 'the shift''s adds (D) and lifts (E) (ADAM CR-518)'
+      - table: orders.refund
+        for: 'cash refunds paid out by this shift (F), completed and settled to the original tender (ADAM CR-518)'
+      - table: orders.refund_payment
+        for: 'which refund paid back which cash payment (F; ADAM CR-518)'
+      - table: orders.sales_order
+        for: 'the shift''s orders (shift_id), and whether any is pending, held or partiallyPaid (409 open-orders-remain;
+          ADAM CR-518)'
       x-ticvai-step-up-reason: A supervisor closes a cashier's shift and sees the expected cash and the variance (CHG-FIN-003); their own PIN on the device in use proves who did it (pre-apply round, 2 October; CHG-CSP-012).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue   # was workstation; the supervisor closes from any till or the back office (CHG-CSP-012)
@@ -1649,7 +1680,8 @@ paths:
           x-ticvai-problem-types: [shift-not-open, open-orders-remain]
           description: >
             Shift is not `open` or `suspended` — already closing or closed (problem type
-            `shift-not-open`) — or open orders remain (`open-orders-remain`)
+            `shift-not-open`) — or open orders remain (`open-orders-remain`): an order whose `shift_id` is this
+            shift is `pending`, `held` or `partiallyPaid` (ADAM CR-518)
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1956,15 +1988,25 @@ paths:
         - "P04 POS-007 Close Shift"
         - "P06 EMP-009 End shift"
       x-ticvai-read-via:
-      - query: finance#fxRateRecords
-        route: in-process
-        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'its read of platform.venue_settings, Tenancy''s data (CHG-MOD-001)'
       - query: tenancy#denominationRecords
         route: in-process
         for: 'what its text calls "platform.denomination": platform.denomination, Tenancy''s data (CHG-R10GEN-001)'
+      x-ticvai-reads:
+      - table: orders.pos_shift
+        for: 'the shift, its opening float (A) and the expected cash it stores (expected_cash_amount; ADAM CR-518)'
+      - table: orders.payment
+        for: 'cash taken (B) and change given (C) on the shift''s orders (ADAM CR-518)'
+      - table: orders.cash_movement
+        for: 'the shift''s adds (D) and lifts (E) (ADAM CR-518)'
+      - table: orders.refund
+        for: 'cash refunds paid out by this shift (F), completed and settled to the original tender (ADAM CR-518)'
+      - table: orders.refund_payment
+        for: 'which refund paid back which cash payment (F; ADAM CR-518)'
+      - table: orders.sales_order
+        for: 'the shift''s orders (shift_id), whose cash payments count (B, C; ADAM CR-518)'
       x-ticvai-audience: [staff]
       summary: The cashier's blind count, closing their own shift
       description: >
@@ -2013,6 +2055,33 @@ paths:
         matches exactly closes with no reason; one beyond the threshold goes to the supervisor as before.
 
         Online only, as `closeShift`: the expected figure is the server's.
+
+        **The expected cash, one formula** (ADAM CR-518, Chinmay, 3 November 2026: "the expected cash is the
+        package's own formula, in the venue's currency, and is the same figure for closeShift and submitShiftCount
+        (both write orders.pos_shift.expected_cash_amount)"; CHG-CR518-001): expected cash = A + B - C + D - E - F,
+        rounded to the venue's currency scale. **A**, the opening float: `pos_shift.opening_float` (the
+        `openingFloat` cash movement is not added as well). **B**, cash taken: cash payments (`tender` cash,
+        `status` captured or refunded) on orders whose `shift_id` is this shift, with `tender_currency` empty or
+        equal to the venue's currency; the same sum, and the same code, as the deposit box's expected cash
+        (`listDepositBoxes`). **C**, change given: `change_amount` on every cash payment of the shift,
+        foreign-currency ones included, since change is only given in the venue's currency. **D**, adds:
+        `orders.cash_movement` kind `add` on the shift. **E**, lifts: `orders.cash_movement` kind `lift` on the
+        shift; a deposit-box withdrawal is already one lift row, so `withdrawn_amount` is not subtracted as well.
+        **F**, cash refunds paid out by this shift: `orders.refund_payment` rows against a cash payment, their
+        `orders.refund` completed and settled to the original tender, that record this shift as the one that paid
+        out; foreign cash refunds are paid in the venue's currency. The refund rows gain that shift on a separate
+        ticket; until it lands F is zero, and an unrecorded refund shows as short, which the cashier's reason
+        `unrecordedRefund` covers.
+
+        **Foreign cash** (ADAM CR-518): count lines whose denomination is not in the venue's currency are stored as
+        counted, but kept out of `countedCash`, `expectedCash` and `variance`, and do not affect
+        `requiresAcceptance` or the shift's next state. The foreign figures are read where they already are (the
+        deposit box's foreign holdings and the foreign tender report, at the payments' own rates). Neither this
+        operation nor `closeShift` reads Ledger's FX rates (no `finance#fxRateRecords`). Response fields and screens are unchanged.
+
+        **`releaseHeldLeases` changes nothing here either** (ADAM CR-517; CHG-CR517-001): accepted as a boolean
+        (default true), a value that is not a boolean is `400 validation`, and nothing else is done with it, as
+        `closeShift` says.
       tags: [shift]
       x-ticvai-permission: SHIFT_CLOSE
       x-ticvai-scope-level: workstation
@@ -2034,6 +2103,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ShiftCountReceipt' }
+        '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403':
           description: >
             The shift is not the caller's own (problem type `not-shift-operator`): a supervisor closing
@@ -2934,9 +3004,12 @@ components:
           type: boolean
           default: true
           description: >
-            Return unsold inventory leases held by this workstation (ADR-0013 C103). Closing
-            without releasing strands capacity until TTL expiry, which is visible at a gate
-            during peak.
+            **Accepted and does nothing** (ADAM CR-517, Chinmay, 3 November 2026; CHG-CR517-001): a till holds
+            no standing lease (one inventory hold per sale, converted when the order is paid), so the close has
+            nothing to give back and no path to Catalogue is added. A value that is not a boolean is `400
+            validation`. True, false and missing behave the same. If standing leases come later (ADR-0013 C103),
+            returning a till's leases at close is Catalogue's job, triggered by the close's event, with its own
+            ticket.
         recordedAt: { type: string, format: date-time }
 
     ShiftCloseResult:
@@ -3178,7 +3251,8 @@ components:
           type: integer
           description: >
             Inventory leases currently held by this workstation. Surfaced so an operator
-            closing a shift can see what will be returned.
+            closing a shift can see what will be returned. **Left null** (ADAM CR-517; CHG-CR517-001): a till
+            holds no standing lease, so nothing sets it.
         openedAt: { type: string, format: date-time }
         businessDate:
           type: string

@@ -3204,7 +3204,10 @@ paths:
 
         **The venue''s step** (ADAM CR-253 option C): with no `stepMinutes` sent, the starts fall on the venue''s
         own `VenueSettings.stepMinutes` (its tenant default where the venue sets none), read in process
-        (`tenancy#venueSettingsRecords`, XDR-004).
+        (`tenancy#venueSettingsRecords`, XDR-004). **An omitted `stepMinutes` is absent** (ADAM CR-484, Chinmay, 3
+        November 2026; CHG-CR484-001): the step is the venue''s `stepMinutes`, else the tenant''s saved
+        `stepMinutes`, else 30, the same value `getVenueSettingsDefaults` answers; the parameter carries no default
+        of its own to fill the value before the venue is asked. A sent 15, 30 or 60 wins.
 
         **Date, start and duration are checked together** (decided 29 September, W9 and W10). A start is
         offered only when a room is free for the whole of `startsAt` to `startsAt + durationMinutes`, plus
@@ -3252,15 +3255,16 @@ paths:
           format: date
       - name: stepMinutes
         in: query
-        description: Spacing of the offered start times. Omitted, the venue's `VenueSettings.stepMinutes` (ADAM
-          CR-253), itself proposed 30, client to correct (rev 3 REV3-13).
+        description: 'Spacing of the offered start times. A sent 15, 30 or 60 wins. Omitted, it is read as absent
+          (no default fills it before the venue is asked): the venue''s `VenueSettings.stepMinutes`, else the
+          tenant''s saved `stepMinutes`, else 30, the value `getVenueSettingsDefaults` answers (ADAM CR-253, CR-484),
+          itself proposed, client to correct (rev 3 REV3-13).'
         schema:
           type: integer
           enum:
           - 15
           - 30
           - 60
-          default: 30
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       - $ref: ../shared/common.yaml#/components/parameters/GuestVenue

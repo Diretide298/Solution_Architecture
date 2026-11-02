@@ -1,0 +1,41 @@
+id: CHG-CR517-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'closeShift and submitShiftCount accept releaseHeldLeases (boolean, default true; anything else 400) and do nothing
+  with it: no Catalogue path, no new field or event, held_lease_count stays null.'
+decision:
+  what: 'Posted on the ticket (Chinmay, 3 November 2026), under the leads instruction ("Close the CRs and respond to devs",
+    and "get the NEw CRs in the r13", 3 November 2026): "a till holds no standing lease, so the close has nothing to give
+    back and no path to Catalogue is added ... accept releaseHeldLeases (boolean, default true). Refuse a value that is not
+    a boolean with 400 validation. Do nothing else with it"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-517 (Pranay Shinde, #30806): releaseHeldLeases (default true) had no declared path to Catalogue''s inventory
+  holds; since r8 there is no standing lease to give back (catalogue.yaml, ''No standing lease in Block A'').'
+keys_touched:
+  operations:
+  - closeShift
+  - submitShiftCount
+  schemas:
+  - CloseShiftRequest
+  - Shift
+  tables:
+  - orders.pos_shift
+  files:
+  - contracts/spine/shift.yaml
+  - tools/check-business-rules.py
+root_class: a request field whose stated effect has no path in the package
+tickets:
+  started: []
+  unstarted:
+  - '30806 (closeShift, Pranay Shinde): accept and ignore the field; the tests the decision names.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-517
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-HELD-LEASES-NOOP
+status: open
+notes: submitShiftCount declares the shared 400 (BadRequest) for the field, as closeShift already did.

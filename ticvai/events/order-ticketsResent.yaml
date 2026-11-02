@@ -1,0 +1,46 @@
+# order.ticketsResent v1 — published by orders
+# Checked by tools/check-states.py against states/ and the contracts.
+# ADAM CR-506 (Chinmay, 3 November 2026; CHG-CR506-001): reprintOrder sends remote deliveries through Access.
+
+name: order.ticketsResent
+version: 1
+publisher: orders
+description: A guest or a member of staff asked for an order's tickets to be sent again by email, SMS or WhatsApp;
+  Access delivers each credential.
+aggregate: order
+emittedWhen: reprintOrder with delivery email, sms or whatsapp, in the same transaction as its ticketsResent
+  order_event row
+emittedBy:
+- orders.reprintOrder
+payload:
+- field: orderId
+  type: uuid
+- field: entitlementIds
+  type: array
+  notes: The tickets resent (the named lines' entitlements, or every line's)
+- field: channel
+  type: string
+  notes: email, sms or whatsapp, as the request's delivery
+- field: destination
+  type: string
+  required: false
+  notes: Where to send; null means the recipient already on each credential (the order holds no plain contact)
+- field: scopePath
+  type: string
+- field: tenantId
+  type: uuid
+- field: at
+  type: timestamp
+consumers:
+- context: access
+  purpose: Deliver each credential as deliverCredential does, one pending access.credential_delivery row per
+    entitlement (sms is smsLink), so Orders sends nothing itself (ADAM CR-506)
+  writes:
+  - access.credential_delivery
+  idempotencyKey: eventId + entitlementId
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 30 days after publication
+notes: '**Why an event** (ADAM CR-506, Chinmay, 3 November 2026; CHG-CR506-001). Access already sends and records
+  credential deliveries (deliverCredential, access.credential_delivery), so a resend is handed to it rather than sent
+  by Orders or by a second messaging path. Wallet passes are not sent: reprintOrder answers them.'

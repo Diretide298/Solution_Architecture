@@ -945,6 +945,8 @@ NO_GUEST = "NULLIF(current_setting('ticvai.subject_id', true), '') IS NULL"
 # currency, time zone and region rules (platform.venue_settings, by venue_in_scope; platform.region_settings,
 # read-beneath). Defined for a table under its base rule (scope_path or venue_id) or marked read-beneath.
 GUEST_SET = "NULLIF(current_setting('ticvai.subject_id', true), '') IS NOT NULL"
+# The tenant's own row (venue_id null) for any session with a scope set (ADAM CR-487; `x-ticvai-tenant-row-read`).
+TENANT_ROW_READ = "(venue_id IS NULL AND cardinality(platform.current_scope_paths()) > 0)"
 
 # The check apply_split_rls gets for `any-grant-no-delete`: a scope path set, the WITH CHECK the append-only trail's
 # INSERT has (CHG-R6-002).
@@ -1020,6 +1022,24 @@ BEGIN
     EXECUTE format('CREATE POLICY %I ON %s FOR UPDATE USING (%s) WITH CHECK (%s)',
                    base || '_update', target, write_check, write_check);
     EXECUTE format('CREATE POLICY %I ON %s FOR DELETE USING (%s)', base || '_delete', target, write_check);
+END
+$$;
+
+-- **A split policy whose INSERT also admits one narrow kind of row** (ADAM CR-506, Chinmay, 3 November 2026;
+-- CHG-CR506-001): apply_split_rls, then the `_append` policy's check is `write_check OR insert_check`, while UPDATE and
+-- DELETE keep `write_check` alone (orders.order_event: a guest appends a `ticketsResent` row to its own order).
+CREATE OR REPLACE FUNCTION platform.apply_split_insert_rls(target regclass, read_check text, write_check text,
+                                                          insert_check text)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    base text := (SELECT left(c.relname, 55) FROM pg_class c WHERE c.oid = target);
+BEGIN
+    PERFORM platform.apply_split_rls(target, read_check, write_check);
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %s', base || '_append', target);
+    EXECUTE format('CREATE POLICY %I ON %s FOR INSERT WITH CHECK ((%s) OR (%s))', base || '_append', target,
+                   write_check, insert_check);
 END
 $$;
 
@@ -2280,6 +2300,13 @@ def table_marks(cols: dict, tables) -> dict:
         # writes and reads it, or any session with a guest subject set. See GUEST_SET.
         if marks.get("x-ticvai-guest-read") is True:
             entry["guest_read"] = True
+        # **The tenant's own row, read by any scoped session** (ADAM CR-487, option A, Chinmay, 3 November 2026;
+        # CHG-CR487-001): `x-ticvai-tenant-row-read: true` beside `x-ticvai-guest-read` on a venue_id table adds the
+        # read branch `venue_id IS NULL AND <a scope is set>` (TENANT_ROW_READ), so a venue-level staff session and an
+        # anonymous guest session (its scope the venue's path) see the tenant's default row their fall-back names.
+        # Writes are unchanged; a session with no scope and no subject still reads nothing.
+        if marks.get("x-ticvai-tenant-row-read") is True:
+            entry["tenant_row_read"] = True
         # **The guest's own rows, by a named column** (ADAM CR-342; CHG-R12DB-009): `x-ticvai-guest-subject: <property>`
         # beside `x-ticvai-rls: guest-reads-own` names the column holding the row's guest (ledger.tax_invoice's
         # buyerSubjectId) where it is not `subject_id`.
@@ -2291,6 +2318,20 @@ def table_marks(cols: dict, tables) -> dict:
         # whoever its parent shows it to, or by the guest any of those columns names. See GUEST_PARENT_READ.
         elif isinstance(gs, list) and gs:
             entry["guest_subjects"] = [column_of(str(x).strip()) or f"?{x}" for x in gs]
+        # **The guest who writes its own row, on a table owned through its parent** (ADAM CR-502, Chinmay, 3 November
+        # 2026; CHG-CR502-001): `x-ticvai-guest-writer: <property>` beside a guest-subject list adds to the parent's
+        # write the branch `<column> = the session's subject AND the parent's subject_id = the session's subject`
+        # (orders.ticket_transfer: the sender of a transfer of its own order). See GUEST_PARENT_READ.
+        # **One narrow insert a guest may make** (ADAM CR-506, Chinmay, 3 November 2026; CHG-CR506-001):
+        # `x-ticvai-guest-insert: {<property>: <value>}` beside `x-ticvai-rls: guest-reads-own` on a table read through
+        # its guest's parent adds an INSERT-only branch: the row's column holds that value and the parent's subject_id is
+        # the session's subject (apply_split_insert_rls). Updates and deletes keep the staff rule.
+        gi = marks.get("x-ticvai-guest-insert")
+        if isinstance(gi, dict) and gi:
+            entry["guest_insert"] = [(column_of(str(k)) or f"?{k}", v) for k, v in gi.items()]
+        gw = marks.get("x-ticvai-guest-writer")
+        if isinstance(gw, str) and gw.strip():
+            entry["guest_writer"] = column_of(gw.strip()) or f"?{gw.strip()}"
         # **A table that takes no scope** (CHG-R9MIG-001, CR-166): `x-ticvai-scope: none`; see DESCOPED.
         sc = marks.get("x-ticvai-scope")
         if sc is not None:
@@ -3622,6 +3663,8 @@ def main() -> int:
                 rd, wr = "platform.in_scope(scope_path)", "platform.in_scope({a}scope_path)"
             else:
                 rd, wr = "platform.venue_in_scope(venue_id)", "platform.venue_in_scope({a}venue_id)"
+                if (marks.get(t) or {}).get("tenant_row_read"):
+                    rd += " OR " + TENANT_ROW_READ   # ADAM CR-487 (CHG-CR487-001)
             call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(f'{rd} OR {GUEST_SET}')}, "
                     f"{sql_literal(wr.format(a=''))});")
             split_mark[t] = ((mark + "+" if mark else "") + "guest-read", "scope_path" if t in scoped else "venue_id")
@@ -3711,6 +3754,15 @@ def main() -> int:
             write = staff if mark == "guest-reads-own" else read
             call = (f"SELECT platform.apply_split_rls('{tq(t)}'::regclass, {sql_literal(read.format(a=''))}, "
                     f"{sql_literal(write.format(a=''))});")
+            gins = (marks.get(t) or {}).get("guest_insert")
+            if gins and mark == "guest-reads-own" and guest.startswith("EXISTS (SELECT 1 FROM ")                     and all(not c_.startswith("?") and c_ in has and isinstance(v_, str) for c_, v_ in gins):
+                # ADAM CR-506 (CHG-CR506-001): the guest's own parent, and the named value, for INSERT only
+                ins = " AND ".join(f"{q(c_)} = {sql_literal(v_)}" for c_, v_ in gins) + f" AND {guest}"
+                call = (f"SELECT platform.apply_split_insert_rls('{tq(t)}'::regclass, {sql_literal(read.format(a=''))}, "
+                        f"{sql_literal(write.format(a=''))}, {sql_literal(ins.format(a=''))});")
+            elif gins:
+                print(f"  ! {t}: x-ticvai-guest-insert needs guest-reads-own through the guest's parent and columns it has; "
+                      "not applied")
             write = "(" + write + ")"
             base = ("the guest's own subject, or staff by " + base if mark == "guest-owns"
                     else "staff by " + base + "; read also by the guest it belongs to")
@@ -3852,6 +3904,14 @@ def main() -> int:
                   + " OR ".join("(" + GUEST_SUBJECT.replace("{a}subject_id", q(g)).format(a="") + ")"
                                 for g in guest_parent_read[t]))
             wr = f"EXISTS (SELECT 1 FROM {tq(par)} pr WHERE {link}{pw})"
+            gw = (marks.get(t) or {}).get("guest_writer")
+            if gw and not gw.startswith("?") and any(c_["column"] == gw for c_ in cols.get(t, []))                     and any(c_["column"] == "subject_id" for c_ in cols.get(par, [])):
+                # ADAM CR-502 (CHG-CR502-001): or the guest the column names, writing a row of its own parent
+                wr = (f"{wr} OR ({GUEST_SUBJECT.replace('{a}subject_id', q(gw)).format(a='')} AND EXISTS (SELECT 1 "
+                      f"FROM {tq(par)} pr WHERE {link} AND {GUEST_SUBJECT.format(a='pr.')}))")
+            elif gw:
+                print(f"  ! {t}: x-ticvai-guest-writer names {gw.lstrip('?')}, not a column of it, or its parent has no "
+                      "subject_id; the parent's write stands")
             by_parent[i] = (t, col, par, key, split_write.get(par, "TRUE").format(a="parent_row"), rd, wr)
             continue
         if t in guest_parent:

@@ -1,0 +1,50 @@
+id: CHG-CR502-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: orders.ticket_transfer's write gains the sender's branch (from_subject_id the session's subject and the parent order's
+  subject_id the same), by a new derive-ddl mark x-ticvai-guest-writer; listTicketTransfers runs under the guest's session
+  with the subject condition kept in the query; claimTicketTransfer updates its one row under ITenantRootGrant once the claim
+  token is verified.
+decision:
+  what: 'Posted on the ticket (Chinmay, 3 November 2026), under the leads instruction ("Close the CRs and respond to devs",
+    and "get the NEw CRs in the r13", 3 November 2026): "orders.ticket_transfer admits a guest''s own transfers by subject,
+    as orders.cart and orders.sales_order already do. No wider grant, and no subject filter in code as the only safeguard
+    ... Write: the current staff rule OR (from_subject_id = ticvai.subject_id AND the parent orders.sales_order''s subject_id
+    = ticvai.subject_id) ... claimTicketTransfer ... updates that one row ... under the routed tenant''s root grant"'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-502 (Narayan Gaonkar, #30677): the table''s write admitted staff only, so a guest''s transfer could not be written;
+  the read had been opened by r13 root R28 (CHG-R13R28-001), which found and left the write.'
+keys_touched:
+  operations:
+  - listTicketTransfers
+  - transferOrderTickets
+  - claimTicketTransfer
+  schemas:
+  - TicketTransfer
+  tables:
+  - orders.ticket_transfer
+  files:
+  - contracts/spine/orders.yaml
+  - tools/derive-ddl.py
+  - tools/check-business-rules.py
+root_class: row security that hides a row from the guest the operation serves
+tickets:
+  started:
+  - '30488 [DB] orders.ticket_transfer (Ready for QA, Hrushikant Patkar): the write policy gains the sender''s branch (new
+    migration task below; the ticket''s text is not rewritten).'
+  unstarted:
+  - '30677 (listTicketTransfers, Narayan Gaonkar): the code and tests now; On hold naming the migration task until it is applied.'
+  - '30980 (transferOrderTickets) and 30976 (claimTicketTransfer): comments, as posted.'
+  - 'New migration task for the migration owner under the orders migration: the forward migration that replaces orders.ticket_transfer''s
+    policies (read as R28 made it; write the staff rule or the sender''s branch), guarded and re-runnable.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-502
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-ddl.py::x-ticvai-guest-writer
+status: open
+notes: 'Database change: orders.ticket_transfer''s policy (tenant). Held by tools/check-business-rules.py::BR-TRANSFER-GUEST-WRITE.'

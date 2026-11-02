@@ -1936,3 +1936,31 @@ changes:
     tag: r13
     producer-tickets: ['37102']
     consumer-tickets: [none-linked]
+  - id: BC-690
+    contract: tenancy
+    operation: enrolDevice
+    change: 'request `testResult.passed` is now required'
+    reason: 'ADAM CR-485 (CHG-CR485-001): the move to provisioned must carry the acceptance test, so testResult is
+      required on that move and testResult.passed inside it (400 validation naming the field), and testResult and
+      configurationProfileId are refused with any other target state. A new required request field cannot be
+      additive.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-485 posted on #33989: "the move to provisioned must carry the acceptance
+      test, and the profile is set only on that move. Both are validation added to what is built"), the lead''s "get
+      the NEw CRs in the r13" of the same day'
+    tag: r13
+    producer-tickets: ['33989']
+    consumer-tickets: [none-linked]
+  - id: BC-691
+    contract: orders
+    operation: reprintOrder
+    change: 'x-ticvai-emits changed None -> ["order.ticketsResent"]'
+    reason: 'ADAM CR-506 (CHG-CR506-001): email, SMS and WhatsApp resends are written as order.ticketsResent to the
+      outbox, beside one ticketsResent order_event row, and Access consumes the event and delivers each credential;
+      Orders sends nothing itself (this replaces r13 root R27''s route through sendTransactionalMessage). A new event
+      an operation emits is a new consumer contract.'
+    approved-by: 'Chinmay, 3 November 2026 (CR-506 posted on #30679: "reprintOrder records a guest''s resend as one
+      order event, sends remote deliveries through Access as an event, and returns wallet passes in its answer"), the
+      lead''s "get the NEw CRs in the r13" of the same day'
+    tag: r13
+    producer-tickets: ['30679']
+    consumer-tickets: [none-linked]
