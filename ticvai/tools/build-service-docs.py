@@ -2275,7 +2275,11 @@ def main() -> int:
         if h:
             t_["assignee"] = h
             taken[h] += pts
-            t_["description"] += f" Helper task: {owner} owns the service and reviews."
+            # an AI server task goes to the AI engineers after the pins (team.json `aiServer`, CHG-R12PL-034), so its
+            # text names them, not the .NET service owner the balancing started from (CHG-R13INT-018)
+            t_["description"] += (" AI server task: the AI engineers build it and review it (team.json aiServer, "
+                                  "CHG-R12PL-034)." if ai_srv_t(t_) else
+                                  f" Helper task: {owner} owns the service and reviews.")
             load[h] += pts
             load[owner] -= pts
 
@@ -3324,6 +3328,30 @@ def main() -> int:
             if "platform.outbox" in writes:
                 need.add("PLATFORM-OUTBOX")
             t_["dependsOn"] = " ".join(sorted(set(t_["dependsOn"].split()) | need))
+    # **The AI server runs on its own kernel** (r13, 3 November 2026, CHG-R13PL-054): ticvai-ai is a separate Python
+    # deployable (ADR-0020, ADR-0055), so an AI server task (team.json `aiServer`) or an AI engine task cannot take its
+    # runtime from PLATFORM-KERNEL or PLATFORM-IDEMPOTENCY, which build the .NET kernel in ticvai-backend. It follows
+    # AI-SERVER-RUNTIME instead, unless its ticket has started (a started ticket is never made to wait on a new task;
+    # its waits stay as they are).
+    if "AI-SERVER-RUNTIME" in by_key:
+        dotnet_ = {"PLATFORM-KERNEL", "PLATFORM-IDEMPOTENCY"}
+        started_ai_ = started_plan_keys()
+        moved_ai_, kept_ai_ = [], []
+        for t_ in tasks:
+            if t_["type"] != "Task" or t_["key"] == "AI-SERVER-RUNTIME":
+                continue
+            if not (ai_srv_t(t_) or t_["key"].startswith("AI-ENGINE-") or t_.get("service") == "AiService"):
+                continue
+            deps_ = set(t_["dependsOn"].split())
+            if not deps_ & dotnet_:
+                continue
+            if t_["key"] in started_ai_:
+                kept_ai_.append(t_["key"])
+                continue
+            t_["dependsOn"] = " ".join(sorted((deps_ - dotnet_) | {"AI-SERVER-RUNTIME"}))
+            moved_ai_.append(t_["key"])
+        print(f"AI server tasks on AI-SERVER-RUNTIME instead of the .NET kernel (CHG-R13PL-054): {len(moved_ai_)}; "
+              f"started, left as they are: {len(kept_ai_)}" + (f" ({', '.join(sorted(kept_ai_))})" if kept_ai_ else ""))
 
     # **A report waits for the data it reports on** (30 September, Chinmay). A backend task whose
     # operations only read (reports, dashboards, analytics, exports) and read tables another task

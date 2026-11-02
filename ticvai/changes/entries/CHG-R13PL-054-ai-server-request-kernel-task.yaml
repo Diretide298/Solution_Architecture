@@ -1,0 +1,45 @@
+id: CHG-R13PL-054
+date: '2026-11-03'
+source: audit
+kind: plan
+proposed: '2026-11-03'
+summary: 'The AI server''s request kernel is a plan task: AI-SERVER-RUNTIME (ticvai-ai, Python: host, tenant context, the
+  row-security session settings, the token check, idempotency, problems and 429, and the repository starter its CLAUDE.md
+  points at), the AI engineers'' (team.json aiServer.keys), not before 3 November 2026; every AI server and AI engine task
+  that has not started follows it instead of the .NET PLATFORM-KERNEL and PLATFORM-IDEMPOTENCY (tools/build-service-docs.py).'
+decision:
+  what: 'The lead, 2 November 2026: "Can you check for all the missing tickets as well" (the class of CHG-R13PL-019 to CHG-R13PL-044);
+    the AI server is the AI engineers'' (the lead, 31 October 2026, "All to the AI engineers"; CHG-R12PL-034). Asked for
+    Sprint 1, which ended on 16 October: the task is not before 3 November, so the schedule puts it at the start of the
+    current sprint. Plan change waived from the cooling-off by the lead ("1 waive", 2 November 2026, for r13).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (r13 Block A review of the AI tickets, batch 6): 44 AI tickets (AI-ENGINE-GATEWAY, SVC-AI-* and others) wait
+  on PLATFORM-KERNEL and PLATFORM-IDEMPOTENCY, which build the .NET kernel in ticvai-backend, and nothing builds ticvai-ai''s
+  own (ADR-0020, ADR-0055).'
+keys_touched:
+  tickets:
+  - AI-SERVER-RUNTIME (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - docs/active/team.json
+  - tools/build-service-docs.py
+root_class: a deployable whose runtime no task builds, its tasks made to wait on another deployable's
+tickets:
+  started:
+  - 'any AI server task whose ticket has started: it keeps its waits (the plan build prints them).'
+  unstarted:
+  - 'the unstarted AiService and AI engine tasks: they follow AI-SERVER-RUNTIME, not the .NET kernel tasks.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 Block A review'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-03'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open

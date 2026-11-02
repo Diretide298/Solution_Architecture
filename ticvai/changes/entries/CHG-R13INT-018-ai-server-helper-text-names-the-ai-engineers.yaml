@@ -1,0 +1,30 @@
+id: CHG-R13INT-018
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'An AI server task the balancing first gave a helper says that the AI engineers build and review it, not "Helper
+  task: Hrushikant Patkar owns the service and reviews": the AI server rule (CHG-R12PL-034) moves it to the AI pool after
+  the pins, and the text the helper pass wrote stayed.'
+decision:
+  what: 'The lead, 31 October 2026: "All to the AI engineers" (CHG-R12PL-034); the coordinator''s review of 3 November 2026:
+    fix the generator rule so the text names the AI engineers.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (r13 Block A review of the AI tickets, batch 6): 27 AiService tasks carry "Helper task: Hrushikant Patkar
+  owns the service and reviews" (tools/build-service-docs.py''s helper pass).'
+keys_touched:
+  files:
+  - tools/build-service-docs.py
+root_class: text written by an early generator pass that a later pass makes untrue
+tickets:
+  started: []
+  unstarted:
+  - 'the 27 AiService tasks: their text names the AI engineers.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 Block A review'
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open
