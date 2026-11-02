@@ -1,0 +1,53 @@
+id: CHG-CR541-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'setSubscription checks a downgrade the way removeLicenceAddOn does: it declares the call to white-label
+  getModuleEnablement and, before anything is written, compares the tenant''s enabled features (asked of its cell at
+  Tenant.cellHost with serviceAuth and X-Tenant-Id; 503 and nothing changed when the cell does not answer) with the
+  target plan version''s modules, the in-force add-ons and core, combined by LicencePosition''s method, and each
+  metric''s usage with the target plan''s limit plus add-ons plus unexpired capacity packs. Any conflict is 409
+  DowngradeConflictProblem naming every one. previewSubscriptionChange returns the same conflicts from the same check;
+  removeLicenceAddOn''s modulesInUse is filled the same way.'
+decision:
+  what: 'Posted on #30841 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the
+    NEw CRs in the r13" of 3 November 2026: "Build now: setSubscription checks a downgrade the same way
+    removeLicenceAddOn already does. Declare the call to white-label getModuleEnablement on setSubscription ... Run
+    the check before anything is written ... If the cell does not answer, refuse with 503 and change nothing; never
+    decide on a guess ... If either list has entries, answer 409 with DowngradeConflictProblem naming every conflict
+    and write nothing ... removeLicenceAddOn''s 409 module-in-use fills modulesInUse the same way.
+    previewSubscriptionChange (ticket #31281) returns the same conflicts from the same check."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-541 (Sanket Keluskar, #30841 setSubscription): the downgrade check needs the tenant''s enabled modules,
+  which live in the tenant''s cell; removeLicenceAddOn already asks the cell for them (subscription.yaml
+  removeLicenceAddOn, CHG-R8WFC-003) but setSubscription declared no such call, and the request left out the add-ons
+  that survive a plan change.'
+keys_touched:
+  operations: [setSubscription, previewSubscriptionChange, removeLicenceAddOn]
+  schemas: [DowngradeConflictProblem]
+  tables: [control.licence_add_on, control.licence_add_on_limit, control.tenant]
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: 'a check that needs another deployable''s data, with the call declared on one of the two operations
+  making it'
+tickets:
+  started: []
+  unstarted:
+  - '30841 (setSubscription, Sanket Keluskar, New): build to the posted comment.'
+  - '31281 (previewSubscriptionChange, Narayan Gaonkar, New): return the same conflicts from the same check.'
+  - '31277 (removeLicenceAddOn, Narayan Gaonkar, New): fill modulesInUse the same way.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-541
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-DOWNGRADE-CHECK
+status: open
+notes: 'Beyond the posted words, for the lead: setSubscription declares 503 (the shared ServiceUnavailable) and its
+  reads of control.licence_add_on, control.licence_add_on_limit and control.tenant (the cell address);
+  previewSubscriptionChange declares the same call. removeLicenceAddOn still declares no 503 response, though its text
+  refuses 503 (not in this decision). The 409''s problem types are unchanged (subscription-expired; the downgrade
+  conflict names no type, as before).'

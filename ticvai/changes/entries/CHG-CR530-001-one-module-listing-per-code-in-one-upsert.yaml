@@ -1,0 +1,49 @@
+id: CHG-CR530-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'A module listing is addressed by its module code, one row per code compared without regard to case. The
+  unique index module_listing_module_code_uniq on lower(module_code) is already in r13 (ModuleListing''s
+  x-ticvai-unique-together [moduleCode], CHG-R13R20-001, BR-R13-UPSERT-KEY) and is not added twice; setModuleListing
+  now states the write: one statement that inserts with a new id or, on a conflict on lower(module_code), updates
+  every field the body carries keeping the row''s id, no advisory lock, module_code stored as the path sends it, a
+  differing body moduleCode refused, the stored row answered.'
+decision:
+  what: 'Posted on #30840 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the
+    NEw CRs in the r13" of 3 November 2026: "option A. A module listing is addressed by its module code, so the table
+    holds one row per code, compared without regard to case ... 1. Storage (#36259): add CREATE UNIQUE INDEX IF NOT
+    EXISTS module_listing_module_code_uniq ON control.module_listing (lower(module_code)) ... Before the index is
+    created, the migration checks for codes that differ only by case or appear more than once. If it finds any, it
+    stops and names them ... 2. setModuleListing (this ticket): drop the advisory lock. In one statement, insert the
+    listing with a new id, or ON CONFLICT ((lower(module_code))) DO UPDATE set every field the body carries, keeping
+    the existing row''s id ... The contract, the screens and the response do not change."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-530 (Sanket Keluskar, #30840 setModuleListing): control.module_listing had no unique key on module_code
+  while setModuleListing creates or replaces a listing by its code (V0108 L117-133), so a race made two rows.'
+keys_touched:
+  operations: [setModuleListing]
+  schemas: [ModuleListing]
+  tables: [control.module_listing]
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: 'an upsert keyed by a field, with no unique index behind the key (the class of CHG-R13R20-001)'
+tickets:
+  started:
+  - '36259 ([DB] control.module_listing, Hrushikant Patkar, Ready for QA): the index CHG-R13R20-001 already gives it;
+    before creating it the migration checks for codes that differ only by case or appear more than once and stops
+    naming them; rollback DROP INDEX IF EXISTS control.module_listing_module_code_uniq;.'
+  unstarted:
+  - '30840 (setModuleListing, Sanket Keluskar, New): build to the posted comment.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-530
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-MODULE-LISTING-UPSERT
+status: open
+notes: 'The posted decision says the contract does not change; its shape does not. setModuleListing had no
+  description, and now carries the posted write rule as one (text only). The duplicate pre-check before the index is
+  the migration owner''s, in #36259 (the generator writes no data check).'

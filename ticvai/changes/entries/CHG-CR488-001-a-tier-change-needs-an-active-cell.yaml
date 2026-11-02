@@ -1,0 +1,47 @@
+id: CHG-CR488-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'updateCellTier refuses a cell that is not active with 409 cell-not-active, the problem type decommissionCell
+  uses for the same rule: after reading the cell (an unknown cell stays 404) and before any other check, a status of
+  provisioning, migrating, suspended, decommissioning or failed is refused and nothing is written, the detail naming
+  the status. Then 400 tier-unavailable-in-jurisdiction, then 409 tier-unchanged. The 409 lists cell-not-active beside
+  tier-unchanged (and CR-489''s tier-change-pending), and the operation states its reads of control.cell and
+  control.cell_job.'
+decision:
+  what: 'Posted on #31357 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the
+    NEw CRs in the r13" of 3 November 2026: "updateCellTier refuses a cell that is not active with 409 cell-not-active,
+    the problem type decommissionCell already uses for the same rule. Build now: in updateCellTier, after reading the
+    cell (an unknown cell stays 404) and before any other check, if control.cell.status is anything but active
+    (provisioning, migrating, suspended, decommissioning or failed), answer 409 with problem type cell-not-active and
+    nothing written. The problem detail names the cell''s current status ... Then come the existing checks in this
+    order: 400 tier-unavailable-in-jurisdiction, then 409 tier-unchanged. The 409 response now lists two problem
+    types, tier-unchanged and cell-not-active ... Remove the 500 placeholder for this path."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-488 (Pranay Shinde, #31357 updateCellTier): the operation defined no answer for a cell that is not
+  active, while states/cell.yaml moves a cell to migrating for a tier change only from active and decommissionCell
+  already refuses the same case 409 cell-not-active.'
+keys_touched:
+  operations: [updateCellTier]
+  tables: [control.cell, control.cell_job]
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: 'a state model that moves a record only from one state, and an operation that names no answer for the
+  others'
+tickets:
+  started: []
+  unstarted:
+  - '31357 (updateCellTier, Pranay Shinde, New): build to the posted comment; the package now says the same.'
+  - '28385 (module test, Subscription & Licensing 1 of 6): cover cell-not-active once for each non-active status.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-488
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CELL-TIER-ACTIVE
+status: open
+notes: 'The 500 placeholder the decision removes is in the developer''s code, not the package. The 409 also lists
+  tier-change-pending, CR-489''s (CHG-CR489-001).'

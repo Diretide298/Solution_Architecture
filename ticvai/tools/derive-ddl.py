@@ -70,7 +70,11 @@ contract). **Uniqueness is carried where the contract marks it**: a property wit
 `x-ticvai-unique: tenant` or `venue` becomes a `<table>_<columns>_uniq` unique index (audit R108,
 28 September). A contract schema's `x-ticvai-unique-together: [[a, b, ...]]` is a unique index over
 several columns, each named by property or by column (CHG-R6-006); with `x-ticvai-unique-nulls: not-distinct` on
-the schema a null member still collides (`NULLS NOT DISTINCT`, CHG-MKT-002). **A text member of either is
+the schema a null member still collides (`NULLS NOT DISTINCT`, CHG-MKT-002). **A child table derived from an array
+takes a unique key declared on that array property** (`x-ticvai-unique-together` beside `type: array`; ADAM CR-510,
+CHG-CR510-001: control.plan_module and control.plan_limit, one row per module and per metric of a plan version), its
+members named by the item's property or by column, and `x-ticvai-unique-compare: exact` there keeps the item members
+unlowered. **A text member of either is
 indexed as `lower(column)`**, so a code is unique whatever its case, as common.yaml says; an opaque
 external id marked `x-ticvai-unique-compare: exact` is not (CHG-GEN-001). `x-ticvai-required-when:
 {prop: {other: value}}` is a table CHECK that the column is set on rows where `other` is `value`
@@ -2096,6 +2100,13 @@ def load_contract_props(docs: dict | None = None) -> dict:
                         ref = str((spec.get("items") or {}).get("$ref") or "")
                         if ref.startswith("#/components/schemas/"):
                             ITEM_SCHEMA[f"{mod}.{name}.{prop}"] = f"{mod}.{ref.rsplit('/', 1)[-1]}"
+                        # **A unique key over the child table, on the array property** (ADAM CR-510, CHG-CR510-001).
+                        aut = spec.get("x-ticvai-unique-together")
+                        if isinstance(aut, list) and aut:
+                            ARRAY_UNIQUE[f"{mod}.{name}.{prop}"] = [g for g in aut if isinstance(g, list) and g]
+                            if str(spec.get(UNIQUE_COMPARE) or "") == "exact":
+                                EXACT_ITEM_SOURCES.update(f"{mod}.{name}.{prop}[].{m}" for g in aut
+                                                          if isinstance(g, list) for m in g)
     return found
 
 
@@ -2124,6 +2135,8 @@ def retired_columns(schema: dict) -> None:
 SCHEMA_MARKS: dict = {}
 ITEM_SCHEMA: dict = {}
 ARRAY_PROPS: set = set()     # `module.Schema.arrayProp`, every array property (a child table's parent key names one)
+ARRAY_UNIQUE: dict = {}      # `module.Schema.arrayProp` -> the unique column sets its child table takes (ADAM CR-510)
+EXACT_ITEM_SOURCES: set = set()  # `module.Schema.arrayProp[].member` an array's x-ticvai-unique-compare: exact keeps
 RETIRED: dict = {}
 # **The tables whose contract says `x-ticvai-scope: none`** (CHG-R9MIG-001, ADAM CR-166 as the lead ruled it, 21
 # October 2026). Filled by main from table_marks; frozen mode hands it to ddl_forward.diff, which removes a scope_path,
@@ -2271,6 +2284,16 @@ def table_marks(cols: dict, tables) -> dict:
             # `NULLS NOT DISTINCT` (PostgreSQL 15 and later; the platform is on 16).
             if str(marks.get("x-ticvai-unique-nulls") or "").strip() == "not-distinct":
                 entry["unique_nulls_not_distinct"] = True
+        # **The array a child table is derived from may name its unique key** (ADAM CR-510, CHG-CR510-001): the
+        # parent-key column's source is the array property (`subscription.Plan.limits`), or an item column's is
+        # `<array>[].<prop>`; its `x-ticvai-unique-together` sets are this table's, named by item property or column.
+        arrays = {str(c.get("source") or "") for c in cols.get(t, []) if str(c.get("source") or "") in ARRAY_PROPS}
+        arrays |= {m.group(1) for c in cols.get(t, [])
+                   for m in [re.match(r"^([\w-]+\.\w+\.\w+)\[\]\.\w+$", str(c.get("source") or ""))] if m}
+        for arr in sorted(arrays):
+            for group in ARRAY_UNIQUE.get(arr) or []:
+                entry.setdefault("unique_together", []).append(
+                    [column_of(str(p)) or (str(p) if str(p) in names else f"?{p}") for p in group])
         # **Who may read a row the scope rule would hide** (CHG-GEN-005): `x-ticvai-rls: read-beneath` or
         # `grant-holder-read` on the schema; see RLS_MARKS.
         rls = marks.get("x-ticvai-rls")
@@ -3307,7 +3330,9 @@ def main() -> int:
             # A text column in a unique index is indexed as `lower(column)`; an opaque external id whose property
             # says `x-ticvai-unique-compare: exact` (a provider's event id, what a gate reads off a credential)
             # is compared as it is. A key that is not text (`venue_id`, `scope_path`) is never wrapped.
-            src_of = {c["column"]: contract_props.get(str(c.get("source") or ""), {}) for c in cols[t]}
+            src_of = {c["column"]: contract_props.get(str(c.get("source") or ""))
+                      or ({UNIQUE_COMPARE: "exact"} if str(c.get("source") or "") in EXACT_ITEM_SOURCES else {})
+                      for c in cols[t]}
             # **Uniqueness the contract marks, as a unique index** (audit R108, 28 September).
             # `x-ticvai-unique: tenant` is unique within the tenant database -- one tenant per
             # database (ADR-0038), so the column alone, or with `tenant_id` where a table carries

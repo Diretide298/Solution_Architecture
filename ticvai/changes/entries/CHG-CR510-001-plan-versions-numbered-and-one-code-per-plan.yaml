@@ -1,0 +1,63 @@
+id: CHG-CR510-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'Plans are numbered 1, 2, 3; only the newest version is active and current; one currency per version; one
+  code per plan. createPlan writes version 1 (active, published now, no subscribers) and refuses 400
+  plan-currency-mismatch, duplicate-plan-module and duplicate-limit-metric; createPlanVersion answers 404 for an
+  unknown plan, locks the plan''s rows, writes the highest version plus 1 and deactivates the earlier ones, and adds 400
+  plan-code-changed. control.plan is unique on (lower(code), version) in place of plan_code_uniq;
+  control.plan_module on (plan_id, plan_version, licensed_module) and control.plan_limit on (plan_id, plan_version,
+  metric), each an x-ticvai-unique-together the generator now reads from an array property (tools/derive-ddl.py).'
+decision:
+  what: 'Posted on #31262 and #31263 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs"
+    and "get the NEw CRs in the r13" of 3 November 2026: "plans are numbered 1, 2, 3 and so on; only the newest version
+    is active and current; one currency per version; one code per plan. Build now (createPlan #31262,
+    createPlanVersion #31263): createPlan writes version ''1'' ... createPlanVersion answers 404 for an unknown planId.
+    Otherwise, in one transaction, it locks the plan''s rows (SELECT ... FROM control.plan WHERE id = $1 FOR UPDATE),
+    writes version = the highest existing version compared as an integer, plus 1 ... and sets isActive false on every
+    earlier version ... Index: the migration owner replaces plan_code_uniq with unique (lower(code), version) on
+    control.plan, and adds unique (plan_id, plan_version, licensed_module) on control.plan_module and unique (plan_id,
+    plan_version, metric) on control.plan_limit. createPlan answers a violation of the code index with 409
+    duplicate-code."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-510 (Deep Khanvilkar, #31262 createPlan, #31263 createPlanVersion): nothing said how a version is
+  numbered, which version is current, how a plan''s currencies agree or what a duplicate module or metric does, and
+  plan_code_uniq on lower(code) (V0108) refused every second version of the same plan.'
+keys_touched:
+  operations: [createPlan, createPlanVersion]
+  schemas: [Plan, CreatePlanRequest, SetSubscriptionRequest]
+  tables: [control.plan, control.plan_module, control.plan_limit]
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/derive-ddl.py
+  - tools/check-ddl-conventions.py
+  - tools/check-business-rules.py
+root_class: 'a versioned record with no numbering rule, and a unique key that ignored the version'
+tickets:
+  started:
+  - '27651 ([DB] Migration V0005__subscription.sql, Hrushikant Patkar, Ready for QA): not rewritten; the index change is
+    the new [DB] task below.'
+  unstarted:
+  - '31262 (createPlan) and 31263 (createPlanVersion), Deep Khanvilkar, New: build to the posted comment.'
+  - '27967 (module test, Platform Foundation setup): cover numbering, the deactivation and the four 400s.'
+  - 'A new [DB] task under #27651 (see notes), for the plan pass.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-510
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-PLAN-VERSIONS
+status: open
+notes: 'Database change (control): the generated DDL drops plan_code_uniq and adds plan_code_version_uniq (lower(code),
+  version), plan_module_plan_id_plan_version_licensed_module_uniq and plan_limit_plan_id_plan_version_metric_uniq (the
+  release''s forward migration), and its names migration drops plan_code_uniq, guarded; the migration owner applies
+  them in the new task "[DB]
+  control.plan: replace plan_code_uniq with unique (lower(code), version); add unique (plan_id, plan_version,
+  licensed_module) on control.plan_module and unique (plan_id, plan_version, metric) on control.plan_limit" (parent
+  #27651, the migration owner). Generator rule: an x-ticvai-unique-together beside type: array is the unique key of the
+  child table the array becomes (x-ticvai-unique-compare: exact keeps its item members unlowered, and
+  check-ddl-conventions D-UNIQUE-CASE reads the same mark). Beyond the posted words: version is marked
+  x-ticvai-unique-compare: exact, so the index is (lower(code), version) as posted.'
