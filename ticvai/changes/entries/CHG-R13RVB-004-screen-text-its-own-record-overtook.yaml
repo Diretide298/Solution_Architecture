@@ -1,0 +1,100 @@
+id: CHG-R13RVB-004
+date: '2026-11-03'
+source: audit
+kind: spec
+summary: 'Screen notes and gaps that contradicted their own record are corrected (tools/applied/r13-review-stale-screen-text.py,
+  judged by tools/screen_gaps.py). "Components, states and operations still to be written" comes off the 85 screens that
+  have all three (EMP-044 and EMP-045, which declare no operation, keep it). Generated gaps the record has overtaken are
+  dropped: 93 "declares no operation that writes anything" beside a declared write, 212 "operations return no schema with
+  described properties" beside an answer that has them, and nine 2 October contract gaps whose operation is now declared
+  (BO-023 listMessageDispatches, BO-112 listProductionPlans, BO-186 getFacePassEnrollmentConfiguration, KIT-009 and
+  POS-028 built in CHG-CSA-045, and by hand BO-008 previewProductTickets, BO-007 bulkUpdateCatalogueProducts, BO-065
+  listDeliveryLocations, BO-454 getGameCard); 127 "the screen declares N operations" counts are corrected, the unserved
+  pack actions kept. By hand: WEB-008''s notes no longer say listCatalogueBundles is still bound (neither it nor GST-056
+  declares it), GST-030''s prototype difference says the feed is in the first release (CHG-SGU-017, as WEB-046 says), and
+  POS-023''s offline state gives CHG-SPO-020''s recorded default (refuse offline) instead of "an open question". Twins
+  (source.sameAs) are left to their copying tool.'
+decision:
+  what: 'The lead, 3 November 2026, on the r13 review of all 1,582 Block A tickets: "why are these coming back again and
+    again?", "get going on those as well so we close it", "you get the rest sorted". Review finding classes
+    stale-text-contradicts-record (batch 7), stale-screen-gap-notes (batch 8a) and stale-screen-gap (batch 8b): a record
+    told the developer an operation or schema was missing that the same record declares, or that it was not ready.
+    Text and gaps only: no component, state, binding or approved screen changes.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13 Block A ticket review, finding classes stale-text-contradicts-record (batch 7: #27755, #28168, #28652, #28657,
+  #28659, #28662, #28706, #28617, #28816, #28858), stale-screen-gap-notes (batch 8a: #27935, #28050, #28085, #28055,
+  #35643, #28273, #28339, #28429) and stale-screen-gap (batch 8b: #28475, #28765, #28793, #28727, #28919, #28926, #28978,
+  #28990). The gaps were written by the 9 September pack regeneration and the 2 October wiring pass (CHG-WIR-004,
+  CHG-WIR-011, CHG-WIR-027) and never re-judged; S-NOTES-STALE (R269) read only gaps that name the operation.'
+keys_touched:
+  screens:
+  - BO-007
+  - BO-008
+  - BO-023
+  - BO-065
+  - BO-112
+  - BO-186
+  - BO-454
+  - KIT-009
+  - POS-023
+  - POS-028
+  - WEB-008
+  - GST-030
+  - ADM-340
+  - ADM-556
+  - ADM-606
+  - CMS-026
+  other:
+  - 491 screen records in all (screens/P04 to P17, P01, P02, P13), notes and gaps only
+  files:
+  - screens/P01-guest-web-storefront.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/P05-guest-kiosk.yaml
+  - screens/P06-staff-app.yaml
+  - screens/P07-staff-scanner.yaml
+  - screens/P08-venue-back-office.yaml
+  - screens/P09-platform-admin-console.yaml
+  - screens/P10-partner-reseller-portal.yaml
+  - screens/P11-accreditation-portal.yaml
+  - screens/P12-support-agent-console.yaml
+  - screens/P13-white-label-cms.yaml
+  - screens/P15-kitchen-display.yaml
+  - screens/P16-venue-analytics.yaml
+  - screens/P17-ticvai-signup.yaml
+  - tools/screen_gaps.py
+  - tools/check-screen-wiring.py
+  - tools/applied/r13-review-stale-screen-text.py
+  - tools/refresh.sh
+root_class: a screen note or gap its own record has overtaken
+tickets:
+  started:
+  - 'Nothing to build on any of them: the dropped gaps described operations or answers the records already declare, and
+    the corrected counts and notes describe the record as it is. The started tickets linked to the corrected screens:
+    #27701 #27706 #27745 #27749 #27781 #27790 #27838 #27845 #27846 #27847 #27848 #27878 #27879 #27881 #27884 #27885
+    #27922 #28742 #29712 #29763 #29830 #30687 #30711 #30715 #30718 #30730 #30739 #30757 #30760 #30762 #30763 #30765
+    #30769 #30770 #30771 #30772 #30773 #30775 #30779 #30780 #30781 #30782 #30783 #30784 #30786 #30798 #30823 #30824
+    #30856 #30857 #30905 #30906 #30907 #30908 #30910 #30911 #30912 #30913 #30922 #30923 #30925 #30926 #30927 #30929
+    #30930 #30934 #30936 #30937 #30939 #31033 #31035 #31039 #31041 #31042 #31043 #31051 #31052 #31053 #31054 #31055
+    #31085 #31086 #31087 #31124 #31158 #31159 #31162 #31848 #33108 #33110 #33473 #33474 #35174 #35239 #35240 #35286
+    #35326 #35596 #35597 #35599 #35614 #35618 #35624 #35625 #37050 #37052.'
+  unstarted:
+  - 'The screens'' unstarted tickets read the corrected records at the next tag.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: r13 Block A ticket review, classes stale-text-contradicts-record, stale-screen-gap-notes and stale-screen-gap
+  (lane x2)'
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-NOTES-STALE
+status: open
+notes: 'S-NOTES-STALE now also fails on a generated gap tools/screen_gaps.py judges overtaken (no write, no schema, the
+  wrong operation count, "No read of X" or "(Y has no get)" beside that read, a 2 October contract gap its operation says
+  was built for this screen) and on the board-import sentence beside components, states and operations. Left for the
+  lead: BO-102''s "no staff preview that records nothing" (whether decideRecommendations with previewOnly writes nothing
+  is not settled); GST-056''s pattern (listDetail, its patternReason naming listCatalogueBundles and getBundle, which it
+  no longer declares: re-deriving the pattern may change how the screen is drawn); POS-027''s and EMP-055''s 2 October
+  gaps, half served (a staff-audience recordConsent and createTableReservationForGuest exist; the profile create and the
+  amend and cancel are not judged here); closing CHG-SPO-020, whose defaults are recorded but which is still open.'
