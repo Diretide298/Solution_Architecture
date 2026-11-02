@@ -1,0 +1,42 @@
+id: CHG-R13INT-017
+date: '2026-11-03'
+source: audit
+kind: plan
+proposed: '2026-11-03'
+summary: CMS-061 (Digital Asset Management Command Center) is a section home in the plan (navHomes), so CMS-065, which joined
+  Block A1 as a setup screen when lane u bound CMS-010's Tag filter to getMediaTaxonomy (CHG-RCR33-001), is reached from
+  the CMS entry through Block A screens; CMS-061 and CMS-065 are wave 1.
+decision:
+  what: 'The r13 integration gate (refresh-safe on fix/r13-integration, 3 November 2026): fix every new finding at its source,
+    never by baselining, acknowledging or exempting. The coordinator for the lead, following the lead''s r11 ruling "Bring
+    CMS-021 in" (CHG-R11INT-004) as CHG-R13INT-014 did. Plan change waived from the cooling-off by the lead ("1 waive",
+    2 November 2026, for r13).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (r13 integration gate at f599f2c6): check-plan-closure 1 new C-REACH (CMS-001 > CMS-061 > CMS-065) and check-screen-patterns
+  P8 CMS-065 (29 against the pin of 28).'
+keys_touched:
+  screens:
+  - CMS-061
+  - CMS-065
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - screens/P13-white-label-cms.yaml
+root_class: a screen pulled into Block A whose only way in is a screen outside it
+tickets:
+  started: []
+  unstarted:
+  - 'APP-CMS-CMS-061 and APP-CMS-CMS-065: wave lines only; no approved screen changes.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 integration gate'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-03'
+    quote: 1 waive
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py::C-REACH
+status: open

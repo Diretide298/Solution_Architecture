@@ -1,0 +1,33 @@
+id: CHG-R13INT-016
+date: '2026-11-03'
+source: audit
+kind: process
+summary: 'Lane v''s database changes are in the forward migration the integration refresh wrote after lane v merged: backend/tenant/V0126__after_r1_20261103.sql
+  (queue.entry''s three columns and key, wallet.transfer_rule.version, site_package.failure_reason, five unique keys, the
+  shop_and_drop, shop_and_drop_line and ticket_transfer policies) and backend/control/V0126__after_r1_20261103.sql (control.module_listing''s
+  unique key), committed as V0124 and V0125 were.'
+decision:
+  what: 'The r13 integration gate (refresh-safe on fix/r13-integration, 3 November 2026): fix every new finding at its source,
+    never by baselining, acknowledging or exempting. The lane brief: "the integration refresh writes the release''s migration
+    once for all lanes"; CHG-R13INT-008.'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (the coordinator''s review agents, 3 November 2026): V0124 and V0125 were written before lane v merged, so
+  its changes were in no committed forward migration.'
+keys_touched:
+  files:
+  - backend/tenant/V0126__after_r1_20261103.sql
+  - backend/control/V0126__after_r1_20261103.sql
+root_class: release-time outputs the refresh does not write, judged by the gate before they are made
+tickets:
+  started: []
+  unstarted:
+  - the five R13-DB-* tasks of CHG-R13PL-053, and R13-DB-SHARED, gain V0126.
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 integration gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-ddl-conventions.py
+status: open

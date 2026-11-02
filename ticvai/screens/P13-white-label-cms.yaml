@@ -10301,7 +10301,7 @@ screens:
   name: Digital Asset Management Command Center
   module: Media Library
   requiresModule: core
-  wave: 3
+  wave: 1
   permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
@@ -10873,7 +10873,7 @@ screens:
   name: Metadata & Taxonomy Management
   module: Media Library
   requiresModule: core
-  wave: 3
+  wave: 1
   permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf

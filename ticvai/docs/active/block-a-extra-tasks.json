@@ -3324,6 +3324,99 @@
     "adr ADR-0063",
     "operation setChannelConnectionConfiguration"
    ]
+  },
+  {
+   "key": "R13-DB-UNIQUE-KEYS",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "VM-MIG-FNB",
+    "MIG-FNB",
+    "MIG-CATALOGUE-6",
+    "MIG-CATALOGUE-11",
+    "MIG-CATALOGUE-12"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "The unique keys r13's keyed upserts find their row by: kitchen routing and course rules per outlet, channel connections and syncs per channel, dynamic pricing strategies per scope and code (R20)",
+   "detail": "Spec: r13 root cause R20 (CHG-R13R20-001: a keyed upsert has a unique key), in the contracts at the release tag in ADAM. The [DB] work on tables whose migration tickets have started, so their text is not rewritten: #36291 ([DB] fnb.kitchen_routing_rule, VM-MIG-FNB), #30570 ([DB] fnb.course_rule, MIG-FNB), #35178 ([DB] catalogue.channel_connection, MIG-CATALOGUE-11) and #35230 ([DB] catalogue.channel_sync, MIG-CATALOGUE-12), all Ready for QA; and #32558 ([DB] catalogue.dynamic_pricing_strategy, MIG-CATALOGUE-6, New), carried here with the others. One guarded forward migration in the tenant database: first list any rows that share a key and, if there is one, stop with an error giving the count and the ids and tell the lead (a duplicate is reported, never deleted); then the unique indexes fnb.kitchen_routing_rule (outlet_id), fnb.course_rule (outlet_id), catalogue.channel_connection (sales_channel_id, lower(connector_name)), catalogue.channel_sync (sales_channel_id, lower(domain)) and catalogue.dynamic_pricing_strategy (scope_path, lower(code)). The control database's control.module_listing (lower(module_code)) is R13-DB-CONTROL-MODULE-LISTING-KEY's. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V0126__after_r1_20261103.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table fnb.kitchen_routing_rule",
+    "table fnb.course_rule",
+    "table catalogue.channel_connection",
+    "table catalogue.channel_sync",
+    "table catalogue.dynamic_pricing_strategy"
+   ]
+  },
+  {
+   "key": "R13-DB-CONTROL-MODULE-LISTING-KEY",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-SUBSCRIPTION"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "control.module_listing gets its unique key on lower(module_code), in the control database (R20)",
+   "detail": "Spec: r13 root cause R20 (CHG-R13R20-001), in the contracts at the release tag in ADAM. The [DB] work of #36259 ([DB] control.module_listing, MIG-SUBSCRIPTION, Ready for QA, not rewritten). One guarded forward migration in the control database: list any two module listings whose module_code differs only by case and, if there is one, stop with the count and ids and tell the lead; then the unique index on lower(module_code). Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/control/V0126__after_r1_20261103.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table control.module_listing"
+   ]
+  },
+  {
+   "key": "R13-DB-WALLET-TRANSFER-RULE-VERSION",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-WALLET"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "wallet.transfer_rule carries the version setWalletTransferRules checks (R24)",
+   "detail": "Spec: r13 root cause R24 (CHG-R13R24-001: wallet transfer rules carry their version), in the contracts at the release tag in ADAM. The [DB] work of #30378 ([DB] wallet.transfer_rules, MIG-WALLET, On hold, not rewritten; the table is wallet.transfer_rule). One guarded forward migration in the tenant database, additive: version integer NOT NULL DEFAULT 1, so every existing rule starts at version 1. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V0126__after_r1_20261103.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table wallet.transfer_rule"
+   ]
+  },
+  {
+   "key": "R13-DB-SHOP-AND-DROP-AND-TRANSFER-POLICIES",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-RETAIL",
+    "MIG-ORDERS"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "Row security admits the caller each row names: shop and drop by venue or the guest's own, ticket transfers by their order or either party (R28)",
+   "detail": "Spec: r13 root cause R28 (CHG-R13R28-001: row security admits the caller named), in the contracts at the release tag in ADAM. The [DB] work of #30639 ([DB] retail.shop_and_drop, MIG-RETAIL) and #30488 ([DB] orders.ticket_transfer, MIG-ORDERS), both Ready for QA and not rewritten. One guarded forward migration in the tenant database that re-applies three policies through the platform helpers: retail.shop_and_drop's split policy (staff by venue for a session with no guest subject; the guest reads its own rows), retail.shop_and_drop_line's split parent policy through its shop_and_drop, and orders.ticket_transfer's split policy (read through its order, or by from_subject_id or to_subject_id; written through the order as before). Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V0126__after_r1_20261103.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table retail.shop_and_drop",
+    "table retail.shop_and_drop_line",
+    "table orders.ticket_transfer"
+   ]
+  },
+  {
+   "key": "R13-DB-QUEUE-ENTRY-AND-SITE-PACKAGE-COLUMNS",
+   "epic": "PLATFORM",
+   "area": "database",
+   "points": 1,
+   "assignee": "Hrushikant Patkar",
+   "depends": [
+    "MIG-QUEUE",
+    "MIG-WHITELABEL"
+   ],
+   "notBefore": "2026-11-03",
+   "subject": "queue.entry keeps who resolved a called guest, when and why; whitelabel.site_package keeps why a build failed (R40)",
+   "detail": "Spec: r13 root cause R40 (CHG-R13R40-001: fields taken have a column), in the contracts at the release tag in ADAM. The [DB] work of #30619 ([DB] queue.entry, MIG-QUEUE) and #30274 ([DB] whitelabel.site_package, MIG-WHITELABEL), both Ready for QA and not rewritten. One guarded forward migration in the tenant database, additive: queue.entry call_resolved_by_principal_id uuid (its key to identity.principal and its index), call_resolution_reason text of at most 500 characters and call_resolved_at timestamptz, all nullable; whitelabel.site_package failure_reason text of at most 500 characters, nullable. No backfill. Source DDL after r1: the statements on these tables in the forward migration the release derives for them (backend/tenant/V0126__after_r1_20261103.sql, at the release tag in ADAM); write the migration yourself, copied from those statements, each guarded so it applies twice. It reaches the server databases as that release file, applied when the lead says (they are frozen until then); the developers build and test against it locally first. Done when: applied to a database at the previous state it makes exactly these changes, a second run changes nothing, and the result matches the package's derived DDL at the release tag.",
+   "builds": [
+    "table queue.entry",
+    "table whitelabel.site_package"
+   ]
   }
  ],
  "blockA1Operations": {
@@ -3727,6 +3820,7 @@
   "updateVisitPlan": ["R13-QUERIES-CATALOGUE"]
  },
  "navHomes": {
+  "CMS-061": "a section home of the white-label CMS (digital assets): the coordinator for the lead, 3 November 2026, following the lead's r11 ruling for CMS-021 (\"Bring CMS-021 in\", CHG-R11INT-004) as CHG-R13INT-014 did for CMS-041 (CHG-R13INT-017): CMS-065 joined Block A1 when CMS-010's Tag filter began reading getMediaTaxonomy (CHG-RCR33-001), and CMS-061 is its only way in from the CMS entry",
   "BO-284": "a section home of Venue Management (memberships): the coordinator for the lead, 2 November 2026, following the lead's r11 ruling for BO-873 (\"Bring BO-873 in\", CHG-R11INT-005; CHG-R13INT-014): BO-288 joined Block A1 when WEB-022 began reading membership benefits (ADAM CR-482), and BO-284 is its only way in from the back-office entry",
   "CMS-041": "a section home of the white-label CMS (waivers and consent): the coordinator for the lead, 2 November 2026, following the lead's r11 ruling for CMS-021 (\"Bring CMS-021 in\", CHG-R11INT-004; CHG-R13INT-014): CMS-050 joined Block A1 when submitForm began reading the waiver version's resign rule (ADAM CR-472), and CMS-041 is its only way in from the CMS entry",
   "BO-873": "a section home of Venue Management (staff): the lead, 29 October 2026 (\"Bring BO-873 in\", r11 gate; CHG-R11INT-005): BO-881 joined Block A1 when rota assignments began reading the venue's working-hour rules (ADAM CR-334), and BO-873 is its only way in from the back-office entry",

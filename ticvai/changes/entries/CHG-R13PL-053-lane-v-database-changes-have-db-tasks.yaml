@@ -1,0 +1,47 @@
+id: CHG-R13PL-053
+date: '2026-11-03'
+source: cr
+kind: plan
+proposed: '2026-11-03'
+summary: 'Lane v''s database changes each have a change-only [DB] task, because the MIG tickets they belong to have started:
+  R13-DB-UNIQUE-KEYS (R20, tenant), R13-DB-CONTROL-MODULE-LISTING-KEY (R20, control), R13-DB-WALLET-TRANSFER-RULE-VERSION
+  (R24), R13-DB-SHOP-AND-DROP-AND-TRANSFER-POLICIES (R28) and R13-DB-QUEUE-ENTRY-AND-SITE-PACKAGE-COLUMNS (R40), Hrushikant
+  Patkar, each following its tables'' migrations and naming V0126 as its Source DDL after r1.'
+decision:
+  what: 'The lead''s r13 root-cause lanes (merged 3 November 2026; lane v, CHG-R13R20-001, CHG-R13R24-001, CHG-R13R28-001,
+    CHG-R13R40-001), and the plan''s rule for a change on a started MIG ticket (CHG-R13PL-028''s R10-DB-* tasks): a started
+    ticket''s text is never rewritten, so the change gets a [DB] task of its own. Plan change waived from the cooling-off
+    by the lead ("1 waive", 2 November 2026, for r13).'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'Finding (r13 integration, the coordinator''s review): lane v listed the changes against #36259, #36291, #30570, #35178,
+  #35230, #32558, #30619, #30378, #30274, #30639 and #30488, of which all but #32558 have started, and no task applies them.'
+keys_touched:
+  tickets:
+  - R13-DB-UNIQUE-KEYS (new)
+  - R13-DB-CONTROL-MODULE-LISTING-KEY (new)
+  - R13-DB-WALLET-TRANSFER-RULE-VERSION (new)
+  - R13-DB-SHOP-AND-DROP-AND-TRANSFER-POLICIES (new)
+  - R13-DB-QUEUE-ENTRY-AND-SITE-PACKAGE-COLUMNS (new)
+  files:
+  - docs/active/block-a-extra-tasks.json
+root_class: a settled change whose database work belongs to a started migration ticket, carried by no plan task
+tickets:
+  started:
+  - '36291, 30570, 35178, 35230, 36259, 30619, 30274, 30639, 30488 (Ready for QA) and 30378 (On hold), Hrushikant Patkar:
+    not rewritten; the changes are the new tasks''.'
+  unstarted:
+  - '32558 ([DB] catalogue.dynamic_pricing_strategy, New): its unique key is carried by R13-DB-UNIQUE-KEYS with the others.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 root-cause lanes'
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-11-03'
+    quote: 1 waive
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: open

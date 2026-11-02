@@ -1,6 +1,6 @@
 id: CHG-R13INT-015
 date: '2026-11-03'
-source: release
+source: audit
 kind: process
 summary: 'The gate''s pinned count for check-screen-patterns is lowered from 39 to 28: findings were fixed, and every
   one of the 28 left is one the old pin held.'
@@ -26,6 +26,9 @@ decision_owner: Chinmay
 adam_cr: 'none: the lead''s own decision of 3 November 2026'
 triage: fix-forward
 prevention:
-  type: none
-  ref: 'next release: check-screen-patterns judged by its finding list rather than an exact count, so it tightens by itself'
+  type: check
+  ref: tools/refresh-safe.sh
 status: open
+notes: 'The pin is an exact count judged by tools/refresh-safe.sh against tools/refresh-safe-baseline.json, so a
+  finding that comes back fails the gate. Next release: check-screen-patterns judged by its finding list rather than
+  an exact count, so it tightens by itself.'
