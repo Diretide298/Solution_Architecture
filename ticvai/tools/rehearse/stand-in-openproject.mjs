@@ -55,6 +55,8 @@ function compile(filters, ctx) {
     else if (name === 'status' && op === 'c') tests.push((wp) => ctx.closed.has(wp._links.status.title));
     else if (name === 'status' && op === '=') tests.push((wp) => vals.includes(idOf(wp._links.status)));
     else if (name === 'parent' && op === '=') tests.push((wp) => vals.includes(idOf(wp._links.parent)));
+    // ADAM reads one ticket through the id-filtered collection since r12 (viewer/api/openproject.py read_one).
+    else if (name === 'id' && op === '=') tests.push((wp) => vals.includes(String(wp.id)));
     else if (name === 'assignee' && op === '=') {
       const who = vals.map((v) => (v === 'me' ? String(ctx.me) : v));
       tests.push((wp) => who.includes(idOf(wp._links.assignee)));
@@ -185,6 +187,7 @@ function selfTest() {
   check('every status', ids(q([{ project: { operator: '=', values: ['153'] } }, { status: { operator: '*', values: [] } }])), [1, 2, 3]);
   check('assigned to 102', ids(q([{ assignee: { operator: '=', values: ['102'] } }])), [2]);
   check('assigned to me', ids(q([{ assignee: { operator: '=', values: ['me'] } }])), []);
+  check('one ticket by id, any status', ids(q([{ id: { operator: '=', values: ['3'] } }, { status: { operator: '*', values: [] } }])), [3]);
   check('a filter it does not know', get(q([{ subject: { operator: '~', values: ['x'] } }]))[0], 501);
   check('newest first', ids(q([], `&sortBy=${encodeURIComponent('[["id","desc"]]')}`)), [3, 2, 1]);
   check('a sort it does not know', get(q([], `&sortBy=${encodeURIComponent('[["priority","asc"]]')}`))[0], 501);
