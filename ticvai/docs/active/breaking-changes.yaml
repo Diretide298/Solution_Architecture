@@ -1835,3 +1835,15 @@ changes:
     tag: r12
     producer-tickets: ['30661', '31129']
     consumer-tickets: ['30697', '30703']
+  - id: BC-610
+    contract: tenancy
+    operation: issueDeviceCredential
+    change: "response `kind` gained enum value(s) ['apiKey']"
+    reason: 'ADAM CR-451 (CHG-CR451-001): a signage display signs in with a display key, a tenancy.device_credential of
+      the new kind apiKey holding only a hash of the key, shown once when issued. A client that switches on the three
+      kinds it knew meets a fourth; the compat rule counts a value added to a response enum as breaking.'
+    approved-by: 'Chinmay, 1 November 2026 (CR-451 posted on #33061: "A display key is a tenancy.device_credential of a
+      new kind apiKey, holding only a hash of the key ..."), with the lead''s "Approve all" of 1 November 2026'
+    tag: r13
+    producer-tickets: ['33880', '37205']
+    consumer-tickets: ['33914']

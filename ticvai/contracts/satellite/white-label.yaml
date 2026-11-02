@@ -5241,8 +5241,16 @@ paths:
         `KioskConfigFindingKind`; the finding''s `reference` names the slide, tile, flow, language or method. The
         reads, all in process: `assets#mediaAssetRecords` by ids (the same host), `catalogue#productRecords` where
         `{venueId}` (as CR-343 ruled; the V0118 grant), `whitelabel.module_enablement` (White Label''s own), and
-        `payments#paymentMethodRecords`, through Orders'' query class under the caller''s row-level security (SELECT on
-        `payments.method` granted to the operations role). A configuration whose `deletedAt` is set answers 404
+        `payments#paymentMethodRecords`, through Orders'' query class (SELECT on `payments.method` granted to the
+        operations role).
+
+
+        **Rows above the venue** (ADAM CR-443, Chinmay, 1 November 2026; CHG-CR443-001): `paymentMethodUnavailable` reads
+        the `payments.method` rows and `mediaDoesNotFit` the `assets.media_asset` rows at the venue and at its ancestors
+        (a method whose `scope_path` is the venue''s or an ancestor of it; an asset whose `venue_id` is the venue or null,
+        the tenant''s library), in process, for this check only, so a tenant-wide method or a library asset is found.
+        Module enablement is read under the routed tenant''s root grant, as `getPublishedKioskConfig` reads it (confirmed
+        as built). Every other read stays under the caller''s grant. A configuration whose `deletedAt` is set answers 404
         `not-found` (ADAM CR-382).
 
         '
@@ -5334,7 +5342,7 @@ paths:
         for: 'a product target''s venue_id (catalogue.product, Catalogue''s data), asked in process through Catalogue''s own query class under the caller''s row security (ADAM CR-394; XDR-033, on the SELECT XDR-008 and XDR-022 already grant)'
       - query: catalogue#productCategoryRecords
         route: in-process
-        for: 'a category target''s scope_path (catalogue.product_category, Catalogue''s data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants)'
+        for: 'a category target''s scope_path (catalogue.product_category, Catalogue''s data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants); the rows at the venue and at its ancestors, read for this check only (ADAM CR-443)'
       - query: catalogue#eventRecords
         route: in-process
         for: 'an event target''s venue_id (catalogue.event, Catalogue''s data), in process (ADAM CR-394; XDR-033)'
@@ -5350,6 +5358,11 @@ paths:
         ancestor of it, read in process from Catalogue (`catalogue#productRecords`, `#productCategoryRecords`,
         `#eventRecords`; XDR-033). Else `400 target-not-in-venue`, which names the failing target in `errors[]` by
         its pointer (`questions/i/answers/j/target`), because a new answer has no id yet.
+
+        **Rows above the venue** (ADAM CR-443, Chinmay, 1 November 2026; CHG-CR443-001): the category check reads the
+        `catalogue.product_category` rows at the venue and at its ancestors (a `scope_path` that is the venue''s or an
+        ancestor of it), in process, for this check only, so a brand-level category head office set up is found;
+        every other read stays under the caller''s grant.
 
         '
       tags:
@@ -5403,7 +5416,7 @@ paths:
         for: 'a product target''s venue_id (catalogue.product, Catalogue''s data), asked in process through Catalogue''s own query class under the caller''s row security (ADAM CR-394; XDR-033, on the SELECT XDR-008 and XDR-022 already grant)'
       - query: catalogue#productCategoryRecords
         route: in-process
-        for: 'a category target''s scope_path (catalogue.product_category, Catalogue''s data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants)'
+        for: 'a category target''s scope_path (catalogue.product_category, Catalogue''s data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants); the rows at the venue and at its ancestors, read for this check only (ADAM CR-443)'
       - query: catalogue#eventRecords
         route: in-process
         for: 'an event target''s venue_id (catalogue.event, Catalogue''s data), in process (ADAM CR-394; XDR-033)'
@@ -5425,6 +5438,11 @@ paths:
         event target whose `venue_id` is not the choice''s venue, or a category whose `scope_path` is neither the
         venue''s nor an ancestor of it, is `400 target-not-in-venue`, named in `errors[]` by its pointer
         (`questions/i/answers/j/target`); Catalogue is read in process (XDR-033).
+
+        **Rows above the venue** (ADAM CR-443, Chinmay, 1 November 2026; CHG-CR443-001): the category check reads the
+        `catalogue.product_category` rows at the venue and at its ancestors (a `scope_path` that is the venue''s or an
+        ancestor of it), in process, for this check only, so a brand-level category head office set up is found;
+        every other read stays under the caller''s grant.
 
         '
       tags:
@@ -5585,12 +5603,31 @@ paths:
       operationId: updateGuidedChoice
       x-ticvai-consumed-by:
         - "P13 CMS-101 Help Me Choose"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'a product target''s venue_id (catalogue.product, Catalogue''s data), in process, as createGuidedChoice asks it (ADAM CR-444; XDR-033)'
+      - query: catalogue#productCategoryRecords
+        route: in-process
+        for: 'a category target''s scope_path (catalogue.product_category, Catalogue''s data), in process, the rows at the venue and at its ancestors, read for this check only (ADAM CR-444, CR-443; XDR-033)'
+      - query: catalogue#eventRecords
+        route: in-process
+        for: 'an event target''s venue_id (catalogue.event, Catalogue''s data), in process (ADAM CR-444; XDR-033)'
       x-ticvai-audience:
       - staff
       summary: Edit a Help me choose set-up, or review a suggestion
       description: 'A partial update. Only a `draft` may be edited: a `published` choice is unpublished
         first, or 409, so guests never see a half-edited set of questions (decided 29 September, rev 3
         REV3-11). Editing an AI suggestion keeps its `source`.
+
+
+        **The same target check as `createGuidedChoice` and `proposeGuidedChoice`** (ADAM CR-444, Chinmay, 1 November
+        2026; CHG-CR444-001). When the body carries `questions`, every target must be in the choice''s venue by the
+        rule `createGuidedChoice` states: a product or event whose `venue_id` is the choice''s venue, or a category
+        whose `scope_path` is the venue''s or an ancestor of it (read at the venue and at its ancestors, for this
+        check only; ADAM CR-443), asked of Catalogue in process (XDR-033). Else `400 target-not-in-venue`, which names
+        the failing target in `errors[]` by the same pointer (`questions/i/answers/j/target`), and nothing is stored,
+        so a draft never holds another venue''s product or event. `publishGuidedChoice`''s checks stay as decided.
 
         '
       tags:
@@ -5646,7 +5683,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuidedChoice'
         '400':
-          $ref: ../shared/common.yaml#/components/responses/BadRequest
+          x-ticvai-problem-types: [validation, target-not-in-venue]
+          description: 'The body is malformed (`validation`), or a target in `questions` is not in this venue
+            (`target-not-in-venue`, named in `errors[]` by its pointer `questions/i/answers/j/target`; ADAM CR-444)'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
@@ -5710,7 +5753,7 @@ paths:
         for: 'a product target''s venue_id, is_sellable, guest_listing, on_sale_from and on_sale_to (catalogue.product, Catalogue''s data), asked in process through Catalogue''s own query class under the caller''s row security (ADAM CR-394; XDR-033, on the SELECT XDR-008 and XDR-022 already grant)'
       - query: catalogue#productCategoryRecords
         route: in-process
-        for: 'a category target''s scope_path, is_active, and its products on sale (catalogue.product_category, Catalogue''s data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants)'
+        for: 'a category target''s scope_path, is_active, and its products on sale (catalogue.product_category, Catalogue''s data), in process (ADAM CR-394; XDR-033, on the SELECT XDR-008 already grants); the rows at the venue and at its ancestors, read for this check only (ADAM CR-443)'
       - query: catalogue#eventRecords
         route: in-process
         for: 'an event target''s venue_id, is_active and lifecycle_state (catalogue.event, Catalogue''s data), in process (ADAM CR-394; XDR-033)'
@@ -5728,7 +5771,10 @@ paths:
 
         **The rule for each kind** (ADAM CR-394, Chinmay, 31 October 2026). Catalogue is asked in process from the
         operations host, through Catalogue''s own query classes and under the caller''s row security
-        (`catalogue#productRecords`, `#productCategoryRecords`, `#eventRecords`; XDR-033). A target is on sale
+        (`catalogue#productRecords`, `#productCategoryRecords`, `#eventRecords`; XDR-033), except that a category
+        target is read at the venue and at its ancestors, for this check only (ADAM CR-443, Chinmay, 1 November
+        2026; CHG-CR443-001). Module enablement is read under the routed tenant''s root grant, as
+        `getPublishedKioskConfig` reads it (ADAM CR-443: confirmed as built). A target is on sale
         (else `422 answer-target-not-on-sale`) when it is: a product with `is_sellable` true, `guest_listing`
         `bookable`, and the current time inside `on_sale_from` and `on_sale_to` where they are set; a category
         with `is_active` true and at least one such product of this venue in it; an event with `is_active` true
@@ -12734,7 +12780,7 @@ components:
 
         | attractLoopEmpty | error | the attract loop has no slide with `playsWhen` `open` |
 
-        | mediaDoesNotFit | error, or warning as stated | error when a `video` or `photo` slide names no `mediaAssetRef`, or an asset not in the library, not `status` `ready`, or not of `kind` `video` (video slide) or `image` (photo slide); error when the asset''s `width` and `height` are known and its orientation differs from `display.orientation`; warning when it is smaller than `display.resolutionWidthPx` or `resolutionHeightPx`, or its size is unknown. Read: `assets#mediaAssetRecords` by ids (the same host) |
+        | mediaDoesNotFit | error, or warning as stated | error when a `video` or `photo` slide names no `mediaAssetRef`, or an asset not in the library, not `status` `ready`, or not of `kind` `video` (video slide) or `image` (photo slide), where the library is the assets whose `venue_id` is the venue or null (the tenant''s library), read for this check only (ADAM CR-443); error when the asset''s `width` and `height` are known and its orientation differs from `display.orientation`; warning when it is smaller than `display.resolutionWidthPx` or `resolutionHeightPx`, or its size is unknown. Read: `assets#mediaAssetRecords` by ids (the same host) |
 
         | tileWithoutProducts | error | for each enabled tile: its module is not enabled in `whitelabel.module_enablement` (`sellTickets` and `collectReservation` `ticketsAndBooking`, `orderFood` `diningAndFnb`, `shop` `shop`, `membership` `membership`, `walletTopUp` `wallet`, `map` `map`; `assistant` has no module and is never reported), or, for `sellTickets`, `orderFood`, `shop`, `membership` and `walletTopUp`, the venue has no catalogue product with `isSellable` true, `guestListing` `bookable` and a kind of that function (`sellTickets`: `admission`, `timedAdmission`, `datedAdmission`, `openDated`, `seated` or `bundle`; `orderFood` `fnb`; `shop` `retail`; `membership` `membership`; `walletTopUp` `walletTopUp`). Read: `catalogue#productRecords` where `{venueId}`, as CR-343 ruled (the V0118 grant) |
 
@@ -12744,7 +12790,7 @@ components:
 
         | languageNotPublished | error | as built: a kiosk language or the default is not one the tenant has published |
 
-        | paymentMethodUnavailable | error | an accepted method (`paymentOutput.paymentMethodIds`) that is not an active `payments.method` row available at the venue (its `venueIds` contain the venue or are empty). Read: `payments#paymentMethodRecords`, through Orders'' query class under the caller''s row-level security (SELECT on `payments.method` granted to the operations role; XDR-028) |
+        | paymentMethodUnavailable | error | an accepted method (`paymentOutput.paymentMethodIds`) that is not an active `payments.method` row available at the venue (its `venueIds` contain the venue or are empty). Read: `payments#paymentMethodRecords`, through Orders'' query class: the rows at the venue and at its ancestors, for this check only (ADAM CR-443; SELECT on `payments.method` granted to the operations role; XDR-028) |
 
         | ticketTemplateMissing | error | as built: ticket printing is on (`ticketStock` set) and no ticket template is named |
 

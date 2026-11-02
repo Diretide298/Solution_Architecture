@@ -1,0 +1,47 @@
+id: CHG-CR453-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'setTemperatureCheckpoint reads the venue''s outlets in process (tenancy#outletRecords, XDR-004) and answers 400
+  for an outletId not among them, for minCelsius above maxCelsius and for a check frequency of 0 or less. getSignageQueueCalls
+  also answers leftCalled: the parties that left the called state since the cursor, each with its new state.'
+decision:
+  what: 'Posted on #37118 (Chinmay, 1 November 2026), under the lead''s "Approve all" (1 November 2026): "as you recommended
+    (A). setTemperatureCheckpoint reads the venue''s outlets in process (Tenancy''s outletRecords) and answers 400 on outletId
+    when it is not one of them, 400 when minCelsius is greater than maxCelsius, and 400 when the check frequency is 0 or
+    less. getSignageQueueCalls also lists the parties that left the called state since the cursor, each with its new state,
+    so the display drops a redeemed or expired party at once."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-453 (Hrushikant Patkar, #37118): the checkpoint write accepted any outlet and inverted or zero values, and
+  the calls cursor never signalled a party leaving early.'
+keys_touched:
+  operations:
+  - setTemperatureCheckpoint
+  - getSignageQueueCalls
+  schemas:
+  - TemperatureCheckpoint
+  files:
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/queue.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - XDR-004 operations gain setTemperatureCheckpoint (no new grant)
+root_class: a configuration write with no reference or value checks, and a delta read that misses leaving rows
+tickets:
+  started:
+  - '37118 (setTemperatureCheckpoint, Hrushikant, Ready for QA): add the outlet read and the three 400s.'
+  - '33062 (getSignageQueueCalls, Hrushikant, On hold): answer leftCalled.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-453
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-TEMPERATURE-CHECKPOINT and BR-SIGNAGE-CALLS-LEFT
+status: open
+notes: 'Beyond the posted words: the three 400s are the shared validation type with errors[] naming the field (no new problem
+  types); the response member is named leftCalled (partyNumber, status). Not stated: queue.entry keeps no time an entry
+  left called except redeemedAt, so ''since the cursor'' for expired or cancelled has no column.'

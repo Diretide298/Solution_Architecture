@@ -171,7 +171,8 @@ reads:
     setGamePricing, setGameplayValidationRules, setItemAvailability, setKitchenRoutingRules, setKpiTargets,
     setMenuItemDailyCount, setMenuSections, setPrizeCost, setRecipe, setRefundCompensationService,
     setRentalDepositPolicy, setRentalFeePolicy, setResourceLifecycleState, setReturnPolicy, setServiceStage,
-    setStoreRules, setTableLayout, setTransportFareTable, setVenuePoint, setWasteApprovalPolicy,
+    setStoreRules, setTableLayout, setTemperatureCheckpoint, setTransportFareTable, setVenuePoint,
+    setWasteApprovalPolicy,
     simulateGameplayAuthorisation, simulateRentalPricing, splitBill, startStockCount, stopCampaign,
     submitOnboardingApplication, suggestResources, swapRentalEquipment, transferOrderItems, transferTableVisit,
     unscheduleCampaign, updateAsset, updateCampaign, updateDashboard, updateGuestProfile, updateMenu,
@@ -469,7 +470,7 @@ reads:
   tables: [catalogue.event, catalogue.product, catalogue.product_media, catalogue.product_category]
   privileges: [SELECT]
   queries: [catalogue#productRecords, catalogue#productCategoryRecords, catalogue#eventRecords]
-  operations: [createGuidedChoice, proposeGuidedChoice, publishGuidedChoice]
+  operations: [createGuidedChoice, proposeGuidedChoice, publishGuidedChoice, updateGuidedChoice]
   added: '2026-10-31'
   decision_ref: ADAM CR-394, Chinmay, 31 October 2026 (not as recommended - A, on the queries that already exist, with
     a rule stated for each kind)
@@ -481,7 +482,9 @@ reads:
     in the caller''s transaction under the caller''s row-level security. The SELECT on catalogue.product,
     catalogue.product_media and catalogue.product_category is the one V0118 already grants the operations role
     (XDR-008, XDR-022); SELECT on catalogue.event is new, and the operations role already has USAGE on schema
-    catalogue.'
+    catalogue. updateGuidedChoice (#30938, ADAM CR-444, Chinmay, 1 November 2026) applies the same venue
+    check to a draft''s new questions and asks the same three queries; no grant is added. The category rows are read
+    at the venue and at its ancestors for these checks only (ADAM CR-443).'
 - id: XDR-035
   reader: access
   tables: [identity.delegated_access]

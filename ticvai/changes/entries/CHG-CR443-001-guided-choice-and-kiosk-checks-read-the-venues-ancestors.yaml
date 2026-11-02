@@ -1,0 +1,64 @@
+id: CHG-CR443-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: The guided choice checks (createGuidedChoice, proposeGuidedChoice, updateGuidedChoice, publishGuidedChoice) and
+  the kiosk checks (getKioskConfigValidation, publishKioskConfigs) read catalogue.product_category, payments.method and
+  assets.media_asset rows at the venue and at its ancestors (a media asset with venue_id null is the tenant's library),
+  in process, for that check only; module enablement is read under the routed tenant's root grant, as built; every other
+  read stays under the caller's grant. Stated on the operations and on the three queries' rules.
+decision:
+  what: 'Posted on #30932 (Chinmay, 1 November 2026), under the lead''s "Approve all" (1 November 2026): "as you recommended
+    (A). The guided choice checks (CR-394) and the kiosk checks (CR-385) read rows at the venue and at its ancestors: catalogue.product_category,
+    payments.method and assets.media_asset rows whose scope is the venue''s or an ancestor of it (for media assets, venue_id
+    null counts as the tenant''s library), read in process for this check only. Module enablement is read under the routed
+    tenant''s root grant, as you built and as getPublishedKioskConfig does: confirmed. Every other read stays under the
+    caller''s grant."'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-443 (Hrushikant Patkar, #30932): under CR-394 and CR-385 the checks read under the caller''s row security,
+  which hides a brand-level category, a tenant-wide payment method and a library asset from a venue grant (apply_scope_rls,
+  apply_venue_rls), so venue staff got 400 target-not-in-venue and false kiosk errors.'
+keys_touched:
+  operations:
+  - createGuidedChoice
+  - proposeGuidedChoice
+  - updateGuidedChoice
+  - publishGuidedChoice
+  - getKioskConfigValidation
+  - publishKioskConfigs
+  tables:
+  - catalogue.product_category
+  - payments.method
+  - assets.media_asset
+  - whitelabel.module_enablement
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/assets.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+root_class: a rule check that must see rows above the caller's scope, read under the caller's row security
+tickets:
+  started:
+  - '30924 (createGuidedChoice), 30931 (proposeGuidedChoice), 30932 (publishGuidedChoice), Hrushikant: read the category
+    targets at the venue and its ancestors for the check.'
+  - '35623 (getKioskConfigValidation) and 35619 (publishKioskConfigs), Hrushikant: read payment methods and media assets
+    at the venue and its ancestors (venue_id null for the library); keep module enablement under the root grant as built.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-443
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CATALOGUE-ANCESTORS
+status: open
+notes: 'STOPPED on the mechanism, reported to the lead: the posted text says the rows are read at the venue and its ancestors
+  ''in process for this check only'' and names no grant. Under the caller''s grant row security hides exactly those rows
+  (product_category and payments.method apply_scope_rls; media_asset apply_venue_rls), and read-beneath row security (option
+  A as the CR framed it) would open them to every reader, not this check only. The package says what was posted and no more;
+  which grant the ancestor read runs under (the routed tenant''s root grant, filtered to the venue and its ancestors, as
+  getPublishedKioskConfig does for module enablement, or a read-beneath policy and its migration) is a follow-up comment
+  for the lead. No migration.'

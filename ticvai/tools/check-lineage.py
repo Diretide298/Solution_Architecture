@@ -85,6 +85,9 @@ def contract_operations():
         except yaml.YAMLError as e:
             ERRORS.append("%s does not parse: %s" % (name, e))
             continue
+        # a device host's localhost API (contracts/devices/, ADAM CR-463) is no deployable's operation: no lineage
+        if ((d.get("info") or {}).get("x-ticvai-tier")) == "device":
+            continue
         for _p, m in (d.get("paths") or {}).items():
             if not isinstance(m, dict):
                 continue

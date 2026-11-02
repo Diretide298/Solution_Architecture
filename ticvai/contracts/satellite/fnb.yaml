@@ -3737,11 +3737,22 @@ paths:
       operationId: setTemperatureCheckpoint
       x-ticvai-consumed-by:
         - "P08 BO-140 Product Availability, 86 & Operational Food Safety"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the venue''s outlets (platform.outlet, Tenancy''s data), so an outletId that is not one of them is refused
+          400 (ADAM CR-453; XDR-004)'
       summary: Define a checkpoint and its safe range
       description: '**The range is the configuration; the reading is the record.** `TemperatureLog`
         keeps `minCelsius` and `maxCelsius` as the snapshot in force when it was taken, for the reason
         the log already gives — *"deleting a bad reading is the one thing an inspector looks for"*, and
         silently restating the range a past reading was judged against is the same act by other means.
+
+
+        **The checks before anything is stored** (ADAM CR-453, Chinmay, 1 November 2026; CHG-CR453-001). The venue''s
+        outlets are read in process (Tenancy''s `tenancy#outletRecords`, XDR-004); an `outletId` that is not one of them
+        is `400` on `outletId`. `minCelsius` greater than `maxCelsius` is `400`, and a `checkFrequencyMinutes` of 0 or
+        less is `400`; each names its field in `errors[]`.
 
         '
       tags:
@@ -3779,6 +3790,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TemperatureCheckpoint'
+        '400':
+          x-ticvai-problem-types: [validation]
+          description: 'An `outletId` that is not one of the venue''s outlets, `minCelsius` greater than `maxCelsius`,
+            or a `checkFrequencyMinutes` of 0 or less; `errors[]` names the field (ADAM CR-453)'
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /food-safety/temperature-logs:
@@ -9846,12 +9865,14 @@ components:
           type: number
           nullable: true
           description: '**Null at either end is legitimate** — a core probe has a floor and no ceiling.
-            Both null is not, and is what an unconfigured checkpoint looks like.'
+            Both null is not, and is what an unconfigured checkpoint looks like. With both set, `minCelsius` is not
+            greater than `maxCelsius` (`400` at `setTemperatureCheckpoint`; ADAM CR-453).'
         checkFrequencyMinutes:
           type: integer
           nullable: true
           description: '**How often it must be read.** The gap this leaves open otherwise is the one an
-            inspector finds: not a bad reading, but a missing one.'
+            inspector finds: not a bad reading, but a missing one. Greater than 0 when set (`400` at
+            `setTemperatureCheckpoint`; ADAM CR-453).'
         requiresCorrectiveActionOnBreach:
           type: boolean
         isActive:

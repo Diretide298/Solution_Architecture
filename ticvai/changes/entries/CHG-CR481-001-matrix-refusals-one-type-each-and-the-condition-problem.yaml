@@ -1,0 +1,40 @@
+id: CHG-CR481-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: setApprovalMatrix's 409 declares loosens-parent-rule, unreachable-rule and matrix-id-mismatch (the URIs approveMatrixMultiLevel
+  already answers), body ApprovalMatrixRefusedProblem; the 422 condition-invalid of setApprovalMatrix and approveMatrixMultiLevel
+  answers the new ApprovalConditionInvalidProblem (Problem plus ruleOrder and clause, the parser's message as detail, no
+  errors[]).
+decision:
+  what: 'Posted on #31185 (Chinmay, 2 November 2026), under the lead''s "approve all as a recommended" (2 November 2026):
+    "option A for the 422; for the 409, the two problem types the package already declares on approveMatrixMultiLevel, not
+    new ones ... (2) The 422 condition-invalid answers Problem plus two members, no errors[]: ruleOrder ... and clause ...
+    (3) approveMatrixMultiLevel (#30846) answers its 422 condition-invalid the same way ... No kernel change."'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-481 (Deep Khanvilkar, #31185, blocking): the 409 reasons had no type URI and the 422 asked for errors[], which
+  the shared problem model keeps for 400s; CR-345''s one type per reason.'
+keys_touched:
+  operations:
+  - setApprovalMatrix
+  - approveMatrixMultiLevel
+  schemas:
+  - ApprovalConditionInvalidProblem
+  files:
+  - contracts/spine/approvals.yaml
+  - tools/check-business-rules.py
+root_class: a refusal answer the shared problem model cannot write
+tickets:
+  started: []
+  unstarted:
+  - '31185 (setApprovalMatrix) and 30846 (approveMatrixMultiLevel), Deep: answer as stated.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-481
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-MATRIX-REFUSAL-TYPES
+status: open
+notes: 'Beyond the posted words: the 422 body schema is named ApprovalConditionInvalidProblem.'

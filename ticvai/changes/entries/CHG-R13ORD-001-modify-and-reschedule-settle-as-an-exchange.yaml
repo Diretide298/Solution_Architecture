@@ -1,0 +1,51 @@
+id: CHG-R13ORD-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'modifyOrder and rescheduleOrder follow CR-480''s posted pattern: refusals before any write, each its own problem
+  type (modify: validation, order-voided, line-redeemed, hold-not-active; reschedule: validation, line-redeemed, outside-reschedule-window,
+  target-unavailable); the quote first, with nothing written until the write half; the write reuses createOrder''s and createRefund''s
+  steps in one transaction; a positive difference is collected by createPayment, a negative one refunded by createRefund;
+  fees stay zero; entitlements and capacity move through order.exchanged''s consumers (kind modification or reschedule),
+  never written by Orders.'
+decision:
+  what: 'The lead, 2 November 2026, "Yes to both", answering "Use CR-480''s settlement rule for modifyOrder and rescheduleOrder
+    too?": apply CR-480''s posted decision (Chinmay, 2 November 2026, on #30685) to modifyOrder and rescheduleOrder.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-480 (#30685) and the lead''s answer of 2 November 2026: modifyOrder and rescheduleOrder issue and revoke entitlements
+  with no route to Access, the same gap CR-480 closed for exchangeOrderLines.'
+keys_touched:
+  operations:
+  - modifyOrder
+  - rescheduleOrder
+  schemas:
+  - OrderModificationResult
+  - OrderExchangeResult
+  tables:
+  - orders.refund_line
+  - orders.order_line
+  - platform.outbox
+  files:
+  - contracts/spine/orders.yaml
+  - events/order-exchanged.yaml
+  - tools/check-business-rules.py
+root_class: an operation that needs pipelines and cross-module reads it neither has nor declares
+tickets:
+  started: []
+  unstarted:
+  - '30678 (modifyOrder) and 30680 (rescheduleOrder), Narayan Gaonkar: the checks and the quote now; the write after #30977
+    and #31924.'
+  - '37212 (order.exchanged consumers): the same consumers serve kind modification and reschedule.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-480
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ORDER-SETTLEMENT
+status: open
+notes: 'Beyond the answer''s words: the consumer is order.exchanged''s (#37212) with a new payload field kind (exchange,
+  modification, reschedule), not new events; modifyOrder''s added-line hold check reuses createOrder''s hold-not-active;
+  rescheduleOrder''s target-unavailable stays its ''replacement unavailable'' (its body carries no hold); rescheduleOrder''s
+  ''fee appears as a line'' waits on a fee rule. modifyOrder now declares x-ticvai-reads and x-ticvai-writes.'

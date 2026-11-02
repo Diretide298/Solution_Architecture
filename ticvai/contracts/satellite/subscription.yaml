@@ -6974,7 +6974,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerApprovalStatusLifecycleManagementView'
         '403':
-          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          description: 'A step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read from the caller''s Control Plane token, never from a tenant session or a tenant MFA challenge row. `step-up-token-missing` when the token''s `ticvai_step_up` is absent, its `action` does not name this operation, or `amr` does not include `mfa`; `step-up-token-expired` when `ticvai_step_up.at` is more than 5 minutes old. Nothing is written.'
           x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
           content:
             application/problem+json:
@@ -7868,7 +7868,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BookingLimitsCommercialExceptionsApprovalView'
         '403':
-          description: 'A step-up refusal: the caller''s session has no verified, unconsumed MFA step-up for this operation (`step-up-token-missing`), or the newest one is older than 5 minutes (`step-up-token-expired`), by the rule in identity `verifyMfaChallenge` (ADAM CR-375; CHG-CR375-001). Nothing is written.'
+          description: 'A step-up refusal for a platform caller (ADR-0072 point 4; ADAM CR-175, CR-375; CHG-R13ID-001): the step-up is read from the caller''s Control Plane token, never from a tenant session or a tenant MFA challenge row. `step-up-token-missing` when the token''s `ticvai_step_up` is absent, its `action` does not name this operation, or `amr` does not include `mfa`; `step-up-token-expired` when `ticvai_step_up.at` is more than 5 minutes old. Nothing is written.'
           x-ticvai-problem-types: [forbidden, step-up-token-missing, step-up-token-expired]
           content:
             application/problem+json:
