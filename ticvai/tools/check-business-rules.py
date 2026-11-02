@@ -122,6 +122,12 @@ And one rule per decision:
                    control.platform_approval_rule row seeded by the control migration (x-ticvai-seed-rows:
                    configurationChange, tenant, PLATFORM_TENANT_MANAGE, 2 approvals, active), and createApprovalRequest
                    asks platform-ops#platformApprovalRuleFor over the service route.
+  BR-R13-UPSERT-KEY, BR-R13-WALLET-TRANSFER-ETAG, BR-R13-GUEST-ROWS, BR-R13-REPRINT-GUEST, BR-R13-WRITES-LISTED,
+  BR-R13-READS-DECLARED, BR-R13-FIELDS-KEPT, BR-R13-ONE-RULE (r13 root-cause lane v, CHG-R13R20-001 to
+                   CHG-R13R41-001): the developer review's roots R20, R24, R28, R27, R21, R39, R40 and R41, for the
+                   operations it named: a unique key behind a keyed upsert, the transfer rules' version, row security
+                   for the guest an operation names, reprintOrder for a guest-checkout buyer, the tables and reads a
+                   text uses, a column for each field kept, and one rule where a text contradicted itself.
   BR-WALLET-ETAG-VERSION (r11, ADAM CR-332 option A, CHG-CR332-001) WalletFundingRules and WalletRefundPolicy carry a
                    version (wallet.funding_rule.version, wallet.refund_policy.version); their GET and PUT send it as
                    ETag, and the PUT refuses a stale If-Match 412, the rule CR-257 chose for group bookings.
@@ -1964,6 +1970,7 @@ def main() -> int:
         need("BR-RESTORE-MISSING-PAGE", word in rtext,
              f"restoreConfigVersion does not say {word!r} for a page deleted since the version (CR-350)")
     access_rules_r12(need, op)
+    roots_r13_v(need, op)
 
     # ---------------------------------------------------------------- r12 CR lane F (31 October 2026; the lead: "for
     # each one actually check if they hold and if not then find out the best way keeping in mind what client needs").
@@ -2683,7 +2690,9 @@ def main() -> int:
              "BR-CHANNEL-ALLOCATION-COUNTS", "BR-CHANNEL-CODE-UNIQUE", "BR-SALE-RULE-INSTANTS", "BR-PRICING-APPROVAL",
              "BR-BOOKING-FLOW-RESOLVE", "BR-FLOW-TYPE-CATALOGUE", "BR-BOOKING-FLOW-WRITES", "BR-GUEST-CONTACT-FIELDS",
              "BR-GUEST-CODE-UNKNOWN", "BR-GUEST-CHECKOUT-PROOF", "BR-DELEGATION-CYCLE", "BR-WEBHOOK-REPLAY-TENANT",
-             "BR-OUTBOX-REPUBLISH-READS"]
+             "BR-OUTBOX-REPUBLISH-READS",
+             "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -2756,6 +2765,136 @@ def access_rules_r12(need, op):
          "working-venue-required (CR-400, CR-217)")
     need("BR-ADMISSION-CREATE", "tenancy#scopeRecords" not in {q for q, _ in vias(uar)},
          "updateAdmissionRules re-derives scope_path from the editor's working venue (CR-400)")
+
+
+def roots_r13_v(need, op):
+    """r13 root-cause lane v (2 November 2026; the lead: "lets see if we can do something in parallel", "yes"): the
+    developer review's roots R20, R21, R24, R27, R28, R39, R40 and R41, each fixed at its source for the operations the
+    review named. Every rule fails on the r12 contract (e3e4082c) and passes on the fix (CHG-R13R20-001 ...)."""
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def sch(rel, name):
+        return ((load(rel).get("components") or {}).get("schemas") or {}).get(name) or {}
+
+    def tables(o, key):
+        return {str(x.get("table") if isinstance(x, dict) else x) for x in o.get(key) or []}
+
+    def vias(o):
+        return {str((v or {}).get("query")) for v in o.get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+
+    def body(o):
+        return ((((o.get("requestBody") or {}).get("content") or {}).get("application/json") or {}).get("schema") or {})
+
+    # BR-R13-UPSERT-KEY (R20): a "keyed by" upsert has a unique index behind its key.
+    for rel, name, table, cols in (
+            ("contracts/satellite/fnb.yaml", "KitchenRoutingRules", "fnb.kitchen_routing_rule", ["outletId"]),
+            ("contracts/satellite/fnb.yaml", "CourseRules", "fnb.course_rule", ["outletId"]),
+            ("contracts/spine/catalogue.yaml", "DynamicPricingStrategy", "catalogue.dynamic_pricing_strategy",
+             ["scopePath", "code"]),
+            ("contracts/spine/catalogue.yaml", "ChannelConnection", "catalogue.channel_connection",
+             ["salesChannelId", "connectorName", "environment"]),
+            ("contracts/spine/catalogue.yaml", "ChannelSync", "catalogue.channel_sync", ["salesChannelId", "domain"]),
+            ("contracts/satellite/subscription.yaml", "ModuleListing", "control.module_listing", ["moduleCode"])):
+        ut = sch(rel, name).get("x-ticvai-unique-together") or []
+        need("BR-R13-UPSERT-KEY", cols in [list(x) for x in ut],
+             f"{name} declares no x-ticvai-unique-together {cols}, so {table} has no unique key behind its upsert (R20)")
+    need("BR-R13-UPSERT-KEY", op("setChannelSyncSetting")[3].get("x-ticvai-body-key") == ["salesChannelId", "domain"],
+         "setChannelSyncSetting is keyed by salesChannelId alone, not by the channel and domain its text says (R20)")
+
+    # BR-R13-WALLET-TRANSFER-ETAG (R24): the version getWalletTransferRules promised, by CR-332's rule.
+    wtr = sch("contracts/satellite/wallet.yaml", "WalletTransferRules")
+    ver = (wtr.get("properties") or {}).get("version") or {}
+    need("BR-R13-WALLET-TRANSFER-ETAG", ver.get("type") == "integer" and ver.get("readOnly") is True
+         and "version" in (wtr.get("required") or []),
+         "WalletTransferRules has no required, readOnly integer version for setWalletTransferRules' If-Match (R24)")
+    for oid in ("getWalletTransferRules", "setWalletTransferRules"):
+        hdr = (((op(oid)[3].get("responses") or {}).get("200") or {}).get("headers") or {}).get("ETag") or {}
+        need("BR-R13-WALLET-TRANSFER-ETAG", "version" in str(hdr.get("description") or ""),
+             f"{oid}'s 200 sends no ETag that is wallet.transfer_rule.version (R24)")
+    need("BR-R13-WALLET-TRANSFER-ETAG",
+         "`412` and nothing changes" in words(op("setWalletTransferRules")[3].get("description")),
+         "setWalletTransferRules does not say a stale If-Match is 412 and nothing changes (R24)")
+
+    # BR-R13-GUEST-ROWS (R28): row security admits the caller the operation names.
+    cc = op("claimCart")[3]
+    ctext = words(cc.get("description"))
+    need("BR-R13-GUEST-ROWS", "ITenantRootGrant" in ctext and "Nothing else runs under the root grant" in ctext
+         and "404" in {str(k) for k in (cc.get("responses") or {})},
+         "claimCart does not read and attach the anonymous cart under ITenantRootGrant after its token check, with "
+         "the shared 404 (R28)")
+    need("BR-R13-GUEST-ROWS",
+         sch("contracts/satellite/retail.yaml", "ShopAndDrop").get("x-ticvai-rls") == "guest-reads-own",
+         "ShopAndDrop is not x-ticvai-rls guest-reads-own, so a guest cannot read its own drops (R28)")
+    tt = sch("contracts/spine/orders.yaml", "TicketTransfer")
+    need("BR-R13-GUEST-ROWS", tt.get("x-ticvai-rls") == "guest-reads-own"
+         and tt.get("x-ticvai-guest-subject") == ["fromSubjectId", "toSubjectId"],
+         "TicketTransfer does not let the guest fromSubjectId or toSubjectId names read it (R28)")
+    rev = words(op("revokeEntitlementShare")[3].get("description"))
+    need("BR-R13-GUEST-ROWS", "over_subject_id" in rev and "the shared `404` before any write" in rev,
+         "revokeEntitlementShare does not say what a guest who is not the owner gets (R28)")
+
+    # BR-R13-REPRINT-GUEST (R27): reprintOrder serves a guest-checkout buyer and answers the wallet passes.
+    rp = op("reprintOrder")[3]
+    pnames = {str((x or {}).get("name") or (x or {}).get("$ref")) for x in rp.get("parameters") or []
+              if isinstance(x, dict)}
+    need("BR-R13-REPRINT-GUEST", "X-Order-Access-Token" in pnames and any("DeviceId" in n for n in pnames),
+         "reprintOrder takes no X-Order-Access-Token and X-Device-Id, so a guest-checkout buyer is refused (R27)")
+    props = (((((rp.get("responses") or {}).get("200") or {}).get("content") or {}).get("application/json") or {})
+             .get("schema") or {}).get("properties") or {}
+    need("BR-R13-REPRINT-GUEST", "WalletPass" in str((props.get("walletPasses") or {}).get("items")),
+         "reprintOrder's 200 carries no walletPasses for delivery wallet (R27)")
+    need("BR-R13-REPRINT-GUEST", "`sendTransactionalMessage` to `destination`" in words(rp.get("description")),
+         "reprintOrder does not say email, sms and whatsapp are sent through sendTransactionalMessage (R27)")
+
+    # BR-R13-WRITES-LISTED (R21): the tables the text writes or reads are listed.
+    for oid, key, want in (("restoreConfigVersion", "x-ticvai-writes",
+                            {"whitelabel.content_page", "whitelabel.booking_flow_step",
+                             "whitelabel.footer_config_column", "whitelabel.footer_config_social_link"}),
+                           ("cloneProduct", "x-ticvai-writes", {"catalogue.price"}),
+                           ("bulkChangePrices", "x-ticvai-writes", {"catalogue.price"}),
+                           ("bulkChangePrices", "x-ticvai-reads", {"catalogue.price"}),
+                           ("getTenantLicences", "x-ticvai-reads", {"control.plan_module", "control.plan_limit"})):
+        got = tables(op(oid)[3], key)
+        need("BR-R13-WRITES-LISTED", want <= got, f"{oid}'s {key} omits {sorted(want - got)}, which its text uses (R21)")
+    need("BR-R13-WRITES-LISTED", "409" in {str(k) for k in (op("cloneProduct")[3].get("responses") or {})},
+         "cloneProduct declares no 409 duplicate-code for a code already used (R21)")
+
+    # BR-R13-READS-DECLARED (R39): the data the text uses has a declared read.
+    for oid, q in (("getCurrentSession", "tenancy#outletRecords"), ("setDeviceAssignment", "identity#principalRecords"),
+                   ("reserveMerchandise", "tenancy#outletRecords"),
+                   ("reserveMerchandise", "tenancy#venueSettingsRecords"),
+                   ("reserveMerchandise", "tenancy#regionSettingsRecords"),
+                   ("proposeTranslations", "catalogue#productRecords")):
+        need("BR-R13-READS-DECLARED", q in vias(op(oid)[3]), f"{oid} declares no read-via {q} (R39)")
+    for oid, t in (("getSiteSetupProgress", "whitelabel.booking_flow_step"), ("setSubscription", "control.plan_module"),
+                   ("setSubscription", "control.plan_limit")):
+        need("BR-R13-READS-DECLARED", t in tables(op(oid)[3], "x-ticvai-reads"), f"{oid} declares no read of {t} (R39)")
+
+    # BR-R13-FIELDS-KEPT (R40): a field an operation takes or promises has a column.
+    wg = sch("contracts/satellite/queue.yaml", "WaitingGuest").get("properties") or {}
+    need("BR-R13-FIELDS-KEPT", {"callResolvedAt", "callResolutionReason", "callResolvedByPrincipalId"} <= set(wg),
+         "WaitingGuest has no column for resolveCalledWaitingGuest's reason and time (R40)")
+    need("BR-R13-FIELDS-KEPT", "failureReason" in (sch("contracts/satellite/white-label.yaml", "SitePackage")
+                                                   .get("properties") or {}),
+         "SitePackage has no failureReason for the job's reason (R40)")
+    need("BR-R13-FIELDS-KEPT", "writtenAt" in (body(op("recordSubjectDataExportPart")[3]).get("properties") or {}),
+         "recordSubjectDataExportPart's body carries no writtenAt (R40)")
+
+    # BR-R13-ONE-RULE (R41): an operation does not contradict its own schema or another text.
+    need("BR-R13-ONE-RULE", "per outlet" in words(op("setKitchenStations")[3].get("x-ticvai-singleton-note")),
+         "setKitchenStations' singleton note says one set per venue against its required outletId (R41)")
+    cor = (sch("contracts/spine/orders.yaml", "CreateOrderRequest").get("properties") or {}).get("id") or {}
+    need("BR-R13-ONE-RULE", "fresh UUIDv7" in words(cor.get("description"))
+         and "fresh UUIDv7" in words(op("syncOrders")[3].get("description")),
+         "syncOrders and CreateOrderRequest.id do not say the header is a fresh key per batch POST (R41)")
+    pf = (sch("contracts/satellite/ai.yaml", "IndexSource").get("properties") or {}).get("payloadFields") or {}
+    need("BR-R13-ONE-RULE", "the vectors are in the tenant database" not in words(pf.get("description")).replace("**", ""),
+         "IndexSource.payloadFields still says the vectors are in the tenant database, against ADR-0049 (R41)")
+    need("BR-R13-ONE-RULE", "the hours rule is CR-104" not in str(op("createShopAndDrop")[3].get("x-ticvai-read-via")),
+         "createShopAndDrop's read-via still gives CR-104's outlet hours as the rule the lead replaced (R41)")
+    need("BR-R13-ONE-RULE", "stored with `requiresApproval` true" in words(op("setSubstitutionRules")[3].get("description")),
+         "setSubstitutionRules does not state when requiresApproval is true (R41)")
 
 
 if __name__ == "__main__":

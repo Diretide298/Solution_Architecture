@@ -2143,6 +2143,13 @@ paths:
         a guest owner as `revoked_by_kind` `subject` with `revoked_by_subject_id`, a staff member as `principal`
         with `revoked_by_principal_id`.
 
+
+        **What the recipient gets** (r13 root R28, CHG-R13R28-001; the package rule that a guest operation answers
+        another subject''s record `404`, not `403`, CHG-R8SPN-018). Row security shows the recipient the share (its
+        `subject_id`) but lets only the owner (`over_subject_id`) write it, so a guest caller whose subject is not the
+        share''s `over_subject_id` is answered the shared `404` before any write, exactly as for a share that does not
+        exist, and nothing changes.
+
         '
       tags:
       - orders
@@ -4555,6 +4562,21 @@ paths:
         claimCart asks Identity''s in-process API `identity#endAnonymousGuestSession` with the cart''s id, so the
         anonymous token stops working; the cart is then the guest''s by its `subject_id`.
 
+
+        **Which grant reads the anonymous cart** (r13 root R28, CHG-R13R28-001; the pattern of ADAM CR-471 and of
+        getOrder''s token path). The anonymous cart has `subject_id` null, and `orders.cart`''s policy shows a session
+        with a guest subject only the carts whose `subject_id` is that subject, so under the caller''s own grant the
+        claim finds no cart. Under the caller''s grant, claimCart reads the guest''s own open cart, if any. Then, for
+        the path''s `cartId` only, the connection switches to the routed tenant''s root grant (ITenantRootGrant) inside
+        the request''s transaction: read that cart; a cart that does not exist is the shared `404`, as for any cart the
+        caller cannot see; one that is not `open` is `409 cart-not-open`; one whose `subject_id` is set and is not the
+        caller''s is `409 cart-already-claimed`; a `cartToken` that is missing or does not equal the cart''s `token` is
+        `403 cart-token-mismatch`, and nothing has been written. Once every check has passed, and still under the root
+        grant for exactly these statements: set the cart''s `subject_id` to the session''s subject and rotate its
+        `token`, or, where the guest already has an open cart, the merge described above, which writes the anonymous
+        cart and its lines; then the caller''s grant is put back before anything else runs,
+        `identity#endAnonymousGuestSession` included. Nothing else runs under the root grant. No migration.
+
         '
       tags:
       - cart
@@ -4585,6 +4607,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '../shared/common.yaml#/components/schemas/Problem'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '403':
           x-ticvai-problem-types: [cart-token-mismatch]
           description: '**The cart''s token was not sent, or does not match** (R8 blocker IDENTITY-C49, the lead''s answer A;
@@ -7674,6 +7698,11 @@ paths:
         quarantined in `sync.rejection` and the batch continues; only a transient failure stops it (SD-028,
         29 September). A void must never be evaluated before the sale it voids.
 
+        **Which key deduplicates what** (r13 root R41, CHG-R13R41-001). The `Idempotency-Key` header is a fresh
+        UUIDv7 for each batch POST, never an entry''s id: a batch retried from `stoppedAtSequence` is a new POST with
+        a new key and the entries from there on. Each entry deduplicates on its own `OfflineOrder.id`
+        (`CreateOrderRequest.id`): an entry already ingested is not ingested twice.
+
         Every line is re-priced on ingest. Variances are returned per order and posted to the variance
         account; the client surfaces nothing to the cashier.
 
@@ -8389,6 +8418,17 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       - table: orders.sales_order
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
+      - table: orders.ticket_template
+        for: 'the pass template, for delivery wallet, as issueWalletPass reads it (r13 root R27)'
+      - table: orders.wallet_pass
+        for: 'a pass already issued for a ticket, reissued rather than duplicated, for delivery wallet (r13 root R27)'
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: in-process
+        for: 'the order''s tickets, for delivery wallet, as issueWalletPass reads them (r13 root R27)'
+      - query: white-label#storeAccountRecords
+        route: service
+        for: 'the store account''s pass certificate, for delivery wallet, as issueWalletPass reads it (r13 root R27)'
       x-ticvai-api-scope: ticketing.write
       security:
       - guestAuth: []
@@ -8420,6 +8460,21 @@ paths:
         option A; CHG-R8SPN-025): one call adds every ticket of the order (or the lines named) to the guest''s
         phone wallet, which is what WEB-013''s approved button does; no other operation is needed.
 
+
+        **What delivery `wallet` answers** (r13 root R27, CHG-R13R27-001): `walletPasses`, one per ticket reissued,
+        each issued and shaped as `issueWalletPass` issues and answers it (an `orders.wallet_pass` row per ticket, the
+        one already issued for that ticket reissued rather than duplicated), so the browser and the app have the pass
+        to add. Absent for the other deliveries. **Email, SMS and WhatsApp** are sent through Marketing''s
+        `sendTransactionalMessage` to `destination`, as `resendPaymentLink` sends.
+
+
+        **A guest who checked out without an account** (r13 root R27; IDENTITY-C52 and getOrder''s rule, ADAM CR-191,
+        CR-432): with no session subject, the caller sends `X-Order-Access-Token` and `X-Device-Id`, checked exactly as
+        `getOrder` checks them (signature, `exp`, `oid` the path''s `orderId`, `tid` the routed tenant, `did` the
+        device); any failure is the shared `404`, as an order that does not exist. A verified token resends or
+        reprints that one order: its statements run under the routed tenant''s root grant (ITenantRootGrant), as
+        getOrder''s token read does, and nothing else in the same transaction.
+
         '
       tags:
       - order
@@ -8431,6 +8486,15 @@ paths:
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      - name: X-Order-Access-Token
+        in: header
+        required: false
+        description: '`Order.orderAccessToken` from `checkoutCart`''s answer, in place of a session, for a guest who
+          checked out without an account (r13 root R27), checked as getOrder checks it; with `X-Device-Id`. A token for
+          another order, expired, forged or from another device is `404`.'
+        schema:
+          type: string
+      - $ref: ../shared/common.yaml#/components/parameters/DeviceId
       requestBody:
         required: true
         content:
@@ -8504,8 +8568,16 @@ paths:
                     items:
                       type: string
                       format: uuid
+                  walletPasses:
+                    type: array
+                    description: 'For delivery `wallet` only: one pass per ticket reissued, in `issueWalletPass`''s
+                      shape (r13 root R27). Absent for the other deliveries.'
+                    items:
+                      $ref: '#/components/schemas/WalletPass'
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /orders/{orderId}/transfer:
@@ -23381,6 +23453,11 @@ components:
     TicketTransfer:
       x-ticvai-persistence: orders.ticket_transfer
       type: object
+      # **The recipient reads a transfer it received** (r13 root R28, CHG-R13R28-001): read where its order is
+      # visible, as before (staff, and the sender through its own order), or by the guest fromSubjectId or toSubjectId
+      # names, so listTicketTransfers' `received` has rows; written only where the order may be written, as before.
+      x-ticvai-rls: guest-reads-own
+      x-ticvai-guest-subject: [fromSubjectId, toSubjectId]
       required:
       - id
       - orderId
@@ -24185,8 +24262,9 @@ components:
           format: uuid
           description: 'Client-generated UUIDv7. Also the idempotency key: it must equal the
             `Idempotency-Key` header, and a replay or a mismatch follows `IdempotencyKey` in
-            `shared/common.yaml`. Offline replay through `syncOrders` carries no header, and this id
-            alone deduplicates there.
+            `shared/common.yaml`. In an offline replay through `syncOrders` the entry carries no header of its
+            own: the batch POST takes a fresh UUIDv7 `Idempotency-Key` per batch, never an entry''s id, and this id
+            alone deduplicates the entry (r13 root R41).
 
             '
         venueId:

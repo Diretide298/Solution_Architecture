@@ -3024,6 +3024,10 @@ paths:
         - "P04 POS-016 Till Configuration"
         - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
         - "P08 BO-732 POS & Device Assignment"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'custodianPrincipalId must name a principal, else 422 unknown-reference (r13 root R39)'
       x-ticvai-conflict-policy: serverWins
       summary: Who owns it, who holds it, and where it is
       description: '16.2.9, 16.2.10 and 16.2.11. **Ownership, custody and location are three facts and

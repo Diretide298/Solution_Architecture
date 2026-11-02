@@ -1,0 +1,52 @@
+id: CHG-R13R21-001
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: 'The tables the review found missing from an operation''s lists are declared: restoreConfigVersion writes whitelabel.content_page,
+  booking_flow_step, footer_config_column and footer_config_social_link; cloneProduct writes and reads catalogue.price (includePrices),
+  answers 409 duplicate-code for a code already used and clears familyKey; bulkChangePrices reads and writes catalogue.price;
+  getTenantLicences reads control.plan_module and control.plan_limit.'
+decision:
+  what: 'The lead, 2 November 2026, on the developer review''s root causes that r12 left unfixed: "lets see if we can do
+    something in parallel", then "yes" to fixing the mechanical ones at their source beside the r13 build lanes. Only what
+    needs no decision of the lead is done here; the rest is brought to the lead.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Developer review root R21 (findings 5.27780.2, 5.27859.2, 5.27859.5, 4.27807.2; tickets #27780, #27859, #27807): a
+  Done-when of ''writes only the tables its spec lists'' could not be met. modifyOrder and rescheduleOrder were settled
+  by r13 lane q (CHG-R13ORD-001) and finding 4.27809.3 by CR-436 (CHG-CR436-001); neither is redone.'
+keys_touched:
+  operations:
+  - restoreConfigVersion
+  - cloneProduct
+  - bulkChangePrices
+  - getTenantLicences
+  tables:
+  - whitelabel.content_page
+  - whitelabel.booking_flow_step
+  - whitelabel.footer_config_column
+  - whitelabel.footer_config_social_link
+  - catalogue.price
+  - control.plan_module
+  - control.plan_limit
+  files:
+  - contracts/satellite/white-label.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: an operation whose declared tables are fewer than its text writes or reads
+tickets:
+  started: []
+  unstarted:
+  - '27859 (cloneProduct, bulkChangePrices): the price rows, the 409 and the cleared family key.'
+  - '27780 (restoreConfigVersion): the four tables. 27807 (getTenantLicences): the two reads.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: developer review root R21 (r13 root-cause lane v)'
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-R13-WRITES-LISTED
+status: open
+notes: 'Not done, for the lead: bulkChangePrices'' effectiveFrom (a future-dated reprice) still has no column; where it
+  goes (a new price-list version or a scheduled change row) is a product choice. No database change.'

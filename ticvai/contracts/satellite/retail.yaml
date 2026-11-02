@@ -1266,7 +1266,9 @@ paths:
         for: 'the retail lines lineIds names on the orderId path (ADAM CR-096)'
       - query: fnb#deliveryLocationRecords
         route: in-process
-        for: 'collectionPointClosed: the collection point and its serving outlets (ADAM CR-096; the hours rule is CR-104)'
+        for: 'collectionPointClosed and the collectBy default: the collection point''s own opensAt and closesAt (ADAM
+          CR-096; the lead''s answer of 25 October 2026 to the r10 question 16 kept these over CR-104''s serving-outlet
+          hours, so no outlet hours are read; r13 root R41)'
       x-ticvai-audience: [staff, service]
       security:
         - bearerAuth: []
@@ -1292,7 +1294,9 @@ paths:
         (and no `saleId`), once per order, naming the retail lines marked for collection in
         `lineIds`. A staff caller at a till sends `saleId`. Exactly one of the two is sent.
 
-        **Collection point hours** (r8 walk of ticket 27820): the collection point (`fnb.DeliveryLocation`) has
+        **Collection point hours** (r8 walk of ticket 27820; the one rule, the lead's answer of 25 October 2026 to
+        the r10 question 16, which keeps these over CR-104's serving-outlet hours; r13 root R41): the collection point
+        (`fnb.DeliveryLocation`) has
         `opensAt` and `closesAt` (time of day, local to the venue). The drop is refused 409 `collectionPointClosed`
         when it would be collected while the point is closed, and `collectBy` defaults to the close of the point's
         day when the request sends none.
@@ -1597,6 +1601,17 @@ paths:
       - query: inventory#stockEarmarkRecords
         route: in-process
         for: 'its read of inventory.stock_earmark, Inventory''s data (CHG-MOD-001)'
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'the stock location each line''s earmark is made at: its merchandise''s outlet''s stock_location_id (r13
+          root R39)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'the venue''s opening hours (opening_hours, ADAM CR-338), whose close today ends the operating day that
+          bounds and defaults expiresAt (r13 root R39)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'the region''s time zone, in which that close is a wall-clock time (r13 root R39)'
       # Retail and Inventory run in one deployable (operations), so the earmark is an in-process call, not a
       # cross-deployable route (check-cross-deployable-writes X-STALE; r8 integration, CHG-R8INT-015).
       x-ticvai-calls:
@@ -1634,6 +1649,10 @@ paths:
         **The stock is set aside by Inventory, not by Retail** (R8 blocker APPROVALS-TENANCY-C34): each line
         earmarks its merchandise's stock item through Inventory's `createStockReservation`, in process, with
         `sourceType` `retailReservation` and `sourceId` this reservation's `id`; the earmark expires with it.
+        Its `locationId` is the stock location of the line's merchandise's outlet (`platform.outlet.stock_location_id`,
+        tenancy#outletRecords in process; r13 root R39). **The close of the venue's operating day** is today's
+        closing time in the venue's opening hours (`VenueOpeningHours`, tenancy#venueSettingsRecords), read in the
+        region's time zone (tenancy#regionSettingsRecords).
       tags: [floor]
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-guest-callable: true
@@ -2591,6 +2610,11 @@ components:
 
     ShopAndDrop:
       x-ticvai-retired-columns: [collection_point_id]
+      # **A guest reads its own drops** (r13 root R28, CHG-R13R28-001; ADAM CR-295's rule, as orders.sales_order):
+      # staff read and write by the venue, for a session with no guest subject; a guest reads (never writes) the rows
+      # whose subject_id is its own, so lookupShopAndDrop answers a guest who names no venue and never shows a guest
+      # another guest's drops at its venue.
+      x-ticvai-rls: guest-reads-own
       type: object
       x-ticvai-persistence: "retail.shop_and_drop + retail.shop_and_drop_line"
       required: [id, dropReference, collectionPointId, status, collectBy]

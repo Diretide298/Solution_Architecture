@@ -1,0 +1,52 @@
+id: CHG-R13R39-001
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: 'Declared reads for data the texts use: getCurrentSession reads tenancy#outletRecords (the outlet''s sale board);
+  setDeviceAssignment identity#principalRecords (the custodian); reserveMerchandise tenancy#outletRecords, venueSettingsRecords
+  and regionSettingsRecords (the earmark''s stock location, the operating day''s close, the time zone) and says the earmark''s
+  location; proposeTranslations catalogue#productRecords (productNames); getSiteSetupProgress whitelabel.booking_flow_step;
+  setSubscription control.plan_module and plan_limit.'
+decision:
+  what: 'The lead, 2 November 2026, on the developer review''s root causes that r12 left unfixed: "lets see if we can do
+    something in parallel", then "yes" to fixing the mechanical ones at their source beside the r13 build lanes. Only what
+    needs no decision of the lead is done here; the rest is brought to the lead.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Developer review root R39 (findings 3.27750.1, 3.27788.1, 4.27821.1, 1.27713.3, 5.27779.5, 4.27808.2; tickets #27750,
+  #27788, #27821, #27713, #27779, #27808): operations needed data their text uses and declared no read for it. Routes follow
+  r13 lane r''s in-process rule (CHG-R13INP-001).'
+keys_touched:
+  operations:
+  - getCurrentSession
+  - setDeviceAssignment
+  - reserveMerchandise
+  - proposeTranslations
+  - getSiteSetupProgress
+  - setSubscription
+  files:
+  - contracts/spine/identity.yaml
+  - contracts/spine/tenancy.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: an operation whose text uses data it declares no read for
+tickets:
+  started: []
+  unstarted:
+  - '27750, 27788, 27821, 27713, 27779: build the declared reads.'
+  - '27808 (setSubscription): the plan''s modules and limits; see notes.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: developer review root R39 (r13 root-cause lane v)'
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-R13-READS-DECLARED
+status: open
+notes: 'Left for the lead: setSubscription''s tenant-side half (the tenant''s enabled modules and usage live in the tenant
+  database and no served query answers them); getForecastAccuracy''s writer and formulas (AI engineers); searchCatalogue''s
+  isAvailable source; getMyMemberships'' field sources; the media referenceCount column (derived or dropped). resolveSyncRejection''s
+  requiresTimeWindow read is kept: tools/fix-read-routes.py still finds the fact in its text. No database change.'

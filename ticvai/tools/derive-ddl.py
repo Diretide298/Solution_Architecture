@@ -2247,6 +2247,11 @@ def table_marks(cols: dict, tables) -> dict:
         gs = marks.get("x-ticvai-guest-subject")
         if isinstance(gs, str) and gs.strip():
             entry["guest_subject"] = column_of(gs.strip()) or f"?{gs.strip()}"
+        # **Several guests a row names, on a table owned through its parent** (r13 root R28, CHG-R13R28-001): a list
+        # beside `x-ticvai-rls: guest-reads-own` (orders.ticket_transfer's fromSubjectId and toSubjectId) is read by
+        # whoever its parent shows it to, or by the guest any of those columns names. See GUEST_PARENT_READ.
+        elif isinstance(gs, list) and gs:
+            entry["guest_subjects"] = [column_of(str(x).strip()) or f"?{x}" for x in gs]
         # **A table that takes no scope** (CHG-R9MIG-001, CR-166): `x-ticvai-scope: none`; see DESCOPED.
         sc = marks.get("x-ticvai-scope")
         if sc is not None:
@@ -3562,6 +3567,7 @@ def main() -> int:
     split_write: dict = {}    # table -> its write check, `{a}` standing for the row's alias
     split_depth: dict = {}
     guest_parent: set = set()   # parent-owned tables marked guest-owns (CHG-R11GST-002)
+    guest_parent_read: dict = {}   # parent-owned tables marked guest-reads-own with a guest-subject list (R28)
     parent_of = {p[0]: p for p in by_parent}
     for t in sorted(real):
         mark = (marks.get(t) or {}).get("rls") or TABLE_RLS.get(t)
@@ -3605,6 +3611,16 @@ def main() -> int:
                 print(f"  ! {t}: x-ticvai-rls guest-owns needs a subject_id; the base rule stands")
                 continue
             guest_parent.add(t)   # its policy is written with its parent's, below (CHG-R11GST-002, CR-291)
+            continue
+        gsubs = (marks.get(t) or {}).get("guest_subjects")
+        if mark == "guest-reads-own" and gsubs and t in parent_of and t not in shared_scope and t not in APPEND_AUDIT:
+            # **GUEST_PARENT_READ** (r13 root R28, CHG-R13R28-001): read where the parent shows the row, or by the
+            # guest one of the named columns holds; written only where the parent may be written, as before.
+            has_t = {c["column"] for c in cols[t]}
+            if any(g.startswith("?") or g not in has_t for g in gsubs):
+                print(f"  ! {t}: x-ticvai-guest-subject names {gsubs}, not all of them its columns; the base rule stands")
+                continue
+            guest_parent_read[t] = gsubs   # its policy is written with its parent's, below
             continue
         if t in shared_scope or t in parent_of or t in APPEND_AUDIT or t == SCOPE_TABLE:
             print(f"  ! {t}: x-ticvai-rls {mark} on a shared-scope, parent-owned or append-only table is not "
@@ -3789,6 +3805,16 @@ def main() -> int:
         protected[t] = "parent"
     # A child of a split row follows it for reading only: its writes take the parent's write check, down the chain.
     for i, (t, col, par, key, *_rest) in enumerate(list(by_parent)):
+        if t in guest_parent_read:
+            # GUEST_PARENT_READ (r13 root R28): the parent's read, or a guest the row names; the parent's write.
+            link = f"pr.{q(key)} = {tq(t)}.{q(col)}"
+            pw = f" AND ({split_write[par].format(a='pr')})" if par in split_write else ""
+            rd = (f"EXISTS (SELECT 1 FROM {tq(par)} pr WHERE {link}) OR "
+                  + " OR ".join("(" + GUEST_SUBJECT.replace("{a}subject_id", q(g)).format(a="") + ")"
+                                for g in guest_parent_read[t]))
+            wr = f"EXISTS (SELECT 1 FROM {tq(par)} pr WHERE {link}{pw})"
+            by_parent[i] = (t, col, par, key, split_write.get(par, "TRUE").format(a="parent_row"), rd, wr)
+            continue
         if t in guest_parent:
             # **Staff through the parent, the guest by its own subject** (CHG-R11GST-002; ADAM CR-291, option B, and
             # CR-295's rule): read and written through the parent for a session with no guest subject, as the parent

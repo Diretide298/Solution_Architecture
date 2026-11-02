@@ -1,0 +1,60 @@
+id: CHG-R13R28-001
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: claimCart reads and attaches the anonymous cart under ITenantRootGrant once its checks pass, for that one cart
+  (CR-471's pattern), with the shared 404; retail.shop_and_drop is guest-reads-own (staff by venue, a guest reads its own
+  drops); orders.ticket_transfer is read where its order is visible or by the guest from_subject_id or to_subject_id names
+  (a new derive-ddl rule for a parent-owned table, x-ticvai-guest-subject as a list); revokeEntitlementShare answers a guest
+  who is not the owner the shared 404 before any write.
+decision:
+  what: 'The lead, 2 November 2026, on the developer review''s root causes that r12 left unfixed: "lets see if we can do
+    something in parallel", then "yes" to fixing the mechanical ones at their source beside the r13 build lanes. Only what
+    needs no decision of the lead is done here; the rest is brought to the lead.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Developer review root R28 (findings 3.27735.1, 3.27820.1, 5.27734.1, 6.28285.2; tickets #27735, #27820, #27734, #28285):
+  row security shut out the caller each operation names. The 404 is the package rule that a guest operation answers another
+  subject''s record 404 (CHG-R8SPN-018); the root-grant block follows CHG-CR471-001.'
+keys_touched:
+  operations:
+  - claimCart
+  - lookupShopAndDrop
+  - listTicketTransfers
+  - revokeEntitlementShare
+  schemas:
+  - ShopAndDrop
+  - TicketTransfer
+  tables:
+  - orders.cart
+  - retail.shop_and_drop
+  - retail.shop_and_drop_line
+  - orders.ticket_transfer
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/satellite/retail.yaml
+  - tools/derive-ddl.py
+  - tools/check-business-rules.py
+root_class: row security that hides a row from the guest the operation serves
+tickets:
+  started:
+  - '30639 [DB] retail.shop_and_drop (Ready for QA, Hrushikant Patkar): the split policy (staff by venue for a session with
+    no guest subject, the guest''s own rows read) and shop_and_drop_line''s split parent policy.'
+  - '30488 [DB] orders.ticket_transfer (Ready for QA, Hrushikant Patkar): the split policy, read also by from_subject_id
+    or to_subject_id, written through the order as before.'
+  unstarted:
+  - '27735 (claimCart): the root-grant block and the 404.'
+  - '27820 (lookupShopAndDrop), 27734 (listTicketTransfers): no code change once the policies apply.'
+  - '28285 (revokeEntitlementShare): the owner test before the write.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: developer review root R28 (r13 root-cause lane v)'
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-R13-GUEST-ROWS
+status: open
+notes: 'Database change: three policies re-applied (tenant). Generator rule GUEST_PARENT_READ in tools/derive-ddl.py. check-rls-scope-fit
+  judges staff, partner and device callers only; extending it to guests is the class check the review asked for and is brought
+  to the lead. **Found, not fixed**: a guest cannot write orders.ticket_transfer either (transferOrderTickets, claimTicketTransfer),
+  since the order''s write check admits staff only.'

@@ -2057,6 +2057,11 @@ paths:
       - subscription
       x-ticvai-permission: PLATFORM_TENANT_MANAGE
       x-ticvai-scope-level: tenant
+      x-ticvai-reads:
+      - table: control.plan_module
+        for: 'the downgrade check: the modules the target plan includes (r13 root R39)'
+      - table: control.plan_limit
+        for: 'the downgrade check: the limits the target plan sets (r13 root R39)'
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -2201,6 +2206,11 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
+      x-ticvai-reads:
+      - table: control.plan_module
+        for: 'the modules the tenant''s plan includes, for LicencePosition (r13 root R21)'
+      - table: control.plan_limit
+        for: 'the limits the tenant''s plan sets, for LicencePosition (r13 root R21)'
       responses:
         '200':
           description: Licence position
@@ -12724,6 +12734,10 @@ components:
     ModuleListing:
       type: object
       x-ticvai-persistence: control.module_listing
+      # **One listing per module code, held by the database** (r13 root R20, CHG-R13R20-001): setModuleListing
+      # creates or replaces the listing its path's moduleCode names.
+      x-ticvai-unique-together:
+      - [moduleCode]
       description: 'Board 4.6. **A marketplace without a dependency graph sells combinations that
         cannot be provisioned.**
 

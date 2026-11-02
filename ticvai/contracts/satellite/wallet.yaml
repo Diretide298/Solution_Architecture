@@ -1470,7 +1470,8 @@ paths:
         **Added 21 October 2026 (r8 gate, CHG-R8RW-007; the contract gap CHG-WIR-027 of 2 October): `setWalletTransferRules`
         was a PUT nothing read**, so BO-1144 could not show the saved rules. Returns the tenant's rules, the ones
         `setWalletTransferRules` writes, or before the first save the defaults that set would get. The `ETag` header
-        carries the version the PUT takes as `If-Match`.
+        carries the version the PUT takes as `If-Match`: the row's `version` (`wallet.transfer_rule.version`; ADAM
+        CR-332's rule, r13 root R24).
       tags:
       - wallet
       x-ticvai-permission: WALLET_VIEW
@@ -1485,6 +1486,7 @@ paths:
           description: The rules
           headers:
             ETag:
+              description: The rules' `version` (wallet.transfer_rule.version), quoted (ADAM CR-332's rule, r13 root R24).
               schema:
                 type: string
           content:
@@ -1516,6 +1518,11 @@ paths:
 
         `transferWalletBalance` performs the transfer; this decides whether it is allowed.
 
+        **Its ETag is the row''s `version`** (ADAM CR-332''s rule for the wallet''s If-Match PUTs, which
+        getWalletTransferRules already promised; r13 root R24, CHG-R13R24-001): `wallet.transfer_rule.version` is 1
+        on create and bumped on every write, and is sent as `ETag` on `getWalletTransferRules` and here; an `If-Match`
+        that is not the current version is `412` and nothing changes.
+
         '
       tags:
       - wallet
@@ -1540,6 +1547,10 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+            ETag:
+              description: The rules' new `version`, quoted (ADAM CR-332's rule, r13 root R24).
+              schema:
+                type: string
           description: Set
           content:
             application/json:
@@ -5838,6 +5849,8 @@ components:
       type: object
       x-ticvai-persistence: wallet.transfer_rule
       description: 'Boards 7.2 and 7.3. **A money-transmission question before it is a feature.**'
+      required:
+      - version
       properties:
         peerToPeerAllowed:
           type: boolean
@@ -5861,6 +5874,15 @@ components:
           default: false
         scopePath:
           type: string
+        version:
+          type: integer
+          minimum: 1
+          default: 1
+          readOnly: true
+          description: '**The row''s version, its ETag** (ADAM CR-332''s rule for the wallet''s If-Match PUTs, the one
+            getWalletTransferRules already promised; r13 root R24, CHG-R13R24-001): 1 on create and bumped on every
+            write; `getWalletTransferRules` and `setWalletTransferRules` send it as `ETag`, and `setWalletTransferRules`
+            checks `If-Match` against it (`412` on a mismatch).'
     WalletRefundPolicy:
       type: object
       x-ticvai-persistence: wallet.refund_policy

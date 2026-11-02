@@ -1,0 +1,46 @@
+id: CHG-R13R27-001
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: reprintOrder takes X-Order-Access-Token and X-Device-Id, checked as getOrder checks them, so a guest who checked
+  out without an account can resend or reprint (its statements under ITenantRootGrant, as getOrder's token read); delivery
+  wallet answers walletPasses in issueWalletPass's shape (one orders.wallet_pass per ticket, reissued rather than duplicated);
+  its text says email, SMS and WhatsApp go through sendTransactionalMessage; a 404 is declared.
+decision:
+  what: 'The lead, 2 November 2026, on the developer review''s root causes that r12 left unfixed: "lets see if we can do
+    something in parallel", then "yes" to fixing the mechanical ones at their source beside the r13 build lanes. Only what
+    needs no decision of the lead is done here; the rest is brought to the lead.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Developer review root R27 (findings 4.27737.1, 4.27737.2, 4.27742.1, 5.27734.5, 5.27734.6; tickets #27737 WEB-013,
+  #27742 GST-010, #27734): reprintOrder could not do what the guest screens ask. The texts already agreed that delivery
+  wallet is the whole of ''Add to wallet'' (IDENTITY-C29, CHG-R8SPN-025); only the answer lacked the passes.'
+keys_touched:
+  operations:
+  - reprintOrder
+  tables:
+  - orders.wallet_pass
+  - orders.ticket_template
+  files:
+  - contracts/spine/orders.yaml
+  - tools/check-business-rules.py
+root_class: an operation a screen calls for a caller and an answer the operation does not declare
+tickets:
+  started: []
+  unstarted:
+  - '27734 (reprintOrder): the token path, the passes and the message route.'
+  - '27737 WEB-013 and 27742 GST-010: send the token and the device id; add the answered passes.'
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+adam_cr: 'none: developer review root R27 (r13 root-cause lane v)'
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-R13-REPRINT-GUEST
+status: open
+notes: 'No database change; no approved frame changes (the bindings the screens already draw now work). **Left for the lead**:
+  ''The order''s email, prefilled'' on WEB-013 and GST-010 has no source (an order holds only the hashed contact), and ''each
+  kiosk reprint is recorded against the device'' has no column on orders.order_event. **Not declared, and why**: an x-ticvai-write-via
+  to marketing.message_dispatch makes check-rls-scope-fit report a new RF-TENANT-ROOT, because that table is written only
+  under the tenant root while every sender runs at venue (createPaymentLink and resendPaymentLink carry the same, known
+  finding); the table''s policy is the fix, brought to the lead.'

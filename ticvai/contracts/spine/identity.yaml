@@ -1713,7 +1713,13 @@ paths:
 
 
         **Idempotent on the export id and the owner**: a redelivered event finds the part recorded and returns it.
-        Invoked by the event relay, never by a screen.'
+        Invoked by the event relay, never by a screen.
+
+
+        **The two NOT NULL columns the body did not carry** (r13 root R40, CHG-R13R40-001): the part''s `owner` is
+        the module that published the event, `marketing-crm` (this operation consumes only
+        `marketing.subjectDataPartWritten`), set by Identity, never sent; its `writtenAt` is the event''s `writtenAt`,
+        sent in the body.'
       tags:
       - identity
       x-ticvai-permission: null
@@ -1754,6 +1760,13 @@ paths:
                 rowCount:
                   type: integer
                   minimum: 0
+                writtenAt:
+                  type: string
+                  format: date-time
+                  description: 'The event''s `writtenAt`, when the owner wrote its part; stored as the part''s
+                    `writtenAt` (r13 root R40). **Required in fact**: a body without it is refused `400 validation`;
+                    the schema leaves it optional only so a client built at r1 still validates.'
+                  x-ticvai-stored-as: identity.subject_data_export_part.written_at
       responses:
         '200':
           headers:
@@ -2616,6 +2629,10 @@ paths:
       - query: tenancy#workstationRecords
         route: in-process
         for: 'the session''s workstation fields: code, regionId and devices (ADAM CR-096)'
+      - query: tenancy#outletRecords
+        route: in-process
+        for: 'Session.saleBoardId where the workstation stores none (sale_board null, saleBoardSource outlet): its
+          outlet''s sale_board_id (r13 root R39)'
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'currency, currencyScale and timezone, from the workstation''s region (ADAM CR-096)'
