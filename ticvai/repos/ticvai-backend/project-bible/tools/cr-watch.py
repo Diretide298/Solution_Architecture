@@ -1478,7 +1478,7 @@ def _t_auto(fails):
             (got[0]["status"], got[0].get("release"), "ref" in got[0]), ("done", False, False))
     _expect(fails, "auto: fixed closes done at the release", (got[2]["status"], got[2].get("ref")), ("done", "r12"))
     _expect(fails, "auto: not a problem is rejected", got[3]["status"], "rejected")
-    with tempfile.TemporaryDirectory() as d:
+    with tempfile.TemporaryDirectory() as d, contextlib.redirect_stdout(io.StringIO()):
         state = {"project": "ticvai", "pending": dict(pending)}
         a = argparse.Namespace(adam="https://adam.example")
         seen = []
