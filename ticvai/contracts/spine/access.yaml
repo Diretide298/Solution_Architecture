@@ -161,12 +161,14 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/AccessPoint'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Access answers with its access.access_point rows, as it stores them and as the caller's scope
-      lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Access' service route (serviceAuth).
-    served: [service]
+      October). Access answers with its access.access_point rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process by the
+      commerce host, which composes Access's query classes, through the C# query class Access implements, under the
+      caller's row-level security (CHG-R13INP-001). It is asked from another deployable through Access' service
+      route (serviceAuth).
+    served: [in-process, service]
   blacklistRecords:
     module: access
     table: access.blacklist
@@ -334,7 +336,7 @@ paths:
         - "P02 GST-012 My Tickets"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
@@ -411,7 +413,7 @@ paths:
         route: in-process
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: identity#delegatedAccessRecords
         route: service
@@ -517,7 +519,7 @@ paths:
         route: service
         for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'productName, imageUrl and guestCategory of each entitlement, Catalogue''s data (R8 blocker ORDERS-MONEY-C20, CHG-R8MIG-009)'
       security:
       - guestAuth: []
@@ -778,7 +780,7 @@ paths:
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-write-via:
       - table: pii.subject_biometric
@@ -1071,10 +1073,10 @@ paths:
         route: service
         for: 'its read of marketing.consent_record, Marketing''s data (CHG-MOD-001)'
       - query: tenancy#regionSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-write-via:
       - table: marketing.consent_record
@@ -1367,7 +1369,7 @@ paths:
       x-ticvai-read-via:
       - query: identity#subjectBiometricRecords
         route: service
-        for: 'the enrolment it revokes (pii.subject_biometric, Identity''s data; CHG-MOD-001), on Identity''s service route listSubjectBiometricRecords, connected when the kernel''s service sign-in (#37051) is ready (ADAM CR-391)'
+        for: 'the enrolment it revokes (pii.subject_biometric, Identity''s data; CHG-MOD-001), on Identity''s service route listSubjectBiometricRecords (POST /queries/subject-biometric-records, ADAM CR-438), connected when the kernel''s service sign-in (#37051) is ready (ADAM CR-391)'
       x-ticvai-write-via:
       - table: pii.subject_biometric
         event: biometric.enrolmentChanged
@@ -1394,8 +1396,9 @@ paths:
 
 
         **How the row is destroyed** (ADAM CR-391, Chinmay, 31 October 2026). The operation reads the enrolment
-        through `identity#subjectBiometricRecords` on Identity''s service route (`listSubjectBiometricRecords`,
-        `serviceAuth`); the access role gets no grant on `pii`. If the `enrolmentId` is unknown, is not a
+        through `identity#subjectBiometricRecords` on Identity''s service route (`listSubjectBiometricRecords`, POST
+        /queries/subject-biometric-records with `ids` or `where` as the body, ADAM CR-438; `serviceAuth`); the
+        access role gets no grant on `pii`. If the `enrolmentId` is unknown, is not a
         `facePass`, or belongs to another guest (for a guest caller), the answer is `404 not-found`. Otherwise it
         publishes `biometric.enrolmentChanged` with `change` `revoked` and the row''s fields, and answers `204`. On
         `revoked`, Identity''s consumer deletes the `pii.subject_biometric` row; it never deactivates it. The
@@ -2975,10 +2978,10 @@ paths:
         for: 'the caller''s working venue''s path (platform.scope, by id), written as the profile''s scope_path,
           Tenancy''s data (ADAM CR-400, decided 31 October 2026, CR-217''s rule; CHG-CR400-001; XDR-036)'
       - query: tenancy#regionSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -3063,10 +3066,10 @@ paths:
         - "P08 BO-220 Multi-Park & Crossover Journey Orchestrator"
       x-ticvai-read-via:
       - query: tenancy#regionSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -3175,7 +3178,7 @@ paths:
         operation: createApprovalRequest
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -3347,7 +3350,7 @@ paths:
         route: in-process
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'the group entitlement''s productName and imageUrl, from catalogue.product and its catalogue.product_media,
           Catalogue''s data (CHG-R8MIG-009) (r8 gate, CHG-R8GT2-007; check-cross-module-reads XR-FACT)'
       x-ticvai-audience:
@@ -3501,7 +3504,7 @@ paths:
         route: in-process
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
@@ -4120,7 +4123,7 @@ paths:
         - "P08 BO-342 Media Replacement, Revocation & Rebinding Rules"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'the product replacementFeeReference names (422 unknown-product) (CHG-MOD-003)'
       x-ticvai-audience:
       - staff
@@ -4628,7 +4631,7 @@ paths:
         - "P08 BO-349 RFID, NFC, Card & Wristband Media Designer"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it accepts or answers: RfidNfcCardWristbandMediaDesignerInput.depositReferenceWhereApplicable, RfidNfcCardWristbandMediaDesignerView.depositReferenceWhereApplicable (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-body-key: [templateId]
       x-ticvai-body-key-note: 'Keyed by the body''s `templateId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per ticket media template within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
@@ -4979,7 +4982,7 @@ paths:
         - "P08 BO-354 Credential Operations Command Center"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
@@ -5117,7 +5120,7 @@ paths:
         route: in-process
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
@@ -5191,7 +5194,7 @@ paths:
         - "P08 BO-356 Credential Generation & Issuance Monitor"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
@@ -6348,7 +6351,7 @@ paths:
         - "P08 BO-153 Topology Validation & Publication"
       x-ticvai-read-via:
       - query: approvals#ruleRecords
-        route: service
+        route: in-process
         for: 'what its text calls "ApprovalRule.subjectTypes": approvals.rule, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-body-key: [configurationVersionId]
       x-ticvai-body-key-note: 'Keyed by the body''s `configurationVersionId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access configuration version within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
@@ -8941,10 +8944,10 @@ paths:
         - "P08 BO-187 Biometric Consent & Guardian Management"
       x-ticvai-read-via:
       - query: tenancy#regionSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.RegionSettings.minorAgeThreshold": platform.region_settings, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'what its text calls "tenancy.VenueSettings.biometrics": platform.venue_settings, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -9453,7 +9456,7 @@ paths:
         - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-read-via:
       - query: tenancy#dataRetentionSettingRecords
-        route: service
+        route: in-process
         for: 'its read of tenancy.data_retention_setting, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -9509,7 +9512,7 @@ paths:
         - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-read-via:
       - query: tenancy#dataRetentionSettingRecords
-        route: service
+        route: in-process
         for: 'its read of tenancy.data_retention_setting, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: tenancy.data_retention_setting
@@ -10921,7 +10924,7 @@ paths:
         - "P08 BO-216 Group Leader & Fast B2B Validation"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
         route: service
@@ -12569,7 +12572,7 @@ paths:
         - "P08 BO-242 Policy Simulation, Conflict & Impact Analysis"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-body-key: [policyId]
       x-ticvai-body-key-note: 'Keyed by the body''s `policyId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per access policy within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
@@ -13225,7 +13228,7 @@ paths:
         - "P08 BO-253 Security Analytics, AI Detection & Governance"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords
-        route: service
+        route: in-process
         for: 'the venue''s frozen trading currency and scale (currency_code, currency_scale) for the Money it answers: SecurityAnalyticsAiDetectionGovernanceView.estimatedFraudPrevented, SecurityAnalyticsAiDetectionGovernanceView.financialExposure (naming-and-style 5.1, ADR-0018; CHG-R10GEN-002)'
       x-ticvai-audience:
       - staff
@@ -13526,7 +13529,7 @@ paths:
         route: in-process
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001); in process in the access host (ADAM CR-240 sibling; XDR-003)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
         route: service
@@ -13650,7 +13653,7 @@ paths:
         - "P08 BO-258 Entry, Exit, Re-entry & Crossover Analytics"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
@@ -13743,7 +13746,7 @@ paths:
         - "P08 BO-260 Validation Outcome & Rejection Analytics"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
         route: service
@@ -15348,7 +15351,7 @@ paths:
         - "P08 BO-196 Physical Device Registration & Provisioning"
       x-ticvai-read-via:
       - query: tenancy#deviceRecords
-        route: service
+        route: in-process
         for: 'what its text calls "platform.device": platform.device, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
@@ -15439,7 +15442,7 @@ paths:
         - "P08 BO-196 Physical Device Registration & Provisioning"
       x-ticvai-read-via:
       - query: tenancy#deviceRecords
-        route: service
+        route: in-process
         for: 'what its text calls "platform.device": platform.device, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
@@ -16350,7 +16353,7 @@ paths:
         - "P08 BO-177 Verification Method Selection & Locking"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-body-key: [productId]
       x-ticvai-body-key-note: 'Keyed by the body''s `productId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per product within the caller''s venue; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
@@ -17131,7 +17134,7 @@ paths:
         - "P08 BO-247 Unified Identity & Credential Lock Manager"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -17226,7 +17229,7 @@ paths:
         - "P08 BO-247 Unified Identity & Credential Lock Manager"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff

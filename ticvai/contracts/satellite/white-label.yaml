@@ -1775,7 +1775,7 @@ paths:
         - "P13 CMS-011 Translations"
       x-ticvai-read-via:
       - query: tenancy#activeVenues
-        route: service
+        route: in-process
         for: 'the venues whose overrides it returns: platform.scope, Tenancy''s data (CHG-RTE-001)'
       x-ticvai-audience:
       - staff
@@ -2298,7 +2298,7 @@ paths:
         - "P13 CMS-105 Kiosk Builder"
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
-        route: service
+        route: in-process
         for: 'whether the workstation is in this venue (404 not-found) (CHG-MOD-003)'
       x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
         the kiosk''s counterpart of getPublishedTenantConfig, served the same way'
@@ -4358,13 +4358,6 @@ paths:
       x-ticvai-reads:
       - table: whitelabel.tenant_config
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
-      x-ticvai-read-via:
-      - query: orders#ticketTemplateRecords
-        route: service
-        for: 'the ticket and pass templates the PDF ticket and Wallet passes are rendered from (ADAM CR-096)'
-      - query: catalogue#productRecords
-        route: service
-        for: 'productId: the product whose own ticket is rendered (ADAM CR-096)'
       x-ticvai-audience:
       - staff
       summary: Generate a preview link
@@ -4390,6 +4383,17 @@ paths:
         writing their references into the same cache entry. `url` is the route
         `https://<the tenant''s platform subdomain>/previews/{previewId}`, served by the guest web host from that
         entry until `expiresAt`; `getPreview` reads the entry back.
+
+
+        **It reads nothing from Catalogue or Orders** (ADAM CR-476, Chinmay, 2 November 2026). It asks no query
+        of either and calls no service route, and the operations role gets no grant on `orders.ticket_template`.
+        It validates the body and writes `cache:preview:{tenantId}:{previewId}` with `expiresAt`; in the same
+        transaction it writes `preview.requested` to the outbox (`previewId`, `platform`, `language`, `outputs`,
+        `productId` as sent, `expiresAt`), then answers `201` with the Preview (CR-106). Rendering the app, the PDF
+        ticket and the Wallet passes is the white-label jobs component''s work in the workers host, triggered by
+        `preview.requested`: like every consumer in the workers host it asks `catalogue#productRecords` (ids
+        `[productId]`) and `orders#ticketTemplateRecords` in process, and Orders implements ticketTemplateRecords
+        as an in-process query class. That renderer is its own ticket.
 
         '
       tags:
@@ -4612,7 +4616,7 @@ paths:
         route: in-process
         for: 'what its text calls "GuestMatchPolicy.matchBy": marketing.guest_match_policy, Marketing''s data (CHG-R10GEN-001)'
       - query: orders#venueChargeCurrencies
-        route: service
+        route: in-process
         for: 'what its text calls "orders.PaymentProvider.supportedMethods": payments.provider, Order''s data (CHG-R10GEN-001)'
       - query: catalogue#productRecords
         route: in-process
@@ -5065,7 +5069,7 @@ paths:
         route: in-process
         for: 'what its text calls "GuestMatchPolicy.matchBy": marketing.guest_match_policy, Marketing''s data (CHG-R10GEN-001)'
       - query: orders#venueChargeCurrencies
-        route: service
+        route: in-process
         for: 'what its text calls "orders.PaymentProvider.supportedMethods": payments.provider, Order''s data (CHG-R10GEN-001)'
       x-ticvai-config-scope: tenant
       x-ticvai-audience:
@@ -5155,8 +5159,13 @@ paths:
         for: 'what this operation reads (r8 walk fix, CHG-R8WFC-004: was path-inferred in the lineage, checked against the description and stated here)'
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
-        for: 'its read of catalogue.product, Catalogue''s data (ADR-0055), to name the products a changed flow reaches'
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (ADR-0055), to name the products a changed flow reaches:
+          where {bookingFlowId} or {venueId} (in process since ADAM CR-475; XDR-051)'
+      - query: catalogue#productCategoryRecords
+        route: in-process
+        for: 'the category''s bookingFlowId, the second step of the flow rule (catalogue.product_category; ADAM CR-475;
+          XDR-051)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5170,6 +5179,17 @@ paths:
         `affectedProducts` lists, for the flows that differ, each product the flow serves, found by the rule
         `Product.bookingFlowId` already states: the product''s own flow, else its category''s, else the venue''s
         default flow for the product''s kind. The server applies that rule on read; nothing is stored.
+
+
+        **Catalogue is asked in process** (ADAM CR-475, Chinmay, 2 November 2026). The operations host asks
+        `catalogue#productRecords` and `catalogue#productCategoryRecords` through Catalogue''s own query classes,
+        already registered there for deleteBookingFlow (CR-426), under the caller''s row-level security; no service
+        route is called. `affectedProducts` lists, for each flow added, removed or modified between the two
+        versions, every product that flow serves. A product''s flow is found by the rule getPublishedBookingFlow
+        applies (CR-427): the product''s own `bookingFlowId`, else its category''s `bookingFlowId`, else the venue''s
+        default flow whose type lists the product''s kind. productRecords and productCategoryRecords are asked with
+        where {bookingFlowId} or {venueId} as needed. Nothing is stored. No grant or migration is needed: V0118
+        already grants `catalogue.product` and `catalogue.product_category` (XDR-051).
 
         '
       tags:
@@ -5531,11 +5551,11 @@ paths:
       x-ticvai-idempotency-exempt: A preview computed in process from the draft answers; it writes nothing, so a replay duplicates no row (r8 integration, CHG-R8INT-014).
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'the products each combination of answers leaves, by the same answer filter listProducts applies for a
           guest (r8, WHITE-C26)'
       - query: catalogue#productEligibilityRuleRecords
-        route: service
+        route: in-process
         for: 'the age and height limits an age or level answer filters on (r8, WHITE-C26)'
       x-ticvai-audience:
       - staff
@@ -6240,8 +6260,8 @@ paths:
         for: 'the promo blocks active now, read live for promoBlocks (ADAM CR-327, option A (2))'
       x-ticvai-read-via:
       - query: payments#providerConnectionRecords
-        route: service
-        for: 'its read of payments.provider_connection, for `paymentTokenisation`, through the service route: White-label runs in operations, Payments in commerce (lineage request, r8; CHG-R8INT-005)'
+        route: in-process
+        for: 'its read of payments.provider_connection, for `paymentTokenisation`, in process: the operations host composes Orders'' query classes, Payments among them (lineage request, r8; CHG-R8INT-005; in process since CHG-R13INP-001, XDR-075)'
       - query: assets#mediaAssetRecords
         route: in-process
         for: 'what its text calls "MediaAsset.url": assets.media_asset, VenueOps''s data (CHG-R10GEN-001)'

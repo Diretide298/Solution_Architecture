@@ -1,0 +1,43 @@
+id: CHG-CR475-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'diffConfigVersion asks catalogue#productRecords and catalogue#productCategoryRecords in process from the
+  operations host, through Catalogue''s query classes registered there for deleteBookingFlow (CR-426), under the
+  caller''s row-level security; no service route. affectedProducts lists, for each flow added, removed or modified,
+  every product that flow serves, by getPublishedBookingFlow''s rule (CR-427): the product''s own bookingFlowId, else
+  its category''s, else the venue''s default flow whose type lists the product''s kind; the queries are asked with where
+  {bookingFlowId} or {venueId}. Nothing is stored; no grant or migration (XDR-051, V0118).'
+decision:
+  what: 'Posted on #30768 (Chinmay, 2 November 2026), under the lead''s "approve all as a recommended" of 2 November
+    2026: "Build now: diffConfigVersion asks catalogue#productRecords and catalogue#productCategoryRecords in process
+    from the operations host. Use Catalogue''s own query classes, already registered there for deleteBookingFlow
+    (CR-426), under the caller''s row-level security; call no service route. affectedProducts lists ... every product
+    that flow serves. A product''s flow is found by the rule getPublishedBookingFlow applies (CR-427) ... Query
+    productRecords and productCategoryRecords with where {bookingFlowId} or {venueId} as needed. Nothing is stored. No
+    grant or migration is needed: V0118 already grants catalogue.product and catalogue.product_category."'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-475 (Deep Khanvilkar, #30768 diffConfigVersion, blocking): the read was declared on the service route
+  although CR-426 settled the same query from the same host in process (XDR-051), and the flow rule''s category step
+  needed productCategoryRecords, which was not declared.'
+keys_touched:
+  operations: [diffConfigVersion]
+  tables: [catalogue.product, catalogue.product_category]
+  files:
+  - contracts/satellite/white-label.yaml
+  - tools/check-business-rules.py
+root_class: 'a read the host already asks in process declared on the service route (the class of CHG-R13INP-001)'
+tickets:
+  started: []
+  unstarted:
+  - '30768 (diffConfigVersion, Deep): ask both Catalogue queries in process as deleteBookingFlow does.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-475
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CONFIG-DIFF-PRODUCTS
+status: open
+notes: 'The class is CHG-R13INP-001 (check-cross-module-reads XR-INPROCESS-HOST). Beyond the posted words: none.'

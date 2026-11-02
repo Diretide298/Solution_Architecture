@@ -288,6 +288,10 @@ reads:
   privileges: [SELECT]
   queries: [identity#subjectRecords]
   operations: [listDeviceBindingSession]
+  # `narrow`: this entry grants its query to its own operations only, as its why says ("No other Access operation reads
+  # pii.subject in process under this entry"); tools/check-cross-module-reads.py XR-ROUTE and XR-INPROCESS-HOST and
+  # tools/contract_shapes.py read_route hold it so (r13, CHG-R13INP-001).
+  narrow: true
   added: '2026-10-29'
   decision_ref: ADAM CR-302, option A, Chinmay, 29 October 2026
   why: 'access listDeviceBindingSession (Access, access host, BO-167) answers each device binding''s user, and the
@@ -533,3 +537,176 @@ reads:
     operations host, in the caller''s transaction under the caller''s row-level security, with their where input,
     as createFnbOrder does under XDR-008 and validateTenantConfig under XDR-022. The SELECT on the three tables is
     the one V0118 already grants the operations role (XDR-008); no grant or migration is added.'
+- id: XDR-071
+  reader: operations
+  tables: [orders.order_line]
+  privileges: [SELECT]
+  queries: [orders#orderLineRecords]
+  operations: [createShopAndDrop]
+  added: '2026-11-02'
+  decision_ref: 'ADAM CR-477, Chinmay, 2 November 2026 (posted on #30870: "Hrushikant adds a guarded grant of USAGE on
+    schema orders and SELECT on orders.order_line to the operations role")'
+  why: 'retail createShopAndDrop (operations host, #30870), on the orderId path, asks orders#orderLineRecords where
+    {orderId} in process, through Orders'' query class already composed in the operations host (CR-385), under the
+    caller''s row-level security: an orderId with no visible line is 422 unknown-order, and a lineIds entry that is not
+    one of those lines is 422 unknown-line. The operations role had no grant on orders.order_line nor USAGE on schema
+    orders (V0122 grants only payments.method, XDR-028). SELECT only; tools/derive-ddl.py writes the guarded grant and
+    the schema''s USAGE. The grant is by deployable and query, so the other operations-host readers of
+    orders#orderLineRecords ask it in process on it too (XDR-075, CHG-R13INP-001).'
+- id: XDR-072
+  reader: operations
+  tables: [promotions.promotion, promotions.promotion_rule]
+  privileges: [SELECT]
+  queries: [promotions#liveEffectivePrice]
+  operations: [lookupMerchandise]
+  added: '2026-11-02'
+  decision_ref: 'ADAM CR-478, Chinmay, 2 November 2026 (posted on #30871: "Hrushikant adds a guarded grant of USAGE on
+    schema promotions and SELECT on promotions.promotion and promotions.promotion_rule to the operations role")'
+  why: 'retail lookupMerchandise (operations host, #30871) answers PriceCheck.effectivePrice from
+    promotions#liveEffectivePrice, asked in process: an in-process query class of Catalogue''s Promotions module,
+    registered in the operations host with Catalogue''s other query classes, running the evaluation code
+    evaluatePromotions uses (#31714) for stacking, precedence and the zero floor, never a copy, under the caller''s
+    row-level security. A buyer''s own conditions (segments, codes) are not applied, so promotions.coupon_code is not
+    read, and catalogue.price_list is already granted (XDR-007). SELECT only, read only.'
+- id: XDR-073
+  reader: operations
+  tables: [accreditation.application, accreditation.credential, accreditation.holder, accreditation.validity,
+    approvals.request, platform.device, tenancy.data_retention_setting, workforce.shift]
+  privileges: [SELECT]
+  queries: [accreditation#applicationRecords, accreditation#credentialRecords, accreditation#holderRecords,
+    accreditation#validityRecords, approvals#requestRecords, tenancy#dataRetentionSettingRecords,
+    tenancy#deviceRecords, workforce#shiftRecords]
+  operations: [approveMembershipProductValidation, askReportingQuestion, getKpiValues, getMembershipProductValidation,
+    listAgentWorkloadAvailability, listCaseResolutionClosure, listCustomerService, listMemberLifecycleCase,
+    listMembershipAnnualPass, listMembershipFreezeSuspension, runSemanticQuery, setCaseResolution,
+    setDataRetentionPolicy, setRefundCompensationService, startKioskAssist, suggestWorkOrderAssignee]
+  composes: TenancyService
+  added: '2026-11-02'
+  decision_ref: 'ADAM CR-475 to CR-478, Chinmay, 2 November 2026, settled for the class by the lead for r13 (the whole
+    class fixed at its source, once), after CR-296, CR-383, CR-385, CR-394, CR-426 and CR-427 settled it case by case'
+  why: 'The operations host composes Tenancy''s query classes (CR-296 (XDR-004: Tenancy''s own query classes), CR-383
+    and CR-384 (XDR-027)), so it asks Tenancy''s queries in process, in the caller''s transaction under the caller''s
+    row-level security, never over the service route between deployables (CHG-R13INP-001; ADR-0055 as amended 2
+    November 2026). These 16 operations asked 8 of them over the service route. SELECT only, read only: the tables
+    listed are the ones the operations role lacked. A query served on the service route only is served in process as
+    well; the owner implements it as an in-process query class. tools/check-cross-module-reads.py XR-INPROCESS-HOST
+    refuses a service read of a Tenancy query from this host from now on.'
+- id: XDR-074
+  reader: operations
+  tables: [catalogue.channel_capacity, catalogue.product_eligibility_rule, catalogue.tax_profile, promotions.bundle,
+    seating.seat]
+  privileges: [SELECT]
+  queries: [catalogue#channelCapacityRecords, catalogue#performanceRecords, catalogue#priceListRecords,
+    catalogue#priceRecords, catalogue#productEligibilityRuleRecords, catalogue#taxProfileRecords,
+    promotions#bundleRecords, promotions#promotionRecords, seating#seatRecords]
+  operations: [applyMenuActions, bookVisitPlan, bulkUpdateProducts, createDeliveryLocation, createQueue,
+    createReferral, generateVisitPlan, getNextTransportDeparture, getTransportDeparture, getVisitPlannerOptions,
+    joinQueue, listMembershipCommercialPricing, listMissingExpiredInvalid, listParticipantWaiverStatus,
+    listVisitPlanAlternatives, listWaiver, previewGuidedChoice, publishTransportTimetable, searchTransportDepartures,
+    setMembershipCommercialConfig, setMembershipEntitlementAdmission, setQueueStatus, setTransportRouteStatus,
+    setVenuePoint, setWaiverException, updateQueue, updateTransportDeparture, updateVisitPlan,
+    withdrawTransportTimetable]
+  composes: CatalogueService
+  added: '2026-11-02'
+  decision_ref: 'ADAM CR-475 to CR-478, Chinmay, 2 November 2026, settled for the class by the lead for r13 (the whole
+    class fixed at its source, once), after CR-296, CR-383, CR-385, CR-394, CR-426 and CR-427 settled it case by case'
+  why: 'The operations host composes Catalogue''s query classes (CR-426 ("register Catalogue''s in-process query
+    classes in the operations host", XDR-051), CR-394 (XDR-033), CR-475), so it asks Catalogue''s queries in process,
+    in the caller''s transaction under the caller''s row-level security, never over the service route between
+    deployables (CHG-R13INP-001; ADR-0055 as amended 2 November 2026). These 29 operations asked 9 of them over the
+    service route. SELECT only, read only: the tables listed are the ones the operations role lacked;
+    catalogue.performance, catalogue.price, catalogue.price_list, promotions.promotion are already granted to it;
+    promotions.promotion is XDR-072''s (CR-478). A query served on the service route only is served in process as
+    well; the owner implements it as an in-process query class. tools/check-cross-module-reads.py XR-INPROCESS-HOST
+    refuses a service read of a Catalogue query from this host from now on.'
+- id: XDR-075
+  reader: operations
+  tables: [orders.cart, orders.cart_line, orders.deposit, orders.deposit_policy, orders.group_booking,
+    orders.invitation, orders.order_fee, orders.order_line_discount, orders.payment, orders.refund,
+    orders.refund_policy, orders.reservation, orders.sales_order, payments.instalment_policy, payments.provider,
+    payments.provider_connection]
+  privileges: [SELECT]
+  queries: [orders#cartLineRecords, orders#cartRecords, orders#depositPolicyRecords, orders#depositRecords,
+    orders#groupBookingRecords, orders#invitationRecords, orders#orderFeeRecords, orders#orderLineDiscountRecords,
+    orders#paymentRecords, orders#refundPolicyRecords, orders#refundRecords, orders#reservationRecords,
+    orders#salesOrderRecords, orders#venueChargeCurrencies, payments#instalmentPolicyRecords,
+    payments#providerConnectionRecords]
+  operations: [accrueLoyaltyPoints, actOnWaiverRequirements, bookVisitPlan, checkGuestCheckoutMatch, checkOutRental,
+    closeTableVisit, createGuestFnbOrder, createRetailSale, createTableReservation, createTableReservationForGuest,
+    decideGuestCheckoutMatch, getBill, getGuestBill, getGuestIntelligence, getGuestTimeline, getKpiValues,
+    getPublishedTenantConfig, listCustomerServiceProfile, listEscalationCriticalCase, listMember,
+    listMemberLifecycleCase, listMembershipActivationCredential, listMembershipRenewalRetention,
+    listMembershipUpgradeDowngrade, listMinorGuardianGroup, listMissingExpiredInvalid, listParticipantWaiverStatus,
+    listRenewalAuto, listServiceRootCause, listWaiver, publishTenantConfig, reconcileBurstEnvironment,
+    recordConsentAnswers, recordSaleOwnerAnswers, respondToInvitation, restoreConfigVersion,
+    setMemberMembershipAccount, setMembershipCommercialConfig, setOrderBookingTicket, setRefundCompensationService,
+    startKioskAssist, updateTableReservation]
+  composes: OrderService
+  added: '2026-11-02'
+  decision_ref: 'ADAM CR-475 to CR-478, Chinmay, 2 November 2026, settled for the class by the lead for r13 (the whole
+    class fixed at its source, once), after CR-296, CR-383, CR-385, CR-394, CR-426 and CR-427 settled it case by case'
+  why: 'The operations host composes Orders''s query classes (CR-385 (XDR-028: Orders'' own query class), CR-477), so
+    it asks Orders''s queries in process, in the caller''s transaction under the caller''s row-level security, never
+    over the service route between deployables (CHG-R13INP-001; ADR-0055 as amended 2 November 2026). These 42
+    operations asked 16 of them over the service route. SELECT only, read only: the tables listed are the ones the
+    operations role lacked; orders.order_line is XDR-071''s (CR-477), which every other operations-host reader of
+    orders#orderLineRecords shares. A query served on the service route only is served in process as well; the owner
+    implements it as an in-process query class. tools/check-cross-module-reads.py XR-INPROCESS-HOST refuses a service
+    read of a Orders query from this host from now on.'
+- id: XDR-076
+  reader: access
+  tables: [approvals.request, approvals.rule, platform.region_settings, tenancy.data_retention_setting]
+  privileges: [SELECT]
+  queries: [approvals#requestRecords, approvals#ruleRecords, tenancy#dataRetentionSettingRecords,
+    tenancy#regionSettingsRecords]
+  operations: [addBlacklistEntry, createAdmissionRules, enrolFacePass, listBiometricConsentGuardian,
+    listBiometricLifecycleRetention, lockIdentity, publishTopologyValidation, releaseIdentityLock,
+    setBiometricLifecycleRetention, updateAdmissionRules]
+  composes: TenancyService
+  added: '2026-11-02'
+  decision_ref: 'ADAM CR-475 to CR-478, Chinmay, 2 November 2026, settled for the class by the lead for r13 (the whole
+    class fixed at its source, once), after CR-296, CR-383, CR-385, CR-394, CR-426 and CR-427 settled it case by case'
+  why: 'The access host composes Tenancy''s query classes (CR-240 (XDR-003: "The access host composes
+    TenancyModuleQueries"), CR-389, CR-390), so it asks Tenancy''s queries in process, in the caller''s transaction
+    under the caller''s row-level security, never over the service route between deployables (CHG-R13INP-001; ADR-0055
+    as amended 2 November 2026). These 10 operations asked 4 of them over the service route. SELECT only, read only:
+    the tables listed are the ones the access role lacked. A query served on the service route only is served in
+    process as well; the owner implements it as an in-process query class. tools/check-cross-module-reads.py
+    XR-INPROCESS-HOST refuses a service read of a Tenancy query from this host from now on.'
+- id: XDR-077
+  reader: access
+  tables: [catalogue.product, catalogue.product_media]
+  privileges: [SELECT]
+  queries: [catalogue#productRecords]
+  operations: [getEntitlement, listAttendanceAdmission, listCredential, listCredentialGenerationIssuance,
+    listEntitlements, listEntryExitCrossover, listGroupLeaderFast, listMyEntitlements, listValidationOutcomeRejection,
+    listVirtualTicket, setMediaReplacementRevocation, setVerificationMethodPolicy, setVirtualTicketCredential,
+    simulatePolicyConflictImpact, validateGroupAccess]
+  composes: CatalogueService
+  added: '2026-11-02'
+  decision_ref: 'ADAM CR-475 to CR-478, Chinmay, 2 November 2026, settled for the class by the lead for r13 (the whole
+    class fixed at its source, once), after CR-296, CR-383, CR-385, CR-394, CR-426 and CR-427 settled it case by case'
+  why: 'The access host composes Catalogue''s query classes (CR-240 (XDR-003: "... and CatalogueModuleQueries")), so
+    it asks Catalogue''s queries in process, in the caller''s transaction under the caller''s row-level security,
+    never over the service route between deployables (CHG-R13INP-001; ADR-0055 as amended 2 November 2026). These 15
+    operations asked 1 of them over the service route. SELECT only, read only: the tables listed are the ones the
+    access role lacked. A query served on the service route only is served in process as well; the owner implements it
+    as an in-process query class. tools/check-cross-module-reads.py XR-INPROCESS-HOST refuses a service read of a
+    Catalogue query from this host from now on.'
+- id: XDR-078
+  reader: commerce
+  tables: [access.access_point]
+  privileges: [SELECT]
+  queries: [access#accessPointRecords]
+  operations: [recordAttendance, setVenueSettings]
+  composes: AccessService
+  added: '2026-11-02'
+  decision_ref: 'ADAM CR-475 to CR-478, Chinmay, 2 November 2026, settled for the class by the lead for r13 (the whole
+    class fixed at its source, once), after CR-296, CR-383, CR-385, CR-394, CR-426 and CR-427 settled it case by case'
+  why: 'The commerce host composes Access''s query classes (CR-196 and CR-212 (XDR-001, XDR-002: Access''s queries
+    asked in process from commerce)), so it asks Access''s queries in process, in the caller''s transaction under the
+    caller''s row-level security, never over the service route between deployables (CHG-R13INP-001; ADR-0055 as
+    amended 2 November 2026). These 2 operations asked 1 of them over the service route. SELECT only, read only: the
+    tables listed are the ones the commerce role lacked. A query served on the service route only is served in process
+    as well; the owner implements it as an in-process query class. tools/check-cross-module-reads.py XR-INPROCESS-HOST
+    refuses a service read of a Access query from this host from now on.'

@@ -963,7 +963,7 @@ paths:
       operationId: checkGuestCheckoutMatch
       x-ticvai-read-via:
       - query: orders#cartRecords
-        route: service
+        route: in-process
         for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       summary: Does this contact already have a profile here
       deprecated: true
@@ -1024,7 +1024,7 @@ paths:
       operationId: decideGuestCheckoutMatch
       x-ticvai-read-via:
       - query: orders#cartRecords
-        route: service
+        route: in-process
         for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: orders.cart
@@ -1381,10 +1381,10 @@ paths:
       operationId: createInvitationCampaign
       x-ticvai-read-via:
       - query: catalogue#eventRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: A quota-bounded, addressed invitation
       description: 'BL-150 and CF-74''s issuance half. **A campaign broadcasts; an invitation is addressed
@@ -1437,7 +1437,7 @@ paths:
         - "P02 GST-072 Share & Group Booking"
       x-ticvai-read-via:
       - query: orders#invitationRecords
-        route: service
+        route: in-process
         for: 'its read of orders.invitation, Orders''s data (CHG-MOD-001)'
       x-ticvai-names-for-context: [access.entitlement]
       security:
@@ -1614,7 +1614,7 @@ paths:
         - "P13 CMS-043 Digital Waiver & Form Builder"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: Define a waiver, survey or capture form
       description: 'CF-129. **One mechanism, three uses.** A waiver is this with a signature, a survey
@@ -1731,10 +1731,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-026 Survey & Feedback"
         - "P02 GST-035 Feedback & Ratings"
-      x-ticvai-read-via:
-      - query: identity#subjectRecords
-        route: service
-        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      x-ticvai-reads:
+      - table: marketing.waiver_version_control
+        for: 'the submitted form version''s resign rule, whether an earlier version''s live acceptance counts (Marketing''s
+          own data; ADAM CR-472)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1756,6 +1756,24 @@ paths:
         version that does not exist or is not published is `404 form-version-not-found`. Where a live
         acceptance already exists, the answer is `200` with the existing submission and no new row is
         written; a new acceptance is `201`.
+
+
+        **It reads nothing from `pii.subject`** (ADAM CR-472, Chinmay, 2 November 2026). It asks no query of
+        Identity and calls no service route: a guest submits for its own subject, and staff with a grant at the
+        venue submit for any guest, both guarded by the grant-holder-write policy on `marketing.form_submission`
+        (CR-318). It checks no one''s age; where a form asks about age, the form''s own fields carry it.
+
+
+        **What a live acceptance is** (ADAM CR-472). Before writing, it looks for a `marketing.form_submission`
+        row for the same form id, the same `subjectId` and the same `onBehalfOfSubjectId` (both null or both
+        equal), with `expires_at` later than now; only versions with `validForMonths` set give a row an
+        `expires_at`. The row counts when its `form_version` is the version being submitted. It also counts when
+        it is an earlier version and `marketing.waiver_version_control.resign_rule` for the submitted form and
+        version is `noResign` (Marketing''s own data; no route is needed). When a row counts, the answer is `200`
+        with that submission and nothing is written. Every other case is a new acceptance: there is no live row,
+        or the submitted version''s resign rule is `resignAtNextBooking` or `resignBeforeNextVisit`, or the version
+        has no resign rule. It is written with its own `form_version`, `expires_at` set from that version''s
+        `validForMonths`, and answered `201`. No grant or migration is needed.
 
         '
       tags:
@@ -1824,7 +1842,7 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
@@ -1934,7 +1952,7 @@ paths:
         - "P08 BO-829 Family, Team & Event Challenges"
       x-ticvai-read-via:
       - query: catalogue#eventRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       - query: tenancy#scopeRecords
         route: in-process
@@ -2256,10 +2274,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-842 SEO Management"
         - "P13 CMS-013 SEO & Metadata"
-      x-ticvai-read-via:
-      - query: catalogue#productRecords
-        route: service
-        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-body-key: [entityId]
       x-ticvai-body-key-note: 'Keyed by the body''s `entityId`, not a singleton (r8 walk fix, CHG-R8WFC-001): one record per entity and locale within the caller''s tenant; a PUT creates it or replaces it whole. There is no key in the path, so the key travels in the body.'
       summary: Titles, descriptions, canonicals and hreflang
@@ -2274,6 +2288,19 @@ paths:
         database, so Marketing owns the table beside them, under the tenant''s row-level security, and no
         write crosses a module or a database. It moved from the shared control
         database, which Platform owned and Marketing wrote with no declared route.
+
+
+        **It reads nothing from Catalogue** (ADAM CR-474, Chinmay, 2 November 2026). It asks no Catalogue query
+        and calls no service route. It stores the metadata for the `entityKind`, `entityId` and `locale` sent,
+        creating or replacing the one record for that key within the caller''s tenant, and does not check that
+        the entity exists.
+
+
+        **A changed slug is stored, and the redirect is a separate call** (ADAM CR-474). A PUT that changes
+        `slug` stores the new slug; it does not refuse and does not write a redirect. The 301 from the old
+        address to the new one is made by `createUrlRedirect` (POST /seo-redirects, #33242), which CMS-013 calls
+        when a live slug is edited. That redirect lives in `control.url_redirect`, outside this tenant
+        transaction. No grant or migration is needed.
 
         '
       tags:
@@ -2501,7 +2528,7 @@ paths:
         - "P08 BO-830 Referral & Streak Management"
       x-ticvai-read-via:
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
@@ -3414,7 +3441,7 @@ paths:
       operationId: accrueLoyaltyPoints
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Award points for a completed order
       description: '**`games` awards points on play and ticketing did not**, so a guest earned for an
@@ -4119,10 +4146,10 @@ paths:
         - "P08 BO-799 Agent Workspace"
       x-ticvai-read-via:
       - query: orders#cartRecords
-        route: service
+        route: in-process
         for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       - query: tenancy#deviceRecords
-        route: service
+        route: in-process
         for: 'its read of platform.device, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -11615,7 +11642,7 @@ paths:
         - "P12 SUP-010 Customer 360° Service Profile"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: identity#subjectRecords
         route: service
@@ -11685,13 +11712,13 @@ paths:
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#reservationRecords
-        route: service
+        route: in-process
         for: 'its read of orders.reservation, Orders''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       - query: wallet#balanceRecords
         route: service
@@ -12022,16 +12049,16 @@ paths:
         - "P12 SUP-014 Order, Booking & Ticket Service Workspace"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'the order and its policies (422 not-permitted-by-policy) (CHG-MOD-003)'
       - query: access#entitlementRecords
         route: service
         for: 'what its text calls "access.entitlement": access.entitlement, Access''s data (CHG-R10GEN-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.order_line": orders.order_line, Order''s data (CHG-R10GEN-001)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.payment": orders.payment, Order''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
@@ -12105,19 +12132,19 @@ paths:
         - "P12 SUP-015 Refund, Compensation & Service Exception Workspace"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: orders#orderFeeRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.order_fee": orders.order_fee, Order''s data (CHG-R10GEN-001)'
       - query: orders#refundRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.refund": orders.refund, Order''s data (CHG-R10GEN-001)'
       - query: orders#refundPolicyRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.refund_policy": orders.refund_policy, Order''s data (CHG-R10GEN-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.sales_order": orders.sales_order, Order''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -12346,7 +12373,7 @@ paths:
         - "P12 SUP-017 Case Resolution, Closure & Customer Feedback"
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -12459,7 +12486,7 @@ paths:
       operationId: setCaseResolution
       x-ticvai-read-via:
       - query: approvals#requestRecords
-        route: service
+        route: in-process
         for: 'what its text calls "approvals.request": approvals.request, Tenancy''s data (CHG-R10GEN-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -12895,7 +12922,7 @@ paths:
         - "P12 SUP-023 Agent Workload, Availability & Workforce Control"
       x-ticvai-read-via:
       - query: workforce#shiftRecords
-        route: service
+        route: in-process
         for: 'what its text calls "workforce.shift": workforce.shift, Tenancy''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
         - staff
@@ -13062,7 +13089,7 @@ paths:
         - "P12 SUP-024 Escalation & Critical Case Monitor"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
@@ -13509,7 +13536,7 @@ paths:
         - "P12 SUP-027 Service Analytics & Root-Cause Intelligence"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15135,13 +15162,13 @@ paths:
         - "P13 CMS-051 Waiver Operations Command Center"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15277,16 +15304,16 @@ paths:
         - "P13 CMS-052 Participant Waiver Status & Tracking"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15406,7 +15433,7 @@ paths:
       operationId: actOnWaiverRequirements
       x-ticvai-read-via:
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15683,10 +15710,10 @@ paths:
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -15983,16 +16010,16 @@ paths:
         - "P13 CMS-056 Missing, Expired & Invalid Waiver Management"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       - query: orders#groupBookingRecords
-        route: service
+        route: in-process
         for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
@@ -16140,7 +16167,7 @@ paths:
         route: service
         for: 'what its text calls "access.entitlement": access.entitlement, Access''s data (CHG-R10GEN-001)'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.order_line": orders.order_line, Order''s data (CHG-R10GEN-001)'
       - query: identity#subjectRecords
         route: service
@@ -16242,7 +16269,7 @@ paths:
       operationId: setWaiverException
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
-        route: service
+        route: in-process
         for: 'the performance the exception''s scope names (422 scope-incomplete) (CHG-MOD-003)'
       x-ticvai-audience:
         - staff
@@ -16713,7 +16740,7 @@ paths:
         route: service
         for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Everything this guest did, in order, across the platform
       description: 'Board 1.5. Purchases, scans, reservations, visits, membership changes, loyalty,
@@ -16868,7 +16895,7 @@ paths:
         - "P08 BO-832 AI Engagement Optimization"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Value, engagement, churn and propensity, with their reasons
       description: 'Board 1.10 — *"turn the unified record into **explainable** customer insight."*
@@ -17102,7 +17129,7 @@ paths:
       operationId: setDataRetentionPolicy
       x-ticvai-read-via:
       - query: tenancy#dataRetentionSettingRecords
-        route: service
+        route: in-process
         for: 'its read of tenancy.data_retention_setting, Tenancy''s data (CHG-MOD-001)'
       summary: How long guest data is kept, and what happens at expiry
       description: 'Board 2.8. **`listDataRetentionExpiry` could read them and nothing set them.**
@@ -17481,7 +17508,7 @@ paths:
         - "P08 BO-828 Milestones & Reward Rules"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'whether a rule''s product exists (409 unknown-reward-or-product) (CHG-MOD-003)'
       summary: Replace a programme's rules as one set
       description: '**Applied whole or not at all.** Setting rules one at a time leaves a live
@@ -18606,7 +18633,7 @@ paths:
         - "P02 GST-007 Select Date & Time"
       x-ticvai-read-via:
       - query: orders#cartRecords
-        route: service
+        route: in-process
         for: 'the questions the cart asks (409, 422 question-not-asked) (CHG-MOD-003)'
       security:
       - guestAuth: []
@@ -20135,10 +20162,10 @@ paths:
       x-ticvai-auth: service
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
-        route: service
+        route: in-process
         for: 'the order must exist, be of the sent venue, and a reservation owner must be its buyer: orders.sales_order, Orders'' data'
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'a ticket owner''s order line must be on the order and its unit within the line''s quantity: orders.order_line, Orders'' data'
       - query: identity#subjectRecords
         route: service
@@ -24066,7 +24093,9 @@ components:
           type: string
           nullable: true
           description: '22.11.6. **Human-readable, and changing one is a redirect rather than an edit**
-            — a slug that changes without a 301 is a page that was ranking and now is not.
+            — a slug that changes without a 301 is a page that was ranking and now is not. `setSeoMetadata`
+            stores the new slug and writes no redirect; the 301 is `createUrlRedirect`, which CMS-013 calls when a
+            live slug is edited (ADAM CR-474).
 
             '
         hreflang:

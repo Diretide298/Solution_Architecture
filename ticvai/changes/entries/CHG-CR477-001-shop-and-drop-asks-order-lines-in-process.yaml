@@ -1,0 +1,50 @@
+id: CHG-CR477-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'createShopAndDrop, on the orderId path, asks orders#orderLineRecords with where {orderId} in process from the
+  operations host, through Orders'' query class already composed there (CR-385), under the caller''s row-level
+  security; no service route. An orderId with no visible line is 422 unknown-order, and a lineIds entry that is not one
+  of those lines is 422 unknown-line. The saleId path reads Retail''s own tables; fnb#deliveryLocationRecords stays in
+  process. XDR-071 grants the operations role USAGE on schema orders and SELECT on orders.order_line (guarded, read
+  only).'
+decision:
+  what: 'Posted on #30870 (Chinmay, 2 November 2026), under the lead''s "approve all as a recommended" of 2 November
+    2026: "Build now: on the orderId path, createShopAndDrop asks orders#orderLineRecords with where {orderId} in
+    process from the operations host. Use Orders'' query class, already composed there (CR-385), under the caller''s
+    row-level security; call no service route. An orderId with no visible line is 422 unknown-order, and a lineIds
+    entry that is not one of those lines is 422 unknown-line ... Database: Hrushikant adds a guarded grant of USAGE on
+    schema orders and SELECT on orders.order_line to the operations role, written the way V0118 and V0122 write
+    theirs. It is read only, and row security still decides the rows. Do not apply it yourself."'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-477 (Deep Khanvilkar, #30870 createShopAndDrop, blocking): orderLineRecords is served in process and the
+  operations host composes Orders'' queries (CR-385, XDR-028), but the read was declared on the service route and the
+  operations role had no grant on orders.order_line.'
+keys_touched:
+  operations: [createShopAndDrop]
+  tables: [orders.order_line]
+  files:
+  - contracts/satellite/retail.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'XDR-071 (operations reads orders.order_line through orders#orderLineRecords)'
+root_class: 'a read the host already asks in process declared on the service route (the class of CHG-R13INP-001)'
+tickets:
+  started: []
+  unstarted:
+  - '30870 (createShopAndDrop, Deep): ask orderLineRecords in process; test against a database that has the grant
+    (PostgreSQL refuses the read until it is applied).'
+  - '37210 ([DB] the grant, Hrushikant, made by hand on 2 November): XDR-071''s guarded USAGE and SELECT.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-477
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-SHOP-DROP-ORDER-LINES
+status: open
+notes: 'The grant is by deployable and query, so the other operations-host readers of orders#orderLineRecords ask it in
+  process on it too (CHG-R13INP-001). tools/derive-ddl.py writes the grant into the next forward migration; the
+  integration refresh writes it. Beyond the posted words: none.'

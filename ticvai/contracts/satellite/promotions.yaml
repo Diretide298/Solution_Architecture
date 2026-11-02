@@ -90,12 +90,14 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/Bundle'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Catalogue answers with its promotions.bundle rows, as it stores them and as the caller's scope
-      lets it see them (the table's row-level security, under the caller's connection and transaction). It
-      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
-      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
-      from another deployable through Catalogue's service route (serviceAuth).
-    served: [service]
+      October). Catalogue answers with its promotions.bundle rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a question
+      with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in process by the
+      operations host, which composes Catalogue's query classes, through the C# query class Catalogue implements,
+      under the caller's row-level security (CHG-R13INP-001). It is asked from another deployable through
+      Catalogue's service route (serviceAuth).
+    served: [in-process, service]
   couponCampaignRecords:
     module: promotions
     table: promotions.coupon_campaign
@@ -199,9 +201,14 @@ x-ticvai-queries:
       (status live, not paused, valid_from at or before now, valid_to null or after now), applied to a basket of
       one unit of each item as evaluatePromotions applies them (stacking, precedence, the zero floor). A buyer's own
       conditions (segments, codes) are not applied, so this is the price any buyer pays. An item no promotion
-      touches comes back at its unitPrice with no promotionIds. It is asked from another deployable through
-      Catalogue's service route (serviceAuth).
-    served: [service]
+      touches comes back at its unitPrice with no promotionIds. It is asked in process (ADAM CR-478, Chinmay, 2
+      November 2026): an in-process query class of Catalogue's Promotions module, registered in the operations host
+      with Catalogue's other query classes (lookupMerchandise, XDR-072), which runs the same evaluation code
+      evaluatePromotions uses (#31714) for stacking, precedence and the zero floor, never a copy, under the caller's
+      row-level security. It reads promotions.promotion and promotions.promotion_rule. It is asked from another
+      deployable through Catalogue's service route (serviceAuth).
+    reads: [promotions.promotion_rule]
+    served: [in-process, service]
 paths:
   /promotions/{promotionId}/simulate:
     parameters:

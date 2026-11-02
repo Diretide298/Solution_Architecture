@@ -338,12 +338,14 @@ x-ticvai-queries:
       items: {$ref: '#/components/schemas/TenantDataRetentionSetting'}
     rule: >-
       A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
-      October). Tenancy answers with its tenancy.data_retention_setting rows, as it stores them and as the
-      caller's scope lets it see them (the table's row-level security, under the caller's connection and
-      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
-      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
-      own. It is asked from another deployable through Tenancy's service route (serviceAuth).
-    served: [service]
+      October). Tenancy answers with its tenancy.data_retention_setting rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process by the access and operations hosts, which compose Tenancy's query classes, through the C# query class
+      Tenancy implements, under the caller's row-level security (CHG-R13INP-001). It is asked from another
+      deployable through Tenancy's service route (serviceAuth).
+    served: [in-process, service]
   scopeRecords:
     module: tenancy
     table: platform.scope
@@ -1572,7 +1574,7 @@ paths:
         - "P08 BO-600 Venue, Calendar & Operational Setup"
       x-ticvai-read-via:
       - query: access#accessPointRecords
-        route: service
+        route: in-process
         for: 'its read of access.access_point, Access''s data (CHG-MOD-001)'
       - query: finance#fxRateRecords
         route: in-process

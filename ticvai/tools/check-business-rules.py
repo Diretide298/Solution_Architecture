@@ -364,6 +364,23 @@ And one rule per decision:
                    subscription's API client, the stop on rows left, and SET NOT NULL.
   BR-OUTBOX-REPUBLISH-READS (r12, ADAM CR-435, CHG-CR435-001) republishOutbox declares no read of outbox rows (neither
                    read-via nor lineage read) and names its partition-catalogue bound.
+  BR-FORM-LIVE-ACCEPTANCE (r13, ADAM CR-472, CHG-CR472-001) submitForm asks nothing of Identity (no read-via, no
+                   lineage read of pii.subject), reads its own waiver_version_control, and states the live-acceptance
+                   rule: same form, subject and onBehalfOf, unexpired, the same version or an earlier one under
+                   noResign, 200 with nothing written, else 201.
+  BR-SEO-METADATA-STORE (r13, ADAM CR-474, CHG-CR474-001) setSeoMetadata asks nothing of Catalogue (no read-via, no
+                   lineage read of catalogue.product), does not check the entity, stores a changed slug and leaves
+                   the 301 to createUrlRedirect.
+  BR-CONFIG-DIFF-PRODUCTS (r13, ADAM CR-475, CHG-CR475-001) diffConfigVersion asks catalogue#productRecords and
+                   #productCategoryRecords in process and states the three-step flow rule of CR-427.
+  BR-PREVIEW-READS-NOTHING (r13, ADAM CR-476, CHG-CR476-001) createPreview asks no query, the operations role has no
+                   grant on orders.ticket_template, ticketTemplateRecords is served in process, and preview.requested's
+                   consumer asks both reads in process.
+  BR-SHOP-DROP-ORDER-LINES (r13, ADAM CR-477, CHG-CR477-001) createShopAndDrop asks orders#orderLineRecords in process
+                   (XDR-071 grants orders.order_line to operations) and states the 422 unknown-order and unknown-line.
+  BR-MERCH-LIVE-PRICE (r13, ADAM CR-478, CHG-CR478-001) lookupMerchandise asks tenancy#workstationRecords and
+                   promotions#liveEffectivePrice in process; liveEffectivePrice is served in process, reads promotion
+                   and promotion_rule, and runs evaluatePromotions' code; XDR-072 grants the two tables.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -1877,9 +1894,10 @@ def main() -> int:
     need("BR-FACE-PASS-REVOKE", not inproc("revokeFacePass", "identity#subjectBiometricRecords"),
          "revokeFacePass reads pii.subject_biometric in process: biometric records stay off the access role (CR-391)")
     sv = op("listSubjectBiometricRecords")
-    need("BR-FACE-PASS-REVOKE", sv[1] == "/internal/subject-biometrics"
+    need("BR-FACE-PASS-REVOKE", sv[1] == "/queries/subject-biometric-records" and sv[2] == "post"
          and {"serviceAuth": []} in (sv[3].get("security") or []),
-         "identity#subjectBiometricRecords has no service operation (listSubjectBiometricRecords, serviceAuth; CR-391)")
+         "identity#subjectBiometricRecords has no service operation (listSubjectBiometricRecords, POST "
+         "/queries/subject-biometric-records, serviceAuth; CR-391, CR-438)")
     ev = load("events/biometric-enrolmentChanged.yaml")
     idc = next((c for c in ev.get("consumers") or [] if isinstance(c, dict) and c.get("context") == "identity"), {})
     purpose = " ".join(str(idc.get("purpose") or "").split())
@@ -2646,6 +2664,102 @@ def main() -> int:
     need("BR-OUTBOX-REPUBLISH-READS", "platform.outbox" not in ((lin.get("republishOutbox") or {}).get("reads") or []),
          "the lineage has republishOutbox reading platform.outbox rows (handoff/api-data-lineage-overrides.json; CR-435)")
 
+    # ---------------------------------------------------------------- r13 lane r (ADAM CR-472 to CR-478, decided by
+    # Chinmay on 2 November 2026, "approve all as a recommended"). Each rule fails on the r12 contract and passes on
+    # the posted decision.
+    def via_of(o_):
+        return {(str((v or {}).get("query")), str((v or {}).get("route"))) for v in o_.get("x-ticvai-read-via") or []
+                if isinstance(v, dict)}
+
+    def asks(o_):
+        return {q for q, _ in via_of(o_)}
+
+    xdr13 = {str((r or {}).get("id")): r for r in (load("docs/active/cross-deployable-writes.yaml").get("reads") or [])
+             if isinstance(r, dict)}
+
+    def w13(x):
+        return " ".join(str(x or "").split())
+
+    # BR-FORM-LIVE-ACCEPTANCE (CR-472)
+    sbf = op("submitForm")[3]
+    need("BR-FORM-LIVE-ACCEPTANCE", not any(q.startswith("identity#") for q in asks(sbf))
+         and "pii.subject" not in ((lin.get("submitForm") or {}).get("reads") or []),
+         "submitForm still reads pii.subject (a read-via of Identity or a lineage read; CR-472)")
+    need("BR-FORM-LIVE-ACCEPTANCE", any(isinstance(r, dict) and r.get("table") == "marketing.waiver_version_control"
+                                        for r in sbf.get("x-ticvai-reads") or []),
+         "submitForm does not read marketing.waiver_version_control, its own data, for the resign rule (CR-472)")
+    sd = w13(sbf.get("description"))
+    for frag in ("both null or both equal", "`expires_at` later than now", "is `noResign`",
+                 "`resignAtNextBooking` or `resignBeforeNextVisit`, or the version has no resign rule",
+                 "with that submission and nothing is written", "It checks no one''s age".replace("''", "'")):
+        need("BR-FORM-LIVE-ACCEPTANCE", frag in sd, f"submitForm does not say {frag!r} (CR-472)")
+
+    # BR-SEO-METADATA-STORE (CR-474)
+    ssm = op("setSeoMetadata")[3]
+    need("BR-SEO-METADATA-STORE", not any(q.startswith("catalogue#") for q in asks(ssm))
+         and "catalogue.product" not in ((lin.get("setSeoMetadata") or {}).get("reads") or []),
+         "setSeoMetadata still reads catalogue.product (a read-via of Catalogue or a lineage read; CR-474)")
+    smd = w13(ssm.get("description"))
+    for frag in ("does not check that the entity exists", "it does not refuse and does not write a redirect",
+                 "`createUrlRedirect` (POST /seo-redirects, #33242)"):
+        need("BR-SEO-METADATA-STORE", frag in smd, f"setSeoMetadata does not say {frag!r} (CR-474)")
+
+    # BR-CONFIG-DIFF-PRODUCTS (CR-475)
+    dcv = op("diffConfigVersion")[3]
+    for q in ("catalogue#productRecords", "catalogue#productCategoryRecords"):
+        need("BR-CONFIG-DIFF-PRODUCTS", (q, "in-process") in via_of(dcv),
+             f"diffConfigVersion does not ask {q} in process from the operations host (CR-475, XDR-051)")
+    dcd = w13(dcv.get("description"))
+    for frag in ("the product''s own `bookingFlowId`, else its category''s `bookingFlowId`, else the venue''s default "
+                 "flow whose type lists the product''s kind".replace("''", "'"), "where {bookingFlowId} or {venueId}"):
+        need("BR-CONFIG-DIFF-PRODUCTS", frag in dcd, f"diffConfigVersion does not say {frag!r} (CR-475)")
+
+    # BR-PREVIEW-READS-NOTHING (CR-476)
+    cpv = op("createPreview")[3]
+    need("BR-PREVIEW-READS-NOTHING", not cpv.get("x-ticvai-read-via"),
+         "createPreview asks a query; the renderer in the workers host reads Catalogue and Orders, not it (CR-476)")
+    need("BR-PREVIEW-READS-NOTHING", not any(r.get("reader") == "operations" and "orders.ticket_template"
+                                             in (r.get("tables") or []) for r in xdr13.values()),
+         "a reads entry grants the operations role orders.ticket_template (CR-476: no grant)")
+    ttr = (load("contracts/spine/orders.yaml").get("x-ticvai-queries") or {}).get("ticketTemplateRecords") or {}
+    need("BR-PREVIEW-READS-NOTHING", "in-process" in (ttr.get("served") or []),
+         "orders#ticketTemplateRecords is not served in process (Orders' in-process query class; CR-476)")
+    prq = load("events/preview-requested.yaml")
+    pur = w13(" ".join(str((c or {}).get("purpose") or "") for c in prq.get("consumers") or []))
+    need("BR-PREVIEW-READS-NOTHING", "catalogue#productRecords (ids [productId]) and orders#ticketTemplateRecords in "
+         "process" in pur, "preview.requested's consumer does not ask its two reads in process (CR-476)")
+
+    # BR-SHOP-DROP-ORDER-LINES (CR-477)
+    csd = op("createShopAndDrop")[3]
+    need("BR-SHOP-DROP-ORDER-LINES", ("orders#orderLineRecords", "in-process") in via_of(csd)
+         and ("fnb#deliveryLocationRecords", "in-process") in via_of(csd),
+         "createShopAndDrop does not ask orders#orderLineRecords (and fnb#deliveryLocationRecords) in process (CR-477)")
+    x71 = xdr13.get("XDR-071") or {}
+    need("BR-SHOP-DROP-ORDER-LINES", x71.get("reader") == "operations" and x71.get("tables") == ["orders.order_line"]
+         and "orders#orderLineRecords" in (x71.get("queries") or []),
+         "XDR-071 does not grant the operations role SELECT on orders.order_line for orderLineRecords (CR-477)")
+    cdd = w13(csd.get("description"))
+    for frag in ("An `orderId` with no visible line is `422 unknown-order`", "not one of those lines is `422 unknown-line`"):
+        need("BR-SHOP-DROP-ORDER-LINES", frag in cdd, f"createShopAndDrop does not say {frag!r} (CR-477)")
+
+    # BR-MERCH-LIVE-PRICE (CR-478)
+    lkm = op("lookupMerchandise")[3]
+    for q in ("tenancy#workstationRecords", "promotions#liveEffectivePrice", "tenancy#venueSettingsRecords"):
+        need("BR-MERCH-LIVE-PRICE", (q, "in-process") in via_of(lkm),
+             f"lookupMerchandise does not ask {q} in process (CR-478)")
+    lep = (load("contracts/satellite/promotions.yaml").get("x-ticvai-queries") or {}).get("liveEffectivePrice") or {}
+    need("BR-MERCH-LIVE-PRICE", "in-process" in (lep.get("served") or [])
+         and "promotions.promotion_rule" in (lep.get("reads") or [])
+         and "the same evaluation code evaluatePromotions uses (#31714)" in w13(lep.get("rule")),
+         "promotions#liveEffectivePrice is not an in-process query class reading promotion_rule and running "
+         "evaluatePromotions' code (CR-478)")
+    x72 = xdr13.get("XDR-072") or {}
+    need("BR-MERCH-LIVE-PRICE", x72.get("reader") == "operations"
+         and x72.get("tables") == ["promotions.promotion", "promotions.promotion_rule"],
+         "XDR-072 does not grant the operations role SELECT on promotions.promotion and promotion_rule (CR-478)")
+    need("BR-MERCH-LIVE-PRICE", "one item per merchandise (`itemRef` the merchandise id, `unitPrice` its list price)"
+         in w13(lkm.get("description")), "lookupMerchandise does not state liveEffectivePrice's inputs (CR-478)")
+
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
              "BR-CONTRAST", "BR-WO-CANCEL", "BR-INCIDENT", "BR-FARE", "BR-SESSIONS-DOOR", "BR-ATTENDANCE",
@@ -2683,7 +2797,9 @@ def main() -> int:
              "BR-CHANNEL-ALLOCATION-COUNTS", "BR-CHANNEL-CODE-UNIQUE", "BR-SALE-RULE-INSTANTS", "BR-PRICING-APPROVAL",
              "BR-BOOKING-FLOW-RESOLVE", "BR-FLOW-TYPE-CATALOGUE", "BR-BOOKING-FLOW-WRITES", "BR-GUEST-CONTACT-FIELDS",
              "BR-GUEST-CODE-UNKNOWN", "BR-GUEST-CHECKOUT-PROOF", "BR-DELEGATION-CYCLE", "BR-WEBHOOK-REPLAY-TENANT",
-             "BR-OUTBOX-REPUBLISH-READS"]
+             "BR-OUTBOX-REPUBLISH-READS",
+             "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
+             "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:

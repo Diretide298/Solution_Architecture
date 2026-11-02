@@ -229,7 +229,7 @@ paths:
         - "P08 BO-005 Queue Monitor"
       x-ticvai-read-via:
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       summary: Create a queue
@@ -306,7 +306,7 @@ paths:
         - "P08 BO-221 Fast Pass & Attraction Access Journey"
       x-ticvai-read-via:
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       summary: Amend queue configuration
@@ -370,7 +370,7 @@ paths:
         - "P08 BO-005 Queue Monitor"
       x-ticvai-read-via:
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'what its text calls "live promotion": promotions.promotion, Catalogue''s data (CHG-RTE-001)'
       x-ticvai-audience: [staff]
       summary: Open, pause or close a queue
@@ -494,7 +494,7 @@ paths:
         route: in-process
         for: 'its read of marketing.loyalty_position, Marketing''s data (CHG-MOD-001)'
       - query: promotions#promotionRecords
-        route: service
+        route: in-process
         for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -1008,7 +1008,7 @@ paths:
         - "P08 BO-005 Queue Monitor"
       x-ticvai-read-via:
       - query: catalogue#productCategoryRecords
-        route: service
+        route: in-process
         for: 'what its text calls "ProductCategory": catalogue.product_category, Catalogue''s data (CHG-R10GEN-001)'
       x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica

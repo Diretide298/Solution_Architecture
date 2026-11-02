@@ -1,0 +1,190 @@
+id: CHG-R13INP-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'The class of CR-475 to CR-478 fixed at its source: every x-ticvai-read-via that asked over the service route
+    a query its host already asks in process is asked in process. 286 reads in 203 operations are re-routed (282 by
+    tools/applied/inprocess-reads-2-november.py, the four of CR-475, CR-477 and CR-478 by hand), through the owner''s
+    own query class under the caller''s row-level security: 121 on a query the lead had already granted the host, 5
+    within one deployable, and 156 to a module the host composes (operations: Tenancy, Catalogue, Orders; access:
+    Tenancy, Catalogue; commerce: Access), each with an additive read grant where the host''s role lacked one (XDR-071
+    to XDR-078 in docs/active/cross-deployable-writes.yaml; 39 table grants). 16 queries served on the service route
+    only are served in process too. ADR-0055 is amended (2 November 2026). check-cross-module-reads XR-INPROCESS-HOST
+    refuses such a service read from now on, and contract_shapes.read_route drafts it in process. XDR-010 is marked
+    narrow, so its pii.subject grant stays with listDeviceBindingSession. Left with the lead and not re-routed: 95
+    reads in 44 Control Plane operations and the 12 Access reads of pii.subject.'
+decision:
+  what: 'The lead, settling CR-475 to CR-478 on 2 November 2026 ("approve all as a recommended"), each in process with
+      an additive read grant for the host''s database role where it lacks one, as CR-296, CR-383, CR-385, CR-394,
+      CR-426 and CR-427 had been settled case by case; and for r13 the whole class fixed at its source, once: an
+      operation that declares a service route for a query whose owning module''s queries already run in its host (the
+      host composes that module''s query classes) asks it in process. Posted on #30768 (CR-475): "diffConfigVersion
+      asks catalogue#productRecords and catalogue#productCategoryRecords in process from the operations host. Use
+      Catalogue''s own query classes ... call no service route." Posted on #30870 (CR-477): "asks
+      orders#orderLineRecords with where {orderId} in process from the operations host. Use Orders'' query class,
+      already composed there (CR-385) ... Database: Hrushikant adds a guarded grant".'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-475 (#30768), CR-476 (#30767), CR-477 (#30870) and CR-478 (#30871), raised by Deep Khanvilkar on 2
+    November 2026, each asked again for what CR-296, CR-383, CR-385, CR-394, CR-426 and CR-427 had decided: a read the
+    host already asks in process, declared on the service route between deployables, which waits on the kernel''s
+    service sign-in (#37051, CR-281) and runs at the tenant root (CR-196). The rule that drafted these routes
+    (contract_shapes.read_route, CHG-R10GEN-007) knew only granted queries, not the modules a host composes, and no
+    check refused a service read the host could ask in process, so every new read came back as a CR. ADR-0055 rules 2
+    and 4 as amended 21 and 25 October 2026.'
+keys_touched:
+  operations: [accrueLoyaltyPoints, actOnWaiverRequirements, addBlacklistEntry, allocateResources,
+    appendEntitlementToMedia, applyMenuActions, approveMembershipProductValidation, approveReviewDecision,
+    askReportingQuestion, assessProductChange, assignRentalEquipment, bookVisitPlan, bulkUpdateProducts,
+    cancelPerformance, checkGuestCheckoutMatch, checkOutRental, claimTicketTransfer, cloneProduct, closeTableVisit,
+    compItem, createAdmissionRules, createChallenge, createCombo, createDeliveryLocation, createForm,
+    createGuestFnbOrder, createInvitationCampaign, createListingSeller, createProduct, createQueue, createReferral,
+    createResaleListing, createRetailSale, createShopAndDrop, createTableReservation, createTableReservationForGuest,
+    createUpgradeCredentialRegeneration, decideGuestCheckoutMatch, diffConfigVersion, enrolFacePass, enrolFaceTag,
+    freezeEntitlement, generateVisitPlan, getBill, getEntitlement, getGuestBill, getGuestIntelligence,
+    getGuestTimeline, getKpiValues, getMembershipProductValidation, getMyMemberships, getNextTransportDeparture,
+    getPublishedKioskConfig, getPublishedTenantConfig, getSessionVenue, getTenantConfig, getTransportDeparture,
+    getVisitPlannerOptions, getWaitTimes, getWaiverStatus, importSeatMap, issueWalletPass, joinQueue,
+    listAgentWorkloadAvailability, listAttendanceAdmission, listBiometricConsentGuardian,
+    listBiometricLifecycleRetention, listBulkGroupAssisted, listCapacityInventoryReconciliation,
+    listCaseResolutionClosure, listChangeImpactAnalysis, listCredential, listCredentialGenerationIssuance,
+    listCredentialRevocationRegeneration, listCustomerService, listCustomerServiceProfile, listEntitlements,
+    listEntryExitCrossover, listEscalationCriticalCase, listGroupArrivalCheck, listGroupBooking,
+    listGroupBookingReconciliation, listGroupLeaderFast, listGroupSale2, listGroupTicketFulfillment,
+    listGroupTicketSeat, listMember, listMemberLifecycleCase, listMembershipActivationCredential,
+    listMembershipAnnualPass, listMembershipCommercialPricing, listMembershipFreezeSuspension,
+    listMembershipRenewalRetention, listMembershipUpgradeDowngrade, listMembershipUsageVisit, listMinorGuardianGroup,
+    listMissingExpiredInvalid, listMyEntitlements, listMyVisitPlans, listOfficialResaleMarketplace,
+    listOrderLineProduct, listParticipantGuestList, listParticipantWaiverStatus, listPricingChangeImpact,
+    listProductStartTimes, listRenewalAuto, listResale, listResaleConfirmationOwnership, listResaleEligibilityTicket,
+    listResaleFraudDuplicate, listResaleInventoryAvailability, listResaleListingSeller, listResaleMarketplace,
+    listResaleOwnership, listResaleTicketDetail, listSalePermissionTargets, listSecurityDetectionGovernance,
+    listServiceRootCause, listSiteWaiverException, listTicketOwnershipTransfer, listTicketReissueFulfillment,
+    listTicketResaleMarketplace, listUpgradeEligibilityQualification, listUpgradeTimingUsage,
+    listValidationOutcomeRejection, listVirtualTicket, listVisitAdmissionEntitlement, listVisitPlanAlternatives,
+    listWaiver, lockIdentity, lookupMerchandise, modifyOrder, openShift, placeAccessDevice, previewGuidedChoice,
+    publishChannelAvailability, publishTenantConfig, publishTopologyValidation, publishTransportTimetable,
+    pushWalletPassUpdate, quoteUpgrade, reconcileBurstEnvironment, recordAttendance, recordConsentAnswers,
+    recordSaleOwnerAnswers, reinstateEntitlement, reissueEntitlement, releaseIdentityLock, respondToChargeback,
+    respondToInvitation, restoreConfigVersion, restoreProductVersion, revokeEntitlementShare, runSemanticQuery,
+    searchTransportDepartures, setBiometricLifecycleRetention, setCaseResolution, setDataRetentionPolicy,
+    setFamilyHouseholdDependent, setKitchenStations, setLoyaltyRules, setMediaReplacementRevocation,
+    setMemberMembershipAccount, setMembershipCommercialConfig, setMembershipEligibilityQualification,
+    setMembershipEntitlementAdmission, setMembershipProductTier, setMembershipUsagePolicy, setOrderAmendment,
+    setOrderBookingTicket, setOrderDetailTransaction, setProductSalePermissionRules, setQueueStatus, setReaderProfile,
+    setRefundCompensationService, setRenewalAutoMembership, setRfidNfcCard, setSessionVenue, setTransportRouteStatus,
+    setValidityActivationExpiry, setVenuePoint, setVenueSettings, setVerificationMethodPolicy,
+    setVirtualTicketCredential, setWaiverException, shareEntitlement, simulatePolicyConflictImpact, startKioskAssist,
+    suggestWorkOrderAssignee, suspendEntitlement, transferOrderTickets, transitionProductLifecycle,
+    updateAccessDevicePlacement, updateAdmissionRules, updateMediaAsset, updateProduct, updateQueue,
+    updateTableReservation, updateTransportDeparture, updateVisitPlan, validateGroupAccess, voidEntitlement,
+    withdrawTransportTimetable]
+  tables: [access.access_point, accreditation.application, accreditation.credential, accreditation.holder,
+    accreditation.validity, approvals.request, approvals.rule, catalogue.channel_capacity, catalogue.product,
+    catalogue.product_eligibility_rule, catalogue.product_media, catalogue.tax_profile, orders.cart, orders.cart_line,
+    orders.deposit, orders.deposit_policy, orders.group_booking, orders.invitation, orders.order_fee,
+    orders.order_line, orders.order_line_discount, orders.payment, orders.refund, orders.refund_policy,
+    orders.reservation, orders.sales_order, payments.instalment_policy, payments.provider,
+    payments.provider_connection, platform.device, platform.region_settings, promotions.bundle, promotions.promotion,
+    promotions.promotion_rule, seating.seat, tenancy.data_retention_setting, workforce.shift]
+  files:
+  - contracts/satellite/accreditation.yaml
+  - contracts/satellite/assets.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/satellite/games.yaml
+  - contracts/satellite/inventory.yaml
+  - contracts/satellite/maintenance.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/payments.yaml
+  - contracts/satellite/promotions.yaml
+  - contracts/satellite/queue.yaml
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/resources.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/seating.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/satellite/transport.yaml
+  - contracts/satellite/venue-map.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/workforce.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - contracts/spine/shift.yaml
+  - contracts/spine/tenancy.yaml
+  - docs/active/breaking-changes.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - docs/adr/0055-a-modular-monolith-deployed-as-five-units.md
+  - events/preview-requested.yaml
+  - handoff/api-data-lineage-overrides.json
+  - tools/applied/README.md
+  - tools/applied/inprocess-reads-2-november.py
+  - tools/check-business-rules.py
+  - tools/check-cross-module-reads.py
+  - tools/contract_shapes.py
+  - tools/tests/test_cross_module_inprocess_host.py
+  - tools/tests/test_generators_r10_patterns.py
+  other:
+  - 'XDR-071 to XDR-078 (reads granted; XDR-073 to XDR-078 carry `composes`, the modules each host composes)'
+  - 'XDR-010 marked `narrow` (its own operation only, as its why says)'
+  - 'ADR-0055 amended 2 November 2026 (rule 1: a host asks the modules it composes in process)'
+  - 'check-cross-module-reads XR-INPROCESS-HOST and its tests (tools/tests/test_cross_module_inprocess_host.py)'
+  - 'tools/applied/inprocess-reads-2-november.py (the re-route, run once; a second run writes nothing)'
+  - '16 queries newly served in process: access#accessPointRecords, accreditation#applicationRecords,
+      accreditation#credentialRecords, accreditation#holderRecords, accreditation#validityRecords,
+      approvals#ruleRecords, catalogue#productEligibilityRuleRecords, orders#cartLineRecords,
+      orders#groupBookingRecords, orders#invitationRecords, orders#orderFeeRecords, orders#reservationRecords,
+      payments#instalmentPolicyRecords, promotions#bundleRecords, tenancy#dataRetentionSettingRecords,
+      workforce#shiftRecords'
+root_class: 'in-process class: a service read of a query the reader''s host already asks in process (same deployable,
+    a granted query, or a module the host composes), drafted by a route rule that knew only grants and refused by no
+    check'
+tickets:
+  started:
+  - '27857 and 30962: addBlacklistEntry (Hrushikant, Ready for QA): ask approvals#requestRecords in process through
+      Tenancy''s query class composed in the access host (XDR-076), not over the service route; test against a
+      database with XDR-076''s grant on approvals.request.'
+  - '30964: createAdmissionRules (Hrushikant, Ready for QA): ask tenancy#regionSettingsRecords (XDR-076, new grant on
+      platform.region_settings) and tenancy#venueSettingsRecords (XDR-032) in process through Tenancy''s query
+      classes.'
+  - '27858 and 30969: updateAdmissionRules (Hrushikant, Ready for QA): the same two reads in process, as
+      createAdmissionRules.'
+  - '27885 and 31052: getPublishedTenantConfig (Hrushikant, Ready for QA): ask payments#providerConnectionRecords in
+      process through Orders'' query class (XDR-075, new grant on payments.provider_connection).'
+  - '31054: getTenantConfig (Hrushikant, Ready for QA): ask tenancy#activeVenues in process (XDR-022; platform.scope
+      is a kernel read, no grant).'
+  - '30775: restoreConfigVersion (Narayan, Ready for QA): ask orders#venueChargeCurrencies in process through Orders''
+      query class (XDR-075, new grant on payments.provider).'
+  - '35599 and 35624: getPublishedKioskConfig (Hrushikant, Ready for QA): ask tenancy#workstationRecords in process
+      (XDR-027, no new grant).'
+  - '27889, 31062, 31064, 31071, 31074, 32125 (Chitrangi), 31749, 31751, 31855, 31857, 32100, 32102 (Chinmay Patkar),
+      33038, 33271 (Chitrangi): front-end tickets of getPublishedTenantConfig, listProductStartTimes, bookVisitPlan,
+      generateVisitPlan, getVisitPlannerOptions, listVisitPlanAlternatives, updateVisitPlan, getMyMemberships,
+      listMyEntitlements and respondToInvitation: nothing to do; the answers do not change.'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-475
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py::XR-INPROCESS-HOST
+status: open
+notes: 'Covers the class beside CR-475 to CR-478 (their own entries CHG-CR475-001 to CHG-CR478-001); generator rule
+    tools/contract_shapes.py read_route and composes_owner. [DB] work for the plan lane: XDR-071 and XDR-072 are
+    #37210 and #37211; XDR-073 to XDR-078 need one new [DB] task, the grants listed in each entry (USAGE on schema
+    accreditation, approvals, tenancy, workforce and seating for operations, approvals and tenancy for access; SELECT
+    on the tables of XDR-073 to XDR-078 (36 grants; 39 with XDR-071 and XDR-072, on 37 tables). Not re-routed, for the
+    lead: (1) 95 reads in 44 Control Plane operations (Platform''s partner, burst-environment, tenant-migration,
+    subscription-preview, channel-listing and dead-letter operations, whose own rows are control.* or whose scope is
+    platform), because the Control Plane runs outside every cell (ADR-0039, ADR-0048) and planTenantMigration says it
+    asks Orders over the service route (CR-083); (2) the 12 Access reads of identity#subjectRecords other than
+    listDeviceBindingSession, which XDR-010 and ADR-0055 keep on the service route; (3) every Identity read from
+    operations or access (103 reads; no host composes Identity), and the operations host''s 25 reads of Access queries
+    (only XDR-023''s one query is granted). The check holds (1) apart by the control.* or scope rule, so it never asks
+    for them. Beyond the posted words: the access host is held to compose Tenancy''s and Catalogue''s query classes on
+    XDR-003''s words, and commerce Access''s on XDR-001''s and the 21 October amendment''s; XDR-022''s and XDR-032''s
+    lists of reads not covered by their decisions are now covered by this ruling and are not edited.'

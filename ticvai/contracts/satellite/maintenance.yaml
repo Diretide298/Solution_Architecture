@@ -1498,7 +1498,7 @@ paths:
         - "P08 BO-577 Maintenance Work Order"
       x-ticvai-read-via:
       - query: workforce#shiftRecords
-        route: service
+        route: in-process
         for: 'its read of workforce.shift, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica

@@ -273,7 +273,7 @@ paths:
         - "P13 CMS-075 Duplicate & Near-Duplicate Management"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'which products list the asset (409 in-use, MediaUsage surface product) (CHG-MOD-003)'
       x-ticvai-audience: [staff]
       summary: Amend metadata, tags or rights

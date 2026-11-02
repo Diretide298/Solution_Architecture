@@ -124,6 +124,27 @@ VENUE_Q = "tenancy#venueSettingsRecords"
 REGION_Q = "tenancy#regionSettingsRecords"
 SETTINGS_DEPLOYABLE = "commerce"      # Tenancy's (handoff/service-decomposition.json)
 _GRANTED = None
+_COMPOSED = None
+_OWNER_OF_CONTRACT = None
+
+
+def _load_grants(root: Path = None):
+    """The `reads` of docs/active/cross-deployable-writes.yaml, read once: the granted (reader, query) pairs that are
+    not `narrow`, and reader -> the modules whose query classes it composes (`composes`; CHG-R13INP-001)."""
+    global _GRANTED, _COMPOSED, _OWNER_OF_CONTRACT
+    if _GRANTED is None:
+        root = root or Path(__file__).resolve().parents[1]
+        p = root / "docs" / "active" / "cross-deployable-writes.yaml"
+        doc = (yaml.safe_load(p.read_text(encoding="utf-8")) or {}) if p.exists() else {}
+        reads = [r for r in doc.get("reads") or [] if isinstance(r, dict)]
+        _GRANTED = {(str(r.get("reader")), str(q)) for r in reads if not r.get("narrow") for q in r.get("queries") or []}
+        _COMPOSED = {}
+        for r in reads:
+            if r.get("composes"):
+                _COMPOSED.setdefault(str(r.get("reader")), set()).add(str(r["composes"]))
+        d = root / "handoff" / "service-decomposition.json"
+        svcs = (json.loads(d.read_text(encoding="utf-8")).get("services") or {}) if d.exists() else {}
+        _OWNER_OF_CONTRACT = {c: s for s, v in svcs.items() for c in v.get("contracts") or []}
 
 
 def granted_in_process(reader_deployable: str, query: str, root: Path = None) -> bool:
@@ -131,20 +152,29 @@ def granted_in_process(reader_deployable: str, query: str, root: Path = None) ->
     docs/active/cross-deployable-writes.yaml (ADAM CR-196, CHG-R9CR-005), the same set check-cross-module-reads
     XR-ROUTE allows. Since ADAM CR-296 (29 October 2026, CHG-R11RUL-001) the operations host reads Tenancy's four
     settings queries in process for every operation it hosts (XDR-004), so a generator drafting one of those reads for
-    an operations-host operation writes `in-process`, not `service`, and the next draft needs no flip."""
-    global _GRANTED
-    if _GRANTED is None:
-        root = root or Path(__file__).resolve().parents[1]
-        p = root / "docs" / "active" / "cross-deployable-writes.yaml"
-        doc = (yaml.safe_load(p.read_text(encoding="utf-8")) or {}) if p.exists() else {}
-        _GRANTED = {(str(r.get("reader")), str(q)) for r in doc.get("reads") or [] for q in r.get("queries") or []}
+    an operations-host operation writes `in-process`, not `service`, and the next draft needs no flip. A `narrow`
+    entry (XDR-010) grants only its own operations, so a generator never drafts it for another (CHG-R13INP-001)."""
+    _load_grants(root)
     return (str(reader_deployable), str(query)) in _GRANTED
 
 
+def composes_owner(reader_deployable: str, query: str, root: Path = None) -> bool:
+    """Whether the reader's host composes the query owner's module query classes (a `reads` entry with `composes`;
+    r13, the lead's ruling for the class of ADAM CR-475 to CR-478, CHG-R13INP-001; ADR-0055 as amended 2 November
+    2026): the operations host composes Tenancy's, Catalogue's and Orders' query classes, the access host Tenancy's
+    and Catalogue's, commerce Access's."""
+    _load_grants(root)
+    owner = _OWNER_OF_CONTRACT.get(str(query or "").split("#", 1)[0])
+    return bool(owner) and owner in _COMPOSED.get(str(reader_deployable), set())
+
+
 def read_route(reader_deployable: str, owner_deployable: str, query: str = None) -> str:
-    """in-process within one deployable or where the lead granted the read in process (granted_in_process), else
-    service (ADR-0055 rules 2 and 4 as amended)."""
-    if reader_deployable == owner_deployable or (query and granted_in_process(reader_deployable, query)):
+    """in-process within one deployable, where the lead granted the read in process (granted_in_process), or where the
+    reader's host composes the owner module's query classes (composes_owner; CHG-R13INP-001), else service (ADR-0055
+    rules 2 and 4 as amended). check-cross-module-reads XR-INPROCESS-HOST refuses a service read in the first three
+    cases, and XR-ROUTE asks for the grant where a composed module's query is not yet in a `reads` entry."""
+    if reader_deployable == owner_deployable or (query and (granted_in_process(reader_deployable, query)
+                                                            or composes_owner(reader_deployable, query))):
         return "in-process"
     return "service"
 

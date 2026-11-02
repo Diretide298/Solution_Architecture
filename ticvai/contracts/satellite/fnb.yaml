@@ -1216,7 +1216,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it accepts: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: catalogue#priceRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       - query: finance#taxCodeRecords
         route: service
@@ -1450,7 +1450,7 @@ paths:
         - "P08 BO-011 Packages & Bundles"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       - query: tenancy#regionSettingsRecords
         route: in-process
@@ -3592,7 +3592,7 @@ paths:
         - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-read-via:
       - query: orders#orderLineRecords
-        route: service
+        route: in-process
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -4516,10 +4516,10 @@ paths:
         route: in-process
         for: 'the outlet at the asked time (409 outlet-full-at-time) (CHG-MOD-003)'
       - query: orders#depositRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.deposit": orders.deposit, Order''s data (CHG-R10GEN-001)'
       - query: orders#depositPolicyRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
       x-ticvai-names-for-context: [orders.deposit]
       security:
@@ -4624,7 +4624,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: orders#depositPolicyRecords
-        route: service
+        route: in-process
         for: 'what its text calls "DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
       security:
       - guestAuth: []
@@ -5654,7 +5654,7 @@ paths:
         route: in-process
         for: 'the outlet''s admissionContext and whether it is taking orders (403 entry-ticket-required, 409 outlet-closed, 422 the outlet''s delivery policy) (CHG-MOD-003)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'the order''s payment (402 payment-required, payment-declined) (CHG-MOD-003)'
       x-ticvai-emits:
       - fnb.kitchenTicketCreated
@@ -5848,7 +5848,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - guest
@@ -7402,7 +7402,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
@@ -7546,7 +7546,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'the payments taken against the bill (409 payments-short-of-bill) (CHG-MOD-003)'
       - query: tenancy#outletRecords
         route: in-process
@@ -7988,7 +7988,7 @@ paths:
         - "P08 BO-134 Kitchen & Preparation Stations"
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
-        route: service
+        route: in-process
         for: 'the display workstations it assigns (400 workstation-on-two-stations) (CHG-MOD-003)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
@@ -9186,7 +9186,7 @@ paths:
         route: in-process
         for: 'the currency and scale of the Money it answers: the venue''s frozen trading currency, from platform.venue_settings, Tenancy''s data, in process (ADAM CR-234; ADR-0055 as amended 25 October 2026)'
       - query: orders#depositPolicyRecords
-        route: service
+        route: in-process
         for: 'what its text calls "orders.DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
       x-ticvai-audience:
       - staff
@@ -9338,7 +9338,7 @@ paths:
         route: in-process
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       - query: seating#seatRecords
-        route: service
+        route: in-process
         for: 'the seat a `seat` location names (422 seat-id-required) (CHG-MOD-003)'
       x-ticvai-audience:
       - staff

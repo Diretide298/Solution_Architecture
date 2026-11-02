@@ -2260,7 +2260,7 @@ paths:
         - "P08 BO-916 Equipment & Asset Allocation"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'the experience product whose resource requirements it allocates (409, ResourceRequirement) (CHG-MOD-003)'
       summary: Fill a requirement from the pool, rotating rather than repeating
       description: '**The 26 August decision is the whole of this operation.** *"resource allocation
@@ -3137,7 +3137,7 @@ paths:
         - "P02 GST-075 Book a Space by the Hour"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'whether the product is sold by time window and the variant''s length (422) (CHG-MOD-003)'
       - query: tenancy#venueSettingsRecords
         route: in-process

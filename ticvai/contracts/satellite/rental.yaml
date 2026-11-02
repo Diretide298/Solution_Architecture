@@ -1673,7 +1673,7 @@ paths:
       x-ticvai-names-for-context: [orders.payment]
       x-ticvai-read-via:
       - query: orders#paymentRecords
-        route: service
+        route: in-process
         for: 'the card deposit''s payment: refused 409 deposit-not-authorised until it is authorised (ADAM CR-146)'
       - query: tenancy#venueSettingsRecords
         route: in-process
@@ -1760,7 +1760,7 @@ paths:
         - "P08 BO-907 Guest & Resource Assignment"
       x-ticvai-read-via:
       - query: catalogue#productRecords
-        route: service
+        route: in-process
         for: 'the product the asset must be of (409 wrong-product) (CHG-MOD-003)'
       x-ticvai-conflict-policy: serverWins
       summary: Bind specific assets to the booking, by scan where required
