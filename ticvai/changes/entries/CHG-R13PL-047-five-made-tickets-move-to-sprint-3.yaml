@@ -32,6 +32,7 @@ tickets:
   - '#37210, #37211, #37214 (Hrushikant Patkar), #37212 (Pranay Shinde), #37213 (Sanket Keluskar): New, now Sprint 3'
 release_tag: pending
 decision_owner: Chinmay
+adam_cr: 'none: a decision of the lead; no ADAM CR is needed'
 triage: fix-forward
 waivers:
   cooling_off:

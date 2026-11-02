@@ -1,0 +1,28 @@
+id: CHG-R13INT-001
+date: '2026-11-02'
+source: audit
+kind: process
+summary: 'CHG-R13PL-047 names its ADAM CR as the entries of a lead''s own decision do (adam_cr ''none: a decision of the
+  lead; no ADAM CR is needed''): once its summary parsed (657b7cef), check-changelog refused it for having no adam_cr.'
+decision:
+  what: 'The r13 integration gate (refresh-safe on fix/r13-integration, 2 November 2026): fix every new finding at its
+    source. The entry records the lead''s "Yesss" (2 November 2026) on moving the five made tickets to Sprint 3, which no
+    ADAM CR raised.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'check-changelog on fix/r13-integration: "CHG-R13PL-047: from 2026-10-05 every change names its ADAM CR (adam_cr)".'
+keys_touched:
+  files:
+  - changes/entries/CHG-R13PL-047-five-made-tickets-move-to-sprint-3.yaml
+root_class: a change entry written without a field the schema requires from 5 October
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 integration gate'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-changelog.py
+status: open
