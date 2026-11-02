@@ -233,6 +233,84 @@ x-ticvai-queries:
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked in process within operations, through the C# query interface Inventory implements.
     served: [in-process]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  batchExpiry:
+    module: inventory
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: stock-batch, from: available, to: expired}
+    reads: [inventory.stock_batch]
+    writes: [inventory.stock_batch]
+    reliesOn: [listExpiringBatches]
+    for: Inventory stock-batch expiry.
+    source: ['states/stock-batch.yaml:29']
+  forecastViews:
+    module: inventory
+    host: workers
+    trigger: {kind: event}
+    consumes: [ai.forecastPublished, ai.operationalRequirementIssued]
+    reads: []
+    writes: []
+    for: 'Forecast-bound operational views: F&B prep and par, Inventory replenishment, Workforce rota (critical: shows the
+      requirement a manager applies), Resources demand, refreshed on a published forecast or an issued operational requirement.'
+    source:
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
+    - events/ai-forecastPublished.yaml
+  serialisedItemMoves:
+    module: inventory
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: serialised-item, from: inStock, to: reserved}
+    - {model: serialised-item, from: reserved, to: inStock}
+    - {model: serialised-item, from: returned, to: inStock}
+    - {model: serialised-item, from: returned, to: damaged}
+    - {model: serialised-item, from: inStock, to: damaged}
+    - {model: serialised-item, from: inTransit, to: lost}
+    - {model: serialised-item, from: inStock, to: lost}
+    - {model: serialised-item, from: damaged, to: warranty}
+    - {model: serialised-item, from: warranty, to: inStock}
+    - {model: serialised-item, from: warranty, to: lost}
+    reads: [inventory.serialised_item]
+    writes: [inventory.serialised_item]
+    for: 'The serialised item''s moves no operation makes: reserved for an order, returned, damaged, lost, sent to and back
+      from warranty.'
+    source: ['states/serialised-item.yaml:1']
+  stockCountPosting:
+    module: inventory
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: stock-count, from: closed, to: variancePending}
+    - {model: stock-count, from: closed, to: posted}
+    reads: [inventory.count, inventory.count_line]
+    writes: [inventory.count]
+    emits: [stock.depleted]
+    for: A closed stock count posts its adjustments within the venue's variance threshold, or waits for approval above it.
+    source: ['states/stock-count.yaml:1']
+  stockMovements:
+    module: inventory
+    host: workers
+    trigger: {kind: event}
+    consumes: [maintenance.workOrderCompleted, order.paid, order.refunded]
+    reads: []
+    writes: [inventory.movement]
+    for: 'Inventory''s consumers: deplete stock for physical lines on a paid order (critical), return stock on a refund, consume
+      the parts recorded on a completed work order.'
+    source:
+    - events/maintenance-workOrderCompleted.yaml
+    - events/order-paid.yaml
+    - events/order-refunded.yaml
 paths:
   /suppliers/{supplierId}:
     parameters:

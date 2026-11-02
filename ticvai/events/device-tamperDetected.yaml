@@ -7,6 +7,8 @@ publisher: tenancy
 description: A device reported physical or logical interference and is now untrusted until someone clears it.
 aggregate: device
 emittedWhen: recordDeviceTamperEvent succeeds
+emittedBy:
+- tenancy.recordDeviceTamperEvent
 payload:
 - field: tamperEventId
   type: uuid

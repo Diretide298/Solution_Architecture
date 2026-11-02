@@ -132,6 +132,37 @@ x-ticvai-queries:
       the caller's row-level security (CHG-R13INP-001). It is asked from another deployable through Tenancy's
       service route (serviceAuth).
     served: [in-process, service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  dailyExpiryRun:
+    module: accreditation
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    moves:
+    - {model: accreditation-application, from: approved, to: expired}
+    - {model: accreditation-holder, from: active, to: expired}
+    reads: [accreditation.application, accreditation.holder]
+    writes: [accreditation.application, accreditation.holder]
+    emits: [accreditation.holderStatusChanged]
+    for: Accreditation daily expiry run.
+    source: ['states/accreditation-application.yaml:112', 'states/accreditation-holder.yaml:53']
+  renewalRun:
+    module: accreditation
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    reads: [accreditation.holder]
+    writes: []
+    emits: [accreditation.renewalDue]
+    reliesOn: [decideAccreditationApplication, renewAccreditation]
+    for: 'The daily renewal run: an active holder whose validTo is renewalWindowDays away gets accreditation.renewalDue, once
+      per holder per validity period.'
+    source: ['events/accreditation-renewalDue.yaml']
 paths:
   /accreditation-programmes:
     get:

@@ -107,6 +107,114 @@ x-ticvai-queries:
       database, so an in-process asker names the rows it may see: approvals#setApprovalExternalProvider asks by
       the `apiClientId` and treats a row whose `allowed_tenant_ids` does not hold the caller's tenant as absent.
     served: [in-process, service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  anomalyMonitor:
+    module: public-api
+    host: workers
+    trigger: {kind: queue}
+    reads: [control.api_anomaly_rule]
+    writes: [control.api_anomaly]
+    emits: [apiClient.anomalyDetected]
+    reliesOn: [setApiAnomalyRule]
+    for: 'The anomaly monitor: records an ApiAnomaly (control.api_anomaly) for a rule set with setApiAnomalyRule and publishes
+      apiClient.anomalyDetected.'
+    source: ['events/apiClient-anomalyDetected.yaml']
+  lifecycleTimers:
+    module: public-api
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: api-version, from: deprecated, to: sunset}
+    - {model: developer-account, from: pending, to: closed}
+    - {model: integration-listing, from: certified, to: delisted}
+    - {model: integration-listing, from: revoked, to: delisted}
+    reads: [control.api_version, control.developer_account, control.integration_listing]
+    writes: [control.api_version, control.developer_account, control.integration_listing]
+    for: 'Public API lifecycle timers: API version sunset, unverified developer accounts, lapsed listing certification.'
+    source:
+    - states/api-version.yaml:27
+    - states/developer-account.yaml:24
+    - states/integration-listing.yaml:51
+  replayDispatcher:
+    module: public-api
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: webhook-replay, from: queued, to: running}
+    - {model: webhook-replay, from: running, to: completed}
+    - {model: webhook-replay, from: running, to: failed}
+    - {model: webhook-replay, from: queued, to: failed}
+    reads: [control.webhook_replay]
+    writes: [control.webhook_replay]
+    reliesOn: [replayEvents, republishOutbox]
+    for: Public API webhook replay dispatcher (CR-140, CR-201).
+    source:
+    - contracts/satellite/public-api.yaml
+    - contracts/satellite/public-api.yaml
+    - states/webhook-replay.yaml:20
+  sandbox:
+    module: public-api
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: sandbox, from: resetting, to: active}
+    - {model: sandbox, from: active, to: expired}
+    - {model: sandbox, from: expired, to: deleted}
+    reads: [control.sandbox]
+    writes: [control.sandbox]
+    for: Public API sandbox reset job and sandbox expiry.
+    source: ['states/sandbox.yaml:30']
+  webhookDelivery:
+    module: public-api
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - accreditation.applicationDecided
+    - accreditation.credentialIssued
+    - accreditation.holderStatusChanged
+    - accreditation.renewalDue
+    - apiClient.anomalyDetected
+    - approval.escalated
+    - approval.expired
+    - approval.requested
+    - approval.stepCompleted
+    - consent.deviceConsentClaimed
+    - consent.deviceConsentRecorded
+    - device.enrolmentChanged
+    - device.firmwareReleased
+    - device.firmwareRolloutCompleted
+    - device.statusChanged
+    - device.tamperDetected
+    - entitlement.expiringSoon
+    - order.chargebackRecorded
+    - seat.blocked
+    - seat.held
+    - seat.released
+    - seatMap.published
+    moves:
+    - {model: webhook-delivery, from: failed, to: retrying}
+    - {model: webhook-delivery, from: failed, to: abandoned}
+    - {model: webhook-subscription, from: active, to: failing}
+    - {model: webhook-subscription, from: failing, to: active}
+    - {model: webhook-subscription, from: failing, to: disabled}
+    - {model: webhook-subscription, from: pendingVerification, to: disabled}
+    reads: [control.webhook_delivery, control.webhook_subscription]
+    writes: [control.webhook_delivery, control.webhook_subscription]
+    for: 'Public API webhook delivery: the consumer that delivers each subscribed event to the tenant''s webhook subscriptions
+      and records control.webhook_delivery, with exponential-backoff retries and endpoint health (merged with the jobs scan''s
+      JOB-PUBLICAPI-WEBHOOK-RETRY).'
+    source:
+    - events/accreditation-applicationDecided.yaml
+    - events/accreditation-credentialIssued.yaml
+    - events/accreditation-holderStatusChanged.yaml
+    - events/accreditation-renewalDue.yaml
 paths:
   /developers:
     post:

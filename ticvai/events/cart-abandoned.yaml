@@ -43,11 +43,6 @@ consumers:
   idempotencyKey: cartId
   onFailure: retryThenDeadLetter
   isCritical: true
-- context: reporting
-  purpose: Abandonment rate by channel and product
-  idempotencyKey: cartId
-  onFailure: retry
-  isCritical: false
 - context: ai
   purpose: Recommendation attribution (an offer shown and not bought), and abandonment in the demand
     forecast (AI system design section 3.2)

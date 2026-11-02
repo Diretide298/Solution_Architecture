@@ -643,6 +643,294 @@ x-ticvai-queries:
       own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
       own. It is asked from another deployable through Catalogue's service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  aiFindingResolution:
+    module: catalogue
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: catalogue-ai-finding, from: open, to: resolved}
+    - {model: catalogue-ai-finding, from: acknowledged, to: resolved}
+    - {model: catalogue-ai-finding, from: accepted, to: resolved}
+    reads: [catalogue.ai_finding, catalogue.audit_entry]
+    writes: [catalogue.ai_finding, catalogue.audit_entry]
+    for: Catalogue's AI monitoring and pricing governance jobs.
+    source:
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
+    - states/catalogue-ai-finding.yaml:55
+  allocationRelease:
+    module: catalogue
+    host: workers
+    trigger: {kind: queue}
+    reads: [catalogue.channel_envelope]
+    writes: [catalogue.channel_envelope, catalogue.audit_entry]
+    reliesOn: [relinquishChannelAllocation]
+    for: 'Catalogue''s allocation release job: return unsold channel allocation before the performance.'
+    source: ['contracts/spine/catalogue.yaml']
+  approvalsAndCapacity:
+    module: catalogue
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - approval.expired
+    - approval.granted
+    - approval.rejected
+    - approval.withdrawn
+    - cart.abandoned
+    - order.refunded
+    - performance.cancelled
+    - seat.sold
+    - seatMap.published
+    - tenant.suspended
+    reads: []
+    writes: [catalogue.dynamic_pricing_control, catalogue.pricing_recommendation]
+    for: 'Catalogue''s approval consumer by subjectType (ADAM CR-415, the pricing recommendation and dynamic-pricing control
+      levels; CR425''s pending level), and its capacity consumers: decrement the performance envelope on a sold seat, return
+      capacity on an abandoned cart and on a cancelled performance (and close its waitlist), cancel or reduce entitlements
+      on a refund, stop publishing and sales for a suspen'
+    source:
+    - events/approval-expired.yaml
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/approval-withdrawn.yaml
+  channelActivation:
+    module: catalogue
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: sales-channel, from: scheduled, to: active}
+    reads: [catalogue.audit_entry, catalogue.sales_channel]
+    writes: [catalogue.audit_entry, catalogue.sales_channel]
+    for: Catalogue's sales-channel activation job (CR-211).
+    source: ['contracts/spine/catalogue.yaml', 'states/sales-channel.yaml:44']
+  channelRetry:
+    module: catalogue
+    host: workers
+    trigger: {kind: event}
+    consumes: [catalogue.channelIncidentRetryRequested]
+    reads: [catalogue.channel_incident]
+    writes: [catalogue.channel_incident, catalogue.audit_entry]
+    reliesOn: [retryChannelIncident]
+    builtBy: CR457-CHANNEL-RETRY-JOB
+    for: 'CR-457 channel retry job: a failed sales-channel call queued again with the same idempotency reference (retryChannelIncident).'
+    source: ['contracts/spine/catalogue.yaml']
+  channelSync:
+    module: catalogue
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: channel-incident, from: retrying, to: resolved}
+    - {model: channel-incident, from: retrying, to: investigating}
+    - {model: channel-incident, from: open, to: resolved}
+    - {model: channel-incident, from: resolved, to: closed}
+    reads: [catalogue.audit_entry, catalogue.channel_incident]
+    writes: [catalogue.audit_entry, catalogue.channel_incident]
+    reliesOn: [setChannelSyncSetting]
+    for: 'Catalogue''s channel sync job: counts, full comparison and channel incidents.'
+    source:
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
+    - states/channel-incident.yaml:34
+  eventLifecycle:
+    module: catalogue
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: performance, from: onSale, to: completed}
+    - {model: performance, from: soldOut, to: completed}
+    reads: [catalogue.performance]
+    writes: [catalogue.performance]
+    for: Catalogue's event lifecycle job and performance completion timer.
+    source:
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
+    - states/performance.yaml:73
+  import:
+    module: catalogue
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: catalogue-import-job, from: parsing, to: failed}
+    - {model: catalogue-import-job, from: previewReady, to: failed}
+    reads: [catalogue.import_job]
+    writes: [catalogue.import_job]
+    for: 'Catalogue import job: parse the file, build the preview, expire abandoned previews.'
+    source:
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
+    - states/catalogue-import-job.yaml:25
+  leaseSweeper:
+    module: catalogue
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: lease, from: active, to: expired}
+    reads: [catalogue.channel_capacity, catalogue.inventory_reservation]
+    writes: [catalogue.channel_capacity, catalogue.inventory_reservation]
+    emits: [inventoryHold.expired]
+    reliesOn: [acquireInventoryHold]
+    for: Catalogue's lease expiry sweeper (deferred by ADR-0037).
+    source:
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
+    - states/lease.yaml:26
+  priceExecutionDeployment:
+    module: catalogue
+    host: workers
+    trigger: {kind: event}
+    consumes: [catalogue.priceExecuted]
+    moves:
+    - {model: price-execution, from: scheduled, to: executing}
+    - {model: price-execution, from: executing, to: deployed}
+    - {model: price-execution, from: executing, to: partiallyDeployed}
+    - {model: price-execution, from: executing, to: failed}
+    - {model: price-execution, from: partiallyDeployed, to: deployed}
+    reads: [catalogue.price_execution]
+    writes: [catalogue.price_execution, catalogue.audit_entry]
+    builtBy: CR422-PRICE-EXECUTION-DEPLOYMENT-JOB
+    for: 'Catalogue''s channel deployment job (CR-422): a live dynamic price moves from executing to deployed, partly deployed
+      or failed.'
+    source: ['states/price-execution.yaml:1']
+  pricingEngine:
+    module: catalogue
+    host: undecided
+    trigger: {kind: timer}
+    reads: []
+    writes: [catalogue.demand_forecast, catalogue.pricing_recommendation]
+    reliesOn: [listDemandBookingCurve, listPriceElasticityRevenue]
+    decision: 'ticvai-ai or Catalogue''s workers: the text says only ''the forecasting job'' (AI-ENGINE-DYNAMIC-PRICING-AI
+      is Block D, phase 2). Awaiting the lead.'
+    for: 'Catalogue''s demand forecasting and price recommendation jobs: the forecasting job writes catalogue.demand_forecast
+      and the engine its recommendations.'
+    source: ['contracts/spine/catalogue.yaml', 'contracts/spine/catalogue.yaml']
+  pricingPublication:
+    module: catalogue
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: catalogue-change-request, from: pendingValidation, to: pendingApproval}
+    - {model: catalogue-change-request, from: pendingValidation, to: draft}
+    - {model: catalogue-change-request, from: scheduled, to: published}
+    - {model: catalogue-change-request, from: published, to: rolledBack}
+    - {model: price-list-version, from: scheduled, to: active}
+    - {model: price-list-version, from: scheduled, to: rolledBack}
+    - {model: price-list-version, from: active, to: rolledBack}
+    - {model: pricing-publication, from: scheduled, to: publishing}
+    - {model: pricing-publication, from: publishing, to: published}
+    - {model: pricing-publication, from: publishing, to: partiallyFailed}
+    - {model: pricing-publication, from: publishing, to: failed}
+    - {model: pricing-publication, from: partiallyFailed, to: publishing}
+    - {model: pricing-publication-target, from: pending, to: publishing}
+    - {model: pricing-publication-target, from: publishing, to: inSync}
+    - {model: pricing-publication-target, from: publishing, to: failed}
+    - {model: pricing-publication-target, from: failed, to: publishing}
+    reads:
+    - catalogue.audit_entry
+    - catalogue.change_request
+    - catalogue.price_list_version
+    - catalogue.pricing_publication
+    - catalogue.pricing_publication_target
+    writes:
+    - catalogue.audit_entry
+    - catalogue.change_request
+    - catalogue.price_list_version
+    - catalogue.pricing_publication
+    - catalogue.pricing_publication_target
+    for: Catalogue's change-request validation run, scheduled publication and pricing distribution job.
+    source:
+    - states/catalogue-change-request.yaml:31
+    - states/price-list-version.yaml:20
+    - states/pricing-publication-target.yaml:19
+    - states/pricing-publication.yaml:22
+  pricingRecommendationExpiry:
+    module: catalogue
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: pricing-recommendation, from: pending, to: ignored}
+    - {model: pricing-recommendation, from: sentToSimulation, to: ignored}
+    reads: [catalogue.demand_forecast, catalogue.pricing_recommendation]
+    writes: [catalogue.demand_forecast, catalogue.pricing_recommendation]
+    for: Catalogue's demand forecasting and price recommendation engine jobs, and recommendation expiry.
+    source:
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
+    - states/pricing-recommendation.yaml:78
+  pricingSignals:
+    module: catalogue
+    host: workers
+    trigger: {kind: queue}
+    reads: [catalogue.demand_signal]
+    writes: [catalogue.demand_signal, catalogue.audit_entry]
+    reliesOn: [setDemandSignalConfiguration]
+    for: Catalogue's demand-signal ingestion and data-quality / model-monitoring jobs.
+    source:
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
+    - contracts/spine/catalogue.yaml
+  scheduledActions:
+    module: catalogue
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: ai-catalogue-session, from: open, to: abandoned}
+    - {model: catalogue-rollback-action, from: scheduled, to: executing}
+    - {model: catalogue-rollback-action, from: executing, to: completed}
+    - {model: catalogue-rollback-action, from: executing, to: failed}
+    - {model: dynamic-pricing-strategy, from: active, to: expired}
+    - {model: dynamic-pricing-strategy, from: paused, to: expired}
+    - {model: dynamic-pricing-strategy, from: frozen, to: expired}
+    - {model: guest-membership-status, from: active, to: expired}
+    - {model: lifecycle-action, from: scheduled, to: running}
+    - {model: lifecycle-action, from: running, to: completed}
+    - {model: lifecycle-action, from: running, to: scheduled}
+    - {model: lifecycle-action, from: running, to: failed}
+    - {model: lifecycle-action, from: running, to: heldForManualAction}
+    - {model: product, from: withdrawn, to: archived}
+    - {model: waitlist-entry, from: offered, to: waiting}
+    - {model: waitlist-entry, from: waiting, to: expired}
+    - {model: waitlist-entry, from: offered, to: expired}
+    reads:
+    - catalogue.ai_catalogue_session
+    - catalogue.audit_entry
+    - catalogue.dynamic_pricing_strategy
+    - catalogue.lifecycle_action
+    - catalogue.product
+    - catalogue.rollback_action
+    - catalogue.waitlist_entry
+    writes:
+    - catalogue.ai_catalogue_session
+    - catalogue.audit_entry
+    - catalogue.dynamic_pricing_strategy
+    - catalogue.lifecycle_action
+    - catalogue.product
+    - catalogue.rollback_action
+    - catalogue.waitlist_entry
+    for: Catalogue's scheduled actions and expiry timers.
+    source:
+    - states/ai-catalogue-session.yaml:26
+    - states/catalogue-rollback-action.yaml:39
+    - states/dynamic-pricing-strategy.yaml:44
+    - states/guest-membership-status.yaml:38
+  orderExchanged:
+    module: catalogue
+    host: workers
+    trigger: {kind: event}
+    consumes: [order.exchanged]
+    reads: []
+    writes: [catalogue.channel_capacity, catalogue.inventory_reservation]
+    builtBy: CR480-ORDER-EXCHANGED-CONSUMERS
+    for: 'This module''s consumer of order.exchanged (ADAM CR-480): the outgoing lines move as on a refund, the incoming lines
+      as on the order-paid saga.'
+    source: ['events/order-exchanged.yaml']
 paths:
   /product-categories:
     get:

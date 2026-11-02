@@ -52,11 +52,6 @@ consumers:
   idempotencyKey: shiftId
   onFailure: retryThenDeadLetter
   isCritical: true
-- context: reporting
-  purpose: Shift and cashier performance
-  idempotencyKey: shiftId
-  onFailure: retry
-  isCritical: false
 - context: ai
   purpose: Staff leakage signals — voids, refunds and cash variance per cashier and till against their
     peers (AI system design section 3.2)

@@ -9,6 +9,10 @@ description: Lines on a paid order were exchanged for different products, dates 
 aggregate: order
 emittedWhen: exchangeOrderLines, modifyOrder or rescheduleOrder writes its lines (the lead, 2 November 2026,
   CHG-R13ORD-001)
+emittedBy:
+- orders.exchangeOrderLines
+- orders.modifyOrder
+- orders.rescheduleOrder
 payload:
 - field: orderId
   type: uuid

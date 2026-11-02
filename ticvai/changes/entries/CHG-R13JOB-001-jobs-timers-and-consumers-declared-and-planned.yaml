@@ -1,0 +1,70 @@
+id: CHG-R13JOB-001
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: 'Every background job, timer and event consumer the package describes is declared in its owning contract''s
+  new top-level `x-ticvai-jobs` map (module, host, trigger, consumes, moves, reads, writes, emits, reliesOn, builtBy),
+  beside `x-ticvai-queries`, and the plan makes one task per declaration (JOB-/CONS-<contract>-<name>) that no named
+  task or ticket already builds. 145 declarations cover all 400 job and timer transitions of states/ and every consumer
+  with no operation in a server module''s context; 4 more are open for the lead (`decision`). The tasks take their block
+  from the operations that rely on them (the waiting tickets follow them; a started one is told in its text instead),
+  and their owner by the plan''s rules for a back-end task of their service.'
+decision:
+  what: 'The lead, 2 November 2026: "Hold r13 until tomorrow", so the fix for the 127 pieces of work with no plan task
+    (the r13 job scan) goes into r13.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'The r13 job scan of 2 November 2026 (a finding: 127 pieces of work the package describes have no plan task, 98 in
+  Block A; 148 state models move on a timer or job that names no operation, and of 266 event consumers 10 have an
+  operation). Root R19 is the same class. ADR-0055: the workers host runs every module''s event consumers and
+  scheduled jobs; ADR-0020: AI''s run in ticvai-ai. The second scan''s promised tickets are in it: CR-188/CR-250
+  (tenancy#profileDeploy, #30821), CR-105 (white-label#domain, #27894, #27895), CR-140 (public-api#replayDispatcher,
+  #31358, #27997), CR-338 (white-label#receivedReleaseCopy, #31053), CR-415 (catalogue#approvalsAndCapacity, #35183,
+  #37165), CR-106 (white-label#appBuild, #sitePackage, #appIconRenditions; #27876, #27778, #27880), CR-462
+  (white-label#approvalsAndCatalogue, the content-block approval consumer) and CR-154 / IDENTITY-C63
+  (white-label#scheduledPublish, #27779).'
+keys_touched:
+  files:
+  - contracts/ (32 contract files, x-ticvai-jobs)
+  - states/_schema.yaml
+  - events/_schema.yaml
+  - tools/ticvai_jobs.py
+  - tools/build-service-docs.py
+  - tools/check-jobs.py
+  - tools/run-checks.py
+  - tools/refresh.sh
+  tickets:
+  - 127 new JOB-* and CONS-* plan tasks
+root_class: work a contract, a state model or an event describes but no operation carries, so the formula that makes a
+  task per operation never planned it
+tickets:
+  started:
+  - 'The started tickets whose operations hand work to a new job are not made to wait (their status and sprint stay);
+    each one''s plan text names the job task, and its developer builds against the job''s declaration and does not
+    build the job: 27732, 27736, 27777, 27778, 27779 (also the scheduled-publish job itself, CR-154; CHG-R13JOB-004),
+    27792, 27817, 27836, 27848, 27849, 27856, 27876, 27877, 27880, 27885, 27923, 27949, 27963, 28375, 28412, 28416,
+    28528, 28714, 28786, 29701, 29712, 29719, 37011.'
+  unstarted:
+  - 'Every unstarted ticket whose operations rely on a job follows the job''s task (a follows link at the release).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 job scan (the lead, 2 November 2026)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-jobs.py
+status: open
+notes: 'The generator rule is tools/build-service-docs.py ("One task per declared job, timer and event consumer"); the
+  check fails on e3e4082c (400 J-TRANSITION, 247 J-CONSUMER, 37 J-HANDOFF, 16 J-EMITTER, 6 J-READ-MODEL) and passes
+  after. Built by a named task or ticket (no new task): AI-ENGINE-QDRANT, -EVAL, -GUIDED, -CONCIERGE,
+  -ANOMALY-DETECTION, -FRAUD-RISK-RULES, PLATFORM-MIGRATE, PLATFORM-REPUBLISH, PLATFORM-SAGA-PAID,
+  CR422-PRICE-EXECUTION-DEPLOYMENT-JOB, PAYMENTS-NI-ADAPTER (its scheduled inquirePaymentStatus poll is the payment
+  reconciler), and the r13 plan tasks CR442-MESSAGE-SENDER, CR457-CHANNEL-RETRY-JOB, CR476-PREVIEW-RENDERER and
+  CR480-ORDER-EXCHANGED-CONSUMERS (Catalogue''s, Seating''s and Access''s consumers; AI''s order.exchanged consumer is
+  a task of its own). Open for the lead (no task until decided): access#fraudDetection (Access workers or ticvai-ai),
+  catalogue#pricingEngine (ticvai-ai or Catalogue workers), tenancy#retentionJobs (which modules), and
+  subscription#tenantProvisioning (the event and the state model disagree on who emits tenant.provisioned). Not
+  declared: the kernel idempotency purge (no module contract; common.yaml says MIG-PARTITIONS builds it, MIG-PARTITIONS
+  does not say so), and the guest app''s whitelabel.contentPublished consumer (a client, not a server module). Writes
+  left empty where the text names no table: identity#riskCaseOutcome, the four forecastViews consumers, fnb#kitchenTicketPush,
+  white-label#previewRenderer, cross-region#entitlementReplication and four AI consumers.'

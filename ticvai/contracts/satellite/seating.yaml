@@ -220,6 +220,71 @@ x-ticvai-queries:
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
       another deployable through Catalogue's service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  holdExpiry:
+    module: seating
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: seat, from: held, to: available}
+    - {model: seat, from: available, to: buffered}
+    - {model: seat, from: buffered, to: available}
+    - {model: seat-hold, from: held, to: expired}
+    reads: []
+    writes: []
+    emits: [seat.released]
+    for: Seating's seat-hold expiry and buffer rules.
+    source: ['states/seat-hold.yaml:40', 'states/seat.yaml:32']
+  import:
+    module: seating
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: import-job, from: parsing, to: previewReady}
+    - {model: import-job, from: parsing, to: failed}
+    - {model: import-job, from: committing, to: committed}
+    - {model: import-job, from: committing, to: failed}
+    - {model: seat-map-import-job, from: queued, to: reading}
+    - {model: seat-map-import-job, from: reading, to: proposed}
+    - {model: seat-map-import-job, from: reading, to: failed}
+    reads: [seating.import_job, seating.seat_map, seating.section, seating.section_row]
+    writes: [seating.import_job, seating.seat_map, seating.section, seating.section_row]
+    for: Seating's seat-map import jobs.
+    source: ['states/import-job.yaml:19', 'states/seat-map-import-job.yaml:60']
+  refundSeatRelease:
+    module: seating
+    host: workers
+    trigger: {kind: event}
+    consumes: [order.refunded]
+    reads: []
+    writes: [seating.seat]
+    for: 'Catalogue''s approval consumer by subjectType (ADAM CR-415, the pricing recommendation and dynamic-pricing control
+      levels; CR425''s pending level), and its capacity consumers: decrement the performance envelope on a sold seat, return
+      capacity on an abandoned cart and on a cancelled performance (and close its waitlist), cancel or reduce entitlements
+      on a refund, stop publishing and sales for a suspen'
+    source:
+    - events/approval-expired.yaml
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/approval-withdrawn.yaml
+  orderExchanged:
+    module: seating
+    host: workers
+    trigger: {kind: event}
+    consumes: [order.exchanged]
+    reads: []
+    writes: [seating.seat]
+    builtBy: CR480-ORDER-EXCHANGED-CONSUMERS
+    for: 'This module''s consumer of order.exchanged (ADAM CR-480): the outgoing lines move as on a refund, the incoming lines
+      as on the order-paid saga.'
+    source: ['events/order-exchanged.yaml']
 paths:
   /performances/{performanceId}/assign-seats:
     parameters:

@@ -23,11 +23,6 @@ payload:
 - field: closedAt
   type: timestamp
 consumers:
-- context: reporting
-  purpose: Freeze the period in the read model and mark reports for it as final
-  idempotencyKey: fiscalPeriodId
-  onFailure: retryThenDeadLetter
-  isCritical: true
 - context: subscription
   purpose: Trigger tenant billing for the period
   idempotencyKey: fiscalPeriodId

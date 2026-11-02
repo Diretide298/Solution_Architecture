@@ -230,6 +230,25 @@ x-ticvai-queries:
       a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
       from another deployable through VenueOps' service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  import:
+    module: venue-map
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: venue-map-import, from: parsing, to: failed}
+    - {model: venue-map-import, from: previewReady, to: failed}
+    reads: [venuemap.point]
+    writes: [venuemap.point]
+    for: 'Venue-map import job: parse the source, OCR, preview, expire abandoned imports.'
+    source: ['contracts/satellite/venue-map.yaml', 'states/venue-map-import.yaml:25']
 paths:
   /venue-maps:
     get:

@@ -262,6 +262,181 @@ x-ticvai-queries:
       rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another deployable
       through Platform's service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  approvalsAndBilling:
+    module: subscription
+    host: workers
+    trigger: {kind: event}
+    consumes: [ai.ceilingApproaching, approval.granted, approval.rejected, ledger.periodClosed]
+    reads: [control.outbox, control.tenant]
+    writes:
+    - control.outbox
+    - control.partner_agreement
+    - control.partner_application
+    - control.partner_change_request
+    - control.tenant
+    emits: [tenant.suspended]
+    for: 'Subscription''s consumers: apply an approval decision to the partner record (agreement, application, change request)
+      and to a pending suspension (which raises tenant.suspended), trigger tenant billing on period close, flag the period
+      for review when AI spend nears its ceiling.'
+    source:
+    - events/ai-ceilingApproaching.yaml
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/ledger-periodClosed.yaml
+  billingTimers:
+    module: subscription
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: invoice, from: issued, to: overdue}
+    - {model: subscription, from: trial, to: expired}
+    - {model: subscription, from: active, to: pastDue}
+    - {model: subscription, from: cancelled, to: expired}
+    reads: [control.contract, control.invoice]
+    writes: [control.contract, control.invoice]
+    for: 'Control Plane billing timers: trial end, cancelled period end, invoice overdue.'
+    source: ['states/invoice.yaml:31', 'states/subscription.yaml:25']
+  cellJobRunner:
+    module: subscription
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: cell, from: provisioning, to: active}
+    - {model: cell, from: provisioning, to: failed}
+    - {model: cell, from: migrating, to: active}
+    - {model: cell, from: migrating, to: failed}
+    - {model: cell-job, from: queued, to: running}
+    - {model: cell-job, from: running, to: completed}
+    - {model: cell-job, from: running, to: failed}
+    - {model: cell-job, from: failed, to: rolledBack}
+    - {model: cell-job, from: failed, to: queued}
+    reads: [control.cell, control.cell_job]
+    writes: [control.cell, control.cell_job]
+    for: 'Control Plane cell job runner: provisioning, migration and tier-change jobs.'
+    source: ['contracts/satellite/subscription.yaml', 'states/cell-job.yaml:20', 'states/cell.yaml:18']
+  membershipAndOnboardingTimers:
+    module: subscription
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: membership-product, from: scheduled, to: active}
+    - {model: membership-product, from: active, to: expired}
+    - {model: membership-product, from: expired, to: retired}
+    - {model: membership-product, from: suspended, to: retired}
+    - {model: onboarding-application, from: submitted, to: abandoned}
+    - {model: onboarding-application, from: verifying, to: abandoned}
+    reads:
+    - control.billing_entity
+    - control.onboarding_application
+    - subscription.membership_product
+    - subscription.membership_product_history
+    writes:
+    - control.billing_entity
+    - control.onboarding_application
+    - subscription.membership_product
+    - subscription.membership_product_history
+    for: Subscription membership-product and onboarding timers.
+    source:
+    - contracts/satellite/subscription.yaml
+    - states/membership-product.yaml:44
+    - states/onboarding-application.yaml:47
+  partnerProgramme:
+    module: subscription
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: partner-agreement, from: active, to: expiringSoon}
+    - {model: partner-agreement, from: expiringSoon, to: expired}
+    - {model: partner-case, from: resolved, to: closed}
+    - {model: partner-commercial-exception, from: pendingApproval, to: expired}
+    - {model: partner-commercial-exception, from: returned, to: expired}
+    - {model: partner-commercial-exception, from: approved, to: expired}
+    - {model: partner-commission-line, from: calculated, to: reconciled}
+    - {model: partner-contact, from: invited, to: expired}
+    - {model: partner-reconciliation-exception, from: open, to: matched}
+    - {model: partner-reconciliation-exception, from: investigating, to: matched}
+    - {model: partner-settlement-batch, from: calculated, to: reconciled}
+    reads:
+    - control.partner_agreement
+    - control.partner_booking_limit
+    - control.partner_case
+    - control.partner_commercial_exception
+    - control.partner_commission_line
+    - control.partner_contact
+    - control.partner_reconciliation_exception
+    - control.partner_settlement_batch
+    - control.partner_user
+    writes:
+    - control.partner_agreement
+    - control.partner_booking_limit
+    - control.partner_case
+    - control.partner_commercial_exception
+    - control.partner_commission_line
+    - control.partner_contact
+    - control.partner_reconciliation_exception
+    - control.partner_settlement_batch
+    - control.partner_user
+    reliesOn: [setPartnerSecurity]
+    for: 'Partner programme jobs: commission calculation, reconciliation, settlement, cases, agreement and security expiry.'
+    source:
+    - contracts/satellite/subscription.yaml
+    - contracts/satellite/subscription.yaml
+    - contracts/satellite/subscription.yaml
+    - contracts/satellite/subscription.yaml
+  tenantLifecycle:
+    module: subscription
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: tenant, from: active, to: suspended}
+    - {model: tenant, from: terminating, to: terminated}
+    reads: [control.tenant]
+    writes: [control.tenant]
+    emits: [tenant.suspended, tenant.terminated]
+    for: 'Control Plane tenant lifecycle job: apply a pending suspension, end a termination.'
+    source:
+    - contracts/satellite/subscription.yaml
+    - contracts/satellite/subscription.yaml
+    - states/tenant.yaml:35
+  tenantMigration:
+    module: subscription
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: cell-cluster, from: provisioning, to: active}
+    - {model: cell-cluster, from: active, to: draining}
+    - {model: cell-cluster, from: draining, to: retired}
+    - {model: tenant-migration, from: copying, to: verifying}
+    - {model: tenant-migration, from: verifying, to: awaitingCutover}
+    - {model: tenant-migration, from: verifying, to: failed}
+    - {model: tenant-migration, from: awaitingCutover, to: cuttingOver}
+    - {model: tenant-migration, from: cuttingOver, to: complete}
+    - {model: tenant-migration, from: copying, to: failed}
+    reads: [control.cell_cluster, control.tenant_migration]
+    writes: [control.cell_cluster, control.tenant_migration]
+    for: Control Plane tenant migration and cell drain jobs.
+    source: ['states/cell-cluster.yaml:19', 'states/tenant-migration.yaml:26']
+  tenantProvisioning:
+    module: subscription
+    host: undecided
+    trigger: {kind: queue}
+    reads: [control.tenant]
+    writes: [control.tenant]
+    emits: [tenant.provisioned]
+    reliesOn: [createTenant]
+    decision: "Which job moves a tenant provisioning to active and writes tenant.provisioned: the event says the
+      provisioning job (createTenant's, or the verified onboarding application's) and that no operation emits it, while
+      states/tenant.yaml gives that move to updateTenant, an operation. Awaiting the lead."
+    for: The provisioning job that makes a new tenant active and writes tenant.provisioned to control.outbox.
+    source: ['events/tenant-provisioned.yaml', 'states/tenant.yaml:16']
 paths:
   /onboarding-applications:
     post:

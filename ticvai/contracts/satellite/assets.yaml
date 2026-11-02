@@ -167,6 +167,49 @@ x-ticvai-queries:
       table: identity.guest_upload_ref
       feeds:
       - assets.guestUploadChanged
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  analysis:
+    module: assets
+    host: workers
+    trigger: {kind: queue}
+    reads: [assets.media_asset]
+    writes: [assets.media_fingerprint, assets.tag]
+    reliesOn: [analyseMediaAsset]
+    for: 'Assets'' analysis job: recompute hash and embedding under the current model.'
+    source: ['contracts/satellite/assets.yaml']
+  guestUploadRetention:
+    module: assets
+    host: workers
+    trigger: {kind: queue}
+    reads: [assets.guest_upload]
+    writes: [assets.guest_upload]
+    reliesOn: [createGuestUpload, completeGuestUpload]
+    for: Assets' guest-upload retention job.
+    source: ['contracts/satellite/assets.yaml', 'contracts/satellite/assets.yaml']
+  mediaProcessing:
+    module: assets
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: media, from: processing, to: ready}
+    - {model: media, from: processing, to: quarantined}
+    - {model: media, from: processing, to: failed}
+    reads: [assets.media_asset, assets.media_fingerprint, assets.rendition]
+    writes: [assets.media_asset, assets.media_fingerprint, assets.rendition]
+    emits: [assets.documentIndexed]
+    for: 'Assets'' media processing job: derivatives, virus scan, fingerprint, text extraction.'
+    source:
+    - contracts/satellite/assets.yaml
+    - contracts/satellite/assets.yaml
+    - contracts/satellite/assets.yaml
+    - states/media.yaml:17
 paths:
   /media:
     get:

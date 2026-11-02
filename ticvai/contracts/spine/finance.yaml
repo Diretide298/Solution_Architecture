@@ -300,6 +300,65 @@ x-ticvai-queries:
       with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
       deployable through Ledger's service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  postings:
+    module: finance
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - inventory.purchaseOrderReceived
+    - order.refunded
+    - shift.closed
+    - stock.depleted
+    - wallet.creditExpired
+    - wallet.credited
+    - wallet.debited
+    moves:
+    - {model: variance-review, from: notRequired, to: pendingReview}
+    reads: [ledger.price_variance]
+    writes: [ledger.price_variance]
+    for: 'Ledger''s posting consumers: post the refund reversal, the shift''s cash position and variance, stored-value liability
+      on wallet top-up, capture and expiry (breakage), the goods-receipt accrual and price variance, and cost of sales on
+      a stock count.'
+    source:
+    - events/inventory-purchaseOrderReceived.yaml
+    - events/order-refunded.yaml
+    - events/shift-closed.yaml
+    - events/stock-depleted.yaml
+  revenueRecognition:
+    module: finance
+    host: workers
+    trigger: {kind: queue}
+    reads: [ledger.recognition_schedule]
+    writes: [ledger.journal_entry, ledger.journal_line]
+    reliesOn: [createRecognitionSchedule]
+    for: Ledger revenue recognition schedule job.
+    source: ['contracts/spine/finance.yaml']
+  settlementIngest:
+    module: finance
+    host: workers
+    trigger: {kind: timer, every: P1D}
+    moves:
+    - {model: settlement, from: ingesting, to: parsing}
+    - {model: settlement, from: parsing, to: matching}
+    - {model: settlement, from: parsing, to: failed}
+    - {model: settlement, from: matching, to: matched}
+    - {model: settlement, from: matching, to: hasExceptions}
+    - {model: settlement, from: matched, to: resolved}
+    reads: [ledger.settlement]
+    writes: [ledger.settlement]
+    for: Ledger settlement file ingestion and matching job, and the nightly reconciliation.
+    source:
+    - contracts/satellite/payments.yaml
+    - contracts/spine/finance.yaml
+    - states/settlement.yaml:19
 paths:
   /internal/order-postings:
     post:

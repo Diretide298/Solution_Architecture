@@ -46,6 +46,15 @@ description: >
   emits with `x-ticvai-emits` (SD-033). A consumer with an `operation` is modelled as that internal
   operation, so its writes appear in lineage and it gets a ticket (SD-026).
 
+  **A consumer with no `operation` is a declared job** (r13, 2 November 2026; CHG-R13JOB-001): the owning
+  module's contract lists it in `x-ticvai-jobs` (`consumes`), with its host, what it reads and writes and what it
+  emits, and the plan gives it a task (tools/check-jobs.py, J-CONSUMER). An event a job writes to the outbox is
+  named by that job's `emits`, since `emittedBy` names operations only.
+
+  **Reporting keeps no separate read model** (ADR-0016; the lead, 2 November 2026, on the 45 reporting consumers that
+  wrote read-model tables that do not exist: "Drop them"): reports read the owning modules' data, so no event has a
+  reporting consumer that "updates the read model" or "adds to a dimension" (J-READ-MODEL).
+
   ## What is deliberately not here
 
   Commands. This catalogue is facts that have already happened — `order.paid`, not

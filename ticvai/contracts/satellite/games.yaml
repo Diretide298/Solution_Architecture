@@ -76,6 +76,40 @@ x-ticvai-queries:
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
       another deployable through VenueOps' service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  cardExpiry:
+    module: games
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: game-card, from: active, to: expired}
+    reads: [games.card]
+    writes: [games.card]
+    for: Wallet hold sweeper and card expiry timers.
+    source: ['contracts/satellite/wallet.yaml', 'states/game-card.yaml:31', 'states/gift-card.yaml:58']
+  creditAndAssetEvents:
+    module: games
+    host: workers
+    trigger: {kind: event}
+    consumes: [maintenance.assetReturnedToService, wallet.credited]
+    reads: [games.card]
+    writes: [games.card]
+    for: 'Smaller module consumers: F&B pushes a new kitchen ticket to the station''s KDS screens (the KDS also polls listKitchenTickets;
+      POS-KDS-ROUTING builds routing only); the Queue releases a held virtual-queue slot on entry (''capacity leaks if this
+      is lost'') and reopens a queue when its attraction returns to service; Games keeps a game card''s balance in step with
+      wallet.credited and re-enables a repair'
+    source:
+    - events/access-validated.yaml
+    - events/approval-granted.yaml
+    - events/entitlement-issued.yaml
+    - events/fnb-kitchenTicketCreated.yaml
 paths:
   /game-cards:
     post:

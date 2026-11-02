@@ -145,6 +145,42 @@ x-ticvai-queries:
       question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
       another deployable through VenueOps' service route (serviceAuth).
     served: [service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  entryAndAssetEvents:
+    module: queue
+    host: workers
+    trigger: {kind: event}
+    consumes: [access.validated, maintenance.assetReturnedToService]
+    reads: []
+    writes: [queue.entry, queue.queue]
+    for: 'Smaller module consumers: F&B pushes a new kitchen ticket to the station''s KDS screens (the KDS also polls listKitchenTickets;
+      POS-KDS-ROUTING builds routing only); the Queue releases a held virtual-queue slot on entry (''capacity leaks if this
+      is lost'') and reopens a queue when its attraction returns to service; Games keeps a game card''s balance in step with
+      wallet.credited and re-enables a repair'
+    source:
+    - events/access-validated.yaml
+    - events/approval-granted.yaml
+    - events/entitlement-issued.yaml
+    - events/fnb-kitchenTicketCreated.yaml
+  timers:
+    module: queue
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: queue-entry, from: called, to: expired}
+    - {model: queue, from: open, to: atCapacity}
+    - {model: queue, from: atCapacity, to: open}
+    reads: [maintenance.work_order, queue.entry, queue.queue]
+    writes: [maintenance.work_order, queue.entry, queue.queue]
+    for: 'Queue timers: call windows and the sensor-fed cycle.'
+    source: ['contracts/satellite/queue.yaml', 'states/queue-entry.yaml:43']
 paths:
   # ---------------------------------------------------------------- queues
   /queues:

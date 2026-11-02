@@ -30,11 +30,6 @@ payload:
   required: false
   notes: Null when the event lifecycle job applied a move scheduled with effectiveFrom
 consumers:
-- context: reporting
-  purpose: The event's lifecycle on the event dashboards (BO-716), and on-sale and cancelled counts
-  idempotencyKey: eventId + changedAt
-  onFailure: retry
-  isCritical: false
 - context: ai
   purpose: Add the event to, or drop it from, forecast and recommendation candidates as it goes on sale, closes or is
     cancelled

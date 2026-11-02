@@ -64,11 +64,6 @@ consumers:
   idempotencyKey: applicationId + decidedAt
   onFailure: retryThenDeadLetter
   isCritical: false
-- context: reporting
-  purpose: Accreditation KPIs — applications decided, approval rate, time to decision (12.1.50)
-  idempotencyKey: applicationId + decidedAt
-  onFailure: retry
-  isCritical: false
 retention: 30 days after publication; the decision itself is kept in accreditation.audit
 notes: '**Added 29 September (build pass, BL-180, 12.1.53)** so an external system can hear that somebody
   was accredited or refused without polling the application list. The name is the one the public-api

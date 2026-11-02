@@ -1,0 +1,46 @@
+id: CHG-R13JOB-003
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: 'Of the 35 events no operation declared as its emitter, 29 now have one: twelve name the operations their
+  emittedWhen gives in `emittedBy` (access.rejected, accreditation.credentialIssued, ai.incidentOpened,
+  ai.operationalRequirementIssued, consent.deviceConsentClaimed, consent.deviceConsentRecorded, device.tamperDetected,
+  identity.credentialResetRequested, identity.loginRecorded, order.exchanged, payment.attemptFailed,
+  storefront.sessionEvent), and seventeen are in the `emits` of the job that writes them (x-ticvai-jobs, CHG-R13JOB-001):
+  accreditation.renewalDue, ai.insightRaised, ai.planExecuted, ai.planFailed, ai.riskAlertRaised,
+  apiClient.anomalyDetected, approval.expired, assets.documentIndexed, cart.abandoned, entitlement.expiringSoon,
+  inventoryHold.expired, marketing.caseClosed, order.completed, tenant.suspended, tenant.terminated,
+  tenantDomain.rejected, whitelabel.passCertificateExpiring. Six are not placed (notes).'
+decision:
+  what: 'The lead, 2 November 2026: "Hold r13 until tomorrow", so the r13 job and consumer fix (the 35 events with no
+    emitter among it) goes into r13.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'The r13 job scan of 2 November 2026 (a finding: 35 events with no emitter declared on any operation; root R19,
+  CHG-R13JOB-001). events/_schema.yaml: emittedBy names the operations that write the event to the outbox (SD-033).'
+keys_touched:
+  operations: [validateAccess, syncScans, issueAccreditationCredential, replaceAccreditationCredential, openAiIncident,
+    decideAiGovernanceAlert, decideOperationalRequirement, claimDeviceConsent, recordDeviceConsent,
+    recordDeviceTamperEvent, requestGuestOtp, resetPrincipalCredential, login, guestPasswordLogin, verifyGuestOtp,
+    guestSocialLogin, guestUaePassLogin, registerGuest, completeSsoAuthorization, verifyMfaChallenge,
+    exchangeOrderLines, createPayment, capturePayment, recordStorefrontSessionEvents]
+  files:
+  - events/ (12 event files, emittedBy)
+root_class: an event whose emitter is written in prose only, so lineage and the plan cannot see who writes it
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 job scan (the lead, 2 November 2026)'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-jobs.py
+status: open
+notes: 'J-EMITTER fails on an event with no emitter whose emittedWhen names an operation. Every operation placed already
+  wrote platform.outbox in the lineage (derive-lineage changed nothing). Not placed, for the lead (the text names no
+  operation or job): ai.ceilingApproaching ("Metered spend crosses ceilingWarningPercent"), device.firmwareRolloutCompleted,
+  fnb.menuPublished, maintenance.templatePublished, retail.merchandisePublished; and tenant.provisioned, whose event says
+  "the provisioning job ... No operation emits it" while states/tenant.yaml gives provisioning to active to updateTenant
+  (declared open: subscription#tenantProvisioning).'

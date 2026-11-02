@@ -506,6 +506,181 @@ x-ticvai-queries:
       commerce, through the C# query interface Order implements, and asked from another deployable through Order's
       service route (serviceAuth).
     served: [in-process, service]
+x-ticvai-jobs:
+  # **The background work this module owns** (r13, 2 November 2026; CHG-R13JOB-001): its timers, its queued jobs and
+  # its event consumers, each one a plan task (tools/build-service-docs.py) unless `builtBy` names the task or ticket
+  # that builds it. `host`: the workers host runs every module's consumers and scheduled jobs (ADR-0055), ticvai-ai
+  # runs AI's (ADR-0020). `trigger.kind`: timer (a clock or a due time; `every` where the text gives it), queue (a
+  # row put in a state by an operation), event (`consumes`, as this module's consumer in events/) or state.
+  # `moves`: the job and timer transitions it makes (states/<model>.yaml). `reliesOn`: the operations that hand it
+  # work. Checked by tools/check-jobs.py.
+  afterSaleApply:
+    module: orders
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: after-sale-request, from: approved, to: completed}
+    - {model: after-sale-request, from: approved, to: failed}
+    reads: [orders.after_sale_request]
+    writes: [orders.after_sale_request]
+    for: Orders' after-sale request application job.
+    source: ['states/after-sale-request.yaml:49']
+  approvalsAndCancellation:
+    module: orders
+    host: workers
+    trigger: {kind: event}
+    consumes:
+    - approval.granted
+    - approval.rejected
+    - approval.withdrawn
+    - inventoryHold.expired
+    - performance.cancelled
+    - tenant.suspended
+    reads: []
+    writes: [orders.cart_line, orders.discount, orders.refund, orders.sales_order]
+    for: 'Orders'' consumers: release or void a held refund or discount when its approval is decided or withdrawn, refund
+      every holder of a cancelled performance (F09, ''the critical consumer''), mark cart lines whose hold expired, and refuse
+      new orders for a suspended tenant.'
+    source:
+    - events/approval-granted.yaml
+    - events/approval-rejected.yaml
+    - events/approval-withdrawn.yaml
+    - events/inventoryHold-expired.yaml
+  entitlementCompletion:
+    module: orders
+    host: workers
+    trigger: {kind: event}
+    consumes: [entitlement.issued]
+    reads: [orders.order_line]
+    writes: [orders.order_line, orders.sales_order]
+    emits: [order.completed]
+    builtBy: PLATFORM-SAGA-PAID
+    for: 'Orders'' consumer of entitlement.issued: record the ids on the line and complete the order (paid to completed).'
+    source: ['events/entitlement-issued.yaml', 'events/order-completed.yaml']
+  guestExpiry:
+    module: orders
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: entitlement-status, from: issued, to: expired}
+    - {model: entitlement-status, from: partiallyConsumed, to: expired}
+    - {model: group-booking, from: confirmed, to: namesPending}
+    - {model: payment-link, from: issued, to: viewed}
+    - {model: payment-link, from: issued, to: expired}
+    - {model: payment-link, from: viewed, to: expired}
+    - {model: resale-listing, from: pendingReview, to: expired}
+    - {model: resale-listing, from: listed, to: expired}
+    - {model: ticket-transfer, from: offered, to: expired}
+    - {model: wallet-pass, from: issued, to: expired}
+    - {model: wallet-pass, from: updated, to: expired}
+    reads:
+    - orders.group_booking
+    - orders.order_event
+    - orders.payment
+    - orders.payment_link
+    - orders.resale_listing
+    - orders.ticket_transfer
+    - orders.wallet_pass
+    - payments.payment_attempt
+    writes:
+    - orders.group_booking
+    - orders.order_event
+    - orders.payment
+    - orders.payment_link
+    - orders.resale_listing
+    - orders.ticket_transfer
+    - orders.wallet_pass
+    - payments.payment_attempt
+    for: 'Orders'' guest-facing expiry timers: transfers, payment links, wallet passes, resale listings, entitlements, group
+      names.'
+    source:
+    - contracts/spine/orders.yaml
+    - states/entitlement-status.yaml:54
+    - states/group-booking.yaml:25
+    - states/payment-link.yaml:42
+  holdExpiry:
+    module: orders
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: cart, from: active, to: expiring}
+    - {model: cart, from: active, to: expired}
+    - {model: cart, from: expiring, to: expired}
+    - {model: order, from: held, to: voided}
+    - {model: order, from: pending, to: voided}
+    - {model: reservation, from: held, to: expired}
+    reads: [orders.cart, orders.order_event, orders.sales_order]
+    writes: [orders.cart, orders.order_event, orders.sales_order]
+    emits: [cart.abandoned, order.lapsed]
+    for: 'Orders'' hold and payment-window timers: carts, held and pending orders, reservations.'
+    source: ['states/cart.yaml:19', 'states/order.yaml:31', 'states/reservation.yaml:26']
+  paymentReconciler:
+    module: orders
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: payment, from: authorised, to: pendingConfirmation}
+    reads: [orders.sales_order]
+    writes: [orders.sales_order]
+    builtBy: PAYMENTS-NI-ADAPTER
+    for: Orders' background payment reconciler (Network International poll, CR-165).
+    source:
+    - contracts/satellite/payments.yaml
+    - contracts/spine/orders.yaml
+    - contracts/spine/orders.yaml
+    - contracts/spine/orders.yaml
+  refundGatewayConfirmation:
+    module: orders
+    host: workers
+    trigger: {kind: queue}
+    moves:
+    - {model: refund, from: pendingGateway, to: completed}
+    - {model: refund, from: pendingGateway, to: failed}
+    reads: [orders.refund]
+    writes: [orders.refund]
+    emits: [order.refunded]
+    reliesOn: [createRefund]
+    for: A refund pending at the gateway completes when the gateway confirms, or fails when it refuses or times out.
+    source: ['states/refund.yaml:30']
+  resaleSettlementAndLateTimers:
+    module: orders
+    host: workers
+    trigger: {kind: timer}
+    moves:
+    - {model: chargeback, from: received, to: expired}
+    - {model: chargeback, from: underReview, to: expired}
+    - {model: group-quote, from: sent, to: expired}
+    - {model: resale-settlement, from: pending, to: scheduled}
+    - {model: resale-settlement, from: pending, to: onHold}
+    - {model: resale-settlement, from: scheduled, to: onHold}
+    - {model: resale-settlement, from: onHold, to: scheduled}
+    - {model: resale-settlement, from: onHold, to: reversed}
+    - {model: resale-settlement, from: scheduled, to: paid}
+    - {model: resale-settlement, from: failed, to: scheduled}
+    reads: [orders.chargeback, orders.group_quote, orders.resale_settlement]
+    writes: [orders.chargeback, orders.group_quote, orders.resale_settlement]
+    emits: [order.chargebackRecorded]
+    for: Orders' resale settlement payout job and late timers (chargeback evidence, group quotes).
+    source:
+    - contracts/spine/orders.yaml
+    - states/chargeback.yaml:53
+    - states/group-quote.yaml:55
+    - states/resale-settlement.yaml:20
+  riskCaseOutcome:
+    module: orders
+    host: workers
+    trigger: {kind: event}
+    consumes: [ai.riskCaseClosed]
+    reads: []
+    writes: [orders.sales_order]
+    for: 'AI''s recommendation and risk signal consumers beyond the five owner events AI-ENGINE-FRAUD-RISK-RULES names: recommendation
+      attribution, candidate availability, renewal moments, risk velocity and chargebacks, browsing signals, account-takeover
+      resets, staff leakage, device-health anomalies, and the risk-case outcome for Identity and Orders.'
+    source:
+    - events/ai-riskCaseClosed.yaml
+    - events/ai-riskCaseClosed.yaml
+    - events/cart-abandoned.yaml
+    - events/device-statusChanged.yaml
 paths:
   /carts:
     post:
