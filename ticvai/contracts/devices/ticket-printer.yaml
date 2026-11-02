@@ -4,7 +4,7 @@ info:
   version: 1.0.0
   x-ticvai-tier: device
   x-ticvai-platforms:
-    - "P04 Point of Sale"
+    - "P04 Venue POS"
     - "P05 Guest Kiosk"
   description: >
     ## What this contract covers

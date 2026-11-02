@@ -4595,7 +4595,6 @@ paths:
       - query: orders#depositPolicyRecords
         route: in-process
         for: 'what its text calls "orders.DepositPolicy.dining": orders.deposit_policy, Order''s data (CHG-R10GEN-001)'
-      x-ticvai-names-for-context: [orders.deposit]
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject

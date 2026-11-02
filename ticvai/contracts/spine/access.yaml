@@ -15580,7 +15580,6 @@ paths:
       - query: tenancy#deviceRecords
         route: in-process
         for: 'what its text calls "platform.device": platform.device, Tenancy''s data (CHG-R10GEN-001)'
-      x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listPhysicalDeviceRegistration reads (pack ''Access
@@ -15671,7 +15670,6 @@ paths:
       - query: tenancy#deviceRecords
         route: in-process
         for: 'what its text calls "platform.device": platform.device, Tenancy''s data (CHG-R10GEN-001)'
-      x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listPhysicalDeviceRegistration reads (pack ''Access

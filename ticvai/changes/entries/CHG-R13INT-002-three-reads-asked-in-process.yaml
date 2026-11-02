@@ -1,0 +1,40 @@
+id: CHG-R13INT-002
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: 'exchangeOrderLines and rescheduleOrder ask access#entitlementRecords in process (commerce), and publishContentBlock
+  asks approvals#requestRecords in process (operations), as every read a host already asks in process is asked: lane r''s
+  rule applied to the reads lanes q and p declared on the service route in parallel.'
+decision:
+  what: 'The r13 integration gate (refresh-safe on fix/r13-integration, 2 November 2026): fix every new finding at its source,
+    never by baselining, acknowledging or exempting. ADAM CR-438 and the in-process reads class (lane r, CHG-R13INP-001):
+    a read the lead granted to the reader''s deployable in process is asked in process. Applied by lane r''s idempotent
+    tools/applied/inprocess-reads-2-november.py --apply, run again on the merged tree.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'check-cross-module-reads on fix/r13-integration: 3 new XR-INPROCESS-HOST (exchangeOrderLines, rescheduleOrder, publishContentBlock),
+  each read declared route: service by a lane that branched before lane r''s class fix merged (CR-480''s and CHG-R13ORD-001''s
+  line-redeemed check; CR-462''s content-block approval consumer).'
+keys_touched:
+  operations:
+  - exchangeOrderLines
+  - rescheduleOrder
+  - publishContentBlock
+  files:
+  - contracts/spine/orders.yaml
+  - contracts/satellite/white-label.yaml
+root_class: a read declared on the service route where the host asks the owner in process (CHG-R13INP-001), written by a
+  lane in parallel with the class fix
+tickets:
+  started: []
+  unstarted:
+  - '30685 (exchangeOrderLines, New), rescheduleOrder''s and publishContentBlock''s tickets: the read is in process, as
+    their other reads are.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-438
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-cross-module-reads.py::XR-INPROCESS-HOST
+status: open

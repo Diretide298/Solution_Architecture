@@ -1607,7 +1607,7 @@ paths:
           x-ticvai-problem-types: [open-shift-already-taken, shift-claimant-not-eligible, working-hour-rule-breach,
             rota-assignment-overlap, open-shift-incomplete]
           description: Already taken, not eligible, it would breach a working-hour rule, or it overlaps another
-            assignment of the claimant at any venue of the tenant (ADAM CR-380); or the open shift lacks a venue,
+            assignment of the claimant at any venue of the tenant (ADAM CR-380); or the `OpenShift` lacks a venue,
             position or time its released assignment cannot give (`open-shift-incomplete`, ADAM CR-441)
           content:
             application/problem+json:

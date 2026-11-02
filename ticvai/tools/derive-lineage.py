@@ -587,6 +587,16 @@ def expected(stored: dict, fresh: dict, overrides: dict, stale: list = None) -> 
         # x-ticvai-write-via"), but only the overrides of suspendTenant and publishContentBlock had put the table in
         # `writes`: addBlacklistEntry's new route read as stale (check-cross-deployable-writes X-STALE).
         writes |= {w["table"] for w in f.get("writeVia") or [] if w.get("table")}
+        # **A served query's route is a read** (ADAM CR-438, Chinmay, 1 November 2026: "a query served on the service
+        # route is POST /queries/<the query's name in kebab case> ... answering 200 with a JSON array of its rows"; r13
+        # integration, CHG-R13INT-005). The verb is POST only because the inputs travel as a JSON body; the route reads
+        # its query's rows and writes nothing. Read as a write (its body and answer persist to the query's table),
+        # listSubjectBiometricRecords wrote pii.subject_biometric, and check-package asked it for an Idempotency-Key
+        # and a consistency token.
+        if str(f.get("verb") or "").upper() == "POST" and str(f.get("path") or "").startswith("/queries/"):
+            writes = set()
+            e["pure"] = e.get("pure") or ("a served query's route (ADAM CR-438: POST /queries/<name>): it reads its "
+                                          "query's rows and writes nothing")
         if e.get("pure"):
             # A `pure` entry writes nothing, whatever its body refs (CHG-FXC-004); a cache it fills is not a table.
             writes = {t for t in writes if ":" in t}

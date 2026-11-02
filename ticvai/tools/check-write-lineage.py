@@ -57,7 +57,13 @@ def main() -> int:
     lin = json.load(io.open(os.path.join(ROOT, "handoff", "api-data-lineage.json"), encoding="utf-8"))
     ops = {}
     for f in sorted(glob.glob(os.path.join(ROOT, "contracts", "*", "*.yaml"))):
-        for p, item in (yl(f).get("paths") or {}).items():
+        doc = yl(f)
+        # **A device host's contract has no lineage** (ADAM CR-463; r13 integration, CHG-R13INT-004), as
+        # derive-lineage and check-lineage read it: contracts/devices/*.yaml (x-ticvai-tier: device) is the localhost API
+        # of the Windows ticket-printer host, no deployable's operation, so submitTicketPrintJob writes no table.
+        if ((doc.get("info") or {}).get("x-ticvai-tier")) == "device":
+            continue
+        for p, item in (doc.get("paths") or {}).items():
             for v, op in (item or {}).items():
                 if isinstance(op, dict) and op.get("operationId"):
                     ops[op["operationId"]] = (v, op)

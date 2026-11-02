@@ -1,0 +1,55 @@
+id: CHG-R13INT-006
+date: '2026-11-02'
+source: audit
+kind: contract
+summary: 'x-ticvai-names-for-context follows the reads: the five operations whose context table is now read in process (checkOutRental
+  orders.payment, createTableReservation orders.deposit, placeAccessDevice and updateAccessDevicePlacement platform.device,
+  updateTransportDeparture catalogue.channel_capacity) drop it, and the six whose r13 text names a table to say it is not
+  read declare it (createPreview orders.ticket_template, lookupMerchandise promotions.promotion_rule, setSeoMetadata control.url_redirect,
+  submitForm pii.subject, topUpWallet and updatePrincipal platform.scope).'
+decision:
+  what: 'The r13 integration gate (refresh-safe on fix/r13-integration, 2 November 2026): fix every new finding at its source,
+    never by baselining, acknowledging or exempting. The r13 decisions as the lanes wrote them (CR-472: "It reads nothing
+    from pii.subject"; CR-474; CR-476: "the operations role gets no grant on orders.ticket_template"; CR-478; CR-483) and
+    lane r''s in-process reads (CHG-R13INP-001).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Finding (ADAM CR-438), check-parameter-columns on fix/r13-integration: 11 new P-NAMED-TABLE, five "declares X named for context, and its
+  lineage uses it" and six "description names X and its lineage does not list it".'
+keys_touched:
+  operations:
+  - checkOutRental
+  - createTableReservation
+  - placeAccessDevice
+  - updateAccessDevicePlacement
+  - updateTransportDeparture
+  - createPreview
+  - lookupMerchandise
+  - setSeoMetadata
+  - submitForm
+  - topUpWallet
+  - updatePrincipal
+  files:
+  - contracts/satellite/rental.yaml
+  - contracts/satellite/fnb.yaml
+  - contracts/spine/access.yaml
+  - contracts/satellite/transport.yaml
+  - contracts/satellite/white-label.yaml
+  - contracts/satellite/retail.yaml
+  - contracts/satellite/marketing-crm.yaml
+  - contracts/satellite/wallet.yaml
+  - contracts/spine/identity.yaml
+root_class: a context-only table declaration not kept with the reads (a read moved in process; a table named to say it is
+  not read)
+tickets:
+  started: []
+  unstarted:
+  - 'the eleven operations'' tickets: metadata only, no behaviour changes.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-438
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py::P-NAMED-TABLE
+status: open

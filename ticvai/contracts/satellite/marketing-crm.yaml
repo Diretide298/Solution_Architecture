@@ -1921,6 +1921,7 @@ paths:
   /form-submissions:
     post:
       operationId: submitForm
+      x-ticvai-names-for-context: [pii.subject]
       x-ticvai-consumed-by:
         - "P01 WEB-026 Survey & Feedback"
         - "P02 GST-035 Feedback & Ratings"
@@ -2464,6 +2465,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSeoMetadata
+      x-ticvai-names-for-context: [control.url_redirect]
       x-ticvai-consumed-by:
         - "P08 BO-842 SEO Management"
         - "P13 CMS-013 SEO & Metadata"

@@ -1,0 +1,35 @@
+id: CHG-R13INT-005
+date: '2026-11-02'
+source: audit
+kind: process
+summary: 'A served query''s route (POST /queries/<name>, ADAM CR-438) is a read: derive-lineage gives it no writes and marks
+  it pure with that reason, and listSubjectBiometricRecords states x-ticvai-idempotency-exempt. Read as a write, it wrote
+  pii.subject_biometric in the lineage, and check-package asked it for an Idempotency-Key and a consistency token.'
+decision:
+  what: 'The r13 integration gate (refresh-safe on fix/r13-integration, 2 November 2026): fix every new finding at its source,
+    never by baselining, acknowledging or exempting. ADAM CR-438 (Chinmay, 1 November 2026): "a query served on the service
+    route is POST /queries/<the query''s name in kebab case> ... answering 200 with a JSON array of its rows" (lane r moved
+    listSubjectBiometricRecords there from GET /internal/subject-biometrics).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Finding (ADAM CR-438), check-package on fix/r13-integration: "identity: 1 mutating operation(s) take no IdempotencyKey and state no x-ticvai-idempotency-exempt
+  reason - listSubjectBiometricRecords" and "identity: 1 write(s) declare no X-Consistency-Token on their 2xx response -
+  listSubjectBiometricRecords".'
+keys_touched:
+  operations:
+  - listSubjectBiometricRecords
+  files:
+  - contracts/spine/identity.yaml
+  - tools/derive-lineage.py
+root_class: a read route given a write verb by a decided convention, read as a write by the lineage
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-438
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-lineage.py::expected
+status: open

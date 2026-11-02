@@ -1,0 +1,34 @@
+id: CHG-R13INT-003
+date: '2026-11-02'
+source: audit
+kind: process
+summary: 'claimOpenShift''s 409 named "the open shift" and the slug open-shift-incomplete (CR-441), which check-error-sources
+  read as Orders'' till shift (orders.pos_shift) asked with no read-via: the 409 now names `OpenShift`, and the check reads
+  an open-shift-* problem-type slug as Workforce''s own, as it reads needs-promotion.'
+decision:
+  what: 'The r13 integration gate (refresh-safe on fix/r13-integration, 2 November 2026): fix every new finding at its source,
+    never by baselining, acknowledging or exempting. Workforce''s open shift is Tenancy''s own record (workforce.open_shift),
+    not a till shift: no read across modules is missing.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'check-error-sources on fix/r13-integration: 1 new E-READ-VIA, "claimOpenShift 409 names shift (OrderService) and has
+  no x-ticvai-read-via to a query of OrderService", from lane p''s CR-441 wording (CHG-CR441-001).'
+keys_touched:
+  operations:
+  - claimOpenShift
+  files:
+  - contracts/satellite/workforce.yaml
+  - tools/check-error-sources.py
+root_class: an entity word in a problem-type slug read as another module's record
+tickets:
+  started: []
+  unstarted:
+  - '37102 (claimOpenShift, On hold): wording only; the refusal is as CR-441 decided.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-441
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-error-sources.py::NOT_ENTITY
+status: open

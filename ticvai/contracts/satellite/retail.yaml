@@ -528,6 +528,7 @@ paths:
   /merchandise/lookup:
     get:
       operationId: lookupMerchandise
+      x-ticvai-names-for-context: [promotions.promotion_rule]
       x-ticvai-consumed-by:
         - "P01 WEB-033 Shop"
         - "P02 GST-026 Retail / Merchandise"

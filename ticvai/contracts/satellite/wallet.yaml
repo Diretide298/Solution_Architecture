@@ -2520,6 +2520,7 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: topUpWallet
+      x-ticvai-names-for-context: [platform.scope]
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
         - "P08 BO-488 Self-Service Wallet Top-Up"

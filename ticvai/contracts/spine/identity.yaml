@@ -654,6 +654,8 @@ paths:
   /queries/subject-biometric-records:
     post:
       operationId: listSubjectBiometricRecords
+      x-ticvai-idempotency-exempt: A served query (ADAM CR-438, POST /queries/<name>) that reads rows and writes nothing;
+        a replay answers the same rows.
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -3171,6 +3173,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updatePrincipal
+      x-ticvai-names-for-context: [platform.scope]
       x-ticvai-consumed-by:
         - "P08 BO-053 Staff Directory"
         - "P08 BO-054 Role Assignment"

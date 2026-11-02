@@ -1349,7 +1349,6 @@ paths:
       - query: catalogue#channelCapacityRecords
         route: in-process
         for: 'seats sold on the departure (422 capacity-below-sold) (CHG-MOD-003)'
-      x-ticvai-names-for-context: [catalogue.channel_capacity]
       x-ticvai-audience: [staff]
       summary: Change a departure's coach or capacity
       description: |-
