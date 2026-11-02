@@ -1,0 +1,31 @@
+id: CHG-R13INT-015
+date: '2026-11-03'
+source: release
+kind: process
+summary: 'The gate''s pinned count for check-screen-patterns is lowered from 39 to 28: findings were fixed, and every
+  one of the 28 left is one the old pin held.'
+decision:
+  what: 'tools/refresh-safe-baseline.json, check-screen-patterns known line: "^28 finding(s): NP 1, P8 20, READ 7$"
+    (was 39: NP 1, P8 29, READ 9). The lead, 3 November 2026, told that lowering the pin makes the gate stricter (the
+    pin is an exact count, and the eleven fixed findings now fail the gate if they come back) and that no finding is
+    new: "OKay".'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'r13''s integration gate failed only on this pin: ADM-089, -090, -091, -094, -095, -106, -109, -115 and BO-441 are
+  no longer findings, and BO-288 and CMS-050 read what they edit (CHG-R13INT-014), so the count fell to 28, all of them
+  among the 39 the pin held.'
+keys_touched:
+  files:
+  - tools/refresh-safe-baseline.json
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s own decision of 3 November 2026'
+triage: fix-forward
+prevention:
+  type: none
+  ref: 'next release: check-screen-patterns judged by its finding list rather than an exact count, so it tightens by itself'
+status: open
