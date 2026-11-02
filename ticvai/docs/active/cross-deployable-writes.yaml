@@ -533,3 +533,18 @@ reads:
     operations host, in the caller''s transaction under the caller''s row-level security, with their where input,
     as createFnbOrder does under XDR-008 and validateTenantConfig under XDR-022. The SELECT on the three tables is
     the one V0118 already grants the operations role (XDR-008); no grant or migration is added.'
+- id: XDR-055
+  reader: operations
+  tables: [catalogue.rate]
+  privileges: [SELECT]
+  queries: [catalogue#variantListingFacts]
+  operations: [addToWishlist, getWishlist]
+  added: '2026-11-02'
+  decision_ref: ADAM CR-439 (Chinmay, 1 November 2026) and CR-455 (Chinmay, 2 November 2026), on #35288
+  why: 'variantListingFacts'' listPrice is now catalogue#variantPriceRecords for the one variant (CR-439), and that rule
+    replaces price.amount with the winning assignment''s category rate, a catalogue.rate row, when the variant has a
+    price category (CR-455). The operations host runs variantListingFacts in process for Marketing''s addToWishlist and
+    getWishlist under XDR-007, which grants SELECT on the price-list resolution tables of CR-270 (price,
+    price_assignment, price_list) but not on catalogue.rate, so the category rate would be refused at runtime. SELECT
+    only on that one table, under the caller''s row-level security, through Catalogue''s own query class; derive-ddl
+    writes the guarded grant into the next forward migration.'

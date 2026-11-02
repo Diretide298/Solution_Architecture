@@ -364,6 +364,22 @@ And one rule per decision:
                    subscription's API client, the stop on rows left, and SET NOT NULL.
   BR-OUTBOX-REPUBLISH-READS (r12, ADAM CR-435, CHG-CR435-001) republishOutbox declares no read of outbox rows (neither
                    read-via nor lineage read) and names its partition-catalogue bound.
+  BR-VARIANT-PRICE (r13, ADAM CR-439 and CR-455, CHG-CR439-001, CHG-CR455-001) catalogue#variantPriceRecords states the
+                   one price rule (candidates, ranking, the category rate, a null amount); searchCatalogue and
+                   variantListingFacts use it; ProductVariant.priceCategoryId; the simulation states the member, dynamic,
+                   fee and tax rules and answers 422 promotion-evaluation-unavailable and unsupported-tax-method.
+  BR-ELASTICITY-LABELS (r13, ADAM CR-446, CHG-CR446-001) a one-bound proximity reads 'up to {to} days' or '{from}+ days';
+                   movementPercent is rounded to one decimal.
+  BR-CHANGE-IMPACT (r13, ADAM CR-456, CHG-CR456-001) listPricingChangeImpact is computed at read time with a rule per
+                   figure, its reads declared, the five sourceless figures nullable and on LO-CR456-001.
+  BR-PRODUCT-WORKFLOW (r13, ADAM CR-460, CHG-CR460-001) listProductApprovalWorkflows reads catalogue.approval_policy rows
+                   with subject product; approveWorkflow states the mapping and what a replace keeps.
+  BR-FEE-INSTANTS  (r13, ADAM CR-464, CHG-CR464-001) the fee and calculation-sequence views answer nullable instants,
+                   asOf is an instant, and status takes CatalogueConfigStatus.
+  BR-SEAT-RULE-OVERLAP (r13, ADAM CR-467, CHG-CR467-001) setSeatPricingRule answers invalid-range and defines covered
+                   seats and the overlap on its own table.
+  BR-TAX-PROFILE-LIST (r13, ADAM CR-468, CHG-CR468-001) listTaxProfiles and getTaxProfileJurisdiction declare their
+                   tax-code, legal-entity, venue, tax-rule and product reads; at or beneath; status as stored.
   BR-GUEST-SELF-403  (r8, CHG-R8SPN-018) a guest operation scoped to the caller's subject answers another subject's
                    record 404, not 403: a ratchet (GUEST_SELF_403_CEILING). BR-ALERT-RECIPIENT (CHG-R8SPN-020) is a
                    warning until reporting's listAlerts states its recipient filter.
@@ -1964,6 +1980,7 @@ def main() -> int:
         need("BR-RESTORE-MISSING-PAGE", word in rtext,
              f"restoreConfigVersion does not say {word!r} for a page deleted since the version (CR-350)")
     access_rules_r12(need, op)
+    pricing_rules_r13(need, op)
 
     # ---------------------------------------------------------------- r12 CR lane F (31 October 2026; the lead: "for
     # each one actually check if they hold and if not then find out the best way keeping in mind what client needs").
@@ -2683,7 +2700,9 @@ def main() -> int:
              "BR-CHANNEL-ALLOCATION-COUNTS", "BR-CHANNEL-CODE-UNIQUE", "BR-SALE-RULE-INSTANTS", "BR-PRICING-APPROVAL",
              "BR-BOOKING-FLOW-RESOLVE", "BR-FLOW-TYPE-CATALOGUE", "BR-BOOKING-FLOW-WRITES", "BR-GUEST-CONTACT-FIELDS",
              "BR-GUEST-CODE-UNKNOWN", "BR-GUEST-CHECKOUT-PROOF", "BR-DELEGATION-CYCLE", "BR-WEBHOOK-REPLAY-TENANT",
-             "BR-OUTBOX-REPUBLISH-READS"]
+             "BR-OUTBOX-REPUBLISH-READS",
+             "BR-VARIANT-PRICE", "BR-ELASTICITY-LABELS", "BR-CHANGE-IMPACT", "BR-PRODUCT-WORKFLOW", "BR-FEE-INSTANTS",
+             "BR-SEAT-RULE-OVERLAP", "BR-TAX-PROFILE-LIST"]
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -2756,6 +2775,157 @@ def access_rules_r12(need, op):
          "working-venue-required (CR-400, CR-217)")
     need("BR-ADMISSION-CREATE", "tenancy#scopeRecords" not in {q for q, _ in vias(uar)},
          "updateAdmissionRules re-derives scope_path from the editor's working venue (CR-400)")
+
+
+def pricing_rules_r13(need, op):
+    """r13 lane n, pricing, fees and tax (ADAM CR-439, CR-446, CR-455, CR-456, CR-460, CR-464, CR-467, CR-468; the
+    lead's "Approve all", 1 November 2026, and "approve all as a recommended", 2 November 2026). Each rule fails on the
+    r12 contract and passes once the posted decision is in the package."""
+    cat = load("contracts/spine/catalogue.yaml")
+    sch = (cat.get("components") or {}).get("schemas") or {}
+    fin = load("contracts/spine/finance.yaml")
+    lo = {str(i.get("id")) for i in (load("docs/active/left-out.yaml").get("items") or []) if isinstance(i, dict)}
+
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def d(oid):
+        return words(op(oid)[3].get("description"))
+
+    def sp(name):
+        return (sch.get(name) or {}).get("properties") or {}
+
+    def reads(oid):
+        return {str(r.get("table")) for r in op(oid)[3].get("x-ticvai-reads") or [] if isinstance(r, dict)}
+
+    def vias(oid):
+        return {str(v.get("query")) for v in op(oid)[3].get("x-ticvai-read-via") or [] if isinstance(v, dict)}
+
+    def codes(oid, code):
+        return set(((op(oid)[3].get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def param(oid, name):
+        for p_ in op(oid)[3].get("parameters") or []:
+            if isinstance(p_, dict) and p_.get("name") == name:
+                return p_.get("schema") or {}
+        return None
+
+    def is_status(node):
+        node = node or {}
+        refs = [node.get("$ref")] + [a.get("$ref") for a in node.get("allOf") or [] if isinstance(a, dict)]
+        return "#/components/schemas/CatalogueConfigStatus" in refs
+
+    # BR-VARIANT-PRICE (ADAM CR-439, CR-455; CHG-CR439-001, CHG-CR455-001)
+    q = (cat.get("x-ticvai-queries") or {}).get("variantPriceRecords") or {}
+    qr = words(q.get("rule"))
+    need("BR-VARIANT-PRICE", {"variantId", "venueId", "channel", "at", "customerSegment"} <= set(q.get("inputs") or {})
+         and "in-process" in (q.get("served") or []),
+         "catalogue#variantPriceRecords is not declared with (variantId, venueId, channel, at, customerSegment), served "
+         "in process (CR-439)")
+    for frag in ("highestPriorityWins", "assignment priority (highest first", "price_category_id equal to the variant's",
+                 "base_rate_id", "null amount"):
+        need("BR-VARIANT-PRICE", frag in qr, f"variantPriceRecords' rule does not state {frag!r} (CR-439, CR-455)")
+    need("BR-VARIANT-PRICE", (sp("ProductVariant").get("priceCategoryId") or {}).get("nullable") is True,
+         "ProductVariant has no nullable priceCategoryId (CR-455)")
+    body = ((((op("updateProductVariant")[3].get("requestBody") or {}).get("content") or {}).get("application/json") or {})
+            .get("schema") or {}).get("properties") or {}
+    need("BR-VARIANT-PRICE", "priceCategoryId" in body, "updateProductVariant does not write priceCategoryId (CR-455)")
+    sc = ((((((op("searchCatalogue")[3].get("responses") or {}).get("200") or {}).get("content") or {})
+            .get("application/json") or {}).get("schema") or {}).get("items") or {}).get("properties") or {}
+    need("BR-VARIANT-PRICE", (sc.get("fromPrice") or {}).get("nullable") is True
+         and "variantPriceRecords" in words((sc.get("fromPrice") or {}).get("description")),
+         "searchCatalogue's fromPrice is not nullable or does not name variantPriceRecords (CR-439, CR-455)")
+    lf = words(((cat.get("x-ticvai-queries") or {}).get("variantListingFacts") or {}).get("rule"))
+    need("BR-VARIANT-PRICE", "variantPriceRecords" in lf,
+         "variantListingFacts' listPrice does not use variantPriceRecords (CR-439)")
+    sim = "simulatePriceBreakdownCalculation"
+    need("BR-VARIANT-PRICE", {"no-selected-rate", "promotion-evaluation-unavailable", "unsupported-tax-method"}
+         <= codes(sim, "422") and "no-price-for-variant" not in codes(sim, "422"),
+         "simulatePriceBreakdownCalculation's 422 does not list no-selected-rate, promotion-evaluation-unavailable and "
+         "unsupported-tax-method, or lists no-price-for-variant (CR-439, CR-455)")
+    need("BR-VARIANT-PRICE", {"pricing.dynamic_price_rule", "pricing.dynamic_price_condition",
+                              "pricing.dynamic_price_action", "catalogue.sales_channel", "catalogue.fee_rule",
+                              "catalogue.tax_rule"} <= reads(sim),
+         "simulatePriceBreakdownCalculation does not declare the member, fee and tax reads (CR-455)")
+    ds = d(sim)
+    for frag in ("`membershipProgramme`", "The lowest priority number wins", "lower number first",
+                 "`channel_deployments`", "one Catalogue calculation component",
+                 "rule wins over `ledger.tax_code.is_inclusive`"):
+        need("BR-VARIANT-PRICE", frag in ds, f"simulatePriceBreakdownCalculation does not state {frag!r} (CR-439, CR-455)")
+    need("BR-VARIANT-PRICE", "LO-CR455-001" in lo,
+         "fixedTax and tiered are not on the left-out list as LO-CR455-001 (CR-455)")
+
+    # BR-ELASTICITY-LABELS (ADAM CR-446; CHG-CR446-001)
+    need("BR-ELASTICITY-LABELS", "'up to {to} days'" in d("listPriceElasticityRevenue")
+         and "'{from}+ days'" in d("listPriceElasticityRevenue"),
+         "listPriceElasticityRevenue does not write a one-bound proximity as 'up to {to} days' / '{from}+ days' (CR-446)")
+    need("BR-ELASTICITY-LABELS", "rounded to one decimal like `positionVsMedian`" in d("listCompetitorPricingMarket"),
+         "listCompetitorPricingMarket does not round movementPercent to one decimal (CR-446)")
+
+    # BR-CHANGE-IMPACT (ADAM CR-456; CHG-CR456-001)
+    ci = "listPricingChangeImpact"
+    need("BR-CHANGE-IMPACT", {"orders#orderLineRecords", "tenancy#venueSettingsRecords"} <= vias(ci)
+         and {"catalogue.rate", "catalogue.price", "catalogue.price_assignment", "catalogue.performance",
+              "catalogue.group_package", "catalogue.dynamic_pricing_control"} <= reads(ci),
+         "listPricingChangeImpact does not declare the reads CR-456 names")
+    vp = sp("PricingChangeImpactAnalysisView")
+    for f_ in ("b2bPartners", "apis", "integrations", "promotions", "marginImpact", "averagePriceChange",
+               "maximumChange", "minimumChange", "riskLevel"):
+        need("BR-CHANGE-IMPACT", (vp.get(f_) or {}).get("nullable") is True,
+             f"PricingChangeImpactAnalysisView.{f_} is not nullable (CR-456)")
+    need("BR-CHANGE-IMPACT", "LO-CR456-001" in lo and "computed when the row is read" in d(ci)
+         and "365 days before the read" in d(ci),
+         "listPricingChangeImpact does not compute at read with the 365-day window, or LO-CR456-001 is missing (CR-456)")
+    need("BR-CHANGE-IMPACT", not any("change_impact_analysis" in str((s_ or {}).get("x-ticvai-persistence") or "")
+                                     for s_ in sch.values() if isinstance(s_, dict)),
+         "a schema persists an impact analysis, which CR-456 ruled out (computed at read time)")
+
+    # BR-PRODUCT-WORKFLOW (ADAM CR-460; CHG-CR460-001)
+    lpw = d("listProductApprovalWorkflows")
+    need("BR-PRODUCT-WORKFLOW", "catalogue.approval_policy" in reads("listProductApprovalWorkflows")
+         and "subject product" in lpw and "ordered by `name` then `id`" in lpw,
+         "listProductApprovalWorkflows does not read catalogue.approval_policy rows with subject product (CR-460)")
+    need("BR-PRODUCT-WORKFLOW", "keep their stored values" in d("approveWorkflow")
+         and "`workflowId` is `id`" in d("approveWorkflow"),
+         "approveWorkflow does not state the mapping and what a replace keeps (CR-460)")
+
+    # BR-FEE-INSTANTS (ADAM CR-464; CHG-CR464-001)
+    for v in ("FeeSurchargeLibraryView", "FeeApplicabilityChargingRuleBuilderView",
+              "FeeApplicabilityChargingRuleBuilderInput", "FeeWaiverTaxExemptionExceptionRulesView",
+              "PriceCalculationSequenceFormulaEngineView"):
+        pr = sp(v)
+        for f_ in ("effectiveFrom", "effectiveTo"):
+            need("BR-FEE-INSTANTS", (pr.get(f_) or {}).get("format") == "date-time"
+                 and (pr.get(f_) or {}).get("nullable") is True, f"{v}.{f_} is not a nullable date-time (CR-464)")
+        if "status" in pr:
+            need("BR-FEE-INSTANTS", is_status(pr.get("status")),
+                 f"{v}.status does not take CatalogueConfigStatus (CR-464)")
+    for oid in ("listFeeSurcharge", "listFeeWaiverTax"):
+        need("BR-FEE-INSTANTS", is_status(param(oid, "status")),
+             f"{oid}'s status filter does not take CatalogueConfigStatus (CR-464)")
+    need("BR-FEE-INSTANTS", (param("listPriceCalculationSequence", "asOf") or {}).get("format") == "date-time",
+         "listPriceCalculationSequence's asOf is not an instant (CR-464)")
+
+    # BR-SEAT-RULE-OVERLAP (ADAM CR-467; CHG-CR467-001)
+    need("BR-SEAT-RULE-OVERLAP", {"invalid-range", "overlapping-rule-same-priority"} <= codes("setSeatPricingRule", "422"),
+         "setSeatPricingRule's 422 does not name invalid-range and overlapping-rule-same-priority (CR-467)")
+    need("BR-SEAT-RULE-OVERLAP", "they are not apart" in d("setSeatPricingRule")
+         and "A selector only one of them sets never makes them apart" in d("setSeatPricingRule")
+         and "Covered seats" in words((sch.get("SeatPricingRule") or {}).get("description")),
+         "setSeatPricingRule or SeatPricingRule does not define covered seats and the overlap (CR-467)")
+
+    # BR-TAX-PROFILE-LIST (ADAM CR-468; CHG-CR468-001)
+    for oid in ("listTaxProfiles", "getTaxProfileJurisdiction"):
+        need("BR-TAX-PROFILE-LIST", {"catalogue.tax_rule", "catalogue.product"} <= reads(oid)
+             and {"finance#taxCodeRecords", "finance#legalEntityRecords", "tenancy#venueSettingsRecords"} <= vias(oid),
+             f"{oid} does not declare the reads CR-468 names")
+    need("BR-TAX-PROFILE-LIST", "at or above" not in d("listTaxProfiles") and "at or beneath" in d("listTaxProfiles")
+         and is_status(param("listTaxProfiles", "status"))
+         and is_status(sp("TaxProfileJurisdictionConfigurationView").get("status")),
+         "listTaxProfiles still says at or above, or its status is not CatalogueConfigStatus (CR-468)")
+    need("BR-TAX-PROFILE-LIST", "in-process" in (((fin.get("x-ticvai-queries") or {}).get("legalEntityRecords") or {})
+                                                 .get("served") or []),
+         "finance#legalEntityRecords is not served in process, so Catalogue cannot ask it within commerce (CR-468)")
 
 
 if __name__ == "__main__":

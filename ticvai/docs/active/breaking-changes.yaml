@@ -1835,3 +1835,33 @@ changes:
     tag: r12
     producer-tickets: ['30661', '31129']
     consumer-tickets: ['30697', '30703']
+  - id: BC-580
+    contract: catalogue
+    operation: listFeeSurcharge
+    operations: [listFeeSurcharge, setFeeApplicabilityCharging, listFeeWaiverTax, listPriceCalculationSequence]
+    reason: 'ADAM CR-464 (CHG-CR464-001), the CR-414 rule: in FeeSurchargeLibraryView, FeeApplicabilityChargingRuleBuilderView
+      and its Input, FeeWaiverTaxExemptionExceptionRulesView and PriceCalculationSequenceFormulaEngineView, effectiveFrom
+      and effectiveTo are the nullable instants catalogue.fee, catalogue.fee_rule and catalogue.calculation_profile store
+      (timestamptz), not a UTC date; listPriceCalculationSequence''s asOf is an instant; and the status filters and members
+      take CatalogueConfigStatus, so expired, which no store writes, leaves the enum. A type change and a removed enum
+      value cannot be additive. The screens show the day in the venue''s time zone, so nothing changes visibly.'
+    approved-by: 'Chinmay, 2 November 2026 (CR-464 posted on #35385: "effectiveFrom and effectiveTo become format
+      date-time ... listPriceCalculationSequence''s asOf becomes date-time ... take CatalogueConfigStatus (draft, active,
+      inactive, retired) and match the stored status exactly. expired leaves the enum"; "approve all as a recommended")'
+    tag: r13
+    producer-tickets: ['35385', '35165', '35386', '35387']
+    consumer-tickets: ['29874', '35720', '29704', '36630', '29875', '36660', '29876', '36663']
+  - id: BC-581
+    contract: catalogue
+    operation: listTaxProfiles
+    operations: [listTaxProfiles, getTaxProfileJurisdiction, setTaxProfileJurisdiction]
+    reason: 'ADAM CR-468 (CHG-CR468-001), as in CR-464: listTaxProfiles'' status filter and
+      TaxProfileJurisdictionConfigurationView.status take CatalogueConfigStatus (draft, active, inactive, retired) and match
+      the stored status, instead of a free string described as draft, active, inactive or expired. The view is also what
+      getTaxProfileJurisdiction and setTaxProfileJurisdiction answer. A type change cannot be additive.'
+    approved-by: 'Chinmay, 2 November 2026 (CR-468 posted on #31818: "The status parameter and member take
+      CatalogueConfigStatus (draft, active, inactive, retired) and match the stored status, as in CR-464"; "approve all
+      as a recommended")'
+    tag: r13
+    producer-tickets: ['31818', '32588', '32575']
+    consumer-tickets: ['29883', '35400', '35706', '28504', '32601']

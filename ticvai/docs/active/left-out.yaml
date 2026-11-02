@@ -390,3 +390,29 @@ items:
   owner: Chinmay
   added: '2026-10-31'
   change: CHG-CR435-001
+- id: LO-CR455-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-076]
+  what: 'The fixedTax and tiered tax calculation methods in simulatePriceBreakdownCalculation''s tax step. A winning tax
+    rule that uses either answers 422 unsupported-tax-method; the percentage, compound, sequential and
+    multipleConcurrent methods are built.'
+  source: 'ADAM CR-455 (#35288 simulatePriceBreakdownCalculation), decided by Chinmay on 2 November 2026; CHG-CR455-001'
+  reason: the decision builds the percentage-based methods now and refuses the two whose charging rule is not yet built
+  target: 'when the fixedTax and tiered methods are specified and built (not scheduled)'
+  owner: Chinmay
+  added: '2026-11-02'
+  change: CHG-CR455-001
+- id: LO-CR456-001
+  kind: deferred
+  platform: P08
+  screens: [ADM-082]
+  what: 'PricingChangeImpactAnalysisView.b2bPartners, apis, integrations, promotions and marginImpact. The members stay
+    in the view, nullable, and listPricingChangeImpact answers them null; every other figure has the rule CR-456 gives.'
+  source: 'ADAM CR-456 (#35388 listPricingChangeImpact), decided by Chinmay on 2 November 2026; CHG-CR456-001'
+  reason: no table the impact analysis reads holds partners, APIs, integrations or promotions per price change, and no
+    cost is stored for a margin
+  target: 'when a source for each figure exists (not scheduled)'
+  owner: Chinmay
+  added: '2026-11-02'
+  change: CHG-CR456-001

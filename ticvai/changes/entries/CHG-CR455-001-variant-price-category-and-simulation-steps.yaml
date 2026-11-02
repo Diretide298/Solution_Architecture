@@ -1,0 +1,79 @@
+id: CHG-CR455-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'catalogue.variant gains price_category_id (uuid, nullable, conventional reference to catalogue.price_category,
+  index variant_price_category_id_idx; the forward migration is the release''s): ProductVariant.priceCategoryId, written
+  by updateProductVariant and answered by listProductVariants. variantPriceRecords applies the winning assignment''s
+  category rate through the rate''s own price_category_id, and answers a null amount when nothing resolves
+  (searchCatalogue''s fromPrice becomes nullable; the simulation stays 422 no-selected-rate). simulatePriceBreakdownCalculation
+  states the member, dynamic, fee and tax rules, in one Catalogue calculation component, and answers 422
+  unsupported-tax-method for fixedTax and tiered (LO-CR455-001).'
+decision:
+  what: 'ADAM CR-455, posted 2 November 2026 on #35288 (the full comment): "Decided (Chinmay, 2 November 2026): A1, A2
+    and A3, with corrections. Build now: (1) Price category: add catalogue.variant.price_category_id uuid NULL, with
+    index variant_price_category_id_idx and a conventional reference to catalogue.price_category, in a forward
+    migration. ProductVariant gains an optional nullable priceCategoryId ... (2) When no price resolves,
+    simulatePriceBreakdownCalculation answers 422 no-selected-rate ... searchCatalogue and getVariantListing answer a
+    null price. (3) Member adjustment ... (4) Dynamic adjustment ... Prefer the most specific (performance, then event,
+    then product only), then the newest created_at, then id ... (5) Fees ... Evaluate in priority order, lower number
+    first, then id ... (6) Taxes ... fixedTax and tiered answer 422 unsupported-tax-method, which is added to the
+    operation''s 422 problem types; both methods go on the left-out list. (7) finance#taxCodeRecords: build it yourself
+    in #35288, inside the Ledger module ... (8) Put the price, fee and tax steps in one Catalogue calculation component
+    rather than inside the endpoint ..." The lead, 2 November 2026: "approve all as a recommended".'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-455 (Hrushikant Patkar, #35288, blocking): CR-439''s category rule needed a price category no column held
+  (category_rates holds a rate id, not an amount); its no-price-for-variant clashed with the r12 contract''s
+  no-selected-rate; and the membership action, the dynamic target, fee evaluation and tax selection were unstated.'
+keys_touched:
+  screens: [ADM-076, BO-1049]
+  operations: [simulatePriceBreakdownCalculation, searchCatalogue, updateProductVariant, listProductVariants]
+  schemas: [ProductVariant, PriceBreakdownCalculationSimulationExplainabilityInput]
+  tables: [catalogue.variant, catalogue.rate, catalogue.price_assignment, catalogue.price_execution, catalogue.fee_rule,
+           catalogue.fee, catalogue.tax_rule, catalogue.tax_profile, catalogue.sales_channel, pricing.dynamic_price_rule,
+           pricing.dynamic_price_action]
+  files:
+  - contracts/spine/catalogue.yaml
+  - docs/active/left-out.yaml
+  - docs/active/cross-deployable-writes.yaml
+  - handoff/cross-deployable-writes.md
+  - tools/check-business-rules.py
+  other:
+  - 'LO-CR455-001 (fixedTax and tiered tax methods)'
+  - 'XDR-055: the operations role may SELECT catalogue.rate, which variantListingFacts now reads through
+    variantPriceRecords'' category rate for Marketing''s wishlist (XDR-007 granted price, price_assignment and
+    price_list only)'
+  - 'derived: catalogue.variant.price_category_id and variant_price_category_id_idx (derive-schema, derive-ddl); the
+    forward migration is written once by the integration refresh'
+root_class: 'a rule naming a column no table holds, and calculation steps (member, dynamic, fee, tax) stated as
+  "apply as the profile says" with no selection rule'
+tickets:
+  started:
+  - '35288 (simulatePriceBreakdownCalculation, Hrushikant Patkar): the member, dynamic, fee and tax rules as posted;
+    build finance#taxCodeRecords in the Ledger module behind its query interface (one read of ledger.tax_code by ids);
+    put the price, fee and tax steps in one Catalogue calculation component; answer 422 unsupported-tax-method for
+    fixedTax and tiered. Told through the CR-455 comment.'
+  - '37215 ([CR-455] [DB] catalogue.variant gains price_category_id, the child made by hand on 2 November 2026): the
+    column and index as derived.'
+  - 'Search front ends already built (31736 WEB-003, 31763 GST-063, Ready for QA): fromPrice may now be null; a result
+    shows no price then, as Product.fromPrice already allows (CR-358).'
+  unstarted:
+  - '30951 (updateProductVariant) and 31008 (listProductVariants): write and answer priceCategoryId at the next tag.'
+  - '31004 (searchCatalogue): fromPrice from variantPriceRecords, null when none resolves (BC not needed: a nullable
+    response field is additive by check-contract-compat).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-455
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-VARIANT-PRICE
+status: open
+notes: 'Covers CR-439''s query rule as CR-455 amends it (one check, BR-VARIANT-PRICE, for both). The simulation declares
+  the reads its steps make (catalogue.price, price_assignment, rate, sales_channel, fee_rule, fee, tax_rule,
+  tax_profile, pricing.dynamic_price_rule, condition, action); most were already in the lineage overrides. Open, not
+  settled by the decision: the simulation''s channel is a SalesChannel (guestWeb, guestApp ...) while price_list.channels
+  and variantPriceRecords'' channel are catalogue''s Channel (web, mobile ...), and the membership rule''s sales_channel
+  is compared with "the channel"; the mapping between the two vocabularies is not stated (CR-422''s mapping is for
+  channel_deployments). No screen changes.'

@@ -1,0 +1,58 @@
+id: CHG-CR456-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'listPricingChangeImpact stays computed at read time (no new table): one row per pricing change request, each
+  figure with its rule (affected lists, variants, products, events, performances, venues, markets, channels,
+  memberships, packages; future reservations and revenue from order lines over 365 days through orders#orderLineRecords;
+  price changes from the lines; dependency counts), analysedAt the time of the read, riskLevel as stored and nullable;
+  b2bPartners, apis, integrations, promotions and marginImpact nullable and null (LO-CR456-001); aiInsights empty.'
+decision:
+  what: 'ADAM CR-456, posted 2 November 2026 on #35388: "Decided (Chinmay, 2 November 2026): B, computed at read time as
+    the view declares; no new table. Build now: One row per catalogue.change_request with subject pricing that the
+    caller can see ... Each figure is computed when the row is read, so analysedAt is the time of the read ... The
+    approval check that requires an analysis runs the same rule ... b2bPartners, apis, integrations, promotions and
+    marginImpact have no source: they become nullable, are answered null, and go on the left-out list. aiInsights is an
+    empty list until an AI producer exists. Declare the reads of catalogue.rate, catalogue.price,
+    catalogue.price_assignment, catalogue.performance, catalogue.group_package and catalogue.dynamic_pricing_control,
+    plus orders#orderLineRecords and tenancy#venueSettingsRecords." The lead, 2 November 2026: "approve all as a
+    recommended".'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-456 (Hrushikant Patkar, #35388, blocking): the view''s 36 figures had no derivation rule and analysedAt
+  and aiInsights no storage. The developer asked for a stored analysis (A); the reviewer and the lead chose B, since
+  computing at read meets "recomputed when edited" by construction.'
+keys_touched:
+  screens: [ADM-082]
+  operations: [listPricingChangeImpact]
+  schemas: [PricingChangeImpactAnalysisView]
+  tables: [catalogue.change_request, catalogue.change_request_line, catalogue.rate, catalogue.price,
+           catalogue.price_assignment, catalogue.performance, catalogue.group_package, catalogue.dynamic_pricing_control,
+           orders.order_line]
+  files:
+  - contracts/spine/catalogue.yaml
+  - docs/active/left-out.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'LO-CR456-001 (b2bPartners, apis, integrations, promotions, marginImpact)'
+root_class: 'a read-time view whose figures name no rule over the tables it lists'
+tickets:
+  started: []
+  unstarted:
+  - '35388 (listPricingChangeImpact, New): build each figure by the rule at the next tag; the developer builds to the
+    posted comment now.'
+  - '36665 to 36667 (ADM-082 front end): the five left-out figures answer null; the approved columns are unchanged.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-456
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CHANGE-IMPACT
+status: open
+notes: 'Made nullable beyond the five the decision names, because the decision gives them null: averagePriceChange,
+  maximumChange and minimumChange (null with no priced lines) and riskLevel (null when unset). All are additive by
+  check-contract-compat. The existing access#entitlementRecords read (and access.entitlement in the lineage override)
+  is kept: no figure of the decision uses it now (existingReservations is 0), and removing it was not part of the
+  decision. "The approval check that requires an analysis" is stated in the description; no other operation''s text
+  changes.'

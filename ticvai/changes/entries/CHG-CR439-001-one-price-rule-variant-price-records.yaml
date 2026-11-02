@@ -1,0 +1,63 @@
+id: CHG-CR439-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'The selected-rate rule is written once, as the Catalogue query catalogue#variantPriceRecords (variantId,
+  venueId, channel, at, optional customerSegment; served in process): the candidates, the assignment rule, the ranking
+  (highestPriorityWins only, another method logs a warning). searchCatalogue''s fromPrice, the variantListingFacts
+  query''s listPrice and simulatePriceBreakdownCalculation''s selected rate name it. A membership rule is a
+  pricing.dynamic_price_rule with a membershipProgramme condition (rule_operator in, value_json an array of programme
+  ids; no DDL change). A promotionCode answers 422 promotion-evaluation-unavailable until evaluatePromotions is built.'
+decision:
+  what: 'ADAM CR-439, posted 1 November 2026 on #35288: "Decided (Chinmay, 1 November 2026): as you recommended: A for
+    the price, with B''s interim for promotions. (1) Selected rate: one rule, used by simulatePriceBreakdownCalculation,
+    searchCatalogue''s fromPrice and getVariantListing''s listPrice alike; build it once in Catalogue as the query
+    variantPriceRecords (variantId, venueId, channel, at, optional customerSegment). Candidates are catalogue.price rows
+    ... Rank the candidates: assignment priority (highest first ...), then price_list.priority ..., then the more
+    specific ..., then the latest valid_from. The first wins ... This is highestPriorityWins ... (2) Member adjustment: a
+    membership rule is a pricing.dynamic_price_rule with a pricing.dynamic_price_condition of type membershipProgramme,
+    rule_operator in, value_json a JSON array of membership programme ids; no DDL change. (3) Promotion: until
+    evaluatePromotions (#28136) is built, a request with promotionCode answers 422 promotion-evaluation-unavailable and
+    computes nothing ..." The lead, 1 November 2026: "Approve all". CR-455 (2 November) replaces CR-439''s
+    no-price-for-variant with a null amount and 422 no-selected-rate, and settles the category amount (CHG-CR455-001).'
+  by: Chinmay
+  date: '2026-11-01'
+why: 'ADAM CR-439 (Hrushikant Patkar, #35288, blocking): CR-419 settled the simulation''s selected rate by reference to
+  "searchCatalogue''s fromPrice resolution", which no artefact stated, and the listing''s listPrice pointed back at it
+  (circular); the promotion step pointed at evaluatePromotions, not built; and no condition said which dynamic price
+  rules are membership rules.'
+keys_touched:
+  operations: [simulatePriceBreakdownCalculation, searchCatalogue]
+  schemas: [PriceBreakdownCalculationSimulationExplainabilityInput, PricingDynamicPriceCondition]
+  tables: [catalogue.price, catalogue.price_list, catalogue.price_assignment, catalogue.rate,
+           pricing.dynamic_price_condition]
+  files:
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'catalogue#variantPriceRecords (new query, x-ticvai-queries); catalogue#variantListingFacts rule names it'
+root_class: 'a rule settled by reference to another operation''s rule that no artefact states (circular), and a step
+  pointing at a collaborator that is not built'
+tickets:
+  started:
+  - '35288 (simulatePriceBreakdownCalculation, Hrushikant Patkar, on hold until these decisions; it comes off hold):
+    build catalogue#variantPriceRecords once in Catalogue and take the selected rate from it; read membership rules by
+    their membershipProgramme condition; answer a promotionCode 422 promotion-evaluation-unavailable and compute
+    nothing. Told through the CR-439 comment.'
+  unstarted:
+  - '31004 (searchCatalogue) and 27869: fromPrice from variantPriceRecords at the next tag (with CR-455''s null).'
+  - '27744 (Marketing''s addToWishlist and getWishlist, through variantListingFacts) picks up the named rule at the next
+    tag; no shape change.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-439
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-VARIANT-PRICE
+status: open
+notes: 'Named beyond the posted words: the query''s answer shape (variantId, amount as a decimal string, priceId,
+  priceListId, priceAssignmentId, rateId), which the simulation needs for the dynamic step''s is_dynamic_pricing_allowed
+  and the tax step''s price.tax_code_id (CR-455); channel is catalogue''s Channel, matched against price_list.channels.
+  The posted text''s getVariantListing is the variantListingFacts query (the request quoted its rule); no operation
+  of that name exists. The 422 no-price-for-variant is not added: CR-455 superseded it the next day.'

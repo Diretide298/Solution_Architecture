@@ -1,0 +1,61 @@
+id: CHG-CR468-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'listTaxProfiles returns the profiles the caller''s row security shows (at or beneath, not at or above),
+  filtered by legalEntityId and status and ordered by taxProfileCode then id; getTaxProfileJurisdiction answers the same
+  shape. ratePercent and country through finance#taxCodeRecords, currency from the legal entity
+  (finance#legalEntityRecords, now also served in process) or else the venue (tenancy#venueSettingsRecords),
+  legalEntity and owner as uuid text, the two counts from active tax rules listing the profile; dates stay dates; status
+  takes CatalogueConfigStatus (BC-581).'
+decision:
+  what: 'ADAM CR-468, posted 2 November 2026 on #31818: "Decided (Chinmay, 2 November 2026): As you recommended (A, at
+    or beneath). Build now: listTaxProfiles returns every catalogue.tax_profile the caller''s row security shows, which
+    is at or beneath the caller''s scope ... It filters by legalEntityId and status and orders by taxProfileCode, then
+    id. getTaxProfileJurisdiction answers the same shape. ratePercent is ledger.tax_code.rate, and country is its
+    country_code ... read in process through finance#taxCodeRecords. #35288 builds that query in the Ledger module
+    (CR-455); if #31818 is ready first, build it there and #35288 reuses it. currency is the legal entity''s currency
+    (ledger.legal_entity.currency, through finance#legalEntityRecords) when legal_entity_id is set. Otherwise it is the
+    trading currency of the venue ... consumingProductCount ... consumingVenueCount ... effectiveFrom and effectiveTo
+    stay format date ... The status parameter and member take CatalogueConfigStatus ... Declare the reads of
+    catalogue.tax_rule and catalogue.product, plus finance#taxCodeRecords, finance#legalEntityRecords and
+    tenancy#venueSettingsRecords." The lead, 2 November 2026: "approve all as a recommended".'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-468 (Hrushikant Patkar, #31818): five view members had no source in catalogue.tax_profile and no read was
+  declared, legalEntity and owner were strings over ids, and "at or above the caller''s scope" contradicted the
+  table''s at-or-beneath row security (ADR-0005), so head office would have seen nothing.'
+keys_touched:
+  screens: [BO-291, ADM-069]
+  operations: [listTaxProfiles, getTaxProfileJurisdiction, setTaxProfileJurisdiction]
+  schemas: [TaxProfileJurisdictionConfigurationView]
+  tables: [catalogue.tax_profile, catalogue.tax_rule, catalogue.product, ledger.tax_code, ledger.legal_entity]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/spine/finance.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'BC-581 (status as CatalogueConfigStatus; the view is also what setTaxProfileJurisdiction answers)'
+root_class: 'view members with no declared source, and a visibility rule contradicting the table''s row security'
+tickets:
+  started: []
+  unstarted:
+  - '31818 (listTaxProfiles, New) and 32588 (getTaxProfileJurisdiction, New): the reads and members as posted; the
+    finance#taxCodeRecords query is built once, by #35288 or by #31818 if it is ready first (posted).'
+  - '32575 (setTaxProfileJurisdiction): its response status takes CatalogueConfigStatus (BC-581); nothing else changes.'
+  - 'BO-291 and ADM-069 front ends (29883, 35399 to 35401, 35706, 35862 to 35864, 28504, 32600 to 32602): no visible
+    change; the names still come from the pickers.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-468
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-TAX-PROFILE-LIST
+status: open
+notes: 'Named beyond the posted words: finance#legalEntityRecords was served over the service route only; Catalogue and
+  Ledger are both in commerce, so it is now served in process as well (finance.yaml), the way taxCodeRecords already is.
+  getTaxProfileJurisdiction declares the same reads, since it answers the same members. The view''s member descriptions
+  name the queries rather than the ledger tables, because setTaxProfileJurisdiction answers the same view and the
+  decision gives it no reads (check-cross-module-reads XR-FACT). No database change.'
