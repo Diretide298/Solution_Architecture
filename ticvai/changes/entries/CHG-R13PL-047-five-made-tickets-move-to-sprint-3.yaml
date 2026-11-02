@@ -3,8 +3,8 @@ date: '2026-11-02'
 source: plan
 kind: plan
 proposed: '2026-11-02'
-summary: The five CR tickets made by hand in Sprint 1 (#37210 to #37214) move to Sprint 3, the current sprint, in
-  OpenProject and in their made records, so the r13 apply keeps them there.
+summary: 'The five CR tickets made by hand in Sprint 1 (#37210 to #37214) move to Sprint 3, the current sprint, in
+  OpenProject and in their made records, so the r13 apply keeps them there.'
 decision:
   what: 'The lead, 2 November 2026, asked whether the five hand-made tickets that sit in Sprint 1, which is over, should
     move to the current sprint: "Yesss". #37210 CR477-DB-OPERATIONS-READS-ORDER-LINE, #37211 CR478-DB-OPERATIONS-READS-PROMOTIONS,
