@@ -1,0 +1,59 @@
+# catalogue.channelIncidentRetryRequested v1 — published by catalogue
+# Added 2 November 2026 (ADAM CR-457, decided by Chinmay, option A; CHG-CR457-001): retryChannelIncident writes the
+# retry as a fact to the outbox, and Catalogue's channel retry job in the workers host carries it out, as
+# appBuild.requested is handled by a job and catalogue.priceExecuted by the channel deployment job (CR-422).
+
+name: catalogue.channelIncidentRetryRequested
+version: 1
+publisher: catalogue
+description: A person asked for the failed channel call behind an incident to be sent again; the incident is
+  `retrying` and this is the retry its job carries out.
+aggregate: channelIncident
+emittedWhen: retryChannelIncident moves an incident from open or investigating to retrying
+emittedBy:
+- retryChannelIncident
+payload:
+- field: incidentId
+  type: uuid
+- field: salesChannelId
+  type: uuid
+- field: channelConnectionId
+  type: uuid
+  required: false
+- field: errorType
+  type: string
+- field: apiRequestReference
+  type: string
+  notes: The partner's idempotency reference, reused unchanged on every retry (the incident's id as text where the
+    failed call had none)
+- field: correlationId
+  type: string
+  required: false
+  notes: The original call's trace id, used only to find the trace and never sent to the partner as the idempotency
+    reference
+- field: retryCount
+  type: integer
+- field: requestedByPrincipalId
+  type: uuid
+consumers:
+- context: catalogue
+  purpose: 'Catalogue''s channel retry job (the workers host). If the incident is no longer `retrying`, or its
+    retry_count is not the event''s, it does nothing. Otherwise it finds the failed call''s trace in
+    catalogue.audit_entry (domain channel, reference equal to the incident''s original apiRequestReference, or by
+    correlationId when it had none) and sends that call again through the channel connector for channelConnectionId,
+    with apiRequestReference as the partner''s idempotency reference: product, price and availability calls send
+    today''s values, not the stale ones; order and cancellation calls send the same request. On the partner''s
+    success it sets status resolved, resolved_at now and resolution_note ''Retry <retry_count> succeeded''. On
+    failure it sets status investigating, with error_code and response_excerpt from the answer (truncated and
+    scrubbed of personal data). Until a connector exists for the connection''s type the attempt fails with error_code
+    connectorNotAvailable: an incident is never marked resolved without a partner''s success. If the event is
+    dead-lettered, the incident moves to investigating with error_code retryNotDelivered, so nothing stays retrying.
+    Each move writes the incident and one catalogue.audit_entry (domain channel, result success or failure, source
+    sync, actor_system channelRetryJob) in one transaction.'
+  writes:
+  - catalogue.channel_incident
+  - catalogue.audit_entry
+  idempotencyKey: incidentId+retryCount
+  onFailure: retryThenDeadLetter
+  isCritical: false
+retention: 30 days after publication

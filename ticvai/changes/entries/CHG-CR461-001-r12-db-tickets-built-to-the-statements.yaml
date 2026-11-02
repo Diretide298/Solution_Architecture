@@ -1,0 +1,74 @@
+id: CHG-CR461-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'The package''s r12 statements are what the nine [DB] tickets build, and the contract now says what each table
+  leaves to its operation: ChannelAllocation''s 0 to 100 is setChannelAllocations'' 400 from the contract''s bounds and a
+  reader takes a null released or returned count as 0; GuestBroadcast.scopePath is the venue''s path broadcastToGuests
+  writes, under the scope policy. The exception: SeatMapTemplate''s structure and scope_path are NOT NULL, the migration
+  that first creates the table creates both NOT NULL, a guarded forward migration fills scope_path from region_id and
+  stops with the count of rows with no structure where it already ran, and source_seat_map_id''s key takes no ON DELETE
+  action.'
+decision:
+  what: 'ADAM CR-461, posted on #27645: "Decided (Chinmay, 2 November 2026): A, with one exception. The package''s
+    statements are what you build; the nine tickets were written from the decisions before the statements were derived,
+    and their texts are corrected to the statements at the next release. Build now, ticket by ticket. #37163 ... #37177
+    ... #37158 ... #37148 ... #37156 ... #37172 ... #37153 ... #37154 ... #37186 seating.seat_map_template is the
+    exception. structure jsonb and scope_path ltree are NOT NULL, as the ticket says ... source_seat_map_id''s foreign key
+    takes no ON DELETE action ..." The lead''s "approve all as a recommended", 2 November 2026.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-461 (Hrushikant Patkar, #27645 Foundation, database migrations): the r12 forward files (tenant V0120 to
+  V0123) and nine r12 CR follow-up [DB] ticket texts disagreed; the [DB] check compares against the statements. The
+  review confirmed all nine differences and found the one where the ticket was right: the contract requires
+  SeatMapTemplate.structure and scopePath and handoff/migration-review.md lists the NOT NULL, which a derived forward
+  file never adds.'
+keys_touched:
+  schemas: [ChannelAllocation, GuestBroadcast, SeatMapTemplate]
+  operations: [setChannelAllocations, relinquishChannelAllocation, broadcastToGuests]
+  tables: [catalogue.channel_envelope, catalogue.competitor_price_observation, workforce.guest_broadcast,
+           identity.guest_verification_policy, platform.audit_record, access.gate_mode_change, whitelabel.policy,
+           platform.tenant_field_key, seating.seat_map_template]
+  files:
+  - contracts/spine/catalogue.yaml
+  - contracts/satellite/workforce.yaml
+  - contracts/satellite/seating.yaml
+  - tools/check-business-rules.py
+root_class: 'ticket texts written from decisions before the statements were derived, and a NOT NULL the derivation
+  cannot write'
+tickets:
+  started:
+  - '37163 (catalogue.channel_envelope): envelope_percent numeric(18,4), released_units and returned_units integer
+    DEFAULT 0, all nullable, no range check, as V0122 lines 24-34.'
+  - '37177 (catalogue.competitor_price_observation): the six *_amount columns numeric(18,4), the currency length check,
+    the index as V0122 line 195; drop the three-capital-letters database test.'
+  - '37158 (workforce.guest_broadcast): text[] assembly points, message at most 300, the scope policy (V0122 line 263);
+    the other-venue test still holds.'
+  - '37148 (identity.guest_verification_policy): currency_code text with the length check only (V0120 line 13); no table
+    check.'
+  - '37156 (platform.audit_record.reason): CHECK (char_length(reason) <= 500) on the parent (V0122 line 87); 2 characters
+    refused at the API; at the database 500 kept, 501 refused, null kept, in this and next month''s partitions.'
+  - '37172 (access.gate_mode_change.target_turnstile_mode): plain nullable text, no check (V0122 line 21).'
+  - '37153 (whitelabel.policy): the unique index policy_kind_version_uniq on (lower(kind), lower(version)) (V0122 line
+    243); the duplicate pre-check may stay.'
+  - '37154 (platform.tenant_field_key): the index names tenant_field_key_purpose_key_version_uniq and
+    tenant_field_key_purpose_uniq (V0120 lines 110 and 114).'
+  - '37186 (seating.seat_map_template): structure and scope_path NOT NULL in the migration that creates the table; if it
+    already ran without them, a guarded forward migration (scope_path from region_id first; stop with the count of rows
+    with no structure); source_seat_map_id''s key with no ON DELETE action; row security read-beneath (V0122 lines
+    266-268).'
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-461
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-R12-DB-STATEMENTS
+status: open
+notes: '**Not done here: the nine ticket texts.** They are generated from docs/active/block-a-extra-tasks.json (a plan
+  file this lane does not touch); the plan lane corrects their entries to the statements, and the started tickets''
+  OpenProject text is not rewritten (their developers build to the posted comment). Rules the decision states that the
+  contract already said are not repeated: setGuestVerificationPolicy''s null pairing (CR-363), AuditRecord.reason
+  minLength 3, setTurnstileMode''s TurnstileMode 400, setPolicy''s 409 concurrency-conflict (CR-392). CR-470 is its
+  addendum (CHG-CR470-001).'

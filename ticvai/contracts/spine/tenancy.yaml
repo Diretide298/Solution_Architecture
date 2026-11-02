@@ -4215,8 +4215,6 @@ components:
       required:
       - id
       - principalId
-      - readAt
-      - target
       properties:
         id:
           type: string
@@ -4236,13 +4234,17 @@ components:
         readAt:
           type: string
           format: date-time
-          description: When the read happened.
+          description: 'When the read happened. **Nullable in the table, as the package SQL adds it** (tenant V0108 `ADD
+            COLUMN read_at timestamptz`; ADAM CR-436, decided by Chinmay on 1 November 2026: "platform.audit_read.read_at
+            and target are nullable. No database change"): every writer sets it, and the table record follows the SQL.'
         target:
           type: string
           enum:
           - auditRecord
           - subject
-          description: What was read. `auditRecord` is a `listAuditRecords` call; `subject` is a guest''s PII.
+          description: 'What was read. `auditRecord` is a `listAuditRecords` call; `subject` is a guest''s PII.
+            **Nullable in the table, as the package SQL adds it** (tenant V0108, with its CHECK on the two values; ADAM
+            CR-436): every writer sets it.'
         filter:
           type: object
           nullable: true

@@ -1,0 +1,52 @@
+id: CHG-CR470-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'Addendum to CR-461. Section.seatMapId states its one guarded forward migration in order: stop with the row
+  count if the table holds any row, ADD COLUMN IF NOT EXISTS then SET NOT NULL, section_seat_map_id_fkey, the plain
+  index section_seat_map_id_idx, the unique index section_seat_map_id_code_uniq; row security unchanged.
+  setDynamicPriceRule says what pricing.dynamic_price_rule leaves to it: sales_channel is plain nullable text, so a value
+  outside SalesChannel is 400 validation on salesChannel; is_dynamic_pricing_enabled is boolean DEFAULT true and
+  nullable, the call always writes true or false (true when left out) and a reader takes null as true.'
+decision:
+  what: 'ADAM CR-470, posted on #27645: "Decided (Chinmay, 2 November 2026): A, as for CR-461, and on seating.section the
+    NOT NULL stays. Build now. #37159 seating.section, one guarded forward migration in this order: (1) the ticket''s
+    guard ... (2) ADD COLUMN IF NOT EXISTS seat_map_id uuid, then SET NOT NULL ... (3) section_seat_map_id_fkey ... (4)
+    the plain index section_seat_map_id_idx ... (5) the unique index section_seat_map_id_code_uniq ... #37162
+    pricing.dynamic_price_rule: sales_channel is plain nullable text with no check ... setDynamicPriceRule always writes
+    true or false, true when the body leaves it out, and a reader takes a null as true. The tickets'' texts are corrected
+    to this at the next release." The lead''s "approve all as a recommended", 2 November 2026.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-470 (Hrushikant Patkar, #27645, the addendum to CR-461): #37159''s text had the guard, the column, the key
+  and the unique index but no plain index, and the package the plain index and no guard; #37162''s text gave a
+  SalesChannel CHECK and a NOT NULL the package does not make. CR-402 decided seat_map_id NOT NULL, the contract requires
+  it and handoff/migration-review.md lists it.'
+keys_touched:
+  schemas: [Section, PricingDynamicPriceRule]
+  operations: [setDynamicPriceRule]
+  tables: [seating.section, pricing.dynamic_price_rule]
+  files:
+  - contracts/satellite/seating.yaml
+  - contracts/spine/catalogue.yaml
+  - tools/check-business-rules.py
+root_class: 'ticket texts written from decisions before the statements were derived, and a NOT NULL the derivation
+  cannot write'
+tickets:
+  started:
+  - '37159 (seating.section, Hrushikant Patkar): the guarded forward migration in the five steps, in order; every writer
+    of a section sets seat_map_id.'
+  - '37162 (pricing.dynamic_price_rule, Hrushikant Patkar): sales_channel plain nullable text (file 356 as it is);
+    is_dynamic_pricing_enabled boolean DEFAULT true, nullable.'
+  unstarted:
+  - '31638 (setDynamicPriceRule): the 400 on salesChannel and always writing true or false, at its next pull.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-470
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-R12-DB-STATEMENTS
+status: open
+notes: 'The two ticket texts come from docs/active/block-a-extra-tasks.json, a plan file this lane does not touch; the
+  plan lane corrects them. CR-461 shares the rule (CHG-CR461-001).'

@@ -4502,7 +4502,11 @@ components:
           minimum: 0
           description: The guests `access#liveEntitlementSubjects` answered for the venue when it was accepted.
         acceptedAt: { type: string, format: date-time }
-        scopePath: { type: string }
+        scopePath:
+          type: string
+          description: 'The venue''s path, which `broadcastToGuests` writes here. Row security is the scope policy
+            (`platform.apply_scope_rls` on `scope_path`), not the venue policy, so another venue cannot see the row
+            (ADAM CR-461, decided by Chinmay on 2 November 2026: the package''s statements are what is built).'
     GuestBroadcastAccepted:
       type: object
       x-ticvai-persistence: none — response only; answered from the workforce.guest_broadcast row (GuestBroadcast)

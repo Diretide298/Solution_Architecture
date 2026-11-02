@@ -1,0 +1,60 @@
+id: CHG-CR458-001
+date: '2026-11-02'
+source: cr
+kind: contract
+summary: 'testChannelConnection''s first version is defined: which tests apply per connectionType and direction, the
+  defaults in production, connectivity (https or sftp, the resolved host refused for loopback, private, link-local and
+  metadata addresses, one unauthenticated request with no redirects within timeoutMs or 10000 ms), authentication (the
+  CR-459 reference valid and resolving in ISecretStore, a certificate not expired; "Credential found ..."), the six
+  partner tests notSupported ("No connector for <connectionType> yet"), the status rule (offline, degraded, connected;
+  notSupported neither), and the one-transaction write with its audit entry. ChannelConnection.lastTests becomes an
+  array of {test, result, testedAt, detail} with passed, failed, notSupported (BC-591; jsonb, no migration).
+  listChannelConnectionIntegration answers the stored names as the view''s (productSync product, pricing price,
+  orderCreation order, webhook left out) and offline where the view says failed.'
+decision:
+  what: 'ADAM CR-458, posted on #35235: "Decided (Chinmay, 2 November 2026): B, as you recommended, using the result
+    values the screen''s view already has. Build now: (1) ChannelConnection.lastTests becomes an array of {test, result,
+    testedAt, detail} ... (2) Which tests apply ... (3) connectivity ... (4) authentication ... (5) productSync,
+    availability, pricing, orderCreation, cancellation and webhook answer notSupported ... (6) connectionStatus ... (7)
+    Write last_tests, connection_status and updated_at, plus one catalogue.audit_entry ... For the reading side
+    (listChannelConnectionIntegration, #35250): map productSync to product, pricing to price and orderCreation to order;
+    leave webhook out; answer the stored offline where the view''s text says failed. No screen changes visibly." The
+    lead''s "approve all as a recommended", 2 November 2026.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'ADAM CR-458 (Hrushikant Patkar, #35235 testChannelConnection, blocking): nothing defined how a channel is called,
+  what each test checks, which tests apply, how connectionStatus is derived, or lastTests'' shape (typed object,
+  described as a list). The review found the result values already in ChannelConnectionIntegrationManagerView and no
+  channel connector anywhere in the package, so the partner tests wait for connectors; the endpoint is typed by a
+  tenant admin and called by our server, so the probe is kept out of our network.'
+keys_touched:
+  operations: [testChannelConnection, listChannelConnectionIntegration, setChannelConnectionConfiguration]
+  schemas: [ChannelConnection, ChannelConnectionIntegrationManagerView]
+  tables: [catalogue.channel_connection, catalogue.audit_entry]
+  files:
+  - contracts/spine/catalogue.yaml
+  - docs/active/breaking-changes.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'BC-591 (testChannelConnection and setChannelConnectionConfiguration: lastTests object -> array), approved by the
+    posted decision'
+root_class: 'an operation that calls an external party with no definition of the call, the pass rule or the result shape'
+tickets:
+  started:
+  - '35235 (testChannelConnection): build the seven points as posted; ISecretStore through its test double until the
+    store lands.'
+  - '35250 (listChannelConnectionIntegration, Narayan Gaonkar): map the stored test names and offline to the view''s.'
+  unstarted:
+  - '35232 (setChannelConnectionConfiguration): answers lastTests as the array (BC-591).'
+  - '29779, 35712 ([FE] ADM-269): no visible change (BC-591 moves them to r13).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-458
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CHANNEL-TESTS
+status: open
+notes: 'The six partner tests wait for channel connectors; no ticket builds a connector, and the review notes that the
+  tests, the incident retry (CR-457), the price deployment job (CR-422) and the sync job all need one. That is a lead
+  question, not part of this decision.'

@@ -737,3 +737,44 @@ changes:
     rule''s fields setDynamicPriceRule takes: name, dimension, that dimension''s channel, segment or location, the
     adjustment range, protection, dynamic pricing on or off, priority and active.'
   change: CHG-CR410-001
+- screen: WEB-022
+  field: 'navigation'
+  to: 53ee00c7d3efbd6e
+  approval: 'The lead''s own design decision on ADAM CR-482 (raised by Chitrangi Mestry on #31742, settled 2 November 2026 by
+    Chinmay, not as recommended): "The page keeps the client-verified frame, basket included, because the package does not
+    change approved UI and every part of the frame except two already has an operation ... WEB-022''s screen record, its
+    approved-UI entry and its page info are brought in line with the frame at the next release." The client-verified rev 3
+    frame (wireframes/P01 Guest Web.dc.html#web-022, Summit Peaks -> Annual pass / membership) draws Continue into the membership booking flow (WEB-011); the record is
+    brought in line with it, and what the client sees does not change.'
+  change: CHG-CR482-001
+- screen: WEB-022
+  field: 'region:collection'
+  to: c7550e2a2510e2da
+  approval: 'The lead''s own design decision on ADAM CR-482 (raised by Chitrangi Mestry on #31742, settled 2 November 2026 by
+    Chinmay, not as recommended): "The page keeps the client-verified frame, basket included, because the package does not
+    change approved UI and every part of the frame except two already has an operation ... WEB-022''s screen record, its
+    approved-UI entry and its page info are brought in line with the frame at the next release." The client-verified rev 3
+    frame (wireframes/P01 Guest Web.dc.html#web-022, Summit Peaks -> Annual pass / membership) draws each plan card''s price, term line, badge, saving, What you get list and Choose button, and the decision
+    adds the mark on a plan the guest already holds (getMyMemberships); the record is
+    brought in line with it, and what the client sees does not change.'
+  change: CHG-CR482-001
+- screen: WEB-022
+  field: 'region:selection'
+  to: 5dc2710f3e867bb1
+  approval: 'The lead''s own design decision on ADAM CR-482 (raised by Chitrangi Mestry on #31742, settled 2 November 2026 by
+    Chinmay, not as recommended): "The page keeps the client-verified frame, basket included, because the package does not
+    change approved UI and every part of the frame except two already has an operation ... WEB-022''s screen record, its
+    approved-UI entry and its page info are brought in line with the frame at the next release." The client-verified rev 3
+    frame (wireframes/P01 Guest Web.dc.html#web-022, Summit Peaks -> Annual pass / membership) draws the right panel as the basket: Your membership, subtotal, VAT, total, Continue; the record is
+    brought in line with it, and what the client sees does not change.'
+  change: CHG-CR482-001
+- screen: WEB-022
+  field: 'state:emptyFirstRun'
+  to: a06731d485d846c0
+  approval: 'The lead''s own design decision on ADAM CR-482 (raised by Chitrangi Mestry on #31742, settled 2 November 2026 by
+    Chinmay, not as recommended): "The page keeps the client-verified frame, basket included, because the package does not
+    change approved UI and every part of the frame except two already has an operation ... WEB-022''s screen record, its
+    approved-UI entry and its page info are brought in line with the frame at the next release." The client-verified rev 3
+    frame (wireframes/P01 Guest Web.dc.html#web-022, Summit Peaks -> Annual pass / membership) draws a page with nothing to choose leaving the basket empty and Continue off; the record is
+    brought in line with it, and what the client sees does not change.'
+  change: CHG-CR482-001

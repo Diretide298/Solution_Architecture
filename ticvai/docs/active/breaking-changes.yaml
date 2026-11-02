@@ -1835,3 +1835,31 @@ changes:
     tag: r12
     producer-tickets: ['30661', '31129']
     consumer-tickets: ['30697', '30703']
+  - id: BC-590
+    contract: catalogue
+    operation: retryChannelIncident
+    change: "x-ticvai-emits changed"
+    reason: 'ADAM CR-457 (CHG-CR457-001): the retry is a fact written to the outbox and carried out by a job.
+      retryChannelIncident writes one platform.outbox row for catalogue.channelIncidentRetryRequested v1 in the
+      transaction that moves the incident to retrying, and Catalogue''s channel retry job in the workers host consumes
+      it. An emitted event added to an operation is breaking by the compat rule.'
+    approved-by: 'Chinmay, 2 November 2026 (CR-457 posted on #35231: "A, as you recommended: the retry is a fact written
+      to the outbox and carried out by a job ... declare x-ticvai-emits catalogue.channelIncidentRetryRequested on the
+      operation"), the lead''s "approve all as a recommended" of 2 November 2026'
+    tag: r13
+    producer-tickets: ['35231']
+    consumer-tickets: ['37206', '36755', '36756']
+  - id: BC-591
+    contract: catalogue
+    operation: testChannelConnection
+    change: "type object -> array<object>"
+    reason: 'ADAM CR-458 (CHG-CR458-001): ChannelConnection.lastTests was typed object while its description, and
+      ChannelConnectionIntegrationManagerView.lastTests, list it; it becomes an array of {test, result, testedAt, detail}
+      with result passed, failed or notSupported, stored as the jsonb list it was (no migration). The same schema answers
+      setChannelConnectionConfiguration. A type change cannot be additive.'
+    approved-by: 'Chinmay, 2 November 2026 (CR-458 posted on #35235: "ChannelConnection.lastTests becomes an array of
+      {test, result, testedAt, detail}. catalogue.channel_connection.last_tests stays jsonb, so no migration"), the
+      lead''s "approve all as a recommended" of 2 November 2026'
+    tag: r13
+    producer-tickets: ['35235', '35232']
+    consumer-tickets: ['35250', '29779', '35712']
