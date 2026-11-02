@@ -8934,7 +8934,7 @@ screens:
       components:
       - kind: selectField
         label: Required fields configured
-        operation: approveWaiverTesting
+        operation: getWaiverTesting
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Fields
       - kind: selectField
         label: 11.1.1

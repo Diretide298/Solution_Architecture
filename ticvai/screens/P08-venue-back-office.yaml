@@ -55942,42 +55942,54 @@ screens:
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
       - kind: selectField
         label: Attraction
+        operation: listMembershipBenefits
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
       - kind: selectField
         label: Event Type
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
       - kind: selectField
         label: Admission Type
+        operation: getPlanBenefits
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
       - kind: selectField
         label: Number of Visits
+        operation: listMembershipAnnualPass
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
       - kind: selectField
         label: Period
+        operation: listMembershipAnnualPass
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
       - kind: selectField
         label: Days
+        operation: listMembershipAnnualPass
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
       - kind: selectField
         label: Times
+        operation: listMembershipAnnualPass
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
       - kind: selectField
         label: Timeslots
+        operation: listMembershipAnnualPass
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
       - kind: selectField
         label: Per Day
+        operation: listMembershipAnnualPass
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
       - kind: selectField
         label: Per Week
+        operation: listMembershipAnnualPass
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
       - kind: selectField
         label: Per Month
+        operation: listMembershipAnnualPass
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
       - kind: selectField
         label: Per Membership Year
+        operation: listMembershipAnnualPass
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
       - kind: selectField
         label: Lifetime of Membership
+        operation: listMembershipAnnualPass
         provenance: pack Membership___Annual_Pass_Management_Reference.pdf, page 9 §Configure
     - name: actionBar
       slot: publish
