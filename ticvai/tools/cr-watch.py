@@ -384,7 +384,8 @@ Do this
    sibling count, search the package for the same pattern and say how many there are and where.
 3. Verdict: FIXED IN {release}, PARTLY FIXED, NOT FIXED or NOT A PROBLEM.
 4. Write the resolution the developer reads in ADAM, in plain words with no batch codes or acronyms as names of work:
-   what was decided, what the next release ({next}) carries, and "Build now:" what they do today. Developers and
+   what was decided and "Build now:" exactly what they build today, complete enough to build from: the decision is
+   the whole change (no release carries it; the package catches up later). Developers and
    agents are always on the latest release: never ask anyone to choose or pin a release. Client-approved screens never
    change visibly: fix the contract, binding or storage to fit the screen.
 5. Who must decide: lead, client (a business rule, law or money question the package cannot settle), or none.
@@ -437,12 +438,14 @@ def releases_from(tags) -> tuple:
 
 
 def settle_as(verdict: str, release: str, nxt: str) -> tuple:
-    """(status, ref) the request is settled with if the lead approves the draft as it stands."""
+    """(status, ref) the request is settled with if the lead approves the draft as it stands. A request the package
+    does not answer yet is closed with no release (ref empty): its comment tells the agent to build the decision now,
+    and the package catches up later (26 October 2026: after r10, CRs are settled by ticket comment)."""
     if verdict.startswith("FIXED IN"):
         return "done", release
     if verdict.startswith("NOT A PROBLEM"):
         return "rejected", release
-    return "accepted", nxt
+    return "done", ""
 
 
 def child_env(environ=None) -> dict:
@@ -618,8 +621,35 @@ def decisions_for(pending: dict, marks: dict, project: str, nxt: str) -> tuple:
         elif not m["resolution"]:
             problems.append(f"{ref}: no resolution to settle with")
         else:
-            items.append({"cr": ref, "status": status, "resolution": m["resolution"], "ref": m["ref_to"] or nxt})
+            item = {"cr": ref, "status": status, "resolution": m["resolution"]}
+            item.update({"ref": m["ref_to"]} if m["ref_to"] else {"release": False})
+            items.append(item)
     return {"project": project, "ref": nxt, "items": items}, problems
+
+
+def auto_decisions(pending: dict, project: str, release: str) -> dict:
+    """The decisions file for what closes without the lead (the lead, 2 November 2026: "checks for new CRs every 30
+    mins, checks them against ours, if decision needed asks me and closes the CR so devs dont have to stop working").
+
+    A request closes on its own when its draft needs nobody (`needs: none`: the package answers it) or its class has
+    an active default ruling (the lead ruled on the class already). A lead or client decision, a failed draft and a
+    request the lead has marked stay for the lead. FIXED IN closes done at that release; NOT A PROBLEM is rejected;
+    anything else closes done with no release (25 October: "we dont need a Release for these"), so the ticket's
+    comment tells the agent to build the resolution now."""
+    items = []
+    for ref in sorted(pending, key=lambda r: int(r[3:])):
+        p = pending[ref]
+        d = p.get("draft") or {}
+        if not d or p.get("decision") or not (d.get("needs") == "none" or _default_ruled(p)):
+            continue
+        verdict = d.get("verdict", "")
+        if verdict.startswith("FIXED IN"):
+            items.append({"cr": ref, "status": "done", "resolution": d["resolution"], "ref": release})
+        elif verdict.startswith("NOT A PROBLEM"):
+            items.append({"cr": ref, "status": "rejected", "resolution": d["resolution"], "release": False})
+        else:
+            items.append({"cr": ref, "status": "done", "resolution": d["resolution"], "release": False})
+    return {"project": project, "release": False, "items": items}
 
 
 def settle_argv(decisions: Path, base: str, apply: bool) -> list:
@@ -820,13 +850,44 @@ def run(a, fetch=None, drafter=None, tree=None, rel=None, branches=None) -> int:
         if not (out / "drafts" / f"{p['ref']}.md").exists():
             _draft_file(out, p, "")
     state["last_id"] = top
-    line = (f"Last run {stamp}: {len(new)} new request(s); {len(pending)} waiting for you; {len(rows)} rows read from "
-            f"ADAM; answers against {release}, fixes for {nxt}.")
+    closed = auto_close(a, out, state, release, stamp) if getattr(a, "auto", False) else []
+    line = (f"Last run {stamp}: {len(new)} new request(s); {len(closed)} closed on their own (the package answers "
+            f"them or a ruling covers them); {len(pending)} waiting for you; {len(rows)} rows read from ADAM; answers "
+            f"against {release}.")
     _write(review, render_review(pending, line))
     save_state(out, state)
-    _log(out, f"{stamp} {len(new)} new, {len(pending)} waiting, {len(todo)} to draft")
-    print(f"cr-watch: {len(new)} new, {len(pending)} waiting; {review}")
+    _log(out, f"{stamp} {len(new)} new, {len(closed)} closed on their own, {len(pending)} waiting, {len(todo)} to draft")
+    print(f"cr-watch: {len(new)} new, {len(closed)} closed on their own ({', '.join(closed) or 'none'}), "
+          f"{len(pending)} waiting for the lead; {review}")
     return 0
+
+
+def auto_close(a, out: Path, state: dict, release: str, stamp: str, runner=None, env=None) -> list:
+    """`run --auto`: settle what needs no decision (auto_decisions) through settle_changes.py --apply, take it off the
+    list, and return the refs closed. Nothing is closed when the credentials are missing or the settle fails: those
+    requests stay on the list and the next run tries again."""
+    spec = auto_decisions(state["pending"], state["project"], release)
+    if not spec["items"]:
+        return []
+    path = out / f"auto-{stamp.replace(':', '').replace('-', '')}.json"
+    _write(path, json.dumps(spec, indent=1, ensure_ascii=False) + "\n")
+    env = dict(os.environ) if env is None else env
+    missing = [k for k in ("ADAM_EMAIL", "ADAM_PASSWORD", "TICVAI_OP_TOKEN") if not env.get(k)]
+    if missing:
+        print(f"cr-watch: {', '.join(missing)} not set; nothing closed on its own ({path})")
+        return []
+    rc = (runner or (lambda argv, e: subprocess.run(argv, env=e).returncode))(settle_argv(path, a.adam, True), env)
+    if rc != 0:
+        print(f"cr-watch: settle_changes.py exited {rc}; nothing taken off the list (the next run tries again)")
+        return []
+    closed = []
+    with (out / "settled.jsonl").open("a", encoding="utf-8") as f:
+        for it in spec["items"]:
+            p = state["pending"].pop(it["cr"])
+            closed.append(it["cr"])
+            f.write(json.dumps({"cr": it["cr"], "status": it["status"], "raised": p["raised"],
+                                "drafted": p.get("drafted_at", ""), "settled": stamp, "decision": "auto"}) + "\n")
+    return closed
 
 
 def settle(a, runner=None, env=None, rel=None) -> int:
@@ -1021,12 +1082,12 @@ def _t_draft(fails):
                 fails.append(f"bad draft refused for the wrong reason: {e}")
     _expect(fails, "settle as: fixed", settle_as("FIXED IN R6", "r6", "r7"), ("done", "r6"))
     _expect(fails, "settle as: not a problem", settle_as("NOT A PROBLEM", "r6", "r7"), ("rejected", "r6"))
-    _expect(fails, "settle as: partly", settle_as("PARTLY FIXED", "r6", "r7"), ("accepted", "r7"))
+    _expect(fails, "settle as: partly", settle_as("PARTLY FIXED", "r6", "r7"), ("done", ""))
     _expect(fails, "releases", releases_from(["r1", "r6", "r6-rc", "r10x", "r5"]), ("r6", "r7"))
     p = draft_prompt(_row(9, blocking="yes", **{"raised by": "Pranay Shinde"}), ["Known class: X"], "r6", "r7",
                      "wrong class")
     for want in ("CR-009", "at\nr6", "Pranay Shinde", ", blocking", "  - Known class: X", "rejected the last draft: "
-                 "wrong class", "(r7)", "Build now:", "never ask anyone to choose or pin"):
+                 "wrong class", "the whole change", "Build now:", "never ask anyone to choose or pin"):
         if want not in p:
             fails.append(f"the prompt lacks {want!r}")
 
@@ -1135,8 +1196,8 @@ def _t_pipeline(fails):
         with contextlib.redirect_stdout(quiet):
             run(a, **kw)
         _expect(fails, "a second run drafts nothing again", len(calls), 3)
-        marked = review.replace("decision: \nstatus: accepted\nref: r7\nresolution: Accepted. Build now: read through "
-                                "the query.\nfacts: Ticket #27001", "decision: approve\nstatus: accepted\nref: r7\n"
+        marked = review.replace("decision: \nstatus: done\nref: \nresolution: Accepted. Build now: read through "
+                                "the query.\nfacts: Ticket #27001", "decision: approve\nstatus: done\nref: \n"
                                 "resolution: Accepted. Build now: read through the query.\nfacts: Ticket #27001", 1)
         marked = re.sub(r"(## CR-002[^\n]*\n[^\n]*\n)decision: \n", r"\1decision: reject: wrong class\n", marked)
         (d / "out" / "REVIEW.md").write_text(marked, encoding="utf-8")
@@ -1169,8 +1230,9 @@ def _t_pipeline(fails):
         _expect(fails, "settle runs settle_changes twice, --apply last", [x[-1] == "--apply" for x in ran],
                 [False, True])
         spec = json.loads(Path(ran[-1][2]).read_text(encoding="utf-8"))
-        _expect(fails, "decisions file", [(i["cr"], i["status"], i["ref"]) for i in spec["items"]],
-                [("CR-001", "accepted", "r7")])
+        _expect(fails, "decisions file: an unfixed request is built now, with no release",
+                [(i["cr"], i["status"], i.get("ref"), i.get("release")) for i in spec["items"]],
+                [("CR-001", "done", None, False)])
         state = load_state(d / "out")
         _expect(fails, "settled request leaves the list", sorted(state["pending"]), ["CR-002", "CR-003"])
         _expect(fails, "measure written", len((d / "out" / "settled.jsonl").read_text(encoding="utf-8").splitlines()),
@@ -1398,7 +1460,45 @@ def _t_proposed(fails):
                 parse_review(marked)["CR-001"]["decision"], "approve" if want else "")
 
 
-TESTS = [_t_export, _t_sort, _t_draft, _t_review, _t_default, _t_pipeline, _t_marks, _t_budget, _t_proposed]
+def _t_auto(fails):
+    def item(ref, needs, verdict="NOT FIXED", ruled=False, decision=""):
+        p = _item(_row(int(ref[3:])))
+        p.update(facts={"default_ruling": "R" if ruled else "", "default_status": "active" if ruled else ""},
+                 draft={"verdict": verdict, "needs": needs, "resolution": f"Build now: {ref}"} if needs else None,
+                 decision=decision)
+        return ref, p
+    pending = dict([item("CR-001", "none"), item("CR-002", "lead"), item("CR-003", "client"),
+                    item("CR-004", "lead", ruled=True), item("CR-005", "none", verdict="FIXED IN R12"),
+                    item("CR-006", "none", verdict="NOT A PROBLEM"), item("CR-007", ""),
+                    item("CR-008", "none", decision="reject")])
+    got = auto_decisions(pending, "ticvai", "r12")["items"]
+    _expect(fails, "auto: closes needs-none and default-ruled only, never a marked or undrafted one",
+            [i["cr"] for i in got], ["CR-001", "CR-004", "CR-005", "CR-006"])
+    _expect(fails, "auto: an unfixed request closes done with no release (build now)",
+            (got[0]["status"], got[0].get("release"), "ref" in got[0]), ("done", False, False))
+    _expect(fails, "auto: fixed closes done at the release", (got[2]["status"], got[2].get("ref")), ("done", "r12"))
+    _expect(fails, "auto: not a problem is rejected", got[3]["status"], "rejected")
+    with tempfile.TemporaryDirectory() as d:
+        state = {"project": "ticvai", "pending": dict(pending)}
+        a = argparse.Namespace(adam="https://adam.example")
+        seen = []
+        closed = auto_close(a, Path(d), state, "r12", "2026-11-02T00:00:00Z",
+                            runner=lambda argv, e: seen.append(argv) or 0,
+                            env={"ADAM_EMAIL": "a", "ADAM_PASSWORD": "b", "TICVAI_OP_TOKEN": "c"})
+        _expect(fails, "auto: settles with --apply", "--apply" in (seen[0] if seen else []), True)
+        _expect(fails, "auto: the closed leave the list", sorted(state["pending"]),
+                ["CR-002", "CR-003", "CR-007", "CR-008"])
+        _expect(fails, "auto: returns what it closed", closed, ["CR-001", "CR-004", "CR-005", "CR-006"])
+        state2 = {"project": "ticvai", "pending": dict(pending)}
+        _expect(fails, "auto: no credentials closes nothing",
+                auto_close(a, Path(d), state2, "r12", "s", runner=lambda argv, e: 0, env={}), [])
+        _expect(fails, "auto: a failed settle closes nothing",
+                auto_close(a, Path(d), state2, "r12", "s2", runner=lambda argv, e: 1,
+                           env={"ADAM_EMAIL": "a", "ADAM_PASSWORD": "b", "TICVAI_OP_TOKEN": "c"}), [])
+        _expect(fails, "auto: a failed settle leaves the list as it was", len(state2["pending"]), 8)
+
+
+TESTS = [_t_export, _t_sort, _t_draft, _t_review, _t_default, _t_pipeline, _t_marks, _t_budget, _t_proposed, _t_auto]
 
 
 def self_test() -> list:
@@ -1430,6 +1530,9 @@ def main(argv=None) -> int:
     ap.add_argument("--claude", default="", help="path of the claude command (default: found on PATH)")
     ap.add_argument("--release-dir", default=RELEASE_DIR, help="the watcher's worktree at the latest release")
     ap.add_argument("--apply", action="store_true", help="settle: really settle (default: dry run)")
+    ap.add_argument("--auto", action="store_true",
+                    help="run: close on their own the requests that need no decision (needs none, or a class with an "
+                         "active default ruling), through settle_changes.py --apply; the rest wait for the lead")
     a = ap.parse_args(argv)
     fails = self_test()
     for f in fails:

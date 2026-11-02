@@ -24,7 +24,10 @@ it waits for, the tickets it touches), drafts one answer per request against the
 `REVIEW.md` in the watcher's folder on the lead's machine (outside git). The lead marks each `approve`, `change` or `reject: <why>`; the requests in a class
 with an active default ruling come first under one `approve all default-ruled` line that clears them with one mark.
 `python3 tools/cr-watch.py settle` (dry run), then `--apply`, settles the marked ones through
-`viewer/api/settle_changes.py`, which tells their tickets (section 6). Nothing is settled without the lead's mark. When
+`viewer/api/settle_changes.py`, which tells their tickets (section 6). Run with `--auto` (CHG-CRF-003; the lead, 2
+November 2026), it first closes on its own every request whose draft needs nobody (the package answers it) or whose
+class has an active default ruling, with no release: the ticket's comment tells the agent to build it now. Only a
+request that needs the lead or the client waits for a mark, and the lead is asked about it. When
 ADAM cannot be read, the list says so at the top; the line under its title says when the watcher last ran.
 
 ## 2. Edit: agents on branches

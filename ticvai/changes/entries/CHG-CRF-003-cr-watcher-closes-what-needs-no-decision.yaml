@@ -1,0 +1,36 @@
+id: CHG-CRF-003
+date: '2026-11-02'
+source: plan
+kind: process
+summary: The CR watcher closes on its own every new request the package answers or a ruling covers, so developers keep
+  working; only a request that needs the lead or the client waits, and the lead is asked about it.
+decision:
+  what: 'tools/cr-watch.py run --auto, every 30 minutes: after drafting, a request whose draft needs nobody (needs
+    none: the package answers it) or whose class has an active default ruling is settled through
+    viewer/api/settle_changes.py --apply with no lead mark. FIXED IN closes done at that release; NOT A PROBLEM is
+    rejected; anything else closes done with no release, so its ticket''s comment tells the agent to build the
+    resolution now. A lead or client decision, a failed draft and a request the lead has marked stay in REVIEW.md, and
+    the lead is asked. The lead''s own approve also settles with no release, unless they give a ref. The drafting
+    prompt asks for a resolution complete enough to build from, since no release carries it.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Lead, 2 November 2026: "Create a agent that checks for new CRs every 30 mins checks them against ours, if we
+  deicision needed asks me and closes the Cr so devs dont have to stop working", then "and run it". Lead, 26 October
+  2026: after r10, CRs are settled by ticket comment only. The watcher of CHG-CRF-002 had never run, and it held every
+  request for the lead''s mark.'
+keys_touched:
+  files:
+  - tools/cr-watch.py
+  - docs/active/release-runbook.md
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: the lead''s request of 2 November 2026'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/cr-watch.py::_t_auto
+status: open
