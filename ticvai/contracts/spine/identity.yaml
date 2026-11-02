@@ -3365,6 +3365,7 @@ paths:
       operationId: createDelegatedAccess
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
+        - "P13 CMS-019 User Access"
       x-ticvai-read-via:
       - query: tenancy#regionSettingsRecords
         route: in-process
@@ -3453,6 +3454,7 @@ paths:
       operationId: deleteDelegatedAccess
       x-ticvai-consumed-by:
         - "P10 PTR-020 Sub-Agent Management"
+        - "P13 CMS-019 User Access"
       x-ticvai-audience:
       - staff
       - partner

@@ -1655,13 +1655,10 @@ screens:
       in the r8 walk fix report (a session-bound anonymous conversation with a migration relaxing the
       subject check, the kiosk calling as its registered device, or the kiosk assistant after r8).'
     source: r8 sample walk, 20 October 2026, APP-KIOSK-KSK-015 (#28867), class screen-op-auth-mismatch
-  - operation: getAvailability
-    why: '**`getAvailability` declares its response inline**, so the component that shows it names fields
-      but binds to no schema. The contract should name the shape.'
-    source: contract catalogue.yaml GET /availability
   - operation: recordAnswerFeedback
     removed: true
-    why: The client-approved screen has no Helpful / Not helpful control.
+    why: The screen has no Helpful / Not helpful control (no P05 frame is client-verified; the record
+      draws none) (r13, CHG-RCR33-001).
     source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
       reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
   layout:
@@ -1685,12 +1682,15 @@ screens:
         - Product.description
         operation: listProducts
         notes: Cards inside the conversation with the price for today; tapping one returns the guest to
-          the ticket step (KSK-004).
+          the ticket step (KSK-004). **The cards are the answer's sources of kind `product`** (`AiMessage.sources[kind=product].id`),
+          matched on `Product.id` in what `listProducts` returned for the venue; a source with no match
+          is not drawn (r13, CHG-RCR33-001).
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
       - kind: banner
         label: Available today
         operation: getAvailability
-        notes: 'On a suggested card: whether it can still be bought today.'
+        notes: 'On a suggested card: whether it can still be bought today, asked by the product''s `Product.eventId`
+          for today. A product with no event (not dated) shows no banner (r13, CHG-RCR33-001).'
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
     - name: actionBar
       slot: rowActions
@@ -1791,8 +1791,9 @@ screens:
   - id: confirmHandover
     component: confirmDialog
     trigger: Talk to a person
-    body: Ask a person to help? The conversation so far goes with it (reason guestRequested, Sahli's own
-      summary); the guest types nothing.
+    body: 'Ask a person to help? The conversation so far goes with it (reason `guestRequested`; no `summary`
+      is sent, since nothing on the kiosk holds one: neither AiMessage nor AiConversation carries a summary,
+      and the agent reads the conversation); the guest types nothing (r13, CHG-RCR33-001).'
     confirm:
       label: Ask a person
       operation: handoverToAgent

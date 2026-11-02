@@ -353,11 +353,13 @@ screens:
         bindsTo: LoginResponse.availableRoles
         columns:
         - RoleSummary.name
+        - RoleSummary.scope.name
         - RoleSummary.code
         - RoleSummary.isPrimary
-        notes: Handed over by EMP-001 from the login response (requiresRoleSelection true); nothing is
-          fetched. The primary role is first. The venue is the role's scope, shown on the session after
-          selectRole.
+        notes: 'Handed over by EMP-001 from the login response (requiresRoleSelection true); nothing is
+          fetched. The primary role is first. **One card per grant**: the venue is the grant''s scope
+          (`RoleSummary.scope.name`), and Select role sends the card''s `grantId` (IDENTITY-C45, CHG-R8SPN-032;
+          r13, CHG-RCR31-001).'
         provenance: defined 4 October 2026 (CHG-FXS-003)
     - name: contextPanel
       slot: selection
@@ -418,7 +420,9 @@ screens:
   - id: formSelectRole
     component: modal
     trigger: Select role
-    body: '**Collects what `selectRole` sends before it is called.** Required: `roleId`. Dismissing sends
+    body: '**Sends the picked card''s `roleId` and `grantId`**; nothing is typed (r13, CHG-RCR31-001;
+      IDENTITY-C45, CHG-R8SPN-032). A role held at two venues is two cards, so the grant says which venue;
+      `roleId` alone is refused 422 `grant-required` when the role is held at several. Dismissing sends
       nothing; the screen behind is unchanged.'
     confirm:
       label: Select role
@@ -427,6 +431,7 @@ screens:
       label: Cancel
       discards:
       - roleId
+      - grantId
     provenance: contract identity.yaml POST /auth/select-role
   gaps:
   - operation: listMfaMethods

@@ -1,0 +1,57 @@
+id: CHG-RCR29-001
+date: '2026-11-02'
+source: audit
+kind: spec
+summary: 'A screen''s gates agree with the operations it calls. POS-000, the till''s sign-in door, is no longer gated on
+  SESSION_FORCE_LOGOUT (no cashier at a door can hold it); its supervisor panel and Take the till over carry that
+  permission on the component, and derive-screen-wiring no longer derives a permission for a screen that declares login.
+  Thirteen component gates corrected to their operation''s permission or dropped where they were labels, not
+  permissions: BO-284 (two), BO-289 and BO-291 (PLATFORM_CELL_MANAGE to MEMBERSHIP_MANAGE), ACC-007 (APPROVAL_DECIDE to
+  ACCREDITATION_APPROVE, Approve and Refuse), POS-020 Run report (OVERSHORT_ACCEPT to REPORT_VIEW_VENUE), PTR-030
+  ("Approve" to PLATFORM_CELL_MANAGE), ADM-284 ("Approve" to ORDER_CREATE), ADM-048 (four labels dropped) and BO-279
+  ("Print" dropped). CMS-019''s Every role table carries ROLE_MANAGE (listRoles) and Change access
+  PERMISSION_GRANT (the grant writes; CHG-RCR32-001). Invisible metadata only: what any approved screen shows is unchanged.'
+decision:
+  what: 'The lead, 2 November 2026, on the root-cause re-check: fix the mechanical roots in parallel with the r13 build
+    lanes ("lets see if we can do something in parallel"; "yes"). Root R29, its mechanical part. Left for the lead:
+    BO-094''s view-only caller (review question Q18) and listModuleCatalogue''s permission on a public read (ADM-424).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Review root R29 of the Block A developer pull (each a review finding: 2.27767.1, 2.29883.5, 6.27769.2, 6.27810.3, 2.28213.2):
+  screen permissions disagreed with the operations the screens call, so the users a screen lets in and the users the
+  server lets through differed. Tickets: #27767 APP-POS-POS-000, #29883 VM-BO-291, #27769 APP-WL-CMS-019, #27810
+  APP-WL-ADM-424, #28213 APP-SETUP-BO-094-REST (none blocked by this root alone).'
+keys_touched:
+  screens: [POS-000, POS-020, BO-279, BO-284, BO-289, BO-291, ADM-048, ADM-284, PTR-030, ACC-007, CMS-019]
+  files:
+  - screens/P04-point-of-sale.yaml
+  - screens/P08-venue-back-office.yaml
+  - screens/P10-partner-reseller-portal.yaml
+  - screens/P11-accreditation-portal.yaml
+  - screens/P13-white-label-cms.yaml
+  - tools/check-screen-permissions.py
+  - tools/check-screen-wiring.py
+  - tools/derive-screen-wiring.py
+root_class: 'screen-permission gap: a screen or component gate taken from another operation, a platform permission or a
+  pack label, not from the operation the control calls'
+tickets:
+  started: []
+  unstarted:
+  - '27767 POS-000 (Pradnya Yeram): the door has no screen permission; the supervisor panel and Take the till over are
+    hidden without SESSION_FORCE_LOGOUT.'
+  - '29883 BO-291, 29788 BO-289, 29857 BO-284 (membership screens): the buttons are gated on MEMBERSHIP_MANAGE.'
+  - '28734 POS-020, 29099 PTR-030, 36788 ADM-048 (on hold), ACC-007''s and ADM-284''s tickets: the component gates as
+    corrected.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 root-cause re-check, root R29'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-permissions.py::SP-DOOR, SP-COMPONENT (with their self-tests); generator rule
+    tools/derive-screen-wiring.py::fix_permission (no permission for a door)
+status: open
+notes: 'check-screen-permissions already failed at r12 on BO-293 and DEV-001 (SP-NOACCESS: their no-access states name a
+  permission no operation needs); both are visible state text on approved screens and are left for the lead. A rule
+  that every onLoad operation''s permission is the screen''s or a component''s was measured and not added: it finds 412
+  screens, most of them guest screens whose staff-permission reads are a different question.'

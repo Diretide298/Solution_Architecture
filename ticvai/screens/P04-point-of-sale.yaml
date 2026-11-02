@@ -91,7 +91,6 @@ screens:
   module: Shift
   requiresModule: core
   wave: 1
-  permission: SESSION_FORCE_LOGOUT
   capability: C11
   notes: 'Build note (r8 second round, IDENTITY-C01, from the core lane): login is online-only for tills
     and staff handhelds in r8 (identity login x-ticvai-offline-note); build the offline state as "signing
@@ -115,9 +114,11 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`;
         a link or an edge that holds one opens it instead.'
-    coldEntry: '**The only screen in venue-pos that needs nothing.** That is what makes it the door. `workstationId`
-      travels in the login request and comes from the terminal itself, not from a session -- the contract
-      says it identifies the device and is *NOT a permission source*.'
+    coldEntry: '**The only screen in venue-pos that needs nothing.** That is what makes it the door, and
+      why it has no screen permission: the supervisor panel and Take the till over carry SESSION_FORCE_LOGOUT
+      on the component, held by the supervisor whose PIN step-up opens them (r13, CHG-RCR29-001).
+      `workstationId` travels in the login request and comes from the terminal itself, not from a session
+      -- the contract says it identifies the device and is *NOT a permission source*.'
   states:
     loading: Checking the credential. The keypad stays visible and disabled.
     emptyFirstRun: '**A till nobody has signed into yet.** No recent operators, so the quick-login row
@@ -232,6 +233,7 @@ screens:
         label: Signed in on this till now
         bindsTo: ActiveSession
         operation: listActiveSessions
+        permission: SESSION_FORCE_LOGOUT
         provenance: contract identity.yaml GET /auth/sessions
         notes: '**Opens only after a supervisor''s PIN step-up** (decided by Chinmay, 3 October 2026 (CHG-SPF-012),
           not the recommendation; reverses CHG-DOOR-003 for this screen). Nobody is signed in at a till''s
@@ -240,6 +242,7 @@ screens:
       - kind: destructiveButton
         label: Take the till over
         operation: forceLogout
+        permission: SESSION_FORCE_LOGOUT
         provenance: contract identity.yaml POST /auth/sessions/{sessionId}/force-logout
         notes: '**One principal, one active session per workstation.** Signing in while somebody else
           holds the till is refused (`login` answers 409); signing in never ends the other session. A
@@ -715,8 +718,10 @@ screens:
   - id: formSelectRole
     component: modal
     trigger: Select role
-    body: '**Collects what `selectRole` sends before it is called.** Required: `roleId`. Dismissing sends
-      nothing; the screen behind is unchanged.'
+    body: '**Collects what `selectRole` sends before it is called.** Sends the chosen role''s `roleId`
+      and its grant''s `grantId`: a role held at several venues is one grant per venue, and `roleId` alone
+      is refused 422 `grant-required` (IDENTITY-C45, CHG-R8SPN-032; r13, CHG-RCR31-001). Dismissing
+      sends nothing; the screen behind is unchanged.'
     confirm:
       label: Select role
       operation: selectRole
@@ -724,6 +729,7 @@ screens:
       label: Cancel
       discards:
       - roleId
+      - grantId
     provenance: client-verified
   states:
     loading: The begin shift list.
@@ -2558,6 +2564,8 @@ screens:
         label: Section map, then the section's seats
         bindsTo: SeatAvailability.sections
         operation: getSeatAvailability
+        reads:
+        - listSeatCategories
         notes: 'v2 (POSV2-11, DEC-552): pick the date and time, then a section on the section map, then
           seats in that section with held and sold seats shown and the price tiers as a legend; Back and
           All sections step back. A zone-priced general-admission event draws the same drawer with zones
@@ -2698,8 +2706,10 @@ screens:
   - id: formCreateSeatHold
     component: modal
     trigger: Create seat hold
-    body: '**Collects what `createSeatHold` sends before it is called.** Required: `id`, `performanceId`,
-      `seatIds`, `ttlSeconds`. Optional: `subjectId`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**Collects what `createSeatHold` sends before it is called.** Required: `id` (a client UUIDv7)
+      and `performanceId`, and exactly one of `seatIds` (a seated section) or `zoneId` with `quantity`
+      (a standing zone, GPS-C38). `ttlSeconds` is left to its default (480). Optional: `subjectId`. Dismissing
+      sends nothing; the screen behind is unchanged (r13, CHG-RCR33-001).'
     bindsTo: CreateSeatHoldRequest
     confirm:
       label: Create seat hold
@@ -7687,7 +7697,7 @@ screens:
         notes: Runs the seeded report `shiftSummary` (each till shift's takings, expected against counted
           cash, and variance), its `reportId` taken from `listSeededReports` (proposed, client to correct;
           decided 28 September, audit R282).
-        permission: OVERSHORT_ACCEPT
+        permission: REPORT_VIEW_VENUE
   states:
     loading: The shift exceptions alerts list.
     error: Could not load. Names which read failed and leaves the shift exceptions alerts untouched.

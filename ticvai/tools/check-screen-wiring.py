@@ -208,6 +208,10 @@ def overlay_refs(o: dict) -> set:
         v = o.get(k)
         if isinstance(v, dict) and v.get("operation"):
             out.add(v["operation"])
+        # the other writes one confirm sends (`alsoCalls`, r13, CHG-RCR32-001): CMS-019's Change access adds and
+        # removes grants and changes the person in one form
+        if isinstance(v, dict):
+            out |= {x for x in (v.get("alsoCalls") or []) if isinstance(x, str) and x}
     out |= {r for r in (o.get("reads") or []) if isinstance(r, str) and r}
     return out
 
@@ -403,6 +407,8 @@ def main() -> int:
             guard.add("S-DUP-REGION", f"{sid}:{n}", f"{sid}: region {n!r} appears {names.count(n)} times")
         # --- R273 unreached operations ---------------------------------------------------------
         refs = {c.get("operation") for c in comps if c.get("operation")}
+        # a picker's other reads (`reads` on the component, r13, CHG-RCR33-001), as an overlay's `reads`
+        refs |= {r for c in comps for r in (c.get("reads") or []) if isinstance(r, str) and r}
         refs |= upload_completes(comps, op_ids)
         for o in overlays:
             refs |= overlay_refs(o)
@@ -462,7 +468,10 @@ def main() -> int:
         # --- R255 screen permission ------------------------------------------------------------
         # **Not on a guest surface** (2 October 2026, CHG-CLN-007): a guest holds no permission (ADR-0025), so a guest
         # screen has none to declare; its no-access state is "not signed in" or "not yours" (GFIX-4).
-        if perms and "emptyNoAccess" in states and not s.get("permission") and not plat.startswith(GUEST_CODES):
+        # **Nor on a door** (r13, CHG-RCR29-001): a screen that declares `login` is reached before anybody holds
+        # a permission (POS-000 was gated on SESSION_FORCE_LOGOUT, which nobody at a till's door can hold); its
+        # supervisor panel carries that permission on the component. check-screen-permissions SP-DOOR.
+        if perms and "emptyNoAccess" in states and not s.get("permission") and not plat.startswith(GUEST_CODES)                 and "login" not in op_ids:
             guard.add("S-SCREEN-PERMISSION", sid, f"{sid}: operations need {', '.join(sorted(perms)[:3])}"
                       f"{' ...' if len(perms) > 3 else ''}; the screen declares no permission")
         # --- R265 edits with no read -----------------------------------------------------------

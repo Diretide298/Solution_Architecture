@@ -1,0 +1,67 @@
+id: CHG-RCR33-001
+date: '2026-11-02'
+source: audit
+kind: spec
+summary: 'Screen values and actions name the read or write they come from, where that needs no visible change. BO-094''s
+  Featured offer takes bundles from promotions listBundles (the ids VenuePoint.featuredOffer holds), not the signed
+  catalogue snapshots of listCatalogueBundles. BO-129''s deploy form asks for the required version, offered from
+  getConfigurationProfile. CMS-010''s Tag filter reads getMediaTaxonomy. BO-015 reads getAvailability by event for
+  "how full". KSK-015 sends no handover summary (nothing holds one), says its product cards are the answer''s product
+  sources and asks availability by the product''s event, and drops two stale gap notes. ADM-268''s Open Operational
+  Incidents tile binds ChannelOperationsCommandCenterSummary.openOperationalIncidents and the screen no longer calls
+  listChannel2, which nothing on it shows. ADM-424 holds the cellId its way back to ADM-419 carries, and ADM-419 hands
+  it over. GST-073''s email form is the six-digit code path. POS-004 reads listSeatCategories for the tier names and
+  its seat-hold form asks what the contract requires (seats or a zone with a quantity; the hold time defaults). A
+  picker''s other reads are declared on the component (`reads`, new in screens/_schema.yaml) and check-screen-wiring
+  counts them as reached.'
+decision:
+  what: 'The lead, 2 November 2026, on the root-cause re-check: fix the mechanical roots in parallel with the r13 build
+    lanes ("lets see if we can do something in parallel"; "yes"). Root R33, its part that changes no approved screen.
+    Left for the lead or for the client''s wording: the state texts of BO-094 (still names listCatalogueBundles), BO-134,
+    POS-003, KSK-001, ADM-018, ADM-268 and WEB-029; BO-129''s profile picker and its firmware rollout and rollback
+    controls (the rollback needs a contract read of rollouts); BO-134''s Outlet id picker; POS-000''s co-branding source;
+    POS-003''s group and family bundles; POS-004''s Create order and Create payment (GPS-C13); BO-015''s calendar day
+    start (getVenueSettings needs TENANT_VIEW, the screen PRODUCT_VIEW); GST-040''s case actions; WEB-029''s reference;
+    ADM-603''s instalment policy.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Review root R33 of the Block A developer pull (28 findings over 17 tickets; each a review finding, among them 2.28213.1, 2.37014.1,
+  6.27842.1, 2.28195.4, 2.28867.4, 2.28867.5, 2.28867.7, 6.29778.2, 6.29778.3, 6.27810.4, 6.27746.4, 2.28206.3,
+  2.28206.4): screen records showed values or offered actions with no source. Blocked tickets: #28213
+  APP-SETUP-BO-094-REST and #37014 APP-SETUP-BO-129-REST.'
+keys_touched:
+  screens: [BO-094, BO-129, CMS-010, BO-015, KSK-015, ADM-268, ADM-424, ADM-419, GST-073, POS-004]
+  operations: [listBundles, listCatalogueBundles, getConfigurationProfile, deployConfigurationProfile, getMediaTaxonomy,
+    getAvailability, handoverToAgent, listChannel2, verifyGuestEmail, listSeatCategories, createSeatHold]
+  files:
+  - screens/P08-venue-back-office.yaml
+  - screens/P13-white-label-cms.yaml
+  - screens/P05-guest-kiosk.yaml
+  - screens/P09-platform-admin-console.yaml
+  - screens/P02-guest-mobile-app.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/_schema.yaml
+  - tools/check-screen-wiring.py
+root_class: 'screen-value gap: a picker, a count or a form field with no declared read, or a call nothing shows'
+tickets:
+  started:
+  - '30712 [FE] GST-073 Security & Sign-in: build with all states (Ready for QA, Chitrangi Mestry): the verify-email
+    form sends mode send, then mode code with the six-digit code; no token field.'
+  unstarted:
+  - '28213, 31881-31883 BO-094 (Pradnya Yeram): the Featured offer''s bundles come from listBundles.'
+  - '37014 BO-129 (Pallavi Sawant): the deploy form asks for version from getConfigurationProfile.'
+  - '27842 CMS-010, 28195 BO-015, 28867 KSK-015, 29778 ADM-268, 27810 ADM-424 and 34488 ADM-419, 30713 GST-073, 28206
+    and 31868-31870 POS-004: as the summary says.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 root-cause re-check, root R33'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py::S-OP-UNREACHED and S-CONSUMED-MIRROR (a declared read must be reached by a
+    component, a component's `reads` or an overlay's `reads`, and the contracts' consumers must agree)
+status: open
+notes: 'Not caught by any check: an overlay body''s Required list against the contract (BO-129 said nothing was required
+  while version is). Measured on r12: 152 of 941 generated form bodies differ from the contract''s required list, most
+  because ids and venueId are filled silently; a check that tells those apart is proposed for the next release, not
+  added here. No baseline is edited by this change.'

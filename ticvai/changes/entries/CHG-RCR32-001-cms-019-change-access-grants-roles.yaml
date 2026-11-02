@@ -1,0 +1,48 @@
+id: CHG-RCR32-001
+date: '2026-11-02'
+source: audit
+kind: spec
+summary: 'CMS-019''s Change access is bound to the grant operations, as IDENTITY-C15 decided: createDelegatedAccess adds
+  a role (role, scope, validity) and deleteDelegatedAccess removes one (the role''s RoleSummary.grantId);
+  updatePrincipal keeps only the display name, active flag and validity. The form''s one confirm sends all three
+  (confirm.alsoCalls, new in screens/_schema.yaml and counted by check-screen-wiring); the record''s "still to be
+  written" note is replaced by the definition; the gates are ROLE_MANAGE on Every role and PERMISSION_GRANT on Change
+  access (CHG-RCR29-001), so a USER_MANAGE holder without PERMISSION_GRANT sees who has access and cannot change it
+  here. check-screen-decisions SD-DECIDED holds the binding.'
+decision:
+  what: 'The lead, 2 November 2026, on the root-cause re-check: fix the mechanical roots in parallel with the r13 build
+    lanes ("lets see if we can do something in parallel"; "yes"). Root R32, carrying the lead''s decision of 20 October
+    2026 (IDENTITY-C15, option A, CHG-R8SPN-024: "createDelegatedAccess and deleteDelegatedAccess") to the screen.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Review root R32 of the Block A developer pull (findings 6.27769.1, 6.27769.3): CHG-R8SPN-024 moved CMS-019''s
+  Change access off updatePrincipal, which "never grants or removes a role", and left the rebinding to the surface lane;
+  the record still called updatePrincipal and said its components were still to be written. Ticket: #27769
+  APP-WL-CMS-019 (blocked).'
+keys_touched:
+  screens: [CMS-019]
+  operations: [createDelegatedAccess, deleteDelegatedAccess, updatePrincipal, listRoles]
+  files:
+  - screens/P13-white-label-cms.yaml
+  - screens/_schema.yaml
+  - contracts/spine/identity.yaml
+  - tools/check-screen-wiring.py
+  - tools/check-screen-decisions.py
+root_class: 'decision not carried to its surface: an entry left "the surface lane''s part" and closed with nothing that
+  checks the screen'
+tickets:
+  started: []
+  unstarted:
+  - '27769 CMS-019 (Chitrangi Mestry): Change access sends createDelegatedAccess and deleteDelegatedAccess for the roles
+    it adds and removes and updatePrincipal only for name, active and validity; the scope gains the two grant
+    operations (x-ticvai-consumed-by now names CMS-019).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 root-cause re-check, root R32'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-decisions.py::SD-DECIDED (with its self-test)
+status: open
+notes: 'identity.yaml changes only by the refresh''s link-screens-contracts (CMS-019 in the two operations''
+  x-ticvai-consumed-by). The backend operations exist and are unchanged.'

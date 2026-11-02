@@ -109,10 +109,12 @@ screens:
         notes: Goes into `LoginRequest.username`; a badge tap fills it.
       - kind: textField
         label: PIN
-        notes: 'Goes into `LoginRequest.credential` with `method: pin`, or the badge with `method: card`
-          or `rfid`. The scanner sends its own `workstationId` (CHG-DOOR-001), so every scan is attributable
-          to a person at this gate. The keypad takes the tenant''s PIN length, exactly `WorkstationContext.pinLength`
-          digits (`PasswordPolicy.pinLength`, 4, 6 or 8; CHG-CRD-002), kept from the scanner''s last session.'
+        notes: Goes into `LoginRequest.credential`; the PIN is always typed. A badge tap fills Employee
+          number (`LoginRequest.username`) and sets `method` to `card` or `rfid`, which say how the username
+          was entered (IDENTITY-C36; r13, CHG-RCR31-001). The scanner sends its own `workstationId`
+          (CHG-DOOR-001), so every scan is attributable to a person at this gate. The keypad takes the
+          tenant's PIN length, exactly `WorkstationContext.pinLength` digits (`PasswordPolicy.pinLength`,
+          4, 6 or 8; CHG-CRD-002), kept from the scanner's last session.
       - kind: primaryButton
         label: Sign in
         operation: login

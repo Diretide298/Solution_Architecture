@@ -923,6 +923,7 @@ paths:
     get:
       operationId: getMediaTaxonomy
       x-ticvai-consumed-by:
+        - "P13 CMS-010 Media Library"
         - "P13 CMS-065 Metadata & Taxonomy Management"
         - "P13 CMS-066 Tags, Keywords & Classification"
       summary: The categories, metadata fields and controlled vocabularies
