@@ -2315,7 +2315,10 @@ screens:
       - kind: multiSelect
         label: Tag
         operation: searchMedia
-        notes: Tags picked from the taxonomy; sends `tag`.
+        reads:
+        - getMediaTaxonomy
+        notes: Tags picked from the taxonomy `getMediaTaxonomy` answers; sends `tag` to `searchMedia`
+          (r13, CHG-RCR33-001).
         provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
         bindsTo: MediaAsset.tags
       - kind: selectField
@@ -2595,6 +2598,10 @@ screens:
   - operationId: searchMedia
     contract: assets
     purpose: Search the asset library
+    trigger: onLoad
+  - operationId: getMediaTaxonomy
+    contract: assets
+    purpose: The tags the Tag filter offers (r13, CHG-RCR33-001)
     trigger: onLoad
   - operationId: completeUpload
     contract: assets
@@ -4359,9 +4366,15 @@ screens:
       trigger: Typography
       provenance: 'derived — CMS-003 declares entryState.params  and CMS-019 holds none of them. The edge
         carries nothing: CMS-003 needs nothing to open'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written. States derived from the screen pattern on 17 August, not individually considered —
-    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: '**Who in the tenant may change what, and Change access changes it** (r13, CHG-RCR32-001).
+    A role held at a scope is a grant: Change access adds a role with `createDelegatedAccess` (the role
+    picked from Every role, the scope, the validity) and removes one with `deleteDelegatedAccess` (the
+    picked role''s `RoleSummary.grantId` from the selected person''s roles); `updatePrincipal` changes
+    only the display name, the active flag and the validity, and never grants or removes a role (decided
+    20 October 2026, Chinmay, IDENTITY-C15 option A; CHG-R8SPN-024). **Gates:** the screen needs `USER_MANAGE`
+    (`listPrincipals`); the Every role table needs `ROLE_MANAGE` (`listRoles`) and Change access `PERMISSION_GRANT` (the grant writes), each on its component,
+    so a caller without them does not see them (hidden, the components'' default; r13, CHG-RCR29-001). A
+    `USER_MANAGE` holder without `PERMISSION_GRANT` sees who has access and cannot change it here.'
   density: compact
   pattern: listDetail
   patternReason: '`listPrincipals` reads a population and nothing reads one of them; the detail is the
@@ -4410,6 +4423,7 @@ screens:
         - Role.principalCount
         - Role.grantCount
         operation: listRoles
+        permission: ROLE_MANAGE
         provenance: corrected 2 October 2026 (CHG-SGU-019, design-notes correction)
         notes: The role a principal holds and the role another inherits from are shown by name; raw ids
           only in the detail panel's copy action.
@@ -4433,8 +4447,14 @@ screens:
       components:
       - kind: secondaryButton
         label: Change access
-        operation: updatePrincipal
-        provenance: contract identity.yaml PATCH /principals/{principalId}; wiring fix, 2 October 2026
+        operation: createDelegatedAccess
+        permission: PERMISSION_GRANT
+        provenance: contract identity.yaml POST /delegated-access, DELETE /delegated-access/{delegatedAccessId}
+          and PATCH /principals/{principalId}; rebound to the grant operations 2 November 2026 (r13, CHG-RCR32-001;
+          IDENTITY-C15, CHG-R8SPN-024)
+        notes: Opens the form for the selected person. The roles it adds and removes are grants (`createDelegatedAccess`,
+          `deleteDelegatedAccess`, which need `PERMISSION_GRANT`); the person's name, active flag and
+          validity go to `updatePrincipal` (`USER_MANAGE`).
   states:
     loading: The user access list.
     error: Could not load. Names which read failed and leaves the user access untouched.
@@ -4455,11 +4475,25 @@ screens:
     contract: identity
     purpose: List roles
     trigger: onLoad
+  - operationId: createDelegatedAccess
+    contract: identity
+    purpose: Give the selected person a role at a scope, for a validity (a grant; IDENTITY-C15, CHG-R8SPN-024)
+    trigger: onAction
+    provenance: r13, CHG-RCR32-001
+    invalidates:
+    - listPrincipals
+  - operationId: deleteDelegatedAccess
+    contract: identity
+    purpose: Take a role away from the selected person (the grant RoleSummary.grantId names; IDENTITY-C15)
+    trigger: onAction
+    provenance: r13, CHG-RCR32-001
+    invalidates:
+    - listPrincipals
   - operationId: updatePrincipal
     contract: identity
-    purpose: Grant or remove a CMS role for the selected person
+    purpose: Change the selected person's display name, active flag or validity; never a role (IDENTITY-C15)
     trigger: onAction
-    provenance: wiring fix, 2 October 2026 (CHG-WIR-021)
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-021); purpose corrected 2 November 2026 (r13, CHG-RCR32-001)
   entryState:
     preloaded:
     - Principal.id
@@ -4470,6 +4504,11 @@ screens:
     params:
     - name: principalId
       from: session
+    - name: delegatedAccessId
+      from: navigation
+      optional: true
+      notes: 'Optional: the grant Change access removes is the picked role''s `RoleSummary.grantId` from the
+        selected person''s roles; an edge that holds one only pre-selects it (r13, CHG-RCR32-001).'
   wireframe:
     status: notStarted
     provenance: generated
@@ -4481,13 +4520,28 @@ screens:
   - id: formUpdatePrincipal
     component: modal
     trigger: Change access
-    body: '**Collects what `updatePrincipal` sends before it is called.** Dismissing sends nothing; the
-      screen behind is unchanged.'
+    body: '**Collects the selected person''s access, and sends only what changed** (r13, CHG-RCR32-001;
+      IDENTITY-C15, CHG-R8SPN-024). Roles to add: a role from Every role, its scope (`scopePath`, within
+      the caller''s own grants) and its validity (`validFrom`, `validTo`), each sent as `createDelegatedAccess`
+      with the person''s `principalId` and `effect` ALLOW. Roles to remove: picked from the person''s
+      roles, each sent as `deleteDelegatedAccess` with that role''s `RoleSummary.grantId`.
+      Display name, active flag and validity: `updatePrincipal`.
+      A refusal names which write failed (400 `scope-outside-own-grants`, 409 `segregation-breach`) and
+      the ones already sent stay sent. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
       label: Change access
-      operation: updatePrincipal
+      operation: createDelegatedAccess
+      alsoCalls:
+      - deleteDelegatedAccess
+      - updatePrincipal
     dismiss:
       label: Cancel
+      discards:
+      - roleId
+      - scopePath
+      - validFrom
+      - validTo
+      - grantId
     provenance: contract identity.yaml PATCH /principals/{principalId}; wiring fix, 2 October 2026
 - id: CMS-021
   name: Privacy & Consent Configuration Command Center

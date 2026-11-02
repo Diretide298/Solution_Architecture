@@ -182,6 +182,9 @@ CHECKS = [
     # 12 October (CHG-R6-030): a screen is gated on a permission its operations require; the ticket media designers
     # take the product permission (BC-034..BC-037).
     "check-screen-permissions",
+    # 2 November (r13 root-cause lane u, CHG-RCR31-001, CHG-RCR32-001): a decision that names what a screen
+    # does is in that screen's record; role forms send the grant, role cards name the venue, a badge fills the username.
+    "check-screen-decisions",
     # 12 October (CHG-R6-031..038): a promise has its operation, field, binding or reader; one business day.
     "check-promises-kept",
     # 14 October (ADAM CR-082, CHG-TEN-005): a configuration write's request field is on its persisted resource,

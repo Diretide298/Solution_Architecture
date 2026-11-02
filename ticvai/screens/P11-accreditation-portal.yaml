@@ -989,10 +989,10 @@ screens:
       - kind: primaryButton
         label: Approve
         operation: decideAccreditationApplication
-        permission: APPROVAL_DECIDE
+        permission: ACCREDITATION_APPROVE
       - kind: destructiveButton
         label: Refuse
-        permission: APPROVAL_DECIDE
+        permission: ACCREDITATION_APPROVE
   overlays:
   - id: refuse
     component: confirmDialog

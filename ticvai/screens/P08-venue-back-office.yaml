@@ -5527,6 +5527,8 @@ screens:
       slot: collection
       components:
       - kind: calendarView
+        reads:
+        - getAvailability
         label: Calendar
         operation: listPerformances
         notes: 'Performances by day, week or month; a slot opens its performance. Day, week, month and
@@ -5779,6 +5781,12 @@ screens:
       what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `createEvent`,
       `updateEvent`; `PERFORMANCE_CONFIGURE` for `createPerformances`, `cancelPerformance`, `updatePerformance`.'
   apis:
+  - operationId: getAvailability
+    contract: catalogue
+    purpose: How full each performance in the visible window is, asked by `eventId`, which answers every
+      performance of the event at once; the purpose's 'how full' has no other source (`Performance` carries
+      no sold or capacity figure) (r13, CHG-RCR33-001)
+    trigger: onLoad
   - operationId: listPerformances
     contract: catalogue
     purpose: List performances of an event
@@ -26440,9 +26448,13 @@ screens:
         label: Featured offer
         bindsTo: VenuePoint.featuredOffer
         operation: listProducts
+        reads:
+        - listBundles
         notes: '**The product or bundle the item detail proposes** (decided 29 September, MOB-4), on any
           kind of point, e.g. a restaurant''s *meal combo with admission* (a bundle from BO-011). Products
-          from `listProducts`, bundles from `listCatalogueBundles`.'
+          from `listProducts`, bundles from promotions'' `listBundles`: `VenuePoint.featuredOffer.id`
+          of kind `bundle` is a `promotions.bundle` id, never a signed catalogue snapshot (`listCatalogueBundles`
+          answers those, for terminals) (r13, CHG-RCR33-001; the same correction as P01''s in R269).'
         provenance: agreed name venue-map VenuePoint.featuredOffer (the 29 September pass brief)
       - kind: numberField
         label: Typical visit (minutes)
@@ -26494,11 +26506,13 @@ screens:
     purpose: Products a point can feature (MOB-4)
     trigger: onAction
     provenance: decided 29 September, MOB-4 (the 29 September pass)
-  - operationId: listCatalogueBundles
-    contract: catalogue
-    purpose: Bundles a point can feature, e.g. a meal combo (MOB-4)
+  - operationId: listBundles
+    contract: promotions
+    purpose: Bundles a point can feature, e.g. a meal combo (MOB-4); promotions bundles, the ids featuredOffer
+      holds
     trigger: onAction
-    provenance: decided 29 September, MOB-4 (the 29 September pass)
+    provenance: decided 29 September, MOB-4 (the 29 September pass); listCatalogueBundles corrected to
+      listBundles (r13, CHG-RCR33-001)
   - operationId: getVenueMap
     contract: venue-map
     purpose: The draft
@@ -34371,6 +34385,10 @@ screens:
     trigger: onAction
     invalidates:
     - listWorkstations
+  - operationId: getConfigurationProfile
+    contract: tenancy
+    purpose: The profile's versions, for the deploy form's required version (r13, CHG-RCR33-001)
+    trigger: onAction
   - operationId: getWorkstationHealth
     contract: tenancy
     purpose: A score a manager can sort by, and what is dragging it down
@@ -34478,19 +34496,22 @@ screens:
   - id: formDeployConfigurationProfile
     component: modal
     trigger: Deploy configuration profile
-    body: '**Collects what `deployConfigurationProfile` sends before it is called.** Nothing in the body
-      is required. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`. **Not asked:** is a client
-      UUIDv7 generated silently; is set by the server (design-note correction, 2 October 2026). Dismissing
-      sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly
-      in the contract): `completedAt`, `failedCount`, `failureReasons`, `id`, `profileId`, `startedAt`,
-      `status`, `succeededCount` (3 October 2026, CHG-SPF-001).'
-    bindsTo: ProfileDeployment
+    body: '**Collects what `deployConfigurationProfile` sends before it is called.** Required: `version`,
+      the published version of the profile to deploy, picked from the profile''s versions that `getConfigurationProfile`
+      answers (a draft cannot be deployed: 409 `profile-version-draft`). Optional: `targetWorkstationIds`,
+      `targetFilter`, `strategy`. The body is `DeployConfigurationProfileRequest` (CHG-R8SPN-017); the
+      answer is the ProfileDeployment the server records, whose identity, status, counts
+      and times the server sets. Dismissing sends nothing; the screen behind is unchanged (r13, CHG-RCR33-001).'
+    bindsTo: DeployConfigurationProfileRequest
+    reads:
+    - getConfigurationProfile
     confirm:
       label: Deploy configuration profile
       operation: deployConfigurationProfile
     dismiss:
       label: Cancel
       discards:
+      - version
       - targetWorkstationIds
       - targetFilter
       - strategy
@@ -54585,7 +54606,6 @@ screens:
       - kind: primaryButton
         label: POS Print
         provenance: pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 27 §Support
-        permission: Print
       - kind: secondaryButton
         label: Physical Collection
         provenance: pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 27 §Support
@@ -55399,7 +55419,7 @@ screens:
       - kind: destructiveButton
         label: Suspend membership product
         operation: approveMembershipProductValidation
-        permission: PLATFORM_CELL_MANAGE
+        permission: MEMBERSHIP_MANAGE
         notes: 'Quick action: sends `action: suspend` with a `reason`. Allowed only on an `active` version;
           selling stops on every channel at once and members already holding it keep their entitlements
           until their own expiry (decided 29 September, writers pass; DM4).'
@@ -55407,7 +55427,7 @@ screens:
       - kind: secondaryButton
         label: Reinstate membership product
         operation: approveMembershipProductValidation
-        permission: PLATFORM_CELL_MANAGE
+        permission: MEMBERSHIP_MANAGE
         notes: 'Quick action: sends `action: reinstate`, moving a `suspended` version back to `active`;
           refused once its `effectiveTo` has passed (decided 29 September, writers pass; DM4).'
         provenance: contract subscription.yaml PUT /membership-product-validation
@@ -56179,7 +56199,7 @@ screens:
       - kind: primaryButton
         label: Save membership usage policy
         operation: setMembershipUsagePolicy
-        permission: PLATFORM_CELL_MANAGE
+        permission: MEMBERSHIP_MANAGE
         notes: 'The writer for the rules BO-289 shows through listMembershipUsageVisit: visit and admission
           limits, re-entry, reservations, no-show treatment, cancellations and guest usage for one membership
           product version, one row of subscription.membership_usage_policy per version (decided 29 September,
@@ -56513,7 +56533,7 @@ screens:
       - kind: primaryButton
         label: Save membership commercial config
         operation: setMembershipCommercialConfig
-        permission: PLATFORM_CELL_MANAGE
+        permission: MEMBERSHIP_MANAGE
         notes: 'The writer for the commercial columns BO-291 shows through listMembershipCommercialPricing:
           `basePricingProfile`, `taxProfile`, `feeProfile`, `upgradePricePolicy`, `promotionalPricingEligibility`,
           `paymentTerms` and `salesPeriod` on subscription.membership_product (decided 29 September, writers
@@ -124956,26 +124976,31 @@ screens:
       - kind: selectField
         label: Maximum daily hours
         operation: getStaffingRules
+        bindsTo: StaffingRules.maximumHoursPerDay
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall
           configure
       - kind: selectField
         label: Maximum weekly hours
         operation: getStaffingRules
+        bindsTo: StaffingRules.maximumHoursPerWeek
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall
           configure
       - kind: selectField
         label: Minimum rest period
         operation: getStaffingRules
+        bindsTo: StaffingRules.minimumRestHours
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall
           configure
       - kind: textField
         label: Maximum consecutive working days
         operation: getStaffingRules
+        bindsTo: StaffingRules.maximumConsecutiveDays
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall
           configure
       - kind: selectField
         label: Overtime threshold
         operation: getStaffingRules
+        bindsTo: StaffingRules.overtime.afterHoursPerWeek
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 44 §Administrators shall
           configure
     - name: actionBar
@@ -124984,6 +125009,8 @@ screens:
       - kind: primaryButton
         label: Approval required
         provenance: pack Resource_Management_Configuration_Reference.pdf, page 44 §Support
+        bindsTo: StaffingRules.overtime.requiresApproval
+        notes: A choice, `overtime.requiresApproval`, sent with the rules; not the save.
   states:
     loading: The overtime working-hour rules configuration as saved.
     error: Could not load. Names which read failed and leaves the overtime working-hour rules untouched.
@@ -125012,6 +125039,13 @@ screens:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-881
     workshopBoard: wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-881
+  notes: '**Bound to the contract as it stands** (r13, CHG-RCR35-001; the rule ADAM CR-193 settled
+    for BO-1144). The limits are `StaffingRules` properties; Standard daily hours and Standard weekly
+    hours have none, so nothing is sent for them. **No control on the layout sends `setStaffingRules`**:
+    under the lead''s rule of 28 October 2026 the developer adds a Save and logs a "Design change:" CR
+    in ADAM. What the save sends for `minimumCover`, which this screen does not show, and whether it sends
+    If-Match, wait on the lead (review question Q13); until then the save sends back the `minimumCover`
+    that `getStaffingRules` answered, unchanged, so it cannot erase the venue''s minimum staffing.'
   apisNote: Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 44.
     0 of 0 labels bound to a contract property; 8 of 26 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
@@ -150381,60 +150415,111 @@ screens:
       - kind: selectField
         label: Cash Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `cash` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Refund Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `refund` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Bonus Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `bonus` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Promotional Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `promotional` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Gift Card Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `giftCard` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Membership Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `membership` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Loyalty Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `loyalty` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Ride Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `ride` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Attraction Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `attraction` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Redemption Ticket Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `redemption` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Meal Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `fnb` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Retail Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `retail` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Parking Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `parking` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Event Credit
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `event` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Custom Credit Type
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §Administrators can define
+        bindsTo: CreditType.category
+        notes: The `other` value of `CreditType.category`.
+        operation: listCreditTypes
       - kind: selectField
         label: Balance code
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type
           configure
+        bindsTo: CreditType.code
+        operation: listCreditTypes
       - kind: selectField
         label: Display name
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type
           configure
+        bindsTo: CreditType.name
+        operation: listCreditTypes
       - kind: selectField
         label: Monetary/non-monetary
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type
           configure
+        bindsTo: CreditType.monetary
+        operation: listCreditTypes
       - kind: selectField
         label: Currency applicable
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type
@@ -150443,10 +150528,14 @@ screens:
         label: Transferable
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type
           configure
+        bindsTo: CreditType.transferable
+        operation: listCreditTypes
       - kind: selectField
         label: Refundable
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type
           configure
+        bindsTo: CreditType.refundable
+        operation: listCreditTypes
       - kind: selectField
         label: Top-up allowed
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type
@@ -150459,6 +150548,8 @@ screens:
         label: Expirable
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type
           configure
+        bindsTo: CreditType.expires
+        operation: listCreditTypes
       - kind: selectField
         label: Redeemable channels
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type
@@ -150475,6 +150566,8 @@ screens:
         label: Accounting classification
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type
           configure
+        bindsTo: CreditType.ledgerAccountCode
+        operation: listCreditTypes
       - kind: selectField
         label: Liability classification
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type
@@ -150483,6 +150576,8 @@ screens:
         label: Consumption priority
         provenance: pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 8 §For each balance type
           configure
+        bindsTo: CreditType.priority
+        operation: listCreditTypes
   states:
     loading: The credit balance type configuration as saved.
     error: Could not load. Names which read failed and leaves the credit balance type untouched.
@@ -150516,6 +150611,15 @@ screens:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1088
     workshopBoard: wireframes/WS186 Wallet Configuration Backend Structure v1.0 Board 1.dc.html#bo-1088
+  notes: '**Bound to the contract as it stands** (r13, CHG-RCR35-001; the rule ADAM CR-193 settled
+    for BO-1144). The fifteen credit kinds are the values of one property, `CreditType.category`; Balance
+    code, Display name, Monetary, Transferable, Refundable, Expirable, Accounting classification and Consumption
+    priority are `CreditType` properties. Currency applicable, Top-up allowed, Promotional, Redeemable
+    channels, Applicable products, Applicable venues and Liability classification have no `CreditType`
+    property, so nothing is sent for them (eligibility is `CreditEligibility`''s). **No control on the
+    layout sends `createCreditType` or `updateCreditType`**: under the lead''s rule of 28 October 2026
+    the developer adds them (Create credit type, Save) and logs a "Design change:" CR in ADAM; the package''s
+    own fix does not change the approved layout.'
   apisNote: Regenerated 9 September 2026 from Wallet_Configuration_Backend_Structure_v1.0.pdf page 8.
     0 of 0 labels bound to a contract property; 31 of 35 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
@@ -166297,11 +166401,9 @@ screens:
       - kind: primaryButton
         label: Create Price List
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions
-        permission: Create Price Lists
       - kind: secondaryButton
         label: Duplicate
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions
-        permission: Duplicate
       - kind: secondaryButton
         label: Open
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions
@@ -166317,11 +166419,9 @@ screens:
       - kind: secondaryButton
         label: Export
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions
-        permission: Export
       - kind: destructiveButton
         label: Archive
         provenance: pack Pricing___Revenue_Management_Reference.pdf, page 6 §Quick Actions
-        permission: Archive
       - kind: banner
         label: Permissions this screen separates
         notes: '**The pack separates these permissions and no action on the screen claims them yet:**
@@ -196092,6 +196192,7 @@ screens:
       - kind: metricTile
         label: Open Operational Incidents
         provenance: pack Sales_Channel_Management_Reference.pdf, page 20 §Display
+        bindsTo: ChannelOperationsCommandCenterSummary.openOperationalIncidents
     - name: contentBody
       slot: moduleTiles
       components:
@@ -196154,10 +196255,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listChannel2
-    contract: catalogue
-    purpose: AI Channel Optimization & Intelligence Center
-    trigger: onLoad
   - operationId: listChannel
     contract: catalogue
     purpose: Channel Operations Command Center
@@ -198695,7 +198792,7 @@ screens:
       - kind: primaryButton
         label: Approve
         provenance: contract operation approveListingModeration
-        permission: Approve
+        permission: ORDER_CREATE
       - kind: banner
         label: Permissions this screen separates
         notes: '**The pack separates these permissions and no action on the screen claims them yet:**
@@ -208486,10 +208583,10 @@ screens:
 
     **Saving** (r8 walk fix, CHG-R8WFC-006). The fields bound to `B2bPaymentTerms` are saved with `setB2bPaymentTerms`
     for the picked account (a PUT of the whole terms, so every bound field is sent). The approved layout
-    has no save control; until the client approves one (docs/active/approved-ui-changes.yaml), the save
-    control is a pending client-approval item, and the ticket builds the bound fields and the call. `setInstalmentPolicy`
-    has no field here: it stays in `apis` for the instalment policy panel the pack names, which this layout
-    does not draw (a gap, not built in Block A).'
+    has no save control. No client approval of one is pending: under the lead''s rule of 28 October 2026
+    the developer adds a Save that sends `setB2bPaymentTerms` and logs a "Design change:" CR in ADAM (r13,
+    CHG-RCR34-001). `setInstalmentPolicy` has no field here: it stays in `apis` for the instalment
+    policy panel the pack names, which this layout does not draw (a gap, not built in Block A).'
   density: compact
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Define) and no display directory

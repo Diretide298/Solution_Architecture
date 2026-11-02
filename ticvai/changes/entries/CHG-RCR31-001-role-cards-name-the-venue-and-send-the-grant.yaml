@@ -1,0 +1,54 @@
+id: CHG-RCR31-001
+date: '2026-11-02'
+source: audit
+kind: spec
+summary: 'The identity decisions reach the sign-in and role screens where they can without changing an approved
+  screen. EMP-002''s role cards show the grant''s venue (RoleSummary.scope.name) and its Select role form sends the
+  picked card''s roleId and grantId; POS-001''s Select role form sends grantId too (IDENTITY-C45, CHG-R8SPN-032).
+  SCN-001''s PIN note says the PIN is the credential and a badge fills the username with method card or rfid
+  (IDENTITY-C36). New check-screen-decisions holds both (SD-GRANT, SD-BADGE).'
+decision:
+  what: 'The lead, 2 November 2026, on the root-cause re-check: fix the mechanical roots in parallel with the r13 build
+    lanes ("lets see if we can do something in parallel"; "yes"). Root R31. The card''s venue is the lead''s own
+    decision of 20 October 2026 (IDENTITY-C45: "a role held at two venues shows two cards"; CHG-R8SPN-032: "the card
+    gains the venue name"), logged in approved-ui-changes.yaml. Left for the lead: SCN-001''s role list, EMP-001''s
+    Choose venue and role, and the offline sign-in texts of POS-000, EMP-001 and SCN-001 (visible text whose wording
+    waits on the client, IDENTITY-C01).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Review root R31 of the Block A developer pull (findings 6.27755.1, 6.27761.1, 6.27761.3, 6.27758.1, 6.27758.3,
+  6.27761.2, 2.27767.5): decisions IDENTITY-C45 and IDENTITY-C36 were made in the contracts and build notes and never
+  carried into the screens (CHG-R8SPN-032 left them to "the surface lane" and closed). Tickets: #27761
+  APP-SCANNER-SCN-001 (blocked), #27755 APP-STAFF-EMP-002, #27758 APP-STAFF-EMP-001, #27767 APP-POS-POS-000.'
+keys_touched:
+  screens: [EMP-002, POS-001, SCN-001]
+  operations: [selectRole, login]
+  schemas: [RoleSummary, LoginRequest]
+  files:
+  - screens/P06-staff-app.yaml
+  - screens/P04-point-of-sale.yaml
+  - screens/P07-staff-scanner.yaml
+  - docs/active/approved-ui-changes.yaml
+  - tools/check-screen-decisions.py
+  - tools/run-checks.py
+root_class: 'decision not carried to its surface: an entry left "the surface lane''s part" and closed with nothing that
+  checks the screen'
+tickets:
+  started: []
+  unstarted:
+  - '27755, 30726-30728 EMP-002 (Chitrangi Mestry): each card names its venue; Select role sends the card''s roleId
+    and grantId.'
+  - '28536, 32668-32670 POS-001 (Pradnya Yeram): Select role sends grantId with roleId.'
+  - '27761, 30735-30737 SCN-001 (Chitrangi Mestry): the badge fills Employee number; the PIN is the credential. The
+    role list is still open (left for the lead).'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 root-cause re-check, root R31'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-decisions.py::SD-GRANT, SD-BADGE (with their self-tests)
+status: open
+notes: 'Design change: EMP-002''s role cards gain the venue line, as the lead decided on 20 October 2026 (IDENTITY-C45);
+  approved-ui-changes.yaml records it. SD-GRANT cannot see a screen that calls selectRole with no list and no form
+  (SCN-001); that gap is the lead''s question.'

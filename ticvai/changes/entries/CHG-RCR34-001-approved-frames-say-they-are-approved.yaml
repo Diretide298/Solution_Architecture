@@ -1,0 +1,49 @@
+id: CHG-RCR34-001
+date: '2026-11-02'
+source: audit
+kind: spec
+summary: 'The P04 capture plan captions the POS v2 frames "client-approved 19 Oct 2026" instead of "ours, not
+  client-approved": the client approved v2 on 19 October 2026 and sixteen P04 records say so; the board takes the
+  caption at its next capture. check-approved-ui AU-CAPTION fails a capture plan that calls an approved screen''s
+  frames not client-approved. ADM-603''s record no longer calls its save control a pending client approval: under the
+  lead''s rule of 28 October 2026 the developer adds the Save that sends setB2bPaymentTerms and logs a "Design change:"
+  CR. No approved frame changes.'
+decision:
+  what: 'The lead, 2 November 2026, on the root-cause re-check: fix the mechanical roots in parallel with the r13 build
+    lanes ("lets see if we can do something in parallel"; "yes"). Root R34, its mechanical part. Left for the lead:
+    GST-073''s Change password, Link Google, Emirates ID and two-step venues (review question Q36) and, with it, binding
+    Remove back to removeMfaMethod and a Sign out on each device row; GST-040''s Search help (Q37) and its case actions;
+    reconciling the POS-000, POS-003 and POS-004 records to their approved frames (record components added or removed,
+    which needs an approved-ui-changes entry the lead makes); WEB-029''s state looks for states it does not have.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Review root R34 of the Block A developer pull (findings 2.27767.6, 6.28054.3 and, left for the lead, 2.27767.3,
+  2.28165.1, 2.28206.2, 6.27746.1, 6.27746.2, 6.27746.3, 6.27746.5, 6.27889.1, 6.27891.1): approved frames and their
+  screen records were not reconciled after the 19 October approval. Blocked ticket: #27746 APP-MOB-GST-073 (left for
+  the lead, Q36).'
+keys_touched:
+  screens: [ADM-603, POS-000, POS-003, POS-004]
+  files:
+  - tools/capture-plans/pos-v2.json
+  - tools/check-approved-ui.py
+  - screens/P08-venue-back-office.yaml
+root_class: 'approval not carried to its artefacts: a frame''s caption and a record''s note kept the state before the
+  client approved'
+tickets:
+  started: []
+  unstarted:
+  - '28054 ADM-603 (Surendra Loke): add the Save that sends setB2bPaymentTerms and log it as a "Design change:" CR.'
+  - '27767 POS-000, 28165 POS-003, 28206 POS-004 (Pradnya Yeram): the board''s caption says client-approved once
+    re-captured; nothing to build differently.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 root-cause re-check, root R34'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-approved-ui.py::AU-CAPTION (with its self-test)
+status: open
+notes: 'The board (wireframes/P04 Venue POS.dc.html) is drawn by tools/capture-prototype.mjs from the prototype kept out
+  of git; this lane did not re-capture it, so the sixteen frames say "not client-approved" until the next capture. The
+  generated GST-073 frame''s footer ("Not client-verified") is the same class outside the capture plans and is not
+  checked.'

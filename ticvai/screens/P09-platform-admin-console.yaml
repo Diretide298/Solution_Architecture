@@ -17426,6 +17426,7 @@ screens:
       provenance: structural — pack board 6 wiring, 11 September 2026
       carries:
       - tenantId
+      - cellId
     - to: ADM-425
       trigger: Venue Template Application
       provenance: structural — pack board 6 wiring, 11 September 2026
@@ -18432,6 +18433,11 @@ screens:
     - name: tenantId
       from: navigation
       optional: true
+    - name: cellId
+      from: navigation
+      optional: true
+      notes: 'Held only to carry back: ADM-419 needs it, ADM-419 opens this screen with it, and nothing
+        this screen reads has a cell id (`Tenant` has `cellHost`) (r13, CHG-RCR33-001).'
   notes: '**One vocabulary 4 October 2026: ModuleListing.moduleCode, LicencePosition.licensedModules[].moduleKey
     and ModuleEnablement.moduleKey all hold ModuleKey values (the contract is asked to type the first
     two as ModuleKey, ledger). Activate is enabled for a module only when it is licensed and every module

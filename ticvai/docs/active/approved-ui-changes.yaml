@@ -778,3 +778,11 @@ changes:
     frame (wireframes/P01 Guest Web.dc.html#web-022, Summit Peaks -> Annual pass / membership) draws a page with nothing to choose leaving the basket empty and Continue off; the record is
     brought in line with it, and what the client sees does not change.'
   change: CHG-CR482-001
+- screen: EMP-002
+  field: 'region:collection'
+  to: ac43a2f7dc55c2e2
+  approval: 'The lead''s decision of 20 October 2026 on R8 blocker cause IDENTITY-C45 (CHG-R8SPN-032; "take the
+    recommendation, option A: chosen; a role held at two venues shows two cards"), whose entry says "the card gains the
+    venue name" and left that to the surface: each role card shows its grant''s venue (RoleSummary.scope.name) beside
+    the role''s name; nothing else on the card or the screen changes.'
+  change: CHG-RCR31-001

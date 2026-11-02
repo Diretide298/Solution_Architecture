@@ -1,0 +1,48 @@
+id: CHG-RCR35-001
+date: '2026-11-02'
+source: audit
+kind: spec
+summary: 'CR-193''s rule for BO-1144 (bind each field to the contract as it stands, send nothing for a field with no
+  property) is carried to BO-1088 and BO-881. BO-1088''s fifteen credit kinds bind CreditType.category (one value each)
+  and its code, name, monetary, transferable, refundable, expires, ledger account and priority fields their CreditType
+  properties; the seven fields with no property are named as sending nothing. BO-881''s limits bind their
+  StaffingRules properties and Approval required binds overtime.requiresApproval; the two standard-hours fields send
+  nothing. Both records say no control on the approved layout sends their write and that the developer adds it under
+  the lead''s rule of 28 October 2026 with a "Design change:" CR; BO-881''s save sends back the minimumCover it read,
+  so it cannot erase minimum staffing while Q13 is open. Bindings only: no approved screen changes.'
+decision:
+  what: 'The lead, 2 November 2026, on the root-cause re-check: fix the mechanical roots in parallel with the r13 build
+    lanes ("lets see if we can do something in parallel"; "yes"). Root R35, its mechanical part. Left for the lead:
+    BO-291''s channel switches (review question Q14), what setStaffingRules does with an absent minimumCover and
+    whether BO-881 and BO-885 send If-Match (Q13).'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Review root R35 of the Block A developer pull (findings 2.36206.1, 2.37057.1, 2.29883.2, 2.29883.3, 2.29883.6):
+  setup screens drawn from client workshop boards had fields bound to nothing and no control calling their operation,
+  the defect ADAM CR-193 settled for BO-1144 and never carried to its class. Blocked tickets: #36206
+  APP-SETUP-BO-1088, #37057 APP-SETUP-BO-881, #29883 VM-BO-291 (left for the lead, Q14).'
+keys_touched:
+  screens: [BO-1088, BO-881]
+  schemas: [CreditType, StaffingRules]
+  files:
+  - screens/P08-venue-back-office.yaml
+root_class: 'setup-screen binding gap: a workshop board''s fields carried as labels, with no property and no write'
+tickets:
+  started: []
+  unstarted:
+  - '36206 BO-1088 (Pallavi Sawant): bind the fields as the record says; add Create credit type and Save, logged as a
+    "Design change:" CR.'
+  - '37057 BO-881 (Pallavi Sawant): bind the fields as the record says; add Save (sends the read minimumCover back
+    unchanged), logged as a "Design change:" CR; Q13 may change what it sends.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: 'none: r13 root-cause re-check, root R35'
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py (the bound counts only fall back if a binding is removed; BO-1088 and BO-881 now
+    count bound)
+status: open
+notes: 'The proposed rule (a setup screen whose fields bind 0 of N fails) was measured and not added: it finds 413
+  workshop-board screens, 7 of them in Block A (BO-161, BO-291, ADM-071, ADM-259, ADM-269, CMS-021, CMS-030), and it
+  could only gate by baselining them. The 7 are for the lead.'

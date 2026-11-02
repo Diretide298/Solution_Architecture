@@ -4689,7 +4689,6 @@ paths:
         - "P06 EMP-018 Offline package"
         - "P08 BO-011 Packages & Bundles"
         - "P08 BO-037 Offline Package Status"
-        - "P08 BO-094 Map Editor & Publish"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -5588,6 +5587,7 @@ paths:
         - "P05 KSK-004 Choose tickets"
         - "P05 KSK-005 Choose a performance"
         - "P05 KSK-015 Assistant"
+        - "P08 BO-015 Performance Calendar"
         - "P10 PTR-007 Availability Search"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -10266,7 +10266,6 @@ paths:
     get:
       operationId: listChannel2
       x-ticvai-consumed-by:
-        - "P08 ADM-268 Channel Operations Command Center"
         - "P08 ADM-277 AI Channel Optimization & Intelligence Center"
       x-ticvai-read-via:
       - query: tenancy#venueSettingsRecords

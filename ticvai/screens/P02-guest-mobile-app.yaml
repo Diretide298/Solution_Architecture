@@ -15057,8 +15057,10 @@ screens:
   - id: formVerifyGuestEmail
     component: modal
     trigger: Verify guest email
-    body: '**Collects what `verifyGuestEmail` sends before it is called.** Required: `mode`. Optional:
-      `token`. Dismissing sends nothing; the screen behind is unchanged.'
+    body: '**The six-digit code path, as the approved screen draws it.** Opening the form sends `mode`
+      `send`, which mails the code; the guest types the six digits and confirm sends `mode` `code` with
+      `code` (`^[0-9]{6}$`). `token` is the emailed-link path, which this screen does not use. Dismissing
+      sends nothing more; the screen behind is unchanged (r13, CHG-RCR33-001).'
     confirm:
       label: Verify guest email
       operation: verifyGuestEmail
@@ -15066,7 +15068,7 @@ screens:
       label: Cancel
       discards:
       - mode
-      - token
+      - code
     provenance: client-verified
   - id: formEnrolMfaMethod
     component: modal

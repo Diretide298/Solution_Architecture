@@ -6298,7 +6298,7 @@ screens:
         label: Approve
         operation: approvePartnerStatuLifecycle
         provenance: contract operation approvePartnerStatuLifecycle
-        permission: Approve
+        permission: PLATFORM_CELL_MANAGE
       - kind: banner
         label: Permissions this screen separates
         notes: '**The pack separates these permissions and no action on the screen claims them yet:**
