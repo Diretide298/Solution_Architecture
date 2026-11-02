@@ -12,8 +12,8 @@ decision:
     needs no decision of the lead is done here; the rest is brought to the lead.'
   by: Chinmay
   date: '2026-11-02'
-why: 'Developer review root R40 (findings 2.37015.1, 5.27779.1, 4.37054.3; tickets #37015, #27779, #37054): fields an operation
-  takes or promises had no column. Each text already said the value is kept.'
+why: 'Developer review root R40 (finding 2.37015.1, with 5.27779.1 and 4.37054.3; tickets #37015, #27779, #37054): fields
+  an operation takes or promises had no column. Each text already said the value is kept.'
 keys_touched:
   operations:
   - resolveCalledWaitingGuest
