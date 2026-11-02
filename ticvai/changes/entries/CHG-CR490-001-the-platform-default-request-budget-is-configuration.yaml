@@ -1,0 +1,51 @@
+id: CHG-CR490-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'The platform-default request budget is one PlanRequestLimits held as per-cell configuration under
+  RequestLimits:Tenant:PlatformDefault, not computed from a sizing tier. tenantRequestLimits states the effective
+  limits: the current contract''s plan''s requestLimits per audience, else the default''s; the share figures the same,
+  else 25 and 70; no current contract (or an unknown tenant) or a null requestLimits takes the default in full; burst
+  2 and 10 seconds unless configured; an audience missing from both has no tenant budget. PlanRequestLimits and
+  ADR-0064 item 1 say the same. No column and no sizing tier are added.'
+decision:
+  what: 'Posted on #27693 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the
+    NEw CRs in the r13" of 3 November 2026: "the platform default is one PlanRequestLimits held as per-cell
+    configuration, not computed from a sizing tier. Build now: tenantRequestLimits reads the plan on the tenant''s
+    current contract (control.contract in force today). For each audience (guest, staff, service, partner), the budget
+    is the plan''s requestLimits value for that audience when it has one, else the default''s value for that audience
+    ... The default is the configuration key RequestLimits:Tenant:PlatformDefault, shaped as PlanRequestLimits ...
+    While the key is absent or an audience is missing from it, that audience has no tenant budget ... Keep the
+    TODO(TICV-27693) marker, now pointing at the configuration key. Add no column and no sizing tier. The figures go in
+    when the lead sets them; recalibration after the benchmark changes configuration only."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-490 (Pranay Shinde, #27693 per-tenant request budgets): ADR-0064 and PlanRequestLimits started the
+  platform default at twice the tenant''s expected peak from its sizing tier, but no tenant records a sizing tier and
+  handoff/sizing.json gives whole-venue peaks, not per-audience rates, so the default had no figure.'
+keys_touched:
+  schemas: [PlanRequestLimits]
+  files:
+  - contracts/satellite/subscription.yaml
+  - docs/adr/0064-per-tenant-limits.md
+  - tools/check-business-rules.py
+  other:
+  - 'query subscription#tenantRequestLimits (its rule)'
+root_class: 'a default the contract promises with no source for its figures'
+tickets:
+  started: []
+  unstarted:
+  - '27693 (KERNEL-TENANT-LIMITS, Pranay Shinde, New): build to the posted comment; keep TODO(TICV-27693) pointing at
+    RequestLimits:Tenant:PlatformDefault.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-490
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-TENANT-LIMITS-DEFAULT
+status: open
+notes: 'Not touched (a plan file): docs/active/block-a-extra-tasks.json KERNEL-TENANT-LIMITS still says it asks
+  subscription#tenantRequestLimits with no word of the configuration key; the integration''s plan pass carries the
+  key and the GET route (CR-491) into its text. Beyond the posted words: an unknown tenant id is answered as a tenant
+  with no current contract (CR-491''s words, stated on the rule too).'

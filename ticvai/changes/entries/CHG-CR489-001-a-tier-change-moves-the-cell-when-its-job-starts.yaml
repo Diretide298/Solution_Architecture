@@ -1,0 +1,60 @@
+id: CHG-CR489-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'A tier change moves the cell to migrating when its job starts, not when it is asked for. updateCellTier writes
+  one control.cell_job row (tierMigration, queued, targetTier, scheduledFor or now) and answers 202 with it, leaving
+  control.cell.status alone, so the cell stays active and takes applyMigration until the job starts; a cell with a
+  tierMigration job already queued or running is 409 tier-change-pending. states/cell.yaml: active to migrating for a
+  tier change is a job transition (no longer updateCellTier''s); states/cell-job.yaml gains queued to failed, for a
+  cell suspended, decommissioning or failed when the job would start. The cell job runner (x-ticvai-jobs.cellJobRunner,
+  the plan''s JOB-SUBSCRIPTION-CELL-JOB-RUNNER task) makes both moves and names updateCellTier in reliesOn.'
+decision:
+  what: 'Posted on #31357 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the
+    NEw CRs in the r13" of 3 November 2026: "a tier change moves the cell to migrating when its job starts, not when it
+    is requested. Build now: updateCellTier, after its checks, writes one control.cell_job row (kind tierMigration,
+    status queued, target_tier, scheduled_for = scheduledFor, or now when it is absent or in the past) and answers 202
+    with that CellJob. It does not change control.cell.status ... If the cell already has a tierMigration job that is
+    queued or running, answer 409 tier-change-pending and write nothing ... Starting the job (built under the new
+    cell-job runner task) ... if the cell is active, set it to migrating and the job to running. If the cell is
+    migrating for another job, leave this job queued and try again later. If the cell is suspended, decommissioning or
+    failed, set the job to failed, with error naming the cell''s status ... states/cell.yaml will later read: active to
+    migrating, trigger job, when a tierMigration job starts."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-489 (Pranay Shinde, #31357 updateCellTier): the contract said the cell is migrating while the job runs,
+  but states/cell.yaml moved it at the request, and #31357''s build sheet lists control.cell_job as its only write; a
+  future scheduledFor would have blocked applyMigration and decommissionCell on the cell until the date.'
+keys_touched:
+  operations: [updateCellTier]
+  tables: [control.cell, control.cell_job]
+  files:
+  - contracts/satellite/subscription.yaml
+  - states/cell.yaml
+  - states/cell-job.yaml
+  - tools/check-business-rules.py
+  other:
+  - 'x-ticvai-jobs subscription#cellJobRunner (moves cell active -> migrating and cell-job queued -> failed)'
+root_class: 'a state model and an operation that disagree on which step moves the record'
+tickets:
+  started: []
+  unstarted:
+  - '31357 (updateCellTier, Pranay Shinde, New): build to the posted comment; the job stays queued until the runner
+    exists, and listCellJobs shows it.'
+  - 'JOB-SUBSCRIPTION-CELL-JOB-RUNNER (the plan''s r13 task for x-ticvai-jobs.cellJobRunner, CHG-R13JOB-001): starts a
+    queued job once scheduledFor has passed, as updateCellTier says.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-489
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-CELL-TIER-JOB
+status: open
+notes: 'Beyond the posted words, for the lead: (1) the "new cell-job runner task" is the task the r13 jobs lane already
+  plans for x-ticvai-jobs.cellJobRunner (JOB-SUBSCRIPTION-CELL-JOB-RUNNER), not a second one under #31357. The runner
+  now lists updateCellTier in reliesOn (check-jobs J-HANDOFF requires it of an operation that hands a job work), so
+  at the release #31357 gets a follows link to the runner task, though the posted words let #31357 ship first with
+  the job staying queued. (2) The 409 tier-change-pending check is stated after
+  tier-unchanged ("after its checks"). (3) states/cell-job.yaml gains queued -> failed, the move "set the job to failed"
+  makes from a queued job.'

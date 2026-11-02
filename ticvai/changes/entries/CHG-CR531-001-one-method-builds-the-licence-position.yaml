@@ -1,0 +1,50 @@
+id: CHG-CR531-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'One combining method in the platform service builds LicencePosition, and getTenantLicences, addLicenceAddOn
+  and removeLicenceAddOn answer through it: the current contract (latest start date, then greatest id) gives planId and
+  the limits; licensedModules one entry per moduleKey, sorted, plan before add-on, core always (plan, no validTo),
+  poweredByRemoval like any add-on, displayName empty; limits per metric in UsageMetric order, null if any row is
+  unlimited, else the plan''s figure (0 when absent) plus every add-on''s, overage from one row (the plan''s, else the
+  latest add-on''s) with that row''s own currency. The limits no longer come from control.tenant.plan_id.'
+decision:
+  what: 'Posted on #30838 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the
+    NEw CRs in the r13" of 3 November 2026: "Build now: one combining method in the platform service builds
+    LicencePosition. getTenantLicences, addLicenceAddOn and removeLicenceAddOn all answer through it ... The current
+    contract is the in-force contract with the latest start date; on a tie, the greatest id ... limits has one
+    EntitlementLimit per metric, taken from the current contract''s plan version (control.plan_limit) and every
+    in-force add-on''s control.licence_add_on_limit rows ... The price carries that row''s own currency_code (CR-202)
+    ... Any later change to this rule is a change to this one method and its tests."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-531 (Sanket Keluskar, #30838 getTenantLicences): LicencePosition said only "union of plan modules and
+  add-ons", with one planId, and its limits came from control.tenant.plan_id beside CR-449''s in-force contract rule
+  for the modules (CHG-CR449-001''s note left that to a follow-up).'
+keys_touched:
+  operations: [getTenantLicences, addLicenceAddOn, removeLicenceAddOn]
+  schemas: [LicencePosition]
+  tables: [control.contract, control.plan_module, control.plan_limit, control.licence_add_on,
+           control.licence_add_on_limit]
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: 'one answer built from two sources with no combining rule'
+tickets:
+  started: []
+  unstarted:
+  - '30838 (getTenantLicences), 30837 (addLicenceAddOn), Sanket Keluskar, New; 31277 (removeLicenceAddOn), Narayan
+    Gaonkar, New: one combining method, built once (on #30838) and used by the other two.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-531
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-LICENCE-COMBINE
+status: open
+notes: 'Beyond the posted words, for the lead: (1) control.plan_limit and control.licence_add_on_limit hold no
+  currency_code of their own; "that row''s own currency_code (CR-202)" is written as "that row''s own currency", the
+  currency_code of the plan version or add-on the row belongs to. (2) removeLicenceAddOn''s read of control.tenant is
+  now for the cell address it asks getModuleEnablement at, not the plan; getTenantLicences declares its reads of
+  control.contract, control.licence_add_on and control.licence_add_on_limit.'

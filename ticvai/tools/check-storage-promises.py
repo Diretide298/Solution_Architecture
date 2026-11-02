@@ -324,10 +324,13 @@ def main() -> int:
                                          for x in grp}
                 break
         if "$ref" in r409:
-            # the shared `DuplicateCode` 409 is a uniqueness promise too: some field must carry the marker
+            # the shared `DuplicateCode` 409 is a uniqueness promise too: some field must carry the marker, or be one
+            # the resource keeps unique together with another (ADAM CR-510, CHG-CR510-001: a plan's code is unique
+            # with its version, `x-ticvai-unique-together: [[code, version]]` on Plan)
             if g.ref_name(str(r409["$ref"])) == "DuplicateCode" \
                     and not any(isinstance(v, dict) and v.get("x-ticvai-unique")
-                                for v in list(props.values()) + list(rprops.values())):
+                                for v in list(props.values()) + list(rprops.values())) \
+                    and not (together & set(props)):
                 guard.add("SP-DUPLICATE-409", f"{oid}.duplicate-code",
                           f"{oid}: answers 409 DuplicateCode and no request field carries x-ticvai-unique")
             continue

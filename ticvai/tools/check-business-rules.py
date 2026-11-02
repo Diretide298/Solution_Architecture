@@ -134,6 +134,12 @@ And one rule per decision:
                    venue limit's proposed default, enrolDevice's field rules, the anonymous cart, the tenant's settings
                    row, a nullable event field, a guest's own transfer and resend, the shift close, the queue event's
                    reads and the device host's idempotency store.
+  BR-CELL-TIER-ACTIVE, BR-CELL-TIER-JOB, BR-TENANT-LIMITS-DEFAULT, BR-TENANT-LIMITS-ROUTE, BR-PLAN-VERSIONS,
+  BR-MODULE-CATALOGUE-AUDIENCE, BR-MODULE-LISTING-UPSERT, BR-LICENCE-COMBINE, BR-ADDON-MODULE-KEY, BR-DOWNGRADE-CHECK
+                   (r13 second CR round, lane w5: ADAM CR-488 to CR-491, CR-510, CR-529 to CR-531, CR-535 and CR-541;
+                   CHG-CR488-001 to CHG-CR541-001): the cell tier change, the tenant request limits and their route,
+                   plan versions, the module catalogue and listing, the licence position and the downgrade check, as
+                   lane_w5_rules_r13 lists them.
   BR-WALLET-ETAG-VERSION (r11, ADAM CR-332 option A, CHG-CR332-001) WalletFundingRules and WalletRefundPolicy carry a
                    version (wallet.funding_rule.version, wallet.refund_policy.version); their GET and PUT send it as
                    ETag, and the PUT refuses a stale If-Match 412, the rule CR-257 chose for group bookings.
@@ -2815,6 +2821,7 @@ def main() -> int:
          in w13(lkm.get("description")), "lookupMerchandise does not state liveEffectivePrice's inputs (CR-478)")
     channel_rules_r13(need, op)
     lane_p_rules_r13(need, op, ops)
+    lane_w5_rules_r13(need, op, ops)
 
     total = sum(len(v) for v in errors.values())
     rules = ["BR-PARSE", "BR-STREAM", "BR-PAIR-REFUSAL", "BR-SPLIT", "BR-VISIT-PLAN", "BR-PO", "BR-PAY-LINK", "BR-REPORT-RUNS",
@@ -2859,7 +2866,7 @@ def main() -> int:
              "BR-FORM-LIVE-ACCEPTANCE", "BR-SEO-METADATA-STORE", "BR-CONFIG-DIFF-PRODUCTS", "BR-PREVIEW-READS-NOTHING",
              "BR-SHOP-DROP-ORDER-LINES", "BR-MERCH-LIVE-PRICE",
              "BR-R13-UPSERT-KEY", "BR-R13-WALLET-TRANSFER-ETAG", "BR-R13-GUEST-ROWS", "BR-R13-REPRINT-GUEST",
-             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES
+             "BR-R13-WRITES-LISTED", "BR-R13-READS-DECLARED", "BR-R13-FIELDS-KEPT", "BR-R13-ONE-RULE"] + LANE_Q_R13_RULES + LANE_W2_R13_RULES + R13_O_RULES + R13_LANE_P_RULES + R13_W5_RULES
     for r in rules:
         print(f"  {r:18} {len(errors.get(r, [])):3d}")
         for m in errors.get(r, [])[:12]:
@@ -3872,6 +3879,195 @@ def lane_w2_rules_r13(need, op):
          and "The key is saved before printing" in td and "never sent to the printer again" in td,
          "the device host does not keep its Idempotency-Keys in files saved before printing, with the 409 and the "
          "restart rule (CR-527)")
+R13_W5_RULES = ["BR-CELL-TIER-ACTIVE", "BR-CELL-TIER-JOB", "BR-TENANT-LIMITS-DEFAULT", "BR-TENANT-LIMITS-ROUTE",
+                "BR-PLAN-VERSIONS", "BR-MODULE-CATALOGUE-AUDIENCE", "BR-MODULE-LISTING-UPSERT", "BR-LICENCE-COMBINE",
+                "BR-ADDON-MODULE-KEY", "BR-DOWNGRADE-CHECK"]
+
+
+def lane_w5_rules_r13(need, op, ops):
+    """r13 second CR round, lane w5 (ADAM CR-488, CR-489, CR-490, CR-491, CR-510, CR-529, CR-530, CR-531, CR-535,
+    CR-541; posted 3 November 2026 under the lead's "Close the CRs and respond to devs" and "get the NEw CRs in the
+    r13"). Each fails on the r13 candidate f599f2c6.
+
+      BR-CELL-TIER-ACTIVE          (CR-488) updateCellTier refuses a cell that is not active, 409 cell-not-active, before
+                                   any other check.
+      BR-CELL-TIER-JOB             (CR-489) updateCellTier queues a tierMigration job and leaves control.cell alone; a
+                                   second one is 409 tier-change-pending; the cell becomes migrating when the job starts
+                                   (states/cell.yaml, a job transition the cell job runner makes), and a job whose cell
+                                   cannot take it fails from queued.
+      BR-TENANT-LIMITS-DEFAULT     (CR-490) the platform default is the configuration key
+                                   RequestLimits:Tenant:PlatformDefault, filled audience by audience, not a sizing tier.
+      BR-TENANT-LIMITS-ROUTE       (CR-491) tenantRequestLimits is served as getTenantRequestLimits, GET
+                                   /internal/tenant-request-limits?tenantId=, serviceAuth, 200 PlanRequestLimits, 400, 401.
+      BR-PLAN-VERSIONS             (CR-510) versions numbered 1, 2, 3, the newest active; one currency per version; 400s
+                                   for currency, duplicates and a changed code; 404 on createPlanVersion; control.plan
+                                   unique on (lower(code), version), plan_module and plan_limit unique per version.
+      BR-MODULE-CATALOGUE-AUDIENCE (CR-529) listModuleCatalogue stays public; non-staff see available and beta only;
+                                   staff keep PLATFORM_PLAN_MANAGE.
+      BR-MODULE-LISTING-UPSERT     (CR-530) setModuleListing is one upsert on lower(module_code) that keeps the row's id,
+                                   behind the unique key on ModuleListing.moduleCode.
+      BR-LICENCE-COMBINE           (CR-531) LicencePosition states the one combining method (current contract, source,
+                                   core, limits, overage row) and its limits are not control.tenant.plan_id's.
+      BR-ADDON-MODULE-KEY          (CR-535) addLicenceAddOn accepts a ModuleKey other than core, refuses anything else
+                                   400 and reads no control.module_listing.
+      BR-DOWNGRADE-CHECK           (CR-541) setSubscription asks white-label getModuleEnablement for the downgrade check,
+                                   answers 503 when the cell does not, and previewSubscriptionChange runs the same check.
+    """
+    def words(x):
+        return " ".join(str(x or "").split())
+
+    def ptypes(o_, code):
+        return set(((o_.get("responses") or {}).get(code) or {}).get("x-ticvai-problem-types") or [])
+
+    def tabs(o_, key):
+        return {str((r or {}).get("table")) for r in o_.get(key) or [] if isinstance(r, dict)}
+
+    sub = load("contracts/satellite/subscription.yaml")
+    sch = (sub.get("components") or {}).get("schemas") or {}
+
+    # BR-CELL-TIER-ACTIVE (CR-488)
+    uct = op("updateCellTier")[3]
+    ud = words(uct.get("description"))
+    need("BR-CELL-TIER-ACTIVE", "cell-not-active" in ptypes(uct, "409"),
+         "updateCellTier's 409 does not list cell-not-active (CR-488)")
+    need("BR-CELL-TIER-ACTIVE", "before any other check, a cell whose `status` is anything but `active`" in ud,
+         "updateCellTier does not refuse a cell that is not active before its other checks (CR-488)")
+
+    # BR-CELL-TIER-JOB (CR-489)
+    need("BR-CELL-TIER-JOB", "tier-change-pending" in ptypes(uct, "409"),
+         "updateCellTier's 409 does not list tier-change-pending (CR-489)")
+    need("BR-CELL-TIER-JOB", "It does not change `control.cell.status`" in ud and "A future `scheduledFor` is accepted" in ud,
+         "updateCellTier does not say the cell stays active until its job starts (CR-489)")
+    need("BR-CELL-TIER-JOB", tabs(uct, "x-ticvai-writes") == {"control.cell_job"},
+         "updateCellTier does not write control.cell_job alone (CR-489)")
+    cell = load("states/cell.yaml")
+    tier = [t for t in cell.get("transitions") or []
+            if t.get("from") == "active" and t.get("to") == "migrating" and "tier" in words(t.get("guard")).lower()]
+    need("BR-CELL-TIER-JOB", bool(tier) and all(t.get("trigger") == "job" and not t.get("operation") for t in tier),
+         "states/cell.yaml still moves the cell to migrating at updateCellTier, not when its job starts (CR-489)")
+    runner = ((sub.get("x-ticvai-jobs") or {}).get("cellJobRunner") or {}).get("moves") or []
+    for mv in ({"model": "cell", "from": "active", "to": "migrating"},
+               {"model": "cell-job", "from": "queued", "to": "failed"}):
+        need("BR-CELL-TIER-JOB", mv in runner, f"the cell job runner does not move {mv} (CR-489)")
+
+    # BR-TENANT-LIMITS-DEFAULT (CR-490)
+    trl = (sub.get("x-ticvai-queries") or {}).get("tenantRequestLimits") or {}
+    tr = words(trl.get("rule"))
+    for frag in ("`RequestLimits:Tenant:PlatformDefault`", "not computed from a sizing tier",
+                 "else the platform default's value for that audience", "the contract defaults of 25 and 70",
+                 "that audience has no tenant budget"):
+        need("BR-TENANT-LIMITS-DEFAULT", frag in tr, f"tenantRequestLimits does not state {frag!r} (CR-490)")
+    prl = words((sch.get("PlanRequestLimits") or {}).get("description"))
+    need("BR-TENANT-LIMITS-DEFAULT", "RequestLimits:Tenant:PlatformDefault" in prl and "expected peak" not in prl,
+         "PlanRequestLimits still takes the platform default from a sizing tier (CR-490)")
+    adr = words((ROOT / "docs/adr/0064-per-tenant-limits.md").read_text(encoding="utf-8"))
+    need("BR-TENANT-LIMITS-DEFAULT", "RequestLimits:Tenant:PlatformDefault" in adr,
+         "ADR-0064 does not name the platform default's configuration key (CR-490)")
+
+    # BR-TENANT-LIMITS-ROUTE (CR-491)
+    f_, path_, meth_, gtl, _d = op("getTenantRequestLimits")
+    need("BR-TENANT-LIMITS-ROUTE", path_ == "/internal/tenant-request-limits" and meth_ == "get"
+         and (gtl.get("security") or []) == [{"serviceAuth": []}] and gtl.get("x-ticvai-permission") is None,
+         "getTenantRequestLimits is not GET /internal/tenant-request-limits under serviceAuth alone (CR-491)")
+    tid = [p for p in gtl.get("parameters") or [] if isinstance(p, dict) and p.get("name") == "tenantId"]
+    need("BR-TENANT-LIMITS-ROUTE", bool(tid) and tid[0].get("in") == "query" and tid[0].get("required") is True
+         and (tid[0].get("schema") or {}).get("format") == "uuid",
+         "getTenantRequestLimits does not take tenantId as a required uuid query parameter (CR-491)")
+    rs = gtl.get("responses") or {}
+    need("BR-TENANT-LIMITS-ROUTE", {"200", "400", "401", "429"} <= set(rs) and "404" not in rs
+         and str(((((rs.get("200") or {}).get("content") or {}).get("application/json") or {}).get("schema") or {})
+                 .get("$ref", "")).endswith("/PlanRequestLimits"),
+         "getTenantRequestLimits does not answer 200 PlanRequestLimits, 400, 401 and 429, with no 404 (CR-491)")
+    need("BR-TENANT-LIMITS-ROUTE", trl.get("operation") == "getTenantRequestLimits",
+         "tenantRequestLimits does not name its operation getTenantRequestLimits (CR-491)")
+    need("BR-TENANT-LIMITS-ROUTE", "/queries/tenant-request-limits" not in (sub.get("paths") or {}),
+         "Platform still has a POST /queries/tenant-request-limits route (CR-491)")
+
+    # BR-PLAN-VERSIONS (CR-510)
+    cp, cpv = op("createPlan")[3], op("createPlanVersion")[3]
+    need("BR-PLAN-VERSIONS", {"plan-currency-mismatch", "duplicate-plan-module", "duplicate-limit-metric"}
+         <= ptypes(cp, "400"), "createPlan's 400 does not list the currency and duplicate refusals (CR-510)")
+    need("BR-PLAN-VERSIONS", {"plan-code-changed", "plan-currency-mismatch", "duplicate-plan-module",
+                              "duplicate-limit-metric"} <= ptypes(cpv, "400") and "404" in (cpv.get("responses") or {}),
+         "createPlanVersion does not answer 404 and the 400 refusals of CR-510")
+    cvd = words(cpv.get("description"))
+    for frag in ("FOR UPDATE", "the highest existing version compared as an integer, plus 1",
+                 "sets `isActive` false on every earlier version"):
+        need("BR-PLAN-VERSIONS", frag in cvd, f"createPlanVersion does not state {frag!r} (CR-510)")
+    need("BR-PLAN-VERSIONS", "version `1`" in words(cp.get("description")),
+         "createPlan does not write version 1 (CR-510)")
+    plan = sch.get("Plan") or {}
+    cpr = (sch.get("CreatePlanRequest") or {}).get("properties") or {}
+    need("BR-PLAN-VERSIONS", ["code", "version"] in (plan.get("x-ticvai-unique-together") or [])
+         and "x-ticvai-unique" not in (cpr.get("code") or {}),
+         "control.plan is not unique on (lower(code), version) in place of plan_code_uniq (CR-510)")
+    need("BR-PLAN-VERSIONS", ["plan_id", "plan_version", "licensed_module"]
+         in ((cpr.get("licensedModules") or {}).get("x-ticvai-unique-together") or [])
+         and ["plan_id", "plan_version", "metric"] in ((cpr.get("limits") or {}).get("x-ticvai-unique-together") or []),
+         "control.plan_module and control.plan_limit have no unique key per plan version (CR-510)")
+
+    # BR-MODULE-CATALOGUE-AUDIENCE (CR-529)
+    lmc = op("listModuleCatalogue")[3]
+    ld = words(lmc.get("description"))
+    need("BR-MODULE-CATALOGUE-AUDIENCE", lmc.get("x-ticvai-permission") == "PLATFORM_PLAN_MANAGE"
+         and lmc.get("x-ticvai-guest-callable") is True and {} in (lmc.get("security") or []),
+         "listModuleCatalogue is no longer a public read with PLATFORM_PLAN_MANAGE for staff (CR-529)")
+    need("BR-MODULE-CATALOGUE-AUDIENCE", "whose `status` is `available` or `beta`" in ld
+         and "with it, the call gets every row with its status" in ld,
+         "listModuleCatalogue does not say which listings non-staff and staff callers see (CR-529)")
+
+    # BR-MODULE-LISTING-UPSERT (CR-530)
+    sml = words(op("setModuleListing")[3].get("description"))
+    need("BR-MODULE-LISTING-UPSERT", "keeps the existing row's id" in sml and "no advisory lock" in sml
+         and "lower(module_code)" in sml,
+         "setModuleListing does not upsert on lower(module_code) keeping the row's id (CR-530)")
+    need("BR-MODULE-LISTING-UPSERT", ["moduleCode"] in ((sch.get("ModuleListing") or {})
+                                                        .get("x-ticvai-unique-together") or []),
+         "ModuleListing has no unique key on moduleCode (CR-530)")
+
+    # BR-LICENCE-COMBINE (CR-531)
+    lp = sch.get("LicencePosition") or {}
+    lpd = words(lp.get("description"))
+    for frag in ("One combining method", "the in-force contract with the latest start date; on a tie, the greatest id",
+                 "even if an add-on also covers it", "`core` is always listed with `source` `plan`",
+                 "`displayName` is left empty", "or 0 when the plan does not have the metric",
+                 "the row of the add-on with the latest `validFrom`"):
+        need("BR-LICENCE-COMBINE", frag in lpd, f"LicencePosition does not state {frag!r} (CR-531)")
+    need("BR-LICENCE-COMBINE", "control.tenant.plan_id" not in words(lp.get("x-ticvai-persistence")),
+         "LicencePosition's limits still come from control.tenant.plan_id (CR-531)")
+    for oid in ("getTenantLicences", "addLicenceAddOn", "removeLicenceAddOn"):
+        need("BR-LICENCE-COMBINE", "combining method" in words(op(oid)[3].get("description")),
+             f"{oid} does not answer through LicencePosition's one combining method (CR-531)")
+    need("BR-LICENCE-COMBINE", "control.tenant.plan_id" not in words(op("removeLicenceAddOn")[3]),
+         "removeLicenceAddOn still takes the limits from control.tenant.plan_id (CR-531)")
+
+    # BR-ADDON-MODULE-KEY (CR-535)
+    ala = op("addLicenceAddOn")[3]
+    ad = words(ala.get("description"))
+    need("BR-ADDON-MODULE-KEY", "not in the module listing" not in ad
+         and "is not a licence module key (`ModuleKey`; `core` excluded) is 400" in ad
+         and "before the lock is taken" in ad,
+         "addLicenceAddOn does not refuse a key that is not a licence module key (core excluded) before the lock "
+         "(CR-535)")
+    need("BR-ADDON-MODULE-KEY", "400" in (ala.get("responses") or {}),
+         "addLicenceAddOn declares no 400 (CR-535)")
+    need("BR-ADDON-MODULE-KEY", "control.module_listing" not in tabs(ala, "x-ticvai-reads"),
+         "addLicenceAddOn reads control.module_listing (CR-535)")
+
+    # BR-DOWNGRADE-CHECK (CR-541)
+    ss, psc = op("setSubscription")[3], op("previewSubscriptionChange")[3]
+    need("BR-DOWNGRADE-CHECK", "white-label.getModuleEnablement" in (ss.get("x-ticvai-calls") or [])
+         and "white-label.getModuleEnablement" in (psc.get("x-ticvai-calls") or []),
+         "setSubscription and previewSubscriptionChange do not declare the call to white-label getModuleEnablement "
+         "(CR-541)")
+    need("BR-DOWNGRADE-CHECK", "503" in (ss.get("responses") or {}),
+         "setSubscription declares no 503 for a cell that does not answer (CR-541)")
+    sd = words(ss.get("description"))
+    for frag in ("every in-force add-on (add-ons survive a plan change) and `core`", "plus every unexpired capacity pack",
+                 "as `getEntitlementUsage` works out `current`", "never decides on a guess"):
+        need("BR-DOWNGRADE-CHECK", frag in sd, f"setSubscription's downgrade check does not state {frag!r} (CR-541)")
+    need("BR-DOWNGRADE-CHECK", "the same check" in words(psc.get("description")),
+         "previewSubscriptionChange does not return the conflicts from setSubscription's check (CR-541)")
 
 
 if __name__ == "__main__":

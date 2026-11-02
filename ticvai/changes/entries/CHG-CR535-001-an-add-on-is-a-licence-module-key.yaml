@@ -1,0 +1,43 @@
+id: CHG-CR535-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'In addLicenceAddOn "the module listing" is the shared ModuleKey list, not control.module_listing: a moduleKey
+  is accepted only if it is a ModuleKey other than core (read from the generated type), and anything else (a
+  white-label feature key such as diningAndFnb, an unknown key, core) is 400 before the lock or the in-force check, with
+  nothing written; poweredByRemoval can be sold and makes poweredByRemovable true. The operation declares the 400 and
+  its description reads "a moduleKey that is not a licence module key (ModuleKey; core excluded) is 400".'
+decision:
+  what: 'Posted on #30837 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the
+    NEw CRs in the r13" of 3 November 2026: "Build now: in addLicenceAddOn, ''the module listing'' means the shared
+    module key list (ModuleKey in common.yaml), not the marketplace table control.module_listing. Accept a moduleKey
+    only if it is one of those values other than core ... Refuse anything else with 400 before taking the lock or
+    checking for an add-on already in force ... Read the allowed values from the generated ModuleKey type, not a copied
+    list. Do not read control.module_listing in this operation. poweredByRemoval can be sold ... The operation''s
+    description will be reworded to say ''a moduleKey that is not a licence module key (ModuleKey; core excluded) is
+    400''."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-535 (Sanket Keluskar, #30837 addLicenceAddOn): the description refused a key "not in the module listing",
+  which could mean control.module_listing (white-label feature codes, where poweredByRemoval can never be), while
+  LicenceAddOn.moduleKey is the shared licence vocabulary.'
+keys_touched:
+  operations: [addLicenceAddOn]
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: 'a description naming a list that two vocabularies could mean'
+tickets:
+  started: []
+  unstarted:
+  - '30837 (addLicenceAddOn, Sanket Keluskar, New): build to the posted comment.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-535
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-ADDON-MODULE-KEY
+status: open
+notes: 'Beyond the posted words, for the lead: the declared 400 names the shared problem type validation (the posted
+  comment names no type).'

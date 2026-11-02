@@ -1,0 +1,55 @@
+id: CHG-CR491-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'tenantRequestLimits is served as a declared internal route: Platform''s new operation getTenantRequestLimits,
+  GET /internal/tenant-request-limits?tenantId=<uuid>, serviceAuth only, audience service, no user permission; 200 the
+  tenant''s effective PlanRequestLimits (CR-490), the JSON value null when no budget applies; 400 when tenantId is
+  missing or not a uuid; 401; 429; an unknown tenant answers as one with no current contract, never 404. The query
+  names the operation (a rule question answering one object, as identity#verifySupervisorStepUp does), so CR-438''s
+  POST /queries/<name> rule for data reads does not apply to it.'
+decision:
+  what: 'Posted on #27693 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the
+    NEw CRs in the r13" of 3 November 2026: "tenantRequestLimits is served as a declared internal route, in the same
+    style as the identity service''s subject-biometrics route. Build now: in Platform, the operation
+    getTenantRequestLimits, GET /internal/tenant-request-limits?tenantId=<uuid>. Security is the service sign-in only
+    (serviceAuth), audience service, no user permission. 200 answers the tenant''s effective PlanRequestLimits as
+    decided on CR-490: the body is the JSON value null when no budget applies. 400 when tenantId is missing or not a
+    uuid. 401 without a valid service sign-in. 429 as usual. An unknown tenant id gets the same answer as a tenant with
+    no current contract, not 404. Replace POST /api/v1/queries/tenant-request-limits ... keep the 60-second per-tenant
+    cache and the refresh when the tenant''s contract changes plan."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-491 (Pranay Shinde, #27693): subscription#tenantRequestLimits was served: [service] with no route, so the
+  kernel middleware was built against a POST /queries/tenant-request-limits no contract declares. ADR-0055 rule 4: a
+  read across deployables goes through the owner''s published serviceAuth operation.'
+keys_touched:
+  operations: [getTenantRequestLimits]
+  tables: [control.contract, control.plan]
+  files:
+  - contracts/satellite/subscription.yaml
+  - docs/adr/0064-per-tenant-limits.md
+  - tools/check-business-rules.py
+  other:
+  - 'query subscription#tenantRequestLimits (operation: getTenantRequestLimits)'
+root_class: 'a query served on the service route with no declared route'
+tickets:
+  started:
+  - '37051 (service sign-in between deployables, Pranay Shinde, Ready for QA): nothing to change; the new route uses
+    the kernel''s service sign-in like the other internal routes.'
+  unstarted:
+  - '27693 (KERNEL-TENANT-LIMITS, Pranay Shinde, New): point TenantRequestLimitsRequest.Route and the middleware client
+    of the commerce, access and operations hosts at GET /internal/tenant-request-limits?tenantId=; keep the cache.'
+  - 'A new operation task for getTenantRequestLimits (PlatformService), for the plan pass.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-491
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-TENANT-LIMITS-ROUTE
+status: open
+notes: 'Beyond the posted words, for the lead: the route reads on the primary (x-ticvai-read-routing: primary) and
+  declares its reads of control.contract and control.plan. "The same style as the subject-biometrics route" is taken
+  as a declared serviceAuth route; that route itself became POST /queries/subject-biometric-records under CR-438, which
+  is for data reads, and getTenantRequestLimits keeps the GET the decision names.'

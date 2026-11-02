@@ -1,0 +1,43 @@
+id: CHG-CR529-001
+date: '2026-11-03'
+source: cr
+kind: contract
+summary: 'listModuleCatalogue stays a public read: a call with no token, a guest token or a prospect token needs no
+  permission and gets only the control.module_listing rows whose status is available or beta; a staff token is checked
+  against PLATFORM_PLAN_MANAGE (403 without it, as on every guest-callable operation) and gets every row with its
+  status. Order and fields unchanged; setModuleListing unchanged.'
+decision:
+  what: 'Posted on #30839 (Chinmay, 3 November 2026), under the lead''s "Close the CRs and respond to devs" and "get the
+    NEw CRs in the r13" of 3 November 2026: "listModuleCatalogue stays a public read; the permission applies to staff
+    callers, and non-staff callers see only listings a buyer can take. Build now (#30839): a call with no token, a
+    guest token or a prospect token needs no permission and is answered only the control.module_listing rows whose
+    status is available or beta. Rows that are deprecated, withdrawn or have no status are left out. A call with a
+    staff token is checked against PLATFORM_PLAN_MANAGE: without it the call gets 403 ... With it, the call gets every
+    row with its status. The order is unchanged (id descending), and each row still carries its status."'
+  by: Chinmay
+  date: '2026-11-03'
+why: 'ADAM CR-529 (Sanket Keluskar, #30839 listModuleCatalogue): a public read carried PLATFORM_PLAN_MANAGE and nothing
+  said which listings a visitor sees; CHG-GCF-003 makes a guest-callable operation''s permission the staff check.'
+keys_touched:
+  operations: [listModuleCatalogue]
+  tables: [control.module_listing]
+  files:
+  - contracts/satellite/subscription.yaml
+  - tools/check-business-rules.py
+root_class: 'a public read with no rule for which rows a non-staff caller sees'
+tickets:
+  started: []
+  unstarted:
+  - '30839 (listModuleCatalogue, Sanket Keluskar, New): build to the posted comment.'
+  - '28385 (module test, Subscription & Licensing 1 of 6): anonymous, guest and prospect see available and beta only;
+    staff with the permission see all four; staff without it get 403.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-529
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py::BR-MODULE-CATALOGUE-AUDIENCE
+status: open
+notes: 'No screen changes: SGN-013 and the other sign-up screens still show each row''s status; an approved screen
+  shows fewer rows to a visitor, not a different design.'

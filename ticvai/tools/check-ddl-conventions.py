@@ -408,6 +408,11 @@ def _exact_props(by: dict) -> set:
                 m = re.match(r"^(?:Create|Update)(\w+)Request$", name)
                 if m:
                     exact.add(f"{stem}.{m.group(1)}.{p}")
+                # an array property's exact unique key names its child table's item columns (ADAM CR-510)
+                if spec.get("type") == "array":
+                    for grp in spec.get("x-ticvai-unique-together") or []:
+                        for k in grp if isinstance(grp, list) else []:
+                            exact.add(f"{stem}.{name}.{p}[].{k}")
     return exact
 
 
