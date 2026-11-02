@@ -1,0 +1,32 @@
+id: CHG-R13INT-007
+date: '2026-11-02'
+source: audit
+kind: process
+summary: 'check-schema-drift judges the "function changed" review row derive-ddl writes for a function a policy or trigger
+  depends on (ADAM CR-483''s session function, written by hand in #37214): done once the target''s definition is the
+  package''s, else open; before, the kind had no judging rule and the check failed on it.'
+decision:
+  what: 'The r13 integration gate (refresh-safe on fix/r13-integration, 2 November 2026): fix every new finding at its
+    source, never by baselining, acknowledging or exempting. ADAM CR-483 (lane q, CHG-CR483-001) changed the body of a
+    function the forward file cannot replace, so tools/ddl_forward.py lists it for a person in handoff/migration-review.md.'
+  by: Chinmay
+  date: '2026-11-02'
+why: 'Finding (ADAM CR-483), check-schema-drift on fix/r13-integration: "handoff/migration-review.md: kinds with no judging
+  rule here: function changed".'
+keys_touched:
+  files:
+  - tools/check-schema-drift.py
+root_class: a review kind the DDL generator writes that the drift check has no rule for
+tickets:
+  started: []
+  unstarted:
+  - '#37214 (CR483-DB-END-PRINCIPAL-SESSIONS, New as made): unchanged; the drift report now says whether a database has
+    its function.'
+release_tag: pending
+decision_owner: Chinmay
+adam_cr: CR-483
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-schema-drift.py::judge_review
+status: open
